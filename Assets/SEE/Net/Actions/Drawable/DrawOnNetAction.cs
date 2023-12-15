@@ -1,6 +1,5 @@
-﻿using Assets.SEE.Game.Drawable;
-using SEE.Game.Drawable;
-using static Assets.SEE.Game.Drawable.GameDrawer;
+﻿using SEE.Game.Drawable;
+using static SEE.Game.Drawable.GameDrawer;
 using SEE.Controls.Actions.Drawable;
 using UnityEngine;
 using SEE.Game.Drawable.Configurations;

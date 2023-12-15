@@ -1,10 +1,10 @@
+using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.ValueHolders;
+using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
-using SEE.Net.Actions.Drawable;
-using SEE.Game.Drawable.Configurations;
-using Assets.SEE.Game.Drawable;
-using SEE.Game.Drawable;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -22,66 +22,6 @@ namespace SEE.Controls.Actions.Drawable
         /// Bool to identifiy if the action is running.
         /// </summary>
         private bool isInAction = false;
-
-        /// <summary>
-        /// This method manages the player's interaction with the mode <see cref="ActionStateType.LayerChanger"/>.
-        /// </summary>
-        /// <returns>Whether this Action is finished</returns>
-        public override bool Update()
-        { 
-            if (!Raycasting.IsMouseOverGUI())
-            {
-                /// Increse block - it increses the order in layer of a game object on a drawable with a <see cref="OrderInLayerValueHolder"/> component.
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !isInAction &&
-                    Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                    GameFinder.hasDrawable(raycastHit.collider.gameObject) &&
-                    raycastHit.collider.gameObject.GetComponent<OrderInLayerValueHolder>() != null)
-                {
-                    isInAction = true;
-                    GameObject hittedObject = raycastHit.collider.gameObject;
-                    GameObject drawable = GameFinder.GetDrawable(hittedObject);
-
-                    int oldOrder = hittedObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
-                    int newOrder = oldOrder + 1;
-                    GameLayerChanger.Increase(hittedObject, newOrder);
-                    memento = new Memento(drawable, GameLayerChanger.LayerChangerStates.Increase,
-                                    hittedObject, hittedObject.name, oldOrder, newOrder);
-                    new LayerChangerNetAction(memento.drawable.ID, memento.drawable.ParentID,
-                        memento.obj.name, memento.state, memento.newOrder).Execute();
-                    currentState = ReversibleAction.Progress.InProgress;
-                }
-
-                /// Decrease block - it decreases the order in layer of a game object on a drawable with a <see cref="OrderInLayerValueHolder"/> component.
-                if ((Input.GetMouseButtonDown(1) || Input.GetMouseButton(1)) && !isInAction &&
-                    Raycasting.RaycastAnything(out RaycastHit raycastHit2) && GameFinder.hasDrawable(raycastHit2.collider.gameObject))
-                {
-                    isInAction = true;
-                    GameObject hittedObject = raycastHit2.collider.gameObject;
-                    GameObject drawable = GameFinder.GetDrawable(hittedObject);
-
-                    int oldOrder = hittedObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
-                    int newOrder = oldOrder - 1;
-                    newOrder = newOrder < 0 ? 0 : newOrder;
-                    GameLayerChanger.Decrease(hittedObject, newOrder);
-                    memento = new Memento(drawable, GameLayerChanger.LayerChangerStates.Decrease,
-                                hittedObject, hittedObject.name, oldOrder, newOrder);
-                    new LayerChangerNetAction(memento.drawable.ID, memento.drawable.ParentID,
-                        memento.obj.name, memento.state, memento.newOrder).Execute();
-                    currentState = ReversibleAction.Progress.InProgress;
-                }
-
-                /// The completes block. 
-                /// It completes the action after a layer changing, if the user releases the pressed mouse button.
-                if ((Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1) ) && isInAction)
-                {
-                    isInAction = false;
-                    currentState = ReversibleAction.Progress.Completed;
-                    return true;
-                }
-                return false;
-            }
-            return false;
-        }
 
         /// <summary>
         /// This struct can store all the information needed to revert or repeat a <see cref="LayerChangerAction"/>.
@@ -122,7 +62,8 @@ namespace SEE.Controls.Actions.Drawable
             /// <param name="id">The object id to save into this Memento</param>
             /// <param name="oldOrder">The old order in layer value to save into this Memento</param>
             /// <param name="newOrder">The new order in layer value to save into this Memento</param>
-            public Memento(GameObject drawable, GameLayerChanger.LayerChangerStates state, GameObject obj, string id, int oldOrder, int newOrder)
+            public Memento(GameObject drawable, GameLayerChanger.LayerChangerStates state, 
+                GameObject obj, string id, int oldOrder, int newOrder)
             {
                 this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
                 this.state = state;
@@ -131,6 +72,90 @@ namespace SEE.Controls.Actions.Drawable
                 this.oldOrder = oldOrder;
                 this.newOrder = newOrder;
             }
+        }
+
+        /// <summary>
+        /// This method manages the player's interaction with the mode <see cref="ActionStateType.LayerChanger"/>.
+        /// </summary>
+        /// <returns>Whether this Action is finished</returns>
+        public override bool Update()
+        { 
+            if (!Raycasting.IsMouseOverGUI())
+            {
+                /// Increse block
+                /// it increses the order in layer of a <see cref="DrawableType"/> object 
+                /// with a <see cref="OrderInLayerValueHolder"/> component.
+                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !isInAction 
+                    && Raycasting.RaycastAnything(out RaycastHit raycastHit) 
+                    && GameFinder.hasDrawable(raycastHit.collider.gameObject) 
+                    && raycastHit.collider.gameObject.GetComponent<OrderInLayerValueHolder>() != null)
+                {
+                    Increase(raycastHit.collider.gameObject);
+                }
+
+                /// Decrease block
+                /// it decreases the order in layer of a <see cref="DrawableType"/> object 
+                /// with a <see cref="OrderInLayerValueHolder"/> component.
+                if ((Input.GetMouseButtonDown(1) || Input.GetMouseButton(1)) && !isInAction 
+                    && Raycasting.RaycastAnything(out RaycastHit raycastHit2) 
+                    && GameFinder.hasDrawable(raycastHit2.collider.gameObject)
+                    && raycastHit2.collider.gameObject.GetComponent<OrderInLayerValueHolder>() != null)
+                {
+                    Decrease(raycastHit2.collider.gameObject);
+                }
+
+                /// The completes block. 
+                /// It completes the action after a layer changing, if the user releases the pressed mouse button.
+                if ((Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1) ) && isInAction)
+                {
+                    isInAction = false;
+                    currentState = ReversibleAction.Progress.Completed;
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Increases the order in layer by one. 
+        /// Additionally, a memento of this action is created, and the progress state is set to InProgress.
+        /// </summary>
+        /// <param name="hittedObject">The object to increase the order</param>
+        private void Increase(GameObject hittedObject)
+        {
+            isInAction = true;
+            GameObject drawable = GameFinder.GetDrawable(hittedObject);
+
+            int oldOrder = hittedObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
+            int newOrder = oldOrder + 1;
+            GameLayerChanger.Increase(hittedObject, newOrder);
+            memento = new Memento(drawable, GameLayerChanger.LayerChangerStates.Increase,
+                            hittedObject, hittedObject.name, oldOrder, newOrder);
+            new LayerChangerNetAction(memento.drawable.ID, memento.drawable.ParentID,
+                memento.obj.name, memento.state, memento.newOrder).Execute();
+            currentState = ReversibleAction.Progress.InProgress;
+        }
+
+        /// <summary>
+        /// Decreases the order in layer by one.
+        /// Additionally, a memento of this action is created, and the progress state is set to InProgress.
+        /// </summary>
+        /// <param name="hittedObject">The object to decrease the order.</param>
+        private void Decrease(GameObject hittedObject)
+        {
+            isInAction = true;
+            GameObject drawable = GameFinder.GetDrawable(hittedObject);
+
+            int oldOrder = hittedObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
+            int newOrder = oldOrder - 1;
+            newOrder = newOrder < 0 ? 0 : newOrder;
+            GameLayerChanger.Decrease(hittedObject, newOrder);
+            memento = new Memento(drawable, GameLayerChanger.LayerChangerStates.Decrease,
+                        hittedObject, hittedObject.name, oldOrder, newOrder);
+            new LayerChangerNetAction(memento.drawable.ID, memento.drawable.ParentID,
+                memento.obj.name, memento.state, memento.newOrder).Execute();
+            currentState = ReversibleAction.Progress.InProgress;
         }
 
         /// <summary>
@@ -148,12 +173,14 @@ namespace SEE.Controls.Actions.Drawable
                 case GameLayerChanger.LayerChangerStates.Increase:
                     GameLayerChanger.Decrease(memento.obj, memento.oldOrder);
                     new LayerChangerNetAction(memento.drawable.ID, memento.drawable.ParentID, 
-                        memento.obj.name, GameLayerChanger.LayerChangerStates.Decrease, memento.oldOrder).Execute();
+                        memento.obj.name, GameLayerChanger.LayerChangerStates.Decrease, 
+                        memento.oldOrder).Execute();
                     break;
                 case GameLayerChanger.LayerChangerStates.Decrease:
                     GameLayerChanger.Increase(memento.obj, memento.oldOrder);
                     new LayerChangerNetAction(memento.drawable.ID, memento.drawable.ParentID, 
-                        memento.obj.name, GameLayerChanger.LayerChangerStates.Increase, memento.oldOrder).Execute();
+                        memento.obj.name, GameLayerChanger.LayerChangerStates.Increase, 
+                        memento.oldOrder).Execute();
                     break;
             }
         }

@@ -15,7 +15,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// </summary>
         /// <param name="positions">The Vector3 array that holds the positions</param>
         /// <param name="hitPoint">The point from which the nearest points should be determinded.</param>
-        /// <returns>all the nearest (same) points from the array</returns>
+        /// <returns>the indices of all nearest (same) points from the array</returns>
         public static List<int> GetNearestIndices(Vector3[] positions, Vector3 hitPoint)
         {
             List<int> matchedIndices = new();
@@ -36,7 +36,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
-        /// Calculates the nearest point of a given point .
+        /// Calculates the nearest point of a given point.
         /// </summary>
         /// <param name="node">Contains the line renderer in child on that the nearest point 
         /// of the given point should be found.</param>

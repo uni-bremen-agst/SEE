@@ -1,6 +1,5 @@
-﻿using Assets.SEE.Game.UI.Drawable;
+﻿using SEE.Game.UI.Menu.Drawable;
 using SEE.Utils;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,25 +17,56 @@ namespace SEE.Game.Drawable.Configurations
         public Color[] Colors;
 
         /// <summary>
-        /// The labels for the eleven color presets boxes.
+        /// The label for the first color preset box.
         /// </summary>
         private const string ColorPresets0 = "ColorPresets0";
+        /// <summary>
+        /// The label for the second color preset box.
+        /// </summary>
         private const string ColorPresets1 = "ColorPresets1";
+        /// <summary>
+        /// The label for the third color preset box.
+        /// </summary>
         private const string ColorPresets2 = "ColorPresets2";
+        /// <summary>
+        /// The label for the fourth color preset box.
+        /// </summary>
         private const string ColorPresets3 = "ColorPresets3";
+        /// <summary>
+        /// The label for the fifth color preset box.
+        /// </summary>
         private const string ColorPresets4 = "ColorPresets4";
+        /// <summary>
+        /// The label for the sixth color preset box.
+        /// </summary>
         private const string ColorPresets5 = "ColorPresets5";
+        /// <summary>
+        /// The label for the seventh color preset box.
+        /// </summary>
         private const string ColorPresets6 = "ColorPresets6";
+        /// <summary>
+        /// The label for the eighth color preset box.
+        /// </summary>
         private const string ColorPresets7 = "ColorPresets7";
+        /// <summary>
+        /// The label for the ninth color preset box.
+        /// </summary>
         private const string ColorPresets8 = "ColorPresets8";
+        /// <summary>
+        /// The label for the tenth color preset box.
+        /// </summary>
         private const string ColorPresets9 = "ColorPresets9";
+        /// <summary>
+        /// The label for the eleventh color preset box.
+        /// </summary>
         private const string ColorPresets10 = "ColorPresets10";
 
         /// <summary>
         /// An array that holdes the eleven color presets labels. It is needed for iterating.
         /// </summary>
-        private string[] presets = { ColorPresets0, ColorPresets1, ColorPresets2, ColorPresets3,
-            ColorPresets4, ColorPresets5, ColorPresets6, ColorPresets7, ColorPresets8, ColorPresets9, ColorPresets10};
+        private string[] presets = { ColorPresets0, ColorPresets1, ColorPresets2, 
+            ColorPresets3, ColorPresets4, ColorPresets5, ColorPresets6, ColorPresets7, 
+            ColorPresets8, ColorPresets9, ColorPresets10};
 
         /// <summary>
         /// Writes this instances' attributes into the given <see cref="ConfigWriter"/>.
@@ -70,7 +100,8 @@ namespace SEE.Game.Drawable.Configurations
 
             if (Colors.Length == 0)
             {
-                Colors = LineMenu.instance.GetComponent<HSVPicker.ColorPicker>().Setup.DefaultPresetColors;
+                Colors = LineMenu.instance.GetComponent<HSVPicker.ColorPicker>()
+                    .Setup.DefaultPresetColors;
             }
         }
     }

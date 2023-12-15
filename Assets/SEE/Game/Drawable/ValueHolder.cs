@@ -1,12 +1,7 @@
-﻿using SEE.Game;
-using System;
-using System.Collections.Generic;
-using System.Xml;
-using UnityEditor.VersionControl;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem.HID;
 
-namespace Assets.SEE.Game.Drawable
+namespace SEE.Game.Drawable
 {
     /// <summary>
     /// This class holds the current values and the constants for drawables.
@@ -95,7 +90,7 @@ namespace Assets.SEE.Game.Drawable
         /// The prefix of a mind map branch line.
         /// </summary>
         public const string MindMapBranchLine = "BranchLine";
- 
+
         /// <summary>
         /// The prefix of a sticky notes.
         /// </summary>
@@ -173,6 +168,11 @@ namespace Assets.SEE.Game.Drawable
         public const float moveFast = 0.01f;
 
         /// <summary>
+        /// The initial scale for sticky notes.
+        /// </summary>
+        public static readonly Vector3 StickyNoteScale = new (0.5f, 0.5f, 0.5f);
+
+        /// <summary>
         /// The path to the folder drawable folder of the saved files. This is saved in a field because multiple
         /// methods of this class and other classes use it.
         /// </summary>
@@ -191,7 +191,7 @@ namespace Assets.SEE.Game.Drawable
         /// In addition to these objects, objects with the tag 'Drawable' are also suitable. 
         /// The respective Sticky Note should then adopt its rotation.
         /// </summary>
-        public static readonly List<string> SuitableObjectsForStickyNotes = new() { 
+        public static readonly List<string> SuitableObjectsForStickyNotes = new() {
             "Mirror",
         };
 
@@ -220,7 +220,7 @@ namespace Assets.SEE.Game.Drawable
         }
 
         /// <summary>
-        /// The constructor, it loads the default values for the current values.
+        /// The constructor, it sets the default values for the current values.
         /// </summary>
         static ValueHolder()
         {

@@ -1,21 +1,16 @@
-﻿using Assets.SEE.Game.UI.Drawable;
-using SEE.Controls.Actions;
+﻿using SEE.Game;
 using SEE.Game.Drawable;
-using SEE.Game;
-using SEE.Game.Drawable.Configurations;
-using SEE.Game.UI.Notification;
-using SEE.Utils;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
-using UnityEngine;
-using static Assets.SEE.Game.UI.Drawable.MindMapMenu;
-using Assets.SEE.Game.Drawable;
-using UnityEngine.UIElements;
-using SEE.Game.UI.PropertyDialog.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
-using UnityEngine.InputSystem.HID;
+using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.ValueHolders;
+using SEE.Game.UI.Menu.Drawable;
+using SEE.Game.UI.Notification;
+using SEE.Game.UI.PropertyDialog.Drawable;
 using SEE.Net.Actions.Drawable;
+using SEE.Utils;
+using System.Collections.Generic;
+using UnityEngine;
+using static SEE.Game.UI.Menu.Drawable.MindMapMenu;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -50,30 +45,37 @@ namespace SEE.Controls.Actions.Drawable
         /// The drawable of the chosen position.
         /// </summary>
         private GameObject drawable;
+
         /// <summary>
         /// The chosen position.
         /// </summary>
         private Vector3 position;
+
         /// <summary>
         /// The description for the mind map node.
         /// </summary>
         private string writtenText;
+
         /// <summary>
         /// The created mind map node;
         /// </summary>
         private GameObject node;
+
         /// <summary>
         /// The branch line to parent.
         /// </summary>
         private GameObject branchLine;
+
         /// <summary>
         /// Line renderer of the branch line.
         /// </summary>
         private LineRenderer branchLineRenderer;
+
         /// <summary>
         /// The write text dialog for getting the node description.
         /// </summary>
         private WriteEditTextDialog writeTextDialog;
+
         /// <summary>
         /// Saves all the information needed to revert or repeat this action.
         /// </summary>
@@ -148,7 +150,8 @@ namespace SEE.Controls.Actions.Drawable
                     case Operation.None:
                         if (Input.GetMouseButtonDown(0))
                         {
-                            ShowNotification.Info("Select an operation", "First you need to select an operation from the menu.");
+                            ShowNotification.Info("Select an operation", 
+                                "First you need to select an operation from the menu.");
                         }
                         break;
                     case Operation.Theme:
@@ -169,7 +172,8 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void ShowChangesFromMenu()
         {
-            if ((chosenOperation == Operation.Subtheme || chosenOperation == Operation.Leaf) && progress == ProgressState.SelectParent)
+            if ((chosenOperation == Operation.Subtheme || chosenOperation == Operation.Leaf) 
+                && progress == ProgressState.SelectParent)
             {
                 if (MindMapParentSelectionMenu.GetChosenParent() != null)
                 {
@@ -178,7 +182,8 @@ namespace SEE.Controls.Actions.Drawable
                         InverseTransformPoint(NearestPoints.GetNearestPoint(node,
                             MindMapParentSelectionMenu.GetChosenParent().transform.position));
                     positions[1] = GameFinder.GetHighestParent(node).transform.
-                        InverseTransformPoint(NearestPoints.GetNearestPoint(MindMapParentSelectionMenu.GetChosenParent(),
+                        InverseTransformPoint(NearestPoints.GetNearestPoint(
+                            MindMapParentSelectionMenu.GetChosenParent(),
                             node.transform.position));
                     branchLineRenderer.positionCount = 2;
                     branchLineRenderer.SetPositions(positions);
@@ -226,13 +231,16 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// Handles the position selection.
+        /// Checks using <see cref="CheckValid"/> whether it is a valid state. 
+        /// If so, the position is adopted, and it waits for the description for the node. 
+        /// Otherwise, the action is aborted and reset.
         /// </summary>
         /// <returns>the success of the selection.</returns>
         private bool SelectPosition()
         {
-            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
-                 Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                (GameFinder.hasDrawable(raycastHit.collider.gameObject)
+            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) 
+                && Raycasting.RaycastAnything(out RaycastHit raycastHit) 
+                && (GameFinder.hasDrawable(raycastHit.collider.gameObject)
                     || raycastHit.collider.gameObject.CompareTag(Tags.Drawable)))
             {
                 drawable = GameFinder.GetDrawable(raycastHit.collider.gameObject);
@@ -276,6 +284,7 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// This method handles the creation of the mind map node.
+        /// It creates the node, and if it is not a theme, the SelectParent section is initiated.
         /// </summary>
         private void AddNode()
         {
@@ -288,6 +297,7 @@ namespace SEE.Controls.Actions.Drawable
             else
             {
                 progress = ProgressState.SelectParent;
+                /// The following block is for a branch line preview.
                 branchLine = GameDrawer.StartDrawing(drawable, new Vector3[] { position },
                     GameDrawer.ColorKind.Monochrome, Color.black, Color.clear,
                     ValueHolder.standardLineThickness, GameDrawer.LineKind.Solid,
@@ -303,6 +313,8 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void SelectParent()
         {
+            /// This block is for the branch line preview.
+            /// It draws the line from the origin of the node to the position of the mouse cursor.
             if (!Input.GetMouseButton(0) && Raycasting.RaycastAnything(out RaycastHit raycast) &&
                (raycast.collider.gameObject.CompareTag(Tags.Drawable)
                   || GameFinder.hasDrawable(raycast.collider.gameObject)))
@@ -316,8 +328,12 @@ namespace SEE.Controls.Actions.Drawable
                 branchLineRenderer.SetPositions(positions);
             }
 
+            /// This block is for the selection of a parent node.
+            /// It will executed if the left mouse button will be clicked.
             if (Input.GetMouseButtonDown(0))
             {
+                /// A node can only be chosen as a parent node if it is a Theme or Subtheme Node. 
+                /// Additionally, the node must not choose itself.
                 if (Raycasting.RaycastAnything(out RaycastHit hit) &&
                    hit.collider.gameObject.CompareTag(Tags.MindMapNode) &&
                     (hit.collider.gameObject.name.StartsWith(ValueHolder.MindMapThemePrefix) ||
@@ -362,7 +378,8 @@ namespace SEE.Controls.Actions.Drawable
                 return true;
             }
 
-            if (attachedObjects != null && GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.MindMapNode).Count > 0)
+            if (attachedObjects != null && GameFinder.FindAllChildrenWithTag(attachedObjects, 
+                Tags.MindMapNode).Count > 0)
             {
                 return true;
             }
@@ -370,7 +387,6 @@ namespace SEE.Controls.Actions.Drawable
             {
                 ShowNotification.Warn("Can't add", "First you need to add a theme.");
             }
-
 
             return false;
         }
@@ -401,7 +417,9 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Reverts this action, i.e., it deletes the created mind map node.
+        /// Reverts this action, i.e., it deletes the created mind map node
+        /// and deletes it from the list of child nodes in the parent node, 
+        /// as well as the branch line to the parent node. 
         /// </summary>
         public override void Undo()
         {
@@ -414,12 +432,15 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     parent.GetComponent<MMNodeValueHolder>().RemoveChild(node);
                 }
-                new MindMapRemoveChildNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.conf).Execute();
+                new MindMapRemoveChildNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                    memento.conf).Execute();
                 GameObject branchToParent = GameFinder.FindChild(attached, memento.conf.branchLineToParent);
-                new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, branchToParent.name).Execute();
+                new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                    branchToParent.name).Execute();
                 Destroyer.Destroy(branchToParent);
             }
-            new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.conf.id).Execute();
+            new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                memento.conf.id).Execute();
             Destroyer.Destroy(node);
         }
 

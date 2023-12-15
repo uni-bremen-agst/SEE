@@ -1,5 +1,5 @@
-﻿using Assets.SEE.Game.Drawable;
-using Dissonance;
+﻿using Dissonance;
+using SEE.Game.Drawable;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections;

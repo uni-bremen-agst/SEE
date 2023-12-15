@@ -230,11 +230,11 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Writes <paramref name="label"/> and its <paramref name="value"/> to <see cref="stream"/>
+        /// Writes <paramref name="label"/> and its <paramref name="color"/> to <see cref="stream"/>
         /// as a composite value of its constituents (Red, Green, Blue, Alpha).
         /// </summary>
         /// <param name="label">label to be emitted</param>
-        /// <param name="value">value to be emitted</param>
+        /// <param name="color">value to be emitted</param>
         internal void Save(Color color, string label = "")
         {
             BeginGroup(label);
@@ -246,11 +246,11 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Writes <paramref name="label"/> and its <paramref name="value"/> to <see cref="stream"/>
-        /// as a composite value of its constituents (Red, Green, Blue, Alpha).
+        /// Writes <paramref name="label"/> and its <paramref name="vector"/> to <see cref="stream"/>
+        /// as a composite value of its constituents (X, Y, Z).
         /// </summary>
         /// <param name="label">label to be emitted</param>
-        /// <param name="value">value to be emitted</param>
+        /// <param name="vector">value to be emitted</param>
         internal void Save(Vector3 vector, string label = "")
         {
             BeginGroup(label);

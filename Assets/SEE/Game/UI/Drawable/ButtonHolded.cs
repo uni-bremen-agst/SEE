@@ -1,34 +1,37 @@
 ﻿using System.Collections;
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
-namespace Assets.SEE.Game.UI.Drawable
+namespace SEE.Game.UI.Drawable
 {
     /// <summary>
-    /// Component for hold a button pressed with a right click.
+    /// Component for hold a mouse button pressed.
+    /// It will used for some menu's.
+    /// 
     /// Inspired by Ahsanhabibrafy, Jul. 2020
     /// https://discussions.unity.com/t/how-to-make-the-button-respond-to-touch-and-hold-feature/213417/6
     /// </summary>
     public class ButtonHolded : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         /// <summary>
-        /// State of clicked the button with right click.
+        /// Status indicating whether the action should be repeatedly executed. 
+        /// This is the case as long as the selected mouse button is held down.
         /// </summary>
         private bool isPressed = false;
+
         /// <summary>
-        /// The action that will be executed.
+        /// The action that is executed on a holded mouse button.
         /// </summary>
         private UnityAction action;
 
         /// <summary>
-        /// Bool for hold left mouse click.
+        /// Bool state for hold left mouse click.
+        /// When this is activated, the left mouse button is considered for 
+        /// holding down instead of the right mouse button.
         /// </summary>
         private bool leftMouseClick;
-        
+
         /// <summary>
         /// Sets the action that should be executed when the right mouse button is pressed.
         /// </summary>
@@ -46,6 +49,8 @@ namespace Assets.SEE.Game.UI.Drawable
         public void OnPointerDown(PointerEventData data)
         {
             bool pressedRightButton = false;
+
+            /// Block for holding the left mouse button.
             if (leftMouseClick)
             {
                 if (data.button == PointerEventData.InputButton.Left)
@@ -54,13 +59,14 @@ namespace Assets.SEE.Game.UI.Drawable
                 }
             }
             else
-            {
+            { /// Block for holding the right mouse button.
                 if (data.button == PointerEventData.InputButton.Right)
                 {
                     pressedRightButton = true;
                 }
             }
 
+            /// Starts the loop that executes the action until the mouse button is released.
             if (pressedRightButton)
             {
                 isPressed = true;

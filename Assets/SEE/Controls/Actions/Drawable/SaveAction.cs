@@ -1,11 +1,9 @@
-﻿using Assets.SEE.Game.Drawable;
-using Assets.SEE.Game.UI.Drawable;
-using HighlightPlus;
-using Michsky.UI.ModernUIPack;
-using OpenAI.Files;
+﻿using HighlightPlus;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.UI.Drawable;
+using SEE.Game.UI.Menu.Drawable;
 using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Utils;
@@ -103,6 +101,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Awake()
         {
+            /// The button for save the selected drawables.
             UnityAction saveButtonCall = () =>
             {
                 if (browser == null || (browser != null && !browser.IsOpen()))
@@ -113,7 +112,10 @@ namespace SEE.Controls.Actions.Drawable
                         if (selectedDrawables.Count == 1)
                         {
                             browser.SaveDrawableConfiguration(SaveState.One);
-                            memento = new Memento(new DrawableConfig[] { DrawableConfigManager.GetDrawableConfig(selectedDrawables[0]) }, SaveState.One);
+                            memento = new Memento(new DrawableConfig[] 
+                            { 
+                                DrawableConfigManager.GetDrawableConfig(selectedDrawables[0]) 
+                            }, SaveState.One);
                         }
                         else 
                         {
@@ -132,6 +134,7 @@ namespace SEE.Controls.Actions.Drawable
                 }
             };
 
+            /// The button for save all drawables in the world.
             UnityAction saveAllButtonCall = () =>
             {
                 if (browser == null || (browser != null && !browser.IsOpen()))
@@ -161,38 +164,9 @@ namespace SEE.Controls.Actions.Drawable
             bool result = false;
 
             if (!Raycasting.IsMouseOverGUI())
-            { 
-                /// This block marks the selected drawable and adds it to a list. If it has already been selected, it is removed from the list, and the marking is cleared.
-                /// For execution, no open file browser should exist.
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
-                    && !clicked &&
-                    Raycasting.RaycastAnything(out RaycastHit hit) &&
-                    (GameFinder.hasDrawable(hit.collider.gameObject) || hit.collider.gameObject.CompareTag(Tags.Drawable))
-                    && (browser == null || (browser != null && !browser.IsOpen())))
-                {
-                    clicked = true;
-                    GameObject drawable = hit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                        hit.collider.gameObject : GameFinder.GetDrawable(hit.collider.gameObject);
-
-                    if (drawable.GetComponent<HighlightEffect>() == null)
-                    {
-                        selectedDrawables.Add(drawable);
-                        HighlightEffect effect = drawable.AddComponent<HighlightEffect>();
-                        effect.highlighted = true;
-                        effect.previewInEditor = false;
-                        effect.outline = 0;
-                        effect.glowQuality = HighlightPlus.QualityLevel.Highest;
-                        effect.glow = 1.0f;
-                        effect.glowHQColor = Color.yellow;
-                        effect.overlay = 1.0f;
-                        effect.overlayColor = Color.magenta;
-                    }
-                    else
-                    {
-                        Destroyer.Destroy(drawable.GetComponent<HighlightEffect>());
-                        selectedDrawables.Remove(drawable);
-                    }
-                }
+            {
+                /// Provides the selecting and deselecting of drawables for saving.
+                DrawableSelection();
 
                 /// Needed for select more drawables to save.
                 if (Input.GetMouseButtonUp(0))
@@ -204,31 +178,79 @@ namespace SEE.Controls.Actions.Drawable
                 /// It saves the selected drawable/drawables in the chosen file.
                 if (browser != null && browser.TryGetFilePath(out string filePath) && memento != null)
                 {
-                    switch (memento.savedState)
-                    {
-                        case SaveState.One:
-                            memento.filePath = new FilePath(filePath);
-                            DrawableConfigManager.SaveDrawable(memento.drawables[0].GetDrawable(), memento.filePath);
-                            currentState = ReversibleAction.Progress.Completed;
-                            result = true;
-                            break;
-                        case SaveState.More:
-                        case SaveState.All:
-                            memento.filePath = new FilePath(filePath);
-                            GameObject[] drawables = new GameObject[memento.drawables.Length];
-                            for (int i = 0; i < drawables.Length; i++)
-                            {
-                                drawables[i] = memento.drawables[i].GetDrawable();
-                            }
-                            DrawableConfigManager.SaveDrawables(drawables, memento.filePath);
-                            currentState = ReversibleAction.Progress.Completed;
-                            result = true;
-                            break;
-                    }
+                    Save(filePath, ref result);
                     browser = null;
                 }
             }
             return result;
+        }
+
+        /// <summary>
+        /// This block marks the selected drawable and adds it to a list. 
+        /// If it has already been selected, it is removed from the list, and the marking is cleared.
+        /// For execution, no open file browser should exist.
+        /// </summary>
+        private void DrawableSelection()
+        {
+            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
+                && !clicked && Raycasting.RaycastAnything(out RaycastHit hit)
+                && (GameFinder.hasDrawable(hit.collider.gameObject)
+                    || hit.collider.gameObject.CompareTag(Tags.Drawable))
+                && (browser == null || (browser != null && !browser.IsOpen())))
+            {
+                clicked = true;
+                GameObject drawable = hit.collider.gameObject.CompareTag(Tags.Drawable) ?
+                    hit.collider.gameObject : GameFinder.GetDrawable(hit.collider.gameObject);
+
+                if (drawable.GetComponent<HighlightEffect>() == null)
+                {
+                    selectedDrawables.Add(drawable);
+                    HighlightEffect effect = drawable.AddComponent<HighlightEffect>();
+                    effect.highlighted = true;
+                    effect.previewInEditor = false;
+                    effect.outline = 0;
+                    effect.glowQuality = HighlightPlus.QualityLevel.Highest;
+                    effect.glow = 1.0f;
+                    effect.glowHQColor = Color.yellow;
+                    effect.overlay = 1.0f;
+                    effect.overlayColor = Color.magenta;
+                }
+                else
+                {
+                    Destroyer.Destroy(drawable.GetComponent<HighlightEffect>());
+                    selectedDrawables.Remove(drawable);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Saves the drawable configurations to a file.
+        /// </summary>
+        /// <param name="filePath">The chosen file path, where the save file should be placed.</param>
+        /// <param name="result">The action state result.</param>
+        private void Save(string filePath, ref bool result)
+        {
+            switch (memento.savedState)
+            {
+                case SaveState.One:
+                    memento.filePath = new FilePath(filePath);
+                    DrawableConfigManager.SaveDrawable(memento.drawables[0].GetDrawable(), memento.filePath);
+                    currentState = ReversibleAction.Progress.Completed;
+                    result = true;
+                    break;
+                case SaveState.More:
+                case SaveState.All:
+                    memento.filePath = new FilePath(filePath);
+                    GameObject[] drawables = new GameObject[memento.drawables.Length];
+                    for (int i = 0; i < drawables.Length; i++)
+                    {
+                        drawables[i] = memento.drawables[i].GetDrawable();
+                    }
+                    DrawableConfigManager.SaveDrawables(drawables, memento.filePath);
+                    currentState = ReversibleAction.Progress.Completed;
+                    result = true;
+                    break;
+            }
         }
 
         /// <summary>

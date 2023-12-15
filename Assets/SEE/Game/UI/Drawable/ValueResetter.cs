@@ -1,11 +1,9 @@
-﻿using SEE.Controls.Actions.Drawable;
-using SEE.Controls.Actions;
-using SEE.Game;
-using System.Collections;
+﻿using SEE.Controls.Actions;
+using SEE.Controls.Actions.Drawable;
+using SEE.Game.Drawable.Configurations;
 using UnityEngine;
-using SEE.Utils;
 
-namespace Assets.SEE.Game.UI.Drawable
+namespace SEE.Game.UI.Drawable
 {
     /// <summary>
     /// This class ensures that the static attributes of an action will be resetted after a actionstate type change.
@@ -18,12 +16,12 @@ namespace Assets.SEE.Game.UI.Drawable
         private ActionStateType allowedState;
 
         /// <summary>
-        /// Metho to set the allowed state.
+        /// Sets the allowed state.
         /// </summary>
         /// <param name="state">the allowed state</param>
         public void SetAllowedState(ActionStateType state)
         {
-            this.allowedState = state;
+            allowedState = state;
         }
 
         /// <summary>
@@ -42,7 +40,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// If this component will be destroyed it calls the reset method for the
         /// appropriate action.
         /// The static attributes are needed in the actions to select a new 
-        /// drawable type object directly after the action.
+        /// <see cref="DrawableType"/> object directly after the action.
         /// </summary>
         private void OnDestroy()
         {

@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using SEE.Controls;
 using SEE.Game.UI.PropertyDialog.HolisticMetrics;
-using SEE.Game.UI.PropertyDialog;
-using SEE.Controls;
-using UnityEngine.Events;
+using UnityEngine;
 
 namespace SEE.Game.UI.PropertyDialog.Drawable
 {
@@ -49,13 +46,15 @@ namespace SEE.Game.UI.PropertyDialog.Drawable
 
             fileNameTextProperty = dialog.AddComponent<StringProperty>();
             fileNameTextProperty.Name = "Filename";
-            fileNameTextProperty.Description = "Insert a desired filename for the image to be saved. If the name is already in use, a suffix will be added.";
+            fileNameTextProperty.Description = "Insert a desired filename for the image to be saved. " +
+                "If the name is already in use, a suffix will be added.";
 
             group.AddProperty(fileNameTextProperty);
 
             propertyDialog = dialog.AddComponent<PropertyDialog>();
             propertyDialog.Title = "Download an image from web";
-            propertyDialog.Description = "Insert the http adress of the image and a desired filename; then hit OK button.";
+            propertyDialog.Description = "Insert the http adress of the image and a desired filename; " +
+                "then hit OK button.";
             propertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Document");
             propertyDialog.AddGroup(group);
 

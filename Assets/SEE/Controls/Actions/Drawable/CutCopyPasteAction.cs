@@ -1,9 +1,10 @@
-﻿using Assets.SEE.Game.Drawable;
-using Assets.SEE.Game.UI.Drawable;
-using Michsky.UI.ModernUIPack;
+﻿using Michsky.UI.ModernUIPack;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.ValueHolders;
+using SEE.Game.UI.Drawable;
+using SEE.Game.UI.Menu.Drawable;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
@@ -13,7 +14,7 @@ using UnityEngine;
 namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
-    /// This action provides the cut and copy functionality for drawable types.
+    /// This action provides the cut and copy functionality for a <see cref="DrawableType"/> object.
     /// </summary>
     public class CutCopyPasteAction : AbstractPlayerAction
     {

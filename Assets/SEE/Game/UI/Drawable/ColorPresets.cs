@@ -1,19 +1,18 @@
-﻿using Assets.SEE.Game.Drawable;
-using HSVPicker;
-using System.Collections;
+﻿using HSVPicker;
+using SEE.Game.Drawable;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace Assets.SEE.Game.UI.Drawable
+namespace SEE.Game.UI.Drawable
 {
-    // File from the hsvpicker packages
-    // https://github.com/judah4/HSV-Color-Picker-Unity/blob/master/Packages/com.judahperez.hsvcolorpicker/UI/ColorPresets.cs
-    // added methods for remove and change color. Also added load and save the color presets to a file.
-
     /// <summary>
     /// This class holds the presets and a image button to create new presets.
+    /// 
+    /// The file comes from the HSVPicker package.
+    /// https://github.com/judah4/HSV-Color-Picker-Unity/blob/master/Packages/com.judahperez.hsvcolorpicker/UI/ColorPresets.cs
+    /// It has been extended to include the functionality of removing and modifying colors, 
+    /// as well as loading and saving colors from the previous session.
     /// </summary>
     public class ColorPresets : MonoBehaviour
     {
@@ -46,7 +45,8 @@ namespace Assets.SEE.Game.UI.Drawable
         }
 
         /// <summary>
-        /// The start method loads the colors from the file, if the file exists. Otherwise it loads the default colors.
+        /// Loads the colors from the file, if the file exists. 
+        /// Otherwise it loads the default colors.
         /// It adds the OnColorsUpdate method to the ColorPresetList action onColorsUpdated.
         /// Then this method will be called with the given colors.
         /// </summary>
@@ -66,7 +66,8 @@ namespace Assets.SEE.Game.UI.Drawable
         }
 
         /// <summary>
-        /// With this method a preset box is assigned for each element of the passed color list. The preset box is made active and is assigned the respective color.
+        /// Assigns each color element from the <paramref name="colors"/> to a preset box. 
+        /// The respective preset box is made active and is assigned the respective color.
         /// Once the eleventh preset box has been assigned, the Create button will be hidden.
         /// In addition, each time this method is called, the list of color presets is saved to a file.
         /// </summary>
@@ -75,23 +76,27 @@ namespace Assets.SEE.Game.UI.Drawable
         {
             for (int cnt = 0; cnt < presets.Length; cnt++)
             {
+                /// Disables the unassigned presets.
                 if (colors.Count <= cnt)
                 {
                     presets[cnt].SetActive(false);
                     continue;
                 }
+                /// Enables the assigned preset and assigns colors to them.
                 presets[cnt].SetActive(true);
                 presets[cnt].GetComponent<Image>().color = colors[cnt];
 
             }
-
+            /// Enables the button for adding a color, or disables it if all eleven preset slots are filled.
             createPresetImage.gameObject.SetActive(colors.Count < presets.Length);
+
+            /// Saves the presets.
             ColorPresetsConfigManager.SaveColors(colors.ToArray());
         }
 
         /// <summary>
-        /// This method will be used from the create preset button in the line configuration menu.
-        /// It's add a new color to the list.
+        /// Add a new color to the list.
+        /// Will be used from the create preset button in the line configuration menu.
         /// </summary>
         public void CreatePresetButton()
         {
@@ -99,8 +104,8 @@ namespace Assets.SEE.Game.UI.Drawable
         }
 
         /// <summary>
-        /// This method will be used from the preset boxes in the line configuration menu.
-        /// It's select the chosen color to the color picker.
+        /// Assigns the chosen color to the color picker.
+        /// Will be used from the preset boxes in the line configuration menu.
         /// </summary>
         public void PresetSelect(Image sender)
         {
@@ -108,8 +113,8 @@ namespace Assets.SEE.Game.UI.Drawable
         }
 
         /// <summary>
-        /// This method will be used for the create preset button in the line configuration menu.
-        /// If the color picker changed his color, the create preset button get the same color.
+        /// Assigns the color picker color to the create preset button.
+        /// Will be used for the create preset button in the line configuration menu.
         /// </summary>
         private void ColorChanged(Color color)
         {
@@ -117,8 +122,7 @@ namespace Assets.SEE.Game.UI.Drawable
         }
 
         /// <summary>
-        /// This method will be used for the preset boxes in the line configuration menu.
-        /// It's removed the chosen color from the list.
+        /// Removes the chosen color from the list.
         /// </summary>
         public void RemoveColor(Image sender)
         {
@@ -126,8 +130,7 @@ namespace Assets.SEE.Game.UI.Drawable
         }
 
         /// <summary>
-        /// This method will be used for the preset boxes in the line configuration menu.
-        /// It's changed the chosen color from the list to the current color of the color picker.
+        /// Changes the chosen color from the list to the current color of the color picker.
         /// </summary>
         public void ChangeColor(int index)
         {

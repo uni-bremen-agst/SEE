@@ -84,15 +84,17 @@ namespace SEE.Utils
         protected const string AlphaLabel = "Alpha";
 
         /// <summary>
-        /// Label for the x coordinate of a vector3.
+        /// Label for the X coordinate of a Vector3.
         /// </summary>
         protected const string XLabel = "X";
+
         /// <summary>
-        /// Label for the y coordinate of a vector3.
+        /// Label for the Y coordinate of a Vector3.
         /// </summary>
         protected const string YLabel = "Y";
+
         /// <summary>
-        /// Label for the z coordinate of a vector3.
+        /// Label for the Z coordinate of a Vector3.
         /// </summary>
         protected const string ZLabel = "Z";
 

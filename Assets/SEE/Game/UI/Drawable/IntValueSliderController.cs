@@ -1,54 +1,90 @@
-using Assets.SEE.Game.Drawable;
 using Michsky.UI.ModernUIPack;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 
-public class IntValueSliderController : MonoBehaviour
+namespace SEE.Game.UI.Drawable
 {
-    private SliderManager manager;
-
-    private TMP_Text tmpText;
-
-    [Header("Event")]
-    public UnityEvent<int> onValueChanged = new UnityEvent<int>();
-
-    private void Awake()
+    /// <summary>
+    /// A controller for a slider that used a int value.
+    /// </summary>
+    public class IntValueSliderController : MonoBehaviour
     {
-        manager = GetComponentInChildren<SliderManager>();
-        tmpText = GetComponentsInChildren<TMP_Text>()[1];
-        tmpText.text = manager.mainSlider.value.ToString();
-        manager.mainSlider.onValueChanged.AddListener(SliderChanged);
-        manager.mainSlider.wholeNumbers = true;
-    }
+        /// <summary>
+        /// The slider manager. 
+        /// It contains the slider in manager.mainSlider.
+        /// When the value of the main slider changes (meaning the player moved the slider), the value
+        /// will be set to the value of this slider.
+        /// </summary>
+        private SliderManager manager;
 
-    private void OnDestroy()
-    {
-        manager.mainSlider.onValueChanged.RemoveListener(SliderChanged);
-    }
+        /// <summary>
+        /// The tmp text that show's the value of the slider.
+        /// </summary>
+        private TMP_Text tmpText;
 
-    private void SliderChanged(float newValue)
-    {
-        newValue = manager.mainSlider.value;
-        tmpText.text = ((int)newValue).ToString();
-        onValueChanged.Invoke((int)newValue);
-    }
+        /// <summary>
+        /// Action that is executed when the value of the slider changes.
+        /// </summary>
+        [Header("Event")]
+        public UnityEvent<int> onValueChanged = new();
 
-    public void AssignValue(int value)
-    {
-        tmpText.text = value.ToString();
-        manager.mainSlider.value = value;
-    }
-    public void ResetToMin()
-    {
-        manager.mainSlider.value = manager.mainSlider.minValue;
-    }
+        /// <summary>
+        /// Initializes the slider controller.
+        /// </summary>
+        private void Awake()
+        {
+            manager = GetComponentInChildren<SliderManager>();
+            tmpText = GetComponentsInChildren<TMP_Text>()[1];
+            tmpText.text = manager.mainSlider.value.ToString();
+            manager.mainSlider.onValueChanged.AddListener(SliderChanged);
+            manager.mainSlider.wholeNumbers = true;
+        }
 
-    public int GetValue()
-    {
-        return (int)manager.mainSlider.value;
+        /// <summary>
+        /// Removes the handler of the slider.
+        /// </summary>
+        private void OnDestroy()
+        {
+            manager.mainSlider.onValueChanged.RemoveListener(SliderChanged);
+        }
+
+        /// <summary>
+        /// Handler method for changing the slider value.
+        /// </summary>
+        /// <param name="newValue">the new selected value</param>
+        private void SliderChanged(float newValue)
+        {
+            newValue = manager.mainSlider.value;
+            tmpText.text = ((int)newValue).ToString();
+            onValueChanged.Invoke((int)newValue);
+        }
+
+        /// <summary>
+        /// Assigns a value to the slider and to the text.
+        /// </summary>
+        /// <param name="value">the value that should be assigned</param>
+        public void AssignValue(int value)
+        {
+            tmpText.text = value.ToString();
+            manager.mainSlider.value = value;
+        }
+
+        /// <summary>
+        /// Resets the slider to it's minimum.
+        /// </summary>
+        public void ResetToMin()
+        {
+            manager.mainSlider.value = manager.mainSlider.minValue;
+        }
+
+        /// <summary>
+        /// Get's the current value of the slider.
+        /// </summary>
+        /// <returns>the slider value.</returns>
+        public int GetValue()
+        {
+            return (int)manager.mainSlider.value;
+        }
     }
 }

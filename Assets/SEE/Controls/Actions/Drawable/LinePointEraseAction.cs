@@ -1,4 +1,3 @@
-using Assets.SEE.Game.Drawable;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
@@ -11,7 +10,7 @@ using UnityEngine;
 namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
-    /// This class provides an action to erase only some points of an line.
+    /// This class provides an action to erase only some points of a <see cref="LineConf"/>.
     /// </summary>
     class LinePointEraseAction : AbstractPlayerAction
     {

@@ -1,24 +1,20 @@
-﻿using Assets.SEE.Game.Drawable;
-using SEE.Net.Actions.Drawable;
-using SEE.Game;
+﻿using SEE.Game;
+using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
+using SEE.Game.UI.Drawable;
+using SEE.Game.UI.Menu.Drawable;
 using SEE.GO;
+using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using static Assets.SEE.Game.Drawable.GameDrawer;
-using Assets.SEE.Game.UI.Drawable;
-using SEE.Game.Drawable.Configurations;
 using TextConf = SEE.Game.Drawable.Configurations.TextConf;
-using UnityEngine.Events;
-using SEE.Game.UI.PropertyDialog.Drawable;
-using SEE.Game.UI.Notification;
-using Toggle = UnityEngine.UI.Toggle;
-using TMPro;
-using SEE.Game.Drawable;
 
 namespace SEE.Controls.Actions.Drawable
 {
+    /// <summary>
+    /// This class provides the option to edit a <see cref="DrawableType"/> object.
+    /// </summary>
     public class EditAction : AbstractPlayerAction
     {
         /// <summary>
@@ -38,7 +34,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// This struct can store all the information needed to revert or repeat a <see cref="EditAction"/>
+        /// Saves all the information needed to revert or repeat this action.
         /// </summary>
         private Memento memento;
 
@@ -128,38 +124,51 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         /// <param name="oldHolder">The holder for the old values.</param>
         /// <param name="newHolder">The holder for the new values.</param>
-        /// <returns></returns>
+        /// <returns>whatever the comparison results in</returns>
         private bool CheckEquals(DrawableType oldHolder, DrawableType newHolder)
         {
             if (oldHolder is LineConf oldLineHolder && newHolder is LineConf newLineHolder)
             {
-                return oldLineHolder.primaryColor.Equals(newLineHolder.primaryColor) &&
-                    oldLineHolder.orderInLayer.Equals(newLineHolder.orderInLayer) &&
-                    oldLineHolder.thickness.Equals(newLineHolder.thickness) &&
-                    oldLineHolder.loop.Equals(newLineHolder.loop) &&
-                    oldLineHolder.lineKind.Equals(newLineHolder.lineKind) &&
-                    oldLineHolder.tiling.Equals(newLineHolder.tiling);
+                return oldLineHolder.primaryColor.Equals(newLineHolder.primaryColor)
+                    && oldLineHolder.secondaryColor.Equals(newLineHolder.secondaryColor)
+                    && oldLineHolder.orderInLayer.Equals(newLineHolder.orderInLayer)
+                    && oldLineHolder.thickness.Equals(newLineHolder.thickness)
+                    && oldLineHolder.loop.Equals(newLineHolder.loop)
+                    && oldLineHolder.lineKind.Equals(newLineHolder.lineKind)
+                    && oldLineHolder.colorKind.Equals(newLineHolder.colorKind)
+                    && oldLineHolder.tiling.Equals(newLineHolder.tiling);
             }
+
             if (oldHolder is TextConf oldTextHolder && newHolder is TextConf newTextHolder)
             {
-                return oldTextHolder.text.Equals(newTextHolder.text) &&
-                    oldTextHolder.fontSize.Equals(newTextHolder.fontSize) &&
-                    oldTextHolder.orderInLayer.Equals(newTextHolder.orderInLayer) &&
-                    oldTextHolder.fontStyles.Equals(newTextHolder.fontStyles) &&
-                    oldTextHolder.fontColor.Equals(newTextHolder.fontColor) &&
-                    oldTextHolder.outlineColor.Equals(newTextHolder.outlineColor) &&
-                    oldTextHolder.outlineThickness.Equals(newTextHolder.outlineThickness);
+                return oldTextHolder.text.Equals(newTextHolder.text)
+                    && oldTextHolder.fontSize.Equals(newTextHolder.fontSize)
+                    && oldTextHolder.orderInLayer.Equals(newTextHolder.orderInLayer)
+                    && oldTextHolder.fontStyles.Equals(newTextHolder.fontStyles)
+                    && oldTextHolder.fontColor.Equals(newTextHolder.fontColor)
+                    && oldTextHolder.outlineColor.Equals(newTextHolder.outlineColor)
+                    && oldTextHolder.outlineThickness.Equals(newTextHolder.outlineThickness);
             }
+
             if (oldHolder is ImageConf oldImageHolder && newHolder is ImageConf newImageHolder)
             {
-                return oldImageHolder.orderInLayer.Equals(newImageHolder.orderInLayer) &&
-                    oldImageHolder.imageColor.Equals(newImageHolder.imageColor);
+                return oldImageHolder.orderInLayer.Equals(newImageHolder.orderInLayer)
+                    && oldImageHolder.imageColor.Equals(newImageHolder.imageColor);
             }
+
             if (oldHolder is MindMapNodeConf oldConf && newHolder is MindMapNodeConf newConf)
             {
-                return oldConf.parentNode.Equals(newConf.parentNode) && oldConf.nodeKind.Equals(newConf.nodeKind) &&
-                    CheckEquals(oldConf.borderConf, newConf.borderConf) && CheckEquals(oldConf.textConf, newConf.textConf) &&
-                    CheckEquals(oldConf.branchLineConf, newConf.branchLineConf);
+                return oldConf.parentNode.Equals(newConf.parentNode)
+                    && oldConf.nodeKind.Equals(newConf.nodeKind)
+                    && CheckEquals(oldConf.borderConf, newConf.borderConf)
+                    && CheckEquals(oldConf.textConf, newConf.textConf)
+                    && CheckEquals(oldConf.branchLineConf, newConf.branchLineConf);
+            }
+
+            /// This case will be needed for mind map change node kind case.
+            if (oldHolder == null && newHolder == null)
+            {
+                return true;
             }
             return false;
         }
@@ -196,7 +205,7 @@ namespace SEE.Controls.Actions.Drawable
                 }
             }
             TextMenu.Disable();
-            LineMenu.disableLineMenu();
+            LineMenu.DisableLineMenu();
             ImageMenu.Disable();
             MindMapEditMenu.Disable();
         }
@@ -212,93 +221,136 @@ namespace SEE.Controls.Actions.Drawable
             {
                 switch (progressState)
                 {
-                    /// This block allows the selection of a drawable type object for editing, taking into account the object edited in the last run. 
-                    /// It prevents the same object from being accidentally selected again when the left mouse button is not released. 
-                    /// Therefore, after the last action has been successfully completed, the left mouse button must be released to select the same object again. 
-                    /// Additionally, a ValueResetter component is added to the UI Canvas to reset the two static variables after exiting this action type.
                     case ProgressState.SelectObject:
-                        if (Input.GetMouseButtonUp(0))
-                        {
-                            mouseWasReleased = true;
-                        }
-                        if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj == null &&
-                            Raycasting.RaycastAnything(out RaycastHit raycastHit) && 
-                            (oldSelectedObj == null || oldSelectedObj != raycastHit.collider.gameObject || (oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased)) &&
-                            Tags.DrawableTypes.Contains(raycastHit.collider.gameObject.tag))
-                        {
-                            selectedObj = raycastHit.collider.gameObject;
-                            oldSelectedObj = selectedObj;
-                            oldValueHolder = DrawableType.Get(selectedObj);
-                            newValueHolder = DrawableType.Get(selectedObj);
-
-                            selectedObj.AddOrGetComponent<BlinkEffect>();
-
-                            if (GameObject.Find("UI Canvas").GetComponent<ValueResetter>() == null)
-                            {
-                                GameObject.Find("UI Canvas").AddComponent<ValueResetter>().SetAllowedState(GetActionStateType());
-                            }
-                            progressState = ProgressState.OpenEditMenu;
-                        }
-                        
+                        Selection();
                         break;
-                    /// In this block the right menu for the chosen drawable type will be opened.
                     case ProgressState.OpenEditMenu:
-                        if (selectedObj.CompareTag(Tags.Line))
-                        {
-                            LineMenu.EnableForEditing(selectedObj, newValueHolder);
-                        }
-                        if (selectedObj.CompareTag(Tags.DText))
-                        {
-                            TextMenu.EnableForEditing(selectedObj, newValueHolder);
-                        }
-                        if (selectedObj.CompareTag(Tags.Image))
-                        {
-                            ImageMenu.Enable(selectedObj, newValueHolder);
-                        }
-                        if (selectedObj.CompareTag(Tags.MindMapNode))
-                        {
-                            MindMapEditMenu.Enable(selectedObj, newValueHolder);
-                        }
-                        if (Input.GetMouseButtonUp(0))
-                        {
-                            progressState = ProgressState.Edit;
-                        }
-                        
+                        OpenMenu();
                         break;
-                    /// This block provides the completion of the action. As soon as the left mouse button is pressed, the completion is initiated.
                     case ProgressState.Edit:
-                        if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj.GetComponent<BlinkEffect>() != null)
-                        {
-                            selectedObj.GetComponent<BlinkEffect>().Deactivate();
-                            progressState = ProgressState.Finish;
-                        }
+                        Edit();
                         break;
-                    /// This block completes or resets this action.
-                    /// If no changes were made, it resets.
-                    /// If there are changes the action will be successfull completed.
                     case ProgressState.Finish:
-                        mouseWasReleased = false;
-                        if (!CheckEquals(oldValueHolder, newValueHolder))
-                        {
-                            memento = new Memento(selectedObj, oldValueHolder, newValueHolder,
-                                     GameFinder.GetDrawable(selectedObj), selectedObj.name);
-                            currentState = ReversibleAction.Progress.Completed;
-                            return true;
-                        } else
-                        {
-                            selectedObj = null;
-                            progressState = ProgressState.SelectObject;
-                            LineMenu.disableLineMenu();
-                            TextMenu.Disable();
-                            ImageMenu.Disable();
-                            MindMapEditMenu.Disable();
-                        }
-                        break;
+                        return Finish();
                     default:
                         return false;
                 }
             }
-            return false;     
+            return false;
+        }
+
+        /// <summary>
+        /// Allows the selection of a drawable type object for editing, 
+        /// taking into account the object edited in the last run. 
+        /// It prevents the same object from being accidentally selected again 
+        /// when the left mouse button is not released. 
+        /// Therefore, after the last action has been successfully completed, 
+        /// the left mouse button must be released to select the same object again. 
+        /// Additionally, a ValueResetter component is added to the UI Canvas to reset 
+        /// the two static variables after exiting this action type.
+        /// </summary>
+        private void Selection()
+        {
+            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj == null
+                && Raycasting.RaycastAnything(out RaycastHit raycastHit)
+                && (oldSelectedObj == null || oldSelectedObj != raycastHit.collider.gameObject
+                    || (oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased))
+                && Tags.DrawableTypes.Contains(raycastHit.collider.gameObject.tag))
+            {
+                selectedObj = raycastHit.collider.gameObject;
+                oldSelectedObj = selectedObj;
+                oldValueHolder = DrawableType.Get(selectedObj);
+                newValueHolder = DrawableType.Get(selectedObj);
+
+                selectedObj.AddOrGetComponent<BlinkEffect>();
+
+                if (GameObject.Find("UI Canvas").GetComponent<ValueResetter>() == null)
+                {
+                    GameObject.Find("UI Canvas").AddComponent<ValueResetter>().
+                        SetAllowedState(GetActionStateType());
+                }
+                progressState = ProgressState.OpenEditMenu;
+            }
+
+            if (Input.GetMouseButtonUp(0))
+            {
+                mouseWasReleased = true;
+            }
+        }
+
+        /// <summary>
+        /// Opens the appropriate menu for editing the selected Drawable Type Object. 
+        /// Once a left mouse button up is registered, the progress state is switched to Edit.
+        /// </summary>
+        private void OpenMenu()
+        {
+            switch (selectedObj.tag)
+            {
+                case Tags.Line:
+                    if (!LineMenu.IsOpen())
+                        LineMenu.EnableForEditing(selectedObj, newValueHolder);
+                    break;
+                case Tags.DText:
+                    if (!TextMenu.IsOpen())
+                        TextMenu.EnableForEditing(selectedObj, newValueHolder);
+                    break;
+                case Tags.Image:
+                    if (!ImageMenu.IsOpen())
+                        ImageMenu.Enable(selectedObj, newValueHolder);
+                    break;
+                case Tags.MindMapNode:
+                    if (!MindMapEditMenu.IsOpen())
+                        MindMapEditMenu.Enable(selectedObj, newValueHolder);
+                    break;
+
+            }
+            if (Input.GetMouseButtonUp(0))
+            {
+                progressState = ProgressState.Edit;
+            }
+        }
+
+        /// <summary>
+        /// Provides the completion of the edit action. 
+        /// As soon as the left mouse button is pressed, the completion is initiated.
+        /// It deactivates the <see cref="BlinkEffect"/> and sets the progress state to finish.
+        /// </summary>
+        private void Edit()
+        {
+            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
+                && selectedObj.GetComponent<BlinkEffect>() != null)
+            {
+                selectedObj.GetComponent<BlinkEffect>().Deactivate();
+                progressState = ProgressState.Finish;
+            }
+        }
+
+        /// <summary>
+        /// Completes or resets this action.
+        /// If no changes were made, it resets.
+        /// If there are changes the action will be successfull completed.
+        /// </summary>
+        /// <returns>whatever the success of the editing is.</returns>
+        private bool Finish()
+        {
+            mouseWasReleased = false;
+            if (!CheckEquals(oldValueHolder, newValueHolder))
+            {
+                memento = new Memento(selectedObj, oldValueHolder, newValueHolder,
+                         GameFinder.GetDrawable(selectedObj), selectedObj.name);
+                currentState = ReversibleAction.Progress.Completed;
+                return true;
+            }
+            else
+            {
+                selectedObj = null;
+                progressState = ProgressState.SelectObject;
+                LineMenu.DisableLineMenu();
+                TextMenu.Disable();
+                ImageMenu.Disable();
+                MindMapEditMenu.Disable();
+                return false;
+            }
         }
 
         /// <summary>

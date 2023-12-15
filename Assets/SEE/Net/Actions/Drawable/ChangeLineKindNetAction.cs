@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using SEE.Game.Drawable;
 using SEE.Controls.Actions.Drawable;
-using Assets.SEE.Game.Drawable;
 
 namespace SEE.Net.Actions.Drawable
 {

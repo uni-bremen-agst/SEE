@@ -1,11 +1,6 @@
-﻿using SEE.Net.Actions;
-using System.Collections;
-using UnityEngine;
-using SEE.Controls.Actions.Drawable;
-using Assets.SEE.Game.Drawable;
-using SEE.Game.Drawable.Configurations;
-using SEE.Game.Drawable;
+﻿using SEE.Controls.Actions.Drawable;
 using SEE.Utils;
+using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {

@@ -1,18 +1,11 @@
-﻿using Assets.SEE.Game.UI.Drawable;
-using RTG;
-using SEE.Game;
-using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable.ValueHolders;
+using SEE.Game.UI.Drawable;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using Unity.Collections;
 using UnityEngine;
-using UnityEngine.InputSystem.HID;
-using UnityEngine.UIElements;
 
-namespace Assets.SEE.Game.Drawable
+namespace SEE.Game.Drawable
 {
     /// <summary>
     /// This class provides methods for moving and rotating objects
@@ -30,16 +23,34 @@ namespace Assets.SEE.Game.Drawable
         /// <returns>The new position of the moved object</returns>
         public static Vector3 MoveObjectByMouse(GameObject obj, Vector3 hitPoint, bool includeChildren)
         {
+            /// For mind map nodes.
+            /// If child nodes are to be included, the child objects in the hierarchy are added to the parent object.
             CheckPrepareNodeChilds(obj, includeChildren);
+
             Vector3 oldPos = obj.transform.localPosition;
-            ///This is needed to ensure that the correct axes are being moved. A rotation changes the axis position.
+
+            /// This is needed to ensure that the correct axes are being moved. A rotation changes the axis position.
             Vector3 localEulerAngles = obj.transform.localEulerAngles;
             obj.transform.localEulerAngles = Vector3.zero;
+
+            /// Transforms the hit point to local space.
             Vector3 convertedHitPoint = GameFinder.GetHighestParent(obj).transform.InverseTransformPoint(hitPoint);
-            convertedHitPoint -= obj.transform.forward * ValueHolder.distanceToDrawable.z * obj.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
-            Vector3 position = new Vector3(convertedHitPoint.x, convertedHitPoint.y, oldPos.z);
+
+            /// Ensure that the converted hit point preserves the distance to the drawable.
+            convertedHitPoint -= obj.transform.forward * ValueHolder.distanceToDrawable.z 
+                * obj.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
+
+            /// Build the new object position.
+            Vector3 position = new(convertedHitPoint.x, convertedHitPoint.y, oldPos.z);
+            
+            /// Sets the new object position.
             obj.transform.localPosition = position;
+
+            /// Restore the old euler angles.
             obj.transform.localEulerAngles = localEulerAngles;
+
+            /// For mind map nodes.
+            /// If child nodes were to be included, they are now encapsulated by the parent object.
             CheckPostProcessNode(obj, includeChildren);
             return position;
         }
@@ -56,16 +67,24 @@ namespace Assets.SEE.Game.Drawable
         /// <returns>The new position of the object</returns>
         public static Vector3 MoveObjectByKeyboard(GameObject obj, KeyCode key, bool speedUp, bool includeChildren)
         {
+            /// For mind map nodes.
+            /// If child nodes are to be included, the child objects in the hierarchy are added to the parent object.
             CheckPrepareNodeChilds(obj, includeChildren);
+
             Vector3 newPosition = obj.transform.localPosition;
+
+            /// This is needed to ensure that the correct axes are being moved. A rotation changes the axis position.
             Vector3 localEulerAngles = obj.transform.localEulerAngles;
             obj.transform.localEulerAngles = Vector3.zero;
-            
+
+            /// The moving speed.
             float multiplyValue = ValueHolder.move;
             if (speedUp)
             {
                 multiplyValue = ValueHolder.moveFast;
             }
+
+            /// Moves the object in the desired direction with the chosen speed.
             switch (key)
             {
                 case KeyCode.LeftArrow:
@@ -81,8 +100,14 @@ namespace Assets.SEE.Game.Drawable
                     newPosition -= Vector3.up * multiplyValue;
                     break;
             }
+
+            /// Sets the new position to the object.
             obj.transform.localPosition = newPosition;
+            /// Restores the old euler angles.
             obj.transform.localEulerAngles = localEulerAngles;
+
+            /// For mind map nodes.
+            /// If child nodes were to be included, they are now encapsulated by the parent object.
             CheckPostProcessNode(obj, includeChildren);
             return newPosition;
         }
@@ -95,8 +120,15 @@ namespace Assets.SEE.Game.Drawable
         /// <param name="position">The new position for the object.</param>
         public static void SetPosition(GameObject obj, Vector3 position, bool includeChildren)
         {
+            /// For mind map nodes.
+            /// If child nodes are to be included, the child objects in the hierarchy are added to the parent object.
             CheckPrepareNodeChilds(obj, includeChildren, false, true);
+
+            /// Sets the position
             obj.transform.localPosition = position;
+
+            /// For mind map nodes.
+            /// If child nodes were to be included, they are now encapsulated by the parent object.
             CheckPostProcessNode(obj, includeChildren);
         }
 
@@ -113,6 +145,7 @@ namespace Assets.SEE.Game.Drawable
             foreach (int i in Indices)
             {
                 float z = renderer.GetPosition(i).z;
+                /// Calculates the new position for the point.
                 Vector3 newPoint = new Vector3(point.x, point.y, z);
                 renderer.SetPosition(i, newPoint);
             }
@@ -129,11 +162,20 @@ namespace Assets.SEE.Game.Drawable
         /// <returns>The new local euler angles of the object</returns>
         public static Vector3 RotateObject(GameObject obj, Vector3 rotateDirection, float degree, bool includeChildren)
         {
+            /// For mind map nodes.
+            /// If child nodes are to be included, the child objects in the hierarchy are added to the parent object.
             CheckPrepareNodeChilds(obj, includeChildren);
+
             Transform transform = obj.transform;
+            /// Roates the object based on the degree to rotate.
             transform.Rotate(rotateDirection, degree, Space.Self);
+
+            /// Refreshes the collider of the object.
             obj.GetComponent<Collider>().enabled = false;
             obj.GetComponent<Collider>().enabled = true;
+
+            /// For mind map nodes.
+            /// If child nodes were to be included, they are now encapsulated by the parent object.
             CheckPostProcessNode(obj, includeChildren);
             return obj.transform.localEulerAngles;
         }
@@ -147,9 +189,17 @@ namespace Assets.SEE.Game.Drawable
         /// <param name="localEulerAngleZ">The new z degree</param>
         public static void SetRotate(GameObject obj, float localEulerAngleZ, bool includeChildren)
         {
+            /// For mind map nodes.
+            /// If child nodes are to be included, the child objects in the hierarchy are added to the parent object.
             CheckPrepareNodeChilds(obj, includeChildren, true, true);
+
             Transform transform = obj.transform;
+
+            /// Sets the new rotation.
             transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, localEulerAngleZ);
+
+            /// For mind map nodes.
+            /// If child nodes were to be included, they are now encapsulated by the parent object.
             CheckPostProcessNode(obj, includeChildren);
         }
 
@@ -163,7 +213,8 @@ namespace Assets.SEE.Game.Drawable
         public static void SetRotateY(GameObject obj, float localEulerAngleY)
         {
             Transform transform = obj.transform;
-            transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, localEulerAngleY, transform.localEulerAngles.z);
+            transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, 
+                localEulerAngleY, transform.localEulerAngles.z);
         }
 
         /// <summary>
@@ -171,22 +222,27 @@ namespace Assets.SEE.Game.Drawable
         /// an action including the children can be performed. 
         /// For this purpose, the child nodes are added to the parent node.
         /// </summary>
-        /// <param name="obj">The parent node</param>
+        /// <param name="node">The parent node</param>
         /// <param name="rotationSetMode">true, if this method will be called from rotation action.</param>
-        private static void PrepareNodeChilds(GameObject obj, bool setMode, bool rotationSetMode = false)
+        private static void PrepareNodeChilds(GameObject node, bool setMode, bool rotationSetMode = false)
         {
-            if (obj.CompareTag(Tags.MindMapNode))
+            if (node.CompareTag(Tags.MindMapNode))
             {
-                MMNodeValueHolder valueHolder = obj.GetComponent<MMNodeValueHolder>();
-                foreach(KeyValuePair<GameObject, GameObject> pair in valueHolder.GetAllChildren())
+                MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
+                foreach (KeyValuePair<GameObject, GameObject> pair in valueHolder.GetAllChildren())
                 {
+                    /// Adopt the rotation of the parent node.
                     if (rotationSetMode)
                     {
-                        pair.Key.transform.localEulerAngles = obj.transform.localEulerAngles;
+                        pair.Key.transform.localEulerAngles = node.transform.localEulerAngles;
                     }
-                    pair.Key.transform.SetParent(obj.transform);
+
+                    /// Assigns the child nodes to the parent node.
+                    pair.Key.transform.SetParent(node.transform);
+
                     if (!setMode)
                     {
+                        /// Enables the collision detection for the childs.
                         if (pair.Key.GetComponent<Rigidbody>() == null)
                         {
                             pair.Key.AddComponent<Rigidbody>().isKinematic = true;
@@ -201,24 +257,31 @@ namespace Assets.SEE.Game.Drawable
         /// Checks if preparing child nodes is necessary, and if not, 
         /// deletes all rigid bodies and collision controllers except those of the selected nodes.
         /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="includeChildren"></param>
-        /// <param name="rotationSetMode"></param>
-        private static void CheckPrepareNodeChilds(GameObject obj, bool includeChildren, bool rotationSetMode = false, bool setMode = false)
+        /// <param name="node">the parent node</param>
+        /// <param name="includeChildren">if the children should be included for the movement or the rotation.</param>
+        /// <param name="rotationSetMode">true, if the method will be called from <see cref="SetRotate"/></param>
+        /// <param name="setMode">true, if the method will be called from a Set-Method 
+        /// (<see cref="SetRotate"/> or <see cref="SetPosition"/>)</param>
+        private static void CheckPrepareNodeChilds(GameObject node, bool includeChildren, 
+            bool rotationSetMode = false, bool setMode = false)
         {
+            /// If the children should be included prepare the child nodes.
             if (includeChildren)
             {
-                PrepareNodeChilds(obj, setMode, rotationSetMode);
-            } else
+                PrepareNodeChilds(node, setMode, rotationSetMode);
+            }
+            else
             {
-                if (obj.CompareTag(Tags.MindMapNode))
+                if (node.CompareTag(Tags.MindMapNode))
                 {
-                    MMNodeValueHolder valueHolder = obj.GetComponent<MMNodeValueHolder>();
-                    GameObject drawable = GameFinder.GetDrawable(obj);
+                    MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
+                    GameObject drawable = GameFinder.GetDrawable(node);
                     string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+                    /// If this method was not called by a set method (<see cref="SetRotate"/> or <see cref="SetPosition"/>), 
+                    /// then disable collision detection for the children.
                     if (!setMode)
                     {
-                        new RbAndCCDestroyerNetAction(drawable.name, drawableParentName, obj.name).Execute();
+                        new RbAndCCDestroyerNetAction(drawable.name, drawableParentName, node.name).Execute();
                         foreach (KeyValuePair<GameObject, GameObject> pair in valueHolder.GetAllChildren())
                         {
                             if (pair.Key.GetComponent<Rigidbody>() != null)
@@ -246,6 +309,9 @@ namespace Assets.SEE.Game.Drawable
                 GameMindMap.ReDrawParentBranchLine(obj);
                 GameObject attachedObject = GameFinder.GetAttachedObjectsObject(obj);
                 MMNodeValueHolder v = obj.GetComponent<MMNodeValueHolder>();
+
+                /// Assign the children back to the attached object - object of the drawable.
+                /// It is necessary to redraw the parent branch line, as it was not moved along with it.
                 foreach (KeyValuePair<GameObject, GameObject> pair in v.GetAllChildren())
                 {
                     pair.Key.transform.SetParent(attachedObject.transform);
@@ -255,17 +321,23 @@ namespace Assets.SEE.Game.Drawable
             }
         }
 
-        private static void CheckPostProcessNode(GameObject obj, bool includeChildren)
+        /// <summary>
+        /// Checks if <see cref="PostProcessNode"/> needs to be executed. 
+        /// If not, only the branch lines are refreshed.
+        /// </summary>
+        /// <param name="node">The parent node</param>
+        /// <param name="includeChildren">Option if children should be included for the action.</param>
+        private static void CheckPostProcessNode(GameObject node, bool includeChildren)
         {
             if (includeChildren)
             {
-                PostProcessNode(obj);
+                PostProcessNode(node);
             }
             else
             {
-                if (obj.CompareTag(Tags.MindMapNode))
+                if (node.CompareTag(Tags.MindMapNode))
                 {
-                    GameMindMap.ReDrawBranchLines(obj);
+                    GameMindMap.ReDrawBranchLines(node);
                 }
             }
         }
@@ -279,7 +351,9 @@ namespace Assets.SEE.Game.Drawable
             if (node.CompareTag(Tags.MindMapNode))
             {
                 MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
-                foreach(KeyValuePair<GameObject, GameObject> pair in valueHolder.GetAllChildren())
+
+                /// Disables the collision detection for the child nodes.
+                foreach (KeyValuePair<GameObject, GameObject> pair in valueHolder.GetAllChildren())
                 {
                     if (pair.Key.GetComponent<Rigidbody>() != null)
                     {

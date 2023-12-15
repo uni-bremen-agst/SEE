@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using SEE.Controls;
 using SEE.Game.UI.PropertyDialog.HolisticMetrics;
-using SEE.Game.UI.PropertyDialog;
-using SEE.Controls;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace SEE.Game.UI.PropertyDialog.Drawable
@@ -22,6 +20,9 @@ namespace SEE.Game.UI.PropertyDialog.Drawable
         /// </summary>
         private StringProperty textProperty;
 
+        /// <summary>
+        /// The action to be executed when the text has been edited.
+        /// </summary>
         private UnityAction<string> stringAction;
 
         /// <summary>
@@ -29,14 +30,18 @@ namespace SEE.Game.UI.PropertyDialog.Drawable
         /// </summary>
         internal void Open(UnityAction<string> stringAction = null)
         {
+            /// Sets the string action, if it's not null.
             if (stringAction != null)
             {
                 this.stringAction = stringAction;
             }
+
+            /// Creates the dialog.
             dialog = new GameObject("Write/Edit Text dialog");
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
             group.Name = "Write/Edit Text dialog";
 
+            /// Adds a text property to the dialog.
             textProperty = dialog.AddComponent<StringProperty>();
             textProperty.Name = "Text";
             textProperty.Description = "Write or edit the text that should be transmit";
@@ -47,6 +52,7 @@ namespace SEE.Game.UI.PropertyDialog.Drawable
             
             group.AddProperty(textProperty);
 
+            /// Adds the property dialog to the dialog.
             propertyDialog = dialog.AddComponent<PropertyDialog>();
             propertyDialog.Title = "Write/Edit Text";
             propertyDialog.Description = "Write or edit the text; then hit OK button.";

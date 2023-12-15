@@ -1,11 +1,8 @@
-﻿using Assets.SEE.Game.Drawable;
-using SEE.Net.Actions.Drawable;
+﻿using SEE.Game.Drawable.ValueHolders;
 using SEE.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static Assets.SEE.Game.Drawable.GameDrawer;
 
 namespace SEE.Game.Drawable.Configurations
 {
@@ -150,15 +147,21 @@ namespace SEE.Game.Drawable.Configurations
             MindMapNodeConf conf = null;
             if (obj != null && obj.CompareTag(Tags.MindMapNode))
             {
-                conf = new();
-                conf.id = obj.name;
-                conf.position = obj.transform.localPosition;
-                conf.scale = obj.transform.localScale;
-                conf.eulerAngles = obj.transform.localEulerAngles;
-                conf.orderInLayer = obj.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
-
                 MMNodeValueHolder valueHolder = obj.GetComponent<MMNodeValueHolder>();
-                conf.layer = valueHolder.GetLayer();
+                conf = new()
+                {
+                    id = obj.name,
+                    position = obj.transform.localPosition,
+                    scale = obj.transform.localScale,
+                    eulerAngles = obj.transform.localEulerAngles,
+                    orderInLayer = obj.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer(),
+                    layer = valueHolder.GetLayer(),
+                    nodeKind = valueHolder.GetNodeKind(),
+                    borderConf = LineConf.GetLine(GameFinder.FindChildWithTag(obj, Tags.Line)),
+                    textConf = TextConf.GetText(GameFinder.FindChildWithTag(obj, Tags.DText)),
+                    children = valueHolder.GetChildren()
+                };
+                /// Set the parent information.
                 if (valueHolder.GetParent() != null)
                 {
                     conf.parentNode = valueHolder.GetParent().name;
@@ -169,10 +172,7 @@ namespace SEE.Game.Drawable.Configurations
                     conf.parentNode = "";
                     conf.branchLineToParent = "";
                 }
-                conf.nodeKind = valueHolder.GetNodeKind();
-                conf.borderConf = LineConf.GetLine(GameFinder.FindChildWithTag(obj, Tags.Line));
-                conf.textConf = TextConf.GetText(GameFinder.FindChildWithTag(obj, Tags.DText));
-                conf.children = valueHolder.GetChildren();
+                /// Converts the children in a pair of strings based on their ids.
                 foreach (var item in conf.children)
                 {
                     if (item.Key != null && item.Value != null)
@@ -226,14 +226,17 @@ namespace SEE.Game.Drawable.Configurations
             writer.Save(branchLineToParent, ParentBranchLineLabel);
             writer.Save(nodeKind.ToString(), NodeKindLabel);
 
+            /// Writes the border configuration (line configuration)
             writer.BeginList(BorderLabel);
             borderConf.Save(writer);
             writer.EndList();
 
+            /// Writes the text configuration
             writer.BeginList(TextLabel);
             textConf.Save(writer);
             writer.EndList();
 
+            /// Writes the pair of the children names and their branch lines to the parent node.
             writer.SaveAsStrings(childrenStrings, ChildrenLabel);
             writer.EndGroup();
         }
@@ -250,7 +253,8 @@ namespace SEE.Game.Drawable.Configurations
         internal bool Restore(Dictionary<string, object> attributes)
         {
             bool errors = false;
-            
+
+            /// Try to restores the id.
             if (attributes.TryGetValue(IDLabel, out object name))
             {
                 id = (string)name;
@@ -259,6 +263,8 @@ namespace SEE.Game.Drawable.Configurations
             {
                 errors = true;
             }
+
+            /// Try to restores the position.
             Vector3 loadedPosition = Vector3.zero;
             if (ConfigIO.Restore(attributes, PositionLabel, ref loadedPosition))
             {
@@ -269,6 +275,8 @@ namespace SEE.Game.Drawable.Configurations
                 position = Vector3.zero;
                 errors = true;
             }
+
+            /// Try to restores the scale.
             Vector3 loadedScale = Vector3.zero;
             if (ConfigIO.Restore(attributes, ScaleLabel, ref loadedScale))
             {
@@ -279,6 +287,8 @@ namespace SEE.Game.Drawable.Configurations
                 scale = Vector3.zero;
                 errors = true;
             }
+
+            /// Try to restores the euler angles.
             Vector3 loadedEulerAngles = Vector3.zero;
             if (ConfigIO.Restore(attributes, EulerAnglesLabel, ref loadedEulerAngles))
             {
@@ -289,14 +299,20 @@ namespace SEE.Game.Drawable.Configurations
                 eulerAngles = Vector3.zero;
                 errors = true;
             }
+
+            /// Try to restores the order in layer.
             if (!ConfigIO.Restore(attributes, OrderInLayerLabel, ref orderInLayer))
             {
                 errors = true;
             }
+
+            /// Try to restores the mind map node layer.
             if (!ConfigIO.Restore(attributes, LayerLabel, ref layer))
             {
                 errors = true;
             }
+
+            /// Try to restores the parent id.
             if (attributes.TryGetValue(ParentIDLabel, out object pName))
             {
                 parentNode = (string)pName;
@@ -305,6 +321,8 @@ namespace SEE.Game.Drawable.Configurations
             {
                 errors = true;
             }
+
+            /// Try to restores the parent branch line id.
             if (attributes.TryGetValue(ParentBranchLineLabel, out object pBranch))
             {
                 branchLineToParent = (string)pBranch;
@@ -313,7 +331,10 @@ namespace SEE.Game.Drawable.Configurations
             {
                 errors = true;
             }
-            if (attributes.TryGetValue(NodeKindLabel, out object kind) && Enum.TryParse<GameMindMap.NodeKind>((string)kind, out GameMindMap.NodeKind result))
+
+            /// Try to restores the node kind.
+            if (attributes.TryGetValue(NodeKindLabel, out object kind) 
+                && Enum.TryParse<GameMindMap.NodeKind>((string)kind, out GameMindMap.NodeKind result))
             {
                 nodeKind = result;
             }
@@ -322,27 +343,32 @@ namespace SEE.Game.Drawable.Configurations
                 nodeKind = GameMindMap.NodeKind.Theme;
                 errors = true;
             }
+
+            /// Try to restores the mind map border (line configuration).
             if (attributes.TryGetValue(BorderLabel, out object lineList))
             {
                 foreach (object item in (List<object>)lineList)
                 {
                     Dictionary<string, object> lineDict = (Dictionary<string, object>)item;
-                    LineConf config = new LineConf();
+                    LineConf config = new();
                     config.Restore(lineDict);
                     borderConf = config;
                 }
             }
+
+            /// Try to restores the mind map text (text configuration).
             if (attributes.TryGetValue(TextLabel, out object textList))
             {
                 foreach (object item in (List<object>)textList)
                 {
                     Dictionary<string, object> textDict = (Dictionary<string, object>)item;
-                    TextConf config = new TextConf();
+                    TextConf config = new();
                     config.Restore(textDict);
                     textConf = config;
                 }
             }
 
+            /// Try to restores the pair of child names and their branch lines.
             if (attributes.TryGetValue(ChildrenLabel, out object childrenDict))
             {
                 foreach (object dict in (List<object>)childrenDict)

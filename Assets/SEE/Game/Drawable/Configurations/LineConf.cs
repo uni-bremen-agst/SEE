@@ -1,15 +1,8 @@
-﻿using Newtonsoft.Json.Linq;
-using Assets.SEE.Game.Drawable;
-using SEE.Game.Drawable;
-using SEE.Game.Drawable.Configurations;
+﻿using SEE.Game.Drawable.ValueHolders;
 using SEE.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.Assertions;
-using UnityEngine.UIElements;
 
 namespace SEE.Game.Drawable.Configurations
 {
@@ -159,17 +152,23 @@ namespace SEE.Game.Drawable.Configurations
         {
             LineConf line = null;
             if (lineGameObject != null && lineGameObject.CompareTag(Tags.Line))
-            {
-                line = new();
-                line.id = lineGameObject.name;
-                line.position = lineGameObject.transform.localPosition;
-                line.scale = lineGameObject.transform.localScale;
+            {   
                 LineRenderer renderer = lineGameObject.GetComponent<LineRenderer>();
-                line.rendererPositions = new Vector3[renderer.positionCount];
+                line = new()
+                {
+                    id = lineGameObject.name,
+                    position = lineGameObject.transform.localPosition,
+                    scale = lineGameObject.transform.localScale,
+                    orderInLayer = lineGameObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer(),
+                    thickness = renderer.startWidth,
+                    tiling = renderer.textureScale.x,
+                    lineKind = lineGameObject.GetComponent<LineValueHolder>().GetLineKind(),
+                    loop = renderer.loop,
+                    eulerAngles = lineGameObject.transform.localEulerAngles,
+                    colorKind = lineGameObject.GetComponent<LineValueHolder>().GetColorKind(),
+                    rendererPositions = new Vector3[renderer.positionCount]
+                };
                 renderer.GetPositions(line.rendererPositions);
-                line.loop = renderer.loop;
-                line.eulerAngles = lineGameObject.transform.localEulerAngles;
-                line.colorKind = lineGameObject.GetComponent<LineValueHolder>().GetColorKind();
                 switch (line.colorKind)
                 {
                     case GameDrawer.ColorKind.Monochrome:
@@ -185,10 +184,6 @@ namespace SEE.Game.Drawable.Configurations
                         line.secondaryColor = renderer.materials[1].color;
                         break;
                 }
-                line.orderInLayer = lineGameObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
-                line.thickness = renderer.startWidth;
-                line.tiling = renderer.textureScale.x;
-                line.lineKind = lineGameObject.GetComponent<LineValueHolder>().GetLineKind();
             }
             return line;
         }
@@ -256,6 +251,8 @@ namespace SEE.Game.Drawable.Configurations
         internal bool Restore(Dictionary<string, object> attributes)
         {
             bool errors = false;
+
+            /// Try to restores the id.
             if (attributes.TryGetValue(IDLabel, out object name))
             {
                 id = (string)name;
@@ -264,6 +261,8 @@ namespace SEE.Game.Drawable.Configurations
             {
                 errors = true;
             }
+
+            /// Try to restores the position.
             Vector3 loadedPosition = Vector3.zero;
             if (ConfigIO.Restore(attributes, PositionLabel, ref loadedPosition))
             {
@@ -274,6 +273,8 @@ namespace SEE.Game.Drawable.Configurations
                 position = Vector3.zero;
                 errors = true;
             }
+
+            /// Try to restores the scale.
             Vector3 loadedScale = Vector3.zero;
             if (ConfigIO.Restore(attributes, ScaleLabel, ref loadedScale))
             {
@@ -285,7 +286,9 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
-            if (attributes.TryGetValue(ColorKindLabel, out object cKind) && Enum.TryParse((string)cKind, out GameDrawer.ColorKind colorResult))
+            /// Try to restores the color kind
+            if (attributes.TryGetValue(ColorKindLabel, out object cKind) 
+                && Enum.TryParse((string)cKind, out GameDrawer.ColorKind colorResult))
             {
                 colorKind = colorResult;
             }
@@ -295,6 +298,7 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
+            /// Try to restores the primary color.
             Color loadedColor = Color.black;
             if (ConfigIO.Restore(attributes, PrimaryColorLabel, ref loadedColor))
             {
@@ -306,6 +310,7 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
+            /// Try to restores the secondary color.
             Color loadedSecColor = Color.black;
             if (ConfigIO.Restore(attributes, SecondaryColorLabel, ref loadedSecColor))
             {
@@ -317,11 +322,13 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
+            /// Try to restores the order in layer.
             if (!ConfigIO.Restore(attributes, OrderInLayerLabel, ref orderInLayer))
             {
                 errors = true;
             }
 
+            /// Try to restores the thickness.
             if (attributes.TryGetValue(ThicknessLabel, out object thick))
             {
                 thickness = (float)thick;
@@ -332,6 +339,7 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
+            /// Try to restores the loop.
             if (attributes.TryGetValue(LoopLabel, out object loadedLoop))
             {
                 loop = (bool)loadedLoop;
@@ -343,7 +351,7 @@ namespace SEE.Game.Drawable.Configurations
             }
             
             List<Vector3> listRendererPositions = new();
-            
+            /// Try to restores the line position points.
             if (attributes.TryGetValue(RendererPositionsLabel, out object positionList))
             {
                 foreach (object item in (List<object>) positionList)
@@ -356,6 +364,7 @@ namespace SEE.Game.Drawable.Configurations
                 rendererPositions = listRendererPositions.ToArray();
             }
 
+            /// Try to restores the euler angles.
             Vector3 loadedEulerAngles = Vector3.zero;
             if (ConfigIO.Restore(attributes, EulerAnglesLabel, ref loadedEulerAngles))
             {
@@ -367,6 +376,7 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
+            /// Try to restores the tiling.
             if (attributes.TryGetValue(TilingLabel, out object til))
             {
                 tiling = (float)til;
@@ -377,7 +387,9 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
-            if (attributes.TryGetValue(LineKindLabel, out object kind) && Enum.TryParse<GameDrawer.LineKind>((string)kind, out GameDrawer.LineKind result))
+            /// Try to restores the line kind.
+            if (attributes.TryGetValue(LineKindLabel, out object kind) 
+                && Enum.TryParse<GameDrawer.LineKind>((string)kind, out GameDrawer.LineKind result))
             {
                 lineKind = result;
             }

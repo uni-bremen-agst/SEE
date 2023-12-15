@@ -1,14 +1,12 @@
-﻿using SEE.Game.HolisticMetrics;
+﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.UI.Notification;
 using SEE.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using SEE.Game.Drawable.Configurations;
 
-namespace Assets.SEE.Game.Drawable
+namespace SEE.Game.Drawable
 {
     /// <summary>
     /// This class can be used to load and save the color presets of the color picker.
@@ -16,30 +14,34 @@ namespace Assets.SEE.Game.Drawable
     public static class ColorPresetsConfigManager
     {
         /// <summary>
-        /// The path to the file containing the saved color presets. This is saved in a field because multiple
-        /// methods of this class use it.
+        /// The path to the file containing the saved color presets. 
+        /// This is saved in a field because multiple methods of this class use it.
         /// </summary>
-        private static readonly string colorPresetsFile = DrawableConfigManager.configurationPath + "ColorPresets" + Filenames.ConfigExtension;
+        private static readonly string colorPresetsFile = DrawableConfigManager.configurationPath 
+            + "ColorPresets" + Filenames.ConfigExtension;
 
         /// <summary>
-        /// This method checks whether the directory for the saved drawable exists. If not, then it creates
-        /// that directory.
+        /// This method checks whether the directory for the saved drawable exists. 
+        /// If not, then it creates that directory.
         /// </summary>
         private static void EnsureDrawableDirectoryExists()
         {
             DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.configurationPath);
         }
 
+        /// <summary>
+        /// Checks if the file exists
+        /// </summary>
+        /// <returns>Whether the file exists or not.</returns>
         public static bool IsFileExists()
         {
             return File.Exists(colorPresetsFile);
         }
 
         /// <summary>
-        /// Loads a metrics board from a file at the given <paramref name="path"/>.
+        /// Loads the colors of the file.
         /// </summary>
-        /// <param name="path">The path to the file which shall be loaded</param>
-        /// <returns>The GameObject that represents the metrics displays</returns>
+        /// <returns>The created colors configuration.</returns>
         internal static ColorsConfig LoadColors()
         {
             ColorsConfig config = new();
@@ -51,7 +53,8 @@ namespace Assets.SEE.Game.Drawable
             }
             catch (Exception e)
             {
-                ShowNotification.Error("Error loading colors", $"Could not load settings from {colorPresetsFile}: {e.Message}");
+                ShowNotification.Error("Error loading colors", 
+                    $"Could not load settings from {colorPresetsFile}: {e.Message}");
                 throw e;
             }
             return config;

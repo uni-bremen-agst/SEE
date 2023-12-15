@@ -1,8 +1,4 @@
-﻿using Assets.SEE.Game.Drawable;
-using Assets.SEE.Game;
-using SEE.Game;
-using System.Collections;
-using UnityEngine;
+﻿using SEE.Game.Drawable;
 
 namespace SEE.Net.Actions.Drawable
 {/// <summary>

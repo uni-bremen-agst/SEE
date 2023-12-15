@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using SEE.Utils;
-using System.Collections;
+﻿using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,17 +10,21 @@ namespace SEE.Game.Drawable.Configurations
     public class Vector3Config : ConfigIO.PersistentConfigItem
     {
         /// <summary>
-        /// Is the vector3 of the configuration. It will be needed for the list of vector3 of the line renderer.
+        /// Is the Vector3 of the configuration. 
+        /// It will be needed for the list of Vector3 of the line renderer.
         /// </summary>
         public Vector3 vector;
+
         /// <summary>
         /// Label for the x coordinate of a vector3.
         /// </summary>
         private const string XLabel = "X";
+
         /// <summary>
         /// Label for the y coordinate of a vector3.
         /// </summary>
         private const string YLabel = "Y";
+
         /// <summary>
         /// Label for the z coordinate of a vector3.
         /// </summary>

@@ -1,30 +1,34 @@
-using Assets.SEE.Game.Drawable;
-using SEE.Net.Actions.Drawable;
 using SEE.Game;
+using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.ValueHolders;
+using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
-using UnityEngine;
-using SEE.Game.Drawable.Configurations;
 using System.Linq;
-using SEE.Game.Drawable;
+using UnityEngine;
 
 namespace SEE.Controls.Actions.Drawable
 {
+    /// <summary>
+    /// This class provides the action to erase (delete) a <see cref="DrawableType"/> object.
+    /// </summary>
     class EraseAction : AbstractPlayerAction
     {
         /// <summary>
         /// A list of memento's for this action.
         /// It will be needed, because a memento saves one deleted drawable object.
         /// </summary>
-        private List<Memento> mementoList = new List<Memento>();
+        private List<Memento> mementoList = new();
 
         /// <summary>
-        /// Saves all the information needed to revert or repeat this action on one drawable object.
+        /// Saves all the information needed to revert or repeat this action for one drawable type object.
         /// </summary>
         private Memento memento;
 
         /// <summary>
-        /// This class can store all the information needed to revert or repeat a <see cref="EraseAction"/>.
+        /// This class can store all the information needed to revert or repeat the <see cref="EraseAction"/>
+        /// for one drawable type object.
         /// </summary>
         private class Memento
         {
@@ -52,6 +56,8 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.Erase"/>.
         /// It deletes one or more drawable object's.
+        /// With the mouse button held down, more than one Drawable Type Object can be deleted. 
+        /// Therefore, a list of mementos is needed.
         /// </summary>
         /// <returns>Whether this Action is finished</returns>
         public override bool Update()
@@ -67,7 +73,8 @@ namespace SEE.Controls.Actions.Drawable
 
                     if (Tags.DrawableTypes.Contains(hittedObject.tag))
                     {
-                        memento = new Memento(GameFinder.GetDrawable(hittedObject), DrawableType.Get(hittedObject));
+                        memento = new Memento(GameFinder.GetDrawable(hittedObject), 
+                            DrawableType.Get(hittedObject));
                         mementoList.Add(memento);
 
                         if (memento.drawableType is MindMapNodeConf conf)
@@ -75,7 +82,8 @@ namespace SEE.Controls.Actions.Drawable
                             DeleteChilds(hittedObject);
                         }
 
-                        new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, hittedObject.name).Execute();
+                        new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                            hittedObject.name).Execute();
                         Destroyer.Destroy(hittedObject);
                     }
                 }
@@ -90,31 +98,45 @@ namespace SEE.Controls.Actions.Drawable
             return false;
         }
 
+        /// <summary>
+        /// This method is needed for Mind Map Nodes. 
+        /// It deletes the child nodes and the branch lines to them.
+        /// </summary>
+        /// <param name="node">The parent node to be deleted.</param>
+        /// <param name="delete">Recursive iteration variable, needed to include the child nodes in the Memento list.</param>
         private void DeleteChilds(GameObject node, bool delete = false)
         {
             GameObject drawable = GameFinder.GetDrawable(node);
             MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
-            Dictionary<GameObject, GameObject> childs = valueHolder.GetChildren().ToDictionary(entry => entry.Key, entry => entry.Value);
+            Dictionary<GameObject, GameObject> childs = valueHolder.GetChildren().
+                ToDictionary(entry => entry.Key, entry => entry.Value);
+            /// The following block deletes the parent branch line of the node.
             if (valueHolder.GetParentBranchLine() != null)
             {
                 GameObject pBranchLine = valueHolder.GetParentBranchLine();
                 memento = new Memento(drawable, DrawableType.Get(pBranchLine));
                 mementoList.Add(memento);
 
-                new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, pBranchLine.name).Execute();
+                new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                    pBranchLine.name).Execute();
                 Destroyer.Destroy(pBranchLine);
             }
+            /// Removes the node from the children list of the parent node.
             if (valueHolder.GetParent() != null)
             {
                 valueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(node);
-                new MindMapRemoveChildNetAction(memento.drawable.ID, memento.drawable.ParentID, MindMapNodeConf.GetNodeConf(node)).Execute();
+                new MindMapRemoveChildNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                    MindMapNodeConf.GetNodeConf(node)).Execute();
             }
 
-            foreach(KeyValuePair<GameObject, GameObject> pair in childs)
+            /// Deletes children nodes recursively and iteratively by recursively calling the <see cref="DeleteChilds"/> function.
+            foreach (KeyValuePair<GameObject, GameObject> pair in childs)
             {
                 DeleteChilds(pair.Key, true);
             }
 
+            /// Adds the node to the memento list and deletes them.
+            /// Is only executed for child nodes in recursively calling.
             if (delete)
             {
                 memento = new Memento(drawable, DrawableType.Get(node));
@@ -127,11 +149,16 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// Reverts this action, i.e., it recovers the deletes drawable object's.
+        /// However, the Memento list is sorted twice before that. 
+        /// First, it is sorted by the types of the Drawable Type Object, 
+        /// and then the Mind Map Nodes are sorted based on the node layer indices. 
+        /// This is because parent nodes must be created before child nodes to avoid errors.
         /// </summary>
         public override void Undo()
         {
             base.Undo();
-            mementoList = mementoList.OrderBy(m => DrawableType.OrderOnType(m.drawableType)).ThenBy(m => DrawableType.OrderMindMap(m.drawableType)).ToList();
+            mementoList = mementoList.OrderBy(m => DrawableType.OrderOnType(m.drawableType)).
+                ThenBy(m => DrawableType.OrderMindMap(m.drawableType)).ToList();
             foreach (Memento mem in mementoList)
             {
                 GameObject drawable = mem.drawable.GetDrawable();
@@ -154,7 +181,8 @@ namespace SEE.Controls.Actions.Drawable
                     if (valueHolder.GetParent() != null)
                     {
                         valueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(toDelete);
-                        new MindMapRemoveChildNetAction(memento.drawable.ID, memento.drawable.ParentID, MindMapNodeConf.GetNodeConf(toDelete)).Execute();
+                        new MindMapRemoveChildNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                            MindMapNodeConf.GetNodeConf(toDelete)).Execute();
                     }
                 }
                 new EraseNetAction(mem.drawable.ID, mem.drawable.ParentID, mem.drawableType.id).Execute();

@@ -1,13 +1,12 @@
-﻿using Assets.SEE.Game.Drawable;
-using SEE.Net.Actions.Drawable;
-using SEE.Game;
+﻿using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
+using SEE.Game.UI.Drawable;
+using SEE.Game.UI.Menu.Drawable;
 using SEE.GO;
+using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
-using Assets.SEE.Game.UI.Drawable;
-using SEE.Game.Drawable;
-using SEE.Game.Drawable.Configurations;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -70,6 +69,51 @@ namespace SEE.Controls.Actions.Drawable
         private static bool mouseWasReleased = true;
 
         /// <summary>
+        /// This struct can store all the information needed to revert or repeat a <see cref="ScaleAction"/>
+        /// </summary>
+        private struct Memento
+        {
+            /// <summary>
+            /// The selected drawable object to scale
+            /// </summary>
+            public GameObject selectedObject;
+            /// <summary>
+            /// The drawable on that the selected object is displayed.
+            /// </summary>
+            public readonly DrawableConfig drawable;
+            /// <summary>
+            /// The id of the selected object
+            /// </summary>
+            public readonly string id;
+            /// <summary>
+            /// The old scale of the selected object.
+            /// </summary>
+            public readonly Vector3 oldScale;
+            /// <summary>
+            /// The new scale of the selected object.
+            /// </summary>
+            public readonly Vector3 newScale;
+
+            /// <summary>
+            /// The constructor, which simply assigns its only parameter to a field in this class.
+            /// </summary>
+            /// <param name="selectedObject">The selected drawable object</param>
+            /// <param name="drawable">The drawable on that the selected object is displayed</param>
+            /// <param name="id">The id of the selected object</param>
+            /// <param name="oldScale">The old scale of the selected object</param>
+            /// <param name="newScale">The new scale of the selected object</param>
+            public Memento(GameObject selectedObject, GameObject drawable, string id,
+                Vector3 oldScale, Vector3 newScale)
+            {
+                this.selectedObject = selectedObject;
+                this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
+                this.id = id;
+                this.oldScale = oldScale;
+                this.newScale = newScale;
+            }
+        }
+
+        /// <summary>
         /// Resets the old selected object, if the action state will leave.
         /// </summary>
         public static void Reset()
@@ -121,98 +165,23 @@ namespace SEE.Controls.Actions.Drawable
             {
                 switch (progressState)
                 {
-                    /// This block allows the selection of a drawable type object for scaling, taking into account the object scales in the last run. 
-                    /// It prevents the same object from being accidentally selected again when the left mouse button is not released. 
-                    /// Therefore, after the last action has been successfully completed, the left mouse button must be released to select the same object again. 
-                    /// Additionally, a ValueResetter component is added to the UI Canvas to reset the two static variables after exiting this action type.
-                    /// The blinking effect is activated to indicate which object has been chosen for scaling.
+                    /// Block for selection.
                     case ProgressState.SelectObject:
-                        if (Input.GetMouseButtonUp(0))
-                        {
-                            mouseWasReleased = true;
-                        }
-                        if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj == null
-                            && Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                            (oldSelectedObj == null || oldSelectedObj != raycastHit.collider.gameObject 
-                                || (oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased)) &&
-                            GameFinder.hasDrawable(raycastHit.collider.gameObject))
-                        {
-                            if (oldSelectedObj != null)
-                            {
-                                if (oldSelectedObj.GetComponent<Rigidbody>() != null)
-                                {
-                                    Destroyer.Destroy(oldSelectedObj.GetComponent<Rigidbody>());
-                                }
-                                if (oldSelectedObj.GetComponent<CollisionController>() != null)
-                                {
-                                    Destroyer.Destroy(oldSelectedObj.GetComponent<CollisionController>());
-                                }
-                            }
-
-                            selectedObj = raycastHit.collider.gameObject;
-                            drawable = GameFinder.GetDrawable(selectedObj);
-                            oldSelectedObj = selectedObj;
-
-                            selectedObj.AddComponent<Rigidbody>().isKinematic = true;
-                            selectedObj.AddComponent<CollisionController>();
-                            selectedObj.AddOrGetComponent<BlinkEffect>();
-
-                            oldScale = selectedObj.transform.localScale;
-                            if (GameObject.Find("UI Canvas").GetComponent<ValueResetter>() == null)
-                            {
-                                GameObject.Find("UI Canvas").AddComponent<ValueResetter>().SetAllowedState(GetActionStateType());
-                            }
-                        }
-                        if (Input.GetMouseButtonUp(0) && selectedObj != null)
-                        {
-                            ScaleMenu.Enable(selectedObj);
-                            progressState = ProgressState.Scale;
-                        }
+                        SelectObject();
                         break;
 
-                    /// In this block, scaling is performed using the mouse wheel, and optionally, the left Ctrl key (faster). 
-                    /// When the left mouse button is pressed and released, scaling is finish and it switches to the last progress state.
+                    /// Block for scaling.
                     case ProgressState.Scale:
                         if (selectedObj.GetComponent<BlinkEffect>() != null)
                         {
-                            string drawableParentName = GameFinder.GetDrawableParentName(drawable);
-                            float scaleFactor = 0f;
-                            bool isScaled = false;
+                            /// Gathers the necessary data for scaling and performs the scaling.
+                            Scale();
 
-                            if (Input.mouseScrollDelta.y > 0 && !Input.GetKey(KeyCode.LeftControl))
-                            {
-                                scaleFactor = ValueHolder.scaleUp;
-                                isScaled = true;
-                            }
-                            if (Input.mouseScrollDelta.y > 0 && Input.GetKey(KeyCode.LeftControl))
-                            {
-                                scaleFactor = ValueHolder.scaleUpFast;
-                                isScaled = true;
-                            }
-
-                            if (Input.mouseScrollDelta.y < 0 && !Input.GetKey(KeyCode.LeftControl))
-                            {
-                                scaleFactor = ValueHolder.scaleDown;
-                                isScaled = true;
-
-                            }
-                            if (Input.mouseScrollDelta.y < 0 && Input.GetKey(KeyCode.LeftControl))
-                            {
-                                scaleFactor = ValueHolder.scaleDownFast;
-                                isScaled = true;
-                            }
-                            if (isScaled)
-                            {
-                                newScale = GameScaler.Scale(selectedObj, scaleFactor);
-                                ScaleMenu.AssignValue(selectedObj);
-                                bool refresh = GameMindMap.ReDrawBranchLines(selectedObj);
-                                new ScaleNetAction(drawable.name, drawableParentName, selectedObj.name, newScale).Execute();
-                                if (refresh)
-                                {
-                                    new MindMapRefreshBranchLinesNetAction(drawable.name, drawableParentName, MindMapNodeConf.GetNodeConf(selectedObj)).Execute();
-                                }
-                            }
-                            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj.GetComponent<BlinkEffect>() != null)
+                            /// Initializes the end of scaling.
+                            /// When the left mouse button is pressed and released, 
+                            /// scaling is finish and it switches to the last progress state.
+                            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) 
+                                && selectedObj.GetComponent<BlinkEffect>() != null)
                             {
                                 selectedObj.GetComponent<BlinkEffect>().Deactivate();
                                 progressState = ProgressState.Finish;
@@ -221,28 +190,8 @@ namespace SEE.Controls.Actions.Drawable
                         return false;
 
                     /// This block completes or resets this action.
-                    /// If no changes were made, it resets.
-                    /// If there are changes the action will be successfull completed.
                     case ProgressState.Finish:
-                        mouseWasReleased = false;
-                        ScaleMenu.Disable();
-                        newScale = selectedObj.transform.localScale;
-                        if (oldScale != newScale)
-                        {
-                            if (!selectedObj.GetComponent<CollisionController>().IsInCollision())
-                            {
-                                Destroyer.Destroy(selectedObj.GetComponent<Rigidbody>());
-                                Destroyer.Destroy(selectedObj.GetComponent<CollisionController>());
-                                memento = new Memento(selectedObj, GameFinder.GetDrawable(selectedObj), selectedObj.name, oldScale, newScale);
-                                currentState = ReversibleAction.Progress.Completed;
-                                return true;
-                            }
-                        } else
-                        {
-                            selectedObj = null;
-                            progressState = ProgressState.SelectObject;
-                        }
-                        break;
+                        return Finish();
                     default:
                         return false;
                 }
@@ -252,48 +201,154 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// This struct can store all the information needed to revert or repeat a <see cref="ScaleAction"/>
+        /// Allows the selection of a drawable type object for scaling, taking into account the object scales in the last run. 
+        /// It prevents the same object from being accidentally selected again when the left mouse button is not released. 
+        /// Therefore, after the last action has been successfully completed, the left mouse button must be released to select the same object again. 
+        /// Additionally, a ValueResetter component is added to the UI Canvas to reset the two static variables after exiting this action type.
+        /// The blinking effect is activated to indicate which object has been chosen for scaling.
         /// </summary>
-        private struct Memento
+        private void SelectObject()
         {
-            /// <summary>
-            /// The selected drawable object to scale
-            /// </summary>
-            public GameObject selectedObject;
-            /// <summary>
-            /// The drawable on that the selected object is displayed.
-            /// </summary>
-            public readonly DrawableConfig drawable;
-            /// <summary>
-            /// The id of the selected object
-            /// </summary>
-            public readonly string id;
-            /// <summary>
-            /// The old scale of the selected object.
-            /// </summary>
-            public readonly Vector3 oldScale;
-            /// <summary>
-            /// The new scale of the selected object.
-            /// </summary>
-            public readonly Vector3 newScale;
-
-            /// <summary>
-            /// The constructor, which simply assigns its only parameter to a field in this class.
-            /// </summary>
-            /// <param name="selectedObject">The selected drawable object</param>
-            /// <param name="drawable">The drawable on that the selected object is displayed</param>
-            /// <param name="id">The id of the selected object</param>
-            /// <param name="oldScale">The old scale of the selected object</param>
-            /// <param name="newScale">The new scale of the selected object</param>
-            public Memento(GameObject selectedObject, GameObject drawable, string id,
-                Vector3 oldScale, Vector3 newScale)
+            /// The selection
+            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj == null
+                && Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
+                (oldSelectedObj == null || oldSelectedObj != raycastHit.collider.gameObject
+                    || (oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased)) 
+                && GameFinder.hasDrawable(raycastHit.collider.gameObject))
             {
-                this.selectedObject = selectedObject;
-                this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
-                this.id = id;
-                this.oldScale = oldScale;
-                this.newScale = newScale;
+                /// If an object was already selected, the Rigidbody and Collision Controller are removed if they are still present.
+                if (oldSelectedObj != null)
+                {
+                    if (oldSelectedObj.GetComponent<Rigidbody>() != null)
+                    {
+                        Destroyer.Destroy(oldSelectedObj.GetComponent<Rigidbody>());
+                    }
+                    if (oldSelectedObj.GetComponent<CollisionController>() != null)
+                    {
+                        Destroyer.Destroy(oldSelectedObj.GetComponent<CollisionController>());
+                    }
+                }
+
+                selectedObj = raycastHit.collider.gameObject;
+                drawable = GameFinder.GetDrawable(selectedObj);
+                oldSelectedObj = selectedObj;
+
+                /// Adds and activates the necessary components to detect a collision. 
+                /// Additionally, the selection is highlighted by the blink effect.
+                selectedObj.AddComponent<Rigidbody>().isKinematic = true;
+                selectedObj.AddComponent<CollisionController>();
+                selectedObj.AddOrGetComponent<BlinkEffect>();
+
+                oldScale = selectedObj.transform.localScale;
+                if (GameObject.Find("UI Canvas").GetComponent<ValueResetter>() == null)
+                {
+                    GameObject.Find("UI Canvas").AddComponent<ValueResetter>()
+                        .SetAllowedState(GetActionStateType());
+                }
             }
+            /// Tracked a released mouse button.
+            if (Input.GetMouseButtonUp(0))
+            {
+                mouseWasReleased = true;
+            }
+            /// Initiates scaling by opening the menu and switching to the corresponding state.
+            if (Input.GetMouseButtonUp(0) && selectedObj != null)
+            {
+                ScaleMenu.Enable(selectedObj);
+                progressState = ProgressState.Scale;
+            }
+        }
+
+        /// <summary>
+        /// In this block, the necessary data for scaling is gathered, and then scaling is performed. 
+        /// The data is collected when the mouse wheel is moved.
+        /// Optionally, the speed of scaling can be increased by pressing the left Ctrl key. 
+        /// </summary>
+        private void Scale()
+        {
+            float scaleFactor = 0f;
+            bool isScaled = false;
+            /// Scale up with normal speed.
+            if (Input.mouseScrollDelta.y > 0 && !Input.GetKey(KeyCode.LeftControl))
+            {
+                scaleFactor = ValueHolder.scaleUp;
+                isScaled = true;
+            }
+            /// Scale up with faster speed.
+            if (Input.mouseScrollDelta.y > 0 && Input.GetKey(KeyCode.LeftControl))
+            {
+                scaleFactor = ValueHolder.scaleUpFast;
+                isScaled = true;
+            }
+            /// Scale down with normal speed.
+            if (Input.mouseScrollDelta.y < 0 && !Input.GetKey(KeyCode.LeftControl))
+            {
+                scaleFactor = ValueHolder.scaleDown;
+                isScaled = true;
+            }
+            /// Scale down with faster speed.
+            if (Input.mouseScrollDelta.y < 0 && Input.GetKey(KeyCode.LeftControl))
+            {
+                scaleFactor = ValueHolder.scaleDownFast;
+                isScaled = true;
+            }
+
+            /// If data has been collected, perform the scaling.
+            if (isScaled)
+            {
+                Scaling(scaleFactor);
+            }
+        }
+
+        /// <summary>
+        /// Performs the scaling.
+        /// If the object to be scaled is a Mind Map Node, the branch lines are updated.
+        /// </summary>
+        /// <param name="scaleFactor">The scale factor by which the existing scale should be multiplied.</param>
+        private void Scaling(float scaleFactor)
+        {
+            string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+
+            newScale = GameScaler.Scale(selectedObj, scaleFactor);
+            ScaleMenu.AssignValue(selectedObj);
+            bool refresh = GameMindMap.ReDrawBranchLines(selectedObj);
+            new ScaleNetAction(drawable.name, drawableParentName, selectedObj.name, newScale).Execute();
+            if (refresh)
+            {
+                new MindMapRefreshBranchLinesNetAction(drawable.name, drawableParentName,
+                    MindMapNodeConf.GetNodeConf(selectedObj)).Execute();
+            }
+        }
+
+        /// <summary>
+        /// This block completes or resets this action.
+        /// If no changes were made, it resets.
+        /// If there are changes the action will be successfull completed.
+        /// </summary>
+        /// <returns>Wheter the action is completed or not.</returns>
+        private bool Finish()
+        {
+            mouseWasReleased = false;
+            ScaleMenu.Disable();
+            newScale = selectedObj.transform.localScale;
+            if (oldScale != newScale)
+            {
+                if (!selectedObj.GetComponent<CollisionController>().IsInCollision())
+                {
+                    Destroyer.Destroy(selectedObj.GetComponent<Rigidbody>());
+                    Destroyer.Destroy(selectedObj.GetComponent<CollisionController>());
+                    memento = new Memento(selectedObj, GameFinder.GetDrawable(selectedObj), 
+                        selectedObj.name, oldScale, newScale);
+                    currentState = ReversibleAction.Progress.Completed;
+                    return true;
+                }
+            }
+            else
+            {
+                selectedObj = null;
+                progressState = ProgressState.SelectObject;
+            }
+            return false;
         }
 
         /// <summary>

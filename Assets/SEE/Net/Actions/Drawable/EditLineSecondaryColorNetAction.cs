@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Game.Drawable;
-using SEE.Controls.Actions.Drawable;
+﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using UnityEngine;
 

@@ -1,59 +1,64 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.UI.Notification;
-using System;
-using System.Collections;
-using System.Xml;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 
-namespace Assets.SEE.Game.UI.Drawable
+namespace SEE.Game.UI.Drawable
 {
     /// <summary>
-    /// This class manages a combination of an input field with a up and a down button.
+    /// This class provides a controller for a combination 
+    /// of an input field with a up and a down button.
     /// </summary>
     public class InputFieldWithButtons : MonoBehaviour
     {
         /// <summary>
-        /// Is the displayed input field of this component.
+        /// Is the input field of this component.
         /// </summary>
         private TMP_InputField inputField;
+
         /// <summary>
-        /// Is the displayed up button of this component.
+        /// Is the button up of this component.
         /// </summary>
         private ButtonManagerBasic upBtn;
+
         /// <summary>
-        /// Is the displayed down button of this component.
+        /// Is the button down of this component.
         /// </summary>
         private ButtonManagerBasic downBtn;
+
         /// <summary>
         /// Is the current value of the input field.
         /// </summary>
         private float value;
+
         /// <summary>
         /// The value with wich the up and down button should calculate.
         /// </summary>
         [SerializeField]
         private float upAndDownValue = 0.01f;
+
         /// <summary>
         /// The minimum value for the input field.
         /// </summary>
         [SerializeField]
         private float minValue = 0.15f;
+
         /// <summary>
         /// The maximum value for the input field.
         /// </summary>
         [SerializeField]
         private float maxValue = 3f;
-        /// <summary>
-        /// An onValueChange event for the input field.
-        /// </summary>
-        [Header("Event")]
-        public UnityEvent<float> onValueChanged = new UnityEvent<float>();
 
         /// <summary>
-        /// An onValueChange event for another input field.
+        /// The action to be executed when the input field is edited.
+        /// </summary>
+        [Header("Event")]
+        public UnityEvent<float> onValueChanged = new();
+
+        /// <summary>
+        /// The action event for another input field.
+        /// When the fields are intended to increase proportionally.
         /// </summary>
         [Header("Event")]
         public UnityEvent<float> onProportionalValueChanged = null;
@@ -66,10 +71,12 @@ namespace Assets.SEE.Game.UI.Drawable
             inputField = GetComponentInChildren<TMP_InputField>();
             upBtn = transform.Find("UpDown").Find("UpBtn").GetComponent<ButtonManagerBasic>();
             downBtn = transform.Find("UpDown").Find("DownBtn").GetComponent<ButtonManagerBasic>();
-            upBtn.clickEvent.AddListener(clickUp);
-            transform.Find("UpDown").Find("UpBtn").gameObject.AddComponent<ButtonHolded>().SetAction(clickUp);
-            downBtn.clickEvent.AddListener(clickDown);
-            transform.Find("UpDown").Find("DownBtn").gameObject.AddComponent<ButtonHolded>().SetAction(clickDown);
+            upBtn.clickEvent.AddListener(ClickUp);
+            /// Adds the component for the option that the button can be holded.
+            transform.Find("UpDown").Find("UpBtn").gameObject.AddComponent<ButtonHolded>().SetAction(ClickUp);
+            downBtn.clickEvent.AddListener(ClickDown);
+            /// Adds the component for the option that the button can be holded.
+            transform.Find("UpDown").Find("DownBtn").gameObject.AddComponent<ButtonHolded>().SetAction(ClickDown);
             inputField.onEndEdit.AddListener(ValueChanged);
         }
 
@@ -77,27 +84,38 @@ namespace Assets.SEE.Game.UI.Drawable
         /// The initial onEndEditEvent for the input field.
         /// It displayed the value and invoke the specific onValueChanged Event
         /// </summary>
-        /// <param name="newValue">is the new value for the input field. It must be between the minimum and maximum range. Otherwise it is set of the respective limit.</param>
+        /// <param name="newValue">is the new value for the input field. It must be between the minimum and maximum range. 
+        /// Otherwise it is set of the respective limit.</param>
         private void ValueChanged(string newValue)
         {
             float oldValue = value;
             newValue = inputField.text;
+            /// If the new value can't be parse in a float, then show a notification and
+            /// set the default value.
             if (!float.TryParse(newValue, out value))
             {
                 ShowNotification.Warn("Wrong format", "The input field only allows float format.");
                 value = 0.5f;
             }
+
+            /// If the value would be less then the <see cref="minValue"/>. 
+            /// Set to <see cref="minValue"/>.
             if (value < minValue)
             {
                 value = minValue;
                 inputField.text = value.ToString();
             }
+
+            /// If the value would be greater then the <see cref="maxValue"/>.
+            /// Set to <see cref="maxValue"/>.
             if (value > maxValue)
             {
                 value = maxValue;
                 inputField.text = value.ToString();
             }
-            if(onProportionalValueChanged != null)
+
+            /// If an action for proportional increase is provided, execute it.
+            if (onProportionalValueChanged != null)
             {
                 onProportionalValueChanged.Invoke(value - oldValue);
             }
@@ -110,14 +128,20 @@ namespace Assets.SEE.Game.UI.Drawable
         /// <param name="assignValue">The value that should assigned.</param>
         public void AssignValue(float assignValue)
         {
+            /// If the value would be less then the <see cref="minValue"/>. 
+            /// Set to <see cref="minValue"/>.
             if (assignValue < minValue)
             {
                 assignValue = minValue;
             }
+
+            /// If the value would be greater then the <see cref="maxValue"/>.
+            /// Set to <see cref="maxValue"/>.
             if (assignValue > maxValue)
             {
                 assignValue = maxValue;
             }
+
             value = assignValue;
             inputField.text = value.ToString();
         }
@@ -125,12 +149,20 @@ namespace Assets.SEE.Game.UI.Drawable
         /// <summary>
         /// OnClick event for the up button.
         /// </summary>
-        private void clickUp()
+        private void ClickUp()
         {
+            /// Assigns the new value. 
+            /// Increase by <see cref="upAndDownValue"/>.
             value += upAndDownValue;
-            value = (float)Decimal.Round((decimal)value, 2);
+            value = (float)decimal.Round((decimal)value, 2);
+
+            /// If the maximum is exceeded, set it to the maximum.
             if (value > maxValue) { value = maxValue; }
+
+            /// Assigns the value.
             AssignValue(value);
+
+            /// If an action for proportional increase is provided, execute it.
             if (onProportionalValueChanged != null)
             {
                 onProportionalValueChanged.Invoke(+upAndDownValue);
@@ -141,12 +173,20 @@ namespace Assets.SEE.Game.UI.Drawable
         /// <summary>
         /// OnClick event for the down button.
         /// </summary>
-        private void clickDown()
+        private void ClickDown()
         {
+            /// Assigns the new value. 
+            /// Decrease by <see cref="upAndDownValue"/>.
             value -= upAndDownValue;
-            value = (float)Decimal.Round((decimal)value, 2);
+            value = (float)decimal.Round((decimal)value, 2);
+            
+            /// If the minimum is undershot, set it to the minimum.
             if (value < minValue) { value = minValue; }
+
+            /// Assigns the value
             AssignValue(value);
+
+            /// If an action for proportional increase is provided, execute it.
             if (onProportionalValueChanged != null)
             {
                 onProportionalValueChanged.Invoke(-upAndDownValue);

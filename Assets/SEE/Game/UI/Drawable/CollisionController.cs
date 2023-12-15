@@ -1,11 +1,12 @@
 ﻿using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
 using UnityEngine;
 
-namespace Assets.SEE.Game.UI.Drawable
+namespace SEE.Game.UI.Drawable
 {
     /// <summary>
     /// The controller for collisions between 
-    /// drawable type objects and a drawable border.
+    /// <see cref="DrawableType"/> objects and a drawable border.
     /// </summary>
     public class CollisionController : MonoBehaviour
     {
@@ -16,6 +17,8 @@ namespace Assets.SEE.Game.UI.Drawable
 
         /// <summary>
         /// Sets the isInCollision true if a collision occurs.
+        /// Only the borders of the used Drawable can have a collision with the <see cref="DrawableType"/> object. 
+        /// This case is necessary, for example, if a sticky note is placed on a whiteboard.
         /// </summary>
         /// <param name="other">The object that causes the collision.</param>
         private void OnTriggerEnter(Collider other)
@@ -25,16 +28,18 @@ namespace Assets.SEE.Game.UI.Drawable
             {
                 isInCollision = true;
             }
-            
+
         }
 
         /// <summary>
         /// Sets the isInCollision false when the collision is over.
+        /// Only the borders of the used Drawable can resolve a collision with the <see cref="DrawableType"/> object. 
+        /// This case is necessary, for example, if a sticky note is placed on a whiteboard.
         /// </summary>
         /// <param name="other">The object that causes the collision.</param>
         private void OnTriggerExit(Collider other)
         {
-            if(GameFinder.GetHighestParent(gameObject).
+            if (GameFinder.GetHighestParent(gameObject).
                 Equals(GameFinder.GetHighestParent(other.gameObject)))
             {
                 isInCollision = false;

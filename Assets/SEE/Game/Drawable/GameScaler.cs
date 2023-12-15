@@ -1,11 +1,9 @@
-﻿using SEE.Game;
-using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Assets.SEE.Game.Drawable
+namespace SEE.Game.Drawable
 {
     /// <summary>
-    /// This class scales a drawable type object
+    /// This class scales an object
     /// </summary>
     public static class GameScaler
     {
@@ -14,13 +12,18 @@ namespace Assets.SEE.Game.Drawable
         /// </summary>
         /// <param name="objectToScale">The drawable type object that should be scaled.</param>
         /// <param name="scaleFactor">The current chosen scale factor.</param>
-        /// <returns></returns>
+        /// <returns>The new scale of the object</returns>
         public static Vector3 Scale(GameObject objectToScale, float scaleFactor)
         {
             Transform transform = objectToScale.transform;
+
+            /// Calculates and sets the new scale for the object.
             Vector3 newScale = transform.localScale * scaleFactor;
             newScale.z = 1f;
             transform.localScale = newScale;
+
+            /// After a line was scaled the mesh collider need to be refreshed,
+            /// because it is not scaled along with it.
             if (objectToScale.CompareTag(Tags.Line))
             {
                 GameDrawer.RefreshCollider(objectToScale);
@@ -37,6 +40,9 @@ namespace Assets.SEE.Game.Drawable
         {
             Transform transform = objectToScale.transform;
             transform.localScale = scale;
+
+            /// After a line was scaled the mesh collider need to be refreshed,
+            /// because it is not scaled along with it.
             if (objectToScale.CompareTag(Tags.Line))
             {
                 GameDrawer.RefreshCollider(objectToScale);

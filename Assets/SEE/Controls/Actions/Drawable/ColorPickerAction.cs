@@ -1,8 +1,8 @@
-using Assets.SEE.Game.Drawable;
-using Assets.SEE.Game.UI.Drawable;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.UI.Drawable;
+using SEE.Game.UI.Menu.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using TMPro;
@@ -11,7 +11,7 @@ using UnityEngine;
 namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
-    /// This class provides a color picker action.
+    /// This class provides a color picker action for <see cref="DrawableType"/> objects.
     /// </summary>
     class ColorPickerAction : AbstractPlayerAction
     {

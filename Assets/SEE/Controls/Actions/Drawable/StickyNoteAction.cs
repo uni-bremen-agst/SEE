@@ -1,15 +1,12 @@
-﻿using Assets.SEE.Game.Drawable;
-using Assets.SEE.Game.UI.Drawable;
-using HighlightPlus;
-using RTG;
+﻿using HighlightPlus;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.UI.Menu.Drawable;
 using SEE.Game.UI.Notification;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 namespace SEE.Controls.Actions.Drawable
@@ -41,7 +38,6 @@ namespace SEE.Controls.Actions.Drawable
         /// It is public and static becaus it will be changed from the menus
         /// with the finish/done button.
         /// </summary>
-        //public static bool finish = false;
         private bool finish = false;
 
         /// <summary>
@@ -69,6 +65,12 @@ namespace SEE.Controls.Actions.Drawable
         /// Represents that the move menu's are open.
         /// </summary>
         private bool moveMenuOpened = false;
+
+        /// <summary>
+        /// An euler angles backup of the selected object.
+        /// Needed for move operation.
+        /// </summary>
+        private Vector3 eulerAnglesBackup;
 
         /// <summary>
         /// Saves all the information needed to revert or repeat this action.
@@ -174,49 +176,11 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>Whether this Operation is finished</returns>
         private bool Spawn()
         {
-            if (Input.GetMouseButtonDown(0) && !inProgress
-            && Raycasting.RaycastAnything(out RaycastHit raycastHit))
-            {
-                inProgress = true;
-                stickyNote = GameStickyNoteManager.Spawn(raycastHit);
+            /// Invocation to place the sticky note at the desired location.
+            SpawnOnPosition();
 
-                /// If the detected object is a drawable or has one, or is part of a sticky note, 
-                /// or is listed in the suitable objects list by name or tag, 
-                /// it is not necessary to choose a rotation, as it can be inherited from the detected object. 
-                /// Otherwise, a desired rotation must be selected for the sticky note.
-                if (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                GameFinder.hasDrawable(raycastHit.collider.gameObject)
-                || GameFinder.IsPartOfADrawable(raycastHit.collider.gameObject)
-                || ValueHolder.IsASuitableObjectForStickyNote(raycastHit.collider.gameObject))
-                {
-                    finish = true;
-
-                }
-                else
-                {
-                    StickyNoteMenu.Disable();
-                    StickyNoteRotationMenu.Enable(stickyNote, raycastHit.collider.gameObject);
-                    StickyNoteMoveMenu.Enable(GameFinder.GetHighestParent(stickyNote), true);
-                }
-            }
-
-            if (StickyNoteMoveMenu.TryGetFinish(out bool isFinished))
-            {
-                finish = isFinished;
-            }
-            else if (stickyNote != null && StickyNoteMoveMenu.IsActive())
-            {
-                MoveByKey(stickyNote, true);
-            }
-
-            if (StickyNoteRotationMenu.TryGetFinish(out bool isRotationFinished))
-            {
-                finish = isRotationFinished;
-            }
-            else if (stickyNote != null && StickyNoteRotationMenu.IsYActive())
-            {
-                RotateByWheel(stickyNote, true);
-            }
+            /// Waits for the correct position and rotation of the sticky note placed from an unsuitable object.
+            SetPositionAndRotation(true);
 
             /// When the spawning is finish create the sticky note on all clients and complete the current state.
             if (finish)
@@ -230,10 +194,68 @@ namespace SEE.Controls.Actions.Drawable
             return false;
         }
 
-        Vector3 eulerAnglesBackup;
+        /// <summary>
+        /// Selects the position for the sticky note and spawns them there.
+        /// If the detected object is a drawable or has one, or is part of a sticky note, 
+        /// or is listed in the suitable objects list by name or tag, 
+        /// it is not necessary to choose a rotation, as it can be inherited from the detected object. 
+        /// Otherwise, a desired rotation must be selected for the sticky note.
+        /// </summary>
+        private void SpawnOnPosition()
+        {
+            if (Input.GetMouseButtonDown(0) && !inProgress
+                && Raycasting.RaycastAnything(out RaycastHit raycastHit))
+            {
+                inProgress = true;
+                stickyNote = GameStickyNoteManager.Spawn(raycastHit);
+
+                /// Block for take the rotation of the suitable object.
+                if (raycastHit.collider.gameObject.CompareTag(Tags.Drawable)
+                    || GameFinder.hasDrawable(raycastHit.collider.gameObject)
+                    || GameFinder.IsPartOfADrawable(raycastHit.collider.gameObject)
+                    || ValueHolder.IsASuitableObjectForStickyNote(raycastHit.collider.gameObject))
+                {
+                    finish = true;
+
+                }
+                else
+                {
+                    /// Block for select the rotation and the right position.
+                    StickyNoteMenu.Disable();
+                    StickyNoteRotationMenu.Enable(stickyNote, raycastHit.collider.gameObject);
+                    StickyNoteMoveMenu.Enable(GameFinder.GetHighestParent(stickyNote), true);
+                }
+            }
+        }
 
         /// <summary>
-        /// "Enables the movement of a sticky note. 
+        /// It waits for either the Move Menu or the Rotation Menu to provide a finish. 
+        /// Additionally, as long as no finish is received from the menus, 
+        /// moving via key and rotating via mouse wheel are provided.
+        /// </summary>
+        private void SetPositionAndRotation(bool spawnMode)
+        {
+            if (StickyNoteMoveMenu.TryGetFinish(out bool isFinished))
+            {
+                finish = isFinished;
+            }
+            else if (stickyNote != null && StickyNoteMoveMenu.IsActive())
+            {
+                MoveByKey(stickyNote, spawnMode);
+            }
+
+            if (StickyNoteRotationMenu.TryGetFinish(out bool isRotationFinished))
+            {
+                finish = isRotationFinished;
+            }
+            else if (stickyNote != null && StickyNoteRotationMenu.IsYActive())
+            {
+                RotateByWheel(stickyNote, true);
+            }
+        }
+
+        /// <summary>
+        /// Enables the movement of a sticky note. 
         /// Initially, the movement is based on the mouse position. 
         /// With another left-click of the mouse, this is terminated, 
         /// and a Rotate and Move menu is opened to make final adjustments.
@@ -242,14 +264,62 @@ namespace SEE.Controls.Actions.Drawable
         private bool Move()
         {
             /// With this block a sticky note to move will be selected.
+            if (!MoveSelection())
+            {
+                return false;
+            }
+
+            /// Finish the sticky note selection and starts the moving.
+            if (inProgress && !mouseWasReleased)
+            {
+                if (Input.GetMouseButtonUp(0))
+                {
+                    mouseWasReleased = true;
+                }
+            }
+
+            /// If a sticky note was selected change the position.
+            /// With a mouse left-click again, the mouse movement is disabled, 
+            /// and a rotate and move menu is opened to make final adjustments.
+            MoveByMouse();
+
+            /// This block is executed after move by mouse and allows fine-tuning for the position and rotation.
+            SetPositionAndRotation(false);
+
+            /// When the moving is finish completed the current state. 
+            /// And save the position and rotation in memento, because they could be changed with the menu's.
+            if (finish)
+            {
+                StickyNoteMoveMenu.Disable();
+                StickyNoteRotationMenu.Disable();
+                memento.changedConfig.Position = stickyNoteHolder.transform.position;
+                memento.changedConfig.Rotation = stickyNoteHolder.transform.eulerAngles;
+                stickyNote.transform.Find("Back").GetComponent<Collider>().enabled = true;
+                currentState = ReversibleAction.Progress.Completed;
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Provides the selection of an object for moving. 
+        /// If an attempt is made to select a non-sticky note, appropriate information is provided. 
+        /// Otherwise, it creates the Memento and disables the collider of the sticky note. 
+        /// The reason for this is that move by mouse would not work as intended with an active collider. 
+        /// Finally, important data for editing the move is collected.
+        /// </summary>
+        /// <returns>true, if a sticky not was selected, Otherwise false</returns>
+        private bool MoveSelection()
+        {
             if (Input.GetMouseButtonDown(0)
-                && Raycasting.RaycastAnything(out RaycastHit raycastHit) && !inProgress &&
-                (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                GameFinder.hasDrawable(raycastHit.collider.gameObject) ||
-                CheckIsPartOfStickyNote(raycastHit.collider.gameObject)))
+                && Raycasting.RaycastAnything(out RaycastHit raycastHit) && !inProgress
+                && (raycastHit.collider.gameObject.CompareTag(Tags.Drawable)
+                    || GameFinder.hasDrawable(raycastHit.collider.gameObject)
+                    || CheckIsPartOfStickyNote(raycastHit.collider.gameObject)))
             {
                 GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
                     raycastHit.collider.gameObject : GameFinder.GetDrawable(raycastHit.collider.gameObject);
+
                 if (GameFinder.GetDrawableParentName(drawable).Contains(ValueHolder.StickyNotePrefix))
                 {
                     inProgress = true;
@@ -268,23 +338,22 @@ namespace SEE.Controls.Actions.Drawable
                     return false;
                 }
             }
+            return true;
+        }
 
-            /// Finish the sticky note selection and starts the moving.
-            if (inProgress && !mouseWasReleased)
-            {
-                if (Input.GetMouseButtonUp(0))
-                {
-                    mouseWasReleased = true;
-                }
-            }
-
-            /// If a sticky note was selected change the position.
-            /// With a mouse left-click again, the mouse movement is disabled, 
-            /// and a rotate and move menu is opened to make final adjustments.
-            if (inProgress && mouseWasReleased && !moveMenuOpened &&
-                Raycasting.RaycastAnything(out RaycastHit hit))
+        /// <summary>
+        /// Enables move by mouse. 
+        /// The sticky note follows the mouse position. 
+        /// This is ended by a mouse click. 
+        /// Subsequently, the Move and Rotation Menu are opened to do the fine-tuning.
+        /// </summary>
+        private void MoveByMouse()
+        {
+            if (inProgress && mouseWasReleased && !moveMenuOpened
+                && Raycasting.RaycastAnything(out RaycastHit hit))
             {
                 Vector3 eulerAngles = eulerAnglesBackup;
+                /// If the new target object is a suitable object, the rotation is adopted.
                 if (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
                     GameFinder.hasDrawable(hit.collider.gameObject) ||
                     GameFinder.IsPartOfADrawable(hit.collider.gameObject) ||
@@ -292,22 +361,30 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     eulerAngles = hit.collider.gameObject.transform.eulerAngles;
                 }
+
                 Vector3 oldPos = stickyNoteHolder.transform.position;
-                if (GameFinder.hasDrawable(hit.collider.gameObject) || 
+                /// If the new target object has a drawable or is part of a sticky note, 
+                /// the Z-axis of the drawable is used for the hit point. 
+                /// This is done to address overlap display errors.
+                if (GameFinder.hasDrawable(hit.collider.gameObject) ||
                     CheckIsPartOfStickyNote(hit.collider.gameObject))
                 {
                     GameObject drawable = GameFinder.GetDrawable(hit.collider.gameObject);
                     hit.point = new Vector3(hit.point.x, hit.point.y, drawable.transform.position.z);
                 }
+
                 GameStickyNoteManager.Move(stickyNoteHolder, hit.point, eulerAngles);
                 Vector3 newPos = stickyNoteHolder.transform.position;
+                /// This block ensures the minimum distance from the object
                 if (oldPos != newPos)
                 {
                     newPos = GameStickyNoteManager.FinishMoving(stickyNoteHolder);
                 }
+
                 new StickyNoteMoveNetAction(GameFinder.GetDrawable(stickyNote).name, stickyNote.name,
                     newPos, eulerAngles).Execute();
 
+                /// Opens the move and rotation menu for fine-tuning.
                 if (Input.GetMouseButton(0))
                 {
                     GameFinder.GetDrawable(stickyNoteHolder).GetComponent<Collider>().enabled = true;
@@ -316,38 +393,6 @@ namespace SEE.Controls.Actions.Drawable
                     moveMenuOpened = true;
                 }
             }
-
-            if (StickyNoteMoveMenu.TryGetFinish(out bool isFinished))
-            {
-                finish = isFinished;
-            }
-            else if (stickyNoteHolder != null && StickyNoteMoveMenu.IsActive())
-            {
-                MoveByKey(stickyNoteHolder, false);
-            }
-
-            if (StickyNoteRotationMenu.TryGetFinish(out bool isRotationFinished))
-            {
-                finish = isRotationFinished;
-            }
-            else if (stickyNoteHolder != null && StickyNoteRotationMenu.IsYActive())
-            {
-                RotateByWheel(stickyNoteHolder, true);
-            }
-
-            /// When the moving is finish completed the current state. 
-            /// And save the position and rotation in memento, because they could be changed with the menu's.
-            if (finish)
-            {
-                StickyNoteMoveMenu.Disable();
-                StickyNoteRotationMenu.Disable();
-                memento.changedConfig.Position = stickyNoteHolder.transform.position;
-                memento.changedConfig.Rotation = stickyNoteHolder.transform.eulerAngles;
-                stickyNote.transform.Find("Back").GetComponent<Collider>().enabled = true;
-                currentState = ReversibleAction.Progress.Completed;
-                return true;
-            }
-            return false;
         }
 
         /// <summary>
@@ -358,8 +403,9 @@ namespace SEE.Controls.Actions.Drawable
         /// <param name="spawnMode">If this method will be called of the spawn method..</param>
         private void MoveByKey(GameObject stickyNote, bool spawnMode)
         {
-            if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.UpArrow)
-                || Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.PageUp) || Input.GetKey(KeyCode.PageDown))
+            if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow)
+                || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow)
+                || Input.GetKey(KeyCode.PageUp) || Input.GetKey(KeyCode.PageDown))
             {
                 ValueHolder.MoveDirection direction = GetDirection();
                 GameObject holder = GameFinder.GetHighestParent(stickyNote);
@@ -412,75 +458,142 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>Whether this Operation is finished</returns>
         private bool Edit()
         {
+            /// This block provides the selection for editing and handles the opening of the needed menus.
+            switch (EditSelection())
+            {
+                case EditReturnState.False:
+                    return false;
+                case EditReturnState.True:
+                    return true;
+                case EditReturnState.None:
+                    break;
+            }
+
+            /// Block for editing the rotation or scale.
+            SetRotationAndScale();
+
+            /// When the editing is finish completed the current state. 
+            /// And save the scale and rotation in memento, because they could be changed with the menu's.
+            if (finish)
+            {
+                memento.changedConfig.Scale = stickyNote.transform.localScale;
+                memento.changedConfig.Rotation = GameFinder.GetHighestParent(stickyNote).transform.eulerAngles;
+                currentState = ReversibleAction.Progress.Completed;
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// The return states of the edit selection.
+        /// </summary>
+        private enum EditReturnState
+        {
+            False,
+            True,
+            None
+        }
+
+        /// <summary>
+        /// Selects a sticky note to be edit.
+        /// </summary>
+        /// <returns>The edit return state. 
+        /// None, if nothing should return. 
+        /// True, if the update method should return a true. 
+        /// False, if the update method should retrun a false.</returns>
+        private EditReturnState EditSelection()
+        {
             if (Input.GetMouseButtonDown(0)
-                && Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                GameFinder.hasDrawable(raycastHit.collider.gameObject) ||
-                CheckIsPartOfStickyNote(raycastHit.collider.gameObject)))
+                && Raycasting.RaycastAnything(out RaycastHit raycastHit) 
+                && (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) 
+                    || GameFinder.hasDrawable(raycastHit.collider.gameObject) 
+                    || CheckIsPartOfStickyNote(raycastHit.collider.gameObject)))
             {
                 GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
                     raycastHit.collider.gameObject : GameFinder.GetDrawable(raycastHit.collider.gameObject);
 
-                /// This block will executed if there was selected another sticky note before in this action run.
-                if (stickyNote != null)
+                /// Checks if changes have been made when a sticky note was already selected.
+                if (CheckChanges() == EditReturnState.True)
                 {
-                    StickyNoteEditMenu.Disable();
-                    StickyNoteRotationMenu.Disable();
-                    ScaleMenu.Disable();
-                    if (stickyNote.GetComponent<HighlightEffect>() != null)
-                    {
-                        Destroyer.Destroy(stickyNote.GetComponent<HighlightEffect>());
-                    }
-                    memento.changedConfig.Scale = stickyNote.transform.localScale;
-                    memento.changedConfig.Rotation = GameFinder.GetHighestParent(stickyNote).transform.eulerAngles;
-
-                    /// If there are changed in the configuration finish this operation.
-                    if (!CheckEquals(memento.originalConfig, memento.changedConfig))
-                    {
-                        currentState = ReversibleAction.Progress.Completed;
-                        return true;
-                    }
+                    return EditReturnState.True;
                 }
 
-                /// This block is executed when no sticky note has been selected yet 
-                /// or when the newly selected sticky note is different from the previous one.
-                if (stickyNote == null || stickyNote != drawable.transform.parent.gameObject)
+                if (SetChosenStickyNote(drawable) != EditReturnState.False)
                 {
-                    /// To edit it is required that a sticky note was selected.
-                    if (GameFinder.GetDrawableParentName(drawable).Contains(ValueHolder.StickyNotePrefix))
-                    {
-                        stickyNote = drawable.transform.parent.gameObject;
-                        GameHighlighter.Enable(stickyNote);
-
-                        memento = new(DrawableConfigManager.GetDrawableConfig(drawable), selectedAction);
-                        memento.changedConfig = DrawableConfigManager.GetDrawableConfig(drawable);
-                        StickyNoteMenu.Disable();
-                        StickyNoteEditMenu.Enable(drawable.transform.parent.gameObject, memento.changedConfig);
-                    }
-                    else
-                    {
-                        if (stickyNote == null)
-                        {
-                            ShowNotification.Info("Wrong selection", "You don't selected a sticky note.");
-                            return false;
-                        }
-                        else
-                        {
-                            stickyNote = null;
-                            selectedAction = Operation.None;
-                            StickyNoteMenu.Enable();
-                        }
-                    }
+                    return EditReturnState.False;
                 }
-                else /// Will be executed if the new selected sticky note is the same as the previous one.
-                {
-                    memento.changedConfig.Scale = stickyNote.transform.localScale;
-                    memento.changedConfig.Rotation = GameFinder.GetHighestParent(stickyNote).transform.eulerAngles;
+            }
+            return EditReturnState.None;
+        }
 
-                    if (!CheckEquals(memento.originalConfig, memento.changedConfig))
+        /// <summary>
+        /// Checks if changes have been made when a sticky note was already selected.
+        /// </summary>
+        /// <returns>True, if changes were made, otherwise None.</returns>
+        private EditReturnState CheckChanges()
+        {
+            if (stickyNote != null)
+            {
+                StickyNoteEditMenu.Disable();
+                StickyNoteRotationMenu.Disable();
+                ScaleMenu.Disable();
+                if (stickyNote.GetComponent<HighlightEffect>() != null)
+                {
+                    Destroyer.Destroy(stickyNote.GetComponent<HighlightEffect>());
+                }
+                memento.changedConfig.Scale = stickyNote.transform.localScale;
+                memento.changedConfig.Rotation = GameFinder.GetHighestParent(stickyNote).transform.eulerAngles;
+
+                /// If there are changed in the configuration finish this operation.
+                if (!CheckEquals(memento.originalConfig, memento.changedConfig))
+                {
+                    currentState = ReversibleAction.Progress.Completed;
+                    return EditReturnState.True;
+                }
+            }
+            return EditReturnState.None;
+        }
+
+        /// <summary>
+        /// Checks if a sticky note has already been set. 
+        /// If not or if a different one than previously chosen is selected, the sticky note is highlighted, 
+        /// and the edit menu is opened. 
+        /// If an attempt is made to select a non-sticky note, an appropriate message is displayed. 
+        /// If a sticky note was already selected and then a non-sticky note is chosen, 
+        /// the action is canceled and reset. 
+        /// This case can only occur if no changes have been made because if changes were present, 
+        /// the action would have already been completed in the <see cref="CheckChanges"/> section. 
+        /// If the same sticky note as the previous time is chosen, it is checked if changes are present.
+        /// If yes, finish is initiated; otherwise, the action is reset.
+        /// </summary>
+        /// <param name="drawable">The drawable of the selected sticky note.</param>
+        /// <returns>The current edit return state:
+        /// None, if nothing should return. 
+        /// True, if the update method should return a true. 
+        /// False, if the update method should retrun a false.</returns>
+        private EditReturnState SetChosenStickyNote(GameObject drawable)
+        {
+            /// This block is executed when no sticky note has been selected yet 
+            /// or when the newly selected sticky note is different from the previous one.
+            if (stickyNote == null || stickyNote != drawable.transform.parent.gameObject)
+            {
+                /// To edit it is required that a sticky note was selected.
+                if (GameFinder.GetDrawableParentName(drawable).Contains(ValueHolder.StickyNotePrefix))
+                {
+                    stickyNote = drawable.transform.parent.gameObject;
+                    GameHighlighter.Enable(stickyNote);
+
+                    memento = new(DrawableConfigManager.GetDrawableConfig(drawable), selectedAction);
+                    memento.changedConfig = DrawableConfigManager.GetDrawableConfig(drawable);
+                    StickyNoteMenu.Disable();
+                    StickyNoteEditMenu.Enable(drawable.transform.parent.gameObject, memento.changedConfig);
+                }
+                else
+                {
+                    if (stickyNote == null)
                     {
-                        finish = true;
-                        return false;
+                        ShowNotification.Info("Wrong selection", "You don't selected a sticky note.");
+                        return EditReturnState.False;
                     }
                     else
                     {
@@ -490,7 +603,34 @@ namespace SEE.Controls.Actions.Drawable
                     }
                 }
             }
+            else /// Will be executed if the new selected sticky note is the same as the previous one.
+            {
+                memento.changedConfig.Scale = stickyNote.transform.localScale;
+                memento.changedConfig.Rotation = GameFinder.GetHighestParent(stickyNote).transform.eulerAngles;
 
+                if (!CheckEquals(memento.originalConfig, memento.changedConfig))
+                {
+                    finish = true;
+                    return EditReturnState.False;
+                }
+                else
+                {
+                    stickyNote = null;
+                    selectedAction = Operation.None;
+                    StickyNoteMenu.Enable();
+                }
+            }
+            return EditReturnState.None;
+        }
+
+        /// <summary>
+        /// It waits for either the rotation menu or the scale menu to provide a finish. 
+        /// Additionally, as long as no finish is received from the menus, 
+        /// rotating and scale via mouse wheel are provided.
+        /// Only one menu can be open at a time, so the mouse wheel can be used for both menus.
+        /// </summary>
+        private void SetRotationAndScale()
+        {
             if (StickyNoteRotationMenu.TryGetFinish(out bool isFinished))
             {
                 finish = isFinished;
@@ -509,18 +649,6 @@ namespace SEE.Controls.Actions.Drawable
             {
                 ScaleByWheel();
             }
-
-
-            /// When the editing is finish completed the current state. 
-            /// And save the scale and rotation in memento, because they could be changed with the menu's.
-            if (finish)
-            {
-                memento.changedConfig.Scale = stickyNote.transform.localScale;
-                memento.changedConfig.Rotation = GameFinder.GetHighestParent(stickyNote).transform.eulerAngles;
-                currentState = ReversibleAction.Progress.Completed;
-                return true;
-            }
-            return false;
         }
 
         /// <summary>
@@ -563,13 +691,14 @@ namespace SEE.Controls.Actions.Drawable
                 StickyNoteRotationMenu.AssignValueToYSlider(newDegree);
                 if (!spawnMode)
                 {
-                    new StickyNoteRoateYNetAction(drawable.name, drawableParentID, newDegree, stickyNote.transform.position).Execute();
+                    new StickyNoteRoateYNetAction(drawable.name, drawableParentID, newDegree, 
+                        stickyNote.transform.position).Execute();
                 }
             }
         }
 
         /// <summary>
-        /// "Enables scaling via the mouse wheel, as well as in the <see cref="ScaleAction"/>.
+        /// Enables scaling via the mouse wheel, as well as in the <see cref="ScaleAction"/>.
         /// </summary>
         private void ScaleByWheel()
         {
@@ -603,7 +732,8 @@ namespace SEE.Controls.Actions.Drawable
                 memento.changedConfig.Scale = GameScaler.Scale(stickyNote, scaleFactor);
                 ScaleMenu.AssignValue(stickyNote);
                 GameObject drawable = GameFinder.GetDrawable(stickyNote);
-                new ScaleNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), stickyNote.name, memento.changedConfig.Scale).Execute();
+                new ScaleNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), stickyNote.name, 
+                    memento.changedConfig.Scale).Execute();
             }
         }
 
@@ -621,7 +751,8 @@ namespace SEE.Controls.Actions.Drawable
                 CheckIsPartOfStickyNote(raycastHit.collider.gameObject)))
             {
                 GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                                raycastHit.collider.gameObject : GameFinder.GetDrawable(raycastHit.collider.gameObject);
+                                raycastHit.collider.gameObject : 
+                                GameFinder.GetDrawable(raycastHit.collider.gameObject);
                 if (GameFinder.GetDrawableParentName(drawable).Contains(ValueHolder.StickyNotePrefix))
                 {
                     memento = new(DrawableConfigManager.GetDrawableConfig(drawable), selectedAction);
@@ -676,14 +807,16 @@ namespace SEE.Controls.Actions.Drawable
                 case Operation.Move:
                     GameObject stickyHolder = GameFinder.GetHighestParent(
                         GameFinder.FindDrawable(memento.originalConfig.ID, memento.originalConfig.ParentID));
-                    GameStickyNoteManager.Move(stickyHolder, memento.originalConfig.Position, memento.originalConfig.Rotation);
+                    GameStickyNoteManager.Move(stickyHolder, memento.originalConfig.Position, 
+                        memento.originalConfig.Rotation);
                     GameObject d = GameFinder.GetDrawable(stickyHolder);
                     string drawableParentID = GameFinder.GetDrawableParentName(d);
                     new StickyNoteMoveNetAction(d.name, drawableParentID, memento.originalConfig.Position,
                         memento.originalConfig.Rotation).Execute();
                     break;
                 case Operation.Edit:
-                    GameObject sticky = GameFinder.FindDrawable(memento.originalConfig.ID, memento.originalConfig.ParentID)
+                    GameObject sticky = GameFinder.FindDrawable(memento.originalConfig.ID, 
+                        memento.originalConfig.ParentID)
                         .transform.parent.gameObject;
                     GameStickyNoteManager.Change(sticky, memento.originalConfig);
                     new StickyNoteChangeNetAction(memento.originalConfig).Execute();
@@ -714,14 +847,16 @@ namespace SEE.Controls.Actions.Drawable
                 case Operation.Move:
                     GameObject stickyHolder = GameFinder.GetHighestParent(
                         GameFinder.FindDrawable(memento.changedConfig.ID, memento.changedConfig.ParentID));
-                    GameStickyNoteManager.Move(stickyHolder, memento.changedConfig.Position, memento.changedConfig.Rotation);
+                    GameStickyNoteManager.Move(stickyHolder, memento.changedConfig.Position, 
+                        memento.changedConfig.Rotation);
                     GameObject d = GameFinder.GetDrawable(stickyHolder);
                     string drawableParentID = GameFinder.GetDrawableParentName(d);
                     new StickyNoteMoveNetAction(d.name, drawableParentID, memento.changedConfig.Position,
                         memento.changedConfig.Rotation).Execute();
                     break;
                 case Operation.Edit:
-                    GameObject sticky = GameFinder.FindDrawable(memento.changedConfig.ID, memento.changedConfig.ParentID)
+                    GameObject sticky = GameFinder.FindDrawable(memento.changedConfig.ID, 
+                        memento.changedConfig.ParentID)
                         .transform.parent.gameObject;
                     GameStickyNoteManager.Change(sticky, memento.changedConfig);
                     new StickyNoteChangeNetAction(memento.changedConfig).Execute();

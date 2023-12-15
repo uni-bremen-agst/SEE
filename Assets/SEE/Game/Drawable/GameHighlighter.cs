@@ -1,12 +1,12 @@
 ﻿using HighlightPlus;
 using SEE.Utils;
-using System.Collections;
+using SEE.Game.Drawable.Configurations;
 using UnityEngine;
 
-namespace Assets.SEE.Game.Drawable
+namespace SEE.Game.Drawable
 {
     /// <summary>
-    /// This class provides highlighter for drawables or drawable type objects
+    /// This class provides highlighter for drawables or <see cref="DrawableType"/> objects
     /// </summary>
     public static class GameHighlighter
     {

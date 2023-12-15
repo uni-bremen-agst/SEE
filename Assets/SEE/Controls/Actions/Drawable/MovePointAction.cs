@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Game.Drawable;
-using SEE.Game;
+﻿using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
@@ -12,7 +11,7 @@ using UnityEngine;
 namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
-    /// This action allows the user to move a point of a line.
+    /// This action allows the user to move a point of a <see cref="LineConf"/>.
     /// It searched for the nearest point based on the mouse position at the moment of selecting.
     /// </summary>
     public class MovePointAction : AbstractPlayerAction

@@ -1,4 +1,3 @@
-using Assets.SEE.Game.Drawable;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
@@ -12,7 +11,7 @@ using UnityEngine;
 namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
-    /// This action allows the user to split a line.
+    /// This action allows the user to split a <see cref="LineConf"/>.
     /// </summary>
     class LineSplitAction : AbstractPlayerAction
     {
@@ -87,6 +86,8 @@ namespace SEE.Controls.Actions.Drawable
                             out List<Vector3> positionsList, out List<int> matchedIndices);
                         GameLineSplit.Split(GameFinder.GetDrawable(hittedObject), originLine, 
                             matchedIndices, positionsList, lines, false);
+
+                        /// Showes a notification if the split was successfully.
                         if (lines.Count > 1)
                         {
                             ShowNotification.Info("Line splitted", 

@@ -1,9 +1,9 @@
-﻿using Assets.SEE.Game.Drawable;
-using Assets.SEE.Game.Drawable.ActionHelpers;
-using Assets.SEE.Game.UI.Drawable;
-using SEE.Game;
+﻿using SEE.Game;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.UI.Drawable;
+using SEE.Game.UI.Menu.Drawable;
 using SEE.Game.UI.Notification;
 using SEE.Game.UI.PropertyDialog.Drawable;
 using SEE.Net.Actions.Drawable;

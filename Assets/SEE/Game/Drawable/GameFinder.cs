@@ -1,7 +1,5 @@
-﻿using SEE.Game;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using SEE.Game.Drawable.Configurations;
 using UnityEngine;
 
 namespace SEE.Game.Drawable
@@ -16,15 +14,18 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="drawableID">the drawable id.</param>
         /// <param name="parentDrawableID">the parent id of the drawable.</param>
-        /// <returns></returns>
+        /// <returns>The sought-after drawable, if found. Otherwise, null.</returns>
         public static GameObject FindDrawable(string drawableID, string parentDrawableID)
         {
             GameObject searchedDrawable = null;
+            /// Gets all drawables of the scene.
             List<GameObject> drawables = new(GameObject.FindGameObjectsWithTag(Tags.Drawable));
 
             foreach (GameObject drawable in drawables)
             {
-                if (parentDrawableID != null && !parentDrawableID.Equals(""))
+                /// Block for searching includes the parend id.
+                if (parentDrawableID != null && !parentDrawableID.Equals("") 
+                    && drawable.transform.parent != null)
                 {
                     string parentName = drawable.transform.parent.gameObject.name;
                     if (string.Equals(parentDrawableID, parentName) &&
@@ -35,13 +36,15 @@ namespace SEE.Game.Drawable
                 }
                 else
                 {
+                    /// Block for searching without parent id.
+                    /// Currently not used, as the drawables from 
+                    /// the Whiteboard and Sticky Notes each have a parent.
                     if (string.Equals(drawableID, drawable.name))
                     {
                         searchedDrawable = drawable;
                     }
                 }
             }
-
             return searchedDrawable;
         }
 
@@ -50,7 +53,7 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="parent">Must be an object of the drawable holder.</param>
         /// <param name="childName">The id of the searched child.</param>
-        /// <returns></returns>
+        /// <returns>The searched child, if found. Otherwise, null</returns>
         public static GameObject FindChild(GameObject parent, string childName)
         {
             Transform[] allChildren;
@@ -81,13 +84,13 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Gets the drawable of the given child.
+        /// Gets the drawable of the given object.
         /// </summary>
-        /// <param name="child">An object of the searched drawable.</param>
+        /// <param name="obj">An object of the searched drawable.</param>
         /// <returns>The drawable object.</returns>
-        public static GameObject GetDrawable(GameObject child)
+        public static GameObject GetDrawable(GameObject obj)
         {
-            return FindChildWithTag(GetHighestParent(child), Tags.Drawable);
+            return FindChildWithTag(GetHighestParent(obj), Tags.Drawable);
         }
 
         /// <summary>
@@ -159,20 +162,23 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Searches for all children with the given tag except the parent has a specific tag.
+        /// Searches for all children with the given tag (<paramref name="childTag"/>) except the parent 
+        /// has a specific tag (<paramref name="parentTag"/>).
         /// Will be used for mind map nodes.
         /// </summary>
         /// <param name="parent">The parent of the children</param>
         /// <param name="childTag">The tag to be searched</param>
         /// <param name="parentTag">The execpt tag</param>
         /// <returns>All children with the searched tag, except those whose parents have the specific tag.</returns>
-        public static List<GameObject> FindAllChildrenWithTagExceptParentHasTag(GameObject parent, string childTag, string parentTag)
+        public static List<GameObject> FindAllChildrenWithTagExceptParentHasTag(GameObject parent, 
+            string childTag, string parentTag)
         {
             List<GameObject> gameObjects = new();
             Transform[] allChildren = parent.GetComponentsInChildren<Transform>();
             foreach (Transform childTransform in allChildren)
             {
-                if (childTransform.gameObject.CompareTag(childTag) && !childTransform.parent.gameObject.CompareTag(parentTag))
+                if (childTransform.gameObject.CompareTag(childTag) 
+                    && !childTransform.parent.gameObject.CompareTag(parentTag))
                 {
                     gameObjects.Add(childTransform.gameObject);
                 }
@@ -258,10 +264,10 @@ namespace SEE.Game.Drawable
 
         /// <summary>
         /// Gets the attached objects object.
-        /// Below this game object, the drawable type objects are placed.
+        /// Below this game object, the <see cref="DrawableType"/> objects are placed.
         /// </summary>
         /// <param name="obj">An object within the drawable holder.</param>
-        /// <returns></returns>
+        /// <returns>the object which holds the <see cref="DrawableType"/> objects of a drawable.</returns>
         public static GameObject GetAttachedObjectsObject(GameObject obj)
         {
             return FindChildWithTag(GetHighestParent(obj), Tags.AttachedObjects);

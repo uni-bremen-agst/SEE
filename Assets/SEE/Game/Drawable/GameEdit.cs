@@ -1,18 +1,14 @@
-﻿using RTG;
-using SEE.Game;
-using SEE.Game.Drawable;
-using SEE.Game.Drawable.Configurations;
-using System.Collections;
-using System.Linq;
+﻿using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.ValueHolders;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using TextConf = SEE.Game.Drawable.Configurations.TextConf;
 
-namespace Assets.SEE.Game.Drawable
+namespace SEE.Game.Drawable
 {
     /// <summary>
-    /// This class manages the editing of a drawable type.
+    /// This class manages the editing of a <see cref="DrawableType"/>.
     /// </summary>
     public static class GameEdit
     {
@@ -69,7 +65,7 @@ namespace Assets.SEE.Game.Drawable
                     case GameDrawer.ColorKind.TwoDashed:
                         renderer.material.color = color;
                         break;
-                }  
+                }
             }
         }
 
@@ -99,17 +95,20 @@ namespace Assets.SEE.Game.Drawable
         /// <summary>
         /// This method changes all editable values of a line at once.
         /// </summary>
-        /// <param name="line">The line whose values should be changed.</param>
+        /// <param name="lineObj">The line whose values should be changed.</param>
         /// <param name="line">Contains the new values.</param>
         public static void ChangeLine(GameObject lineObj, LineConf line)
         {
-            ChangeThickness(lineObj, line.thickness);
-            ChangeLayer(lineObj, line.orderInLayer);
-            GameDrawer.ChangeColorKind(lineObj, line.colorKind, line);
-            ChangePrimaryColor(lineObj, line.primaryColor);
-            ChangeSecondaryColor(lineObj, line.secondaryColor);
-            ChangeLoop(lineObj, line.loop);
-            GameDrawer.ChangeLineKind(lineObj, line.lineKind, line.tiling);
+            if (lineObj.CompareTag(Tags.Line))
+            {
+                ChangeThickness(lineObj, line.thickness);
+                ChangeLayer(lineObj, line.orderInLayer);
+                GameDrawer.ChangeColorKind(lineObj, line.colorKind, line);
+                ChangePrimaryColor(lineObj, line.primaryColor);
+                ChangeSecondaryColor(lineObj, line.secondaryColor);
+                ChangeLoop(lineObj, line.loop);
+                GameDrawer.ChangeLineKind(lineObj, line.lineKind, line.tiling);
+            }
         }
 
         /// <summary>
@@ -125,7 +124,8 @@ namespace Assets.SEE.Game.Drawable
                 if (newLayer - oldLayer > 0)
                 {
                     GameLayerChanger.Increase(obj, newLayer, false);
-                } else
+                }
+                else
                 {
                     GameLayerChanger.Decrease(obj, newLayer, false);
                 }
@@ -139,15 +139,18 @@ namespace Assets.SEE.Game.Drawable
         /// <param name="text">Contains the new values.</param>
         public static void ChangeText(GameObject textObj, TextConf text)
         {
-            ChangeText(textObj, text.text);
-            ChangeFontSize(textObj, text.fontSize);
-            ChangeLayer(textObj, text.orderInLayer);
-            ChangeFontStyles(textObj, text.fontStyles);
-            ChangeFontColor(textObj, text.fontColor);
-            ChangeOutlineColor(textObj, text.outlineColor);
-            ChangeOutlineThickness(textObj, text.outlineThickness);
-            textObj.GetComponent<TextMeshPro>().ForceMeshUpdate(true);
-            GameTexter.RefreshMeshCollider(textObj);
+            if (textObj.CompareTag(Tags.DText))
+            {
+                ChangeText(textObj, text.text);
+                ChangeFontSize(textObj, text.fontSize);
+                ChangeLayer(textObj, text.orderInLayer);
+                ChangeFontStyles(textObj, text.fontStyles);
+                ChangeFontColor(textObj, text.fontColor);
+                ChangeOutlineColor(textObj, text.outlineColor);
+                ChangeOutlineThickness(textObj, text.outlineThickness);
+                textObj.GetComponent<TextMeshPro>().ForceMeshUpdate(true);
+                GameTexter.RefreshMeshCollider(textObj);
+            }
         }
 
         /// <summary>
@@ -185,7 +188,8 @@ namespace Assets.SEE.Game.Drawable
             {
                 TextMeshPro tmp = textObj.GetComponent<TextMeshPro>();
                 tmp.fontSize = fontSize;
-                tmp.rectTransform.sizeDelta = GameTexter.CalculateWidthAndHeight(tmp.text, tmp.font, fontSize, tmp.fontStyle);
+                tmp.rectTransform.sizeDelta = GameTexter.CalculateWidthAndHeight(tmp.text, tmp.font,
+                    fontSize, tmp.fontStyle);
                 textObj.GetComponent<TextMeshPro>().ForceMeshUpdate(true);
                 GameTexter.RefreshMeshCollider(textObj);
             }
@@ -210,7 +214,8 @@ namespace Assets.SEE.Game.Drawable
             {
                 TextMeshPro tmp = textObj.GetComponent<TextMeshPro>();
                 tmp.fontStyle = styles;
-                tmp.rectTransform.sizeDelta = GameTexter.CalculateWidthAndHeight(tmp.text, tmp.font, tmp.fontSize, tmp.fontStyle);
+                tmp.rectTransform.sizeDelta = GameTexter.CalculateWidthAndHeight(tmp.text, tmp.font,
+                    tmp.fontSize, tmp.fontStyle);
                 textObj.GetComponent<TextMeshPro>().ForceMeshUpdate(true);
                 GameTexter.RefreshMeshCollider(textObj);
             }
@@ -285,8 +290,11 @@ namespace Assets.SEE.Game.Drawable
         /// <param name="conf">The configuration which holds the necessary values.</param>
         public static void ChangeImage(GameObject imageObj, ImageConf conf)
         {
-            ChangeLayer(imageObj, conf.orderInLayer);
-            ChangeImageColor(imageObj, conf.imageColor);
+            if (imageObj.CompareTag(Tags.Image))
+            {
+                ChangeLayer(imageObj, conf.orderInLayer);
+                ChangeImageColor(imageObj, conf.imageColor);
+            }
         }
 
         /// <summary>
@@ -296,21 +304,24 @@ namespace Assets.SEE.Game.Drawable
         /// <param name="conf">The configuration which holds the necessary values.</param>
         public static void ChangeMindMapNode(GameObject node, MindMapNodeConf conf)
         {
-            ChangeLine(GameFinder.FindChildWithTag(node, Tags.Line), conf.borderConf);
-            ChangeText(GameFinder.FindChildWithTag(node, Tags.DText), conf.textConf);
-            GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(
-                    GameFinder.GetDrawable(node));
-            GameObject parent = GameFinder.FindChild(attachedObjects, conf.parentNode);
-            GameMindMap.ChangeNodeKind(node, conf.nodeKind, conf.borderConf);
-            GameMindMap.ChangeParent(node, parent);
-
-            GameFinder.FindChildWithTag(node, Tags.Line).GetComponent<MeshCollider>().enabled = false;
-            GameFinder.FindChildWithTag(node, Tags.DText).GetComponent<MeshCollider>().enabled = false;
-            if (conf.branchLineToParent != "")
+            if (node.CompareTag(Tags.MindMapNode))
             {
-                GameObject branch = GameFinder.FindChild(attachedObjects, conf.branchLineToParent);
-                ChangeLine(branch, conf.branchLineConf);
-                branch.GetComponent<MeshCollider>().enabled = false;
+                ChangeLine(GameFinder.FindChildWithTag(node, Tags.Line), conf.borderConf);
+                ChangeText(GameFinder.FindChildWithTag(node, Tags.DText), conf.textConf);
+                GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(
+                        GameFinder.GetDrawable(node));
+                GameObject parent = GameFinder.FindChild(attachedObjects, conf.parentNode);
+                GameMindMap.ChangeNodeKind(node, conf.nodeKind, conf.borderConf);
+                GameMindMap.ChangeParent(node, parent);
+
+                GameFinder.FindChildWithTag(node, Tags.Line).GetComponent<MeshCollider>().enabled = false;
+                GameFinder.FindChildWithTag(node, Tags.DText).GetComponent<MeshCollider>().enabled = false;
+                if (conf.branchLineToParent != "")
+                {
+                    GameObject branch = GameFinder.FindChild(attachedObjects, conf.branchLineToParent);
+                    ChangeLine(branch, conf.branchLineConf);
+                    branch.GetComponent<MeshCollider>().enabled = false;
+                }
             }
         }
     }

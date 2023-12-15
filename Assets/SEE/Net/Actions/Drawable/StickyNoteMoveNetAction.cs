@@ -2,7 +2,6 @@
 using System.Collections;
 using UnityEngine;
 using SEE.Controls.Actions.Drawable;
-using Assets.SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable;
 using UnityEditor;

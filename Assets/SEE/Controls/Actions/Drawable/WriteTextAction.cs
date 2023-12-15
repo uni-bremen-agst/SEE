@@ -1,18 +1,13 @@
-﻿using Assets.SEE.Game.Drawable;
-using Assets.SEE.Game.UI.Drawable;
-using RTG;
-using SEE.Controls.Actions;
-using SEE.DataModel.DG;
-using SEE.Game;
+﻿using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.UI.Drawable;
+using SEE.Game.UI.Menu.Drawable;
 using SEE.Game.UI.Notification;
 using SEE.Game.UI.PropertyDialog.Drawable;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
-using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
 namespace SEE.Controls.Actions.Drawable
@@ -80,7 +75,7 @@ namespace SEE.Controls.Actions.Drawable
             /// The written text.
             /// </summary>
             public TextConf text;
-            
+
             /// <summary>
             /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
@@ -109,7 +104,8 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (firstStart)
             {
-                GameObject.Find("UI Canvas").AddComponent<ValueResetter>().SetAllowedState(GetActionStateType());
+                GameObject.Find("UI Canvas").AddComponent<ValueResetter>()
+                    .SetAllowedState(GetActionStateType());
                 TextMenu.EnableForWriting();
                 firstStart = false;
             }
@@ -129,55 +125,82 @@ namespace SEE.Controls.Actions.Drawable
             {
                 switch (progress)
                 {
-                    /// Block for identifying where to place the text. The <see cref="WriteEditTextDialog"/> is then opened.
-                    /// You can enter the text in it.
+                    /// Block for getting the text position.
                     case ProgressState.GettingPosition:
-                        if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
-                             Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                            (GameFinder.hasDrawable(raycastHit.collider.gameObject) || raycastHit.collider.gameObject.CompareTag(Tags.Drawable)))
-                        {
-                            drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                                raycastHit.collider.gameObject : GameFinder.GetDrawable(raycastHit.collider.gameObject);
-                            position = raycastHit.point;
-                            progress = ProgressState.GettingText;
-                            writeTextDialog = new WriteEditTextDialog();
-                            writeTextDialog.Open();
-                        }
+                        GettingPosition();
                         return false;
 
-                    /// Block for getting the text for the drawable text and create the drawable text if the text is not empty.
-                    /// Because the MeshRenderer of TextMeshPro takes some time to generate the mesh, the MeshCollider of the text must be refreshed.
-                    /// When the text for the drawable text is not empty the action will be finished.
+                    /// Block for getting the text.
                     case ProgressState.GettingText:
-                        if (writeTextDialog.GetUserInput(out string textOut))
-                        {
-                            if (textOut != null && textOut != "")
-                            {
-                                textObj = GameTexter.WriteText(drawable, textOut, position, ValueHolder.currentPrimaryColor, ValueHolder.currentSecondaryColor,
-                                    ValueHolder.currentOutlineThickness, ValueHolder.currentFontSize, ValueHolder.currentOrderInLayer, TextMenu.GetFontStyle());
-                                new WriteTextNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), TextConf.GetText(textObj)).Execute();
-                                memento = new Memento(drawable, TextConf.GetText(textObj));
-                                GameTexter.RefreshMeshCollider(textObj);
-                                currentState = ReversibleAction.Progress.Completed;
-                                return true;
-                            }
-                            else
-                            {
-                                ShowNotification.Warn("Empty text", "The text to write is empty. Please add one.");
-                                progress = ProgressState.GettingPosition;
-                                return false;
-                            }
-                        }
-                        /// If the dialog was canceled the action will starts from beginning.
-                        if (writeTextDialog.WasCanceled())
-                        {
-                            progress = ProgressState.GettingPosition;
-                        }
-                        return false;
+                        return GettingText();
                     default:
                         return false;
 
                 }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Identifying where the text should be placed. 
+        /// The <see cref="WriteEditTextDialog"/> is then opened.
+        /// The user can enter the text in it.
+        /// Changes the progress state to <see cref="ProgressState.GettingText"/>
+        /// </summary>
+        private void GettingPosition()
+        {
+            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
+                && Raycasting.RaycastAnything(out RaycastHit raycastHit)
+                && (GameFinder.hasDrawable(raycastHit.collider.gameObject)
+                    || raycastHit.collider.gameObject.CompareTag(Tags.Drawable)))
+            {
+                drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
+                    raycastHit.collider.gameObject : GameFinder.GetDrawable(raycastHit.collider.gameObject);
+                position = raycastHit.point;
+                progress = ProgressState.GettingText;
+                writeTextDialog = new WriteEditTextDialog();
+                writeTextDialog.Open();
+            }
+        }
+
+        /// <summary>
+        /// Gets the user input for the drawable text and create the drawable text if the text is not empty.
+        /// Because the mesh renderer of TextMeshPro takes some time to generate the mesh, 
+        /// the mesh collider of the text must be refreshed.
+        /// When the text for the drawable text is not empty the action will be finished.
+        /// 
+        /// If the dialog was canceled or the user input is empty, then the action is resets.
+        /// </summary>
+        /// <returns>Whatever the success of creating is.</returns>
+        private bool GettingText()
+        {
+            if (writeTextDialog.GetUserInput(out string textOut))
+            {
+                if (textOut != null && textOut != "")
+                {
+                    textObj = GameTexter.WriteText(drawable, textOut, position, 
+                        ValueHolder.currentPrimaryColor, ValueHolder.currentSecondaryColor,
+                        ValueHolder.currentOutlineThickness, ValueHolder.currentFontSize, 
+                        ValueHolder.currentOrderInLayer, TextMenu.GetFontStyle());
+
+                    new WriteTextNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
+                        TextConf.GetText(textObj)).Execute();
+                    memento = new Memento(drawable, TextConf.GetText(textObj));
+                    GameTexter.RefreshMeshCollider(textObj);
+                    currentState = ReversibleAction.Progress.Completed;
+                    return true;
+                }
+                else
+                {
+                    ShowNotification.Warn("Empty text", "The text to write is empty. Please add one.");
+                    progress = ProgressState.GettingPosition;
+                    return false;
+                }
+            }
+            /// If the dialog was canceled the action will starts from beginning.
+            if (writeTextDialog.WasCanceled())
+            {
+                progress = ProgressState.GettingPosition;
             }
             return false;
         }

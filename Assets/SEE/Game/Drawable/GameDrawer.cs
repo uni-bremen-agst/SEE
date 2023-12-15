@@ -1,17 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.Utils;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using UnityEngine;
-using SEE.Game.Drawable.Configurations;
-using SEE.Game.Drawable;
-using SEE.Game;
 
-namespace Assets.SEE.Game.Drawable
+namespace SEE.Game.Drawable
 {
+    /// <summary>
+    /// This class provides the creation of the <see cref="DrawableType"/> <see cref="LineConf"/>.
+    /// </summary>
     public static class GameDrawer
     {
+        /// <summary>
+        /// The different color kinds.
+        /// </summary>
         [Serializable]
         public enum ColorKind
         {
@@ -19,18 +25,29 @@ namespace Assets.SEE.Game.Drawable
             Gradient,
             TwoDashed
         }
+
+        /// <summary>
+        /// Gets a list with the color kinds.
+        /// If <paramref name="isDashedLineKind"/> is true, the list contains <see cref="ColorKind.TwoDashed"/>.
+        /// Otherwise, the list only contains <see cref="ColorKind.Monochrome"/> and <see cref="ColorKind.Gradient"/>.
+        /// </summary>
+        /// <param name="isDashedLineKind">Whether the line has a dashed line child.</param>
+        /// <returns>The color kind list depending on <paramref name="isDashedLineKind"/>.</returns>
         public static List<ColorKind> GetColorKinds(bool isDashedLineKind)
         {
             if (isDashedLineKind)
             {
                 return Enum.GetValues(typeof(ColorKind)).Cast<ColorKind>().ToList();
-            } else
+            }
+            else
             {
-                return new List<ColorKind>() { ColorKind.Monochrome, ColorKind.Gradient};
+                return new List<ColorKind>() { ColorKind.Monochrome, ColorKind.Gradient };
             }
         }
 
-
+        /// <summary>
+        /// The different line kinds.
+        /// </summary>
         [Serializable]
         public enum LineKind
         {
@@ -41,41 +58,79 @@ namespace Assets.SEE.Game.Drawable
             Dashed75,
             Dashed100
         }
+
+        /// <summary>
+        /// Gets a list with all the different line kinds.
+        /// </summary>
+        /// <returns>a list with all the line kinds.</returns>
         public static List<LineKind> GetLineKinds()
         {
             return Enum.GetValues(typeof(LineKind)).Cast<LineKind>().ToList();
         }
 
-        private static void Setup(GameObject drawable, string name, Vector3[] positions, ColorKind colorKind, 
-            Color primaryColor, Color secondaryColor, float thickness, int order, LineKind lineKind, float tiling,
+        /// <summary>
+        /// Setups a line object based on the parameters.
+        /// It creates the initial line.
+        /// </summary>
+        /// <param name="drawable">The drawable on which the line should displayed.</param>
+        /// <param name="name">The line name, can be empty.</param>
+        /// <param name="positions">The positions of the line.</param>
+        /// <param name="colorKind">The color kind of the line.</param>
+        /// <param name="primaryColor">The primary color of the line.</param>
+        /// <param name="secondaryColor">The secondary color of the line.</param>
+        /// <param name="thickness">The line thickness.</param>
+        /// <param name="order">The order in layer for the line.</param>
+        /// <param name="lineKind">The line kind of the line.</param>
+        /// <param name="tiling">The tiling for a dashed line kind.</param>
+        /// <param name="line">The created line object</param>
+        /// <param name="renderer">The line renderer of the line.</param>
+        /// <param name="meshCollider">The mesh collider of the line.</param>
+        private static void Setup(GameObject drawable, string name, Vector3[] positions, 
+            ColorKind colorKind, Color primaryColor, Color secondaryColor, float thickness, 
+            int order, LineKind lineKind, float tiling,
             out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider)
         {
+            /// If the object has been created earlier, it already has a name, 
+            /// and this name is taken from the parameters <paramref name="name"/>.
             if (name.Length > 4)
             {
                 line = new(name);
             }
             else
             {
+                /// Otherwise, a name for the line will be generated.
+                /// For this, the <see cref="ValueHolder.LinePrefix"/> is concatenated with 
+                /// the object ID along with a random string consisting of four characters.
                 line = new("");
                 name = ValueHolder.LinePrefix + line.GetInstanceID() + DrawableHolder.GetRandomString(4);
-                while(GameFinder.FindChild(drawable, name) != null)
+                /// Check if the name is already in use. If so, generate a new name.
+                while (GameFinder.FindChild(drawable, name) != null)
                 {
                     name = ValueHolder.LinePrefix + line.GetInstanceID() + DrawableHolder.GetRandomString(4);
                 }
                 line.name = name;
             }
+            /// Setups the drawable holder <see cref="DrawableHolder"/>.
+            DrawableHolder.Setup(drawable, out GameObject highestParent, out GameObject attachedObjects);
 
-            GameObject highestParent, attachedObjects;
-            DrawableHolder.Setup(drawable, out highestParent, out attachedObjects);
-
+            /// Assign the line tag to the line object.
             line.tag = Tags.Line;
+
+            /// Add the line object to the hierarchy below the attached objects - object of the drawable.
             line.transform.SetParent(attachedObjects.transform);
-            
+
+            /// Adds the line renderer to the line object.
             renderer = line.AddComponent<LineRenderer>();
+            /// Adds the mesh collider to the line object.
             meshCollider = line.AddComponent<MeshCollider>();
+            /// Ensure that the line is represented in a flat (2D) manner.
             renderer.alignment = LineAlignment.TransformZ;
+            /// Sets the correct material for the chosen line kind.
             renderer.sharedMaterial = GetMaterial(primaryColor, lineKind);
-            line.AddComponent<LineValueHolder>().SetColorKind(colorKind);
+            /// Adds the line value holder to the object and assign the color kind to it.
+            line.AddComponent<LineValueHolder>()
+                .SetColorKind(colorKind);
+            /// Set the color(s) of the line depending on the chosen color kind.
             switch (colorKind)
             {
                 case ColorKind.Monochrome:
@@ -93,51 +148,105 @@ namespace Assets.SEE.Game.Drawable
                     renderer.materials[1].color = secondaryColor;
                     break;
             }
+            /// Sets the texture scale of the renderer depending on the chosen line kind.
             SetRendererTextrueScale(renderer, lineKind, tiling);
+            /// Sets the line thickness.
             renderer.startWidth = thickness;
             renderer.endWidth = renderer.startWidth;
+            /// Use world space must be false, as it allows the line to be moved and rotated.
             renderer.useWorldSpace = false;
+            /// Ensure that the renderer have enough positions for the <paramref name="positions">.
             renderer.positionCount = positions.Length;
+            /// Make the line ends round.
             renderer.numCapVertices = 90;
 
+            /// Set the position of the line and ensure the correct order in the layer. 
+            /// Additionally, adopt the rotation of the attached object.
             line.transform.position = attachedObjects.transform.position;
             line.transform.rotation = attachedObjects.transform.rotation;
             line.transform.position -= line.transform.forward * ValueHolder.distanceToDrawable.z * order;
 
+            /// Adds the order in layer value holder component to the line object and sets the order.
             line.AddComponent<OrderInLayerValueHolder>().SetOrderInLayer(order);
+            /// Sets the line kind in the line value holder.
             line.GetComponent<LineValueHolder>().SetLineKind(lineKind);
         }
 
+        /// <summary>
+        /// Gets the <see cref="LineRenderer"/> of the line.
+        /// </summary>
+        /// <param name="line">The line whose Line Renderer is to be returned.</param>
+        /// <returns>The <see cref="LineRenderer"/></returns>
         private static LineRenderer GetRenderer(GameObject line)
         {
             return line.GetComponent<LineRenderer>();
         }
 
+        /// <summary>
+        /// Gets the <see cref="MeshCollider"/> of the line.
+        /// </summary>
+        /// <param name="line">The line whose Mesh Collider is to be returned.</param>
+        /// <returns>The <see cref="MeshCollider"/></returns>
         private static MeshCollider GetMeshCollider(GameObject line)
         {
             return line.GetComponent<MeshCollider>();
         }
-        public static GameObject StartDrawing(GameObject drawable, Vector3[] positions, ColorKind colorKind, 
+
+        /// <summary>
+        /// Initiate the drawing of a line. 
+        /// This call creates the line and adds the initial position. 
+        /// Additionally, it increases the current order in the layer. 
+        /// 
+        /// To add further points to the created line, the <see cref="Drawing"/> method must be 
+        /// subsequently called with the new points. 
+        /// To complete the drawing, <see cref="FinishDrawing"/> should be executed at the end. 
+        /// If desired, <see cref="SetPivot"/> can then be called to set the correct pivot.
+        /// </summary>
+        /// <param name="drawable">The drawable on which the line should be displayed.</param>
+        /// <param name="positions">The start positions for the line.</param>
+        /// <param name="colorKind">The chosen color kind for the line.</param>
+        /// <param name="primaryColor">The chosen primary color for the line.</param>
+        /// <param name="secondaryColor">The chosen secondary color for the line.</param>
+        /// <param name="thickness">The line thickness.</param>
+        /// <param name="lineKind">The chosen line kind.</param>
+        /// <param name="tiling">The tiling for a dashed line kind.</param>
+        /// <returns>The created line.</returns>
+        public static GameObject StartDrawing(GameObject drawable, Vector3[] positions, ColorKind colorKind,
             Color primaryColor, Color secondaryColor, float thickness, LineKind lineKind, float tiling)
         {
-            Setup(drawable, "", positions, colorKind, primaryColor, secondaryColor, thickness, 
-                ValueHolder.currentOrderInLayer, lineKind, tiling, out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
+            Setup(drawable, "", positions, colorKind, primaryColor, secondaryColor, thickness,
+                ValueHolder.currentOrderInLayer, lineKind, tiling, 
+                out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
             ValueHolder.currentOrderInLayer++;
 
             return line;
         }
 
         /// <summary>
-        ///  Draws the line given the <see cref="positions"/>.
+        /// Update the positions of an existing line.
         /// </summary>
+        /// <param name="line">The line to be updated.</param>
+        /// <param name="positions">The new positions for the line.</param>
         public static void Drawing(GameObject line, Vector3[] positions)
         {
             LineRenderer renderer = GetRenderer(line);
             renderer.positionCount = positions.Length;
+            /// Ensure that all points of the line have a z-axis value of 0.
             UpdateZPositions(ref positions);
             renderer.SetPositions(positions);
         }
 
+        /// <summary>
+        /// Finish drawing a line. 
+        /// Ensure that the mesh collider aligns with the renderer line points. 
+        /// However, the generated mesh must have at least three different points for this to work 
+        /// (otherwise, the mesh won't function).
+        /// 
+        /// Additionally, it can be specified whether the line should form a loop, 
+        /// meaning that the endpoint is connected to the starting point.
+        /// </summary>
+        /// <param name="line">The line for which drawing is to be finished.</param>
+        /// <param name="loop">Option to connect the line endpoint with the starting point.</param>
         public static void FinishDrawing(GameObject line, bool loop)
         {
             LineRenderer renderer = GetRenderer(line);
@@ -152,11 +261,36 @@ namespace Assets.SEE.Game.Drawable
 
         }
 
-        public static GameObject DrawLine(GameObject drawable, String name, Vector3[] positions, ColorKind colorKind, 
-            Color primaryColor, Color secondaryColor, float thickness, bool loop, LineKind lineKind, float tiling, bool increaseCurrentOrder = true)
+        /// <summary>
+        /// Draws or updates an entire line. 
+        /// It combines the functionality of the methods <see cref="StartDrawing"/>, <see cref="Drawing"/>, and <see cref="FinishDrawing"/>. 
+        /// 
+        /// First, it ensures that the z-axis of the positions is set to 0. 
+        /// Then, it checks if the line is already present on the drawable. 
+        /// If so, the line is only refreshed. 
+        /// Otherwise, it is newly created.
+        /// </summary>
+        /// <param name="drawable">The drawable on which the line should be displayed.</param>
+        /// <param name="name">The name of the line, can be empty.</param>
+        /// <param name="positions">The positions for the line.</param>
+        /// <param name="colorKind">The chosen color kind.</param>
+        /// <param name="primaryColor">The chosen primary color for the line.</param>
+        /// <param name="secondaryColor">The chosen secondary color for the line.</param>
+        /// <param name="thickness">The line thickness.</param>
+        /// <param name="loop">Option to connect the line endpoint with the starting point.</param>
+        /// <param name="lineKind">The line kind for the line.</param>
+        /// <param name="tiling">The tiling for a dashed line kind</param>
+        /// <param name="increaseCurrentOrder">Option to increase the current order in the layer value. 
+        /// By default, it is set to true.</param>
+        /// <returns>The created or updated line.</returns>
+        public static GameObject DrawLine(GameObject drawable, string name, Vector3[] positions, ColorKind colorKind,
+            Color primaryColor, Color secondaryColor, float thickness, bool loop, LineKind lineKind, 
+            float tiling, bool increaseCurrentOrder = true)
         {
             GameObject lineObject;
+            /// Updates the z axis values of the positions to 0.
             UpdateZPositions(ref positions);
+            /// If the drawable already has a child with this name, update it.
             if (GameFinder.FindChild(drawable, name) != null)
             {
                 lineObject = GameFinder.FindChild(drawable, name);
@@ -165,8 +299,10 @@ namespace Assets.SEE.Game.Drawable
             }
             else
             {
-                Setup(drawable, name, positions, colorKind, primaryColor, secondaryColor, thickness, 
-                    ValueHolder.currentOrderInLayer, lineKind, tiling, out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
+                /// Block for creating a new line.
+                Setup(drawable, name, positions, colorKind, primaryColor, secondaryColor, thickness,
+                    ValueHolder.currentOrderInLayer, lineKind, tiling, 
+                    out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
                 lineObject = line;
                 renderer.SetPositions(positions);
                 if (increaseCurrentOrder)
@@ -178,15 +314,47 @@ namespace Assets.SEE.Game.Drawable
             return lineObject;
         }
 
-        public static GameObject ReDrawLine(GameObject drawable, String name, Vector3[] positions, 
-            ColorKind colorKind, Color primaryColor, Color secondaryColor, float thickness, int orderInLayer, Vector3 position,
-            Vector3 eulerAngles, Vector3 scale, bool loop, LineKind lineKind, float tiling)
+        /// <summary>
+        /// Redraws a line that has been drawn before. 
+        /// The difference from <see cref="DrawLine"/> is that the object's position,
+        /// rotation, scale and order in layer is also restored in this case. 
+        /// Otherwise, it works almost the same. 
+        /// The difference is that in the <see cref="ReDrawLine"/>, you cannot specify 
+        /// that the order in the layer should not be increased. 
+        /// This only happens if the order in layer of the line to be created is greater 
+        /// than or equal to the current maximum order.
+        /// </summary>
+        /// <param name="drawable">The drawable on which the line should be displayed.</param>
+        /// <param name="name">The name of the line, can be empty.</param>
+        /// <param name="positions">The positions for the line.</param>
+        /// <param name="colorKind">The chosen color kind.</param>
+        /// <param name="primaryColor">The chosen primary color for the line.</param>
+        /// <param name="secondaryColor">The chosen secondary color for the line.</param>
+        /// <param name="thickness">The line thickness.</param>
+        /// <param name="orderInLayer">The order in layer for the line object</param>
+        /// <param name="position">The position for the line object</param>
+        /// <param name="eulerAngles">The euler angles for the line object</param>
+        /// <param name="scale">The scale for the line object.</param>
+        /// <param name="loop">Option to connect the line endpoint with the starting point.</param>
+        /// <param name="lineKind">The line kind for the line.</param>
+        /// <param name="tiling">The tiling for a dashed line kind</param>
+        /// <returns>The recreated or updated line.</returns>
+        public static GameObject ReDrawLine(GameObject drawable, string name, Vector3[] positions,
+            ColorKind colorKind, Color primaryColor, Color secondaryColor, float thickness, 
+            int orderInLayer, Vector3 position, Vector3 eulerAngles, Vector3 scale, bool loop, 
+            LineKind lineKind, float tiling)
         {
+            /// Updates the z axis values of the positions to 0.
             UpdateZPositions(ref positions);
+
+            /// Adjusts the current order in the layer if the 
+            /// order in layer for the line is greater than or equal to it.
             if (orderInLayer >= ValueHolder.currentOrderInLayer)
             {
                 ValueHolder.currentOrderInLayer = orderInLayer + 1;
             }
+
+            /// Block for update an existing line with the given name.
             if (GameFinder.FindChild(drawable, name) != null)
             {
                 GameObject line = GameFinder.FindChild(drawable, name);
@@ -201,8 +369,10 @@ namespace Assets.SEE.Game.Drawable
             }
             else
             {
-                Setup(drawable, name, positions, colorKind, primaryColor, secondaryColor, thickness, 
-                    orderInLayer, lineKind, tiling, out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
+                /// Block for creating of a new line.
+                Setup(drawable, name, positions, colorKind, primaryColor, secondaryColor, thickness,
+                    orderInLayer, lineKind, tiling, 
+                    out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
                 line.transform.localScale = scale;
                 line.transform.localEulerAngles = eulerAngles;
                 line.transform.localPosition = position;
@@ -214,6 +384,13 @@ namespace Assets.SEE.Game.Drawable
             }
         }
 
+        /// <summary>
+        /// Redraws or update the line of the given <see cref="LineConf"/> to the <paramref name="drawable"/>.
+        /// It calls <see cref="ReDrawLine(GameObject, string, Vector3[], ColorKind, Color, Color, float, int, Vector3, Vector3, Vector3, bool, LineKind, float)"/>
+        /// </summary>
+        /// <param name="drawable">The drawable on which the line should be displayed.</param>
+        /// <param name="lineToRedraw">The configuration of the line to be restore.</param>
+        /// <returns>The created line.</returns>
         public static GameObject ReDrawLine(GameObject drawable, LineConf lineToRedraw)
         {
             GameObject line = ReDrawLine(drawable,
@@ -232,106 +409,204 @@ namespace Assets.SEE.Game.Drawable
                  lineToRedraw.tiling);
             return line;
         }
+
+        /// <summary>
+        /// Sets the pivot of the line to the center of the line. 
+        /// For an odd number of positions, the pivot is placed precisely at the midpoint. 
+        /// For an even number, the midpoint is calculated by adding the two middle points and 
+        /// dividing by two, obtaining the center of the two middle points.
+        /// 
+        /// After determining the midpoint, 
+        /// the line positions are converted to world space, 
+        /// and the line is shifted to the midpoint. 
+        /// Subsequently, the world space coordinates are converted back to local, 
+        /// ensuring that the visual representation of the line remains unchanged while the pivot is shifted.
+        /// </summary>
+        /// <param name="line">The line in which the pivot should be set</param>
+        /// <returns>The line with the pivot in the middle</returns>
         public static GameObject SetPivot(GameObject line)
         {
-            LineRenderer renderer = GetRenderer(line);
-            Vector3[] positions = new Vector3[renderer.positionCount];
-            renderer.GetPositions(positions);
-            Vector3 middlePos = Vector3.zero;
-            if (positions.Length % 2 == 1)
+            if (line.CompareTag(Tags.Line))
             {
-                middlePos = positions[(int)Mathf.Round(positions.Length / 2)];
+                LineRenderer renderer = GetRenderer(line);
+                Vector3[] positions = new Vector3[renderer.positionCount];
+                renderer.GetPositions(positions);
+                Vector3 middlePos;
+                /// Calculate the middle point.
+                if (positions.Length % 2 == 1)
+                {
+                    /// Block for odd number of positions.
+                    middlePos = positions[(int)Mathf.Round(positions.Length / 2)];
+                }
+                else
+                {
+                    /// Block for even number of positions.
+                    Vector3 left = positions[positions.Length / 2 - 1];
+                    Vector3 right = positions[positions.Length / 2];
+                    middlePos = (left + right) / 2;
+                }
+
+                /// Restoration of the line's appearance.
+                middlePos.z = line.transform.localPosition.z;
+                Vector3[] convertedPositions = new Vector3[positions.Length];
+                Array.Copy(sourceArray: positions, destinationArray: convertedPositions, length: positions.Length);
+                /// Transform the line positions to world space.
+                line.transform.TransformPoints(convertedPositions);
+                /// Move the line to the middle pos.
+                line.transform.localPosition = middlePos;
+                /// Transform the line positions back to local space.
+                line.transform.InverseTransformPoints(convertedPositions);
+                /// Update the new line positions.
+                Drawing(line, convertedPositions);
+                /// Update the mesh collider.
+                FinishDrawing(line, renderer.loop);
             }
-            else
-            {
-                Vector3 left = positions[(positions.Length / 2) - 1];
-                Vector3 right = positions[positions.Length / 2];
-                middlePos = (left + right) / 2;
-            }
-            middlePos.z = line.transform.localPosition.z;
-            Vector3[] convertedPositions = new Vector3[positions.Length];
-            Array.Copy(sourceArray: positions, destinationArray: convertedPositions, length: positions.Length);
-            line.transform.TransformPoints(convertedPositions);
-            line.transform.localPosition = middlePos;
-            line.transform.InverseTransformPoints(convertedPositions);
-            Drawing(line, convertedPositions);
-            FinishDrawing(line, renderer.loop);
             return line;
         }
 
+        /// <summary>
+        /// Sets the pivot point for shapes. 
+        /// In this case, the pivot point is placed at the original hit point of creation, 
+        /// corresponding to the center of the shape.
+        /// </summary>
+        /// <param name="line">The shape for which the pivot point should be set.</param>
+        /// <param name="middlePos">The center position for the shape.</param>
+        /// <returns></returns>
         public static GameObject SetPivotShape(GameObject line, Vector3 middlePos)
         {
-            LineRenderer renderer = GetRenderer(line);
-            Vector3[] positions = new Vector3[renderer.positionCount];
-            renderer.GetPositions(positions);
-            middlePos.z = line.transform.localPosition.z;
-            Vector3[] convertedPositions = new Vector3[positions.Length];
-            Array.Copy(sourceArray: positions, destinationArray: convertedPositions, length: positions.Length);
-            line.transform.TransformPoints(convertedPositions);
-            line.transform.localPosition = middlePos;
-            line.transform.InverseTransformPoints(convertedPositions);
-            Drawing(line, convertedPositions);
-            FinishDrawing(line, renderer.loop);
+            if (line.CompareTag(Tags.Line))
+            {
+                LineRenderer renderer = GetRenderer(line);
+                /// Gets the positions of the shape.
+                Vector3[] positions = new Vector3[renderer.positionCount];
+                renderer.GetPositions(positions);
+                middlePos.z = line.transform.localPosition.z;
+                /// Gets a copy of the positions.
+                Vector3[] convertedPositions = new Vector3[positions.Length];
+                Array.Copy(sourceArray: positions, destinationArray: convertedPositions, length: positions.Length);
+                /// Transforms the shape positions to world space.
+                line.transform.TransformPoints(convertedPositions);
+                /// Moves the shape to the middle position.
+                line.transform.localPosition = middlePos;
+                /// Transforms the shape positions back to local space to obtain the visual representation of the line.
+                line.transform.InverseTransformPoints(convertedPositions);
+                /// Updates the new line positions.
+                Drawing(line, convertedPositions);
+                /// Update the mesh collider.
+                FinishDrawing(line, renderer.loop);
+            }
             return line;
         }
 
+        /// <summary>
+        /// Refreshes the mesh collider of the line.
+        /// The mesh for the Mesh Collider is recalculated.
+        /// </summary>
+        /// <param name="line">The line which mesh collider should be refreshed.</param>
         public static void RefreshCollider(GameObject line)
         {
-            LineRenderer lineRenderer = line.GetComponent<LineRenderer>();
-            MeshCollider collider = line.GetComponent<MeshCollider>();
-            Mesh mesh = new();
-            lineRenderer.BakeMesh(mesh);
-            if (mesh.vertices.Distinct().Count() >= 3)
+            if (line.CompareTag(Tags.Line))
             {
-                collider.sharedMesh = mesh;
+                LineRenderer lineRenderer = line.GetComponent<LineRenderer>();
+                MeshCollider collider = line.GetComponent<MeshCollider>();
+                Mesh mesh = new();
+                lineRenderer.BakeMesh(mesh);
+                if (mesh.vertices.Distinct().Count() >= 3)
+                {
+                    collider.sharedMesh = mesh;
+                }
             }
         }
 
+        /// <summary>
+        /// Changes the line kind of the given line.
+        /// </summary>
+        /// <param name="line">The line which line kind should be changed.</param>
+        /// <param name="lineKind">The new line kind</param>
+        /// <param name="tiling">The tiling, if the new line kind is a dashed line kind</param>
         public static void ChangeLineKind(GameObject line, LineKind lineKind, float tiling)
         {
-            LineValueHolder holder = line.GetComponent<LineValueHolder>();
-            LineRenderer renderer = GetRenderer(line);
-            renderer.sharedMaterial = GetMaterial(renderer.material.color, lineKind);
-            SetRendererTextrueScale(renderer, lineKind, tiling);
-            holder.SetLineKind(lineKind);
+            if (line.CompareTag(Tags.Line))
+            {
+                LineValueHolder holder = line.GetComponent<LineValueHolder>();
+                LineRenderer renderer = GetRenderer(line);
+                /// Changes the renderer material.
+                renderer.sharedMaterial = GetMaterial(renderer.material.color, lineKind);
+                /// Sets the correct texture scale for the renderer depending on the chosen line kind.
+                SetRendererTextrueScale(renderer, lineKind, tiling);
+                /// Sets the new line kind to the line value holder.
+                holder.SetLineKind(lineKind);
+            }
         }
 
-        public static void ChangeColorKind(GameObject line, ColorKind colorKind, LineConf l)
+        /// <summary>
+        /// Changes the color kind of the given line.
+        /// </summary>
+        /// <param name="line">The line which cholor kind should be changed.</param>
+        /// <param name="colorKind">The new color kind for the line.</param>
+        /// <param name="conf">The old line configuration, will be needed for restore the colors.</param>
+        public static void ChangeColorKind(GameObject line, ColorKind colorKind, LineConf conf)
         {
-            LineValueHolder holder = line.GetComponent<LineValueHolder>();
-            if (colorKind == ColorKind.TwoDashed)
+            if (line.CompareTag(Tags.Line))
             {
-                GetRenderer(line).startColor = Color.white;
-                GetRenderer(line).endColor = Color.white;
-                if (GetRenderer(line).materials.Length == 1)
-                {
-                    Material[] materials = new Material[2];
-                    materials[0] = GetRenderer(line).materials[0];
-                    materials[1] = GetMaterial(Color.white, LineKind.Solid);
-                    GetRenderer(line).materials = materials;
-                }
-            } else
-            {
-                if (GetRenderer(line).materials.Length > 1)
-                {
-                    Material[] materials = new Material[1];
-                    materials[0] = GetRenderer(line).materials[0];
-                    GetRenderer(line).materials = materials;
-                }
-                if (colorKind == ColorKind.Gradient)
-                {
-                    GetRenderer(line).material.color = Color.white;
-                } else
+                LineValueHolder holder = line.GetComponent<LineValueHolder>();
+                /// The initial color for deactivated color kinds is white.
+                /// If the new ColorKind is TwoDashed, another material must be 
+                /// added to the line renderer for the second color.
+                if (colorKind == ColorKind.TwoDashed)
                 {
                     GetRenderer(line).startColor = Color.white;
                     GetRenderer(line).endColor = Color.white;
+                    if (GetRenderer(line).materials.Length == 1)
+                    {
+                        Material[] materials = new Material[2];
+                        materials[0] = GetRenderer(line).materials[0];
+                        materials[1] = GetMaterial(Color.white, LineKind.Solid);
+                        GetRenderer(line).materials = materials;
+                    }
                 }
+                else
+                {
+                    /// Block for the case that the previous color kind was <see cref="ColorKind.TwoDashed"/>, 
+                    /// then the additional material must be removed.
+                    if (GetRenderer(line).materials.Length > 1)
+                    {
+                        Material[] materials = new Material[1];
+                        materials[0] = GetRenderer(line).materials[0];
+                        GetRenderer(line).materials = materials;
+                    }
+
+                    /// Block for initialing the initial color for the remaining <see cref="ColorKind"/>.
+                    if (colorKind == ColorKind.Gradient)
+                    {
+                        GetRenderer(line).material.color = Color.white;
+                    }
+                    else
+                    {
+                        GetRenderer(line).startColor = Color.white;
+                        GetRenderer(line).endColor = Color.white;
+                    }
+                }
+                /// Update the <see cref="LineValueHolder"/>
+                holder.SetColorKind(colorKind);
+
+                /// Restores the primary and secondary color of the line.
+                GameEdit.ChangePrimaryColor(line, conf.primaryColor);
+                GameEdit.ChangeSecondaryColor(line, conf.secondaryColor);
             }
-            holder.SetColorKind(colorKind);
-            GameEdit.ChangePrimaryColor(line, l.primaryColor);
-            GameEdit.ChangeSecondaryColor(line, l.secondaryColor);
         }
 
+        /// <summary>
+        /// Sets the texture scale for the line renderer depending on the chosen <paramref name="kind"/>.
+        /// Required only for dashed line kinds. 
+        /// The X-Scale value varies for different LineKinds. 
+        /// It is multiplied by the material's tiling (15) to achieve the 
+        /// correct tiling for the dashed line. 
+        /// Tiling describes the spacing between the dashed lines.
+        /// </summary>
+        /// <param name="renderer">The line renderer that should be update his texture scale.</param>
+        /// <param name="kind">The chosen color kind.</param>
+        /// <param name="tiling">The tiling for a <see cref="LineKind.Dashed"/></param>
         private static void SetRendererTextrueScale(LineRenderer renderer, LineKind kind, float tiling)
         {
             switch (kind)
@@ -359,7 +634,7 @@ namespace Assets.SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Sets the z positions of a line renderer to zero.
+        /// Sets the z positions of the given <paramref name="positions"/> to zero.
         /// It is needed because a Line Renderer by itself 
         /// changes the z values in case of an overlap. 
         /// However, this is problematic for the change order in layer variant.
@@ -373,58 +648,80 @@ namespace Assets.SEE.Game.Drawable
             }
         }
 
+        /// <summary>
+        /// Counts the different positions of an <see cref="Vector3"/> array.
+        /// </summary>
+        /// <param name="positions">The positions to be examined.</param>
+        /// <returns>The count of different positions.</returns>
         public static int DifferentPositionCounter(Vector3[] positions)
         {
             List<Vector3> positionsList = new List<Vector3>(positions);
             return positionsList.Distinct().ToList().Count;
         }
 
+        /// <summary>
+        /// Calculates the various vertices of a mesh that has been computed 
+        /// from the line points of the line renderer.
+        /// </summary>
+        /// <param name="line">The line which holds the line renderer.</param>
+        /// <returns>The number of different vertices</returns>
         public static int DifferentMeshVerticesCounter(GameObject line)
         {
-            LineRenderer renderer = GetRenderer(line);
-            Mesh mesh = new();
-            renderer.BakeMesh(mesh);
-            return mesh.vertices.Distinct().ToList().Count;
+            if (line.CompareTag(Tags.Line))
+            {
+                LineRenderer renderer = GetRenderer(line);
+                Mesh mesh = new();
+                renderer.BakeMesh(mesh);
+                return mesh.vertices.Distinct().ToList().Count;
+            } else
+            {
+                return 0;
+            }
         }
 
+        /// <summary>
+        /// Creates the material associated with the <paramref name="kind"/>.
+        /// </summary>
+        /// <param name="color">The color for the material.</param>
+        /// <param name="kind">The chosen line kind.</param>
+        /// <returns>The created material</returns>
         private static Material GetMaterial(Color color, LineKind kind)
         {
-            ColorRange colorRange = new ColorRange(color, color, 1);
+            /// Define the color range.
+            ColorRange colorRange = new(color, color, 1);
             Materials.ShaderType shaderType;
+            /// Select the correct shader type.
             if (kind.Equals(LineKind.Solid))
             {
+                /// Material for the <see cref="LineKind.Solid"/>
                 shaderType = Materials.ShaderType.DrawableLine;
             }
             else
             {
+                /// Material for the dashed kinds.
                 shaderType = Materials.ShaderType.DrawableDashedLine;
             }
-            Materials materials = new Materials(shaderType, colorRange);
+            /// Gets the material of the shader type.
+            Materials materials = new (shaderType, colorRange);
             Material material = materials.Get(0, 0);
             return material;
         }
 
+        /// <summary>
+        /// Converts a world space coordinate to a local space coordinate 
+        /// as if it were a line originating from that point.
+        /// A line is created for the calculation and then deleted afterward.
+        /// </summary>
+        /// <param name="drawable">The targeted drawable.</param>
+        /// <param name="position">The position to be transformed.</param>
+        /// <returns>The converted position.</returns>
         public static Vector3 GetConvertedPosition(GameObject drawable, Vector3 position)
         {
             Vector3 convertedPosition;
-            Setup(drawable, "", new Vector3[] { position }, ColorKind.Monochrome, ValueHolder.currentPrimaryColor, 
+            Setup(drawable, "", new Vector3[] { position }, ColorKind.Monochrome, ValueHolder.currentPrimaryColor,
                 Color.clear, ValueHolder.currentThickness, 0, ValueHolder.currentLineKind, 1,
                 out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
             convertedPosition = line.transform.InverseTransformPoint(position) - ValueHolder.distanceToDrawable;
-            Destroyer.Destroy(line);
-            return convertedPosition;
-        }
-
-        public static Vector3[] GetConvertedPositions(GameObject drawable, Vector3[] positions)
-        {
-            Vector3[] convertedPosition = new Vector3[positions.Length];
-            Setup(drawable, "", positions, ColorKind.Monochrome, ValueHolder.currentPrimaryColor, 
-                Color.clear, ValueHolder.currentThickness, 0, ValueHolder.currentLineKind, 1,
-                out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
-            for (int i = 0; i < positions.Length; i++)
-            {
-                convertedPosition[i] = line.transform.InverseTransformPoint(positions[i]) - ValueHolder.distanceToDrawable;
-            }
             Destroyer.Destroy(line);
             return convertedPosition;
         }

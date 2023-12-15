@@ -1,7 +1,5 @@
-﻿using Assets.SEE.Game.Drawable;
-using SEE.Net.Actions.Drawable;
+﻿using SEE.Net.Actions.Drawable;
 using System;
-using System.Collections;
 using UnityEngine;
 
 namespace SEE.Game.Drawable.Configurations
@@ -57,19 +55,23 @@ namespace SEE.Game.Drawable.Configurations
             {
                 case LineConf line:
                     GameDrawer.ReDrawLine(drawable, line);
-                    new DrawOnNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), line).Execute();
+                    new DrawOnNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
+                        line).Execute();
                     break;
                 case TextConf text:
                     GameTexter.ReWriteText(drawable, text);
-                    new WriteTextNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), text).Execute();
+                    new WriteTextNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
+                        text).Execute();
                     break;
                 case ImageConf image:
                     GameImage.RePlaceImage(drawable, image);
-                    new AddImageNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), image).Execute();
+                    new AddImageNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
+                        image).Execute();
                     break;
                 case MindMapNodeConf node:
                     GameMindMap.ReCreate(drawable, node);
-                    new MindMapCreateNodeNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), node).Execute();
+                    new MindMapCreateNodeNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
+                        node).Execute();
                     break;
                 default:
                     Debug.Log("Can't restore " + type.id);

@@ -1,10 +1,9 @@
-﻿using SEE.Game;
-using UnityEngine;
-using SEE.Game.Drawable.Configurations;
-using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.ValueHolders;
 using SEE.Utils;
+using UnityEngine;
 
-namespace Assets.SEE.Game.Drawable
+namespace SEE.Game.Drawable
 {
     /// <summary>
     /// This class adds a drawable holder to a drawable. 
@@ -77,9 +76,10 @@ namespace Assets.SEE.Game.Drawable
             if (GameFinder.hasAParent(drawable))
             {
                 GameObject parent = GameFinder.GetHighestParent(drawable);
+                /// Block for drawable holder creation.
                 if (!parent.name.StartsWith(ValueHolder.DrawableHolderPrefix))
                 {
-                    highestParent = new GameObject(ValueHolder.DrawableHolderPrefix + "-" + parent.name);//drawable.GetInstanceID());
+                    highestParent = new GameObject(ValueHolder.DrawableHolderPrefix + "-" + parent.name);
                     highestParent.transform.position = parent.transform.position;
                     highestParent.transform.rotation = parent.transform.rotation;
 
@@ -90,6 +90,7 @@ namespace Assets.SEE.Game.Drawable
                     attachedObjects.transform.SetParent(highestParent.transform);
                     parent.transform.SetParent(highestParent.transform);
 
+                    /// Copies the order in layer component to the highest parent.
                     if (parent.GetComponentInChildren<OrderInLayerValueHolder>() != null)
                     {
                         OrderInLayerValueHolder highestHolder = highestParent.AddComponent<OrderInLayerValueHolder>();
@@ -101,12 +102,17 @@ namespace Assets.SEE.Game.Drawable
                 }
                 else
                 {
+                    /// Block if the drawable holder already exists.
                     highestParent = parent;
                     attachedObjects = GameFinder.FindChildWithTag(highestParent, Tags.AttachedObjects);
                 }
             }
             else
             {
+                /// Block for the case where the drawable has no parent and is thus the highest instance.
+                /// Does not occur so far. 
+                /// Both whiteboards and sticky notes have a parent object, as both offer borders for collision detection.
+                /// It creates a new parent for the drawable as well as an attached objects object.
                 highestParent = new GameObject(ValueHolder.DrawableHolderPrefix + drawable.GetInstanceID());
                 highestParent.transform.position = drawable.transform.position;
                 highestParent.transform.rotation = drawable.transform.rotation;
@@ -119,6 +125,7 @@ namespace Assets.SEE.Game.Drawable
 
                 drawable.transform.SetParent(highestParent.transform);
 
+                /// Copies the order in layer component to the highest parent.
                 if (drawable.GetComponentInChildren<OrderInLayerValueHolder>() != null)
                 {
                     OrderInLayerValueHolder highestHolder = highestParent.AddComponent<OrderInLayerValueHolder>();

@@ -1,14 +1,10 @@
-﻿using Assets.SEE.Game.Drawable;
-using SEE.Game.Drawable.Configurations;
+﻿using SEE.Game.Drawable.ValueHolders;
 using SEE.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using static Assets.SEE.Game.Drawable.GameDrawer;
 
 namespace SEE.Game.Drawable.Configurations
 {
@@ -99,15 +95,17 @@ namespace SEE.Game.Drawable.Configurations
             ImageConf conf = null;
             if (imageObject != null && imageObject.CompareTag(Tags.Image))
             {
-                conf = new();
-                conf.id = imageObject.name;
-                conf.position = imageObject.transform.localPosition;
-                conf.eulerAngles = imageObject.transform.localEulerAngles;
-                conf.scale = imageObject.transform.localScale;
-                conf.orderInLayer = imageObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
-                conf.imageColor = imageObject.GetComponent<Image>().color;
-                conf.path = imageObject.GetComponent<ImageValueHolder>().GetPath();
-                conf.fileData = imageObject.GetComponent<ImageValueHolder>().GetFileData();
+                conf = new()
+                {
+                    id = imageObject.name,
+                    position = imageObject.transform.localPosition,
+                    eulerAngles = imageObject.transform.localEulerAngles,
+                    scale = imageObject.transform.localScale,
+                    orderInLayer = imageObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer(),
+                    imageColor = imageObject.GetComponent<Image>().color,
+                    path = imageObject.GetComponent<ImageValueHolder>().GetPath(),
+                    fileData = imageObject.GetComponent<ImageValueHolder>().GetFileData()
+                };
             }
             return conf;
         }
@@ -149,9 +147,9 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
-        /// Given the representation of a <see cref="ImageConf"/> as created by the <see cref="ConfigWriter"/>, this
-        /// method parses the attributes from that representation and puts them into this <see cref="ImageConf"/>
-        /// instance.
+        /// Given the representation of a <see cref="ImageConf"/> as created by the <see cref="ConfigWriter"/>, 
+        /// this method parses the attributes from that representation and 
+        /// puts them into this <see cref="ImageConf"/> instance.
         /// </summary>
         /// <param name="attributes">A list of labels (strings) of attributes and their values (objects). This
         /// has to be the representation of a <see cref="ImageConf"/> as created by
@@ -160,6 +158,7 @@ namespace SEE.Game.Drawable.Configurations
         internal bool Restore(Dictionary<string, object> attributes)
         {
             bool errors = false;
+            /// Try to restores the id.
             if (attributes.TryGetValue(IDLabel, out object name))
             {
                 id = (string)name;
@@ -168,6 +167,8 @@ namespace SEE.Game.Drawable.Configurations
             {
                 errors = true;
             }
+
+            /// Try to restores the position.
             Vector3 loadedPosition = Vector3.zero;
             if (ConfigIO.Restore(attributes, PositionLabel, ref loadedPosition))
             {
@@ -178,6 +179,8 @@ namespace SEE.Game.Drawable.Configurations
                 position = Vector3.zero;
                 errors = true;
             }
+
+            /// Try to restores the scale.
             Vector3 loadedScale = Vector3.zero;
             if (ConfigIO.Restore(attributes, ScaleLabel, ref loadedScale))
             {
@@ -189,11 +192,13 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
+            /// Try to restores the order in layer.
             if (!ConfigIO.Restore(attributes, OrderInLayerLabel, ref orderInLayer))
             {
                 errors = true;
             }
 
+            /// Try to restores the euler angles.
             Vector3 loadedEulerAngles = Vector3.zero;
             if (ConfigIO.Restore(attributes, EulerAnglesLabel, ref loadedEulerAngles))
             {
@@ -205,6 +210,7 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
+            /// Try to restores the image color.
             Color loadedimageColor = Color.black;
             if (ConfigIO.Restore(attributes, ColorLabel, ref loadedimageColor))
             {
@@ -216,6 +222,7 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
+            /// Try to restores the image file.
             if (attributes.TryGetValue(PathLabel, out object p))
             {
                 path = (string)p;

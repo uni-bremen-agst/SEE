@@ -3,7 +3,6 @@ using SEE.Utils;
 using UnityEngine;
 using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
-using Assets.SEE.Game.Drawable;
 
 namespace SEE.Net.Actions.Drawable
 {

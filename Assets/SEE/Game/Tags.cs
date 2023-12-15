@@ -80,45 +80,53 @@ namespace SEE.Game
         public const string MainCamera = "MainCamera";
 
         ///<summary>
-        /// For the object on which the drawable type objects are to be placed
+        /// For the object on which the <see cref="DrawableTypes"/> objects are displayed
         /// </summary>
         public const string Drawable = "Drawable";
+
         /// <summary>
         /// For the drawable type object line.
         /// </summary>
         public const string Line = "Line";
+
         /// <summary>
         /// For the drawable type object text.
         /// </summary>
         public const string DText = "DText";
+
         /// <summary>
         /// For the drawable type object image.
         /// </summary>
         public const string Image = "Image";
-        /// <summary>
-        /// For the object which holds all drawable type objects for a drawable.
-        /// Will needed because an drawable could be scaled.
-        /// </summary>
-        public const string AttachedObjects = "AttachedObjects";
+
         /// <summary>
         /// For the drawable type object mind map node.
         /// </summary>
         public const string MindMapNode = "MindMapNode";
 
         /// <summary>
-        /// For the drawable top boarder.
+        /// For the object which holds all drawable type objects for a drawable.
+        /// Will needed because a drawable could be scaled.
+        /// </summary>
+        public const string AttachedObjects = "AttachedObjects";
+        
+        /// <summary>
+        /// For the drawable top border.
         /// </summary>
         public const string Top = "Top";
+
         /// <summary>
-        /// For the drawable bottom boarder.
+        /// For the drawable bottom border.
         /// </summary>
         public const string Bottom = "Bottom";
+
         /// <summary>
-        /// For the drawable left boarder.
+        /// For the drawable left border.
         /// </summary>
         public const string Left = "Left";
+
         /// <summary>
-        /// For the drawable right boarder.
+        /// For the drawable right border.
         /// </summary>
         public const string Right = "Right";
 
@@ -126,12 +134,14 @@ namespace SEE.Game
         /// All existing tags in one.
         /// </summary>
         public static readonly string[] All = { Graph, Node, Edge, Text, Erosion, Decoration,
-              Path, Runtime, FunctionCall, CullingPlane, ChartManager, MainCamera, Drawable, Line, DText, Image, AttachedObjects, MindMapNode, Top, Bottom, Left, Right};
+            Path, Runtime, FunctionCall, CullingPlane, ChartManager, MainCamera, 
+            Drawable, Line, DText, Image, AttachedObjects, MindMapNode, Top, Bottom, Left, Right};
 
         /// <summary>
-        /// All existing drawable types object tags in one.
+        /// All existing <see cref="DrawableTypes"/> object tags in one.
         /// </summary>
         public static readonly string[] DTypes = { Line, DText, Image, MindMapNode };
+
         /// <summary>
         /// All existing drawable types object tags in one list.
         /// </summary>

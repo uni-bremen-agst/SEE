@@ -1,12 +1,9 @@
-﻿using Assets.SEE.Game.Drawable;
-using HSVPicker;
+﻿using SEE.Game.Drawable.ValueHolders;
 using SEE.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using static Assets.SEE.Game.Drawable.GameDrawer;
 
 namespace SEE.Game.Drawable.Configurations
 {
@@ -131,19 +128,21 @@ namespace SEE.Game.Drawable.Configurations
             TextConf text = null;
             if (textObject != null && textObject.CompareTag(Tags.DText))
             {
-                text = new();
-                text.id = textObject.name;
-                text.position = textObject.transform.localPosition;
-                text.eulerAngles = textObject.transform.localEulerAngles;
-                text.scale = textObject.transform.localScale;
                 TextMeshPro tmp = textObject.GetComponent<TextMeshPro>();
-                text.text = tmp.text;
-                text.fontColor = tmp.color;
-                text.outlineColor = tmp.outlineColor;
-                text.outlineThickness = tmp.outlineWidth;
-                text.fontStyles = tmp.fontStyle;
-                text.fontSize = tmp.fontSize;
-                text.orderInLayer = textObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
+                text = new()
+                {
+                    id = textObject.name,
+                    position = textObject.transform.localPosition,
+                    eulerAngles = textObject.transform.localEulerAngles,
+                    scale = textObject.transform.localScale,
+                    text = tmp.text,
+                    fontColor = tmp.color,
+                    outlineColor = tmp.outlineColor,
+                    outlineThickness = tmp.outlineWidth,
+                    fontStyles = tmp.fontStyle,
+                    fontSize = tmp.fontSize,
+                    orderInLayer = textObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer()
+                };
             }
 
             return text;
@@ -204,6 +203,8 @@ namespace SEE.Game.Drawable.Configurations
         internal bool Restore(Dictionary<string, object> attributes)
         {
             bool errors = false;
+
+            /// Try to restores the id.
             if (attributes.TryGetValue(IDLabel, out object name))
             {
                 id = (string)name;
@@ -213,6 +214,7 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
+            /// Try to restores the position.
             Vector3 loadedPosition = Vector3.zero;
             if (ConfigIO.Restore(attributes, PositionLabel, ref loadedPosition))
             {
@@ -223,7 +225,8 @@ namespace SEE.Game.Drawable.Configurations
                 position = Vector3.zero;
                 errors = true;
             }
-            
+
+            /// Try to restores the euler angles.
             Vector3 loadedEulerAngles = Vector3.zero;
             if (ConfigIO.Restore(attributes, EulerAnglesLabel, ref loadedEulerAngles))
             {
@@ -235,6 +238,7 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
+            /// Try to restores the scale.
             Vector3 loadedScale = Vector3.zero;
             if (ConfigIO.Restore(attributes, ScaleLabel, ref loadedScale))
             {
@@ -246,6 +250,7 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
+            /// Try to restores the text.
             if (attributes.TryGetValue(TextLabel, out object txt))
             {
                 text = (string)txt;
@@ -255,6 +260,7 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
+            /// Try to restores the font color.
             Color loadedFontColor = Color.black;
             if (ConfigIO.Restore(attributes, FontColorLabel, ref loadedFontColor))
             {
@@ -266,6 +272,7 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
+            /// Try to restores the outline color.
             Color loadedOutlineColor = Color.clear;
             if (ConfigIO.Restore(attributes, OutlineColorLabel, ref loadedOutlineColor))
             {
@@ -277,6 +284,7 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
+            /// Try to restores the outline thickness.
             if (attributes.TryGetValue(OutlineThicknessColorLabel, out object thickness))
             {
                 outlineThickness = (float)thickness;
@@ -287,6 +295,7 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
+            /// Try to restores the font size.
             if (attributes.TryGetValue(FontSizeLabel, out object size))
             {
                 fontSize = (float)size;
@@ -297,7 +306,9 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
-            if (attributes.TryGetValue(FontStylesLabel, out object styles) && Enum.TryParse<FontStyles>((string)styles, out FontStyles result))
+            /// Try to restores the font styles.
+            if (attributes.TryGetValue(FontStylesLabel, out object styles) 
+                && Enum.TryParse<FontStyles>((string)styles, out FontStyles result))
             {
                 fontStyles = result;
             }
@@ -307,6 +318,7 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
+            /// Try to restores the order in layer.
             if (!ConfigIO.Restore(attributes, OrderInLayerLabel, ref orderInLayer))
             {
                 errors = true;
