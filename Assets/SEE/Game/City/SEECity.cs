@@ -11,6 +11,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Assertions;
 using SEE.Game.CityRendering;
+using SEE.UI.LoadingSpinner;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 
@@ -133,14 +134,17 @@ namespace SEE.Game.City
         {
             base.Start();
 
-            if (!gameObject.IsCodeCityDrawn())
+            using (LoadingSpinner.Show($"Loading city \"{gameObject.name}\""))
             {
-                Debug.LogWarning($"There is no drawn code city for {gameObject.name}.");
-                return;
+                if (!gameObject.IsCodeCityDrawn())
+                {
+                    Debug.LogWarning($"There is no drawn code city for {gameObject.name}.");
+                    return;
+                }
+                LoadData();
+                InitializeAfterDrawn();
+                BoardSettings.LoadBoard();
             }
-            LoadData();
-            InitializeAfterDrawn();
-            BoardSettings.LoadBoard();
         }
 
         /// <summary>
