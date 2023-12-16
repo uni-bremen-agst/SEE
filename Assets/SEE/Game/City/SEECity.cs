@@ -11,7 +11,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Assertions;
 using SEE.Game.CityRendering;
-using SEE.UI.LoadingSpinner;
+using SEE.UI;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 

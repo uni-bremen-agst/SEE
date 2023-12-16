@@ -5,7 +5,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using SEE.DataModel;
 using SEE.DataModel.DG;
-using SEE.UI.LoadingSpinner;
+using SEE.UI;
 using UnityEngine;
 
 namespace SEE.Game.City

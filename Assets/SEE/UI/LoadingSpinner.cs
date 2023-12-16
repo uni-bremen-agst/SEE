@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.GO;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
 
-namespace SEE.UI.LoadingSpinner
+namespace SEE.UI
 {
     /// <summary>
     /// A loading spinner that can be shown and hidden.
@@ -29,7 +30,7 @@ namespace SEE.UI.LoadingSpinner
     /// returned by <see cref="Show"/> to mark the end of your loading process.
     /// You can also call <see cref="Hide"/> manually with your unique message to hide the spinner.
     /// </summary>
-    public class LoadingSpinner: PlatformDependentComponent
+    public class LoadingSpinner : PlatformDependentComponent
     {
         /// <summary>
         /// The path to the prefab for the loading spinner game object.
@@ -141,7 +142,7 @@ namespace SEE.UI.LoadingSpinner
         /// A disposable that hides the loading spinner when disposed.
         /// </summary>
         /// <param name="processName">The unique message for the loading process that this disposable represents</param>
-        private record LoadingSpinnerDisposable(string processName): IDisposable
+        private record LoadingSpinnerDisposable(string processName) : IDisposable
         {
             /// <summary>
             /// Disposes this disposable, hiding the loading spinner for the given <paramref name="processName"/>.
