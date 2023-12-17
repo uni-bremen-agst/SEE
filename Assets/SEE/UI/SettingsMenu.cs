@@ -41,7 +41,7 @@ namespace SEE.UI
         /// change the binding. This dictionary is used to update the label if the key binding
         /// was changed by the user.
         /// </summary>
-        Dictionary<string, TextMeshProUGUI> shortNameOfBindingToLabel;
+        private readonly Dictionary<string, TextMeshProUGUI> shortNameOfBindingToLabel = new();
 
         /// <summary>
         /// Sets the <see cref="KeyBindingContent"/> and adds the onClick event
@@ -54,8 +54,6 @@ namespace SEE.UI
             // adds the ExitGame method to the exit button
             settingsMenuGameObject.transform.Find("ExitPanel/Buttons/Content/Exit").gameObject.MustGetComponent<Button>()
                 .onClick.AddListener(ExitGame);
-
-            shortNameOfBindingToLabel = new Dictionary<string, TextMeshProUGUI>();
 
             // Displays all bindings grouped by their category.
             foreach (IGrouping<KeyBindings.KeyActionCategory, KeyValuePair<KeyBindings.KeyAction, KeyBindings.KeyActionDescriptor>> group
