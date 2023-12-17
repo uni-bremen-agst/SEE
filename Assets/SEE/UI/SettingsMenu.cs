@@ -56,8 +56,7 @@ namespace SEE.UI
                 .onClick.AddListener(ExitGame);
 
             // Displays all bindings grouped by their category.
-            foreach (IGrouping<KeyBindings.KeyActionCategory, KeyValuePair<KeyBindings.KeyAction, KeyBindings.KeyActionDescriptor>> group
-                in KeyBindings.AllBindings().GroupBy(binding => binding.Value.Category))
+            foreach (var group in KeyBindings.AllBindings().GroupBy(binding => binding.Value.Category))
             {
                 // Creates a list of keybinding descriptions for the given category.
                 GameObject scrollView = PrefabInstantiator.InstantiatePrefab(ScrollPrefab, Canvas.transform, false).transform.gameObject;
