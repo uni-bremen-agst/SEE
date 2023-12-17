@@ -14,7 +14,7 @@ namespace SEE.Controls
         /// <param name="Category">The scope of the action.</param>
         /// <param name="KeyCode">The key on the keyboard this action is bound to. If that key is pressed,
         /// the user wants to trigger this action.</param>
-        internal record KeyActionDescriptor(string Name, string Description, KeyActionCategory Category, KeyCode KeyCode) 
+        internal record KeyActionDescriptor(string Name, string Description, KeyActionCategory Category, KeyCode KeyCode)
         {
             /// <summary>
             /// The key on the keyboard this action is bound to. If that key is pressed,
