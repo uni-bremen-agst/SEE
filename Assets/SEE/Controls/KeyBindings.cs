@@ -116,7 +116,7 @@ namespace SEE.Controls
         {
             if (keyBindings.TryGetValue(keyAction, out KeyActionDescriptor descriptor))
             {
-                Debug.LogError($"Key action {keyAction} is already bound ot {descriptor.Name}.\n");
+                Debug.LogError($"Key action {keyAction} is already bound to {descriptor.Name}.\n");
             }
             else if (TryGetKeyAction(keyCode, out KeyAction boundKeyAction))
             {
