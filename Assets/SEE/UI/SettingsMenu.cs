@@ -83,7 +83,7 @@ namespace SEE.UI
                     key.text = binding.Value.KeyCode.ToString();
                     shortNameOfBindingToLabel[binding.Value.Name] = key;
                     // add the actionlistener to be able to change the key code of a binding.
-                    keyBindingContent.transform.Find("Key").gameObject.MustGetComponent<Button>().onClick.AddListener(() => { StartRebindFor(binding.Value); });
+                    keyBindingContent.transform.Find("Key").gameObject.MustGetComponent<Button>().onClick.AddListener(() => StartRebindFor(binding.Value));
                 }
             }
         }
