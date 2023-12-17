@@ -4,7 +4,7 @@
     {
         /// <summary>
         /// Categories for the keyboard shortcuts. Each <see cref="KeyActionDescriptor"/>
-        /// is element of exactly one of these categories. These categories are used
+        /// is an element of exactly one of these categories. These categories are used
         /// to organize the key actions into cohesive groups meaningful to a user.
         /// </summary>
         internal enum KeyActionCategory
