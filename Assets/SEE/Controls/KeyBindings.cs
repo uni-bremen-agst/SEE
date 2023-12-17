@@ -301,19 +301,17 @@ namespace SEE.Controls
         /// </summary>
         /// <param name="descriptor">the binding that will that should be triggered by <paramref name="keyCode"/></param>
         /// <param name="keyCode">the key code that should trigger the action represented by <paramref name="descriptor"/></param>
-        /// <returns>false if <paramref name="keyCode"/> is already bound, and true otherwise</returns>
-        public static bool SetBindingForKey(KeyActionDescriptor descriptor, KeyCode keyCode)
+        /// <exception cref="Exception">thrown if <paramref name="keyCode"/> is already bound to an action</exception>
+        public static void SetBindingForKey(KeyActionDescriptor descriptor, KeyCode keyCode)
         {
             if (TryGetKeyAction(keyCode, out KeyAction action))
             {
-                Debug.LogError($"Cannot register key {keyCode} for {descriptor}."
-                               + $"Key {keyCode} is already bound to {action}.\n");
-                return false;
+                throw new Exception($"Cannot register key {keyCode} for {descriptor.Name}."
+               + $" Key {keyCode} is already bound to {action}.\n");
             }
             else
             {
                 descriptor.KeyCode = keyCode;
-                return true;
             }
         }
 

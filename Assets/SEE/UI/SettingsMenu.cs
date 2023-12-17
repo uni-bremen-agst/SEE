@@ -91,7 +91,7 @@ namespace SEE.UI
         /// </summary>
         protected override void UpdateDesktop()
         {
-            // when the buttonToRebind is not null, then the user clicked a button to start the rebind.
+            // If the buttonToRebind is not null, the user clicked a button to start the rebinding.
             if (bindingToRebind != null)
             {
                 SEEInput.KeyboardShortcutsEnabled = false;
@@ -102,24 +102,18 @@ namespace SEE.UI
                     {
                         if (Input.GetKeyDown(key) && KeyBindings.AssignableKeyCode(key))
                         {
-                            // check if the key is already bound to another binding, if not, then re-assign the key
-                            if (KeyBindings.SetBindingForKey(bindingToRebind, key))
+                           try
                             {
+                                KeyBindings.SetBindingForKey(bindingToRebind, key);
                                 // TODO (#683): We need to open a modal dialog and ask the user
                                 // whether he/she really wants to change the binding.
                                 shortNameOfBindingToLabel[bindingToRebind.Name].text = key.ToString();
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                string message = string.Empty;
-                                if (KeyBindings.TryGetKeyAction(key, out KeyBindings.KeyAction action))
-                                {
-                                    message = $"\n Key {key} already bound to {action}.";
-                                }
-                                ShowNotification.Error
-                                    ("Key code already bound",
-                                    $"Cannot register key {key} for {bindingToRebind}.{message}\n");
+                                ShowNotification.Error("Key code already bound", ex.Message);
                             }
+
                             bindingToRebind = null;
                             SEEInput.KeyboardShortcutsEnabled = true;
                             break;
@@ -154,6 +148,7 @@ namespace SEE.UI
         /// </summary>
         private void StartRebindFor(KeyBindings.KeyActionDescriptor binding)
         {
+            ShowNotification.Info("Bind action to key", "Press a key to bind this action.");
             bindingToRebind = binding;
         }
 
