@@ -98,7 +98,7 @@ namespace SEE.UI
             if (bindingToRebind != null)
             {
                 SEEInput.KeyboardShortcutsEnabled = false;
-                // the next button, that gets pressed, will be the new keyBind.
+                // the next button that gets pressed will be the new keyBind.
                 if (Input.anyKeyDown)
                 {
                     foreach (KeyCode key in Enum.GetValues(typeof(KeyCode)))
