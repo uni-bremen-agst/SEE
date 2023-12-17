@@ -5,7 +5,8 @@ using UnityEngine;
 namespace SEE.Controls
 {
     /// <summary>
-    /// Defines the key codes for all interaction based on the keyboard in SEE.
+    /// Defines the
+    ///      codes for all interaction based on the keyboard in SEE.
     /// </summary>
     internal static partial class KeyBindings
     {
@@ -133,57 +134,118 @@ namespace SEE.Controls
         /// </summary>
         static KeyBindings()
         {
-            Register(KeyAction.Help, KeyCode.H, "Help", KeyActionCategory.General, "Provides help");
-            Register(KeyAction.ToggleVoiceInput, KeyCode.Period, "Toggle voice chat", KeyActionCategory.General, "Toggles voice input on/off.");
-            Register(KeyAction.ToggleMenu, KeyCode.Space, "Toggle menu", KeyActionCategory.General, "Toggles the user-action menu.");
-            Register(KeyAction.ToggleSettings, KeyCode.Pause, "Toggle settings", KeyActionCategory.General, "Turns on/off the settings menu.");
-            Register(KeyAction.ToggleBrowser, KeyCode.F4, "Toggle browser", KeyActionCategory.General, "Turns on/off the browser.");
-            Register(KeyAction.SearchMenu, KeyCode.F, "Search", KeyActionCategory.General, "Opens the search menu.");
-            Register(KeyAction.Undo, KeyCode.Z, "Undo", KeyActionCategory.General, "Undoes the last action.");
-            Register(KeyAction.Redo, KeyCode.Y, "Redo", KeyActionCategory.General, "Re-does the last action.");
-            Register(KeyAction.ConfigMenu, KeyCode.K, "Config", KeyActionCategory.General, "Opens/closes the configuration menu.");
-            Register(KeyAction.TreeView, KeyCode.Tab, "Tree view", KeyActionCategory.General, "Opens/closes the tree view window.");
-            Register(KeyAction.SavePathPosition, KeyCode.F11, "Save position", KeyActionCategory.CameraPaths, "Saves the current position when recording paths.");
-            Register(KeyAction.TogglePathPlaying, KeyCode.F12, "Toggle path playing", KeyActionCategory.CameraPaths, "Starts/stops the automated camera movement along a path.");
-            Register(KeyAction.ToggleCharts, KeyCode.M, "Toggle charts", KeyActionCategory.MetricCharts, "Turns the metric charts on/off.");
-            Register(KeyAction.ToggleMetricHoveringSelection, KeyCode.N, "Toggle metric hovering/selection", KeyActionCategory.MetricCharts, "Toggles hovering/selection for markers in metric charts.");
-            Register(KeyAction.ToggleEdges, KeyCode.V, "Toggle edges", KeyActionCategory.Browsing, "Toggles the visibility of all edges of a hovered code city.");
-            Register(KeyAction.Unselect, KeyCode.U, "Unselect", KeyActionCategory.Browsing, "Forgets all currently selected objects.");
-            Register(KeyAction.Cancel, KeyCode.Escape, "Cancel", KeyActionCategory.Browsing, "Cancels an action.");
-            Register(KeyAction.Reset, KeyCode.R, "Reset", KeyActionCategory.Browsing, "Resets a code city to its original position and scale.");
-            Register(KeyAction.ZoomInto, KeyCode.G, "Zoom in", KeyActionCategory.Browsing, "To zoom into a city.");
-            Register(KeyAction.Snap, KeyCode.LeftAlt, "Snap", KeyActionCategory.Browsing, "Snap move/rotate city.");
-            Register(KeyAction.DragHovered, KeyCode.LeftControl, "Drag hovered", KeyActionCategory.Browsing, "Drag code city.");
-            Register(KeyAction.ToggleCameraLock, KeyCode.L, "Toggle camera lock", KeyActionCategory.Browsing, "Toggles between the locked and free camera mode.");
-            Register(KeyAction.Pointing, KeyCode.P, "Point", KeyActionCategory.Browsing, "Toggles between Pointing.");
-            Register(KeyAction.BoostCameraSpeed, KeyCode.LeftShift, "Boost speed", KeyActionCategory.Movement, "Boosts the speed of the player movement. While pressed, movement is faster.");
-            Register(KeyAction.MoveForward, KeyCode.W, "Move forward", KeyActionCategory.Movement, "Move forward.");
-            Register(KeyAction.MoveBackward, KeyCode.S, "Move backward", KeyActionCategory.Movement, "Move backward.");
-            Register(KeyAction.MoveRight, KeyCode.D, "Move right", KeyActionCategory.Movement, "Move to the right.");
-            Register(KeyAction.MoveLeft, KeyCode.A, "Move left", KeyActionCategory.Movement, "Move to the left.");
-            Register(KeyAction.MoveUp, KeyCode.Q, "Move up", KeyActionCategory.Movement, "Move up.");
-            Register(KeyAction.MoveDown, KeyCode.E, "Move down", KeyActionCategory.Movement, "Move down.");
-            Register(KeyAction.SetMarker, KeyCode.Insert, "Set marker", KeyActionCategory.Evolution, "Sets a new marker.");
-            Register(KeyAction.DeleteMarker, KeyCode.Delete, "Delete marker", KeyActionCategory.Evolution, "Deletes a marker.");
-            Register(KeyAction.ToggleEvolutionCanvases, KeyCode.T, "Toggle evolution canvases", KeyActionCategory.Evolution, "Toggles between between the two canvases for the animation and selection of a revision.");
-            Register(KeyAction.Previous, KeyCode.LeftArrow, "Previous", KeyActionCategory.Animation, "Go to previous element in the animation.");
-            Register(KeyAction.Next, KeyCode.RightArrow, "Next", KeyActionCategory.Animation, "Go to next element in the animation.");
-            Register(KeyAction.ToggleAutoPlay, KeyCode.F9, "Toggle auto play", KeyActionCategory.Animation, "Toggles auto play of the animation.");
-            Register(KeyAction.IncreaseAnimationSpeed, KeyCode.UpArrow, "Increase animation speed", KeyActionCategory.Animation, "Doubles animation speed.");
-            Register(KeyAction.DecreaseAnimationSpeed, KeyCode.DownArrow, "Decrease animation speed", KeyActionCategory.Animation, "Halves animation speed.");
-            Register(KeyAction.ToggleExecutionOrder, KeyCode.O, "Toggle execution order", KeyActionCategory.Debugging, "Toggles execution order (foward/backward).");
-            Register(KeyAction.ExecuteToBreakpoint, KeyCode.B, "Execute to breakpoint", KeyActionCategory.Debugging, "Continues execution until next breakpoint is reached.");
-            Register(KeyAction.FirstStatement, KeyCode.Home, "First statement", KeyActionCategory.Debugging, "Execution is back to very first statement.");
-            Register(KeyAction.ShowWindowMenu, KeyCode.F1, "Show window menu", KeyActionCategory.CodeViewer, "Toggles the menu of the open windows.");
-            Register(KeyAction.CodeWindowUndo, KeyCode.F5, "Code-window undo", KeyActionCategory.CodeViewer, "Undoes an edit in the source-code viewer.");
-            Register(KeyAction.CodeWindowRedo, KeyCode.F6, "Code-window redo", KeyActionCategory.CodeViewer, "Redoes an undone edit in the source-code viewer.");
-            Register(KeyAction.CodeWindowSave, KeyCode.F7, "Code-window save", KeyActionCategory.CodeViewer, "Saves the content of the source-code viewer.");
-            Register(KeyAction.RefreshSyntaxHighlighting, KeyCode.F8, "Refresh", KeyActionCategory.CodeViewer, "Refreshes syntax highlighting in the source-code viewer.");
-            Register(KeyAction.ToggleTextChat, KeyCode.F2, "Toggle text chat", KeyActionCategory.Chat, "Toggles the text chat.");
-            Register(KeyAction.CloseNotifications, KeyCode.X, "Close notifications", KeyActionCategory.General, "Clears all notifications.");
-            Register(KeyAction.ToggleFaceCam, KeyCode.I, "Toggle face cam", KeyActionCategory.General, "Toggles the face camera on or off.");
-            Register(KeyAction.ToggleFaceCamPosition, KeyCode.F3, "Toggle face-cam position", KeyActionCategory.General, "Toggles the position of the FaceCam on the player's face.");
-            Register(KeyAction.ToggleHolisticMetricsMenu, KeyCode.C, "Toggle metrics menu", KeyActionCategory.General, "Toggles the menu for holistic code metrics");
+            // General
+            Register(KeyAction.Help, KeyCode.H, "Help",
+                     KeyActionCategory.General, "Provides help");
+            Register(KeyAction.ToggleVoiceInput, KeyCode.Period, "Toggle voice chat",
+                     KeyActionCategory.General, "Toggles voice input on/off.");
+            Register(KeyAction.ToggleMenu, KeyCode.Space, "Toggle menu",
+                     KeyActionCategory.General, "Toggles the user-action menu.");
+            Register(KeyAction.ToggleSettings, KeyCode.Pause, "Toggle settings",
+                     KeyActionCategory.General, "Turns on/off the settings menu.");
+            Register(KeyAction.ToggleBrowser, KeyCode.F4, "Toggle browser",
+                     KeyActionCategory.General, "Turns on/off the browser.");
+            Register(KeyAction.SearchMenu, KeyCode.F, "Search",
+                     KeyActionCategory.General, "Opens the search menu.");
+            Register(KeyAction.Undo, KeyCode.Z, "Undo",
+                     KeyActionCategory.General, "Undoes the last action.");
+            Register(KeyAction.Redo, KeyCode.Y, "Redo",
+                     KeyActionCategory.General, "Re-does the last action.");
+            Register(KeyAction.ConfigMenu, KeyCode.K, "Config",
+                     KeyActionCategory.General, "Opens/closes the configuration menu.");
+            Register(KeyAction.TreeView, KeyCode.Tab, "Tree view",
+                     KeyActionCategory.General, "Opens/closes the tree view window.");
+            Register(KeyAction.CloseNotifications, KeyCode.X, "Close notifications",
+                     KeyActionCategory.General, "Clears all notifications.");
+            Register(KeyAction.ToggleFaceCam, KeyCode.I, "Toggle face cam",
+                     KeyActionCategory.General, "Toggles the face camera on or off.");
+            Register(KeyAction.ToggleFaceCamPosition, KeyCode.F3, "Toggle face-cam position",
+                     KeyActionCategory.General, "Toggles the position of the FaceCam on the player's face.");
+            Register(KeyAction.ToggleHolisticMetricsMenu, KeyCode.C, "Toggle metrics menu",
+                     KeyActionCategory.General, "Toggles the menu for holistic code metrics");
+            // CameraPaths
+            Register(KeyAction.SavePathPosition, KeyCode.F11, "Save position",
+                     KeyActionCategory.CameraPaths, "Saves the current position when recording paths.");
+            Register(KeyAction.TogglePathPlaying, KeyCode.F12, "Toggle path playing",
+                     KeyActionCategory.CameraPaths, "Starts/stops the automated camera movement along a path.");
+            // MetricCharts
+            Register(KeyAction.ToggleCharts, KeyCode.M, "Toggle charts",
+                     KeyActionCategory.MetricCharts, "Turns the metric charts on/off.");
+            Register(KeyAction.ToggleMetricHoveringSelection, KeyCode.N, "Toggle metric hovering/selection",
+                     KeyActionCategory.MetricCharts, "Toggles hovering/selection for markers in metric charts.");
+            // Browsing
+            Register(KeyAction.ToggleEdges, KeyCode.V, "Toggle edges",
+                     KeyActionCategory.Browsing, "Toggles the visibility of all edges of a hovered code city.");
+            Register(KeyAction.Unselect, KeyCode.U, "Unselect",
+                     KeyActionCategory.Browsing, "Forgets all currently selected objects.");
+            Register(KeyAction.Cancel, KeyCode.Escape, "Cancel",
+                     KeyActionCategory.Browsing, "Cancels an action.");
+            Register(KeyAction.Reset, KeyCode.R, "Reset",
+                     KeyActionCategory.Browsing, "Resets a code city to its original position and scale.");
+            Register(KeyAction.ZoomInto, KeyCode.G, "Zoom in",
+                     KeyActionCategory.Browsing, "To zoom into a city.");
+            Register(KeyAction.Snap, KeyCode.LeftAlt, "Snap",
+                     KeyActionCategory.Browsing, "Snap move/rotate city.");
+            Register(KeyAction.DragHovered, KeyCode.LeftControl, "Drag hovered",
+                     KeyActionCategory.Browsing, "Drag code city.");
+            Register(KeyAction.ToggleCameraLock, KeyCode.L, "Toggle camera lock",
+                     KeyActionCategory.Browsing, "Toggles between the locked and free camera mode.");
+            Register(KeyAction.Pointing, KeyCode.P, "Point",
+                     KeyActionCategory.Browsing, "Toggles between Pointing.");
+            // Movement
+            Register(KeyAction.BoostCameraSpeed, KeyCode.LeftShift, "Boost speed",
+                     KeyActionCategory.Movement, "Boosts the speed of the player movement. While pressed, movement is faster.");
+            Register(KeyAction.MoveForward, KeyCode.W, "Move forward",
+                     KeyActionCategory.Movement, "Move forward.");
+            Register(KeyAction.MoveBackward, KeyCode.S, "Move backward",
+                     KeyActionCategory.Movement, "Move backward.");
+            Register(KeyAction.MoveRight, KeyCode.D, "Move right",
+                     KeyActionCategory.Movement, "Move to the right.");
+            Register(KeyAction.MoveLeft, KeyCode.A, "Move left",
+                     KeyActionCategory.Movement, "Move to the left.");
+            Register(KeyAction.MoveUp, KeyCode.Q, "Move up",
+                     KeyActionCategory.Movement, "Move up.");
+            Register(KeyAction.MoveDown, KeyCode.E, "Move down",
+                     KeyActionCategory.Movement, "Move down.");
+            // Evolution
+            Register(KeyAction.SetMarker, KeyCode.Insert, "Set marker",
+                     KeyActionCategory.Evolution, "Sets a new marker.");
+            Register(KeyAction.DeleteMarker, KeyCode.Delete, "Delete marker",
+                     KeyActionCategory.Evolution, "Deletes a marker.");
+            Register(KeyAction.ToggleEvolutionCanvases, KeyCode.T, "Toggle evolution canvases",
+                     KeyActionCategory.Evolution, "Toggles between between the two canvases for the animation and selection of a revision.");
+            // Animation
+            Register(KeyAction.Previous, KeyCode.LeftArrow, "Previous",
+                     KeyActionCategory.Animation, "Go to previous element in the animation.");
+            Register(KeyAction.Next, KeyCode.RightArrow, "Next",
+                     KeyActionCategory.Animation, "Go to next element in the animation.");
+            Register(KeyAction.ToggleAutoPlay, KeyCode.F9, "Toggle auto play",
+                     KeyActionCategory.Animation, "Toggles auto play of the animation.");
+            Register(KeyAction.IncreaseAnimationSpeed, KeyCode.UpArrow, "Increase animation speed",
+                     KeyActionCategory.Animation, "Doubles animation speed.");
+            Register(KeyAction.DecreaseAnimationSpeed, KeyCode.DownArrow, "Decrease animation speed",
+                     KeyActionCategory.Animation, "Halves animation speed.");
+            // Debugging
+            Register(KeyAction.ToggleExecutionOrder, KeyCode.O, "Toggle execution order",
+                     KeyActionCategory.Debugging, "Toggles execution order (foward/backward).");
+            Register(KeyAction.ExecuteToBreakpoint, KeyCode.B, "Execute to breakpoint",
+                     KeyActionCategory.Debugging, "Continues execution until next breakpoint is reached.");
+            Register(KeyAction.FirstStatement, KeyCode.Home, "First statement",
+                     KeyActionCategory.Debugging, "Execution is back to very first statement.");
+            // Code Viewer
+            Register(KeyAction.ShowWindowMenu, KeyCode.F1, "Show window menu",
+                     KeyActionCategory.CodeViewer, "Toggles the menu of the open windows.");
+            Register(KeyAction.CodeWindowUndo, KeyCode.F5, "Code-window undo",
+                     KeyActionCategory.CodeViewer, "Undoes an edit in the source-code viewer.");
+            Register(KeyAction.CodeWindowRedo, KeyCode.F6, "Code-window redo",
+                     KeyActionCategory.CodeViewer, "Redoes an undone edit in the source-code viewer.");
+            Register(KeyAction.CodeWindowSave, KeyCode.F7, "Code-window save",
+                     KeyActionCategory.CodeViewer, "Saves the content of the source-code viewer.");
+            Register(KeyAction.RefreshSyntaxHighlighting, KeyCode.F8, "Refresh",
+                     KeyActionCategory.CodeViewer, "Refreshes syntax highlighting in the source-code viewer.");
+            // Chat
+            Register(KeyAction.ToggleTextChat, KeyCode.F2, "Toggle text chat",
+                     KeyActionCategory.Chat, "Toggles the text chat.");
         }
 
         /// <summary>
