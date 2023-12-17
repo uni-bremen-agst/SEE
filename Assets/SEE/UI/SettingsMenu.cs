@@ -37,7 +37,7 @@ namespace SEE.UI
         private GameObject settingsMenuGameObject;
 
         /// <summary>
-        /// A mapping of the short name of key binding onto the label of the button that allows to
+        /// A mapping of the short name of the key binding onto the label of the button that allows to
         /// change the binding. This dictionary is used to update the label if the key binding
         /// was changed by the user.
         /// </summary>
