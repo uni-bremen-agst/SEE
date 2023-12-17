@@ -90,7 +90,7 @@ namespace SEE.UI
 
         /// <summary>
         /// Toggles the settings panel with the Pause button and handles
-        /// the case, that the user wants to change the key of a keyBinding.
+        /// the case that the user wants to change the key of a keyBinding.
         /// </summary>
         protected override void UpdateDesktop()
         {
