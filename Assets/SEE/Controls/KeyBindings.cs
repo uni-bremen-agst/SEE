@@ -186,7 +186,7 @@ namespace SEE.Controls
             Register(KeyAction.ToggleHolisticMetricsMenu, KeyCode.C, "Toggle metrics menu", KeyActionCategory.General, "Toggles the menu for holistic code metrics");
         }
 
-        //<summary>
+        /// <summary>
         /// Returns the <see cref="KeyAction"/> in <see cref="keyBindings"/> that is
         /// triggered by the given <paramref name="keyCode"/>. If a binding is found,
         /// the <see cref="KeyAction"/> bound to the <paramref name="keyCode"/> is
