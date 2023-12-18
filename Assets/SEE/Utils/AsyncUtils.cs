@@ -36,7 +36,7 @@ namespace SEE.Utils
             }
             else
             {
-                Debug.LogWarning("RunOnMainThread called from main thread. This is not necessary.");
+                Debug.LogWarning("RunOnMainThread called from main thread. This is not necessary.\n");
             }
             T result = action();
             if (notOnMainThread)
