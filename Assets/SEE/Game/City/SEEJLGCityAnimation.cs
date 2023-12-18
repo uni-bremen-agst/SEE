@@ -752,7 +752,15 @@ namespace SEE.Game.City
 
             if (statementCounter.UpperBound())
             {
-                Debug.Log($"End of execution trace reached. Press '{KeyBindings.Previous}' to start playing backward.\n");
+                const string begin = "End of execution trace reached.";
+                if (KeyBindings.TryGetKeyCode(KeyBindings.KeyAction.Previous, out KeyCode keyCode))
+                {
+                    Debug.Log(begin + $" Press '{keyCode}' to start playing backward.\n");
+                }
+                else
+                {
+                    Debug.Log(begin + "\n");
+                }
                 inAutomaticMode = false;
                 playingForward = false;
             }
@@ -778,7 +786,15 @@ namespace SEE.Game.City
 
             if (statementCounter.LowerBound())
             {
-                Debug.Log($"Start of execution trace reached. Press '{KeyBindings.Next}' to start playing forward.\n");
+                const string begin = "Start of execution trace reached.";
+                if (KeyBindings.TryGetKeyCode(KeyBindings.KeyAction.Next, out KeyCode keyCode))
+                {
+                    Debug.Log(begin + $" Press '{keyCode}' to start playing forward.\n");
+                }
+                else
+                {
+                    Debug.Log(begin + "\n");
+                }
                 inAutomaticMode = false;
                 playingForward = true;
             }
