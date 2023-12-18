@@ -391,16 +391,19 @@ namespace SEE.Game.City
                 }
                 else
                 {
-                    graphRenderer = new GraphRenderer(this, theVisualizedSubGraph);
-                    // We assume here that this SEECity instance was added to a game object as
-                    // a component. The inherited attribute gameObject identifies this game object.
-                    graphRenderer.DrawGraph(theVisualizedSubGraph, gameObject);
-
-                    // If we're in editmode, InitializeAfterDrawn() will be called by Start() once the
-                    // game starts. Otherwise, in playmode, we have to call it ourselves.
-                    if (Application.isPlaying)
+                    using (LoadingSpinner.Show($"Drawing city \"{gameObject.name}\""))
                     {
-                        InitializeAfterDrawn();
+                        graphRenderer = new GraphRenderer(this, theVisualizedSubGraph);
+                        // We assume here that this SEECity instance was added to a game object as
+                        // a component. The inherited attribute gameObject identifies this game object.
+                        graphRenderer.DrawGraph(theVisualizedSubGraph, gameObject);
+
+                        // If we're in editmode, InitializeAfterDrawn() will be called by Start() once the
+                        // game starts. Otherwise, in playmode, we have to call it ourselves.
+                        if (Application.isPlaying)
+                        {
+                            InitializeAfterDrawn();
+                        }
                     }
                 }
             }
