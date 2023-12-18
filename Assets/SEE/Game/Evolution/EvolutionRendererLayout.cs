@@ -50,13 +50,8 @@ namespace SEE.Game.Evolution
         private void CalculateAllGraphLayouts(IList<Graph> graphs)
         {
             // Determines the layouts of all loaded graphs upfront.
-            Performance p = Performance.Begin("Layouting all " + graphs.Count + " graphs");
-            ISet<string> numericNodeAttributes = new HashSet<string>();
-            graphs.ForEach(graph =>
-            {
-                CalculateLayout(graph);
-                numericNodeAttributes.UnionWith(graph.AllNumericNodeAttributes());
-            });
+            Performance p = Performance.Begin($"Layouting all {graphs.Count} graphs");
+            graphs.ForEach(CalculateLayout);
             objectManager.Clear();
             p.End(true);
         }
