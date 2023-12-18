@@ -93,11 +93,12 @@ namespace SEE.UI
         /// <param name="processMessage">The unique message for the loading process</param>
         /// <seealso cref="LoadingSpinner"/>
         /// <returns>An <see cref="IDisposable"/> that can be used to hide the spinner.</returns>
-        public static IDisposable Show(string processMessage = null)
+        public static IDisposable Show(string processMessage)
         {
-            // If the process name is not specified, we generate a random one.
-            // TODO (@koschke): However, does it ever make sense to not specify a process name?
-            processMessage ??= $"Unnamed loading process [{Guid.NewGuid().ToString()}]";
+            if (processMessage == null)
+            {
+                throw new ArgumentNullException(nameof(processMessage));
+            }
 
             if (loadingProcesses.Add(processMessage) && !ReferenceEquals(loadingSpinner, null))
             {
