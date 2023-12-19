@@ -1,8 +1,5 @@
-﻿using SEE.Game;
-using SEE.Utils;
+﻿using SEE.Game.Drawable;
 using UnityEngine;
-using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -48,7 +45,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Destroys all rigid bodies and collision controller of all drawable types object of the given drawable on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="ObjectName"/> don't exists.</exception>
+        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="NodeID"/> don't exists.</exception>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())

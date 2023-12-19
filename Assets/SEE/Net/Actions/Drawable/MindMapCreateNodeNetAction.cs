@@ -13,7 +13,7 @@ namespace SEE.Net.Actions.Drawable
     public class MindMapCreateNodeNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The id of the drawable on which the object is located
+        /// The id of the drawable on which the node should be created
         /// </summary>
         public string DrawableID;
 
@@ -30,7 +30,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        /// <param name="drawableID">The id of the drawable on which the object is located.</param>
+        /// <param name="drawableID">The id of the drawable on which the node should be created.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="node">The node that should be created.</param>
         public MindMapCreateNodeNetAction(string drawableID, string parentDrawableID, MindMapNodeConf node)
@@ -50,7 +50,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Creates the node on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="MindMapNodeConf.IDLabel"/> don't exists.</exception>
+        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="Node"/> don't exists.</exception>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())

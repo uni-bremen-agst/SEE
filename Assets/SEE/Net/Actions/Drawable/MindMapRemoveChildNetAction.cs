@@ -1,10 +1,7 @@
-﻿using System.Collections;
-using UnityEngine;
-using SEE.Controls.Actions.Drawable;
+﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.Game;
-using SEE.Game.Drawable;
 using SEE.Game.Drawable.ValueHolders;
+using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -14,7 +11,7 @@ namespace SEE.Net.Actions.Drawable
     public class MindMapRemoveChildNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The id of the drawable on which the object is located
+        /// The id of the drawable on which the node is located
         /// </summary>
         public string DrawableID;
 
@@ -31,7 +28,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        /// <param name="drawableID">The id of the drawable on which the object is located.</param>
+        /// <param name="drawableID">The id of the drawable on which the node is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="child">The node that should be removed.</param>
         public MindMapRemoveChildNetAction(string drawableID, string parentDrawableID, MindMapNodeConf child)
@@ -49,9 +46,9 @@ namespace SEE.Net.Actions.Drawable
         {
         }
         /// <summary>
-        /// Change the parent of a node on each client.
+        /// Removes the node from old parent's children list on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="MindMapNodeConf.IDLabel"/> don't exists.</exception>
+        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="ChildNode"/> don't exists.</exception>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())

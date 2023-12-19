@@ -1,9 +1,6 @@
-﻿using SEE.Net.Actions;
-using System.Collections;
-using UnityEngine;
-using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable.Configurations;
+﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -35,7 +32,6 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Spawn the sticky note on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="TextName"/> don't exists.</exception>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())

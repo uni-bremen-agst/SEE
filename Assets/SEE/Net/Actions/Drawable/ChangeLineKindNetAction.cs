@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
-using SEE.Controls.Actions.Drawable;
+using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -22,11 +22,12 @@ namespace SEE.Net.Actions.Drawable
         /// </summary>
         public string LineName;
         /// <summary>
-        /// The line kind to which the line kind holder value of the line should be set.
+        /// The new line kind.
         /// </summary>
         public GameDrawer.LineKind LineKind;
         /// <summary>
-        /// The tiling to which the line renderer texture scale of the line should be set. Only necessary if the LinKind is dashed.
+        /// The tiling to which the line renderer texture scale of the line should be set. 
+        /// Only necessary if the <see cref="GameDrawer.LineKind"/> is <see cref="GameDrawer.LineKind.Dashed"/>.
         /// </summary>
         public float Tiling;
 
@@ -38,7 +39,8 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="lineName">The id of the line that should be changed</param>
         /// <param name="lineKind">The line kind to which the line kind holder value of the line should be set.</param>
         /// <param name="tiling">The tiling to which the line renderer texture scale of the line should be set.</param>
-        public ChangeLineKindNetAction(string drawableID, string parentDrawableID, string lineName, GameDrawer.LineKind lineKind, float tiling) : base()
+        public ChangeLineKindNetAction(string drawableID, string parentDrawableID, string lineName, 
+            GameDrawer.LineKind lineKind, float tiling) : base()
         {
             DrawableID = drawableID;
             ParentDrawableID = parentDrawableID;

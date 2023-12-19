@@ -1,11 +1,12 @@
 ﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
 using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is responsible for changing the order in layer (<see cref="EditAction"/>) of a drawable type on all clients.
+    /// This class is responsible for changing the order in layer (<see cref="EditAction"/>) of a <see cref="DrawableType"/> object on all clients.
     /// </summary>
     public class EditLayerNetAction : AbstractNetAction
     {
@@ -51,9 +52,9 @@ namespace SEE.Net.Actions.Drawable
         }
 
         /// <summary>
-        /// Changes the order in layer of the given line on each client.
+        /// Changes the order in layer of the given object on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="LineName"/> don't exists.</exception>
+        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="TypeName"/> don't exists.</exception>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())

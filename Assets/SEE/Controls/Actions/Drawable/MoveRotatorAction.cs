@@ -623,6 +623,15 @@ namespace SEE.Controls.Actions.Drawable
                     MoveMenu.Disable();
                     currentState = ReversibleAction.Progress.Completed;
                     return true;
+                } else
+                {
+                    if (executedOperation == ProgressState.Rotate)
+                    {
+                        /// A block is needed because occasionally a trigger exit is not registered during rotation. 
+                        /// This block attempts to set the isInCollision value of the Collision Controller to false. 
+                        /// However, if the object is still in a collision, it will be set back to true by its OnStayCollision method.
+                        selectedObject.GetComponent<CollisionController>().TrySetCollisionToFalse();
+                    }
                 }
             }
             else
@@ -677,7 +686,7 @@ namespace SEE.Controls.Actions.Drawable
                 if (memento.moveOrRotate == ProgressState.Move)
                 {
                     GameMoveRotator.SetPosition(memento.selectedObject, memento.oldObjectPosition,
-                        memento.includeChildren);
+                                            memento.includeChildren);
                     new MoveNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.id,
                         memento.oldObjectPosition, memento.includeChildren).Execute();
                 }
@@ -688,6 +697,7 @@ namespace SEE.Controls.Actions.Drawable
                     new RotatorNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.id,
                         memento.oldObjectLocalEulerAngles.z, memento.includeChildren).Execute();
                 }
+
                 GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(
                     GameFinder.GetAttachedObjectsObject(memento.selectedObject));
                 new RbAndCCDestroyerNetAction(memento.drawable.ID, memento.drawable.ParentID,

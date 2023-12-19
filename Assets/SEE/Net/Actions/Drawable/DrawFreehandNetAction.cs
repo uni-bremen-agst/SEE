@@ -1,18 +1,17 @@
-﻿using SEE.Game.Drawable;
-using static SEE.Game.Drawable.GameDrawer;
-using SEE.Controls.Actions.Drawable;
-using UnityEngine;
+﻿using SEE.Controls.Actions.Drawable;
+using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is responsible for drawing (<see cref="DrawOnAction"/>) a line on the given drawable on all clients.
+    /// This class is responsible for drawing (<see cref="DrawFreehandAction"/>) a line on the given drawable on all clients.
     /// </summary>
-    public class DrawOnNetAction : AbstractNetAction
+    public class DrawFreehandNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The id of the drawable on which the object is located
+        /// The id of the drawable on which the line should be drawn.
         /// </summary>
         public string DrawableID;
 
@@ -29,10 +28,10 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        /// <param name="drawableID">The id of the drawable on which the object is located.</param>
+        /// <param name="drawableID">The id of the drawable on which the line should be drawn.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="line">The line that should be drawn.</param>
-        public DrawOnNetAction(string drawableID, string parentDrawableID, LineConf line)
+        public DrawFreehandNetAction(string drawableID, string parentDrawableID, LineConf line)
         {
             this.DrawableID = drawableID;
             this.ParentDrawableID = parentDrawableID;
@@ -42,7 +41,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Draws the line on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="LineName"/> don't exists.</exception>
+        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="Line"/> don't exists.</exception>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())

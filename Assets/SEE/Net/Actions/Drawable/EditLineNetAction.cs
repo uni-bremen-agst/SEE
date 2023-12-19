@@ -13,7 +13,7 @@ namespace SEE.Net.Actions.Drawable
     public class EditLineNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The id of the drawable on which the object is located
+        /// The id of the drawable on which the line is located
         /// </summary>
         public string DrawableID;
         /// <summary>
@@ -50,7 +50,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Changes the values of the given line on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="LineName"/> don't exists.</exception>
+        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="Line"/> don't exists.</exception>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())

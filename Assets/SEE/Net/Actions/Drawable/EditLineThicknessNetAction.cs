@@ -1,8 +1,6 @@
-﻿using SEE.Net.Actions;
-using SEE.Utils;
-using SEE.Controls.Actions.Drawable;
-using UnityEngine;
+﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
+using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -12,7 +10,7 @@ namespace SEE.Net.Actions.Drawable
     public class EditLineThicknessNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The id of the drawable on which the object is located
+        /// The id of the drawable on which the line is located
         /// </summary>
         public string DrawableID;
         /// <summary>
@@ -31,7 +29,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        /// <param name="drawableID">The id of the drawable on which the object is located.</param>
+        /// <param name="drawableID">The id of the drawable on which the line is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="lineName">The id of the line that should be changed.</param>
         /// <param name="thickness">The new thickness for the line.</param>

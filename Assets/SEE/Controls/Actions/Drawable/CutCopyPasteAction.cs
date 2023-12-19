@@ -456,7 +456,7 @@ namespace SEE.Controls.Actions.Drawable
             newObject = GameDrawer.ReDrawLine(newDrawable, lineConf);
             newObject.transform.position = newPosition 
                 - newObject.transform.forward * ValueHolder.distanceToDrawable.z * lineConf.orderInLayer;
-            new DrawOnNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable), 
+            new DrawFreehandNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable), 
                 LineConf.GetLine(newObject)).Execute();
         }
 

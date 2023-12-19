@@ -1,8 +1,7 @@
-﻿using SEE.Game.Drawable.Configurations;
-using SEE.Game;
-using System.Collections;
-using UnityEngine;
+﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
+using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -12,7 +11,7 @@ namespace SEE.Net.Actions.Drawable
     public class EditImageNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The id of the drawable on which the object is located
+        /// The id of the drawable on which the image is located
         /// </summary>
         public string DrawableID;
         /// <summary>
@@ -49,7 +48,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Changes the values of the given image configuration on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="LineName"/> don't exists.</exception>
+        /// <exception cref="System.Exception">will be thrown, if the drawable or if image don't exists.</exception>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
@@ -62,7 +61,7 @@ namespace SEE.Net.Actions.Drawable
                 }
                 else
                 {
-                    throw new System.Exception($"There is no drawable with the ID {DrawableID} or line with the ID {Image.id}.");
+                    throw new System.Exception($"There is no drawable with the ID {DrawableID} or image with the ID {Image.id}.");
                 }
             }
         }

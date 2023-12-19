@@ -33,7 +33,7 @@ namespace SEE.Game.Drawable
             stickyNote.transform.rotation = raycastHit.collider.gameObject.transform.rotation;
 
             /// Adopt the position of the hitted object, but preserve the distance.
-            stickyNote.transform.position = raycastHit.point - stickyNote.transform.forward 
+            stickyNote.transform.position = raycastHit.point - stickyNote.transform.forward
                 * ValueHolder.distanceToDrawable.z * ValueHolder.currentOrderInLayer;
 
             /// Sets the inital scale for sticky notes
@@ -101,8 +101,8 @@ namespace SEE.Game.Drawable
         /// <returns>The new position</returns>
         public static Vector3 FinishMoving(GameObject stickyNoteHolder)
         {
-            stickyNoteHolder.transform.position -= stickyNoteHolder.transform.forward 
-                * ValueHolder.distanceToDrawable.z 
+            stickyNoteHolder.transform.position -= stickyNoteHolder.transform.forward
+                * ValueHolder.distanceToDrawable.z
                 * stickyNoteHolder.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
             return stickyNoteHolder.transform.position;
         }
@@ -114,7 +114,7 @@ namespace SEE.Game.Drawable
         /// <param name="direction">The direction in which the holder should moved.</param>
         /// <param name="speed">The movement speed</param>
         /// <returns>The new position</returns>
-        public static Vector3 MoveByMenu(GameObject stickyNoteHolder, 
+        public static Vector3 MoveByMenu(GameObject stickyNoteHolder,
             ValueHolder.MoveDirection direction, float speed)
         {
             /// Moves the sticky note in the desired direction with the chosen speed.
@@ -152,10 +152,10 @@ namespace SEE.Game.Drawable
         {
             Transform transform = obj.transform;
             /// Sets the y euler angle.
-            transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, 
+            transform.localEulerAngles = new Vector3(transform.localEulerAngles.x,
                 localEulerAngleY, transform.localEulerAngles.z);
             /// Preserve the distance.
-            obj.transform.position = oldPos - obj.transform.forward 
+            obj.transform.position = oldPos - obj.transform.forward
                 * ValueHolder.distanceToDrawable.z * ValueHolder.currentOrderInLayer;
         }
         /// <summary>
@@ -169,12 +169,12 @@ namespace SEE.Game.Drawable
         {
             Transform transform = obj.transform;
             /// Sets the x euler angle.
-            transform.localEulerAngles = new Vector3(localEulerAngleX, 
+            transform.localEulerAngles = new Vector3(localEulerAngleX,
                 transform.localEulerAngles.y, transform.localEulerAngles.z);
             if (changePos)
             {
                 /// Preserve the distance.
-                obj.transform.position = oldPos - obj.transform.forward 
+                obj.transform.position = oldPos - obj.transform.forward
                     * ValueHolder.distanceToDrawable.z * ValueHolder.currentOrderInLayer;
             }
         }
@@ -187,7 +187,7 @@ namespace SEE.Game.Drawable
         public static void SetRotateX(GameObject obj, float localEulerAngleX)
         {
             Transform transform = obj.transform;
-            transform.localEulerAngles = new Vector3(localEulerAngleX, 
+            transform.localEulerAngles = new Vector3(localEulerAngleX,
                 transform.localEulerAngles.y, transform.localEulerAngles.z);
         }
 
@@ -227,7 +227,11 @@ namespace SEE.Game.Drawable
         /// <param name="color">The new color for the drawable</param>
         public static void ChangeColor(GameObject stickyNote, Color color)
         {
-            stickyNote.transform.Find("Front").GetComponent<MeshRenderer>().material.color = color;
+            if (GameFinder.GetDrawable(stickyNote) != null
+                && GameFinder.GetDrawable(stickyNote).GetComponent<MeshRenderer>() != null)
+            {
+                GameFinder.GetDrawable(stickyNote).GetComponent<MeshRenderer>().material.color = color;
+            }
         }
 
         /// <summary>
@@ -238,12 +242,14 @@ namespace SEE.Game.Drawable
         public static void Change(GameObject stickyNote, DrawableConfig config)
         {
             GameObject root = GameFinder.GetHighestParent(stickyNote);
-
-            ChangeColor(stickyNote, config.Color);
-            ChangeLayer(root, config.Order);
-            SetRotateX(root, config.Rotation.x);
-            SetRotateY(root, config.Rotation.y, config.Position);
-            GameScaler.SetScale(stickyNote, config.Scale);
+            if (root.name.Contains(ValueHolder.StickyNotePrefix))
+            {
+                ChangeColor(stickyNote, config.Color);
+                ChangeLayer(root, config.Order);
+                SetRotateX(root, config.Rotation.x);
+                SetRotateY(root, config.Rotation.y, config.Position);
+                GameScaler.SetScale(stickyNote, config.Scale);
+            }
         }
     }
 }

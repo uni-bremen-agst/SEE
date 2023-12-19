@@ -1,10 +1,5 @@
-﻿using SEE.Net.Actions;
-using System.Collections;
+﻿using SEE.Game.Drawable;
 using UnityEngine;
-using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable.Configurations;
-using SEE.Game.Drawable;
-using UnityEditor;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -14,7 +9,7 @@ namespace SEE.Net.Actions.Drawable
     public class StickyNoteMoveNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The id of the drawable on which the object is located.
+        /// The id of the sticky note's drawable.
         /// </summary>
         public string DrawableID;
         /// <summary>
@@ -49,7 +44,7 @@ namespace SEE.Net.Actions.Drawable
         {
         }
         /// <summary>
-        /// Change the position of a sticky note on each client.
+        /// Changes the position of a sticky note on each client.
         /// </summary>
         protected override void ExecuteOnClient()
         {

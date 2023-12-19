@@ -1,19 +1,17 @@
-﻿using SEE.Net.Actions;
-using System.Collections;
-using UnityEngine;
-using System.Collections.Generic;
-using SEE.Controls.Actions.Drawable;
+﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is responsible for changing positions of a given line (<see cref="MovePointAction"/>) of an object on all clients.
+    /// This class is responsible for changing positions of a given line (<see cref="MovePointAction"/>) on all clients.
     /// </summary>
     public class MovePointNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The id of the drawable on which the object is located
+        /// The id of the drawable on which the line is located
         /// </summary>
         public string DrawableID;
         /// <summary>
@@ -36,7 +34,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        /// <param name="drawableID">The id of the drawable on which the object is located.</param>
+        /// <param name="drawableID">The id of the drawable on which the line is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="lineName">The id of the line thats line renderer positions should be changed</param>
         /// <param name="Indices">The selected positions of the line renderer</param>

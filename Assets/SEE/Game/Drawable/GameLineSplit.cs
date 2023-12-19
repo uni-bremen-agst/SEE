@@ -119,7 +119,7 @@ namespace SEE.Game.Drawable
             lineToCreate.rendererPositions = positions;
 
             GameObject newLine = GameDrawer.ReDrawLine(drawable, lineToCreate);
-            new DrawOnNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
+            new DrawFreehandNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
                 LineConf.GetLine(newLine)).Execute();
 
             return LineConf.GetLine(newLine);

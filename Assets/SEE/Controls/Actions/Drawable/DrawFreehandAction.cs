@@ -14,7 +14,7 @@ namespace SEE.Controls.Actions.Drawable
     /// <summary>
     /// This action allows drawing on a drawable.
     /// </summary>
-    class DrawOnAction : AbstractPlayerAction
+    class DrawFreehandAction : AbstractPlayerAction
     {
         /// <summary>
         /// The different progress states of this action.
@@ -64,7 +64,7 @@ namespace SEE.Controls.Actions.Drawable
         private bool finishDrawing = false;
 
         /// <summary>
-        /// This struct can store all the information needed to revert or repeat a <see cref="DrawOnAction"/>.
+        /// This struct can store all the information needed to revert or repeat a <see cref="DrawFreehandAction"/>.
         /// </summary>
         private struct Memento
         {
@@ -90,7 +90,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Starts the <see cref="DrawOnAction"/>.
+        /// Starts the <see cref="DrawFreehandAction"/>.
         /// It sets the progress state to start drawing.
         /// </summary>
         public override void Start()
@@ -107,7 +107,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Stops the <see cref="DrawOnAction"/> and hides the line menu.
+        /// Stops the <see cref="DrawFreehandAction"/> and hides the line menu.
         /// </summary>
         public override void Stop()
         {
@@ -205,7 +205,7 @@ namespace SEE.Controls.Actions.Drawable
                 positions = newPositions;
 
                 GameDrawer.Drawing(line, positions);
-                new DrawOnNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
+                new DrawFreehandNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
                     LineConf.GetLine(line)).Execute();
             }
         }
@@ -232,7 +232,7 @@ namespace SEE.Controls.Actions.Drawable
                     line = GameDrawer.SetPivot(line);
                     LineConf currentLine = LineConf.GetLine(line);
                     memento = new Memento(drawable, currentLine);
-                    new DrawOnNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                    new DrawFreehandNetAction(memento.drawable.ID, memento.drawable.ParentID, 
                         currentLine).Execute();
                     currentState = ReversibleAction.Progress.Completed;
                     return true;
@@ -275,26 +275,26 @@ namespace SEE.Controls.Actions.Drawable
             line = GameDrawer.ReDrawLine(memento.drawable.GetDrawable(), memento.line);
             if (line != null)
             {
-                new DrawOnNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                new DrawFreehandNetAction(memento.drawable.ID, memento.drawable.ParentID, 
                     LineConf.GetLine(line)).Execute();
             }
         }
 
         /// <summary>
-        /// A new instance of <see cref="DrawOnAction"/>.
+        /// A new instance of <see cref="DrawFreehandAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="DrawOnAction"/></returns>
+        /// <returns>new instance of <see cref="DrawFreehandAction"/></returns>
         public static ReversibleAction CreateReversibleAction()
         {
-            return new DrawOnAction();
+            return new DrawFreehandAction();
         }
 
         /// <summary>
-        /// A new instance of <see cref="DrawOnAction"/>.
+        /// A new instance of <see cref="DrawFreehandAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="DrawOnAction"/></returns>
+        /// <returns>new instance of <see cref="DrawFreehandAction"/></returns>
         public override ReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -306,7 +306,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns><see cref="ActionStateType.DrawOnWhiteboard"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateTypes.DrawOn;
+            return ActionStateTypes.DrawFreehand;
         }
 
         /// <summary>

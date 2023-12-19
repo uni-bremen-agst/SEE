@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using UnityEngine;
-using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable.Configurations;
-using SEE.Game;
+﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
+using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -13,7 +11,7 @@ namespace SEE.Net.Actions.Drawable
     public class WriteTextNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The id of the drawable on which the object is located
+        /// The id of the drawable on which the text should be written.
         /// </summary>
         public string DrawableID;
 
@@ -30,7 +28,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        /// <param name="drawableID">The id of the drawable on which the object is located.</param>
+        /// <param name="drawableID">The id of the drawable on which the text should be written.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="text">The text that should be written.</param>
         public WriteTextNetAction(string drawableID, string parentDrawableID, TextConf text)
@@ -50,7 +48,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Writes the text on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="TextName"/> don't exists.</exception>
+        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="Text"/> don't exists.</exception>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())

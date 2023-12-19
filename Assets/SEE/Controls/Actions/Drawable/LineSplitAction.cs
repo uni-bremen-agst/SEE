@@ -119,7 +119,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             GameObject drawable = memento.drawable.GetDrawable();
             GameDrawer.ReDrawLine(drawable, memento.originalLine);
-            new DrawOnNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.originalLine).Execute();
+            new DrawFreehandNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.originalLine).Execute();
 
             foreach (LineConf line in memento.lines)
             {
@@ -143,7 +143,7 @@ namespace SEE.Controls.Actions.Drawable
             foreach (LineConf line in memento.lines)
             {
                 GameDrawer.ReDrawLine(drawable, line);
-                new DrawOnNetAction(memento.drawable.ID, memento.drawable.ParentID, line).Execute();
+                new DrawFreehandNetAction(memento.drawable.ID, memento.drawable.ParentID, line).Execute();
             }
         }
 

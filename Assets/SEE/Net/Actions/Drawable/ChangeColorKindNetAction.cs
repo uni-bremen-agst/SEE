@@ -1,7 +1,7 @@
-﻿using UnityEngine;
+﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
-using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable.Configurations;
+using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -11,19 +11,22 @@ namespace SEE.Net.Actions.Drawable
     public class ChangeColorKindNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The id of the drawable on which the object is located
+        /// The id of the drawable on which the line is located
         /// </summary>
         public string DrawableID;
+
         /// <summary>
         /// The id of the drawable parent
         /// </summary>
         public string ParentDrawableID;
+
         /// <summary>
-        /// The color kind to which the color kind holder value of the line should be set.
+        /// The new color kind for the line.
         /// </summary>
         public GameDrawer.ColorKind ColorKind;
+
         /// <summary>
-        /// The Line configuration.
+        /// The line configuration.
         /// </summary>
         public LineConf Line;
 
@@ -33,8 +36,9 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="drawableID">The id of the drawable on which the object is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="line">The configuration of the line that should be changed</param>
-        /// <param name="colorKind">The color kind to which the color kind holder value of the line should be set.</param>
-        public ChangeColorKindNetAction(string drawableID, string parentDrawableID, LineConf line, GameDrawer.ColorKind colorKind) : base()
+        /// <param name="colorKind">The new color kind for the line.</param>
+        public ChangeColorKindNetAction(string drawableID, string parentDrawableID, LineConf line, 
+            GameDrawer.ColorKind colorKind) : base()
         {
             DrawableID = drawableID;
             ParentDrawableID = parentDrawableID;
@@ -54,7 +58,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Changes the color kind of the given line on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="LineName"/> don't exists.</exception>
+        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="Line.id"/> don't exists.</exception>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())

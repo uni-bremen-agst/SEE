@@ -166,122 +166,122 @@ namespace SEE.Controls.Actions
                   parent: MetricBoard);
 
             // Whiteboard actions
-            Whiteboard =
-              new("Whiteboard", "Please select the whiteboard mode you want to activate.",
-                  Color.blue, "Materials/ModernUIPack/Pencil");
+            Drawable =
+              new("Drawable", "Please select the drawable mode you want to activate.",
+                  Color.blue, "Materials/Drawable/Drawable");
 
-            DrawOn =
-                new("Draw on", "Draw a line on a drawable",
-                    Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
-                    DrawOnAction.CreateReversibleAction,
-                    parent: Whiteboard);
+            DrawFreehand =
+                new("Draw Freehand", "Draw a line on a drawable",
+                    Color.magenta.Darker(), "Materials/Drawable/Brush",
+                    DrawFreehandAction.CreateReversibleAction,
+                    parent: Drawable);
 
             DrawShapes =
                 new("Draw Shape", "Draw different shapes on a drawable",
-                    Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
+                    Color.magenta.Darker(), "Materials/ModernUIPack/Crop",
                     DrawShapesAction.CreateReversibleAction,
-                    parent: Whiteboard);
+                    parent: Drawable);
 
             WriteText =
                 new("Write Text", "Writes a text on a drawable",
-                    Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
+                    Color.magenta.Darker(), "Materials/Drawable/Text",
                     WriteTextAction.CreateReversibleAction,
-                    parent: Whiteboard);
+                    parent: Drawable);
 
             AddImage =
                 new("Adds an Image", "Adds an image to a drawable",
-                    Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
+                    Color.magenta.Darker(), "Materials/Drawable/Image",
                     AddImageAction.CreateReversibleAction,
-                    parent: Whiteboard);
+                    parent: Drawable);
 
             MindMap =
                 new("Mind Map", "Adds and controll mind map components",
-                    Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
+                    Color.magenta.Darker(), "Materials/Charts/TreeIcon",
                     MindMapAction.CreateReversibleAction,
-                    parent: Whiteboard);
+                    parent: Drawable);
 
             ColorPicker =
                 new("Color picker", "Picks a color",
-                    Color.yellow.Darker(), "Materials/ModernUIPack/Pencil",
+                    Color.yellow.Darker(), "Materials/Drawable/Eyedropper",
                     ColorPickerAction.CreateReversibleAction,
-                    parent: Whiteboard);
+                    parent: Drawable);
 
             Edit =
                 new("Edit", "Edits a drawable type.",
-                    Color.green.Darker(), "Materials/ModernUIPack/Pencil",
+                    Color.green.Darker(), "Materials/Drawable/Edit",
                     EditAction.CreateReversibleAction,
-                    parent: Whiteboard);
+                    parent: Drawable);
 
             MoveRotator =
                 new("Move or Rotate", "Move or rotates a Object on the Drawable.",
-                    Color.green.Darker(), "Materials/ModernUIPack/Pencil",
+                    Color.green.Darker(), "Materials/Drawable/MoveRotator",
                     MoveRotatorAction.CreateReversibleAction,
-                    parent: Whiteboard);
+                    parent: Drawable);
 
             Scale =
                 new("Scale", "Scales a drawable type. Mouse wheel up to scale up, mouse wheel down to scale down.",
-                    Color.green.Darker(), "Materials/ModernUIPack/Pencil",
+                    Color.green.Darker(), "Materials/Drawable/Scale",
                     ScaleAction.CreateReversibleAction,
-                    parent: Whiteboard);
+                    parent: Drawable);
 
             LayerChanger =
                 new("Change the sorting layer", "Left mouse click to increase, right mouse click to decrease",
-                    Color.green.Darker(), "Materials/ModernUIPack/Pencil",
+                    Color.green.Darker(), "Materials/Drawable/Layer",
                     LayerChangerAction.CreateReversibleAction,
-                    parent: Whiteboard);
+                    parent: Drawable);
 
             CutCopyPaste = new("Cut, Copy, Paste", "Cut or Copy a drawable type and paste it on the selected position.",
-                    Color.green.Darker(), "Materials/ModernUIPack/Pencil",
+                    Color.green.Darker(), "Materials/Drawable/CutCopyPaste",
                     CutCopyPasteAction.CreateReversibleAction,
-                    parent: Whiteboard);
+                    parent: Drawable);
 
             MovePoint =
                 new("Moves a point", "Moves a point of a line.",
-                    Color.green.Darker(), "Materials/ModernUIPack/Pencil",
+                    Color.green.Darker().Darker(), "Materials/Charts/MoveIcon",
                     MovePointAction.CreateReversibleAction,
-                    parent: Whiteboard);
+                    parent: Drawable);
 
             LineSplit =
                 new("Line split", "Splittes a line on a given point.",
-                    Color.green.Darker(), "Materials/ModernUIPack/Pencil",
+                    Color.green.Darker().Darker(), "Materials/Drawable/LineSplit",
                     LineSplitAction.CreateReversibleAction,
-                    parent: Whiteboard);
+                    parent: Drawable);
 
             Save =
                 new("Save", "Save one or more drawables.",
-                    Color.yellow, "Materials/ModernUIPack/Pencil",
+                    Color.yellow, "Materials/Drawable/Save",
                     SaveAction.CreateReversibleAction,
-                    parent: Whiteboard);
+                    parent: Drawable);
 
             Load =
                 new("Load", "Load one or more drawables.",
-                    Color.yellow.Darker(), "Materials/ModernUIPack/Pencil",
+                    Color.yellow.Darker(), "Materials/ModernUIPack/Document",
                     LoadAction.CreateReversibleAction,
-                    parent: Whiteboard);
-
-            Erase =
-                new("Erase", "Erase a complete object on a drawable",
-                    Color.red, "Materials/ModernUIPack/Pencil",
-                    EraseAction.CreateReversibleAction,
-                    parent: Whiteboard);
+                    parent: Drawable);
 
             LinePointErase =
                 new("Line point erase", "Erase a point from a line on a drawable",
-                    Color.red, "Materials/ModernUIPack/Pencil",
+                    Color.red, "Materials/Drawable/LineErase",
                     LinePointEraseAction.CreateReversibleAction,
-                    parent: Whiteboard);
+                    parent: Drawable);
+
+            Erase =
+                new("Erase", "Erase a complete object on a drawable",
+                    Color.red.Darker(), "Materials/Drawable/Erase",
+                    EraseAction.CreateReversibleAction,
+                    parent: Drawable);
 
             Cleaner =
                 new("Cleaner", "Cleans a complete drawable",
-                    Color.red.Darker(), "Materials/ModernUIPack/Pencil",
+                    Color.red.Darker(), "Materials/ModernUIPack/Trash",
                     CleanerAction.CreateReversibleAction,
-                    parent: Whiteboard);
+                    parent: Drawable);
 
             StickyNote =
                 new("Sticky Note", "Manage sticky notes (spawn/move/edit/delete)",
-                 Color.blue.Darker(), "Materials/ModernUIPack/Pencil",
+                 Color.blue.Darker(), "Materials/Drawable/StickyNote",
                     StickyNoteAction.CreateReversibleAction,
-                    parent: Whiteboard);
+                    parent: Drawable);
         }
 
         public readonly static ActionStateType Move;
@@ -305,8 +305,8 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType LoadBoard;
         public readonly static ActionStateType SaveBoard;
 
-        public readonly static ActionStateTypeGroup Whiteboard;
-        public readonly static ActionStateType DrawOn;
+        public readonly static ActionStateTypeGroup Drawable;
+        public readonly static ActionStateType DrawFreehand;
         public readonly static ActionStateType DrawShapes;
         public readonly static ActionStateType WriteText;
         public readonly static ActionStateType AddImage;

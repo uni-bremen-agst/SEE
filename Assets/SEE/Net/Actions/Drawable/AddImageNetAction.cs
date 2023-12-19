@@ -1,19 +1,17 @@
-﻿using SEE.Net.Actions;
-using System.Collections;
-using UnityEngine;
-using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable.Configurations;
+﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
+using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is reponsible for add <see cref="AddImageAction"/> a image to the given drawable on all clients.
+    /// This class is reponsible for add <see cref="AddImageAction"/> an image to the given drawable on all clients.
     /// </summary>
     public class AddImageNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The id of the drawable on which the object is located
+        /// The id of the drawable on which the object should be placed
         /// </summary>
         public string DrawableID;
 
@@ -25,19 +23,19 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The image that should be add as <see cref="ImageConf"/> object.
         /// </summary>
-        public ImageConf ImageConf;
+        public ImageConf Conf;
 
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        /// <param name="drawableID">The id of the drawable on which the object is located.</param>
+        /// <param name="drawableID">The id of the drawable on which the object should be placed.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
-        /// <param name="imageConf">The image configuration of the image that should be displayed.</param>
+        /// <param name="imageConf">The image configuration of the image that should be added.</param>
         public AddImageNetAction(string drawableID, string parentDrawableID, ImageConf imageConf)
         {
             this.DrawableID = drawableID;
             this.ParentDrawableID = parentDrawableID;
-            this.ImageConf = imageConf;
+            this.Conf = imageConf;
         }
 
         /// <summary>
@@ -50,7 +48,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Adds the image on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="TextName"/> don't exists.</exception>
+        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="Conf.id"/> don't exists.</exception>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
@@ -61,13 +59,13 @@ namespace SEE.Net.Actions.Drawable
                     throw new System.Exception($"There is no drawable with the ID {DrawableID}.");
                 }
 
-                if (ImageConf != null && ImageConf.id != "")
+                if (Conf != null && Conf.id != "")
                 {
-                    GameImage.RePlaceImage(drawable, ImageConf);
+                    GameImage.RePlaceImage(drawable, Conf);
                 }
                 else
                 {
-                    throw new System.Exception($"There is no text to write.");
+                    throw new System.Exception($"There is no image to add.");
                 }
             }
         }

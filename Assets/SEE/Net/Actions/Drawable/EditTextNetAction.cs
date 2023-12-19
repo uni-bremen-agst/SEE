@@ -1,8 +1,7 @@
-﻿using SEE.Game.Drawable.Configurations;
-using SEE.Game;
-using System.Collections;
-using UnityEngine;
+﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
+using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -49,7 +48,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Changes the values of the given text on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="LineName"/> don't exists.</exception>
+        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="Text"/> don't exists.</exception>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
@@ -62,7 +61,7 @@ namespace SEE.Net.Actions.Drawable
                 }
                 else
                 {
-                    throw new System.Exception($"There is no drawable with the ID {DrawableID} or line with the ID {Text.id}.");
+                    throw new System.Exception($"There is no drawable with the ID {DrawableID} or text with the ID {Text.id}.");
                 }
             }
         }

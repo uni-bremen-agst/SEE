@@ -1,8 +1,7 @@
-﻿using SEE.Game.Drawable.Configurations;
-using SEE.Game;
-using System.Collections;
-using UnityEngine;
+﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
+using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -12,7 +11,7 @@ namespace SEE.Net.Actions.Drawable
     public class EditMMNodeNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The id of the drawable on which the object is located
+        /// The id of the drawable on which the node is located
         /// </summary>
         public string DrawableID;
         /// <summary>
@@ -27,7 +26,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        /// <param name="drawableID">The id of the drawable on which the object is located.</param>
+        /// <param name="drawableID">The id of the drawable on which the node is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="conf">The configuration that contains the values to change the associated game object.</param>
         public EditMMNodeNetAction(string drawableID, string parentDrawableID, MindMapNodeConf conf) : base()
@@ -49,7 +48,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Changes the values of the given mind map node configuration on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="LineName"/> don't exists.</exception>
+        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="Conf"/> don't exists.</exception>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())

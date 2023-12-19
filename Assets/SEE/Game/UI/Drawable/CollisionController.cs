@@ -28,7 +28,15 @@ namespace SEE.Game.UI.Drawable
             {
                 isInCollision = true;
             }
+        }
 
+        private void OnTriggerStay(Collider other)
+        {
+            if (GameFinder.GetHighestParent(gameObject).
+                Equals(GameFinder.GetHighestParent(other.gameObject)))
+            {
+                isInCollision = true;
+            }
         }
 
         /// <summary>
@@ -53,6 +61,16 @@ namespace SEE.Game.UI.Drawable
         public bool IsInCollision()
         {
             return isInCollision;
+        }
+
+        /// <summary>
+        /// Trys to set the <see cref="isInCollision"/> to false.
+        /// It is necessary if a trigger exit was not properly registered. 
+        /// If, nevertheless, they are still involved in a collision, <see cref="OnTriggerStay"/> will set this to true again.
+        /// </summary>
+        public void TrySetCollisionToFalse()
+        {
+            isInCollision = false;
         }
     }
 }

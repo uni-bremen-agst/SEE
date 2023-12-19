@@ -1,19 +1,17 @@
-﻿using System.Collections;
-using UnityEngine;
-using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable.Configurations;
-using SEE.Game;
+﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
+using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is reponsible for change the node kind <see cref="EditAction"/> of a mind map node on the given drawable on all clients.
+    /// This class is reponsible for change the <see cref="GameMindMap.NodeKind"/> <see cref="EditAction"/> of a mind map node on the given drawable on all clients.
     /// </summary>
     public class MindMapChangeNodeKindNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The id of the drawable on which the object is located
+        /// The id of the drawable on which the node is located
         /// </summary>
         public string DrawableID;
 
@@ -23,7 +21,7 @@ namespace SEE.Net.Actions.Drawable
         public string ParentDrawableID;
 
         /// <summary>
-        /// The mind map node that should be change the parent as <see cref="MindMapNodeConf"/> object.
+        /// The mind map node that should be change the node kind as <see cref="MindMapNodeConf"/> object.
         /// </summary>
         public MindMapNodeConf Node;
 
@@ -35,9 +33,9 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        /// <param name="drawableID">The id of the drawable on which the object is located.</param>
+        /// <param name="drawableID">The id of the drawable on which the node is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
-        /// <param name="node">The node that should be change the parent.</param>
+        /// <param name="node">The node that should be change the node kind.</param>
         /// <param name="nodeKind">The new node kind.</param>
         public MindMapChangeNodeKindNetAction(string drawableID, string parentDrawableID, MindMapNodeConf node, GameMindMap.NodeKind nodeKind)
         {
@@ -55,9 +53,9 @@ namespace SEE.Net.Actions.Drawable
         {
         }
         /// <summary>
-        /// Change the node kind of a node on each client.
+        /// Changes the node kind of a node on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="MindMapNodeConf.IDLabel"/> don't exists.</exception>
+        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="MindMapNodeConf.Id"/> don't exists.</exception>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())

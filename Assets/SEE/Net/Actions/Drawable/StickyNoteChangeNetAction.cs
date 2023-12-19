@@ -1,9 +1,6 @@
-﻿using SEE.Net.Actions;
-using System.Collections;
-using UnityEngine;
-using SEE.Controls.Actions.Drawable;
+﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.Game.Drawable;
+using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -35,19 +32,26 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Changes the values of the sticky note on each client.
         /// </summary>
+        /// /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableConf"/> don't exists.</exception>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
             {
-                GameObject drawable = GameFinder.FindDrawable(DrawableConf.ID, DrawableConf.ParentID);
-                GameObject stickyNote = drawable.transform.parent.gameObject;
-                GameObject root = GameFinder.GetHighestParent(drawable);
+                if (DrawableConf != null && GameFinder.FindDrawable(DrawableConf.ID, DrawableConf.ParentID) != null)
+                {
+                    GameObject drawable = GameFinder.FindDrawable(DrawableConf.ID, DrawableConf.ParentID);
+                    GameObject stickyNote = drawable.transform.parent.gameObject;
+                    GameObject root = GameFinder.GetHighestParent(drawable);
 
-                GameStickyNoteManager.ChangeLayer(root, DrawableConf.Order);
-                GameStickyNoteManager.ChangeColor(stickyNote, DrawableConf.Color);
-                GameStickyNoteManager.SetRotateX(root, DrawableConf.Rotation.x);
-                GameStickyNoteManager.SetRotateY(root, DrawableConf.Rotation.y, DrawableConf.Position);
-                GameScaler.SetScale(stickyNote, DrawableConf.Scale);
+                    GameStickyNoteManager.ChangeLayer(root, DrawableConf.Order);
+                    GameStickyNoteManager.ChangeColor(stickyNote, DrawableConf.Color);
+                    GameStickyNoteManager.SetRotateX(root, DrawableConf.Rotation.x);
+                    GameStickyNoteManager.SetRotateY(root, DrawableConf.Rotation.y, DrawableConf.Position);
+                    GameScaler.SetScale(stickyNote, DrawableConf.Scale);
+                } else
+                {
+                    throw new System.Exception($"There is no drawable with the ID {DrawableConf.ID}.");
+                }
             }
         }
     }

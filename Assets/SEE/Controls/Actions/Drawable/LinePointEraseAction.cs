@@ -124,7 +124,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 GameObject drawable = mem.drawable.GetDrawable();
                 GameDrawer.ReDrawLine(drawable, mem.originalLine);
-                new DrawOnNetAction(mem.drawable.ID, mem.drawable.ParentID, mem.originalLine).Execute();
+                new DrawFreehandNetAction(mem.drawable.ID, mem.drawable.ParentID, mem.originalLine).Execute();
 
                 foreach (LineConf line in mem.lines)
                 {
@@ -150,7 +150,7 @@ namespace SEE.Controls.Actions.Drawable
                 foreach (LineConf line in mem.lines)
                 {
                     GameDrawer.ReDrawLine(drawable, line);
-                    new DrawOnNetAction(mem.drawable.ID, mem.drawable.ParentID, line).Execute();
+                    new DrawFreehandNetAction(mem.drawable.ID, mem.drawable.ParentID, line).Execute();
                 }
             }
         }

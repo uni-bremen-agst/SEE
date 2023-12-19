@@ -1,9 +1,5 @@
-﻿using SEE.Net.Actions;
-using System.Collections;
+﻿using SEE.Game.Drawable;
 using UnityEngine;
-using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable.Configurations;
-using SEE.Game.Drawable;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -43,7 +39,7 @@ namespace SEE.Net.Actions.Drawable
         {
         }
         /// <summary>
-        /// Change the x rotation of a sticky note on each client.
+        /// Changes the x rotation of a sticky note on each client.
         /// </summary>
         /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> don't exists.</exception>
         protected override void ExecuteOnClient()

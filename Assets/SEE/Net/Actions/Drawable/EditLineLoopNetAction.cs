@@ -1,7 +1,6 @@
-﻿using SEE.Net.Actions;
-using SEE.Controls.Actions.Drawable;
-using UnityEngine;
+﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
+using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -11,7 +10,7 @@ namespace SEE.Net.Actions.Drawable
     public class EditLineLoopNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The id of the drawable on which the object is located
+        /// The id of the drawable on which the line is located
         /// </summary>
         public string DrawableID;
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using SEE.Controls.Actions.Drawable;
 using SEE.Utils;
+using UnityEditor;
 using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
@@ -12,14 +13,14 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The sticky note that should be delete.
         /// </summary>
-        public string stickyNoteID;
+        public string StickyNoteID;
 
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
         public StickyNoteDeleterNetAction(string stickyNoteID)
         {
-            this.stickyNoteID = stickyNoteID;
+            this.StickyNoteID = stickyNoteID;
         }
 
         /// <summary>
@@ -32,12 +33,12 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Deletes the sticky note on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="TextName"/> don't exists.</exception>
+        /// <exception cref="System.Exception">will be thrown, if the <see cref="StickyNoteID"/> don't exists.</exception>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
             {
-                Destroyer.Destroy(GameObject.Find(stickyNoteID));
+                Destroyer.Destroy(GameObject.Find(StickyNoteID));
             }
         }
     }
