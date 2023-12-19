@@ -32,6 +32,7 @@ using UnityEngine.Assertions;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
 using SEE.Game.CityRendering;
+using SEE.UI;
 
 namespace SEE.Game.Evolution
 {
@@ -99,6 +100,11 @@ namespace SEE.Game.Evolution
         /// city.
         /// </summary>
         private const float skyLevel = 2.0f;
+
+        /// <summary>
+        /// The message to be displayed while rendering the evolution city.
+        /// </summary>
+        private string loadingMessage => $"Rendering evolution city {gameObject.name}...";
 
         /// <summary>
         /// The manager of the game objects created for the city.
@@ -349,6 +355,10 @@ namespace SEE.Game.Evolution
             currentCity = null;
             nextCity = null;
 
+            if (graphs.Count > 0)
+            {
+                LoadingSpinner.Show(loadingMessage);
+            }
             CalculateAllGraphLayouts(graphs);
 
             shownGraphHasChangedEvent.Invoke();
@@ -608,6 +618,7 @@ namespace SEE.Game.Evolution
             UpdateGameNodeHierarchy();
             RenderPlane();
 
+            LoadingSpinner.Hide(loadingMessage);
             IsStillAnimating = false;
             animationFinishedEvent.Invoke();
 

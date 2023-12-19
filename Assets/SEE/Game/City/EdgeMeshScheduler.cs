@@ -5,6 +5,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using SEE.DataModel;
 using SEE.DataModel.DG;
+using SEE.UI;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -58,6 +59,11 @@ namespace SEE.Game.City
         private bool initialEdgesDone;
 
         /// <summary>
+        /// The text that shall be shown in the loading spinner while the initial edges are being processed.
+        /// </summary>
+        private string loadingText => $"Creating edge meshes for {gameObject.name}...";
+
+        /// <summary>
         /// Event that is triggered once all graph edges have been processed for the first time.
         /// </summary>
         public event Action OnInitialEdgesDone;
@@ -81,6 +87,7 @@ namespace SEE.Game.City
             graph.Subscribe(this);
 
             // When we're initialized, we also convert all existing edges into meshes first.
+            LoadingSpinner.Show(loadingText);
             graph.Edges().ForEach(edges.Enqueue);
         }
 
@@ -113,6 +120,7 @@ namespace SEE.Game.City
                 // We're done with the initial edges.
                 initialEdgesDone = true;
                 OnInitialEdgesDone?.Invoke();
+                LoadingSpinner.Hide(loadingText);
             }
             // We will loop until either we converted `EdgesPerFrame` many edges,
             // or until there are no further edges to convert to meshes.
@@ -174,6 +182,7 @@ namespace SEE.Game.City
             if (value is EdgeEvent { Change: ChangeType.Addition } edgeEvent)
             {
                 // If this is an added edge, we are going to need to turn it into a mesh.
+                LoadingSpinner.Show(loadingText);
                 edges.Enqueue(edgeEvent.Edge);
             }
 
