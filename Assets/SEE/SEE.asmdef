@@ -51,7 +51,8 @@
         "NetworkCommsDotNetComplete.dll",
         "DOTween.dll",
         "Joveler.Compression.XZ.dll",
-        "MathNet.Numerics.dll"
+        "MathNet.Numerics.dll",
+        "LibGit2Sharp.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
