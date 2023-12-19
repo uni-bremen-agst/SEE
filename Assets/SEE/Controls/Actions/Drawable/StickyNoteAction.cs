@@ -130,6 +130,16 @@ namespace SEE.Controls.Actions.Drawable
             {
                 Destroyer.Destroy(stickyNote.GetComponent<HighlightEffect>());
             }
+
+            if (selectedAction == Operation.Move
+                && stickyNote != null)
+            {
+                foreach (Collider collider in 
+                    GameFinder.GetHighestParent(stickyNote).GetComponentsInChildren<Collider>())
+                {
+                    collider.enabled = true;
+                }
+            }
             finish = false;
         }
 
@@ -295,6 +305,11 @@ namespace SEE.Controls.Actions.Drawable
                 memento.changedConfig.Position = stickyNoteHolder.transform.position;
                 memento.changedConfig.Rotation = stickyNoteHolder.transform.eulerAngles;
                 stickyNote.transform.Find("Back").GetComponent<Collider>().enabled = true;
+                foreach (Collider collider in 
+                    GameFinder.GetHighestParent(stickyNote).GetComponentsInChildren<Collider>())
+                {
+                    collider.enabled = true;
+                }
                 currentState = ReversibleAction.Progress.Completed;
                 return true;
             }
@@ -330,6 +345,10 @@ namespace SEE.Controls.Actions.Drawable
                     stickyNote = drawable.transform.parent.gameObject;
                     stickyNote.transform.Find("Back").GetComponent<Collider>().enabled = false;
                     stickyNoteHolder = GameFinder.GetHighestParent(drawable);
+                    foreach(Collider collider in stickyNoteHolder.GetComponentsInChildren<Collider>())
+                    {
+                        collider.enabled = false;
+                    }
                     eulerAnglesBackup = stickyNoteHolder.transform.eulerAngles;
                 }
                 else
