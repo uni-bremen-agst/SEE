@@ -25,14 +25,14 @@
     /// </summary>
     public static class AttributeNamesExtensions
     {
-        public const string InstructionMissed = "Metric.InstructionMissed";
-        public const string InstructionCovered = "Metric.InstructionCovered";
-        public const string LineMissed = "Metric.LineMissed";
-        public const string LineCovered = "Metric.LineCovered";
-        public const string ComplexityMissed = "Metric.ComplexityMissed";
-        public const string ComplexityCovered = "Metric.ComplexityCovered";
-        public const string MethodMissed = "Metric.MethodMissed";
-        public const string MethodCovered = "Metric.MethodCovered";
+        public const string InstructionMissed = "Metric.INSTRUCTION_missed";
+        public const string InstructionCovered = "Metric.INSTRUCTION_covered";
+        public const string LineMissed = "Metric.LINE_missed";
+        public const string LineCovered = "Metric.LINE_covered";
+        public const string ComplexityMissed = "Metric.COMPLEXITY_missed";
+        public const string ComplexityCovered = "Metric.COMPLEXITY_covered";
+        public const string MethodMissed = "Metric.METHOD_missed";
+        public const string MethodCovered = "Metric.METHOD_covered";
 
         /// <summary>
         /// Name of the given <paramref name="numericAttributeName"/>.

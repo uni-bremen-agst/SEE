@@ -1,5 +1,7 @@
 ﻿using SEE.DataModel.DG;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Xml;
 
 namespace Assets.SEE.DataModel.DG.IO
@@ -12,131 +14,153 @@ namespace Assets.SEE.DataModel.DG.IO
     /// </summary>
     public class JaCoCoImporter : IDisposable
     {
-        // graph where to add the XML-Testreport information
-        private Graph graph;
-
-        // current used Graphelement to add the attribute information
-        private GraphElement currentElement;
-
-
-
-        // Filepath of the xml-file which has the testreport
-        private String filepath;
-
-        /// <summary>
-        /// Constructor for JaCoCoImporter
-        /// </summary>
-        /// <param name="filepath"></param>
-        /// <param name="graph"></param>
-        public JaCoCoImporter(string filepath, Graph graph)
-        {
-            this.filepath = filepath;
-            this.graph = graph;
-        }
 
         /// <summary>
         /// Reading the given xml to include Test-Metrics in SEE
         /// </summary>
         /// <param name="graph"></param>
         /// <param name="filepath"></param>
-        protected void StartReading(Graph graph, String filepath )
+        public static void StartReading(Graph graph, String filepath )
         {
-            try
-            {
-                // Add XmlReaderSettings with active DTD-Processing
-                XmlReaderSettings settings = new XmlReaderSettings();
-                settings.DtdProcessing = DtdProcessing.Parse;
+			try
+			{
+				// Add XmlReaderSettings with active DTD-Processing
+				XmlReaderSettings settings = new XmlReaderSettings();
+				settings.DtdProcessing = DtdProcessing.Parse;
 
-                // XMLReader for parsing named file
-                using (XmlReader xmlReader = XmlReader.Create(filepath, settings))
-                {
-                    string currentClassName = null;
-                    string currentMethodName = null;
-                    string classCounterType = null;
-                    int currentMethodLine = -1;
+				// XMLReader for parsing named file
+				using (XmlReader xmlReader = XmlReader.Create(filepath, settings))
+				{
+					string currentClassName = null;
+					string currentClassFile = null;
+					string currentName = null;
+					string nodeType = null;
+					int currentMethodLine = -1;
+					Stack<Node> myStack = new Stack<Node>();
+					bool inSource = false;
 
-                    // Iterate over file
-                    while (xmlReader.Read())
-                    {
-                        switch (xmlReader.NodeType)
-                        {
-                            case XmlNodeType.Element:
-                                // find class
-                                if (xmlReader.Name == "class")
-                                {
-                                    // store class name
-                                    currentClassName = xmlReader.GetAttribute("name");
-                                    //Console.WriteLine($"Class: {currentClassName}");
-                                }
-                                // find method
-                                else if (currentClassName != null && xmlReader.Name == "method")
-                                {
-                                    // store method name
-                                    currentMethodName = xmlReader.GetAttribute("name");
-                                    currentMethodLine = Int32.Parse(xmlReader.GetAttribute("line")) - 1;
-                                }
-                                else if (currentClassName != null && xmlReader.Name == "counter")
-                                {
-                                    // Depth 3 is within report, package, class
-                                    if (xmlReader.Depth == 3)
+					// Iterate over file
+					while (xmlReader.Read())
+					{
+						switch (xmlReader.NodeType)
+						{
+							case XmlNodeType.Element:
+								if (xmlReader.Name != "counter" && xmlReader.Name != "sourcefile" && xmlReader.Name != "line" && xmlReader.Name != "sessioninfo")
+								{
+									if (xmlReader.Name == "class")
+									{
+										currentClassFile = xmlReader.GetAttribute("sourcefilename");
+										currentClassName = xmlReader.GetAttribute("name");
+									}
+									if (xmlReader.Name == "method")
+									{
+										currentMethodLine = Int32.Parse(xmlReader.GetAttribute("line"));
+									}
+									nodeType = xmlReader.Name;
+									currentName = xmlReader.GetAttribute("name");
+									// hier den Node suchen
+									myStack.Push(GetNode(graph, nodeType, currentClassName, currentClassFile, currentMethodLine));
+								}
+								else if (xmlReader.Name == "sourcefile")
+								{
+									inSource = true;
+									continue;
+								}
+
+								else if (!inSource && xmlReader.Name == "counter")
+								{
+									// setFloat on Node
+									if(myStack.Peek() != null)
                                     {
-                                        // Counter for class
-                                        classCounterType = xmlReader.GetAttribute("type");
-                                        string missed = xmlReader.GetAttribute("missed");
-                                        string covered = xmlReader.GetAttribute("covered");
-                                        Console.WriteLine($"    Class Counter für {currentClassName} Type: {classCounterType}, Missed: {missed}, Covered: {covered}");
-                                        //TODO instead of ConsoleWrite find node with given attributes (class name - which contans package in xml), use node.setFloat for setting the Metric values
-                                    }
-                                    // depth 4 is within report, package, class, method
-                                    else if (xmlReader.Depth == 4)
-                                    {
-                                        // Counter for methods in classes
-                                        string counterType = xmlReader.GetAttribute("type");
-                                        string missed = xmlReader.GetAttribute("missed");
-                                        string covered = xmlReader.GetAttribute("covered");
-                                        Console.WriteLine($"      Method Counter für {currentMethodName} in Line {currentMethodLine} Type: {counterType}, Missed: {missed}, Covered: {covered}");
-                                        //TODO instead of ConsoleWrite find node with given attributes (class name - which contans package in xml + Line), use node.setFloat for setting the Metric values
-                                    }
-                                }
-                                break;
+										myStack.Peek().SetFloat("Metric." + xmlReader.GetAttribute("type") + "_missed", float.Parse(xmlReader.GetAttribute("missed"), CultureInfo.InvariantCulture.NumberFormat));
+										myStack.Peek().SetFloat(xmlReader.GetAttribute("type") + "_covered", float.Parse(xmlReader.GetAttribute("covered"), CultureInfo.InvariantCulture.NumberFormat));
+										//Console.WriteLine("Metrik für " + myStack.Peek() + xmlReader.GetAttribute("type") + " missed: " + xmlReader.GetAttribute("missed") + " covered: " + xmlReader.GetAttribute("covered"));
+									}
+								}
+								break;
 
-                            case XmlNodeType.EndElement:
-                                if (xmlReader.Name == "class")
-                                {
-                                    // leave class-Element and reset values
-                                    currentClassName = null;
-                                    classCounterType = null;
-                                }
-                                else if (xmlReader.Name == "method")
-                                {
-                                    // leave class-Element and reset values
-                                    currentMethodName = null;
-                                }
-                                break;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"A Mistake appeard: {ex.Message}");
-            }
+							case XmlNodeType.EndElement:
+								if (xmlReader.Name == "class")
+								{
+									currentClassName = null;
+								}
+								if (xmlReader.Name == "method")
+								{
+									currentMethodLine = -1;
+								}
+								if (xmlReader.Name == "sourcefile" || xmlReader.Name == "line" || xmlReader.Name == "sessioninfo")
+								{
+									if (xmlReader.Name == "sourcefile")
+									{
+										inSource = false;
+									}
+									continue;
+								}
+								myStack.Pop();
+								break;
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"A Mistake appeard: {ex.Message}");
+			}
 
-        }
+		}
 
         /// <summary>
-        /// Find Node where to add the metrics
-        /// </summary>
-        /// <param name="graph"></param> Graph which contains the node
-        /// <param name="classPath"></param> Given classpath from xml
-        /// <param name="methodeName"></param> Given methodeName from xml
-        /// <param name="SourceLine"></param> Given SourceLine from method from xml
-        /// <returns></returns>
-        protected Node GetNode(Graph graph, String classPath, String methodeName, String SourceLine)
+		/// Find Node to add Test-Metrics
+		/// </summary>
+		/// <param name="graph"></param>
+		/// <param name="nodeType"></param>
+		/// <param name="currentClassName"></param>
+		/// <param name="currentClassFile"></param>
+		/// <param name="currentMethodLine"></param>
+		/// <returns></returns>
+        protected static Node GetNode(Graph graph, string nodeType, string currentClassName, string currentClassFile, int currentMethodLine)
         {
-            //TODO logic needs to implemented
-            Node nodeToAddTestMetric = null;
-            return nodeToAddTestMetric;
+			// TODO Filename needs to change to a unique indifier
+			foreach (var node in graph.Nodes())
+            {
+				if (nodeType == "class" && currentMethodLine == -1)
+				{
+                    if (node.Type == "Class")
+                    {
+						if (currentClassFile.Equals(node.Filename()))
+						{
+							return node;
+						}
+                    }
+				}
+				if (nodeType == "method")
+				{
+					if (node.Type == "Method")
+					{
+						if (currentClassFile.Equals(node.Filename()) && currentMethodLine.Equals(node.SourceLine()))
+						{
+							return node;
+						}
+					}
+				}
+				if (nodeType == "package")
+				{
+					if (node.Type == "Package")
+					{
+						// needs to be implemented
+						return null;
+					}
+				}
+				if (nodeType == "")
+				{
+					if (node.Type == "report")
+					{
+						return null;
+					}
+				}
+
+			}
+            return null;
         }
 
 

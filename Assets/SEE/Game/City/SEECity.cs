@@ -13,6 +13,7 @@ using UnityEngine.Assertions;
 using SEE.Game.CityRendering;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
+using Assets.SEE.DataModel.DG.IO;
 
 namespace SEE.Game.City
 {
@@ -251,7 +252,7 @@ namespace SEE.Game.City
         /// </summary>
         private void LoadMetrics()
         {
-            LoadGraphMetrics(LoadedGraph, CSVPath.Path, ErosionSettings).Forget();
+            LoadGraphMetrics(LoadedGraph, CSVPath.Path, XMLPath.Path, ErosionSettings).Forget();
         }
 
         /// <summary>
@@ -272,7 +273,7 @@ namespace SEE.Game.City
         /// involving a network call. If you simply want to call it synchronously without querying the dashboard,
         /// set <paramref name="erosionSettings"/> to an appropriate value and use <c>LoadGraphMetrics.Forget()</c>.
         /// </remarks>
-        protected static async UniTask LoadGraphMetrics(Graph graph, string csvPath, ErosionAttributes erosionSettings)
+        protected static async UniTask LoadGraphMetrics(Graph graph, string csvPath, string xmlPath,  ErosionAttributes erosionSettings)
         {
             Performance p = Performance.Begin($"loading metric data data from CSV file {csvPath}");
             int numberOfErrors = MetricImporter.LoadCsv(graph, csvPath);
@@ -282,6 +283,15 @@ namespace SEE.Game.City
             }
 
             p.End();
+
+
+                //add xml-test-metrics
+                p = Performance.Begin($"loading metric data data from XML file {xmlPath}");
+                JaCoCoImporter.StartReading(graph, xmlPath);
+
+                p.End();
+
+
 
             // Substitute missing values from the dashboard
             if (erosionSettings.LoadDashboardMetrics)
