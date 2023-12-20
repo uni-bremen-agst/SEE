@@ -18,13 +18,31 @@ using UnityEngine.Assertions;
 
 namespace SEE.Game.City
 {
-    public class SEEBranchCity : SEECity
+    public class SEEBranchCity : AbstractSEECity
     {
+        /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
+        /// configuration file, make sure you save and restore it in
+        /// <see cref="SEECityEvolution.Save(ConfigWriter)"/> and
+        /// <see cref="SEECityEvolution.Restore(Dictionary{string,object})"/>,
+        /// respectively. You should also extend the test cases in TestConfigIO.
+
         /// <summary>
         /// The path to the Version Control System
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Path of VersionControlSystem"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
-        public BranchesLayoutAttributes VersionControlSystem = new();
+        /*[SerializeField, ShowInInspector, Tooltip("Path of VersionControlSystem"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        public BranchesLayoutAttributes VersionControlSystem = new();*/
+
+        /// The path to the GXL file containing the graph data.
+        /// Note that any deriving class may use multiple GXL paths from which the single city is constructed.
+        /// </summary>
+        [SerializeField, ShowInInspector, Tooltip("Path of first GXL file"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        public FilePath GXLPath1 = new();
+
+        /// <summary>
+        /// The path to the CSV file containing the additional metric values.
+        /// </summary>
+        [SerializeField, ShowInInspector, Tooltip("Path of second GXL file"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        public FilePath GXLPath2 = new();
 
         /// <summary>
         /// The graph that is visualized in the scene and whose visualization settings are
@@ -56,7 +74,7 @@ namespace SEE.Game.City
         [NonSerialized]
         private Graph nextGraph = null;
 
-        private Graph diffGraph = new Graph("basePath", "diffGraph");
+        private Graph diffGraph;
 
         /// <summary>
         /// Allows the comparison of two instances of <see cref="Node"/> from different graphs.
@@ -70,6 +88,29 @@ namespace SEE.Game.City
 
         private GraphRenderer graphRenderer;
 
+        /// <summary>
+        /// Yields the graph renderer that draws this city.
+        /// </summary>
+        /// <remarks>Implements <see cref="AbstractSEECity.Renderer"/>.</remarks>
+        public override IGraphRenderer Renderer => graphRenderer ??= new GraphRenderer(this, diffGraph);
+
+
+        /// <summary>
+        /// The graph underlying this SEE city that was loaded from disk. May be null.
+        /// If a new graph is assigned to this property, the selected node types will
+        /// be updated, too.
+        ///
+        /// Neither serialized nor saved to the config file.
+        /// </summary>
+        public override Graph LoadedGraph
+        {
+            get => loadedGraph;
+            protected set
+            {
+                loadedGraph = value;
+                InspectSchema(loadedGraph);
+            }
+        }
 
         /// <summary>
         /// The graph underlying this SEE city that was loaded from disk. May be null.
@@ -94,9 +135,9 @@ namespace SEE.Game.City
         /// </summary>
         protected override void Start()
         {
-            //base.Start();
+            base.Start();
             
-            //LoadData();
+            LoadData();
             //InitializeAfterDrawn();
             //BoardSettings.LoadBoard();
         }
@@ -115,9 +156,10 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
-        public override void LoadData()
+        public void LoadData()
         {
-            if (string.IsNullOrEmpty(GXLPath.Path))
+            Debug.Log("Load Data");
+            if (string.IsNullOrEmpty(GXLPath1.Path) || string.IsNullOrEmpty(GXLPath2.Path))
             {
                 Debug.LogError("Empty graph path.\n");
             }
@@ -129,11 +171,21 @@ namespace SEE.Game.City
                 }
 
 
-                loadedGraph = LoadGraph(VersionControlSystem.GLXPath1.Path, null);
-                nextGraph = LoadGraph(VersionControlSystem.GLXPath2.Path, null);
+                LoadedGraph = LoadGraph(GXLPath1.Path);
+                nextGraph = LoadGraph(GXLPath2.Path);
 
+                InspectSchema(loadedGraph);
+                loadedGraph = RelevantGraph(loadedGraph);
+
+                Debug.Log($"Loaded graph with {loadedGraph.NodeCount} nodes and {loadedGraph.EdgeCount} edges.\n");
 
                 CalculateDiff();
+
+                Debug.Log("Size AddedNodes: " + addedNodes.Count + "\n");
+                Debug.Log("Size RemovedNodes: " + removedNodes.Count + "\n");
+                Debug.Log("Size ChangedNodes: " + changedNodes.Count + "\n");
+                Debug.Log("Size EqualNodes: " + equalNodes.Count + "\n");
+
                 CreateDiffGraph();
                 
             }
@@ -142,7 +194,7 @@ namespace SEE.Game.City
         private void CalculateDiff()
         {
             //Node Comparison
-            loadedGraph.Diff(nextGraph,
+            NextGraph.Diff(LoadedGraph,
                           g => g.Nodes(),
                           (g, id) => g.GetNode(id),
                           GraphExtensions.AttributeDiff(loadedGraph, nextGraph),
@@ -153,7 +205,7 @@ namespace SEE.Game.City
                           out equalNodes);
 
             //Edge Comparison
-            loadedGraph.Diff(nextGraph,
+            NextGraph.Diff(LoadedGraph,
                          g => g.Edges(),
                         (g, id) => g.GetEdge(id),
                         GraphExtensions.AttributeDiff(loadedGraph, nextGraph),
@@ -166,90 +218,42 @@ namespace SEE.Game.City
 
         private void CreateDiffGraph()
         {
+            diffGraph = new Graph(loadedGraph);
             //Draw Nodes
-            addedNodes.ForEach(diffGraph.AddNode);
-            equalNodes.ForEach(diffGraph.AddNode);
-            changedNodes.ForEach(diffGraph.AddNode);
-            equalNodes.ForEach(diffGraph.AddNode);
+            addedNodes.ForEach(node =>
+            {
+                diffGraph.AddNode(node);
+            });
 
             //Draw Edges
-            addedEdges.ForEach(diffGraph.AddEdge);
-            equalEdges.ForEach(diffGraph.AddEdge);
-            changedEdges.ForEach(diffGraph.AddEdge);
-            equalEdges.ForEach(diffGraph.AddEdge);
+            addedEdges.ForEach(edge =>
+            {
+                diffGraph.AddEdge(edge);
+            });
+
         }
 
         /// <summary>
         /// Draws the graph.
-        /// Precondition: The graph has been loaded.
+        /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Draw Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
         [PropertyOrder(DataButtonsGroupOrderDraw)]
-        public override void DrawGraph()
+        public void DrawGraph()
         {
-            if (loadedGraph == null)
+            if (diffGraph != null)
             {
-                Debug.LogError("No graph loaded.\n");
+                GraphRenderer graphRenderer = new GraphRenderer(this, diffGraph);
+                graphRenderer.DrawGraph(diffGraph, gameObject);
             }
             else
             {
-                Graph theVisualizedSubGraph = diffGraph;
-                if (ReferenceEquals(theVisualizedSubGraph, null))
-                {
-                    Debug.LogError("No graph loaded.\n");
-                }
-                else
-                {
-                    graphRenderer = new GraphRenderer(this, theVisualizedSubGraph);
-                    // We assume here that this SEECity instance was added to a game object as
-                    // a component. The inherited attribute gameObject identifies this game object.
-                    graphRenderer.DrawGraph(theVisualizedSubGraph, gameObject);
-
-                    // If we're in editmode, InitializeAfterDrawn() will be called by Start() once the
-                    // game starts. Otherwise, in playmode, we have to call it ourselves.
-                    if (Application.isPlaying)
-                    {
-                        InitializeAfterDrawn();
-                    }
-                }
+                Debug.LogWarning("No graph loaded yet.\n");
             }
         }
 
-        /// <summary>
-        /// Loads the graph and metric data and sets all NodeRef and EdgeRef components to the
-        /// loaded nodes and edges. This "deserializes" the graph to make it available at runtime.
-        /// Note: <see cref="LoadedGraph"/> will be <see cref="VisualizedSubGraph"/> afterwards,
-        /// that is, if node types are filtered, <see cref="LoadedGraph"/> may not contain all
-        /// nodes saved in the underlying GXL file.
-        /// Also note that this method may only be called after the code city has been drawn.
-        /// </summary>
-        protected override void InitializeAfterDrawn()
-        {
-            Assert.IsTrue(gameObject.IsCodeCityDrawn());
-            Graph subGraph = diffGraph;
-            if (subGraph != null)
-            {
-                foreach (GraphElement graphElement in loadedGraph.Elements().Except(subGraph.Elements()))
-                {
-                    // All other elements are virtual, i.e., should not be drawn.
-                    graphElement.SetToggle(GraphElement.IsVirtualToggle);
-                }
-
-                SetNodeEdgeRefs(subGraph, gameObject);
-            }
-            else
-            {
-                Debug.LogError($"Could not load city {name}.\n");
-            }
-
-            // Add EdgeMeshScheduler to convert edge lines to meshes over time.
-            gameObject.AddOrGetComponent<EdgeMeshScheduler>().Init(EdgeLayoutSettings, EdgeSelectionSettings,
-                                                                   diffGraph);
-            loadedGraph = subGraph;
-
-            UpdateGraphElementIDMap(gameObject);
-        }
+       
 
 
 
@@ -304,6 +308,63 @@ namespace SEE.Game.City
         /// current graph that has the same ID).
         /// </summary>
         private ISet<Edge> equalEdges;
+
+        /// <summary>
+        /// Will be called whenever a new value is assigned to <see cref="ProjectPath"/>.
+        /// In this case, we will update <see cref="loadedGraph.BasePath"/> with the
+        /// new <see cref="ProjectPath.Path"/> if <see cref="loadedGraph"/> is not null.
+        /// </summary>
+        protected override void ProjectPathChanged()
+        {
+            if (loadedGraph != null)
+            {
+                loadedGraph.BasePath = SourceCodeDirectory.Path;
+            }
+        }
+
+        /// <summary>
+        /// Returns the names of all node metrics that truly exist in the underlying
+        /// graph, that is, there is at least one node in the graph that has this
+        /// metric.
+        ///
+        /// If no graph has been loaded yet, the empty list will be returned.
+        /// </summary>
+        /// <returns>names of all existing node metrics</returns>
+        public override ISet<string> AllExistingMetrics()
+        {
+            if (loadedGraph == null)
+            {
+                return new HashSet<string>();
+            }
+            else
+            {
+                ISet<string> set1 = loadedGraph.AllNumericNodeAttributes();
+                ISet<string> set2 = nextGraph.AllNumericNodeAttributes();
+
+                ISet<string> result = set1;
+                result.UnionWith(set2);
+
+                return result;
+            }
+        }
+
+        /// <summary>
+        /// Dumps the metric names of all node types of the currently loaded graph.
+        /// </summary>
+        protected override void DumpNodeMetrics()
+        {
+            if (loadedGraph == null || nextGraph)
+            {
+                Debug.Log("Either the first graph or the second graph have not been loaded");
+            }
+            else
+            {
+                DumpNodeMetrics(new List<Graph>() { loadedGraph, nextGraph });
+            }
+        }
+
+
+
 
         //--------------------------------
         // Configuration file input/output

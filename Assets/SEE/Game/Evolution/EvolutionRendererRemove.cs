@@ -43,7 +43,7 @@ namespace SEE.Game.Evolution
             Debug.Log($"Phase 1: Removing {deletedGraphElements} graph elements.\n");
             animationWatchDog.Await(deletedGraphElements, () => Phase2MoveExistingGraphElements(next));
             if (deletedGraphElements > 0)
-            {
+            {   
                 // Remove those edges.
                 removedEdges.ForEach(RenderRemovedEdge);
                 // Remove those nodes.
