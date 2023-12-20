@@ -119,6 +119,7 @@ namespace SEE.Game.Drawable
             lineToCreate.rendererPositions = positions;
 
             GameObject newLine = GameDrawer.ReDrawLine(drawable, lineToCreate);
+            GameDrawer.ChangePivot(newLine);
             new DrawFreehandNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
                 LineConf.GetLine(newLine)).Execute();
 

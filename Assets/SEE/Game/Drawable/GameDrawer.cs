@@ -465,6 +465,49 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
+        /// Changes the pivot point of a line.
+        /// Will be needed for <see cref="GameLineSplit"/>
+        /// </summary>
+        /// <param name="line">The line which pivot point should be changes.</param>
+        /// <returns><paramref name="line"/> with the new pivot point.</returns>
+        public static GameObject ChangePivot(GameObject line)
+        {
+            if (line.CompareTag(Tags.Line))
+            {
+                LineRenderer renderer = GetRenderer(line);
+                Vector3[] positions = new Vector3[renderer.positionCount];
+                renderer.GetPositions(positions);
+                Vector3 middlePos;
+                Vector3[] convertedPositions = new Vector3[positions.Length];
+                Array.Copy(sourceArray: positions, destinationArray: convertedPositions, length: positions.Length);
+                /// Transform the line positions to world space.
+                line.transform.TransformPoints(convertedPositions);
+                /// Calculate the middle point.
+                if (convertedPositions.Length % 2 == 1)
+                {
+                    /// Block for odd number of positions.
+                    middlePos = convertedPositions[(int)Mathf.Round(convertedPositions.Length / 2)];
+                }
+                else
+                {
+                    /// Block for even number of positions.
+                    Vector3 left = convertedPositions[convertedPositions.Length / 2 - 1];
+                    Vector3 right = convertedPositions[convertedPositions.Length / 2];
+                    middlePos = (left + right) / 2;
+                }
+                /// Move the line to the middle pos.
+                line.transform.position = middlePos;
+                /// Transform the line positions back to local space.
+                line.transform.InverseTransformPoints(convertedPositions);
+                /// Update the new line positions.
+                Drawing(line, convertedPositions);
+                /// Update the mesh collider.
+                FinishDrawing(line, renderer.loop);
+            }
+            return line;
+        }
+
+        /// <summary>
         /// Sets the pivot point for shapes. 
         /// In this case, the pivot point is placed at the original hit point of creation, 
         /// corresponding to the center of the shape.
