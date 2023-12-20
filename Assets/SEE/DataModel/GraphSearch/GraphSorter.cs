@@ -13,7 +13,7 @@ namespace SEE.DataModel.GraphSearch
         /// <summary>
         /// The attributes to sort by along with whether to sort descending, in the order of precedence.
         /// </summary>
-        private readonly List<(string Name, Func<GraphElement, object> GetKey, bool Descending)> SortAttributes = new();
+        private readonly List<(string Name, Func<GraphElement, object> GetKey, bool Descending)> sortAttributes = new();
 
         /// <summary>
         /// Add an attribute to sort by.
@@ -23,7 +23,7 @@ namespace SEE.DataModel.GraphSearch
         /// <param name="descending">Whether to sort descending.</param>
         public void AddSortAttribute(string attributeName, Func<GraphElement, object> getAttribute, bool descending)
         {
-            SortAttributes.Add((attributeName, getAttribute, descending));
+            sortAttributes.Add((attributeName, getAttribute, descending));
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace SEE.DataModel.GraphSearch
         /// <param name="attributeName">The name of the attribute to remove.</param>
         public void RemoveSortAttribute(string attributeName)
         {
-            SortAttributes.RemoveAll(a => a.Name == attributeName);
+            sortAttributes.RemoveAll(a => a.Name == attributeName);
         }
 
         /// <summary>
@@ -41,17 +41,17 @@ namespace SEE.DataModel.GraphSearch
         /// </summary>
         public IEnumerable<T> Apply<T>(IEnumerable<T> elements) where T : GraphElement
         {
-            return SortAttributes.Count == 0
+            return sortAttributes.Count == 0
                 ? elements
                 // The first `OrderBy` call is to get an IOrderedEnumerable<T> that we can repeatedly pass to `ThenBy`.
                 // `OrderBy` is stable, so the order is preserved, as we are passing in a constant key.
-                : SortAttributes.Aggregate(elements.OrderBy(_ => 0),
+                : sortAttributes.Aggregate(elements.OrderBy(_ => 0),
                                            (current, sortAttribute) =>
                                            {
-                                               (_, Func<GraphElement, object> GetKey, bool Descending) = sortAttribute;
-                                               return Descending
-                                                   ? current.ThenByDescending(x => GetKey(x))
-                                                   : current.ThenBy(x => GetKey(x));
+                                               (_, Func<GraphElement, object> getKey, bool descending) = sortAttribute;
+                                               return descending
+                                                   ? current.ThenByDescending(x => getKey(x))
+                                                   : current.ThenBy(x => getKey(x));
                                            });
         }
 
@@ -66,7 +66,7 @@ namespace SEE.DataModel.GraphSearch
         /// </remarks>
         public bool? IsAttributeDescending(string attributeName)
         {
-            (string, Func<GraphElement, object>, bool Descending) result = SortAttributes.FirstOrDefault(a => a.Name == attributeName);
+            (string, Func<GraphElement, object>, bool Descending) result = sortAttributes.FirstOrDefault(a => a.Name == attributeName);
             if (result == default)
             {
                 return null;
@@ -80,11 +80,11 @@ namespace SEE.DataModel.GraphSearch
         /// <summary>
         /// Implements <see cref="IGraphModifier.IsActive"/>.
         /// </summary>
-        public bool IsActive() => SortAttributes.Count > 0;
+        public bool IsActive() => sortAttributes.Count > 0;
 
         /// <summary>
         /// Implements <see cref="IGraphModifier.Reset"/>.
         /// </summary>
-        public void Reset() => SortAttributes.Clear();
+        public void Reset() => sortAttributes.Clear();
     }
 }

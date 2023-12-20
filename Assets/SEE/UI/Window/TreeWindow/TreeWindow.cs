@@ -40,7 +40,7 @@ namespace SEE.UI.Window.TreeWindow
         /// The search helper used to search for elements in the graph.
         /// We also use this to keep track of the current filter, sort, and group settings.
         /// </summary>
-        private GraphSearch Searcher;
+        private GraphSearch searcher;
 
         /// <summary>
         /// Transform of the object containing the items of the tree window.
@@ -51,12 +51,12 @@ namespace SEE.UI.Window.TreeWindow
         /// The context menu that is displayed when the user right-clicks on an item
         /// or uses the filter or sort buttons.
         /// </summary>
-        private TreeWindowContextMenu ContextMenu;
+        private TreeWindowContextMenu contextMenu;
 
         /// <summary>
         /// The grouper that is used to group the elements in the tree window.
         /// </summary>
-        private TreeWindowGrouper Grouper;
+        private TreeWindowGrouper grouper;
 
         /// <summary>
         /// The subscription to the graph observable.
@@ -65,8 +65,8 @@ namespace SEE.UI.Window.TreeWindow
 
         protected override void Start()
         {
-            Searcher = new GraphSearch(Graph);
-            Grouper = new TreeWindowGrouper(Searcher.Filter, Graph);
+            searcher = new GraphSearch(Graph);
+            grouper = new TreeWindowGrouper(searcher.Filter, Graph);
             subscription = Graph.Subscribe(this);
             base.Start();
         }
@@ -95,12 +95,12 @@ namespace SEE.UI.Window.TreeWindow
         /// </summary>
         private async UniTask AddRoots()
         {
-            if (Grouper.IsActive)
+            if (grouper.IsActive)
             {
                 // Instead of the roots, we should add the categories as the first level.
-                foreach (TreeWindowGroup group in Grouper.AllGroups)
+                foreach (TreeWindowGroup group in grouper.AllGroups)
                 {
-                    if (Grouper.MembersInGroup(group) > 0)
+                    if (grouper.MembersInGroup(group) > 0)
                     {
                         AddGroup(group);
                     }

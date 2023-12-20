@@ -18,22 +18,22 @@ namespace SEE.UI.PopupMenu
         /// <summary>
         /// Path to the prefab that should be used as the popup menu.
         /// </summary>
-        private const string MenuPrefabPath = "Prefabs/UI/PopupMenu";
+        private const string menuPrefabPath = "Prefabs/UI/PopupMenu";
 
         /// <summary>
         /// The root transform of the popup menu.
         /// </summary>
-        private RectTransform Menu;
+        private RectTransform menu;
 
         /// <summary>
         /// The canvas group of the popup menu.
         /// </summary>
-        private CanvasGroup MenuCanvasGroup;
+        private CanvasGroup menuCanvasGroup;
 
         /// <summary>
         /// The transform under which the entries are listed.
         /// </summary>
-        private RectTransform EntryList;
+        private RectTransform entryList;
 
         /// <summary>
         /// The content size fitter of the popup menu.
@@ -44,33 +44,33 @@ namespace SEE.UI.PopupMenu
         /// A queue of entries that were added before the menu was started.
         /// These entries will be added to the menu once it is started.
         /// </summary>
-        private readonly Queue<PopupMenuEntry> EntriesBeforeStart = new();
+        private readonly Queue<PopupMenuEntry> entriesBeforeStart = new();
 
         /// <summary>
         /// Whether the menu should currently be shown.
         /// </summary>
-        private bool ShouldShowMenu;
+        private bool shouldShowMenu;
 
         /// <summary>
         /// The height of the menu.
         /// </summary>
-        private float MenuHeight => Menu.sizeDelta.y;
+        private float MenuHeight => menu.sizeDelta.y;
 
         /// <summary>
         /// Duration of the animation that is used to show or hide the menu.
         /// </summary>
-        private const float AnimationDuration = 0.5f;
+        private const float animationDuration = 0.5f;
 
         protected override void StartDesktop()
         {
             // Instantiate the menu.
-            Menu = (RectTransform)PrefabInstantiator.InstantiatePrefab(MenuPrefabPath, Canvas.transform, false).transform;
-            contentSizeFitter = Menu.gameObject.MustGetComponent<ContentSizeFitter>();
-            MenuCanvasGroup = Menu.gameObject.MustGetComponent<CanvasGroup>();
-            EntryList = (RectTransform)Menu.Find("Action List");
+            menu = (RectTransform)PrefabInstantiator.InstantiatePrefab(menuPrefabPath, Canvas.transform, false).transform;
+            contentSizeFitter = menu.gameObject.MustGetComponent<ContentSizeFitter>();
+            menuCanvasGroup = menu.gameObject.MustGetComponent<CanvasGroup>();
+            entryList = (RectTransform)menu.Find("Action List");
 
             // The menu should be hidden when the user moves the mouse away from it.
-            PointerHelper pointerHelper = Menu.gameObject.MustGetComponent<PointerHelper>();
+            PointerHelper pointerHelper = menu.gameObject.MustGetComponent<PointerHelper>();
             pointerHelper.ExitEvent.AddListener(x =>
             {
                 // If the mouse is not moving, this may indicate that the trigger has just been
@@ -82,13 +82,13 @@ namespace SEE.UI.PopupMenu
             });
 
             // We add all entries that were added before the menu was started.
-            while (EntriesBeforeStart.Count > 0)
+            while (entriesBeforeStart.Count > 0)
             {
-                AddEntry(EntriesBeforeStart.Dequeue());
+                AddEntry(entriesBeforeStart.Dequeue());
             }
 
             // We hide the menu by default.
-            Menu.gameObject.SetActive(false);
+            menu.gameObject.SetActive(false);
 
             // TODO (#679): Make this scrollable once it gets too big.
         }
@@ -99,9 +99,9 @@ namespace SEE.UI.PopupMenu
         /// <param name="entry">The entry to be added.</param>
         public void AddEntry(PopupMenuEntry entry)
         {
-            if (Menu is null)
+            if (menu is null)
             {
-                EntriesBeforeStart.Enqueue(entry);
+                entriesBeforeStart.Enqueue(entry);
                 return;
             }
 
@@ -126,7 +126,7 @@ namespace SEE.UI.PopupMenu
         /// <param name="action">The action to be added.</param>
         private void AddAction(PopupMenuAction action)
         {
-            GameObject actionItem = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuButton", EntryList, false);
+            GameObject actionItem = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuButton", entryList, false);
             ButtonManagerBasic button = actionItem.MustGetComponent<ButtonManagerBasic>();
             button.buttonText = action.Name;
 
@@ -153,7 +153,7 @@ namespace SEE.UI.PopupMenu
         /// <param name="heading">The heading to be added.</param>
         private void AddHeading(PopupMenuHeading heading)
         {
-            GameObject headingItem = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuHeading", EntryList, false);
+            GameObject headingItem = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuHeading", entryList, false);
             TextMeshProUGUI text = headingItem.MustGetComponent<TextMeshProUGUI>();
             text.text = heading.Text;
         }
@@ -175,13 +175,13 @@ namespace SEE.UI.PopupMenu
         /// </summary>
         public void ClearEntries()
         {
-            if (Menu is null)
+            if (menu is null)
             {
-                EntriesBeforeStart.Clear();
+                entriesBeforeStart.Clear();
                 return;
             }
 
-            foreach (Transform child in EntryList)
+            foreach (Transform child in entryList)
             {
                 Destroyer.Destroy(child.gameObject);
             }
@@ -208,7 +208,7 @@ namespace SEE.UI.PopupMenu
                 // so we move the menu up and to the left a bit.
                 position += new Vector2(-5, 5);
             }
-            Menu.position = position;
+            menu.position = position;
         }
 
         /// <summary>
@@ -217,17 +217,17 @@ namespace SEE.UI.PopupMenu
         /// </summary>
         public async UniTask ShowMenu()
         {
-            ShouldShowMenu = true;
-            Menu.gameObject.SetActive(true);
-            Menu.localScale = Vector3.zero;
+            shouldShowMenu = true;
+            menu.gameObject.SetActive(true);
+            menu.localScale = Vector3.zero;
             // This may seem stupid, but unfortunately, due to a Unity bug,
             // this appears to be the only way to make the content size fitter update.
             // See https://forum.unity.com/threads/content-size-fitter-refresh-problem.498536/
             contentSizeFitter.enabled = false;
             await UniTask.WaitForEndOfFrame();
             contentSizeFitter.enabled = true;
-            await UniTask.WhenAll(Menu.DOScale(1, AnimationDuration).AsyncWaitForCompletion().AsUniTask(),
-                                  MenuCanvasGroup.DOFade(1, AnimationDuration / 2).AsyncWaitForCompletion().AsUniTask());
+            await UniTask.WhenAll(menu.DOScale(1, animationDuration).AsyncWaitForCompletion().AsUniTask(),
+                                  menuCanvasGroup.DOFade(1, animationDuration / 2).AsyncWaitForCompletion().AsUniTask());
         }
 
         /// <summary>
@@ -236,12 +236,12 @@ namespace SEE.UI.PopupMenu
         /// </summary>
         public async UniTask HideMenu()
         {
-            ShouldShowMenu = false;
+            shouldShowMenu = false;
             // We use a fade effect rather than DOScale because it looks better.
-            await MenuCanvasGroup.DOFade(0, AnimationDuration).AsyncWaitForCompletion();
-            if (!ShouldShowMenu)
+            await menuCanvasGroup.DOFade(0, animationDuration).AsyncWaitForCompletion();
+            if (!shouldShowMenu)
             {
-                Menu.gameObject.SetActive(false);
+                menu.gameObject.SetActive(false);
             }
         }
 

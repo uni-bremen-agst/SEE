@@ -23,11 +23,11 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The popup menu that is shown when the user requests the context menu.
         /// </summary>
-        private PopupMenu PopupMenu;
+        private PopupMenu popupMenu;
 
         private void Start()
         {
-            PopupMenu = gameObject.AddComponent<PopupMenu>();
+            popupMenu = gameObject.AddComponent<PopupMenu>();
         }
 
         private void Update()
@@ -42,7 +42,7 @@ namespace SEE.Controls.Actions
                 }
 
                 IEnumerable<PopupMenuAction> actions = GetApplicableOptions(o.GraphElemRef.Elem, o.gameObject);
-                PopupMenu.ShowWith(actions, Input.mousePosition);
+                popupMenu.ShowWith(actions, Input.mousePosition);
             }
         }
 
