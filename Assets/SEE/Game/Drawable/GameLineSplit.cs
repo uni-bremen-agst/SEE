@@ -40,6 +40,7 @@ namespace SEE.Game.Drawable
                     if (i > 0)
                     {
                         int startIndex = removeMatchedIndex ? matchedIndices[i - 1] + 1 : matchedIndices[i - 1];
+                        Debug.Log("StartIndex: " + startIndex + ", size: " + newI + ", positions length: " + positions.Count + ", is in bounds: " + ((startIndex+newI)< positions.Count));
                         parts.Add(positions.GetRange(startIndex, newI));
                     }
                     else
