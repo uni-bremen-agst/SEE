@@ -265,6 +265,12 @@ namespace SEE.Controls.Actions
                     LinePointEraseAction.CreateReversibleAction,
                     parent: Drawable);
 
+            LineConnectionErase =
+                new("Line connection erase", "Erase a line connection from a line of the chosen point.",
+                    Color.red, "Materials/Drawable/LineConnectionErase",
+                    LineConnectionEraseAction.CreateReversibleAction,
+                    parent: Drawable);
+
             Erase =
                 new("Erase", "Erase a complete object on a drawable",
                     Color.red.Darker(), "Materials/Drawable/Erase",
@@ -323,6 +329,7 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType Save;
         public readonly static ActionStateType Erase;
         public readonly static ActionStateType LinePointErase;
+        public readonly static ActionStateType LineConnectionErase;
         public readonly static ActionStateType Cleaner;
         public readonly static ActionStateType StickyNote;
 

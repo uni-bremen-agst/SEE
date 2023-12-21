@@ -2,6 +2,7 @@
 using SEE.Game.UI.Notification;
 using SEE.Net.Actions.Drawable;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game.Drawable
@@ -40,7 +41,8 @@ namespace SEE.Game.Drawable
                     if (i > 0)
                     {
                         int startIndex = removeMatchedIndex ? matchedIndices[i - 1] + 1 : matchedIndices[i - 1];
-                        Debug.Log("StartIndex: " + startIndex + ", size: " + newI + ", positions length: " + positions.Count + ", is in bounds: " + ((startIndex+newI)< positions.Count));
+                        int include = removeMatchedIndex ? 0 : 1;
+                        newI = matchedIndices[i] + include - startIndex;
                         parts.Add(positions.GetRange(startIndex, newI));
                     }
                     else
@@ -48,6 +50,12 @@ namespace SEE.Game.Drawable
                         parts.Add(positions.GetRange(0, newI));
                     }
                 }
+
+                /// Add the last part of the splitting.
+                int endIndex = removeMatchedIndex ? matchedIndices.Last() + 1 : matchedIndices.Last();
+                int endI = positions.Count - endIndex;
+                parts.Add(positions.GetRange(endIndex, endI));
+
                 /// Trys to re-draw every segment.
                 foreach (List<Vector3> list in parts)
                 {
@@ -86,8 +94,85 @@ namespace SEE.Game.Drawable
                     TryReDraw(drawable, originLine, end, lines);
                 }
             }
+        }
 
+        /// <summary>
+        /// Erases a connection line between two points. 
+        /// To do this, select the starting point of this line.
+        /// Is intended for shapes.
+        /// </summary>
+        /// <param name="drawable">The drawable on that the lines should be redrawn.</param>
+        /// <param name="originLine">Configuration of the original line.</param>
+        /// <param name="matchedIndices">The indices of the points which connection lines should be erases.</param>
+        /// <param name="positions">The positions of the line.</param>
+        /// <param name="lines">List that holds the new created line configurations.</param>
+        public static void EraseLinePointConnection(GameObject drawable, LineConf originLine, List<int> matchedIndices,
+            List<Vector3> positions, List<LineConf> lines)
+        {
+            /// Block for the case where multiple indices were found that need to be split.
+            if (matchedIndices.Count > 1)
+            {
+                Debug.Log("Matches: " + matchedIndices.Count);
+                /// Creates the individual segments that remain when the line is split at the indices. 
+                /// Depending on whether the split point should be deleted, it is either removed immediately or retained.
+                List<List<Vector3>> parts = new();
+                for (int i = 0; i < matchedIndices.Count; i++)
+                {
+                    int newI = matchedIndices[i] + 1;
+                    newI = newI < 1 ? 1 : newI;
+                    if (i > 0)
+                    {
+                        int startIndex = matchedIndices[i - 1] + 1;
+                        newI = matchedIndices[i] + 1 - startIndex;
+                        parts.Add(positions.GetRange(startIndex, newI));
+                    }
+                    else
+                    {
+                        parts.Add(positions.GetRange(0, newI));
+                    }
+                }
 
+                /// Add the last part of the splitting.
+                int endIndex = matchedIndices.Last() + 1;
+                int endI = positions.Count - endIndex;
+                parts.Add(positions.GetRange(endIndex, endI));
+
+                /// Trys to re-draw every segment.
+                foreach (List<Vector3> list in parts)
+                {
+                    TryReDraw(drawable, originLine, list.ToArray(), lines);
+                }
+                
+                /// Block for the case where an attempt was made to split at the start or end point.
+                if (lines.Count == 1 
+                    && lines[0].rendererPositions.Length == positions.Count)
+                {
+                    ShowNotification.Warn("Line Connector Erase Problem:", "You can't erase a line connector on the endpoint. " +
+                        "Because the endpoint has none." +
+                        "\nThe line was redrawn nonetheless.");
+                }
+            }
+            else
+            {
+                /// Block for the case where only one index was found to split the line.
+                if (matchedIndices.Count == 1)
+                {
+                    Vector3[] begin = positions.GetRange(0, matchedIndices[0] + 1).ToArray();
+
+                    if (begin.Length == positions.Count)
+                    {/// Block for the case where an attempt was made to split at the end point.
+                        ShowNotification.Warn("Line Connector Erase Problem: ", "You can't erase a line connector on the endpoint. " +
+                            "Because the endpoint has none." +
+                            "\nThe line was redrawn nonetheless.");
+                    }
+                    int lastIndex = positions.Count - 1 - matchedIndices[0];
+                    Vector3[] end = positions.GetRange(matchedIndices[0] + 1, lastIndex).ToArray();
+
+                    /// Trys to re-draw the first and second segment.
+                    TryReDraw(drawable, originLine, begin, lines);
+                    TryReDraw(drawable, originLine, end, lines);
+                }
+            }
         }
 
         /// <summary>

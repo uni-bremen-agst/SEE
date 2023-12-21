@@ -10,50 +10,45 @@ using UnityEngine;
 namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
-    /// This class provides an action to erase only some points of a <see cref="LineConf"/>.
+    /// This action allows the user to delete a line connector between two points.
+    /// Is intended for shapes.
     /// </summary>
-    class LinePointEraseAction : AbstractPlayerAction
+    class LineConnectionEraseAction : AbstractPlayerAction
     {
         /// <summary>
         /// Represents that the action is active.
         /// </summary>
         private bool isActive = false;
-
         /// <summary>
         /// Saves all the information needed to revert or repeat this action.
-        /// </summary>
-        private List<Memento> mementoList = new List<Memento>();
-
-        /// <summary>
-        /// Saves the information for one line point erase.
         /// </summary>
         private Memento memento;
 
         /// <summary>
-        /// This class can store all the information needed to 
-        /// revert or repeat a <see cref="LinePointEraseAction"/>.
+        /// This struct can store all the information needed to 
+        /// revert or repeat a <see cref="LineConnectionEraseAction"/>.
         /// </summary>
-        private class Memento
+        private struct Memento
         {
             /// <summary>
-            /// Is the configuration of line before a point was removed.
+            /// Is the configuration of line before it was modified.
             /// </summary>
-            public LineConf originalLine;
+            public readonly LineConf originalLine;
             /// <summary>
             /// Is the drawable on that the lines are displayed.
             /// </summary>
             public readonly DrawableConfig drawable;
             /// <summary>
-            /// The list of lines that resulted from point remove of the original line.
+            /// The list of lines that resulted from modify the original line.
             /// </summary>
-            public List<LineConf> lines;
+            public readonly List<LineConf> lines;
 
             /// <summary>
             /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
-            /// <param name="originalLine">Is the configuration of line before a point was removed.</param>
+            /// <param name="originalLine">Is the configuration of line before it was modified.</param>
             /// <param name="drawable">The drawable where the lines are displayed</param>
-            /// <param name="lines">The list of lines that resulted from remove a point of the original line</param>
+            /// <param name="lines">The list of lines that resulted from modify the original line</param>
             public Memento(GameObject originalLine, GameObject drawable, List<LineConf> lines)
             {
                 this.originalLine = LineConf.GetLine(originalLine);
@@ -63,26 +58,27 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// This method manages the player's interaction with the mode <see cref="ActionStateType.LinePointErase"/>.
-        /// Specifically: Allows the user to remove one or more points of a line. 
-        ///               In one action run it can be remove more points of different lines.
+        /// This method manages the player's interaction with the mode <see cref="ActionStateType.LineConnectorErase"/>.
+        /// Specifically: Allows the user to delete a line connection between two points. 
+        /// One action run allows to delete the line connections of one point.
+        /// Is intended for shapes.
         /// </summary>
         /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
             {
-                /// This block is responsible for remove a point of the line/lines.
+                /// This block is responsible for deleting the line connectors of the given point.
                 /// It searches for the nearest point on the line from the mouse position.
                 /// Multiple line points may overlap, so it works with a list of nearest points.
-                /// The line is split at the found points and the points will be removed. Sublines will be created, 
-                /// with their starting and ending points corresponding to the nearest point of the removed point.
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
+                /// The line is split at the found points, and sublines are created, 
+                /// with their starting and ending points corresponding to the splitting point.
+                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !isActive &&
                     Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     GameFinder.hasDrawable(raycastHit.collider.gameObject))
                 {
-                    GameObject hittedObject = raycastHit.collider.gameObject;
                     isActive = true;
+                    GameObject hittedObject = raycastHit.collider.gameObject;
 
                     if (hittedObject.CompareTag(Tags.Line))
                     {
@@ -90,12 +86,10 @@ namespace SEE.Controls.Actions.Drawable
                         List<LineConf> lines = new();
                         NearestPoints.GetNearestPoints(hittedObject, raycastHit.point, 
                             out List<Vector3> positionsList, out List<int> matchedIndices);
-
-                        GameLineSplit.Split(GameFinder.GetDrawable(hittedObject), originLine,
-                            matchedIndices, positionsList, lines, true);
+                        GameLineSplit.EraseLinePointConnection(GameFinder.GetDrawable(hittedObject), originLine, 
+                            matchedIndices, positionsList, lines);
 
                         memento = new Memento(hittedObject, GameFinder.GetDrawable(hittedObject), lines);
-                        mementoList.Add(memento);
                         new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, 
                             memento.originalLine.id).Execute();
                         Destroyer.Destroy(hittedObject);
@@ -118,58 +112,51 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo();
-            List<Memento> reverseList = new(mementoList);
-            reverseList.Reverse();
-            foreach (Memento mem in reverseList)
-            {
-                GameObject drawable = mem.drawable.GetDrawable();
-                GameDrawer.ReDrawLine(drawable, mem.originalLine);
-                new DrawFreehandNetAction(mem.drawable.ID, mem.drawable.ParentID, mem.originalLine).Execute();
+            GameObject drawable = memento.drawable.GetDrawable();
+            GameDrawer.ReDrawLine(drawable, memento.originalLine);
+            new DrawFreehandNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.originalLine).Execute();
 
-                foreach (LineConf line in mem.lines)
-                {
-                    GameObject lineObj = GameFinder.FindChild(drawable, line.id);
-                    new EraseNetAction(mem.drawable.ID, mem.drawable.ParentID, line.id).Execute();
-                    Destroyer.Destroy(lineObj);
-                }
+            foreach (LineConf line in memento.lines)
+            {
+                GameObject lineObj = GameFinder.FindChild(drawable, line.id);
+                new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, line.id).Execute();
+                Destroyer.Destroy(lineObj);
             }
         }
+
         /// <summary>
         /// Repeats this action, i.e., deletes the original line and restores the sublines.
         /// </summary>
         public override void Redo()
         {
             base.Redo();
-            foreach (Memento mem in mementoList)
-            {
-                GameObject drawable = mem.drawable.GetDrawable();
-                GameObject originObj = GameFinder.FindChild(drawable, mem.originalLine.id);
-                new EraseNetAction(mem.drawable.ID, mem.drawable.ParentID, mem.originalLine.id).Execute();
-                Destroyer.Destroy(originObj);
+            GameObject drawable = memento.drawable.GetDrawable();
+            GameObject originObj = GameFinder.FindChild(drawable, memento.originalLine.id);
+            new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.originalLine.id).Execute();
+            Destroyer.Destroy(originObj);
 
-                foreach (LineConf line in mem.lines)
-                {
-                    GameDrawer.ReDrawLine(drawable, line);
-                    new DrawFreehandNetAction(mem.drawable.ID, mem.drawable.ParentID, line).Execute();
-                }
+            foreach (LineConf line in memento.lines)
+            {
+                GameDrawer.ReDrawLine(drawable, line);
+                new DrawFreehandNetAction(memento.drawable.ID, memento.drawable.ParentID, line).Execute();
             }
         }
 
         /// <summary>
-        /// A new instance of <see cref="LinePointEraseAction"/>.
+        /// A new instance of <see cref="LineConnectionEraseAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="LinePointEraseAction"/></returns>
+        /// <returns>new instance of <see cref="LineConnectionEraseAction"/></returns>
         public static ReversibleAction CreateReversibleAction()
         {
-            return new LinePointEraseAction();
+            return new LineConnectionEraseAction();
         }
 
         /// <summary>
-        /// A new instance of <see cref="LinePointEraseAction"/>.
+        /// A new instance of <see cref="LineConnectionEraseAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="LinePointEraseAction"/></returns>
+        /// <returns>new instance of <see cref="LineConnectionEraseAction"/></returns>
         public override ReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -178,10 +165,10 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.LinePointErase"/></returns>
+        /// <returns><see cref="ActionStateType.LineConnectorErase"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateTypes.LinePointErase;
+            return ActionStateTypes.LineConnectionErase;
         }
 
         /// <summary>
@@ -190,21 +177,16 @@ namespace SEE.Controls.Actions.Drawable
         /// Because this action does not actually change any game object, 
         /// an empty set is always returned.
         /// </summary>
-        /// <returns>a set of line id's</returns>
+        /// <returns>the id of the line that was splitted.</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            if (memento == null || memento.drawable == null)
+            if (memento.drawable == null)
             {
                 return new HashSet<string>();
             }
             else
             {
-                HashSet<string> changedObjects = new HashSet<string>();
-                foreach (Memento mem in mementoList)
-                {
-                    changedObjects.Add(mem.originalLine.id);
-                }
-                return changedObjects;
+                return new HashSet<string> { memento.originalLine.id };
             }
         }
     }
