@@ -471,7 +471,8 @@ namespace SEE.Game.Drawable
         /// <param name="parent">The new chosen parent node</param>
         public static void ChangeParent(GameObject node, GameObject parent)
         {
-            if (node.CompareTag(Tags.MindMapNode) && parent.CompareTag(Tags.MindMapNode))
+            if (node.CompareTag(Tags.MindMapNode) && parent != null 
+                && parent.CompareTag(Tags.MindMapNode))
             {
                 MMNodeValueHolder nodeValueHolder = node.GetComponent<MMNodeValueHolder>();
                 if (nodeValueHolder.GetParent() != parent && CheckValidParentChange(node, parent))
