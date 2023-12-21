@@ -249,8 +249,16 @@ namespace SEE.Controls.Actions.Drawable
                         drawables[i] = memento.drawables[i].GetDrawable();
                     }
                     DrawableConfigManager.SaveDrawables(drawables, memento.filePath);
+                    string chosen;
+                    if (memento.savedState == SaveState.More)
+                    {
+                        chosen = "The chosen " + drawables.Length;
+                    } else
+                    {
+                        chosen = "All";
+                    }
                     ShowNotification.Info("Saved!",
-                            "The chosen drawables has been successfully saved to the file " + filePath);
+                            chosen + " drawables have been successfully saved to the file " + filePath);
                     currentState = ReversibleAction.Progress.Completed;
                     result = true;
                     break;
