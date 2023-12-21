@@ -1,6 +1,7 @@
 ﻿using DiffMatchPatch;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -39,6 +40,14 @@ namespace SEE.Utils
             string oldRegion = FileIO.Read(oldPath, oldStartLine, oldEndLine);
             string newRegion = FileIO.Read(newPath, newStartLine, newEndLine);
             return Diff2RichText(diff.diff_main(oldRegion, newRegion));
+        }
+        //TODO: Add summary
+        public static string[] DiffForDiffCity(string result1, string result2)
+        {
+            diff_match_patch diff = new();
+            List<Diff> diffs = diff.diff_main(result1, result2);
+            diff.diff_cleanupSemantic(diffs);
+            return Diff2RichText(diffs);
         }
 
         /// <summary>

@@ -11,6 +11,8 @@ using SEE.DataModel.DG;
 using System;
 using SEE.UI.Window;
 using SEE.Utils.History;
+using SEE.Game;
+using SEE.Game.City;
 
 namespace SEE.Controls.Actions
 {
@@ -186,6 +188,36 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Returns a new CodeWindow showing a diff for the given edge in a diff city.
+        /// </summary>
+        /// <param name="edgeRef">The edge to get the CodeWindow for</param>
+        /// <returns>new CodeWindow showing a diff</returns>
+        public static CodeWindow ShowDiffCityDiff(GraphElementRef graphElementRef)
+        {
+            GameObject city = GameObject.Find("DiffCity");
+            GraphElement graphElement = graphElementRef.Elem;
+            // TODO: sourceAbsolutePlatformPath and targetAbsolutePlatformPath are not getting the right paths
+            (string sourceFilename, string sourceAbsolutePlatformPath) = GetPath(graphElement);
+            (string _, string targetAbsolutePlatformPath) = GetPath(graphElement);
+            string versionControlSystem = city.MustGetComponent<DiffCity>().VersionControlSystem;
+            string repositoryPath = city.MustGetComponent<DiffCity>().RepositoryPath;
+            string oldBranchName = city.MustGetComponent<DiffCity>().OldBranchName;
+            string newBranchName = city.MustGetComponent<DiffCity>().NewBranchName;
+            string oldCommitIdentifier = city.MustGetComponent<DiffCity>().OldCommitIdentifier;
+            string newCommitIdentifier = city.MustGetComponent<DiffCity>().NewCommitIdentifier;
+            IVersionControl versionControl = SwitchVersionControlSystems.CreateVersionControl(versionControlSystem);
+            string showOldCode = versionControl.Show(repositoryPath, oldBranchName, sourceAbsolutePlatformPath, oldCommitIdentifier);
+            string showNewCode = versionControl.Show(repositoryPath, newBranchName, targetAbsolutePlatformPath, newCommitIdentifier);
+            // TODO: Update the Output from DiffForDiffCity to string[], its the way it is for now, just for demonstration
+            string[] diff = TextualDiff.DiffForDiffCity(showOldCode, showNewCode);
+
+            CodeWindow codeWindow = GetOrCreateCodeWindow(graphElementRef, sourceFilename);
+            codeWindow.EnterFromText(diff, true);
+            codeWindow.ScrolledVisibleLine = 1;
+            return codeWindow;
+        }
+
+        /// <summary>
         /// Returns a CodeWindow showing the code range of the given graph element
         /// retrieved from a file. The path of the file is retrieved from
         /// the absolute path as specified by the graph element's source location
@@ -227,8 +259,9 @@ namespace SEE.Controls.Actions
                 // showing a unified diff.
                 CodeWindow codeWindow = graphElementRef is EdgeRef { Value: { Type: "Clone" } } edgeRef
                     ? ShowUnifiedDiff(edgeRef)
+                    : graphElementRef.GetComponentInParent<DiffCity>() != null
+                    ? ShowDiffCityDiff(graphElementRef)
                     : ShowCode(graphElementRef);
-
                 // Add code window to our space of code window, if it isn't in there yet
                 WindowSpace manager = spaceManager[WindowSpaceManager.LocalPlayer];
                 if (!manager.Windows.Contains(codeWindow))
