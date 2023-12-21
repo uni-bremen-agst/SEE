@@ -211,6 +211,10 @@ namespace SEE.Game.Drawable
             textObj.AddComponent<OrderInLayerValueHolder>().SetOrderInLayer(order);
             /// The Text Mesh Pro needs also the order.
             tmp.sortingOrder = order;
+
+            /// Is needed to fix an issue in the <see cref="TextMeshPro"/> component. 
+            /// If the outline color is set to black during creation, it is strangely always set to white.
+            tmp.outlineColor = tmp.outlineColor;
         }
 
         /// <summary>
@@ -233,6 +237,10 @@ namespace SEE.Game.Drawable
             Setup(drawable, "", text, position, fontColor, outlineColor, outlineThickness, fontSize, 
                 order, styles, out GameObject textObj);
             ValueHolder.currentOrderInLayer++;
+
+            /// Is needed to fix an issue in the <see cref="TextMeshPro"/> component. 
+            /// If the outline color is set to black during creation, it is strangely always set to white.
+            GameEdit.ChangeOutlineColor(textObj, outlineColor);
             return textObj;
         }
 
@@ -284,6 +292,10 @@ namespace SEE.Game.Drawable
             textObject.transform.localEulerAngles = eulerAngles;
             textObject.transform.localPosition = position;
             textObject.GetComponent<OrderInLayerValueHolder>().SetOrderInLayer(order);
+
+            /// Is needed to fix an issue in the <see cref="TextMeshPro"/> component. 
+            /// If the outline color is set to black during creation, it is strangely always set to white.
+            GameEdit.ChangeOutlineColor(textObject, outlineColor);
 
             return textObject;
         }

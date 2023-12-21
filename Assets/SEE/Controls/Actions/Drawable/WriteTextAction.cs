@@ -182,7 +182,6 @@ namespace SEE.Controls.Actions.Drawable
                         ValueHolder.currentPrimaryColor, ValueHolder.currentSecondaryColor,
                         ValueHolder.currentOutlineThickness, ValueHolder.currentFontSize, 
                         ValueHolder.currentOrderInLayer, TextMenu.GetFontStyle());
-
                     new WriteTextNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
                         TextConf.GetText(textObj)).Execute();
                     memento = new Memento(drawable, TextConf.GetText(textObj));
