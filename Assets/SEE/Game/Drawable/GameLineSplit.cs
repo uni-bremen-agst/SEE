@@ -112,7 +112,6 @@ namespace SEE.Game.Drawable
             /// Block for the case where multiple indices were found that need to be split.
             if (matchedIndices.Count > 1)
             {
-                Debug.Log("Matches: " + matchedIndices.Count);
                 /// Creates the individual segments that remain when the line is split at the indices. 
                 /// Depending on whether the split point should be deleted, it is either removed immediately or retained.
                 List<List<Vector3>> parts = new();

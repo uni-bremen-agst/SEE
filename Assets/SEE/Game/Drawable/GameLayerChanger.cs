@@ -52,6 +52,12 @@ namespace SEE.Game.Drawable
                 {
                     /// Block to execute if the desired order in the layer is less than the maximum.
                     holder.SetOrderInLayer(order);
+
+                    if (showInformation)
+                    {
+                        ShowNotification.Info("Increases the order",
+                            "The order in layer of the chosen object increases to " + holder.GetOrderInLayer() + ".", 1f);
+                    }
                     /// For mind map nodes, it's important that the text is also assigned the order.
                     if (obj.CompareTag(Tags.MindMapNode))
                     {
@@ -100,6 +106,11 @@ namespace SEE.Game.Drawable
                 else
                 {
                     holder.SetOrderInLayer(order);
+                    if (showInformation)
+                    {
+                        ShowNotification.Info("Decreases the order",
+                            "The order in layer of the chosen object decreases to " + holder.GetOrderInLayer() + ".", 1f);
+                    }
                     /// For mind map nodes, it's important that the text is also assigned the order.
                     if (obj.CompareTag(Tags.MindMapNode))
                     {
