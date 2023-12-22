@@ -40,12 +40,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         private bool ProcessingEvents { get; set; }
 
-        // TODO: 
-        private readonly IDictionary<string, TreeWindow> treeWindows = new Dictionary<string, TreeWindow>();
-
-        // TODO: 
-        private WindowSpace space;
-
         public CandidateRecommendation CandidateRecommendation
         {
             get 
@@ -58,6 +52,18 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 return candidateRecommendation; 
             }
         }
+
+        private const string updateConfigurationButtonLabel = "Update configuration";
+        private const string createInitialMappingLabel = "Create initial Mapping";
+        private const string startAutomatedMappingLabel = "Start automated mapping";
+        private const string showRecommendationLabel = "Show recommendation";
+        private const string startRecordingLabel = "Start recording";
+        private const string stopRecordingLabel = "Stop recording";
+        private const string processDataLabel = "Process data";
+        private const string dumbTrainingDataLabel = "Dumb training data";
+
+        private const string statisticButtonGroup = "statisticButtonsGroup";
+        private const string mappingButtonGroup = "mappingButtonsGroups";
 
         // TODO: include cda option into the updating of the configuration
         [SerializeField]
@@ -74,6 +80,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         [SerializeField]
         public FilePath xmlPath;
+
+        [SerializeField]
+        public double initialMappingPercentage = 0.5;
+
+        [SerializeField]
+        public int initialMappingSeed = 593946;
 
         public ReflexionGraph ReflexionGraph
         {
@@ -163,49 +175,75 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         }
 
         #region Buttons
-        [Button(ButtonSizes.Small)]
+        [Button(startRecordingLabel,ButtonSizes.Small)]
+        [ButtonGroup(statisticButtonGroup)]
         public void StartRecording()
         {
             CandidateRecommendation.Statistics.StartRecording();
         }
 
-        [Button(ButtonSizes.Small)]
+        [Button(stopRecordingLabel, ButtonSizes.Small)]
+        [ButtonGroup(statisticButtonGroup)]
         public void StopRecording()
         {
             CandidateRecommendation.Statistics.StopRecording();
         }
 
-        [Button(ButtonSizes.Small)]
-        public void ProcessRecordedData()
+        [Button(processDataLabel,ButtonSizes.Small)]
+        [ButtonGroup(statisticButtonGroup)]
+        public void ProcessData()
         {
             CandidateRecommendation.Statistics.StopRecording();
             CandidateRecommendation.Statistics.ProcessMappingData(csvPath.Path, xmlPath.Path);
         }
 
-        [Button(ButtonSizes.Small)]
         public void UpdateConfiguration()
         {
-            CandidateRecommendation.UpdateConfiguration(reflexionGraph,attractFunctionType,candidateType);
-            CandidateRecommendation.Statistics.SetOracleMapping(oracleMapping);
+            // These calls are triggering rerunning of the reflexion analysis 
+            // within the reflexion graph and the oracle graph. During the analysis
+            // we will exclude any parallel writes through processing events
+            // or assignments of recommendations towards the graphs
+            lock (reflexionGraphLockObject)
+            {
+                CandidateRecommendation.UpdateConfiguration(reflexionGraph, attractFunctionType, candidateType);
+                CandidateRecommendation.Statistics.SetOracleMapping(oracleMapping);
+            }
+        }
+       
+        public async UniTask UpdateConfigurationAsync()
+        {
+            await UniTask.RunOnThreadPool(async () => 
+            {
+            	await UniTask.WaitWhile(() => ProcessingEvents);
+                await UniTask.SwitchToMainThread();
+                UpdateConfiguration();
+            });
         }
 
-        [Button(ButtonSizes.Small)]
-        public void GenerateArticialInitialMapping()
+        [Button(updateConfigurationButtonLabel, ButtonSizes.Small)]
+        public void UpdateConfigurationCommand()
         {
-            Dictionary<Node, HashSet<Node>> initialMapping = CandidateRecommendation.Statistics.GenerateArtificialInitialMapping(0.5, 593946);
+            UpdateConfigurationAsync().Forget();
+        }
+
+        [Button(createInitialMappingLabel,ButtonSizes.Small)]
+        [ButtonGroup(mappingButtonGroup)]
+        public void CreateInitialMapping()
+        {
+            Dictionary<Node, HashSet<Node>> initialMapping = CandidateRecommendation.Statistics.CreateInitialMapping(
+                                                                                                initialMappingPercentage, 
+                                                                                                initialMappingSeed);
             foreach (Node cluster in initialMapping.Keys)
             {
                 foreach (Node candidate in initialMapping[cluster])
                 {
                     Debug.Log($"Artificial initial mapping {candidate.ID} --> {cluster.ID}");
-
-                    // TODO: Wrap automatic mapping action?
                     MapRecommendation(candidate, cluster).Forget();
                 }
             }
         }
 
-        [Button(ButtonSizes.Small)]
+        [Button(dumbTrainingDataLabel, ButtonSizes.Small)]
         public void DumpTrainingData()
         {
             Debug.Log(CandidateRecommendation.AttractFunction.DumpTrainingData());
@@ -217,13 +255,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             return new Dictionary<Node, HashSet<MappingPair>>(CandidateRecommendation.Recommendations);
         }
 
-        [Button(ButtonSizes.Small)]
-        public void AutomaticallyMapEntitiesCommand()
+        [Button(startAutomatedMappingLabel,ButtonSizes.Small)]
+        [ButtonGroup(mappingButtonGroup)]
+        public void StartAutomatedMappingCommand()
         {
-            AutomaticallyMapEntities().Forget();
+            StartAutomatedMapping().Forget();
         }
 
-        [Button(ButtonSizes.Small)]
+        [Button(showRecommendationLabel, ButtonSizes.Small)]
+        [ButtonGroup(mappingButtonGroup)]
         public void ShowRecommendation()
         {
             TriggerBlinkAnimation().Forget();
@@ -232,11 +272,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// 
         /// </summary>
-        public async UniTaskVoid AutomaticallyMapEntities()
+        public async UniTaskVoid StartAutomatedMapping()
         {
             Dictionary<Node, HashSet<MappingPair>> recommendations = await this.GetRecommendations();
-            // While next recommendation still exists
             
+            // While next recommendation still exists      
             while (recommendations.Count != 0)
             {
                 MappingPair chosenMappingPair;
@@ -255,8 +295,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 }
                 
                 Debug.Log($"Chosen Mapping Pair {chosenMappingPair.CandidateID} --> {chosenMappingPair.CandidateID}");
-
-                // TODO: Wrap automatic mapping action?
                 MapRecommendation(chosenMappingPair.Candidate, chosenMappingPair.Cluster).Forget();
 
                 recommendations = await this.GetRecommendations();
@@ -280,7 +318,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             await UniTask.SwitchToMainThread();
             lock (reflexionGraphLockObject)
             {
-                // TODO: Implement as Commando to visualize mapping/ Trigger Animation.
+                // TODO: Wrap automatic mapping in action?
+                // TODO: Implement as action to visualize mapping/ Trigger Animation.
                 CandidateRecommendation.ReflexionGraph.AddToMapping(candidate, cluster); 
             }
         }

@@ -100,7 +100,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
         }
 
-        public Dictionary<Node, HashSet<Node>> GenerateArtificialInitialMapping(double percentage, int seed)
+        public Dictionary<Node, HashSet<Node>> CreateInitialMapping(double percentage, int seed)
         {
             Dictionary<Node, HashSet<Node>> initialMapping = new Dictionary<Node, HashSet<Node>>();
             if (percentage > 1 || percentage < 0) throw new Exception("Parameter percentage have to be a double value between 0.0 and 1.0");
