@@ -879,6 +879,11 @@ namespace SEE.Game.UI.Menu.Drawable
             lowerCaseBtn.colors = notSelectedBlock;
             upperCaseBtn.colors = notSelectedBlock;
             smallCapsBtn.colors = notSelectedBlock;
+
+            if (fontStyleAction != null)
+            {
+                fontStyleAction = null;
+            }
         }
 
         /// <summary>
