@@ -56,7 +56,7 @@ namespace SEE.Game.Drawable
                     if (showInformation)
                     {
                         ShowNotification.Info("Increases the order",
-                            "The order in layer of the chosen object increases to " + holder.GetOrderInLayer() + ".", 1f);
+                            "The order in layer of the chosen object increases to " + holder.GetOrderInLayer() + ".", 0.8f);
                     }
                     /// For mind map nodes, it's important that the text is also assigned the order.
                     if (obj.CompareTag(Tags.MindMapNode))
@@ -109,7 +109,7 @@ namespace SEE.Game.Drawable
                     if (showInformation)
                     {
                         ShowNotification.Info("Decreases the order",
-                            "The order in layer of the chosen object decreases to " + holder.GetOrderInLayer() + ".", 1f);
+                            "The order in layer of the chosen object decreases to " + holder.GetOrderInLayer() + ".", 0.8f);
                     }
                     /// For mind map nodes, it's important that the text is also assigned the order.
                     if (obj.CompareTag(Tags.MindMapNode))
