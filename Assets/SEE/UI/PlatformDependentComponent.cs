@@ -93,7 +93,7 @@ namespace SEE.UI
             // initialization finished
             HasStarted = true;
             OnStartFinished();
-            OnMenuInitialized?.Invoke();
+            OnComponentInitialized?.Invoke();
         }
 
         /// <summary>
@@ -167,8 +167,8 @@ namespace SEE.UI
         protected virtual void OnStartFinished() { }
 
         /**
-         * Triggers when the menu is initialized. (<see cref="Start"/> and <see cref="HasStarted"/>)
+         * Triggers when the component has been initialized, i.e., when the Start() method has been called.
          */
-        public event UnityAction OnMenuInitialized;
+        public event UnityAction OnComponentInitialized;
     }
 }

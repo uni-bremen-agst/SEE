@@ -46,7 +46,7 @@ namespace SEE.UI.Window.CodeWindow
         /// Characters representing newlines.
         /// Note that newlines may also consist of aggregations of this set (e.g. "\r\n").
         /// </summary>
-        private static readonly char[] newlineCharacters = {'\r', '\n'};
+        private static readonly char[] newlineCharacters = { '\r', '\n' };
 
         /// <summary>
         /// Populates the code window with the content of the given token stream.
@@ -77,16 +77,15 @@ namespace SEE.UI.Window.CodeWindow
             // Unsurprisingly, each newline token corresponds to a new line.
             // However, we need to also add "hidden" newlines contained in other tokens, e.g. block comments.
             int assumedLines = tokenList.Count(x => x.TokenType.Equals(SEEToken.Type.Newline))
-                               + tokenList.Where(x => !x.TokenType.Equals(SEEToken.Type.Newline))
-                                          .Aggregate(0, (_, token) => token.Text.Count(x => x == '\n'));
+                + tokenList.Where(x => !x.TokenType.Equals(SEEToken.Type.Newline))
+                           .Aggregate(0, (_, token) => token.Text.Count(x => x == '\n'));
             // Needed padding is the number of lines, because the line number will be at most this long.
-             neededPadding = assumedLines.ToString().Length;
+            neededPadding = assumedLines.ToString().Length;
 
             text = $"<color=#CCCCCC>{string.Join("", Enumerable.Repeat(" ", neededPadding - 1))}1</color> ";
             int lineNumber = 2; // Line number we'll write down next
             bool currentlyMarking = false;
             Dictionary<SEEToken, ISet<Issue>> issueTokens = new();
-            //TODO: Handle these issues
 
             foreach (SEEToken token in tokenList)
             {
@@ -221,7 +220,7 @@ namespace SEE.UI.Window.CodeWindow
                     IList<SEEToken> lineTokens =
                         tokenList.SkipWhile(x => x != currentToken).Skip(1)
                                  .TakeWhile(x => x.TokenType != SEEToken.Type.Newline
-                                                 && !x.Text.Intersect(newlineCharacters).Any()).ToList();
+                                                && !x.Text.Intersect(newlineCharacters).Any()).ToList();
                     string line = lineTokens.Aggregate("", (s, t) => s + t.Text);
                     MatchCollection matches = Regex.Matches(line, Regex.Escape(entityContent));
                     if (matches.Count != 1)
@@ -278,7 +277,7 @@ namespace SEE.UI.Window.CodeWindow
             void IncreaseLinkCounter()
             {
                 Assert.IsTrue(linkCounter < char.MaxValue);
-                char[] reservedCharacters = {'<', '>', '"', '\''}; // these characters would break our formatting
+                char[] reservedCharacters = { '<', '>', '"', '\'' }; // these characters would break our formatting
                 // Increase link counter until it contains an allowed character
                 while (reservedCharacters.Contains(++linkCounter))
                 {
@@ -380,66 +379,62 @@ namespace SEE.UI.Window.CodeWindow
         private async UniTaskVoid MarkIssuesAsync(string path)
         {
             // First notification should stay as long as issues are still loading.
-            Notification.Notification firstNotification = ShowNotification.Info("Loading issues...",
-                                                                                "This may take a while.", -1f);
-            string queryPath = Path.GetFileName(path);
-            List<Issue> allIssues;
-            try
+            using (LoadingSpinner.Show($"Loading issues for {Title}..."))
             {
-                allIssues = new List<Issue>(await DashboardRetriever.Instance.GetConfiguredIssuesAsync(fileFilter: $"\"*{queryPath}\""));
-            }
-            catch (DashboardException e)
-            {
-                firstNotification.Close();
-                ShowNotification.Error("Couldn't load issues", e.Message);
-                return;
-            }
+                string queryPath = Path.GetFileName(path);
+                List<Issue> allIssues;
+                try
+                {
+                    allIssues = new List<Issue>(await DashboardRetriever.Instance.GetConfiguredIssuesAsync(fileFilter: $"\"*{queryPath}\""));
+                }
+                catch (DashboardException e)
+                {
+                    ShowNotification.Error("Couldn't load issues", e.Message);
+                    return;
+                }
 
-            await UniTask.SwitchToThreadPool(); // don't interrupt main UI thread
-            if (allIssues.Count == 0)
-            {
-                return;
+                await UniTask.SwitchToThreadPool(); // don't interrupt main UI thread
+                if (allIssues.Count == 0)
+                {
+                    return;
+                }
+
+                const char pathSeparator = '/';
+                // When there are different paths in the issue table, this implies that there are some files
+                // which aren't actually the one we're looking for (because we've only matched by filename so far).
+                // In this case, we'll gradually refine our results until this isn't the case anymore.
+                for (int skippedParts = path.Count(x => x == pathSeparator) - 2; !MatchingPaths(allIssues); skippedParts--)
+                {
+                    Assert.IsTrue(path.Contains(pathSeparator));
+                    // Skip the first <c>skippedParts</c> parts, so that we query progressively larger parts.
+                    queryPath = string.Join(pathSeparator.ToString(), path.Split(pathSeparator).Skip(skippedParts));
+                    allIssues.RemoveAll(x => !x.Entities.Select(e => e.Path).Any(p => p.EndsWith(queryPath)));
+                }
+
+                // Mapping from each line to the entities and issues contained therein.
+                // Important: When an entity spans over multiple lines, it's split up into one entity per line.
+                Dictionary<int, List<(SourceCodeEntity entity, Issue issue)>> entities =
+                    allIssues.SelectMany(x => x.Entities.SelectMany(SplitUpIntoLines).Select(e => (entity: e, issue: x)))
+                             .Where(x => x.entity.Path.EndsWith(queryPath))
+                             .OrderBy(x => x.entity.Line).GroupBy(x => x.entity.Line)
+                             .ToDictionary(x => x.Key, x => x.ToList());
+
+                EnterFromTokens(tokenList, entities);
+
+                await UniTask.SwitchToMainThread();
+
+                try
+                {
+                    textMesh.text = text;
+                    textMesh.ForceMeshUpdate();
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    // FIXME (#250): Use multiple TMPs: Either one as an overlay, or split the main TMP up into multiple ones.
+                    ShowNotification.Error("File too big", "This file is too big to be displayed correctly.");
+                }
             }
-
-            const char pathSeparator = '/';
-            // When there are different paths in the issue table, this implies that there are some files
-            // which aren't actually the one we're looking for (because we've only matched by filename so far).
-            // In this case, we'll gradually refine our results until this isn't the case anymore.
-            for (int skippedParts = path.Count(x => x == pathSeparator) - 2; !MatchingPaths(allIssues); skippedParts--)
-            {
-                Assert.IsTrue(path.Contains(pathSeparator));
-                // Skip the first <c>skippedParts</c> parts, so that we query progressively larger parts.
-                queryPath = string.Join(pathSeparator.ToString(), path.Split(pathSeparator).Skip(skippedParts));
-                allIssues.RemoveAll(x => !x.Entities.Select(e => e.Path).Any(p => p.EndsWith(queryPath)));
-            }
-
-            // Mapping from each line to the entities and issues contained therein.
-            // Important: When an entity spans over multiple lines, it's split up into one entity per line.
-            Dictionary<int, List<(SourceCodeEntity entity, Issue issue)>> entities =
-                allIssues.SelectMany(x => x.Entities.SelectMany(SplitUpIntoLines).Select(e => (entity: e, issue: x)))
-                         .Where(x => x.entity.Path.EndsWith(queryPath))
-                         .OrderBy(x => x.entity.Line).GroupBy(x => x.entity.Line)
-                         .ToDictionary(x => x.Key, x => x.ToList());
-
-            EnterFromTokens(tokenList, entities);
-
-            await UniTask.SwitchToMainThread();
-            firstNotification.Close();
-            try
-            {
-                textMesh.text = text;
-                textMeshInputField.text = text;
-                textMesh.ForceMeshUpdate();
-            }
-            catch (IndexOutOfRangeException)
-            {
-                //FIXME: Use multiple TMPs: Either one as an overlay, or split the main TMP up into multiple ones.
-                ShowNotification.Error("File too big", "This file is too big to be displayed correctly.");
-                return;
-            }
-
-            //TODO: This may as well be implemented as a loading bar, showing continuous progress as we iterate.
-            ShowNotification.Info("Issues loaded", $"{allIssues.Count} issues have been found for {Title}.");
+            return;
 
             // Returns true iff all issues are on the same path.
             static bool MatchingPaths(ICollection<Issue> issues)
@@ -476,29 +471,6 @@ namespace SEE.UI.Window.CodeWindow
         private int GetRichIndex(int cleanIndex)
         {
             return textMesh.textInfo.characterInfo[cleanIndex].index;
-        }
-
-        /// <summary>
-        /// Returns the clean index for a given rich index
-        /// See also <see cref="GetRichIndex(int)"/>
-        /// </summary>
-        /// <param name="richIndex"></param>
-        /// <returns>clean index</returns>
-        private int GetCleanIndex(int richIndex)
-        {
-            return textMesh.textInfo.characterInfo.Select((x, idx) => (x, idx)).First( x => x.x.index >= richIndex).idx;
-        }
-
-        /// <summary>
-        /// Returns the Text without the XML Tags
-        /// </summary>
-        /// <returns>The clean text</returns>
-        private async UniTask<string> GetCleanTextAsync()
-        {
-            await UniTask.SwitchToThreadPool();
-            string ret = textMesh.textInfo.characterInfo.Aggregate("", (result, c) => result + c.character);
-            await UniTask.SwitchToMainThread();
-            return ret;
         }
     }
 }

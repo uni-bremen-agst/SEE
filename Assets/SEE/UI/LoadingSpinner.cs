@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using SEE.GO;
 using SEE.Utils;
 using TMPro;
@@ -135,6 +136,12 @@ namespace SEE.UI
                 return;
             }
             processCountText.text = loadingProcesses.Count <= 1 ? "" : $"{loadingProcesses.Count}";
+        }
+
+        private void OnDisable()
+        {
+            Destroyer.Destroy(loadingSpinner);
+            loadingSpinner = null;
         }
 
         /// <summary>
