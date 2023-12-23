@@ -25,7 +25,7 @@ if [ -n "$CI" ]; then
 	set -ex
 
 	# Check for non-SEE Assets.
-	CHANGED_ASSETS=$(git diff --name-only --diff-filter=AM origin/master -- Assets ':!Assets/Editor' ':!Assets/Native' ':!Assets/StreamingAssets' ':!Assets/NuGet.config*' ':!Assets/packages.config*' ':!Assets/Resources' ':!Assets/Scenes' ':!Assets/SEE*' ':!Assets/XR' | git check-attr --stdin filter | grep -v "filter: lfs" || exit 0)
+	CHANGED_ASSETS=$(git diff --name-only --diff-filter=AM origin/master -- Assets ':!Assets/Editor' ':!Assets/Native' ':!Assets/StreamingAssets' ':!Assets/csc.rsp*' ':!Assets/NuGet.config*' ':!Assets/packages.config*' ':!Assets/Resources' ':!Assets/Scenes' ':!Assets/SEE*' ':!Assets/XR' | git check-attr --stdin filter | grep -v "filter: lfs" || exit 0)
 	if [ -n "$CHANGED_ASSETS" ]; then
 		echo ""
 		echo -n "::error title=Assets not in LFS::You have committed non-SEE assets outside of LFS.%0A"
