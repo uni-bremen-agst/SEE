@@ -117,7 +117,7 @@ namespace SEE.UI.Window.CodeWindow
                     if (ICRDT.IsEmpty(Title))
                     {
                         textMeshInputField.enabled = false;
-                        AddStringStart().Forget();
+                        AddStringStartAsync().Forget();
                     }
                     else
                     {
@@ -175,7 +175,7 @@ namespace SEE.UI.Window.CodeWindow
                 Window.transform.Find("Dragger/IDEButton").gameObject.GetComponent<Button>()
                       .onClick.AddListener(() =>
                       {
-                          IDEIntegration.Instance?.OpenFile(FilePath, city.SolutionPath.Path, markedLine).Forget();
+                          IDEIntegration.Instance?.OpenFileAsync(FilePath, city.SolutionPath.Path, markedLine).Forget();
                       });
             }
 
@@ -432,7 +432,7 @@ namespace SEE.UI.Window.CodeWindow
                     char linkId = textMesh.textInfo.linkInfo[link].GetLinkID()[0];
                     issueTooltip ??= gameObject.AddComponent<Tooltip.Tooltip>();
                     // Display tooltip containing all issue descriptions
-                    UniTask.WhenAll(issueDictionary[linkId].Select(x => x.ToDisplayString()))
+                    UniTask.WhenAll(issueDictionary[linkId].Select(x => x.ToDisplayStringAsync()))
                            .ContinueWith(x => issueTooltip.Show(string.Join("\n", x), 0f))
                            .Forget();
                 }
@@ -476,11 +476,11 @@ namespace SEE.UI.Window.CodeWindow
         /// An async method to add the text into the crdt while the user can already read the content of the file.
         /// </summary>
         /// <returns></returns>
-        private async UniTask AddStringStart()
+        private async UniTask AddStringStartAsync()
         {
             ShowNotification.Info("Loading editor", "The Editable file is loading, please wait");
-            string cleanText = await AsyncGetCleanText();
-            await ICRDT.AsyncAddString(cleanText, 0, Title, true);
+            string cleanText = await GetCleanTextAsync();
+            await ICRDT.AddStringAsync(cleanText, 0, Title, true);
             textMeshInputField.enabled = true;
             ShowNotification.Info("Editor ready", "You now can use the editor");
         }

@@ -26,15 +26,15 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="graph">The graph whose nodes' metrics shall be set</param>
         /// <param name="override">Whether any existing metrics present in the graph's nodes shall be updated</param>
-        public static async UniTask LoadDashboard(Graph graph, bool @override = true, string addedFrom = "")
+        public static async UniTask LoadDashboardAsync(Graph graph, bool @override = true, string addedFrom = "")
         {
-            IDictionary<(string path, string entity), List<MetricValueTableRow>> metrics = await DashboardRetriever.Instance.GetAllMetricRows();
-            IDictionary<string, List<Issue>> issues = await LoadIssueMetrics(addedFrom.IsNullOrWhitespace() ? null : addedFrom, null);
+            IDictionary<(string path, string entity), List<MetricValueTableRow>> metrics = await DashboardRetriever.Instance.GetAllMetricRowsAsync();
+            IDictionary<string, List<Issue>> issues = await LoadIssueMetrics(addedFrom.IsNullOrWhitespace() ? null : addedFrom);
             string projectFolder = DataPath.ProjectFolder();
 
             await UniTask.SwitchToThreadPool();
 
-            HashSet<Node> encounteredIssueNodes = new HashSet<Node>();
+            HashSet<Node> encounteredIssueNodes = new();
             int updatedMetrics = 0;
             // Go through all nodes, checking whether any metric in the dashboard matches it.
             foreach (Node node in graph.Nodes())
@@ -66,7 +66,7 @@ namespace SEE.DataModel.DG.IO
                     {
                         int? length = node.SourceLength();
                         // Note: In .NET 7 there is a Enumerable.ToHashSet() which could be used instead of the constructor.
-                        HashSet<int> lineRange = new HashSet<int>(Enumerable.Range(line.Value, length ?? 1), null);
+                        HashSet<int> lineRange = new(Enumerable.Range(line.Value, length ?? 1), null);
                         // Relevant issues are those which are entirely contained by the source region of this node
                         relevantIssues = issueList.Where(
                             x => x.Entities.Any(e => lineRange.Contains(e.Line) &&
@@ -121,7 +121,7 @@ namespace SEE.DataModel.DG.IO
             static async UniTask<IDictionary<string, List<Issue>>> LoadIssueMetrics(string start, string end = null)
             {
                 IDictionary<string, List<Issue>> issues = new Dictionary<string, List<Issue>>();
-                IList<Issue> allIssues = await DashboardRetriever.Instance.GetConfiguredIssues(start, end, Issue.IssueState.added);
+                IList<Issue> allIssues = await DashboardRetriever.Instance.GetConfiguredIssuesAsync(start, end, Issue.IssueState.added);
                 foreach (Issue issue in allIssues)
                 {
                     foreach (SourceCodeEntity entity in issue.Entities)
@@ -171,7 +171,7 @@ namespace SEE.DataModel.DG.IO
             int numberOfErrors = 0;
             try
             {
-                using StreamReader reader = new StreamReader(filename);
+                using StreamReader reader = new(filename);
                 if (reader.EndOfStream)
                 {
                     Debug.LogError($"Empty file: {filename}.\n");

@@ -54,7 +54,7 @@ namespace SEE.UI.Window.CodeWindow
         /// <param name="tokens">Stream of tokens representing the source code of this code window.</param>
         /// <param name="issues">Issues for this file. If <c>null</c>, will be automatically retrieved.
         /// Entities spanning multiple lines (i.e. using <c>endLine</c>) are not supported.
-        /// If you wish to use such issues, split the entities up into one per line (see <see cref="MarkIssues"/>).
+        /// If you wish to use such issues, split the entities up into one per line (see <see cref="MarkIssuesAsync"/>).
         /// </param>
         /// <exception cref="ArgumentNullException">If <paramref name="tokens"/> is <c>null</c>.</exception>
         public void EnterFromTokens(IEnumerable<SEEToken> tokens,
@@ -356,7 +356,7 @@ namespace SEE.UI.Window.CodeWindow
                         if (SceneQueries.GetCodeCity(transform).gameObject.TryGetComponentOrLog(out AbstractSEECity city)
                             && city.ErosionSettings.ShowIssuesInCodeWindow)
                         {
-                            MarkIssues(filename).Forget(); // initiate issue search
+                            MarkIssuesAsync(filename).Forget(); // initiate issue search
                         }
                     }
                     catch (ArgumentException e)
@@ -377,7 +377,7 @@ namespace SEE.UI.Window.CodeWindow
             }
         }
 
-        private async UniTaskVoid MarkIssues(string path)
+        private async UniTaskVoid MarkIssuesAsync(string path)
         {
             // First notification should stay as long as issues are still loading.
             Notification.Notification firstNotification = ShowNotification.Info("Loading issues...",
@@ -386,7 +386,7 @@ namespace SEE.UI.Window.CodeWindow
             List<Issue> allIssues;
             try
             {
-                allIssues = new List<Issue>(await DashboardRetriever.Instance.GetConfiguredIssues(fileFilter: $"\"*{queryPath}\""));
+                allIssues = new List<Issue>(await DashboardRetriever.Instance.GetConfiguredIssuesAsync(fileFilter: $"\"*{queryPath}\""));
             }
             catch (DashboardException e)
             {
@@ -493,7 +493,7 @@ namespace SEE.UI.Window.CodeWindow
         /// Returns the Text without the XML Tags
         /// </summary>
         /// <returns>The clean text</returns>
-        private async UniTask<string> AsyncGetCleanText()
+        private async UniTask<string> GetCleanTextAsync()
         {
             await UniTask.SwitchToThreadPool();
             string ret = textMesh.textInfo.characterInfo.Aggregate("", (result, c) => result + c.character);

@@ -368,7 +368,7 @@ namespace SEE.Game.Operator
             // we need to call Refresh() on it or it will stop working.
             if (value is HierarchyEvent)
             {
-                RefreshGlow().Forget();
+                RefreshGlowAsync().Forget();
             }
         }
 
@@ -377,7 +377,7 @@ namespace SEE.Game.Operator
         ///
         /// Needs to be called whenever the material changes. Hierarchy changes are handled automatically.
         /// </summary>
-        public async UniTaskVoid RefreshGlow(bool fullRefresh = false)
+        public async UniTaskVoid RefreshGlowAsync(bool fullRefresh = false)
         {
             if (highlightEffect != null && Glow != null)
             {
@@ -418,7 +418,7 @@ namespace SEE.Game.Operator
             if (TryGetComponent(out highlightEffect))
             {
                 // If the component already exists, we need to rebuild it to be sure it fits our material.
-                RefreshGlow(true).Forget();
+                RefreshGlowAsync(true).Forget();
             }
             else
             {

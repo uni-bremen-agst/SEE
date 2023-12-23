@@ -482,7 +482,7 @@ namespace SEE.Utils
         /// <param name="addedString">The string that should be added</param>
         /// <param name="startIdx">The start index of the string in the file</param>
         /// <param name="startUp">Is this the start-up from a CRDT or CodeWindow, respectively</param>
-        public async UniTask AsyncAddString(string addedString, int startIdx, bool startUp = false)
+        public async UniTask AddStringAsync(string addedString, int startIdx, bool startUp = false)
         {
             await UniTask.SwitchToThreadPool();
             List<CharObj> charObjs = new(addedString.Length);

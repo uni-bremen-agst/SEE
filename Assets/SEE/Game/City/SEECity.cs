@@ -249,7 +249,7 @@ namespace SEE.Game.City
         /// </summary>
         private void LoadMetrics()
         {
-            LoadGraphMetrics(LoadedGraph, CSVPath.Path, ErosionSettings).Forget();
+            LoadGraphMetricsAsync(LoadedGraph, CSVPath.Path, ErosionSettings).Forget();
         }
 
         /// <summary>
@@ -268,9 +268,9 @@ namespace SEE.Game.City
         /// <remarks>
         /// Note that the import of metrics from the dashboard will happen asynchronously due to
         /// involving a network call. If you simply want to call it synchronously without querying the dashboard,
-        /// set <paramref name="erosionSettings"/> to an appropriate value and use <c>LoadGraphMetrics.Forget()</c>.
+        /// set <paramref name="erosionSettings"/> to an appropriate value and use <c>LoadGraphMetricsAsync.Forget()</c>.
         /// </remarks>
-        protected static async UniTask LoadGraphMetrics(Graph graph, string csvPath, ErosionAttributes erosionSettings)
+        protected static async UniTask LoadGraphMetricsAsync(Graph graph, string csvPath, ErosionAttributes erosionSettings)
         {
             Performance p = Performance.Begin($"loading metric data data from CSV file {csvPath}");
             int numberOfErrors = MetricImporter.LoadCsv(graph, csvPath);
@@ -286,7 +286,7 @@ namespace SEE.Game.City
             {
                 string startVersion = string.IsNullOrEmpty(erosionSettings.IssuesAddedFromVersion) ? "EMPTY" : erosionSettings.IssuesAddedFromVersion;
                 Debug.Log($"Loading metrics and added issues from the Axivion Dashboard for start version {startVersion}.\n");
-                await MetricImporter.LoadDashboard(graph, erosionSettings.OverrideMetrics,
+                await MetricImporter.LoadDashboardAsync(graph, erosionSettings.OverrideMetrics,
                                                    erosionSettings.IssuesAddedFromVersion);
             }
         }

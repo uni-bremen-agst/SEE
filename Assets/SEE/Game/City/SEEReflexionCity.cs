@@ -122,12 +122,12 @@ namespace SEE.Game.City
                 IList<UniTask> tasks = new List<UniTask>();
                 if (!string.IsNullOrEmpty(CsvArchitecturePath.Path))
                 {
-                    tasks.Add(LoadGraphMetrics(architectureGraph, CsvArchitecturePath.Path, ErosionSettings));
+                    tasks.Add(LoadGraphMetricsAsync(architectureGraph, CsvArchitecturePath.Path, ErosionSettings));
                 }
 
                 if (!string.IsNullOrEmpty(CsvArchitecturePath.Path))
                 {
-                    tasks.Add(LoadGraphMetrics(architectureGraph, CsvArchitecturePath.Path, ErosionSettings));
+                    tasks.Add(LoadGraphMetricsAsync(architectureGraph, CsvArchitecturePath.Path, ErosionSettings));
                 }
 
                 if (tasks.Count > 0)

@@ -130,14 +130,14 @@ namespace SEE.Utils.IdeRPC
                     if (RpcConnections.Count < maxClients)
                     {
                         byte[] message = Encoding.ASCII.GetBytes("START\n");
-                        tcpClient.GetStream().Write(message, 0, message.Length);
+                        await tcpClient.GetStream().WriteAsync(message, 0, message.Length);
                         await tcpClient.GetStream().FlushAsync(token);
                         RunConnection(new Client(tcpClient));
                     }
                     else
                     {
                         byte[] message = Encoding.ASCII.GetBytes("MAX_CLIENT_REACHED\n");
-                        tcpClient.GetStream().Write(message, 0, message.Length);
+                        await tcpClient.GetStream().WriteAsync(message, 0, message.Length);
                         await tcpClient.GetStream().FlushAsync(token);
                     }
                 }

@@ -179,7 +179,7 @@ namespace SEE.IDE
                     }
                     else
                     {
-                        ideIntegration.ideCalls.Decline(connection).Forget();
+                        ideIntegration.ideCalls.DeclineAsync(connection).Forget();
                     }
                 }
             }

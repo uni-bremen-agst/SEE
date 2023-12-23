@@ -102,9 +102,9 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.TargetLinkName = targetLinkName;
         }
 
-        public override async UniTask<string> ToDisplayString()
+        public override async UniTask<string> ToDisplayStringAsync()
         {
-            string explanation = await DashboardRetriever.Instance.GetIssueDescription($"CY{ID}");
+            string explanation = await DashboardRetriever.Instance.GetIssueDescriptionAsync($"CY{ID}");
             return "<style=\"H2\">Cyclic dependency</style>"
                    + $"\nSource: {SourcePath} ({SourceEntityType}), Line {SourceLine}\n".WrapLines(WrapAt)
                    + $"\nTarget: {TargetPath} ({TargetEntityType}), Line {TargetLine}\n".WrapLines(WrapAt)

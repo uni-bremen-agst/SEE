@@ -142,9 +142,9 @@ namespace SEE.Utils
         /// <param name="startIdx">The start position in the code window.</param>
         /// <param name="file">The name of the file in which the string should be added.</param>
         /// <param name="startUp">If true, no undo/redo is activated for the added characters.</param>
-        public static async UniTask AsyncAddString(string s, int startIdx, string file, bool startUp = false)
+        public static async UniTask AddStringAsync(string s, int startIdx, string file, bool startUp = false)
         {
-            await GetInstanceByName(file).AsyncAddString(s, startIdx, startUp);
+            await GetInstanceByName(file).AddStringAsync(s, startIdx, startUp);
         }
 
         /// <summary>

@@ -27,7 +27,7 @@ namespace SEE.Utils
         /// cannot be accessed. This method allows you to side-step this limitation by switching to the main thread
         /// to execute the given action.
         /// </remarks>
-        public static async UniTask<T> RunOnMainThread<T>(Func<T> action)
+        public static async UniTask<T> RunOnMainThreadAsync<T>(Func<T> action)
         {
             bool notOnMainThread = Thread.CurrentThread.ManagedThreadId != 1;
             if (notOnMainThread)
@@ -36,7 +36,7 @@ namespace SEE.Utils
             }
             else
             {
-                Debug.LogWarning("RunOnMainThread called from main thread. This is not necessary.\n");
+                Debug.LogWarning("RunOnMainThreadAsync called from main thread. This is not necessary.\n");
             }
             T result = action();
             if (notOnMainThread)
