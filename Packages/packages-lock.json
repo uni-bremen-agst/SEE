@@ -28,6 +28,13 @@
       "dependencies": {},
       "hash": "72e620d169841f32bc6110ad0e12ee9eae6f1aaf"
     },
+    "com.github-glitchenzo.nugetforunity": {
+      "version": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "17c6330d51a140eac037b9ea6f5d157a846535af"
+    },
     "com.openai.unity": {
       "version": "7.0.3",
       "depth": 0,
