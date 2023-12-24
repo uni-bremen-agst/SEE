@@ -147,7 +147,7 @@ jobs:
             Library-SEE
       - name: Restore NuGet packages
         run: /home/see/.dotnet/tools/nugetforunity restore .
-      - uses: game-ci/unity-test-runner@v4
+      - uses: falko17/unity-test-runner@255-set-fullprojectpath
         timeout-minutes: 45
         name: Run Tests
         id: tests
@@ -159,7 +159,7 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           checkName: Test Results
           testMode: EditMode  # PlayMode tests get stuck in batchmode
-          runAsHostUser: false
+          runAsHostUser: true
           customParameters: -testCategory "!NonDeterministic"
           coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;assemblyFilters:+SEE'
       - uses: actions/upload-artifact@v3
@@ -234,7 +234,7 @@ jobs:
           targetPlatform: ${{ matrix.targetPlatform }}
           buildName: ${{ matrix.targetPlatform }}
           buildMethod: CITools.BuildScript.Build
-          runAsHostUser: false
+          runAsHostUser: true
           allowDirtyBuild: true
       - name: Compress build
         # Compress only if manually triggered or merged into master, otherwise we won't upload.
