@@ -146,7 +146,7 @@ jobs:
             Library-SEE-Tests
             Library-SEE
       - name: Restore NuGet packages
-        run: nugetforunity restore .
+        run: /home/see/.dotnet/tools/nugetforunity restore .
       - uses: game-ci/unity-test-runner@v4
         timeout-minutes: 45
         name: Run Tests
@@ -221,7 +221,7 @@ jobs:
           git clean -fd -e 'build-*.zip'
           rm -rf build "build-${{ matrix.targetPlatform }}.zip" || true
       - name: Restore NuGet packages
-        run: nugetforunity restore .
+        run: /home/see/.dotnet/tools/nugetforunity restore .
       - uses: game-ci/unity-builder@v4
         timeout-minutes: 45
         name: Build project
