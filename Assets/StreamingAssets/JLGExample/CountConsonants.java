@@ -1,3 +1,5 @@
+
+
 public class CountConsonants {
 
     private char[] consonants = {'q','w','r','t','z','p','s','d','f','g','h','j','k','l','y','x','c','v','b','n','m'};
