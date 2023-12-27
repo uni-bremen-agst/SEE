@@ -150,7 +150,6 @@ namespace SEE.Game.Drawable
         /// <param name="oldPos">The old position of the object.</param>
         public static void SetRotateY(GameObject obj, float localEulerAngleY, Vector3 oldPos)
         {
-            Debug.Log("Obj name: " + obj.name);
             Transform transform = obj.transform;
             /// Sets the y euler angle.
             transform.localEulerAngles = new Vector3(transform.localEulerAngles.x,
