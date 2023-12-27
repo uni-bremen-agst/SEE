@@ -201,7 +201,7 @@ namespace SEE.Controls.Actions
                     parent: Drawable);
 
             ColorPicker =
-                new("Color picker", "Picks a color",
+                new("Color Picker", "Picks a color",
                     Color.yellow.Darker(), "Materials/Drawable/Eyedropper",
                     ColorPickerAction.CreateReversibleAction,
                     parent: Drawable);
@@ -236,13 +236,13 @@ namespace SEE.Controls.Actions
                     parent: Drawable);
 
             MovePoint =
-                new("Moves a point", "Moves a point of a line.",
+                new("Moves a Point", "Moves a point of a line.",
                     Color.green.Darker().Darker(), "Materials/Charts/MoveIcon",
                     MovePointAction.CreateReversibleAction,
                     parent: Drawable);
 
             LineSplit =
-                new("Line split", "Splittes a line on a given point.",
+                new("Line Split", "Splittes a line on a given point.",
                     Color.green.Darker().Darker(), "Materials/Drawable/LineSplit",
                     LineSplitAction.CreateReversibleAction,
                     parent: Drawable);
@@ -260,13 +260,13 @@ namespace SEE.Controls.Actions
                     parent: Drawable);
 
             LinePointErase =
-                new("Line point erase", "Erase a point from a line on a drawable",
+                new("Line Point Erase", "Erase a point from a line on a drawable",
                     Color.red, "Materials/Drawable/LineErase",
                     LinePointEraseAction.CreateReversibleAction,
                     parent: Drawable);
 
             LineConnectionErase =
-                new("Line connection erase", "Erase a line connection from a line of the chosen point.",
+                new("Line Connection Erase", "Erase a line connection from a line of the chosen point.",
                     Color.red, "Materials/Drawable/LineConnectionErase",
                     LineConnectionEraseAction.CreateReversibleAction,
                     parent: Drawable);

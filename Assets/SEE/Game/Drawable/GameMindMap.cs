@@ -614,7 +614,8 @@ namespace SEE.Game.Drawable
                 Drawing(nodeBorder, positions);
 
                 /// Restores the old border appearance, if the new node kind is not a Leaf.
-                if (newNodeKind != NodeKind.Leaf && borderConf != null)
+                if (newNodeKind != NodeKind.Leaf && borderConf != null
+                    && borderConf.primaryColor != Color.clear)
                 {
                     GameEdit.ChangeLine(nodeBorder, borderConf);
                 }

@@ -346,7 +346,7 @@ namespace SEE.Controls.Actions.Drawable
                 }
                 else
                 {
-                    ShowNotification.Warn("Wrong selection.", "You need to select a theme or another subtheme node.");
+                    ShowNotification.Warn("Wrong selection.", "You need to select a theme or a subtheme node.");
                 }
             }
         }

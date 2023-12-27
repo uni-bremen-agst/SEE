@@ -260,7 +260,7 @@ namespace SEE.Controls.Actions.Drawable
             }
             else if (stickyNote != null && StickyNoteRotationMenu.IsYActive())
             {
-                RotateByWheel(stickyNote, true);
+                RotateByWheel(stickyNote, spawnMode);
             }
         }
 
@@ -705,13 +705,14 @@ namespace SEE.Controls.Actions.Drawable
 
             if (rotate)
             {
-                float newDegree = stickyNote.transform.localEulerAngles.y + degree;
-                GameStickyNoteManager.SetRotateY(stickyNote, newDegree, stickyNote.transform.position);
+                stickyNoteHolder = GameFinder.GetHighestParent(stickyNote);
+                float newDegree = stickyNoteHolder.transform.localEulerAngles.y + degree;
+                GameStickyNoteManager.SetRotateY(stickyNoteHolder, newDegree, stickyNoteHolder.transform.position);
                 StickyNoteRotationMenu.AssignValueToYSlider(newDegree);
                 if (!spawnMode)
                 {
                     new StickyNoteRoateYNetAction(drawable.name, drawableParentID, newDegree, 
-                        stickyNote.transform.position).Execute();
+                        stickyNoteHolder.transform.position).Execute();
                 }
             }
         }
