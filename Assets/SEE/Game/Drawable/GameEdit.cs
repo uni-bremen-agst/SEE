@@ -56,6 +56,7 @@ namespace SEE.Game.Drawable
                 switch (obj.GetComponent<LineValueHolder>().GetColorKind())
                 {
                     case GameDrawer.ColorKind.Monochrome:
+                        renderer.startColor = renderer.endColor = Color.white;
                         renderer.material.color = color;
                         break;
                     case GameDrawer.ColorKind.Gradient:
@@ -87,6 +88,9 @@ namespace SEE.Game.Drawable
                         break;
                     case GameDrawer.ColorKind.TwoDashed:
                         renderer.materials[1].color = color;
+                        break;
+                    case GameDrawer.ColorKind.Monochrome:
+                        renderer.startColor = renderer.endColor = Color.white;
                         break;
                 }
             }

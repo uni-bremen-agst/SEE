@@ -334,9 +334,8 @@ namespace SEE.Game.UI.Menu.Drawable
 
         /// <summary>
         /// Init the Handlers for the Drawing.
-        /// It's needed to be outsourced because it will needed in shape menu.
         /// </summary>
-        public static void InitDrawing()
+        private static void InitDrawing()
         {
             /// Initialize the tiling slider and 
             /// save the changes in the global value for the tiling <see cref="ValueHolder.currentTiling"/>.
@@ -671,6 +670,15 @@ namespace SEE.Game.UI.Menu.Drawable
                 ChangeColorKind(selectedLine, lineHolder.colorKind, lineHolder);
                 new ChangeColorKindNetAction(drawable.name, drawableParentName, LineConf.GetLine(selectedLine),
                     lineHolder.colorKind).Execute();
+
+                /// Activates the primary color button, if it changes to <see cref="ColorKind.Monochrome"/>
+                if (lineHolder.colorKind == ColorKind.Monochrome
+                    && !secondaryColorBMB.buttonVar.IsInteractable())
+                {
+                    picker.onValueChanged.RemoveListener(colorAction);
+                    MutuallyExclusiveColorButtons();
+                    SetUpColorPickerForEditing(selectedLine, renderer, lineHolder, drawable, drawableParentName);
+                }
             };
 
             /// Adds the color kind selector action.

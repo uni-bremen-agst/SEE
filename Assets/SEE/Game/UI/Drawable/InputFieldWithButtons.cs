@@ -89,7 +89,7 @@ namespace SEE.Game.UI.Drawable
         private void ValueChanged(string newValue)
         {
             float oldValue = value;
-            newValue = inputField.text;
+            newValue = inputField.text.Replace(".",",");
             /// If the new value can't be parse in a float, then show a notification and
             /// set the default value.
             if (!float.TryParse(newValue, out value))

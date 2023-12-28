@@ -636,6 +636,13 @@ namespace SEE.Game.Drawable
                 /// Restores the primary and secondary color of the line.
                 GameEdit.ChangePrimaryColor(line, conf.primaryColor);
                 GameEdit.ChangeSecondaryColor(line, conf.secondaryColor);
+
+                /// When the secondary color is clear use the primary.
+                /// It prevents it from looking like a part of the line has disappeared.
+                if (conf.secondaryColor == Color.clear)
+                {
+                    GameEdit.ChangeSecondaryColor(line, conf.primaryColor);
+                }
             }
         }
 

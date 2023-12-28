@@ -483,9 +483,20 @@ namespace SEE.Controls.Actions.Drawable
         {
             ImageConf imageConf = ImageConf.GetImageConf(selectedObj);
             imageConf.id = "";
+            bool mirrored = imageConf.eulerAngles.y == 180;
             newObject = GameImage.RePlaceImage(newDrawable, imageConf);
             newObject.transform.position = newPosition 
                 - newObject.transform.forward * ValueHolder.distanceToDrawable.z * imageConf.orderInLayer;
+
+            if (mirrored)
+            {
+                newObject.transform.position = newPosition
+                    + newObject.transform.forward * ValueHolder.distanceToDrawable.z * imageConf.orderInLayer;
+            } else
+            {
+                newObject.transform.position = newPosition
+                    - newObject.transform.forward * ValueHolder.distanceToDrawable.z * imageConf.orderInLayer;
+            }
             new AddImageNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable), 
                 ImageConf.GetImageConf(newObject)).Execute();
         }

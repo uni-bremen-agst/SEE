@@ -229,8 +229,9 @@ namespace SEE.Game.UI.Menu.Drawable
             else
             {
                 shapeMenu.SetActive(false);
-                LineMenu.EnableLineMenu(false, new LineMenu.MenuLayer[] 
-                    { LineMenu.MenuLayer.Layer, LineMenu.MenuLayer.Loop });
+                //LineMenu.EnableLineMenu(false, new LineMenu.MenuLayer[] 
+                //    { LineMenu.MenuLayer.Layer, LineMenu.MenuLayer.Loop });
+                LineMenu.EnableForDrawing();
                 BindLineMenu();
             }
         }
@@ -401,7 +402,9 @@ namespace SEE.Game.UI.Menu.Drawable
         /// </summary>
         private static void InitConfigMenu()
         {
-            LineMenu.InitDrawing();
+            //LineMenu.InitDrawing();
+            LineMenu.EnableForDrawing();
+            LineMenu.instance.SetActive(false);
         }
 
         /// <summary>
