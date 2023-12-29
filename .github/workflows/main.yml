@@ -147,7 +147,7 @@ jobs:
             Library-SEE
       - name: Restore NuGet packages
         run: /home/see/.dotnet/tools/nugetforunity restore .
-      - uses: falko17/unity-test-runner@255-set-fullprojectpath
+      - uses: game-ci/unity-test-runner@v4.1.1
         timeout-minutes: 45
         name: Run Tests
         id: tests

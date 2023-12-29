@@ -376,6 +376,11 @@ namespace SEE.UI.Window.CodeWindow
             }
         }
 
+        /// <summary>
+        /// Loads code issues for the file at the given path, and fills the CodeWindow
+        /// with the collected tokens while marking all detected issues.
+        /// </summary>
+        /// <param name="path">The path to the file whose issues shall be marked.</param>
         private async UniTaskVoid MarkIssuesAsync(string path)
         {
             // First notification should stay as long as issues are still loading.
