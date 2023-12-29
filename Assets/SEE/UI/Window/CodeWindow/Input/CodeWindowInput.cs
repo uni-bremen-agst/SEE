@@ -452,25 +452,5 @@ namespace SEE.UI.Window.CodeWindow
                 => Enumerable.Range(entity.Line, entity.EndLine - entity.Line + 1 ?? 1)
                              .Select(l => new SourceCodeEntity(entity.Path, l, null, entity.Content));
         }
-
-        /// <summary>
-        /// Calculates the position of a letter (index) in the "rich" text (with markup tags). Given the
-        /// position of the letter in the "clean" text (Without markup tags).
-        /// </summary>
-        /// <param name="cleanIndex">The index within the "clean" text.</param>
-        /// <returns>The index within the "rich" text.</returns>
-        /// <example>
-        /// Assume we have the source line <c>&lt;color red&gt;private class&lt;/color&gt; Test {</c>.
-        /// As we can see, rich tags have been inserted so that the "private class" keywords are rendered in red.
-        /// This is a problem when we later want to e.g. highlight "class Test". It's no longer possible to simply
-        /// search the text for "class Test" and highlight that part, because it's broken up by <c>&lt;/color&gt;</c>.
-        /// To remedy this, you can call this method with an index in the "clean" version.
-        /// In our example, this would be 9 (before "class") and 19 (after "Test"). This method will then return the
-        /// corresponding index in the text with tags present, which in our example would be 20 and 38.
-        /// </example>
-        private int GetRichIndex(int cleanIndex)
-        {
-            return textMesh.textInfo.characterInfo[cleanIndex].index;
-        }
     }
 }
