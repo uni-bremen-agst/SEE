@@ -158,13 +158,13 @@ namespace SEE.UI
         //        // user select any menu entry while this process is running. We do
         //        // not want the user to start any other network setting until this
         //        // process has come to an end.
-        //        menu.ShowMenu(false);
+        //        menu.ShowMenuAsync(false);
         //        SceneSettings.InputType = inputType;
         //        network.StartServer(NetworkCallBack);
         //    }
         //    catch (Exception exception)
         //    {
-        //        menu.ShowMenu(true);
+        //        menu.ShowMenuAsync(true);
         //        ShowNotification.Error("Server cannot be started", exception.Message);
         //    }
         //}
@@ -192,7 +192,7 @@ namespace SEE.UI
         private void Settings()
         {
             /// Note: We arrive here because the user pressed one of the buttons of the
-            /// menu, which - in turn - will call menu.ShowMenu(false). Thus
+            /// menu, which - in turn - will call menu.ShowMenuAsync(false). Thus
             /// at this time, menu is no longer visible. When the following dialog
             /// is finished, <see cref="Reactivate"/> will be called to turn the menu on again.
             NetworkPropertyDialog dialog = new(network, Reactivate);

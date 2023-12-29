@@ -77,7 +77,7 @@ namespace SEE.UI.PopupMenu
                 // menu entries being rebuilt instead of the mouse moving outside of the menu.
                 if (x.IsPointerMoving())
                 {
-                    HideMenu().Forget();
+                    HideMenuAsync().Forget();
                 }
             });
 
@@ -142,7 +142,7 @@ namespace SEE.UI.PopupMenu
                 action.Action();
                 if (action.CloseAfterClick)
                 {
-                    HideMenu().Forget();
+                    HideMenuAsync().Forget();
                 }
             }
         }
@@ -215,7 +215,7 @@ namespace SEE.UI.PopupMenu
         /// Activates the menu and fades it in.
         /// This asynchronous method will return once the menu is fully shown.
         /// </summary>
-        public async UniTask ShowMenu()
+        public async UniTask ShowMenuAsync()
         {
             shouldShowMenu = true;
             menu.gameObject.SetActive(true);
@@ -234,7 +234,7 @@ namespace SEE.UI.PopupMenu
         /// Hides the menu and fades it out.
         /// This asynchronous method will return once the menu is fully hidden and deactivated.
         /// </summary>
-        public async UniTask HideMenu()
+        public async UniTask HideMenuAsync()
         {
             shouldShowMenu = false;
             // We use a fade effect rather than DOScale because it looks better.
@@ -264,7 +264,7 @@ namespace SEE.UI.PopupMenu
             {
                 MoveTo(position.Value);
             }
-            ShowMenu().Forget();
+            ShowMenuAsync().Forget();
         }
     }
 }

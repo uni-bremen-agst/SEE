@@ -688,7 +688,7 @@ namespace SEE.UI.Window.TreeWindow
             ClearTree();
             if (searchTerm == null || searchTerm.Trim().Length == 0)
             {
-                AddRoots().Forget();
+                AddRootsAsync().Forget();
                 return;
             }
 
@@ -697,7 +697,7 @@ namespace SEE.UI.Window.TreeWindow
                 GameObject nodeGameObject = GraphElementIDMap.Find(node.ID, mustFindElement: true);
                 AddItem(CleanupID(node.ID),
                         false, node.ToShortString(), Icons.Node, nodeGameObject, node,
-                        expandItem: (_, _) => RevealElement(node).Forget());
+                        expandItem: (_, _) => RevealElementAsync(node).Forget());
             }
 
             items.position = items.position.WithXYZ(y: 0);
@@ -711,7 +711,7 @@ namespace SEE.UI.Window.TreeWindow
         /// </summary>
         /// <param name="element">The element to be made visible.</param>
         /// <param name="viaSource">Whether to make the source or target node of the edge visible.</param>
-        public async UniTaskVoid RevealElement(GraphElement element, bool viaSource = false)
+        public async UniTaskVoid RevealElementAsync(GraphElement element, bool viaSource = false)
         {
             TreeWindowGroup group = grouper?.GetGroupFor(element);
             if (searchField == null)
@@ -762,7 +762,7 @@ namespace SEE.UI.Window.TreeWindow
             }
 
             // We need to wait until the transform actually exists, hence the await.
-            await AddRoots();
+            await AddRootsAsync();
 
             RectTransform item = (RectTransform)items.Find(transformID);
             scrollRect.ScrollTo(item, duration: 1f);
@@ -819,7 +819,7 @@ namespace SEE.UI.Window.TreeWindow
         {
             ClearTree();
             grouper?.RebuildCounts();
-            AddRoots().Forget();
+            AddRootsAsync().Forget();
         }
     }
 }

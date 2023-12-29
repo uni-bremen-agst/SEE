@@ -1137,7 +1137,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     filePicker.CloseDropdown();
                 }
             };
-            filePicker.OnMenuInitialized +=
+            filePicker.OnComponentInitialized +=
                 () => AddLayoutElement(parent.transform.Find(settingName).gameObject);
 
             // listener when the dropdown or path is changed

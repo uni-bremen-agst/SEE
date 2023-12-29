@@ -93,7 +93,7 @@ namespace SEE.UI.Window.TreeWindow
         /// Adds the roots of the graph to the tree view.
         /// It may take up to a frame to add and reorder all items, hence this method is asynchronous.
         /// </summary>
-        private async UniTask AddRoots()
+        private async UniTask AddRootsAsync()
         {
             if (grouper.IsActive)
             {

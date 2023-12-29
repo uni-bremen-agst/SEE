@@ -127,7 +127,7 @@ namespace SEE.UI.Window.CodeWindow
                     DOTween.Sequence().Append(DOTween.To(() => ImmediateVisibleLine, f => ImmediateVisibleLine = f, value - 1, 1f))
                            .AppendCallback(() => scrollingTo = 0);
 
-                    // FIXME: TMP bug: Large files cause issues with highlighting text. This is just a workaround.
+                    // FIXME (#250): TMP bug: Large files cause issues with highlighting text. This is just a workaround.
                     // See https://github.com/uni-bremen-agst/SEE/issues/250#issuecomment-819653373
                     if (text.Length < 16382)
                     {

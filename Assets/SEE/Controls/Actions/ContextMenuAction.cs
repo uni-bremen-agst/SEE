@@ -180,7 +180,7 @@ namespace SEE.Controls.Actions
 
             void RevealInTreeView()
             {
-                ActivateTreeWindow(node, gameObject.transform).RevealElement(node).Forget();
+                ActivateTreeWindow(node, gameObject.transform).RevealElementAsync(node).Forget();
             }
         }
 
@@ -212,12 +212,12 @@ namespace SEE.Controls.Actions
 
             void RevealAtSource()
             {
-                ActivateTreeWindow(edge, gameObject.transform).RevealElement(edge, viaSource: true).Forget();
+                ActivateTreeWindow(edge, gameObject.transform).RevealElementAsync(edge, viaSource: true).Forget();
             }
 
             void RevealAtTarget()
             {
-                ActivateTreeWindow(edge, gameObject.transform).RevealElement(edge, viaSource: false).Forget();
+                ActivateTreeWindow(edge, gameObject.transform).RevealElementAsync(edge, viaSource: false).Forget();
             }
 
             void ShowUnifiedDiff()

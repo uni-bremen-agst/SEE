@@ -145,16 +145,21 @@ jobs:
           restore-keys: |
             Library-SEE-Tests
             Library-SEE
-      - uses: game-ci/unity-test-runner@c80d9094f5f5f471d0ae6f44a8c8868a448bfb7e
+      - name: Restore NuGet packages
+        run: /home/see/.dotnet/tools/nugetforunity restore .
+      - uses: game-ci/unity-test-runner@v4.1.1
         timeout-minutes: 45
         name: Run Tests
         id: tests
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           checkName: Test Results
           testMode: EditMode  # PlayMode tests get stuck in batchmode
+          runAsHostUser: true
           customParameters: -testCategory "!NonDeterministic"
           coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;assemblyFilters:+SEE'
       - uses: actions/upload-artifact@v3
@@ -215,16 +220,21 @@ jobs:
           # Try deleting any previous build, but not other zip files that we may need later.
           git clean -fd -e 'build-*.zip'
           rm -rf build "build-${{ matrix.targetPlatform }}.zip" || true
-      - uses: game-ci/unity-builder@7afabe74da5227a9ecd537f5260b398258c3eb3b
+      - name: Restore NuGet packages
+        run: /home/see/.dotnet/tools/nugetforunity restore .
+      - uses: game-ci/unity-builder@v4
         timeout-minutes: 45
         name: Build project
         id: build
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: ${{ matrix.targetPlatform }}
           buildName: ${{ matrix.targetPlatform }}
           buildMethod: CITools.BuildScript.Build
+          runAsHostUser: true
           allowDirtyBuild: true
       - name: Compress build
         # Compress only if manually triggered or merged into master, otherwise we won't upload.
