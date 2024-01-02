@@ -138,7 +138,6 @@ namespace SEE.UI
             processCountText.text = loadingProcesses.Count <= 1 ? "" : $"{loadingProcesses.Count}";
         }
 
-
         /// <summary>
         /// Destroys <see cref="loadingSpinner"/>. Field <see cref="loadingSpinner"/>
         /// will be <c>null</c> afterwards.
