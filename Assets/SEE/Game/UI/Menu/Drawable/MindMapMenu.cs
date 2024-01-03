@@ -98,7 +98,6 @@ namespace SEE.Game.UI.Menu.Drawable
             {
                 operation = chosenOperation;
                 gotOperation = false;
-                Disable();
                 return true;
             }
 

@@ -140,9 +140,35 @@ namespace SEE.Controls.Actions.Drawable
                     ShapeMenu.GetLoopManager().UpdateUI();
                 }
 
-                /// Block for successfully completing the line. It requires a left-click with the left Ctrl key held down.
+                /// Block for successfully completing the line.
+                /// It adds a final point to the line.
+                /// It requires a left-click with the left Ctrl key held down.
                 if (Input.GetMouseButtonUp(0) && Input.GetKey(KeyCode.LeftControl)
                     && drawing && positions.Length > 1 
+                    && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
+                    && Raycasting.RaycastAnything(out RaycastHit hit)
+                    && (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
+                        GameFinder.hasDrawable(hit.collider.gameObject)))
+                {
+                    Vector3 newPosition = shape.transform.InverseTransformPoint(hit.point) - ValueHolder.distanceToDrawable;
+                    if (newPosition != positions.Last())
+                    {
+                        Vector3[] newPositions = new Vector3[positions.Length + 1];
+                        Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
+                        newPositions[newPositions.Length - 1] = newPosition;
+                        positions = newPositions;
+
+                        GameDrawer.Drawing(shape, positions);
+                        new DrawFreehandNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), LineConf.GetLine(shape)).Execute();
+                    }
+                    FinishDrawing();
+                    return true;
+                }
+
+                /// Block for successfully completing the line without adding a new point. 
+                /// It requires a wheel-click.
+                if (Input.GetMouseButtonUp(2)
+                    && drawing && positions.Length > 1
                     && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line)
                 {
                     FinishDrawing();

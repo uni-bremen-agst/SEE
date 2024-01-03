@@ -260,20 +260,40 @@ namespace SEE.Game.UI.Menu.Drawable
         private static void InitBtn()
         {
             /// Initialize the objects for the font style buttons
-            boldBtn = GameFinder.FindChild(instance, "Bold").GetComponent<Button>();
-            boldBMB = GameFinder.FindChild(instance, "Bold").GetComponent<ButtonManagerBasic>();
-            italicBtn = GameFinder.FindChild(instance, "Italic").GetComponent<Button>();
-            italicBMB = GameFinder.FindChild(instance, "Italic").GetComponent<ButtonManagerBasic>();
-            underlineBtn = GameFinder.FindChild(instance, "Underline").GetComponent<Button>();
-            underlineBMB = GameFinder.FindChild(instance, "Underline").GetComponent<ButtonManagerBasic>();
-            strikethroughBtn = GameFinder.FindChild(instance, "Strikethrough").GetComponent<Button>();
-            strikethroughBMB = GameFinder.FindChild(instance, "Strikethrough").GetComponent<ButtonManagerBasic>();
-            lowerCaseBtn = GameFinder.FindChild(instance, "LowerCase").GetComponent<Button>();
-            lowerCaseBMB = GameFinder.FindChild(instance, "LowerCase").GetComponent<ButtonManagerBasic>();
-            upperCaseBtn = GameFinder.FindChild(instance, "UpperCase").GetComponent<Button>();
-            upperCaseBMB = GameFinder.FindChild(instance, "UpperCase").GetComponent<ButtonManagerBasic>();
-            smallCapsBtn = GameFinder.FindChild(instance, "SmallCaps").GetComponent<Button>();
-            smallCapsBMB = GameFinder.FindChild(instance, "SmallCaps").GetComponent<ButtonManagerBasic>();
+            GameObject bold = GameFinder.FindChild(instance, "Bold");
+            boldBtn = bold.GetComponent<Button>();
+            boldBMB = bold.GetComponent<ButtonManagerBasic>();
+            bold.AddComponent<ButtonHoverTooltip>().SetMessage("Bold");
+
+            GameObject italic = GameFinder.FindChild(instance, "Italic");
+            italicBtn = italic.GetComponent<Button>();
+            italicBMB = italic.GetComponent<ButtonManagerBasic>();
+            italic.AddComponent<ButtonHoverTooltip>().SetMessage("Italic");
+
+            GameObject underline = GameFinder.FindChild(instance, "Underline");
+            underlineBtn = underline.GetComponent<Button>();
+            underlineBMB = underline.GetComponent<ButtonManagerBasic>();
+            underline.AddComponent<ButtonHoverTooltip>().SetMessage("Underline");
+
+            GameObject strikethrough = GameFinder.FindChild(instance, "Strikethrough");
+            strikethroughBtn = strikethrough.GetComponent<Button>();
+            strikethroughBMB = strikethrough.GetComponent<ButtonManagerBasic>();
+            strikethrough.AddComponent<ButtonHoverTooltip>().SetMessage("Strikethrough");
+
+            GameObject lowerCase = GameFinder.FindChild(instance, "LowerCase");
+            lowerCaseBtn = lowerCase.GetComponent<Button>();
+            lowerCaseBMB = lowerCase.GetComponent<ButtonManagerBasic>();
+            lowerCase.AddComponent<ButtonHoverTooltip>().SetMessage("Lower Case");
+
+            GameObject upperCase = GameFinder.FindChild(instance, "UpperCase");
+            upperCaseBtn = upperCase.GetComponent<Button>();
+            upperCaseBMB = upperCase.GetComponent<ButtonManagerBasic>();
+            upperCase.AddComponent<ButtonHoverTooltip>().SetMessage("Upper Case");
+
+            GameObject smallCaps = GameFinder.FindChild(instance, "SmallCaps");
+            smallCapsBtn = smallCaps.GetComponent<Button>();
+            smallCapsBMB = smallCaps.GetComponent<ButtonManagerBasic>();
+            smallCaps.AddComponent<ButtonHoverTooltip>().SetMessage("Small Caps");
 
             /// Initialize the handler for the buttons
             InitFontStyleButtons();
@@ -315,6 +335,8 @@ namespace SEE.Game.UI.Menu.Drawable
         private static void InitFontStyleButtons()
         {
             boldBMB.clickEvent.AddListener(() => Press(Bold));
+            //boldBMB.hoverEvent.AddListener(() =>  boldBMB.transform.parent.gameObject
+            //    .AddOrGetComponent<Tooltip.Tooltip>().Show("TEST"));
             italicBMB.clickEvent.AddListener(() => Press(Italic));
             underlineBMB.clickEvent.AddListener(() => Press(Underline));
             strikethroughBMB.clickEvent.AddListener(() => Press(Strikethrough));

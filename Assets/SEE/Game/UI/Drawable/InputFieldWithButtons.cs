@@ -69,14 +69,23 @@ namespace SEE.Game.UI.Drawable
         private void Awake()
         {
             inputField = GetComponentInChildren<TMP_InputField>();
-            upBtn = transform.Find("UpDown").Find("UpBtn").GetComponent<ButtonManagerBasic>();
-            downBtn = transform.Find("UpDown").Find("DownBtn").GetComponent<ButtonManagerBasic>();
+            GameObject up = transform.Find("UpDown").Find("UpBtn").gameObject;
+            upBtn = up.GetComponent<ButtonManagerBasic>();
+
+            GameObject down = transform.Find("UpDown").Find("DownBtn").gameObject;
+            downBtn = down.GetComponent<ButtonManagerBasic>();
+            /// Adds the handler for the normal left click.
             upBtn.clickEvent.AddListener(ClickUp);
-            /// Adds the component for the option that the button can be holded.
-            transform.Find("UpDown").Find("UpBtn").gameObject.AddComponent<ButtonHolded>().SetAction(ClickUp);
+            /// Adds the component for the option that the button can be holded (right click).
+            up.AddComponent<ButtonHolded>().SetAction(ClickUp);
+            /// Adds the handler for the normal left click.
             downBtn.clickEvent.AddListener(ClickDown);
-            /// Adds the component for the option that the button can be holded.
-            transform.Find("UpDown").Find("DownBtn").gameObject.AddComponent<ButtonHolded>().SetAction(ClickDown);
+            /// Adds the component for the option that the button can be holded (right click).
+            down.AddComponent<ButtonHolded>().SetAction(ClickDown);
+            /// Adds a hover tool tip to the buttons.
+            up.AddComponent<ButtonHoverTooltip>().SetMessage("Left mouse button for a single click, right mouse button can be held down (performs multiple steps).");
+            down.AddComponent<ButtonHoverTooltip>().SetMessage("Left mouse button for a single click, right mouse button can be held down (performs multiple steps).");
+
             inputField.onEndEdit.AddListener(ValueChanged);
         }
 

@@ -243,6 +243,7 @@ namespace SEE.Controls.Actions.Drawable
                 && (GameFinder.hasDrawable(raycastHit.collider.gameObject)
                     || raycastHit.collider.gameObject.CompareTag(Tags.Drawable)))
             {
+                MindMapMenu.Disable();
                 drawable = GameFinder.GetDrawable(raycastHit.collider.gameObject);
                 bool validState = CheckValid(GameFinder.GetAttachedObjectsObject(drawable));
                 if (validState)

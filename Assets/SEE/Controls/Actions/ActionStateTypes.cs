@@ -189,7 +189,7 @@ namespace SEE.Controls.Actions
                     parent: Drawable);
 
             AddImage =
-                new("Adds an Image", "Adds an image to a drawable",
+                new("Add an Image", "Adds an image to a drawable",
                     Color.magenta.Darker(), "Materials/Drawable/Image",
                     AddImageAction.CreateReversibleAction,
                     parent: Drawable);
@@ -225,7 +225,7 @@ namespace SEE.Controls.Actions
                     parent: Drawable);
 
             LayerChanger =
-                new("Change the sorting layer", "Left mouse click to increase, right mouse click to decrease",
+                new("Change The Sorting Layer", "Left mouse click to increase, right mouse click to decrease",
                     Color.green.Darker(), "Materials/Drawable/Layer",
                     LayerChangerAction.CreateReversibleAction,
                     parent: Drawable);
@@ -236,7 +236,7 @@ namespace SEE.Controls.Actions
                     parent: Drawable);
 
             MovePoint =
-                new("Moves a Point", "Moves a point of a line.",
+                new("Move a Point", "Moves a point of a line.",
                     Color.green.Darker().Darker(), "Materials/Charts/MoveIcon",
                     MovePointAction.CreateReversibleAction,
                     parent: Drawable);

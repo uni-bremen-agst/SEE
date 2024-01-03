@@ -68,6 +68,13 @@ namespace SEE.Game.UI.Menu.Drawable
                     gotSource = true;
                     chosenSource = Source.Web;
                 });
+
+                ButtonManagerBasic cancelBtn = GameFinder.FindChild(instance, "Cancel")
+                    .GetComponent<ButtonManagerBasic>();
+                cancelBtn.clickEvent.AddListener(() =>
+                {
+                    Disable();
+                });
             }
         }
 

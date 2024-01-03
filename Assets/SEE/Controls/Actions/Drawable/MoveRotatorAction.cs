@@ -205,6 +205,10 @@ namespace SEE.Controls.Actions.Drawable
             }
             RotationMenu.Disable();
             MoveMenu.Disable();
+            if (switchMenu != null)
+            {
+                Destroyer.Destroy(switchMenu);
+            }
         }
 
         /// <summary>
