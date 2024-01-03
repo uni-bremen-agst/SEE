@@ -24,11 +24,11 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The popup menu that is shown when the user requests the context menu.
         /// </summary>
-        private PopupMenu PopupMenu;
+        private PopupMenu popupMenu;
 
         private void Start()
         {
-            PopupMenu = gameObject.AddComponent<PopupMenu>();
+            popupMenu = gameObject.AddComponent<PopupMenu>();
         }
 
         private void Update()
@@ -43,13 +43,7 @@ namespace SEE.Controls.Actions
                 }
 
                 IEnumerable<PopupMenuAction> actions = GetApplicableOptions(o.GraphElemRef.Elem, o.gameObject);
-
-                PopupMenu.ClearActions();
-                PopupMenu.AddActions(actions);
-
-                // We want to move the popup menu to the cursor position before showing it.
-                PopupMenu.MoveTo(Input.mousePosition);
-                PopupMenu.ShowMenu().Forget();
+                popupMenu.ShowWith(actions, Input.mousePosition);
             }
         }
 
@@ -82,19 +76,19 @@ namespace SEE.Controls.Actions
             IList<PopupMenuAction> actions = new List<PopupMenuAction>
             {
                 // TODO (#665): Ask for confirmation or allow undo.
-                new("Delete", DeleteElement, '\uF1F8'),
+                new("Delete", DeleteElement, Icons.Trash),
                 // TODO (#666): Better properties view
-                new("Properties", ShowProperties, '\uF05A'),
+                new("Properties", ShowProperties, Icons.Info),
             };
 
             if (gameObject != null)
             {
-                actions.Add(new("Highlight", Highlight, '\uF0EB'));
+                actions.Add(new("Highlight", Highlight, Icons.LightBulb));
             }
 
             if (graphElement.Filename() != null)
             {
-                actions.Add(new("Show Code", ShowCode, '\uF121'));
+                actions.Add(new("Show Code", ShowCode, Icons.Code));
             }
 
             return actions;
@@ -202,7 +196,7 @@ namespace SEE.Controls.Actions
         {
             IList<PopupMenuAction> actions = new List<PopupMenuAction>
             {
-                new("Show in TreeView", RevealInTreeView, '\uF802'),
+                new("Show in TreeView", RevealInTreeView, Icons.TreeView),
             };
 
             GameObject city = SceneQueries.GetCodeCity(gameObject.transform).gameObject;
@@ -238,18 +232,18 @@ namespace SEE.Controls.Actions
         {
             IList<PopupMenuAction> actions = new List<PopupMenuAction>
             {
-                new("Show at Source (TreeView)", RevealAtSource, '\uF802'),
-                new("Show at Target (TreeView)", RevealAtTarget, '\uF802'),
+                new("Show at Source (TreeView)", RevealAtSource, Icons.TreeView),
+                new("Show at Target (TreeView)", RevealAtTarget, Icons.TreeView),
             };
 
             if (edge.Type == "Clone")
             {
-                actions.Add(new("Show Unified Diff", ShowUnifiedDiff, '\uE13A'));
+                actions.Add(new("Show Unified Diff", ShowUnifiedDiff, Icons.Compare));
             }
 
             if (edge.IsInImplementation() && ReflexionGraph.IsDivergent(edge))
             {
-                actions.Add(new("Accept Divergence", AcceptDivergence, '\uF00C'));
+                actions.Add(new("Accept Divergence", AcceptDivergence, Icons.Checkmark));
             }
 
             return actions;

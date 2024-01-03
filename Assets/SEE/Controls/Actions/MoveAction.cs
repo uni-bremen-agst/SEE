@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using SEE.Audio;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.Game.Operator;
 using SEE.Game.SceneManipulation;
 using SEE.UI.Notification;
 using SEE.GO;
@@ -169,7 +168,7 @@ namespace SEE.Controls.Actions
             /// The position of the grabbed object in world space.
             /// </summary>
             /// <exception cref="InvalidOperationException">in case no object is currently grabbed</exception>
-            internal Vector3 Position
+            internal readonly Vector3 Position
             {
                 get
                 {
@@ -206,7 +205,7 @@ namespace SEE.Controls.Actions
             /// Returns the grabbed object to its original position when it was grabbed.
             /// This method will be called for Undo.
             /// </summary>
-            private void MoveToOrigin()
+            private readonly void MoveToOrigin()
             {
                 if (GrabbedGameObject)
                 {
@@ -219,7 +218,7 @@ namespace SEE.Controls.Actions
             /// to its origin via <see cref="MoveToOrigin"/>.
             /// This method will be called for Redo.
             /// </summary>
-            private void MoveToLastUserRequestedPosition()
+            private readonly void MoveToLastUserRequestedPosition()
             {
                 if (GrabbedGameObject)
                 {
@@ -589,16 +588,13 @@ namespace SEE.Controls.Actions
                 if (Raycasting.RaycastLowestNode(out RaycastHit? raycastHit, out Node _, grabbedObject.Node))
                 {
                     // Note: the root node can never be grabbed. See above.
+                    // We need to undo the reparenting of the grabbed node if it is
+                    // currently reparented onto another node.
+                    grabbedObject.UnReparent();
                     if (raycastHit.HasValue)
                     {
                         // The user is currently aiming at a node. The grabbed node is reparented onto this aimed node.
                         grabbedObject.Reparent(raycastHit.Value.transform.gameObject);
-                    }
-                    else
-                    {
-                        // The user is currently not aiming at a node. The reparenting
-                        // of the grabbed must be reverted.
-                        grabbedObject.UnReparent();
                     }
                 }
             }

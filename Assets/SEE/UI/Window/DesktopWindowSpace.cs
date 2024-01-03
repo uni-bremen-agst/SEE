@@ -154,7 +154,11 @@ namespace SEE.UI.Window
             {
                 if (panelTab.Panel == panel)
                 {
-                    CloseWindow(windows.First(x => x.Window.GetInstanceID() == panelTab.Content.gameObject.GetInstanceID()));
+                    BaseWindow window = windows.FirstOrDefault(x => x.Window.GetInstanceID() == panelTab.Content.gameObject.GetInstanceID());
+                    if (window != null)
+                    {
+                        CloseWindow(window);
+                    }
                     if (panelTab.Panel.NumberOfTabs <= 1)
                     {
                         // All tabs were closed, so we send out an event

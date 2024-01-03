@@ -11,6 +11,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Assertions;
 using SEE.Game.CityRendering;
+using SEE.UI;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 
@@ -133,14 +134,17 @@ namespace SEE.Game.City
         {
             base.Start();
 
-            if (!gameObject.IsCodeCityDrawn())
+            using (LoadingSpinner.Show($"Loading city \"{gameObject.name}\""))
             {
-                Debug.LogWarning($"There is no drawn code city for {gameObject.name}.");
-                return;
+                if (!gameObject.IsCodeCityDrawn())
+                {
+                    Debug.LogWarning($"There is no drawn code city for {gameObject.name}.");
+                    return;
+                }
+                LoadData();
+                InitializeAfterDrawn();
+                BoardSettings.LoadBoard();
             }
-            LoadData();
-            InitializeAfterDrawn();
-            BoardSettings.LoadBoard();
         }
 
         /// <summary>
@@ -387,16 +391,19 @@ namespace SEE.Game.City
                 }
                 else
                 {
-                    graphRenderer = new GraphRenderer(this, theVisualizedSubGraph);
-                    // We assume here that this SEECity instance was added to a game object as
-                    // a component. The inherited attribute gameObject identifies this game object.
-                    graphRenderer.DrawGraph(theVisualizedSubGraph, gameObject);
-
-                    // If we're in editmode, InitializeAfterDrawn() will be called by Start() once the
-                    // game starts. Otherwise, in playmode, we have to call it ourselves.
-                    if (Application.isPlaying)
+                    using (LoadingSpinner.Show($"Drawing city \"{gameObject.name}\""))
                     {
-                        InitializeAfterDrawn();
+                        graphRenderer = new GraphRenderer(this, theVisualizedSubGraph);
+                        // We assume here that this SEECity instance was added to a game object as
+                        // a component. The inherited attribute gameObject identifies this game object.
+                        graphRenderer.DrawGraph(theVisualizedSubGraph, gameObject);
+
+                        // If we're in editmode, InitializeAfterDrawn() will be called by Start() once the
+                        // game starts. Otherwise, in playmode, we have to call it ourselves.
+                        if (Application.isPlaying)
+                        {
+                            InitializeAfterDrawn();
+                        }
                     }
                 }
             }

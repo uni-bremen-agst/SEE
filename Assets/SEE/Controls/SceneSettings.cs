@@ -133,9 +133,6 @@ namespace SEE.Controls
         {
             SetDoTweenSettings();
             SetInstance();
-#if UNITY_EDITOR
-            KeyBindings.PrintBindings();
-#endif
         }
 
         /// <summary>

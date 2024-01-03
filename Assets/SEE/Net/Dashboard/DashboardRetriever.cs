@@ -36,18 +36,15 @@ namespace SEE.Net.Dashboard
         [EnvironmentVariable("DASHBOARD_PUBLIC_KEY")]
         [TextArea]
         [Tooltip("The public key for the X.509 certificate authority from the dashboard's certificate.")]
-        public string PublicKey = "3082018A0282018100D5EB3F1B3AB0ABCE827FA70BA32FCF8C834B1206464B785B7AE1"
-                                + "3D962F19887D6733B0A555651F130BCDB04D8BF6F199EF76DB7932C001B6916D0E3F0C"
-                                + "84C9A7DDB7BC62C93590E49C5DD97109B01B2CFAFD183A45DD8E02F86EBAFB4C74DF24"
-                                + "449D582DFC03D8E783DA035BB2985907EC00774D748AFC9A0195E05E2B992A7877F437"
-                                + "DB6088E2490A53D83D8F729482A383142AE5FBAFA4F2C3112E5A5C16D520ADFCF5E0F0"
-                                + "C9FF865126AFC8B97EAEFD77CE31A431F0E66C2200CDF70BC56B478FB7B56858CE605E"
-                                + "3313A876E4B719529DB929D9D7A966B16A9656FF639AE7382B6B7591E19D05A0B35468"
-                                + "03007DCE8354FDFDFC0DAB4E5103C0ED67A6BFD42E810C78A649DD419A0E4C1BB15267"
-                                + "A85DB4336D101F3799B71A654C5A8422875EE4ADCF7FD7D684D5B71AC4C0E392A533DE"
-                                + "143AACC68CCDD77F3FB47AFCF59F058E3873FCF454CED0EF1B5DF8A18A14C4D56A4C81"
-                                + "E6F3D3D8246BDF2E402C78AB50DCA8CC603E2681B9E28A032BFE156DDC04C266986E31"
-                                + "10112A86CC01C5150203010001";
+        public string PublicKey = "3082018A028201810084BA2FF29AB0282BEE362EA659FE9C5A90CC7C6E6AED7743847C2"
+            + "CE12FCAE85963CE613C4DA2B1685EB8B355A95072FF7FBC4D08D5545573A3BB8C21667D7FEE766DA410B22681AC"
+            + "CD028DB46CE5EAE8E9D455B350BA3E6867480F2990799F3D3130F87EAAC7B8AD4226634A28C99922C43C8CC8984"
+            + "EA92FB25FDC7510AEFA7793AF0042DF30498BC1F0507613ABB1A30F3954FF21A6631EB83A40A4DD7B5EB89B5CA1"
+            + "B2982605453A0B1B2A8D4064917E8C6582A6DBE4A032E3EB84B9B2A4500C8ADEA236787CBC709E30D893D08DC8B"
+            + "824D309C0AA4CFE976A4645B8EBDA797E618A5A22A775078C84BC536486D6F45E0659A1FEB03FEEC6944393025E"
+            + "1EFF3948E42ADF05A803770D327F85B900B1D7ADFB9B7BBE4E01E23E7653578B28917D4683DA4EC538758EF6A02"
+            + "532CD74CAA6B644D0FFCE5AA096A6CFE76E5C0BD30DA19DF4187E1E358077CD771B0B470441A934B8F991FE78EA"
+            + "A90B35AD7CF600B573272D9E2888DB0BB34FA374F29FDA92E2D3E2D36A1E1A1E40164648D63F930203010001";
 
         /// <summary>
         /// The URL to the Axivion Dashboard, up to the project name.
@@ -246,6 +243,7 @@ namespace SEE.Net.Dashboard
         private async UniTaskVoid VerifyVersionNumber()
         {
             DashboardVersion version = await GetDashboardVersion();
+            Debug.Log($"Axivion Dashboard version {version}\n");
             switch (version.DifferenceToSupportedVersion)
             {
                 case DashboardVersion.Difference.MajorOlder:
@@ -372,7 +370,13 @@ namespace SEE.Net.Dashboard
                 // https://docs.unity3d.com/ScriptReference/Networking.CertificateHandler.ValidateCertificate.html
                 X509Certificate2 certificate = new(certificateData);
                 string certPublicKey = certificate.GetPublicKeyString();
-                return certPublicKey?.Equals(acceptKey) ?? false;
+
+                bool result = certPublicKey?.Equals(acceptKey) ?? false;
+                if (!result)
+                {
+                    Debug.LogError($"Public keys do not match:\nOurs: {acceptKey}\nServer's: {certPublicKey}\n");
+                }
+                return result;
             }
         }
     }
