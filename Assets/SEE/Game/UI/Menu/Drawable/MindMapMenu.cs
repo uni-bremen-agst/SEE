@@ -1,5 +1,6 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
+using SEE.Game.UI.Notification;
 using SEE.Utils;
 using UnityEngine;
 
@@ -56,6 +57,7 @@ namespace SEE.Game.UI.Menu.Drawable
             {
                 gotOperation = true;
                 chosenOperation = Operation.Theme;
+                ShowNotification.Info("Select position", "Choose a suitable position for the new central theme.", 2);
             });
 
             /// Initialize the button for spawn a subtheme.
@@ -64,6 +66,7 @@ namespace SEE.Game.UI.Menu.Drawable
             {
                 gotOperation = true;
                 chosenOperation = Operation.Subtheme;
+                ShowNotification.Info("Select position", "Choose a suitable position for the new subtheme.", 2);
             });
 
             /// Initialize the button for spawn a leaf.
@@ -72,6 +75,7 @@ namespace SEE.Game.UI.Menu.Drawable
             {
                 gotOperation = true;
                 chosenOperation = Operation.Leaf;
+                ShowNotification.Info("Select position", "Choose a suitable position for the new leaf.", 2);
             });
         }
 

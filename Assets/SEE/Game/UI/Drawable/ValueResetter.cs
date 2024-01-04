@@ -63,6 +63,11 @@ namespace SEE.Game.UI.Drawable
             {
                 ScaleAction.Reset();
             }
+
+            if (allowedState == ActionStateTypes.LayerChanger)
+            {
+                LayerChangerAction.Reset();
+            }
         }
     }
 }

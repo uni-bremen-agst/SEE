@@ -1,5 +1,6 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
+using SEE.Game.UI.Notification;
 using SEE.Utils;
 using UnityEngine;
 using static SEE.Controls.Actions.Drawable.StickyNoteAction;
@@ -48,6 +49,7 @@ namespace SEE.Game.UI.Menu.Drawable
             {
                 gotOperation = true;
                 chosenOperation = Operation.Spawn;
+                ShowNotification.Info("Select position", "Choose a suitable position for the sticky note.", 2);
             });
 
             /// Initialize the button for the move option.
@@ -57,6 +59,7 @@ namespace SEE.Game.UI.Menu.Drawable
             {
                 gotOperation = true;
                 chosenOperation = Operation.Move;
+                ShowNotification.Info("Select for moving", "Choose the sticky note that you want to move.", 2);
             });
 
             /// Initialize the button for the edit option.
@@ -66,6 +69,7 @@ namespace SEE.Game.UI.Menu.Drawable
             {
                 gotOperation = true;
                 chosenOperation = Operation.Edit;
+                ShowNotification.Info("Select for editing", "Choose the sticky note that you want to edit.", 2);
             });
 
             /// Initialize the button for the delete option.
@@ -75,6 +79,7 @@ namespace SEE.Game.UI.Menu.Drawable
             {
                 gotOperation = true;
                 chosenOperation = Operation.Delete;
+                ShowNotification.Info("Select for deleting", "Choose the sticky note that you want to delete.", 2);
             });
 
         }

@@ -1,6 +1,8 @@
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.Game.UI.Drawable;
+using SEE.Game.UI.Notification;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
@@ -22,6 +24,11 @@ namespace SEE.Controls.Actions.Drawable
         /// Bool to identifiy if the action is running.
         /// </summary>
         private bool isInAction = false;
+
+        /// <summary>
+        /// Indicates whether information about the control has already been displayed.
+        /// </summary>
+        public static bool showInfo = false;
 
         /// <summary>
         /// This struct can store all the information needed to revert or repeat a <see cref="LayerChangerAction"/>.
@@ -71,6 +78,30 @@ namespace SEE.Controls.Actions.Drawable
                 this.id = id;
                 this.oldOrder = oldOrder;
                 this.newOrder = newOrder;
+            }
+        }
+
+        /// <summary>
+        /// Is required to display the control information again after a change in action.
+        /// </summary>
+        public static void Reset()
+        {
+            showInfo = false;
+        }
+
+        /// <summary>
+        /// Displays a control hint when invoking this action. 
+        /// A <see cref="ValueResetter"/> is added to the UI canvas so that 
+        /// the information can be shown again after an action change.
+        /// </summary>
+        public override void Awake()
+        {
+            if (!showInfo)
+            {
+                showInfo = true;
+                ShowNotification.Info("Usage note", "Use the left mouse button to increase the layer." +
+                    "\nUse the right mouse button to decrease the layer.");
+                GameObject.Find("UI Canvas").AddComponent<ValueResetter>().SetAllowedState(GetActionStateType());
             }
         }
 

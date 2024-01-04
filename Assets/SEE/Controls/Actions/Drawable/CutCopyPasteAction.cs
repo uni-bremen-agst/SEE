@@ -5,6 +5,7 @@ using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Game.UI.Drawable;
 using SEE.Game.UI.Menu.Drawable;
+using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
@@ -226,11 +227,13 @@ namespace SEE.Controls.Actions.Drawable
             cut.clickEvent.AddListener(() =>
             {
                 state = CutCopy.Cut;
+                ShowNotification.Info("Select position", "Choose a suitable position for pasting the cutted object.", 2);
             });
 
             copy.clickEvent.AddListener(() =>
             {
                 state = CutCopy.Copy;
+                ShowNotification.Info("Select position", "Choose a suitable position for pasting the copied object.", 2);
             });
         }
 
