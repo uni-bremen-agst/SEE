@@ -76,6 +76,16 @@ namespace SEE.Game.City
 
         private Graph diffGraph;
 
+        private List<Node> nodeList;
+
+        private List<Node> nodeList2;
+
+        private bool flag = false;
+
+        private List<Tuple<string, int>> oldNodeAttributes = new List<Tuple<string, int>>();
+
+
+
         /// <summary>
         /// Allows the comparison of two instances of <see cref="Node"/> from different graphs.
         /// </summary>
@@ -137,13 +147,12 @@ namespace SEE.Game.City
         {
             base.Start();
             
-            LoadData();
+            //LoadData();
             //InitializeAfterDrawn();
             //BoardSettings.LoadBoard();
         }
 
 
-        //TODO
         /// <summary>
         /// First, if a graph was already loaded (<see cref="LoadedGraph"/> is not null),
         /// everything will be reset by calling <see cref="Reset"/>.
@@ -177,14 +186,12 @@ namespace SEE.Game.City
                 InspectSchema(loadedGraph);
                 loadedGraph = RelevantGraph(loadedGraph);
 
-                Debug.Log($"Loaded graph with {loadedGraph.NodeCount} nodes and {loadedGraph.EdgeCount} edges.\n");
+                //InspectSchema(nextGraph);
+                //nextGraph = RelevantGraph(nextGraph);
+
+                
 
                 CalculateDiff();
-
-                Debug.Log("Size AddedNodes: " + addedNodes.Count + "\n");
-                Debug.Log("Size RemovedNodes: " + removedNodes.Count + "\n");
-                Debug.Log("Size ChangedNodes: " + changedNodes.Count + "\n");
-                Debug.Log("Size EqualNodes: " + equalNodes.Count + "\n");
 
                 CreateDiffGraph();
                 
@@ -214,23 +221,172 @@ namespace SEE.Game.City
                         out removedEdges,
                         out changedEdges,
                         out equalEdges);
+
+           /* Debug.Log("addedNodes: " + addedNodes.Count);
+            Debug.Log("changedNodes: " + changedNodes.Count);
+            Debug.Log("removedNodes: " + removedNodes.Count);
+            Debug.Log("equalNodes: " + equalNodes.Count);*/
         }
 
+        /// <summary>
+        /// Calculates the graph to be drawn in the code city.
+        /// </summary>
         private void CreateDiffGraph()
         {
             diffGraph = new Graph(loadedGraph);
-            //Draw Nodes
+
+            List<Node> listGraphA = diffGraph.Nodes();
+            List<Node> listGraphB = NextGraph.Nodes();
+            
+
+
+            //Delete Nodes and Edges for Graph B to avoid multiple nodes with the same ID
             addedNodes.ForEach(node =>
             {
+                if (node.ItsGraph != null)
+                {
+                    NextGraph.RemoveNode(node);
+                }
+            });
+
+            addedEdges.ForEach(edge =>
+            {
+                if (edge.ItsGraph != null)
+                {
+                    NextGraph.RemoveEdge(edge);
+                }
+            });
+
+            changedNodes.ForEach(node => {
+                if (node.ItsGraph != null)
+                {
+                    NextGraph.RemoveNode(node);
+                }
+            });
+
+            changedEdges.ForEach(edge => {
+                if (edge.ItsGraph != null)
+                {
+                    NextGraph.RemoveEdge(edge);
+                }
+            });
+
+
+
+
+            //Draw Nodes
+
+            //New Node added with attribute
+            addedNodes.ForEach(node =>
+            {
+                node.SetToggle("addedNode");
                 diffGraph.AddNode(node);
             });
 
-            //Draw Edges
-            addedEdges.ForEach(edge =>
+            //RemovedNodes marked with attribute
+            removedNodes.ForEach(node =>
             {
-                diffGraph.AddEdge(edge);
+                node.SetToggle("deletedNode");
             });
 
+
+            
+            changedNodes.ForEach(node =>
+            {
+                Node toBeComparedNode;
+                ISet<string> metricListNodeA;
+                ISet<string> metricListNodeB = node.AllMetrics();
+
+                //Suche richtige NodeID
+                listGraphA.ForEach(nodeGraphA => {
+                    if (node.ID == nodeGraphA.ID)
+                    {
+                        metricListNodeA = diffGraph.AllMetrics();
+                        //Gehe durch die Metriken
+                        //Wenn B mehrere Metriken hat, dann gehe da durch
+                        if(metricListNodeB.Count > metricListNodeA.Count)
+                        {
+                            metricListNodeB.ForEach(metrics =>
+                            {
+                                int a = node.GetInt(metrics);
+                                //Debug.Log("Metrics: " + metrics + " hat die Nummer: " + a);
+                                oldNodeAttributes.Add(new Tuple<string, int>(metrics, a));
+                                nodeGraphA.SetInt(metrics, a);
+                            });
+                        }
+                        //Sonst gehe durch A
+                        else
+                        {
+                            metricListNodeA.ForEach(metrics =>
+                            {
+                                int a = node.GetInt(metrics);
+                                //Debug.Log("Metrics: " + metrics + " hat die Nummer: " + a);
+                                oldNodeAttributes.Add(new Tuple<string, int>(metrics, a));
+                                nodeGraphA.SetInt(metrics, a);
+                            });
+                        }
+                        
+                    }
+                });
+            });
+
+
+            Debug.Log(addedEdges.Count);
+
+            addedEdges.ForEach(edge =>
+            {
+                Node sourceNode = diffGraph.Nodes().Find(diffEdge => diffEdge.ID == edge.Source.ID);
+                Node targetNode = diffGraph.Nodes().Find(diffEdge => diffEdge.ID == edge.Target.ID);
+
+                diffGraph.AddEdge(sourceNode, targetNode, edge.Type);
+                //Debug.Log("Operation erfolgreich");
+
+            });
+
+            //Add or remove Edges
+            List<Node> diffNodes = diffGraph.Nodes();
+
+            //Add Edges with attribute
+            //Such die Source und Target Nodes manuell und füge dann ein Edge hinzu
+            addedEdges.ForEach(edge =>
+            {
+                diffNodes.ForEach(node1 => {
+                    string targetID = edge.Target.ID;
+                    string node1ID = node1.ID;
+                    string sourceID = edge.Source.ID;
+
+                    if (targetID == node1ID)
+                    {
+                        diffNodes.ForEach(node2 =>
+                        {
+                            string node2ID = node2.ID;
+
+                            if(sourceID == node2ID)
+                            {
+                                diffGraph.AddEdge(node2, node1, edge.Type);
+                            }
+                        });
+                    }
+
+                });
+                edge.SetToggle("addedEdge");
+            });
+
+
+            //Mark removed Edge with attribute
+            removedEdges.ForEach(edge =>
+            {
+                edge.SetToggle("removedEdge");
+            });
+
+           /* Debug.Log("LoadGraph Edges: " + LoadedGraph.EdgeCount);
+
+            Debug.Log("NextGraph Edges: " + NextGraph.EdgeCount);
+
+            Debug.Log("DiffGraph Nodes: " + diffGraph.NodeCount);
+
+            Debug.Log("DiffGraph Edges: " + diffGraph.EdgeCount);*/
+        
         }
 
         /// <summary>
@@ -244,6 +400,9 @@ namespace SEE.Game.City
         {
             if (diffGraph != null)
             {
+                Debug.Log(diffGraph);
+                diffGraph = RelevantGraph(diffGraph);
+                LoadDataForGraphListing(diffGraph);
                 GraphRenderer graphRenderer = new GraphRenderer(this, diffGraph);
                 graphRenderer.DrawGraph(diffGraph, gameObject);
             }
@@ -361,6 +520,24 @@ namespace SEE.Game.City
             {
                 DumpNodeMetrics(new List<Graph>() { loadedGraph, nextGraph });
             }
+        }
+
+
+        /// <summary>
+        /// Resets everything that is specific to a given graph. Here: the selected node types,
+        /// the underlying graph, and all game objects visualizing information about it.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "Reset Data")]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
+        [PropertyOrder(ResetButtonsGroupOrderReset)]
+        public override void Reset()
+        {
+            base.Reset();
+            // Delete the underlying graph.
+            diffGraph?.Destroy();
+            LoadedGraph = null;
+            NextGraph = null;
+            diffGraph = null;
         }
 
 
