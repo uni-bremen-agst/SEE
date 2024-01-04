@@ -44,6 +44,12 @@ namespace SEE.Game.Drawable.Configurations
         public Color outlineColor;
 
         /// <summary>
+        /// The status if the outline color is enabled or disabled.
+        /// True = enabled; false = disabled.
+        /// </summary>
+        public bool outlineStatus;
+
+        /// <summary>
         /// The thickness for the text outline.
         /// </summary>
         public float outlineThickness;
@@ -99,6 +105,11 @@ namespace SEE.Game.Drawable.Configurations
         private const string OutlineColorLabel = "OutlineColorLabel";
 
         /// <summary>
+        /// Label in the configuration file for the outline color status.
+        /// </summary>
+        private const string OutlineStatusLabel = "OutlineStatusLabel";
+
+        /// <summary>
         /// Label in the configuration file for the thickness of a text outline.
         /// </summary>
         private const string OutlineThicknessColorLabel = "OutlineThicknessColorLabel";
@@ -138,6 +149,7 @@ namespace SEE.Game.Drawable.Configurations
                     text = tmp.text,
                     fontColor = tmp.color,
                     outlineColor = tmp.outlineColor,
+                    outlineStatus = tmp.fontMaterial.IsKeywordEnabled(GameTexter.OutlineKeyWord),
                     outlineThickness = tmp.outlineWidth,
                     fontStyles = tmp.fontStyle,
                     fontSize = tmp.fontSize,
@@ -163,6 +175,7 @@ namespace SEE.Game.Drawable.Configurations
                 text = this.text,
                 fontColor = this.fontColor,
                 outlineColor = this.outlineColor,
+                outlineStatus = this.outlineStatus,
                 outlineThickness = this.outlineThickness,
                 fontStyles = this.fontStyles,
                 fontSize = this.fontSize,
@@ -183,6 +196,7 @@ namespace SEE.Game.Drawable.Configurations
             writer.Save(scale, ScaleLabel);
             writer.Save(text, TextLabel);
             writer.Save(fontColor, FontColorLabel);
+            writer.Save(outlineStatus, OutlineStatusLabel);
             writer.Save(outlineColor, OutlineColorLabel);
             writer.Save(outlineThickness, OutlineThicknessColorLabel);
             writer.Save(fontSize, FontSizeLabel);
@@ -281,6 +295,17 @@ namespace SEE.Game.Drawable.Configurations
             else
             {
                 outlineColor = Color.clear;
+                errors = true;
+            }
+
+            /// Try to restores the outline status.
+            if (attributes.TryGetValue(OutlineStatusLabel, out object status))
+            {
+                outlineStatus = (bool)status;
+            }
+            else
+            {
+                outlineStatus = false;
                 errors = true;
             }
 

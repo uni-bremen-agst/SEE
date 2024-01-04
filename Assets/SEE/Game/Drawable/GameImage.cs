@@ -1,5 +1,7 @@
 ﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.Game.UI.Notification;
+using SEE.Utils;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -223,10 +225,18 @@ namespace SEE.Game.Drawable
             /// If no file with the exact name exists, create it.
             if (!File.Exists(path))
             {
-                File.WriteAllBytes(path, fileData);
-                if (imageObj != null)
+                if (fileData != null && fileData.Length > 0)
                 {
-                    imageObj.GetComponent<ImageValueHolder>().SetPath(path);
+                    File.WriteAllBytes(path, fileData);
+                    if (imageObj != null)
+                    {
+                        imageObj.GetComponent<ImageValueHolder>().SetPath(path);
+                    }
+                } else
+                {
+                    /// For the case if the file in the path dont exists and the file data is empty.
+                    ShowNotification.Warn("Cannot be restored.", "The image cannot be restored.");
+                    Destroyer.Destroy(imageObj);
                 }
             }
             else

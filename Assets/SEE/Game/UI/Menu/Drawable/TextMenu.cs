@@ -217,6 +217,16 @@ namespace SEE.Game.UI.Menu.Drawable
         private static GameObject thicknessLayer;
 
         /// <summary>
+        /// The switch for enable or disable the outline.
+        /// </summary>
+        private static SwitchManager outlineSwitch;
+
+        /// <summary>
+        /// The game object of the outline switch layer.
+        /// </summary>
+        private static GameObject outlineSwitchLayer;
+
+        /// <summary>
         /// The game object of the order in layer layer.
         /// </summary>
         private static GameObject orderInLayer;
@@ -315,7 +325,12 @@ namespace SEE.Game.UI.Menu.Drawable
             outlineColorBMB = GameFinder.FindChild(instance, "OutlineColorBtn").GetComponent<ButtonManagerBasic>();
             outlineColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
 
-            /// Initialize the font thickness slider.
+            /// Initialize the outline switch and their layer.
+            outlineSwitchLayer = GameFinder.FindChild(instance, "Outline");
+            outlineSwitch = outlineSwitchLayer.GetComponentInChildren<SwitchManager>();
+            outlineSwitchLayer.SetActive(false);
+
+            /// Initialize the font outline thickness slider.
             thicknessLayer = GameFinder.FindChild(instance, "Thickness").gameObject;
             thicknessSlider = thicknessLayer.GetComponentInChildren<FloatValueSliderController>();
             thicknessLayer.SetActive(false);
@@ -335,8 +350,6 @@ namespace SEE.Game.UI.Menu.Drawable
         private static void InitFontStyleButtons()
         {
             boldBMB.clickEvent.AddListener(() => Press(Bold));
-            //boldBMB.hoverEvent.AddListener(() =>  boldBMB.transform.parent.gameObject
-            //    .AddOrGetComponent<Tooltip.Tooltip>().Show("TEST"));
             italicBMB.clickEvent.AddListener(() => Press(Italic));
             underlineBMB.clickEvent.AddListener(() => Press(Underline));
             strikethroughBMB.clickEvent.AddListener(() => Press(Strikethrough));
@@ -369,6 +382,8 @@ namespace SEE.Game.UI.Menu.Drawable
             outlineColorBMB.clickEvent.RemoveAllListeners();
             outlineColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
             thicknessSlider.onValueChanged.RemoveAllListeners();
+            outlineSwitch.OffEvents.RemoveAllListeners();
+            outlineSwitch.OnEvents.RemoveAllListeners();
             fontSizeInput.onValueChanged.RemoveAllListeners();
             orderInLayerSlider.onValueChanged.RemoveAllListeners();
         }
@@ -480,6 +495,10 @@ namespace SEE.Game.UI.Menu.Drawable
             AssignOutlineThickness(thickness => ValueHolder.currentOutlineThickness = thickness, 
                 ValueHolder.currentOutlineThickness);
 
+            /// Disables the outline color.
+            outlineSwitch.isOn = false;
+            outlineSwitch.UpdateUI();
+
             /// Adds the handler for the font size component.
             AssignFontSize(size => ValueHolder.currentFontSize = size, ValueHolder.currentFontSize);
 
@@ -557,6 +576,14 @@ namespace SEE.Game.UI.Menu.Drawable
                     textHolder.outlineThickness = thickness;
                     new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
                 }, textHolder.outlineThickness);
+
+                /// Adds the handler for the outline color status.
+                /// Changes are saved in the configuration.
+                AssignOutlineStatus(selectedText, textHolder, drawable, drawableParentName);
+
+                /// Assigns the current status to the switch and updates the UI.
+                outlineSwitch.isOn = textHolder.outlineStatus;
+                outlineSwitch.UpdateUI();
 
                 /// Adds the handler for the font size component.
                 /// Changes are saved in the configuration.
@@ -711,10 +738,12 @@ namespace SEE.Game.UI.Menu.Drawable
             if (!outlineColorBtn.interactable)
             {
                 thicknessLayer.SetActive(true);
+                outlineSwitchLayer.SetActive(true);
             }
             else
             {
                 thicknessLayer.SetActive(false);
+                outlineSwitchLayer.SetActive(false);
             }
         }
 
@@ -744,6 +773,38 @@ namespace SEE.Game.UI.Menu.Drawable
             thicknessSlider.onValueChanged.RemoveAllListeners();
             thicknessSlider.AssignValue(thickness);
             thicknessSlider.onValueChanged.AddListener(thicknessAction);
+        }
+
+        /// <summary>
+        /// Assigns the action to edit the outline color status.
+        /// </summary>
+        /// <param name="selectedText">The chosen text to be edited.</param>
+        /// <param name="textHolder">The configuration which holds the new value.</param>
+        /// <param name="drawable">The drawable on which the text is displayed</param>
+        /// <param name="drawableParentName">The id of the drawable parent</param>
+        public static void AssignOutlineStatus(GameObject selectedText, TextConf textHolder,
+            GameObject drawable, string drawableParentName)
+        {
+            outlineSwitch.OffEvents.AddListener(()=>
+            {
+                GameTexter.ChangeOutlineStatus(selectedText, false);
+                textHolder.outlineStatus = false;
+                new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
+            });
+
+            outlineSwitch.OnEvents.AddListener(() =>
+            {
+                GameTexter.ChangeOutlineStatus(selectedText, true);
+                textHolder.outlineStatus = true;
+                /// Changes the outline color if the outline was clear.
+                TextMeshPro tmp = selectedText.GetComponent<TextMeshPro>();
+                if (textHolder.outlineColor != tmp.outlineColor 
+                    && tmp.outlineColor == Color.clear)
+                {
+                    GameEdit.ChangeOutlineColor(selectedText, textHolder.outlineColor);
+                }
+                new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
+            });
         }
 
         /// <summary>
@@ -983,6 +1044,16 @@ namespace SEE.Game.UI.Menu.Drawable
                 }
             }
             return style;
+        }
+
+        /// <summary>
+        /// Gets the status of the outline color.
+        /// True = enabled, false = disabled.
+        /// </summary>
+        /// <returns>the status of outline.</returns>
+        public static bool GetOutlineStatus()
+        {
+            return outlineSwitch.isOn;
         }
     }
 }

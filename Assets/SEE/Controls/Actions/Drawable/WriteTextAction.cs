@@ -180,6 +180,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     textObj = GameTexter.WriteText(drawable, textOut, position, 
                         ValueHolder.currentPrimaryColor, ValueHolder.currentSecondaryColor,
+                        TextMenu.GetOutlineStatus(),
                         ValueHolder.currentOutlineThickness, ValueHolder.currentFontSize, 
                         ValueHolder.currentOrderInLayer, TextMenu.GetFontStyle());
                     new WriteTextNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 

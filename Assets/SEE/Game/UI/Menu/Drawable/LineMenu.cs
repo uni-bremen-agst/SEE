@@ -318,7 +318,7 @@ namespace SEE.Game.UI.Menu.Drawable
             instance.SetActive(true);
 
             /// Calculates the height of the menu.
-            MenuHelper.CalculateHeight(instance);
+            MenuHelper.CalculateHeight(instance, true);
         }
 
         /// <summary>
@@ -329,7 +329,7 @@ namespace SEE.Game.UI.Menu.Drawable
             EnableLineMenu(withoutMenuLayer: new MenuLayer[] { MenuLayer.Layer, MenuLayer.Loop });
             InitDrawing();
             /// Calculates the height of the menu.
-            MenuHelper.CalculateHeight(instance);
+            MenuHelper.CalculateHeight(instance, true);
         }
 
         /// <summary>
@@ -364,7 +364,7 @@ namespace SEE.Game.UI.Menu.Drawable
             picker.onValueChanged.AddListener(colorAction = color => ValueHolder.currentPrimaryColor = color);
 
             /// At least re-calculate the menu heigt.
-            MenuHelper.CalculateHeight(instance);
+            MenuHelper.CalculateHeight(instance, true);
         }
 
         /// <summary>
@@ -429,7 +429,16 @@ namespace SEE.Game.UI.Menu.Drawable
             }
 
             /// Creates the new action for changing the color kind on the selector.
-            colorKindAction = index => { ValueHolder.currentColorKind = GetColorKinds(true)[index]; };
+            colorKindAction = index => { 
+                ValueHolder.currentColorKind = GetColorKinds(true)[index];
+
+                /// Set the secondary color when it is transparent.
+                if (ValueHolder.currentColorKind != ColorKind.Monochrome 
+                    && ValueHolder.currentSecondaryColor == Color.clear)
+                {
+                    ValueHolder.currentSecondaryColor = ValueHolder.currentPrimaryColor;
+                }
+            };
 
             /// Adds the action to the selector.
             colorKindSelector.selectorEvent.AddListener(colorKindAction);
@@ -557,7 +566,7 @@ namespace SEE.Game.UI.Menu.Drawable
                 SetUpColorPickerForEditing(selectedLine, renderer, lineHolder, drawable, drawableParentName);
 
                 /// Re-calculates the menu height.
-                MenuHelper.CalculateHeight(instance);
+                MenuHelper.CalculateHeight(instance, true);
             }
         }
 
@@ -971,7 +980,7 @@ namespace SEE.Game.UI.Menu.Drawable
         public static void AssignLineKind(LineKind kind)
         {
             selectedLineKind = kind;
-            MenuHelper.CalculateHeight(instance);
+            MenuHelper.CalculateHeight(instance, true);
         }
 
         /// <summary>
@@ -994,7 +1003,7 @@ namespace SEE.Game.UI.Menu.Drawable
             { /// In all other cases the tiling layer will disabled.
                 DisableTilingFromLineMenu();
             }
-            MenuHelper.CalculateHeight(instance);
+            MenuHelper.CalculateHeight(instance, true);
         }
         #endregion
 
@@ -1027,7 +1036,7 @@ namespace SEE.Game.UI.Menu.Drawable
                 /// For all other <see cref="ColorKind"/> enable the color area.
                 EnableColorAreaFromLineMenu();
             }
-            MenuHelper.CalculateHeight(instance);
+            MenuHelper.CalculateHeight(instance, true);
         }
         #endregion
 

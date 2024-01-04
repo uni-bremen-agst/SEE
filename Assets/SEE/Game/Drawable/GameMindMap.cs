@@ -151,7 +151,7 @@ namespace SEE.Game.Drawable
             }
 
             /// Create the text. Initial the color is black. It can be changed with the <see cref="EditAction"/>.
-            GameObject text = GameTexter.WriteText(drawable, writtenText, position, Color.black, Color.clear,
+            GameObject text = GameTexter.WriteText(drawable, writtenText, position, Color.black, Color.clear, false,
                 ValueHolder.standardTextOutlineThickness, fontSize, 0, fontStyles);
 
             return text;

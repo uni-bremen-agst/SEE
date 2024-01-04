@@ -2,6 +2,7 @@
 using SEE.Game.Drawable.ValueHolders;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace SEE.Game.Drawable
 {
@@ -14,6 +15,11 @@ namespace SEE.Game.Drawable
         /// Name of the font for the text
         /// </summary>
         private const string DrawableTextFontName = "Fonts/DrawableTextFont";
+
+        /// <summary>
+        /// The shader keyword for the outline color.
+        /// </summary>
+        public static readonly string OutlineKeyWord = "OUTLINE_ON";
 
         /// <summary>
         /// Removes HTML tags from string using char array.
@@ -148,7 +154,8 @@ namespace SEE.Game.Drawable
         /// <param name="styles">The chosen font styles for the text</param>
         /// <param name="textObj">The created drawable text object</param>
         private static void Setup(GameObject drawable, string name, string text, Vector3 position, 
-            Color fontColor, Color outlineColor, float outlineThickness, float fontSize, int order, FontStyles styles,
+            Color fontColor, Color outlineColor, bool outlineStatus, float outlineThickness, 
+            float fontSize, int order, FontStyles styles,
             out GameObject textObj)
         {
             /// If the object has been created earlier, it already has a name, 
@@ -197,6 +204,7 @@ namespace SEE.Game.Drawable
 
             /// Adopt the rotation of the attached object.
             textObj.transform.rotation = attachedObjects.transform.rotation;
+
             /// Calculates the position and preserve the distance.
             textObj.transform.position = position - textObj.transform.forward * ValueHolder.distanceToDrawable.z * order;
 
@@ -215,6 +223,9 @@ namespace SEE.Game.Drawable
             /// Is needed to fix an issue in the <see cref="TextMeshPro"/> component. 
             /// If the outline color is set to black during creation, it is strangely always set to white.
             tmp.outlineColor = tmp.outlineColor;
+
+            /// Enables or disables the outline color.
+            ChangeOutlineStatus(textObj, outlineStatus);
         }
 
         /// <summary>
@@ -232,9 +243,9 @@ namespace SEE.Game.Drawable
         /// <param name="styles">The chosen font styles for the text</param>
         /// <returns>The created drawable text object</returns>
         public static GameObject WriteText(GameObject drawable, string text, Vector3 position, 
-            Color fontColor, Color outlineColor, float outlineThickness, float fontSize, int order, FontStyles styles)
+            Color fontColor, Color outlineColor, bool outlineStatus, float outlineThickness, float fontSize, int order, FontStyles styles)
         {
-            Setup(drawable, "", text, position, fontColor, outlineColor, outlineThickness, fontSize, 
+            Setup(drawable, "", text, position, fontColor, outlineColor, outlineStatus, outlineThickness, fontSize, 
                 order, styles, out GameObject textObj);
             ValueHolder.currentOrderInLayer++;
 
@@ -261,7 +272,7 @@ namespace SEE.Game.Drawable
         /// <param name="styles">The chosen font styles for the text</param>
         /// <returns>The created drawable text object</returns>
         private static GameObject ReWriteText(GameObject drawable, string id, string text, Vector3 position, 
-            Vector3 scale, Vector3 eulerAngles, Color fontColor, Color outlineColor,
+            Vector3 scale, Vector3 eulerAngles, Color fontColor, Color outlineColor, bool outlineStatus,
             float outlineThickness, float fontSize, int order, FontStyles styles)
         {
             /// Adjusts the current order in the layer if the 
@@ -281,7 +292,7 @@ namespace SEE.Game.Drawable
             }
             else
             { /// Creates the text object.
-                Setup(drawable, id, text, position, fontColor, outlineColor, outlineThickness, fontSize, order, 
+                Setup(drawable, id, text, position, fontColor, outlineColor, outlineStatus, outlineThickness, fontSize, order, 
                     styles, out GameObject textObj);
                 textObject = textObj;
 
@@ -316,6 +327,7 @@ namespace SEE.Game.Drawable
                 text.eulerAngles,
                 text.fontColor,
                 text.outlineColor,
+                text.outlineStatus,
                 text.outlineThickness,
                 text.fontSize,
                 text.orderInLayer,
@@ -337,5 +349,19 @@ namespace SEE.Game.Drawable
             }
         }
 
+        /// <summary>
+        /// Changes the status (enabled or disabled) of the outline color.
+        /// </summary>
+        /// <param name="textObj">The text object which outline status should be changed.</param>
+        /// <param name="status">The new status for the outline color.</param>
+        public static void ChangeOutlineStatus(GameObject textObj, bool status)
+        {
+            if (textObj.CompareTag(Tags.DText))
+            {
+                TextMeshPro tmp = textObj.GetComponent<TextMeshPro>();
+                LocalKeyword outlineKeyword = new(tmp.fontMaterial.shader, OutlineKeyWord);
+                tmp.fontMaterial.SetKeyword(outlineKeyword, status);
+            }
+        }
     }
 }

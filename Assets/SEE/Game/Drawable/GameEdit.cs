@@ -150,6 +150,7 @@ namespace SEE.Game.Drawable
                 ChangeLayer(textObj, text.orderInLayer);
                 ChangeFontStyles(textObj, text.fontStyles);
                 ChangeFontColor(textObj, text.fontColor);
+                GameTexter.ChangeOutlineStatus(textObj, text.outlineStatus);
                 ChangeOutlineColor(textObj, text.outlineColor);
                 ChangeOutlineThickness(textObj, text.outlineThickness);
                 textObj.GetComponent<TextMeshPro>().ForceMeshUpdate(true);

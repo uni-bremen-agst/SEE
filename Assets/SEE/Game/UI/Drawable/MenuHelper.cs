@@ -13,7 +13,8 @@ namespace SEE.Game.UI.Drawable
         /// Calculates the rect height for a dynamic UI menu.
         /// </summary>
         /// <param name="menuInstance">The instance of the menu</param>
-        public static void CalculateHeight(GameObject menuInstance)
+        /// <param name="movePosition">Indicates whether the menu should be shifted to maintain the original appearance.</param>
+        public static void CalculateHeight(GameObject menuInstance, bool movePosition = false)
         {
             /// Gets the three transforms of a menu.
             /// The whole menu transform
@@ -25,6 +26,9 @@ namespace SEE.Game.UI.Drawable
             RectTransform draggerTransform = GameFinder.FindChild(menuInstance, "Dragger")
                 .GetComponent<RectTransform>();
 
+            /// The old height of the menu.
+            float oldHeight = contentTransform.rect.height;
+
             /// Forces the menu canvas to update so that the correct sizes are calculated.
             Canvas.ForceUpdateCanvases();
 
@@ -33,6 +37,12 @@ namespace SEE.Game.UI.Drawable
             ContentSizeFitter csf = GameFinder.FindChild(menuInstance, "Content").GetComponent<ContentSizeFitter>();
             csf.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
             csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            /// The new height of the menu.
+            float newHeight = contentTransform.rect.height;
+
+            /// The offset of the change.
+            float diffHeight = oldHeight - newHeight;
 
             /// Calculates the new whole menu height.
             menuTransform.sizeDelta = new Vector2(contentTransform.rect.width, 
@@ -44,6 +54,13 @@ namespace SEE.Game.UI.Drawable
             menuTransform.SetParent(null);
             menuTransform.SetParent(parent);
             menuTransform.position = position;
+
+            if (movePosition)
+            {
+                /// Moves the local position of the menu by the offset, divided by 2.
+                Vector3 locPos = menuTransform.localPosition;
+                menuTransform.localPosition = new Vector3(locPos.x, locPos.y + diffHeight / 2, locPos.z);
+            }
         }
     }
 }

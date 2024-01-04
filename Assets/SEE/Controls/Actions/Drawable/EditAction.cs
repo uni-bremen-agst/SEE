@@ -147,7 +147,8 @@ namespace SEE.Controls.Actions.Drawable
                     && oldTextHolder.fontStyles.Equals(newTextHolder.fontStyles)
                     && oldTextHolder.fontColor.Equals(newTextHolder.fontColor)
                     && oldTextHolder.outlineColor.Equals(newTextHolder.outlineColor)
-                    && oldTextHolder.outlineThickness.Equals(newTextHolder.outlineThickness);
+                    && oldTextHolder.outlineThickness.Equals(newTextHolder.outlineThickness)
+                    && oldTextHolder.outlineStatus.Equals(newTextHolder.outlineStatus);
             }
 
             if (oldHolder is ImageConf oldImageHolder && newHolder is ImageConf newImageHolder)
