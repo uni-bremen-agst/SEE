@@ -152,7 +152,7 @@ namespace SEE.Net
                     throw new ArgumentOutOfRangeException($"Invalid server IP address: {value}.");
                 }
                 UnityTransport netTransport = GetNetworkTransport();
-                netTransport.ConnectionData.ServerListenAddress = value;
+                netTransport.ConnectionData.ServerListenAddress = "0.0.0.0";
             }
 
             get
