@@ -557,8 +557,7 @@ namespace SEE.Game.UI.Menu.Drawable
             configBMB.enabled = false;
             shapeBMB.enabled = true;
             shapeBtn.interactable = true;
-            LineMenu.EnableLineMenu(false, new LineMenu.MenuLayer[] 
-                { LineMenu.MenuLayer.Layer, LineMenu.MenuLayer.Loop });
+            LineMenu.EnableForDrawing();
             MenuHelper.CalculateHeight(LineMenu.instance);
             /// Binds the config menu to the switch menu.
             BindLineMenu();

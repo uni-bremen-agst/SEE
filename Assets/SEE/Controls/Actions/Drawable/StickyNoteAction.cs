@@ -335,6 +335,7 @@ namespace SEE.Controls.Actions.Drawable
                 GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
                     raycastHit.collider.gameObject : GameFinder.GetDrawable(raycastHit.collider.gameObject);
 
+                /// Only accept to move a sticky note.
                 if (GameFinder.GetDrawableParentName(drawable).Contains(ValueHolder.StickyNotePrefix))
                 {
                     inProgress = true;
@@ -378,7 +379,18 @@ namespace SEE.Controls.Actions.Drawable
                     GameFinder.IsPartOfADrawable(hit.collider.gameObject) ||
                     ValueHolder.IsASuitableObjectForStickyNote(hit.collider.gameObject))
                 {
-                    eulerAngles = hit.collider.gameObject.transform.eulerAngles;
+                    /// Adopts the euler angles of the hitted object,
+                    /// unless it is a <see cref="DrawableType"/> object. 
+                    /// In that case, take the euler angles of the drawable.
+                    if (DrawableType.Get(hit.collider.gameObject) == null)
+                    {
+                        eulerAngles = hit.collider.gameObject.transform.eulerAngles;
+                    }
+                    else
+                    {
+                        GameObject drawable = GameFinder.GetDrawable(hit.collider.gameObject);
+                        eulerAngles = drawable.transform.eulerAngles;
+                    }
                 }
 
                 Vector3 oldPos = stickyNoteHolder.transform.position;
@@ -808,7 +820,11 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>true, if the object parent is the sticky note. Otherwise false.</returns>
         private bool CheckIsPartOfStickyNote(GameObject selectedObject)
         {
-            return selectedObject.transform.parent.name.StartsWith(ValueHolder.StickyNotePrefix);
+            if (selectedObject.transform.parent != null)
+            {
+                return selectedObject.transform.parent.name.StartsWith(ValueHolder.StickyNotePrefix);
+            }
+            return false;
         }
 
         /// <summary>

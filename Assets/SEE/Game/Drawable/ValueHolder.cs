@@ -168,6 +168,21 @@ namespace SEE.Game.Drawable
         public const float moveFast = 0.01f;
 
         /// <summary>
+        /// Specifies the radius for the line split marker.
+        /// </summary>
+        public const float lineSplitMarkerRadius = 0.022f;
+
+        /// <summary>
+        /// Specifies the number of edges for the polygon of the line split marker.
+        /// </summary>
+        public const int lineSplitMarkerVertices = 30;
+
+        /// <summary>
+        /// Specifies the time after which the Line Split marker should be deleted.
+        /// </summary>
+        public const float lineSplitTimer = 3.0f;
+
+        /// <summary>
         /// The initial scale for sticky notes.
         /// </summary>
         public static readonly Vector3 StickyNoteScale = new (0.5f, 0.5f, 0.5f);

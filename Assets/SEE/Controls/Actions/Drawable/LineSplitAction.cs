@@ -2,7 +2,9 @@ using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.UI.Drawable;
 using SEE.Game.UI.Notification;
+using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
@@ -92,8 +94,9 @@ namespace SEE.Controls.Actions.Drawable
                         {
                             ShowNotification.Info("Line splitted", 
                                 "The original line was successfully splitted in " + lines.Count + " lines");
-                        }
 
+                            MarkSplitPosition(hittedObject, positionsList[matchedIndices[0]]);
+                        }
                         memento = new Memento(hittedObject, GameFinder.GetDrawable(hittedObject), lines);
                         new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, 
                             memento.originalLine.id).Execute();
@@ -109,6 +112,45 @@ namespace SEE.Controls.Actions.Drawable
                 return false;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Marks the split point with a polygon with a radius of 
+        /// <see cref="ValueHolder.lineSplitMarkerRadius"/> and vertices count of <see cref="ValueHolder.lineSplitMarkerVertices"/>
+        /// for <see cref="ValueHolder.lineSplitTimer"/> seconds.
+        /// </summary>
+        /// <param name="hittedObject">The object that has been split.</param>
+        /// <param name="splitPos">The first split position.</param>
+        private void MarkSplitPosition(GameObject hittedObject, Vector3 splitPos)
+        {
+            /// Calculates the pivot point for the marker.
+            Vector3 position = hittedObject.transform.TransformPoint(splitPos);
+            GameObject drawable = GameFinder.GetDrawable(hittedObject);
+            position = GameDrawer.GetConvertedPosition(drawable, position);
+
+            /// Calculates the negativ color for the marker.
+            Color color = hittedObject.GetColor();
+            Color.RGBToHSV(color, out float H, out float S, out float V);
+            /// Calculate the complementary color.
+            float negativH = (H + 0.5f) % 1f;
+            /// Calculate the complementary brightness.
+            float negativV = (V + 0.5f) % 1f;
+            Color negativColor = Color.HSVToRGB(negativH, S, negativV);
+
+            /// Calculates the positions of the marker polygon.
+            Vector3[] positions = ShapePointsCalculator.Polygon(position,
+                ValueHolder.lineSplitMarkerRadius, ValueHolder.lineSplitMarkerVertices);
+            /// Creates the marker polygon.
+            GameObject point = GameDrawer.DrawLine(drawable, DrawableHolder.GetRandomString(10), positions,
+                GameDrawer.ColorKind.Monochrome,
+                negativColor, negativColor, 0.01f,
+                false, GameDrawer.LineKind.Solid, 1f, false);
+            /// Sets the pivot point of the marker.
+            GameDrawer.SetPivotShape(point, position);
+            /// Adds a blink effect.
+            point.AddComponent<BlinkEffect>();
+            /// Destroys the marker after the chosen time.
+            Object.Destroy(point, ValueHolder.lineSplitTimer);
         }
 
         /// <summary>

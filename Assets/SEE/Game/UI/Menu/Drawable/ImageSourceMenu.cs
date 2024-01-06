@@ -69,6 +69,7 @@ namespace SEE.Game.UI.Menu.Drawable
                     chosenSource = Source.Web;
                 });
 
+                /// Initialize the button for canceling the menu.
                 ButtonManagerBasic cancelBtn = GameFinder.FindChild(instance, "Cancel")
                     .GetComponent<ButtonManagerBasic>();
                 cancelBtn.clickEvent.AddListener(() =>

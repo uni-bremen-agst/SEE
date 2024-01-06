@@ -29,8 +29,17 @@ namespace SEE.Game.Drawable
             /// Sets the name of the sticky note.
             stickyNote.name = ValueHolder.StickyNotePrefix + "-" + DrawableHolder.GetRandomString(8);
 
-            /// Adopt the rotation of the hitted object.
-            stickyNote.transform.rotation = raycastHit.collider.gameObject.transform.rotation;
+            /// Adopts the rotation of the hitted object,
+            /// unless it is a <see cref="DrawableType"/> object. 
+            /// In that case, take the rotation of the drawable.
+            if (DrawableType.Get(raycastHit.collider.gameObject) == null)
+            {
+                stickyNote.transform.rotation = raycastHit.collider.gameObject.transform.rotation;
+            } else
+            {
+                GameObject drawable = GameFinder.GetDrawable(raycastHit.collider.gameObject);
+                stickyNote.transform.rotation = drawable.transform.rotation;
+            }
 
             /// Adopt the position of the hitted object, but preserve the distance.
             stickyNote.transform.position = raycastHit.point - stickyNote.transform.forward

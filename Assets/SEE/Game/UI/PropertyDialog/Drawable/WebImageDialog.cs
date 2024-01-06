@@ -10,9 +10,9 @@ namespace SEE.Game.UI.PropertyDialog.Drawable
     internal class WebImageDialog : HolisticMetricsDialog
     {
         /// <summary>
-        /// The in the dialog written http.
+        /// The in the dialog written url.
         /// </summary>
-        private string http = "";
+        private string url = "";
 
         /// <summary>
         /// The in the dialog written file name.
@@ -20,9 +20,9 @@ namespace SEE.Game.UI.PropertyDialog.Drawable
         private string fileName = "";
 
         /// <summary>
-        /// The input field where the player can enter a link for a http adress.
+        /// The input field where the player can enter a link for an url adress.
         /// </summary>
-        private StringProperty httpTextProperty;
+        private StringProperty urlTextProperty;
 
         /// <summary>
         /// The input field where the player can enter a file name for saving the downloaded image.
@@ -38,11 +38,11 @@ namespace SEE.Game.UI.PropertyDialog.Drawable
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
             group.Name = "Web image dialog";
 
-            httpTextProperty = dialog.AddComponent<StringProperty>();
-            httpTextProperty.Name = "Http";
-            httpTextProperty.Description = "Insert the http adress of the image";
+            urlTextProperty = dialog.AddComponent<StringProperty>();
+            urlTextProperty.Name = "URL";
+            urlTextProperty.Description = "Insert the url adress of the image";
 
-            group.AddProperty(httpTextProperty);
+            group.AddProperty(urlTextProperty);
 
             fileNameTextProperty = dialog.AddComponent<StringProperty>();
             fileNameTextProperty.Name = "Filename";
@@ -53,7 +53,7 @@ namespace SEE.Game.UI.PropertyDialog.Drawable
 
             propertyDialog = dialog.AddComponent<PropertyDialog>();
             propertyDialog.Title = "Download an image from web";
-            propertyDialog.Description = "Insert the http adress of the image and a desired filename; " +
+            propertyDialog.Description = "Insert the url adress of the image and a desired filename; " +
                 "then hit OK button.";
             propertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Document");
             propertyDialog.AddGroup(group);
@@ -72,7 +72,7 @@ namespace SEE.Game.UI.PropertyDialog.Drawable
         private void TransmitText()
         {
             gotInput = true;
-            http = httpTextProperty.Value;
+            url = urlTextProperty.Value;
             fileName = fileNameTextProperty.Value;
             Close();
         }
@@ -88,7 +88,7 @@ namespace SEE.Game.UI.PropertyDialog.Drawable
             if (gotInput)
             {
                 gotInput = false;
-                httpOut = http;
+                httpOut = url;
                 fileNameOut = fileName;
                 return true;
             }
