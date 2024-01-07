@@ -152,7 +152,7 @@ namespace SEE.Net
                     throw new ArgumentOutOfRangeException($"Invalid server IP address: {value}.");
                 }
                 UnityTransport netTransport = GetNetworkTransport();
-                netTransport.ConnectionData.ServerListenAddress = "0.0.0.0";
+                netTransport.ConnectionData.ServerListenAddress = value;
             }
 
             get
@@ -277,6 +277,16 @@ namespace SEE.Net
 
             for (int i = 0; i < arguments.Length; i++)
             {
+                if (arguments[i] == "-port")
+                {
+                    ServerPort = Int32.Parse(arguments[i+1]);
+                }
+
+                if (arguments[i] == "-password")
+                {
+                    RoomPassword = arguments[i+1];
+                }
+
                 if (arguments[i] == "-launch-as-server")
                 {
                     StartServer(null);
