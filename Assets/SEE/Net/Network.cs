@@ -546,6 +546,7 @@ namespace SEE.Net
 
             void InternalStartServer()
             {
+                ServerIP4Address = "0.0.0.0";
                 Debug.Log($"Server is starting to listen at {ServerIP4Address}:{ServerPort}...\n");
                 try
                 {
