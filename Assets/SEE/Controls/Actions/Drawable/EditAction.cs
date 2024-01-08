@@ -188,22 +188,7 @@ namespace SEE.Controls.Actions.Drawable
             if (progressState != ProgressState.Finish && selectedObj != null)
             {
                 GameObject drawable = GameFinder.GetDrawable(selectedObj);
-                string drawableParent = GameFinder.GetDrawableParentName(drawable);
-                if (oldValueHolder is LineConf oldLineHolder)
-                {
-                    GameEdit.ChangeLine(selectedObj, oldLineHolder);
-                    new EditLineNetAction(drawable.name, drawableParent, oldLineHolder).Execute();
-                }
-                if (oldValueHolder is TextConf oldTextHolder)
-                {
-                    GameEdit.ChangeText(selectedObj, oldTextHolder);
-                    new EditTextNetAction(drawable.name, drawableParent, oldTextHolder).Execute();
-                }
-                if (oldValueHolder is ImageConf oldImageHolder)
-                {
-                    GameEdit.ChangeImage(selectedObj, oldImageHolder);
-                    new EditImageNetAction(drawable.name, drawableParent, oldImageHolder).Execute();
-                }
+                DrawableType.Edit(selectedObj, oldValueHolder, drawable);
             }
             TextMenu.Disable();
             LineMenu.DisableLineMenu();
@@ -368,27 +353,7 @@ namespace SEE.Controls.Actions.Drawable
             if (memento.selectedObj != null)
             {
                 GameObject drawable = GameFinder.GetDrawable(memento.selectedObj);
-                string drawableParent = GameFinder.GetDrawableParentName(drawable);
-                if (memento.oldValueHolder is LineConf oldLineHolder)
-                {
-                    GameEdit.ChangeLine(memento.selectedObj, oldLineHolder);
-                    new EditLineNetAction(drawable.name, drawableParent, oldLineHolder).Execute();
-                }
-                if (memento.oldValueHolder is TextConf oldTextHolder)
-                {
-                    GameEdit.ChangeText(memento.selectedObj, oldTextHolder);
-                    new EditTextNetAction(drawable.name, drawableParent, oldTextHolder).Execute();
-                }
-                if (memento.oldValueHolder is ImageConf oldImageHolder)
-                {
-                    GameEdit.ChangeImage(memento.selectedObj, oldImageHolder);
-                    new EditImageNetAction(drawable.name, drawableParent, oldImageHolder).Execute();
-                }
-                if (memento.oldValueHolder is MindMapNodeConf oldNodeHolder)
-                {
-                    GameEdit.ChangeMindMapNode(memento.selectedObj, oldNodeHolder);
-                    new EditMMNodeNetAction(drawable.name, drawableParent, oldNodeHolder).Execute();
-                }
+                DrawableType.Edit(memento.selectedObj, memento.oldValueHolder, drawable);
             }
         }
 
@@ -406,27 +371,7 @@ namespace SEE.Controls.Actions.Drawable
             if (memento.selectedObj != null)
             {
                 GameObject drawable = GameFinder.GetDrawable(memento.selectedObj);
-                string drawableParent = GameFinder.GetDrawableParentName(drawable);
-                if (memento.newValueHolder is LineConf newLineValueHolder)
-                {
-                    GameEdit.ChangeLine(memento.selectedObj, newLineValueHolder);
-                    new EditLineNetAction(drawable.name, drawableParent, newLineValueHolder).Execute();
-                }
-                if (memento.newValueHolder is TextConf newTextHolder)
-                {
-                    GameEdit.ChangeText(memento.selectedObj, newTextHolder);
-                    new EditTextNetAction(drawable.name, drawableParent, newTextHolder).Execute();
-                }
-                if (memento.newValueHolder is ImageConf newImageHolder)
-                {
-                    GameEdit.ChangeImage(memento.selectedObj, newImageHolder);
-                    new EditImageNetAction(drawable.name, drawableParent, newImageHolder).Execute();
-                }
-                if (memento.newValueHolder is MindMapNodeConf newNodeHolder)
-                {
-                    GameEdit.ChangeMindMapNode(memento.selectedObj, newNodeHolder);
-                    new EditMMNodeNetAction(drawable.name, drawableParent, newNodeHolder).Execute();
-                }
+                DrawableType.Edit(memento.selectedObj, memento.newValueHolder, drawable);
             }
         }
 

@@ -2,6 +2,7 @@ using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.ValueHolders;
 using SEE.Game.UI.Drawable;
 using SEE.Game.UI.Notification;
 using SEE.GO;
@@ -129,13 +130,18 @@ namespace SEE.Controls.Actions.Drawable
             position = GameDrawer.GetConvertedPosition(drawable, position);
 
             /// Calculates the negativ color for the marker.
-            Color color = hittedObject.GetColor();
+            Color color = GetColor(hittedObject);
+            
             Color.RGBToHSV(color, out float H, out float S, out float V);
             /// Calculate the complementary color.
             float negativH = (H + 0.5f) % 1f;
-            /// Calculate the complementary brightness.
-            float negativV = (V + 0.5f) % 1f;
-            Color negativColor = Color.HSVToRGB(negativH, S, negativV);
+            Color negativColor = Color.HSVToRGB(negativH, S, V);
+
+            /// If the color does not have a complementary color, take the default.
+            if (color == negativColor)
+            {
+                negativColor = ValueHolder.lineSplitDefaultMarkerColor;
+            }
 
             /// Calculates the positions of the marker polygon.
             Vector3[] positions = ShapePointsCalculator.Polygon(position,
@@ -151,6 +157,34 @@ namespace SEE.Controls.Actions.Drawable
             point.AddComponent<BlinkEffect>();
             /// Destroys the marker after the chosen time.
             Object.Destroy(point, ValueHolder.lineSplitTimer);
+        }
+
+        /// <summary>
+        /// Delivers the color for the complementary color calculation.
+        /// For <see cref="GameDrawer.ColorKind.Monochrome"/>, it is the normal line color.
+        /// For <see cref="GameDrawer.ColorKind.Gradient"/>, it is a mix of the start and the end color.
+        /// For <see cref="GameDrawer.ColorKind.TwoDashed"/>, it is a mix of the two material colors.
+        /// </summary>
+        /// <param name="line">The splitted line.</param>
+        /// <returns>The color for the complementary color calculation.</returns>
+        private Color GetColor(GameObject line)
+        {
+            Color color = Color.magenta;
+            LineValueHolder holder = line.GetComponent<LineValueHolder>();
+            LineRenderer renderer = line.GetComponent<LineRenderer>();
+            switch (holder.GetColorKind())
+            {
+                case GameDrawer.ColorKind.Monochrome:
+                    color = line.GetColor();
+                    break;
+                case GameDrawer.ColorKind.Gradient:
+                    color = (renderer.startColor + renderer.endColor) / 2;
+                    break;
+                case GameDrawer.ColorKind.TwoDashed:
+                    color = (renderer.materials[0].color + renderer.materials[1].color) / 2;
+                    break;
+            }
+            return color;
         }
 
         /// <summary>

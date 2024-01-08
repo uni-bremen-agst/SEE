@@ -299,6 +299,7 @@ namespace SEE.Game.Drawable
             {
                 ChangeLayer(imageObj, conf.orderInLayer);
                 ChangeImageColor(imageObj, conf.imageColor);
+                GameMoveRotator.SetRotateY(imageObj, conf.eulerAngles.y);
             }
         }
 

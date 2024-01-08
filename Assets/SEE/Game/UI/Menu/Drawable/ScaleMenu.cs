@@ -124,18 +124,19 @@ namespace SEE.Game.UI.Menu.Drawable
 
         /// <summary>
         /// Enables the proportional scaling for the x and y scale component.
+        /// To prevent floating-point errors, rounding is applied to a maximum of 6 decimal places.
         /// </summary>
         private static void EnableProportionalScaling()
         {
             xScale.onProportionalValueChanged = new UnityEvent<float>();
             xScale.onProportionalValueChanged.AddListener(diff =>
             {
-                yScale.AssignValue(yScale.GetValue() + diff);
+                yScale.AssignValue((float)decimal.Round((decimal)(yScale.GetValue() + diff), 6));
             });
             yScale.onProportionalValueChanged = new UnityEvent<float>();
             yScale.onProportionalValueChanged.AddListener(diff =>
             {
-                xScale.AssignValue(xScale.GetValue() + diff);
+                xScale.AssignValue((float)decimal.Round((decimal)(xScale.GetValue() + diff), 6));
             });
         }
 

@@ -46,6 +46,7 @@ namespace SEE.Game.Drawable.Configurations
 
         /// <summary>
         /// Restores the object to the given drawable type configuration.
+        /// It calls the corresponding re-creation method of the respective drawable type.
         /// </summary>
         /// <param name="type">The type to restore.</param>
         /// <param name="drawable">The drawable on which the drawable type should be restored.</param>
@@ -75,6 +76,40 @@ namespace SEE.Game.Drawable.Configurations
                     break;
                 default:
                     Debug.Log("Can't restore " + type.id);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Edits the object to the given drawable type configuration.
+        /// It calls the corresponding <see cref="GameEdit"/> - Change method of the respective drawable type.
+        /// </summary>
+        /// <param name="objectToEdit">The object to be edit.</param>
+        /// <param name="type">The drawable type configuration that should be applied.</param>
+        /// <param name="drawable">The drawable on that the object is displayed.</param>
+        public static void Edit(GameObject objectToEdit, DrawableType type, GameObject drawable) 
+        {
+            string drawableParent = GameFinder.GetDrawableParentName(drawable);
+            switch(type)
+            {
+                case LineConf line:
+                    GameEdit.ChangeLine(objectToEdit, line);
+                    new EditLineNetAction(drawable.name, drawableParent, line).Execute();
+                    break;
+                case TextConf text:
+                    GameEdit.ChangeText(objectToEdit, text);
+                    new EditTextNetAction(drawable.name, drawableParent, text).Execute();
+                    break;
+                case ImageConf image:
+                    GameEdit.ChangeImage(objectToEdit, image);
+                    new EditImageNetAction(drawable.name, drawableParent, image).Execute();
+                    break;
+                case MindMapNodeConf node:
+                    GameEdit.ChangeMindMapNode(objectToEdit, node);
+                    new EditMMNodeNetAction(drawable.name, drawableParent, node).Execute();
+                    break;
+                default:
+                    Debug.Log("Can't edit " + type.id);
                     break;
             }
         }
