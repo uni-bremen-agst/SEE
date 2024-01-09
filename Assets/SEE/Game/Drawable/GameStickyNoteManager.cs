@@ -2,6 +2,7 @@
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Utils;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SEE.Game.Drawable
 {
@@ -101,6 +102,7 @@ namespace SEE.Game.Drawable
         {
             stickyNoteHolder.transform.position = position;
             stickyNoteHolder.transform.eulerAngles = eulerAngles;
+            stickyNoteHolder.GetComponent<OrderInLayerValueHolder>().SetOriginPosition(position);
         }
 
         /// <summary>
@@ -113,6 +115,8 @@ namespace SEE.Game.Drawable
             stickyNoteHolder.transform.position -= stickyNoteHolder.transform.forward
                 * ValueHolder.distanceToDrawable.z
                 * stickyNoteHolder.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
+            stickyNoteHolder.GetComponent<OrderInLayerValueHolder>()
+                .SetOriginPosition(stickyNoteHolder.transform.position);
             return stickyNoteHolder.transform.position;
         }
 
@@ -148,6 +152,8 @@ namespace SEE.Game.Drawable
                     stickyNoteHolder.transform.position -= stickyNoteHolder.transform.forward * speed;
                     break;
             }
+            stickyNoteHolder.GetComponent<OrderInLayerValueHolder>()
+                .SetOriginPosition(stickyNoteHolder.transform.position);
             return stickyNoteHolder.transform.position;
         }
 

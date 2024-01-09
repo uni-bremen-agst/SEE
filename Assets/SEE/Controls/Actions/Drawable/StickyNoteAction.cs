@@ -118,7 +118,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Destroys the menu's and resets finish attribut.
+        /// Destroys the menu's and resets the action if it's not finish.
         /// </summary>
         public override void Stop()
         {
@@ -140,7 +140,35 @@ namespace SEE.Controls.Actions.Drawable
                     collider.enabled = true;
                 }
             }
-            finish = false;
+            if (!finish)
+            {
+                switch(memento.action)
+                {
+                    case Operation.Spawn:
+                        if (stickyNote != null)
+                        {
+                            Destroyer.Destroy(stickyNote);
+                        }
+                        break;
+                    case Operation.Move:
+                        GameObject stickyHolder = GameFinder.GetHighestParent(
+                        GameFinder.FindDrawable(memento.originalConfig.ID, memento.originalConfig.ParentID));
+                        GameStickyNoteManager.Move(stickyHolder, memento.originalConfig.Position,
+                            memento.originalConfig.Rotation);
+                        GameObject d = GameFinder.GetDrawable(stickyHolder);
+                        string drawableParentID = GameFinder.GetDrawableParentName(d);
+                        new StickyNoteMoveNetAction(d.name, drawableParentID, memento.originalConfig.Position,
+                            memento.originalConfig.Rotation).Execute();
+                        break;
+                    case Operation.Edit:
+                        GameObject sticky = GameFinder.FindDrawable(memento.originalConfig.ID,
+                            memento.originalConfig.ParentID)
+                            .transform.parent.gameObject;
+                        GameStickyNoteManager.Change(sticky, memento.originalConfig);
+                        new StickyNoteChangeNetAction(memento.originalConfig).Execute();
+                        break;             
+                }
+            }
         }
 
         /// <summary>
@@ -578,6 +606,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// If there are changed in the configuration finish this operation.
                 if (!CheckEquals(memento.originalConfig, memento.changedConfig))
                 {
+                    finish = true;
                     currentState = ReversibleAction.Progress.Completed;
                     return EditReturnState.True;
                 }

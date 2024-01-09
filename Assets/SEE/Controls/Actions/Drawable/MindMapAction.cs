@@ -129,6 +129,15 @@ namespace SEE.Controls.Actions.Drawable
         {
             MindMapMenu.Disable();
             MindMapParentSelectionMenu.Disable();
+
+            if (progress != ProgressState.Finish && node != null)
+            {
+                Destroyer.Destroy(node);
+                if (branchLine != null)
+                {
+                    Destroyer.Destroy(branchLine);
+                }
+            }
         }
 
         /// <summary>

@@ -207,12 +207,22 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// Destroys the blink effect, if it is still active.
+        /// Resets the changes, if the progress is not finished.
         /// </summary>
         public override void Stop()
         {
             if (selectedLine != null && selectedLine.GetComponent<BlinkEffect>() != null)
             {
                 selectedLine.GetComponent<BlinkEffect>().Deactivate();
+            }
+
+            if (progressState != ProgressState.Finish && selectedLine != null)
+            {
+                GameObject drawable = GameFinder.GetDrawable(selectedLine);
+                string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+                GameMoveRotator.MovePoint(selectedLine, Indices, oldPointPosition);
+                new MovePointNetAction(drawable.name, drawableParentName, selectedLine.name, Indices,
+                    oldPointPosition).Execute();
             }
         }
 
