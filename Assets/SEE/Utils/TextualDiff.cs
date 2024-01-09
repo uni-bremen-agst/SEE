@@ -41,11 +41,26 @@ namespace SEE.Utils
             string newRegion = FileIO.Read(newPath, newStartLine, newEndLine);
             return Diff2RichText(diff.diff_main(oldRegion, newRegion));
         }
-        //TODO: Add summary
-        public static string[] DiffForDiffCity(string result1, string result2)
+        /// <summary>
+        /// Returns the difference of two text regions in two version controled files.
+        /// The diff contains Rich Text markup that indicates the additions
+        /// and deletions between the two regions. An addition is text that is contained
+        /// in the new region only and a deletion is text that is contained only in the
+        /// old region.
+        ///
+        /// The Rich Text markup of a deletion renders the deleted text in red
+        /// and struck through. The markup of an additions renders the added text
+        /// in green and underlined.
+        ///
+        /// Each entry in the result is a line of text of the new region.
+        /// </summary>
+        /// <param name="old">the old region</param>
+        /// <param name="current">the new region</param>
+        /// <returns>diff in Rich Text markup</returns>
+        public static string[] DiffForDiffCity(string old, string current)
         {
             diff_match_patch diff = new();
-            List<Diff> diffs = diff.diff_main(result1, result2);
+            List<Diff> diffs = diff.diff_main(old, current);
             diff.diff_cleanupSemantic(diffs);
             return Diff2RichText(diffs);
         }

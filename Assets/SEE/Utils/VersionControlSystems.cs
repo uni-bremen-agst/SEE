@@ -4,9 +4,15 @@ using UnityEngine;
 using LibGit2Sharp;
 using System.Linq;
 
+/// <summary>
+/// Contains all version control systems as subclasses, which derives from IVersionControl,
+/// so that all have the same functionality.
+/// </summary>
 public class VersionControlSystems : MonoBehaviour
 {
-    // TODO: Add description.
+    /// <summary>
+    /// Implements the functionality of IVersionControl for Git.
+    /// </summary>
     public class GitVersionControl : IVersionControl
     {
         public string Show(string repositoryPath, string branchName, string fileName, string commitIdentifier)
@@ -33,7 +39,9 @@ public class VersionControlSystems : MonoBehaviour
             }
         }
     }
-    // TODO: Add description.
+    /// <summary>
+    /// Implements the functionality of IVersionControl for SVN.
+    /// </summary>
     public class SvnVersionControl : IVersionControl
     {
         public string Show(string repositoryPath, string branchName, string fileName, string commitIdentifier)
