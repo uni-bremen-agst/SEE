@@ -348,7 +348,8 @@ namespace SEE.Controls.Actions.Drawable
                    hit.collider.gameObject.CompareTag(Tags.MindMapNode) &&
                     (hit.collider.gameObject.name.StartsWith(ValueHolder.MindMapThemePrefix) ||
                     hit.collider.gameObject.name.StartsWith(ValueHolder.MindMapSubthemePrefix)) &&
-                    hit.collider.gameObject != node)
+                    hit.collider.gameObject != node
+                    && GameFinder.GetDrawable(hit.collider.gameObject).Equals(GameFinder.GetDrawable(node)))
                 {
                     Destroyer.Destroy(branchLine);
                     branchLine = GameMindMap.CreateBranchLine(node, hit.collider.gameObject);
@@ -356,7 +357,7 @@ namespace SEE.Controls.Actions.Drawable
                 }
                 else
                 {
-                    ShowNotification.Warn("Wrong selection.", "You need to select a theme or a subtheme node.");
+                    ShowNotification.Warn("Wrong selection.", "You need to select a theme or a subtheme node of the current selected drawable.");
                 }
             }
         }
