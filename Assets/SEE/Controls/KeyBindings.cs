@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -10,14 +12,13 @@ namespace SEE.Controls
     /// </summary>
     internal static partial class KeyBindings
     {
-        // TODO (#682): We need to be able to save and load the bindings since a
-        // user can change them.
 
         // IMPORTANT NOTES:
         // (1) Keep in mind that KeyCodes in Unity map directly to a
         //     physical key on an keyboard with an English layout.
         // (2) Ctrl-Z and Ctrl-Y are reserved for Undo and Redo.
         // (3) The digits 0-9 are reserved for shortcuts for the player menu.
+
 
         /// <summary>
         /// Mapping of every <see cref="KeyAction"/> onto its currently bound <see cref="KeyActionDescriptor"/>.
@@ -297,9 +298,9 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Rebinds a binding to another key.
+        /// Rebinds a binding to another key and saves the changed key.
         /// </summary>
-        /// <param name="descriptor">the binding that will that should be triggered by <paramref name="keyCode"/></param>
+        /// <param name="descriptor">the binding that should be triggered by <paramref name="keyCode"/></param>
         /// <param name="keyCode">the key code that should trigger the action represented by <paramref name="descriptor"/></param>
         /// <exception cref="Exception">thrown if <paramref name="keyCode"/> is already bound to an action</exception>
         public static void SetBindingForKey(KeyActionDescriptor descriptor, KeyCode keyCode)
@@ -311,8 +312,29 @@ namespace SEE.Controls
             }
             else
             {
+                KeyCode oldKey = descriptor.KeyCode;
                 descriptor.KeyCode = keyCode;
+                string path = Application.dataPath + "/StreamingAssets/KeyBindings.json";
+                string jsonContent = File.ReadAllText(path);
+                List<KeyCode> jsonObject = JsonConvert.DeserializeObject<List<KeyCode>>(jsonContent);
+                int index = jsonObject.IndexOf(oldKey);
+                jsonObject[index] = keyCode;
+                File.WriteAllText(path, JsonConvert.SerializeObject(jsonObject));
             }
+        }
+
+        /// <summary>
+        /// Returns a list of all keyCodes.
+        /// </summary>
+        /// <returns>all keyCodes</returns>
+        internal static List<KeyCode> GetKeyCodes()
+        {
+            List<KeyCode> keys = new List<KeyCode>();
+            foreach(var binding in keyBindings)
+            {
+                keys.Add(binding.Value.KeyCode);
+            }
+            return keys;
         }
 
         /// <summary>
