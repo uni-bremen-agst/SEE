@@ -35,6 +35,11 @@ namespace SEE.Net.Actions
         public ulong Requester;
 
         /// <summary>
+        /// Should be sent to newly connecting clients
+        /// </summary>
+        public virtual bool ShouldBeSentToNewClient { get => true; }
+
+        /// <summary>
         /// Constructs an abstract action.
         /// </summary>
         public AbstractNetAction()

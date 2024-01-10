@@ -15,6 +15,11 @@ namespace SEE.Audio
         public string SoundEffectName;
 
         /// <summary>
+        /// Should not be sent to newly connecting clients
+        /// </summary>
+        public override bool ShouldBeSentToNewClient { get => false; }
+
+        /// <summary>
         /// GameObject Id of the Game Object the sound effect should eminate from.
         /// </summary>
         public string TargetGameObjectName;

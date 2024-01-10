@@ -17,6 +17,11 @@ namespace SEE.Net.Actions
         public ulong NetworkObjectID;
 
         /// <summary>
+        /// Should not be sent to newly connecting clients
+        /// </summary>
+        public override bool ShouldBeSentToNewClient { get => false; }
+
+        /// <summary>
         /// Whether pointing should be activated or deactivated.
         /// </summary>
         public bool Activate;

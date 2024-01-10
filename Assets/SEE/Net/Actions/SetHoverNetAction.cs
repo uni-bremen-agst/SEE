@@ -19,6 +19,11 @@ namespace SEE.Net.Actions
             = new Dictionary<ulong, HashSet<InteractableObject>>();
 
         /// <summary>
+        /// Should not be sent to newly connecting clients
+        /// </summary>
+        public override bool ShouldBeSentToNewClient { get => false; }
+
+        /// <summary>
         /// The id of the interactable.
         /// </summary>
         public string id;

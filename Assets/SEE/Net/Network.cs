@@ -39,11 +39,6 @@ namespace SEE.Net
         private const int MaxServerPort = 65535;
 
         /// <summary>
-        /// Stores every executed Action
-        /// </summary>
-        static List<string> rpcActions;
-
-        /// <summary>
         /// The port of the server where the server listens to SEE action requests.
         /// Note: This field is accessed in NetworkEditor, hence, the name must not change.
         /// </summary>
@@ -244,6 +239,11 @@ namespace SEE.Net
             }
         }
 
+        /// <summary>
+        /// Stores every executed Action to be synced with new connecting clients
+        /// </summary>
+        public static List<string> networkActionList = new();
+
         private void Awake()
         {
             /// The field <see cref="MainThread"/> is supposed to denote Unity's main thread.
@@ -295,25 +295,6 @@ namespace SEE.Net
         }
 
 
-         public static void SyncClient(ulong recipient)
-        {
-            if(rpcActions.IsNullOrEmpty()){
-                rpcActions = new List<string>();
-                return;
-            }
-            ulong[] receiver = new ulong[1] {recipient};
-
-            Debug.Log($"Client cast to arry: {receiver[0]}\n");
-            ServerActionNetwork clientServerNetwork = GameObject.Find("Server").GetComponent<ServerActionNetwork>();
-            if(clientServerNetwork == null){
-                return;
-            }
-            foreach(string rpcAction in rpcActions){
-                clientServerNetwork.BroadcastActionServerRpc(rpcAction, receiver);
-                Debug.Log($"Action send to Client: {rpcAction}\n");
-            }
-        }
-
         /// <summary>
         /// Broadcasts a serialized action.
         /// </summary>
@@ -321,12 +302,8 @@ namespace SEE.Net
         /// <param name="recipients">List of recipients to broadcast to, will broadcast to all if this is null.</param>
         public static void BroadcastAction(String serializedAction, ulong[] recipients)
         {
-            if(rpcActions.IsNullOrEmpty()){
-                rpcActions = new List<string>();
-            }
-            ServerActionNetwork clientServerNetwork = GameObject.Find("Server").GetComponent<ServerActionNetwork>();
-            clientServerNetwork.BroadcastActionServerRpc(serializedAction, recipients);
-            rpcActions.Add(serializedAction);
+            ServerActionNetwork serverNetwork = GameObject.Find("Server").GetComponent<ServerActionNetwork>();
+            serverNetwork.BroadcastActionServerRpc(serializedAction, recipients);
         }
 
         /// <summary>
@@ -568,13 +545,6 @@ namespace SEE.Net
                 }
                 callBack(true, $"Server started at {ServerIP4Address}:{ServerPort}.");
             }
-        }
-
-
-        private void SyncServerStateToClientOnClientConnectCallback(ulong owner)
-        {
-            Debug.Log($"Send client {owner} newest state");
-            SyncClient(owner);
         }
 
         /// <summary>

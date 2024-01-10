@@ -9,20 +9,42 @@ using UnityEngine;
 using UnityEngine.SocialPlatforms;
 
 namespace SEE.Net
-{
+{ 
     /// <summary>
     /// DOC
     /// </summary>
     public class ClientActionNetwork : NetworkBehaviour
     {
+        public void Start()
+        {
+            if(!IsServer && !IsHost)
+            {
+                ServerActionNetwork serverNetwork = GameObject.Find("Server").GetComponent<ServerActionNetwork>();
+                serverNetwork.SyncClientServerRpc(NetworkManager.Singleton.LocalClientId);
+            }
+        }
+
+        [ClientRpc]
+        public void ExecuteActionUnsafeClientRpc(string serializedAction)
+        {
+            if (IsHost || IsServer)
+            {
+                return;
+            }
+            AbstractNetAction action = ActionSerializer.Deserialize(serializedAction);
+            action.ExecuteOnClient();
+        }
+
         [ClientRpc]
         public void ExecuteActionClientRpc(string serializedAction)
         {
-            if (IsOwner) return;
+            if (IsHost  || IsServer)
+            {
+                return;
+            }
             AbstractNetAction action = ActionSerializer.Deserialize(serializedAction);
             if(action.Requester != NetworkManager.Singleton.LocalClientId)
             {
-                Debug.Log("Execute action on client: " + action.ToString());
                 action.ExecuteOnClient();
             }
         }
