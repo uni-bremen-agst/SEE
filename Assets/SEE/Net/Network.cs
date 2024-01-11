@@ -242,7 +242,7 @@ namespace SEE.Net
         /// <summary>
         /// Stores every executed Action to be synced with new connecting clients
         /// </summary>
-        public static List<string> networkActionList = new();
+        public static List<string> NetworkActionList = new();
 
         private void Awake()
         {
@@ -256,7 +256,7 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Makes sure that we have only one <see cref="Instance"/>.
+        /// Makes sure that we have only one <see cref="Instance"/> and check command line arguments.
         /// </summary>
         private void Start()
         {
@@ -273,8 +273,9 @@ namespace SEE.Net
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
             NetworkManager.Singleton.NetworkConfig.ConnectionApproval = true;
 
-            string[] arguments = Environment.GetCommandLineArgs();
+            string[] arguments = Environment.GetCommandLineArgs(); 
 
+            //Check command line arguments
             for (int i = 0; i < arguments.Length; i++)
             {
                 if (arguments[i] == "-port")

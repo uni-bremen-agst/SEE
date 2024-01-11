@@ -26,7 +26,7 @@ namespace SEE.Net
                 return;
             }
 
-            foreach (string serializedAction in Network.networkActionList.ToList())
+            foreach (string serializedAction in Network.NetworkActionList.ToList())
             {
                 clientNetwork.ExecuteActionUnsafeClientRpc(serializedAction);
             }
@@ -43,8 +43,7 @@ namespace SEE.Net
             AbstractNetAction deserializedAction = ActionSerializer.Deserialize(serializedAction);
             if (deserializedAction.ShouldBeSentToNewClient)
             {
-                Network.networkActionList.Add(serializedAction);
-                Debug.Log(Network.networkActionList.Count);
+                Network.NetworkActionList.Add(serializedAction);
             }
             deserializedAction.ExecuteOnServer();
             foreach (NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
