@@ -18,19 +18,13 @@ using UnityEngine.Assertions;
 
 namespace SEE.Game.City
 {
-    public class SEEBranchCity : AbstractSEECity
+    public class SEEBranchCity : SEECity
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
         /// <see cref="SEECityEvolution.Save(ConfigWriter)"/> and
         /// <see cref="SEECityEvolution.Restore(Dictionary{string,object})"/>,
         /// respectively. You should also extend the test cases in TestConfigIO.
-
-        /// <summary>
-        /// The path to the Version Control System
-        /// </summary>
-        /*[SerializeField, ShowInInspector, Tooltip("Path of VersionControlSystem"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
-        public BranchesLayoutAttributes VersionControlSystem = new();*/
 
         /// The path to the GXL file containing the graph data.
         /// Note that any deriving class may use multiple GXL paths from which the single city is constructed.
@@ -65,8 +59,8 @@ namespace SEE.Game.City
         ///
         /// Neither serialized nor saved to the config file.
         /// </summary>
-        [NonSerialized]
-        private Graph loadedGraph = null;
+        //[NonSerialized]
+        //private Graph loadedGraph = null;
 
         /// <summary>
         /// The graph that should be compared to.
@@ -76,12 +70,9 @@ namespace SEE.Game.City
 
         private Graph diffGraph;
 
-        private List<Node> nodeList;
-
-        private List<Node> nodeList2;
-
-        private bool flag = false;
-
+        /// <summary>
+        /// List to save the old Attributes from 
+        /// </summary>
         private List<Tuple<string, int>> oldNodeAttributes = new List<Tuple<string, int>>();
 
 
@@ -112,7 +103,7 @@ namespace SEE.Game.City
         ///
         /// Neither serialized nor saved to the config file.
         /// </summary>
-        public override Graph LoadedGraph
+        /*public override Graph LoadedGraph
         {
             get => loadedGraph;
             protected set
@@ -120,7 +111,7 @@ namespace SEE.Game.City
                 loadedGraph = value;
                 InspectSchema(loadedGraph);
             }
-        }
+        }*/
 
         /// <summary>
         /// The graph underlying this SEE city that was loaded from disk. May be null.
@@ -165,7 +156,7 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
-        public void LoadData()
+        public override void LoadData()
         {
             Debug.Log("Load Data");
             if (string.IsNullOrEmpty(GXLPath1.Path) || string.IsNullOrEmpty(GXLPath2.Path))
@@ -174,27 +165,26 @@ namespace SEE.Game.City
             }
             else
             {
-                if (LoadedGraph != null)
+                if (LoadedGraph != null || NextGraph != null)
                 {
                     Reset();
                 }
 
-
                 LoadedGraph = LoadGraph(GXLPath1.Path);
                 nextGraph = LoadGraph(GXLPath2.Path);
 
-                InspectSchema(loadedGraph);
-                loadedGraph = RelevantGraph(loadedGraph);
+                InspectSchema(LoadedGraph);
+                LoadedGraph = RelevantGraph(LoadedGraph);
 
                 //InspectSchema(nextGraph);
                 //nextGraph = RelevantGraph(nextGraph);
 
-                
-
                 CalculateDiff();
 
                 CreateDiffGraph();
-                
+
+                //loadedGraph = diffGraph;
+
             }
         }
 
@@ -204,7 +194,7 @@ namespace SEE.Game.City
             NextGraph.Diff(LoadedGraph,
                           g => g.Nodes(),
                           (g, id) => g.GetNode(id),
-                          GraphExtensions.AttributeDiff(loadedGraph, nextGraph),
+                          GraphExtensions.AttributeDiff(LoadedGraph, nextGraph),
                           nodeEqualityComparer,
                           out addedNodes,
                           out removedNodes,
@@ -215,7 +205,7 @@ namespace SEE.Game.City
             NextGraph.Diff(LoadedGraph,
                          g => g.Edges(),
                         (g, id) => g.GetEdge(id),
-                        GraphExtensions.AttributeDiff(loadedGraph, nextGraph),
+                        GraphExtensions.AttributeDiff(LoadedGraph, nextGraph),
                         edgeEqualityComparer,
                         out addedEdges,
                         out removedEdges,
@@ -233,44 +223,21 @@ namespace SEE.Game.City
         /// </summary>
         private void CreateDiffGraph()
         {
-            diffGraph = new Graph(loadedGraph);
+            diffGraph = new Graph(LoadedGraph);
 
             List<Node> listGraphA = diffGraph.Nodes();
             List<Node> listGraphB = NextGraph.Nodes();
-            
 
 
             //Delete Nodes and Edges for Graph B to avoid multiple nodes with the same ID
-            addedNodes.ForEach(node =>
+            nextGraph.Nodes().ForEach(node =>
             {
-                if (node.ItsGraph != null)
-                {
-                    NextGraph.RemoveNode(node);
-                }
+                nextGraph.RemoveNode(node);
             });
 
-            addedEdges.ForEach(edge =>
-            {
-                if (edge.ItsGraph != null)
-                {
-                    NextGraph.RemoveEdge(edge);
-                }
+            nextGraph.Edges().ForEach(edge => {
+                nextGraph.RemoveEdge(edge);
             });
-
-            changedNodes.ForEach(node => {
-                if (node.ItsGraph != null)
-                {
-                    NextGraph.RemoveNode(node);
-                }
-            });
-
-            changedEdges.ForEach(edge => {
-                if (edge.ItsGraph != null)
-                {
-                    NextGraph.RemoveEdge(edge);
-                }
-            });
-
 
 
 
@@ -290,10 +257,10 @@ namespace SEE.Game.City
             });
 
 
-            
+            //Go through every changedNode and update their attributes
             changedNodes.ForEach(node =>
             {
-                Node toBeComparedNode;
+                //Node toBeComparedNode;
                 ISet<string> metricListNodeA;
                 ISet<string> metricListNodeB = node.AllMetrics();
 
@@ -333,15 +300,17 @@ namespace SEE.Game.City
 
             Debug.Log(addedEdges.Count);
 
-            addedEdges.ForEach(edge =>
+            /*addedEdges.ForEach(edge =>
             {
                 Node sourceNode = diffGraph.Nodes().Find(diffEdge => diffEdge.ID == edge.Source.ID);
                 Node targetNode = diffGraph.Nodes().Find(diffEdge => diffEdge.ID == edge.Target.ID);
 
+                //edge.SetToggle("addedEdge");
                 diffGraph.AddEdge(sourceNode, targetNode, edge.Type);
+                
                 //Debug.Log("Operation erfolgreich");
 
-            });
+            });*/
 
             //Add or remove Edges
             List<Node> diffNodes = diffGraph.Nodes();
@@ -369,47 +338,52 @@ namespace SEE.Game.City
                     }
 
                 });
-                edge.SetToggle("addedEdge");
+                //edge.SetToggle("addedEdge");
             });
 
 
             //Mark removed Edge with attribute
             removedEdges.ForEach(edge =>
             {
-                edge.SetToggle("removedEdge");
+                //edge.SetToggle("removedEdge");
             });
 
-           /* Debug.Log("LoadGraph Edges: " + LoadedGraph.EdgeCount);
+            /* Debug.Log("LoadGraph Edges: " + LoadedGraph.EdgeCount);
 
-            Debug.Log("NextGraph Edges: " + NextGraph.EdgeCount);
+             Debug.Log("NextGraph Edges: " + NextGraph.EdgeCount);
 
-            Debug.Log("DiffGraph Nodes: " + diffGraph.NodeCount);
+             Debug.Log("DiffGraph Nodes: " + diffGraph.NodeCount);
 
-            Debug.Log("DiffGraph Edges: " + diffGraph.EdgeCount);*/
+             Debug.Log("DiffGraph Edges: " + diffGraph.EdgeCount);*/
+             Debug.Log(diffGraph);
         
         }
 
         /// <summary>
         /// Draws the graph.
-        /// Precondition: The graph and its metrics have been loaded.
+        /// Precondition: The graphs have been loaded and the graph to be visualised has been calculated
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Draw Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
         [PropertyOrder(DataButtonsGroupOrderDraw)]
-        public void DrawGraph()
+        public override void DrawGraph()
         {
-            if (diffGraph != null)
+            /*if (diffGraph != null)
             {
-                Debug.Log(diffGraph);
+                //Debug.Log(diffGraph);
                 diffGraph = RelevantGraph(diffGraph);
-                LoadDataForGraphListing(diffGraph);
+                //LoadDataForGraphListing(diffGraph);
                 GraphRenderer graphRenderer = new GraphRenderer(this, diffGraph);
                 graphRenderer.DrawGraph(diffGraph, gameObject);
             }
             else
             {
                 Debug.LogWarning("No graph loaded yet.\n");
-            }
+            }*/
+            LoadedGraph = diffGraph;
+            Debug.Log(LoadedGraph);
+            //Debug.Log(loadedGraph);
+            base.DrawGraph();
         }
 
        
@@ -475,9 +449,9 @@ namespace SEE.Game.City
         /// </summary>
         protected override void ProjectPathChanged()
         {
-            if (loadedGraph != null)
+            if (LoadedGraph != null)
             {
-                loadedGraph.BasePath = SourceCodeDirectory.Path;
+                LoadedGraph.BasePath = SourceCodeDirectory.Path;
             }
         }
 
@@ -491,13 +465,13 @@ namespace SEE.Game.City
         /// <returns>names of all existing node metrics</returns>
         public override ISet<string> AllExistingMetrics()
         {
-            if (loadedGraph == null)
+            if (LoadedGraph == null)
             {
                 return new HashSet<string>();
             }
             else
             {
-                ISet<string> set1 = loadedGraph.AllNumericNodeAttributes();
+                ISet<string> set1 = LoadedGraph.AllNumericNodeAttributes();
                 ISet<string> set2 = nextGraph.AllNumericNodeAttributes();
 
                 ISet<string> result = set1;
@@ -512,13 +486,13 @@ namespace SEE.Game.City
         /// </summary>
         protected override void DumpNodeMetrics()
         {
-            if (loadedGraph == null || nextGraph)
+            if (LoadedGraph == null || nextGraph)
             {
                 Debug.Log("Either the first graph or the second graph have not been loaded");
             }
             else
             {
-                DumpNodeMetrics(new List<Graph>() { loadedGraph, nextGraph });
+                DumpNodeMetrics(new List<Graph>() { LoadedGraph, nextGraph });
             }
         }
 
@@ -540,7 +514,10 @@ namespace SEE.Game.City
             diffGraph = null;
         }
 
-
+        protected override void InitializeAfterDrawn()
+        {
+            base.InitializeAfterDrawn();
+        }
 
 
         //--------------------------------
@@ -551,24 +528,20 @@ namespace SEE.Game.City
         /// Label of attribute <see cref="GXLPath"/> in the configuration file.
         /// </summary>
         private const string gxlPathLabel = "GXLPath";
-/*
 
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
-            VersionControlSystem.FilePath.Save(writer, gxlPathLabel);
-            VersionControlSystem.GLXPath1.Save(writer, gxlPathLabel);
-            VersionControlSystem.GLXPath2.Save(writer, gxlPathLabel);
+            GXLPath1.Save(writer, gxlPathLabel);
+            GXLPath2.Save(writer, gxlPathLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
-            VersionControlSystem.FilePath.Restore(attributes, gxlPathLabel);
-            VersionControlSystem.GLXPath1.Restore(attributes, gxlPathLabel);
-            VersionControlSystem.GLXPath2.Restore(attributes, gxlPathLabel);
+            GXLPath1.Restore(attributes, gxlPathLabel);
+            GXLPath2.Restore(attributes, gxlPathLabel);
         }
-*/
     }
 }
 
