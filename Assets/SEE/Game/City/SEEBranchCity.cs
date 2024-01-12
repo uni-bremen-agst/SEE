@@ -29,14 +29,14 @@ namespace SEE.Game.City
         /// The path to the GXL file containing the graph data.
         /// Note that any deriving class may use multiple GXL paths from which the single city is constructed.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Path of first GXL file"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
-        public FilePath GXLPath1 = new();
+        [SerializeField, ShowInInspector, Tooltip("Path of GXLBasePath file"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        public FilePath GXLBasePath = new();
 
         /// <summary>
         /// The path to the CSV file containing the additional metric values.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Path of second GXL file"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
-        public FilePath GXLPath2 = new();
+        /*[SerializeField, ShowInInspector, Tooltip("Path of second GXL file"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        public FilePath GXLPath2 = new();*/
 
         /// <summary>
         /// The graph that is visualized in the scene and whose visualization settings are
@@ -71,7 +71,7 @@ namespace SEE.Game.City
         private Graph diffGraph;
 
         /// <summary>
-        /// List to save the old Attributes from 
+        /// List to save the old Attributes from
         /// </summary>
         private List<Tuple<string, int>> oldNodeAttributes = new List<Tuple<string, int>>();
 
@@ -137,7 +137,7 @@ namespace SEE.Game.City
         protected override void Start()
         {
             base.Start();
-            
+
             //LoadData();
             //InitializeAfterDrawn();
             //BoardSettings.LoadBoard();
@@ -159,7 +159,7 @@ namespace SEE.Game.City
         public override void LoadData()
         {
             Debug.Log("Load Data");
-            if (string.IsNullOrEmpty(GXLPath1.Path) || string.IsNullOrEmpty(GXLPath2.Path))
+            if (string.IsNullOrEmpty(GXLBasePath.Path) || string.IsNullOrEmpty(GXLPath.Path))
             {
                 Debug.LogError("Empty graph path.\n");
             }
@@ -170,8 +170,8 @@ namespace SEE.Game.City
                     Reset();
                 }
 
-                LoadedGraph = LoadGraph(GXLPath1.Path);
-                nextGraph = LoadGraph(GXLPath2.Path);
+                LoadedGraph = LoadGraph(GXLPath.Path);
+                nextGraph = LoadGraph(GXLBasePath.Path);
 
                 InspectSchema(LoadedGraph);
                 LoadedGraph = RelevantGraph(LoadedGraph);
@@ -193,7 +193,7 @@ namespace SEE.Game.City
         private void CalculateDiff()
         {
             //Node Comparison
-            NextGraph.Diff(LoadedGraph,
+            LoadedGraph.Diff(NextGraph,
                           g => g.Nodes(),
                           (g, id) => g.GetNode(id),
                           GraphExtensions.AttributeDiff(LoadedGraph, nextGraph),
@@ -204,7 +204,7 @@ namespace SEE.Game.City
                           out equalNodes);
 
             //Edge Comparison
-            NextGraph.Diff(LoadedGraph,
+            LoadedGraph.Diff(NextGraph,
                          g => g.Edges(),
                         (g, id) => g.GetEdge(id),
                         GraphExtensions.AttributeDiff(LoadedGraph, nextGraph),
@@ -214,10 +214,12 @@ namespace SEE.Game.City
                         out changedEdges,
                         out equalEdges);
 
-           /* Debug.Log("addedNodes: " + addedNodes.Count);
+            Debug.Log("addedNodes: " + addedNodes.Count);
             Debug.Log("changedNodes: " + changedNodes.Count);
             Debug.Log("removedNodes: " + removedNodes.Count);
-            Debug.Log("equalNodes: " + equalNodes.Count);*/
+            Debug.Log("equalNodes: " + equalNodes.Count);
+            Debug.Log("changedEdges: " + changedEdges.Count);
+            Debug.Log("addedEdges: " + addedEdges.Count);
         }
 
         /// <summary>
@@ -225,27 +227,29 @@ namespace SEE.Game.City
         /// </summary>
         private void CreateDiffGraph()
         {
-            diffGraph = new Graph(LoadedGraph);
-
-            List<Node> listGraphA = diffGraph.Nodes();
-            List<Node> listGraphB = NextGraph.Nodes();
+            diffGraph = new Graph(NextGraph);
 
 
-            //Delete Nodes and Edges for Graph B to avoid multiple nodes with the same ID
-            nextGraph.Nodes().ForEach(node =>
+
+            List<Node> listdiffGraph = diffGraph.Nodes();
+            List<Node> listLoadedGraph = LoadedGraph.Nodes();
+
+
+            //Delete Nodes and Edges for the new Graph to avoid multiple nodes with the same ID
+            LoadedGraph.Nodes().ForEach(node =>
             {
-                nextGraph.RemoveNode(node);
+                LoadedGraph.RemoveNode(node);
             });
 
-            nextGraph.Edges().ForEach(edge => {
-                nextGraph.RemoveEdge(edge);
+            LoadedGraph.Edges().ForEach(edge => {
+                LoadedGraph.RemoveEdge(edge);
             });
 
 
 
             //Draw Nodes
 
-            //New Node added with attribute
+            //Add Node with attribute
             addedNodes.ForEach(node =>
             {
                 node.SetToggle("addedNode");
@@ -255,7 +259,10 @@ namespace SEE.Game.City
             //RemovedNodes marked with attribute
             removedNodes.ForEach(node =>
             {
-                node.SetToggle("deletedNode");
+
+                Node diffNode = diffGraph.Nodes().Find(diffNode2 => diffNode2.ID == node.ID);
+                diffNode.SetToggle("deletedNode");
+                //Debug.Log("Removed Erfolgreich" + node);
             });
 
 
@@ -267,7 +274,7 @@ namespace SEE.Game.City
                 ISet<string> metricListNodeB = node.AllMetrics();
 
                 //Suche richtige NodeID
-                listGraphA.ForEach(nodeGraphA => {
+                listdiffGraph.ForEach(nodeGraphA => {
                     if (node.ID == nodeGraphA.ID)
                     {
                         metricListNodeA = diffGraph.AllMetrics();
@@ -301,32 +308,33 @@ namespace SEE.Game.City
                             oldNodeAttributes.Add(new Tuple<string, int>(metric, a));
                             nodeGraphA.SetInt(metric, a);
                         });
-                        
+
                     }
                 });
             });
 
 
-            Debug.Log(addedEdges.Count);
+            //Debug.Log(addedEdges.Count);
 
-            /*addedEdges.ForEach(edge =>
+            addedEdges.ForEach(edge =>
             {
                 Node sourceNode = diffGraph.Nodes().Find(diffEdge => diffEdge.ID == edge.Source.ID);
                 Node targetNode = diffGraph.Nodes().Find(diffEdge => diffEdge.ID == edge.Target.ID);
 
                 //edge.SetToggle("addedEdge");
                 diffGraph.AddEdge(sourceNode, targetNode, edge.Type);
-                
+
                 //Debug.Log("Operation erfolgreich");
 
-            });*/
+            });
+
 
             //Add or remove Edges
             List<Node> diffNodes = diffGraph.Nodes();
 
             //Add Edges with attribute
             //Such die Source und Target Nodes manuell und füge dann ein Edge hinzu
-            addedEdges.ForEach(edge =>
+            /*addedEdges.ForEach(edge =>
             {
                 diffNodes.ForEach(node1 => {
                     string targetID = edge.Target.ID;
@@ -348,7 +356,7 @@ namespace SEE.Game.City
 
                 });
                 //edge.SetToggle("addedEdge");
-            });
+            });*/
 
 
             //Mark removed Edge with attribute
@@ -365,7 +373,7 @@ namespace SEE.Game.City
 
              Debug.Log("DiffGraph Edges: " + diffGraph.EdgeCount);*/
              Debug.Log(diffGraph);
-        
+
         }
 
         /// <summary>
@@ -390,7 +398,7 @@ namespace SEE.Game.City
                 Debug.LogWarning("No graph loaded yet.\n");
             }*/
             LoadedGraph = diffGraph;
-            //Debug.Log(LoadedGraph);
+            Debug.Log(LoadedGraph);
             //Debug.Log(LoadedGraph);
             base.DrawGraph();
         }
@@ -491,7 +499,7 @@ namespace SEE.Game.City
         /// If no graph has been loaded yet, the empty list will be returned.
         /// </summary>
         /// <returns>names of all existing node metrics</returns>
-        public override ISet<string> AllExistingMetrics()
+        /*public override ISet<string> AllExistingMetrics()
         {
             if (LoadedGraph == null)
             {
@@ -507,7 +515,7 @@ namespace SEE.Game.City
 
                 return result;
             }
-        }
+        }*/
 
         /// <summary>
         /// Dumps the metric names of all node types of the currently loaded graph.
@@ -555,20 +563,18 @@ namespace SEE.Game.City
         /// <summary>
         /// Label of attribute <see cref="GXLPath"/> in the configuration file.
         /// </summary>
-        private const string gxlPathLabel = "GXLPath";
+        private const string gxlBasePathLabel = "GXLBasePath";
 
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
-            GXLPath1.Save(writer, gxlPathLabel);
-            GXLPath2.Save(writer, gxlPathLabel);
+            GXLBasePath.Save(writer, gxlBasePathLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
-            GXLPath1.Restore(attributes, gxlPathLabel);
-            GXLPath2.Restore(attributes, gxlPathLabel);
+            GXLBasePath.Restore(attributes, gxlBasePathLabel);
         }
     }
 }
