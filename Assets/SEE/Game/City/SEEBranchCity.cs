@@ -176,8 +176,10 @@ namespace SEE.Game.City
                 InspectSchema(LoadedGraph);
                 LoadedGraph = RelevantGraph(LoadedGraph);
 
-                //InspectSchema(nextGraph);
-                //nextGraph = RelevantGraph(nextGraph);
+                InspectSchema(nextGraph);
+                NextGraph = RelevantGraph(NextGraph);
+
+                //SaveData();
 
                 CalculateDiff();
 
@@ -271,7 +273,7 @@ namespace SEE.Game.City
                         metricListNodeA = diffGraph.AllMetrics();
                         //Gehe durch die Metriken
                         //Wenn B mehrere Metriken hat, dann gehe da durch
-                        if(metricListNodeB.Count > metricListNodeA.Count)
+                        /*if(metricListNodeB.Count > metricListNodeA.Count)
                         {
                             metricListNodeB.ForEach(metrics =>
                             {
@@ -291,7 +293,14 @@ namespace SEE.Game.City
                                 oldNodeAttributes.Add(new Tuple<string, int>(metrics, a));
                                 nodeGraphA.SetInt(metrics, a);
                             });
-                        }
+                        }*/
+                        metricListNodeB.ForEach(metric =>
+                        {
+                            int a = node.GetInt(metric);
+                            //Debug.Log("Metrics: " + metrics + " hat die Nummer: " + a);
+                            oldNodeAttributes.Add(new Tuple<string, int>(metric, a));
+                            nodeGraphA.SetInt(metric, a);
+                        });
                         
                     }
                 });
@@ -381,12 +390,31 @@ namespace SEE.Game.City
                 Debug.LogWarning("No graph loaded yet.\n");
             }*/
             LoadedGraph = diffGraph;
-            Debug.Log(LoadedGraph);
-            //Debug.Log(loadedGraph);
+            //Debug.Log(LoadedGraph);
+            //Debug.Log(LoadedGraph);
             base.DrawGraph();
         }
 
-       
+
+        /// <summary>
+        /// Saves the graph data to the GXL file with GXLPath().
+        /// </summary>
+        /*[Button(ButtonSizes.Small)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Data")]
+        [PropertyOrder(DataButtonsGroupOrderSave)]
+        public override void SaveData()
+        {
+            if (string.IsNullOrEmpty(GXLPath1.Path) || string.IsNullOrEmpty(GXLPath2.Path))
+            {
+                Debug.LogError("Empty graph path.\n");
+            }
+            else if (LoadedGraph != null)
+            {
+                GraphWriter.Save(GXLPath1.Path, LoadedGraph, HierarchicalEdges.First());
+                GraphWriter.Save(GXLPath2.Path, NextGraph, HierarchicalEdges.First());
+            }
+        }*/
+
 
 
 

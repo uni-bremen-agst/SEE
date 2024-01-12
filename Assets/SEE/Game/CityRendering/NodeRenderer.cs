@@ -51,6 +51,20 @@ namespace SEE.Game.CityRendering
         /// <returns>game object representing given <paramref name="node"/></returns>
         private GameObject CreateGameNode(Node node, bool addToGraphElementIDMap = true)
         {
+            //Debug.Log("GameNode: " + node.ItsGraph);
+            /*Debug.Log("nodeType Count: " + nodeTypeToFactory.Count);
+            foreach(var kvp in nodeTypeToFactory)
+            {
+                Debug.Log($"string: {kvp.Key}, NodeFactory: {kvp.Value}");
+            }*/
+
+            /*foreach (string nodeType in AllNodeTypes())
+            {
+                Debug.Log(nodeType);
+                Debug.Log(Settings.NodeTypes.TryGetValue(nodeType, out VisualNodeAttributes value));
+            }*/
+            //Debug.Log(nodeTypeToFactory.TryGetValue(node.Type, out NodeFactory test));
+
             if (!nodeTypeToFactory.TryGetValue(node.Type, out NodeFactory nodeFactory))
             {
                 throw new InvalidOperationException($"No node type factory for node type {node.Type}.\n");
