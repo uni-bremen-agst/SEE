@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Antlr4.Runtime;
+using UnityEngine;
 
 namespace SEE.UI.Window.CodeWindow
 {
@@ -103,14 +104,14 @@ namespace SEE.UI.Window.CodeWindow
         /// <li>Each token will be created by using <see cref="FromAntlrToken"/>.</li>
         /// </ul>
         /// </remarks>
-        public static IList<SEEToken> FromFile(string filename)
+        public static IEnumerable<SEEToken> FromFile(string filename)
         {
-            TokenLanguage language = TokenLanguage.FromFileExtension(Path.GetExtension(filename)?.Substring(1));
+            TokenLanguage language = TokenLanguage.FromFileExtension(Path.GetExtension(filename)?[1..]);
             Lexer lexer = language.CreateLexer(File.ReadAllText(filename));
             CommonTokenStream tokenStream = new(lexer);
             tokenStream.Fill();
             // Generate list of SEETokens using the token stream and its language
-            return tokenStream.GetTokens().Select(x => FromAntlrToken(x, lexer, language)).ToList();
+            return tokenStream.GetTokens().Select(x => FromAntlrToken(x, lexer, language));
         }
 
         /// <summary>
@@ -200,7 +201,7 @@ namespace SEE.UI.Window.CodeWindow
             /// <summary>
             /// End-Of-File token.
             /// </summary>
-            public static readonly Type EOF = new("EOF", "000000"); // color doesn't matter
+            public static readonly Type EOF = new("eof", "000000"); // color doesn't matter
 
             /// <summary>
             /// Unknown tokens, i.e. those not recognized by the lexer.
@@ -237,7 +238,12 @@ namespace SEE.UI.Window.CodeWindow
                 }
 
                 string typeName = language.TypeName(symbolicName);
-                return AllTokens.SingleOrDefault(x => x.Name.Equals(typeName)) ?? Unknown;
+                Type type = AllTokens.SingleOrDefault(x => x.Name.Equals(typeName));
+                if (type == null)
+                {
+                    Debug.LogError($"Unknown token type: {typeName}");
+                }
+                return type ?? Unknown;
             }
         }
     }

@@ -712,10 +712,10 @@ namespace SEE.Net
 
                 while (!NetworkManager.Singleton.IsConnectedClient)
                 {
-                    Debug.Log($"Client is waiting for connection to server {ServerAddress} {waitingTime}/{MaxWaitingTime}...\n");
+                    Debug.Log($"Client is waiting for connection to server {ServerAddress} {waitingTime}/{maxWaitingTime}...\n");
                     yield return new WaitForSeconds(waitingTimePerIteration);
                     waitingTime += waitingTimePerIteration;
-                    if (waitingTime > MaxWaitingTime)
+                    if (waitingTime > maxWaitingTime)
                     {
                         break;
                     }
@@ -736,7 +736,7 @@ namespace SEE.Net
         /// The maximal waiting time in seconds a client is willing to wait until a connection
         /// can be established.
         /// </summary>
-        private const float MaxWaitingTime = 5 * 60;
+        private const float maxWaitingTime = 5 * 60;
 
         /// <summary>
         /// Starts a dedicated server without client.
@@ -828,14 +828,14 @@ namespace SEE.Net
         /// <summary>
         /// Name of the Inspector foldout group for the logging setttings.
         /// </summary>
-        private const string VoiceChatFoldoutGroup = "Voice Chat";
+        private const string voiceChatFoldoutGroup = "Voice Chat";
 
         /// <summary>
         /// The voice chat system as selected by the user. Note: This attribute
         /// can be changed in the editor via <see cref="NetworkEditor"/> as well
         /// as at the start up in the <see cref="OpeningDialog"/>.
         /// </summary>
-        [Tooltip("The voice chat system to be used. 'None' for no voice chat."), FoldoutGroup(VoiceChatFoldoutGroup)]
+        [Tooltip("The voice chat system to be used. 'None' for no voice chat."), FoldoutGroup(voiceChatFoldoutGroup)]
         public VoiceChatSystems VoiceChat = VoiceChatSystems.None;
 
         /// <summary>
@@ -907,19 +907,19 @@ namespace SEE.Net
         /// <summary>
         /// The name of the group for the fold-out group of the configuration file.
         /// </summary>
-        private const string ConfigurationFoldoutGroup = "Configuration File";
+        private const string configurationFoldoutGroup = "Configuration File";
 
         /// <summary>
         /// The name of the group for the Inspector buttons loading and saving the configuration file.
         /// </summary>
-        private const string ConfigurationButtonsGroup = "ConfigurationButtonsGroup";
+        private const string configurationButtonsGroup = "ConfigurationButtonsGroup";
 
         /// <summary>
         /// Default path of the configuration file (path and filename).
         /// </summary>
         [SerializeField]
         [PropertyTooltip("Path of the file containing the network configuration.")]
-        [HideReferenceObjectPicker, FoldoutGroup(ConfigurationFoldoutGroup)]
+        [HideReferenceObjectPicker, FoldoutGroup(configurationFoldoutGroup)]
         public FilePath ConfigPath = new();
 
         /// <summary>
@@ -928,7 +928,7 @@ namespace SEE.Net
         /// </summary>
         [Button(ButtonSizes.Small)]
         [PropertyTooltip("Saves the network settings in a configuration file.")]
-        [ButtonGroup(ConfigurationButtonsGroup)]
+        [ButtonGroup(configurationButtonsGroup)]
         public void Save()
         {
             Save(ConfigPath.Path);
@@ -940,7 +940,7 @@ namespace SEE.Net
         /// </summary>
         [Button(ButtonSizes.Small)]
         [PropertyTooltip("Loads the network configuration file.")]
-        [ButtonGroup(ConfigurationButtonsGroup)]
+        [ButtonGroup(configurationButtonsGroup)]
         public void Load()
         {
             Load(ConfigPath.Path);
@@ -1055,7 +1055,7 @@ namespace SEE.Net
         public static VivoxUnity.IChannelSession VivoxChannelSession { get; private set; } = null;
 
         [SerializeField]
-        [Tooltip("The channel name for Vivox."), FoldoutGroup(VoiceChatFoldoutGroup)]
+        [Tooltip("The channel name for Vivox."), FoldoutGroup(voiceChatFoldoutGroup)]
         [ShowIf("VoiceChat", VoiceChatSystems.Vivox)]
         private string vivoxChannelName = string.Empty;
         public static string VivoxChannelName { get => Instance ? Instance.vivoxChannelName : string.Empty; }

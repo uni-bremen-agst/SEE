@@ -24,7 +24,7 @@ namespace SEE.Game
         /// <returns>true if a <see cref="PlayerMenu"/> could be found</returns>
         internal static bool TryGetPlayerMenu(out PlayerMenu playerMenu)
         {
-            if (Instance == null) 
+            if (Instance == null)
             {
                 Debug.LogError($"Local player is null'.\n");
                 playerMenu = null;

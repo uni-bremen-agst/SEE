@@ -48,7 +48,6 @@ namespace SEE.UI.HelpSystem
         {
             if (SEEInput.Help())
             {
-                KeyBindings.PrintBindings();
                 if (!mainMenu.ShowMenu)
                 {
                     mainMenu.ShowMenu = true;

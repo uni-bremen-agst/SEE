@@ -178,6 +178,9 @@
         "CycleDetection-IncludeCycles": {
             "_active": true
         },
+        "FileWide": {
+            "_active": true
+        },
         "Generic-MarkupComments": {
             "_active": false
         },
@@ -636,9 +639,24 @@
         "Metric-TokenMetric.XXX": {
             "_active": true
         },
+        "NextLine": {
+            "_active": true
+        },
+        "NextRoutine": {
+            "_active": true
+        },
+        "SameLine": {
+            "_active": true
+        },
+        "SameRoutine": {
+            "_active": true
+        },
         "SaveRFG": {
             "_active": true,
             "rfg_file": null
+        },
+        "SelectedRoutine": {
+            "_active": true
         }
     },
     "Project": {
@@ -708,11 +726,11 @@
         }
     },
     "_Format": "1.0",
-    "_Version": "7.6.3",
+    "_Version": "7.7.1",
     "_VersionNum": [
         7,
-        6,
-        3,
-        12797
+        7,
+        1,
+        13682
     ]
 }

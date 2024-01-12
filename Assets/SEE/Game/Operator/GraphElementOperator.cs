@@ -27,23 +27,23 @@ namespace SEE.Game.Operator
         /// Operation handling the blinking of the element.
         /// The parameter specifies the number of blinks.
         /// </summary>
-        protected TweenOperation<int> blinking;
+        protected TweenOperation<int> Blinking;
 
         /// <summary>
         /// Operation handling the glow effect around the element.
         /// </summary>
-        protected TweenOperation<float> glow;
+        protected TweenOperation<float> Glow;
 
         /// <summary>
         /// Amount of glow that should be animated towards.
         /// </summary>
         /// <remarks>Its value must be greater than 0 and not greater than 5.</remarks>
-        protected const float fullGlow = 2;
+        protected const float FullGlow = 2;
 
         /// <summary>
         /// Whether the glow effect is currently (supposed to be) enabled.
         /// </summary>
-        protected bool glowEnabled;
+        protected bool GlowEnabled;
 
         /// <summary>
         /// The city to which the element belongs.
@@ -83,7 +83,7 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> Blink(int blinkCount, float factor = 1)
         {
-            return blinking.AnimateTo(blinkCount, ToDuration(factor));
+            return Blinking.AnimateTo(blinkCount, ToDuration(factor));
         }
 
         /// <summary>
@@ -97,8 +97,8 @@ namespace SEE.Game.Operator
         public virtual IOperationCallback<Action> GlowIn(float factor = 1)
         {
             float targetGlow = GetTargetGlow();
-            glowEnabled = true;
-            return glow.AnimateTo(targetGlow, ToDuration(factor));
+            GlowEnabled = true;
+            return Glow.AnimateTo(targetGlow, ToDuration(factor));
         }
 
         /// <summary>
@@ -111,8 +111,8 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> GlowOut(float factor = 1)
         {
-            glowEnabled = false;
-            return glow.AnimateTo(0, ToDuration(factor));
+            GlowEnabled = false;
+            return Glow.AnimateTo(0, ToDuration(factor));
         }
 
         /// <summary>
@@ -247,13 +247,13 @@ namespace SEE.Game.Operator
 
             C targetColor = ModifyColor(Color.TargetValue, c => c.WithAlpha(alpha));
             // Elements being faded should also lead to highlights being faded.
-            float targetGlow = GetTargetGlow(glowEnabled ? fullGlow : 0, alpha);
+            float targetGlow = GetTargetGlow(GlowEnabled ? FullGlow : 0, alpha);
 
             float duration = ToDuration(factor);
             return new AndCombinedOperationCallback<Action>(new[]
             {
                 Color.AnimateTo(targetColor, duration),
-                glow.AnimateTo(targetGlow, duration)
+                Glow.AnimateTo(targetGlow, duration)
             });
         }
 
@@ -293,7 +293,7 @@ namespace SEE.Game.Operator
 
             highlightEffect.outline = 0;
 
-            glow = new TweenOperation<float>(AnimateToGlowAction, highlightEffect.glow);
+            Glow = new TweenOperation<float>(AnimateToGlowAction, highlightEffect.glow);
             return;
 
             Tween[] AnimateToGlowAction(float endGlow, float duration) => new Tween[]
@@ -321,7 +321,7 @@ namespace SEE.Game.Operator
         private static float GetTargetGlow(float glowTarget, float alphaTarget)
         {
             // Normalized glow (i.e., glow expressed as value in [0,1]) must not be higher than alpha.
-            return Mathf.Min(glowTarget / fullGlow, alphaTarget) * fullGlow;
+            return Mathf.Min(glowTarget / FullGlow, alphaTarget) * FullGlow;
         }
 
         /// <summary>
@@ -331,7 +331,7 @@ namespace SEE.Game.Operator
         /// <returns>Glow value which doesn't exceed alpha value</returns>
         protected override float GetTargetGlow()
         {
-            return GetTargetGlow(fullGlow, AsEnumerable(Color.TargetValue).Max(x => x.a));
+            return GetTargetGlow(FullGlow, AsEnumerable(Color.TargetValue).Max(x => x.a));
         }
 
         /// <summary>
@@ -368,7 +368,7 @@ namespace SEE.Game.Operator
             // we need to call Refresh() on it or it will stop working.
             if (value is HierarchyEvent)
             {
-                RefreshGlow().Forget();
+                RefreshGlowAsync().Forget();
             }
         }
 
@@ -377,13 +377,13 @@ namespace SEE.Game.Operator
         ///
         /// Needs to be called whenever the material changes. Hierarchy changes are handled automatically.
         /// </summary>
-        public async UniTaskVoid RefreshGlow(bool fullRefresh = false)
+        public async UniTaskVoid RefreshGlowAsync(bool fullRefresh = false)
         {
-            if (highlightEffect != null && glow != null)
+            if (highlightEffect != null && Glow != null)
             {
                 if (fullRefresh)
                 {
-                    glow.KillAnimator();
+                    Glow.KillAnimator();
                     Destroyer.Destroy(highlightEffect);
                     await UniTask.WaitForEndOfFrame(); // component is only destroyed by the end of the frame.
                     highlightEffect = Highlighter.GetHighlightEffect(gameObject);
@@ -412,13 +412,13 @@ namespace SEE.Game.Operator
             City = GetCity(gameObject);
             Color = InitializeColorOperation();
 
-            blinking = new TweenOperation<int>(BlinkAction, 0, equalityComparer: new AlwaysFalseEqualityComparer<int>(),
+            Blinking = new TweenOperation<int>(BlinkAction, 0, equalityComparer: new AlwaysFalseEqualityComparer<int>(),
                                                conflictingOperations: new[] { Color });
 
             if (TryGetComponent(out highlightEffect))
             {
                 // If the component already exists, we need to rebuild it to be sure it fits our material.
-                RefreshGlow(true).Forget();
+                RefreshGlowAsync(true).Forget();
             }
             else
             {
@@ -439,8 +439,8 @@ namespace SEE.Game.Operator
         {
             Color.KillAnimator();
             Color = null;
-            glow.KillAnimator();
-            glow = null;
+            Glow.KillAnimator();
+            Glow = null;
         }
     }
 }

@@ -102,9 +102,9 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.RightWeight = rightWeight;
         }
 
-        public override async UniTask<string> ToDisplayString()
+        public override async UniTask<string> ToDisplayStringAsync()
         {
-            string explanation = await DashboardRetriever.Instance.GetIssueDescription($"CL{ID}");
+            string explanation = await DashboardRetriever.Instance.GetIssueDescriptionAsync($"CL{ID}");
             return $"<style=\"H2\">Clone of type {CloneType}</style>"
                    + $"\nLeft: {LeftPath}, Lines {LeftLine}-{LeftEndLine}".WrapLines(WrapAt)
                    + $"\nRight: {RightPath}, Lines {RightLine}-{RightEndLine}\n".WrapLines(WrapAt)

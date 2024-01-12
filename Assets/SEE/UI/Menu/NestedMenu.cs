@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using FuzzySharp;
 using SEE.Controls;
+using SEE.DataModel.GraphSearch;
 using SEE.GO;
-using SEE.GO.Menu;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Windows.Speech;
@@ -256,7 +256,7 @@ namespace SEE.UI.Menu
             }
 
             allEntries ??= GetAllEntries().ToDictionary(x => x.Title, x => x);
-            IEnumerable<T> results = Process.ExtractTop(SearchMenu.FilterString(text), allEntries.Keys, cutoff: 10)
+            IEnumerable<T> results = Process.ExtractTop(GraphSearch.FilterString(text), allEntries.Keys, cutoff: 10)
                                             .OrderByDescending(x => x.Score)
                                             .Select(x => allEntries[x.Value])
                                             .ToList();

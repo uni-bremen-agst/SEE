@@ -6,6 +6,7 @@ using SEE.Game.City;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -47,8 +48,8 @@ namespace SEE.Game.CityRendering
             {
                 if (gameEdge.TryGetEdge(out Edge edge))
                 {
-                    gameNodes.Add(edge.Source.RetrieveGameNode());
-                    gameNodes.Add(edge.Target.RetrieveGameNode());
+                    gameNodes.Add(edge.Source.GameObject(mustFind: true));
+                    gameNodes.Add(edge.Target.GameObject(mustFind: true));
                 }
             }
 

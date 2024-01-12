@@ -30,20 +30,10 @@ namespace SEE.UI.Window.CodeWindow
         public string FilePath;
 
         /// <summary>
-        /// Whether code issues should be downloaded and added to the shown code.
-        /// </summary>
-        public bool ShowIssues;
-
-        /// <summary>
         /// The line that was marked (1-indexed). Unlike <see cref="ScrolledVisibleLine"/>,
         /// this line is independent of scrolling.
         /// </summary>
         private int markedLine = 1;
-
-        /// <summary>
-        /// The solution path used for the IDE integration.
-        /// </summary>
-        public string SolutionPath;
 
         /// <summary>
         /// Size of the font used in the code window.
@@ -137,7 +127,7 @@ namespace SEE.UI.Window.CodeWindow
                     DOTween.Sequence().Append(DOTween.To(() => ImmediateVisibleLine, f => ImmediateVisibleLine = f, value - 1, 1f))
                            .AppendCallback(() => scrollingTo = 0);
 
-                    // FIXME: TMP bug: Large files cause issues with highlighting text. This is just a workaround.
+                    // FIXME (#250): TMP bug: Large files cause issues with highlighting text. This is just a workaround.
                     // See https://github.com/uni-bremen-agst/SEE/issues/250#issuecomment-819653373
                     if (text.Length < 16382)
                     {

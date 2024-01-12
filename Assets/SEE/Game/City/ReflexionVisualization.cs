@@ -93,7 +93,7 @@ namespace SEE.Game.City
                 GameObject edgeObject = edge.GameObject();
                 if (edgeObject != null && edgeObject.TryGetComponent(out SEESpline spline))
                 {
-                    spline.GradientColors = GetEdgeGradient(edge);
+                    spline.GradientColors = GetEdgeGradient(edge.State());
 
                     if (edge.HasToggle(Edge.IsHiddenToggle))
                     {
@@ -176,14 +176,13 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Returns a fitting color gradient from the first to the second color for the given edge by examining
-        /// its state.
+        /// Returns a fitting color gradient from the first to the second color for the given edge state.
         /// </summary>
-        /// <param name="edge">edge for which to yield a color gradient</param>
+        /// <param name="edgeState">edge state for which to yield a color gradient</param>
         /// <returns>color gradient</returns>
-        private static (Color, Color) GetEdgeGradient(Edge edge)
+        public static (Color, Color) GetEdgeGradient(State edgeState)
         {
-            (Color, Color) gradient = edge.State() switch
+            (Color, Color) gradient = edgeState switch
             {
                 State.Undefined => (Color.black, Color.Lerp(Color.gray, Color.black, edgeGradientFactor)),
                 State.Specified => (Color.gray, Color.Lerp(Color.gray, Color.black, edgeGradientFactor)),
@@ -194,7 +193,7 @@ namespace SEE.Game.City
                 State.Divergent => (Color.red, Color.Lerp(Color.red, Color.black, edgeGradientFactor)),
                 State.Absent => (Color.yellow, Color.Lerp(Color.yellow, Color.black, edgeGradientFactor)),
                 State.Convergent => (Color.green, Color.Lerp(Color.green, Color.black, edgeGradientFactor)),
-                _ => throw new ArgumentOutOfRangeException(nameof(edge), edge.State(), "Unknown state of given edge!")
+                _ => throw new ArgumentOutOfRangeException(nameof(edgeState), edgeState, "Unknown state of given edge!")
             };
 
             return gradient;
@@ -228,7 +227,7 @@ namespace SEE.Game.City
             switch (changeEvent)
             {
                 case EdgeChange edgeChange:
-                    HandleEdgeChange(edgeChange).Forget();
+                    HandleEdgeChangeAsync(edgeChange).Forget();
                     break;
                 case EdgeEvent edgeEvent:
                     HandleEdgeEvent(edgeEvent);
@@ -279,7 +278,7 @@ namespace SEE.Game.City
         /// Handles the given <paramref name="edgeChange"/> by modifying the scene accordingly.
         /// </summary>
         /// <param name="edgeChange">The event which shall be handled.</param>
-        private async UniTaskVoid HandleEdgeChange(EdgeChange edgeChange)
+        private async UniTaskVoid HandleEdgeChangeAsync(EdgeChange edgeChange)
         {
             // We first check if the corresponding edge should be hidden.
             if (hiddenEdgeStates.Contains(edgeChange.NewState))
@@ -305,7 +304,7 @@ namespace SEE.Game.City
 
             if (edge != null)
             {
-                (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge);
+                (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge.State());
                 EdgeOperator edgeOperator = edge.EdgeOperator();
                 edgeOperator.ShowOrHide(!edgeChange.Edge.HasToggle(Edge.IsHiddenToggle), city.EdgeLayoutSettings.AnimationKind);
                 edgeOperator.ChangeColorsTo((newColors.start, newColors.end), useAlpha: false);

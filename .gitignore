@@ -128,3 +128,5 @@ Data/Vcs2See/target/
 packages/
 Build/
 build/
+Assets/Packages/
+Assets/Packages.meta

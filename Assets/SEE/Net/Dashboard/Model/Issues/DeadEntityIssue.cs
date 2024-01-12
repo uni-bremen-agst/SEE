@@ -58,9 +58,9 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.LinkName = linkName;
         }
 
-        public override async UniTask<string> ToDisplayString()
+        public override async UniTask<string> ToDisplayStringAsync()
         {
-            string explanation = await DashboardRetriever.Instance.GetIssueDescription($"DE{ID}");
+            string explanation = await DashboardRetriever.Instance.GetIssueDescriptionAsync($"DE{ID}");
             return "<style=\"H2\">Dead Entity</style>"
                    + $"\nThe entity '{Entity.WrapLines(WrapAt)}' ({EntityType.WrapLines(WrapAt)}) is dead."
                    + $"\nMay it rest in peace.\n{explanation.WrapLines(WrapAt)}";
