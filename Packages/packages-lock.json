@@ -36,11 +36,11 @@
       "hash": "17c6330d51a140eac037b9ea6f5d157a846535af"
     },
     "com.openai.unity": {
-      "version": "7.3.0",
+      "version": "7.3.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.utilities.rest": "2.4.5",
+        "com.utilities.rest": "2.4.6",
         "com.utilities.encoder.wav": "1.1.4",
         "com.utilities.encoder.ogg": "3.1.2"
       },
@@ -179,7 +179,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.postprocessing": {
-      "version": "3.2.2",
+      "version": "3.4.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -419,7 +419,7 @@
       "url": "https://package.openupm.com"
     },
     "com.utilities.rest": {
-      "version": "2.4.5",
+      "version": "2.4.6",
       "depth": 1,
       "source": "registry",
       "dependencies": {
