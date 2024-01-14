@@ -1,575 +1,223 @@
-using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
-using SEE.Game.CityRendering;
-using SEE.Game.Evolution;
-using SEE.GO;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using Sirenix.Utilities;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Game.City
 {
+    /// <summary>
+    /// Manages settings of the graph data showing a single version of a software
+    /// system and its differences relative to a baseline graph (a former version
+    /// of the same software system).
+    /// </summary>
     public class SEEBranchCity : SEECity
     {
-        /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
-        /// configuration file, make sure you save and restore it in
-        /// <see cref="SEECityEvolution.Save(ConfigWriter)"/> and
-        /// <see cref="SEECityEvolution.Restore(Dictionary{string,object})"/>,
-        /// respectively. You should also extend the test cases in TestConfigIO.
+        /// <summary>
+        /// Name of the label marking a graph element as new (existing only in the newer version).
+        /// </summary>
+        public const string IsNew = "IsNew";
+        /// <summary>
+        /// Name of the label marking a graph element as deleted (existing only in the baseline version).
+        /// </summary>
+        public const string IsDeleted = "IsDeleted";
+        /// <summary>
+        /// Name of the label marking a graph element as changed (existing in both the newer and baseline
+        /// version). At least one numeric attribute has changed between the two (including the addition
+        /// or removal of an attribute).
+        /// </summary>
+        public const string IsChanged = "IsChanged";
 
+        /// <summary>
         /// The path to the GXL file containing the graph data.
         /// Note that any deriving class may use multiple GXL paths from which the single city is constructed.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Path of first GXL file"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
-        public FilePath GXLPath1 = new();
+        [ShowInInspector, Tooltip("Path of GXL file for the baseline graph"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        public FilePath BaselineGXLPath = new();
 
         /// <summary>
-        /// The path to the CSV file containing the additional metric values.
-        /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Path of second GXL file"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
-        public FilePath GXLPath2 = new();
-
-        /// <summary>
-        /// The graph that is visualized in the scene and whose visualization settings are
-        /// managed here.
-        /// We do not want to serialize it using Unity or Odin because both frameworks are
-        /// insufficient for the highly recursive structure of all the graph objects.
-        /// There are different points in time in which the underlying graph is created:
-        /// (1) in the editor mode or (2) during the game. If the graph is created in the
-        /// editor mode by a graph renderer, the graph renderer will attach the NodeRefs
-        /// to the game objects representing the nodes. So all the information about nodes
-        /// is available, for instance for the layouts or the inspector. During the game
-        /// there are two different possible scenarios: (a) this SEECity is is created
-        /// and configured at runtime or (b) the SEECity was created in the editor and then
-        /// the game is started. For scenario (a), we expect the graph to be loaded and
-        /// all NodeRefs be defined accordingly. For scenario (b), the graph attribute
-        /// will not be serialized and, hence, be null. In that case, we load the graph
-        /// from the GXL file, i.e., the GXL file is our persistent serialization we
-        /// use to re-create the graph. We need, however, to set the NodeRefs at runtime.
-        /// All that is being done in Start() below.
+        /// First, <see cref=">SEECity.LoadData"/> will be called.
+        /// The resulting graph is available in <see cref="LoadedGraph"/> afterwards.
+        /// Then, the differences of <see cref="LoadedGraph"/> with respect to a
+        /// baseline graph stored in <see cref="BaselineGXLPath"/> will be merged
+        /// into <see cref="LoadedGraph"/>.
         ///
-        /// Neither serialized nor saved to the config file.
-        /// </summary>
-        //[NonSerialized]
-        //private Graph loadedGraph = null;
-
-        /// <summary>
-        /// The graph that should be compared to.
-        /// </summary>
-        [NonSerialized]
-        private Graph nextGraph = null;
-
-        private Graph diffGraph;
-
-        /// <summary>
-        /// List to save the old Attributes from 
-        /// </summary>
-        private List<Tuple<string, int>> oldNodeAttributes = new List<Tuple<string, int>>();
-
-
-
-        /// <summary>
-        /// Allows the comparison of two instances of <see cref="Node"/> from different graphs.
-        /// </summary>
-        private static readonly NodeEqualityComparer nodeEqualityComparer = new();
-
-        /// <summary>
-        /// Allows the comparison of two instances of <see cref="Edge"/> from different graphs.
-        /// </summary>
-        private static readonly EdgeEqualityComparer edgeEqualityComparer = new();
-
-        private GraphRenderer graphRenderer;
-
-        /// <summary>
-        /// Yields the graph renderer that draws this city.
-        /// </summary>
-        /// <remarks>Implements <see cref="AbstractSEECity.Renderer"/>.</remarks>
-        public override IGraphRenderer Renderer => graphRenderer ??= new GraphRenderer(this, diffGraph);
-
-
-        /// <summary>
-        /// The graph underlying this SEE city that was loaded from disk. May be null.
-        /// If a new graph is assigned to this property, the selected node types will
-        /// be updated, too.
+        /// If a graph element is in the baseline but not in <see cref="LoadedGraph"/>,
+        /// it will be added to <see cref="LoadedGraph"/> and marked by toggle <see cref="IsDeleted"/>.
         ///
-        /// Neither serialized nor saved to the config file.
-        /// </summary>
-        /*public override Graph LoadedGraph
-        {
-            get => loadedGraph;
-            protected set
-            {
-                loadedGraph = value;
-                InspectSchema(loadedGraph);
-            }
-        }*/
-
-        /// <summary>
-        /// The graph underlying this SEE city that was loaded from disk. May be null.
-        /// If a new graph is assigned to this property, the selected node types will
-        /// be updated, too.
+        /// If a graph element is in <see cref="LoadedGraph"/> but not in the baseline,
+        /// it will be marked by toggle <see cref="IsNew"/>.
         ///
-        /// Neither serialized nor saved to the config file.
-        /// </summary>
-        public Graph NextGraph
-        {
-            get => nextGraph;
-            protected set
-            {
-                nextGraph = value;
-                InspectSchema(nextGraph);
-            }
-        }
-
-
-        /// <summary>
-        /// Sets up drawn city (if it has been drawn yet) and loads the metric board.
-        /// </summary>
-        protected override void Start()
-        {
-            base.Start();
-            
-            //LoadData();
-            //InitializeAfterDrawn();
-            //BoardSettings.LoadBoard();
-        }
-
-
-        /// <summary>
-        /// First, if a graph was already loaded (<see cref="LoadedGraph"/> is not null),
-        /// everything will be reset by calling <see cref="Reset"/>.
-        /// Second, the graph data from the GXL file with GXLPath() and the metrics
-        /// from the CSV file with CSVPath() are loaded. The loaded graph is available
-        /// in <see cref="LoadedGraph"/> afterwards.
+        /// If a graph element is in <see cref="LoadedGraph"/> and in the baseline, but has
+        /// any change in any of the existing numeric attributes, it will be marked by toggle <see cref="IsNew"/>.
+        /// A change of an attribute could be the addition or deletion of the attribute as well as
+        /// a change of the attribute's value. Note that only numeric attributes are considered.
         ///
-        /// This method loads only the data, but does not actually render the graph.
+        /// Whether two graph elements in the two graphs are considered the logically identical
+        /// graph element is determined by their <see cref="Node.ID"/>.
         /// </summary>
+        /// <remarks>This method loads only the data, but does not actually render the graph.</remarks>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
         public override void LoadData()
         {
-            Debug.Log("Load Data");
-            if (string.IsNullOrEmpty(GXLPath1.Path) || string.IsNullOrEmpty(GXLPath2.Path))
+            base.LoadData();
+            if (string.IsNullOrEmpty(BaselineGXLPath.Path))
             {
-                Debug.LogError("Empty graph path.\n");
+                Debug.LogError("Empty path for baseline GXL.\n");
             }
             else
             {
-                if (LoadedGraph != null || NextGraph != null)
-                {
-                    Reset();
-                }
-
-                LoadedGraph = LoadGraph(GXLPath1.Path);
-                nextGraph = LoadGraph(GXLPath2.Path);
-
-                InspectSchema(LoadedGraph);
-                LoadedGraph = RelevantGraph(LoadedGraph);
-
-                InspectSchema(nextGraph);
-                NextGraph = RelevantGraph(NextGraph);
-
-                //SaveData();
-
-                CalculateDiff();
-
-                CreateDiffGraph();
-
-                //loadedGraph = diffGraph;
-
+                Merge(BaselineGXLPath.Path);
             }
         }
 
-        private void CalculateDiff()
+        /// <summary>
+        /// Merges the changes of nodes and edges of the <see cref="LoadedGraph"/> with
+        /// respect to a baseline graph. The baseline graph is loaded from <paramref name="pathBaselineGXL"/>.
+        ///
+        /// </summary>
+        /// <param name="pathBaselineGXL"></param>
+        private void Merge(string pathBaselineGXL)
         {
-            //Node Comparison
-            NextGraph.Diff(LoadedGraph,
+            Graph baseline = LoadGraph(pathBaselineGXL);
+            // TODO: Normally we would call LoadMetrics() to add additional metrics
+            // for the graph stored in a separate CSV file. That is done for LoadedGraph.
+            // Do we want to do that for this baseline graph, too? If so, we need to add
+            // another CSV path to this class.
+
+            InspectSchema(baseline);
+
+            MergeNodes(baseline);
+            MergeEdges(baseline);
+        }
+
+        /// <summary>
+        /// Handling nodes of <see cref="LoadedGraph"/> relative to former <paramref name="baseline"/>.
+        /// </summary>
+        /// <param name="baseline">a predecessor graph of <see cref="LoadedGraph">/></param>
+        private void MergeNodes(Graph baseline)
+        {
+            LoadedGraph.Diff(baseline,
                           g => g.Nodes(),
                           (g, id) => g.GetNode(id),
-                          GraphExtensions.AttributeDiff(LoadedGraph, nextGraph),
-                          nodeEqualityComparer,
-                          out addedNodes,
-                          out removedNodes,
-                          out changedNodes,
-                          out equalNodes);
+                          GraphExtensions.AttributeDiff(LoadedGraph, baseline),
+                          new NodeEqualityComparer(),
+                          out ISet<Node> addedNodes,
+                          out ISet<Node> removedNodes,
+                          out ISet<Node> changedNodes,
+                          out ISet<Node> equalNodes);
 
-            //Edge Comparison
-            NextGraph.Diff(LoadedGraph,
+            MergeGraphElements(addedNodes, removedNodes, changedNodes, n => { LoadedGraph.AddNode(n); });
+        }
+
+        /// <summary>
+        /// Handling edges of <see cref="LoadedGraph"/> relative to former <paramref name="baseline"/>.
+        /// </summary>
+        /// <param name="baseline">a predecessor graph of <see cref="LoadedGraph">/></param>
+        private void MergeEdges(Graph baseline)
+        {
+            LoadedGraph.Diff(baseline,
                          g => g.Edges(),
                         (g, id) => g.GetEdge(id),
-                        GraphExtensions.AttributeDiff(LoadedGraph, nextGraph),
-                        edgeEqualityComparer,
-                        out addedEdges,
-                        out removedEdges,
-                        out changedEdges,
-                        out equalEdges);
+                        GraphExtensions.AttributeDiff(LoadedGraph, baseline),
+                        new EdgeEqualityComparer(),
+                        out ISet<Edge> addedEdges,
+                        out ISet<Edge> removedEdges,
+                        out ISet<Edge> changedEdges,
+                        out ISet<Edge> equalEdges);
+            MergeGraphElements(addedEdges, removedEdges, changedEdges, AddEdge);
 
-           /* Debug.Log("addedNodes: " + addedNodes.Count);
-            Debug.Log("changedNodes: " + changedNodes.Count);
-            Debug.Log("removedNodes: " + removedNodes.Count);
-            Debug.Log("equalNodes: " + equalNodes.Count);*/
-        }
-
-        /// <summary>
-        /// Calculates the graph to be drawn in the code city.
-        /// </summary>
-        private void CreateDiffGraph()
-        {
-            diffGraph = new Graph(LoadedGraph);
-
-            List<Node> listGraphA = diffGraph.Nodes();
-            List<Node> listGraphB = NextGraph.Nodes();
-
-
-            //Delete Nodes and Edges for Graph B to avoid multiple nodes with the same ID
-            nextGraph.Nodes().ForEach(node =>
+            // Adds edge to LoadedGraph. Note: edge is assumed to be cloned
+            // from an edge belonging to the baseline graph that has no
+            // corresponding edge in LoadedGraph, thus, was deleted.
+            void AddEdge(Edge edge)
             {
-                nextGraph.RemoveNode(node);
-            });
-
-            nextGraph.Edges().ForEach(edge => {
-                nextGraph.RemoveEdge(edge);
-            });
-
-
-
-            //Draw Nodes
-
-            //New Node added with attribute
-            addedNodes.ForEach(node =>
-            {
-                node.SetToggle("addedNode");
-                diffGraph.AddNode(node);
-            });
-
-            //RemovedNodes marked with attribute
-            removedNodes.ForEach(node =>
-            {
-                node.SetToggle("deletedNode");
-            });
-
-
-            //Go through every changedNode and update their attributes
-            changedNodes.ForEach(node =>
-            {
-                //Node toBeComparedNode;
-                ISet<string> metricListNodeA;
-                ISet<string> metricListNodeB = node.AllMetrics();
-
-                //Suche richtige NodeID
-                listGraphA.ForEach(nodeGraphA => {
-                    if (node.ID == nodeGraphA.ID)
-                    {
-                        metricListNodeA = diffGraph.AllMetrics();
-                        //Gehe durch die Metriken
-                        //Wenn B mehrere Metriken hat, dann gehe da durch
-                        /*if(metricListNodeB.Count > metricListNodeA.Count)
-                        {
-                            metricListNodeB.ForEach(metrics =>
-                            {
-                                int a = node.GetInt(metrics);
-                                //Debug.Log("Metrics: " + metrics + " hat die Nummer: " + a);
-                                oldNodeAttributes.Add(new Tuple<string, int>(metrics, a));
-                                nodeGraphA.SetInt(metrics, a);
-                            });
-                        }
-                        //Sonst gehe durch A
-                        else
-                        {
-                            metricListNodeA.ForEach(metrics =>
-                            {
-                                int a = node.GetInt(metrics);
-                                //Debug.Log("Metrics: " + metrics + " hat die Nummer: " + a);
-                                oldNodeAttributes.Add(new Tuple<string, int>(metrics, a));
-                                nodeGraphA.SetInt(metrics, a);
-                            });
-                        }*/
-                        metricListNodeB.ForEach(metric =>
-                        {
-                            int a = node.GetInt(metric);
-                            //Debug.Log("Metrics: " + metrics + " hat die Nummer: " + a);
-                            oldNodeAttributes.Add(new Tuple<string, int>(metric, a));
-                            nodeGraphA.SetInt(metric, a);
-                        });
-                        
-                    }
-                });
-            });
-
-
-            Debug.Log(addedEdges.Count);
-
-            /*addedEdges.ForEach(edge =>
-            {
-                Node sourceNode = diffGraph.Nodes().Find(diffEdge => diffEdge.ID == edge.Source.ID);
-                Node targetNode = diffGraph.Nodes().Find(diffEdge => diffEdge.ID == edge.Target.ID);
-
-                //edge.SetToggle("addedEdge");
-                diffGraph.AddEdge(sourceNode, targetNode, edge.Type);
-                
-                //Debug.Log("Operation erfolgreich");
-
-            });*/
-
-            //Add or remove Edges
-            List<Node> diffNodes = diffGraph.Nodes();
-
-            //Add Edges with attribute
-            //Such die Source und Target Nodes manuell und füge dann ein Edge hinzu
-            addedEdges.ForEach(edge =>
-            {
-                diffNodes.ForEach(node1 => {
-                    string targetID = edge.Target.ID;
-                    string node1ID = node1.ID;
-                    string sourceID = edge.Source.ID;
-
-                    if (targetID == node1ID)
-                    {
-                        diffNodes.ForEach(node2 =>
-                        {
-                            string node2ID = node2.ID;
-
-                            if(sourceID == node2ID)
-                            {
-                                diffGraph.AddEdge(node2, node1, edge.Type);
-                            }
-                        });
-                    }
-
-                });
-                //edge.SetToggle("addedEdge");
-            });
-
-
-            //Mark removed Edge with attribute
-            removedEdges.ForEach(edge =>
-            {
-                //edge.SetToggle("removedEdge");
-            });
-
-            /* Debug.Log("LoadGraph Edges: " + LoadedGraph.EdgeCount);
-
-             Debug.Log("NextGraph Edges: " + NextGraph.EdgeCount);
-
-             Debug.Log("DiffGraph Nodes: " + diffGraph.NodeCount);
-
-             Debug.Log("DiffGraph Edges: " + diffGraph.EdgeCount);*/
-             Debug.Log(diffGraph);
-        
-        }
-
-        /// <summary>
-        /// Draws the graph.
-        /// Precondition: The graphs have been loaded and the graph to be visualised has been calculated
-        /// </summary>
-        [Button(ButtonSizes.Small, Name = "Draw Data")]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
-        [PropertyOrder(DataButtonsGroupOrderDraw)]
-        public override void DrawGraph()
-        {
-            /*if (diffGraph != null)
-            {
-                //Debug.Log(diffGraph);
-                diffGraph = RelevantGraph(diffGraph);
-                //LoadDataForGraphListing(diffGraph);
-                GraphRenderer graphRenderer = new GraphRenderer(this, diffGraph);
-                graphRenderer.DrawGraph(diffGraph, gameObject);
-            }
-            else
-            {
-                Debug.LogWarning("No graph loaded yet.\n");
-            }*/
-            LoadedGraph = diffGraph;
-            //Debug.Log(LoadedGraph);
-            //Debug.Log(LoadedGraph);
-            base.DrawGraph();
-        }
-
-
-        /// <summary>
-        /// Saves the graph data to the GXL file with GXLPath().
-        /// </summary>
-        /*[Button(ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Data")]
-        [PropertyOrder(DataButtonsGroupOrderSave)]
-        public override void SaveData()
-        {
-            if (string.IsNullOrEmpty(GXLPath1.Path) || string.IsNullOrEmpty(GXLPath2.Path))
-            {
-                Debug.LogError("Empty graph path.\n");
-            }
-            else if (LoadedGraph != null)
-            {
-                GraphWriter.Save(GXLPath1.Path, LoadedGraph, HierarchicalEdges.First());
-                GraphWriter.Save(GXLPath2.Path, NextGraph, HierarchicalEdges.First());
-            }
-        }*/
-
-
-
-
-        /// <summary>
-        /// Set of added nodes from the current to the next graph.
-        /// They are contained in the next graph.
-        /// </summary>
-        private ISet<Node> addedNodes;
-        /// <summary>
-        /// Set of removed nodes from the current to the next graph.
-        /// They are contained in the current graph.
-        /// </summary>
-        private ISet<Node> removedNodes;
-        /// <summary>
-        /// Set of changed nodes from the current to the next graph.
-        /// They are contained in the next graph (and logically also
-        /// in the current graph, that is, there is a node in the
-        /// current graph that has the same ID).
-        /// </summary>
-        private ISet<Node> changedNodes;
-        /// <summary>
-        /// Set of equal nodes (i.e., nodes without any changes) from
-        /// the current to the next graph.
-        /// They are contained in the next graph (and logically also
-        /// in the current graph, that is, there is a node in the
-        /// current graph that has the same ID).
-        /// </summary>
-        private ISet<Node> equalNodes;
-
-        /// <summary>
-        /// Set of added edges from the current to the next graph.
-        /// They are contained in the next graph.
-        /// </summary>
-        private ISet<Edge> addedEdges;
-        /// <summary>
-        /// Set of removed edges from the current to the next graph.
-        /// They are contained in the current graph.
-        /// </summary>
-        private ISet<Edge> removedEdges;
-        /// <summary>
-        /// Set of changed edges from the current to the next graph.
-        /// They are contained in the next graph (and logically also
-        /// in the current graph, that is, there is an edge in the
-        /// current graph that has the same ID).
-        /// </summary>
-        private ISet<Edge> changedEdges;
-        /// <summary>
-        /// Set of equal edges (i.e., edges without any changes) from
-        /// the current to the next graph.
-        /// They are contained in the next graph (and logically also
-        /// in the current graph, that is, there is an edge in the
-        /// current graph that has the same ID).
-        /// </summary>
-        private ISet<Edge> equalEdges;
-
-        /// <summary>
-        /// Will be called whenever a new value is assigned to <see cref="ProjectPath"/>.
-        /// In this case, we will update <see cref="loadedGraph.BasePath"/> with the
-        /// new <see cref="ProjectPath.Path"/> if <see cref="loadedGraph"/> is not null.
-        /// </summary>
-        protected override void ProjectPathChanged()
-        {
-            if (LoadedGraph != null)
-            {
-                LoadedGraph.BasePath = SourceCodeDirectory.Path;
+                // edge is cloned from a baseline edge, but after the cloning its source
+                // and target are nodes in the baseline graph. edge will be added to the
+                // LoadedGraph, hence, we need to adjust its source and target to the
+                // corresponding nodes in LoadedGraph.
+                edge.Source = LoadedGraph.GetNode(edge.Source.ID);
+                edge.Target = LoadedGraph.GetNode(edge.Target.ID);
+                // edge was clone from a baseline edge, but the cloned edge does
+                // not belong to any graph (its graph is null). As a consequence,
+                // we do not need to reset ItsGraph.
+                LoadedGraph.AddEdge(edge);
             }
         }
 
         /// <summary>
-        /// Returns the names of all node metrics that truly exist in the underlying
-        /// graph, that is, there is at least one node in the graph that has this
-        /// metric.
+        /// A method that adds <paramref name="graphElement"/> to <see cref="LoadedGraph"/>.
+        /// </summary>
+        /// <typeparam name="T">type of <see cref="GraphElement"/></typeparam>
+        /// <param name="graphElement">the element to be added</param>
+        private delegate void AddToGraph<T>(T graphElement) where T : GraphElement;
+
+        /// <summary>
+        /// Marks all <paramref name="added"/> as <see cref="IsNew"/>.
+        /// Marks all <paramref name="changed"/> as <see cref="IsChanged"/>.
+        /// Adds all <paramref name="removed"/> to <see cref="LoadedGraph"/>
+        /// and marks them as <see cref="IsDeleted"/>.
         ///
-        /// If no graph has been loaded yet, the empty list will be returned.
+        /// Assumption: <paramref name="added"/>, <paramref name="changed"/>, and
+        /// <paramref name="removed"/> are mutually exclusive.
         /// </summary>
-        /// <returns>names of all existing node metrics</returns>
-        public override ISet<string> AllExistingMetrics()
+        /// <typeparam name="T">type of <see cref="GraphElement"/></typeparam>
+        /// <param name="added">added graph elements</param>
+        /// <param name="removed">removed graph elements</param>
+        /// <param name="changed">changed graph elements</param>
+        /// <param name="addToGraph">adds <paramref name="graphElement"/> to <see cref="LoadedGraph"/>;
+        /// will be called for all elements in <paramref name="removed"/></param>
+        private static void MergeGraphElements<T>(ISet<T> added, ISet<T> removed, ISet<T> changed, AddToGraph<T> addToGraph)
+            where T : GraphElement
         {
-            if (LoadedGraph == null)
-            {
-                return new HashSet<string>();
-            }
-            else
-            {
-                ISet<string> set1 = LoadedGraph.AllNumericNodeAttributes();
-                ISet<string> set2 = nextGraph.AllNumericNodeAttributes();
+            _ = added.ForEach(node => { node.SetToggle(IsNew); });
+            _ = changed.ForEach(node => { UpdateChanged(node); });
+            _ = removed.ForEach(node => { MergeRemoved(node); });
 
-                ISet<string> result = set1;
-                result.UnionWith(set2);
-
-                return result;
-            }
-        }
-
-        /// <summary>
-        /// Dumps the metric names of all node types of the currently loaded graph.
-        /// </summary>
-        protected override void DumpNodeMetrics()
-        {
-            if (LoadedGraph == null || nextGraph)
+            // Adds graphElement to LoadedGraph and marks it as deleted.
+            void MergeRemoved(T graphElement)
             {
-                Debug.Log("Either the first graph or the second graph have not been loaded");
+                T removedGraphElement = graphElement.Clone() as T;
+                addToGraph(removedGraphElement);
+                removedGraphElement.SetToggle(IsDeleted);
             }
-            else
+
+            // Marks given graph element as changed.
+            // Note: graphElement is from baseline graph.
+            void UpdateChanged(T graphElement)
             {
-                DumpNodeMetrics(new List<Graph>() { LoadedGraph, nextGraph });
+                graphElement.SetToggle(IsChanged);
+                // TODO: We could run a diff between graphElement and its corresponding
+                // graphElement in LoadedGraph and mark deleted, changed, and added attributes.
             }
         }
 
-
-        /// <summary>
-        /// Resets everything that is specific to a given graph. Here: the selected node types,
-        /// the underlying graph, and all game objects visualizing information about it.
-        /// </summary>
-        [Button(ButtonSizes.Small, Name = "Reset Data")]
-        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
-        [PropertyOrder(ResetButtonsGroupOrderReset)]
-        public override void Reset()
-        {
-            base.Reset();
-            // Delete the underlying graph.
-            diffGraph?.Destroy();
-            LoadedGraph = null;
-            NextGraph = null;
-            diffGraph = null;
-        }
-
-        protected override void InitializeAfterDrawn()
-        {
-            base.InitializeAfterDrawn();
-        }
-
-
+        #region Configuration file input/output
         //--------------------------------
         // Configuration file input/output
         //--------------------------------
 
         /// <summary>
-        /// Label of attribute <see cref="GXLPath"/> in the configuration file.
+        /// Label of attribute <see cref="BaselineGXLPath"/> in the configuration file.
         /// </summary>
-        private const string gxlPathLabel = "GXLPath";
+        private const string baselineGXLPathLabel = "BaselineGXLPath";
 
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
-            GXLPath1.Save(writer, gxlPathLabel);
-            GXLPath2.Save(writer, gxlPathLabel);
+            BaselineGXLPath.Save(writer, baselineGXLPathLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
-            GXLPath1.Restore(attributes, gxlPathLabel);
-            GXLPath2.Restore(attributes, gxlPathLabel);
+            BaselineGXLPath.Restore(attributes, baselineGXLPathLabel);
         }
+        #endregion
     }
 }
-
