@@ -58,6 +58,7 @@ namespace SEE.Game.UI.Menu.Drawable
                 {
                     gotSource = true;
                     chosenSource = Source.Local;
+                    Disable();
                 });
 
                 /// Initialize the button for load the image from web.
@@ -67,6 +68,7 @@ namespace SEE.Game.UI.Menu.Drawable
                 {
                     gotSource = true;
                     chosenSource = Source.Web;
+                    Disable();
                 });
 
                 /// Initialize the button for canceling the menu.
@@ -111,7 +113,7 @@ namespace SEE.Game.UI.Menu.Drawable
             {
                 source = chosenSource;
                 gotSource = false;
-                Destroyer.Destroy(instance);
+                Disable();
                 return true;
             }
 

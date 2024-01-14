@@ -95,7 +95,7 @@ namespace SEE.Controls.Actions.Drawable
                         {
                             ShowNotification.Info("Line splitted", 
                                 "The original line was successfully splitted in " + lines.Count + " lines");
-
+                            /// Marks the split position for a specific time.
                             MarkSplitPosition(hittedObject, positionsList[matchedIndices[0]]);
                         }
                         memento = new Memento(hittedObject, GameFinder.GetDrawable(hittedObject), lines);
@@ -153,10 +153,15 @@ namespace SEE.Controls.Actions.Drawable
                 false, GameDrawer.LineKind.Solid, 1f, false);
             /// Sets the pivot point of the marker.
             GameDrawer.SetPivotShape(point, position);
+            /// Adds the point on all clients.
+            new DrawFreehandNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), LineConf.GetLine(point)).Execute();
             /// Adds a blink effect.
             point.AddComponent<BlinkEffect>();
+            /// Adds the blink effect to the point on all clients.
+            new AddBlinkEffectNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), point.name).Execute();
             /// Destroys the marker after the chosen time.
             Object.Destroy(point, ValueHolder.lineSplitTimer);
+            new EraseAfterTimeNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), point.name, ValueHolder.lineSplitTimer).Execute();
         }
 
         /// <summary>
