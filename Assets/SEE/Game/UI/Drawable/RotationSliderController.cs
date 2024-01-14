@@ -1,4 +1,6 @@
 ﻿using Michsky.UI.ModernUIPack;
+using RTG;
+using SEE.Game.UI.Notification;
 using System.Globalization;
 using TMPro;
 using UnityEngine;
@@ -43,7 +45,7 @@ namespace SEE.Game.UI.Drawable
             /// Adds the slider change method
             manager.mainSlider.onValueChanged.AddListener(SliderChanged);
             /// Adds the input field change method.
-            inputField.onEndEdit.AddListener(InputChanged);
+            inputField.onValueChanged.AddListener(InputChanged);
             /// Minimum degree
             manager.mainSlider.minValue = 0f;
             /// Maximum degree
@@ -56,7 +58,7 @@ namespace SEE.Game.UI.Drawable
         private void OnDestroy()
         {
             manager.mainSlider.onValueChanged.RemoveListener(SliderChanged);
-            inputField.onEndEdit.RemoveListener(InputChanged);
+            inputField.onValueChanged.RemoveListener(InputChanged);
         }
 
         /// <summary>
@@ -66,7 +68,14 @@ namespace SEE.Game.UI.Drawable
         private void SliderChanged(float newValue)
         {
             newValue = manager.mainSlider.value;
-            inputField.text = newValue.ToString("F1");
+            if ((newValue % 1) == 0)
+            {
+                inputField.text = newValue.ToString();
+            }
+            else
+            {
+                inputField.text = newValue.ToString("F1");
+            }
             onValueChanged.Invoke(newValue);
         }
 
@@ -79,14 +88,17 @@ namespace SEE.Game.UI.Drawable
         {
             text = text.Replace(",", ".");
             /// Try to parse the text into a float.
-            if (float.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out float value))
+            if (text.LastChar() != '.' && float.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out float value))
             {
                 manager.mainSlider.value = value;
                 SliderChanged(value);
             }
             else
             {
-                Debug.Log("The given text is no degree format.");
+                if (text.LastChar() != '.')
+                {
+                    ShowNotification.Warn("Wrong format!", "The given text is no degree format.");
+                }
             }
         }
 
@@ -96,7 +108,13 @@ namespace SEE.Game.UI.Drawable
         /// <param name="value">the value that should be assigned</param>
         public void AssignValue(float value)
         {
-            inputField.text = value.ToString();
+            if ((value % 1) == 0)
+            {
+                inputField.text = value.ToString();
+            } else
+            {
+                inputField.text = value.ToString("F1");
+            }
             manager.mainSlider.value = value;
         }
     }
