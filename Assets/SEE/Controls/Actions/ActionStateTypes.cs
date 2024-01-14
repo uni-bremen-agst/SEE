@@ -1,7 +1,6 @@
 ﻿using SEE.Utils;
 using UnityEngine;
 using SEE.Controls.Actions.HolisticMetrics;
-using SEE.Game.Evolution;
 
 namespace SEE.Controls.Actions
 {
@@ -117,11 +116,6 @@ namespace SEE.Controls.Actions
                   Color.grey.Darker(), "Materials/ModernUIPack/Arrow Bold",
                   AcceptDivergenceAction.CreateReversibleAction);
 
-            ShowDiff =
-                new("Show Diff", "Display differences of two branches.",
-                    Color.black, "Materials/ModernUIPack/Document",
-                    ShowDiffAction.CreateReversibleAction);
-
             // Metric Board actions
             MetricBoard =
               new("Metric Board", "Manipulate a metric board",
@@ -188,7 +182,6 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType ShowCode;
         public readonly static ActionStateType Draw;
         public readonly static ActionStateType AcceptDivergence;
-        public readonly static ActionStateType ShowDiff;
 
         public readonly static ActionStateTypeGroup MetricBoard;
         public readonly static ActionStateType AddBoard;
