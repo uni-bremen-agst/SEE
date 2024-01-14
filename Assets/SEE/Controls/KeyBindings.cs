@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
+using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -312,29 +314,96 @@ namespace SEE.Controls
             }
             else
             {
-                KeyCode oldKey = descriptor.KeyCode;
                 descriptor.KeyCode = keyCode;
-                string path = Application.dataPath + "/StreamingAssets/KeyBindings.json";
-                string jsonContent = File.ReadAllText(path);
-                List<KeyCode> jsonObject = JsonConvert.DeserializeObject<List<KeyCode>>(jsonContent);
-                int index = jsonObject.IndexOf(oldKey);
-                jsonObject[index] = keyCode;
-                File.WriteAllText(path, JsonConvert.SerializeObject(jsonObject));
+                Save();
             }
         }
 
         /// <summary>
-        /// Returns a list of all keyCodes.
+        /// Defines the path for the keybindings.
         /// </summary>
-        /// <returns>all keyCodes</returns>
-        internal static List<KeyCode> GetKeyCodes()
+        private static readonly string Path = Application.dataPath + "/StreamingAssets/KeyBindings.json";
+
+        /// <summary>
+        /// Defines the settings for the JSON serialization.
+        /// These settings ensure that enums are handled as strings rather than their numeric values,
+        /// so that the JSON file is more human readable.
+        /// </summary>
+        private static readonly JsonSerializerSettings JsonSettings = new()
         {
-            List<KeyCode> keys = new List<KeyCode>();
-            foreach(var binding in keyBindings)
+            Converters = { new Newtonsoft.Json.Converters.StringEnumConverter() }
+        };
+
+        /// <summary>
+        /// Defines the content of the JSON file.
+        /// </summary>
+        private class KeyData
+        {
+            public KeyCode KeyCode { get; set; }
+            public string Action { get; set; }
+        }
+
+        /// <summary>
+        /// Saves the keybindings to the JSON file, whenever they get updated.
+        /// </summary>
+        private static void Save()
+        {
+            IList<KeyData> keyList = new List<KeyData>();
+            keyList.AddRange(keyBindings.Select(binding => new KeyData { KeyCode = binding.Value.KeyCode, Action = binding.Value.Name }));
+            File.WriteAllText(Path, JsonConvert.SerializeObject(keyList, Formatting.Indented, JsonSettings));
+        }
+
+        /// <summary>
+        /// Loads the keybindings at the start of the game.
+        /// When the file already exists, we check if it has the same amount of
+        /// keybindings, as defined in <see cref="keyBindings"/>. If thats the case,
+        /// we also need to check if the order of the keybindins is the same as in
+        /// <see cref="keyBindings"/>. Otherwise there was an update, and we need to
+        /// override the old savings, or create new ones.
+        /// </summary>
+        public static void LoadKeyBindings()
+        {
+            // The keys defined in keyBindings.
+            IList<KeyData> keyList = new List<KeyData>();
+            keyList.AddRange(keyBindings.Select(binding => new KeyData { KeyCode = binding.Value.KeyCode, Action = binding.Value.Name }));
+            int index = 0;
+            bool isEqual = true;
+            // When the file exists, we can read from it, otherwise it gets created.
+            if (File.Exists(Path))
             {
-                keys.Add(binding.Value.KeyCode);
+                string jsonContent = File.ReadAllText(Path);
+                // The keys defined in the JSON file.
+                IList<KeyData> keyListFromFile = JsonConvert.DeserializeObject<List<KeyData>>(jsonContent);
+                // If the number of keys is different from keybindings, then we need to override the file.
+                if (keyList.Count == keyListFromFile.Count)
+                {
+                    // Check if the order of the actions is still the same.
+                    for (int i = 0; i < keyList.Count; i++)
+                    {
+                        if (keyList[i].Action != keyListFromFile[i].Action)
+                        {
+                            isEqual = false;
+                            File.WriteAllText(Path, JsonConvert.SerializeObject(keyList, Formatting.Indented, JsonSettings));
+                        }
+                    }
+                    // When everything is fine, we can load the keybindings from the JSON file.
+                    if (isEqual)
+                    {
+                        foreach (var binding in keyBindings)
+                        {
+                            binding.Value.KeyCode = keyListFromFile[index++].KeyCode;
+                        }
+                    }
+                }
+                else
+                {
+                    File.WriteAllText(Path, JsonConvert.SerializeObject(keyList, Formatting.Indented, JsonSettings));
+                }
             }
-            return keys;
+            else
+            {
+                File.WriteAllText(Path, JsonConvert.SerializeObject(keyList, Formatting.Indented, JsonSettings));
+            }
         }
 
         /// <summary>

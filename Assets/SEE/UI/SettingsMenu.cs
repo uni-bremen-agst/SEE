@@ -51,31 +51,7 @@ namespace SEE.UI
         /// </summary>
         protected override void StartDesktop()
         {
-            string path = Application.dataPath + "/StreamingAssets/KeyBindings.json";
-            string allKeys = JsonConvert.SerializeObject(KeyBindings.GetKeyCodes());
-            // when the file exists, read the file, when it does not exist, write to the file, to make reading possible.
-            if (File.Exists(path) && File.ReadAllText(path) != null)
-            {
-                string jsonContent = File.ReadAllText(path);
-                List<KeyCode> keyBindingDataList = JsonConvert.DeserializeObject<List<KeyCode>>(jsonContent);
-                int index = 0;
-                // check if new keyBindings got added, which are not present in the file.
-                if(keyBindingDataList.Count() == KeyBindings.GetKeyCodes().Count())
-                {
-                    foreach (var binding in KeyBindings.AllBindings())
-                    {
-                        binding.Value.KeyCode = keyBindingDataList[index++];
-                    }
-                }
-                else
-                {
-                    File.WriteAllText(Application.dataPath + "/StreamingAssets/KeyBindings.json", allKeys);
-                }
-            }
-            else
-            {
-                File.WriteAllText(Application.dataPath + "/StreamingAssets/KeyBindings.json", allKeys);
-            }
+            KeyBindings.LoadKeyBindings();
             // instantiates the SettingsMenu
             settingsMenuGameObject = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, Canvas.transform, false);
             // adds the ExitGame method to the exit button
