@@ -56,7 +56,7 @@ namespace SEE.Game.Drawable.Configurations
             {
                 case LineConf line:
                     GameDrawer.ReDrawLine(drawable, line);
-                    new DrawFreehandNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
+                    new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
                         line).Execute();
                     break;
                 case TextConf text:

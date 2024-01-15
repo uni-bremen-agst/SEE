@@ -3,6 +3,7 @@ using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.UI.Menu.Drawable;
+using SEE.Game.UI.Notification;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System;
@@ -159,7 +160,8 @@ namespace SEE.Controls.Actions.Drawable
                         positions = newPositions;
 
                         GameDrawer.Drawing(shape, positions);
-                        new DrawFreehandNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), LineConf.GetLine(shape)).Execute();
+                        new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
+                            LineConf.GetLine(shape)).Execute();
                     }
                     FinishDrawing();
                     return true;
@@ -184,7 +186,60 @@ namespace SEE.Controls.Actions.Drawable
                 FinishDrawing();
                 return true;
             }
+
+            /// Block for canceling the drawing of a line shape.
+            CancelDrawing();
+
+            /// Block for removing the last point during the drawing of a line shape.
+            RemoveLastPoint();
+
             return false;
+        }
+
+        /// <summary>
+        /// Provides the option to cancel drawing a line shape with the escape button.
+        /// </summary>
+        private void CancelDrawing()
+        {
+            if (drawing && Input.GetKeyDown(KeyCode.Escape))
+            {
+                ShowNotification.Info("Line-Shape drawing canceled.", "The drawing of the shape art line has been canceled.");
+                new EraseNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), shape.name).Execute();
+                Destroyer.Destroy(shape);
+                positions = new Vector3[1];
+                drawing = false;
+                shape = null;
+            }
+        }
+
+        /// <summary>
+        /// Provides the option to remove the last added point. 
+        /// Press the Tab key for this action.
+        /// If the line does not have enough points to remove, it will be deleted.
+        /// </summary>
+        private void RemoveLastPoint()
+        {
+            if (drawing && Input.GetKeyDown(KeyCode.Tab))
+            {
+                if (shape.GetComponent<LineRenderer>().positionCount >= 3)
+                {
+                    ShowNotification.Info("Last point removed.", "The last placed point of the line has been removed.");
+                    LineRenderer renderer = shape.GetComponent<LineRenderer>();
+                    renderer.positionCount -= 2;
+                    positions = positions.ToList().GetRange(0, positions.Length - 1).ToArray();
+                    renderer.SetPositions(positions);
+                    new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), LineConf.GetLine(shape)).Execute();
+                }
+                else
+                {
+                    ShowNotification.Info("Line-Shape drawing canceled.", "The drawing of the shape art line has been canceled.");
+                    new EraseNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), shape.name).Execute();
+                    Destroyer.Destroy(shape);
+                    positions = new Vector3[1];
+                    drawing = false;
+                    shape = null;
+                }
+            }
         }
 
         /// <summary>
@@ -295,7 +350,7 @@ namespace SEE.Controls.Actions.Drawable
                 shape = GameDrawer.SetPivotShape(shape, convertedHitPoint);
                 LineConf currentShape = LineConf.GetLine(shape);
                 memento = new Memento(drawable, currentShape);
-                new DrawFreehandNetAction(memento.drawable.ID, memento.drawable.ParentID, currentShape).Execute();
+                new DrawNetAction(memento.drawable.ID, memento.drawable.ParentID, currentShape).Execute();
                 currentState = ReversibleAction.Progress.Completed;
                 drawing = false;
                 return true;
@@ -327,7 +382,7 @@ namespace SEE.Controls.Actions.Drawable
                 Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
                 newPositions[newPositions.Length - 1] = newPosition;
                 GameDrawer.Drawing(shape, newPositions);
-                new DrawFreehandNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), LineConf.GetLine(shape)).Execute();
+                new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), LineConf.GetLine(shape)).Execute();
             }
         }
 
@@ -354,7 +409,7 @@ namespace SEE.Controls.Actions.Drawable
                     positions = newPositions;
 
                     GameDrawer.Drawing(shape, positions);
-                    new DrawFreehandNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), LineConf.GetLine(shape)).Execute();
+                    new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), LineConf.GetLine(shape)).Execute();
                 }
             }
         }
@@ -370,7 +425,7 @@ namespace SEE.Controls.Actions.Drawable
             shape = GameDrawer.SetPivot(shape);
             LineConf currentShape = LineConf.GetLine(shape);
             memento = new Memento(drawable, currentShape);
-            new DrawFreehandNetAction(memento.drawable.ID, memento.drawable.ParentID, currentShape).Execute();
+            new DrawNetAction(memento.drawable.ID, memento.drawable.ParentID, currentShape).Execute();
             currentState = ReversibleAction.Progress.Completed;
             drawing = false;
         }
@@ -401,7 +456,7 @@ namespace SEE.Controls.Actions.Drawable
             shape = GameDrawer.ReDrawLine(memento.drawable.GetDrawable(), memento.shape);
             if (shape != null)
             {
-                new DrawFreehandNetAction(memento.drawable.ID, memento.drawable.ParentID, LineConf.GetLine(shape)).Execute();
+                new DrawNetAction(memento.drawable.ID, memento.drawable.ParentID, LineConf.GetLine(shape)).Execute();
             }
         }
 

@@ -94,6 +94,12 @@ namespace SEE.Game.UI.Menu.Drawable
             finish.clickEvent.AddListener(() =>
             {
                 gotSelection = true;
+
+                /// In case it is not selected, but 'Finish' is clicked directly.
+                if (chosenObject == null)
+                {
+                    chosenObject = nodes[parentSelector.index];
+                }
             });
         }
 

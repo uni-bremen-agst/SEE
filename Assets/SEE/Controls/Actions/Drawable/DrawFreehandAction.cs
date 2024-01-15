@@ -207,7 +207,7 @@ namespace SEE.Controls.Actions.Drawable
                 positions = newPositions;
 
                 GameDrawer.Drawing(line, positions);
-                new DrawFreehandNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
+                new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
                     LineConf.GetLine(line)).Execute();
             }
         }
@@ -234,7 +234,7 @@ namespace SEE.Controls.Actions.Drawable
                     line = GameDrawer.SetPivot(line);
                     LineConf currentLine = LineConf.GetLine(line);
                     memento = new Memento(drawable, currentLine);
-                    new DrawFreehandNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                    new DrawNetAction(memento.drawable.ID, memento.drawable.ParentID, 
                         currentLine).Execute();
                     currentState = ReversibleAction.Progress.Completed;
                     return true;
@@ -277,7 +277,7 @@ namespace SEE.Controls.Actions.Drawable
             line = GameDrawer.ReDrawLine(memento.drawable.GetDrawable(), memento.line);
             if (line != null)
             {
-                new DrawFreehandNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                new DrawNetAction(memento.drawable.ID, memento.drawable.ParentID, 
                     LineConf.GetLine(line)).Execute();
             }
         }

@@ -45,7 +45,7 @@ namespace SEE.Game.Drawable
                         switch (child.tag)
                         {
                             case Tags.Line:
-                                new DrawFreehandNetAction(drawable.name, drawableParent, 
+                                new DrawNetAction(drawable.name, drawableParent, 
                                     LineConf.GetLine(child)).Execute();
                                 break;
                             case Tags.DText:

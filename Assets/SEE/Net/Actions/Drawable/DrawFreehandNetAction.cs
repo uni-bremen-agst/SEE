@@ -6,9 +6,9 @@ using UnityEngine;
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is responsible for drawing (<see cref="DrawFreehandAction"/>) a line on the given drawable on all clients.
+    /// This class is responsible for drawing (<see cref="DrawFreehandAction"/> or <see cref="DrawShapesAction"/>) a line on the given drawable on all clients.
     /// </summary>
-    public class DrawFreehandNetAction : AbstractNetAction
+    public class DrawNetAction : AbstractNetAction
     {
         /// <summary>
         /// The id of the drawable on which the line should be drawn.
@@ -31,7 +31,7 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="drawableID">The id of the drawable on which the line should be drawn.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="line">The line that should be drawn.</param>
-        public DrawFreehandNetAction(string drawableID, string parentDrawableID, LineConf line)
+        public DrawNetAction(string drawableID, string parentDrawableID, LineConf line)
         {
             this.DrawableID = drawableID;
             this.ParentDrawableID = parentDrawableID;

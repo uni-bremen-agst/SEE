@@ -205,7 +205,7 @@ namespace SEE.Game.Drawable
 
             GameObject newLine = GameDrawer.ReDrawLine(drawable, lineToCreate);
             GameDrawer.ChangePivot(newLine);
-            new DrawFreehandNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
+            new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
                 LineConf.GetLine(newLine)).Execute();
 
             return LineConf.GetLine(newLine);

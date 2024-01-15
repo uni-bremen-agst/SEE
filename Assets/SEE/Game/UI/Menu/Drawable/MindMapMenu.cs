@@ -57,7 +57,7 @@ namespace SEE.Game.UI.Menu.Drawable
             {
                 gotOperation = true;
                 chosenOperation = Operation.Theme;
-                ShowNotification.Info("Select position", "Choose a suitable position for the new central theme.", 2);
+                ShowNotification.Info("Select position", "Choose a suitable position for the new central theme.", 3);
             });
 
             /// Initialize the button for spawn a subtheme.
@@ -66,7 +66,7 @@ namespace SEE.Game.UI.Menu.Drawable
             {
                 gotOperation = true;
                 chosenOperation = Operation.Subtheme;
-                ShowNotification.Info("Select position", "Choose a suitable position for the new subtheme.", 2);
+                ShowNotification.Info("Select position", "Choose a suitable position for the new subtheme.", 3);
             });
 
             /// Initialize the button for spawn a leaf.
@@ -75,7 +75,7 @@ namespace SEE.Game.UI.Menu.Drawable
             {
                 gotOperation = true;
                 chosenOperation = Operation.Leaf;
-                ShowNotification.Info("Select position", "Choose a suitable position for the new leaf.", 2);
+                ShowNotification.Info("Select position", "Choose a suitable position for the new leaf.", 3);
             });
         }
 
