@@ -83,8 +83,10 @@ namespace SEE.Game.UI.Drawable
             /// Adds the component for the option that the button can be holded (right click).
             down.AddComponent<ButtonHolded>().SetAction(ClickDown);
             /// Adds a hover tool tip to the buttons.
-            up.AddComponent<ButtonHoverTooltip>().SetMessage("Left mouse button for a single click, right mouse button can be held down (performs multiple steps).");
-            down.AddComponent<ButtonHoverTooltip>().SetMessage("Left mouse button for a single click, right mouse button can be held down (performs multiple steps).");
+            up.AddComponent<ButtonHoverTooltip>().SetMessage("Left mouse button for a single click, " +
+                "right mouse button can be held down (performs multiple steps).");
+            down.AddComponent<ButtonHoverTooltip>().SetMessage("Left mouse button for a single click, " +
+                "right mouse button can be held down (performs multiple steps).");
 
             inputField.onEndEdit.AddListener(ValueChanged);
         }

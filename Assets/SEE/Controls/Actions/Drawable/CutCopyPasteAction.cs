@@ -10,6 +10,7 @@ using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 
 namespace SEE.Controls.Actions.Drawable
@@ -244,6 +245,9 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
+            /// Block for canceling the action.
+            Cancel();
+
             if (!Raycasting.IsMouseOverGUI())
             {
                 switch (progressState)
@@ -286,6 +290,19 @@ namespace SEE.Controls.Actions.Drawable
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Provides the option to cancel the action. 
+        /// Simply press the "Esc" key if an object is selected for Cut/Copy/Paste.
+        /// </summary>
+        private void Cancel()
+        {
+            if (selectedObj != null && Input.GetKeyDown(KeyCode.Escape))
+            {
+                ShowNotification.Info("Canceled", "The action was canceled by the user.");
+                SetToInitialState();
+            }
         }
 
         /// <summary>

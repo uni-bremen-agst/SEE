@@ -4,10 +4,12 @@ using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.UI.Drawable;
 using SEE.Game.UI.Menu.Drawable;
+using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 using MoveNetAction = SEE.Net.Actions.Drawable.MoveNetAction;
 
@@ -218,6 +220,9 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
+            /// Block for canceling the action.
+            Cancel();
+
             if (!Raycasting.IsMouseOverGUI())
             {
                 switch (progressState)
@@ -244,7 +249,64 @@ namespace SEE.Controls.Actions.Drawable
                 }
                 return false;
             }
+            
             return false;
+        }
+
+        /// <summary>
+        /// Provides the option to cancel the action. 
+        /// Simply press the "Esc" key if an object is selected for move/rotate.
+        /// </summary>
+        private void Cancel()
+        {
+            if (selectedObject != null && Input.GetKeyDown(KeyCode.Escape))
+            {
+                ShowNotification.Info("Canceled", "The action was canceled by the user.");
+                if (selectedObject != null)
+                {
+                    if (selectedObject.GetComponent<BlinkEffect>() != null)
+                    {
+                        selectedObject.GetComponent<BlinkEffect>().Deactivate();
+                    }
+                    if (selectedObject.GetComponent<Rigidbody>() != null)
+                    {
+                        Destroyer.Destroy(selectedObject.GetComponent<Rigidbody>());
+                    }
+                    if (selectedObject.GetComponent<CollisionController>() != null)
+                    {
+                        Destroyer.Destroy(selectedObject.GetComponent<CollisionController>());
+                    }
+                }
+                if (progressState != ProgressState.Finish && selectedObject != null)
+                {
+                    GameObject drawable = GameFinder.GetDrawable(selectedObject);
+                    string drawableParent = GameFinder.GetDrawableParentName(drawable);
+                    if (progressState == ProgressState.Move)
+                    {
+                        GameMoveRotator.SetPosition(selectedObject, oldObjectPosition,
+                            MoveMenu.includeChildren);
+                        new MoveNetAction(drawable.name, drawableParent, selectedObject.name,
+                            oldObjectPosition, MoveMenu.includeChildren).Execute();
+                    }
+
+                    if (progressState == ProgressState.Rotate)
+                    {
+                        GameMoveRotator.SetRotate(selectedObject, oldObjectLocalEulerAngles.z,
+                            RotationMenu.includeChildren);
+                        new RotatorNetAction(drawable.name, drawableParent, selectedObject.name,
+                            oldObjectLocalEulerAngles.z, RotationMenu.includeChildren).Execute();
+                    }
+                }
+                RotationMenu.Disable();
+                MoveMenu.Disable();
+                if (switchMenu != null)
+                {
+                    Destroyer.Destroy(switchMenu);
+                }
+
+                progressState = ProgressState.SelectObject;
+                selectedObject = null;
+            }
         }
 
         /// <summary>

@@ -3,10 +3,12 @@ using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.UI.Drawable;
 using SEE.Game.UI.Menu.Drawable;
+using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 using TextConf = SEE.Game.Drawable.Configurations.TextConf;
 
@@ -203,6 +205,9 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
+            /// Block for canceling the action.
+            Cancel();
+
             if (!Raycasting.IsMouseOverGUI())
             {
                 switch (progressState)
@@ -223,6 +228,33 @@ namespace SEE.Controls.Actions.Drawable
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Provides the option to cancel the action. 
+        /// Simply press the "Esc" key if an object is selected for edit.
+        /// </summary>
+        private void Cancel()
+        {
+            if (selectedObj != null && Input.GetKeyDown(KeyCode.Escape))
+            {
+                ShowNotification.Info("Canceled", "The action was canceled by the user.");
+                if (selectedObj != null && selectedObj.GetComponent<BlinkEffect>() != null)
+                {
+                    selectedObj.GetComponent<BlinkEffect>().Deactivate();
+                }
+                if (progressState != ProgressState.Finish && selectedObj != null)
+                {
+                    GameObject drawable = GameFinder.GetDrawable(selectedObj);
+                    DrawableType.Edit(selectedObj, oldValueHolder, drawable);
+                }
+                selectedObj = null;
+                progressState = ProgressState.SelectObject;
+                TextMenu.Disable();
+                LineMenu.DisableLineMenu();
+                ImageMenu.Disable();
+                MindMapEditMenu.Disable();
+            }
         }
 
         /// <summary>

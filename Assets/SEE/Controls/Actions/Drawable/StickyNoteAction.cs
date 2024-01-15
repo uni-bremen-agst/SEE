@@ -126,6 +126,7 @@ namespace SEE.Controls.Actions.Drawable
             StickyNoteRotationMenu.Disable();
             StickyNoteEditMenu.Disable();
             StickyNoteMoveMenu.Disable();
+            ScaleMenu.Disable();
             if (stickyNote != null && stickyNote.GetComponent<HighlightEffect>() != null)
             {
                 Destroyer.Destroy(stickyNote.GetComponent<HighlightEffect>());
@@ -178,6 +179,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
+            Cancel();
             if (!Raycasting.IsMouseOverGUI())
             {
                 if (StickyNoteMenu.TryGetOperation(out Operation op))
@@ -204,6 +206,73 @@ namespace SEE.Controls.Actions.Drawable
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Provides the option to cancel the action. 
+        /// Simply press the "Esc" key.
+        /// </summary>
+        private void Cancel()
+        {
+            if ((stickyNote != null || stickyNoteHolder != null)
+                && Input.GetKeyDown(KeyCode.Escape))
+            {
+                ShowNotification.Info("Canceled", "The action was canceled by the user.");
+                StickyNoteRotationMenu.Disable();
+                StickyNoteEditMenu.Disable();
+                StickyNoteMoveMenu.Disable();
+                ScaleMenu.Disable();
+                if (stickyNote != null && stickyNote.GetComponent<HighlightEffect>() != null)
+                {
+                    Destroyer.Destroy(stickyNote.GetComponent<HighlightEffect>());
+                }
+
+                if (selectedAction == Operation.Move
+                    && stickyNote != null)
+                {
+                    foreach (Collider collider in
+                        GameFinder.GetHighestParent(stickyNote).GetComponentsInChildren<Collider>())
+                    {
+                        collider.enabled = true;
+                    }
+                }
+                if (!finish)
+                {
+                    switch (selectedAction)
+                    {
+                        case Operation.Spawn:
+                            if (stickyNote != null)
+                            {
+                                Destroyer.Destroy(stickyNote);
+                            }
+                            break;
+                        case Operation.Move:
+                            GameObject stickyHolder = GameFinder.GetHighestParent(
+                            GameFinder.FindDrawable(memento.originalConfig.ID, memento.originalConfig.ParentID));
+                            GameStickyNoteManager.Move(stickyHolder, memento.originalConfig.Position,
+                                memento.originalConfig.Rotation);
+                            GameObject d = GameFinder.GetDrawable(stickyHolder);
+                            string drawableParentID = GameFinder.GetDrawableParentName(d);
+                            new StickyNoteMoveNetAction(d.name, drawableParentID, memento.originalConfig.Position,
+                                memento.originalConfig.Rotation).Execute();
+                            break;
+                        case Operation.Edit:
+                            GameObject sticky = GameFinder.FindDrawable(memento.originalConfig.ID,
+                                memento.originalConfig.ParentID)
+                                .transform.parent.gameObject;
+                            GameStickyNoteManager.Change(sticky, memento.originalConfig);
+                            new StickyNoteChangeNetAction(memento.originalConfig).Execute();
+                            break;
+                    }
+                }
+                StickyNoteMenu.Enable();
+                stickyNote = null;
+                stickyNoteHolder = null;
+                inProgress = false;
+                mouseWasReleased = false;
+                moveMenuOpened = false;
+                selectedAction = Operation.None;
+            }
         }
 
         /// <summary>

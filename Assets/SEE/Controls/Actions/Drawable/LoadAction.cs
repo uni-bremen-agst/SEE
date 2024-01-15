@@ -10,6 +10,7 @@ using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -143,6 +144,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
+            Cancel();
             bool result = false;
 
             if (!Raycasting.IsMouseOverGUI())
@@ -176,6 +178,22 @@ namespace SEE.Controls.Actions.Drawable
                 } 
             }
             return result;
+        }
+
+        /// <summary>
+        /// Deactivates the selected drawable
+        /// </summary>
+        private void Cancel()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape)
+                && selectedDrawable != null
+                && selectedDrawable.GetComponent<HighlightEffect>() != null
+                && (browser == null || (browser != null && !browser.IsOpen())))
+            {
+                ShowNotification.Info("Unselect drawable", "The marked drawable was unselected.");
+                Destroyer.Destroy(selectedDrawable.GetComponent<HighlightEffect>());
+                selectedDrawable = null;
+            }
         }
 
         /// <summary>

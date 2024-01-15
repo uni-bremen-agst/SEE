@@ -325,10 +325,14 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void SelectParent()
         {
+            /// This block enables the canceling of the action.
+            Cancel();
+
             /// This block is for the branch line preview.
             /// It draws the line from the origin of the node to the position of the mouse cursor.
-            if (!Input.GetMouseButton(0) && Raycasting.RaycastAnything(out RaycastHit raycast) &&
-               (raycast.collider.gameObject.CompareTag(Tags.Drawable)
+            if (!Input.GetMouseButton(0) && Raycasting.RaycastAnything(out RaycastHit raycast) 
+                && node != null
+                && (raycast.collider.gameObject.CompareTag(Tags.Drawable)
                   || GameFinder.hasDrawable(raycast.collider.gameObject)))
             {
                 Vector3[] positions = new Vector3[2];
@@ -342,7 +346,7 @@ namespace SEE.Controls.Actions.Drawable
 
             /// This block is for the selection of a parent node.
             /// It will executed if the left mouse button will be clicked.
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && node != null)
             {
                 /// A node can only be chosen as a parent node if it is a Theme or Subtheme Node. 
                 /// Additionally, the node must not choose itself.
@@ -361,6 +365,34 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     ShowNotification.Warn("Wrong selection.", "You need to select a theme or a subtheme node of the current selected drawable.");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Provides the option to cancel the action. 
+        /// Simply press the "Esc" key if an object is selected for parent selecting.
+        /// </summary>
+        private void Cancel()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                ShowNotification.Info("Canceled", "The action was canceled by the user.");
+                MindMapParentSelectionMenu.Disable();
+
+                if (progress != ProgressState.Finish && node != null)
+                {
+                    Destroyer.Destroy(node);
+                    if (branchLine != null)
+                    {
+                        Destroyer.Destroy(branchLine);
+                    }
+                }
+
+                progress = ProgressState.SelectPosition;
+                chosenOperation = Operation.None;
+                node = null;
+                branchLine = null;
+                MindMapMenu.Enable();
             }
         }
 

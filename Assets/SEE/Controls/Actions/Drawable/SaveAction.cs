@@ -8,6 +8,7 @@ using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -161,6 +162,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
+            Cancel();
             bool result = false;
 
             if (!Raycasting.IsMouseOverGUI())
@@ -183,6 +185,26 @@ namespace SEE.Controls.Actions.Drawable
                 }
             }
             return result;
+        }
+
+        /// <summary>
+        /// Deactivates the highlighting of the selected drawables and clears the selected drawable list.
+        /// </summary>
+        private void Cancel()
+        {
+            if (selectedDrawables.Count > 0 && Input.GetKeyDown(KeyCode.Escape)
+                && (browser == null || (browser != null && !browser.IsOpen())))
+            {
+                ShowNotification.Info("Unselect drawables", "The marked drawables was unselected.");
+                foreach (GameObject drawable in selectedDrawables)
+                {
+                    if (drawable.GetComponent<HighlightEffect>() != null)
+                    {
+                        Destroyer.Destroy(drawable.GetComponent<HighlightEffect>());
+                    }
+                }
+                selectedDrawables.Clear();
+            }
         }
 
         /// <summary>

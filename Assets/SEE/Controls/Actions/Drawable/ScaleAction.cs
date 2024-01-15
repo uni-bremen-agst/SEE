@@ -2,6 +2,7 @@
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.UI.Drawable;
 using SEE.Game.UI.Menu.Drawable;
+using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
@@ -161,6 +162,9 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
+            /// Block for canceling the action.
+            Cancel();
+
             if (!Raycasting.IsMouseOverGUI())
             {
                 switch (progressState)
@@ -180,7 +184,7 @@ namespace SEE.Controls.Actions.Drawable
                             /// Initializes the end of scaling.
                             /// When the left mouse button is pressed and released, 
                             /// scaling is finish and it switches to the last progress state.
-                            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) 
+                            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
                                 && selectedObj.GetComponent<BlinkEffect>() != null)
                             {
                                 selectedObj.GetComponent<BlinkEffect>().Deactivate();
@@ -201,6 +205,44 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
+        /// Provides the option to cancel the action. 
+        /// Simply press the "Esc" key if an object is selected for scaling.
+        /// </summary>
+        private void Cancel()
+        {
+            if (selectedObj != null && Input.GetKeyDown(KeyCode.Escape))
+            {
+                ShowNotification.Info("Canceled", "The action was canceled by the user.");
+                if (selectedObj != null)
+                {
+                    if (selectedObj.GetComponent<BlinkEffect>() != null)
+                    {
+                        selectedObj.GetComponent<BlinkEffect>().Deactivate();
+                    }
+                    if (selectedObj.GetComponent<Rigidbody>() != null)
+                    {
+                        Destroyer.Destroy(selectedObj.GetComponent<Rigidbody>());
+                    }
+                    if (selectedObj.GetComponent<CollisionController>() != null)
+                    {
+                        Destroyer.Destroy(selectedObj.GetComponent<CollisionController>());
+                    }
+                }
+                if (progressState != ProgressState.Finish && selectedObj != null)
+                {
+                    GameObject drawable = GameFinder.GetDrawable(selectedObj);
+                    string drawableParent = GameFinder.GetDrawableParentName(drawable);
+                    GameScaler.SetScale(selectedObj, oldScale);
+                    new ScaleNetAction(drawable.name, drawableParent, selectedObj.name, oldScale).Execute();
+                }
+                ScaleMenu.Disable();
+
+                selectedObj = null;
+                progressState = ProgressState.SelectObject;
+            }
+        }
+
+        /// <summary>
         /// Allows the selection of a drawable type object for scaling, taking into account the object scales in the last run. 
         /// It prevents the same object from being accidentally selected again when the left mouse button is not released. 
         /// Therefore, after the last action has been successfully completed, the left mouse button must be released to select the same object again. 
@@ -213,7 +255,7 @@ namespace SEE.Controls.Actions.Drawable
             if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj == null
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                 (oldSelectedObj == null || oldSelectedObj != raycastHit.collider.gameObject
-                    || (oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased)) 
+                    || (oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased))
                 && GameFinder.hasDrawable(raycastHit.collider.gameObject))
             {
                 /// If an object was already selected, the Rigidbody and Collision Controller are removed if they are still present.
@@ -337,7 +379,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     Destroyer.Destroy(selectedObj.GetComponent<Rigidbody>());
                     Destroyer.Destroy(selectedObj.GetComponent<CollisionController>());
-                    memento = new Memento(selectedObj, GameFinder.GetDrawable(selectedObj), 
+                    memento = new Memento(selectedObj, GameFinder.GetDrawable(selectedObj),
                         selectedObj.name, oldScale, newScale);
                     currentState = ReversibleAction.Progress.Completed;
                     return true;
@@ -366,11 +408,11 @@ namespace SEE.Controls.Actions.Drawable
             {
                 GameScaler.SetScale(memento.selectedObject, memento.oldScale);
                 bool refresh = GameMindMap.ReDrawBranchLines(memento.selectedObject);
-                new ScaleNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                new ScaleNetAction(memento.drawable.ID, memento.drawable.ParentID,
                     memento.selectedObject.name, memento.oldScale).Execute();
                 if (refresh)
                 {
-                    new MindMapRefreshBranchLinesNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                    new MindMapRefreshBranchLinesNetAction(memento.drawable.ID, memento.drawable.ParentID,
                         MindMapNodeConf.GetNodeConf(memento.selectedObject)).Execute();
                 }
             }

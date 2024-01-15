@@ -2,10 +2,13 @@
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.UI.Menu.Drawable;
+using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 
 namespace SEE.Controls.Actions.Drawable
@@ -115,6 +118,9 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
+            /// Block for canceling the action.
+            Cancel();
+
             if (!Raycasting.IsMouseOverGUI())
             {
                 switch (progressState)
@@ -139,6 +145,32 @@ namespace SEE.Controls.Actions.Drawable
                 return false;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Provides the option to cancel the action. 
+        /// Simply press the "Esc" key if an object is selected for move a point.
+        /// </summary>
+        private void Cancel()
+        {
+            if (selectedLine != null && Input.GetKeyDown(KeyCode.Escape))
+            {
+                ShowNotification.Info("Canceled", "The action was canceled by the user.");
+                if (selectedLine != null && selectedLine.GetComponent<BlinkEffect>() != null)
+                {
+                    selectedLine.GetComponent<BlinkEffect>().Deactivate();
+                }
+                if (progressState != ProgressState.Finish && selectedLine != null)
+                {
+                    GameObject drawable = GameFinder.GetDrawable(selectedLine);
+                    string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+                    GameMoveRotator.MovePoint(selectedLine, Indices, oldPointPosition);
+                    new MovePointNetAction(drawable.name, drawableParentName, selectedLine.name, Indices,
+                        oldPointPosition).Execute();
+                }
+                selectedLine = null;
+                progressState = ProgressState.SelectLine;
+            }
         }
 
         /// <summary>
