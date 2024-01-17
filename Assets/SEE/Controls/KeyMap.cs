@@ -221,20 +221,27 @@ namespace SEE.Controls.KeyActions
             // If the file exists, we can read from it, otherwise we don't do anything.
             if (File.Exists(keyBindingsPath))
             {
-                // We are using a copy of keyBindings to finalize the merge only when there
-                // there are no duplicate key codes.
-                IDictionary<KeyAction, KeyActionDescriptor> newKeyBindings = new Dictionary<KeyAction, KeyActionDescriptor>(keyBindings);
+                // We are using a copy of keyBindings to finalize the merge only when
+                // there are no duplicate key codes. We are testing for duplicated
+                // key codes at the end only because two key code could have been
+                // swapped, which would be perfectly okay. Testing each individually
+                // would appear as an error erroneously.
+                IDictionary<KeyAction, KeyActionDescriptor> newKeyBindings
+                    = new Dictionary<KeyAction, KeyActionDescriptor>(keyBindings);
 
-                foreach (KeyData keyData in (IList<KeyData>)JsonConvert.DeserializeObject<List<KeyData>>(File.ReadAllText(keyBindingsPath)))
+                foreach (KeyData keyData in (IList<KeyData>)JsonConvert.DeserializeObject<List<KeyData>>
+                                                                         (File.ReadAllText(keyBindingsPath)))
                 {
                     // If the key code is in file, but not in keyBindings, we will ignore it.
-                    if (TryGetKeyActionDescriptorByName(newKeyBindings, keyData.ActionName, out KeyActionDescriptor keyActionDescriptor))
+                    if (TryGetKeyActionDescriptorByName(newKeyBindings, keyData.ActionName,
+                                                        out KeyActionDescriptor keyActionDescriptor))
                     {
                         keyActionDescriptor.KeyCode = keyData.KeyCode;
                     }
                     else
                     {
-                        Debug.LogWarning($"Loaded key binding {keyData} with {keyActionDescriptor} that is not contained in key bindings. Will be ignored.\n");
+                        Debug.LogWarning($"Loaded key binding {keyData} with {keyActionDescriptor} "
+                            + "that is not contained in key bindings. Will be ignored.\n");
                     }
                 }
 
@@ -248,15 +255,6 @@ namespace SEE.Controls.KeyActions
                 {
                     keyBindings = newKeyBindings;
                 }
-            }
-        }
-
-        private void Dump(string message, IDictionary<KeyAction, KeyActionDescriptor> bindings)
-        {
-            Debug.Log(message + "\n");
-            foreach (var binding in bindings)
-            {
-                Debug.Log($"{binding.Key} -> {binding.Value}\n");
             }
         }
 
