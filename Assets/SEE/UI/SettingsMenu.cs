@@ -6,8 +6,8 @@ using SEE.Utils;
 using SEE.GO;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using SEE.UI.Notification;
+using SEE.Controls.KeyActions;
 
 namespace SEE.UI
 {
@@ -49,6 +49,7 @@ namespace SEE.UI
         /// </summary>
         protected override void StartDesktop()
         {
+            KeyBindings.LoadKeyBindings();
             // instantiates the SettingsMenu
             settingsMenuGameObject = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, Canvas.transform, false);
             // adds the ExitGame method to the exit button
@@ -56,7 +57,7 @@ namespace SEE.UI
                 .onClick.AddListener(ExitGame);
 
             // Displays all bindings grouped by their category.
-            foreach (var group in KeyBindings.AllBindings().GroupBy(binding => binding.Value.Category))
+            foreach (var group in KeyBindings.AllBindings())
             {
                 // Creates a list of keybinding descriptions for the given category.
                 GameObject scrollView = PrefabInstantiator.InstantiatePrefab(ScrollPrefab, Canvas.transform, false).transform.gameObject;
@@ -141,12 +142,12 @@ namespace SEE.UI
         /// <summary>
         /// The keyBinding which gets updated.
         /// </summary>
-        private KeyBindings.KeyActionDescriptor bindingToRebind = null;
+        private KeyActionDescriptor bindingToRebind = null;
 
         /// <summary>
         /// Sets the <see cref="bindingToRebind"/>.
         /// </summary>
-        private void StartRebindFor(KeyBindings.KeyActionDescriptor binding)
+        private void StartRebindFor(KeyActionDescriptor binding)
         {
             ShowNotification.Info("Bind action to key", "Press a key to bind this action.");
             bindingToRebind = binding;

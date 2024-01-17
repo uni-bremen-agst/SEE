@@ -1,18 +1,16 @@
-﻿using System;
+﻿using SEE.UI.Notification;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-namespace SEE.Controls
+namespace SEE.Controls.KeyActions
 {
     /// <summary>
-    /// Defines the
-    ///      codes for all interaction based on the keyboard in SEE.
+    /// Defines the codes for all interaction based on the keyboard in SEE.
     /// </summary>
-    internal static partial class KeyBindings
+    internal static class KeyBindings
     {
-        // TODO (#682): We need to be able to save and load the bindings since a
-        // user can change them.
-
         // IMPORTANT NOTES:
         // (1) Keep in mind that KeyCodes in Unity map directly to a
         //     physical key on an keyboard with an English layout.
@@ -20,11 +18,16 @@ namespace SEE.Controls
         // (3) The digits 0-9 are reserved for shortcuts for the player menu.
 
         /// <summary>
-        /// Mapping of every <see cref="KeyAction"/> onto its currently bound <see cref="KeyActionDescriptor"/>.
+        /// Defines the path of the file where the <see cref="keybindings"/> are stored.
+        /// </summary>
+        private static readonly string keyBindingsPath = Application.dataPath + "/StreamingAssets/KeyBindings.json";
+
+        /// <summary>
+        /// Mapping of every <see cref="KeyAction"/> onto its currently
+        /// bound <see cref="KeyActionDescriptor"/>.
         /// </summary>
         /// <remarks>Key actions can be re-bound.</remarks>
-        private static readonly IDictionary<KeyAction, KeyActionDescriptor> keyBindings
-            = new Dictionary<KeyAction, KeyActionDescriptor>();
+        private static readonly KeyMap keyBindings = new();
 
         /// <summary>
         /// Returns true if the user has pressed down a key requesting the given <paramref name="keyAction"/>
@@ -79,16 +82,7 @@ namespace SEE.Controls
         /// <returns>true if <paramref name="keyAction"/> is bound</returns>
         internal static bool TryGetKeyCode(KeyAction keyAction, out KeyCode keyCode)
         {
-            if (keyBindings.TryGetValue(keyAction, out KeyActionDescriptor descriptor))
-            {
-                keyCode = descriptor.KeyCode;
-                return true;
-            }
-            else
-            {
-                keyCode = KeyCode.None;
-                return false;
-            }
+            return keyBindings.TryGetValue(keyAction, out keyCode);
         }
 
         /// <summary>
@@ -115,17 +109,15 @@ namespace SEE.Controls
         /// this name will be presented to our users</param>
         private static void Register(KeyAction keyAction, KeyCode keyCode, string name, KeyActionCategory scope, string description)
         {
-            if (keyBindings.TryGetValue(keyAction, out KeyActionDescriptor descriptor))
+            try
             {
-                Debug.LogError($"Key action {keyAction} is already bound to {descriptor.Name}.\n");
+                keyBindings.Bind(keyAction, new KeyActionDescriptor(name, description, scope, keyCode));
             }
-            else if (TryGetKeyAction(keyCode, out KeyAction boundKeyAction))
+            catch (Exception ex)
             {
-                Debug.LogError($"Key code {keyCode} is already bound to key action {boundKeyAction}.\n");
-            }
-            else
-            {
-                keyBindings[keyAction] = new KeyActionDescriptor(name, description, scope, keyCode);
+                // Because this method is called by the static initializer, it represent an internal
+                // problem. The user is not responsible for it. We do not show a notification
+                Debug.LogError(ex.Message);
             }
         }
 
@@ -249,80 +241,33 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Returns the <see cref="KeyAction"/> in <see cref="keyBindings"/> that is
-        /// triggered by the given <paramref name="keyCode"/>. If a binding is found,
-        /// the <see cref="KeyAction"/> bound to the <paramref name="keyCode"/> is
-        /// returned in <paramref name="boundKeyAction"/> and <c>true</c> is returned.
-        /// Otherwise <c>false</c> is returned and <paramref name="boundKeyAction"/>
-        /// is undefined.
+        /// Rebinds a binding to another key and saves the changed key.
         /// </summary>
-        /// <param name="keyCode">a <see cref="KeyCode"/> for which a binding
-        /// is to be searched</param>
-        /// <param name="boundKeyAction">the <see cref="KeyAction"/> bound
-        /// to <paramref name="keyCode"/> if one exists; otherwise undefined</param>
-        /// <returns><c>true</c> if and only if there is a <see cref="KeyAction"/>
-        /// triggered by <paramref name="keyCode"/></returns>
-        public static bool TryGetKeyAction(KeyCode keyCode, out KeyAction boundKeyAction)
-        {
-            foreach (var binding in keyBindings)
-            {
-                if (binding.Value.KeyCode == keyCode)
-                {
-                    boundKeyAction = binding.Key;
-                    return true;
-                }
-            }
-            boundKeyAction = default;
-            return false;
-        }
-
-        /// <summary>
-        /// Returns the category of given <paramref name="keyAction"/> if this
-        /// <paramref name="keyAction"/> is bound at all; otherwise an exception
-        /// is thrown.
-        /// </summary>
-        /// <param name="keyAction"><see cref="KeyAction"/> whose category is to be retrieved</param>
-        /// <returns>category for <paramref name="keyAction"/></returns>
-        /// <exception cref="Exception">thrown if <paramref name="keyAction"/> is not bound</exception>
-        internal static KeyActionCategory GetCategory(KeyAction keyAction)
-        {
-            if (keyBindings.TryGetValue(keyAction, out KeyActionDescriptor descriptor))
-            {
-                return descriptor.Category;
-            }
-            else
-            {
-                throw new Exception($"{keyAction} is not bound");
-            }
-        }
-
-        /// <summary>
-        /// Rebinds a binding to another key.
-        /// </summary>
-        /// <param name="descriptor">the binding that will that should be triggered by <paramref name="keyCode"/></param>
+        /// <param name="descriptor">the binding that should be triggered by <paramref name="keyCode"/></param>
         /// <param name="keyCode">the key code that should trigger the action represented by <paramref name="descriptor"/></param>
         /// <exception cref="Exception">thrown if <paramref name="keyCode"/> is already bound to an action</exception>
-        public static void SetBindingForKey(KeyActionDescriptor descriptor, KeyCode keyCode)
+        internal static void SetBindingForKey(KeyActionDescriptor descriptor, KeyCode keyCode)
         {
-            if (TryGetKeyAction(keyCode, out KeyAction action))
-            {
-                throw new Exception($"Cannot register key {keyCode} for {descriptor.Name}."
-               + $" Key {keyCode} is already bound to {action}.\n");
-            }
-            else
-            {
-                descriptor.KeyCode = keyCode;
-            }
+            keyBindings.ResetKeyCode(descriptor, keyCode);
+            keyBindings.Save(keyBindingsPath);
         }
 
         /// <summary>
         /// Returns the current mapping of <see cref="KeyAction"/>s onto their
-        /// <see cref="KeyActionDescriptor"/>.
+        /// <see cref="KeyActionDescriptor"/> grouped by their <see cref="KeyActionCategory"/>.
         /// </summary>
         /// <returns>current mapping of key actions onto their descriptor</returns>
-        internal static IDictionary<KeyAction, KeyActionDescriptor> AllBindings()
+        internal static IEnumerable<IGrouping<KeyActionCategory, KeyValuePair<KeyAction, KeyActionDescriptor>>> AllBindings()
         {
-            return keyBindings;
+            return keyBindings.AllBindings();
+        }
+
+        /// <summary>
+        /// Loads the key bindings.
+        /// </summary>
+        internal static void LoadKeyBindings()
+        {
+            keyBindings.Load(keyBindingsPath);
         }
     }
 }
