@@ -46,11 +46,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         public static AttractFunction Create(AttractFunctionType attractFunctionType, ReflexionGraph reflexionGraph, string candidateType)
         {
-            switch(attractFunctionType)
+            // TODO: Resolve target language properly, when creating AttractFunctions
+            switch (attractFunctionType)
             {
                 case AttractFunctionType.CountAttract: return new CountAttract(reflexionGraph, candidateType);
-                // TODO: Resolve target language properly
-                case AttractFunctionType.NBAttract: return new NBAttract(reflexionGraph, candidateType, true, TokenLanguage.Plain, true);
+
+                case AttractFunctionType.NBAttract: return new NBAttract(reflexionGraph, candidateType, useStandardTerms:true, TokenLanguage.Plain, useCda:true);
+
+                case AttractFunctionType.ADCAttract: return new ADCAttract(reflexionGraph, candidateType, TokenLanguage.Plain);
             }
             throw new ArgumentException("Given attractFunctionType is currently not implemented");
         }
@@ -60,7 +63,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return this.edgeWeights.TryGetValue(edge.ID, out var weight) ? weight : 1.0;
         }
 
-        public abstract void HandleMappedEntities(Node cluster, List<Node> nodesChangedInMapping, ChangeType changeType);
+        public abstract void HandleChangedNodes(Node cluster, List<Node> nodesChangedInMapping, ChangeType changeType);
 
         public abstract double GetAttractionValue(Node node, Node cluster);
 

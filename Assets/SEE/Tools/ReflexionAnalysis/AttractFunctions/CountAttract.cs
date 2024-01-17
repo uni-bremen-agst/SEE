@@ -59,8 +59,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             foreach (Edge edge in implementationEdges)
             {
-                Node neighborOfCandidate = edge.Source.Equals(candidateNode) ? edge.Target : edge.Source;
-                Node neighborCluster = reflexionGraph.MapsTo(neighborOfCandidate);
+                Node candidateNeighbor = edge.Source.Equals(candidateNode) ? edge.Target : edge.Source;
+                Node neighborCluster = reflexionGraph.MapsTo(candidateNeighbor);
   
                 if (neighborCluster == null || neighborCluster.ID.Equals(cluster.ID)) continue;
 
@@ -82,7 +82,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return toOthers;
         }
 
-        public override void HandleMappedEntities(Node cluster, List<Node> nodesChangedInMapping, ChangeType changeType)
+        public override void HandleChangedNodes(Node cluster, List<Node> nodesChangedInMapping, ChangeType changeType)
         {
             foreach (Node nodeChangedInMapping in nodesChangedInMapping)
             {

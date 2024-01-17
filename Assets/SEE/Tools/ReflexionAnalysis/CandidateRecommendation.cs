@@ -248,14 +248,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                             chosenMappingPair = new MappingPair(nodeChangedInMapping, edgeEvent.Edge.Target, -1.0d);
                         }
 
-                        AttractFunction.HandleMappedEntities(edgeEvent.Edge.Target, new List<Node> { nodeChangedInMapping }, (ChangeType)edgeEvent.Change);
+                        AttractFunction.HandleChangedNodes(edgeEvent.Edge.Target, new List<Node> { nodeChangedInMapping }, (ChangeType)edgeEvent.Change);
                         UpdateRecommendations();
                         Statistics.RecordChosenMappingPair(chosenMappingPair, (ChangeType)edgeEvent.Change);
                     }
                 } 
                 else
                 {
-                    AttractFunction.HandleMappedEntities(edgeEvent.Edge.Target, nodesChangedInMapping, (ChangeType)edgeEvent.Change);
+                    AttractFunction.HandleChangedNodes(edgeEvent.Edge.Target, nodesChangedInMapping, (ChangeType)edgeEvent.Change);
                     UpdateRecommendations();
                 }
             }

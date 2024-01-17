@@ -968,7 +968,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="itsType">the edge type of the propagated dependency</param>
         /// <returns>the propagated edge in the architecture graph between source and target
         /// with given type; null if there is no such edge</returns>
-        private static Edge GetPropagatedDependency(
+        public static Edge GetPropagatedDependency(
             Node source, // source of edge; must be in architecture
             Node target, // target of edge; must be in architecture
             string itsType) // the edge type that must match exactly

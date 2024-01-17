@@ -91,7 +91,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return attraction;
         }
 
-        public override void HandleMappedEntities(Node cluster, List<Node> nodesChangedInMapping, ChangeType changeType)
+        public override void HandleChangedNodes(Node cluster, List<Node> nodesChangedInMapping, ChangeType changeType)
         {
             foreach(Node nodeChangedInMapping in nodesChangedInMapping)
             {
