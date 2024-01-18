@@ -52,7 +52,6 @@
         "Joveler.Compression.XZ.dll",
         "MathNet.Numerics.dll",
         "Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.dll",
-        "Microsoft.VisualStudio.Validation.dll",
         "Newtonsoft.Json.dll",
         "NetworkCommsDotNet.dll"
     ],
