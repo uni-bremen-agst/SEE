@@ -504,7 +504,7 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Test for DiffCity
+        /// Test for SEEBranchCity
         /// </summary>
         [Test]
         public void TestSEEBranchCity()
@@ -645,6 +645,12 @@ namespace SEE.Utils
             AreEqual(expected.DeletionBeamColor, actual.DeletionBeamColor);
         }
 
+        /// <summary>
+        /// Checks whether the configuration attributes of <paramref name="expected"/> and
+        /// <paramref name="actual"/> are equal.
+        /// </summary>
+        /// <param name="expected">expected settings</param>
+        /// <param name="actual">actual settings</param>
         private static void SEEBranchCityAttributesAreEqual(SEEBranchCity expected, SEEBranchCity actual)
         {
             SEECityAttributesAreEqual(expected, actual);
