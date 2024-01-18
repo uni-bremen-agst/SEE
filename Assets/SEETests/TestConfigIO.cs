@@ -503,6 +503,28 @@ namespace SEE.Utils
             SEEJlgCityAttributesAreEqual(savedCity, loadedCity);
         }
 
+        /// <summary>
+        /// Test for DiffCity
+        /// </summary>
+        [Test]
+        public void TestSEEBranchCity()
+        {
+            string filename = "mini-diff.cfg";
+            // First save a new city with all its default values.
+            SEEBranchCity savedCity = NewVanillaSEECity<SEEBranchCity>();
+            savedCity.Save(filename);
+
+            // Create a new city with all its default values and then
+            // wipe out all its attributes to see whether they are correctly
+            // restored from the saved configuration file.
+            SEEBranchCity loadedCity = NewVanillaSEECity<SEEBranchCity>();
+            WipeOutSEEBranchCityAttributs(loadedCity);
+            // Load the saved attributes from the configuration file.
+            loadedCity.Load(filename);
+
+            SEEBranchCityAttributesAreEqual(savedCity, loadedCity);
+        }
+
         //--------------------------------------------------------
         // AreEqual comparisons
         //--------------------------------------------------------
@@ -623,6 +645,12 @@ namespace SEE.Utils
             AreEqual(expected.DeletionBeamColor, actual.DeletionBeamColor);
         }
 
+        private static void SEEBranchCityAttributesAreEqual(SEEBranchCity expected, SEEBranchCity actual)
+        {
+            SEECityAttributesAreEqual(expected, actual);
+            AreEqual(expected.BaselineGXLPath, actual.BaselineGXLPath);
+        }
+
         /// <summary>
         /// Checks whether the configuration attributes of <paramref name="expected"/> and
         /// <paramref name="actual"/> are equal.
@@ -741,6 +769,17 @@ namespace SEE.Utils
             WipeOutAbstractSEECityAttributes(city);
             city.GXLPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gxl");
             city.CSVPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.csv");
+        }
+
+        /// <summary>
+        /// Assigns all attribute of given <paramref name="city"/> to arbitrary values
+        /// differnet from their default values.
+        /// </summary>
+        /// <param name="city">the city whose attributes are to be re-assigned</param>
+        private static void WipeOutSEEBranchCityAttributs(SEEBranchCity city)
+        {
+            WipeOutSEECityAttributes(city);
+            city.BaselineGXLPath.Set("C:/MyAbsoluteDirectory/MyBaselineFile.gxl");
         }
 
         /// <summary>
