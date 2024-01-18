@@ -156,7 +156,7 @@ namespace SEE.Controls.KeyActions
         /// These settings ensure that enums are handled as strings rather than their numeric values,
         /// so that the JSON file is more human readable.
         /// </summary>
-        private static readonly JsonSerializerSettings JsonSettings = new()
+        private static readonly JsonSerializerSettings jsonSettings = new()
         {
             Converters = { new Newtonsoft.Json.Converters.StringEnumConverter() }
         };
@@ -195,7 +195,7 @@ namespace SEE.Controls.KeyActions
                 KeyCode = binding.Value.KeyCode,
                 ActionName = binding.Value.Name
             }));
-            File.WriteAllText(keyBindingsPath, JsonConvert.SerializeObject(keyList, Formatting.Indented, JsonSettings));
+            File.WriteAllText(keyBindingsPath, JsonConvert.SerializeObject(keyList, Formatting.Indented, jsonSettings));
         }
 
         /// <summary>
