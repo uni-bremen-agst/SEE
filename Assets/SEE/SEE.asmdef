@@ -48,10 +48,13 @@
         "Sirenix.Utilities.dll",
         "Sirenix.OdinInspector.Attributes.dll",
         "Antlr4.Runtime.Standard.dll",
-        "NetworkCommsDotNetComplete.dll",
         "DOTween.dll",
         "Joveler.Compression.XZ.dll",
-        "MathNet.Numerics.dll"
+        "MathNet.Numerics.dll",
+        "Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.dll",
+        "Microsoft.VisualStudio.Validation.dll",
+        "Newtonsoft.Json.dll",
+        "NetworkCommsDotNet.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
