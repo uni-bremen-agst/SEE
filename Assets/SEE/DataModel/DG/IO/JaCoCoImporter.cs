@@ -55,6 +55,7 @@ namespace Assets.SEE.DataModel.DG.IO
 
                 using XmlReader xmlReader = XmlReader.Create(filepath, settings);
                 NodeKey currentKey = default;
+                Node NodeToAddMetric = null;
 
                 string XMLClassPath = null; // Class-Path named in XML, e.g. CodeFacts/CountConsonants
                 string XMLClassFile = null; // Class-File named in XML, e.g. CountConsonants.java
@@ -112,10 +113,11 @@ namespace Assets.SEE.DataModel.DG.IO
                                 try
                                 {
                                     // find Node with before created NodeKey and set metrics directly or calculate percentage and then set
-                                    nodeDictionary[currentKey].SetFloat("Metric." + xmlReader.GetAttribute("type") + "_missed", float.Parse(xmlReader.GetAttribute("missed"), CultureInfo.InvariantCulture.NumberFormat));
-                                    nodeDictionary[currentKey].SetFloat("Metric." + xmlReader.GetAttribute("type") + "_covered", float.Parse(xmlReader.GetAttribute("covered"), CultureInfo.InvariantCulture.NumberFormat));
+                                    NodeToAddMetric = nodeDictionary[currentKey];
+                                    NodeToAddMetric.SetFloat("Metric." + xmlReader.GetAttribute("type") + "_missed", float.Parse(xmlReader.GetAttribute("missed"), CultureInfo.InvariantCulture.NumberFormat));
+                                    NodeToAddMetric.SetFloat("Metric." + xmlReader.GetAttribute("type") + "_covered", float.Parse(xmlReader.GetAttribute("covered"), CultureInfo.InvariantCulture.NumberFormat));
                                     float percentage = float.Parse(xmlReader.GetAttribute("covered")) / (float.Parse(xmlReader.GetAttribute("covered")) + float.Parse(xmlReader.GetAttribute("missed"))) * 100;
-                                    nodeDictionary[currentKey].SetFloat("Metric." + xmlReader.GetAttribute("type") + "_percentage", percentage);
+                                    NodeToAddMetric.SetFloat("Metric." + xmlReader.GetAttribute("type") + "_percentage", percentage);
                                 }
                                 catch
                                 {
