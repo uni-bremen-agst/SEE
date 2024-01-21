@@ -48,5 +48,16 @@ namespace SEE.Net
                 action.ExecuteOnClient();
             }
         }
+
+        [ClientRpc]
+        public void FileTransferClientRpc(byte[] fileData, string fileName, ulong targetClient)
+        {
+            // Hier kannst du das Byte-Array 'fileData' auf der Clientseite verarbeiten
+            // und die Datei mit dem Namen 'fileName' speichern, wenn benötigt.
+            Debug.Log($"Received file '{fileName}' with {fileData.Length} bytes.");
+
+            // Beachte, dass du hier möglicherweise weitere Logik hinzufügen musst,
+            // um die Datei zu speichern oder zu verarbeiten.
+        }
     }
 }
