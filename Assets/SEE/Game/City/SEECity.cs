@@ -276,6 +276,7 @@ namespace SEE.Game.City
         protected static async UniTask LoadGraphMetrics(Graph graph, string csvPath, string xmlPath,  ErosionAttributes erosionSettings)
         {
             Performance p = Performance.Begin($"loading metric data data from CSV file {csvPath}");
+            Debug.Log("Performance CSV gestartet\n");
             int numberOfErrors = MetricImporter.LoadCsv(graph, csvPath);
             if (numberOfErrors > 0)
             {
@@ -285,11 +286,12 @@ namespace SEE.Game.City
             p.End();
 
 
-                //add xml-test-metrics
-                p = Performance.Begin($"loading metric data data from XML file {xmlPath}");
-                JaCoCoImporter.StartReading(graph, xmlPath);
+            //add xml-test-metrics
+            p = Performance.Begin($"loading metric data data from XML file {xmlPath}");
+            Debug.Log("Performance XML gestartet\n");
+            JaCoCoImporter.StartReadingTestXML(graph, xmlPath);
 
-                p.End();
+            p.End();
 
 
 

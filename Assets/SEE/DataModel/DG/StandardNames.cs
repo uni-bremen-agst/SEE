@@ -27,12 +27,16 @@
     {
         public const string InstructionMissed = "Metric.INSTRUCTION_missed";
         public const string InstructionCovered = "Metric.INSTRUCTION_covered";
+        public const string PercentageOfInstructionCovered = "Metric.INSTRUCTION_percentage";
         public const string LineMissed = "Metric.LINE_missed";
         public const string LineCovered = "Metric.LINE_covered";
+        public const string PercentageOfLineCovered = "Metric.LINE_percentage";
         public const string ComplexityMissed = "Metric.COMPLEXITY_missed";
         public const string ComplexityCovered = "Metric.COMPLEXITY_covered";
+        public const string PercentageOfComplexityCovered = "Metric.COMPLEXITY_percentage";
         public const string MethodMissed = "Metric.METHOD_missed";
         public const string MethodCovered = "Metric.METHOD_covered";
+        public const string PercentageOfMethodCovered = "Metric.METHOD_percentage";
 
         /// <summary>
         /// Name of the given <paramref name="numericAttributeName"/>.

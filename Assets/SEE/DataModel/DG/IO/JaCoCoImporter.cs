@@ -3,166 +3,245 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
+using UnityEngine;
 
 namespace Assets.SEE.DataModel.DG.IO
 {
-    //TODO Find Node to add the Metrics
+    /// <summary>
+    /// Structur to define a searchKey in a dictionary to find nodes.
+    /// </summary>
+	public struct NodeKey
+    {
+        public string NodeType { get; }
+        public string FileName { get; }
+        public int SourceLine { get; }
 
+
+        public NodeKey(string nodeType, string fileName, int sourceline)
+        {
+            NodeType = nodeType;
+            FileName = fileName;
+            SourceLine = sourceline;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is not NodeKey other)
+                return false;
+
+            return NodeType == other.NodeType &&
+                   FileName == other.FileName &&
+                   SourceLine == other.SourceLine;
+        }
+    }
 
     /// <summary>
-    /// Reads a testreport from a xml file and add information to GraphElement/Nodes. This class should be similar to GraphReader.
+    /// This class implements everything that is necessary to read a JaCoCo testreport in xml-format and that the metrics to the graph nodes.
     /// </summary>
     public class JaCoCoImporter : IDisposable
     {
-
         /// <summary>
-        /// Reading the given xml to include Test-Metrics in SEE
+        /// Starts Reading a JaCoCo-Test in XML-format given under named filepath. Test-Metrics will be added to Nodes of graph.
         /// </summary>
-        /// <param name="graph"></param>
-        /// <param name="filepath"></param>
-        public static void StartReading(Graph graph, String filepath )
+        /// <param name="graph"></param> Graph where to add the metrics
+        /// <param name="filepath"></param> Filepath where the XML-File is found
+        public static void StartReadingTestXML(Graph graph, string filepath)
         {
-			try
-			{
-				// Add XmlReaderSettings with active DTD-Processing
-				XmlReaderSettings settings = new XmlReaderSettings();
-				settings.DtdProcessing = DtdProcessing.Parse;
+            Dictionary<NodeKey, Node> nodeDictionary = GetAllNodes(graph); // Dictionary with all Nodes
 
-				// XMLReader for parsing named file
-				using (XmlReader xmlReader = XmlReader.Create(filepath, settings))
-				{
-					string currentClassName = null;
-					string currentClassFile = null;
-					string currentName = null;
-					string nodeType = null;
-					int currentMethodLine = -1;
-					Stack<Node> myStack = new Stack<Node>();
-					bool inSource = false;
-
-					// Iterate over file
-					while (xmlReader.Read())
-					{
-						switch (xmlReader.NodeType)
-						{
-							case XmlNodeType.Element:
-								if (xmlReader.Name != "counter" && xmlReader.Name != "sourcefile" && xmlReader.Name != "line" && xmlReader.Name != "sessioninfo")
-								{
-									if (xmlReader.Name == "class")
-									{
-										currentClassFile = xmlReader.GetAttribute("sourcefilename");
-										currentClassName = xmlReader.GetAttribute("name");
-									}
-									if (xmlReader.Name == "method")
-									{
-										currentMethodLine = Int32.Parse(xmlReader.GetAttribute("line"));
-									}
-									nodeType = xmlReader.Name;
-									currentName = xmlReader.GetAttribute("name");
-									// hier den Node suchen
-									myStack.Push(GetNode(graph, nodeType, currentClassName, currentClassFile, currentMethodLine));
-								}
-								else if (xmlReader.Name == "sourcefile")
-								{
-									inSource = true;
-									continue;
-								}
-
-								else if (!inSource && xmlReader.Name == "counter")
-								{
-									// setFloat on Node
-									if(myStack.Peek() != null)
-                                    {
-										myStack.Peek().SetFloat("Metric." + xmlReader.GetAttribute("type") + "_missed", float.Parse(xmlReader.GetAttribute("missed"), CultureInfo.InvariantCulture.NumberFormat));
-										myStack.Peek().SetFloat(xmlReader.GetAttribute("type") + "_covered", float.Parse(xmlReader.GetAttribute("covered"), CultureInfo.InvariantCulture.NumberFormat));
-										//Console.WriteLine("Metrik für " + myStack.Peek() + xmlReader.GetAttribute("type") + " missed: " + xmlReader.GetAttribute("missed") + " covered: " + xmlReader.GetAttribute("covered"));
-									}
-								}
-								break;
-
-							case XmlNodeType.EndElement:
-								if (xmlReader.Name == "class")
-								{
-									currentClassName = null;
-								}
-								if (xmlReader.Name == "method")
-								{
-									currentMethodLine = -1;
-								}
-								if (xmlReader.Name == "sourcefile" || xmlReader.Name == "line" || xmlReader.Name == "sessioninfo")
-								{
-									if (xmlReader.Name == "sourcefile")
-									{
-										inSource = false;
-									}
-									continue;
-								}
-								myStack.Pop();
-								break;
-						}
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine($"A Mistake appeard: {ex.Message}");
-			}
-
-		}
-
-        /// <summary>
-		/// Find Node to add Test-Metrics
-		/// </summary>
-		/// <param name="graph"></param>
-		/// <param name="nodeType"></param>
-		/// <param name="currentClassName"></param>
-		/// <param name="currentClassFile"></param>
-		/// <param name="currentMethodLine"></param>
-		/// <returns></returns>
-        protected static Node GetNode(Graph graph, string nodeType, string currentClassName, string currentClassFile, int currentMethodLine)
-        {
-			// TODO Filename needs to change to a unique indifier
-			foreach (var node in graph.Nodes())
+            try
             {
-				if (nodeType == "class" && currentMethodLine == -1)
-				{
-                    if (node.Type == "Class")
-                    {
-						if (currentClassFile.Equals(node.Filename()))
-						{
-							return node;
-						}
-                    }
-				}
-				if (nodeType == "method")
-				{
-					if (node.Type == "Method")
-					{
-						if (currentClassFile.Equals(node.Filename()) && currentMethodLine.Equals(node.SourceLine()))
-						{
-							return node;
-						}
-					}
-				}
-				if (nodeType == "package")
-				{
-					if (node.Type == "Package")
-					{
-						// needs to be implemented
-						return null;
-					}
-				}
-				if (nodeType == "")
-				{
-					if (node.Type == "report")
-					{
-						return null;
-					}
-				}
+                XmlReaderSettings settings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Parse };
 
-			}
-            return null;
+                using XmlReader xmlReader = XmlReader.Create(filepath, settings);
+                NodeKey currentKey = default;
+
+                string XMLClassPath = null; // Class-Path named in XML, e.g. CodeFacts/CountConsonants
+                string XMLClassFile = null; // Class-File named in XML, e.g. CountConsonants.java
+                string nodeType = null; // Type of element to add the metric, e.g. package
+                int XMLMethodLine = -1; // Sourceline named in the XML, -1 if not set
+                string XMLpackageName = null; // Name of the current package
+
+                Stack<string> nodeTypeStack = new(); // Stack to store the nodeType
+                bool inSourcefile = false; // indicator for sourcefile-tag in the xml to avoid setting this counters
+
+                // Starts reading the XML tag by tag and checks what NodeType the tag has
+                while (xmlReader.Read())
+                {
+                    switch (xmlReader.NodeType)
+                    {
+                        case XmlNodeType.Element:
+                            if (xmlReader.Name != "counter" && xmlReader.Name != "sourcefile" && xmlReader.Name != "line" && xmlReader.Name != "sessioninfo")
+                            {
+                                // Sets the name for the current package
+                                if (xmlReader.Name == "package")
+                                {
+                                    XMLpackageName = xmlReader.GetAttribute("name");
+                                }
+                                // Sets the classfile and path for the current class
+                                else if (xmlReader.Name == "class")
+                                {
+                                    XMLClassFile = xmlReader.GetAttribute("sourcefilename");
+                                    XMLClassPath = xmlReader.GetAttribute("name") + ".java";
+                                }
+                                // Sets the line where a method is found by JaCoCo
+                                else if (xmlReader.Name == "method")
+                                {
+                                    XMLMethodLine = Int32.Parse(xmlReader.GetAttribute("line"));
+                                }
+                                nodeTypeStack.Push(FirstCharUpper(xmlReader.Name));
+                            }
+                            // skip sourcefile and its counter
+                            else if (xmlReader.Name == "sourcefile")
+                            {
+                                inSourcefile = true;
+                                continue;
+                            }
+                            // read metrics-counter and create NodeKey dependiing on nodeType
+                            else if (!inSourcefile && xmlReader.Name == "counter")
+                            {
+                                nodeType = nodeTypeStack.Peek();
+                                currentKey = nodeType switch
+                                {
+                                    "Report" => new NodeKey(null, null, -1),
+                                    "Package" => new NodeKey(nodeType, XMLpackageName, -1),
+                                    "Class" => new NodeKey(nodeType, XMLClassPath, -1),
+                                    _ => new NodeKey(nodeType, XMLClassPath, XMLMethodLine) // method
+                                };
+
+                                try
+                                {
+                                    // find Node with before created NodeKey and set metrics directly or calculate percentage and then set
+                                    nodeDictionary[currentKey].SetFloat("Metric." + xmlReader.GetAttribute("type") + "_missed", float.Parse(xmlReader.GetAttribute("missed"), CultureInfo.InvariantCulture.NumberFormat));
+                                    nodeDictionary[currentKey].SetFloat("Metric." + xmlReader.GetAttribute("type") + "_covered", float.Parse(xmlReader.GetAttribute("covered"), CultureInfo.InvariantCulture.NumberFormat));
+                                    float percentage = float.Parse(xmlReader.GetAttribute("covered")) / (float.Parse(xmlReader.GetAttribute("covered")) + float.Parse(xmlReader.GetAttribute("missed"))) * 100;
+                                    nodeDictionary[currentKey].SetFloat("Metric." + xmlReader.GetAttribute("type") + "_percentage", percentage);
+                                }
+                                catch
+                                {
+                                    Debug.Log($"Setting metric failed for: {currentKey.NodeType + currentKey.FileName + currentKey.SourceLine}");
+                                }
+                            }
+                            break;
+
+                        // set attributes to default when tag is closed
+                        case XmlNodeType.EndElement:
+                            if (xmlReader.Name == "class")
+                            {
+                                XMLClassPath = null;
+                                XMLClassFile = null;
+                            }
+                            else if (xmlReader.Name == "method")
+                            {
+                                XMLMethodLine = -1;
+                            }
+                            else if (xmlReader.Name == "sourcefile" || xmlReader.Name == "line" || xmlReader.Name == "sessioninfo")
+                            {
+                                if (xmlReader.Name == "sourcefile")
+                                {
+                                    inSourcefile = false;
+                                }
+                                continue;
+                            }
+                            nodeTypeStack.Pop();
+                            break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.Log($"An error occurred: {ex.Message}");
+            }
         }
 
+        /// <summary>
+        /// Collect all Nodes of Graph.
+        /// </summary>
+        /// <param name="graph"></param> Graph where to add Metrics later.
+        /// <returns>Returns all Nodes in a Dictionary.</returns>
+        protected static Dictionary<NodeKey, Node> GetAllNodes(Graph graph)
+        {
+            Dictionary<NodeKey, Node> NodeDictionary = new(); // Dictionary for all Nodes
+            NodeKey key;
+            int methodStart; // Sourceline where a method starts
+            int methodEnd; // Sourceline where a method ends
+
+            // iterate over every node in given graph and store it with key in dictionary
+            foreach (Node node in graph.Nodes())
+            {
+                try
+                {
+                    if (node.Filename() != null && !NodeDictionary.ContainsValue(node))
+                    {
+                        if (node.Type == "Class")
+                        {
+                            key = new NodeKey(node.Type, CreateUniquePath(node.Path()) + node.SourceFile, -1);
+                            NodeDictionary.Add(key, node);
+                        }
+                        else if (node.Type == "Method")
+                        {
+                            // because of shift in method-lines between Test-XML and graph there is a entry for each line in the range between start and end of method
+                            methodStart = (int)node.SourceLine();
+                            methodEnd = methodStart + (int)node.SourceLength();
+
+                            for (int i = methodStart; i < methodEnd; i++)
+                            {
+                                key = new NodeKey(node.Type, CreateUniquePath(node.Path()) + node.SourceFile, i);
+                                NodeDictionary.Add(key, node);
+                            }
+                        }
+                    }
+                    else if (node.Filename() == null && !NodeDictionary.ContainsValue(node))
+                    {
+                        if (node.Level == 0) // root of the project
+                        {
+                            key = new NodeKey(null, null, -1);
+                            NodeDictionary.Add(key, node);
+                        }
+                        else if (node.Type == "Package")
+                        {
+                            key = new NodeKey(node.Type, node.SourceName, -1);
+                            NodeDictionary.Add(key, node);
+                        }
+                    }
+                }
+                catch
+                {
+                    Debug.Log("Node can't be added to Dictionary.");
+                }
+
+            }
+            return NodeDictionary;
+        }
+
+        /// <summary>
+        /// Manipulate given String so the first Char is in Uppercase.
+        /// </summary>
+        /// <param name="input"></param> String that needs a uppercase first char
+        /// <returns>Manipulated string</returns>
+        public static string FirstCharUpper(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                return string.Empty;
+            }
+            return $"{input[0].ToString().ToUpper()}{input.Substring(1)}";
+        }
+
+        /// <summary>
+        /// Delete "src/main/java/" in given string to make in comperable with Filepath in XML-Report.
+        /// </summary>
+        /// <param name="path"></param> Path where the "src/main/java/" needs to be deleted
+        /// <returns>Manipulated string</returns>
+		public static string CreateUniquePath(string path)
+        {
+            string inputString = path;
+            string result;
+            string pathToRemove = "src/main/java/";
+
+            result = inputString.Replace(pathToRemove, "");
+            return result;
+        }
 
         public void Dispose()
         {
