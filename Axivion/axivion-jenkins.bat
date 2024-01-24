@@ -13,12 +13,16 @@
 @REM "The system cannot find the path specified.":
 cmd.exe /c
 
-@REM Python
-@REM set "PATH=C:\Users\SWT\AppData\Local\Programs\Python\Python38;%PATH%"
-@REM set "BAUHAUS_PYTHON=C:\Users\SWT\AppData\Local\Programs\Python\Python38\python.exe"
+if not "%AXIVION_LOCAL_BUILD%"=="" (
+  @echo "Variable AXIVION_LOCAL_BUILD is set. If axivion_ci is run, it will be a local build."
+  
+  if "%AXIVION_PASSWORD%"=="" (
+    @echo "Environment variable AXIVION_PASSWORD not set. You might be prompted for your Axivion Dashboard password interactively."
+  )
 
-if "%AXIVION_PASSWORD%"=="" (
-  @echo "Environment variable AXIVION_PASSWORD not set. You might be prompted for your Axivion Dashboard password interactively."
+  if "%AXIVION_USERNAME%"=="" (
+    @echo "Environment variable AXIVION_USERNAME not set. It is assumed that your local account matches your user ID of the Axivion Dashboard."
+  )
 )
 
 if "%AXIVION%"=="" (
@@ -112,10 +116,6 @@ if not exist "%UNITY%" (
 @echo AXIVION_DASHBOARD_URL="%AXIVION_DASHBOARD_URL%"
 @echo UNITY="%UNITY%"
 
-if not "%AXIVION_LOCAL_BUILD%"=="" (
-  @echo "Variable AXIVION_LOCAL_BUILD is set. If axivion_ci is run, it will be a local build."
-)
-
 @REM If the dashserver is installed as a Windows service, you can
 @REM start and stop it as follows:
 @REM   net (start|stop) "axivion_dashboard_service"
@@ -146,6 +146,16 @@ IF %argCount% == 0 (
 )
 
 :end
+
+if not "%AXIVION_LOCAL_BUILD%"=="" (
+  @echo "Results of this local build can be found in %userprofile%/.bauhaus/localbuild"
+  
+  @echo "You can view the results as follows:"
+  @echo "   %AXIVION%\bin\dashserver start --local --install_file=%USERPROFILE%\.bauhaus\localbuild\projects\SEE.db --noauth"
+  @echo "The URL and the necessary credentials (in case you do not use --noauth) will be made available when you run the above command."
+  @echo "When done, you can stop the Dashboard server as follows:"
+  @echo "  dashserver stop --local"
+)
 
 :error
 
