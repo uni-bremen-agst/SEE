@@ -4,7 +4,7 @@
 @REM set.
 
 @REM This is to be able to set the environment variables only for this run of the script.
-setlocal
+@setlocal
 
 @echo off
 
@@ -22,13 +22,13 @@ if "%AXIVION%"=="" (
 )
 
 if not exist "%AXIVION%" (
-  echo "Directory %AXIVION% does not exist. You need to set environment variable AXIVION to the directory where the Axivion suite is installed."
+  @echo "Directory %AXIVION% does not exist. You need to set environment variable AXIVION to the directory where the Axivion suite is installed."
   goto error
 )
 
 @REM include AXIVION bin in exectuable path
 if not exist "%AXIVION%\bin%" (
-  echo "Directory %AXIVION%\bin does not exist. You need to set environment variable AXIVION to the directory where the Axivion suite is installed having a bin subdirectory."
+  @echo "Directory %AXIVION%\bin does not exist. You need to set environment variable AXIVION to the directory where the Axivion suite is installed having a bin subdirectory."
   goto error
 )
 
@@ -43,7 +43,7 @@ if "%WORKSPACE%" == "" (
 )
 
 if not exist "%SEEDIRECTORY%" (
-  echo "Directory %SEEDIRECTORY% does not exist. You need to set environment variable SEEDIRECTORY to the directory where the SEE project resides."
+  @echo "Directory %SEEDIRECTORY% does not exist. You need to set environment variable SEEDIRECTORY to the directory where the SEE project resides."
   goto error
 )
 
@@ -53,7 +53,7 @@ if "%BAUHAUS_CONFIG%"=="" (
 )
 
 if not exist "%BAUHAUS_CONFIG%" (
-  echo "Directory %BAUHAUS_CONFIG% does not exist. You need to set environment variable BAUHAUS_CONFIG to the directory where the Axivion configuration for SEE resides."
+  @echo "Directory %BAUHAUS_CONFIG% does not exist. You need to set environment variable BAUHAUS_CONFIG to the directory where the Axivion configuration for SEE resides."
   goto error
 )
 
@@ -63,7 +63,7 @@ if "%AXIVION_DASHBOARD_CONFIG%"=="" (
 )
 
 if not exist "%AXIVION_DASHBOARD_CONFIG%" (
-  echo "Directory %AXIVION_DASHBOARD_CONFIG% does not exist. You need to set environment variable AXIVION_DASHBOARD_CONFIG to the directory where the Axivion dashboard configuration resides."
+  @echo "Directory %AXIVION_DASHBOARD_CONFIG% does not exist. You need to set environment variable AXIVION_DASHBOARD_CONFIG to the directory where the Axivion dashboard configuration resides."
   goto error
 )
 
@@ -72,7 +72,7 @@ if "%AXIVION_DATABASES_DIR%"=="" (
 )
 
 if not exist "%AXIVION_DATABASES_DIR%" (
-  echo "Directory %AXIVION_DATABASES_DIR% does not exist. You need to set environment variable AXIVION_DATABASES_DIR to the directory where the Axivion dashboard databases reside."
+  @echo "Directory %AXIVION_DATABASES_DIR% does not exist. You need to set environment variable AXIVION_DATABASES_DIR to the directory where the Axivion dashboard databases reside."
   goto error
 )
 
@@ -81,7 +81,7 @@ if "%REQUESTS_CA_BUNDLE%"=="" (
 )
 
 if not exist "%REQUESTS_CA_BUNDLE%" (
-  echo "File %REQUESTS_CA_BUNDLE% does not exist. You need to set environment variable REQUESTS_CA_BUNDLE to the file containing the CA bundle for the Axivion dashboard."
+  @echo "File %REQUESTS_CA_BUNDLE% does not exist. You need to set environment variable REQUESTS_CA_BUNDLE to the file containing the CA bundle for the Axivion dashboard."
   goto error
 )
 
@@ -96,15 +96,19 @@ if "%UNITY%"=="" (
 )
 
 if not exist "%UNITY%" (
-  echo "Directory %UNITY% does not exist. You need to set environment variable UNITY to where Unity is installed."
+  @echo "Directory %UNITY% does not exist. You need to set environment variable UNITY to where Unity is installed."
   goto error
 )
 
-echo AXIVION="%AXIVION%"
-echo SEEDIRECTORY="%SEEDIRECTORY%"
-echo AXIVION_DASHBOARD_CONFIG="%AXIVION_DASHBOARD_CONFIG%"
-echo AXIVION_DASHBOARD_URL="%AXIVION_DASHBOARD_URL%"
-echo UNITY="%UNITY%"
+@echo AXIVION="%AXIVION%"
+@echo SEEDIRECTORY="%SEEDIRECTORY%"
+@echo AXIVION_DASHBOARD_CONFIG="%AXIVION_DASHBOARD_CONFIG%"
+@echo AXIVION_DASHBOARD_URL="%AXIVION_DASHBOARD_URL%"
+@echo UNITY="%UNITY%"
+
+if not "%AXIVION_LOCAL_BUILD%"=="" (
+  @echo "Variable %AXIVION_LOCAL_BUILD% is set. If axivion_ci is run, it will be a local build."  
+)
 
 @REM If the dashserver is installed as a Windows service, you can
 @REM start and stop it as follows:
@@ -123,11 +127,11 @@ for %%x in (%*) do (
    set /A argCount+=1
 )
 
-@REM echo "Number of processed arguments: %argCount%"
+@REM @echo "Number of processed arguments: %argCount%"
 
 @REM Execute command line parameters if there are any.
 IF %argCount% == 0 (
-  echo "No parameters to be executed given"
+  @echo "No parameters to be executed given"
 ) ELSE (
 @  REM We are executing only the first parameter. If this parameter is 
 @  REM an executable with other parameters, the executable and its
