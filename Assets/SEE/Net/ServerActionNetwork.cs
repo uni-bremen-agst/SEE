@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
-using System.IO;
 
 namespace SEE.Net
 {
@@ -13,7 +12,7 @@ namespace SEE.Net
     /// DOC
     /// </summary>
     public class ServerActionNetwork : NetworkBehaviour
-    {
+    { 
         [ServerRpc(RequireOwnership = false)]
         public void SyncClientServerRpc(ulong client)
         {
@@ -22,7 +21,7 @@ namespace SEE.Net
             {
                 return;
             }
-            if (!networkClient.PlayerObject.TryGetComponent<ClientActionNetwork>(out var clientNetwork))
+            if(!networkClient.PlayerObject.TryGetComponent<ClientActionNetwork>(out var clientNetwork))
             {
                 return;
             }
@@ -31,25 +30,7 @@ namespace SEE.Net
             {
                 clientNetwork.ExecuteActionUnsafeClientRpc(serializedAction);
             }
-
-            try
-            {
-                string[] filePaths = Directory.GetFiles(Network.assetFolderPath, "*", SearchOption.AllDirectories);
-
-                foreach (string filePath in filePaths)
-                {
-                    // Lesen Sie den Inhalt der Datei in ein Byte-Array
-                    byte[] fileData = File.ReadAllBytes(filePath);
-
-                    // Sende das Byte-Array an den Client
-                    clientNetwork.FileTransferClientRpc(fileData, Path.GetFileName(filePath), client);
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"Error sending files to client: {e.Message}");
-            }
-        }
+        } 
 
         [ServerRpc(RequireOwnership = false)]
         public void BroadcastActionServerRpc(string serializedAction, ulong[] recipients)
