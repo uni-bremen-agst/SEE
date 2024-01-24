@@ -1,4 +1,4 @@
-@REM This batch file sets the various environment variables needed to 
+@REM This batch file sets the various environment variables needed to
 @REM run the Axivion Suite tools and then executes the command line parameters
 @REM passed to this batch file. If there are none, only the variables are
 @REM set.
@@ -16,6 +16,10 @@ cmd.exe /c
 @REM Python
 @REM set "PATH=C:\Users\SWT\AppData\Local\Programs\Python\Python38;%PATH%"
 @REM set "BAUHAUS_PYTHON=C:\Users\SWT\AppData\Local\Programs\Python\Python38\python.exe"
+
+if "%AXIVION_PASSWORD%"=="" (
+  @echo "Environment variable AXIVION_PASSWORD not set. You might be prompted for your Axivion Dashboard password interactively."
+)
 
 if "%AXIVION%"=="" (
   set "AXIVION=C:\Program Files (x86)\Bauhaus"
@@ -76,13 +80,15 @@ if not exist "%AXIVION_DATABASES_DIR%" (
   goto error
 )
 
+@REM The Axivion dashboard server certificate can be downloaded using a
+@REM brower. The certiciate file must contain the whole certificate chain.
 if "%REQUESTS_CA_BUNDLE%"=="" (
-  set "REQUESTS_CA_BUNDLE=%AXIVION_DASHBOARD_CONFIG%\cert\auto.crt"
+  set "REQUESTS_CA_BUNDLE=%AXIVION_DASHBOARD_CONFIG%\cert\stvr2.crt"
 )
 
 if not exist "%REQUESTS_CA_BUNDLE%" (
   @echo "File %REQUESTS_CA_BUNDLE% does not exist. You need to set environment variable REQUESTS_CA_BUNDLE to the file containing the CA bundle for the Axivion dashboard."
-  goto error
+  goto errormore
 )
 
 @REM URL of the dashserver
@@ -107,7 +113,7 @@ if not exist "%UNITY%" (
 @echo UNITY="%UNITY%"
 
 if not "%AXIVION_LOCAL_BUILD%"=="" (
-  @echo "Variable %AXIVION_LOCAL_BUILD% is set. If axivion_ci is run, it will be a local build."  
+  @echo "Variable AXIVION_LOCAL_BUILD is set. If axivion_ci is run, it will be a local build."
 )
 
 @REM If the dashserver is installed as a Windows service, you can
@@ -133,10 +139,10 @@ for %%x in (%*) do (
 IF %argCount% == 0 (
   @echo "No parameters to be executed given"
 ) ELSE (
-@  REM We are executing only the first parameter. If this parameter is 
+@  REM We are executing only the first parameter. If this parameter is
 @  REM an executable with other parameters, the executable and its
 @  REM parameters must be enclosed in double quotes.
-  %*  
+  %*
 )
 
 :end
