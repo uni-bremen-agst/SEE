@@ -15,13 +15,18 @@ cmd.exe /c
 
 if not "%AXIVION_LOCAL_BUILD%"=="" (
   @echo "Variable AXIVION_LOCAL_BUILD is set. If axivion_ci is run, it will be a local build."
-  
+
   if "%AXIVION_PASSWORD%"=="" (
     @echo "Environment variable AXIVION_PASSWORD not set. You might be prompted for your Axivion Dashboard password interactively."
   )
 
   if "%AXIVION_USERNAME%"=="" (
     @echo "Environment variable AXIVION_USERNAME not set. It is assumed that your local account matches your user ID of the Axivion Dashboard."
+  )
+
+  if "%AXIVION_REFERENCE_DATE%"=="" (
+    @echo "Environment variable AXIVION_REFERENCE_DATE not set. Comparison will be against latest analysis version of the Axivion Dashboard."
+    @echo "If setting AXIVION_REFERENCE_DATE, its syntax must conform to ISO timestamps."
   )
 )
 
@@ -122,7 +127,6 @@ if not exist "%UNITY%" (
 @REM or use the Windows Services Console (services.msc).
 
 @REM The Visual Studio .csproj files need to be created before we can start the build.
-REM FIXME
 @"%UNITY%\Editor\Unity.exe" -batchmode -nographics -logFile - -executeMethod CITools.SolutionGenerator.Sync -projectPath . -quit
 @REM "%UNITY%\Editor\Unity.exe" -batchmode -nographics -logFile - -executeMethod UnityEditor.SyncVS.SyncSolution -projectPath . -quit
 
@@ -139,22 +143,23 @@ for %%x in (%*) do (
 IF %argCount% == 0 (
   @echo "No parameters to be executed given"
 ) ELSE (
-@  REM We are executing only the first parameter. If this parameter is
-@  REM an executable with other parameters, the executable and its
-@  REM parameters must be enclosed in double quotes.
   %*
 )
 
 :end
 
 if not "%AXIVION_LOCAL_BUILD%"=="" (
-  @echo "Results of this local build can be found in %userprofile%/.bauhaus/localbuild"
-  
+  if "%AXIVION_REFERENCE_DATE%"=="" (
+    @echo "Comparison is relative to the latest analysis version of the Axivion Dashboard."
+  ) else (
+    @echo "Comparison is relative to the analysis version at %AXIVION_REFERENCE_DATE% of the Axivion Dashboard."
+  )
+  @echo "Results of this local build can be found in "%userprofile%"/.bauhaus/localbuild"
   @echo "You can view the results as follows:"
-  @echo "   %AXIVION%\bin\dashserver start --local --install_file=%USERPROFILE%\.bauhaus\localbuild\projects\SEE.db --noauth"
+  @echo "   %AXIVION%"\bin\dashserver start --local --install_file="%USERPROFILE%"\.bauhaus\localbuild\projects\SEE.db --noauth"
   @echo "The URL and the necessary credentials (in case you do not use --noauth) will be made available when you run the above command."
   @echo "When done, you can stop the Dashboard server as follows:"
-  @echo "  dashserver stop --local"
+  @echo "   %AXIVION%"\bin\dashserver stop --local"
 )
 
 :error
