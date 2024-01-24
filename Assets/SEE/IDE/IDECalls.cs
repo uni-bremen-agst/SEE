@@ -33,7 +33,7 @@ namespace SEE.IDE
     /// future.
     /// Note: Only one instance of this class can be created.
     /// </summary>
-    public partial class IDEIntegration : MonoBehaviour
+    public partial class IDEIntegration
     {
         /// <summary>
         /// Lists all methods remotely callable by the server in a convenient way.
@@ -60,9 +60,9 @@ namespace SEE.IDE
             /// <param name="connection">A connection to an IDE.</param>
             /// <param name="path">Absolute file path.</param>
             /// <param name="line">Optional line number.</param>
-            public async UniTask OpenFile(JsonRpcConnection connection, string path, int? line)
+            public async UniTask OpenFileAsync(JsonRpcConnection connection, string path, int? line)
             {
-                await server.CallRemoteProcessOnConnectionAsync(connection, "OpenFile", path, line);
+                await server.CallRemoteProcessOnConnectionAsync(connection, "OpenFileAsync", path, line);
             }
 
             /// <summary>
@@ -70,7 +70,7 @@ namespace SEE.IDE
             /// </summary>
             /// <param name="connection">A connection to an IDE.</param>
             /// <returns>Returns the absolute project path. Can be null.</returns>
-            public async UniTask<string> GetProjectPath(JsonRpcConnection connection)
+            public async UniTask<string> GetProjectPathAsync(JsonRpcConnection connection)
             {
                 return await server.CallRemoteProcessOnConnectionAsync<string>(connection, "GetProject");
             }
@@ -80,7 +80,7 @@ namespace SEE.IDE
             /// </summary>
             /// <param name="connection">A connection to an IDE.</param>
             /// <returns>Returns the absolute project path. Can be null.</returns>
-            public async UniTask<string> GetIDEVersion(JsonRpcConnection connection)
+            public async UniTask<string> GetIDEVersionAsync(JsonRpcConnection connection)
             {
                 return await server.CallRemoteProcessOnConnectionAsync<string>(connection, "GetIdeVersion");
             }
@@ -90,16 +90,16 @@ namespace SEE.IDE
             /// </summary>
             /// <param name="connection">A connection to an IDE.</param>
             /// <returns>True if SEE started this connection.</returns>
-            public async UniTask<bool> WasStartedBySee(JsonRpcConnection connection)
+            public async UniTask<bool> WasStartedBySeeAsync(JsonRpcConnection connection)
             {
-                return await server.CallRemoteProcessOnConnectionAsync<bool>(connection, "WasStartedBySee");
+                return await server.CallRemoteProcessOnConnectionAsync<bool>(connection, "WasStartedBySeeAsync");
             }
 
             /// <summary>
             /// Will focus this IDE instance.
             /// </summary>
             /// <param name="connection">A connection to an IDE.</param>
-            public async UniTask FocusIDE(JsonRpcConnection connection)
+            public async UniTask FocusIDEAsync(JsonRpcConnection connection)
             {
                 await server.CallRemoteProcessOnConnectionAsync(connection, "SetFocus");
             }
@@ -109,7 +109,7 @@ namespace SEE.IDE
             /// </summary>
             /// <param name="connection">A connection to an IDE.</param>
             /// <param name="path">The absolute solution path.</param>
-            public async UniTask ChangeSolution(JsonRpcConnection connection, string path)
+            public async UniTask ChangeSolutionAsync(JsonRpcConnection connection, string path)
             {
                 await server.CallRemoteProcessOnConnectionAsync(connection, "", path);
             }
@@ -118,9 +118,9 @@ namespace SEE.IDE
             /// Declines an IDE instance.
             /// </summary>
             /// <param name="connection">A connection to an IDE.</param>
-            public async UniTask Decline(JsonRpcConnection connection)
+            public async UniTask DeclineAsync(JsonRpcConnection connection)
             {
-                await server.CallRemoteProcessOnConnectionAsync(connection, "Decline");
+                await server.CallRemoteProcessOnConnectionAsync(connection, "DeclineAsync");
             }
         }
     }

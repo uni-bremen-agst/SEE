@@ -49,6 +49,7 @@ ExportedObj/
 *.mdb
 *.opendb
 *.VC.db
+.vsconfig
 
 # Unity3D generated meta files
 *.pidb.meta
@@ -103,7 +104,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-
 # NetworkComms.Net
 CompleteIncomingItemTaskError*.txt
 ConnectionKeepAlivePollError*.txt
@@ -123,8 +123,13 @@ UnityPlayer_s.debug
 # Git LFS
 lfs
 
+# Axivion/Bauhaus
+.bauhaus
+
 # Our own local files to be ignored.
 Data/Vcs2See/target/
 packages/
 Build/
 build/
+Assets/Packages/
+Assets/Packages.meta

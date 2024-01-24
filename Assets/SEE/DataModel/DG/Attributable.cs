@@ -198,7 +198,7 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Returns the value of a numeric (integer or float) attribute for the
-        /// attributed named <paramref name="attributeName"/> if it exists.
+        /// attribute named <paramref name="attributeName"/> if it exists.
         /// Otherwise an exception is thrown.
         ///
         /// Note: It could happen that the same name is given to a float and
@@ -219,6 +219,85 @@ namespace SEE.DataModel.DG
             }
             {
                 throw new UnknownAttribute(attributeName);
+            }
+        }
+
+        /// <summary>
+        /// Returns the value of an attribute of any type (integer, float, string, or toggle)
+        /// for the attribute named <paramref name="attributeName"/> if it exists.
+        /// Otherwise an exception is thrown.
+        ///
+        /// In case of a toggle attribute, the value is always <see cref="UnitType.Unit"/>
+        /// if the attribute exists.
+        ///
+        /// Note: It could happen that the same name is given to different attribute types,
+        /// in which case the preference is as follows: float, integer, string, toggle.
+        /// </summary>
+        /// <param name="attributeName">name of an attribute</param>
+        /// <returns>value of attribute <paramref name="attributeName"/></returns>
+        /// <exception cref="UnknownAttribute">if <paramref name="attributeName"/> is not an attribute of this node</exception>
+        public object GetAny(string attributeName)
+        {
+            if (FloatAttributes.TryGetValue(attributeName, out float floatValue))
+            {
+                return floatValue;
+            }
+            else if (IntAttributes.TryGetValue(attributeName, out int intValue))
+            {
+                return intValue;
+            }
+            else if (StringAttributes.TryGetValue(attributeName, out string stringValue))
+            {
+                return stringValue;
+            }
+            else if (toggleAttributes.Contains(attributeName))
+            {
+                return UnitType.Unit;
+            }
+            else
+            {
+                throw new UnknownAttribute(attributeName);
+            }
+        }
+
+        /// <summary>
+        /// Returns true if <paramref name="attributeName"/> is the name of an attribute
+        /// of any type (integer, float, string, or toggle) of this node, and if so,
+        /// sets <paramref name="value"/> to the value of that attribute.
+        /// Otherwise <paramref name="value"/> is set to null and false is returned.
+        ///
+        /// Note: It could happen that the same name is given to different attribute types,
+        /// in which case the preference is as follows: float, integer, string, toggle.
+        /// </summary>
+        /// <param name="attributeName">name of an attribute</param>
+        /// <param name="value">value of attribute <paramref name="attributeName"/></param>
+        /// <returns>whether <paramref name="attributeName"/> is the name of an attribute of this node</returns>
+        public bool TryGetAny(string attributeName, out object value)
+        {
+            if (FloatAttributes.TryGetValue(attributeName, out float floatValue))
+            {
+                value = floatValue;
+                return true;
+            }
+            else if (IntAttributes.TryGetValue(attributeName, out int intValue))
+            {
+                value = intValue;
+                return true;
+            }
+            else if (StringAttributes.TryGetValue(attributeName, out string stringValue))
+            {
+                value = stringValue;
+                return true;
+            }
+            else if (toggleAttributes.Contains(attributeName))
+            {
+                value = UnitType.Unit;
+                return true;
+            }
+            else
+            {
+                value = null;
+                return false;
             }
         }
 

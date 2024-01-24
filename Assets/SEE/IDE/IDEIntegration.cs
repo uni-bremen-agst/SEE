@@ -207,7 +207,7 @@ namespace SEE.IDE
             {
                 try
                 {
-                    await server.Start(MaxNumberOfIdes);
+                    await server.StartAsync(MaxNumberOfIdes);
                 }
                 catch (JsonRpcServer.JsonRpcServerCreationFailedException e)
                 {
@@ -349,15 +349,15 @@ namespace SEE.IDE
         /// <param name="solutionPath">The absolute solution path of this file.</param>
         /// <param name="line">Optional line number.</param>
         /// <returns>Async UniTask.</returns>
-        public async UniTask OpenFile(string filePath, string solutionPath, int? line = null)
+        public async UniTask OpenFileAsync(string filePath, string solutionPath, int? line = null)
         {
-            JsonRpcConnection connection = await LookForIDEConnection(solutionPath);
+            JsonRpcConnection connection = await LookForIDEConnectionAsync(solutionPath);
             if (connection != null)
             {
                 //string fullPath = Path.GetFullPath(filePath);
                 try
                 {
-                    await ideCalls.OpenFile(connection, filePath, line);
+                    await ideCalls.OpenFileAsync(connection, filePath, line);
                 }
                 catch (Exception)
                 {
@@ -375,7 +375,7 @@ namespace SEE.IDE
         /// <param name="solutionPath">The solution path.</param>
         /// <returns>Will return the <see cref="JsonRpcConnection"/> to a given solution path.
         /// Null if not found.</returns>
-        private async UniTask<JsonRpcConnection> LookForIDEConnection(string solutionPath)
+        private async UniTask<JsonRpcConnection> LookForIDEConnectionAsync(string solutionPath)
         {
             if (solutionPath == null)
             {
@@ -393,7 +393,7 @@ namespace SEE.IDE
                                                                && solutionPath != "")
                 {
                     connection = cachedConnections.First().Value;
-                    await ideCalls.ChangeSolution(connection, solutionPath);
+                    await ideCalls.ChangeSolutionAsync(connection, solutionPath);
                 }
                 else if (MaxNumberOfIdes != 0 && solutionPath != "")
                 {
@@ -407,7 +407,7 @@ namespace SEE.IDE
                 }
             }
 
-            await ideCalls.FocusIDE(connection);
+            await ideCalls.FocusIDEAsync(connection);
 
             return connection;
         }
@@ -418,19 +418,19 @@ namespace SEE.IDE
         /// </summary>
         /// <param name="connection">The IDE connection.</param>
         /// <returns>True if IDE was accepted, false otherwise.</returns>
-        private async UniTask<bool> CheckIDE(JsonRpcConnection connection)
+        private async UniTask<bool> CheckIDEAsync(JsonRpcConnection connection)
         {
             // Right version of the IDE
-            string version = await ideCalls.GetIDEVersion(connection);
+            string version = await ideCalls.GetIDEVersionAsync(connection);
             if (version == null || !version.Equals(Type.ToString()))
             {
                 return false;
             }
             else
             {
-                return await ideCalls.WasStartedBySee(connection)
+                return await ideCalls.WasStartedBySeeAsync(connection)
                        || ConnectToAny
-                       || cachedSolutionPaths.Contains(await ideCalls.GetProjectPath(connection));
+                       || cachedSolutionPaths.Contains(await ideCalls.GetProjectPathAsync(connection));
             }
         }
 
@@ -522,10 +522,10 @@ namespace SEE.IDE
         {
             UniTask.Run(async () =>
             {
-                if (await CheckIDE(connection))
+                if (await CheckIDEAsync(connection))
                 {
 
-                    string project = await ideCalls.GetProjectPath(connection);
+                    string project = await ideCalls.GetProjectPathAsync(connection);
                     connection.AddTarget(new RemoteProcedureCalls(this, project));
 
                     if (project == null)
@@ -543,7 +543,7 @@ namespace SEE.IDE
                 }
                 else
                 {
-                    await ideCalls.Decline(connection);
+                    await ideCalls.DeclineAsync(connection);
                 }
             }).Forget();
         }

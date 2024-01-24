@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Cysharp.Threading.Tasks;
 using SEE.DataModel;
 using SEE.DataModel.DG;
+using SEE.DataModel.GraphSearch;
 using SEE.UI.Notification;
 using SEE.Utils;
 using UnityEngine;
@@ -27,27 +30,6 @@ namespace SEE.UI.Window.TreeWindow
         /// </summary>
         private const string treeItemPrefab = "Prefabs/UI/TreeViewItem";
 
-        // TODO: In the future, distinguish by node/edge type as well for the icons.
-        /// <summary>
-        /// The unicode character for a node.
-        /// </summary>
-        private const char nodeTypeUnicode = '\uf1b2';
-
-        /// <summary>
-        /// The unicode character for an edge.
-        /// </summary>
-        private const char edgeTypeUnicode = '\uf542';
-
-        /// <summary>
-        /// The unicode character for outgoing edges.
-        /// </summary>
-        private const char outgoingEdgeUnicode = '\uf2f5';
-
-        /// <summary>
-        /// The unicode character for incoming edges.
-        /// </summary>
-        private const char incomingEdgeUnicode = '\uf2f6';
-
         /// <summary>
         /// The graph to be displayed.
         /// Must be set before starting the window.
@@ -56,42 +38,92 @@ namespace SEE.UI.Window.TreeWindow
 
         /// <summary>
         /// The search helper used to search for elements in the graph.
+        /// We also use this to keep track of the current filter, sort, and group settings.
         /// </summary>
         private GraphSearch searcher;
-
-        /// <summary>
-        /// The context menu that is displayed when the user right-clicks on an item.
-        /// </summary>
-        private PopupMenu.PopupMenu ContextMenu;
 
         /// <summary>
         /// Transform of the object containing the items of the tree window.
         /// </summary>
         private RectTransform items;
 
+        /// <summary>
+        /// The context menu that is displayed when the user right-clicks on an item
+        /// or uses the filter or sort buttons.
+        /// </summary>
+        private TreeWindowContextMenu contextMenu;
+
+        /// <summary>
+        /// The grouper that is used to group the elements in the tree window.
+        /// </summary>
+        private TreeWindowGrouper grouper;
+
+        /// <summary>
+        /// The subscription to the graph observable.
+        /// </summary>
+        private IDisposable subscription;
+
         protected override void Start()
         {
             searcher = new GraphSearch(Graph);
-            ContextMenu = gameObject.AddComponent<PopupMenu.PopupMenu>();
-            Graph.Subscribe(this);
+            grouper = new TreeWindowGrouper(searcher.Filter, Graph);
+            subscription = Graph.Subscribe(this);
             base.Start();
+        }
+
+        private void OnDestroy()
+        {
+            subscription.Dispose();
+        }
+
+        /// <summary>
+        /// Returns the roots for the tree view.
+        /// </summary>
+        /// <param name="inGroup">The group to which the roots should belong.</param>
+        /// <returns>The roots for the tree view.</returns>
+        /// <remarks>
+        /// The roots for the tree view may differ from the roots of the graph, such as when the graph is grouped.
+        /// </remarks>
+        private IList<Node> GetRoots(TreeWindowGroup inGroup = null)
+        {
+            return WithHiddenChildren(Graph.GetRoots(), inGroup).ToList();
         }
 
         /// <summary>
         /// Adds the roots of the graph to the tree view.
+        /// It may take up to a frame to add and reorder all items, hence this method is asynchronous.
         /// </summary>
-        private void AddRoots()
+        private async UniTask AddRootsAsync()
         {
-            // We will traverse the graph and add each node to the tree view.
-            IList<Node> roots = Graph.GetRoots();
-            foreach (Node root in roots)
+            if (grouper.IsActive)
             {
-                AddNode(root);
+                // Instead of the roots, we should add the categories as the first level.
+                foreach (TreeWindowGroup group in grouper.AllGroups)
+                {
+                    if (grouper.MembersInGroup(group) > 0)
+                    {
+                        AddGroup(group);
+                    }
+                }
             }
-
-            if (roots.Count == 0)
+            else
             {
-                ShowNotification.Warn("Empty graph", "Graph has no roots. TreeView will be empty.");
+                IList<Node> roots = GetRoots();
+                if (roots.Count == 0)
+                {
+                    ShowNotification.Warn("Empty graph", "Graph has no roots. TreeView will be empty.");
+                    return;
+                }
+
+                foreach (Node root in roots)
+                {
+                    AddNode(root);
+                }
+                await UniTask.Yield();
+                foreach (Node root in roots)
+                {
+                    OrderTree(root);
+                }
             }
         }
 
@@ -102,7 +134,10 @@ namespace SEE.UI.Window.TreeWindow
         {
             foreach (Transform child in items)
             {
-                Destroyer.Destroy(child.gameObject);
+                if (child != null)
+                {
+                    Destroyer.Destroy(child.gameObject);
+                }
             }
         }
 
@@ -148,8 +183,7 @@ namespace SEE.UI.Window.TreeWindow
                 case GraphElementTypeEvent:
                 case HierarchyEvent:
                 case NodeEvent:
-                    ClearTree();
-                    AddRoots();
+                    Rebuild();
                     break;
             }
         }

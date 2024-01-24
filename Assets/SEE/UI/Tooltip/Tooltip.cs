@@ -176,12 +176,12 @@ namespace SEE.UI.Tooltip
 
         private void OnDestroy()
         {
-            fadeIn.Kill();
             Destroyer.Destroy(tooltipGameObject);
         }
 
         private void OnDisable()
         {
+            fadeIn?.Kill();
             if (tooltipGameObject != null)
             {
                 tooltipGameObject.SetActive(false);

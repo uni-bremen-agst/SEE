@@ -320,6 +320,20 @@ namespace SEE.Utils
         public static Vector2 ZW(this Vector4 a) => new(a.z, a.w);
 
         /// <summary>
+        /// Returns the given <paramref name="vector2"/>, replacing any of its components with
+        /// <paramref name="x"/>, and/or <paramref name="y"/> respectively, if they were given.
+        /// If no parameters are given, this method will be equivalent to the identity function.
+        /// </summary>
+        /// <param name="vector2">The vector whose components shall be replaced</param>
+        /// <param name="x">New X component</param>
+        /// <param name="y">New Y component</param>
+        /// <returns><paramref name="vector2"/> with its components replaced</returns>
+        public static Vector2 WithXY(this Vector2 vector2, float? x = null, float? y = null)
+        {
+            return new Vector2(x ?? vector2.x, y ?? vector2.y);
+        }
+
+        /// <summary>
         /// Returns the given <paramref name="vector3"/>, replacing any of its components with
         /// <paramref name="x"/>, <paramref name="y"/>, and/or <paramref name="z"/>, respectively, if they were given.
         /// If no parameters are given, this method will be equivalent to the identity function.
@@ -332,20 +346,6 @@ namespace SEE.Utils
         public static Vector3 WithXYZ(this Vector3 vector3, float? x = null, float? y = null, float? z = null)
         {
             return new Vector3(x ?? vector3.x, y ?? vector3.y, z ?? vector3.z);
-        }
-
-        /// <summary>
-        /// Returns the given <paramref name="vector2"/>, replacing any of its components with
-        /// <paramref name="x"/>, and/or <paramref name="y"/> respectively, if they were given.
-        /// If no parameters are given, this method will be equivalent to the identity function.
-        /// </summary>
-        /// <param name="vector2">The vector whose components shall be replaced</param>
-        /// <param name="x">New X component</param>
-        /// <param name="y">New Y component</param>
-        /// <returns><paramref name="vector2"/> with its components replaced</returns>
-        public static Vector2 WithXY(this Vector2 vector2, float? x = null, float? y = null)
-        {
-            return new Vector2(x ?? vector2.x, y ?? vector2.y);
         }
 
         /// <summary>

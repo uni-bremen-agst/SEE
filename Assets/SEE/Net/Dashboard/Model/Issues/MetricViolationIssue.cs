@@ -115,9 +115,9 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.Value = value;
         }
 
-        public override async UniTask<string> ToDisplayString()
+        public override async UniTask<string> ToDisplayStringAsync()
         {
-            string explanation = showExplanation ? await DashboardRetriever.Instance.GetIssueDescription($"MV{ID}") : "";
+            string explanation = showExplanation ? await DashboardRetriever.Instance.GetIssueDescriptionAsync($"MV{ID}") : "";
             string minimum = Min.HasValue ? $"; Minimum: <b>{Min:0.##}</b>" : "";
             string maximum = Max.HasValue ? $"; Maximum: <b>{Max:0.##}</b>" : "";
             return $"<style=\"H2\">Metric: {Description.WrapLines(WrapAt / 2)}</style>"

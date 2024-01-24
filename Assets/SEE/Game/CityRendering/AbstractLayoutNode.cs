@@ -36,9 +36,9 @@ namespace SEE.Game.CityRendering
         /// <param name="toLayoutNode">the mapping of graph nodes onto LayoutNodes this node should be added to</param>
         protected AbstractLayoutNode(Node node, IDictionary<Node, ILayoutNode> toLayoutNode)
         {
-            this.Node = node;
-            this.ToLayoutNode = toLayoutNode;
-            this.ToLayoutNode[node] = this;
+            Node = node;
+            ToLayoutNode = toLayoutNode;
+            ToLayoutNode[node] = this;
         }
 
         /// <summary>
@@ -179,8 +179,8 @@ namespace SEE.Game.CityRendering
         public abstract Vector3 Ground { get; }
 
         private Vector3 relativePosition;
-        private bool isSublayoutNode = false;
-        private bool isSublayoutRoot = false;
+        private bool isSublayoutNode;
+        private bool isSublayoutRoot;
         private Sublayout sublayout;
         private ILayoutNode sublayoutRoot;
 

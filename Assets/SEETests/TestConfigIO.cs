@@ -372,7 +372,7 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Test for SEECity.
+        /// Test for <see cref="SEECity"/>.
         /// </summary>
         [Test]
         public void TestSEECity()
@@ -383,11 +383,11 @@ namespace SEE.Utils
             // FIXME: We need tests for the antenna settings
             //savedCity.LeafNodeSettings.AntennaSettings.AntennaSections.Add(new AntennaSection("leafmetric", Color.white));
             //savedCity.InnerNodeSettings.AntennaSettings.AntennaSections.Add(new AntennaSection("innermetric", Color.black));
-            VisualNodeAttributes function = new VisualNodeAttributes()
+            VisualNodeAttributes function = new()
             {
                 IsRelevant = true
             };
-            VisualNodeAttributes file = new VisualNodeAttributes()
+            VisualNodeAttributes file = new()
             {
                 IsRelevant = false
             };
@@ -405,6 +405,36 @@ namespace SEE.Utils
             loadedCity.Load(filename);
 
             SEECityAttributesAreEqual(savedCity, loadedCity);
+        }
+
+        /// <summary>
+        /// Test for <see cref="DiffCity"/>.
+        /// </summary>
+        /// <remarks>We test only the attributes specific to <see cref="DiffCity"/>
+        /// excluding those just inherited. We trust that the inherited attributes
+        /// are tested by <see cref="TestSEECity"/>.</remarks>
+        [Test]
+        public void TestDiffCity()
+        {
+            string filename = "diffcity.cfg";
+            string vcsPath = "/c/mypath/myvcs";
+
+            // First save a new city with all its default values.
+            DiffCity savedCity = NewVanillaSEECity<DiffCity>();
+            savedCity.VCSPath = new(vcsPath);
+            savedCity.OldRevision = "old revision";
+            savedCity.NewRevision = "new revision";
+            savedCity.Save(filename);
+
+            // Create a new city with all its default values and then
+            // wipe out all its attributes to see whether they are correctly
+            // restored from the saved configuration file.
+            DiffCity loadedCity = NewVanillaSEECity<DiffCity>();
+            WipeOutDiffCityAttributes(loadedCity);
+            // Load the saved attributes from the configuration file.
+            loadedCity.Load(filename);
+
+            DiffCityAttributesAreEqual(savedCity, loadedCity);
         }
 
         /// <summary>
@@ -489,6 +519,20 @@ namespace SEE.Utils
             AreEqual(expected.GXLPath, actual.GXLPath);
             AreEqual(expected.CSVPath, actual.CSVPath);
             AreEqual(expected.XMLPath, actual.XMLPath);
+        }
+
+        /// <summary>
+        /// Checks whether the configuration attributes of <paramref name="expected"/> and
+        /// <paramref name="actual"/> are equal.
+        /// </summary>
+        /// <param name="expected">expected settings</param>
+        /// <param name="actual">actual settings</param>
+        private static void DiffCityAttributesAreEqual(DiffCity expected, DiffCity actual)
+        {
+            SEECityAttributesAreEqual(expected, actual);
+            Assert.AreEqual(expected.OldRevision, actual.OldRevision);
+            Assert.AreEqual(expected.NewRevision, actual.NewRevision);
+            AreEqual(expected.VCSPath, actual.VCSPath);
         }
 
         /// <summary>
@@ -699,6 +743,19 @@ namespace SEE.Utils
             city.GXLPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gxl");
             city.CSVPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.csv");
             city.XMLPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.xml");
+        }
+
+        /// <summary>
+        /// Assigns all attributes of given <paramref name="city"/> to arbitrary values
+        /// different from their default values.
+        /// </summary>
+        /// <param name="city">the city whose attributes are to be re-assigned</param>
+        private static void WipeOutDiffCityAttributes(DiffCity city)
+        {
+            WipeOutSEECityAttributes(city);
+            city.VCSPath.Set("C:/MyAbsoluteDirectory/MyVCSDirectory");
+            city.OldRevision = "XXX";
+            city.NewRevision = "YYY";
         }
 
         /// <summary>

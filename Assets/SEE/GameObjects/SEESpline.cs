@@ -582,7 +582,7 @@ namespace SEE.GO
             if (gameObject.TryGetComponent(out EdgeOperator edgeOperator))
             {
                 // Glow effect depends on materials staying the same. We need to fully refresh it.
-                edgeOperator.RefreshGlow(true).Forget();
+                edgeOperator.RefreshGlowAsync(true).Forget();
             }
             needsUpdate = false; // apparently
             return mesh;
