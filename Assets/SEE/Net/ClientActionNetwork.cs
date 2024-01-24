@@ -38,7 +38,7 @@ namespace SEE.Net
         /// </summary>
         IEnumerator GetSource()
         { 
-            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.Instance.ServerIP4Address + "/api/v1/getFilesForClient?id=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
+            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.Instance.ServerIP4Address + "/api/v1/getCode?id=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
             webRequest.downloadHandler = new DownloadHandlerFile(Application.streamingAssetsPath + "/Multiplayer/src.zip");
 
             // Request and wait for the desired page.
@@ -59,6 +59,74 @@ namespace SEE.Net
                 {
                     Debug.LogError("Error unzipping source code: " + e.Message);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Fetches the Gxl file from the backend
+        /// </summary>
+        IEnumerator GetGxl()
+        {
+            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.Instance.ServerIP4Address + "/api/v1/getSolution?id=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
+            webRequest.downloadHandler = new DownloadHandlerFile(Application.streamingAssetsPath + "/Multiplayer/src.zip");
+
+            // Request and wait for the desired page.
+            yield return webRequest.SendWebRequest();
+
+            if (webRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Error fetching source from backend: " + webRequest.error);
+            }
+        }
+
+        /// <summary>
+        /// Fetches the Gxl file from the backend
+        /// </summary>
+        IEnumerator GetConfig()
+        {
+            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.Instance.ServerIP4Address + "/api/v1/getConfig?id=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
+            webRequest.downloadHandler = new DownloadHandlerFile(Application.streamingAssetsPath + "/Multiplayer/test");
+
+            // Request and wait for the desired page.
+            yield return webRequest.SendWebRequest();
+
+            if (webRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Error fetching source from backend: " + webRequest.error);
+            }
+        }
+
+        /// <summary>
+        /// Fetches the solution file from the backend
+        /// </summary>
+        IEnumerator GetSolution()
+        {
+            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.Instance.ServerIP4Address + "/api/v1/getGxl?id=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
+            webRequest.downloadHandler = new DownloadHandlerFile(Application.streamingAssetsPath + "/Multiplayer/src.zip");
+
+            // Request and wait for the desired page.
+            yield return webRequest.SendWebRequest();
+
+            if (webRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Error fetching source from backend: " + webRequest.error);
+            } 
+        }
+
+        /// <summary>
+        /// Fetches the csv file from the backend
+        /// </summary>
+        IEnumerator GetCsv()
+        {
+            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.Instance.ServerIP4Address + "/api/v1/getFilesForClient?id=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
+            webRequest.downloadHandler = new DownloadHandlerFile(Application.streamingAssetsPath + "/Multiplayer/multiplayer.csv");
+
+            // Request and wait for the desired page.
+            yield return webRequest.SendWebRequest();
+
+            if (webRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Error fetching source from backend: " + webRequest.error);
             }
         }
 
@@ -101,9 +169,17 @@ namespace SEE.Net
         public void SyncFilesClientRpc(string serverId)
         {
             Network.ServerId = serverId;
-            Directory.Delete(Application.streamingAssetsPath + "/Multiplayer/", true);
-            Directory.CreateDirectory(Application.streamingAssetsPath + "/Multiplayer/");
+            if(Directory.Exists(Application.streamingAssetsPath + "/Multiplayer/"))
+            {
+                Directory.Delete(Application.streamingAssetsPath + "/Multiplayer/", true);
+                Directory.CreateDirectory(Application.streamingAssetsPath + "/Multiplayer/");
+            }
             StartCoroutine(GetSource());
+            StartCoroutine(GetGxl());
+            StartCoroutine(GetCsv());
+            StartCoroutine(GetConfig());
+            StartCoroutine(GetSolution());
+
         }
     }
 }
