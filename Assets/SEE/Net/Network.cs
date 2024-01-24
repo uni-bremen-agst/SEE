@@ -44,6 +44,11 @@ namespace SEE.Net
         public static string ServerId;
 
         /// <summary>
+        /// Address of the backend server where the files are stored
+        /// </summary>
+        public string BackendDomain;
+
+        /// <summary>
         /// The port of the server where the server listens to SEE action requests.
         /// Note: This field is accessed in NetworkEditor, hence, the name must not change.
         /// </summary>
@@ -293,10 +298,16 @@ namespace SEE.Net
                     RoomPassword = arguments[i+1];
                 }
 
+                if (arguments[i] == "-domain")
+                {
+                    BackendDomain = arguments[i+1];
+                }
+
                 if (arguments[i] == "-id")
                 {
-                    ServerId = arguments[i+1];
+                    BackendDomain = arguments[i+1];
                 }
+
 
                 if (arguments[i] == "-launch-as-server")
                 {

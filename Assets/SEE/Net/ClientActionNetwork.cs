@@ -38,7 +38,7 @@ namespace SEE.Net
         /// </summary>
         IEnumerator GetSource()
         { 
-            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.Instance.ServerIP4Address + "/api/v1/getCode?id=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
+            using UnityWebRequest webRequest = UnityWebRequest.Get("http://"  + Network.Instance.BackendDomain + "/api/v1/file/client/source?serverId=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
             webRequest.downloadHandler = new DownloadHandlerFile(Application.streamingAssetsPath + "/Multiplayer/src.zip");
 
             // Request and wait for the desired page.
@@ -67,7 +67,7 @@ namespace SEE.Net
         /// </summary>
         IEnumerator GetGxl()
         {
-            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.Instance.ServerIP4Address + "/api/v1/getSolution?id=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
+            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.Instance.BackendDomain + "/api/v1/file/client/gxl?serverId=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
             webRequest.downloadHandler = new DownloadHandlerFile(Application.streamingAssetsPath + "/Multiplayer/multiplayer.gxl");
 
             // Request and wait for the desired page.
@@ -84,7 +84,7 @@ namespace SEE.Net
         /// </summary>
         IEnumerator GetConfig()
         {
-            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.Instance.ServerIP4Address + "/api/v1/getConfig?id=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
+            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.Instance.BackendDomain + "/api/v1/file/client/csv?serverId=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
             webRequest.downloadHandler = new DownloadHandlerFile(Application.streamingAssetsPath + "/Multiplayer/multiplayer.cfg");
 
             // Request and wait for the desired page.
@@ -101,7 +101,7 @@ namespace SEE.Net
         /// </summary>
         IEnumerator GetSolution()
         {
-            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.Instance.ServerIP4Address + "/api/v1/getGxl?id=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
+            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.Instance.BackendDomain + "/api/v1/file/client/solution?serverId=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
             webRequest.downloadHandler = new DownloadHandlerFile(Application.streamingAssetsPath + "/Multiplayer/multiplayer.sln");
 
             // Request and wait for the desired page.
@@ -118,7 +118,7 @@ namespace SEE.Net
         /// </summary>
         IEnumerator GetCsv()
         {
-            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.Instance.ServerIP4Address + "/api/v1/getFilesForClient?id=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
+            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.Instance.BackendDomain + "/api/v1/file/client/csv?serverId=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
             webRequest.downloadHandler = new DownloadHandlerFile(Application.streamingAssetsPath + "/Multiplayer/multiplayer.csv");
 
             // Request and wait for the desired page.
