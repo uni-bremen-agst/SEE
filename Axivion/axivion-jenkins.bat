@@ -3,40 +3,108 @@
 @REM passed to this batch file. If there are none, only the variables are
 @REM set.
 
+@REM This is to be able to set the environment variables only for this run of the script.
+setlocal
+
+@echo off
+
 @REM Because this batch script is called by Jenkins, we apparently need to
 @REM call this first to avoid failing with an error because of the error
 @REM "The system cannot find the path specified.":
-@cmd.exe /c
+cmd.exe /c
 
 @REM Python
 @REM set "PATH=C:\Users\SWT\AppData\Local\Programs\Python\Python38;%PATH%"
 @REM set "BAUHAUS_PYTHON=C:\Users\SWT\AppData\Local\Programs\Python\Python38\python.exe"
 
-@REM include Bauhaus bin in exectuable path
-REM FIXME
-@set "PATH=C:\Program Files (x86)\Bauhaus\bin;%PATH%"
+if "%AXIVION%"=="" (
+  set "AXIVION=C:\Program Files (x86)\Bauhaus"
+)
+
+if not exist "%AXIVION%" (
+  echo "Directory %AXIVION% does not exist. You need to set environment variable AXIVION to the directory where the Axivion suite is installed."
+  goto error
+)
+
+@REM include AXIVION bin in exectuable path
+if not exist "%AXIVION%\bin%" (
+  echo "Directory %AXIVION%\bin does not exist. You need to set environment variable AXIVION to the directory where the Axivion suite is installed having a bin subdirectory."
+  goto error
+)
+
+set "PATH=%AXIVION%\bin;%PATH%"
 
 @REM SEE project directory (generally the Jenkins workspace if this job is run
 @REM by Jenkins, in which case WORKSPACE is set, or otherwise the current directory)
-@if "%WORKSPACE%" == "" (
-@  set "SEEDIRECTORY=%cd%"
-@) else (
-@  set "SEEDIRECTORY=%WORKSPACE%"
-@)
+if "%WORKSPACE%" == "" (
+  set "SEEDIRECTORY=%cd%"
+) else (
+  set "SEEDIRECTORY=%WORKSPACE%"
+)
 
-@REM where the Axivion configuration resides within SEE
-@set "BAUHAUS_CONFIG=%SEEDIRECTORY%\Axivion"
+if not exist "%SEEDIRECTORY%" (
+  echo "Directory %SEEDIRECTORY% does not exist. You need to set environment variable SEEDIRECTORY to the directory where the SEE project resides."
+  goto error
+)
+
+@REM where the Axivion configuration for SEE resides
+if "%BAUHAUS_CONFIG%"=="" (
+  set "BAUHAUS_CONFIG=%SEEDIRECTORY%\Axivion"
+)
+
+if not exist "%BAUHAUS_CONFIG%" (
+  echo "Directory %BAUHAUS_CONFIG% does not exist. You need to set environment variable BAUHAUS_CONFIG to the directory where the Axivion configuration for SEE resides."
+  goto error
+)
 
 @REM where the Axivion dashserver configuration resides
-@REM FIXME
-@set "AXIVION_DASHBOARD_CONFIG=C:\Users\koschke\Axivion"
-@set "AXIVION_DATABASES_DIR=%AXIVION_DASHBOARD_CONFIG%"
-@set "REQUESTS_CA_BUNDLE=%AXIVION_DASHBOARD_CONFIG%\cert\auto.crt"
+if "%AXIVION_DASHBOARD_CONFIG%"=="" (
+  set "AXIVION_DASHBOARD_CONFIG=C:\Users\koschke\Axivion"
+)
+
+if not exist "%AXIVION_DASHBOARD_CONFIG%" (
+  echo "Directory %AXIVION_DASHBOARD_CONFIG% does not exist. You need to set environment variable AXIVION_DASHBOARD_CONFIG to the directory where the Axivion dashboard configuration resides."
+  goto error
+)
+
+if "%AXIVION_DATABASES_DIR%"=="" (
+  set "AXIVION_DATABASES_DIR=%AXIVION_DASHBOARD_CONFIG%"
+)
+
+if not exist "%AXIVION_DATABASES_DIR%" (
+  echo "Directory %AXIVION_DATABASES_DIR% does not exist. You need to set environment variable AXIVION_DATABASES_DIR to the directory where the Axivion dashboard databases reside."
+  goto error
+)
+
+if "%REQUESTS_CA_BUNDLE%"=="" (
+  set "REQUESTS_CA_BUNDLE=%AXIVION_DASHBOARD_CONFIG%\cert\auto.crt"
+)
+
+if not exist "%REQUESTS_CA_BUNDLE%" (
+  echo "File %REQUESTS_CA_BUNDLE% does not exist. You need to set environment variable REQUESTS_CA_BUNDLE to the file containing the CA bundle for the Axivion dashboard."
+  goto error
+)
 
 @REM URL of the dashserver
-@REM set "AXIVION_DASHBOARD_URL=https://localhost:9443/axivion/"
-@REM set "AXIVION_DASHBOARD_URL=https://swt-jenkins.informatik.uni-bremen.de:9443/axivion/"
-@set "AXIVION_DASHBOARD_URL=https://stvr2.informatik.uni-bremen.de:9443/axivion/"
+if "%AXIVION_DASHBOARD_URL%"=="" (
+  @REM set "AXIVION_DASHBOARD_URL=https://localhost:9443/axivion/"
+  set "AXIVION_DASHBOARD_URL=https://stvr2.informatik.uni-bremen.de:9443/axivion/"
+)
+
+if "%UNITY%"=="" (
+  set "UNITY=C:\Program Files\Unity\Hub\Editor\2022.3.18f1"
+)
+
+if not exist "%UNITY%" (
+  echo "Directory %UNITY% does not exist. You need to set environment variable UNITY to where Unity is installed."
+  goto error
+)
+
+echo AXIVION="%AXIVION%"
+echo SEEDIRECTORY="%SEEDIRECTORY%"
+echo AXIVION_DASHBOARD_CONFIG="%AXIVION_DASHBOARD_CONFIG%"
+echo AXIVION_DASHBOARD_URL="%AXIVION_DASHBOARD_URL%"
+echo UNITY="%UNITY%"
 
 @REM If the dashserver is installed as a Windows service, you can
 @REM start and stop it as follows:
@@ -44,24 +112,31 @@ REM FIXME
 @REM or use the Windows Services Console (services.msc).
 
 @REM The Visual Studio .csproj files need to be created before we can start the build.
-@"C:\Program Files\Unity\Hub\Editor\2022.3.18f1\Editor\Unity.exe" -batchmode -nographics -logFile - -executeMethod CITools.SolutionGenerator.Sync -projectPath . -quit
-@REM "C:\Program Files\Unity\Hub\Editor\2022.3.18f1\Editor\Unity.exe" -batchmode -nographics -logFile - -executeMethod UnityEditor.SyncVS.SyncSolution -projectPath . -quit
+REM FIXME
+@"%UNITY%\Editor\Unity.exe" -batchmode -nographics -logFile - -executeMethod CITools.SolutionGenerator.Sync -projectPath . -quit
+@REM "%UNITY%\Editor\Unity.exe" -batchmode -nographics -logFile - -executeMethod UnityEditor.SyncVS.SyncSolution -projectPath . -quit
 
 @REM Count the number of command-line parameters
 @setlocal enabledelayedexpansion
 @set argCount=0
-@for %%x in (%*) do (
-@   set /A argCount+=1
-@)
+for %%x in (%*) do (
+   set /A argCount+=1
+)
 
 @REM echo "Number of processed arguments: %argCount%"
 
 @REM Execute command line parameters if there are any.
-@IF %argCount% == 0 (
-@  echo "No parameters to be executed given"
-@) ELSE (
+IF %argCount% == 0 (
+  echo "No parameters to be executed given"
+) ELSE (
 @  REM We are executing only the first parameter. If this parameter is 
 @  REM an executable with other parameters, the executable and its
 @  REM parameters must be enclosed in double quotes.
-  "%*"
-@)
+  %*  
+)
+
+:end
+
+:error
+
+endlocal
