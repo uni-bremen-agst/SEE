@@ -1,4 +1,7 @@
 using SEE.DataModel.DG;
+using SEE.Game.CityRendering;
+using SEE.Game.Evolution;
+using SEE.GO;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
@@ -32,11 +35,32 @@ namespace SEE.Game.City
         public const string IsChanged = "IsChanged";
 
         /// <summary>
+        /// This Graph will be used to store a graph and will be used as a flag
+        /// </summary>
+        static Graph tempGraph = null;
+
+        //private EvolutionRenderer evolutionRenderer;
+
+        /// <summary>
         /// The path to the GXL file containing the graph data.
         /// Note that any deriving class may use multiple GXL paths from which the single city is constructed.
         /// </summary>
         [ShowInInspector, Tooltip("Path of GXL file for the baseline graph"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         public FilePath BaselineGXLPath = new();
+
+        /// <summary>
+        /// Factory method to create the used EvolutionRenderer.
+        /// </summary>
+        /// <returns>the current or new evolution renderer attached to this city</returns>
+        /*protected EvolutionRenderer CreateEvolutionRenderer()
+        {
+            if (!gameObject.TryGetComponent(out EvolutionRenderer result))
+            {
+                result = gameObject.AddComponent<EvolutionRenderer>();
+                result.SetUpGraph();
+            }
+            return result;
+        }*/
 
         /// <summary>
         /// First, <see cref=">SEECity.LoadData"/> will be called.
@@ -73,7 +97,7 @@ namespace SEE.Game.City
             else
             {
                 Merge(BaselineGXLPath.Path);
-            }
+            }            
         }
 
         /// <summary>
@@ -85,6 +109,7 @@ namespace SEE.Game.City
         private void Merge(string pathBaselineGXL)
         {
             Graph baseline = LoadGraph(pathBaselineGXL);
+            tempGraph = null;
             // TODO: Normally we would call LoadMetrics() to add additional metrics
             // for the graph stored in a separate CSV file. That is done for LoadedGraph.
             // Do we want to do that for this baseline graph, too? If so, we need to add
@@ -92,8 +117,17 @@ namespace SEE.Game.City
 
             InspectSchema(baseline);
 
+            //If baseline has more nodes than LoadedGraph then the baseline has to be the LoadedGraph
+            if (baseline.Nodes().Count > LoadedGraph.Nodes().Count)
+            {
+                tempGraph = baseline;
+                baseline = LoadedGraph;
+                LoadedGraph = tempGraph;
+            }
+
             MergeNodes(baseline);
             MergeEdges(baseline);
+
         }
 
         /// <summary>
@@ -112,6 +146,14 @@ namespace SEE.Game.City
                           out ISet<Node> changedNodes,
                           out ISet<Node> equalNodes);
 
+
+
+
+            Debug.Log("addedNodes: " + addedNodes.Count);
+            Debug.Log("removedNodes: " + removedNodes.Count);
+            Debug.Log("changedNodes: " + changedNodes.Count);
+            Debug.Log("equalNodes: " + equalNodes.Count);
+
             MergeGraphElements(addedNodes, removedNodes, changedNodes, n => { LoadedGraph.AddNode(n); });
         }
 
@@ -122,7 +164,7 @@ namespace SEE.Game.City
         private void MergeEdges(Graph baseline)
         {
             LoadedGraph.Diff(baseline,
-                         g => g.Edges(),
+                        g => g.Edges(),
                         (g, id) => g.GetEdge(id),
                         GraphExtensions.AttributeDiff(LoadedGraph, baseline),
                         new EdgeEqualityComparer(),
@@ -130,6 +172,8 @@ namespace SEE.Game.City
                         out ISet<Edge> removedEdges,
                         out ISet<Edge> changedEdges,
                         out ISet<Edge> equalEdges);
+
+                
             MergeGraphElements(addedEdges, removedEdges, changedEdges, AddEdge);
 
             // Adds edge to LoadedGraph. Note: edge is assumed to be cloned
@@ -137,6 +181,8 @@ namespace SEE.Game.City
             // corresponding edge in LoadedGraph, thus, was deleted.
             void AddEdge(Edge edge)
             {
+                //Debug.Log(baseline);
+                //Debug.Log(edge.ItsGraph);
                 // edge is cloned from a baseline edge, but after the cloning its source
                 // and target are nodes in the baseline graph. edge will be added to the
                 // LoadedGraph, hence, we need to adjust its source and target to the
@@ -146,6 +192,7 @@ namespace SEE.Game.City
                 // edge was clone from a baseline edge, but the cloned edge does
                 // not belong to any graph (its graph is null). As a consequence,
                 // we do not need to reset ItsGraph.
+                Debug.Log(LoadedGraph);
                 LoadedGraph.AddEdge(edge);
             }
         }
@@ -175,7 +222,8 @@ namespace SEE.Game.City
         private static void MergeGraphElements<T>(ISet<T> added, ISet<T> removed, ISet<T> changed, AddToGraph<T> addToGraph)
             where T : GraphElement
         {
-            _ = added.ForEach(node => { node.SetToggle(IsNew); });
+            //SetToggle will be IsDeleted if baseline and LoadedGraph have been swapped
+            _ = added.ForEach(node => { node.SetToggle(tempGraph != null ? IsDeleted : IsNew); });
             _ = changed.ForEach(node => { UpdateChanged(node); });
             _ = removed.ForEach(node => { MergeRemoved(node); });
 
@@ -184,7 +232,8 @@ namespace SEE.Game.City
             {
                 T removedGraphElement = graphElement.Clone() as T;
                 addToGraph(removedGraphElement);
-                removedGraphElement.SetToggle(IsDeleted);
+                //SetToggle will be IsNew if baseline and LoadedGraph have been swapped
+                removedGraphElement.SetToggle(tempGraph != null ? IsNew : IsDeleted);
             }
 
             // Marks given graph element as changed.
@@ -196,6 +245,19 @@ namespace SEE.Game.City
                 // graphElement in LoadedGraph and mark deleted, changed, and added attributes.
             }
         }
+
+        /*protected override void Start()
+        {
+            base.Start();
+            Reset();
+
+            evolutionRenderer = CreateEvolutionRenderer();
+            evolutionRenderer.DrawMarkOnGraph(LoadedGraph);
+
+            //gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
+
+            //evolutionRenderer.ShowGraphEvolution();
+        }*/
 
         #region Configuration file input/output
         //--------------------------------
