@@ -398,7 +398,8 @@
             "_active": true
         },
         "Metric-Lines.Class.OnlyComment": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-Lines.Code": {
             "_active": true
@@ -422,13 +423,15 @@
             "_active": true
         },
         "Metric-Lines.File.OnlyComment": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-Lines.LOC": {
             "_active": true
         },
         "Metric-Lines.OnlyComment": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-Lines.PP.Define": {
             "_active": true
@@ -497,7 +500,8 @@
             "_active": true
         },
         "Metric-Lines.Routine.OnlyComment": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-LogNPathCeiling": {
             "_active": true
@@ -551,7 +555,8 @@
             "_active": true
         },
         "Metric-OO.CBOa": {
-            "_active": true
+            "_active": true,
+            "max_value": 15
         },
         "Metric-OO.CBOs": {
             "_active": true
@@ -581,7 +586,8 @@
             "_active": true
         },
         "Metric-OO.NOMA": {
-            "_active": true
+            "_active": true,
+            "max_value": 30
         },
         "Metric-OO.NOMO": {
             "_active": true
@@ -722,7 +728,7 @@
                 }
             },
             "local_mode": {
-                "directory": "($userprofile)\\.bauhaus\\localbuild\\projects",
+                "directory": "($SEEDIRECTORY)\\.bauhaus\\localbuild\\projects",
                 "provide_ir": {
                     "provide_in_dashboard": false
                 },
@@ -730,6 +736,10 @@
                     "backup_existing": true
                 }
             }
+        },
+        "JSONReport": {
+            "_active": true,
+            "filename": "$(SEEDIRECTORY)/issues.json"
         }
     },
     "_Format": "1.0",
