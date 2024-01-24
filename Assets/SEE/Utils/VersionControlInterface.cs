@@ -8,7 +8,8 @@ using UnityEngine;
 /// </summary>
 public interface IVersionControl
     {
-        string Show(string repositoryPath, string branchName, string fileName, string commitIdentifier);
+        string Show(string repositoryPath, string fileName, string oldCommitID, string newCommitID);
+        string ShowName();
         // Add other version control operations as needed
     }
 

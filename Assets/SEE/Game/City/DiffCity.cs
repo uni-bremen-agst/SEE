@@ -55,18 +55,6 @@ namespace SEE.Game.City
         public string RepositoryPath = string.Empty;
 
         /// <summary>
-        /// The old branch name identifier, to get the source code from the old revision.
-        /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Branch name"), TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
-        public string OldBranchName = string.Empty;
-
-        /// <summary>
-        /// The new branch name identifier, to get the source code from the new revision.
-        /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Branch name"), TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
-        public string NewBranchName = string.Empty;
-
-        /// <summary>
         /// The old commit identifier, to get the source code from both revision.
         /// </summary>
         [SerializeField, ShowInInspector, Tooltip("Old commit identifier"), TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
@@ -100,16 +88,6 @@ namespace SEE.Game.City
         private const string repositoryPathLabel = "RepositoryPath";
 
         /// <summary>
-        /// Label of attribute <see cref="OldBranchName"/> in the configuration file.
-        /// </summary>
-        private const string oldbranchNameLabel = "OldBranchName";
-
-        /// <summary>
-        /// Label of attribute <see cref="NewBranchName"/> in the configuration file.
-        /// </summary>
-        private const string newbranchNameLabel = "NewBranchName";
-
-        /// <summary>
         /// Label of attribute <see cref="OldCommitIdentifier"/> in the configuration file.
         /// </summary>
         private const string oldCommitIdentifierLabel = "OldCommitIdentifier";
@@ -137,8 +115,6 @@ namespace SEE.Game.City
             writer.Save(NewRevision, newRevisionLabel);
             writer.Save(VersionControlSystem, versionControlSystemLabel);
             writer.Save(RepositoryPath, repositoryPathLabel);
-            writer.Save(OldBranchName, oldbranchNameLabel);
-            writer.Save(NewBranchName, newbranchNameLabel);
             writer.Save(OldCommitIdentifier, oldCommitIdentifierLabel);
             writer.Save(NewCommitIdentifier, newCommitIdentifierLabel);
         }
@@ -151,8 +127,6 @@ namespace SEE.Game.City
             ConfigIO.Restore(attributes, newRevisionLabel, ref NewRevision);
             ConfigIO.Restore(attributes, versionControlSystemLabel, ref VersionControlSystem);
             ConfigIO.Restore(attributes, repositoryPathLabel, ref RepositoryPath);
-            ConfigIO.Restore(attributes, oldbranchNameLabel, ref OldBranchName);
-            ConfigIO.Restore(attributes, newbranchNameLabel, ref NewBranchName);
             ConfigIO.Restore(attributes, oldCommitIdentifierLabel, ref OldCommitIdentifier);
             ConfigIO.Restore(attributes, newCommitIdentifierLabel, ref NewCommitIdentifier);
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LibGit2Sharp;
 using System.Linq;
+using DiffMatchPatch;
 
 /// <summary>
 /// Contains all version control systems as subclasses, which derives from IVersionControl,
@@ -15,16 +16,17 @@ public class VersionControlSystems : MonoBehaviour
     /// </summary>
     public class GitVersionControl : IVersionControl
     {
-        public string Show(string repositoryPath, string branchName, string fileName, string commitIdentifier)
+        string name = null;
+        public string Show(string repositoryPath, string fileName, string oldCommitID, string newCommitID)
         {
             using (var repo = new Repository(repositoryPath))
             {
-                // Get commit for given branch
-                var branch = repo.Branches[branchName];
-                var commit = repo.Commits.Single(c => c.Id.Sha.StartsWith(commitIdentifier) || c.Id.ToString().StartsWith(commitIdentifier));
+                // Get commit.
+                var oldCommit = repo.Lookup<Commit>(oldCommitID);
+
 
                 // Get file from commit
-                var blob = commit[fileName]?.Target as Blob;
+                var blob = oldCommit[fileName]?.Target as Blob;
 
                 if (blob != null)
                 {
@@ -34,24 +36,65 @@ public class VersionControlSystems : MonoBehaviour
                 }
                 else
                 {
+                    // Get commit, to find possible renames.
+                    var newCommit = repo.Lookup<Commit>(newCommitID);
+
+                    // Set up the diff options.
+                    var compareOptions = new CompareOptions
+                    {
+                        Similarity = new SimilarityOptions
+                        {
+                            RenameDetectionMode = RenameDetectionMode.Default,
+                            RenameThreshold = 50,
+                        }
+                    };
+
+                    // Compare the commits
+                    var changes = repo.Diff.Compare<TreeChanges>(newCommit.Tree, oldCommit.Tree, compareOptions);
+                    foreach (TreeEntryChanges change in changes)
+                    {
+                        string changeInfo = change.Status.ToString();
+                        string changeInff = change.OldPath.ToString();
+                        string changeInf = change.Path.ToString();
+                        Debug.Log(changeInfo);
+                        Debug.Log(changeInff);
+                        Debug.Log(changeInf);
+                        if ((change.Status == ChangeKind.Renamed || change.Status == ChangeKind.TypeChanged) &&
+                            (change.Path == fileName || change.OldPath == fileName))
+                        {
+                            name = change.Path;
+                            // Get renamed file from commit.
+                            var renamedBlob = oldCommit[change.Path]?.Target as Blob;
+                            if (renamedBlob != null)
+                            {
+                                return renamedBlob.GetContentText();
+                            }
+                        }
+                    }
                     return "Datei nicht gefunden.";
                 }
             }
         }
-    }
-    /// <summary>
-    /// Implements the functionality of IVersionControl for SVN.
-    /// </summary>
-    public class SvnVersionControl : IVersionControl
-    {
-        public string Show(string repositoryPath, string branchName, string fileName, string commitIdentifier)
+        public string ShowName()
         {
-            // Implement SVN-specific logic here
-            // Maybe use SharpSvn
-            return $"SVN show {branchName}:{fileName}";
+            return name;
         }
     }
+        /// <summary>
+        /// Implements the functionality of IVersionControl for SVN.
+        /// </summary>
+        public class SvnVersionControl : IVersionControl
+        {
+            public string Show(string repositoryPath, string fileName, string oldCommitID, string newCommitID)
+            {
+                // Implement SVN-specific logic here
+                // Maybe use SharpSvn
+                return $"SVN show {fileName}";
+            }
+            
+            public string ShowName() { return null; }
+        }
 
-    // Add more version control classes as needed
+        // Add more version control classes as needed
 
 }

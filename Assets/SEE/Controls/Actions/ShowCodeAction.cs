@@ -196,22 +196,27 @@ namespace SEE.Controls.Actions
         {
             GameObject city = GameObject.Find("DiffCity");
             GraphElement graphElement = graphElementRef.Elem;
-            // TODO: sourceAbsolutePlatformPath and targetAbsolutePlatformPath are not getting the right paths
-            (string sourceFilename, string sourceAbsolutePlatformPath) = GetPath(graphElement);
-            (string _, string targetAbsolutePlatformPath) = GetPath(graphElement);
+            (string sourceFilename, _) = GetPath(graphElement);
             string versionControlSystem = city.MustGetComponent<DiffCity>().VersionControlSystem;
             string repositoryPath = city.MustGetComponent<DiffCity>().RepositoryPath;
-            string oldBranchName = city.MustGetComponent<DiffCity>().OldBranchName;
-            string newBranchName = city.MustGetComponent<DiffCity>().NewBranchName;
             string oldCommitIdentifier = city.MustGetComponent<DiffCity>().OldCommitIdentifier;
             string newCommitIdentifier = city.MustGetComponent<DiffCity>().NewCommitIdentifier;
             IVersionControl versionControl = SwitchVersionControlSystems.CreateVersionControl(versionControlSystem);
-            string showOldCode = versionControl.Show(repositoryPath, oldBranchName, sourceAbsolutePlatformPath, oldCommitIdentifier);
-            string showNewCode = versionControl.Show(repositoryPath, newBranchName, targetAbsolutePlatformPath, newCommitIdentifier);
+            string showOldCode = versionControl.Show(repositoryPath, sourceFilename, oldCommitIdentifier, newCommitIdentifier);
+            string showNewCode = versionControl.Show(repositoryPath, sourceFilename, newCommitIdentifier, oldCommitIdentifier);
             // TODO: Update the Output from DiffForDiffCity to string[], its the way it is for now, just for demonstration
             string[] diff = TextualDiff.DiffForDiffCity(showOldCode, showNewCode);
 
             CodeWindow codeWindow = GetOrCreateCodeWindow(graphElementRef, sourceFilename);
+            if (versionControl.ShowName() != null)
+            {
+                codeWindow.Title = $"<color=\"red\"><s><noparse>{versionControl.ShowName()}</noparse></s></color> -> <color=\"green\"><u><noparse>{sourceFilename}</noparse></u></color>";
+            }
+            else
+            {
+                codeWindow.Title = sourceFilename;
+            }
+
             codeWindow.EnterFromText(diff, true);
             codeWindow.ScrolledVisibleLine = 1;
             return codeWindow;
