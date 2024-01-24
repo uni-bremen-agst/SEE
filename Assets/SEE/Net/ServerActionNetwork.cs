@@ -12,7 +12,10 @@ namespace SEE.Net
     /// DOC
     /// </summary>
     public class ServerActionNetwork : NetworkBehaviour
-    { 
+    {
+        /// <summary>
+        /// Syncs the current state of the server with the connecting client.
+        /// </summary>
         [ServerRpc(RequireOwnership = false)]
         public void SyncClientServerRpc(ulong client)
         {
@@ -30,8 +33,11 @@ namespace SEE.Net
             {
                 clientNetwork.ExecuteActionUnsafeClientRpc(serializedAction);
             }
-        } 
+        }
 
+        /// <summary>
+        /// Broadcasts an action to all clients in the recipients list, or to all connected clients if the list is empty
+        /// </summary>
         [ServerRpc(RequireOwnership = false)]
         public void BroadcastActionServerRpc(string serializedAction, ulong[] recipients)
         {
@@ -52,6 +58,25 @@ namespace SEE.Net
                     ClientActionNetwork clientNetwork = client.PlayerObject.GetComponent<ClientActionNetwork>();
                     clientNetwork.ExecuteActionClientRpc(serializedAction);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Sends the server id to the client, this is not the internal id but the id given to the server by the backend.
+        /// </summary>
+        [ServerRpc(RequireOwnership = false)]
+        public void SyncFilesServerRpc(ServerRpcParams serverRpcParams = default)
+        {
+            if (!IsServer && !IsHost)
+            {
+                return;
+            }
+            var clientId = serverRpcParams.Receive.SenderClientId;
+            if (NetworkManager.Singleton.ConnectedClients[clientId] != null)
+            {
+                NetworkClient client = NetworkManager.Singleton.ConnectedClients[clientId];
+                ClientActionNetwork clientNetwork = client.PlayerObject.GetComponent<ClientActionNetwork>();
+                clientNetwork.SyncFilesClientRpc(Network.ServerId);
             }
         }
     }

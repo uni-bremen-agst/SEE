@@ -39,6 +39,11 @@ namespace SEE.Net
         private const int MaxServerPort = 65535;
 
         /// <summary>
+        /// The id of the server to fetch files from backend
+        /// </summary>
+        public static string ServerId;
+
+        /// <summary>
         /// The port of the server where the server listens to SEE action requests.
         /// Note: This field is accessed in NetworkEditor, hence, the name must not change.
         /// </summary>
@@ -286,6 +291,11 @@ namespace SEE.Net
                 if (arguments[i] == "-password")
                 {
                     RoomPassword = arguments[i+1];
+                }
+
+                if (arguments[i] == "-id")
+                {
+                    ServerId = arguments[i+1];
                 }
 
                 if (arguments[i] == "-launch-as-server")
