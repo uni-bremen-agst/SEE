@@ -728,7 +728,7 @@
                 }
             },
             "local_mode": {
-                "directory": "($SEEDIRECTORY)\\.bauhaus\\localbuild\\projects",
+                "directory": "$(SEEDIRECTORY)\\.bauhaus\\localbuild\\projects",
                 "provide_ir": {
                     "provide_in_dashboard": false
                 },
