@@ -305,7 +305,7 @@ namespace SEE.Net
 
                 if (arguments[i] == "-id")
                 {
-                    BackendDomain = arguments[i+1];
+                    ServerId = arguments[i+1];
                 }
 
 
