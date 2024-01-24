@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using SEE.Utils;
 using System;
 using System.IO;
 using UnityEngine;
@@ -55,7 +56,7 @@ namespace SEE.Controls.KeyActions
             }
             finally
             {
-                Delete(filename);
+                FileIO.DeleteIfExists(filename);
             }
         }
 
@@ -89,7 +90,7 @@ namespace SEE.Controls.KeyActions
             }
             finally
             {
-                Delete(filename);
+                FileIO.DeleteIfExists(filename);
             }
         }
 
@@ -162,7 +163,7 @@ namespace SEE.Controls.KeyActions
             }
             finally
             {
-                Delete(filename);
+                FileIO.DeleteIfExists(filename);
             }
         }
 
@@ -188,7 +189,7 @@ namespace SEE.Controls.KeyActions
             }
             finally
             {
-                Delete(filename);
+                FileIO.DeleteIfExists(filename);
             }
         }
 
@@ -227,18 +228,6 @@ namespace SEE.Controls.KeyActions
             {
                 Assert.IsTrue(superset.TryGetValue(binding.Key, out KeyActionDescriptor supersetBinding));
                 AreEqual(binding.Value, supersetBinding);
-            }
-        }
-
-        /// <summary>
-        /// If a file named <paramref name="filename"/> exists, it will be deleted.
-        /// </summary>
-        /// <param name="filename">file to be deleted</param>
-        private static void Delete(string filename)
-        {
-            if (File.Exists(filename))
-            {
-                File.Delete(filename);
             }
         }
     }
