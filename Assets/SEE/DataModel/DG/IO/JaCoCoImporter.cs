@@ -193,23 +193,33 @@ namespace Assets.SEE.DataModel.DG.IO
                             }
                         }
                     }
-                    else if (node.Filename() == null && !NodeDictionary.ContainsValue(node))
+                    else if (node.Type == "Package")
                     {
-                        if (node.Level == 0) // root of the project
-                        {
-                            key = new NodeKey(null, null, -1);
-                            NodeDictionary.Add(key, node);
-                        }
-                        else if (node.Type == "Package")
-                        {
-                            key = new NodeKey(node.Type, node.SourceName, -1);
-                            NodeDictionary.Add(key, node);
-                        }
+                        key = new NodeKey(node.Type, node.SourceName, -1);
+                        NodeDictionary.Add(key, node);
+                    }
+                    else if (node.Level == 0) // root of the project
+                    {
+                        key = new NodeKey(null, null, -1);
+                        NodeDictionary.Add(key, node);
                     }
                 }
                 catch
                 {
-                    Debug.Log("Node can't be added to Dictionary.");
+                    if(NodeDictionary.ContainsValue(node))
+                    {
+                        Debug.Log($"Node was already added. {node}");
+                    }
+                    else if (node.Filename() == null)
+                    {
+                        Debug.Log($"Filename was null and Node type was neither package nor was it the root. {node}");
+                    }
+                    else if (node.Type == "Method" && node.SourceLine() == null)
+                    {
+                        Debug.Log($"Method-Node but Sourceline was empty.{node}");
+                    }
+                    else { Debug.Log($"Node can't be added to Dictionary. {node}"); }
+
                 }
 
             }
