@@ -39407,7 +39407,7 @@ MonoBehaviour:
       Data: 3
     - Name: relativePath
       Entry: 1
-      Data: /mini/
+      Data: /Multiplayer/src
     - Name: absolutePath
       Entry: 1
       Data: 
@@ -40395,15 +40395,15 @@ MonoBehaviour:
   LODCulling: 0.001
   ConfigurationPath:
     Root: 3
-    relativePath: /mini/mini.cfg
+    relativePath: /Multiplayer/multiplayer.cfg
     absolutePath: 
   sourceCodeDirectory:
     Root: 3
-    relativePath: /mini/
+    relativePath: /Multiplayer/src
     absolutePath: 
   SolutionPath:
     Root: 3
-    relativePath: /mini/src/mini.sln
+    relativePath: /Multiplayer/multiplayer.sln
     absolutePath: 
   IgnoreSelfLoopsInLifting: 0
   MaximalAntennaSegmentHeight: 0.25
@@ -40458,11 +40458,11 @@ MonoBehaviour:
       absolutePath: 
   GXLPath:
     Root: 3
-    relativePath: /mini/CodeFacts.gxl
+    relativePath: /Multiplayer/multiplayer.gxl
     absolutePath: 
   CSVPath:
     Root: 3
-    relativePath: /mini/CodeFacts.csv
+    relativePath: /Multiplayer/multiplayer.csv
     absolutePath: 
 --- !u!114 &786317128
 MonoBehaviour:
@@ -99727,7 +99727,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 616cd0a1c5e06384e8441efb4837d445, type: 3}
       propertyPath: m_Name
-      value: ImplementationTable
+      value: NetworkTable
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 616cd0a1c5e06384e8441efb4837d445, type: 3}
       propertyPath: m_StaticEditorFlags
