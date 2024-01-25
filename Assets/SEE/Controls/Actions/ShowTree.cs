@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.Game;
 using SEE.Game.City;
@@ -76,14 +78,21 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Close all tree view windows.
+        /// It is assumed that this method is called from a toggle action.
         /// </summary>
         private void HideCodeView()
         {
+            // If none of the windows were actually closed, we should instead open them.
+            bool anyClosed = false;
             foreach (string city in treeWindows.Keys)
             {
-                space.CloseWindow(treeWindows[city]);
+                anyClosed |= space.CloseWindow(treeWindows[city]);
             }
             treeWindows.Clear();
+            if (!anyClosed)
+            {
+                ShowCodeView();
+            }
         }
 
         private void Update()
