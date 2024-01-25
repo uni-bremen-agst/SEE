@@ -52,7 +52,7 @@ namespace SEE.UI.PropertyDialog
         /// </summary>
         private Tooltip.Tooltip tooltip;
 
-        private HorizontalSelector horizontalSelector;
+        public HorizontalSelector horizontalSelector { get; private set; }
 
         /// <summary>
         /// Sets <see cref="inputField"/> as an instantiation of prefab <see cref="inputFieldPrefab"/>.
