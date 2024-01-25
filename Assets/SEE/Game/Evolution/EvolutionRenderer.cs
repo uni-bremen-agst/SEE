@@ -255,6 +255,52 @@ namespace SEE.Game.Evolution
 
         #endregion
 
+        public void SetGraphEvolution2(IList<Graph> graphs)
+        {
+            this.graphs = graphs;
+            if (gameObject.TryGetComponent(out SEEBranchCity cityEvolution))
+            {
+                // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
+                // So we cannot make the following assignment in the constructor. Neither
+                // can we assign this value at the declaration of graphRenderer because
+                // we need the city argument, which comes only later. Anyhow, whenever we
+                // assign a new city, we also need a new graph renderer for that city.
+                // So in fact this is the perfect place to assign graphRenderer.
+                Renderer = new GraphRenderer(cityEvolution, graphs);
+                edgesAreDrawn = Renderer.AreEdgesDrawn();
+
+                objectManager = new ObjectManager(Renderer, gameObject);
+                markerFactory = new MarkerFactory(markerWidth: cityEvolution.MarkerWidth,
+                                    markerHeight: cityEvolution.MarkerHeight,
+                                    additionColor: cityEvolution.AdditionBeamColor,
+                                    changeColor: cityEvolution.ChangeBeamColor,
+                                    deletionColor: cityEvolution.DeletionBeamColor);
+                animationWatchDog = new CountingJoin();
+            }
+            else
+            {
+                Debug.LogError($"This EvolutionRenderer attached to {name} has no sibling component of type {nameof(SEECityEvolution)}.\n");
+                enabled = false;
+            }
+            //Renderer.SetScaler(graphs);
+        }
+
+        public void SetUpGraph(Graph LoadedGraph)
+        {
+            graphs.Add(LoadedGraph);
+            Debug.Log("test");
+            Debug.Log(graphs[0]);
+            if (gameObject.TryGetComponent(out SEEBranchCity sEEBranchCity))
+            {
+                Debug.Log("AdditionBeamColor: " + sEEBranchCity.AdditionBeamColor);
+                markerFactory = new MarkerFactory(markerWidth: sEEBranchCity.MarkerWidth,
+                                markerHeight: sEEBranchCity.MarkerHeight,
+                                additionColor: sEEBranchCity.AdditionBeamColor,
+                                changeColor: sEEBranchCity.ChangeBeamColor,
+                                deletionColor: sEEBranchCity.DeletionBeamColor);
+            }
+        }
+
         /// <summary>
         /// Sets the evolving series of <paramref name="graphs"/> to be visualized.
         /// The actual visualization is triggered by <see cref="ShowGraphEvolution"/>
@@ -598,6 +644,31 @@ namespace SEE.Game.Evolution
                           out equalEdges);
 
             Phase1RemoveDeletedGraphElements(next);
+        }
+
+        //Draw marks on Graph based on their toggle
+        public void DrawMarkOnGraph(Graph LoadedGraph)
+        {
+            //Debug.Log("LoadedGraph: " + LoadedGraph);
+            foreach (Node node in LoadedGraph.Nodes())
+            {
+                //Debug.Log("nodes: " + node);
+                if (node.HasToggle("IsNew"))
+                {
+                    //Debug.Log("Mark added");
+                    markerFactory.MarkBorn(GraphElementIDMap.Find(node.ID, true));
+                }
+                else if (node.HasToggle("IsDeleted"))
+                {
+                    //Debug.Log("Mark Removed");
+                    markerFactory.MarkDead(GraphElementIDMap.Find(node.ID, true));
+                }
+                else if (node.HasToggle("IsChanged"))
+                {
+                    //Debug.Log("GraphElementIDMap: " + GraphElementIDMap.Find(node.ID, true).ToString());
+                    markerFactory.MarkChanged(GraphElementIDMap.Find(node.ID, true));
+                }
+            }
         }
 
         /// <summary>

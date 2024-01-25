@@ -35,11 +35,16 @@ namespace SEE.Game.City
         public const string IsChanged = "IsChanged";
 
         /// <summary>
+        /// Name of the Inspector foldout group for the specific evolution setttings.
+        /// </summary>
+        private const string diffFoldoutGroup = "Diff settings";
+
+        /// <summary>
         /// This Graph will be used to store a graph and will be used as a flag
         /// </summary>
         static Graph tempGraph = null;
 
-        //private EvolutionRenderer evolutionRenderer;
+        private EvolutionRenderer evolutionRenderer; // not serialized by Unity; will be set in Start()
 
         /// <summary>
         /// The path to the GXL file containing the graph data.
@@ -48,19 +53,61 @@ namespace SEE.Game.City
         [ShowInInspector, Tooltip("Path of GXL file for the baseline graph"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         public FilePath BaselineGXLPath = new();
 
+        //-----------------------------------------------------
+        // Attributes to mark changes
+        //-----------------------------------------------------
+
+        /// <summary>
+        /// The height of posts used as markers for new and deleted elements.
+        /// </summary>
+        [Tooltip("The height of posts used as markers for new, changed, and deleted elements (>=0).")]
+        [SerializeField, ShowInInspector, FoldoutGroup(diffFoldoutGroup), RuntimeTab(diffFoldoutGroup)]
+        public float MarkerHeight = 0.2f;
+
+        /// <summary>
+        /// The width (x and z lengths) of posts used as markers for new and deleted elements.
+        /// </summary>
+        [Tooltip("The width (x and z lengths) of posts used as markers for new and deleted elements (>=0).")]
+        [SerializeField, ShowInInspector, FoldoutGroup(diffFoldoutGroup), RuntimeTab(diffFoldoutGroup)]
+        public float MarkerWidth = 0.01f;
+
+        /// <summary>
+        /// Color for power beams of newly added nodes, can be set in inspector
+        /// </summary>
+        [Tooltip("The color of the beam for newly created nodes.")]
+        [SerializeField, ShowInInspector, FoldoutGroup(diffFoldoutGroup), RuntimeTab(diffFoldoutGroup)]
+        public Color AdditionBeamColor = Color.green;
+
+        /// <summary>
+        /// Changed nodes beam color to be pickable in inspector
+        /// </summary>
+        [Tooltip("The color of the beam for changed nodes.")]
+        [SerializeField, ShowInInspector, FoldoutGroup(diffFoldoutGroup), RuntimeTab(diffFoldoutGroup)]
+        public Color ChangeBeamColor = Color.yellow;
+
+        /// <summary>
+        /// Deleted nodes beam color to be pickable in inspector
+        /// </summary>
+        [Tooltip("The color of the beam for deleted nodes.")]
+        [SerializeField, ShowInInspector, FoldoutGroup(diffFoldoutGroup), RuntimeTab(diffFoldoutGroup)]
+        public Color DeletionBeamColor = Color.black;
+
         /// <summary>
         /// Factory method to create the used EvolutionRenderer.
         /// </summary>
         /// <returns>the current or new evolution renderer attached to this city</returns>
-        /*protected EvolutionRenderer CreateEvolutionRenderer()
+        protected EvolutionRenderer CreateEvolutionRenderer()
         {
+            
             if (!gameObject.TryGetComponent(out EvolutionRenderer result))
             {
                 result = gameObject.AddComponent<EvolutionRenderer>();
-                result.SetUpGraph();
+                IList<Graph> graphList = new List<Graph>();
+                graphList.Add(LoadedGraph);
+                result.SetGraphEvolution2(graphList);
             }
             return result;
-        }*/
+        }
 
         /// <summary>
         /// First, <see cref=">SEECity.LoadData"/> will be called.
@@ -146,13 +193,10 @@ namespace SEE.Game.City
                           out ISet<Node> changedNodes,
                           out ISet<Node> equalNodes);
 
-
-
-
-            Debug.Log("addedNodes: " + addedNodes.Count);
-            Debug.Log("removedNodes: " + removedNodes.Count);
-            Debug.Log("changedNodes: " + changedNodes.Count);
-            Debug.Log("equalNodes: " + equalNodes.Count);
+            //Debug.Log("addedNodes: " + addedNodes.Count);
+            //Debug.Log("removedNodes: " + removedNodes.Count);
+            //Debug.Log("changedNodes: " + changedNodes.Count);
+            //Debug.Log("equalNodes: " + equalNodes.Count);
 
             MergeGraphElements(addedNodes, removedNodes, changedNodes, n => { LoadedGraph.AddNode(n); });
         }
@@ -173,7 +217,6 @@ namespace SEE.Game.City
                         out ISet<Edge> changedEdges,
                         out ISet<Edge> equalEdges);
 
-                
             MergeGraphElements(addedEdges, removedEdges, changedEdges, AddEdge);
 
             // Adds edge to LoadedGraph. Note: edge is assumed to be cloned
@@ -246,18 +289,56 @@ namespace SEE.Game.City
             }
         }
 
-        /*protected override void Start()
+        /// <summary>
+        /// Draws the graph.
+        /// Precondition: The graph and its metrics have been loaded.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "Draw Data")]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
+        [PropertyOrder(DataButtonsGroupOrderDraw)]
+        public override void DrawGraph()
+        {
+            base.DrawGraph();
+
+            //TEST 
+            evolutionRenderer = CreateEvolutionRenderer();
+            //gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
+            Debug.Log("evoRen grpCrnt: " + evolutionRenderer.GraphCurrent);
+            //Debug.Log("DrawMarkOnGraph");
+            evolutionRenderer.DrawMarkOnGraph(LoadedGraph);
+        }
+
+        protected override void Start()
         {
             base.Start();
-            Reset();
+            //Reset();
 
-            evolutionRenderer = CreateEvolutionRenderer();
-            evolutionRenderer.DrawMarkOnGraph(LoadedGraph);
+            //Debug.Log("CreateEvolutionRenderer");
+            //evolutionRenderer = CreateEvolutionRenderer();
+            //Debug.Log("DrawMarkOnGraph");
+            //evolutionRenderer.DrawMarkOnGraph(LoadedGraph);
 
             //gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
 
             //evolutionRenderer.ShowGraphEvolution();
-        }*/
+        }
+
+        /// <summary>
+        /// Destroys <see cref="firstGraph"/> if not <c>null</c>.
+        /// Postcondition: <see cref="firstGraph"/> will be <c>null</c>.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "Reset Data")]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset")]
+        [PropertyOrder(ResetButtonsGroupOrderReset)]
+        public override void Reset()
+        {
+            base.Reset();
+            //Remove Component
+            if (gameObject.TryGetComponent(out EvolutionRenderer evolutionRenderer))
+            {
+                DestroyImmediate(evolutionRenderer);
+            }
+        }
 
         #region Configuration file input/output
         //--------------------------------
@@ -268,17 +349,47 @@ namespace SEE.Game.City
         /// Label of attribute <see cref="BaselineGXLPath"/> in the configuration file.
         /// </summary>
         private const string baselineGXLPathLabel = "BaselineGXLPath";
+        /// <summary>
+        /// Label of attribute <see cref="MarkerHeight"/> in the configuration file.
+        /// </summary>
+        private const string markerHeightLabel = "MarkerHeight";
+        /// <summary>
+        /// Label of attribute <see cref="MarkerWidth"/> in the configuration file.
+        /// </summary>
+        private const string markerWidthLabel = "MarkerWidth";
+        /// <summary>
+        /// Label of attribute <see cref="AdditionBeamColor"/> in the configuration file.
+        /// </summary>
+        private const string additionBeamColorLabel = "AdditionBeamColor";
+        /// <summary>
+        /// Label of attribute <see cref="ChangeBeamColor"/> in the configuration file.
+        /// </summary>
+        private const string changeBeamColorLabel = "ChangeBeamColor";
+        /// <summary>
+        /// Label of attribute <see cref="DeletionBeamColor"/> in the configuration file.
+        /// </summary>
+        private const string deletionBeamColorLabel = "DeletionBeamColor";
 
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
             BaselineGXLPath.Save(writer, baselineGXLPathLabel);
+            writer.Save(MarkerHeight, markerHeightLabel);
+            writer.Save(MarkerWidth, markerWidthLabel);
+            writer.Save(AdditionBeamColor, additionBeamColorLabel);
+            writer.Save(ChangeBeamColor, changeBeamColorLabel);
+            writer.Save(DeletionBeamColor, deletionBeamColorLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
             BaselineGXLPath.Restore(attributes, baselineGXLPathLabel);
+            ConfigIO.Restore(attributes, markerHeightLabel, ref MarkerHeight);
+            ConfigIO.Restore(attributes, markerWidthLabel, ref MarkerWidth);
+            ConfigIO.Restore(attributes, additionBeamColorLabel, ref AdditionBeamColor);
+            ConfigIO.Restore(attributes, changeBeamColorLabel, ref ChangeBeamColor);
+            ConfigIO.Restore(attributes, deletionBeamColorLabel, ref DeletionBeamColor);
         }
         #endregion
     }
