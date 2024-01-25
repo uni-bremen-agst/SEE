@@ -52,12 +52,6 @@ namespace SEE.UI
 
             return new List<MenuEntry>
                     {
-                      new(selectAction: this.StartHost,
-                          unselectAction: null,
-                          title: "Host",
-                          description: "Starts a server and local client process.",
-                          entryColor: NextColor(),
-                          icon: Resources.Load<Sprite>("Icons/Host")),
                       new(selectAction: this.StartClient,
                           unselectAction: null,
                           title: "Client",
@@ -72,13 +66,7 @@ namespace SEE.UI
                           entryColor: NextColor(),
                           icon: Resources.Load<Sprite>("Icons/Client")),
 #endif
-                      // FIXME: Running only a server is currently not working.
-                      new (               selectAction: StartServer,
-                                          unselectAction: null,
-                                          title: "Server",
-                                         description: "Starts a dedicated server without local client.",
-                                          entryColor: NextColor(),
-                                          icon: Resources.Load<Sprite>("Icons/Server")),
+
                       new(selectAction: this.Settings,
                           unselectAction: null,
                           title: "Settings",
