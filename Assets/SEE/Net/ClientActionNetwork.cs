@@ -28,9 +28,9 @@ namespace SEE.Net
             {
                 ServerActionNetwork serverNetwork = GameObject.Find("Server").GetComponent<ServerActionNetwork>();
                 serverNetwork.SyncFilesServerRpc();
-                serverNetwork.SyncClientServerRpc(NetworkManager.Singleton.LocalClientId);
             }
         }
+
 
 
         /// <summary>
@@ -48,6 +48,7 @@ namespace SEE.Net
             if (webRequest.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("Error fetching source from backend: " + webRequest.error);
+                StartCoroutine(GetGxl());
             }
             else
             {
@@ -55,6 +56,7 @@ namespace SEE.Net
                 {
                     // unzip the source code
                     ZipFile.ExtractToDirectory(Application.streamingAssetsPath + "/Multiplayer/src.zip", Application.streamingAssetsPath + "/Multiplayer/src");
+                    StartCoroutine(GetGxl());
                 }
                 catch (Exception e)
                 {
@@ -78,6 +80,7 @@ namespace SEE.Net
             {
                 Debug.LogError("Error fetching source from backend: " + webRequest.error);
             }
+            StartCoroutine(GetConfig());
         }
 
         /// <summary>
@@ -95,6 +98,7 @@ namespace SEE.Net
             {
                 Debug.LogError("Error fetching source from backend: " + webRequest.error);
             }
+            StartCoroutine(GetSolution());
         }
 
         /// <summary>
@@ -111,7 +115,8 @@ namespace SEE.Net
             if (webRequest.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("Error fetching source from backend: " + webRequest.error);
-            } 
+            }
+            StartCoroutine(GetCsv());
         }
 
         /// <summary>
@@ -129,6 +134,8 @@ namespace SEE.Net
             {
                 Debug.LogError("Error fetching source from backend: " + webRequest.error);
             }
+            ServerActionNetwork serverNetwork = GameObject.Find("Server").GetComponent<ServerActionNetwork>();
+            serverNetwork.SyncClientServerRpc(NetworkManager.Singleton.LocalClientId);
         }
 
         /// <summary>
@@ -177,11 +184,6 @@ namespace SEE.Net
                 Directory.CreateDirectory(Application.streamingAssetsPath + "/Multiplayer/");
             }
             StartCoroutine(GetSource());
-            StartCoroutine(GetGxl());
-            StartCoroutine(GetCsv());
-            StartCoroutine(GetConfig());
-            StartCoroutine(GetSolution());
-
         }
     }
 }

@@ -550,7 +550,6 @@ namespace SEE.Net
                 try
                 {
                     NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
-                    //NetworkManager.Singleton.OnClientConnectedCallback += SyncServerStateToClientOnClientConnectCallback;
                     if (NetworkManager.Singleton.StartServer())
                     {
                         InitializeGame();
@@ -589,7 +588,6 @@ namespace SEE.Net
                 try
                 {
                     NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
-                    //NetworkManager.Singleton.OnClientConnectedCallback += SyncServerStateToClientOnClientConnectCallback;
                     if (NetworkManager.Singleton.StartHost())
                     {
                         InitializeGame();
