@@ -30,7 +30,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Displays the tree view window for each code city.
         /// </summary>
-        private void ShowCodeView()
+        private void ShowTreeView()
         {
             GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
             if (cities.Length == 0)
@@ -47,9 +47,9 @@ namespace SEE.Controls.Actions
                     {
                         continue;
                     }
-                    if (!gameObject.TryGetComponent(out TreeWindow window))
+                    if (!cityObject.TryGetComponent(out TreeWindow window))
                     {
-                        window = gameObject.AddComponent<TreeWindow>();
+                        window = cityObject.AddComponent<TreeWindow>();
                         window.Graph = city.LoadedGraph;
                     }
                     treeWindows.Add(city.name, window);
@@ -80,7 +80,7 @@ namespace SEE.Controls.Actions
         /// Close all tree view windows.
         /// It is assumed that this method is called from a toggle action.
         /// </summary>
-        private void HideCodeView()
+        private void HideTreeView()
         {
             // If none of the windows were actually closed, we should instead open them.
             bool anyClosed = false;
@@ -91,7 +91,7 @@ namespace SEE.Controls.Actions
             treeWindows.Clear();
             if (!anyClosed)
             {
-                ShowCodeView();
+                ShowTreeView();
             }
         }
 
@@ -101,11 +101,11 @@ namespace SEE.Controls.Actions
             {
                 if (treeWindows.Count == 0)
                 {
-                    ShowCodeView();
+                    ShowTreeView();
                 }
                 else
                 {
-                    HideCodeView();
+                    HideTreeView();
                 }
             }
         }
