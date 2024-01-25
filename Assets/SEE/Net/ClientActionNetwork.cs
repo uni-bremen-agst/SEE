@@ -37,8 +37,9 @@ namespace SEE.Net
         /// Fetches the Source file from the backend which should be a zipped file and unzips it.
         /// </summary>
         IEnumerator GetSource()
-        { 
-            using UnityWebRequest webRequest = UnityWebRequest.Get("http://"  + Network.Instance.BackendDomain + "/api/v1/file/client/source?serverId=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
+        {
+            Debug.Log("DOMAIN IS: " + Network.BackendDomain);
+            using UnityWebRequest webRequest = UnityWebRequest.Get("http://"  + Network.BackendDomain + "/api/v1/file/client/source?serverId=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
             webRequest.downloadHandler = new DownloadHandlerFile(Application.streamingAssetsPath + "/Multiplayer/src.zip");
 
             // Request and wait for the desired page.
@@ -67,7 +68,7 @@ namespace SEE.Net
         /// </summary>
         IEnumerator GetGxl()
         {
-            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.Instance.BackendDomain + "/api/v1/file/client/gxl?serverId=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
+            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.BackendDomain + "/api/v1/file/client/gxl?serverId=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
             webRequest.downloadHandler = new DownloadHandlerFile(Application.streamingAssetsPath + "/Multiplayer/multiplayer.gxl");
 
             // Request and wait for the desired page.
@@ -84,7 +85,7 @@ namespace SEE.Net
         /// </summary>
         IEnumerator GetConfig()
         {
-            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.Instance.BackendDomain + "/api/v1/file/client/csv?serverId=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
+            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.BackendDomain + "/api/v1/file/client/csv?serverId=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
             webRequest.downloadHandler = new DownloadHandlerFile(Application.streamingAssetsPath + "/Multiplayer/multiplayer.cfg");
 
             // Request and wait for the desired page.
@@ -101,7 +102,7 @@ namespace SEE.Net
         /// </summary>
         IEnumerator GetSolution()
         {
-            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.Instance.BackendDomain + "/api/v1/file/client/solution?serverId=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
+            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.BackendDomain + "/api/v1/file/client/solution?serverId=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
             webRequest.downloadHandler = new DownloadHandlerFile(Application.streamingAssetsPath + "/Multiplayer/multiplayer.sln");
 
             // Request and wait for the desired page.
@@ -118,7 +119,7 @@ namespace SEE.Net
         /// </summary>
         IEnumerator GetCsv()
         {
-            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.Instance.BackendDomain + "/api/v1/file/client/csv?serverId=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
+            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.BackendDomain + "/api/v1/file/client/csv?serverId=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
             webRequest.downloadHandler = new DownloadHandlerFile(Application.streamingAssetsPath + "/Multiplayer/multiplayer.csv");
 
             // Request and wait for the desired page.
@@ -166,9 +167,10 @@ namespace SEE.Net
         /// Then fetches the 
         /// </summary>
         [ClientRpc]
-        public void SyncFilesClientRpc(string serverId)
+        public void SyncFilesClientRpc(string serverId, string backendDomain)
         {
             Network.ServerId = serverId;
+            Network.BackendDomain = backendDomain;
             if(Directory.Exists(Application.streamingAssetsPath + "/Multiplayer/"))
             {
                 Directory.Delete(Application.streamingAssetsPath + "/Multiplayer/", true);

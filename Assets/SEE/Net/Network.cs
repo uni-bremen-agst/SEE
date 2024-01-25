@@ -46,7 +46,7 @@ namespace SEE.Net
         /// <summary>
         /// Address of the backend server where the files are stored
         /// </summary>
-        public string BackendDomain;
+        public static string BackendDomain;
 
         /// <summary>
         /// The port of the server where the server listens to SEE action requests.

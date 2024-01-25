@@ -76,7 +76,7 @@ namespace SEE.Net
             {
                 NetworkClient client = NetworkManager.Singleton.ConnectedClients[clientId];
                 ClientActionNetwork clientNetwork = client.PlayerObject.GetComponent<ClientActionNetwork>();
-                clientNetwork.SyncFilesClientRpc(Network.ServerId);
+                clientNetwork.SyncFilesClientRpc(Network.ServerId, Network.BackendDomain);
             }
         }
     }
