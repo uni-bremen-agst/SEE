@@ -655,6 +655,11 @@ namespace SEE.Utils
         {
             SEECityAttributesAreEqual(expected, actual);
             AreEqual(expected.BaselineGXLPath, actual.BaselineGXLPath);
+            Assert.AreEqual(expected.MarkerHeight, actual.MarkerHeight);
+            Assert.AreEqual(expected.MarkerWidth, actual.MarkerWidth);
+            AreEqual(expected.AdditionBeamColor, actual.AdditionBeamColor);
+            AreEqual(expected.ChangeBeamColor, actual.ChangeBeamColor);
+            AreEqual(expected.DeletionBeamColor, actual.DeletionBeamColor);
         }
 
         /// <summary>
@@ -786,6 +791,11 @@ namespace SEE.Utils
         {
             WipeOutSEECityAttributes(city);
             city.BaselineGXLPath.Set("C:/MyAbsoluteDirectory/MyBaselineFile.gxl");
+            city.MarkerHeight++;
+            city.MarkerWidth++;
+            city.AdditionBeamColor = Color.clear;
+            city.ChangeBeamColor = Color.clear;
+            city.DeletionBeamColor = Color.clear;
         }
 
         /// <summary>
