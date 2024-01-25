@@ -36,45 +36,83 @@ public class VersionControlSystems : MonoBehaviour
                 }
                 else
                 {
-                    // Get commit, to find possible renames.
-                    var newCommit = repo.Lookup<Commit>(newCommitID);
-
-                    // Set up the diff options.
-                    var compareOptions = new CompareOptions
-                    {
-                        Similarity = new SimilarityOptions
-                        {
-                            RenameDetectionMode = RenameDetectionMode.Default,
-                            RenameThreshold = 50,
-                        }
-                    };
-
-                    // Compare the commits
-                    var changes = repo.Diff.Compare<TreeChanges>(newCommit.Tree, oldCommit.Tree, compareOptions);
-                    foreach (TreeEntryChanges change in changes)
-                    {
-                        string changeInfo = change.Status.ToString();
-                        string changeInff = change.OldPath.ToString();
-                        string changeInf = change.Path.ToString();
-                        Debug.Log(changeInfo);
-                        Debug.Log(changeInff);
-                        Debug.Log(changeInf);
-                        if ((change.Status == ChangeKind.Renamed || change.Status == ChangeKind.TypeChanged) &&
-                            (change.Path == fileName || change.OldPath == fileName))
-                        {
-                            name = change.Path;
-                            // Get renamed file from commit.
-                            var renamedBlob = oldCommit[change.Path]?.Target as Blob;
-                            if (renamedBlob != null)
-                            {
-                                return renamedBlob.GetContentText();
-                            }
-                        }
-                    }
                     return "Datei nicht gefunden.";
                 }
             }
         }
+        public string ShowOriginal(string repositoryPath, string fileName, string oldCommitID, string newCommitID)
+        {
+            var repo = new Repository(repositoryPath);
+            // Get commit, to find possible renames.
+            var newCommit = repo.Lookup<Commit>(newCommitID);
+            var oldCommit = repo.Lookup<Commit>(oldCommitID);
+
+            // Set up the diff options.
+            var compareOptions = new CompareOptions
+            {
+                Algorithm = DiffAlgorithm.Myers,
+                Similarity = new SimilarityOptions
+                {
+                    RenameDetectionMode = RenameDetectionMode.CopiesHarder,
+                    RenameThreshold = 20,
+                    BreakRewriteThreshold = 70,
+                    RenameFromRewriteThreshold = 99,
+                    CopyThreshold = 90,
+                    RenameLimit = 1,
+                }
+            };
+            // Compare the commits
+            var changes = repo.Diff.Compare<TreeChanges>(oldCommit.Tree, newCommit.Tree, compareOptions);
+            foreach (TreeEntryChanges change in changes)
+            {
+                string changeInfo = change.Status.ToString();
+                string changeInff = change.OldPath.ToString();
+                string changeInf = change.Path.ToString();
+                string a = change.Exists.ToString();
+                string b = change.OldExists.ToString();
+                Debug.Log(changeInfo);
+                Debug.Log(changeInff);
+                Debug.Log(changeInf);
+                Debug.Log(a);
+                Debug.Log(b);
+                // Case: file got renamed.
+                if ((change.Status == ChangeKind.Renamed || change.Status == ChangeKind.Copied) &&
+                    (change.Path == fileName || change.OldPath == fileName))
+                {
+                    // Change the filename in the codewindow.
+                    name = change.Path;
+                    // Get renamed file from commit.
+                    var renamedBlob = newCommit[change.Path]?.Target as Blob;
+                    if (renamedBlob != null)
+                    {
+                        return renamedBlob.GetContentText();
+                    }
+                }
+                // Case: File got Added.
+                if (change.Status == ChangeKind.Added && change.Path == fileName)
+                {
+                    return "";
+                }
+                // Case: File got deleted.
+                if (!change.Exists && change.Path == fileName)
+                {
+                    return "";
+                }
+            }
+
+            var blob = newCommit[fileName]?.Target as Blob;
+
+            if (blob != null)
+            {
+                // Get content from file
+                return blob.GetContentText();
+            }
+            else
+            {
+                return "";
+            }
+        }
+
         public string ShowName()
         {
             return name;
@@ -91,7 +129,12 @@ public class VersionControlSystems : MonoBehaviour
                 // Maybe use SharpSvn
                 return $"SVN show {fileName}";
             }
-            
+            public string ShowOriginal(string repositoryPath, string fileName, string oldCommitID, string newCommitID)
+            {
+                // Implement SVN-specific logic here
+                // Maybe use SharpSvn
+                return $"SVN show {fileName}";
+            }
             public string ShowName() { return null; }
         }
 
