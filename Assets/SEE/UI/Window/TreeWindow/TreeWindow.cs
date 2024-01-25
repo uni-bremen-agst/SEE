@@ -1,4 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Cysharp.Threading.Tasks;
+using SEE.DataModel;
 using SEE.DataModel.DG;
+using SEE.DataModel.GraphSearch;
+using SEE.UI.Notification;
+using SEE.Utils;
+using UnityEngine;
 
 namespace SEE.UI.Window.TreeWindow
 {
@@ -9,7 +18,7 @@ namespace SEE.UI.Window.TreeWindow
     /// Each item represents a node in the graph.
     /// In addition to its children, the expanded form of an item also shows its connected edges.
     /// </summary>
-    public partial class TreeWindow : BaseWindow
+    public partial class TreeWindow : BaseWindow, IObserver<ChangeEvent>
     {
         /// <summary>
         /// Path to the tree window content prefab.
@@ -21,32 +30,116 @@ namespace SEE.UI.Window.TreeWindow
         /// </summary>
         private const string treeItemPrefab = "Prefabs/UI/TreeViewItem";
 
-        // TODO: In the future, distinguish by node/edge type as well for the icons.
-        /// <summary>
-        /// The unicode character for a node.
-        /// </summary>
-        private const char nodeTypeUnicode = '\uf1b2';
-
-        /// <summary>
-        /// The unicode character for an edge.
-        /// </summary>
-        private const char edgeTypeUnicode = '\uf542';
-
-        /// <summary>
-        /// The unicode character for outgoing edges.
-        /// </summary>
-        private const char outgoingEdgeUnicode = '\uf2f5';
-
-        /// <summary>
-        /// The unicode character for incoming edges.
-        /// </summary>
-        private const char incomingEdgeUnicode = '\uf2f6';
-
         /// <summary>
         /// The graph to be displayed.
         /// Must be set before starting the window.
         /// </summary>
         public Graph Graph;
+
+        /// <summary>
+        /// The search helper used to search for elements in the graph.
+        /// We also use this to keep track of the current filter, sort, and group settings.
+        /// </summary>
+        private GraphSearch searcher;
+
+        /// <summary>
+        /// Transform of the object containing the items of the tree window.
+        /// </summary>
+        private RectTransform items;
+
+        /// <summary>
+        /// The context menu that is displayed when the user right-clicks on an item
+        /// or uses the filter or sort buttons.
+        /// </summary>
+        private TreeWindowContextMenu contextMenu;
+
+        /// <summary>
+        /// The grouper that is used to group the elements in the tree window.
+        /// </summary>
+        private TreeWindowGrouper grouper;
+
+        /// <summary>
+        /// The subscription to the graph observable.
+        /// </summary>
+        private IDisposable subscription;
+
+        protected override void Start()
+        {
+            searcher = new GraphSearch(Graph);
+            grouper = new TreeWindowGrouper(searcher.Filter, Graph);
+            subscription = Graph.Subscribe(this);
+            base.Start();
+        }
+
+        private void OnDestroy()
+        {
+            subscription.Dispose();
+        }
+
+        /// <summary>
+        /// Returns the roots for the tree view.
+        /// </summary>
+        /// <param name="inGroup">The group to which the roots should belong.</param>
+        /// <returns>The roots for the tree view.</returns>
+        /// <remarks>
+        /// The roots for the tree view may differ from the roots of the graph, such as when the graph is grouped.
+        /// </remarks>
+        private IList<Node> GetRoots(TreeWindowGroup inGroup = null)
+        {
+            return WithHiddenChildren(Graph.GetRoots(), inGroup).ToList();
+        }
+
+        /// <summary>
+        /// Adds the roots of the graph to the tree view.
+        /// It may take up to a frame to add and reorder all items, hence this method is asynchronous.
+        /// </summary>
+        private async UniTask AddRootsAsync()
+        {
+            if (grouper.IsActive)
+            {
+                // Instead of the roots, we should add the categories as the first level.
+                foreach (TreeWindowGroup group in grouper.AllGroups)
+                {
+                    if (grouper.MembersInGroup(group) > 0)
+                    {
+                        AddGroup(group);
+                    }
+                }
+            }
+            else
+            {
+                IList<Node> roots = GetRoots();
+                if (roots.Count == 0)
+                {
+                    ShowNotification.Warn("Empty graph", "Graph has no roots. TreeView will be empty.");
+                    return;
+                }
+
+                foreach (Node root in roots)
+                {
+                    AddNode(root);
+                }
+                await UniTask.Yield();
+                foreach (Node root in roots)
+                {
+                    OrderTree(root);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Clears the tree view of all items.
+        /// </summary>
+        private void ClearTree()
+        {
+            foreach (Transform child in items)
+            {
+                if (child != null)
+                {
+                    Destroyer.Destroy(child.gameObject);
+                }
+            }
+        }
 
         public override void RebuildLayout()
         {
@@ -56,17 +149,43 @@ namespace SEE.UI.Window.TreeWindow
         protected override void InitializeFromValueObject(WindowValues valueObject)
         {
             // TODO: Should tree windows be sent over the network?
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override void UpdateFromNetworkValueObject(WindowValues valueObject)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override WindowValues ToValueObject()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
+        }
+
+        public void OnCompleted()
+        {
+            // Graph has been destroyed.
+            Destroyer.Destroy(this);
+        }
+
+        public void OnError(Exception error)
+        {
+            throw error;
+        }
+
+        public void OnNext(ChangeEvent value)
+        {
+            // Rebuild tree when graph changes.
+            switch (value)
+            {
+                case EdgeChange:
+                case EdgeEvent:
+                case GraphElementTypeEvent:
+                case HierarchyEvent:
+                case NodeEvent:
+                    Rebuild();
+                    break;
+            }
         }
     }
 }

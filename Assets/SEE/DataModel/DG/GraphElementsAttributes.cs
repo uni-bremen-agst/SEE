@@ -173,11 +173,23 @@ namespace SEE.DataModel.DG
         /// Returns the union of <see cref="AllNumericNodeAttributes()"/>
         /// and <see cref="AllNumericEdgeAttributes()"/>.
         /// </summary>
-        /// <returns>names of all numeric (int or float) node attributes</returns>
+        /// <returns>names of all numeric (int or float) attributes</returns>
         public ISet<string> AllNumericAttributes()
         {
             ISet<string> result = AllNumericNodeAttributes();
             result.UnionWith(AllNumericEdgeAttributes());
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the union of <see cref="AllStringNodeAttributes()"/>
+        /// and <see cref="AllStringEdgeAttributes()"/>.
+        /// </summary>
+        /// <returns>names of all string attributes</returns>
+        public ISet<string> AllStringAttributes()
+        {
+            ISet<string> result = AllStringNodeAttributes();
+            result.UnionWith(AllStringEdgeAttributes());
             return result;
         }
 

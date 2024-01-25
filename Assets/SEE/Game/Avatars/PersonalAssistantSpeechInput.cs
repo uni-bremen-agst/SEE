@@ -228,7 +228,7 @@ namespace SEE.Game.Avatars
             {
                 ChatResponse result = await openAiClient.ChatEndpoint.GetCompletionAsync(request);
                 notification.Close();
-                string message = result.FirstChoice.Message.Content;
+                string message = result.FirstChoice.Message.Content.ToString();
                 chatGptHistory.Add(new Message(Role.Assistant, message));
                 // We need to stop listening before we start speaking, else we will hear our own voice.
                 StopListening();

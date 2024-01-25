@@ -108,7 +108,7 @@ namespace SEE.Utils.IdeRPC
         /// </summary>
         /// <exception cref="JsonRpcServerCreationFailedException">A server instance couldn't be initiated.</exception>
         /// <param name="maxClients">The maximal number of clients that can connect to the server.</param>
-        public async UniTask Start(uint maxClients)
+        public async UniTask StartAsync(uint maxClients)
         {
             if (Server.Status != UniTaskStatus.Pending)
             {

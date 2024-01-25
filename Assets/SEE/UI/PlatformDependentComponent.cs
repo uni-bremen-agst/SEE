@@ -54,7 +54,11 @@ namespace SEE.UI
         /// <summary>
         /// Initializes the component for the current platform.
         /// </summary>
-        protected void Start()
+        /// <remarks>
+        /// Only override this if you need to execute platform-independent code on startup.
+        /// Otherwise, use <see cref="StartDesktop"/>, <see cref="StartVR"/> or <see cref="StartTouchGamepad"/>.
+        /// </remarks>
+        protected virtual void Start()
         {
             // initializes the Canvas if necessary
             if (Canvas == null)
@@ -89,7 +93,7 @@ namespace SEE.UI
             // initialization finished
             HasStarted = true;
             OnStartFinished();
-            OnMenuInitialized?.Invoke();
+            OnComponentInitialized?.Invoke();
         }
 
         /// <summary>
@@ -163,8 +167,8 @@ namespace SEE.UI
         protected virtual void OnStartFinished() { }
 
         /**
-         * Triggers when the menu is initialized. (<see cref="Start"/> and <see cref="HasStarted"/>)
+         * Triggers when the component has been initialized, i.e., when the Start() method has been called.
          */
-        public event UnityAction OnMenuInitialized;
+        public event UnityAction OnComponentInitialized;
     }
 }

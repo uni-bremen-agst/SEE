@@ -187,35 +187,6 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Adds a texture to <paramref name="material"/>.
-        /// </summary>
-        /// <param name="material">material to which a texture should be added</param>
-        private static void AddTexture(Material material)
-        {
-            if (material.HasProperty(texturePropertyID))
-            {
-                if (false)
-                {
-                    material.SetTexture(texturePropertyID, NewTexture());
-                }
-                else
-                {
-                    const string textureName = "Textures/TestTexture";
-                    Texture texture = Resources.Load<Texture>(textureName);
-                    if (texture == null)
-                    {
-                        Debug.LogError($"No such texture {textureName}\n");
-                    }
-                    else
-                    {
-                        //Debug.Log($"_Texture: {texture.name}\n");
-                        material.SetTexture(texturePropertyID, texture);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// Adds <paramref name="texture"/> to <paramref name="material"/> as <see cref="TexturePropertyName"/>
         /// if <paramref name="material"/> has this property. If not, nothing happens. Likewise, if <paramref name="texture"/>
         /// is null, nothing happens.
@@ -227,46 +198,6 @@ namespace SEE.GO
             if (texture != null && material.HasProperty(texturePropertyID))
             {
                 material.SetTexture(texturePropertyID, texture);
-            }
-        }
-
-        /// <summary>
-        /// Creates and returns a new texture.
-        /// Note: This method is currently used only to demonstrate on how to
-        /// create a texture.
-        /// </summary>
-        /// <returns>a new texture</returns>
-        private static Texture NewTexture()
-        {
-            Texture2D result = new Texture2D(512, 512);
-
-            Color visible = new Color(1, 1, 1, 1);
-            Color invisible = new Color(0, 0, 0, 0);
-
-            for (int x = 0; x < result.width; x++)
-            {
-                for (int y = 0; y < result.height; y++)
-                {
-                    if (y % 5 == 0)
-                    {
-                        result.SetPixel(x, y, invisible);
-                    }
-                    else
-                    {
-                        result.SetPixel(x, y, visible);
-                    }
-                }
-            }
-            result.Apply();
-            // SaveTexture(result);
-            return result;
-
-            static void SaveTexture(Texture2D result)
-            {
-                byte[] bytes = result.EncodeToPNG();
-                string path = Application.dataPath + "/Resources/Textures/TestTexture.png";
-                System.IO.File.WriteAllBytes(path, bytes);
-                Debug.Log($"Texture written to {path}.\n");
             }
         }
 

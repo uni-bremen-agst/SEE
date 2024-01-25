@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using NUnit.Framework;
 using SEE.Game;
 using SEE.Game.City;
@@ -265,20 +266,27 @@ namespace SEE.Utils
         [Test]
         public void TestMetricColorMapZeroElements()
         {
-            const string filename = "metricmap.cfg";
+            string filename = Path.GetTempFileName();
             const string label = "metricMap";
 
-            ColorMap saved = new ColorMap();
+            try
             {
-                using ConfigWriter writer = new ConfigWriter(filename);
-                saved.Save(writer, label);
+                ColorMap saved = new();
+                {
+                    using ConfigWriter writer = new(filename);
+                    saved.Save(writer, label);
+                }
+                ColorMap loaded = new();
+                {
+                    using ConfigReader stream = new(filename);
+                    loaded.Restore(stream.Read(), label);
+                }
+                AreEqualMetricColorMap(saved, loaded);
             }
-            ColorMap loaded = new ColorMap();
+            finally
             {
-                using ConfigReader stream = new ConfigReader(filename);
-                loaded.Restore(stream.Read(), label);
+                FileIO.DeleteIfExists(filename);
             }
-            AreEqualMetricColorMap(saved, loaded);
         }
 
         /// <summary>
@@ -287,30 +295,39 @@ namespace SEE.Utils
         [Test]
         public void TestMetricColorMapOneElement()
         {
-            const string filename = "metricmap.cfg";
+            string filename = Path.GetTempFileName();
             const string label = "metricMap";
 
-            ColorMap saved = new ColorMap();
-            ColorRange colorRange = NewColorRange(Color.green, Color.cyan, 5);
-            saved["metricX"] = colorRange;
+            try
             {
-                using ConfigWriter writer = new ConfigWriter(filename);
-                saved.Save(writer, label);
+                ColorMap saved = new();
+                ColorRange colorRange = NewColorRange(Color.green, Color.cyan, 5);
+                saved["metricX"] = colorRange;
+                {
+                    using ConfigWriter writer = new(filename);
+                    saved.Save(writer, label);
+                }
+                ColorMap loaded = new();
+                {
+                    using ConfigReader stream = new(filename);
+                    loaded.Restore(stream.Read(), label);
+                }
+                AreEqualMetricColorMap(saved, loaded);
             }
-            ColorMap loaded = new ColorMap();
+            finally
             {
-                using ConfigReader stream = new ConfigReader(filename);
-                loaded.Restore(stream.Read(), label);
+                FileIO.DeleteIfExists(filename);
             }
-            AreEqualMetricColorMap(saved, loaded);
         }
 
         private static ColorRange NewColorRange(Color lower, Color upper, uint numberOfColors)
         {
-            ColorRange colorRange = new ColorRange();
-            colorRange.Lower = lower;
-            colorRange.Upper = upper;
-            colorRange.NumberOfColors = numberOfColors;
+            ColorRange colorRange = new()
+            {
+                Lower = lower,
+                Upper = upper,
+                NumberOfColors = numberOfColors
+            };
             return colorRange;
         }
 
@@ -320,22 +337,29 @@ namespace SEE.Utils
         [Test]
         public void TestMetricColorMapTwoElements()
         {
-            const string filename = "metricmap.cfg";
+            string filename = Path.GetTempFileName();
             const string label = "metricMap";
 
-            ColorMap saved = new ColorMap();
-            saved["metricX"] = NewColorRange(Color.white, Color.grey, 10);
-            saved["metricY"] = NewColorRange(Color.grey, Color.black, 3);
+            try
             {
-                using ConfigWriter writer = new ConfigWriter(filename);
-                saved.Save(writer, label);
+                ColorMap saved = new();
+                saved["metricX"] = NewColorRange(Color.white, Color.grey, 10);
+                saved["metricY"] = NewColorRange(Color.grey, Color.black, 3);
+                {
+                    using ConfigWriter writer = new(filename);
+                    saved.Save(writer, label);
+                }
+                ColorMap loaded = new();
+                {
+                    using ConfigReader stream = new(filename);
+                    loaded.Restore(stream.Read(), label);
+                }
+                AreEqualMetricColorMap(saved, loaded);
             }
-            ColorMap loaded = new ColorMap();
+            finally
             {
-                using ConfigReader stream = new ConfigReader(filename);
-                loaded.Restore(stream.Read(), label);
+                FileIO.DeleteIfExists(filename);
             }
-            AreEqualMetricColorMap(saved, loaded);
         }
 
         private void AreEqualMetricColorMap(ColorMap saved, ColorMap loaded)
@@ -353,58 +377,109 @@ namespace SEE.Utils
         [Test]
         public void TestAntennaAttributes()
         {
-            AntennaAttributes saved = new AntennaAttributes();
+            AntennaAttributes saved = new();
             saved.AntennaSections.Add("metricA");
             saved.AntennaSections.Add("metricB");
 
-            const string filename = "antenna.cfg";
-            const string label = "Antenna";
+            string filename = Path.GetTempFileName();
+            try
             {
-                using ConfigWriter writer = new ConfigWriter(filename);
-                saved.Save(writer, label);
+                const string label = "Antenna";
+                {
+                    using ConfigWriter writer = new(filename);
+                    saved.Save(writer, label);
+                }
+                AntennaAttributes loaded = new();
+                {
+                    using ConfigReader stream = new(filename);
+                    loaded.Restore(stream.Read(), label);
+                }
+                AreEqualAntennaSettings(saved, loaded);
             }
-            AntennaAttributes loaded = new AntennaAttributes();
+            finally
             {
-                using ConfigReader stream = new ConfigReader(filename);
-                loaded.Restore(stream.Read(), label);
+                FileIO.DeleteIfExists(filename);
             }
-            AreEqualAntennaSettings(saved, loaded);
         }
 
         /// <summary>
-        /// Test for SEECity.
+        /// Test for <see cref="SEECity"/>.
         /// </summary>
         [Test]
         public void TestSEECity()
         {
-            string filename = "seecity.cfg";
+            string filename = Path.GetTempFileName();
             // First save a new city with all its default values.
             SEECity savedCity = NewVanillaSEECity<SEECity>();
             // FIXME: We need tests for the antenna settings
             //savedCity.LeafNodeSettings.AntennaSettings.AntennaSections.Add(new AntennaSection("leafmetric", Color.white));
             //savedCity.InnerNodeSettings.AntennaSettings.AntennaSections.Add(new AntennaSection("innermetric", Color.black));
-            VisualNodeAttributes function = new VisualNodeAttributes()
+            VisualNodeAttributes function = new()
             {
                 IsRelevant = true
             };
-            VisualNodeAttributes file = new VisualNodeAttributes()
+            VisualNodeAttributes file = new()
             {
                 IsRelevant = false
             };
-            savedCity.NodeTypes = new NodeTypeVisualsMap();
-            savedCity.NodeTypes["Function"] = function;
-            savedCity.NodeTypes["File"] = file;
-            savedCity.Save(filename);
+            try
+            {
+                savedCity.NodeTypes = new NodeTypeVisualsMap();
+                savedCity.NodeTypes["Function"] = function;
+                savedCity.NodeTypes["File"] = file;
+                savedCity.Save(filename);
 
-            // Create a new city with all its default values and then
-            // wipe out all its attributes to see whether they are correctly
-            // restored from the saved configuration file.
-            SEECity loadedCity = NewVanillaSEECity<SEECity>();
-            WipeOutSEECityAttributes(loadedCity);
-            // Load the saved attributes from the configuration file.
-            loadedCity.Load(filename);
+                // Create a new city with all its default values and then
+                // wipe out all its attributes to see whether they are correctly
+                // restored from the saved configuration file.
+                SEECity loadedCity = NewVanillaSEECity<SEECity>();
+                WipeOutSEECityAttributes(loadedCity);
+                // Load the saved attributes from the configuration file.
+                loadedCity.Load(filename);
 
-            SEECityAttributesAreEqual(savedCity, loadedCity);
+                SEECityAttributesAreEqual(savedCity, loadedCity);
+            }
+            finally
+            {
+                FileIO.DeleteIfExists(filename);
+            }
+        }
+
+        /// <summary>
+        /// Test for <see cref="DiffCity"/>.
+        /// </summary>
+        /// <remarks>We test only the attributes specific to <see cref="DiffCity"/>
+        /// excluding those just inherited. We trust that the inherited attributes
+        /// are tested by <see cref="TestSEECity"/>.</remarks>
+        [Test]
+        public void TestDiffCity()
+        {
+            string filename = Path.GetTempFileName();
+            string vcsPath = "/c/mypath/myvcs";
+
+            try
+            {
+                // First save a new city with all its default values.
+                DiffCity savedCity = NewVanillaSEECity<DiffCity>();
+                savedCity.VCSPath = new(vcsPath);
+                savedCity.OldRevision = "old revision";
+                savedCity.NewRevision = "new revision";
+                savedCity.Save(filename);
+
+                // Create a new city with all its default values and then
+                // wipe out all its attributes to see whether they are correctly
+                // restored from the saved configuration file.
+                DiffCity loadedCity = NewVanillaSEECity<DiffCity>();
+                WipeOutDiffCityAttributes(loadedCity);
+                // Load the saved attributes from the configuration file.
+                loadedCity.Load(filename);
+
+                DiffCityAttributesAreEqual(savedCity, loadedCity);
+            }
+            finally
+            {
+                FileIO.DeleteIfExists(filename);
+            }
         }
 
         /// <summary>
@@ -413,20 +488,27 @@ namespace SEE.Utils
         [Test]
         public void TestSEEEvolutionCity()
         {
-            string filename = "seerandomcity.cfg";
-            // First save a new city with all its default values.
-            SEECityEvolution savedCity = NewVanillaSEECity<SEECityEvolution>();
-            savedCity.Save(filename);
+            string filename = Path.GetTempFileName();
+            try
+            {
+                // First save a new city with all its default values.
+                SEECityEvolution savedCity = NewVanillaSEECity<SEECityEvolution>();
+                savedCity.Save(filename);
 
-            // Create a new city with all its default values and then
-            // wipe out all its attributes to see whether they are correctly
-            // restored from the saved configuration file.
-            SEECityEvolution loadedCity = NewVanillaSEECity<SEECityEvolution>();
-            WipeOutSEEEvolutionCityAttributes(loadedCity);
-            // Load the saved attributes from the configuration file.
-            loadedCity.Load(filename);
+                // Create a new city with all its default values and then
+                // wipe out all its attributes to see whether they are correctly
+                // restored from the saved configuration file.
+                SEECityEvolution loadedCity = NewVanillaSEECity<SEECityEvolution>();
+                WipeOutSEEEvolutionCityAttributes(loadedCity);
+                // Load the saved attributes from the configuration file.
+                loadedCity.Load(filename);
 
-            SEEEvolutionCityAttributesAreEqual(savedCity, loadedCity);
+                SEEEvolutionCityAttributesAreEqual(savedCity, loadedCity);
+            }
+            finally
+            {
+                FileIO.DeleteIfExists(filename);
+            }
         }
 
         /// <summary>
@@ -435,20 +517,27 @@ namespace SEE.Utils
         [Test]
         public void TestSEERandomCity()
         {
-            string filename = "seerandomcity.cfg";
-            // First save a new city with all its default values.
-            SEECityRandom savedCity = NewVanillaSEECity<SEECityRandom>();
-            savedCity.Save(filename);
+            string filename = Path.GetTempFileName();
+            try
+            {
+                // First save a new city with all its default values.
+                SEECityRandom savedCity = NewVanillaSEECity<SEECityRandom>();
+                savedCity.Save(filename);
 
-            // Create a new city with all its default values and then
-            // wipe out all its attributes to see whether they are correctly
-            // restored from the saved configuration file.
-            SEECityRandom loadedCity = NewVanillaSEECity<SEECityRandom>();
-            WipeOutSEERandomCityAttributes(loadedCity);
-            // Load the saved attributes from the configuration file.
-            loadedCity.Load(filename);
+                // Create a new city with all its default values and then
+                // wipe out all its attributes to see whether they are correctly
+                // restored from the saved configuration file.
+                SEECityRandom loadedCity = NewVanillaSEECity<SEECityRandom>();
+                WipeOutSEERandomCityAttributes(loadedCity);
+                // Load the saved attributes from the configuration file.
+                loadedCity.Load(filename);
 
-            SEERandomCityAttributesAreEqual(savedCity, loadedCity);
+                SEERandomCityAttributesAreEqual(savedCity, loadedCity);
+            }
+            finally
+            {
+                FileIO.DeleteIfExists(filename);
+            }
         }
 
         /// <summary>
@@ -457,20 +546,27 @@ namespace SEE.Utils
         [Test]
         public void TestSEEJlgCity()
         {
-            string filename = "seejlgcity.cfg";
-            // First save a new city with all its default values.
-            SEEJlgCity savedCity = NewVanillaSEECity<SEEJlgCity>();
-            savedCity.Save(filename);
+            string filename = Path.GetTempFileName();
+            try
+            {
+                // First save a new city with all its default values.
+                SEEJlgCity savedCity = NewVanillaSEECity<SEEJlgCity>();
+                savedCity.Save(filename);
 
-            // Create a new city with all its default values and then
-            // wipe out all its attributes to see whether they are correctly
-            // restored from the saved configuration file.
-            SEEJlgCity loadedCity = NewVanillaSEECity<SEEJlgCity>();
-            WipeOutSEEJlgCityAttributes(loadedCity);
-            // Load the saved attributes from the configuration file.
-            loadedCity.Load(filename);
+                // Create a new city with all its default values and then
+                // wipe out all its attributes to see whether they are correctly
+                // restored from the saved configuration file.
+                SEEJlgCity loadedCity = NewVanillaSEECity<SEEJlgCity>();
+                WipeOutSEEJlgCityAttributes(loadedCity);
+                // Load the saved attributes from the configuration file.
+                loadedCity.Load(filename);
 
-            SEEJlgCityAttributesAreEqual(savedCity, loadedCity);
+                SEEJlgCityAttributesAreEqual(savedCity, loadedCity);
+            }
+            finally
+            {
+                FileIO.DeleteIfExists(filename);
+            }
         }
 
         //--------------------------------------------------------
@@ -488,6 +584,20 @@ namespace SEE.Utils
             AbstractSEECityAttributesAreEqual(expected, actual);
             AreEqual(expected.GXLPath, actual.GXLPath);
             AreEqual(expected.CSVPath, actual.CSVPath);
+        }
+
+        /// <summary>
+        /// Checks whether the configuration attributes of <paramref name="expected"/> and
+        /// <paramref name="actual"/> are equal.
+        /// </summary>
+        /// <param name="expected">expected settings</param>
+        /// <param name="actual">actual settings</param>
+        private static void DiffCityAttributesAreEqual(DiffCity expected, DiffCity actual)
+        {
+            SEECityAttributesAreEqual(expected, actual);
+            Assert.AreEqual(expected.OldRevision, actual.OldRevision);
+            Assert.AreEqual(expected.NewRevision, actual.NewRevision);
+            AreEqual(expected.VCSPath, actual.VCSPath);
         }
 
         /// <summary>
@@ -697,6 +807,19 @@ namespace SEE.Utils
             WipeOutAbstractSEECityAttributes(city);
             city.GXLPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gxl");
             city.CSVPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.csv");
+        }
+
+        /// <summary>
+        /// Assigns all attributes of given <paramref name="city"/> to arbitrary values
+        /// different from their default values.
+        /// </summary>
+        /// <param name="city">the city whose attributes are to be re-assigned</param>
+        private static void WipeOutDiffCityAttributes(DiffCity city)
+        {
+            WipeOutSEECityAttributes(city);
+            city.VCSPath.Set("C:/MyAbsoluteDirectory/MyVCSDirectory");
+            city.OldRevision = "XXX";
+            city.NewRevision = "YYY";
         }
 
         /// <summary>

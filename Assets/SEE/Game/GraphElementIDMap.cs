@@ -48,6 +48,18 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Returns whether there is a game object with the given <paramref name="id"/>
+        /// in this map.
+        /// </summary>
+        /// <param name="id">the ID of the game object to be looked up</param>
+        /// <returns>whether there is a game object with the given <paramref name="id"/> in this map</returns>
+        internal static bool Has(string id)
+        {
+            Assert.IsFalse(string.IsNullOrEmpty(id));
+            return mapping.ContainsKey(id);
+        }
+
+        /// <summary>
         /// Emits the <paramref name="id"/> and all current entries of the map.
         /// </summary>
         /// <remarks>Used for debugging when <paramref name="id"/> cannot be found in the map.</remarks>

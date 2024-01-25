@@ -164,9 +164,9 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.TargetLinkName = targetLinkName;
         }
 
-        public override async UniTask<string> ToDisplayString()
+        public override async UniTask<string> ToDisplayStringAsync()
         {
-            string explanation = await DashboardRetriever.Instance.GetIssueDescription($"AV{ID}");
+            string explanation = await DashboardRetriever.Instance.GetIssueDescriptionAsync($"AV{ID}");
             return "<style=\"H2\">"
                    + $"{ViolationType} ({ArchitectureSource} to {ArchitectureTarget})".WrapLines(WrapAt / 2)
                    + $"</style>\nSource: {SourcePath} ({SourceEntityType}), Line {SourceLine}".WrapLines(WrapAt)

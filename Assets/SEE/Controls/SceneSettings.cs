@@ -1,10 +1,10 @@
-﻿using SEE.Game;
-using SEE.GO;
-using System;
-using DG.Tweening;
-using UnityEngine;
-using Sirenix.OdinInspector;
+﻿using System;
 using System.IO;
+using DG.Tweening;
+using SEE.Game;
+using SEE.GO;
+using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace SEE.Controls
 {
@@ -53,12 +53,12 @@ namespace SEE.Controls
                 if (Enum.TryParse(input, out PlayerInputType playerInputType))
                 {
                     Debug.Log($"Loaded environment {playerInputType} from configuration file {path}.\n");
-                    SceneSettings.InputType = playerInputType;
+                    InputType = playerInputType;
                 }
                 else
                 {
                     Debug.LogError($"Configuration file {path} for the selected kind of environment (desktop, VR, etc.) does not contain the expected content. Using default {PlayerInputType.DesktopPlayer}.\n");
-                    SceneSettings.InputType = PlayerInputType.DesktopPlayer;
+                    InputType = PlayerInputType.DesktopPlayer;
                 }
             }
             else
@@ -133,9 +133,6 @@ namespace SEE.Controls
         {
             SetDoTweenSettings();
             SetInstance();
-#if UNITY_EDITOR
-            KeyBindings.PrintBindings();
-#endif
         }
 
         /// <summary>

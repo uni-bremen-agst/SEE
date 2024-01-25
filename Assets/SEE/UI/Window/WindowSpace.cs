@@ -32,6 +32,11 @@ namespace SEE.UI.Window
         public string WindowSpaceName = "WindowSpace";
 
         /// <summary>
+        /// This event will be invoked whenever a new window is added to the space.
+        /// </summary>
+        public UnityEvent<BaseWindow> OnWindowAdded = new();
+
+        /// <summary>
         /// Whether to allow the user to close the tabs containing the windows.
         /// Changing this value will only have an effect when doing so before <see cref="Start"/> has been called.
         /// </summary>
@@ -75,6 +80,7 @@ namespace SEE.UI.Window
             }
 
             windows.Add(window);
+            OnWindowAdded.Invoke(window);
             // Actual UI generation happens in Update()
         }
 
@@ -82,7 +88,6 @@ namespace SEE.UI.Window
         /// Closes a previously opened window.
         /// </summary>
         /// <param name="window">The window which should be closed.</param>
-        /// <exception cref="ArgumentException">If the given <paramref name="window"/> is already closed.</exception>
         /// <exception cref="ArgumentNullException">If the given <paramref name="window"/> is <c>null</c>.</exception>
         public void CloseWindow(BaseWindow window)
         {
@@ -90,12 +95,10 @@ namespace SEE.UI.Window
             {
                 throw new ArgumentNullException(nameof(window));
             }
-            else if (!windows.Contains(window))
+            else if (windows.Contains(window))
             {
-                throw new ArgumentException("Given window is already closed.");
+                windows.Remove(window);
             }
-
-            windows.Remove(window);
         }
 
         /// <summary>

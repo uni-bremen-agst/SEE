@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.Operator;
@@ -45,5 +47,24 @@ namespace SEE.Utils
         /// <returns>The <see cref="GameObject"/> for this graph <paramref name="element"/>.</returns>
         public static GameObject GameObject(this GraphElement element, bool mustFind = false)
             => GraphElementIDMap.Find(element.ID, mustFind);
+
+        /// <summary>
+        /// Returns true iff the given <paramref name="element"/> has a game object associated to it.
+        /// </summary>
+        /// <param name="element">The element to check.</param>
+        /// <returns>True iff the given <paramref name="element"/> has a game object associated to it.</returns>
+        public static bool HasGameObject(this GraphElement element)
+            => GraphElementIDMap.Has(element.ID);
+
+        /// <summary>
+        /// Returns all <see cref="GraphElement"/>s in the given <paramref name="elements"/> which have a
+        /// game object associated to them.
+        /// </summary>
+        /// <param name="elements">The elements to filter.</param>
+        /// <typeparam name="T">The type of the elements.</typeparam>
+        /// <returns>All <see cref="GraphElement"/>s in the given <paramref name="elements"/> which have a
+        /// game object associated to them.</returns>
+        public static IEnumerable<T> WithGameObject<T>(this IEnumerable<T> elements) where T : GraphElement
+            => elements.Where(HasGameObject);
     }
 }

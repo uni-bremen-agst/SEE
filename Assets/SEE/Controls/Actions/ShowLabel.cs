@@ -156,7 +156,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Creates a text label above the object with its node's SourceName if the label doesn't exist yet.
         /// </summary>
-        private void On()
+        public void On()
         {
             if (nodeOperator == null)
             {
@@ -179,7 +179,7 @@ namespace SEE.Controls.Actions
         ///
         /// </summary>
         /// <seealso cref="SelectionOn"/>
-        private void Off()
+        public void Off()
         {
             if (nodeOperator.Node != null)
             {
