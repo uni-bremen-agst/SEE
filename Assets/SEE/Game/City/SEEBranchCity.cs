@@ -98,13 +98,11 @@ namespace SEE.Game.City
         /// <returns>the current or new evolution renderer attached to this city</returns>
         protected EvolutionRenderer CreateEvolutionRenderer()
         {
-            
+
             if (!gameObject.TryGetComponent(out EvolutionRenderer result))
             {
                 result = gameObject.AddComponent<EvolutionRenderer>();
-                IList<Graph> graphList = new List<Graph>();
-                graphList.Add(LoadedGraph);
-                result.SetGraphEvolution2(graphList);
+                result.SetGraphEvolution2(new List<Graph> { LoadedGraph });
             }
             return result;
         }
@@ -144,7 +142,7 @@ namespace SEE.Game.City
             else
             {
                 Merge(BaselineGXLPath.Path);
-            }            
+            }
         }
 
         /// <summary>
@@ -192,11 +190,6 @@ namespace SEE.Game.City
                           out ISet<Node> removedNodes,
                           out ISet<Node> changedNodes,
                           out ISet<Node> equalNodes);
-
-            //Debug.Log("addedNodes: " + addedNodes.Count);
-            //Debug.Log("removedNodes: " + removedNodes.Count);
-            //Debug.Log("changedNodes: " + changedNodes.Count);
-            //Debug.Log("equalNodes: " + equalNodes.Count);
 
             MergeGraphElements(addedNodes, removedNodes, changedNodes, n => { LoadedGraph.AddNode(n); });
         }
@@ -289,56 +282,15 @@ namespace SEE.Game.City
             }
         }
 
-        /// <summary>
-        /// Draws the graph.
-        /// Precondition: The graph and its metrics have been loaded.
-        /// </summary>
-        [Button(ButtonSizes.Small, Name = "Draw Data")]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
-        [PropertyOrder(DataButtonsGroupOrderDraw)]
-        public override void DrawGraph()
-        {
-            base.DrawGraph();
-
-            //TEST 
-            evolutionRenderer = CreateEvolutionRenderer();
-            //gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
-            Debug.Log("evoRen grpCrnt: " + evolutionRenderer.GraphCurrent);
-            //Debug.Log("DrawMarkOnGraph");
-            evolutionRenderer.DrawMarkOnGraph(LoadedGraph);
-        }
-
         protected override void Start()
         {
             base.Start();
             //Reset();
 
-            //Debug.Log("CreateEvolutionRenderer");
-            //evolutionRenderer = CreateEvolutionRenderer();
-            //Debug.Log("DrawMarkOnGraph");
-            //evolutionRenderer.DrawMarkOnGraph(LoadedGraph);
-
-            //gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
-
-            //evolutionRenderer.ShowGraphEvolution();
+            evolutionRenderer = CreateEvolutionRenderer();
+            evolutionRenderer.DrawMarkOnGraph();
         }
 
-        /// <summary>
-        /// Destroys <see cref="firstGraph"/> if not <c>null</c>.
-        /// Postcondition: <see cref="firstGraph"/> will be <c>null</c>.
-        /// </summary>
-        [Button(ButtonSizes.Small, Name = "Reset Data")]
-        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset")]
-        [PropertyOrder(ResetButtonsGroupOrderReset)]
-        public override void Reset()
-        {
-            base.Reset();
-            //Remove Component
-            if (gameObject.TryGetComponent(out EvolutionRenderer evolutionRenderer))
-            {
-                DestroyImmediate(evolutionRenderer);
-            }
-        }
 
         #region Configuration file input/output
         //--------------------------------
