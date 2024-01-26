@@ -95,9 +95,24 @@ namespace SEE.DataModel.DG
 
         public Dictionary<string, string> StringAttributes { get; private set; } = new Dictionary<string, string>();
 
+        /// <summary>
+        /// Sets the string attribute with given <paramref name="attributeName"/> to <paramref name="value"/>
+        /// if <paramref name="value"/> is different from <c>null</c>. If <paramref name="value"/> is <c>null</c>,
+        /// the attribute will be removed.
+        /// </summary>
+        /// <param name="attributeName">name of the attribute</param>
+        /// <param name="value">new value of the attribute</param>
+        /// <remarks>This method will notify all listeners of this attributable</remarks>
         public void SetString(string attributeName, string value)
         {
-            StringAttributes[attributeName] = value;
+            if (value == null)
+            {
+                StringAttributes.Remove(attributeName);
+            }
+            else
+            {
+                StringAttributes[attributeName] = value;
+            }
             Notify(new AttributeEvent<string>(Version, this, attributeName, value, Addition));
         }
 
@@ -124,11 +139,26 @@ namespace SEE.DataModel.DG
 
         public Dictionary<string, float> FloatAttributes { get; private set; } = new Dictionary<string, float>();
 
-        public void SetFloat(string attributeName, float value)
+        /// <summary>
+        /// Sets the float attribute with given <paramref name="attributeName"/> to <paramref name="value"/>
+        /// if <paramref name="value"/> is different from <c>null</c>. If <paramref name="value"/> is <c>null</c>,
+        /// the attribute will be removed.
+        /// </summary>
+        /// <param name="attributeName">name of the attribute</param>
+        /// <param name="value">new value of the attribute</param>
+        /// <remarks>This method will notify all listeners of this attributable</remarks>
+        public void SetFloat(string attributeName, float? value)
         {
-            FloatAttributes[attributeName] = value;
-            NumericAttributeNames.Add(attributeName);
-            Notify(new AttributeEvent<float>(Version, this, attributeName, value, Addition));
+            if (value.HasValue)
+            {
+                FloatAttributes[attributeName] = value.Value;
+                NumericAttributeNames.Add(attributeName);
+            }
+            else
+            {
+                FloatAttributes.Remove(attributeName);
+            }
+            Notify(new AttributeEvent<float?>(Version, this, attributeName, value, Addition));
         }
 
         public float GetFloat(string attributeName)
@@ -154,11 +184,26 @@ namespace SEE.DataModel.DG
 
         public Dictionary<string, int> IntAttributes { get; private set; } = new Dictionary<string, int>();
 
-        public void SetInt(string attributeName, int value)
+        /// <summary>
+        /// Sets the integer attribute with given <paramref name="attributeName"/> to <paramref name="value"/>
+        /// if <paramref name="value"/> is different from <c>null</c>. If <paramref name="value"/> is <c>null</c>,
+        /// the attribute will be removed.
+        /// </summary>
+        /// <param name="attributeName">name of the attribute</param>
+        /// <param name="value">new value of the attribute</param>
+        /// <remarks>This method will notify all listeners of this attributable</remarks>
+        public void SetInt(string attributeName, int? value)
         {
-            IntAttributes[attributeName] = value;
-            NumericAttributeNames.Add(attributeName);
-            Notify(new AttributeEvent<int>(Version, this, attributeName, value, Addition));
+            if (value.HasValue)
+            {
+                IntAttributes[attributeName] = value.Value;
+                NumericAttributeNames.Add(attributeName);
+            }
+            else
+            {
+                IntAttributes.Remove(attributeName);
+            }
+            Notify(new AttributeEvent<int?>(Version, this, attributeName, value, Addition));
         }
 
         public int GetInt(string attributeName)
