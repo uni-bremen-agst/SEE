@@ -289,7 +289,6 @@ namespace SEE.Game.City
 
             p.End();
 
-
             //add xml-test-metrics
             p = Performance.Begin($"loading metric data data from XML file {xmlPath}");
             Debug.Log("Performance XML gestartet\n");

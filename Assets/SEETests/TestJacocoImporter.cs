@@ -1,20 +1,31 @@
 ﻿using Assets.SEE.DataModel.DG.IO;
 using NUnit.Framework;
+using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.DataModel.DG
+namespace Assets.SEE.DataModel.DG
 {
+    // FIXME:
+    // TODO (#672) Change path of test-data
+
+    /// <summary>
+    /// Unit-Tests for JaCoCoImporter
+    /// </summary>
     internal class TestJacocoImporter
     {
-
         /// <summary>
         /// The name of the hierarchical edge type we use for emitting the parent-child
         /// relation among nodes.
         /// </summary>
         private const string hierarchicalEdgeType = "Enclosing";
 
+        /// <summary>
+        /// Load Graph from gxl
+        /// </summary>
+        /// <param name="filename">gxl-file</param>
+        /// <returns>Graph</returns>
         private static Graph LoadGraph(string filename)
         {
             GraphReader graphReader = new(filename, new HashSet<string> { hierarchicalEdgeType }, basePath: "");
@@ -22,6 +33,9 @@ namespace SEE.DataModel.DG
             return graphReader.GetGraph();
         }
 
+        /// <summary>
+        /// Test if metrics are set for the Project-Root. In JaCoCo-Test-Report its named "report".
+        /// </summary>
         [Test]
         public void AddMetricToRootNode()
         {
@@ -69,6 +83,9 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(7f, floatClassCovered);
         }
 
+        /// <summary>
+        /// Test if metrics are set for class-node. In JaCoCo-Test-Report its named "class".
+        /// </summary>
         [Test]
         public void AddMetricToClassNode()
         {
@@ -116,6 +133,9 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(1f, floatClassCovered);
         }
 
+        /// <summary>
+        /// Test if metrics are set for class-node, when there is a second class with the same name.
+        /// </summary>
         [Test]
         public void AddMetricToClassNodeWhichNameIsUsedTwice()
         {
@@ -163,6 +183,9 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(1f, floatClassCovered);
         }
 
+        /// <summary>
+        /// Test if metrics are set for package-node. In JaCoCo-Test-Report its named "package".
+        /// </summary>
         [Test]
         public void AddMetricToPackageNode()
         {
@@ -210,8 +233,9 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(4f, floatClassCovered);
         }
 
-
-        //BankAccount.Bank.getName()
+        /// <summary>
+        /// Test if metrics are set for method-node. In JaCoCo-Test-Report its named "method".
+        /// </summary>
         [Test]
         public void AddMetricToMethodNode()
         {
