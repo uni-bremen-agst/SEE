@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
 {
-    public abstract class DebugAdapter : MonoBehaviour
+    public abstract class DebugAdapter
     {
         protected static readonly string AdapterDirectory = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "Adapters"));
 

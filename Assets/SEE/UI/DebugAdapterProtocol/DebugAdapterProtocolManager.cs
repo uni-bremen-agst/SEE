@@ -10,22 +10,12 @@ namespace SEE.UI.DebugAdapterProtocol
 {
     public class DebugAdapterProtocolManager : PlatformDependentComponent
     {
-        private static DebugAdapter.DebugAdapter[] debugAdapters;
-        private static DebugAdapter.DebugAdapter debugAdapter;
-
-        protected override void Start()
+        private static readonly DebugAdapter.DebugAdapter[] debugAdapters =
         {
-            base.Start();
-            if (debugAdapters == null)
-            {
-                GameObject go = new GameObject("Debug Adapters");
-                debugAdapters = new DebugAdapter.DebugAdapter[] {
-                    go.AddComponent<MockDebugAdapter>(),
-                    go.AddComponent<NetCoreDebugAdapter>()
-                };
-                debugAdapter = debugAdapters[0];
-            }
-        }
+            new MockDebugAdapter(),
+            new NetCoreDebugAdapter()
+        };
+        private static DebugAdapter.DebugAdapter debugAdapter = debugAdapters[0];
 
         protected override void StartDesktop() {}
 
