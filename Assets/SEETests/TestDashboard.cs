@@ -12,7 +12,7 @@ namespace SEETests
     /// <summary>
     /// Class which tests the dashboard retrieval, i.e. everything in the <see cref="SEE.Net.Dashboard"/> namespace.
     /// </summary>
-    //[Category("NonDeterministic")]
+    [Category("NonDeterministic")]
     public class TestDashboard
     {
         /**
@@ -34,7 +34,6 @@ namespace SEETests
             DashboardVersion version = await DashboardRetriever.Instance.GetDashboardVersionAsync();
             Assert.AreEqual(DashboardVersion.SupportedVersion.MajorVersion, version.MajorVersion);
             Assert.AreEqual(DashboardVersion.SupportedVersion.MinorVersion, version.MinorVersion);
-
         });
 
         [UnityTest]
