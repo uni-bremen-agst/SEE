@@ -1,11 +1,10 @@
 ﻿using Assets.SEE.DataModel.DG.IO;
 using NUnit.Framework;
-using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.SEE.DataModel.DG
+namespace SEE.DataModel.DG
 {
     internal class TestJacocoImporter
     {
