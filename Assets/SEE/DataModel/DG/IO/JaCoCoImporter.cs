@@ -220,11 +220,11 @@ namespace Assets.SEE.DataModel.DG.IO
             {
                 try
                 {
-                    if (node.Filename() != null && !result.ContainsValue(node))
+                    if (node.Filename != null && !result.ContainsValue(node))
                     {
                         if (node.Type == "Class")
                         {
-                            result.Add(new NodeKey(node.Type, CreateUniquePath(node.Path()) + node.SourceFile, -1), node);
+                            result.Add(new NodeKey(node.Type, CreateUniquePath(node.Directory) + node.Path(), -1), node);
                         }
                         else if (node.Type == "Method")
                         {
@@ -235,12 +235,12 @@ namespace Assets.SEE.DataModel.DG.IO
                             // the start and end of the method.
                             // FIXME: I am not sure whether this is actually a good idea.
                             // What will happen for a huge project?
-                            int  methodStart = (int)node.SourceLine();
-                            int methodEnd = methodStart + (int)node.SourceLength();
+                            int  methodStart = (int)node.SourceLine;
+                            int methodEnd = methodStart + (int)node.SourceLength;
 
                             for (int i = methodStart; i < methodEnd; i++)
                             {
-                                result.Add(new NodeKey(node.Type, CreateUniquePath(node.Path()) + node.SourceFile, i), node);
+                                result.Add(new NodeKey(node.Type, CreateUniquePath(node.Directory) + node.Path(), i), node);
                             }
                         }
                     }
@@ -259,11 +259,11 @@ namespace Assets.SEE.DataModel.DG.IO
                     {
                         Debug.Log($"Node {node} was already added.\n");
                     }
-                    else if (node.Filename() == null)
+                    else if (node.Filename == null)
                     {
                         Debug.Log($"Filename of {node} was null and node type was neither a package nor was it the root (Report).\n");
                     }
-                    else if (node.Type == "Method" && node.SourceLine() == null)
+                    else if (node.Type == "Method" && node.SourceLine == null)
                     {
                         Debug.Log($"Method {node} has an undefined Sourceline.\n");
                     }

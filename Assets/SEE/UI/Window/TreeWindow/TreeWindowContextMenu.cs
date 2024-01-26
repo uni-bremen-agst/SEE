@@ -248,8 +248,8 @@ namespace SEE.UI.Window.TreeWindow
             // These are the attributes we want to sort by for the time being. We might want to include
             // all other attributes in the future, in which case the following code needs to be adapted.
             entries.Add(SortActionFor("Source Name", x => x is Node node ? node.SourceName : null, false));
-            entries.Add(SortActionFor("Source Line", x => x.SourceLine(), true));
-            entries.Add(SortActionFor("Filename", x => x.Filename(), false));
+            entries.Add(SortActionFor("Source Line", x => x.SourceLine, true));
+            entries.Add(SortActionFor("Filename", x => x.Filename, false));
             entries.Add(SortActionFor("Type", x => x.Type, false));
 
             contextMenu.ClearEntries();
