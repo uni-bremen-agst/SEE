@@ -63,7 +63,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         public void RemoveWord(string word) 
         {
             if (!wordFrequencies.ContainsKey(word)) return;
-            if (wordFrequencies[word] > 0) wordFrequencies[word]--;
+            if (wordFrequencies[word] <= 0) throw new Exception($"Cannot remove word {word}. Count word would be negative."); 
+            wordFrequencies[word]--;
         }
 
         public int GetFrequency(string word)

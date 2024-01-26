@@ -81,6 +81,52 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         /// <summary>
+        /// Constructor to deep copy a reflexion graph. This includes the state of the current reflexion analysis.
+        /// </summary>
+        /// <param name="fullGraph">The reflexion graph to copy</param>
+        /// <param name="allowDependenciesToParents">whether descendants may access their ancestors</param>
+        /// <exception cref="Exception">Throws a RuntimeException if propagated edges
+        /// or nodes could not be found in the copied graph.</exception>
+        public ReflexionGraph(ReflexionGraph fullGraph, bool allowDependenciesToParents = true) : this(fullGraph as Graph, allowDependenciesToParents)
+        {
+            this.AnalysisInitialized = fullGraph.AnalysisInitialized;
+
+            // Copy propagationTable
+            foreach (string key in fullGraph.propagationTable?.Keys ?? new string[]{})
+            {
+                List<Edge> propagatedEdges = new List<Edge>();
+                this.propagationTable.Add(key, propagatedEdges);
+                foreach (Edge propagatedEdge in fullGraph.propagationTable[key])
+                {
+                    Edge clonedPropagatedEdge = this.GetEdge(propagatedEdge.ID);
+                    if (clonedPropagatedEdge == null) throw new Exception($"Could not clone propagationTable. Propagated edge \"{propagatedEdge.ID}\" was not cloned correctly.");
+                    propagatedEdges.Add(clonedPropagatedEdge);
+                }
+            }
+
+            // Copy implicitMapsToTable
+            this.implicitMapsToTable = new Dictionary<string, Node>();
+            copyTable(fullGraph.implicitMapsToTable, this.implicitMapsToTable, "implicitMapsToTable");
+
+            // Copy explicitMapsToTable
+            this.explicitMapsToTable = new Dictionary<string, Node>();
+            copyTable(fullGraph.explicitMapsToTable, this.explicitMapsToTable, "explicitMapsToTable");
+
+            void copyTable(IDictionary<string, Node> sourceTable, IDictionary<string,Node> targetTable, string tableName) 
+            {
+                foreach (string key in sourceTable?.Keys ?? new string[] { })
+                {
+                    Node nodeToCopy = this.GetNode(sourceTable[key].ID);
+                    if (nodeToCopy == null)
+                    {
+                        throw new Exception($"Could not clone {tableName}. Node {sourceTable[key].ID} was not cloned correctly.");
+                    }
+                    targetTable.Add(key, nodeToCopy);
+                }
+            }
+        }
+
+        /// <summary>
         /// Generates the full graph from the three sub-graphs <see cref="ImplementationGraph"/>,
         /// <see cref="ArchitectureGraph"/> and <see cref="MappingGraph"/> by combining them into one, returning
         /// the result. Note that the name of the three graphs may be modified.

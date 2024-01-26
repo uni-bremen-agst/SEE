@@ -510,6 +510,7 @@ namespace SEE.DataModel.DG
         public virtual object Clone()
         {
             Attributable clone = (Attributable)MemberwiseClone();
+            base.HandleCloned(clone);
             HandleCloned(clone);
             return clone;
         }

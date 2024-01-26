@@ -38,13 +38,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             {
                 double toOthers = GetToOthersValue(candidateNode, cluster);
 
-                UnityEngine.Debug.Log($"CountAttract({candidateNode.ID},{cluster.ID}) = {overall}(overall) - {toOthers}(toOthers) = {overall - toOthers}");
+                // UnityEngine.Debug.Log($"CountAttract({candidateNode.ID},{cluster.ID}) = {overall}(overall) - {toOthers}(toOthers) = {overall - toOthers}");
                 return overall - toOthers;
             } 
             else
             {
                 // TODO: dirty? does no overall value imply always 0?
-                UnityEngine.Debug.LogWarning($"Couldn't find overall value for the candidate {candidateNode.ID}");
+                // UnityEngine.Debug.LogWarning($"Couldn't find overall value for the candidate {candidateNode.ID}");
                 return 0;
             };
         }
@@ -68,7 +68,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 
                 if (edge.State() == State.Allowed || edge.State() == State.ImplicitlyAllowed)
                 {
-                    UnityEngine.Debug.Log($"State is allowed. Phi value will be applied.");
+                    // UnityEngine.Debug.Log($"State is allowed. Phi value will be applied.");
                     weight *= Phi;
                 }
 

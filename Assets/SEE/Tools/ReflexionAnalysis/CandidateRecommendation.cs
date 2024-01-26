@@ -72,6 +72,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// </summary>
         public AttractFunction AttractFunction { get => attractFunction; }
 
+        private IDisposable subscription;
+
         /// <summary>
         /// TODO: integrate into configuration
         /// </summary>
@@ -153,7 +155,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 relatedNodeClone.ID = $"{relatedNode.ID}";
                 Edge edge = new Edge(relatedNodeClone, 
                                     examinedNodeClone, 
-                                    $"{recommendationEdgeType} {Math.Round(mappingPair.AttractionValue, 4).ToString()}");
+                                    $"{recommendationEdgeType} {Math.Round(mappingPair.AttractionValue, 4)}");
                 graph.AddNode(relatedNodeClone);
                 examinedNode.AddChild(relatedNodeClone);
                 graph.AddEdge(edge);
@@ -195,9 +197,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             attractFunction = AttractFunction.Create((AttractFunctionType)attractFunctionType, 
                                                       reflexionGraph, 
                                                       CandidateType);
-            bool wasActive = Statistics.Active;
+
+            subscription?.Dispose();
+            subscription = reflexionGraph.Subscribe(this);
 
             // Stop and reset the recording
+            bool wasActive = Statistics.Active;
             Statistics.Reset();
             Statistics.SetCandidateRecommendation(this);
             recommendations.Clear();
@@ -223,7 +228,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         {
             if (value is EdgeEvent edgeEvent && edgeEvent.Affected == ReflexionSubgraphs.Mapping)
             {
-                Debug.Log("Handle Change in Mapping... " + edgeEvent.ToString());
+                // Debug.Log("Handle Change in Mapping... " + edgeEvent.ToString());
 
                 // TODO: is this safe?
                 if (edgeEvent.Change == null) return;
@@ -280,14 +285,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             recommendations.Clear();
             mappingPairs.Clear();
-            Debug.Log($"Calculate attraction values... candidates.Count={unmappedCandidates.Count} clusters.Count={clusters.Count}");
+            // Debug.Log($"Calculate attraction values... candidates.Count={unmappedCandidates.Count} clusters.Count={clusters.Count}");
 
             foreach (Node cluster in clusters)
             {
                 foreach (Node candidate in unmappedCandidates)
-                {               
+                {
                     // Calculate the attraction value for current node and current cluster
                     double attractionValue = AttractFunction.GetAttractionValue(candidate, cluster);
+                    
                     // Debug.Log($"Candidate {candidate.ID} attracted to cluster {cluster.ID} with attraction value {attractionValue}");
 
                     // Keep track of all attractions for statistical purposes
@@ -324,19 +330,19 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
         }
 
-        public bool IsRecommendationDefinite()
+        public static bool IsRecommendationDefinite(Dictionary<Node, HashSet<MappingPair>> recommendations)
         {
-            Node cluster = Recommendations.Keys.First<Node>();
-            HashSet<MappingPair> candidates = Recommendations[cluster];
-            return Recommendations.Keys.Count == 1 && candidates.Count == 1;
+            Node cluster = recommendations.Keys.First<Node>();
+            HashSet<MappingPair> candidates = recommendations[cluster];
+            return recommendations.Keys.Count == 1 && candidates.Count == 1;
         }
 
-        public MappingPair GetDefiniteRecommendation()
+        public static MappingPair GetDefiniteRecommendation(Dictionary<Node, HashSet<MappingPair>> recommendations)
         {
-            if(IsRecommendationDefinite())
+            if(IsRecommendationDefinite(recommendations))
             {
-                Node cluster = Recommendations.Keys.First<Node>();
-                return Recommendations[cluster].FirstOrDefault<MappingPair>();
+                Node cluster = recommendations.Keys.First<Node>();
+                return recommendations[cluster].FirstOrDefault<MappingPair>();
             } 
             else
             {

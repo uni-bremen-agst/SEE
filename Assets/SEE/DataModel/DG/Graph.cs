@@ -400,17 +400,17 @@ namespace SEE.DataModel.DG
             {
                 if (edge.Source.ItsGraph != this)
                 {
-                    throw new InvalidOperationException($"Source node {edge.Source} is not in the graph.");
+                    throw new InvalidOperationException($"Source node {edge.Source} is not in the graph {this.Name}");
                 }
 
                 if (edge.Target.ItsGraph != this)
                 {
-                    throw new InvalidOperationException($"Target node {edge.Target} is not in the graph.");
+                    throw new InvalidOperationException($"Target node {edge.Target} is not in the graph {this.Name}.");
                 }
 
                 if (edges.ContainsKey(edge.ID))
                 {
-                    throw new InvalidOperationException($"There is already an edge with the ID {edge.ID}.");
+                    throw new InvalidOperationException($"There is already an edge with the ID {edge.ID} in graph {this.Name}.");
                 }
 
                 edge.ItsGraph = this;

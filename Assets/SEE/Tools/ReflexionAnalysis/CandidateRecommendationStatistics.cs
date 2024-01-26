@@ -23,12 +23,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// 
         /// </summary>
-        int mappingStep = 0;
+        private int mappingStep = 0;
 
         /// <summary>
         /// 
         /// </summary>
-        int numberMappedPairs;
+        private int numberMappedPairs;
+
+        private int seed;
 
         /// <summary>
         /// 
@@ -100,16 +102,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
         }
 
-        public Dictionary<Node, HashSet<Node>> CreateInitialMapping(double percentage, int seed)
+        public Dictionary<Node, HashSet<Node>> CreateInitialMapping(double percentage, int seed, ReflexionGraph reflexionGraph)
         {
             Dictionary<Node, HashSet<Node>> initialMapping = new Dictionary<Node, HashSet<Node>>();
             if (percentage > 1 || percentage < 0) throw new Exception("Parameter percentage have to be a double value between 0.0 and 1.0");
             if (OracleGraph == null) throw new Exception("No OracleGraph loaded. Cannot generate initial mapping.");
             if (ReflexionGraph == null) throw new Exception("No ReflexionGraph loaded. Cannot generate initial mapping.");
 
-            List<Node> implementationNodes = ReflexionGraph.Nodes().Where(n => n.IsInImplementation() 
+            List<Node> implementationNodes = reflexionGraph.Nodes().Where(n => n.IsInImplementation() 
                                                                           && n.Type.Equals(CandidateType)).ToList();
 
+            this.seed = seed;
             Random rand = new Random(seed);
 
             int implementationNodesCount = implementationNodes.Count;
@@ -126,11 +129,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 usedIndices.Add(randomIndex);
 
                 // check if the current node is already mapped
-                Node mapsTo = ReflexionGraph.MapsTo(node);
+                Node mapsTo = reflexionGraph.MapsTo(node);
                 if (mapsTo == null)
                 {
                     Node oracleMapsTo = OracleGraph.MapsTo(node);
-                    mapsTo = ReflexionGraph.GetNode(oracleMapsTo.ID);
+                    mapsTo = reflexionGraph.GetNode(oracleMapsTo.ID);
                     if(mapsTo != null)
                     {
                         AddToInitialMapping(mapsTo, node);
@@ -315,7 +318,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 new XElement("AveragePercentileRankGlobally", averagePercentileRankGlobally),
                 new XElement("initiallyMapped", initiallyMapped),
                 new XElement("chosen", chosen),
-                new XElement("candidateType", CandidateType));
+                new XElement("candidateType", CandidateType),
+                new XElement("seed", seed));
 
             XElement percentileRanksElement = new XElement("percentileRanksElement");
             
@@ -390,7 +394,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 UnityEngine.Debug.LogWarning("No OracleGraph selected. No Data will be saved.");
                 return;
             }
-            if (!File.Exists(CsvPath.Path)) File.Create(CsvPath.Path);
+            if (File.Exists(CsvPath.Path))
+            {
+                File.Delete(CsvPath.Path);
+                File.Create(CsvPath.Path).Close();
+            }
             IEnumerable<Node> implementationNodes = OracleGraph.Nodes().Where(n => n.IsInImplementation()
                                                                             && n.Type.Equals(CandidateType));
             foreach (Node node in implementationNodes)

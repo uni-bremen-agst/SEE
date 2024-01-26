@@ -1,5 +1,8 @@
-﻿using System;
+﻿using SEE.DataModel.DG;
+using Sirenix.Utilities;
+using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace SEE.DataModel
 {
@@ -15,7 +18,7 @@ namespace SEE.DataModel
         /// <summary>
         /// The list of currently registered observers that need to be notified upon a change of the state.
         /// </summary>
-        private readonly IList<IObserver<T>> observers = new List<IObserver<T>>();
+        private IList<IObserver<T>> observers = new List<IObserver<T>>();
 
         /// <summary>
         /// If set to true, no notifications will be sent to observers.
@@ -35,6 +38,28 @@ namespace SEE.DataModel
                 observers.Add(observer);
             }
             return new Unsubscriber<T>(observers, observer);
+        }
+
+        public string DumpSubscriptions() 
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.Append("Observers: " + Environment.NewLine);
+            foreach(IObserver<T> observer in observers)
+            {
+                stringBuilder.Append(observer.ToString() + Environment.NewLine);
+            }
+            return stringBuilder.ToString();
+        }
+
+        /// <summary>
+        /// This methods handles the cloning of an Oberservable object. If an Observable object
+        /// is cloned, the registered observers are not copied to the new Observable object.
+        /// </summary>
+        /// <param name="clone"></param>
+        protected void HandleCloned(object clone)
+        {
+            Observable<T> observable = (Observable<T>)clone;
+            observable.observers = new List<IObserver<T>>();
         }
 
         /// <summary>

@@ -4,8 +4,6 @@ using SEE.DataModel.DG;
 using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
-using SEE.UI.Window;
-using SEE.UI.Window.TreeWindow;
 using SEE.Utils;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
@@ -30,13 +28,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         private Coroutine blinkEffectCoroutine;
 
-        private ReflexionGraph reflexionGraph;
+        private ReflexionGraph reflexionGraphViz;
+
+        private ReflexionGraph reflexionGraphCalc;
 
         private Graph oracleMapping;
 
         private Queue<ChangeEvent> changeEventQueue = new Queue<ChangeEvent>();
 
-        private object reflexionGraphLockObject = new object();
+        private object calculationReflexionGraphLock = new object();
+
+        private object visualizedReflexionGraphLock = new object();
 
         private bool ProcessingEvents { get; set; }
 
@@ -53,17 +55,20 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
         }
 
-        private const string updateConfigurationButtonLabel = "Update configuration";
-        private const string createInitialMappingLabel = "Create initial Mapping";
-        private const string startAutomatedMappingLabel = "Start automated mapping";
-        private const string showRecommendationLabel = "Show recommendation";
-        private const string startRecordingLabel = "Start recording";
-        private const string stopRecordingLabel = "Stop recording";
-        private const string processDataLabel = "Process data";
-        private const string dumbTrainingDataLabel = "Dumb training data";
+        private const string updateConfigurationButtonLabel = "Update Configuration";
+        private const string createInitialMappingLabel = "Create Initial Mapping";
+        private const string startAutomatedMappingLabel = "Start Automated Mapping";
+        private const string showRecommendationLabel = "Show Recommendation";
+        private const string startRecordingLabel = "Start Recording";
+        private const string stopRecordingLabel = "Stop Recording";
+        private const string processDataLabel = "Process Data";
+        private const string dumbTrainingDataLabel = "Dumb Training Data";
+        private const string resetMappingLabel = "Reset Mapping";
+        private const string debugScenarioLabel = "Debug Scenario";
 
         private const string statisticButtonGroup = "statisticButtonsGroup";
-        private const string mappingButtonGroup = "mappingButtonsGroups";
+        private const string mappingButtonGroup = "mappingButtonsGroup";
+        private const string debugButtonGroup = "debugScenarioButtonGroup";
 
         // TODO: include cda option into the updating of the configuration
         [SerializeField]
@@ -87,11 +92,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         [SerializeField]
         public int initialMappingSeed = 593946;
 
-        public ReflexionGraph ReflexionGraph
+        public ReflexionGraph ReflexionGraphViz
         {
             set 
             {
-                reflexionGraph = value;
+                reflexionGraphViz = value;
             }
         }
 
@@ -121,6 +126,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         public void OnNext(ChangeEvent value)
         {
             changeEventQueue.Enqueue(value);
+            // UnityEngine.Debug.Log($"Received Change event {value}. Enqueued event.");
 
             // TODO: How to solve event filtering in both classes, EventFilter class?
             if (!ProcessingEvents && value is EdgeEvent edgeEvent && edgeEvent.Affected == ReflexionSubgraphs.Mapping)
@@ -129,6 +135,76 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 TriggerBlinkAnimation().Forget();
             }
         }
+
+        public void SendEventToCalculationGraph(ChangeEvent value)
+        {
+            // UnityEngine.Debug.Log($"Try to send Change event {value} to calculation reflexion graph");
+            switch (value)
+            {
+                case NodeEvent nodeEvent:
+
+                    if (value.Change == ChangeType.Addition)
+                    {
+                        // TODO: Is cloning the node thread safe?
+                        Node nodeClone = (Node)nodeEvent.Node.Clone();
+                        reflexionGraphCalc.AddNode(nodeClone);
+                    } 
+                    else if (value.Change == ChangeType.Removal)
+                    {
+                        Node nodeToRemove = reflexionGraphCalc.GetNode(nodeEvent.Node.ID);
+                        if (nodeToRemove == null) throw new Exception($"Node {nodeEvent.Node.ID} not found in calculation reflexion graph" +
+                                                                      $" when trying to synchronize with visualization reflexion graph.");
+                        // TODO: What to do about orphans option? Add information to changeEvent?
+                        reflexionGraphCalc.RemoveNode(nodeToRemove);
+                    }
+                    break;
+                case EdgeEvent edgeEvent:
+
+                    if(value.Change == ChangeType.Addition)
+                    {
+                        if (edgeEvent.Affected == ReflexionSubgraphs.Mapping)
+                        {
+                            Node nodeSource = reflexionGraphCalc.GetNode(edgeEvent.Edge.Source.ID);
+                            Node nodeTarget = reflexionGraphCalc.GetNode(edgeEvent.Edge.Target.ID);
+                            reflexionGraphCalc.AddToMapping(nodeSource, nodeTarget);
+                        }
+                        else
+                        {
+                            // Filter for propagated edges, because
+                            // the reflexion graph for calculation will add them by itself
+                            if (!edgeEvent.Edge.IsInArchitecture() || ReflexionGraph.IsSpecified(edgeEvent.Edge))
+                            {
+                                // TODO: Is cloning the edge thread safe?
+                                Edge edgeClone = (Edge)edgeEvent.Edge.Clone();
+                                Node nodeSource = reflexionGraphCalc.GetNode(edgeEvent.Edge.Source.ID);
+                                Node nodeTarget = reflexionGraphCalc.GetNode(edgeEvent.Edge.Target.ID);
+                                edgeClone.Source = nodeSource;
+                                edgeClone.Target = nodeTarget;
+                                reflexionGraphCalc.AddEdge(edgeClone); 
+                            }
+                        }
+                    }
+                    // Do not remove propagated edges, because their ID is not transferable
+                    // and they are not add in the first place
+                    else if(value.Change == ChangeType.Removal 
+                        && (!edgeEvent.Edge.IsInArchitecture() || ReflexionGraph.IsSpecified(edgeEvent.Edge)))
+                    {
+                        Edge edgeToRemove = reflexionGraphCalc.GetEdge(edgeEvent.Edge.ID);
+                        if (edgeToRemove == null) throw new Exception($"Edge {edgeEvent.Edge.ID} not found in calculation reflexion graph" +
+                                                                      $" when trying to synchronize with visualization reflexion graph.");
+                        reflexionGraphCalc.RemoveEdge(edgeToRemove);
+                    }
+                    break;
+                case HierarchyEvent e:
+                // TODO Handling of Hierarchy event necessary? Yes, this needs to be handled.
+                    break;
+                case AttributeEvent<int> e:
+                // TODO Handling of Attribute events necessary?
+                    break;
+                default: break;
+            }
+        }
+
         #endregion
 
         public async UniTaskVoid TriggerBlinkAnimation()
@@ -143,7 +219,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 nodeOperator = cluster.GameObject().AddOrGetComponent<NodeOperator>();
                 nodeOperators.Add(nodeOperator);
 
-                foreach (MappingPair mappingPair in CandidateRecommendation.Recommendations[cluster])
+                foreach (MappingPair mappingPair in recommendations[cluster])
                 {
                     nodeOperators.Add(mappingPair.Candidate.GameObject().AddOrGetComponent<NodeOperator>());
                 }
@@ -163,11 +239,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             ProcessingEvents = true;
             await UniTask.RunOnThreadPool(() =>
             {
-                lock (reflexionGraphLockObject)
+                lock (calculationReflexionGraphLock)
                 {
                     while (changeEventQueue.Count > 0)
                     {
-                        CandidateRecommendation.OnNext(changeEventQueue.Dequeue());
+                        SendEventToCalculationGraph(changeEventQueue.Dequeue());
                     }
                 }
                 ProcessingEvents = false;
@@ -199,15 +275,22 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         public void UpdateConfiguration()
         {
-            // These calls are triggering rerunning of the reflexion analysis 
-            // within the reflexion graph and the oracle graph. During the analysis
-            // we will exclude any parallel writes through processing events
-            // or assignments of recommendations towards the graphs
-            lock (reflexionGraphLockObject)
-            {
-                CandidateRecommendation.UpdateConfiguration(reflexionGraph, attractFunctionType, candidateType);
-                CandidateRecommendation.Statistics.SetOracleMapping(oracleMapping);
-            }
+
+                lock (visualizedReflexionGraphLock)
+                {
+                    reflexionGraphCalc = new ReflexionGraph(reflexionGraphViz);
+                }
+                reflexionGraphCalc.Name = "reflexionGraph for Recommendations";
+                
+                // These calls are triggering rerunning of the reflexion analysis 
+                // within the reflexion graph and the oracle graph. During the analysis
+                // we will exclude any parallel writes through processing events
+                // or assignments of recommendations towards the graphs
+                lock (calculationReflexionGraphLock)
+                {
+                    CandidateRecommendation.UpdateConfiguration(reflexionGraphCalc, attractFunctionType, candidateType);
+                    CandidateRecommendation.Statistics.SetOracleMapping(oracleMapping);
+                }          
         }
        
         public async UniTask UpdateConfigurationAsync()
@@ -230,16 +313,33 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         [ButtonGroup(mappingButtonGroup)]
         public void CreateInitialMapping()
         {
-            Dictionary<Node, HashSet<Node>> initialMapping = CandidateRecommendation.Statistics.CreateInitialMapping(
-                                                                                                initialMappingPercentage, 
-                                                                                                initialMappingSeed);
+            Dictionary<Node, HashSet<Node>> initialMapping;
+            lock (visualizedReflexionGraphLock)
+            {
+                 initialMapping = CandidateRecommendation.Statistics.CreateInitialMapping(initialMappingPercentage,
+                                                                                          initialMappingSeed,
+                                                                                          reflexionGraphViz); 
+            }
             foreach (Node cluster in initialMapping.Keys)
             {
                 foreach (Node candidate in initialMapping[cluster])
                 {
-                    Debug.Log($"Artificial initial mapping {candidate.ID} --> {cluster.ID}");
+                    // Debug.Log($"Artificial initial mapping {candidate.ID} --> {cluster.ID}");
                     MapRecommendation(candidate, cluster).Forget();
                 }
+            }
+        }
+
+        [Button(resetMappingLabel, ButtonSizes.Small)]
+        [ButtonGroup(mappingButtonGroup)]
+        public void ResetMapping()
+        {
+            // TODO: Implement this within the reflexion graph itself?
+            // TODO: Make this call async
+            lock (visualizedReflexionGraphLock)
+            {
+                List<Node> nodes = reflexionGraphViz.Nodes().Where(n => n.IsInImplementation() && reflexionGraphViz.MapsTo(n) != null).ToList();
+                nodes.ForEach(n => reflexionGraphViz.RemoveFromMapping(n)); 
             }
         }
 
@@ -252,7 +352,32 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         public async UniTask<Dictionary<Node, HashSet<MappingPair>>> GetRecommendations() 
         {
             await UniTask.WaitWhile(() => ProcessingEvents);
-            return new Dictionary<Node, HashSet<MappingPair>>(CandidateRecommendation.Recommendations);
+            Dictionary<Node, HashSet<MappingPair>> RecommendationsVisualized = new Dictionary<Node, HashSet<MappingPair>>();
+            lock (visualizedReflexionGraphLock)
+            {
+                foreach (Node key in CandidateRecommendation.Recommendations.Keys)
+                {
+                    HashSet<MappingPair> visualizedMappingPairs = new HashSet<MappingPair>();
+                    Node keyInViz = reflexionGraphViz.GetNode(key.ID);
+                    RecommendationsVisualized.Add(keyInViz, visualizedMappingPairs);
+                    foreach (MappingPair mappingPair in CandidateRecommendation.Recommendations[key])
+                    {
+                        Node visualizedCandidate = reflexionGraphViz.GetNode(mappingPair.CandidateID);
+                        Node visualizedCluster = reflexionGraphViz.GetNode(mappingPair.ClusterID);
+                        if (visualizedCandidate == null || visualizedCluster == null)
+                        {
+                            Debug.LogWarning($"Couldn't map recommendation to visualized reflexion graph." +
+                                $" {mappingPair.CandidateID} --> {visualizedCandidate?.ID} | {mappingPair.ClusterID} --> {visualizedCluster?.ID}");
+                            continue;
+                        }
+                        MappingPair mappingPairVisualized = new MappingPair(visualizedCandidate,
+                                                                            visualizedCluster,
+                                                                            mappingPair.AttractionValue);
+                        visualizedMappingPairs.Add(mappingPairVisualized);
+                    }
+                } 
+            }
+            return RecommendationsVisualized;
         }
 
         [Button(startAutomatedMappingLabel,ButtonSizes.Small)]
@@ -269,6 +394,36 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             TriggerBlinkAnimation().Forget();
         }
 
+        [Button(debugScenarioLabel, ButtonSizes.Small)]
+        [ButtonGroup(debugButtonGroup)]
+        public void StartDebugScenario()
+        {
+            string nameNode1 = "minilax.c";
+            string nameNode2 = "scanner.h";
+            string clusterName1 = "Main";
+            string clusterName2 = "FrontEnd";
+            Node node1 = reflexionGraphViz.Nodes().Where(n => n.ID.Contains(nameNode1)).FirstOrDefault();
+            Node node2 = reflexionGraphViz.Nodes().Where(n => n.ID.Contains(nameNode2)).FirstOrDefault();
+
+            Node cluster1 = reflexionGraphViz.Nodes().Where(n => n.ID.Contains(clusterName1)).FirstOrDefault();
+            Node cluster2 = reflexionGraphViz.Nodes().Where(n => n.ID.Contains(clusterName2)).FirstOrDefault();
+
+            lock (calculationReflexionGraphLock)
+            {
+                reflexionGraphViz.AddToMapping(node1, cluster1);
+                reflexionGraphViz.AddToMapping(node2, cluster2);
+            }
+
+            foreach(Edge edge in reflexionGraphViz.Edges().Where(  e =>
+                                                                   (e.Source.ID.Contains(nameNode2) || e.Target.ID.Contains(nameNode2))
+                                                                && (e.Source.ID.Contains(nameNode1)  || e.Target.ID.Contains(nameNode1))  
+                                                                && (e.State() == State.Allowed || e.State() == State.ImplicitlyAllowed)
+                                                                && e.IsInImplementation()))
+            {
+                UnityEngine.Debug.Log($"After Analysis: Edge {edge.Source.ID} --> {edge.Target.ID} is in State.(State: {edge.State()})");
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -280,23 +435,24 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             while (recommendations.Count != 0)
             {
                 MappingPair chosenMappingPair;
-                // TODO: wrap recommendations within own class?
-                if(CandidateRecommendation.IsRecommendationDefinite())
+
+                // TODO: Wrap recommendations within own class?
+                if(CandidateRecommendation.IsRecommendationDefinite(recommendations))
                 {
-                    chosenMappingPair = CandidateRecommendation.GetDefiniteRecommendation();
+                    chosenMappingPair = CandidateRecommendation.GetDefiniteRecommendation(recommendations);
                     Debug.Log($"Automatically map candidate {chosenMappingPair.Candidate.ID} to the cluster {chosenMappingPair.Cluster.ID}");
                 } 
                 else
                 {
-                    chosenMappingPair = CandidateRecommendation.Recommendations[CandidateRecommendation.Recommendations.Keys.First<Node>()].FirstOrDefault<MappingPair>();
+                    chosenMappingPair = recommendations[recommendations.Keys.First<Node>()].FirstOrDefault<MappingPair>();
 
-                    // TODO: handle ambigous mapping steps
+                    // TODO: Handle ambigous mapping steps
                     Debug.Log("Warning: Ambigous recommendation.");
                 }
                 
                 Debug.Log($"Chosen Mapping Pair {chosenMappingPair.CandidateID} --> {chosenMappingPair.CandidateID}");
-                MapRecommendation(chosenMappingPair.Candidate, chosenMappingPair.Cluster).Forget();
 
+                await MapRecommendation(chosenMappingPair.Candidate, chosenMappingPair.Cluster);
                 recommendations = await this.GetRecommendations();
             }
             Debug.Log("Automatic Mapping stopped.");
@@ -316,11 +472,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         {
             await UniTask.WaitWhile(() => ProcessingEvents);
             await UniTask.SwitchToMainThread();
-            lock (reflexionGraphLockObject)
+            lock (visualizedReflexionGraphLock)
             {
                 // TODO: Wrap automatic mapping in action?
                 // TODO: Implement as action to visualize mapping/ Trigger Animation.
-                CandidateRecommendation.ReflexionGraph.AddToMapping(candidate, cluster); 
+                Debug.Log($"About to map: candidate {candidate.ID} in {candidate.ItsGraph.Name} Into cluster {cluster.ID} in {cluster.ItsGraph.Name}");
+                reflexionGraphViz.AddToMapping(candidate, cluster); 
             }
         }
     }

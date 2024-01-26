@@ -172,7 +172,7 @@ namespace SEE.Game.City
                 CandidateRecommendationVisualization candidateRecommendationViz = gameObject.AddOrGetComponent<CandidateRecommendationVisualization>();
                 if (candidateRecommendationViz != null)
                 {
-                    candidateRecommendationViz.ReflexionGraph = reflexionGraph;
+                    candidateRecommendationViz.ReflexionGraphViz = reflexionGraph;
                     candidateRecommendationViz.OracleMapping = oracleMappingGraph;
                     LoadedGraph.Subscribe(candidateRecommendationViz);
                     Debug.Log("Registered CandidateRecommendation.");
