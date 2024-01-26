@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.Game;
 using SEE.Game.City;
@@ -28,7 +30,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Displays the tree view window for each code city.
         /// </summary>
-        private void ShowCodeView()
+        private void ShowTreeView()
         {
             GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
             if (cities.Length == 0)
@@ -45,9 +47,9 @@ namespace SEE.Controls.Actions
                     {
                         continue;
                     }
-                    if (!gameObject.TryGetComponent(out TreeWindow window))
+                    if (!cityObject.TryGetComponent(out TreeWindow window))
                     {
-                        window = gameObject.AddComponent<TreeWindow>();
+                        window = cityObject.AddComponent<TreeWindow>();
                         window.Graph = city.LoadedGraph;
                     }
                     treeWindows.Add(city.name, window);
@@ -76,14 +78,21 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Close all tree view windows.
+        /// It is assumed that this method is called from a toggle action.
         /// </summary>
-        private void HideCodeView()
+        private void HideTreeView()
         {
+            // If none of the windows were actually closed, we should instead open them.
+            bool anyClosed = false;
             foreach (string city in treeWindows.Keys)
             {
-                space.CloseWindow(treeWindows[city]);
+                anyClosed |= space.CloseWindow(treeWindows[city]);
             }
             treeWindows.Clear();
+            if (!anyClosed)
+            {
+                ShowTreeView();
+            }
         }
 
         private void Update()
@@ -92,11 +101,11 @@ namespace SEE.Controls.Actions
             {
                 if (treeWindows.Count == 0)
                 {
-                    ShowCodeView();
+                    ShowTreeView();
                 }
                 else
                 {
-                    HideCodeView();
+                    HideTreeView();
                 }
             }
         }

@@ -82,7 +82,7 @@ namespace SEE.Controls.Actions
 
             if (gameObject != null)
             {
-                actions.Add(new("Highlight", Highlight, Icons.LightBulb));
+                actions.Add(new("Show in City", Highlight, Icons.LightBulb));
             }
 
             if (graphElement.Filename() != null)
