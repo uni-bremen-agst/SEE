@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace SEE.DataModel.DG
+namespace SEE.DataModel.DG.SourceRange
 {
     /// <summary>
     /// A source-location based node index that allows to search for graph nodes
@@ -38,7 +38,7 @@ namespace SEE.DataModel.DG
 
             Stack<Range> stack = new();
 
-            foreach (File file in files.Values)
+            foreach (FileRanges file in files.Values)
             {
                 result &= NoOverlap(file);
 
@@ -81,7 +81,7 @@ namespace SEE.DataModel.DG
                 return result;
             }
 
-            static bool NoOverlap(File file)
+            static bool NoOverlap(FileRanges file)
             {
                 bool result = true;
 
@@ -127,7 +127,7 @@ namespace SEE.DataModel.DG
         /// A representation of the source-code ranges of a file. This
         /// data structure is used at the top level of the index.
         /// </summary>
-        private class File
+        private class FileRanges
         {
             /// <summary>
             /// The children sorted by the SourceLine.
@@ -185,7 +185,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// A representation of a source-code range in the index.
         /// </summary>
-        private class Range : File
+        private class Range : FileRanges
         {
             /// <summary>
             /// Start line of the range.
@@ -225,11 +225,11 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// The source-code range index as a mapping of the path of a file
-        /// onto <see cref="File"/>. The children of <see cref="File"/>
+        /// onto <see cref="FileRanges"/>. The children of <see cref="FileRanges"/>
         /// are the code ranges for nodes in the graph whose declaration
         /// is contained in that file.
         /// </summary>
-        private readonly Dictionary<string, File> files = new();
+        private readonly Dictionary<string, FileRanges> files = new();
 
         /// <summary>
         /// Returns the innermost <paramref name="node"/> declared in a
@@ -246,7 +246,7 @@ namespace SEE.DataModel.DG
         /// <returns>true if a node could be found</returns>
         public bool TryGetValue(string path, int line, out Node node)
         {
-            if (files.TryGetValue(path, out File file))
+            if (files.TryGetValue(path, out FileRanges file))
             {
                 Range range = file.Find(line);
                 if (range == null)
@@ -280,7 +280,7 @@ namespace SEE.DataModel.DG
         private int NumberOfRanges()
         {
             int count = 0;
-            foreach (File file in files.Values)
+            foreach (FileRanges file in files.Values)
             {
                 foreach (Range range in file.Children)
                 {
@@ -311,7 +311,7 @@ namespace SEE.DataModel.DG
                 DumpFile(entry.Value);
             }
 
-            void DumpFile(File file)
+            void DumpFile(FileRanges file)
             {
                 int i = 1;
                 foreach (Range range in file.Children)
@@ -353,10 +353,10 @@ namespace SEE.DataModel.DG
         /// If it does not have a filename, nothing happens.
         ///
         /// If <see cref="files"/> does not yet have an entry for the filename,
-        /// a <see cref="File"/> under this filename will be added at top level.
+        /// a <see cref="FileRanges"/> under this filename will be added at top level.
         ///
-        /// Let F be the <see cref="File"/> representing the file with the node's filename (full
-        /// path). Then the <paramref name="node"/> is added via <see cref="File.Add(Node))"/>
+        /// Let F be the <see cref="FileRanges"/> representing the file with the node's filename (full
+        /// path). Then the <paramref name="node"/> is added via <see cref="FileRanges.Add(Node))"/>
         /// passing F.
         /// </summary>
         /// <param name="node">graph node to be added</param>
@@ -369,9 +369,9 @@ namespace SEE.DataModel.DG
                 // Note: path cannot be empty because node.Filename is not empty.
                 string path = node.Path();
                 // If we do not already have a File for path, we will add one to the index.
-                if (!files.TryGetValue(path, out File file))
+                if (!files.TryGetValue(path, out FileRanges file))
                 {
-                    files.Add(path, file = new File());
+                    files.Add(path, file = new FileRanges());
                 }
                 file.Add(node);
             }

@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
-using System;
 
-namespace SEE.DataModel.DG
+namespace SEE.DataModel.DG.SourceRange
 {
     /// <summary>
     /// Tests for <see cref="SourceRangeIndex"/>.
