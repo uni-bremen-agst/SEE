@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using System;
 
 namespace SEE.DataModel.DG
 {
@@ -8,17 +9,96 @@ namespace SEE.DataModel.DG
     internal class TestSourceRangeIndex : TestGraphBase
     {
         [Test]
-        public void TestConsistentGraph()
+        public void TestConsistent1()
         {
             SourceRangeIndex index = new(g);
             Assert.IsTrue(index.IsConsistent());
+            // 11 nodes were added to the graph, but 3 are ignored because of incomplete
+            // source-location information.
+            Assert.AreEqual(8, index.Count);
+
+            AssertNotFound(index, c1, 1);
+            AssertNotFound(index, c1, 49);
+            AssertFound(index, c1, 50);
+            AssertFound(index, c1, 51);
+            AssertNotFound(index, c1, 52);
+            AssertNotFound(index, c1, 54);
+            AssertFound(index, c1, 69);
+            AssertNotFound(index, c1, 70);
+
+            AssertNotFound(index, c1m1, 51);
+            AssertNotFound(index, c1m1, 52);
+            AssertNotFound(index, c1m1, 53);
+            AssertFound(index, c1m1, 54);
+            AssertFound(index, c1m1, 55);
+            AssertNotFound(index, c1m1, 56);
+            AssertFound(index, c1m1, 57);
+            AssertNotFound(index, c1m1, 58);
+
+            AssertNotFound(index, c1m1M1, 51);
+            AssertFound(index, c1m1M1, 52);
+            AssertNotFound(index, c1m1M1, 53);
+
+            AssertNotFound(index, c1m1M2, 52);
+            AssertFound(index, c1m1M2, 53);
+            AssertNotFound(index, c1m1M2, 54);
+
+            AssertNotFound(index, c1m1M3, 55);
+            AssertNotFound(index, c1m1M3, 56);
+            AssertNotFound(index, c1m1M3, 57);
+
+            AssertNotFound(index, c1m1M3M1, 55);
+            AssertFound(index, c1m1M3M1, 56);
+            AssertNotFound(index, c1m1M3M1, 57);
+
+            AssertNotFound(index, c1m2, 59);
+            AssertFound(index, c1m2, 60);
+            AssertFound(index, c1m2, 61);
+            AssertFound(index, c1m2, 62);
+            AssertFound(index, c1m2, 63);
+            AssertFound(index, c1m2, 64);
+            AssertNotFound(index, c1m2, 65);
+
+            AssertNotFound(index, c1m5, 65);
+            AssertFound(index, c1m5, 66);
+            AssertNotFound(index, c1m5, 67);
+        }
+
+        [Test]
+        public void TestConsistent2()
+        {
+            // This node should fit.
+            Node c1m1M4 = Child(g, c1m1, "c1.m1.M4", type: "Method", directory: "mydir/", filename: "myfile.java", line: 54, length: 1);
+
+            SourceRangeIndex index = new(g);
+            Assert.IsTrue(index.IsConsistent());
+            AssertFound(index, c1m1M4, 54);
+        }
+
+        /// <summary>
+        /// Asserts that either no node can be found in the file containing <paramref name="unexpected"/>
+        /// at the given <paramref name="line"/> or -- if one is found -- that the found node is
+        /// different from <paramref name="unexpected"/>.
+        /// </summary>
+        /// <param name="index">where to search</param>
+        /// <param name="unexpected">node not expected to be found</param>
+        /// <param name="line">source line where to search</param>
+        private static void AssertNotFound(SourceRangeIndex index, Node unexpected, int line)
+        {
+            Assert.IsTrue(!index.TryGetValue(unexpected.Path(), line, out Node node) // no node found at all
+                || (node != null && unexpected != node)); // if one is found, it must be different from unexpected
+        }
+
+        private static void AssertFound(SourceRangeIndex index, Node expected, int line)
+        {
+            Assert.IsTrue(index.TryGetValue(expected.Path(), line, out Node found));
+            Assert.AreEqual(expected, found);
         }
 
         [Test]
         public void TestNonHomormorphicGraph()
         {
             // This node is logically in c1m1, but spatially nested in c1m1M3
-            Node c1m1 = g.GetNode("c1.m1");
             Child(g, c1m1, "c1.m1.M4", type: "Method", directory: "mydir/", filename: "myfile.java", line: 56, length: 1);
 
             SourceRangeIndex index = new(g);
@@ -26,12 +106,20 @@ namespace SEE.DataModel.DG
         }
 
         [Test]
-        public void TestOverlappingGraph()
+        public void TestOverlapping1()
         {
-            // This node overlaps with c1m1M3
-            //HIER WEITER
-            Node c1m1 = g.GetNode("c1.m1");
-            Child(g, c1m1, "c1.m1.M4", type: "Method", directory: "mydir/", filename: "myfile.java", line: 56, length: 1);
+            // This node overlaps with c1.m1.M2
+            Child(g, c1m1, "c1.m1.M4", type: "Method", directory: "mydir/", filename: "myfile.java", line: 53, length: 1);
+
+            SourceRangeIndex index = new(g);
+            Assert.IsFalse(index.IsConsistent());
+        }
+
+        [Test]
+        public void TestOverlapping2()
+        {
+            // This node overlaps with c1.m1.M3
+            Child(g, c1m1, "c1.m1.M4", type: "Method", directory: "mydir/", filename: "myfile.java", line: 54, length: 3);
 
             SourceRangeIndex index = new(g);
             Assert.IsFalse(index.IsConsistent());
@@ -50,13 +138,29 @@ namespace SEE.DataModel.DG
         private Node c1m5;
         private Node c1m6;
 
+        /// <summary>
+        /// Generates a graph whose source-range index should look like so:
+        ///
+        /// *** mydir/myfile.java ***
+        /// 1       c1@[50, 69]
+        /// 1.1       c1.m1@[52, 57]
+        /// 1.1.1       c1.m1.M1@[52, 52]
+        /// 1.1.2       c1.m1.M2@[53, 53]
+        /// 1.1.3       c1.m1.M3@[56, 56]
+        /// 1.1.3.1       c1.m1.M3.M1@[56, 56]
+        /// 1.2       c1.m2@[60, 64]
+        ///
+        /// *** myfile.java ***
+        /// 1 c1.m5@[66, 66]
+        ///
+        /// </summary>
         [SetUp]
         public void SetUp()
         {
             g = NewGraph();
             c1 = NewNode(g, "c1", type: "Class", directory: "mydir/", filename: "myfile.java", line: 50, length: 20);
 
-            c1m1 = Child(g, c1, "c1.m1", type: "Method", directory: "mydir/", filename: "myfile.java", line: 52, length: 5);
+            c1m1 = Child(g, c1, "c1.m1", type: "Method", directory: "mydir/", filename: "myfile.java", line: 52, length: 6);
             c1m1M1 = Child(g, c1m1, "c1.m1.M1", type: "Method", directory: "mydir/", filename: "myfile.java", line: 52, length: 1);
             c1m1M2 = Child(g, c1m1, "c1.m1.M2", type: "Method", directory: "mydir/", filename: "myfile.java", line: 53, length: 1);
             c1m1M3 = Child(g, c1m1, "c1.m1.M3", type: "Method", directory: "mydir/", filename: "myfile.java", line: 56, length: 1);
@@ -74,6 +178,18 @@ namespace SEE.DataModel.DG
             c1m5 = Child(g, c1, "c1.m5", type: "Method", filename: "myfile.java", line: 66, length: null);
             // No source line => will be ignored.
             c1m6 = Child(g, c1, "c1.m6", type: "Method", filename: "myfile.java", line: null, length: 5);
+        }
+
+        [Test]
+        public void SameRangeTwice()
+        {
+            g = NewGraph();
+            NewNode(g, "c1", type: "Class", directory: "mydir/", filename: "myfile.java", line: 50, length: 20);
+            NewNode(g, "c2", type: "Class", directory: "mydir/", filename: "myfile.java", line: 50, length: 20);
+            NewNode(g, "c3", type: "Class", directory: "mydir/", filename: "myfile.java", line: 50, length: 30);
+
+            SourceRangeIndex index = new(g);
+            Assert.IsTrue(index.IsConsistent());
         }
 
         [TearDown]
