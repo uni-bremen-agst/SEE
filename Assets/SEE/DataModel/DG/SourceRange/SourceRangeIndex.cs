@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.DataModel.DG.SourceRange
 {
@@ -8,7 +7,7 @@ namespace SEE.DataModel.DG.SourceRange
     /// A source-location based node index that allows to search for graph nodes
     /// based on a path and source line.
     /// </summary>
-    internal class SourceRangeIndex
+    internal partial class SourceRangeIndex
     {
         /// <summary>
         /// Creates the index for <paramref name="graph"/>.
@@ -101,7 +100,7 @@ namespace SEE.DataModel.DG.SourceRange
                     }
                     catch
                     {
-                        Dump(file.Children);
+                        file.Children.Dump();
                         throw;
                     }
                 }
@@ -112,114 +111,6 @@ namespace SEE.DataModel.DG.SourceRange
                 }
 
                 return result;
-            }
-        }
-
-        private static void Dump(SortedSet<Range> children)
-        {
-            foreach (Range item in children)
-            {
-                Debug.Log($"{item}\n");
-            }
-        }
-
-        /// <summary>
-        /// A representation of the source-code ranges of a file. This
-        /// data structure is used at the top level of the index.
-        /// </summary>
-        private class FileRanges
-        {
-            /// <summary>
-            /// The children sorted by the SourceLine.
-            /// </summary>
-            public readonly SortedSet<Range> Children = new();
-
-            /// <summary>
-            /// Adds the source-code range of the given <paramref name="node"/>
-            /// to the list of children.
-            /// </summary>
-            /// <param name="node">node whose source-code range is to be added</param>
-            public void Add(Node node)
-            {
-                int? sourceLine = node.SourceLine;
-                if (sourceLine.HasValue)
-                {
-                    Range descendant = Find(sourceLine.Value);
-                    if (descendant == null)
-                    {
-                        Children.Add(new Range(sourceLine, node.EndLine(), node));
-                    }
-                    else
-                    {
-                        descendant.Add(node);
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning($"{node.ID} does not have a source line. Will be ignored.\n");
-                }
-            }
-
-            /// <summary>
-            /// Returns the innermost source-code range enclosing the given
-            /// source <paramref name="line"/>. If no such range exists,
-            /// <c>null</c> is returned.
-            /// </summary>
-            /// <param name="line">source line to be searched for</param>
-            /// <returns>innermost source-code range or <c>null</c></returns>
-            public Range Find(int line)
-            {
-                // FIXME: Use binary search instead.
-                foreach (Range range in Children)
-                {
-                    if (range.Start <=  line && line <= range.End)
-                    {
-                        Range child = range.Find(line);
-                        return child ?? range;
-                    }
-                }
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// A representation of a source-code range in the index.
-        /// </summary>
-        private class Range : FileRanges
-        {
-            /// <summary>
-            /// Start line of the range.
-            /// </summary>
-            public int? Start;
-            /// <summary>
-            /// End line of the range.
-            /// </summary>
-            public int? End;
-            /// <summary>
-            /// The node whose source-code range is represented.
-            /// </summary>
-            public Node Node;
-            /// <summary>
-            /// Constructor.
-            /// </summary>
-            /// <param name="start">Start line of the range.</param>
-            /// <param name="end">End line of the range.</param>
-            /// <param name="node">The node whose source-code range is represented.</param>
-            public Range(int? start, int? end, Node node)
-            {
-                Assert.IsNotNull(node);
-                Assert.IsTrue(start.HasValue);
-                Assert.IsTrue(end.HasValue);
-                Assert.IsTrue(start <= end);
-
-                Start = start;
-                End = end;
-                Node = node;
-            }
-
-            public override string ToString()
-            {
-                return $"{Node.ID}@[{Start}, {End}]";
             }
         }
 
