@@ -23,15 +23,20 @@ namespace SEE.DataModel.DG.SourceRange
         }
 
         /// <summary>
-        /// True if the source range index is consistent, that is, if the
-        /// following conditions hold:
+        /// True if the source-range hierarchy is isomporphic to the node hierarchy
+        /// of the underlying graph for which the index was calculated.
         ///
-        /// (1) the ranges of the siblings at the same level do not overlap
-        /// (2) the source-range hierarchy is isomporphic to the node hierarchy
-        /// of the underlying graph for the index was calculated.
+        /// There are two kinds of hierarchies: (1) the node hierarchy in the graph,
+        /// which is determined syntactically, and (2) the range hierarchy here,
+        /// which is determined by the nesting of source-code ranges.
+        /// Because there may be nodes in the graph that do not have source-location information,
+        /// the two hierarchies do not necessarily need to be isomorphic. The second hierarchy
+        /// needs to be only homomorphic to the first one. That is, if N is a node in
+        /// the range hierarchy and P its parent in the range hierarchy, then
+        /// P must be an ancestor (not necessarily an immediate parent) of N in the node hierarchy.
         /// </summary>
-        /// <returns></returns>
-        public bool IsConsistent()
+        /// <returns>true if consistent</returns>
+        public bool IsIsomorphic()
         {
             bool result = true;
 
@@ -39,16 +44,6 @@ namespace SEE.DataModel.DG.SourceRange
 
             foreach (FileRanges file in files.Values)
             {
-                result &= NoOverlap(file);
-
-                // There are two kinds of hierarchies: (1) the node hierarchy in the graph,
-                // which is determined syntactically, and (2) the range hierarchy here,
-                // which is determined by the nesting of source code ranges.
-                // Because nodes in the graph that do not have source-location information,
-                // the two hierarchies do not necessarily need to be isomorphic. The second hierarchy
-                // needs to be only homomorphic to the first one. That is, if N is a node in
-                // the range hierarchy and P its parent in the range hierarchy, then
-                // P must be an ancestor of N in the node hierarchy.
                 foreach (Range child in file.Children)
                 {
                     result &= IsHomomorphic(child);
@@ -66,8 +61,8 @@ namespace SEE.DataModel.DG.SourceRange
                     bool isdescendant = range.Node.IsDescendantOf(parentRange.Node);
                     if (!isdescendant)
                     {
-                        Debug.LogWarning($"Range {range} is subsumed by {parentRange}, but {range.Node.ID} is "
-                            + "not a descendant of {parentRange.Node.ID} in the node hierarchy.\n");
+                        Debug.LogError($"Range {range} is subsumed by {parentRange}, but {range.Node.ID} is "
+                            + $"not a descendant of {parentRange.Node.ID} in the node hierarchy.\n");
                     }
                     result &= isdescendant;
                 }
@@ -77,39 +72,6 @@ namespace SEE.DataModel.DG.SourceRange
                     result &= IsHomomorphic(child);
                 }
                 stack.Pop();
-                return result;
-            }
-
-            static bool NoOverlap(FileRanges file)
-            {
-                bool result = true;
-
-                // Ranges at the same level must not overlap.
-                for (int i = 0; i < file.Children.Count - 1; i++)
-                {
-                    try
-                    {
-                        Range pred = file.Children[i];
-                        Range succ = file.Children[i + 1];
-                        if (pred.End >= succ.Start)
-                        {
-                            Debug.LogWarning($"The ranges of {pred.Node.ID} (ends at line {pred.End}) "
-                                + "and {succ.Node.ID} (starts at line {succ.Start}) overlap.\n");
-                            result = false;
-                        }
-                    }
-                    catch
-                    {
-                        file.Children.Dump();
-                        throw;
-                    }
-                }
-
-                foreach (Range child in file.Children)
-                {
-                    result &= NoOverlap(child);
-                }
-
                 return result;
             }
         }
