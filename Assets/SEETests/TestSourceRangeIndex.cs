@@ -1,4 +1,8 @@
 ﻿using NUnit.Framework;
+using System;
+using System.Text.RegularExpressions;
+using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace SEE.DataModel.DG.SourceRange
 {
@@ -11,7 +15,7 @@ namespace SEE.DataModel.DG.SourceRange
         public void TestConsistent1()
         {
             SourceRangeIndex index = new(g);
-            Assert.IsTrue(index.IsConsistent());
+            Assert.IsTrue(index.IsIsomorphic());
             // 11 nodes were added to the graph, but 3 are ignored because of incomplete
             // source-location information.
             Assert.AreEqual(8, index.Count);
@@ -70,7 +74,7 @@ namespace SEE.DataModel.DG.SourceRange
             Node c1m1M4 = Child(g, c1m1, "c1.m1.M4", type: "Method", directory: "mydir/", filename: "myfile.java", line: 54, length: 1);
 
             SourceRangeIndex index = new(g);
-            Assert.IsTrue(index.IsConsistent());
+            Assert.IsTrue(index.IsIsomorphic());
             AssertFound(index, c1m1M4, 54);
         }
 
@@ -101,27 +105,33 @@ namespace SEE.DataModel.DG.SourceRange
             Child(g, c1m1, "c1.m1.M4", type: "Method", directory: "mydir/", filename: "myfile.java", line: 56, length: 1);
 
             SourceRangeIndex index = new(g);
-            Assert.IsFalse(index.IsConsistent());
+            Assert.IsFalse(index.IsIsomorphic());
+
+            LogAssert.Expect(LogType.Error, new Regex(@"Range c1.m1.M4.* is subsumed by c1.m1.M3.M1.*"));
         }
 
         [Test]
-        public void TestOverlapping1()
+        public void TestSubsumption()
         {
-            // This node overlaps with c1.m1.M2
+            // This node is subsumed by c1.m1.M2, but is not in parent-child relation in the node hierarchy
             Child(g, c1m1, "c1.m1.M4", type: "Method", directory: "mydir/", filename: "myfile.java", line: 53, length: 1);
 
             SourceRangeIndex index = new(g);
-            Assert.IsFalse(index.IsConsistent());
+            Assert.IsFalse(index.IsIsomorphic());
+
+            LogAssert.Expect(LogType.Error, new Regex(@"Range .* is subsumed by .*"));
         }
 
         [Test]
-        public void TestOverlapping2()
+        public void TestOverlapping()
         {
-            // This node overlaps with c1.m1.M3
+            // This node overlaps with c1.m1.M3 but is not subsumed only by c1.m1. This node and
+            // c1.m1.M3 are siblings in the node hierarchy and they would also be siblings in the
+            // source-range hierarchy of the index; yet they overlap. Hence, an exception will be
+            // thrown.
             Child(g, c1m1, "c1.m1.M4", type: "Method", directory: "mydir/", filename: "myfile.java", line: 54, length: 3);
 
-            SourceRangeIndex index = new(g);
-            Assert.IsFalse(index.IsConsistent());
+            Assert.Throws<ArgumentException>(() =>  new SourceRangeIndex(g));
         }
 
         private Graph g;
@@ -188,7 +198,10 @@ namespace SEE.DataModel.DG.SourceRange
             NewNode(g, "c3", type: "Class", directory: "mydir/", filename: "myfile.java", line: 50, length: 30);
 
             SourceRangeIndex index = new(g);
-            Assert.IsTrue(index.IsConsistent());
+            Assert.IsFalse(index.IsIsomorphic());
+
+            LogAssert.Expect(LogType.Error, new Regex(@"Range c2.* is subsumed by c1.*"));
+            LogAssert.Expect(LogType.Error, new Regex(@"Range c3.* is subsumed by c2.*"));
         }
 
         [TearDown]
