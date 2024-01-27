@@ -50,7 +50,7 @@ namespace SEE.DataModel.DG
                 // needs to be only homomorphic to the first one. That is, if N is a node in
                 // the range hierarchy and P its parent in the range hierarchy, then
                 // P must be an ancestor of N in the node hierarchy.
-                foreach (Range child in file.Children.Values)
+                foreach (Range child in file.Children)
                 {
                     result &= IsHomomorphic(child);
                 }
@@ -73,7 +73,7 @@ namespace SEE.DataModel.DG
                     result &= isdescendant;
                 }
                 stack.Push(range);
-                foreach (Range child in range.Children.Values)
+                foreach (Range child in range.Children)
                 {
                     result &= IsHomomorphic(child);
                 }
@@ -106,7 +106,7 @@ namespace SEE.DataModel.DG
                     }
                 }
 
-                foreach (Range child in file.Children.Values)
+                foreach (Range child in file.Children)
                 {
                     result &= NoOverlap(child);
                 }
@@ -115,11 +115,11 @@ namespace SEE.DataModel.DG
             }
         }
 
-        private static void Dump(SortedList<int, Range> children)
+        private static void Dump(SortedSet<Range> children)
         {
-            foreach (var item in children)
+            foreach (Range item in children)
             {
-                Debug.Log($"{item.Key} => {item.Value}\n");
+                Debug.Log($"{item}\n");
             }
         }
 
@@ -132,7 +132,7 @@ namespace SEE.DataModel.DG
             /// <summary>
             /// The children sorted by the SourceLine.
             /// </summary>
-            public readonly SortedList<int, Range> Children = new();
+            public readonly SortedSet<Range> Children = new();
 
             /// <summary>
             /// Adds the source-code range of the given <paramref name="node"/>
@@ -147,7 +147,7 @@ namespace SEE.DataModel.DG
                     Range descendant = Find(sourceLine.Value);
                     if (descendant == null)
                     {
-                        Children.Add(sourceLine.Value, new Range(sourceLine, node.EndLine(), node));
+                        Children.Add(new Range(sourceLine, node.EndLine(), node));
                     }
                     else
                     {
@@ -170,7 +170,7 @@ namespace SEE.DataModel.DG
             public Range Find(int line)
             {
                 // FIXME: Use binary search instead.
-                foreach (Range range in Children.Values)
+                foreach (Range range in Children)
                 {
                     if (range.Start <=  line && line <= range.End)
                     {
@@ -282,7 +282,7 @@ namespace SEE.DataModel.DG
             int count = 0;
             foreach (File file in files.Values)
             {
-                foreach (Range range in file.Children.Values)
+                foreach (Range range in file.Children)
                 {
                     CountRanges(range, ref count);
                 }
@@ -293,7 +293,7 @@ namespace SEE.DataModel.DG
             static void CountRanges(Range range, ref int count)
             {
                 count++;
-                foreach (Range child in range.Children.Values)
+                foreach (Range child in range.Children)
                 {
                     CountRanges(child, ref count);
                 }
@@ -314,7 +314,7 @@ namespace SEE.DataModel.DG
             void DumpFile(File file)
             {
                 int i = 1;
-                foreach (Range range in file.Children.Values)
+                foreach (Range range in file.Children)
                 {
                     DumpRange(range, i.ToString());
                     i++;
@@ -325,7 +325,7 @@ namespace SEE.DataModel.DG
             {
                 Debug.Log($"{prefix} {range}\n");
                 int i = 1;
-                foreach (Range child in range.Children.Values)
+                foreach (Range child in range.Children)
                 {
                     DumpRange(child, prefix + "." + i.ToString());
                     i++;
