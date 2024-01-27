@@ -56,16 +56,17 @@ namespace SEE.DataModel.DG.SourceRange
         /// <returns>innermost source-code range or <c>null</c></returns>
         public Range Find(int line)
         {
-            // FIXME: Use binary search instead.
-            foreach (Range range in Children)
+            if (Children.TryGetValue(line, out Range range))
             {
-                if (range.Start <= line && line <= range.End)
-                {
-                    Range child = range.Find(line);
-                    return child ?? range;
-                }
+                // We are looking for the innermost range, hence we need to
+                // recurse into the Children of the found range.
+                Range child = range.Find(line);
+                return child ?? range;
             }
-            return null;
+            else
+            {
+                return null;
+            }
         }
     }
 }
