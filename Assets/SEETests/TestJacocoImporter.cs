@@ -33,54 +33,37 @@ namespace Assets.SEE.DataModel.DG
             return graphReader.GetGraph();
         }
 
+        private readonly string gxlPath = Application.dataPath + "/../Assets/StreamingAssets/gradleProject/CodeFacts.gxl";
+        private readonly string xmlPath = Application.dataPath + "/../Assets/StreamingAssets/gradleProject/jacocoTestReport(3).xml";
+
         /// <summary>
         /// Test if metrics are set for the Project-Root. In JaCoCo-Test-Report its named "report".
         /// </summary>
         [Test]
         public void AddMetricToRootNode()
         {
-            string gxlPath = Application.dataPath + "/../Assets/StreamingAssets/gradleProject/CodeFacts.gxl";
-            string xmlPath = Application.dataPath + "/../Assets/StreamingAssets/gradleProject/jacocoTestReport(3).xml";
             Graph graph = LoadGraph(gxlPath);
             Node nodeToTest = graph.GetRoots()[0];
 
             JaCoCoImporter.StartReadingTestXML(graph, xmlPath);
 
-            float floatInstructionMissed = nodeToTest.GetFloat("Metric.INSTRUCTION_missed");
-            float floatInstructionCovered = nodeToTest.GetFloat("Metric.INSTRUCTION_covered");
+            Assert.AreEqual(1395f, nodeToTest.GetFloat(AttributeNamesExtensions.InstructionMissed));
+            Assert.AreEqual(494f, nodeToTest.GetFloat(AttributeNamesExtensions.InstructionCovered));
 
-            float floatBranchMissed = nodeToTest.GetFloat("Metric.BRANCH_missed");
-            float floatBranchCovered = nodeToTest.GetFloat("Metric.BRANCH_covered");
+            Assert.AreEqual(110f, nodeToTest.GetFloat(AttributeNamesExtensions.BranchMissed));
+            Assert.AreEqual(22f, nodeToTest.GetFloat(AttributeNamesExtensions.BranchCovered));
 
-            float floatLineMissed = nodeToTest.GetFloat("Metric.LINE_missed");
-            float floatLineCovered = nodeToTest.GetFloat("Metric.LINE_covered");
+            Assert.AreEqual(351f, nodeToTest.GetFloat(AttributeNamesExtensions.LineMissed));
+            Assert.AreEqual(100f, nodeToTest.GetFloat(AttributeNamesExtensions.LineCovered));
 
-            float floatComplexityMissed = nodeToTest.GetFloat("Metric.COMPLEXITY_missed");
-            float floatComplexityCovered = nodeToTest.GetFloat("Metric.COMPLEXITY_covered");
+            Assert.AreEqual(102f, nodeToTest.GetFloat(AttributeNamesExtensions.ComplexityMissed));
+            Assert.AreEqual(37f, nodeToTest.GetFloat(AttributeNamesExtensions.ComplexityCovered));
 
-            float floatMethodMissed = nodeToTest.GetFloat("Metric.METHOD_missed");
-            float floatMethodCovered = nodeToTest.GetFloat("Metric.METHOD_covered");
+            Assert.AreEqual(47f, nodeToTest.GetFloat(AttributeNamesExtensions.MethodMissed));
+            Assert.AreEqual(26f, nodeToTest.GetFloat(AttributeNamesExtensions.MethodCovered));
 
-            float floatClassMissed = nodeToTest.GetFloat("Metric.CLASS_missed");
-            float floatClassCovered = nodeToTest.GetFloat("Metric.CLASS_covered");
-
-            Assert.AreEqual(1395f, floatInstructionMissed);
-            Assert.AreEqual(494f, floatInstructionCovered);
-
-            Assert.AreEqual(110f, floatBranchMissed);
-            Assert.AreEqual(22f, floatBranchCovered);
-
-            Assert.AreEqual(351f, floatLineMissed);
-            Assert.AreEqual(100f, floatLineCovered);
-
-            Assert.AreEqual(102f, floatComplexityMissed);
-            Assert.AreEqual(37f, floatComplexityCovered);
-
-            Assert.AreEqual(47f, floatMethodMissed);
-            Assert.AreEqual(26f, floatMethodCovered);
-
-            Assert.AreEqual(5f, floatClassMissed);
-            Assert.AreEqual(7f, floatClassCovered);
+            Assert.AreEqual(5f, nodeToTest.GetFloat(AttributeNamesExtensions.ClassMissed));
+            Assert.AreEqual(7f, nodeToTest.GetFloat(AttributeNamesExtensions.ClassCovered));
         }
 
         /// <summary>
@@ -89,48 +72,28 @@ namespace Assets.SEE.DataModel.DG
         [Test]
         public void AddMetricToClassNode()
         {
-            string gxlPath = Application.dataPath + "/../Assets/StreamingAssets/gradleProject/CodeFacts.gxl";
-            string xmlPath = Application.dataPath + "/../Assets/StreamingAssets/gradleProject/jacocoTestReport(3).xml";
             Graph graph = LoadGraph(gxlPath);
             Node nodeToTest = graph.GetNode("BankAccount.Account");
 
             JaCoCoImporter.StartReadingTestXML(graph, xmlPath);
 
-            float floatInstructionMissed = nodeToTest.GetFloat("Metric.INSTRUCTION_missed");
-            float floatInstructionCovered = nodeToTest.GetFloat("Metric.INSTRUCTION_covered");
+            Assert.AreEqual(0f, nodeToTest.GetFloat(AttributeNamesExtensions.InstructionMissed));
+            Assert.AreEqual(44f, nodeToTest.GetFloat(AttributeNamesExtensions.InstructionCovered));
 
-            float floatBranchMissed = nodeToTest.GetFloat("Metric.BRANCH_missed");
-            float floatBranchCovered = nodeToTest.GetFloat("Metric.BRANCH_covered");
+            Assert.AreEqual(0.0f, nodeToTest.GetFloat(AttributeNamesExtensions.BranchMissed));
+            Assert.AreEqual(2f, nodeToTest.GetFloat(AttributeNamesExtensions.BranchCovered));
 
-            float floatLineMissed = nodeToTest.GetFloat("Metric.LINE_missed");
-            float floatLineCovered = nodeToTest.GetFloat("Metric.LINE_covered");
+            Assert.AreEqual(0f, nodeToTest.GetFloat(AttributeNamesExtensions.LineMissed));
+            Assert.AreEqual(14f, nodeToTest.GetFloat(AttributeNamesExtensions.LineCovered));
 
-            float floatComplexityMissed = nodeToTest.GetFloat("Metric.COMPLEXITY_missed");
-            float floatComplexityCovered = nodeToTest.GetFloat("Metric.COMPLEXITY_covered");
+            Assert.AreEqual(0f, nodeToTest.GetFloat(AttributeNamesExtensions.ComplexityMissed));
+            Assert.AreEqual(7f, nodeToTest.GetFloat(AttributeNamesExtensions.ComplexityCovered));
 
-            float floatMethodMissed = nodeToTest.GetFloat("Metric.METHOD_missed");
-            float floatMethodCovered = nodeToTest.GetFloat("Metric.METHOD_covered");
+            Assert.AreEqual(0f, nodeToTest.GetFloat(AttributeNamesExtensions.MethodMissed));
+            Assert.AreEqual(6f, nodeToTest.GetFloat(AttributeNamesExtensions.MethodCovered));
 
-            float floatClassMissed = nodeToTest.GetFloat("Metric.CLASS_missed");
-            float floatClassCovered = nodeToTest.GetFloat("Metric.CLASS_covered");
-
-            Assert.AreEqual(0f, floatInstructionMissed);
-            Assert.AreEqual(44f, floatInstructionCovered);
-
-            Assert.AreEqual(0.0f, floatBranchMissed);
-            Assert.AreEqual(2f, floatBranchCovered);
-
-            Assert.AreEqual(0f, floatLineMissed);
-            Assert.AreEqual(14f, floatLineCovered);
-
-            Assert.AreEqual(0f, floatComplexityMissed);
-            Assert.AreEqual(7f, floatComplexityCovered);
-
-            Assert.AreEqual(0f, floatMethodMissed);
-            Assert.AreEqual(6f, floatMethodCovered);
-
-            Assert.AreEqual(0f, floatClassMissed);
-            Assert.AreEqual(1f, floatClassCovered);
+            Assert.AreEqual(0f, nodeToTest.GetFloat(AttributeNamesExtensions.ClassMissed));
+            Assert.AreEqual(1f, nodeToTest.GetFloat(AttributeNamesExtensions.ClassCovered));
         }
 
         /// <summary>
@@ -139,48 +102,28 @@ namespace Assets.SEE.DataModel.DG
         [Test]
         public void AddMetricToClassNodeWhichNameIsUsedTwice()
         {
-            string gxlPath = Application.dataPath + "/../Assets/StreamingAssets/gradleProject/CodeFacts.gxl";
-            string xmlPath = Application.dataPath + "/../Assets/StreamingAssets/gradleProject/jacocoTestReport(3).xml";
             Graph graph = LoadGraph(gxlPath);
             Node nodeToTest = graph.GetNode("BankAccount.Main");
 
             JaCoCoImporter.StartReadingTestXML(graph, xmlPath);
 
-            float floatInstructionMissed = nodeToTest.GetFloat("Metric.INSTRUCTION_missed");
-            float floatInstructionCovered = nodeToTest.GetFloat("Metric.INSTRUCTION_covered");
+            Assert.AreEqual(3f, nodeToTest.GetFloat(AttributeNamesExtensions.InstructionMissed));
+            Assert.AreEqual(77f, nodeToTest.GetFloat(AttributeNamesExtensions.InstructionCovered));
 
-            float floatBranchMissed = nodeToTest.GetFloat("Metric.BRANCH_missed");
-            float floatBranchCovered = nodeToTest.GetFloat("Metric.BRANCH_covered");
+            Assert.AreEqual(0f, nodeToTest.GetFloat(AttributeNamesExtensions.BranchMissed));
+            Assert.AreEqual(2f, nodeToTest.GetFloat(AttributeNamesExtensions.BranchCovered));
 
-            float floatLineMissed = nodeToTest.GetFloat("Metric.LINE_missed");
-            float floatLineCovered = nodeToTest.GetFloat("Metric.LINE_covered");
+            Assert.AreEqual(1f, nodeToTest.GetFloat(AttributeNamesExtensions.LineMissed));
+            Assert.AreEqual(17f, nodeToTest.GetFloat(AttributeNamesExtensions.LineCovered));
 
-            float floatComplexityMissed = nodeToTest.GetFloat("Metric.COMPLEXITY_missed");
-            float floatComplexityCovered = nodeToTest.GetFloat("Metric.COMPLEXITY_covered");
+            Assert.AreEqual(1f, nodeToTest.GetFloat(AttributeNamesExtensions.ComplexityMissed));
+            Assert.AreEqual(2f, nodeToTest.GetFloat(AttributeNamesExtensions.ComplexityCovered));
 
-            float floatMethodMissed = nodeToTest.GetFloat("Metric.METHOD_missed");
-            float floatMethodCovered = nodeToTest.GetFloat("Metric.METHOD_covered");
+            Assert.AreEqual(1f, nodeToTest.GetFloat(AttributeNamesExtensions.MethodMissed));
+            Assert.AreEqual(1f, nodeToTest.GetFloat(AttributeNamesExtensions.MethodCovered));
 
-            float floatClassMissed = nodeToTest.GetFloat("Metric.CLASS_missed");
-            float floatClassCovered = nodeToTest.GetFloat("Metric.CLASS_covered");
-
-            Assert.AreEqual(3f, floatInstructionMissed);
-            Assert.AreEqual(77f, floatInstructionCovered);
-
-            Assert.AreEqual(0f, floatBranchMissed);
-            Assert.AreEqual(2f, floatBranchCovered);
-
-            Assert.AreEqual(1f, floatLineMissed);
-            Assert.AreEqual(17f, floatLineCovered);
-
-            Assert.AreEqual(1f, floatComplexityMissed);
-            Assert.AreEqual(2f, floatComplexityCovered);
-
-            Assert.AreEqual(1f, floatMethodMissed);
-            Assert.AreEqual(1f, floatMethodCovered);
-
-            Assert.AreEqual(0f, floatClassMissed);
-            Assert.AreEqual(1f, floatClassCovered);
+            Assert.AreEqual(0f, nodeToTest.GetFloat(AttributeNamesExtensions.ClassMissed));
+            Assert.AreEqual(1f, nodeToTest.GetFloat(AttributeNamesExtensions.ClassCovered));
         }
 
         /// <summary>
@@ -189,48 +132,28 @@ namespace Assets.SEE.DataModel.DG
         [Test]
         public void AddMetricToPackageNode()
         {
-            string gxlPath = Application.dataPath + "/../Assets/StreamingAssets/gradleProject/CodeFacts.gxl";
-            string xmlPath = Application.dataPath + "/../Assets/StreamingAssets/gradleProject/jacocoTestReport(3).xml";
             Graph graph = LoadGraph(gxlPath);
             Node nodeToTest = graph.GetNode("BankAccount");
 
             JaCoCoImporter.StartReadingTestXML(graph, xmlPath);
 
-            float floatInstructionMissed = nodeToTest.GetFloat("Metric.INSTRUCTION_missed");
-            float floatInstructionCovered = nodeToTest.GetFloat("Metric.INSTRUCTION_covered");
+            Assert.AreEqual(3f, nodeToTest.GetFloat(AttributeNamesExtensions.InstructionMissed));
+            Assert.AreEqual(153f, nodeToTest.GetFloat(AttributeNamesExtensions.InstructionCovered));
 
-            float floatBranchMissed = nodeToTest.GetFloat("Metric.BRANCH_missed");
-            float floatBranchCovered = nodeToTest.GetFloat("Metric.BRANCH_covered");
+            Assert.AreEqual(0f, nodeToTest.GetFloat(AttributeNamesExtensions.BranchMissed));
+            Assert.AreEqual(4f, nodeToTest.GetFloat(AttributeNamesExtensions.BranchCovered));
 
-            float floatLineMissed = nodeToTest.GetFloat("Metric.LINE_missed");
-            float floatLineCovered = nodeToTest.GetFloat("Metric.LINE_covered");
+            Assert.AreEqual(1f, nodeToTest.GetFloat(AttributeNamesExtensions.LineMissed));
+            Assert.AreEqual(43f, nodeToTest.GetFloat(AttributeNamesExtensions.LineCovered));
 
-            float floatComplexityMissed = nodeToTest.GetFloat("Metric.COMPLEXITY_missed");
-            float floatComplexityCovered = nodeToTest.GetFloat("Metric.COMPLEXITY_covered");
+            Assert.AreEqual(1f, nodeToTest.GetFloat(AttributeNamesExtensions.ComplexityMissed));
+            Assert.AreEqual(15f, nodeToTest.GetFloat(AttributeNamesExtensions.ComplexityCovered));
 
-            float floatMethodMissed = nodeToTest.GetFloat("Metric.METHOD_missed");
-            float floatMethodCovered = nodeToTest.GetFloat("Metric.METHOD_covered");
+            Assert.AreEqual(1f, nodeToTest.GetFloat(AttributeNamesExtensions.MethodMissed));
+            Assert.AreEqual(13f, nodeToTest.GetFloat(AttributeNamesExtensions.MethodCovered));
 
-            float floatClassMissed = nodeToTest.GetFloat("Metric.CLASS_missed");
-            float floatClassCovered = nodeToTest.GetFloat("Metric.CLASS_covered");
-
-            Assert.AreEqual(3f, floatInstructionMissed);
-            Assert.AreEqual(153f, floatInstructionCovered);
-
-            Assert.AreEqual(0f, floatBranchMissed);
-            Assert.AreEqual(4f, floatBranchCovered);
-
-            Assert.AreEqual(1f, floatLineMissed);
-            Assert.AreEqual(43f, floatLineCovered);
-
-            Assert.AreEqual(1f, floatComplexityMissed);
-            Assert.AreEqual(15f, floatComplexityCovered);
-
-            Assert.AreEqual(1f, floatMethodMissed);
-            Assert.AreEqual(13f, floatMethodCovered);
-
-            Assert.AreEqual(0f, floatClassMissed);
-            Assert.AreEqual(4f, floatClassCovered);
+            Assert.AreEqual(0f, nodeToTest.GetFloat(AttributeNamesExtensions.ClassMissed));
+            Assert.AreEqual(4f, nodeToTest.GetFloat(AttributeNamesExtensions.ClassCovered));
         }
 
         /// <summary>
@@ -239,36 +162,22 @@ namespace Assets.SEE.DataModel.DG
         [Test]
         public void AddMetricToMethodNode()
         {
-            string gxlPath = Application.dataPath + "/../Assets/StreamingAssets/gradleProject/CodeFacts.gxl";
-            string xmlPath = Application.dataPath + "/../Assets/StreamingAssets/gradleProject/jacocoTestReport(3).xml";
             Graph graph = LoadGraph(gxlPath);
             Node nodeToTest = graph.GetNode("BankAccount.Bank.getName()");
 
             JaCoCoImporter.StartReadingTestXML(graph, xmlPath);
 
-            float floatInstructionMissed = nodeToTest.GetFloat("Metric.INSTRUCTION_missed");
-            float floatInstructionCovered = nodeToTest.GetFloat("Metric.INSTRUCTION_covered");
+            Assert.AreEqual(0f, nodeToTest.GetFloat(AttributeNamesExtensions.InstructionMissed));
+            Assert.AreEqual(3f, nodeToTest.GetFloat(AttributeNamesExtensions.InstructionCovered));
 
-            float floatLineMissed = nodeToTest.GetFloat("Metric.LINE_missed");
-            float floatLineCovered = nodeToTest.GetFloat("Metric.LINE_covered");
+            Assert.AreEqual(0f, nodeToTest.GetFloat(AttributeNamesExtensions.LineMissed));
+            Assert.AreEqual(1f, nodeToTest.GetFloat(AttributeNamesExtensions.LineCovered));
 
-            float floatComplexityMissed = nodeToTest.GetFloat("Metric.COMPLEXITY_missed");
-            float floatComplexityCovered = nodeToTest.GetFloat("Metric.COMPLEXITY_covered");
+            Assert.AreEqual(0f, nodeToTest.GetFloat(AttributeNamesExtensions.ComplexityMissed));
+            Assert.AreEqual(1f, nodeToTest.GetFloat(AttributeNamesExtensions.ComplexityCovered));
 
-            float floatMethodMissed = nodeToTest.GetFloat("Metric.METHOD_missed");
-            float floatMethodCovered = nodeToTest.GetFloat("Metric.METHOD_covered");
-
-            Assert.AreEqual(0f, floatInstructionMissed);
-            Assert.AreEqual(3f, floatInstructionCovered);
-
-            Assert.AreEqual(0f, floatLineMissed);
-            Assert.AreEqual(1f, floatLineCovered);
-
-            Assert.AreEqual(0f, floatComplexityMissed);
-            Assert.AreEqual(1f, floatComplexityCovered);
-
-            Assert.AreEqual(0f, floatMethodMissed);
-            Assert.AreEqual(1f, floatMethodCovered);
+            Assert.AreEqual(0f, nodeToTest.GetFloat(AttributeNamesExtensions.MethodMissed));
+            Assert.AreEqual(1f, nodeToTest.GetFloat(AttributeNamesExtensions.MethodCovered));
         }
     }
 }
