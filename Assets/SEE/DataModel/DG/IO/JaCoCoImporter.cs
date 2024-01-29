@@ -1,11 +1,11 @@
-﻿using SEE.DataModel.DG;
+﻿using SEE.DataModel.DG.SourceRange;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
 using UnityEngine;
 
-namespace Assets.SEE.DataModel.DG.IO
+namespace SEE.DataModel.DG.IO
 {
     /// <summary>
     /// Structure to define a searchKey in a dictionary to find nodes.
@@ -50,8 +50,13 @@ namespace Assets.SEE.DataModel.DG.IO
     /// This class implements everything that is necessary to read a JaCoCo test report in
     /// XML and adds the metrics to the graph nodes.
     /// </summary>
-    public class JaCoCoImporter : IDisposable
+    public class JaCoCoImporter
     {
+        private const string reportContext = "report";
+        private const string classContext = "class";
+        private const string packageContext = "package";
+        private const string methodContext = "method";
+
         /// <summary>
         /// Starts reading a JaCoCo test report in XML given by <paramref name="filepath"/>.
         /// Test-Metrics will be added to nodes of graph.
@@ -60,20 +65,45 @@ namespace Assets.SEE.DataModel.DG.IO
         /// <param name="filepath">Path of the XM file</param>
         public static void StartReadingTestXML(Graph graph, string filepath)
         {
-            IDictionary<NodeKey, Node> nodeDictionary = GetAllNodes(graph);
+            // IDictionary<NodeKey, Node> nodeDictionary = GetAllNodes(graph);
+            SourceRangeIndex index = new(graph);
 
             try
             {
                 XmlReaderSettings settings = new() { DtdProcessing = DtdProcessing.Parse };
-
                 using XmlReader xmlReader = XmlReader.Create(filepath, settings);
-                Node NodeToAddMetric = null;
 
-                string XMLClassPath = null; // Class-Path named in XML, e.g. CodeFacts/CountConsonants
-                string XMLClassFile = null; // Class-File named in XML, e.g. CountConsonants.java
-                string nodeType = null; // Type of element to add the metric, e.g. package
-                int XMLMethodLine = -1; // Sourceline named in the XML, -1 if not set
-                string XMLpackageName = null; // Name of the current package
+                // The fully qualified name of a class in JaCoCo's XML report, where
+                // a foward slash / is used as a separator, e.g., CodeFacts/CountConsonants.
+                string qualifiedClassName = null; 
+
+                // The name of the source-code file for a class in JaCoCo's report,
+                // e.g. CountConsonants.java. This filename is apparently always a
+                // non-qualified name, that is, the directories this file is contained in
+                // is not part of this name.
+                string sourceFilename = null;
+
+                // Source line as retrieved from JaCoCo's XML report, -1 if not set.
+                //
+                // Note that classes do not have a source line in JaCoCo's XML report,
+                // only methods have. Yet, we need a source line to look up the node
+                // in the source-range index. That is why we do not reset the source
+                // line whose processing has finished. Instead we keep its value and
+                // re-use it to look up the class. Because methods are necessarily 
+                // nested in a class, we can as well use this line to look up the
+                // class. Note also that there is always at least one method
+                // for each class -- even if the developer did not code one.
+                // If a developer did not write a method, the artificially generated
+                // constructor <init> will exist and will have a source line.
+                //
+                // That is, if the value of sourceLine is different from -1, it may relate
+                // to the currently processed method or the method just processed last.
+                int sourceLine = -1;
+
+                // Type of the element in JaCoCo's report currently processed, that is, the
+                // one to add the metrics, to. This can be any of "Report", "Package",
+                // "Class", or "Method".
+                string nodeType = null;
 
                 // Note: A report clause is the outermost XML clause and may have immediate
                 // counter clauses itself. E.g.:
@@ -96,40 +126,34 @@ namespace Assets.SEE.DataModel.DG.IO
                     switch (xmlReader.NodeType)
                     {
                         case XmlNodeType.Element:
-                            if (xmlReader.Name == "report"
-                                || xmlReader.Name == "package"
-                                || xmlReader.Name == "class"
-                                || xmlReader.Name == "method")
+                            if (xmlReader.Name == reportContext
+                                || xmlReader.Name == packageContext
+                                || xmlReader.Name == classContext
+                                || xmlReader.Name == methodContext)
                             {
-                                // Sets the name for the current package
-                                if (xmlReader.Name == "package")
-                                {
-                                    XMLpackageName = xmlReader.GetAttribute("name");
-                                }
-                                // Sets the classfile and path for the current class
-                                else if (xmlReader.Name == "class")
+                                if (xmlReader.Name == classContext)
                                 {
                                     // Attribute sourcefilename consists of the simple filename including the
                                     // file extension ".java" but excluding the directories this file is
                                     // contained in.
-                                    XMLClassFile = xmlReader.GetAttribute("sourcefilename");
+                                    sourceFilename = xmlReader.GetAttribute("sourcefilename");
                                     // Attribute name consists of the fully qualified class name where
                                     // a slash / is used as a separator.
-                                    XMLClassPath = xmlReader.GetAttribute("name") + ".java";
+                                    qualifiedClassName = xmlReader.GetAttribute("name") + ".java";
                                 }
                                 // Sets the line where a method is found by JaCoCo
-                                else if (xmlReader.Name == "method")
+                                else if (xmlReader.Name == methodContext)
                                 {
                                     // Attribute line refers to the line in which the opening curly bracket
                                     // of the method's body occurs within its source file.
-                                    XMLMethodLine = Int32.Parse(xmlReader.GetAttribute("line"));
+                                    sourceLine = Int32.Parse(xmlReader.GetAttribute("line"));
                                 }
                                 // Here we assume that the XML clause's name corresponds to our
                                 // graph node types where our node types' names start with a capital
                                 // letter. E.g., XML clause "method" corresponds to node type "Method".
                                 // "Report" will be pushed, too, even though we do not have such a
                                 // node type. We will take of that below.
-                                nodeTypeStack.Push(FirstCharUpper(xmlReader.Name));
+                                nodeTypeStack.Push(xmlReader.Name);
                             }
                             // skip sourcefile and its counter
                             else if (xmlReader.Name == "sourcefile")
@@ -147,44 +171,71 @@ namespace Assets.SEE.DataModel.DG.IO
                                 // a class clause.
                                 nodeType = nodeTypeStack.Peek();
 
-                                NodeKey currentKey = nodeType switch
+                                // The qualifiedClassName contains the name of the path prefixed by the
+                                // packages it is contained in. In Java, the name of a source file is
+                                // the name of the main class in this file, appended by the file extension ".java".
+                                // A Java file, however, may have other classes - inner classes as well as classes
+                                // at the top level of the file. JaCoCo will report both kinds of non-main classes
+                                // with the same filename (obviously) as the filename of the main class. Only the
+                                // qualified name of non-main classes will differ. For instance, if we have a main
+                                // class C in package P, the filename will be C.java and the qualified name will
+                                // be P/C. If there is another class D in C.java, that is not the main class, 
+                                // the file of that class will be C.java, too, and its qualified name will be
+                                // P/D. If there is another class I nested in class C, the file of I will again
+                                // be C.java, but its qualified name will be P/D$I. The delimiter $ is used
+                                // to separate inner classes from the classes they are nested in.
+                                // To get the project-relative path, we thus need to replace the last word
+                                // of the qualifiedClassName by the sourceFilename. That is whay GetPath() does.
+                                try
                                 {
-                                    "Report" => new NodeKey(null, null, -1),
-                                    "Package" => new NodeKey(nodeType, XMLpackageName, -1),
-                                    "Class" => new NodeKey(nodeType, XMLClassPath, -1),
-                                    "Method" => new NodeKey(nodeType, XMLClassPath, XMLMethodLine),
-                                    _ => throw new NotImplementedException($"Unexpected node type {nodeType}")
-                                };
+                                    if (nodeType == packageContext)
+                                    {
+                                        // FIXME: We need to add metrics to the package node.
+                                        // Package nodes do not have a source line.
+                                    } else if (index.TryGetValue(GetPath(qualifiedClassName, sourceFilename), sourceLine, out Node nodeToAddMetric))
+                                    {
+                                        Debug.Log($"Adding metrics to node {nodeToAddMetric.ID} {qualifiedClassName}:{sourceLine} [{nodeType}].\n");
 
-                                // find Node with before created NodeKey and set metrics directly or calculate percentage and then set
-                                if (nodeDictionary.TryGetValue(currentKey, out NodeToAddMetric))
-                                {
-                                    float missed = float.Parse(xmlReader.GetAttribute("missed"), CultureInfo.InvariantCulture.NumberFormat);
-                                    float covered = float.Parse(xmlReader.GetAttribute("covered"), CultureInfo.InvariantCulture.NumberFormat);
-                                    string metricNamePrefix = "Metric." + xmlReader.GetAttribute("type");
+                                        float missed = float.Parse(xmlReader.GetAttribute("missed"), CultureInfo.InvariantCulture.NumberFormat);
+                                        float covered = float.Parse(xmlReader.GetAttribute("covered"), CultureInfo.InvariantCulture.NumberFormat);
+                                        string metricNamePrefix = "Metric." + xmlReader.GetAttribute("type");
 
-                                    NodeToAddMetric.SetFloat(metricNamePrefix + "_missed", missed);
-                                    NodeToAddMetric.SetFloat(metricNamePrefix + "_covered", covered);
-                                    float percentage = covered + missed > 0 ? covered / (covered + missed) * 100 : 0;
-                                    NodeToAddMetric.SetFloat(metricNamePrefix + "_percentage", percentage);
+                                        nodeToAddMetric.SetFloat(metricNamePrefix + "_missed", missed);
+                                        nodeToAddMetric.SetFloat(metricNamePrefix + "_covered", covered);
+                                        float percentage = covered + missed > 0 ? covered / (covered + missed) * 100 : 0;
+                                        nodeToAddMetric.SetFloat(metricNamePrefix + "_percentage", percentage);
+                                    }
+                                    else
+                                    {
+                                        Debug.LogError($"No node found for: {qualifiedClassName}:{sourceLine}  [{nodeType}].\n");
+                                    }
                                 }
-                                else
+                                catch
                                 {
-                                    Debug.LogError($"Setting metric failed for: {currentKey}.\n");
+                                    string position = "<unknown>";
+
+                                    if (xmlReader is IXmlLineInfo xmlLineInfo && xmlLineInfo.HasLineInfo())
+                                    {
+                                        position = "line " + xmlLineInfo.LineNumber.ToString() + " and column " + xmlLineInfo.LinePosition.ToString();
+                                    }
+
+                                    Debug.LogError($"Error at: {position}.\n");
+                                    throw;
                                 }
                             }
                             break;
 
                         // set attributes to default when tag is closed
                         case XmlNodeType.EndElement:
-                            if (xmlReader.Name == "class")
+                            if (xmlReader.Name == classContext)
                             {
-                                XMLClassPath = null;
-                                XMLClassFile = null;
+                                qualifiedClassName = null;
+                                sourceFilename = null;
                             }
-                            else if (xmlReader.Name == "method")
+                            else if (xmlReader.Name == methodContext)
                             {
-                                XMLMethodLine = -1;
+                                // We do not reset sourceLine for the reasons stated above. We need it for
+                                // for looking up the class whose method was just processed.
                             }
                             else if (xmlReader.Name == "sourcefile" || xmlReader.Name == "line" || xmlReader.Name == "sessioninfo")
                             {
@@ -206,105 +257,35 @@ namespace Assets.SEE.DataModel.DG.IO
         }
 
         /// <summary>
-        /// Collects all nodes of <paramref name="graph"/> and adds them to the
-        /// resulting dictionary.
+        /// A qualified name is a set of words separated by delimiter /.
+        /// This method returns the qualified name given in <paramref name="qualifiedClassName"/>
+        /// where its last word is replaced by <paramref name="sourceFilename"/>.
+        /// For instance, let the qualified name be A/B and F be the source file name,
+        /// then A/F is returned. If the qualified name were only A, just F would be returned.
         /// </summary>
-        /// <param name="graph">Graph where to add metrics later.</param>
-        /// <returns>Returns all nodes in a dictionary.</returns>
-        private static IDictionary<NodeKey, Node> GetAllNodes(Graph graph)
+        /// <param name="qualifiedClassName">qualified name to be processed</param>
+        /// <param name="sourceFilename">source filename to be appended</param>
+        /// <returns>qualified name whose last word is replaced by <paramref name="sourceFilename"/>
+        /// </returns>
+        /// <exception cref="ArgumentException">thrown in case <paramref name="qualifiedClassName"/>
+        /// is null or empty</exception>
+        private static string GetPath(string qualifiedClassName, string sourceFilename)
         {
-            Dictionary<NodeKey, Node> result = new();
-
-            // iterate over every node in given graph and store it with key in dictionary
-            foreach (Node node in graph.Nodes())
+            const char jacocoSeparator = '/';
+            if (string.IsNullOrEmpty(qualifiedClassName))
             {
-                try
-                {
-                    if (node.Filename != null && !result.ContainsValue(node))
-                    {
-                        if (node.Type == "Class")
-                        {
-                            result.Add(new NodeKey(node.Type, CreateUniquePath(node.Directory) + node.Path(), -1), node);
-                        }
-                        else if (node.Type == "Method")
-                        {
-                            // The SourceLine of a graph node refers to the point where its identifier
-                            // occurs in the declaration. The line attribute in the test XML report
-                            // refers to the point of the opening curly brackets of the method's body.
-                            // Because of this shift we add an entry for each line in the range between
-                            // the start and end of the method.
-                            // FIXME: I am not sure whether this is actually a good idea.
-                            // What will happen for a huge project?
-                            int  methodStart = (int)node.SourceLine;
-                            int methodEnd = methodStart + (int)node.SourceLength;
-
-                            for (int i = methodStart; i < methodEnd; i++)
-                            {
-                                result.Add(new NodeKey(node.Type, CreateUniquePath(node.Directory) + node.Path(), i), node);
-                            }
-                        }
-                    }
-                    else if (node.Type == "Package")
-                    {
-                        result.Add(new NodeKey(node.Type, node.SourceName, -1), node);
-                    }
-                    else if (node.IsRoot()) // root of the project
-                    {
-                        result.Add(new NodeKey(null, null, -1), node);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (result.ContainsValue(node))
-                    {
-                        Debug.Log($"Node {node} was already added.\n");
-                    }
-                    else if (node.Filename == null)
-                    {
-                        Debug.Log($"Filename of {node} was null and node type was neither a package nor was it the root (Report).\n");
-                    }
-                    else if (node.Type == "Method" && node.SourceLine == null)
-                    {
-                        Debug.Log($"Method {node} has an undefined Sourceline.\n");
-                    }
-                    else
-                    {
-                        Debug.Log($"Node {node} can't be added to Dictionary; {ex.Message}.\n");
-                    }
-                }
+                throw new ArgumentException("The qualified name of a class must not be empty.");
             }
-            return result;
-        }
 
-        /// <summary>
-        /// Returns <paramref name="input"/> with its first character in upper case.
-        /// If <paramref name="input"/> is <c>null</c> or empty, the empty string
-        /// is returned.
-        /// </summary>
-        /// <param name="input">String that needs a uppercase first char</param>
-        /// <returns>Capitalized string</returns>
-        public static string FirstCharUpper(string input)
-        {
-            if (string.IsNullOrEmpty(input))
+            int lastSeparatorPosition = qualifiedClassName.LastIndexOf(jacocoSeparator);
+            if (lastSeparatorPosition == -1) 
             {
-                return string.Empty;
+                return sourceFilename;
             }
-            return input[0].ToString().ToUpper() + input[1..];
-        }
-
-        /// <summary>
-        /// Delete "src/main/java/" in given string to make in comperable with Filepath in XML-Report.
-        /// </summary>
-        /// <param name="path">Path where the "src/main/java/" needs to be deleted</param>
-        /// <returns>Manipulated string</returns>
-        public static string CreateUniquePath(string path)
-        {
-            return path.Replace("src/main/java/", "");
-        }
-
-        public void Dispose()
-        {
-            throw new NotImplementedException();
+            else
+            {
+                return qualifiedClassName.Remove(lastSeparatorPosition) + jacocoSeparator + sourceFilename;
+            }
         }
     }
 }
