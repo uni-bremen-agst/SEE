@@ -36,13 +36,12 @@
       "hash": "17c6330d51a140eac037b9ea6f5d157a846535af"
     },
     "com.openai.unity": {
-      "version": "7.3.2",
+      "version": "7.3.4",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.utilities.rest": "2.4.6",
-        "com.utilities.encoder.wav": "1.1.4",
-        "com.utilities.encoder.ogg": "3.1.2"
+        "com.utilities.rest": "2.5.1",
+        "com.utilities.encoder.wav": "1.1.4"
       },
       "url": "https://package.openupm.com"
     },
@@ -391,15 +390,6 @@
       },
       "url": "https://package.openupm.com"
     },
-    "com.utilities.encoder.ogg": {
-      "version": "3.1.2",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.utilities.audio": "1.1.2"
-      },
-      "url": "https://package.openupm.com"
-    },
     "com.utilities.encoder.wav": {
       "version": "1.1.4",
       "depth": 1,
@@ -420,7 +410,7 @@
       "url": "https://package.openupm.com"
     },
     "com.utilities.rest": {
-      "version": "2.4.6",
+      "version": "2.5.1",
       "depth": 1,
       "source": "registry",
       "dependencies": {
