@@ -18,6 +18,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         public abstract void SetupLaunchConfig(GameObject go, PropertyGroup group);
         public abstract void SaveLaunchConfig();
 
-        public abstract LaunchRequest GetLaunchRequest();
+        public abstract LaunchRequest GetLaunchRequest(InitializeResponse capabilities);
     }
 }

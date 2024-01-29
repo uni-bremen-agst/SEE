@@ -15,7 +15,7 @@ using Encoding = System.Text.Encoding;
 
 namespace SEE.UI.DebugAdapterProtocol
 {
-    public class DebugAdapterProtocolSession : PlatformDependentComponent
+    public class DebugAdapterProtocolSession : MonoBehaviour
     {
         private const string DebugControlsPrefab = "Prefabs/UI/DebugAdapterProtocolControls";
 
@@ -26,11 +26,12 @@ namespace SEE.UI.DebugAdapterProtocol
         private GameObject controls;
         private Process adapterProcess;
         private DebugProtocolHost adapterHost;
+        private InitializeResponse capabilities;
+        private bool isInitialized;
 
 
-        protected override void Start()
+        protected void Start()
         {
-            base.Start();
             OpenConsole();
             SetupControls();
 
@@ -40,29 +41,38 @@ namespace SEE.UI.DebugAdapterProtocol
                 Destroyer.Destroy(this);
                 return;
             }
-            console.AddMessage("Creating the debug adapter process.", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
+            console.AddMessage($"Start debugging session: {Adapter.Name} - {Adapter.AdapterFileName} - {Adapter.AdapterArguments} - {Adapter.AdapterWorkingDirectory}");
+
             if (!CreateAdapterProcess())
             {
                 console.AddMessage("Couldn't create the debug adapter process.", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
                 Destroyer.Destroy(this);
                 return;
+            } else
+            {
+                console.AddMessage("Created the debug adapter process.", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
             }
-            console.AddMessage("Creating the debug adapter host.", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
             if (!CreateAdapterHost())
             {
                 console.AddMessage("Couldn't create the debug adapter host.", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
                 Destroyer.Destroy(this);
                 return;
+            } else
+            {
+                console.AddMessage("Created the debug adapter host.", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
             }
 
-            adapterHost.SendRequestSync(new InitializeRequest()
+            // FIXME: Sometimes the "initialized" event occurs before the "initialize" response
+            // normal order: initialize request -> initialize response, intialized event -> launch request
+            capabilities = adapterHost.SendRequestSync(new InitializeRequest()
             {
                 ClientID = "SEE",
                 ClientName = "Software Engineering Experience",
                 AdapterID = Adapter.Name,
                 PathFormat = InitializeArguments.PathFormatValue.Path,
             });
-
+            console.AddMessage("Capabilities\t" + capabilities);
+            Launch();
         }
 
         private void SetupControls()
@@ -136,6 +146,25 @@ namespace SEE.UI.DebugAdapterProtocol
             return adapterProcess != null && !adapterProcess.HasExited;
         }
 
+        private void Launch()
+        {
+            // safe guard to prevent launching the debugee before knowing its capabilities
+            if (capabilities == null || !isInitialized) return;
+
+            console.AddMessage("Launch");
+            adapterHost.SendRequest(Adapter.GetLaunchRequest(capabilities), _ => { });
+        }
+
+        private void OnEventReceived(object sender, EventReceivedEventArgs e)
+        {
+            if (e.Body is InitializedEvent) {
+                isInitialized = true;
+                Launch();
+            } else if (e.Body is OutputEvent outputEvent) {
+                console.AddMessage(outputEvent.Output, ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Log);
+            }
+        }
+
         private bool CreateAdapterHost()
         {
             adapterHost = new DebugProtocolHost(adapterProcess.StandardInput.BaseStream, adapterProcess.StandardOutput.BaseStream);
@@ -145,10 +174,14 @@ namespace SEE.UI.DebugAdapterProtocol
             adapterHost.EventReceived += (_, args) => console.AddMessage($"EventReceived - {args.EventType}", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
             adapterHost.RequestReceived += (_, args) => console.AddMessage($"RequestReceived - {args.Command}", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
             adapterHost.RequestCompleted += (_, args) => console.AddMessage($"RequestCompleted - {args.Command} - {args.SequenceId} - {args.ElapsedTime}", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
+
+            adapterHost.EventReceived += OnEventReceived;
+            
             adapterHost.Run();
 
             return adapterHost.IsRunning;
         }
+
 
 
         private void OnDestroy()
@@ -168,8 +201,5 @@ namespace SEE.UI.DebugAdapterProtocol
             }
         }
 
-        protected override void StartDesktop()
-        {
-        }
     }
 }

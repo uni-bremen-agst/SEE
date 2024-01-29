@@ -77,7 +77,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         }
 
         
-        public override LaunchRequest GetLaunchRequest()
+        public override LaunchRequest GetLaunchRequest(InitializeResponse capabilities)
         {
             return new()
             {
