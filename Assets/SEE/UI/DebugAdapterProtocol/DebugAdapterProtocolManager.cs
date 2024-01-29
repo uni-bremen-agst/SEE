@@ -9,23 +9,23 @@ namespace SEE.UI.DebugAdapterProtocol
 {
     public class DebugAdapterProtocolManager : PlatformDependentComponent
     {
-        private static readonly DebugAdapter.DebugAdapter[] debugAdapters =
+        private static readonly DebugAdapter.DebugAdapter[] adapters =
         {
             new MockDebugAdapter(),
             new NetCoreDebugAdapter()
         };
-        private static DebugAdapter.DebugAdapter debugAdapter = debugAdapters[0];
-        private static DebugAdapterProtocolSession debugSession;
+        private static DebugAdapter.DebugAdapter adapter = adapters[0];
+        private static DebugAdapterProtocolSession session;
 
         protected override void StartDesktop() {}
 
 
         public void Run()
         {
-            if (debugSession == null)
+            if (session == null)
             {
-                debugSession = Canvas.AddComponent<DebugAdapterProtocolSession>();
-                debugSession.debugAdapter = debugAdapter;
+                session = Canvas.AddComponent<DebugAdapterProtocolSession>();
+                session.Adapter = adapter;
             }
         }
 
@@ -41,8 +41,8 @@ namespace SEE.UI.DebugAdapterProtocol
             SelectionProperty debugAdapterProperty = go.AddComponent<SelectionProperty>();
             debugAdapterProperty.Name = "Debug Adapter";
             debugAdapterProperty.Description = "The type of the debug adapter.";
-            debugAdapterProperty.AddOptions(debugAdapters.Select(adapter => adapter.Name));
-            debugAdapterProperty.Value = debugAdapter.Name;
+            debugAdapterProperty.AddOptions(adapters.Select(adapter => adapter.Name));
+            debugAdapterProperty.Value = adapter.Name;
             group.AddProperty(debugAdapterProperty);
 
             StringProperty workingDirectoryProperty = go.AddComponent<StringProperty>();
@@ -67,7 +67,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 debugAdapterProperty.horizontalSelector.selectorEvent.AddListener(_ =>
                 {
                     UpdateAdapterValues();
-                    debugAdapter = debugAdapters[debugAdapterProperty.horizontalSelector.index];
+                    adapter = adapters[debugAdapterProperty.horizontalSelector.index];
                     UpdateUIValues();
                 });
             };
@@ -92,15 +92,15 @@ namespace SEE.UI.DebugAdapterProtocol
             }
             void UpdateUIValues()
             {
-                workingDirectoryProperty.Value = debugAdapter.AdapterWorkingDirectory;
-                fileNameProperty.Value = debugAdapter.AdapterFileName;
-                argumentsProperty.Value = debugAdapter.AdapterArguments;
+                workingDirectoryProperty.Value = adapter.AdapterWorkingDirectory;
+                fileNameProperty.Value = adapter.AdapterFileName;
+                argumentsProperty.Value = adapter.AdapterArguments;
             }
             void UpdateAdapterValues()
             {
-                debugAdapter.AdapterWorkingDirectory = workingDirectoryProperty.Value ;
-                debugAdapter.AdapterFileName = fileNameProperty.Value ;
-                debugAdapter.AdapterArguments  = argumentsProperty.Value ;
+                adapter.AdapterWorkingDirectory = workingDirectoryProperty.Value ;
+                adapter.AdapterFileName = fileNameProperty.Value ;
+                adapter.AdapterArguments  = argumentsProperty.Value ;
             }
         }
 
@@ -111,7 +111,7 @@ namespace SEE.UI.DebugAdapterProtocol
             // create property group
             PropertyGroup group = go.gameObject.AddComponent<PropertyGroup>();
             group.Name = "Launch Request Group";
-            debugAdapter.SetupLaunchConfig(go, group);
+            adapter.SetupLaunchConfig(go, group);
 
             // create dialog
             PropertyDialog.PropertyDialog dialog = go.AddComponent<PropertyDialog.PropertyDialog>();
@@ -119,7 +119,7 @@ namespace SEE.UI.DebugAdapterProtocol
             dialog.Title = "Launch Request Configuration";
             dialog.Description = "Enter the launch request configuration.";
             dialog.AddGroup(group);
-            dialog.OnConfirm.AddListener(debugAdapter.SaveLaunchConfig);
+            dialog.OnConfirm.AddListener(adapter.SaveLaunchConfig);
 
             // open dialog
             SEEInput.KeyboardShortcutsEnabled = false;
