@@ -14,7 +14,6 @@ using SEE.Game.CityRendering;
 using SEE.UI;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
-using Assets.SEE.DataModel.DG.IO;
 
 namespace SEE.Game.City
 {
