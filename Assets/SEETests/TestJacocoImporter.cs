@@ -1,11 +1,9 @@
-﻿using Assets.SEE.DataModel.DG.IO;
-using NUnit.Framework;
-using SEE.DataModel.DG;
+﻿using NUnit.Framework;
 using SEE.DataModel.DG.IO;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.SEE.DataModel.DG
+namespace SEE.DataModel.DG
 {
     // FIXME:
     // TODO (#672) Change path of test-data
@@ -38,8 +36,8 @@ namespace Assets.SEE.DataModel.DG
         [SetUp]
         public void SetUp()
         {
-            string gxlPath = Application.dataPath + "/../Assets/StreamingAssets/gradleProject/CodeFacts.gxl";
-            string xmlPath = Application.dataPath + "/../Assets/StreamingAssets/gradleProject/jacocoTestReport(3).xml";
+            string gxlPath = Application.dataPath + "/../Assets/StreamingAssets/JLGExample/CodeFacts.gxl.xz";
+            string xmlPath = Application.dataPath + "/../Assets/StreamingAssets/JLGExample/jacoco.xml";
 
             graph = LoadGraph(gxlPath);
             JaCoCoImporter.StartReadingTestXML(graph, xmlPath);
