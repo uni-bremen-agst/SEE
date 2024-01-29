@@ -22,10 +22,10 @@ namespace Assets.SEE.DataModel.DG
         private const string hierarchicalEdgeType = "Enclosing";
 
         /// <summary>
-        /// Load Graph from gxl
+        /// Load Graph from GXL file <paramref name="filename"/>.
         /// </summary>
-        /// <param name="filename">gxl-file</param>
-        /// <returns>Graph</returns>
+        /// <param name="filename">GXL file</param>
+        /// <returns>loaded graph</returns>
         private static Graph LoadGraph(string filename)
         {
             GraphReader graphReader = new(filename, new HashSet<string> { hierarchicalEdgeType }, basePath: "");
@@ -33,8 +33,23 @@ namespace Assets.SEE.DataModel.DG
             return graphReader.GetGraph();
         }
 
-        private readonly string gxlPath = Application.dataPath + "/../Assets/StreamingAssets/gradleProject/CodeFacts.gxl";
-        private readonly string xmlPath = Application.dataPath + "/../Assets/StreamingAssets/gradleProject/jacocoTestReport(3).xml";
+        private Graph graph;
+
+        [SetUp]
+        public void SetUp()
+        {
+            string gxlPath = Application.dataPath + "/../Assets/StreamingAssets/gradleProject/CodeFacts.gxl";
+            string xmlPath = Application.dataPath + "/../Assets/StreamingAssets/gradleProject/jacocoTestReport(3).xml";
+
+            graph = LoadGraph(gxlPath);
+            JaCoCoImporter.StartReadingTestXML(graph, xmlPath);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            graph = null;   
+        }
 
         /// <summary>
         /// Test if metrics are set for the Project-Root. In JaCoCo-Test-Report its named "report".
@@ -42,10 +57,7 @@ namespace Assets.SEE.DataModel.DG
         [Test]
         public void AddMetricToRootNode()
         {
-            Graph graph = LoadGraph(gxlPath);
             Node nodeToTest = graph.GetRoots()[0];
-
-            JaCoCoImporter.StartReadingTestXML(graph, xmlPath);
 
             Assert.AreEqual(1395f, nodeToTest.GetFloat(AttributeNamesExtensions.InstructionMissed));
             Assert.AreEqual(494f, nodeToTest.GetFloat(AttributeNamesExtensions.InstructionCovered));
@@ -72,10 +84,7 @@ namespace Assets.SEE.DataModel.DG
         [Test]
         public void AddMetricToClassNode()
         {
-            Graph graph = LoadGraph(gxlPath);
             Node nodeToTest = graph.GetNode("BankAccount.Account");
-
-            JaCoCoImporter.StartReadingTestXML(graph, xmlPath);
 
             Assert.AreEqual(0f, nodeToTest.GetFloat(AttributeNamesExtensions.InstructionMissed));
             Assert.AreEqual(44f, nodeToTest.GetFloat(AttributeNamesExtensions.InstructionCovered));
@@ -102,10 +111,7 @@ namespace Assets.SEE.DataModel.DG
         [Test]
         public void AddMetricToClassNodeWhichNameIsUsedTwice()
         {
-            Graph graph = LoadGraph(gxlPath);
             Node nodeToTest = graph.GetNode("BankAccount.Main");
-
-            JaCoCoImporter.StartReadingTestXML(graph, xmlPath);
 
             Assert.AreEqual(3f, nodeToTest.GetFloat(AttributeNamesExtensions.InstructionMissed));
             Assert.AreEqual(77f, nodeToTest.GetFloat(AttributeNamesExtensions.InstructionCovered));
@@ -132,10 +138,7 @@ namespace Assets.SEE.DataModel.DG
         [Test]
         public void AddMetricToPackageNode()
         {
-            Graph graph = LoadGraph(gxlPath);
             Node nodeToTest = graph.GetNode("BankAccount");
-
-            JaCoCoImporter.StartReadingTestXML(graph, xmlPath);
 
             Assert.AreEqual(3f, nodeToTest.GetFloat(AttributeNamesExtensions.InstructionMissed));
             Assert.AreEqual(153f, nodeToTest.GetFloat(AttributeNamesExtensions.InstructionCovered));
@@ -162,10 +165,7 @@ namespace Assets.SEE.DataModel.DG
         [Test]
         public void AddMetricToMethodNode()
         {
-            Graph graph = LoadGraph(gxlPath);
             Node nodeToTest = graph.GetNode("BankAccount.Bank.getName()");
-
-            JaCoCoImporter.StartReadingTestXML(graph, xmlPath);
 
             Assert.AreEqual(0f, nodeToTest.GetFloat(AttributeNamesExtensions.InstructionMissed));
             Assert.AreEqual(3f, nodeToTest.GetFloat(AttributeNamesExtensions.InstructionCovered));
