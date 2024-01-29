@@ -1,7 +1,14 @@
-using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
+using Cysharp.Threading.Tasks;
+using HSVPicker;
+using Michsky.UI.ModernUIPack;
+using SEE.Controls;
 using SEE.GO;
+using SEE.UI.PopupMenu;
 using SEE.Utils;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 
@@ -17,8 +24,28 @@ namespace SEE.UI.Window.ConsoleWindow
         private bool messageAdded;
 
         private Transform items;
+        private TMP_InputField searchField;
+        private PopupMenu.PopupMenu popupMenu;
+        private ButtonManagerBasic searchOptionsButton;
+        private ButtonManagerBasic filterButton;
+        private ButtonManagerBasic clearButton;
 
-        public void AddMessage(string text, string source = "\uf188", MessageLevel level = MessageLevel.Log)
+        private bool matchCase = true;
+        private bool fullMatch = false;
+        private Dictionary<MessageSource, Dictionary<MessageLevel, bool>> showSourceWithLevel = new() {
+            {MessageSource.Adapter, new() {
+                {MessageLevel.Log, true },
+                {MessageLevel.Warning, true },
+                {MessageLevel.Error, true },
+            }},
+            {MessageSource.Debugee, new() {
+                {MessageLevel.Log, true },
+                {MessageLevel.Warning, true },
+                {MessageLevel.Error, true },
+            }}
+        };
+
+        public void AddMessage(string text, MessageSource source = MessageSource.Adapter, MessageLevel level = MessageLevel.Log)
         {
             messages.Add(new(text, source, level));
             messageAdded = true;
@@ -41,12 +68,36 @@ namespace SEE.UI.Window.ConsoleWindow
             base.StartDesktop();
             Transform root = PrefabInstantiator.InstantiatePrefab(windowPrefab, Window.transform.Find("Content"), false).transform;
             items = (RectTransform)root.Find("Content/Items");
-            messagesCleared = true;
+
+            searchField = root.Find("Search/SearchField").gameObject.MustGetComponent<TMP_InputField>();
+            searchField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
+            searchField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
+            searchField.onValueChanged.AddListener(_ => UpdateFilters());
+
+            popupMenu = gameObject.AddComponent<PopupMenu.PopupMenu>();
+
+            searchOptionsButton = root.Find("Search/SearchOptions").gameObject.MustGetComponent<ButtonManagerBasic>();
+            searchOptionsButton.clickEvent.AddListener(() => ShowSearchOptionsPopup());
+
+            filterButton = root.Find("Search/Filter").gameObject.MustGetComponent<ButtonManagerBasic>();
+            filterButton.clickEvent.AddListener(() => ShowFilterPopup());
+
+            clearButton = root.Find("Search/Clear").gameObject.MustGetComponent<ButtonManagerBasic>();
+            clearButton.clickEvent.AddListener(ClearMessages);
+
+            OnComponentInitialized += () =>
+            {
+                foreach (Transform child in items)
+                {
+                    Destroyer.Destroy(child.gameObject);
+                }
+            };
         }
 
-        protected override void UpdateDesktop()
+        protected override void Update()
         {
-            base.UpdateDesktop();
+            base.Update();
+            // destroys message items after a clear
             if (messagesCleared)
             {
                 messagesCleared = false;
@@ -54,12 +105,12 @@ namespace SEE.UI.Window.ConsoleWindow
                 {
                     Destroyer.Destroy(child.gameObject);
                 }
-                return;
             }
-            if (messageAdded)
+            // adds new message items (not on the same frame as clearing)
+            else if (messageAdded)
             {
                 messageAdded = false;
-                for (int i=items.childCount; i<messages.Count; i++)
+                for (int i = items.childCount; i < messages.Count; i++)
                 {
                     AddItem(messages[i]);
                 }
@@ -70,11 +121,107 @@ namespace SEE.UI.Window.ConsoleWindow
         {
             GameObject item = PrefabInstantiator.InstantiatePrefab(itemPrefab, items, false);
 
+            var color = message.Level switch
+            {
+                MessageLevel.Error => Color.red.Lighter(),
+                MessageLevel.Warning => Color.yellow.Lighter(),
+                MessageLevel.Log => Color.gray.Lighter(),
+                _ => Color.white
+            };
+
             TextMeshProUGUI textMesh = item.transform.Find("Foreground/Text").gameObject.MustGetComponent<TextMeshProUGUI>();
             textMesh.text = message.Text;
-            TextMeshProUGUI iconMesh = item.transform.Find("Foreground/Type Icon").gameObject.MustGetComponent<TextMeshProUGUI>();
-            iconMesh.text = message.Icon;
+            textMesh.color = color.IdealTextColor();
 
+            TextMeshProUGUI iconMesh = item.transform.Find("Foreground/Type Icon").gameObject.MustGetComponent<TextMeshProUGUI>();
+            iconMesh.text = message.Source switch
+            {
+                MessageSource.Adapter => "\uf188",
+                MessageSource.Debugee => "\uf135",
+                _ => ""
+            };
+            iconMesh.color = color.IdealTextColor().Lighter();
+
+            item.transform.Find("Background").GetComponent<UIGradient>().EffectGradient.SetKeys(
+                new Color[] { color, color.Darker(0.3f) }.ToGradientColorKeys().ToArray(), 
+                new GradientAlphaKey[] { new(1, 0), new(1, 1) });
+
+            UpdateFilter(message, item);
+        }
+
+        private void UpdateFilters()
+        {
+            for (int i = 0; i < items.childCount; i++)
+            {
+                UpdateFilter(messages[i], items.GetChild(i).gameObject);
+            }
+        }
+
+        private void UpdateFilter(Message message, GameObject item)
+        {
+            item.SetActive(true);
+
+            string text = item.transform.Find("Foreground/Text").gameObject.MustGetComponent<TextMeshProUGUI>().text;
+            if (!text.Contains(searchField.text, matchCase ? 0 : StringComparison.OrdinalIgnoreCase))
+            {
+                item.SetActive(false);
+            }
+            if (fullMatch && text.Length != searchField.text.Length)
+            {
+                item.SetActive(false);
+            }
+            if (!showSourceWithLevel[message.Source][message.Level])
+            {
+                item.SetActive(false);
+            }
+        }
+
+        private void ShowSearchOptionsPopup(bool refresh = false)
+        {
+            popupMenu.ClearEntries();
+
+            popupMenu.AddEntry(new PopupMenuAction("Match Case", () =>
+            {
+                matchCase = !matchCase;
+                ShowSearchOptionsPopup(true);
+                UpdateFilters();
+            }, matchCase ? Icons.CheckedCheckbox : Icons.EmptyCheckbox, false));
+            popupMenu.AddEntry(new PopupMenuAction("Full Match", () =>
+            {
+                fullMatch = !fullMatch;
+                ShowSearchOptionsPopup(true);
+                UpdateFilters();
+            }, fullMatch ? Icons.CheckedCheckbox : Icons.EmptyCheckbox, false));
+
+            if (!refresh)
+            {
+                popupMenu.MoveTo(searchOptionsButton.transform.position);
+                popupMenu.ShowMenuAsync().Forget();
+            }
+        }
+
+        private void ShowFilterPopup(bool refresh = false)
+        {
+            popupMenu.ClearEntries();
+
+            foreach (var source in showSourceWithLevel)
+            {
+                popupMenu.AddEntry(new PopupMenuHeading(source.Key.ToString()));
+                foreach (var level in source.Value)
+                {
+                    popupMenu.AddEntry(new PopupMenuAction(level.Key.ToString(), () =>
+                    {
+                        showSourceWithLevel[source.Key][level.Key] = !level.Value;
+                        UpdateFilters();
+                        ShowFilterPopup(true);
+                    }, level.Value ? Icons.CheckedCheckbox : Icons.EmptyCheckbox, false));
+                }
+            }
+            if (!refresh)
+            {
+                popupMenu.MoveTo(filterButton.transform.position);
+                popupMenu.ShowMenuAsync().Forget();
+            }
         }
 
         public override void RebuildLayout()
@@ -99,14 +246,16 @@ namespace SEE.UI.Window.ConsoleWindow
         private class Message
         {
             public string Text;
-            public string Icon;
+            public MessageSource Source;
             public MessageLevel Level;
-            public Message(string Text, string Icon, MessageLevel Level)
+            public Message(string text, MessageSource source, MessageLevel level)
             {
-                this.Text = Text;
-                this.Icon = Icon;
-                this.Level = Level;
+                this.Text = text;
+                this.Source = source;
+                this.Level = level;
             }
+
+
         }
         public enum MessageLevel
         {
@@ -114,5 +263,13 @@ namespace SEE.UI.Window.ConsoleWindow
             Warning = 1,
             Error = 2,
         }
+
+        public enum MessageSource
+        {
+            Adapter,
+            Debugee
+        }
+
+
     }
 }

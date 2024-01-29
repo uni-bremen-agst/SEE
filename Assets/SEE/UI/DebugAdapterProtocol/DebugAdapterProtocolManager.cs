@@ -1,12 +1,9 @@
-using Cysharp.Threading.Tasks.Triggers;
 using SEE.Controls;
 using SEE.UI.DebugAdapterProtocol.DebugAdapter;
 using SEE.UI.PropertyDialog;
 using SEE.Utils;
-using System;
 using System.Linq;
 using UnityEngine;
-using static SEE.UI.PropertyDialog.NetworkPropertyDialog;
 
 namespace SEE.UI.DebugAdapterProtocol
 {
@@ -18,7 +15,7 @@ namespace SEE.UI.DebugAdapterProtocol
             new NetCoreDebugAdapter()
         };
         private static DebugAdapter.DebugAdapter debugAdapter = debugAdapters[0];
-        private static DebugSession debugSession;
+        private static DebugAdapterProtocolSession debugSession;
 
         protected override void StartDesktop() {}
 
@@ -27,7 +24,7 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             if (debugSession == null)
             {
-                debugSession = Canvas.AddComponent<DebugSession>();
+                debugSession = Canvas.AddComponent<DebugAdapterProtocolSession>();
                 debugSession.debugAdapter = debugAdapter;
             }
         }
