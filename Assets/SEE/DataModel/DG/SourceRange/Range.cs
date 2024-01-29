@@ -37,7 +37,7 @@ namespace SEE.DataModel.DG.SourceRange
 
         public override string ToString()
         {
-            return $"{Node.ID}@[{Start}, {End}]";
+            return $"{Node.ID}@{Node.Path()}:{Start}-{End}";
         }
     }
 }
