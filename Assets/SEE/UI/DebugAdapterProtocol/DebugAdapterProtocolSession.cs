@@ -6,6 +6,7 @@ using SEE.UI.Window;
 using SEE.UI.Window.ConsoleWindow;
 using SEE.Utils;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using UnityEngine;
@@ -28,6 +29,8 @@ namespace SEE.UI.DebugAdapterProtocol
         private DebugProtocolHost adapterHost;
         private InitializeResponse capabilities;
         private bool isInitialized;
+
+        private Queue<Action> queuedRequests = new();
 
 
         protected void Start()
@@ -126,7 +129,6 @@ namespace SEE.UI.DebugAdapterProtocol
             adapterProcess.ErrorDataReceived += (_, args) => console.AddMessage($"Process: ErrorDataReceived! ({adapterProcess.ProcessName}\t{args.Data}", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
             adapterProcess.OutputDataReceived += (_, args) => console.AddMessage($"Process: OutputDataReceived! ({adapterProcess.ProcessName}\t{args.Data}", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
 
-
             string currentDirectory = Directory.GetCurrentDirectory();
             // working directory needs to be set manually so that executables can be found
             Directory.SetCurrentDirectory(Adapter.AdapterWorkingDirectory);
@@ -151,8 +153,32 @@ namespace SEE.UI.DebugAdapterProtocol
             // safe guard to prevent launching the debugee before knowing its capabilities
             if (capabilities == null || !isInitialized) return;
 
-            console.AddMessage("Launch");
-            adapterHost.SendRequest(Adapter.GetLaunchRequest(capabilities), _ => { });
+            queuedRequests.Enqueue(() =>
+            {
+                if (capabilities.SupportsConfigurationDoneRequest == true)
+                {
+                    adapterHost.SendRequestSync(new ConfigurationDoneRequest());
+                } else
+                {
+                    adapterHost.SendRequestSync(new SetExceptionBreakpointsRequest());
+                }
+            });
+
+            queuedRequests.Enqueue(() =>adapterHost.SendRequestSync(Adapter.GetLaunchRequest(capabilities)));
+        }
+
+        private void Update()
+        {
+            while (queuedRequests.Count > 0)
+            {
+                try
+                {
+                    queuedRequests.Dequeue()();
+                } catch (Exception e)
+                {
+                    console.AddMessage(e.ToString(), ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Error);
+                }
+            }
         }
 
         private void OnEventReceived(object sender, EventReceivedEventArgs e)
@@ -161,19 +187,49 @@ namespace SEE.UI.DebugAdapterProtocol
                 isInitialized = true;
                 Launch();
             } else if (e.Body is OutputEvent outputEvent) {
-                console.AddMessage(outputEvent.Output, ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Log);
+                ConsoleWindow.MessageSource source;
+                ConsoleWindow.MessageLevel level;
+                switch (outputEvent.Category)
+                {
+                    case OutputEvent.CategoryValue.Console:
+                    case OutputEvent.CategoryValue.MessageBox:
+                    case OutputEvent.CategoryValue.Unknown:
+                        (source, level) = (ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
+                        break;
+                    case OutputEvent.CategoryValue.Important:
+                        (source, level) = (ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Warning);
+                        break;
+                    case OutputEvent.CategoryValue.Exception:
+                        (source, level) = (ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
+                        break;
+                    case OutputEvent.CategoryValue.Stdout:
+                        (source, level) = (ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Log);
+                        break;
+                    case OutputEvent.CategoryValue.Stderr:
+                        (source, level) = (ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Error);
+                        break;
+                    case null:
+                    default:
+                    case OutputEvent.CategoryValue.Telemetry:
+                        return;
+                }
+                console.AddMessage(outputEvent.Output, source, level);
+            }
+            else
+            {
+                console.AddMessage("Event Received: " + e.EventType, ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Log);
             }
         }
 
         private bool CreateAdapterHost()
         {
             adapterHost = new DebugProtocolHost(adapterProcess.StandardInput.BaseStream, adapterProcess.StandardOutput.BaseStream);
-            adapterHost.LogMessage += (sender, args) => console.AddMessage($"LogMessage - {args.Category} - {args.Message}", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
-            adapterHost.DispatcherError += (sender, args) => console.AddMessage($"DispatcherError - {args.Exception}", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
-            adapterHost.ResponseTimeThresholdExceeded += (_, args) => console.AddMessage($"ResponseTimeThresholdExceeded - \t{args.Command}\t{args.SequenceId}\t{args.Threshold}", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Warning);
-            adapterHost.EventReceived += (_, args) => console.AddMessage($"EventReceived - {args.EventType}", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
-            adapterHost.RequestReceived += (_, args) => console.AddMessage($"RequestReceived - {args.Command}", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
-            adapterHost.RequestCompleted += (_, args) => console.AddMessage($"RequestCompleted - {args.Command} - {args.SequenceId} - {args.ElapsedTime}", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
+            adapterHost.LogMessage += (sender, args) => Debug.Log($"LogMessage - {args.Category} - {args.Message}");
+            adapterHost.DispatcherError += (sender, args) => Debug.Log($"DispatcherError - {args.Exception}");
+            adapterHost.ResponseTimeThresholdExceeded += (_, args) => Debug.Log($"ResponseTimeThresholdExceeded - \t{args.Command}\t{args.SequenceId}\t{args.Threshold}");
+            adapterHost.EventReceived += (_, args) => Debug.Log($"EventReceived - {args.EventType}");
+            adapterHost.RequestReceived += (_, args) => Debug.Log($"RequestReceived - {args.Command}");
+            adapterHost.RequestCompleted += (_, args) => Debug.Log($"RequestCompleted - {args.Command} - {args.SequenceId} - {args.ElapsedTime}");
 
             adapterHost.EventReceived += OnEventReceived;
             
@@ -181,8 +237,6 @@ namespace SEE.UI.DebugAdapterProtocol
 
             return adapterHost.IsRunning;
         }
-
-
 
         private void OnDestroy()
         {

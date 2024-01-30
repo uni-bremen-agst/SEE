@@ -22,9 +22,9 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         private string launchName = ".NET Core Launch";
         private string launchType = "coreclr";
         private string launchPreLaunchTask = "build";
-        private string launchProgram = "program.dll";
+        private string launchProgram = "D:\\ferdi\\SamplePrograms\\HelloCS1\\bin\\Debug\\net8.0\\HelloCS1.dll";
         private List<string> launchArgs = new() { "Hello", "World"};
-        private string launchCwd = "";
+        private string launchCwd = "D:\\ferdi\\SamplePrograms\\HelloCS1\\bin\\Debug\\net8.0";
         private Dictionary<string, string> launchEnv = new();
         private string launchConsole = "internalConsole";
         private bool launchStopAtEntry = true;
@@ -83,18 +83,18 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             {
                 ConfigurationProperties = new Dictionary<string, JToken>
                 {
-                    { "launchName", launchName },
-                    { "launchType", launchType },
-                    { "launchPreLaunchTask", launchPreLaunchTask },
-                    { "launchProgram", launchProgram },
-                    { "launchArgs", JToken.FromObject(launchArgs) },
-                    { "launchCwd", launchCwd },
-                    { "launchEnv", JToken.FromObject(launchEnv) },
-                    { "launchConsole", launchConsole },
-                    { "launchStopAtEntry", launchStopAtEntry },
-                    { "launchJustMyCode", launchJustMyCode },
-                    { "launchEnableStepFiltering", launchEnableStepFiltering },
-                    { "launchInternalConsoleOptions", launchInternalConsoleOptions },
+                    { "name", launchName },
+                    { "type", launchType },
+                    { "preLaunchTask", launchPreLaunchTask },
+                    { "program", launchProgram },
+                    { "args", JToken.FromObject(launchArgs) },
+                    { "cwd", launchCwd },
+                    { "env", JToken.FromObject(launchEnv) },
+                    { "console", launchConsole },
+                    { "stopAtEntry", launchStopAtEntry },
+                    { "justMyCode", launchJustMyCode },
+                    { "enableStepFiltering", launchEnableStepFiltering },
+                    { "internalConsoleOptions", launchInternalConsoleOptions },
                     { "__sessionId", launchSessionId },
                 }
             };

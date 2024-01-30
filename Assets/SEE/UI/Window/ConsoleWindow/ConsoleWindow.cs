@@ -34,7 +34,7 @@ namespace SEE.UI.Window.ConsoleWindow
         private bool fullMatch = false;
         private Dictionary<MessageSource, Dictionary<MessageLevel, bool>> showSourceWithLevel = new() {
             {MessageSource.Adapter, new() {
-                {MessageLevel.Log, true },
+                {MessageLevel.Log, false },
                 {MessageLevel.Warning, true },
                 {MessageLevel.Error, true },
             }},
