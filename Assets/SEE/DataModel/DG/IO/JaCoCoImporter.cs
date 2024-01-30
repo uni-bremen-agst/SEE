@@ -179,7 +179,7 @@ namespace SEE.DataModel.DG.IO
                                 // with the same filename (obviously) as the filename of the main class. Only the
                                 // qualified name of non-main classes will differ. For instance, if we have a main
                                 // class C in package P, the filename will be C.java and the qualified name will
-                                // be P/C. If there is another class D in C.java, that is not the main class, 
+                                // be P/C. If there is another class D in C.java, that is not the main class,
                                 // the file of that class will be C.java, too, and its qualified name will be
                                 // P/D. If there is another class I nested in class C, the file of I will again
                                 // be C.java, but its qualified name will be P/D$I. The delimiter $ is used
