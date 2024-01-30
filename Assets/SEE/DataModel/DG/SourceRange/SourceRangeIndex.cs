@@ -19,7 +19,6 @@ namespace SEE.DataModel.DG.SourceRange
             {
                 BuildIndex(root);
             }
-            Dump();
         }
 
         /// <summary>
