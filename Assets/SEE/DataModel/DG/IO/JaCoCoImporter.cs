@@ -75,7 +75,7 @@ namespace SEE.DataModel.DG.IO
 
                 // The fully qualified name of a class in JaCoCo's XML report, where
                 // a foward slash / is used as a separator, e.g., CodeFacts/CountConsonants.
-                string qualifiedClassName = null; 
+                string qualifiedClassName = null;
 
                 // The name of the source-code file for a class in JaCoCo's report,
                 // e.g. CountConsonants.java. This filename is apparently always a
