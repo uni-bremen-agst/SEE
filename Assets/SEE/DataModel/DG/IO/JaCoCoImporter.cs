@@ -278,7 +278,7 @@ namespace SEE.DataModel.DG.IO
             }
 
             int lastSeparatorPosition = qualifiedClassName.LastIndexOf(jacocoSeparator);
-            if (lastSeparatorPosition == -1) 
+            if (lastSeparatorPosition == -1)
             {
                 return sourceFilename;
             }
