@@ -89,7 +89,7 @@ namespace SEE.DataModel.DG.IO
                 // only methods have. Yet, we need a source line to look up the node
                 // in the source-range index. That is why we do not reset the source
                 // line whose processing has finished. Instead we keep its value and
-                // re-use it to look up the class. Because methods are necessarily 
+                // re-use it to look up the class. Because methods are necessarily
                 // nested in a class, we can as well use this line to look up the
                 // class. Note also that there is always at least one method
                 // for each class -- even if the developer did not code one.
