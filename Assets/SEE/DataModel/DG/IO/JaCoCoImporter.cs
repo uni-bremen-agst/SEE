@@ -32,7 +32,7 @@ namespace SEE.DataModel.DG.IO
         private const string methodContext = "method";
 
         /// <summary>
-        /// Starts reading a JaCoCo test report in XML given by <paramref name="filepath"/>.
+        /// Loads a JaCoCo test report from the given JaCoCo XML <paramref name="filepath"/>.
         /// The retrieved coverage metrics will be added to nodes of <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">Graph where to add the metrics</param>
