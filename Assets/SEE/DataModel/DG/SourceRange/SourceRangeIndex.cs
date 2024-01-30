@@ -5,7 +5,7 @@ namespace SEE.DataModel.DG.SourceRange
 {
     /// <summary>
     /// A source-location based node index that allows to search for graph nodes
-    /// based on a path and source line.
+    /// based on a file path and source line.
     /// </summary>
     internal partial class SourceRangeIndex
     {
@@ -153,8 +153,9 @@ namespace SEE.DataModel.DG.SourceRange
         }
 
         /// <summary>
-        /// Dumps the index for debugging.
+        /// Dumps the index.
         /// </summary>
+        /// <remarks>Can be used for debugging.</remarks>
         private void Dump()
         {
             foreach (var entry in files)
@@ -187,7 +188,7 @@ namespace SEE.DataModel.DG.SourceRange
 
         /// <summary>
         /// Adds <paramref name="root"/> to the index and then
-        /// recurses into its descendants.
+        /// recurses into its descendants to add these to the index, too.
         /// </summary>
         /// <param name="root">root node of the graph</param>
         private void BuildIndex(Node root)
