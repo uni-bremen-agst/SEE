@@ -12,7 +12,7 @@ namespace SEE.DataModel.DG.IO
     /// This class implements everything that is necessary to read a JaCoCo test report in
     /// XML and adds the metrics to the graph nodes.
     /// </summary>
-    public class JaCoCoImporter
+    internal class JaCoCoImporter
     {
         /// <summary>
         /// A report XML node is currently processed.

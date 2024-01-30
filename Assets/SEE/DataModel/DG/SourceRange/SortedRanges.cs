@@ -8,7 +8,7 @@ namespace SEE.DataModel.DG.SourceRange
     /// <summary>
     /// Represents sorted lists of <see cref="Range"/>s.
     /// </summary>
-    public class SortedRanges : IEnumerable<Range>
+    internal class SortedRanges : IEnumerable<Range>
     {
         /// <summary>
         /// The sorted list of ranges.
