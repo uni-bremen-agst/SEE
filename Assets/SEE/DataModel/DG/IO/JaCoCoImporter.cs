@@ -67,13 +67,27 @@ namespace SEE.DataModel.DG.IO
 
                 // The fully qualified name of the package currently processed.
                 // The name is retrieved from JaCoCo's XML report, where
-                // a foward slash / is used as a separator, e.g., mypackage/mysubpackage.
+                // a forward slash / is used as a separator, e.g., mypackage/mysubpackage.
                 // A package name may be empty (in cases where the default package was
                 // intended by a developer).
                 string packageName = string.Empty;
 
                 // The fully qualified name of the currently processed class in JaCoCo's XML report,
                 // where a foward slash / is used as a separator, e.g., CodeFacts/CountConsonants.
+                //
+                // The qualifiedClassName contains the name of the path prefixed by the
+                // packages it is contained in. In Java, the name of a source file is
+                // the name of the main class in this file, appended by the file extension ".java".
+                // A Java file, however, may have other classes - inner classes as well as classes
+                // at the top level of the file. JaCoCo will report both kinds of non-main classes
+                // with the same filename (obviously) as the filename of the main class. Only the
+                // qualified name of non-main classes will differ. For instance, if we have a main
+                // class C in package P, the filename will be C.java and the qualified name will
+                // be P/C. If there is another class D in C.java, that is not the main class,
+                // the file of that class will be C.java, too, and its qualified name will be
+                // P/D. If there is another class I nested in class C, the file of I will again
+                // be C.java, but its qualified name will be P/D$I. The delimiter $ is used
+                // to separate inner classes from the classes they are nested in.
                 string qualifiedClassName = null;
 
                 // The name of the source-code file for a class in JaCoCo's report,
@@ -103,14 +117,14 @@ namespace SEE.DataModel.DG.IO
                 //  <counter type = "CLASS" missed = "5" covered = "7" />
 
                 // Stack to store the XML node type, that is, the values of nodeType.
-                // The inner-most XML node type is at the top
+                // The inner-most XML node type is at the top. This gives us the context
+                // we are currently working in. The XML nodes may be nested deeply.
                 Stack<string> nodeTypeStack = new();
 
                 // True if the currently processed XML node type is "sourcefile". If true, the
                 // read metrics will be ignored.
                 bool inSourcefile = false;
 
-                // Starts reading the XML tag by tag and checks what NodeType the tag has
                 while (xmlReader.Read())
                 {
                     switch (xmlReader.NodeType)
@@ -127,11 +141,10 @@ namespace SEE.DataModel.DG.IO
                                     // file extension ".java" but excluding the directories this file is
                                     // contained in.
                                     sourceFilename = xmlReader.GetAttribute("sourcefilename");
-                                    // Attribute name consists of the fully qualified class name where
+                                    // Attribute 'name' consists of the fully qualified class name where
                                     // a slash / is used as a separator.
                                     qualifiedClassName = xmlReader.GetAttribute("name");
                                 }
-                                // Sets the line where a method is found by JaCoCo
                                 else if (xmlReader.Name == methodContext)
                                 {
                                     // Attribute line refers to the line in which the opening curly bracket
@@ -147,15 +160,9 @@ namespace SEE.DataModel.DG.IO
                                              + "Data for the default Java package (without name) were given. These will be ignored.\n");
                                     }
                                 }
-
-                                // Here we assume that the XML clause's name corresponds to our
-                                // graph node types where our node types' names start with a capital
-                                // letter. E.g., XML clause "method" corresponds to node type "Method".
-                                // "Report" will be pushed, too, even though we do not have such a
-                                // node type. We will take of that below.
                                 nodeTypeStack.Push(xmlReader.Name);
                             }
-                            // skip sourcefile and its counter
+                            // skip sourcefile and its counter XML nodes
                             else if (xmlReader.Name == "sourcefile")
                             {
                                 // From now on we are in the section where the executed lines are listed
@@ -163,41 +170,29 @@ namespace SEE.DataModel.DG.IO
                                 inSourcefile = true;
                                 continue;
                             }
-                            // read metrics-counter and create NodeKey dependiing on nodeType
                             else if (!inSourcefile && xmlReader.Name == "counter")
                             {
-                                // A clause counter may occur both nested in a sourcefile clause and
+                                // An XML node 'counter' may occur both nested in a sourcefile clause and
                                 // in a class clause. When we arrive here, the counter is one in
-                                // a class clause.
+                                // a class clause. These counters are processed and added to a graph node.
                                 nodeType = nodeTypeStack.Peek();
 
-                                // The qualifiedClassName contains the name of the path prefixed by the
-                                // packages it is contained in. In Java, the name of a source file is
-                                // the name of the main class in this file, appended by the file extension ".java".
-                                // A Java file, however, may have other classes - inner classes as well as classes
-                                // at the top level of the file. JaCoCo will report both kinds of non-main classes
-                                // with the same filename (obviously) as the filename of the main class. Only the
-                                // qualified name of non-main classes will differ. For instance, if we have a main
-                                // class C in package P, the filename will be C.java and the qualified name will
-                                // be P/C. If there is another class D in C.java, that is not the main class,
-                                // the file of that class will be C.java, too, and its qualified name will be
-                                // P/D. If there is another class I nested in class C, the file of I will again
-                                // be C.java, but its qualified name will be P/D$I. The delimiter $ is used
-                                // to separate inner classes from the classes they are nested in.
-                                // To get the project-relative path, we thus need to replace the last word
-                                // of the qualifiedClassName by the sourceFilename. That is whay GetPath() does.
                                 try
                                 {
                                     if (nodeType == packageContext)
                                     {
                                         if (string.IsNullOrWhiteSpace(packageName))
                                         {
-                                            // There is no need to add metrics with an empty link name.
+                                            // There is no chance to add metrics if we have an empty link name.
+                                            // It is not an error, though, because a developer could have nested
+                                            // a class within the default package, which does not have a name.
+                                            // If we encounter this case, we have already reported it above.
                                         }
                                         else
                                         {
                                             // Packages have no source range and, hence, are not represented in the
-                                            // source-range index. We need to use a different approach to retrieve their node.
+                                            // source-range index. We need to use a different approach to retrieve their
+                                            // node from the graph.
                                             // We do that via the unique ID of a package node, which is assumed to be
                                             // the fully qualified name of the packages where individual packages are
                                             // separated by a period.
@@ -226,17 +221,19 @@ namespace SEE.DataModel.DG.IO
                                     {
                                         // We add all metrics reported at the report level to the root of the graph
                                         // A non-empty graph has always a root node.
-                                        // Note that we might override the values of another node that we processed
-                                        // and for which we added metrics.
+                                        // Note that we might override the values of another node -- happened to be the
+                                        // root -- that we processed previously and for which we added metrics.
                                         AddMetrics(xmlReader, graph.GetRoots()[0]);
                                     }
-                                    else if (index.TryGetValue(GetPath(qualifiedClassName, sourceFilename), sourceLine, out Node nodeToAddMetrics))
+                                    else if (index.TryGetValue(GetPath(qualifiedClassName, sourceFilename),
+                                                               sourceLine, out Node nodeToAddMetrics))
                                     {
                                         AddMetrics(xmlReader, nodeToAddMetrics);
                                     }
                                     else
                                     {
-                                        Debug.LogError($"{XMLSourcePosition(filepath, xmlReader)}: No node found for: {qualifiedClassName}:{sourceLine}  [{nodeType}].\n");
+                                        Debug.LogError($"{XMLSourcePosition(filepath, xmlReader)}: "
+                                            + "No node found for: {qualifiedClassName}:{sourceLine}  [{nodeType}].\n");
                                     }
                                 }
                                 catch (Exception e)
@@ -247,26 +244,34 @@ namespace SEE.DataModel.DG.IO
                             }
                             break;
 
-                        // set attributes to default when tag is closed
+                        // re-sets attributes to default when tag is closed
                         case XmlNodeType.EndElement:
-                            if (xmlReader.Name == classContext)
+                            if (xmlReader.Name == reportContext
+                                || xmlReader.Name == packageContext
+                                || xmlReader.Name == classContext
+                                || xmlReader.Name == methodContext)
                             {
-                                qualifiedClassName = null;
-                                sourceFilename = null;
-                            }
-                            else if (xmlReader.Name == methodContext)
-                            {
-                                sourceLine = -1;
-                            }
-                            else if (xmlReader.Name == "sourcefile" || xmlReader.Name == "line" || xmlReader.Name == "sessioninfo")
-                            {
-                                if (xmlReader.Name == "sourcefile")
+                                // Only for the XML nodes listed in the condition above, we pushed a context.
+                                nodeTypeStack.Pop();
+
+                                if (xmlReader.Name == classContext)
                                 {
-                                    inSourcefile = false;
+                                    qualifiedClassName = null;
+                                    sourceFilename = null;
                                 }
-                                continue;
+                                else if (xmlReader.Name == methodContext)
+                                {
+                                    sourceLine = -1;
+                                }
+                                else if (xmlReader.Name == packageContext)
+                                {
+                                    packageName = string.Empty;
+                                }
                             }
-                            nodeTypeStack.Pop();
+                            else if (xmlReader.Name == "sourcefile")
+                            {
+                                inSourcefile = false;
+                            }
                             break;
                     }
                 }
@@ -276,7 +281,7 @@ namespace SEE.DataModel.DG.IO
                 Debug.LogError($"An error occurred: {ex.Message}.\n");
             }
 
-            // Retrieves the various metrics from xmlReader and adds them to nodeToAddMetrics
+            // Retrieves the counter metrics from xmlReader and adds them to nodeToAddMetrics
             static void AddMetrics(XmlReader xmlReader, Node nodeToAddMetrics)
             {
                 int missed = int.Parse(xmlReader.GetAttribute("missed"), CultureInfo.InvariantCulture.NumberFormat);
@@ -291,14 +296,13 @@ namespace SEE.DataModel.DG.IO
                 nodeToAddMetrics.SetFloat(metricNamePrefix + "_percentage", percentage);
             }
 
-            // Retrieves the various metrics from xmlReader and adds them to a package or class
+            // Retrieves the counter metrics from xmlReader and adds them to a package or class
             // node retrieved from the given graph having the given uniqueID.
             // Note: the actually used node ID is uniqueID where every / is replaced by a period.
             void AddMetricsToClassOrPackage(Graph graph, XmlReader xmlReader, string uniqueID)
             {
                 // JaCoCo uses "/" as a separator for packages and classes while our graph is
-                // assumed to use a period "." to separate package names in unique IDs
-                // for packages and classes.
+                // assumed to use a period "." to separate package/class names in unique IDs.
                 Node packageOrClassNode = graph.GetNode(uniqueID.Replace("/", "."));
                 if (packageOrClassNode != null)
                 {
@@ -318,7 +322,7 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="filepath">name of the XML file currently processed</param>
         /// <param name="xmlReader">the XML reader processing the XML file</param>
-        /// <returns></returns>
+        /// <returns>the source position of the XML file</returns>
         private static string XMLSourcePosition(string filepath, XmlReader xmlReader)
         {
             string position = "<unknown>";
