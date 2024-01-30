@@ -59,7 +59,7 @@ namespace SEE.DataModel.DG.SourceRange
 
         /// <summary>
         /// Searches for a range containing the given <paramref name="line"/>.
-        /// If it one exists, that range will be contained in <paramref name="range"/>
+        /// If one exists, that range will be contained in <paramref name="range"/>
         /// and true will be returned; otherwise false will be returned and <paramref name="range"/>
         /// will be undefined.
         /// </summary>
@@ -83,7 +83,7 @@ namespace SEE.DataModel.DG.SourceRange
 
         /// <summary>
         /// Searches for a range containing the given <paramref name="line"/>.
-        /// If it one exists, the index of this range will be contained in <paramref name="index"/>
+        /// If one exists, the index of this range will be contained in <paramref name="index"/>
         /// and true will be returned; otherwise false will be returned and <paramref name="index"/>
         /// is the position at which a range would be added starting with <paramref name="line"/>.
         /// </summary>
