@@ -15,26 +15,6 @@ namespace SEE.Game.Drawable.Configurations
     public class ImageConf : DrawableType, ICloneable
     {
         /// <summary>
-        /// The position of the image.
-        /// </summary>
-        public Vector3 position;
-
-        /// <summary>
-        /// The euler angles of the image.
-        /// </summary>
-        public Vector3 eulerAngles;
-
-        /// <summary>
-        /// The scale of the text.
-        /// </summary>
-        public Vector3 scale;
-
-        /// <summary>
-        /// The order in layer for this drawable object.
-        /// </summary>
-        public int orderInLayer;
-
-        /// <summary>
         /// The color of the image.
         /// </summary>
         public Color imageColor;
@@ -48,31 +28,6 @@ namespace SEE.Game.Drawable.Configurations
         /// The file path where the image is located.
         /// </summary>
         public string path;
-
-        /// <summary>
-        /// Label in the configuration file for the id of the image.
-        /// </summary>
-        private const string IDLabel = "IDLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the position of the image.
-        /// </summary>
-        private const string PositionLabel = "PositionLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the euler angles of the image.
-        /// </summary>
-        private const string EulerAnglesLabel = "EulerAnglesLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the scale of the image.
-        /// </summary>
-        private const string ScaleLabel = "ScaleLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the order in layer of the image.
-        /// </summary>
-        private const string OrderInLayerLabel = "OrderInLayerLabel";
 
         /// <summary>
         /// Label in the configurtation file for the color of the image.
@@ -133,14 +88,10 @@ namespace SEE.Game.Drawable.Configurations
         /// Writes this instances' attributes into the given <see cref="ConfigWriter"/>.
         /// </summary>
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes into.</param>
-        internal void Save(ConfigWriter writer)
+        override internal void Save(ConfigWriter writer)
         {
             writer.BeginGroup();
-            writer.Save(id, IDLabel);
-            writer.Save(position, PositionLabel);
-            writer.Save(eulerAngles, EulerAnglesLabel);
-            writer.Save(scale, ScaleLabel);
-            writer.Save(orderInLayer, OrderInLayerLabel);
+            base.Save(writer);
             writer.Save(imageColor, ColorLabel);
             writer.Save(path, PathLabel);
             writer.EndGroup();
@@ -155,61 +106,10 @@ namespace SEE.Game.Drawable.Configurations
         /// has to be the representation of a <see cref="ImageConf"/> as created by
         /// <see cref="ConfigWriter"/>.</param>
         /// <returns>Whether or not the <see cref="ImageConf"/> was loaded without errors.</returns>
-        internal bool Restore(Dictionary<string, object> attributes)
+        override internal bool Restore(Dictionary<string, object> attributes)
         {
-            bool errors = false;
-            /// Try to restores the id.
-            if (attributes.TryGetValue(IDLabel, out object name))
-            {
-                id = (string)name;
-            }
-            else
-            {
-                errors = true;
-            }
-
-            /// Try to restores the position.
-            Vector3 loadedPosition = Vector3.zero;
-            if (ConfigIO.Restore(attributes, PositionLabel, ref loadedPosition))
-            {
-                position = loadedPosition;
-            }
-            else
-            {
-                position = Vector3.zero;
-                errors = true;
-            }
-
-            /// Try to restores the scale.
-            Vector3 loadedScale = Vector3.zero;
-            if (ConfigIO.Restore(attributes, ScaleLabel, ref loadedScale))
-            {
-                scale = loadedScale;
-            }
-            else
-            {
-                scale = Vector3.zero;
-                errors = true;
-            }
-
-            /// Try to restores the order in layer.
-            if (!ConfigIO.Restore(attributes, OrderInLayerLabel, ref orderInLayer))
-            {
-                errors = true;
-            }
-
-            /// Try to restores the euler angles.
-            Vector3 loadedEulerAngles = Vector3.zero;
-            if (ConfigIO.Restore(attributes, EulerAnglesLabel, ref loadedEulerAngles))
-            {
-                eulerAngles = loadedEulerAngles;
-            }
-            else
-            {
-                eulerAngles = Vector3.zero;
-                errors = true;
-            }
-
+            bool errors = base.Restore(attributes);
+            
             /// Try to restores the image color.
             Color loadedimageColor = Color.black;
             if (ConfigIO.Restore(attributes, ColorLabel, ref loadedimageColor))

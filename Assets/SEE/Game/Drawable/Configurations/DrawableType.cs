@@ -1,5 +1,7 @@
 ﻿using SEE.Net.Actions.Drawable;
+using SEE.Utils;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game.Drawable.Configurations
@@ -8,12 +10,57 @@ namespace SEE.Game.Drawable.Configurations
     /// The configuration class of the drawable types.
     /// </summary>
     [Serializable]
-    public class DrawableType
+    public abstract class DrawableType
     {
         /// <summary>
-        /// The name of the line.
+        /// The name of the drawable type object.
         /// </summary>
         public string id;
+
+        /// <summary>
+        /// The position of the drawable type object.
+        /// </summary>
+        public Vector3 position;
+
+        /// <summary>
+        /// The euler angles of the drawable type object.
+        /// </summary>
+        public Vector3 eulerAngles;
+
+        /// <summary>
+        /// The scale of the text.
+        /// </summary>
+        public Vector3 scale;
+
+        /// <summary>
+        /// The order in layer for this drawable type object.
+        /// </summary>
+        public int orderInLayer;
+
+        /// <summary>
+        /// Label in the configuration file for the id of a line.
+        /// </summary>
+        private const string IDLabel = "IDLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the position of a line.
+        /// </summary>
+        private const string PositionLabel = "PositionLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the scale of a line.
+        /// </summary>
+        private const string ScaleLabel = "ScaleLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the order in layer of a line.
+        /// </summary>
+        private const string OrderInLayerLabel = "OrderInLayerLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the euler angles of a line.
+        /// </summary>
+        private const string EulerAnglesLabel = "EulerAnglesLabel";
 
         /// <summary>
         /// Gets the drawable type of the given object.
@@ -183,6 +230,87 @@ namespace SEE.Game.Drawable.Configurations
                 default:
                     return 0;
             }
+        }
+
+        /// <summary>
+        /// Writes this instances' attributes into the given <see cref="ConfigWriter"/>.
+        /// </summary>
+        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes into.</param>
+        internal virtual void Save(ConfigWriter writer)
+        {
+            writer.Save(id, IDLabel);
+            writer.Save(position, PositionLabel);
+            writer.Save(eulerAngles, EulerAnglesLabel);
+            writer.Save(scale, ScaleLabel);
+            writer.Save(orderInLayer, OrderInLayerLabel);
+        }
+
+        /// <summary>
+        /// Given the representation of a <see cref="DrawableType"/> as created by the <see cref="ConfigWriter"/>, this
+        /// method parses the attributes from that representation and puts them into this <see cref="DrawableType"/>
+        /// instance.
+        /// </summary>
+        /// <param name="attributes">A list of labels (strings) of attributes and their values (objects). This
+        /// has to be the representation of a <see cref="DrawableType"/> as created by
+        /// <see cref="ConfigWriter"/>.</param>
+        /// <returns>Whether or not the <see cref="DrawableType"/> was loaded without errors.</returns>
+        internal virtual bool Restore(Dictionary<string, object> attributes)
+        {
+            bool errors = false;
+
+            /// Try to restores the id.
+            if (attributes.TryGetValue(IDLabel, out object name))
+            {
+                id = (string)name;
+            }
+            else
+            {
+                errors = true;
+            }
+
+            /// Try to restores the position.
+            Vector3 loadedPosition = Vector3.zero;
+            if (ConfigIO.Restore(attributes, PositionLabel, ref loadedPosition))
+            {
+                position = loadedPosition;
+            }
+            else
+            {
+                position = Vector3.zero;
+                errors = true;
+            }
+
+            /// Try to restores the euler angles.
+            Vector3 loadedEulerAngles = Vector3.zero;
+            if (ConfigIO.Restore(attributes, EulerAnglesLabel, ref loadedEulerAngles))
+            {
+                eulerAngles = loadedEulerAngles;
+            }
+            else
+            {
+                eulerAngles = Vector3.zero;
+                errors = true;
+            }
+
+            /// Try to restores the scale.
+            Vector3 loadedScale = Vector3.zero;
+            if (ConfigIO.Restore(attributes, ScaleLabel, ref loadedScale))
+            {
+                scale = loadedScale;
+            }
+            else
+            {
+                scale = Vector3.zero;
+                errors = true;
+            }
+
+            /// Try to restores the order in layer.
+            if (!ConfigIO.Restore(attributes, OrderInLayerLabel, ref orderInLayer))
+            {
+                errors = true;
+            }
+
+            return errors;
         }
     }
 }

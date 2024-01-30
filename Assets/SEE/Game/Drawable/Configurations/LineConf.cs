@@ -13,16 +13,6 @@ namespace SEE.Game.Drawable.Configurations
     public class LineConf : DrawableType, ICloneable
     {
         /// <summary>
-        /// The position of the line.
-        /// </summary>
-        public Vector3 position;
-
-        /// <summary>
-        /// The scale of the line.
-        /// </summary>
-        public Vector3 scale;
-
-        /// <summary>
         /// The renderer positions of the drawed points.
         /// </summary>
         public Vector3[] rendererPositions;
@@ -54,19 +44,9 @@ namespace SEE.Game.Drawable.Configurations
         public GameDrawer.ColorKind colorKind;
 
         /// <summary>
-        /// The order in layer for this drawable object.
-        /// </summary>
-        public int orderInLayer;
-
-        /// <summary>
         /// The thickness of the line.
         /// </summary>
         public float thickness;
-
-        /// <summary>
-        /// The euler angles of the line.
-        /// </summary>
-        public Vector3 eulerAngles;
 
         /// <summary>
         /// The line kind of the line (Solid/Dashed/Dashed25/Dashed50/Dashed75/Dashed100)
@@ -77,21 +57,6 @@ namespace SEE.Game.Drawable.Configurations
         /// The tiling of a dashed line. Only used for "Dashed" line kind.
         /// </summary>
         public float tiling;
-
-        /// <summary>
-        /// Label in the configuration file for the id of a line.
-        /// </summary>
-        private const string IDLabel = "IDLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the position of a line.
-        /// </summary>
-        private const string PositionLabel = "PositionLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the scale of a line.
-        /// </summary>
-        private const string ScaleLabel = "ScaleLabel";
 
         /// <summary>
         /// Label in the configuration file for the positions of the line renderer for a line.
@@ -119,19 +84,9 @@ namespace SEE.Game.Drawable.Configurations
         private const string ColorKindLabel = "ColorKindLabel";
 
         /// <summary>
-        /// Label in the configuration file for the order in layer of a line.
-        /// </summary>
-        private const string OrderInLayerLabel = "OrderInLayerLabel";
-
-        /// <summary>
         /// Label in the configuration file for the thickness of a line.
         /// </summary>
         private const string ThicknessLabel = "ThicknessLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the euler angles of a line.
-        /// </summary>
-        private const string EulerAnglesLabel = "EulerAnglesLabel";
 
         /// <summary>
         /// Label in the configuration file for the line kind of a line.
@@ -216,16 +171,13 @@ namespace SEE.Game.Drawable.Configurations
         /// Writes this instances' attributes into the given <see cref="ConfigWriter"/>.
         /// </summary>
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes into.</param>
-        internal void Save(ConfigWriter writer)
+        override internal void Save(ConfigWriter writer)
         {
             writer.BeginGroup();
-            writer.Save(id, IDLabel);
-            writer.Save(position, PositionLabel);
-            writer.Save(scale, ScaleLabel);
+            base.Save(writer);
             writer.Save(colorKind.ToString(), ColorKindLabel);
             writer.Save(primaryColor, PrimaryColorLabel);
             writer.Save(secondaryColor, SecondaryColorLabel);
-            writer.Save(orderInLayer, OrderInLayerLabel);
             writer.Save(thickness, ThicknessLabel);
             writer.Save(loop, LoopLabel);
             writer.Save(lineKind.ToString(), LineKindLabel);
@@ -235,7 +187,6 @@ namespace SEE.Game.Drawable.Configurations
                 rendererPositionConfigs.Add(new Vector3Config() { vector = pos });
             }
             writer.Save(rendererPositionConfigs, RendererPositionsLabel);
-            writer.Save(eulerAngles, EulerAnglesLabel);
             writer.EndGroup();
         }
 
@@ -248,43 +199,9 @@ namespace SEE.Game.Drawable.Configurations
         /// has to be the representation of a <see cref="LineConf"/> as created by
         /// <see cref="ConfigWriter"/>.</param>
         /// <returns>Whether or not the <see cref="LineConf"/> was loaded without errors.</returns>
-        internal bool Restore(Dictionary<string, object> attributes)
+        new internal bool Restore(Dictionary<string, object> attributes)
         {
-            bool errors = false;
-
-            /// Try to restores the id.
-            if (attributes.TryGetValue(IDLabel, out object name))
-            {
-                id = (string)name;
-            }
-            else
-            {
-                errors = true;
-            }
-
-            /// Try to restores the position.
-            Vector3 loadedPosition = Vector3.zero;
-            if (ConfigIO.Restore(attributes, PositionLabel, ref loadedPosition))
-            {
-                position = loadedPosition;
-            }
-            else
-            {
-                position = Vector3.zero;
-                errors = true;
-            }
-
-            /// Try to restores the scale.
-            Vector3 loadedScale = Vector3.zero;
-            if (ConfigIO.Restore(attributes, ScaleLabel, ref loadedScale))
-            {
-                scale = loadedScale;
-            }
-            else
-            {
-                scale = Vector3.zero;
-                errors = true;
-            }
+            bool errors = base.Restore(attributes);
 
             /// Try to restores the color kind
             if (attributes.TryGetValue(ColorKindLabel, out object cKind) 
@@ -322,12 +239,6 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
-            /// Try to restores the order in layer.
-            if (!ConfigIO.Restore(attributes, OrderInLayerLabel, ref orderInLayer))
-            {
-                errors = true;
-            }
-
             /// Try to restores the thickness.
             if (attributes.TryGetValue(ThicknessLabel, out object thick))
             {
@@ -362,18 +273,6 @@ namespace SEE.Game.Drawable.Configurations
                     listRendererPositions.Add(config.vector);
                 }
                 rendererPositions = listRendererPositions.ToArray();
-            }
-
-            /// Try to restores the euler angles.
-            Vector3 loadedEulerAngles = Vector3.zero;
-            if (ConfigIO.Restore(attributes, EulerAnglesLabel, ref loadedEulerAngles))
-            {
-                eulerAngles = loadedEulerAngles;
-            }
-            else
-            {
-                eulerAngles = Vector3.zero;
-                errors = true;
             }
 
             /// Try to restores the tiling.

@@ -14,21 +14,6 @@ namespace SEE.Game.Drawable.Configurations
     public class TextConf : DrawableType, ICloneable
     {
         /// <summary>
-        /// The position of the text.
-        /// </summary>
-        public Vector3 position;
-
-        /// <summary>
-        /// The euler angles of the text.
-        /// </summary>
-        public Vector3 eulerAngles;
-
-        /// <summary>
-        /// The scale of the text.
-        /// </summary>
-        public Vector3 scale;
-
-        /// <summary>
         /// The written text.
         /// </summary>
         public string text;
@@ -63,31 +48,6 @@ namespace SEE.Game.Drawable.Configurations
         /// The font size of the text.
         /// </summary>
         public float fontSize;
-        
-        /// <summary>
-        /// The order in layer for this drawable object.
-        /// </summary>
-        public int orderInLayer;
-
-        /// <summary>
-        /// Label in the configuration file for the id of a text.
-        /// </summary>
-        private const string IDLabel = "IDLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the position of a text.
-        /// </summary>
-        private const string PositionLabel = "PositionLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the euler angles of a text.
-        /// </summary>
-        private const string EulerAnglesLabel = "EulerAnglesLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the scale of a text.
-        /// </summary>
-        private const string ScaleLabel = "ScaleLabel";
 
         /// <summary>
         /// Label in the configuration file for the text of a text.
@@ -123,11 +83,6 @@ namespace SEE.Game.Drawable.Configurations
         /// Label in the configuration file for the font styles of a text.
         /// </summary>
         private const string FontStylesLabel = "FontStylesLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the order in layer of a text.
-        /// </summary>
-        private const string OrderInLayerLabel = "OrderInLayerLabel";
 
         /// <summary>
         /// Creates a <see cref="TextConf"/> for the given game object.
@@ -187,13 +142,10 @@ namespace SEE.Game.Drawable.Configurations
         /// Writes this instances' attributes into the given <see cref="ConfigWriter"/>.
         /// </summary>
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes into.</param>
-        internal void Save(ConfigWriter writer)
+        override internal void Save(ConfigWriter writer)
         {
             writer.BeginGroup();
-            writer.Save(id, IDLabel);
-            writer.Save(position, PositionLabel);
-            writer.Save(eulerAngles, EulerAnglesLabel);
-            writer.Save(scale, ScaleLabel);
+            base.Save(writer);
             writer.Save(text, TextLabel);
             writer.Save(fontColor, FontColorLabel);
             writer.Save(outlineStatus, OutlineStatusLabel);
@@ -201,7 +153,6 @@ namespace SEE.Game.Drawable.Configurations
             writer.Save(outlineThickness, OutlineThicknessColorLabel);
             writer.Save(fontSize, FontSizeLabel);
             writer.Save(fontStyles.ToString(), FontStylesLabel);
-            writer.Save(orderInLayer, OrderInLayerLabel);
             writer.EndGroup();
         }
 
@@ -214,55 +165,9 @@ namespace SEE.Game.Drawable.Configurations
         /// has to be the representation of a <see cref="LineConf"/> as created by
         /// <see cref="ConfigWriter"/>.</param>
         /// <returns>Whether or not the <see cref="LineConf"/> was loaded without errors.</returns>
-        internal bool Restore(Dictionary<string, object> attributes)
+        override internal bool Restore(Dictionary<string, object> attributes)
         {
-            bool errors = false;
-
-            /// Try to restores the id.
-            if (attributes.TryGetValue(IDLabel, out object name))
-            {
-                id = (string)name;
-            }
-            else
-            {
-                errors = true;
-            }
-
-            /// Try to restores the position.
-            Vector3 loadedPosition = Vector3.zero;
-            if (ConfigIO.Restore(attributes, PositionLabel, ref loadedPosition))
-            {
-                position = loadedPosition;
-            }
-            else
-            {
-                position = Vector3.zero;
-                errors = true;
-            }
-
-            /// Try to restores the euler angles.
-            Vector3 loadedEulerAngles = Vector3.zero;
-            if (ConfigIO.Restore(attributes, EulerAnglesLabel, ref loadedEulerAngles))
-            {
-                eulerAngles = loadedEulerAngles;
-            }
-            else
-            {
-                eulerAngles = Vector3.zero;
-                errors = true;
-            }
-
-            /// Try to restores the scale.
-            Vector3 loadedScale = Vector3.zero;
-            if (ConfigIO.Restore(attributes, ScaleLabel, ref loadedScale))
-            {
-                scale = loadedScale;
-            }
-            else
-            {
-                scale = Vector3.zero;
-                errors = true;
-            }
+            bool errors = base.Restore(attributes);
 
             /// Try to restores the text.
             if (attributes.TryGetValue(TextLabel, out object txt))
@@ -340,12 +245,6 @@ namespace SEE.Game.Drawable.Configurations
             else
             {
                 fontStyles = FontStyles.Normal;
-                errors = true;
-            }
-
-            /// Try to restores the order in layer.
-            if (!ConfigIO.Restore(attributes, OrderInLayerLabel, ref orderInLayer))
-            {
                 errors = true;
             }
 

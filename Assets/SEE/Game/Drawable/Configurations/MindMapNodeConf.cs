@@ -13,26 +13,6 @@ namespace SEE.Game.Drawable.Configurations
     public class MindMapNodeConf : DrawableType, ICloneable
     {
         /// <summary>
-        /// The position of the node.
-        /// </summary>
-        public Vector3 position;
-
-        /// <summary>
-        /// The scale of the node.
-        /// </summary>
-        public Vector3 scale;
-
-        /// <summary>
-        /// The euler angles of the node.
-        /// </summary>
-        public Vector3 eulerAngles;
-
-        /// <summary>
-        /// The order in layer for this drawable object.
-        /// </summary>
-        public int orderInLayer;
-
-        /// <summary>
         /// The mind map layer of the node.
         /// </summary>
         public int layer;
@@ -75,31 +55,6 @@ namespace SEE.Game.Drawable.Configurations
         /// The dictionary with the children names and the branch line names.
         /// </summary>
         private Dictionary<string, string> childrenStrings = new();
-
-        /// <summary>
-        /// Label in the configuration file for the id of a node.
-        /// </summary>
-        private const string IDLabel = "IDLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the position of a node.
-        /// </summary>
-        private const string PositionLabel = "PositionLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the scale of a node.
-        /// </summary>
-        private const string ScaleLabel = "ScaleLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the euler angles of a line.
-        /// </summary>
-        private const string EulerAnglesLabel = "EulerAnglesLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the order in layer of a line.
-        /// </summary>
-        private const string OrderInLayerLabel = "OrderInLayerLabel";
 
         /// <summary>
         /// Label in the configuration file for the mind map layer of the node.
@@ -212,15 +167,11 @@ namespace SEE.Game.Drawable.Configurations
         /// Writes this instances' attributes into the given <see cref="ConfigWriter"/>.
         /// </summary>
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes into.</param>
-        internal void Save(ConfigWriter writer)
+        override internal void Save(ConfigWriter writer)
         {
 
             writer.BeginGroup();
-            writer.Save(id, IDLabel);
-            writer.Save(position, PositionLabel);
-            writer.Save(scale, ScaleLabel);
-            writer.Save(eulerAngles, EulerAnglesLabel);
-            writer.Save(orderInLayer, OrderInLayerLabel);
+            base.Save(writer);
             writer.Save(layer, LayerLabel);
             writer.Save(parentNode, ParentIDLabel);
             writer.Save(branchLineToParent, ParentBranchLineLabel);
@@ -250,61 +201,9 @@ namespace SEE.Game.Drawable.Configurations
         /// has to be the representation of a <see cref="MindMapNodeConf"/> as created by
         /// <see cref="ConfigWriter"/>.</param>
         /// <returns>Whether or not the <see cref="MindMapNodeConf"/> was loaded without errors.</returns>
-        internal bool Restore(Dictionary<string, object> attributes)
+        override internal bool Restore(Dictionary<string, object> attributes)
         {
-            bool errors = false;
-
-            /// Try to restores the id.
-            if (attributes.TryGetValue(IDLabel, out object name))
-            {
-                id = (string)name;
-            }
-            else
-            {
-                errors = true;
-            }
-
-            /// Try to restores the position.
-            Vector3 loadedPosition = Vector3.zero;
-            if (ConfigIO.Restore(attributes, PositionLabel, ref loadedPosition))
-            {
-                position = loadedPosition;
-            }
-            else
-            {
-                position = Vector3.zero;
-                errors = true;
-            }
-
-            /// Try to restores the scale.
-            Vector3 loadedScale = Vector3.zero;
-            if (ConfigIO.Restore(attributes, ScaleLabel, ref loadedScale))
-            {
-                scale = loadedScale;
-            }
-            else
-            {
-                scale = Vector3.zero;
-                errors = true;
-            }
-
-            /// Try to restores the euler angles.
-            Vector3 loadedEulerAngles = Vector3.zero;
-            if (ConfigIO.Restore(attributes, EulerAnglesLabel, ref loadedEulerAngles))
-            {
-                eulerAngles = loadedEulerAngles;
-            }
-            else
-            {
-                eulerAngles = Vector3.zero;
-                errors = true;
-            }
-
-            /// Try to restores the order in layer.
-            if (!ConfigIO.Restore(attributes, OrderInLayerLabel, ref orderInLayer))
-            {
-                errors = true;
-            }
+            bool errors = base.Restore(attributes);
 
             /// Try to restores the mind map node layer.
             if (!ConfigIO.Restore(attributes, LayerLabel, ref layer))
