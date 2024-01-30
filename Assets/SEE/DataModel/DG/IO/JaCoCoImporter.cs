@@ -2,70 +2,62 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Xml;
 using UnityEngine;
 
 namespace SEE.DataModel.DG.IO
 {
     /// <summary>
-    /// Structure to define a searchKey in a dictionary to find nodes.
-    /// </summary>
-	public readonly struct NodeKey
-    {
-        public string NodeType { get; }
-        public string FileName { get; }
-        public int SourceLine { get; }
-
-        public NodeKey(string nodeType, string fileName, int sourceline)
-        {
-            NodeType = nodeType;
-            FileName = fileName;
-            SourceLine = sourceline;
-        }
-
-        public override readonly bool Equals(object obj)
-        {
-            if (obj is not NodeKey other)
-            {
-                return false;
-            }
-
-            return NodeType == other.NodeType &&
-                   FileName == other.FileName &&
-                   SourceLine == other.SourceLine;
-        }
-
-        public override readonly string ToString()
-        {
-            return $"{NodeType}@{FileName}:{SourceLine}";
-        }
-
-        public override readonly int GetHashCode()
-        {
-            return ToString().GetHashCode();
-        }
-    }
-
-    /// <summary>
     /// This class implements everything that is necessary to read a JaCoCo test report in
     /// XML and adds the metrics to the graph nodes.
     /// </summary>
     public class JaCoCoImporter
     {
+        /// <summary>
+        /// A report XML node is currently processed.
+        /// </summary>
         private const string reportContext = "report";
-        private const string classContext = "class";
+        /// <summary>
+        /// A package XML node is currently processed.
+        /// </summary>
         private const string packageContext = "package";
+        /// <summary>
+        /// A class XML node is currently processed.
+        /// </summary>
+        private const string classContext = "class";
+        /// <summary>
+        /// A method XML node is currently processed.
+        /// </summary>
         private const string methodContext = "method";
 
         /// <summary>
         /// Starts reading a JaCoCo test report in XML given by <paramref name="filepath"/>.
-        /// Test-Metrics will be added to nodes of graph.
+        /// The retrieved coverage metrics will be added to nodes of <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">Graph where to add the metrics</param>
-        /// <param name="filepath">Path of the XM file</param>
-        public static void StartReadingTestXML(Graph graph, string filepath)
+        /// <param name="filepath">Path of the XML file</param>
+        public static void Load(Graph graph, string filepath)
         {
-            // IDictionary<NodeKey, Node> nodeDictionary = GetAllNodes(graph);
+            if (graph == null)
+            {
+                throw new ArgumentNullException("Graph must not be null.");
+            }
+            if (graph.GetRoots().Count == 0)
+            {
+                // graph is empty. Nothing to do.
+                return;
+            }
+            if (string.IsNullOrEmpty(filepath))
+            {
+                throw new ArgumentException("File path must neither be null nor empty.");
+            }
+            if (!File.Exists(filepath))
+            {
+                Debug.LogError($"The JaCoCo XML file named {filepath} does not exist.\n");
+                return;
+            }
+
             SourceRangeIndex index = new(graph);
 
             try
@@ -73,39 +65,35 @@ namespace SEE.DataModel.DG.IO
                 XmlReaderSettings settings = new() { DtdProcessing = DtdProcessing.Parse };
                 using XmlReader xmlReader = XmlReader.Create(filepath, settings);
 
-                // The fully qualified name of a class in JaCoCo's XML report, where
-                // a foward slash / is used as a separator, e.g., CodeFacts/CountConsonants.
+                // The fully qualified name of the package currently processed.
+                // The name is retrieved from JaCoCo's XML report, where
+                // a foward slash / is used as a separator, e.g., mypackage/mysubpackage.
+                // A package name may be empty (in cases where the default package was
+                // intended by a developer).
+                string packageName = string.Empty;
+
+                // The fully qualified name of the currently processed class in JaCoCo's XML report,
+                // where a foward slash / is used as a separator, e.g., CodeFacts/CountConsonants.
                 string qualifiedClassName = null;
 
                 // The name of the source-code file for a class in JaCoCo's report,
                 // e.g. CountConsonants.java. This filename is apparently always a
                 // non-qualified name, that is, the directories this file is contained in
-                // is not part of this name.
+                // are not part of this name.
                 string sourceFilename = null;
 
                 // Source line as retrieved from JaCoCo's XML report, -1 if not set.
                 //
                 // Note that classes do not have a source line in JaCoCo's XML report,
-                // only methods have. Yet, we need a source line to look up the node
-                // in the source-range index. That is why we do not reset the source
-                // line whose processing has finished. Instead we keep its value and
-                // re-use it to look up the class. Because methods are necessarily
-                // nested in a class, we can as well use this line to look up the
-                // class. Note also that there is always at least one method
-                // for each class -- even if the developer did not code one.
-                // If a developer did not write a method, the artificially generated
-                // constructor <init> will exist and will have a source line.
-                //
-                // That is, if the value of sourceLine is different from -1, it may relate
-                // to the currently processed method or the method just processed last.
+                // only methods have.
                 int sourceLine = -1;
 
-                // Type of the element in JaCoCo's report currently processed, that is, the
-                // one to add the metrics, to. This can be any of "Report", "Package",
-                // "Class", or "Method".
+                // Type of the XML node in JaCoCo's report currently processed, that is, the
+                // one to add the metrics, to. This can be any of reportContext, packageContext,
+                // classContext, or methodContext.
                 string nodeType = null;
 
-                // Note: A report clause is the outermost XML clause and may have immediate
+                // Note: A report clause is the outermost XML node and may have immediate
                 // counter clauses itself. E.g.:
                 //  <counter type = "INSTRUCTION" missed = "1395" covered = "494" />
                 //  <counter type = "BRANCH" missed = "110" covered = "22" />
@@ -114,11 +102,13 @@ namespace SEE.DataModel.DG.IO
                 //  <counter type = "METHOD" missed = "47" covered = "26" />
                 //  <counter type = "CLASS" missed = "5" covered = "7" />
 
-                // Stack to store the node type. This can be any of Report, Package, Class, or Method.
-                // The inner-most node type is at the top.
+                // Stack to store the XML node type, that is, the values of nodeType.
+                // The inner-most XML node type is at the top
                 Stack<string> nodeTypeStack = new();
 
-                bool inSourcefile = false; // indicator for sourcefile-tag in the xml to avoid setting this counters
+                // True if the currently processed XML node type is "sourcefile". If true, the
+                // read metrics will be ignored.
+                bool inSourcefile = false;
 
                 // Starts reading the XML tag by tag and checks what NodeType the tag has
                 while (xmlReader.Read())
@@ -139,7 +129,7 @@ namespace SEE.DataModel.DG.IO
                                     sourceFilename = xmlReader.GetAttribute("sourcefilename");
                                     // Attribute name consists of the fully qualified class name where
                                     // a slash / is used as a separator.
-                                    qualifiedClassName = xmlReader.GetAttribute("name") + ".java";
+                                    qualifiedClassName = xmlReader.GetAttribute("name");
                                 }
                                 // Sets the line where a method is found by JaCoCo
                                 else if (xmlReader.Name == methodContext)
@@ -148,6 +138,16 @@ namespace SEE.DataModel.DG.IO
                                     // of the method's body occurs within its source file.
                                     sourceLine = Int32.Parse(xmlReader.GetAttribute("line"));
                                 }
+                                else if (xmlReader.Name == packageContext)
+                                {
+                                    packageName = xmlReader.GetAttribute("name");
+                                    if (string.IsNullOrWhiteSpace(packageName))
+                                    {
+                                        Debug.LogWarning($"{XMLSourcePosition(filepath, xmlReader)}: "
+                                             + "Data for the default Java package (without name) were given. These will be ignored.\n");
+                                    }
+                                }
+
                                 // Here we assume that the XML clause's name corresponds to our
                                 // graph node types where our node types' names start with a capital
                                 // letter. E.g., XML clause "method" corresponds to node type "Method".
@@ -190,36 +190,58 @@ namespace SEE.DataModel.DG.IO
                                 {
                                     if (nodeType == packageContext)
                                     {
-                                        // FIXME: We need to add metrics to the package node.
-                                        // Package nodes do not have a source line.
-                                    } else if (index.TryGetValue(GetPath(qualifiedClassName, sourceFilename), sourceLine, out Node nodeToAddMetric))
+                                        if (string.IsNullOrWhiteSpace(packageName))
+                                        {
+                                            // There is no need to add metrics with an empty link name.
+                                        }
+                                        else
+                                        {
+                                            // Packages have no source range and, hence, are not represented in the
+                                            // source-range index. We need to use a different approach to retrieve their node.
+                                            // We do that via the unique ID of a package node, which is assumed to be
+                                            // the fully qualified name of the packages where individual packages are
+                                            // separated by a period.
+                                            AddMetricsToClassOrPackage(graph, xmlReader, packageName);
+                                        }
+                                    }
+                                    else if (nodeType == classContext)
                                     {
-                                        Debug.Log($"Adding metrics to node {nodeToAddMetric.ID} {qualifiedClassName}:{sourceLine} [{nodeType}].\n");
-
-                                        float missed = float.Parse(xmlReader.GetAttribute("missed"), CultureInfo.InvariantCulture.NumberFormat);
-                                        float covered = float.Parse(xmlReader.GetAttribute("covered"), CultureInfo.InvariantCulture.NumberFormat);
-                                        string metricNamePrefix = "Metric." + xmlReader.GetAttribute("type");
-
-                                        nodeToAddMetric.SetFloat(metricNamePrefix + "_missed", missed);
-                                        nodeToAddMetric.SetFloat(metricNamePrefix + "_covered", covered);
-                                        float percentage = covered + missed > 0 ? covered / (covered + missed) * 100 : 0;
-                                        nodeToAddMetric.SetFloat(metricNamePrefix + "_percentage", percentage);
+                                        // JaCoCo uses a similar way to represent the qualified name of a class
+                                        // as how our graph does for unique IDs for classes - except that JaCoCo
+                                        // uses / as a delimiter between simple names and our graph uses a period
+                                        // as a delimiter. Also inner classes are named equally: both JaCoCo and
+                                        // our unique IDs for graph nodes uses $ to separate the name of the inner
+                                        // class from its nesting class. That allows us to retrieve classes directly
+                                        // from the graph without the need for source positions.
+                                        // Note also that non-main classes in Java (top-level classes declared non-public
+                                        // in a file which already declares a public top-level class) will not cause any
+                                        // problem. For instance, if a non-main class C were declared in a file X.java
+                                        // which declares a main class X contained in package P, there cannot be another
+                                        // file declaring a main class C as a sibling to X within P in the package hierarchy.
+                                        // Both would have the name P.C in our graph. Yet, that would be illegal Java
+                                        // code and, hence, cannot happen.
+                                        AddMetricsToClassOrPackage(graph, xmlReader, qualifiedClassName);
+                                    }
+                                    else if (nodeType == reportContext)
+                                    {
+                                        // We add all metrics reported at the report level to the root of the graph
+                                        // A non-empty graph has always a root node.
+                                        // Note that we might override the values of another node that we processed
+                                        // and for which we added metrics.
+                                        AddMetrics(xmlReader, graph.GetRoots()[0]);
+                                    }
+                                    else if (index.TryGetValue(GetPath(qualifiedClassName, sourceFilename), sourceLine, out Node nodeToAddMetrics))
+                                    {
+                                        AddMetrics(xmlReader, nodeToAddMetrics);
                                     }
                                     else
                                     {
-                                        Debug.LogError($"No node found for: {qualifiedClassName}:{sourceLine}  [{nodeType}].\n");
+                                        Debug.LogError($"{XMLSourcePosition(filepath, xmlReader)}: No node found for: {qualifiedClassName}:{sourceLine}  [{nodeType}].\n");
                                     }
                                 }
-                                catch
+                                catch (Exception e)
                                 {
-                                    string position = "<unknown>";
-
-                                    if (xmlReader is IXmlLineInfo xmlLineInfo && xmlLineInfo.HasLineInfo())
-                                    {
-                                        position = "line " + xmlLineInfo.LineNumber.ToString() + " and column " + xmlLineInfo.LinePosition.ToString();
-                                    }
-
-                                    Debug.LogError($"Error at: {position}.\n");
+                                    Debug.LogError($"{XMLSourcePosition(filepath, xmlReader)}: {e.Message}.\n");
                                     throw;
                                 }
                             }
@@ -234,8 +256,7 @@ namespace SEE.DataModel.DG.IO
                             }
                             else if (xmlReader.Name == methodContext)
                             {
-                                // We do not reset sourceLine for the reasons stated above. We need it for
-                                // for looking up the class whose method was just processed.
+                                sourceLine = -1;
                             }
                             else if (xmlReader.Name == "sourcefile" || xmlReader.Name == "line" || xmlReader.Name == "sessioninfo")
                             {
@@ -254,6 +275,61 @@ namespace SEE.DataModel.DG.IO
             {
                 Debug.LogError($"An error occurred: {ex.Message}.\n");
             }
+
+            // Retrieves the various metrics from xmlReader and adds them to nodeToAddMetrics
+            static void AddMetrics(XmlReader xmlReader, Node nodeToAddMetrics)
+            {
+                int missed = int.Parse(xmlReader.GetAttribute("missed"), CultureInfo.InvariantCulture.NumberFormat);
+                int covered = int.Parse(xmlReader.GetAttribute("covered"), CultureInfo.InvariantCulture.NumberFormat);
+
+                string metricNamePrefix = "Metric." + xmlReader.GetAttribute("type");
+
+                nodeToAddMetrics.SetInt(metricNamePrefix + "_missed", missed);
+                nodeToAddMetrics.SetInt(metricNamePrefix + "_covered", covered);
+
+                float percentage = covered + missed > 0 ? covered / (covered + missed) * 100 : 0;
+                nodeToAddMetrics.SetFloat(metricNamePrefix + "_percentage", percentage);
+            }
+
+            // Retrieves the various metrics from xmlReader and adds them to a package or class
+            // node retrieved from the given graph having the given uniqueID.
+            // Note: the actually used node ID is uniqueID where every / is replaced by a period.
+            void AddMetricsToClassOrPackage(Graph graph, XmlReader xmlReader, string uniqueID)
+            {
+                // JaCoCo uses "/" as a separator for packages and classes while our graph is
+                // assumed to use a period "." to separate package names in unique IDs
+                // for packages and classes.
+                Node packageOrClassNode = graph.GetNode(uniqueID.Replace("/", "."));
+                if (packageOrClassNode != null)
+                {
+                    AddMetrics(xmlReader, packageOrClassNode);
+                }
+                else
+                {
+                    Debug.LogError($"{XMLSourcePosition(filepath, xmlReader)}: No node found for package/class {uniqueID}.\n");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the source position of the XML code currently processed by <paramref name="xmlReader"/>.
+        /// The position is reported as <paramref name="filepath"/>:line:column. In case no source position
+        /// can be retrieved <paramref name="filepath"/>:<unknown> will returned.
+        /// </summary>
+        /// <param name="filepath">name of the XML file currently processed</param>
+        /// <param name="xmlReader">the XML reader processing the XML file</param>
+        /// <returns></returns>
+        private static string XMLSourcePosition(string filepath, XmlReader xmlReader)
+        {
+            string position = "<unknown>";
+
+            if (xmlReader is IXmlLineInfo xmlLineInfo && xmlLineInfo.HasLineInfo())
+            {
+                position = xmlLineInfo.LineNumber.ToString() + ":"
+                    + xmlLineInfo.LinePosition.ToString();
+            }
+
+            return $"{filepath}:{position}";
         }
 
         /// <summary>
