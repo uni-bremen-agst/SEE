@@ -119,7 +119,7 @@ namespace SEE.DataModel.DG.SourceRange
             SourceRangeIndex index = new(g);
             Assert.IsFalse(index.IsIsomorphic());
 
-            LogAssert.Expect(LogType.Error, new Regex(@"Range .* is subsumed by .*"));
+            LogAssert.Expect(LogType.Error, new Regex("Range .* is subsumed by .*"));
         }
 
         [Test]
