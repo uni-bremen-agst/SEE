@@ -146,7 +146,7 @@ namespace SEE.DataModel.DG.IO
                                 {
                                     // Attribute line refers to the line in which the opening curly bracket
                                     // of the method's body occurs within its source file.
-                                    sourceLine = Int32.Parse(xmlReader.GetAttribute("line"));
+                                    sourceLine = int.Parse(xmlReader.GetAttribute("line"));
                                 }
                                 else if (xmlReader.Name == packageContext)
                                 {
