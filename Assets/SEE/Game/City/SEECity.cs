@@ -42,7 +42,7 @@ namespace SEE.Game.City
         public FilePath CSVPath = new();
 
         /// <summary>
-        /// The path to the XLM file containing the additional metric values within (JaCoCo)Test-Report.
+        /// The path to the XML file containing the additional metric values within (JaCoCo)Test-Report.
         /// </summary>
         [SerializeField, ShowInInspector, Tooltip("Path of metric XLM file"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         public FilePath XMLPath = new();
