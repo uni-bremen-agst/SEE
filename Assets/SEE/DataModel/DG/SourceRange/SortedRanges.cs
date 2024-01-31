@@ -66,7 +66,7 @@ namespace SEE.DataModel.DG.SourceRange
         /// <param name="line">the line to be searched for</param>
         /// <param name="range">if true is returned, the range containing <paramref name="line"/>;
         /// otherwise undefined</param>
-        /// <returns>true if a range exists containg <paramref name="line"/></returns>
+        /// <returns>true if a range exists containing <paramref name="line"/></returns>
         internal bool TryGetValue(int line, out Range range)
         {
             if (TryGetIndex(line, out int index))
