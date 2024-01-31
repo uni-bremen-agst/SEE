@@ -279,7 +279,6 @@ namespace SEE.Game.City
         protected static async UniTask LoadGraphMetrics(Graph graph, string csvPath, string xmlPath,  ErosionAttributes erosionSettings)
         {
             Performance p = Performance.Begin($"loading metric data data from CSV file {csvPath}");
-            Debug.Log("Performance CSV gestartet\n");
             int numberOfErrors = MetricImporter.LoadCsv(graph, csvPath);
             if (numberOfErrors > 0)
             {
