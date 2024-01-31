@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
@@ -287,17 +288,23 @@ namespace SEE.Game.City
         protected static async UniTask LoadGraphMetricsAsync
             (Graph graph, string csvPath, string xmlPath,  ErosionAttributes erosionSettings)
         {
-            Performance p = Performance.Begin($"loading metric data from CSV file {csvPath}");
-            int numberOfErrors = MetricImporter.LoadCsv(graph, csvPath);
-            if (numberOfErrors > 0)
+            if (ValidPath(csvPath, "Metric CSV"))
             {
-                Debug.LogWarning($"CSV file {csvPath} has {numberOfErrors} many errors.\n");
+                Performance p = Performance.Begin($"Loading metric data from CSV file {csvPath}");
+                int numberOfErrors = MetricImporter.LoadCsv(graph, csvPath);
+                if (numberOfErrors > 0)
+                {
+                    Debug.LogWarning($"CSV file {csvPath} has {numberOfErrors} many errors.\n");
+                }
+                p.End();
             }
-            p.End();
 
-            p = Performance.Begin($"loading JaCoCo data from XML file {xmlPath}");
-            JaCoCoImporter.Load(graph, xmlPath);
-            p.End();
+            if (ValidPath(xmlPath, "JaCoCo XML"))
+            {
+                Performance p = Performance.Begin($"Loading JaCoCo data from XML file {xmlPath}");
+                JaCoCoImporter.Load(graph, xmlPath);
+                p.End();
+            }
 
             // Substitute missing values from the dashboard
             if (erosionSettings.LoadDashboardMetrics)
@@ -306,6 +313,20 @@ namespace SEE.Game.City
                 Debug.Log($"Loading metrics and added issues from the Axivion Dashboard for start version {startVersion}.\n");
                 await MetricImporter.LoadDashboardAsync(graph, erosionSettings.OverrideMetrics,
                                                    erosionSettings.IssuesAddedFromVersion);
+            }
+            return;
+
+            bool ValidPath(string path, string title)
+            {
+                if (File.Exists(path))
+                {
+                    return true;
+                }
+                else if (!string.IsNullOrEmpty(path))
+                {
+                    Debug.LogWarning($"{title} file {path} does not exist.\n");
+                }
+                return false;
             }
         }
 
