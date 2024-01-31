@@ -58,10 +58,7 @@ namespace SEE.DataModel.DG.SourceRange
                     result &= isdescendant;
                 }
                 stack.Push(range);
-                foreach (Range child in range.Children)
-                {
-                    result &= IsHomomorphic(child);
-                }
+                result &= range.Children.All(IsHomomorphic);
                 stack.Pop();
                 return result;
             }
