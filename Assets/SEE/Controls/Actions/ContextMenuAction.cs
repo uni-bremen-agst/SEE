@@ -85,7 +85,7 @@ namespace SEE.Controls.Actions
                 actions.Add(new("Show in City", Highlight, Icons.LightBulb));
             }
 
-            if (graphElement.Filename() != null)
+            if (graphElement.Filename != null)
             {
                 actions.Add(new("Show Code", ShowCode, Icons.Code));
             }

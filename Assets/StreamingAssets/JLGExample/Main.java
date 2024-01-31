@@ -1,4 +1,7 @@
-import UnterOrdner.UnterOrdnerTest;
+import counter.unterordner.UnterOrdnerTest;
+import counter.CountConsonants;
+import counter.CountToAThousand;
+import counter.CountVowels;
 
 import java.io.BufferedReader;
 import java.io.IOException;
