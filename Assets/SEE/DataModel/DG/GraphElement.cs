@@ -1,5 +1,7 @@
 ﻿using SEE.Utils;
 using SEE.Utils.Paths;
+using Sirenix.Utilities;
+using System.Diagnostics;
 
 namespace SEE.DataModel.DG
 {
@@ -85,46 +87,106 @@ namespace SEE.DataModel.DG
         //--------------------------------------------
 
         /// <summary>
-        /// Returns the path of the source file for this graph element.
-        /// Note that not all graph elements may have a source file.
-        /// If the graph element does not have this attribute, null is returned.
+        /// The attribute name for the filename. The filename may not exist.
         /// </summary>
-        /// <returns>path of source file or null</returns>
-        public string Path()
+        private const string SourceFileAttribute = "Source.File";
+
+        /// <summary>
+        /// The attribute name for the path. The path may not exist.
+        /// </summary>
+        private const string SourcePathAttribute = "Source.Path";
+
+        /// <summary>
+        /// The attribute name for the source line. The source line may not exist.
+        /// </summary>
+        private const string SourceLineAttribute = "Source.Line";
+
+        /// <summary>
+        /// The attribute name for the source column. The source column may not exist.
+        /// </summary>
+        private const string SourceColumnAttribute = "Source.Column";
+
+        /// <summary>
+        /// The attribute name for the source region length. The source region may not exist.
+        /// </summary>
+        private const string RegionLengthAttribute = "Source.Region_Length";
+
+        /// <summary>
+        /// The directory of the source file for this graph element.
+        /// Note that not all graph elements may have a source file.
+        /// If the graph element does not have this attribute, it will be null.
+        /// </summary>
+        public string Directory
         {
-            TryGetString("Source.Path", out string result);
-            // If this attribute cannot be found, result will have the standard value
-            // for strings, which is null.
-            return result;
+            get
+            {
+                TryGetString(SourcePathAttribute, out string result);
+                // If this attribute cannot be found, result will have the standard value
+                // for strings, which is null.
+                return result;
+            }
+
+            set
+            {
+                SetString(SourcePathAttribute, value);
+            }
         }
 
         /// <summary>
-        /// Returns the path of the source file for this graph element relative to the project root.
-        /// The project root is determined by calling <see cref="DataPath.ProjectFolder"/> if it is not supplied
+        /// Returns the directory of the source file for this graph element relative to the project root directory.
+        /// The project root directory is determined by calling <see cref="DataPath.ProjectFolder"/> if it is not supplied
         /// by <paramref name="projectFolder"/>.
         /// Note that not all graph elements may have a source file.
         /// If the graph element does not have this attribute, null is returned.
         /// </summary>
         /// <param name="projectFolder">The project's folder, containing the node's path.</param>
-        /// <returns>relative path of source file or null</returns>
-        public string RelativePath(string projectFolder = null)
+        /// <returns>relative directory of source file or null</returns>
+        public string RelativeDirectory(string projectFolder = null)
         {
             // FIXME: The data model (graph) should be independent of Unity (here: DataPath.ProjectFolder()).
-            return Path()?.Replace(projectFolder ?? DataPath.ProjectFolder(), string.Empty).TrimStart('/');
+            return Directory?.Replace(projectFolder ?? DataPath.ProjectFolder(), string.Empty).TrimStart('/');
         }
 
         /// <summary>
-        /// Returns the name of the source file for this graph element.
+        /// The name of the source file for this graph element.
         /// Note that not all graph elements may have a source file.
         /// If the graph element does not have this attribute, null is returned.
         /// </summary>
         /// <returns>name of source file or null</returns>
-        public string Filename()
+        public string Filename
         {
-            TryGetString("Source.File", out string result);
-            // If this attribute cannot be found, result will have the standard value
-            // for strings, which is null.
-            return result;
+            get
+            {
+                TryGetString(SourceFileAttribute, out string result);
+                // If this attribute cannot be found, result will have the standard value
+                // for strings, which is null.
+                return result;
+            }
+
+            set
+            {
+                SetString(SourceFileAttribute, value);
+            }
+        }
+
+        /// <summary>
+        /// Returns the path of the file containing the given graph element.
+        /// A path is the concatenation of its directory and filename.
+        /// Not all graph elements have this information, in which case the result
+        /// may be empty.
+        /// </summary>
+        /// <returns>path of the source file containing this graph element; may be empty</returns>
+        /// <remarks>Unlike <see cref="Filename()"/> and <see cref="Directory"/> the result
+        /// will never be <c>null</c></remarks>
+        public string Path()
+        {
+            string filename = Filename;
+            string directory = Directory;
+            if (filename.IsNullOrWhitespace())
+            {
+                return directory.IsNullOrWhitespace() ? string.Empty : directory;
+            }
+            return directory.IsNullOrWhitespace() ? filename : System.IO.Path.Combine(directory, filename);
         }
 
         /// <summary>
@@ -139,56 +201,107 @@ namespace SEE.DataModel.DG
         public string AbsolutePlatformPath()
         {
             return System.IO.Path.Combine(ItsGraph.BasePath,
-                                          Filenames.OnCurrentPlatform(Path()),
-                                          Filenames.OnCurrentPlatform(Filename()));
+                                          Filenames.OnCurrentPlatform(Directory),
+                                          Filenames.OnCurrentPlatform(Filename));
         }
 
         /// <summary>
-        /// Returns the line in the source file declaring this graph element.
+        /// The line in the source file declaring this graph element.
         /// Note that not all graph elements may have a source location.
-        /// If the graph element does not have this attribute, null is returned.
+        /// If the graph element does not have this attribute, its value is null.
         /// </summary>
-        /// <returns>line in source file or null</returns>
-        public int? SourceLine()
+        public int? SourceLine
         {
-            if (TryGetInt("Source.Line", out int result))
+            get
             {
-                return result;
+                if (TryGetInt(SourceLineAttribute, out int result))
+                {
+                    return result;
+                }
+                // If this attribute cannot be found, result will be null
+                return null;
             }
-            // If this attribute cannot be found, result will be null
-            return null;
+
+            set
+            {
+                Debug.Assert(value == null || value > 0);
+                SetInt(SourceLineAttribute, value);
+            }
+
         }
 
         /// <summary>
-        /// Returns the length of this graph element, measured in number of lines.
+        /// Returns the line in the source file where the declaration of this graph element
+        /// ends, i.e., <see cref="SourceLine()"/> + <see cref="SourceLength()"/> - 1 if
+        /// both are defined.
+        ///
+        /// If <see cref="SourceLine()"/> is undefined, <c>null</c> will be returned.
+        ///
+        /// If <see cref="SourceLength()"/> is undefined, <see cref="SourceLine()"/> will
+        /// be returned.
+        /// </summary>
+        /// <returns>line in source file where declaration ends or <c>null</c></returns>
+        public int? EndLine()
+        {
+            int? sourceLine = SourceLine;
+            if (sourceLine.HasValue)
+            {
+                int? sourceLength = SourceLength;
+                return sourceLength.HasValue ? sourceLine + sourceLength - 1 : sourceLine;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// The length of this graph element, measured in number of lines.
         /// Note that not all graph elements may have a length.
-        /// If the graph element does not have this attribute, null is returned.
+        /// If the graph element does not have this attribute, its value is null.
         /// </summary>
-        /// <returns>number of lines of the element in source file or null</returns>
-        public int? SourceLength()
+        public int? SourceLength
         {
-            if (TryGetInt("Source.Region_Length", out int result))
+            get
             {
-                return result;
+                if (TryGetInt(RegionLengthAttribute, out int result))
+                {
+                    return result;
+                }
+                // If this attribute cannot be found, result will be null
+                return null;
             }
-            // If this attribute cannot be found, result will be null
-            return null;
+
+            set
+            {
+                Debug.Assert(value == null || value > 0);
+                SetInt(RegionLengthAttribute, value);
+            }
         }
 
         /// <summary>
-        /// Returns the column in the source file declaring this graph element.
+        /// The column in the source file declaring this graph element.
         /// Note that not all graph elements may have a source location.
-        /// If the graph element does not have this attribute, null is returned.
+        /// If the graph element does not have this attribute, its value is
+        /// null.
         /// </summary>
-        /// <returns>column in source file or null</returns>
-        public int? SourceColumn()
+        public int? SourceColumn
         {
-            if (TryGetInt("Source.Column", out int result))
+            get
             {
-                return result;
+                if (TryGetInt(SourceColumnAttribute, out int result))
+                {
+                    return result;
+                }
+                // If this attribute cannot be found, result will be null.
+                return null;
             }
-            // If this attribute cannot be found, result will be null.
-            return null;
+
+            set
+            {
+                Debug.Assert(value == null || value > 0);
+                SetInt(SourceColumnAttribute, value);
+            }
         }
 
         /// <summary>

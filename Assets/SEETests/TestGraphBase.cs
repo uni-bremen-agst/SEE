@@ -16,14 +16,20 @@ namespace SEE.DataModel.DG
         /// <param name="id">unique ID of the new node</param>
         /// <param name="type">type of the new node</param>
         /// <returns>a new node added to <paramref name="graph"/></returns>
-        protected static Node NewNode(Graph graph, string id, string type = "Routine")
+        protected static Node NewNode(Graph graph, string id, string type = "Routine",
+            string directory = null, string filename = null, int? line = null, int? length = null)
         {
             Node result = new()
             {
                 SourceName = id,
                 ID = id,
-                Type = type
+                Type = type,
+                Directory = directory,
+                Filename = filename,
+                SourceLine = line,
+                SourceLength = length
             };
+
             graph.AddNode(result);
             return result;
         }
@@ -36,9 +42,10 @@ namespace SEE.DataModel.DG
         /// <param name="id">unique ID of the new node</param>
         /// <param name="type">type of the new node</param>
         /// <returns>a new node added to <paramref name="graph"/></returns>
-        protected static Node Child(Graph graph, Node parent, string id, string type = "Routine")
+        protected static Node Child(Graph graph, Node parent, string id, string type = "Routine",
+            string directory = null, string filename = null, int? line = null, int? length = null)
         {
-            Node child = NewNode(graph, id, type);
+            Node child = NewNode(graph, id, type, directory, filename, line, length);
             parent.AddChild(child);
             return child;
         }

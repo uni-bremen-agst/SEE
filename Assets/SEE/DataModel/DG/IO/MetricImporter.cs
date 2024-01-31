@@ -39,7 +39,7 @@ namespace SEE.DataModel.DG.IO
             // Go through all nodes, checking whether any metric in the dashboard matches it.
             foreach (Node node in graph.Nodes())
             {
-                string nodePath = $"{node.RelativePath(projectFolder)}{node.Filename() ?? string.Empty}";
+                string nodePath = $"{node.RelativeDirectory(projectFolder)}{node.Filename ?? string.Empty}";
                 if (metrics.TryGetValue((nodePath, node.SourceName), out List<MetricValueTableRow> metricValues))
                 {
                     foreach (MetricValueTableRow metricValue in metricValues)
@@ -55,7 +55,7 @@ namespace SEE.DataModel.DG.IO
 
                 if (issues.TryGetValue(nodePath, out List<Issue> issueList))
                 {
-                    int? line = node.SourceLine();
+                    int? line = node.SourceLine;
                     IEnumerable<Issue> relevantIssues;
                     if (!line.HasValue)
                     {
@@ -64,7 +64,7 @@ namespace SEE.DataModel.DG.IO
                     }
                     else
                     {
-                        int? length = node.SourceLength();
+                        int? length = node.SourceLength;
                         // Note: In .NET 7 there is a Enumerable.ToHashSet() which could be used instead of the constructor.
                         HashSet<int> lineRange = new(Enumerable.Range(line.Value, length ?? 1), null);
                         // Relevant issues are those which are entirely contained by the source region of this node
