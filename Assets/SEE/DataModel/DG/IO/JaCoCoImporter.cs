@@ -286,7 +286,7 @@ namespace SEE.DataModel.DG.IO
                 nodeToAddMetrics.SetInt(metricNamePrefix + "_missed", missed);
                 nodeToAddMetrics.SetInt(metricNamePrefix + "_covered", covered);
 
-                float percentage = covered + missed > 0 ? covered / (covered + missed) * 100 : 0;
+                float percentage = covered + missed > 0 ? (float) covered / (covered + missed) * 100 : 0;
                 nodeToAddMetrics.SetFloat(metricNamePrefix + "_percentage", percentage);
             }
 
