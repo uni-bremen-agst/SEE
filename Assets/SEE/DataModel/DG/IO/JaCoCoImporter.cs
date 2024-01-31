@@ -323,8 +323,7 @@ namespace SEE.DataModel.DG.IO
 
             if (xmlReader is IXmlLineInfo xmlLineInfo && xmlLineInfo.HasLineInfo())
             {
-                position = xmlLineInfo.LineNumber.ToString() + ":"
-                    + xmlLineInfo.LinePosition.ToString();
+                position = $"{xmlLineInfo.LineNumber}:{xmlLineInfo.LinePosition}";
             }
 
             return $"{filepath}:{position}";
