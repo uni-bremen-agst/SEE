@@ -113,7 +113,7 @@
         /// This metric is defined for all class files that have been compiled with debug information,
         /// such that coverage information for individual lines can be calculated.
         /// A source line is considered executed when at least one instruction that is assigned to
-        /// this line has been executed
+        /// this line has been executed.
         /// This metric counts the number of such lines missed.
         /// </summary>
         public const string LineMissed = "Metric.LINE_missed";
