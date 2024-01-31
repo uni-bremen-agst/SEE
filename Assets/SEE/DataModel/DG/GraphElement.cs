@@ -89,27 +89,27 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The attribute name for the filename. The filename may not exist.
         /// </summary>
-        private const string SourceFileAttribute = "Source.File";
+        private const string sourceFileAttribute = "Source.File";
 
         /// <summary>
         /// The attribute name for the path. The path may not exist.
         /// </summary>
-        private const string SourcePathAttribute = "Source.Path";
+        private const string sourcePathAttribute = "Source.Path";
 
         /// <summary>
         /// The attribute name for the source line. The source line may not exist.
         /// </summary>
-        private const string SourceLineAttribute = "Source.Line";
+        private const string sourceLineAttribute = "Source.Line";
 
         /// <summary>
         /// The attribute name for the source column. The source column may not exist.
         /// </summary>
-        private const string SourceColumnAttribute = "Source.Column";
+        private const string sourceColumnAttribute = "Source.Column";
 
         /// <summary>
         /// The attribute name for the source region length. The source region may not exist.
         /// </summary>
-        private const string RegionLengthAttribute = "Source.Region_Length";
+        private const string regionLengthAttribute = "Source.Region_Length";
 
         /// <summary>
         /// The directory of the source file for this graph element.
@@ -120,7 +120,7 @@ namespace SEE.DataModel.DG
         {
             get
             {
-                TryGetString(SourcePathAttribute, out string result);
+                TryGetString(sourcePathAttribute, out string result);
                 // If this attribute cannot be found, result will have the standard value
                 // for strings, which is null.
                 return result;
@@ -128,7 +128,7 @@ namespace SEE.DataModel.DG
 
             set
             {
-                SetString(SourcePathAttribute, value);
+                SetString(sourcePathAttribute, value);
             }
         }
 
@@ -157,7 +157,7 @@ namespace SEE.DataModel.DG
         {
             get
             {
-                TryGetString(SourceFileAttribute, out string result);
+                TryGetString(sourceFileAttribute, out string result);
                 // If this attribute cannot be found, result will have the standard value
                 // for strings, which is null.
                 return result;
@@ -165,7 +165,7 @@ namespace SEE.DataModel.DG
 
             set
             {
-                SetString(SourceFileAttribute, value);
+                SetString(sourceFileAttribute, value);
             }
         }
 
@@ -214,7 +214,7 @@ namespace SEE.DataModel.DG
         {
             get
             {
-                if (TryGetInt(SourceLineAttribute, out int result))
+                if (TryGetInt(sourceLineAttribute, out int result))
                 {
                     return result;
                 }
@@ -225,7 +225,7 @@ namespace SEE.DataModel.DG
             set
             {
                 Debug.Assert(value == null || value > 0);
-                SetInt(SourceLineAttribute, value);
+                SetInt(sourceLineAttribute, value);
             }
 
         }
@@ -264,7 +264,7 @@ namespace SEE.DataModel.DG
         {
             get
             {
-                if (TryGetInt(RegionLengthAttribute, out int result))
+                if (TryGetInt(regionLengthAttribute, out int result))
                 {
                     return result;
                 }
@@ -275,7 +275,7 @@ namespace SEE.DataModel.DG
             set
             {
                 Debug.Assert(value == null || value > 0);
-                SetInt(RegionLengthAttribute, value);
+                SetInt(regionLengthAttribute, value);
             }
         }
 
@@ -289,7 +289,7 @@ namespace SEE.DataModel.DG
         {
             get
             {
-                if (TryGetInt(SourceColumnAttribute, out int result))
+                if (TryGetInt(sourceColumnAttribute, out int result))
                 {
                     return result;
                 }
@@ -300,7 +300,7 @@ namespace SEE.DataModel.DG
             set
             {
                 Debug.Assert(value == null || value > 0);
-                SetInt(SourceColumnAttribute, value);
+                SetInt(sourceColumnAttribute, value);
             }
         }
 
