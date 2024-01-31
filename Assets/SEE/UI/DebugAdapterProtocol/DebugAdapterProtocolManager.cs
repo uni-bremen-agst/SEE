@@ -11,8 +11,8 @@ namespace SEE.UI.DebugAdapterProtocol
     {
         private static readonly DebugAdapter.DebugAdapter[] adapters =
         {
-            new NetCoreDebugAdapter(),
             new MockDebugAdapter(),
+            new NetCoreDebugAdapter(),
         };
         private static DebugAdapter.DebugAdapter adapter = adapters[0];
         private static DebugAdapterProtocolSession session;
@@ -37,6 +37,7 @@ namespace SEE.UI.DebugAdapterProtocol
             // create property group
             PropertyGroup group = go.gameObject.AddComponent<PropertyGroup>();
             group.Name = "Debug Adapter Group";
+            group.Compact = true;
 
             SelectionProperty debugAdapterProperty = go.AddComponent<SelectionProperty>();
             debugAdapterProperty.Name = "Debug Adapter";
@@ -111,6 +112,7 @@ namespace SEE.UI.DebugAdapterProtocol
             // create property group
             PropertyGroup group = go.gameObject.AddComponent<PropertyGroup>();
             group.Name = "Launch Request Group";
+            group.Compact = true;
             adapter.SetupLaunchConfig(go, group);
 
             // create dialog

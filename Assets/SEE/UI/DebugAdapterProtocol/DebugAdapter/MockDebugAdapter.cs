@@ -19,16 +19,12 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         private string launchProgram = Path.Combine(AdapterDirectory, "vscode-mock-debug", "sampleWorkspace", "readme.md");
         private bool launchStopOnEntry = true;
         private bool launchTrace = true;
-        private string launchCompileError = launchCompileErrorOptions[0];
+        private bool launchCompileError;
 
         private StringProperty launchProgramProperty;
-        private SelectionProperty launchStopOnEntryProperty;
-        private SelectionProperty launchTraceProperty;
-        private SelectionProperty launchCompileErrorProperty;
-
-        private static readonly string[] launchStopOnEntryOptions = new string[] { "Stop on entry - Enabled", "Stop on entry - Disabled" };
-        private static readonly string[] launchTraceOptions = new string[] { "Logging - Enabled", "Logging - Disabled" };
-        private static readonly string[] launchCompileErrorOptions = new string[] { "Fake compile error - Show", "Fake compile error - Hide" };
+        private BooleanProperty launchStopOnEntryProperty;
+        private BooleanProperty launchTraceProperty;
+        private BooleanProperty launchCompileErrorProperty;
 
         public override void SetupLaunchConfig(GameObject go, PropertyGroup group)
         {
@@ -38,24 +34,21 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             launchProgramProperty.Description = "Absolute path to a text file.";
             group.AddProperty(launchProgramProperty);
 
-            launchStopOnEntryProperty = go.AddComponent<SelectionProperty>();
+            launchStopOnEntryProperty = go.AddComponent<BooleanProperty>();
             launchStopOnEntryProperty.Name = "Stop on Entry";
             launchStopOnEntryProperty.Description = "Automatically stop on entry.";
-            launchStopOnEntryProperty.AddOptions(launchStopOnEntryOptions);
-            launchStopOnEntryProperty.Value = launchStopOnEntry ? launchStopOnEntryOptions[0] : launchStopOnEntryOptions[1];
+            launchStopOnEntryProperty.Value = launchStopOnEntry;
             group.AddProperty(launchStopOnEntryProperty);
 
-            launchTraceProperty = go.AddComponent<SelectionProperty>();
+            launchTraceProperty = go.AddComponent<BooleanProperty>();
             launchTraceProperty.Name = "Trace";
             launchTraceProperty.Description = "Enable logging of the Debug Adapter Protocol.";
-            launchTraceProperty.AddOptions(launchTraceOptions);
-            launchTraceProperty.Value = launchTrace ? launchTraceOptions[0] : launchTraceOptions[1];
+            launchTraceProperty.Value = launchTrace;
             group.AddProperty(launchTraceProperty);
 
-            launchCompileErrorProperty = go.AddComponent<SelectionProperty>();
+            launchCompileErrorProperty = go.AddComponent<BooleanProperty>();
             launchCompileErrorProperty.Name = "Compile Error";
             launchCompileErrorProperty.Description = "Simulates a compile error in 'launch' request.";
-            launchCompileErrorProperty.AddOptions(launchCompileErrorOptions);
             launchCompileErrorProperty.Value = launchCompileError;
             group.AddProperty(launchCompileErrorProperty);
 
@@ -64,8 +57,8 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         public override void SaveLaunchConfig()
         {
             launchProgram = launchProgramProperty.Value;
-            launchStopOnEntry = launchStopOnEntryProperty.Value == launchStopOnEntryOptions[0];
-            launchTrace = launchTraceProperty.Value == launchTraceOptions[0];
+            launchStopOnEntry = launchStopOnEntryProperty.Value;
+            launchTrace = launchTraceProperty.Value;
             launchCompileError = launchCompileErrorProperty.Value;
         }
 
@@ -78,7 +71,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
                     {"program", launchProgram},
                     {"stopOnEntry", launchStopOnEntry },
                     {"trace", launchTrace },
-                    {"compileError", launchCompileError == launchCompileErrorOptions[0] ? "show" : "hide"},
+                    {"compileError", launchCompileError ? "show" : "hide"},
                 }
             };
         }

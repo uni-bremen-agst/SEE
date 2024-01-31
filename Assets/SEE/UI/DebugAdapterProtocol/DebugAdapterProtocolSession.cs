@@ -65,8 +65,6 @@ namespace SEE.UI.DebugAdapterProtocol
                 console.AddMessage("Created the debug adapter host.", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
             }
 
-            // FIXME: Sometimes the "initialized" event occurs before the "initialize" response
-            // normal order: initialize request -> initialize response, intialized event -> launch request
             capabilities = adapterHost.SendRequestSync(new InitializeRequest()
             {
                 ClientID = "SEE",
@@ -74,8 +72,6 @@ namespace SEE.UI.DebugAdapterProtocol
                 AdapterID = Adapter.Name,
                 PathFormat = InitializeArguments.PathFormatValue.Path,
             });
-            console.AddMessage("Capabilities\t" + capabilities);
-            Launch();
         }
 
         private void SetupControls()
@@ -150,9 +146,6 @@ namespace SEE.UI.DebugAdapterProtocol
 
         private void Launch()
         {
-            // safe guard to prevent launching the debugee before knowing its capabilities
-            if (capabilities == null || !isInitialized) return;
-
             queuedRequests.Enqueue(() =>
             {
                 if (capabilities.SupportsConfigurationDoneRequest == true)
@@ -164,12 +157,11 @@ namespace SEE.UI.DebugAdapterProtocol
                 }
             });
 
-            queuedRequests.Enqueue(() =>adapterHost.SendRequestSync(Adapter.GetLaunchRequest(capabilities)));
+            queuedRequests.Enqueue(() => adapterHost.SendRequestSync(Adapter.GetLaunchRequest(capabilities)));
         }
 
         private void Update()
-        {
-            while (queuedRequests.Count > 0)
+            if (queuedRequests.Count > 0)
             {
                 try
                 {
