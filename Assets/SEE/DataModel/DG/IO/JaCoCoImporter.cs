@@ -130,10 +130,7 @@ namespace SEE.DataModel.DG.IO
                     switch (xmlReader.NodeType)
                     {
                         case XmlNodeType.Element:
-                            if (xmlReader.Name == reportContext
-                                || xmlReader.Name == packageContext
-                                || xmlReader.Name == classContext
-                                || xmlReader.Name == methodContext)
+                            if (xmlReader.Name is reportContext or packageContext or classContext or methodContext)
                             {
                                 if (xmlReader.Name == classContext)
                                 {
