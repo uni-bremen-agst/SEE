@@ -196,15 +196,14 @@ namespace SEE.Controls.Actions
         {
             GameObject city = GameObject.Find("DiffCity");
             GraphElement graphElement = graphElementRef.Elem;
-            (string sourceFilename, _) = GetPath(graphElement);
+            (string sourceFilename, string path) = GetPath(graphElement);
             string versionControlSystem = city.MustGetComponent<DiffCity>().VersionControlSystem;
             string repositoryPath = city.MustGetComponent<DiffCity>().RepositoryPath;
             string oldCommitIdentifier = city.MustGetComponent<DiffCity>().OldCommitIdentifier;
             string newCommitIdentifier = city.MustGetComponent<DiffCity>().NewCommitIdentifier;
             IVersionControl versionControl = SwitchVersionControlSystems.CreateVersionControl(versionControlSystem);
-            string showOldCode = versionControl.Show(repositoryPath, sourceFilename, oldCommitIdentifier, newCommitIdentifier);
-            string showNewCode = versionControl.Show(repositoryPath, sourceFilename, newCommitIdentifier, oldCommitIdentifier);
-            // TODO: Update the Output from DiffForDiffCity to string[], its the way it is for now, just for demonstration
+            string showOldCode = versionControl.Show(repositoryPath, path, oldCommitIdentifier);
+            string showNewCode = versionControl.ShowOriginal(repositoryPath, Path.GetRelativePath(repositoryPath, path).Replace("\\", "/"), oldCommitIdentifier, newCommitIdentifier);
             string[] diff = TextualDiff.DiffForDiffCity(showOldCode, showNewCode);
 
             CodeWindow codeWindow = GetOrCreateCodeWindow(graphElementRef, sourceFilename);

@@ -4,6 +4,7 @@ using UnityEngine;
 using LibGit2Sharp;
 using System.Linq;
 using DiffMatchPatch;
+using System.IO;
 
 /// <summary>
 /// Contains all version control systems as subclasses, which derives from IVersionControl,
@@ -17,16 +18,12 @@ public class VersionControlSystems : MonoBehaviour
     public class GitVersionControl : IVersionControl
     {
         string name = null;
-        public string Show(string repositoryPath, string fileName, string oldCommitID, string newCommitID)
+        public string Show(string repositoryPath, string fileName, string commitID)
         {
             using (var repo = new Repository(repositoryPath))
             {
-                // Get commit.
-                var oldCommit = repo.Lookup<Commit>(oldCommitID);
-
-
                 // Get file from commit
-                var blob = oldCommit[fileName]?.Target as Blob;
+                var blob = repo.Lookup<Blob>($"{commitID}:{Path.GetRelativePath(repositoryPath, fileName).Replace("\\","/")}");
 
                 if (blob != null)
                 {
@@ -36,7 +33,8 @@ public class VersionControlSystems : MonoBehaviour
                 }
                 else
                 {
-                    return "Datei nicht gefunden.";
+                    // FIXME: Just for debugging.
+                    return $"{commitID}:{Path.GetRelativePath(repositoryPath, fileName).Replace("\\", "/")}";
                 }
             }
         }
@@ -65,6 +63,7 @@ public class VersionControlSystems : MonoBehaviour
             var changes = repo.Diff.Compare<TreeChanges>(oldCommit.Tree, newCommit.Tree, compareOptions);
             foreach (TreeEntryChanges change in changes)
             {
+                // FIXME: Just for debugging.
                 string changeInfo = change.Status.ToString();
                 string changeInff = change.OldPath.ToString();
                 string changeInf = change.Path.ToString();
@@ -94,23 +93,25 @@ public class VersionControlSystems : MonoBehaviour
                     return "";
                 }
                 // Case: File got deleted.
-                if (!change.Exists && change.Path == fileName)
+                if (change.Status == ChangeKind.Deleted && change.Path == fileName)
                 {
                     return "";
                 }
+                // Case: File is unmodified.
+                if (change.Status == ChangeKind.Unmodified && change.Path == fileName)
+                {
+                    var blob = newCommit[fileName]?.Target as Blob;
+                    return blob.GetContentText();
+                }
+                // Case: File got modified.
+                if (change.Status == ChangeKind.Modified && change.Path == fileName)
+                {
+                    var changedBlob = newCommit[change.Path]?.Target as Blob;
+                    return changedBlob.GetContentText();
+                }
             }
-
-            var blob = newCommit[fileName]?.Target as Blob;
-
-            if (blob != null)
-            {
-                // Get content from file
-                return blob.GetContentText();
-            }
-            else
-            {
-                return "";
-            }
+            // FIXME: Just for debugging.
+            return fileName;
         }
 
         public string ShowName()
@@ -123,7 +124,7 @@ public class VersionControlSystems : MonoBehaviour
         /// </summary>
         public class SvnVersionControl : IVersionControl
         {
-            public string Show(string repositoryPath, string fileName, string oldCommitID, string newCommitID)
+            public string Show(string repositoryPath, string fileName, string oldCommitID)
             {
                 // Implement SVN-specific logic here
                 // Maybe use SharpSvn
