@@ -243,10 +243,7 @@ namespace SEE.DataModel.DG.IO
 
                         // re-sets attributes to default when tag is closed
                         case XmlNodeType.EndElement:
-                            if (xmlReader.Name == reportContext
-                                || xmlReader.Name == packageContext
-                                || xmlReader.Name == classContext
-                                || xmlReader.Name == methodContext)
+                            if (xmlReader.Name is reportContext or packageContext or classContext or methodContext)
                             {
                                 // Only for the XML nodes listed in the condition above, we pushed a context.
                                 nodeTypeStack.Pop();
