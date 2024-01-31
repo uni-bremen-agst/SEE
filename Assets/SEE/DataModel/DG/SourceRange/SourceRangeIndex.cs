@@ -41,15 +41,7 @@ namespace SEE.DataModel.DG.SourceRange
 
             Stack<Range> stack = new();
 
-            foreach (FileRanges file in files.Values)
-            {
-                foreach (Range child in file.Children)
-                {
-                    result &= IsHomomorphic(child);
-                }
-            }
-
-            return result;
+            return files.Values.SelectMany(file => file.Children).All(IsHomomorphic);
 
             bool IsHomomorphic(Range range)
             {
