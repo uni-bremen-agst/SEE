@@ -154,7 +154,7 @@ namespace SEE.Game.City
         /// </summary>
         private List<Graph> LoadDataSeries()
         {
-            GraphsReader graphsReader = new GraphsReader();
+            GraphsReader graphsReader = new();
             // Load all GXL graphs and CSV files in directory PathPrefix but not more than maxRevisionsToLoad many.
             graphsReader.Load(GXLDirectory.Path, HierarchicalEdges, basePath: SourceCodeDirectory.Path, rootName: GXLDirectory.Path, MaxRevisionsToLoad);
             return graphsReader.Graphs;
@@ -255,7 +255,7 @@ namespace SEE.Game.City
         /// <returns>the loaded graph or null if none could be found</returns>
         private Graph LoadFirstGraph()
         {
-            GraphsReader reader = new GraphsReader();
+            GraphsReader reader = new();
             reader.Load(GXLDirectory.Path, HierarchicalEdges, basePath: SourceCodeDirectory.Path, rootName: GXLDirectory.Path, 1);
             List<Graph> graphs = reader.Graphs;
             if (graphs.Count == 0)
