@@ -41,7 +41,7 @@ namespace SEE.DataModel.DG.IO
         {
             if (graph == null)
             {
-                throw new ArgumentNullException("Graph must not be null.");
+                throw new ArgumentNullException(nameof(graph));
             }
             if (graph.GetRoots().Count == 0)
             {
