@@ -21,6 +21,10 @@ namespace SEE.UI.PropertyDialog
         /// TODO: This is unused.
         /// </summary>
         public Sprite Icon;
+        /// <summary>
+        /// Whether to display the properties more compact.
+        /// </summary>
+        public bool Compact;
 
         /// <summary>
         /// The game object representing the group of properties. It is an instantiation
@@ -41,6 +45,11 @@ namespace SEE.UI.PropertyDialog
         private const string configurationGroupPrefabPath = "Prefabs/UI/PropertyGroup";
 
         /// <summary>
+        /// The path of the prefab for a PropertyGroup.
+        /// </summary>
+        private const string configurationCompactGroupPrefabPath = "Prefabs/UI/PropertyGroupCompact";
+
+        /// <summary>
         /// Makes <paramref name="parent"/> the parent of <see cref="PropertyGroupUIObject"/>.
         /// If <see cref="PropertyGroupUIObject"/> is null, it will be created first.
         /// </summary>
@@ -49,7 +58,7 @@ namespace SEE.UI.PropertyDialog
         {
             if (PropertyGroupUIObject == null)
             {
-                PropertyGroupUIObject = CreatePropertyUIObject(Name);
+                PropertyGroupUIObject = CreatePropertyUIObject(Name, Compact);
             }
             // Reset scale to (1,1,1), otherwise it might be changed
             PropertyGroupUIObject.transform.SetParent(parent.transform);
@@ -81,7 +90,7 @@ namespace SEE.UI.PropertyDialog
         {
             if (PropertyGroupUIObject == null)
             {
-                PropertyGroupUIObject = CreatePropertyUIObject(Name);
+                PropertyGroupUIObject = CreatePropertyUIObject(Name, Compact);
             }
             foreach (Property property in properties)
             {
@@ -94,10 +103,11 @@ namespace SEE.UI.PropertyDialog
         /// with given <paramref name="name"/>.
         /// </summary>
         /// <param name="name">name of the instantiated object</param>
+        /// <param name="compact">whether to use the compact group prefab</param>
         /// <returns>instantiation of prefab <see cref="configurationGroupPrefabPath"/></returns>
-        private static GameObject CreatePropertyUIObject(string name)
+        private static GameObject CreatePropertyUIObject(string name, bool compact)
         {
-            GameObject result = PrefabInstantiator.InstantiatePrefab(configurationGroupPrefabPath, instantiateInWorldSpace: false);
+            GameObject result = PrefabInstantiator.InstantiatePrefab(compact ? configurationCompactGroupPrefabPath : configurationGroupPrefabPath, instantiateInWorldSpace: false);
             result.name = name;
             return result;
         }
