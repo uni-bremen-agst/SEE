@@ -219,7 +219,7 @@ namespace SEE.DataModel.DG.IO
                                     }
                                     else if (nodeType == reportContext)
                                     {
-                                        // We add all metrics reported at the report level to the root of the graph
+                                        // We add all metrics reported at the report level to the root of the graph.
                                         // A non-empty graph has always a root node.
                                         // Note that we might override the values of another node -- happened to be the
                                         // root -- that we processed previously and for which we added metrics.
