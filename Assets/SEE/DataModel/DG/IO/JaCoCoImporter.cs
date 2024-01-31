@@ -233,7 +233,7 @@ namespace SEE.DataModel.DG.IO
                                     else
                                     {
                                         Debug.LogError($"{XMLSourcePosition(filepath, xmlReader)}: "
-                                            + "No node found for: {qualifiedClassName}:{sourceLine}  [{nodeType}].\n");
+                                            + $"No node found for: {qualifiedClassName}:{sourceLine}  [{nodeType}].\n");
                                     }
                                 }
                                 catch (Exception e)
