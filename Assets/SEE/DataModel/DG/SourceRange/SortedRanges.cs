@@ -47,7 +47,7 @@ namespace SEE.DataModel.DG.SourceRange
         /// The range at given <paramref name="index"/>. The first index of this
         /// range is 0.
         ///
-        /// Precondition: 0 <= <paramref name="index"/> <see cref="Count"/>.
+        /// Precondition: 0 <= <paramref name="index"/> < <see cref="Count"/>.
         /// </summary>
         /// <param name="index">index of the requested range</param>
         /// <returns>the range at given <paramref name="index"/></returns>
