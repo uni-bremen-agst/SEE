@@ -14,6 +14,8 @@ using SEE.Game.CityRendering;
 using SEE.UI;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
+using SEE.Game.GraphProviders;
+using Sirenix.Serialization;
 
 namespace SEE.Game.City
 {
@@ -23,11 +25,15 @@ namespace SEE.Game.City
     /// </summary>
     public class SEECity : AbstractSEECity
     {
+        [OdinSerialize, ShowInInspector, Tooltip("A graph provider yielding the data to be visualized as code city."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        internal GraphProvider DataProvider;
+
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
         /// <see cref="SEECity.Save(ConfigWriter)"/> and
         /// <see cref="SEECity.Restore(Dictionary{string,object})"/>,
         /// respectively. You should also extend the test cases in TestConfigIO.
+
         /// <summary>
         /// The path to the GXL file containing the graph data.
         /// Note that any deriving class may use multiple GXL paths from which the single city is constructed.
@@ -329,19 +335,31 @@ namespace SEE.Game.City
         [PropertyOrder(DataButtonsGroupOrderLoad)]
         public virtual void LoadData()
         {
-            if (string.IsNullOrEmpty(GXLPath.Path))
+            if (string.IsNullOrWhiteSpace(GXLPath.Path))
             {
                 Debug.LogError("Empty graph path.\n");
             }
             else
             {
-                if (LoadedGraph != null)
-                {
-                    Reset();
-                }
-
                 LoadedGraph = LoadGraph(GXLPath.Path);
                 LoadMetrics();
+            }
+
+            if (DataProvider != null)
+            {
+                try
+                {
+                    Graph g = DataProvider.Provide(new Graph(""), this);
+                    if (g != null)
+                    {
+                        g.DumpTree();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"Graph provider failed with: {ex}\n");
+                    Debug.LogException(ex);
+                }
             }
         }
 
