@@ -22,7 +22,7 @@ namespace SEE.DataModel.DG.SourceRange
         }
 
         /// <summary>
-        /// True if the source-range hierarchy is isomporphic to the node hierarchy
+        /// True if the source-range hierarchy is isomorphic to the node hierarchy
         /// of the underlying graph for which the index was calculated.
         ///
         /// There are two kinds of hierarchies: (1) the node hierarchy in the graph,
