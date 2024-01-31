@@ -295,8 +295,6 @@ namespace SEE.Game.City
 
             p.End();
 
-
-
             // Substitute missing values from the dashboard
             if (erosionSettings.LoadDashboardMetrics)
             {
