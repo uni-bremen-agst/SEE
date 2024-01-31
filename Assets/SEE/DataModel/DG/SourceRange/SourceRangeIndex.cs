@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.DataModel.DG.SourceRange
@@ -7,7 +8,7 @@ namespace SEE.DataModel.DG.SourceRange
     /// A source-location based node index that allows to search for graph nodes
     /// based on a file path and source line.
     /// </summary>
-    internal partial class SourceRangeIndex
+    internal class SourceRangeIndex
     {
         /// <summary>
         /// Creates the index for <paramref name="graph"/>.

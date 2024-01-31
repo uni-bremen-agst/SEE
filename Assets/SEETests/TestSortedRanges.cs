@@ -50,7 +50,7 @@ namespace SEE.DataModel.DG.SourceRange
 
         private static void PermuteAddAndFind(Range[] ranges)
         {
-            foreach (IList<Range> permutation  in Permuter<Range>.Permute(ranges))
+            foreach (IList<Range> permutation  in ranges.Permutations())
             {
                 AssertAddAndFind(permutation);
             }
@@ -113,7 +113,7 @@ namespace SEE.DataModel.DG.SourceRange
 
         private static void PermuteOverlap(Range[] ranges)
         {
-            foreach (IList<Range> permut in Permuter<Range>.Permute(ranges))
+            foreach (IList<Range> permut in ranges.Permutations())
             {
                 AssertOverlap(permut);
             }
@@ -123,21 +123,13 @@ namespace SEE.DataModel.DG.SourceRange
         {
             SortedRanges sr = new();
 
-            // We do not know which addition will throw the exception,
-            // that is why, we cannot use Assert.Throws.
-            try
+            Assert.Throws<ArgumentException>(() =>
             {
                 foreach (Range r in ranges)
                 {
                     sr.Add(r);
                 }
-                sr.Dump();
-                Assert.Fail($"Exception {nameof(ArgumentException)} was expected.");
-            }
-            catch (ArgumentException)
-            {
-                // This exception is expected.
-            }
+            });
         }
     }
 }

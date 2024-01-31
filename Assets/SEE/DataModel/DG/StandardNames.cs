@@ -53,15 +53,11 @@
     }
 
     /// <summary>
-    /// Defines names of JaCoCo code-coverage metrics.
+    /// Defines names of node attributes for JaCoCo code-coverage metrics.
+    /// See also: https://www.eclemma.org/jacoco/trunk/doc/counters.html
     /// </summary>
     public static class JaCoCo
     {
-        /// <summary>
-        /// Names of node attributes provided by JaCoCo.
-        /// See also: https://www.eclemma.org/jacoco/trunk/doc/counters.html
-        /// </summary>
-
         /// <summary>
         /// The number of instructions that were not executed.
         /// </summary>
