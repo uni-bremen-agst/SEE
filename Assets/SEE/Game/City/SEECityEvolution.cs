@@ -70,6 +70,8 @@ namespace SEE.Game.City
         [SerializeField, ShowInInspector, Tooltip("The directory in which the GXL files are located."), FoldoutGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         public DirectoryPath GXLDirectory = new DirectoryPath();
 
+        private bool isDrawn = false;
+
         //-----------------------------------------------------
         // Attributes to mark changes
         //-----------------------------------------------------
@@ -219,6 +221,7 @@ namespace SEE.Game.City
             // Delete the underlying graph.
             firstGraph?.Destroy();
             firstGraph = null;
+            isDrawn = false;
         }
 
         /// <summary>
@@ -234,6 +237,7 @@ namespace SEE.Game.City
             {
                 GraphRenderer graphRenderer = new GraphRenderer(this, firstGraph);
                 graphRenderer.DrawGraph(firstGraph, gameObject);
+                isDrawn = true;
             }
             else
             {
@@ -288,8 +292,11 @@ namespace SEE.Game.City
         {
             base.Start();
             Reset();
-
-            List<Graph> graphs = LoadDataSeries();
+            List<Graph> graphs = new List<Graph>();
+            if (isDrawn)
+            {
+                graphs = LoadDataSeries();
+            }
             evolutionRenderer = CreateEvolutionRenderer(graphs);
             DrawGraphs(graphs);
 

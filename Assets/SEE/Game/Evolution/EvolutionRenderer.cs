@@ -255,10 +255,8 @@ namespace SEE.Game.Evolution
 
         #endregion
 
-
-        public void SetGraphEvolution2(IList<Graph> graphs)
+        public void SetGraphDiff(IList<Graph> graph)
         {
-            this.graphs = graphs;
             if (gameObject.TryGetComponent(out SEEBranchCity sEEBranchCity))
             {
                 // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
@@ -267,19 +265,13 @@ namespace SEE.Game.Evolution
                 // we need the city argument, which comes only later. Anyhow, whenever we
                 // assign a new city, we also need a new graph renderer for that city.
                 // So in fact this is the perfect place to assign graphRenderer.
-                Renderer = new GraphRenderer(sEEBranchCity, graphs);
-                edgesAreDrawn = Renderer.AreEdgesDrawn();
-
-                //objectManager = new ObjectManager(Renderer, gameObject);
                 markerFactory = new MarkerFactory(markerWidth: sEEBranchCity.MarkerWidth,
                                     markerHeight: sEEBranchCity.MarkerHeight,
                                     additionColor: sEEBranchCity.AdditionBeamColor,
                                     changeColor: sEEBranchCity.ChangeBeamColor,
                                     deletionColor: sEEBranchCity.DeletionBeamColor);
-                //animationWatchDog = new CountingJoin();
             }
         }
-
 
         /// <summary>
         /// Sets the evolving series of <paramref name="graphs"/> to be visualized.
@@ -385,6 +377,7 @@ namespace SEE.Game.Evolution
             if (graphs.Count > 0)
             {
                 LoadingSpinner.Show(LoadingMessage);
+
             }
             CalculateAllGraphLayouts(graphs);
 
@@ -392,6 +385,7 @@ namespace SEE.Game.Evolution
 
             if (HasCurrentLaidOutGraph(out LaidOutGraph loadedGraph))
             {
+                Debug.Log("DisplayGraphAsNew");
                 DisplayGraphAsNew(loadedGraph);
             }
             else
@@ -628,9 +622,9 @@ namespace SEE.Game.Evolution
         }
 
         //Draw marks on Graph based on their toggle
-        public void DrawMarkOnGraph()
+        public void DrawMarkOnGraph(Graph diffGraph)
         {
-            foreach (Node node in graphs[currentGraphIndex].Nodes())
+            foreach (Node node in diffGraph.Nodes())
             {
                 if (node.HasToggle("IsNew"))
                 {

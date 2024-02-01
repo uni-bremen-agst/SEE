@@ -102,7 +102,7 @@ namespace SEE.Game.City
             if (!gameObject.TryGetComponent(out EvolutionRenderer result))
             {
                 result = gameObject.AddComponent<EvolutionRenderer>();
-                result.SetGraphEvolution2(new List<Graph> { LoadedGraph });
+                result.SetGraphDiff(new List<Graph> { LoadedGraph });
             }
             return result;
         }
@@ -172,7 +172,6 @@ namespace SEE.Game.City
 
             MergeNodes(baseline);
             MergeEdges(baseline);
-
         }
 
         /// <summary>
@@ -191,7 +190,7 @@ namespace SEE.Game.City
                           out ISet<Node> changedNodes,
                           out ISet<Node> equalNodes);
 
-            MergeGraphElements(addedNodes, removedNodes, changedNodes, n => { LoadedGraph.AddNode(n); });
+            MergeGraphElements(addedNodes, removedNodes, changedNodes, n => { LoadedGraph.AddNode(n); }, baseline);
         }
 
         /// <summary>
@@ -210,15 +209,13 @@ namespace SEE.Game.City
                         out ISet<Edge> changedEdges,
                         out ISet<Edge> equalEdges);
 
-            MergeGraphElements(addedEdges, removedEdges, changedEdges, AddEdge);
+            MergeGraphElements(addedEdges, removedEdges, changedEdges, AddEdge, baseline);
 
             // Adds edge to LoadedGraph. Note: edge is assumed to be cloned
             // from an edge belonging to the baseline graph that has no
             // corresponding edge in LoadedGraph, thus, was deleted.
             void AddEdge(Edge edge)
             {
-                //Debug.Log(baseline);
-                //Debug.Log(edge.ItsGraph);
                 // edge is cloned from a baseline edge, but after the cloning its source
                 // and target are nodes in the baseline graph. edge will be added to the
                 // LoadedGraph, hence, we need to adjust its source and target to the
@@ -255,7 +252,7 @@ namespace SEE.Game.City
         /// <param name="changed">changed graph elements</param>
         /// <param name="addToGraph">adds <paramref name="graphElement"/> to <see cref="LoadedGraph"/>;
         /// will be called for all elements in <paramref name="removed"/></param>
-        private static void MergeGraphElements<T>(ISet<T> added, ISet<T> removed, ISet<T> changed, AddToGraph<T> addToGraph)
+        private static void MergeGraphElements<T>(ISet<T> added, ISet<T> removed, ISet<T> changed, AddToGraph<T> addToGraph, Graph baseline)
             where T : GraphElement
         {
             //SetToggle will be IsDeleted if baseline and LoadedGraph have been swapped
@@ -278,17 +275,55 @@ namespace SEE.Game.City
             {
                 graphElement.SetToggle(IsChanged);
                 // TODO: We could run a diff between graphElement and its corresponding
-                // graphElement in LoadedGraph and mark deleted, changed, and added attributes.
+                // graphElement in LoadedGraph and mark deleted, changed, and added attributes. Neu - Alt = Diff
+                //ICollection<string> intMetrics = graphElement.AllIntAttributeNames();
+                List<string> intMetrics = new List<string>(graphElement.AllIntAttributeNames());
+                Node baseNode = baseline.GetNode(graphElement.ID);
+                intMetrics.ForEach(metric => 
+                {
+                    string diffStr = "diff." + metric;
+
+                    int graphInt = graphElement.GetInt(metric);
+                    baseNode.TryGetInt(metric, out int baselineInt);
+                    int diffInt = (tempGraph == null) ? (graphInt - baselineInt) : (baselineInt - graphInt);
+
+                    graphElement.SetInt(diffStr, diffInt);
+
+                });
             }
         }
 
-        protected override void Start()
+        /// <summary>
+        /// Draws the graph.
+        /// Precondition: The graph and its metrics have been loaded.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "Draw Data")]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
+        [PropertyOrder(DataButtonsGroupOrderDraw)]
+        public override void DrawGraph()
         {
-            base.Start();
-            //Reset();
+            base.DrawGraph();
 
             evolutionRenderer = CreateEvolutionRenderer();
-            evolutionRenderer.DrawMarkOnGraph();
+            evolutionRenderer.DrawMarkOnGraph(LoadedGraph);
+
+        }
+
+        /// <summary>
+        /// Removes the component.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "Reset Data")]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset")]
+        [PropertyOrder(ResetButtonsGroupOrderReset)]
+        public override void Reset()
+        {
+            base.Reset();
+            // Destroy Component.
+            if(gameObject.TryGetComponent(out EvolutionRenderer evolutionRenderer))
+            {
+                DestroyImmediate(evolutionRenderer);
+            }
+
         }
 
 
