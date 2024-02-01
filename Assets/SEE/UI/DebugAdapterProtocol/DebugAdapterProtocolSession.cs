@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
@@ -29,11 +30,7 @@ namespace SEE.UI.DebugAdapterProtocol
         private DebugProtocolHost adapterHost;
         private InitializeResponse capabilities;
 
-        /// <summary>
-        /// The queued requests.
-        /// </summary>
         private Queue<Action> queuedRequests = new();
-
 
         protected void Start()
         {
@@ -153,18 +150,9 @@ namespace SEE.UI.DebugAdapterProtocol
             return adapterProcess != null && !adapterProcess.HasExited;
         }
 
-        private void Launch()
-        {
-            queuedRequests.Enqueue(() => adapterHost.SendRequest(Adapter.GetLaunchRequest(capabilities), _ => { }));
-            if (capabilities.SupportsConfigurationDoneRequest == true)
-            {
-                queuedRequests.Enqueue(() => adapterHost.SendRequest(new ConfigurationDoneRequest(), _ => { }));
-            }
-        }
-
         private void Update()
         {
-            if (queuedRequests.Count > 0)
+            if (queuedRequests.Count > 0 && capabilities != null)
             {
                 try
                 {
@@ -181,12 +169,28 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             if (e.Body is InitializedEvent)
             {
-                Launch();
+                queuedRequests.Enqueue(() => adapterHost.SendRequestSync(Adapter.GetLaunchRequest(capabilities)));
+                queuedRequests.Enqueue(() =>
+                {
+                    if (capabilities.SupportsConfigurationDoneRequest == true)
+                    {
+                        adapterHost.SendRequestSync(new ConfigurationDoneRequest());
+                    }
+                });
             }
             else if (e.Body is OutputEvent outputEvent)
             {
-                ConsoleWindow.MessageSource source;
-                ConsoleWindow.MessageLevel level;
+                ConsoleWindow.MessageSource source = ConsoleWindow.MessageSource.Debugee;
+                ConsoleWindow.MessageLevel level = ConsoleWindow.MessageLevel.Warning;
+                console.AddMessage(outputEvent.Output, source, level);
+                Debug.Log($"OutputEvent" +
+                    $"\n\tGroup: {outputEvent.Group}" +
+                    $"\n\tvariablesReference: {outputEvent.VariablesReference}" +
+                    $"\n\tsource: {outputEvent.Source}" +
+                    $"\n\tline:column: {outputEvent.Line}:{outputEvent.Column}" +
+                    $"\n\toutput: {outputEvent.Output.Replace("\n", "\\n")}" +
+                    $"\n\tdata: {outputEvent.Data}");
+
                 switch (outputEvent.Category)
                 {
                     case OutputEvent.CategoryValue.Console:
@@ -211,11 +215,6 @@ namespace SEE.UI.DebugAdapterProtocol
                     case null:
                         return;
                 }
-                console.AddMessage("OutputEvent: " + outputEvent.Output, source, level);
-            }
-            else
-            {
-                console.AddMessage("OnEventReceived: " + e.EventType, ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Log);
             }
         }
 

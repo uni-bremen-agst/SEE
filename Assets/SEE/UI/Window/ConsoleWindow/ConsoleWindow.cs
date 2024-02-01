@@ -8,7 +8,7 @@ using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Text;
 using TMPro;
 using UnityEngine;
 
@@ -18,10 +18,24 @@ namespace SEE.UI.Window.ConsoleWindow
     {
         private const string windowPrefab = "Prefabs/UI/ConsoleWindow/ConsoleView";
         private const string itemPrefab = "Prefabs/UI/ConsoleWindow/ConsoleViewItem";
+        /// <summary>
+        /// The number of spaces to use for tabs.
+        /// </summary>
+        private const int tabSize = 4;
+        /// <summary>
+        /// The replacement for tabs in console messages.
+        /// Tabs are replaced with spaces for two reasons:
+        /// (1) TeshMeshPro doesn't work well with tabs. (weird spacing)
+        /// (2) The search field doesn't allow tabs.
+        /// </summary>
+        private static readonly string tabReplacement = new(' ', tabSize);
 
         private List<Message> messages = new List<Message>();
+        private bool messageNotFinished;
+
         private bool messagesCleared;
         private bool messageAdded;
+        private bool messageAppended;
 
         private Transform items;
         private TMP_InputField searchField;
@@ -47,8 +61,18 @@ namespace SEE.UI.Window.ConsoleWindow
 
         public void AddMessage(string text, MessageSource source = MessageSource.Adapter, MessageLevel level = MessageLevel.Log)
         {
-            messages.Add(new(text, source, level));
-            messageAdded = true;
+            text = text.Replace("\t", tabReplacement);
+            if (messageNotFinished)
+            {
+                messages.Last().Text += text;
+                messageAppended = true;
+            }
+            else
+            {
+                messages.Add(new(text, source, level));
+                messageAdded = true;
+            }
+            messageNotFinished = !text.EndsWith("\n");
         }
 
         public void ClearMessages()
@@ -106,7 +130,14 @@ namespace SEE.UI.Window.ConsoleWindow
                     Destroyer.Destroy(child.gameObject);
                 }
             }
-            // adds new message items (not on the same frame as clearing)
+            else if (messageAppended)
+            {
+                messageAppended = false;
+                for (int i = 0; i < items.childCount; i++)
+                {
+                    UpdateItem(items.GetChild(i).gameObject, messages[i].Text);
+                }
+            }
             else if (messageAdded)
             {
                 messageAdded = false;
@@ -147,6 +178,12 @@ namespace SEE.UI.Window.ConsoleWindow
                 new GradientAlphaKey[] { new(1, 0), new(1, 1) });
 
             UpdateFilter(message, item);
+        }
+
+        private void UpdateItem(GameObject item, string text)
+        {
+            TextMeshProUGUI textMesh = item.transform.Find("Foreground/Text").gameObject.MustGetComponent<TextMeshProUGUI>();
+            textMesh.SetText(text);
         }
 
         private void UpdateFilters()
