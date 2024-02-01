@@ -11,8 +11,8 @@ namespace SEE.UI.DebugAdapterProtocol
     {
         private static readonly DebugAdapter.DebugAdapter[] adapters =
         {
-            new MockDebugAdapter(),
             new NetCoreDebugAdapter(),
+            new MockDebugAdapter(),
         };
         private static DebugAdapter.DebugAdapter adapter = adapters[0];
         private static DebugAdapterProtocolSession session;

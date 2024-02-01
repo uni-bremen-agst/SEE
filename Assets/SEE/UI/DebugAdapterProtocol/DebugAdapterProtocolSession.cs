@@ -28,8 +28,10 @@ namespace SEE.UI.DebugAdapterProtocol
         private Process adapterProcess;
         private DebugProtocolHost adapterHost;
         private InitializeResponse capabilities;
-        private bool isInitialized;
 
+        /// <summary>
+        /// The queued requests.
+        /// </summary>
         private Queue<Action> queuedRequests = new();
 
 
@@ -51,7 +53,8 @@ namespace SEE.UI.DebugAdapterProtocol
                 console.AddMessage("Couldn't create the debug adapter process.", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
                 Destroyer.Destroy(this);
                 return;
-            } else
+            }
+            else
             {
                 console.AddMessage("Created the debug adapter process.", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
             }
@@ -60,17 +63,21 @@ namespace SEE.UI.DebugAdapterProtocol
                 console.AddMessage("Couldn't create the debug adapter host.", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
                 Destroyer.Destroy(this);
                 return;
-            } else
+            }
+            else
             {
                 console.AddMessage("Created the debug adapter host.", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
             }
 
             capabilities = adapterHost.SendRequestSync(new InitializeRequest()
             {
-                ClientID = "SEE",
-                ClientName = "Software Engineering Experience",
-                AdapterID = Adapter.Name,
                 PathFormat = InitializeArguments.PathFormatValue.Path,
+                ClientID = "vscode",
+                ClientName = "Visual Studio Code",
+                AdapterID = Adapter.Name,
+                Locale = "en",
+                LinesStartAt1 = true,
+                ColumnsStartAt1 = true,
             });
         }
 
@@ -134,7 +141,9 @@ namespace SEE.UI.DebugAdapterProtocol
                 {
                     adapterProcess = null;
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 console.AddMessage(e.ToString(), ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
                 adapterProcess = null;
             }
@@ -146,27 +155,22 @@ namespace SEE.UI.DebugAdapterProtocol
 
         private void Launch()
         {
-            queuedRequests.Enqueue(() =>
+            queuedRequests.Enqueue(() => adapterHost.SendRequest(Adapter.GetLaunchRequest(capabilities), _ => { }));
+            if (capabilities.SupportsConfigurationDoneRequest == true)
             {
-                if (capabilities.SupportsConfigurationDoneRequest == true)
-                {
-                    adapterHost.SendRequestSync(new ConfigurationDoneRequest());
-                } else
-                {
-                    adapterHost.SendRequestSync(new SetExceptionBreakpointsRequest());
-                }
-            });
-
-            queuedRequests.Enqueue(() => adapterHost.SendRequestSync(Adapter.GetLaunchRequest(capabilities)));
+                queuedRequests.Enqueue(() => adapterHost.SendRequest(new ConfigurationDoneRequest(), _ => { }));
+            }
         }
 
         private void Update()
+        {
             if (queuedRequests.Count > 0)
             {
                 try
                 {
                     queuedRequests.Dequeue()();
-                } catch (Exception e)
+                }
+                catch (Exception e)
                 {
                     console.AddMessage(e.ToString(), ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Error);
                 }
@@ -175,10 +179,12 @@ namespace SEE.UI.DebugAdapterProtocol
 
         private void OnEventReceived(object sender, EventReceivedEventArgs e)
         {
-            if (e.Body is InitializedEvent) {
-                isInitialized = true;
+            if (e.Body is InitializedEvent)
+            {
                 Launch();
-            } else if (e.Body is OutputEvent outputEvent) {
+            }
+            else if (e.Body is OutputEvent outputEvent)
+            {
                 ConsoleWindow.MessageSource source;
                 ConsoleWindow.MessageLevel level;
                 switch (outputEvent.Category)
@@ -200,16 +206,16 @@ namespace SEE.UI.DebugAdapterProtocol
                     case OutputEvent.CategoryValue.Stderr:
                         (source, level) = (ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Error);
                         break;
-                    case null:
                     default:
                     case OutputEvent.CategoryValue.Telemetry:
+                    case null:
                         return;
                 }
-                console.AddMessage(outputEvent.Output, source, level);
+                console.AddMessage("OutputEvent: " + outputEvent.Output, source, level);
             }
             else
             {
-                console.AddMessage("Event Received: " + e.EventType, ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Log);
+                console.AddMessage("OnEventReceived: " + e.EventType, ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Log);
             }
         }
 
@@ -224,7 +230,7 @@ namespace SEE.UI.DebugAdapterProtocol
             adapterHost.RequestCompleted += (_, args) => Debug.Log($"RequestCompleted - {args.Command} - {args.SequenceId} - {args.ElapsedTime}");
 
             adapterHost.EventReceived += OnEventReceived;
-            
+
             adapterHost.Run();
 
             return adapterHost.IsRunning;

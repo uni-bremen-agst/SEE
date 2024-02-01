@@ -12,19 +12,19 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
 {
     public class NetCoreDebugAdapter : DebugAdapter
     {
-        public override string Name => "Netcoredbg";
+        public override string Name => "coreclr";
 
         public override string AdapterWorkingDirectory { get; set; } = Path.Combine(AdapterDirectory, "netcoredbg");
         public override string AdapterFileName { get; set; } = "netcoredbg.exe";
-        public override string AdapterArguments { get; set; } = "--interpreter=vscode";
+        public override string AdapterArguments { get; set; } = "--interpreter=vscode --engineLogging=RunWithUnity.log";
 
         // https://github.com/Samsung/netcoredbg/blob/27606c317017beb81bc1b81846cdc460a7a6aed3/test-suite/NetcoreDbgTest/VSCode/VSCodeProtocolRequest.cs#L44
         private string launchName = ".NET Core Launch";
         private string launchType = "coreclr";
         private string launchPreLaunchTask = "build";
-        private string launchProgram = "D:\\ferdi\\SamplePrograms\\HelloCS1\\bin\\Debug\\net8.0\\HelloCS1.dll";
+        private string launchProgram = Path.Combine("D:" + Path.DirectorySeparatorChar + "ferdi", "SampleProjects", "HelloCS1", "src", "bin", "Debug", "net8.0", "src.dll");
         private List<string> launchArgs = new() { "Hello", "World"};
-        private string launchCwd = "D:\\ferdi\\SamplePrograms\\HelloCS1\\bin\\Debug\\net8.0";
+        private string launchCwd = Path.Combine("D:" + Path.DirectorySeparatorChar + "ferdi", "SampleProjects", "HelloCS1");
         private Dictionary<string, string> launchEnv = new();
         private string launchConsole = "internalConsole";
         private bool launchStopAtEntry = true;
@@ -36,9 +36,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         private StringProperty launchProgramProperty;
         private StringProperty launchArgsProperty;
         private StringProperty launchCwdProperty;
-        private SelectionProperty launchStopAtEntryProperty;
-
-        private static readonly string[] launchStopAtEntryOptions = new string[] { "Stop at entry\nEnabled", "Stop at Entry\nDisabled" };
+        private BooleanProperty launchStopAtEntryProperty;
 
         public override void SetupLaunchConfig(GameObject go, PropertyGroup group)
         {
@@ -60,11 +58,10 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             launchCwdProperty.Value = launchCwd;
             group.AddProperty(launchCwdProperty);
 
-            launchStopAtEntryProperty = go.AddComponent<SelectionProperty>();
+            launchStopAtEntryProperty = go.AddComponent<BooleanProperty>();
             launchStopAtEntryProperty.Name = "Stop at Entry";
             launchStopAtEntryProperty.Description = "Automatically stops after launch.";
-            launchStopAtEntryProperty.AddOptions(launchStopAtEntryOptions);
-            launchStopAtEntryProperty.Value = launchStopAtEntry ? launchStopAtEntryOptions[0] : launchStopAtEntryOptions[1];
+            launchStopAtEntryProperty.Value = launchStopAtEntry;
             group.AddProperty(launchStopAtEntryProperty);
         }
 
@@ -73,7 +70,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             launchProgram = launchProgramProperty.Value;
             launchArgs = parseList(launchArgsProperty.Value);
             launchCwd = launchCwdProperty.Value;
-            launchStopAtEntry = launchStopAtEntryProperty.Value == launchStopAtEntryOptions[0];
+            launchStopAtEntry = launchStopAtEntryProperty.Value;
         }
 
         
