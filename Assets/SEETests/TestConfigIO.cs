@@ -14,7 +14,7 @@ namespace SEE.Utils
     /// <summary>
     /// Test cases for ConfigIO.
     /// </summary>
-    internal class TestConfigIO
+    internal class TestConfigIO : AbstractTestConfigIO
     {
         [Test]
         public void TestConfigParseInteger1()
@@ -779,19 +779,6 @@ namespace SEE.Utils
             Assert.AreEqual(expected.g, actual.g, 0.001f);
             Assert.AreEqual(expected.b, actual.b, 0.001f);
             Assert.AreEqual(expected.a, actual.a, 0.001f);
-        }
-
-        /// <summary>
-        /// Checks whether the two data paths <paramref name="expected"/> and <paramref name="actual"/>
-        /// are equal (by value).
-        /// </summary>
-        /// <param name="expected">expected data path</param>
-        /// <param name="actual">actual data path</param>
-        private static void AreEqual(DataPath expected, DataPath actual)
-        {
-            Assert.AreEqual(expected.Root, actual.Root);
-            Assert.AreEqual(expected.RelativePath, actual.RelativePath);
-            Assert.AreEqual(expected.AbsolutePath, actual.AbsolutePath);
         }
 
         //--------------------------------------------------------
