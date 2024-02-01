@@ -15,8 +15,8 @@ using SEE.Game.CityRendering;
 using SEE.UI;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
-using SEE.Game.GraphProviders;
 using Sirenix.Serialization;
+using SEE.GraphProviders;
 
 namespace SEE.Game.City
 {
@@ -26,14 +26,19 @@ namespace SEE.Game.City
     /// </summary>
     public class SEECity : AbstractSEECity
     {
-        [OdinSerialize, ShowInInspector, Tooltip("A graph provider yielding the data to be visualized as code city."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
-        internal GraphProvider DataProvider;
-
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
         /// <see cref="SEECity.Save(ConfigWriter)"/> and
         /// <see cref="SEECity.Restore(Dictionary{string,object})"/>,
         /// respectively. You should also extend the test cases in TestConfigIO.
+
+        /// <summary>
+        /// A provider of the data shown as code city.
+        /// </summary>
+        [OdinSerialize, ShowInInspector,
+            Tooltip("A graph provider yielding the data to be visualized as code city."),
+            TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        internal GraphProvider DataProvider;
 
         /// <summary>
         /// The path to the GXL file containing the graph data.
@@ -371,10 +376,7 @@ namespace SEE.Game.City
                 try
                 {
                     Graph g = DataProvider.Provide(new Graph(""), this);
-                    if (g != null)
-                    {
-                        g.DumpTree();
-                    }
+                    g?.DumpTree();
                 }
                 catch (Exception ex)
                 {
