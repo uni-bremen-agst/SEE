@@ -204,7 +204,7 @@ namespace SEE.Controls.Actions
             IVersionControl versionControl = SwitchVersionControlSystems.CreateVersionControl(versionControlSystem);
             string showOldCode = versionControl.Show(repositoryPath, path, oldCommitIdentifier);
             string showNewCode = versionControl.ShowOriginal(repositoryPath, Path.GetRelativePath(repositoryPath, path).Replace("\\", "/"), oldCommitIdentifier, newCommitIdentifier);
-            string[] diff = TextualDiff.DiffForDiffCity(showOldCode, showNewCode);
+            string[] diff = TextualDiff.DiffForDiffCity(showNewCode, showOldCode);
 
             CodeWindow codeWindow = GetOrCreateCodeWindow(graphElementRef, sourceFilename);
             if (versionControl.ShowName() != null)

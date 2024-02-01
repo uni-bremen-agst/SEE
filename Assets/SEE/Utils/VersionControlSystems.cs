@@ -60,7 +60,11 @@ public class VersionControlSystems : MonoBehaviour
                 }
             };
             // Compare the commits
-            var changes = repo.Diff.Compare<TreeChanges>(oldCommit.Tree, newCommit.Tree, compareOptions);
+            var changes = repo.Diff.Compare<TreeChanges>(oldCommit.Tree, newCommit.Tree, compareOptions).Where(change => (change.Path == fileName || change.OldPath == fileName));
+            if (changes != null)
+            {
+                Debug.Log(changes.ToString());
+            }
             foreach (TreeEntryChanges change in changes)
             {
                 // FIXME: Just for debugging.
@@ -97,21 +101,15 @@ public class VersionControlSystems : MonoBehaviour
                 {
                     return "";
                 }
-                // Case: File is unmodified.
-                if (change.Status == ChangeKind.Unmodified && change.Path == fileName)
-                {
-                    var blob = newCommit[fileName]?.Target as Blob;
-                    return blob.GetContentText();
-                }
                 // Case: File got modified.
-                if (change.Status == ChangeKind.Modified && change.Path == fileName)
+                if (change.Status == ChangeKind.Modified && (change.Path == fileName || change.OldPath == fileName))
                 {
                     var changedBlob = newCommit[change.Path]?.Target as Blob;
                     return changedBlob.GetContentText();
                 }
             }
-            // FIXME: Just for debugging.
-            return fileName;
+            var blob = newCommit[fileName]?.Target as Blob;
+            return blob.GetContentText();
         }
 
         public string ShowName()
