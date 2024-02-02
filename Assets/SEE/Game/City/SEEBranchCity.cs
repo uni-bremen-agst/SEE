@@ -44,6 +44,11 @@ namespace SEE.Game.City
         /// </summary>
         static Graph tempGraph = null;
 
+        /// <summary>
+        /// The renderer for rendering the evolution of the graph series.
+        ///
+        /// Neither serialized nor saved in the configuration file.
+        /// </summary>
         private EvolutionRenderer evolutionRenderer; // not serialized by Unity; will be set in Start()
 
         /// <summary>
@@ -102,7 +107,7 @@ namespace SEE.Game.City
             if (!gameObject.TryGetComponent(out EvolutionRenderer result))
             {
                 result = gameObject.AddComponent<EvolutionRenderer>();
-                result.SetGraphDiff(new List<Graph> { LoadedGraph });
+                result.SetGraphDiff();
             }
             return result;
         }
@@ -154,6 +159,7 @@ namespace SEE.Game.City
         private void Merge(string pathBaselineGXL)
         {
             Graph baseline = LoadGraph(pathBaselineGXL);
+
             tempGraph = null;
             // TODO: Normally we would call LoadMetrics() to add additional metrics
             // for the graph stored in a separate CSV file. That is done for LoadedGraph.
@@ -274,27 +280,35 @@ namespace SEE.Game.City
             void UpdateChanged(T graphElement)
             {
                 graphElement.SetToggle(IsChanged);
-                // TODO: We could run a diff between graphElement and its corresponding
-                // graphElement in LoadedGraph and mark deleted, changed, and added attributes. Neu - Alt = Diff
-                //ICollection<string> intMetrics = graphElement.AllIntAttributeNames();
-                List<string> intMetrics = new List<string>(graphElement.AllIntAttributeNames());
+                //Calculates the diff between the corresponding metrics. Diff = new - old
+
+                //The corresponding Node from the baseline
                 Node baseNode = baseline.GetNode(graphElement.ID);
+                List<string> intMetrics = new List<string>(baseNode.AllIntAttributeNames());
+                List<string> intMetrics2 = new List<string>(graphElement.AllIntAttributeNames());
                 intMetrics.ForEach(metric => 
                 {
-                    string diffStr = "diff." + metric;
+                    string diffStr = metric + ".diff";
+                    string deletedStr = metric + ".deleted";
 
-                    int graphInt = graphElement.GetInt(metric);
-                    baseNode.TryGetInt(metric, out int baselineInt);
+                    int baselineInt = baseNode.GetInt(metric);
+                    graphElement.TryGetInt(metric, out int graphInt);
                     int diffInt = (tempGraph == null) ? (graphInt - baselineInt) : (baselineInt - graphInt);
-
-                    graphElement.SetInt(diffStr, diffInt);
-
+                    //If a metric has been deleted it will additionaly be marked with ".deleted" otherwise it has a ".diff"
+                    if (intMetrics2.Contains(metric))
+                    {
+                        graphElement.SetInt(diffStr, diffInt);
+                    }
+                    else
+                    {
+                        graphElement.SetInt(deletedStr, diffInt);
+                    }
                 });
             }
         }
 
         /// <summary>
-        /// Draws the graph.
+        /// Draws the graph and the beam according to if the node has been added, deleted or changed.
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Draw Data")]
@@ -310,7 +324,7 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Removes the component.
+        /// Resets everything that is specific to a given graph and removes the component.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset")]

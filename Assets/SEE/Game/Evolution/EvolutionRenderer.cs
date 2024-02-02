@@ -621,7 +621,10 @@ namespace SEE.Game.Evolution
             Phase1RemoveDeletedGraphElements(next);
         }
 
-        //Draw marks on Graph based on their toggle
+        /// <summary>
+        /// Draw marks on Graph based on their toggle
+        /// </summary>
+        /// <param name="diffGraph"> graph where the beams will be drawn on</param>
         public void DrawMarkOnGraph(Graph diffGraph)
         {
             foreach (Node node in diffGraph.Nodes())
