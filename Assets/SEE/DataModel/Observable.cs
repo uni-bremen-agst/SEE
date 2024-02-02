@@ -27,6 +27,18 @@ namespace SEE.DataModel
         public bool SuppressNotifications { get; set; } = false;
 
         /// <summary>
+        /// If set to true, events are not sent directly to the subscribers, but cached within <see cref="cachedChanges"/>.
+        /// After <see cref="StartCaching"/> is called this property should be set to true.
+        /// After <see cref="ReleaseCaching"/> is called this property should be set to false.
+        /// </summary>
+        private bool CachingActive { get; set; }
+
+        /// <summary>
+        /// Contains cached events.
+        /// </summary>
+        private IList<T> cachedChanges = new List<T>();
+
+        /// <summary>
         /// Registers a new subscriber for this observable.
         /// </summary>
         /// <param name="observer">The new observer which shall subscribe to this observable</param>
@@ -98,12 +110,47 @@ namespace SEE.DataModel
         }
 
         /// <summary>
+        /// Activates the caching of changes. After this method is called changes are not directly 
+        /// sent to the observers, but cached within <see cref="cachedChanges"/>.
+        /// Postcondition: <see cref="CachingActive"/> is true. 
+        /// </summary>
+        public void StartCaching()
+        {
+            CachingActive = true;
+        }
+
+        /// <summary>
+        /// This method Stops the caching of events. 
+        /// After this method is caclled all subscribed oberservers are notified 
+        /// about the cached changes.
+        /// Postcondition: <see cref="CachingActive"/> is false. 
+        ///                <see cref="cachedChanges"/> should be empty.
+        /// </summary>
+        public void ReleaseCaching()
+        {
+            CachingActive = false;
+            foreach (T cachedChange in cachedChanges)
+            {
+                this.Notify(cachedChange);
+            }
+            cachedChanges.Clear();
+        }
+
+        /// <summary>
         /// Notifies all registered observers with given change information about a change of the
-        /// state. This method must be called whenever a change of the state occurs.
+        /// state. But if <see cref="CachingActive"/> is set to true, the method first caches 
+        /// reveived changes and does not directly notify the observers.
+        /// This method must be called whenever a change of the state occurs.
         /// </summary>
         /// <param name="change">information about the change of the state to be passed on to the observers</param>
         protected void Notify(T change)
         {
+            if(CachingActive)
+            {
+                this.cachedChanges.Add(change);
+                return;
+            }
+
             if (SuppressNotifications)
             {
                 return;

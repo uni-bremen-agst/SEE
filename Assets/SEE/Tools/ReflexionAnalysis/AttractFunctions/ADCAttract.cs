@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
     public class ADCAttract : LanguageProcessingAttractFunction
@@ -67,15 +66,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                     Node clusterTarget = isCandidateSource ? neighborCluster : cluster;
 
                     string id = this.GetPropagatedDependencyID(clusterSource, clusterTarget, edge.Type);
-                    
+
                     if (id != null)
                     {
                         if (!this.wordsPerDependency.ContainsKey(id))
                         {
-                            UnityEngine.Debug.Log($"No Document found for propagated Dependency: " + Environment.NewLine +
-                                $"id:{id} propagated by " + Environment.NewLine +
-                                $"{edge.Source.ID} -{edge.Type}-> {edge.Target.ID} " + Environment.NewLine +
-                                $"implementation edge is in State {edge.State()}");
+                            //UnityEngine.Debug.Log($"No Document found for propagated Dependency: " + Environment.NewLine +
+                            //    $"id:{id} propagated by " + Environment.NewLine +
+                            //    $"{edge.Source.ID} -{edge.Type}-> {edge.Target.ID} " + Environment.NewLine +
+                            //    $"implementation edge is in State {edge.State()}");
 
                             continue;
                         }
@@ -141,6 +140,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <param name="implEdge">incoming or outgoing implementation edge associated with the changed node</param>
         public void AddDocumentsOfPropagatedEdge(Edge implEdge)
         {
+            // UnityEngine.Debug.Log($"Try to add Documents of edge {implEdge.Source.ID} --> {implEdge.Target.ID} (State: {implEdge.State()}, Graph: {implEdge.ItsGraph.Name})");
             if (implEdge.State() == State.Allowed || implEdge.State() == State.ImplicitlyAllowed)
             {
                 Node mapsToSource = this.reflexionGraph.MapsTo(implEdge.Source);
@@ -160,6 +160,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 {
                     wordsPerDependency[id].AddWords(mergedDocument);
                 }
+            } 
+            else
+            {
+                // UnityEngine.Debug.Log($"Edge {implEdge.Source.ID} --> {implEdge.Target.ID} is not in an allowed State.(State: {implEdge.State()})");
             }
         }
 
@@ -169,9 +173,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             if (!source.ID.Equals(target.ID))
             {
-                Edge architectureEdge = ReflexionGraph.GetPropagatedDependency(source,
-                                                                            target,
-                                                                            type);
+                //Edge architectureEdge = ReflexionGraph.GetPropagatedDependency(source,
+                //                                                            target,
+                //                                                            type);
+                // TODO: Is this correct?
+                Edge architectureEdge = source.FromTo(target, type).SingleOrDefault(edge => ReflexionGraph.IsSpecified(edge));
                 architectureId = architectureEdge.ID;
             }
             else
@@ -239,15 +245,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             this.AddStandardTerms(edge.Source, documentSource);
             this.AddStandardTerms(edge.Target, documentTarget);
             return documentSource.MergeDocuments(documentTarget, mergingType);
-        }
-
-        private Edge FindCorrespondingEdgeInArchitecture(Edge edge)
-        {
-            Node mapsToSource = this.reflexionGraph.MapsTo(edge.Source);
-            Node mapsToTarget = this.reflexionGraph.MapsTo(edge.Target);
-
-            // TODO: from ReflexionAnalysis.cs:1012, type hierarchy?
-            return ReflexionGraph.GetPropagatedDependency(mapsToSource, mapsToTarget, edge.Type);
         }
     }
 }

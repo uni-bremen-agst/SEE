@@ -131,6 +131,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             // TODO: How to solve event filtering in both classes, EventFilter class?
             if (!ProcessingEvents && value is EdgeEvent edgeEvent && edgeEvent.Affected == ReflexionSubgraphs.Mapping)
             {
+                // Debug.Log($"In Vizualization: Queued Changeevent in Mapping... {edgeEvent.ToString()} sender: {edgeEvent.Sender} to process...");
                 ProcessEvents().Forget();
                 TriggerBlinkAnimation().Forget();
             }
@@ -139,6 +140,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         public void SendEventToCalculationGraph(ChangeEvent value)
         {
             // UnityEngine.Debug.Log($"Try to send Change event {value} to calculation reflexion graph");
+            reflexionGraphCalc.StartCaching();
             switch (value)
             {
                 case NodeEvent nodeEvent:
@@ -203,6 +205,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     break;
                 default: break;
             }
+            reflexionGraphCalc.ReleaseCaching();
         }
 
         #endregion
@@ -314,6 +317,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         public void CreateInitialMapping()
         {
             Dictionary<Node, HashSet<Node>> initialMapping;
+            UnityEngine.Debug.Log($"Create Initial mapping with seed {initialMappingSeed}");
             lock (visualizedReflexionGraphLock)
             {
                  initialMapping = CandidateRecommendation.Statistics.CreateInitialMapping(initialMappingPercentage,
@@ -411,7 +415,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             lock (calculationReflexionGraphLock)
             {
                 reflexionGraphViz.AddToMapping(node1, cluster1);
-                reflexionGraphViz.AddToMapping(node2, cluster2);
+            }
+
+            lock (calculationReflexionGraphLock)
+            {
+                reflexionGraphViz.AddToMapping(node2, cluster2); 
             }
 
             foreach(Edge edge in reflexionGraphViz.Edges().Where(  e =>
@@ -420,7 +428,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                                                                 && (e.State() == State.Allowed || e.State() == State.ImplicitlyAllowed)
                                                                 && e.IsInImplementation()))
             {
-                UnityEngine.Debug.Log($"After Analysis: Edge {edge.Source.ID} --> {edge.Target.ID} is in State.(State: {edge.State()})");
+                // UnityEngine.Debug.Log($"After Analysis: Edge {edge.Source.ID} --> {edge.Target.ID} is in State.(State: {edge.State()}, Graph: {edge.ItsGraph.Name})");
             }
         }
 
