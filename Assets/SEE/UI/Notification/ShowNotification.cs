@@ -130,7 +130,11 @@ namespace SEE.UI.Notification
         public static Notification Show(string title, string description, Sprite icon, Color color,
                                         float duration = defaultDuration)
         {
-            return manager.Value.Show(title, description, icon, color, duration);
+            if (Application.isPlaying)
+            {
+                return manager.Value.Show(title, description, icon, color, duration);
+            }
+            return null;
         }
     }
 }
