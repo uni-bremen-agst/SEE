@@ -553,7 +553,7 @@ GameObject:
   - component: {fileID: 5116534107542572726}
   - component: {fileID: 6349769678875601617}
   m_Layer: 5
-  m_Name: ContinueButton
+  m_Name: Continue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

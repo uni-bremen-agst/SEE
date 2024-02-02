@@ -31,11 +31,9 @@ namespace SEE.UI.Window.ConsoleWindow
         private static readonly string tabReplacement = new(' ', tabSize);
 
         private List<Message> messages = new List<Message>();
-        private bool messageNotFinished;
 
         private bool messagesCleared;
         private bool messageAdded;
-        private bool messageAppended;
 
         private Transform items;
         private TMP_InputField searchField;
@@ -62,17 +60,8 @@ namespace SEE.UI.Window.ConsoleWindow
         public void AddMessage(string text, MessageSource source = MessageSource.Adapter, MessageLevel level = MessageLevel.Log)
         {
             text = text.Replace("\t", tabReplacement);
-            if (messageNotFinished)
-            {
-                messages.Last().Text += text;
-                messageAppended = true;
-            }
-            else
-            {
-                messages.Add(new(text, source, level));
-                messageAdded = true;
-            }
-            messageNotFinished = !text.EndsWith("\n");
+            messages.Add(new(text, source, level));
+            messageAdded = true;
         }
 
         public void ClearMessages()
@@ -128,14 +117,6 @@ namespace SEE.UI.Window.ConsoleWindow
                 foreach (Transform child in items)
                 {
                     Destroyer.Destroy(child.gameObject);
-                }
-            }
-            else if (messageAppended)
-            {
-                messageAppended = false;
-                for (int i = 0; i < items.childCount; i++)
-                {
-                    UpdateItem(items.GetChild(i).gameObject, messages[i].Text);
                 }
             }
             else if (messageAdded)
