@@ -255,16 +255,13 @@ namespace SEE.Game.Evolution
 
         #endregion
 
-        public void SetGraphDiff(IList<Graph> graph)
+        /// <summary>
+        /// Sets the initializes the MarkerFactory to draw the beams on the graph.
+        /// </summary>
+        public void SetGraphDiff()
         {
             if (gameObject.TryGetComponent(out SEEBranchCity sEEBranchCity))
             {
-                // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
-                // So we cannot make the following assignment in the constructor. Neither
-                // can we assign this value at the declaration of graphRenderer because
-                // we need the city argument, which comes only later. Anyhow, whenever we
-                // assign a new city, we also need a new graph renderer for that city.
-                // So in fact this is the perfect place to assign graphRenderer.
                 markerFactory = new MarkerFactory(markerWidth: sEEBranchCity.MarkerWidth,
                                     markerHeight: sEEBranchCity.MarkerHeight,
                                     additionColor: sEEBranchCity.AdditionBeamColor,
@@ -624,7 +621,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Draw marks on Graph based on their toggle
         /// </summary>
-        /// <param name="diffGraph"> graph where the beams will be drawn on</param>
+        /// <param name="diffGraph"> graph where the beams will be drawn on </param>
         public void DrawMarkOnGraph(Graph diffGraph)
         {
             foreach (Node node in diffGraph.Nodes())
