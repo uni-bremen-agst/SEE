@@ -7,6 +7,7 @@ using System.IO;
 using Cysharp.Threading.Tasks;
 using OpenAI;
 using OpenAI.Chat;
+using SEE.UI;
 using SEE.UI.Notification;
 using UnityEngine;
 using UnityEngine.Windows.Speech;
@@ -219,17 +220,19 @@ namespace SEE.Game.Avatars
             if (confidence != ConfidenceLevel.Rejected)
             {
                 chatGptHistory.Add(new Message(Role.User, text));
-                Notification notification = ShowNotification.Info("Thinking...",
-                                                                  "Please wait while I think about what you said...");
-                SendChatMessage(new ChatRequest(chatGptHistory, "gpt-3.5-turbo"), notification).Forget();
+                SendChatMessage(new ChatRequest(chatGptHistory, "gpt-3.5-turbo")).Forget();
             }
+            return;
 
-            async UniTaskVoid SendChatMessage(ChatRequest request, Notification notification)
+            async UniTaskVoid SendChatMessage(ChatRequest request)
             {
-                ChatResponse result = await openAiClient.ChatEndpoint.GetCompletionAsync(request);
-                notification?.Close();
-                string message = result.FirstChoice.Message.Content.ToString();
-                chatGptHistory.Add(new Message(Role.Assistant, message));
+                string message;
+                using (LoadingSpinner.Show("ChatGPT is thinking about what you said..."))
+                {
+                    ChatResponse result = await openAiClient.ChatEndpoint.GetCompletionAsync(request);
+                    message = result.FirstChoice.Message.Content.ToString();
+                    chatGptHistory.Add(new Message(Role.Assistant, message));
+                }
                 // We need to stop listening before we start speaking, else we will hear our own voice.
                 StopListening();
                 brain.Say(message, StartListening);
