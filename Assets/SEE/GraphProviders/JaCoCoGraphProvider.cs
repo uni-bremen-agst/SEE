@@ -3,6 +3,7 @@ using SEE.DataModel.DG.IO;
 using SEE.Game.City;
 using System;
 using System.IO;
+using Cysharp.Threading.Tasks;
 
 namespace SEE.GraphProviders
 {
@@ -23,7 +24,7 @@ namespace SEE.GraphProviders
         /// is undefined or does not exist or <paramref name="city"/> is null</exception>
         /// <exception cref="NotImplementedException">thrown in case <paramref name="graph"/> is
         /// null; this is currently not supported.</exception>
-        public override Graph Provide(Graph graph, AbstractSEECity city)
+        public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
         {
             CheckArguments(city);
             if (graph == null)
@@ -33,7 +34,7 @@ namespace SEE.GraphProviders
             else
             {
                 JaCoCoImporter.Load(graph, Path.Path);
-                return graph;
+                return UniTask.FromResult(graph);
             }
         }
     }

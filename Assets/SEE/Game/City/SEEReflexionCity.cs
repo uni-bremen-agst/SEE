@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.GO;
@@ -33,16 +34,16 @@ namespace SEE.Game.City
         ///
         /// This method loads only the data, but does not actually render the graph.
         /// </summary>
-        [Button(ButtonSizes.Small)]
+        [Button("Load Data", ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
-        public override void LoadData()
+        public override async UniTask LoadDataAsync()
         {
             if (LoadedGraph != null)
             {
                 Reset();
             }
-            LoadedGraph = DataProvider.Provide(new Graph(""), this);
+            LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this);
             Debug.Log($"Loaded graph {LoadedGraph.Name}.\n");
             visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
             visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);

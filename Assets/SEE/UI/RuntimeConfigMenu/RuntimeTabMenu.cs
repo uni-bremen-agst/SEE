@@ -1380,7 +1380,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 return;
             }
 
-            city.Invoke(nameof(SEECity.LoadData), 0);
+            city.Invoke(nameof(SEECity.LoadDataAsync), 0);
             StartCoroutine(DrawNextFrame());
 
             IEnumerator DrawNextFrame()

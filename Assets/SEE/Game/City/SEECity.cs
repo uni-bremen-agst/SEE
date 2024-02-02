@@ -139,7 +139,13 @@ namespace SEE.Game.City
                     Debug.LogWarning($"There is no drawn code city for {gameObject.name}.");
                     return;
                 }
-                LoadData();
+                LoadAsync().Forget();
+            }
+            return;
+
+            async UniTaskVoid LoadAsync()
+            {
+                await LoadDataAsync();
                 InitializeAfterDrawn();
                 BoardSettings.LoadBoard();
             }
@@ -282,18 +288,17 @@ namespace SEE.Game.City
                 await MetricImporter.LoadDashboardAsync(graph, erosionSettings.OverrideMetrics,
                                                    erosionSettings.IssuesAddedFromVersion);
             }
-            return;
         }
 
         /// <summary>
         /// Loads the graph data from the GXL file with GXLPath() and the metrics
         /// from the CSV file with CSVPath() and then draws it. Equivalent to:
-        ///   LoadData();
+        ///   LoadDataAsync();
         ///   DrawGraph();
         /// </summary>
-        public virtual void LoadAndDrawGraph()
+        public virtual async UniTaskVoid LoadAndDrawGraphAsync()
         {
-            LoadData();
+            await LoadDataAsync();
             DrawGraph();
         }
 
@@ -306,16 +311,16 @@ namespace SEE.Game.City
         ///
         /// This method loads only the data, but does not actually render the graph.
         /// </summary>
-        [Button(ButtonSizes.Small)]
+        [Button("Load Data", ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
-        public virtual void LoadData()
+        public virtual async UniTask LoadDataAsync()
         {
             if (DataProvider != null)
             {
                 try
                 {
-                    LoadedGraph = DataProvider.Provide(new Graph(""), this);
+                    LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this);
                     LoadMetricsFromDashboard();
                     LoadedGraph?.DumpTree();
                 }

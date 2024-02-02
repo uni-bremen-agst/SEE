@@ -3,6 +3,7 @@ using SEE.Game.City;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 
 namespace SEE.GraphProviders
 {
@@ -18,7 +19,7 @@ namespace SEE.GraphProviders
         /// <param name="graph">input graph</param>
         /// <param name="city">settings possibly necessary to provide a graph</param>
         /// <returns>provided graph based on <paramref name="graph"/></returns>
-        public abstract Graph Provide(Graph graph, AbstractSEECity city);
+        public abstract UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city);
 
         /// <summary>
         /// Saves the settings in the configuration file.

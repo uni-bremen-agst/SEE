@@ -9,6 +9,7 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -44,7 +45,7 @@ namespace SEE.GraphProviders
         [Tooltip("The name of the resulting reflexion city.")]
         public string CityName = "Reflexion Analysis";
 
-        public override Graph Provide(Graph graph, AbstractSEECity city)
+        public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
         {
             if (city == null)
             {
@@ -66,7 +67,7 @@ namespace SEE.GraphProviders
                 mappingGraph = LoadGraph(Mapping.Path, city);
             }
 
-            return new ReflexionGraph(implementationGraph, architectureGraph, mappingGraph, CityName);
+            return UniTask.FromResult<Graph>(new ReflexionGraph(implementationGraph, architectureGraph, mappingGraph, CityName));
         }
 
         /// <summary>

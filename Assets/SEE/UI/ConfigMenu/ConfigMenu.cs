@@ -23,8 +23,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Michsky.UI.ModernUIPack;
-using SEE.Controls;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.Utils;
@@ -151,7 +151,7 @@ namespace SEE.UI.ConfigMenu
             MustGetComponentInChild("Canvas/TabNavigation/Sidebar/CityLoadButton", out cityLoadButton);
             cityLoadButton.clickEvent.AddListener(() =>
             {
-                city.LoadData();
+                city.LoadDataAsync().Forget();
                 actions.SetActive(true);
                 cityLoadButton.gameObject.SetActive(false);
             });

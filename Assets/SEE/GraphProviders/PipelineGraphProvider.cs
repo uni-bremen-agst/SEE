@@ -4,6 +4,8 @@ using SEE.Utils.Config;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Cysharp.Threading.Tasks;
 
 namespace SEE.GraphProviders
 {
@@ -35,15 +37,11 @@ namespace SEE.GraphProviders
         /// in <see cref="Pipeline"/></param>
         /// <returns></returns>
         /// <remarks>Exceptions may be thrown by each nested graph provider.</remarks>
-        public override Graph Provide(Graph graph, AbstractSEECity city)
+        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
         {
-            Graph current = graph;
-
-            foreach (GraphProvider provider in Pipeline)
-            {
-                current = provider.Provide(current, city);
-            }
-            return current;
+            UniTask<Graph> initial = UniTask.FromResult(graph);
+            return await Pipeline.Aggregate(initial,
+                                            (current, provider) => current.ContinueWith(g => provider.ProvideAsync(g, city)));
         }
 
         #region Config I/O

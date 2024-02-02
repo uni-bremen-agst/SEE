@@ -22,6 +22,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using Cysharp.Threading.Tasks;
 using SEE.Utils.Paths;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
@@ -50,15 +51,15 @@ namespace SEE.Game.City
         public FilePath JLGPath = new();
 
         /// <summary>
-        /// Loads all city data as in <see cref="SEECity.LoadData()"/> plus the
+        /// Loads all city data as in <see cref="SEECity.LoadDataAsync"/> plus the
         /// JLG tracing data.
         /// </summary>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup)]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
-        public override void LoadData()
+        public override async UniTask LoadDataAsync()
         {
-            base.LoadData();
+            await base.LoadDataAsync();
             LoadJLG();
         }
 
