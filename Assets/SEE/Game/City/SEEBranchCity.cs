@@ -286,7 +286,7 @@ namespace SEE.Game.City
                 Node baseNode = baseline.GetNode(graphElement.ID);
                 List<string> intMetrics = new List<string>(baseNode.AllIntAttributeNames());
                 List<string> intMetrics2 = new List<string>(graphElement.AllIntAttributeNames());
-                intMetrics.ForEach(metric => 
+                intMetrics.ForEach(metric =>
                 {
                     string diffStr = metric + ".diff";
                     string deletedStr = metric + ".deleted";
