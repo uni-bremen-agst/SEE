@@ -1,6 +1,7 @@
 ﻿using SEE.Game.City;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
+using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,7 +19,7 @@ namespace SEE.GraphProviders
         /// <summary>
         /// The path to the file containing the additional data to be added to a graph.
         /// </summary>
-        [Tooltip("Path to the input file.")]
+        [Tooltip("Path to the input file."), HideReferenceObjectPicker]
         public FilePath Path = new();
 
         /// <summary>
