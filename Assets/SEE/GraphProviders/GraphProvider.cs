@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace SEE.GraphProviders
 {
-    internal abstract class GraphProvider : IGraphProvider
+    internal abstract class GraphProvider
     {
         /// <summary>
         /// Intended to implement <see cref="IGraphProvider.Provide(Graph, AbstractSEECity)"/>.
