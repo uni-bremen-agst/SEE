@@ -7,11 +7,15 @@ using Cysharp.Threading.Tasks;
 
 namespace SEE.GraphProviders
 {
+    /// <summary>
+    /// The GraphProvider class is an abstract base class that provides a framework
+    /// for creating and managing graph data. Concrete subclasses of GraphProvider
+    /// are responsible for providing a graph based on the input graph by
+    /// implementing the method <see cref="ProvideAsync(Graph, AbstractSEECity)"/>.
+    /// </summary>
     internal abstract class GraphProvider
     {
         /// <summary>
-        /// Intended to implement <see cref="IGraphProvider.Provide(Graph, AbstractSEECity)"/>.
-        ///
         /// Yields a new graph based on the input <paramref name="graph"/>.
         /// The input <paramref name="graph"/> may be empty. Subclasses are free to
         /// ignore the parameter <paramref name="graph"/>.
