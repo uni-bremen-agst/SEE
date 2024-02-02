@@ -527,7 +527,7 @@ namespace SEE.Game.City
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
-            DataProvider.Save(writer, dataProviderPathLabel);
+            DataProvider?.Save(writer, dataProviderPathLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
