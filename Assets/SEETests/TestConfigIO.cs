@@ -3,6 +3,7 @@ using System.IO;
 using NUnit.Framework;
 using SEE.Game;
 using SEE.Game.City;
+using SEE.GraphProviders;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Tools.RandomGraphs;
 using SEE.Utils.Config;
@@ -582,9 +583,7 @@ namespace SEE.Utils
         private static void SEECityAttributesAreEqual(SEECity expected, SEECity actual)
         {
             AbstractSEECityAttributesAreEqual(expected, actual);
-            AreEqual(expected.GXLPath, actual.GXLPath);
-            AreEqual(expected.CSVPath, actual.CSVPath);
-            AreEqual(expected.XMLPath, actual.XMLPath);
+            TestGraphProviderIO.AreEqual(expected.DataProvider, actual.DataProvider);
         }
 
         /// <summary>
@@ -793,9 +792,7 @@ namespace SEE.Utils
         private static void WipeOutSEECityAttributes(SEECity city)
         {
             WipeOutAbstractSEECityAttributes(city);
-            city.GXLPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gxl");
-            city.CSVPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.csv");
-            city.XMLPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.xml");
+            city.DataProvider = new CSVGraphProvider();
         }
 
         /// <summary>

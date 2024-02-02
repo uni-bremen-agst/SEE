@@ -11,6 +11,38 @@ namespace SEE.GraphProviders
     /// </summary>
     internal class TestGraphProviderIO : AbstractTestConfigIO
     {
+        /// <summary>
+        /// Checks whether the two graph providers have identical types
+        /// and whether their attributes are the same.
+        /// </summary>
+        /// <param name="expected">expected graph provider</param>
+        /// <param name="actual">actual graph provider</param>
+        /// <exception cref="System.NotImplementedException"></exception>
+        public static void AreEqual(GraphProvider expected, GraphProvider actual)
+        {
+            Assert.IsTrue(expected.GetType() == actual.GetType());
+            if (expected is GXLGraphProvider gXLGraphProvider)
+            {
+                AreEqualGXLProviders(gXLGraphProvider, actual);
+            }
+            else if (expected is CSVGraphProvider csvGraphProvider)
+            {
+                AreEqualCSVProviders(csvGraphProvider, actual);
+            }
+            else if (expected is PipelineGraphProvider pipelineGraphProvider)
+            {
+                AreEqualPipelineProviders(pipelineGraphProvider, actual);
+            }
+            else if (expected is ReflexionGraphProvider reflexionGraphProvider)
+            {
+                AreEqualReflexionGraphProviders(reflexionGraphProvider, actual);
+            }
+            else
+            {
+                throw new System.NotImplementedException();
+            }
+        }
+
         private const string providerLabel = "provider";
 
         private string filename;
@@ -43,7 +75,7 @@ namespace SEE.GraphProviders
             };
         }
 
-        private void AreEqualGXLProviders(GXLGraphProvider saved, GraphProvider loaded)
+        private static void AreEqualGXLProviders(GXLGraphProvider saved, GraphProvider loaded)
         {
             Assert.IsTrue(saved.GetType() == loaded.GetType());
             GXLGraphProvider gxlLoaded = loaded as GXLGraphProvider;
@@ -66,7 +98,7 @@ namespace SEE.GraphProviders
             };
         }
 
-        private void AreEqualCSVProviders(CSVGraphProvider saved, GraphProvider loaded)
+        private static void AreEqualCSVProviders(CSVGraphProvider saved, GraphProvider loaded)
         {
             Assert.IsTrue(saved.GetType() == loaded.GetType());
             CSVGraphProvider gxlLoaded = loaded as CSVGraphProvider;
@@ -80,7 +112,6 @@ namespace SEE.GraphProviders
             saved.Pipeline.Add(GetGXLProvider());
             saved.Pipeline.Add(GetCSVProvider());
             Save(saved);
-            Print();
             AreEqualPipelineProviders(saved, Load());
         }
 
@@ -89,7 +120,6 @@ namespace SEE.GraphProviders
         {
             PipelineGraphProvider saved = new();
             Save(saved);
-            Print();
             AreEqualPipelineProviders(saved, Load());
         }
 
@@ -105,37 +135,46 @@ namespace SEE.GraphProviders
                 saved.Pipeline.Add(nested);
             }
             Save(saved);
-            Print();
             AreEqualPipelineProviders(saved, Load());
         }
 
-        private void AreEqualPipelineProviders(PipelineGraphProvider saved, GraphProvider loaded)
+        private static void AreEqualPipelineProviders(PipelineGraphProvider saved, GraphProvider loaded)
         {
             Assert.IsTrue(saved.GetType() == loaded.GetType());
             PipelineGraphProvider pipelineLoaded = loaded as PipelineGraphProvider;
             Assert.AreEqual(saved.Pipeline.Count, pipelineLoaded.Pipeline.Count);
             for (int i = 0; i < saved.Pipeline.Count; i++)
             {
-                GraphProvider savedProvider = saved.Pipeline[i];
-                GraphProvider loadedProvider = pipelineLoaded.Pipeline[i];
-                Assert.IsTrue(savedProvider.GetType() == loadedProvider.GetType());
-                if (savedProvider is GXLGraphProvider gXLGraphProvider)
-                {
-                    AreEqualGXLProviders(gXLGraphProvider, loadedProvider);
-                }
-                else if (savedProvider is CSVGraphProvider csvGraphProvider)
-                {
-                    AreEqualCSVProviders(csvGraphProvider, loadedProvider);
-                }
-                else if (savedProvider is PipelineGraphProvider pipelineGraphProvider)
-                {
-                    AreEqualPipelineProviders(pipelineGraphProvider, loadedProvider);
-                }
-                else
-                {
-                    throw new System.NotImplementedException();
-                }
+                AreEqual(saved.Pipeline[i], pipelineLoaded.Pipeline[i]);
             }
+        }
+
+        [Test]
+        public void TestReflexionGraphProvider()
+        {
+            ReflexionGraphProvider saved = GetReflexionProvider();
+            Save(saved);
+            Print();
+            AreEqualReflexionGraphProviders(saved, Load());
+        }
+
+        private ReflexionGraphProvider GetReflexionProvider()
+        {
+            return new ReflexionGraphProvider()
+            {
+                Architecture = new Utils.Paths.FilePath("mydir/Architecture.gxl"),
+                Implementation = new Utils.Paths.FilePath("mydir/Implementation.gxl"),
+                Mapping = new Utils.Paths.FilePath("mydir/Mapping.gxl"),
+            };
+        }
+
+        private static void AreEqualReflexionGraphProviders(ReflexionGraphProvider saved, GraphProvider loaded)
+        {
+            Assert.IsTrue(saved.GetType() == loaded.GetType());
+            ReflexionGraphProvider reflexionLoaded = loaded as ReflexionGraphProvider;
+            AreEqual(saved.Architecture, reflexionLoaded.Architecture);
+            AreEqual(saved.Implementation, reflexionLoaded.Implementation);
+            AreEqual(saved.Mapping, reflexionLoaded.Mapping);
         }
 
         private GraphProvider Load()

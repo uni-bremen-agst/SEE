@@ -16,6 +16,10 @@ namespace SEE.GraphProviders
         /// </summary>
         private const string CSVGraphProviderKind = "CSV";
         /// <summary>
+        /// Label for the kind of provider for <see cref="ReflexionGraphProvider"/> in the config file.
+        /// </summary>
+        private const string ReflexionGraphProviderKind = "Reflexion";
+        /// <summary>
         /// Label for the kind of provider for <see cref="PipelineGraphProvider"/> in the config file.
         /// </summary>
         private const string PipelineGraphProviderKind = "Pipeline";
@@ -38,6 +42,10 @@ namespace SEE.GraphProviders
             {
                 return CSVGraphProviderKind;
             }
+            if (graphProvider.GetType() == typeof(ReflexionGraphProvider))
+            {
+                return ReflexionGraphProviderKind;
+            }
             if (graphProvider.GetType() == typeof(PipelineGraphProvider))
             {
                 return PipelineGraphProviderKind;
@@ -51,6 +59,7 @@ namespace SEE.GraphProviders
             {
                 GXLGraphProviderKind => new GXLGraphProvider(),
                 CSVGraphProviderKind => new CSVGraphProvider(),
+                ReflexionGraphProviderKind => new ReflexionGraphProvider(),
                 PipelineGraphProviderKind => new PipelineGraphProvider(),
                 _ => throw new NotImplementedException($"Not implemented for {kind}")
             };

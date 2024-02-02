@@ -569,18 +569,6 @@ namespace SEE.UI.ConfigMenu
                 .SetRange((0f, 1f))
                 .SetDefaultValue(city.LODCulling)
                 .SetOnChangeHandler(f => city.LODCulling = f);
-
-            // GXL file
-            FilePickerBuilder.Init(controls.transform)
-                .SetLabel("GXL file")
-                .SetPathInstance(city.GXLPath)
-                .Build();
-
-            // Metric file
-            FilePickerBuilder.Init(controls.transform)
-                .SetLabel("Metric file")
-                .SetPathInstance(city.CSVPath)
-                .Build();
         }
 
         private GameObject CreateAndInsertPage(string headline)

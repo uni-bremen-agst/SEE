@@ -554,46 +554,6 @@ namespace SEE.Game.City
                           .ToDictionary(x => x.Key, x => x.Value);
 
         /// <summary>
-        /// Loads and returns the graph data from the GXL file with given <paramref name="filename"/>.
-        /// </summary>
-        /// <param name="filename">GXL filename from which to load the graph</param>
-        /// <param name="rootName">the name of the artificial root if any needs to be added;
-        /// if null is given, <paramref name="filename"/> will be used instead</param>
-        /// <returns>the loaded graph (may be empty if a graph could not be loaded)</returns>
-        protected Graph LoadGraph(string filename, string rootName = null)
-        {
-            if (string.IsNullOrEmpty(filename))
-            {
-                Debug.LogError("Empty graph path.\n");
-                Graph graph = new(SourceCodeDirectory.Path);
-                return graph;
-            }
-
-            if (File.Exists(filename))
-            {
-                Performance p = Performance.Begin("loading graph data from " + filename);
-                GraphReader graphCreator = new(filename, HierarchicalEdges,
-                                               basePath: SourceCodeDirectory.Path,
-                                               rootID: rootName ?? filename,
-                                               logger: new SEELogger());
-                graphCreator.Load();
-                Graph graph = graphCreator.GetGraph();
-                p.End();
-                Debug.Log($"Loaded graph data for city {name} from {filename} successfully:\n"
-                          + $"Number of nodes: {graph.NodeCount}\n"
-                          + $"Number of edges: {graph.EdgeCount}\n"
-                          + $"Elapsed time: {p.GetElapsedTime()} [h:m:s:ms]\n");
-                LoadDataForGraphListing(graph);
-                return graph;
-            }
-            else
-            {
-                Debug.LogError($"GXL file {filename} of city {name} does not exist.\n");
-                return new Graph(SourceCodeDirectory.Path);
-            }
-        }
-
-        /// <summary>
         /// Lists the metrics for each node type.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "List Node Metrics")]
@@ -676,6 +636,7 @@ namespace SEE.Game.City
         /// Saves all data needed for the listing of the dirs in gui in cosegraphSettings
         /// </summary>
         /// <param name="graph"></param>
+        [Obsolete]
         public void LoadDataForGraphListing(Graph graph)
         {
             if (NodeLayoutSettings.Kind == NodeLayoutKind.CompoundSpringEmbedder)
@@ -714,6 +675,8 @@ namespace SEE.Game.City
                                                                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.IsRelevant);
             }
         }
+
+        #region Odin Inspector Attributes
 
         //----------------------------------------------------------------
         // Odin Inspector Attributes
@@ -799,5 +762,6 @@ namespace SEE.Game.City
         /// </summary>
         protected const string ErosionFoldoutGroup = "Erosion";
 
+        #endregion
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
@@ -14,9 +13,9 @@ using UnityEngine.Assertions;
 using SEE.Game.CityRendering;
 using SEE.UI;
 using SEE.Utils.Config;
-using SEE.Utils.Paths;
 using Sirenix.Serialization;
 using SEE.GraphProviders;
+using SEE.UI.Notification;
 
 namespace SEE.Game.City
 {
@@ -39,25 +38,6 @@ namespace SEE.Game.City
             Tooltip("A graph provider yielding the data to be visualized as code city."),
             TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         internal GraphProvider DataProvider;
-
-        /// <summary>
-        /// The path to the GXL file containing the graph data.
-        /// Note that any deriving class may use multiple GXL paths from which the single city is constructed.
-        /// </summary>
-        [ShowInInspector, Tooltip("Path of GXL file"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
-        public FilePath GXLPath = new();
-
-        /// <summary>
-        /// The path to the CSV file containing the additional metric values.
-        /// </summary>
-        [ShowInInspector, Tooltip("Path of metric CSV file"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
-        public FilePath CSVPath = new();
-
-        /// <summary>
-        /// The path to the XML file containing the additional metric values within (JaCoCo)Test-Report.
-        /// </summary>
-        [ShowInInspector, Tooltip("Path of JaCoCo XML file"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
-        public FilePath XMLPath = new();
 
         /// <summary>
         /// The graph that is visualized in the scene and whose visualization settings are
@@ -115,7 +95,7 @@ namespace SEE.Game.City
 
         /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
-        /// containing only nodes with relevant node types or the original LoadedGraph
+        /// containing only nodes with relevant node types or the original <see cref="LoadedGraph"/>
         /// if all node types are relevant. It is null if no graph has been loaded yet
         /// (i.e. <see cref="LoadedGraph"/> is null).
         /// </summary>
@@ -123,7 +103,7 @@ namespace SEE.Game.City
 
         /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
-        /// containing only nodes with relevant node types or the original LoadedGraph
+        /// containing only nodes with relevant node types or the original <see cref="LoadedGraph"/>
         /// if all node types are relevant. It is null if no graph has been loaded yet
         /// (i.e. <see cref="LoadedGraph"/> is null).
         /// </summary>
@@ -266,9 +246,10 @@ namespace SEE.Game.City
         /// them to the graph.
         /// Precondition: graph must have been loaded before.
         /// </summary>
-        private void LoadMetrics()
+        [Obsolete("Should be implemented by a graph provider")]
+        private void LoadMetricsFromDashboard()
         {
-            LoadGraphMetricsAsync(LoadedGraph, CSVPath.Path, XMLPath.Path, ErosionSettings).Forget();
+            LoadGraphMetricsFromDashboardAsync(LoadedGraph, ErosionSettings).Forget();
         }
 
         /// <summary>
@@ -277,8 +258,6 @@ namespace SEE.Game.City
         /// from the Axivion Dashboard.
         /// </summary>
         /// <param name="graph">The graph into which the metrics shall be loaded</param>
-        /// <param name="csvPath">The CSV file containing the metrics for the given <paramref name="graph"/></param>
-        /// <param name="xmlPath">The path to the JaCoCo XML report to be loaded</param>
         /// <param name="erosionSettings">
         /// Will be used to determine whether metric data from the Axivion Dashboard shall be imported into the graph.
         /// For this, <see cref="ErosionAttributes.LoadDashboardMetrics"/>,
@@ -290,27 +269,11 @@ namespace SEE.Game.City
         /// involving a network call. If you simply want to call it synchronously without querying the dashboard,
         /// set <paramref name="erosionSettings"/> to an appropriate value and use <c>LoadGraphMetricsAsync.Forget()</c>.
         /// </remarks>
-        protected static async UniTask LoadGraphMetricsAsync
-            (Graph graph, string csvPath, string xmlPath,  ErosionAttributes erosionSettings)
+        [Obsolete("Should be implemented by a graph provider")]
+        protected static async UniTask LoadGraphMetricsFromDashboardAsync
+            (Graph graph, ErosionAttributes erosionSettings)
         {
-            if (ValidPath(csvPath, "Metric CSV"))
-            {
-                Performance p = Performance.Begin($"Loading metric data from CSV file {csvPath}");
-                int numberOfErrors = MetricImporter.LoadCsv(graph, csvPath);
-                if (numberOfErrors > 0)
-                {
-                    Debug.LogWarning($"CSV file {csvPath} has {numberOfErrors} many errors.\n");
-                }
-                p.End();
-            }
-
-            if (ValidPath(xmlPath, "JaCoCo XML"))
-            {
-                Performance p = Performance.Begin($"Loading JaCoCo data from XML file {xmlPath}");
-                JaCoCoImporter.Load(graph, xmlPath);
-                p.End();
-            }
-
+            // FIXME: This MetricImporter.LoadDashboardAsync should also be turned into a GraphProvider.
             // Substitute missing values from the dashboard
             if (erosionSettings.LoadDashboardMetrics)
             {
@@ -320,19 +283,6 @@ namespace SEE.Game.City
                                                    erosionSettings.IssuesAddedFromVersion);
             }
             return;
-
-            bool ValidPath(string path, string title)
-            {
-                if (File.Exists(path))
-                {
-                    return true;
-                }
-                else if (!string.IsNullOrEmpty(path))
-                {
-                    Debug.LogWarning($"{title} file {path} does not exist.\n");
-                }
-                return false;
-            }
         }
 
         /// <summary>
@@ -361,34 +311,33 @@ namespace SEE.Game.City
         [PropertyOrder(DataButtonsGroupOrderLoad)]
         public virtual void LoadData()
         {
-            if (string.IsNullOrWhiteSpace(GXLPath.Path))
-            {
-                Debug.LogError("Empty graph path.\n");
-            }
-            else
-            {
-                LoadedGraph = LoadGraph(GXLPath.Path);
-                LoadMetrics();
-            }
-
             if (DataProvider != null)
             {
                 try
                 {
-                    Graph g = DataProvider.Provide(new Graph(""), this);
-                    g?.DumpTree();
+                    LoadedGraph = DataProvider.Provide(new Graph(""), this);
+                    LoadMetricsFromDashboard();
+                    LoadedGraph?.DumpTree();
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError($"Graph provider failed with: {ex}\n");
+                    ShowNotification.Error("Data failure", $"Graph provider failed with: {ex}\n");
                     Debug.LogException(ex);
                 }
+            }
+            else
+            {
+                ShowNotification.Error("No data provider", "You must set a data provider before you can load the data.");
             }
         }
 
         /// <summary>
         /// Saves the graph data to the GXL file with GXLPath().
         /// </summary>
+        /*
+         * FIXME: Do we want to re-active this code? If so, it should query the path from
+         * the user with a file picker.
+         *
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Data")]
         [PropertyOrder(DataButtonsGroupOrderSave)]
@@ -403,6 +352,7 @@ namespace SEE.Game.City
                 GraphWriter.Save(GXLPath.Path, LoadedGraph, HierarchicalEdges.First());
             }
         }
+        */
 
         /// <summary>
         /// Re-draws the graph without deleting the underlying loaded graph.
@@ -564,39 +514,27 @@ namespace SEE.Game.City
             }
         }
 
+        #region Config I/O
         //--------------------------------
         // Configuration file input/output
         //--------------------------------
 
         /// <summary>
-        /// Label of attribute <see cref="GXLPath"/> in the configuration file.
+        /// Label of attribute <see cref="DataProvider"/> in the configuration file.
         /// </summary>
-        private const string gxlPathLabel = "GXLPath";
-
-        /// <summary>
-        /// Label of attribute <see cref="CSVPath"/> in the configuration file.
-        /// </summary>
-        private const string csvPathLabel = "CSVPath";
-
-        /// <summary>
-        /// Label of attribute <see cref="XMLPath"/> in the configuration file.
-        /// </summary>
-        private const string xmlPathLabel = "XMLPath";
+        private const string dataProviderPathLabel = "data";
 
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
-            GXLPath.Save(writer, gxlPathLabel);
-            CSVPath.Save(writer, csvPathLabel);
-            XMLPath.Save(writer, xmlPathLabel);
+            DataProvider.Save(writer, dataProviderPathLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
-            GXLPath.Restore(attributes, gxlPathLabel);
-            CSVPath.Restore(attributes, csvPathLabel);
-            XMLPath.Restore(attributes, xmlPathLabel);
+            DataProvider = GraphProvider.Restore(attributes, dataProviderPathLabel);
         }
+        #endregion
     }
 }
