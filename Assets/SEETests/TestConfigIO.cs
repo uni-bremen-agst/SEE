@@ -575,20 +575,27 @@ namespace SEE.Utils
         [Test]
         public void TestSEEBranchCity()
         {
-            string filename = "mini-diff.cfg";
-            // First save a new city with all its default values.
-            SEEBranchCity savedCity = NewVanillaSEECity<SEEBranchCity>();
-            savedCity.Save(filename);
+            string filename = Path.GetTempFileName();
+            try
+            {
+                // First save a new city with all its default values.
+                SEEBranchCity savedCity = NewVanillaSEECity<SEEBranchCity>();
+                savedCity.Save(filename);
 
-            // Create a new city with all its default values and then
-            // wipe out all its attributes to see whether they are correctly
-            // restored from the saved configuration file.
-            SEEBranchCity loadedCity = NewVanillaSEECity<SEEBranchCity>();
-            WipeOutSEEBranchCityAttributs(loadedCity);
-            // Load the saved attributes from the configuration file.
-            loadedCity.Load(filename);
+                // Create a new city with all its default values and then
+                // wipe out all its attributes to see whether they are correctly
+                // restored from the saved configuration file.
+                SEEBranchCity loadedCity = NewVanillaSEECity<SEEBranchCity>();
+                WipeOutSEEBranchCityAttributs(loadedCity);
+                // Load the saved attributes from the configuration file.
+                loadedCity.Load(filename);
 
-            SEEBranchCityAttributesAreEqual(savedCity, loadedCity);
+                SEEBranchCityAttributesAreEqual(savedCity, loadedCity);
+            }
+            finally
+            {
+                FileIO.DeleteIfExists(filename);
+            }
         }
 
         //--------------------------------------------------------
