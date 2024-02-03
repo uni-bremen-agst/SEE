@@ -17,67 +17,57 @@ public class VersionControlSystems : MonoBehaviour
     /// </summary>
     public class GitVersionControl : IVersionControl
     {
-        string name = null;
+        /// <summary>
+        /// The name of the file, when it got deleted, or renamed.
+        /// </summary>
+        private string name = null;
+
+        /// <summary>
+        /// Returns the source code from the revision being compared against.
+        /// </summary>
+        /// <returns>the source code from the revision being compared against.</returns>
         public string Show(string repositoryPath, string fileName, string commitID)
         {
-            using (var repo = new Repository(repositoryPath))
-            {
-                // Get file from commit
-                var blob = repo.Lookup<Blob>($"{commitID}:{Path.GetRelativePath(repositoryPath, fileName).Replace("\\","/")}");
+            Repository repo = new(repositoryPath);
+            // Get file from commit
+            Blob blob = repo.Lookup<Blob>($"{commitID}:{Path.GetRelativePath(repositoryPath, fileName).Replace("\\", "/")}");
 
-                if (blob != null)
-                {
-                    // Get content from file
-                    var content = blob.GetContentText();
-                    return content;
-                }
-                else
-                {
-                    // FIXME: Just for debugging.
-                    return $"{commitID}:{Path.GetRelativePath(repositoryPath, fileName).Replace("\\", "/")}";
-                }
+            if (blob != null)
+            {
+                return blob.GetContentText();
+            }
+            else
+            {
+                // File got added and is only available in the other commit.
+                return "";
             }
         }
+
+        /// <summary>
+        /// Returns the source code from the revision, that gets compared.
+        /// </summary>
+        /// <returns>the source code from the revision, that gets compared.</returns>
         public string ShowOriginal(string repositoryPath, string fileName, string oldCommitID, string newCommitID)
         {
-            var repo = new Repository(repositoryPath);
-            // Get commit, to find possible renames.
-            var newCommit = repo.Lookup<Commit>(newCommitID);
-            var oldCommit = repo.Lookup<Commit>(oldCommitID);
+            Repository repo = new(repositoryPath);
+            Commit newCommit = repo.Lookup<Commit>(newCommitID);
+            Commit oldCommit = repo.Lookup<Commit>(oldCommitID);
 
-            // Set up the diff options.
-            var compareOptions = new CompareOptions
+            CompareOptions compareOptions = new()
             {
                 Algorithm = DiffAlgorithm.Myers,
                 Similarity = new SimilarityOptions
                 {
-                    RenameDetectionMode = RenameDetectionMode.CopiesHarder,
-                    RenameThreshold = 20,
-                    BreakRewriteThreshold = 70,
-                    RenameFromRewriteThreshold = 99,
-                    CopyThreshold = 90,
-                    RenameLimit = 1,
+                    RenameDetectionMode = RenameDetectionMode.Default,
                 }
             };
+
             // Compare the commits
-            var changes = repo.Diff.Compare<TreeChanges>(oldCommit.Tree, newCommit.Tree, compareOptions).Where(change => (change.Path == fileName || change.OldPath == fileName));
-            if (changes != null)
-            {
-                Debug.Log(changes.ToString());
-            }
+            var changes = repo.Diff.Compare<TreeChanges>(oldCommit.Tree, newCommit.Tree, compareOptions)
+                .Where(change => (change.Path == fileName || change.OldPath == fileName));
+
             foreach (TreeEntryChanges change in changes)
             {
-                // FIXME: Just for debugging.
-                string changeInfo = change.Status.ToString();
-                string changeInff = change.OldPath.ToString();
-                string changeInf = change.Path.ToString();
-                string a = change.Exists.ToString();
-                string b = change.OldExists.ToString();
-                Debug.Log(changeInfo);
-                Debug.Log(changeInff);
-                Debug.Log(changeInf);
-                Debug.Log(a);
-                Debug.Log(b);
                 // Case: file got renamed.
                 if ((change.Status == ChangeKind.Renamed || change.Status == ChangeKind.Copied) &&
                     (change.Path == fileName || change.OldPath == fileName))
@@ -91,27 +81,25 @@ public class VersionControlSystems : MonoBehaviour
                         return renamedBlob.GetContentText();
                     }
                 }
-                // Case: File got Added.
-                if (change.Status == ChangeKind.Added && change.Path == fileName)
-                {
-                    return "";
-                }
                 // Case: File got deleted.
                 if (change.Status == ChangeKind.Deleted && change.Path == fileName)
                 {
+                    // Mark filename in the codewindow as deleted.
+                    name = fileName;
                     return "";
                 }
-                // Case: File got modified.
-                if (change.Status == ChangeKind.Modified && (change.Path == fileName || change.OldPath == fileName))
-                {
-                    var changedBlob = newCommit[change.Path]?.Target as Blob;
-                    return changedBlob.GetContentText();
-                }
             }
-            var blob = newCommit[fileName]?.Target as Blob;
+            Blob blob = newCommit[fileName]?.Target as Blob;
             return blob.GetContentText();
         }
 
+        /// <summary>
+        /// Returns the updated filename.
+        /// When a renaming took place, the new name gets returned.
+        /// When a file got deleted, the original filename gets returned.
+        /// Otherwise null gets returned.
+        /// </summary>
+        /// <returns>the updated filename</returns>
         public string ShowName()
         {
             return name;
@@ -122,18 +110,35 @@ public class VersionControlSystems : MonoBehaviour
         /// </summary>
         public class SvnVersionControl : IVersionControl
         {
+            /// <summary>
+            /// Returns the source code from the revision being compared against.
+            /// </summary>
+            /// <returns>the source code from the revision being compared against.</returns>
             public string Show(string repositoryPath, string fileName, string oldCommitID)
             {
                 // Implement SVN-specific logic here
                 // Maybe use SharpSvn
                 return $"SVN show {fileName}";
             }
+            
+            /// <summary>
+            /// Returns the source code from the revision, that gets compared.
+            /// </summary>
+            /// <returns>the source code from the revision, that gets compared.</returns>
             public string ShowOriginal(string repositoryPath, string fileName, string oldCommitID, string newCommitID)
             {
                 // Implement SVN-specific logic here
                 // Maybe use SharpSvn
                 return $"SVN show {fileName}";
             }
+            
+            /// <summary>
+            /// Returns the updated filename.
+            /// When a renaming took place, the new name gets returned.
+            /// When a file got deleted, the original filename gets returned.
+            /// Otherwise null gets returned.
+            /// </summary>
+            /// <returns>the updated filename</returns>
             public string ShowName() { return null; }
         }
 

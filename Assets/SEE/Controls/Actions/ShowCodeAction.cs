@@ -192,24 +192,35 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="edgeRef">The edge to get the CodeWindow for</param>
         /// <returns>new CodeWindow showing a diff</returns>
-        public static CodeWindow ShowDiffCityDiff(GraphElementRef graphElementRef)
+        public static CodeWindow ShowDiff(GraphElementRef graphElementRef, AbstractSEECity city)
         {
-            GameObject city = GameObject.Find("DiffCity");
             GraphElement graphElement = graphElementRef.Elem;
             (string sourceFilename, string path) = GetPath(graphElement);
-            string versionControlSystem = city.MustGetComponent<DiffCity>().VersionControlSystem;
-            string repositoryPath = city.MustGetComponent<DiffCity>().RepositoryPath;
-            string oldCommitIdentifier = city.MustGetComponent<DiffCity>().OldCommitIdentifier;
-            string newCommitIdentifier = city.MustGetComponent<DiffCity>().NewCommitIdentifier;
+            string versionControlSystem = city.gameObject.MustGetComponent<DiffCity>().VersionControlSystem;
+            string repositoryPath = city.gameObject.MustGetComponent<DiffCity>().RepositoryPath;
+            string oldCommitIdentifier = city.gameObject.MustGetComponent<DiffCity>().OldCommitIdentifier;
+            string newCommitIdentifier = city.gameObject.MustGetComponent<DiffCity>().NewCommitIdentifier;
+            string relativePath = Path.GetRelativePath(repositoryPath, path).Replace("\\", "/");
             IVersionControl versionControl = SwitchVersionControlSystems.CreateVersionControl(versionControlSystem);
-            string showOldCode = versionControl.Show(repositoryPath, path, oldCommitIdentifier);
-            string showNewCode = versionControl.ShowOriginal(repositoryPath, Path.GetRelativePath(repositoryPath, path).Replace("\\", "/"), oldCommitIdentifier, newCommitIdentifier);
-            string[] diff = TextualDiff.DiffForDiffCity(showNewCode, showOldCode);
-
+            string showOldRevision = versionControl.Show(repositoryPath, path, oldCommitIdentifier);
+            string showNewRevision = versionControl.ShowOriginal(repositoryPath, relativePath, oldCommitIdentifier, newCommitIdentifier);
+            string[] diff = TextualDiff.DiffForDiffCity(showNewRevision, showOldRevision);
             CodeWindow codeWindow = GetOrCreateCodeWindow(graphElementRef, sourceFilename);
-            if (versionControl.ShowName() != null)
+            string changedName = versionControl.ShowName();
+
+            if (changedName != null)
             {
-                codeWindow.Title = $"<color=\"red\"><s><noparse>{versionControl.ShowName()}</noparse></s></color> -> <color=\"green\"><u><noparse>{sourceFilename}</noparse></u></color>";
+                // Case: File got deleted.
+                if (changedName == relativePath)
+                {
+                    codeWindow.Title = $"<color=\"red\"><s><noparse>{sourceFilename}</noparse></s></color>";
+                }
+                // Case: File got renamed.
+                else
+                {
+                    codeWindow.Title = $"<color=\"red\"><s><noparse>{sourceFilename}</noparse></s></color>" +
+                        $" -> <color=\"green\"><u><noparse>{versionControl.ShowName()}</noparse></u></color>";
+                }
             }
             else
             {
@@ -263,8 +274,6 @@ namespace SEE.Controls.Actions
                 // showing a unified diff.
                 CodeWindow codeWindow = graphElementRef is EdgeRef { Value: { Type: "Clone" } } edgeRef
                     ? ShowUnifiedDiff(edgeRef)
-                    : graphElementRef.GetComponentInParent<DiffCity>() != null
-                    ? ShowDiffCityDiff(graphElementRef)
                     : ShowCode(graphElementRef);
                 // Add code window to our space of code window, if it isn't in there yet
                 WindowSpace manager = spaceManager[WindowSpaceManager.LocalPlayer];

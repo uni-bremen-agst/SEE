@@ -15,15 +15,12 @@ public class SwitchVersionControlSystems
     /// <returns>the functionality for the given version control system</returns>
     public static IVersionControl CreateVersionControl(string system)
     {
-        switch (system.ToLower())
+        return system.ToLower() switch
         {
-            case "git":
-                return new VersionControlSystems.GitVersionControl();
-            case "svn":
-                return new VersionControlSystems.SvnVersionControl();
+            "git" => new VersionControlSystems.GitVersionControl(),
+            "svn" => new VersionControlSystems.SvnVersionControl(),
             // Add cases for other version control systems
-            default:
-                throw new ArgumentException("Unsupported version control system", nameof(system));
-        }
+            _ => throw new ArgumentException("Unsupported version control system", nameof(system)),
+        };
     }
 }
