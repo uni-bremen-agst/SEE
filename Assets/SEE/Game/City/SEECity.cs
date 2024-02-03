@@ -334,12 +334,18 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Returns whether the graph has been loaded.
+        /// </summary>
+        private bool IsGraphLoaded => loadedGraph != null && !ReferenceEquals(VisualizedSubGraph, null);
+
+        /// <summary>
         /// Draws the graph.
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Draw Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
         [PropertyOrder(DataButtonsGroupOrderDraw)]
+        [EnableIf(nameof(IsGraphLoaded))]
         public virtual void DrawGraph()
         {
             if (loadedGraph == null)
