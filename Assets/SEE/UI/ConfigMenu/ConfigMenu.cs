@@ -480,22 +480,8 @@ namespace SEE.UI.ConfigMenu
                 .SetOnChangeHandler(b => city.ErosionSettings.ShowInnerErosions = b)
                 .Build();
 
-            // loadDashboardMetrics
-            SwitchBuilder.Init(controls.transform)
-                .SetLabel("Load dashboard metrics")
-                .SetDefaultValue(city.ErosionSettings.LoadDashboardMetrics)
-                .SetOnChangeHandler(b => city.ErosionSettings.LoadDashboardMetrics = b)
-                .Build();
-
             // FIXME: Provide an configuration input for city.nodeLayoutSettings.issuesAddedFromVersion.
             // Apparently, there is no string input field.
-
-            // overrideMetrics
-            SwitchBuilder.Init(controls.transform)
-                .SetLabel("Dashboard metrics override")
-                .SetDefaultValue(city.ErosionSettings.OverrideMetrics)
-                .SetOnChangeHandler(b => city.ErosionSettings.OverrideMetrics = b)
-                .Build();
 
             // Erosion scaling factor
             SliderBuilder.Init(controls.transform)
