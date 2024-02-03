@@ -60,6 +60,7 @@ namespace SEE.Game.City
         ///
         /// Neither serialized nor saved to the config file.
         /// </summary>
+        /// <remarks>Do not use this field directly. Use <see cref="LoadedGraph"/> instead.</remarks>
         [NonSerialized]
         private Graph loadedGraph = null;
 
@@ -75,6 +76,10 @@ namespace SEE.Game.City
             get => loadedGraph;
             protected set
             {
+                if (loadedGraph  != null)
+                {
+                    Reset();
+                }
                 loadedGraph = value;
                 InspectSchema(loadedGraph);
             }
@@ -87,9 +92,9 @@ namespace SEE.Game.City
         /// </summary>
         protected override void ProjectPathChanged()
         {
-            if (loadedGraph != null)
+            if (LoadedGraph != null)
             {
-                loadedGraph.BasePath = SourceCodeDirectory.Path;
+                LoadedGraph.BasePath = SourceCodeDirectory.Path;
             }
         }
 
@@ -111,15 +116,15 @@ namespace SEE.Game.City
         {
             get
             {
-                if (loadedGraph == null)
+                if (LoadedGraph == null)
                 {
                     visualizedSubGraph = null;
                     return null;
                 }
                 else if (visualizedSubGraph == null)
                 {
-                    visualizedSubGraph = RelevantGraph(loadedGraph);
-                    LoadDataForGraphListing(visualizedSubGraph);
+                    visualizedSubGraph = RelevantGraph(LoadedGraph);
+                    SetupCompoundSpringEmbedder(visualizedSubGraph);
                 }
                 return visualizedSubGraph;
             }
@@ -165,7 +170,7 @@ namespace SEE.Game.City
             Graph subGraph = VisualizedSubGraph;
             if (subGraph != null)
             {
-                foreach (GraphElement graphElement in loadedGraph.Elements().Except(subGraph.Elements()))
+                foreach (GraphElement graphElement in LoadedGraph.Elements().Except(subGraph.Elements()))
                 {
                     // All other elements are virtual, i.e., should not be drawn.
                     graphElement.SetToggle(GraphElement.IsVirtualToggle);
@@ -181,6 +186,7 @@ namespace SEE.Game.City
             // Add EdgeMeshScheduler to convert edge lines to meshes over time.
             gameObject.AddOrGetComponent<EdgeMeshScheduler>().Init(EdgeLayoutSettings, EdgeSelectionSettings,
                                                                    visualizedSubGraph);
+            // FIXME: Should this be LoadedGraph?
             loadedGraph = subGraph;
 
             UpdateGraphElementIDMap(gameObject);
@@ -196,7 +202,7 @@ namespace SEE.Game.City
         /// </summary>
         public void SetNodeEdgeRefs()
         {
-            if (loadedGraph != null)
+            if (LoadedGraph != null)
             {
                 SetNodeEdgeRefs(loadedGraph, gameObject);
                 Debug.Log($"Node and edge references for {gameObject.name} are resolved.\n");
@@ -322,7 +328,7 @@ namespace SEE.Game.City
                 {
                     LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this);
                     LoadMetricsFromDashboard();
-                    LoadedGraph?.DumpTree();
+                    // LoadedGraph?.DumpTree();
                 }
                 catch (Exception ex)
                 {
@@ -366,7 +372,7 @@ namespace SEE.Game.City
         /// </summary>
         public void ReDrawGraph()
         {
-            if (loadedGraph == null)
+            if (LoadedGraph == null)
             {
                 Debug.LogError("No graph loaded.\n");
             }
@@ -386,7 +392,7 @@ namespace SEE.Game.City
         [PropertyOrder(DataButtonsGroupOrderDraw)]
         public virtual void DrawGraph()
         {
-            if (loadedGraph == null)
+            if (LoadedGraph == null)
             {
                 Debug.LogError("No graph loaded.\n");
             }
@@ -445,7 +451,7 @@ namespace SEE.Game.City
             Debug.Log($"Saving layout data to {path}.\n");
             if (Filenames.HasExtension(path, Filenames.GVLExtension))
             {
-                Layout.IO.GVLWriter.Save(path, loadedGraph.Name, AllNodeDescendants(gameObject));
+                Layout.IO.GVLWriter.Save(path, LoadedGraph.Name, AllNodeDescendants(gameObject));
             }
             else
             {
@@ -470,8 +476,9 @@ namespace SEE.Game.City
 
         /// <summary>
         /// Resets everything that is specific to a given graph. Here: the selected node types,
-        /// the underlying graph, and all game objects visualizing information about it.
+        /// the underlying and visualized graph, and all game objects visualizing information about it.
         /// </summary>
+        /// <remarks>This method should be called whenever <see cref="loadedGraph"/> is re-assigned.</remarks>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
         [PropertyOrder(ResetButtonsGroupOrderReset)]
@@ -479,7 +486,7 @@ namespace SEE.Game.City
         {
             base.Reset();
             // Delete the underlying graph.
-            loadedGraph?.Destroy();
+            LoadedGraph?.Destroy();
             LoadedGraph = null;
             visualizedSubGraph = null;
         }
@@ -494,13 +501,13 @@ namespace SEE.Game.City
         /// <returns>names of all existing node metrics</returns>
         public override ISet<string> AllExistingMetrics()
         {
-            if (loadedGraph == null)
+            if (LoadedGraph == null)
             {
                 return new HashSet<string>();
             }
             else
             {
-                return loadedGraph.AllNumericNodeAttributes();
+                return LoadedGraph.AllNumericNodeAttributes();
             }
         }
 
@@ -509,7 +516,7 @@ namespace SEE.Game.City
         /// </summary>
         protected override void DumpNodeMetrics()
         {
-            if (loadedGraph == null)
+            if (LoadedGraph == null)
             {
                 Debug.Log("No graph loaded yet.");
             }

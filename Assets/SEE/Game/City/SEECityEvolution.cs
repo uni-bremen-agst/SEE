@@ -316,7 +316,7 @@ namespace SEE.Game.City
                     relevantGraph.AddSingleRoot(out Node _, name: "ROOT", type: Graph.UnknownType);
                 }
                 graphs[i] = relevantGraph;
-                LoadDataForGraphListing(graphs[i]);
+                SetupCompoundSpringEmbedder(graphs[i]);
             }
         }
 

@@ -637,7 +637,7 @@ namespace SEE.Game.City
         /// </summary>
         /// <param name="graph"></param>
         [Obsolete]
-        public void LoadDataForGraphListing(Graph graph)
+        public void SetupCompoundSpringEmbedder(Graph graph)
         {
             if (NodeLayoutSettings.Kind == NodeLayoutKind.CompoundSpringEmbedder)
             {
