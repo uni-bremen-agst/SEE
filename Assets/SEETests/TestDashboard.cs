@@ -1,13 +1,12 @@
 ﻿using System.Collections;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
-using SEE.Net.Dashboard;
 using SEE.Net.Dashboard.Model.Issues;
 using SEE.Net.Dashboard.Model.Metric;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace SEETests
+namespace SEE.Net.Dashboard
 {
     /// <summary>
     /// Class which tests the dashboard retrieval, i.e. everything in the <see cref="SEE.Net.Dashboard"/> namespace.

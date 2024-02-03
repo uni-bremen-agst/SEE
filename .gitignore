@@ -52,6 +52,10 @@ ExportedObj/
 *.VC.db
 .vsconfig
 
+# Java class files
+**/*.class
+**/*.class.meta
+
 # Unity3D generated meta files
 *.pidb.meta
 *.pdb.meta

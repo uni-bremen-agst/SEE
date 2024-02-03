@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
@@ -32,14 +33,20 @@ namespace SEE.Game.City
         /// The path to the GXL file containing the graph data.
         /// Note that any deriving class may use multiple GXL paths from which the single city is constructed.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Path of GXL file"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        [ShowInInspector, Tooltip("Path of GXL file"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         public FilePath GXLPath = new();
 
         /// <summary>
         /// The path to the CSV file containing the additional metric values.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Path of metric CSV file"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        [ShowInInspector, Tooltip("Path of metric CSV file"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         public FilePath CSVPath = new();
+
+        /// <summary>
+        /// The path to the XML file containing the additional metric values within (JaCoCo)Test-Report.
+        /// </summary>
+        [ShowInInspector, Tooltip("Path of JaCoCo XML file"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        public FilePath XMLPath = new();
 
         /// <summary>
         /// The graph that is visualized in the scene and whose visualization settings are
@@ -244,12 +251,13 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Loads the metrics from CSVPath() and aggregates and adds them to the graph.
+        /// Loads the metrics from <see cref="CSVPath"/> and and <see cref="XMLPath"/> and aggregates and adds
+        /// them to the graph.
         /// Precondition: graph must have been loaded before.
         /// </summary>
         private void LoadMetrics()
         {
-            LoadGraphMetricsAsync(LoadedGraph, CSVPath.Path, ErosionSettings).Forget();
+            LoadGraphMetricsAsync(LoadedGraph, CSVPath.Path, XMLPath.Path, ErosionSettings).Forget();
         }
 
         /// <summary>
@@ -259,6 +267,7 @@ namespace SEE.Game.City
         /// </summary>
         /// <param name="graph">The graph into which the metrics shall be loaded</param>
         /// <param name="csvPath">The CSV file containing the metrics for the given <paramref name="graph"/></param>
+        /// <param name="xmlPath">The path to the JaCoCo XML report to be loaded</param>
         /// <param name="erosionSettings">
         /// Will be used to determine whether metric data from the Axivion Dashboard shall be imported into the graph.
         /// For this, <see cref="ErosionAttributes.LoadDashboardMetrics"/>,
@@ -270,16 +279,26 @@ namespace SEE.Game.City
         /// involving a network call. If you simply want to call it synchronously without querying the dashboard,
         /// set <paramref name="erosionSettings"/> to an appropriate value and use <c>LoadGraphMetricsAsync.Forget()</c>.
         /// </remarks>
-        protected static async UniTask LoadGraphMetricsAsync(Graph graph, string csvPath, ErosionAttributes erosionSettings)
+        protected static async UniTask LoadGraphMetricsAsync
+            (Graph graph, string csvPath, string xmlPath,  ErosionAttributes erosionSettings)
         {
-            Performance p = Performance.Begin($"loading metric data data from CSV file {csvPath}");
-            int numberOfErrors = MetricImporter.LoadCsv(graph, csvPath);
-            if (numberOfErrors > 0)
+            if (ValidPath(csvPath, "Metric CSV"))
             {
-                Debug.LogWarning($"CSV file {csvPath} has {numberOfErrors} many errors.\n");
+                Performance p = Performance.Begin($"Loading metric data from CSV file {csvPath}");
+                int numberOfErrors = MetricImporter.LoadCsv(graph, csvPath);
+                if (numberOfErrors > 0)
+                {
+                    Debug.LogWarning($"CSV file {csvPath} has {numberOfErrors} many errors.\n");
+                }
+                p.End();
             }
 
-            p.End();
+            if (ValidPath(xmlPath, "JaCoCo XML"))
+            {
+                Performance p = Performance.Begin($"Loading JaCoCo data from XML file {xmlPath}");
+                JaCoCoImporter.Load(graph, xmlPath);
+                p.End();
+            }
 
             // Substitute missing values from the dashboard
             if (erosionSettings.LoadDashboardMetrics)
@@ -288,6 +307,20 @@ namespace SEE.Game.City
                 Debug.Log($"Loading metrics and added issues from the Axivion Dashboard for start version {startVersion}.\n");
                 await MetricImporter.LoadDashboardAsync(graph, erosionSettings.OverrideMetrics,
                                                    erosionSettings.IssuesAddedFromVersion);
+            }
+            return;
+
+            bool ValidPath(string path, string title)
+            {
+                if (File.Exists(path))
+                {
+                    return true;
+                }
+                else if (!string.IsNullOrEmpty(path))
+                {
+                    Debug.LogWarning($"{title} file {path} does not exist.\n");
+                }
+                return false;
             }
         }
 
@@ -525,11 +558,17 @@ namespace SEE.Game.City
         /// </summary>
         private const string csvPathLabel = "CSVPath";
 
+        /// <summary>
+        /// Label of attribute <see cref="XMLPath"/> in the configuration file.
+        /// </summary>
+        private const string xmlPathLabel = "XMLPath";
+
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
             GXLPath.Save(writer, gxlPathLabel);
             CSVPath.Save(writer, csvPathLabel);
+            XMLPath.Save(writer, xmlPathLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
@@ -537,6 +576,7 @@ namespace SEE.Game.City
             base.Restore(attributes);
             GXLPath.Restore(attributes, gxlPathLabel);
             CSVPath.Restore(attributes, csvPathLabel);
+            XMLPath.Restore(attributes, xmlPathLabel);
         }
     }
 }
