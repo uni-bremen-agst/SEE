@@ -9,7 +9,6 @@ using SEE.Net.Dashboard;
 using SEE.Net.Dashboard.Model.Issues;
 using SEE.Net.Dashboard.Model.Metric;
 using SEE.Tools;
-using Sirenix.Utilities;
 using UnityEngine;
 
 namespace SEE.DataModel.DG.IO
@@ -26,10 +25,13 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="graph">The graph whose nodes' metrics shall be set</param>
         /// <param name="override">Whether any existing metrics present in the graph's nodes shall be updated</param>
-        public static async UniTask LoadDashboardAsync(Graph graph, bool @override = true, string addedFrom = "")
+        /// <param name="addedFrom">If empty, all issues will be retrieved. Otherwise, only those issues which have been added from
+        /// the given version to the most recent one will be loaded.</param>
+        /// <returns>The graph with the updated metrics and issues</returns>
+        public static async UniTask<Graph> LoadDashboardAsync(Graph graph, bool @override = true, string addedFrom = "")
         {
             IDictionary<(string path, string entity), List<MetricValueTableRow>> metrics = await DashboardRetriever.Instance.GetAllMetricRowsAsync();
-            IDictionary<string, List<Issue>> issues = await LoadIssueMetrics(addedFrom.IsNullOrWhitespace() ? null : addedFrom);
+            IDictionary<string, List<Issue>> issues = await LoadIssueMetrics(string.IsNullOrWhiteSpace(addedFrom) ? null : addedFrom);
             string projectFolder = DataPath.ProjectFolder();
 
             await UniTask.SwitchToThreadPool();
@@ -116,12 +118,13 @@ namespace SEE.DataModel.DG.IO
             await UniTask.SwitchToMainThread();
             Debug.Log($"Updated {updatedMetrics} metric values and {encounteredIssueNodes.Count} issues "
                       + "using the Axivion dashboard.\n");
+            return graph;
 
 
-            static async UniTask<IDictionary<string, List<Issue>>> LoadIssueMetrics(string start, string end = null)
+            static async UniTask<IDictionary<string, List<Issue>>> LoadIssueMetrics(string start)
             {
                 IDictionary<string, List<Issue>> issues = new Dictionary<string, List<Issue>>();
-                IList<Issue> allIssues = await DashboardRetriever.Instance.GetConfiguredIssuesAsync(start, end, Issue.IssueState.added);
+                IList<Issue> allIssues = await DashboardRetriever.Instance.GetConfiguredIssuesAsync(start, end: null, state: Issue.IssueState.added);
                 foreach (Issue issue in allIssues)
                 {
                     foreach (SourceCodeEntity entity in issue.Entities)

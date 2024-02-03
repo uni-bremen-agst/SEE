@@ -248,49 +248,6 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Loads the metrics from <see cref="CSVPath"/> and and <see cref="XMLPath"/> and aggregates and adds
-        /// them to the graph.
-        /// Precondition: graph must have been loaded before.
-        /// </summary>
-        [Obsolete("Should be implemented by a graph provider")]
-        private void LoadMetricsFromDashboard()
-        {
-            LoadGraphMetricsFromDashboardAsync(LoadedGraph, ErosionSettings).Forget();
-        }
-
-        /// <summary>
-        /// Loads the metrics available at the CSV file <paramref name="csvPath"/> into the given
-        /// <paramref name="graph"/>. Depending on <paramref name="erosionSettings"/>, metrics will also be integrated
-        /// from the Axivion Dashboard.
-        /// </summary>
-        /// <param name="graph">The graph into which the metrics shall be loaded</param>
-        /// <param name="erosionSettings">
-        /// Will be used to determine whether metric data from the Axivion Dashboard shall be imported into the graph.
-        /// For this, <see cref="ErosionAttributes.LoadDashboardMetrics"/>,
-        /// <see cref="ErosionAttributes.OverrideMetrics"/>, and <see cref="erosionSettings.IssuesAddedFromVersion"/>
-        /// will be used.
-        /// </param>
-        /// <remarks>
-        /// Note that the import of metrics from the dashboard will happen asynchronously due to
-        /// involving a network call. If you simply want to call it synchronously without querying the dashboard,
-        /// set <paramref name="erosionSettings"/> to an appropriate value and use <c>LoadGraphMetricsAsync.Forget()</c>.
-        /// </remarks>
-        [Obsolete("Should be implemented by a graph provider")]
-        protected static async UniTask LoadGraphMetricsFromDashboardAsync
-            (Graph graph, ErosionAttributes erosionSettings)
-        {
-            // FIXME: This MetricImporter.LoadDashboardAsync should also be turned into a GraphProvider.
-            // Substitute missing values from the dashboard
-            if (erosionSettings.LoadDashboardMetrics)
-            {
-                string startVersion = string.IsNullOrEmpty(erosionSettings.IssuesAddedFromVersion) ? "EMPTY" : erosionSettings.IssuesAddedFromVersion;
-                Debug.Log($"Loading metrics and added issues from the Axivion Dashboard for start version {startVersion}.\n");
-                await MetricImporter.LoadDashboardAsync(graph, erosionSettings.OverrideMetrics,
-                                                   erosionSettings.IssuesAddedFromVersion);
-            }
-        }
-
-        /// <summary>
         /// Loads the graph data from the GXL file with GXLPath() and the metrics
         /// from the CSV file with CSVPath() and then draws it. Equivalent to:
         ///   LoadDataAsync();
@@ -321,7 +278,6 @@ namespace SEE.Game.City
                 try
                 {
                     LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this);
-                    LoadMetricsFromDashboard();
                     LoadedGraph?.DumpTree();
                 }
                 catch (Exception ex)

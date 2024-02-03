@@ -23,23 +23,6 @@ namespace SEE.Game.City
         public bool ShowLeafErosions = false;
 
         /// <summary>
-        /// Whether metrics shall be retrieved from the dashboard.
-        /// This includes erosion data.
-        /// </summary>
-        public bool LoadDashboardMetrics = false;
-
-        /// <summary>
-        /// If empty, all issues will be retrieved. Otherwise, only those issues which have been added from
-        /// the given version to the most recent one will be loaded.
-        /// </summary>
-        public string IssuesAddedFromVersion = "";
-
-        /// <summary>
-        /// Whether metrics retrieved from the dashboard shall override existing metrics.
-        /// </summary>
-        public bool OverrideMetrics = true;
-
-        /// <summary>
         /// The maximal value for <see cref="ErosionScalingFactor"/>.
         /// </summary>
         public const float MaxErosionScalingFactor = 5.0f;
@@ -129,10 +112,7 @@ namespace SEE.Game.City
             writer.BeginGroup(label);
             writer.Save(ShowInnerErosions, showInnerErosionsLabel);
             writer.Save(ShowLeafErosions, showLeafErosionsLabel);
-            writer.Save(LoadDashboardMetrics, loadDashboardMetricsLabel);
-            writer.Save(OverrideMetrics, overrideMetricsLabel);
             writer.Save(ShowIssuesInCodeWindow, showIssuesInCodeWindowLabel);
-            writer.Save(IssuesAddedFromVersion, issuesFromVersionLabel);
             writer.Save(ErosionScalingFactor, erosionScalingFactorLabel);
 
             writer.Save(StyleIssue, styleIssueLabel);
@@ -161,10 +141,7 @@ namespace SEE.Game.City
 
                 ConfigIO.Restore(values, showInnerErosionsLabel, ref ShowInnerErosions);
                 ConfigIO.Restore(values, showLeafErosionsLabel, ref ShowLeafErosions);
-                ConfigIO.Restore(values, loadDashboardMetricsLabel, ref LoadDashboardMetrics);
-                ConfigIO.Restore(values, overrideMetricsLabel, ref OverrideMetrics);
                 ConfigIO.Restore(values, showIssuesInCodeWindowLabel, ref ShowIssuesInCodeWindow);
-                ConfigIO.Restore(values, issuesFromVersionLabel, ref IssuesAddedFromVersion);
                 ConfigIO.Restore(values, erosionScalingFactorLabel, ref ErosionScalingFactor);
 
                 ConfigIO.Restore(values, styleIssueLabel, ref StyleIssue);
@@ -188,9 +165,6 @@ namespace SEE.Game.City
         private const string showLeafErosionsLabel = "ShowLeafErosions";
         private const string showInnerErosionsLabel = "ShowInnerErosions";
         private const string erosionScalingFactorLabel = "ErosionScalingFactor";
-        private const string loadDashboardMetricsLabel = "LoadDashboardMetrics";
-        private const string issuesFromVersionLabel = "IssuesAddedFromVersion";
-        private const string overrideMetricsLabel = "OverrideMetrics";
         private const string showIssuesInCodeWindowLabel = "ShowIssuesInCodeWindow";
 
         private const string styleIssueLabel = "StyleIssue";

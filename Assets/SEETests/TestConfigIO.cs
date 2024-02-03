@@ -932,9 +932,6 @@ namespace SEE.Utils
         {
             city.ErosionSettings.ShowInnerErosions = !city.ErosionSettings.ShowInnerErosions;
             city.ErosionSettings.ShowLeafErosions = !city.ErosionSettings.ShowLeafErosions;
-            city.ErosionSettings.LoadDashboardMetrics = !city.ErosionSettings.LoadDashboardMetrics;
-            city.ErosionSettings.IssuesAddedFromVersion = "XXX";
-            city.ErosionSettings.OverrideMetrics = !city.ErosionSettings.OverrideMetrics;
             city.ErosionSettings.ShowIssuesInCodeWindow = !city.ErosionSettings.ShowIssuesInCodeWindow;
             city.ErosionSettings.ErosionScalingFactor++;
 
@@ -959,9 +956,6 @@ namespace SEE.Utils
         {
             Assert.AreEqual(expected.ShowInnerErosions, actual.ShowInnerErosions);
             Assert.AreEqual(expected.ShowLeafErosions, actual.ShowLeafErosions);
-            Assert.AreEqual(expected.LoadDashboardMetrics, actual.LoadDashboardMetrics);
-            Assert.AreEqual(expected.IssuesAddedFromVersion, actual.IssuesAddedFromVersion);
-            Assert.AreEqual(expected.OverrideMetrics, actual.OverrideMetrics);
             Assert.AreEqual(expected.ShowIssuesInCodeWindow, actual.ShowIssuesInCodeWindow);
             Assert.AreEqual(expected.ErosionScalingFactor, actual.ErosionScalingFactor);
 
