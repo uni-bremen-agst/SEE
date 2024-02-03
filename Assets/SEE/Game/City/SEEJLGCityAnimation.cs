@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using SEE.Controls;
+using SEE.Controls.KeyActions;
 using SEE.DataModel.DG;
 using SEE.Game.Runtime;
 using SEE.GO;
@@ -753,7 +754,7 @@ namespace SEE.Game.City
             if (statementCounter.UpperBound())
             {
                 const string begin = "End of execution trace reached.";
-                if (KeyBindings.TryGetKeyCode(KeyBindings.KeyAction.Previous, out KeyCode keyCode))
+                if (KeyBindings.TryGetKeyCode(KeyAction.Previous, out KeyCode keyCode))
                 {
                     Debug.Log(begin + $" Press '{keyCode}' to start playing backward.\n");
                 }
@@ -787,7 +788,7 @@ namespace SEE.Game.City
             if (statementCounter.LowerBound())
             {
                 const string begin = "Start of execution trace reached.";
-                if (KeyBindings.TryGetKeyCode(KeyBindings.KeyAction.Next, out KeyCode keyCode))
+                if (KeyBindings.TryGetKeyCode(KeyAction.Next, out KeyCode keyCode))
                 {
                     Debug.Log(begin + $" Press '{keyCode}' to start playing forward.\n");
                 }

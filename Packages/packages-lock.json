@@ -36,13 +36,12 @@
       "hash": "17c6330d51a140eac037b9ea6f5d157a846535af"
     },
     "com.openai.unity": {
-      "version": "7.3.1",
+      "version": "7.3.4",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.utilities.rest": "2.4.6",
-        "com.utilities.encoder.wav": "1.1.4",
-        "com.utilities.encoder.ogg": "3.1.2"
+        "com.utilities.rest": "2.5.1",
+        "com.utilities.encoder.wav": "1.1.4"
       },
       "url": "https://package.openupm.com"
     },
@@ -71,11 +70,12 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.burst": {
-      "version": "1.8.11",
+      "version": "1.8.12",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.mathematics": "1.2.1"
+        "com.unity.mathematics": "1.2.1",
+        "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
     },
@@ -188,7 +188,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.render-pipelines.core": {
-      "version": "14.0.9",
+      "version": "14.0.10",
       "depth": 1,
       "source": "builtin",
       "dependencies": {
@@ -213,11 +213,11 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.shadergraph": {
-      "version": "14.0.9",
+      "version": "14.0.10",
       "depth": 0,
       "source": "builtin",
       "dependencies": {
-        "com.unity.render-pipelines.core": "14.0.9",
+        "com.unity.render-pipelines.core": "14.0.10",
         "com.unity.searcher": "4.9.2"
       }
     },
@@ -259,7 +259,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.textmeshpro": {
-      "version": "3.0.6",
+      "version": "3.0.7",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -345,7 +345,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.management": {
-      "version": "4.4.0",
+      "version": "4.4.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -390,15 +390,6 @@
       },
       "url": "https://package.openupm.com"
     },
-    "com.utilities.encoder.ogg": {
-      "version": "3.1.2",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.utilities.audio": "1.1.2"
-      },
-      "url": "https://package.openupm.com"
-    },
     "com.utilities.encoder.wav": {
       "version": "1.1.4",
       "depth": 1,
@@ -419,7 +410,7 @@
       "url": "https://package.openupm.com"
     },
     "com.utilities.rest": {
-      "version": "2.4.6",
+      "version": "2.5.1",
       "depth": 1,
       "source": "registry",
       "dependencies": {

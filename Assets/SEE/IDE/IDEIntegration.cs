@@ -290,8 +290,8 @@ namespace SEE.IDE
                 // File not found
             }
 
-            key = GenerateKey(node.SourceName, node.SourceLine().GetValueOrDefault(),
-                              node.SourceColumn().GetValueOrDefault(), node.SourceLength().GetValueOrDefault());
+            key = GenerateKey(node.SourceName, node.SourceLine.GetValueOrDefault(),
+                              node.SourceColumn.GetValueOrDefault(), node.SourceLength.GetValueOrDefault());
             return path != null && key != null;
         }
 

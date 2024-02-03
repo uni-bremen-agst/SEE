@@ -3,6 +3,7 @@ using SEE.Game;
 using SEE.Layout.NodeLayouts;
 using SEE.Utils;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 
@@ -26,28 +27,34 @@ namespace SEE.Layout
         {
             // GVL does not contain the height (y co-ordinate).
             bool yIsStored = false;
-            string filename = Application.dataPath + "/../Temp/layout" + Filenames.GVLExtension;
+            string filename = Path.GetTempFileName() + Filenames.GVLExtension;
 
-            ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes(1);
+            try
+            {
+                ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes(1);
 
-            CalculateLayout(gameObjects,
-                            out Dictionary<ILayoutNode, NodeTransform> savedLayout,
-                            out Dictionary<string, NodeTransform> layoutMap);
+                CalculateLayout(gameObjects,
+                                out Dictionary<ILayoutNode, NodeTransform> savedLayout,
+                                out Dictionary<string, NodeTransform> layoutMap);
 
-            // Save the layout.
-            IO.GVLWriter.Save(filename, "architecture", gameObjects);
-            //Dump(gameObjects, 10);
+                // Save the layout.
+                IO.GVLWriter.Save(filename, "architecture", gameObjects);
 
-            ClearLayout(gameObjects, yIsStored);
+                ClearLayout(gameObjects, yIsStored);
 
-            // Read the saved layout.
-            Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(0, filename).Layout(gameObjects);
-            //Dump(readLayout, 10);
+                // Read the saved layout.
+                Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(0, filename).Layout(gameObjects);
+                //Dump(readLayout, 10);
 
-            Assert.AreEqual(savedLayout.Count, readLayout.Count); // no gameObject added or removed
-            // Now layoutMap and readLayout should be the same except for
-            // scale.y and, thus, position.y (none of those are stored in GVL).
-            LayoutsAreEqual(readLayout, layoutMap, yIsStored);
+                Assert.AreEqual(savedLayout.Count, readLayout.Count); // no gameObject added or removed
+                                                                      // Now layoutMap and readLayout should be the same except for
+                                                                      // scale.y and, thus, position.y (none of those are stored in GVL).
+                LayoutsAreEqual(readLayout, layoutMap, yIsStored);
+            }
+            finally
+            {
+                FileIO.DeleteIfExists(filename);
+            }
         }
 
         /// <summary>
@@ -59,34 +66,41 @@ namespace SEE.Layout
             float groundLevel = -1;
             // SLD contains the height (y co-ordinate).
             bool yIsStored = true;
-            string filename = Application.dataPath + "/../Temp/layout" + Filenames.SLDExtension;
+            string filename = Path.GetTempFileName() + Filenames.SLDExtension;
 
-            ICollection<ILayoutNode> layoutNodes = NodeCreator.CreateNodes(howManyRootNodes: 9, howDeeplyNested:0);
-
-            CalculateLayout(layoutNodes,
-                            out Dictionary<ILayoutNode, NodeTransform> _,
-                            out Dictionary<string, NodeTransform> layoutMap);
-
-            //Dump(layoutMap, 10, "Created layout (y relates to the ground)");
-
-            // Save the layout including the y co-ordinate (in SLD relating to the center).
+            try
             {
-                ICollection<GameObject> gameObjects = ToGameNodes(layoutMap);
-                IO.SLDWriter.Save(filename, gameObjects);
-                //Dump(gameObjects, 10, "Saved layout (y relates to the center)");
+                ICollection<ILayoutNode> layoutNodes = NodeCreator.CreateNodes(howManyRootNodes: 9, howDeeplyNested: 0);
+
+                CalculateLayout(layoutNodes,
+                                out Dictionary<ILayoutNode, NodeTransform> _,
+                                out Dictionary<string, NodeTransform> layoutMap);
+
+                //Dump(layoutMap, 10, "Created layout (y relates to the ground)");
+
+                // Save the layout including the y co-ordinate (in SLD relating to the center).
+                {
+                    ICollection<GameObject> gameObjects = ToGameNodes(layoutMap);
+                    IO.SLDWriter.Save(filename, gameObjects);
+                    //Dump(gameObjects, 10, "Saved layout (y relates to the center)");
+                }
+
+                ClearLayout(layoutNodes, yIsStored);
+
+                // Read the saved layout.
+                // Note: groundLevel will be ignored when the layout was stored in SLD.
+                Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(groundLevel, filename).Layout(layoutNodes);
+                //Dump(readLayout, 10, "Read layout (y relates to the ground)");
+
+                Assert.AreEqual(layoutMap.Count, readLayout.Count); // no gameObject added or removed
+                                                                    // Now layoutMap and readLayout should be the same including
+                                                                    // scale.y and, thus, position.y (all of those are stored in GVL).
+                LayoutsAreEqual(readLayout, layoutMap, yIsStored);
             }
-
-            ClearLayout(layoutNodes, yIsStored);
-
-            // Read the saved layout.
-            // Note: groundLevel will be ignored when the layout was stored in SLD.
-            Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(groundLevel, filename).Layout(layoutNodes);
-            //Dump(readLayout, 10, "Read layout (y relates to the ground)");
-
-            Assert.AreEqual(layoutMap.Count, readLayout.Count); // no gameObject added or removed
-            // Now layoutMap and readLayout should be the same including
-            // scale.y and, thus, position.y (all of those are stored in GVL).
-            LayoutsAreEqual(readLayout, layoutMap, yIsStored);
+            finally
+            {
+                FileIO.DeleteIfExists(filename);
+            }
 
             static ICollection<GameObject> ToGameNodes(Dictionary<string, NodeTransform> layoutNodes)
             {
@@ -296,25 +310,32 @@ namespace SEE.Layout
         private static void TestWriteReadLayout(string fileExtension)
         {
             string graphName = "architecture";
-            string filename = Application.dataPath + "/../Temp/emptylayout" + fileExtension;
+            string filename = Path.GetTempFileName() + fileExtension;
 
-            // Save the layout.
-            if (fileExtension == Filenames.GVLExtension)
+            try
             {
-                IO.GVLWriter.Save(filename, graphName, new List<ILayoutNode>());
+                // Save the layout.
+                if (fileExtension == Filenames.GVLExtension)
+                {
+                    IO.GVLWriter.Save(filename, graphName, new List<ILayoutNode>());
+                }
+                else if (fileExtension == Filenames.SLDExtension)
+                {
+                    IO.SLDWriter.Save(filename, new List<GameObject>());
+                }
+                else
+                {
+                    Assert.Fail("Untested layout format");
+                }
+                // Read the saved layout.
+                LoadedNodeLayout loadedNodeLayout = new(0, filename);
+                Dictionary<ILayoutNode, NodeTransform> readLayout = loadedNodeLayout.Layout(new List<ILayoutNode>());
+                Assert.AreEqual(0, readLayout.Count);
             }
-            else if (fileExtension == Filenames.SLDExtension)
+            finally
             {
-                IO.SLDWriter.Save(filename, new List<GameObject>());
+                FileIO.DeleteIfExists(filename);
             }
-            else
-            {
-                Assert.Fail("Untested layout format");
-            }
-            // Read the saved layout.
-            LoadedNodeLayout loadedNodeLayout = new(0, filename);
-            Dictionary<ILayoutNode, NodeTransform> readLayout = loadedNodeLayout.Layout(new List<ILayoutNode>());
-            Assert.AreEqual(0, readLayout.Count);
         }
 
         /// <summary>
