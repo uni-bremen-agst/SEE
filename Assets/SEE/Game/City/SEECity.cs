@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.GO;
 using SEE.Utils;
@@ -80,6 +79,7 @@ namespace SEE.Game.City
                 {
                     Reset();
                 }
+                Assert.IsNull(visualizedSubGraph);
                 loadedGraph = value;
                 InspectSchema(loadedGraph);
             }
@@ -104,7 +104,8 @@ namespace SEE.Game.City
         /// if all node types are relevant. It is null if no graph has been loaded yet
         /// (i.e. <see cref="LoadedGraph"/> is null).
         /// </summary>
-        private Graph visualizedSubGraph;
+        [NonSerialized]
+        private Graph visualizedSubGraph = null;
 
         /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
@@ -112,10 +113,16 @@ namespace SEE.Game.City
         /// if all node types are relevant. It is null if no graph has been loaded yet
         /// (i.e. <see cref="LoadedGraph"/> is null).
         /// </summary>
+        /// <remarks>Accessing this value has a side effect on <see cref="visualizedSubGraph"/>.
+        /// If <see cref="LoadedGraph"/> is null, <see cref="visualizedSubGraph"/> will
+        /// become null, too. If <see cref="LoadedGraph"/> is null and <see cref="visualizedSubGraph"/> is
+        /// currently null, too, then <see cref="visualizedSubGraph"/> will be set to the
+        /// <see cref="RelevantGraph(LoadedGraph)"/>.</remarks>
         protected Graph VisualizedSubGraph
         {
             get
             {
+                Debug.Log($"VisualizedSubGraph is null: {visualizedSubGraph == null}.\n");
                 if (LoadedGraph == null)
                 {
                     visualizedSubGraph = null;
@@ -137,6 +144,9 @@ namespace SEE.Game.City
         {
             base.Start();
 
+            loadedGraph = null;
+            visualizedSubGraph = null;
+
             using (LoadingSpinner.Show($"Loading city \"{gameObject.name}\""))
             {
                 if (!gameObject.IsCodeCityDrawn())
@@ -157,12 +167,16 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Loads the graph and metric data and sets all NodeRef and EdgeRef components to the
-        /// loaded nodes and edges. This "deserializes" the graph to make it available at runtime.
-        /// Note: <see cref="LoadedGraph"/> will be <see cref="VisualizedSubGraph"/> afterwards,
-        /// that is, if node types are filtered, <see cref="LoadedGraph"/> may not contain all
-        /// nodes saved in the underlying GXL file.
-        /// Also note that this method may only be called after the code city has been drawn.
+        /// Sets the <see cref="NodeRef"/> and <see cref="EdgeRef"/>, respectively, for all
+        /// game objects representing nodes or edges in the <see cref="VisualizedSubGraph"/>.
+        ///
+        /// Sets the toggle attribute <see cref="GraphElement.IsVirtualToggle"/> for all
+        /// nodes and edges in <see cref="LoadedGraph"/> that are not in the <see cref="VisualizedSubGraph"/>.
+        /// This toggle prevents them to be drawn. This is necessary because <see cref="LoadedGraph"/>
+        /// and <see cref="VisualizedSubGraph"/> co-exist and the latter may only be a subgraph
+        /// of the former.
+        ///
+        /// Note that this method may only be called after the code city has been drawn.
         /// </summary>
         protected virtual void InitializeAfterDrawn()
         {
@@ -170,6 +184,8 @@ namespace SEE.Game.City
             Graph subGraph = VisualizedSubGraph;
             if (subGraph != null)
             {
+                // All graph elements that are only in the LoadedGraph but not in the VisualizedSubGraph
+                // are toggled as GraphElement.IsVirtualToggle. These are not intended to be drawn.
                 foreach (GraphElement graphElement in LoadedGraph.Elements().Except(subGraph.Elements()))
                 {
                     // All other elements are virtual, i.e., should not be drawn.
@@ -185,7 +201,7 @@ namespace SEE.Game.City
 
             // Add EdgeMeshScheduler to convert edge lines to meshes over time.
             gameObject.AddOrGetComponent<EdgeMeshScheduler>().Init(EdgeLayoutSettings, EdgeSelectionSettings,
-                                                                   visualizedSubGraph);
+                                                                   subGraph);
             // FIXME: Should this be LoadedGraph?
             loadedGraph = subGraph;
 
@@ -274,7 +290,7 @@ namespace SEE.Game.City
         ///
         /// This method loads only the data, but does not actually render the graph.
         /// </summary>
-        [Button("Load Data", ButtonSizes.Small)]
+        [Button(ButtonSizes.Small, Name = "Load Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
         public virtual async UniTask LoadDataAsync()
@@ -341,7 +357,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Returns whether the graph has been loaded.
         /// </summary>
-        private bool IsGraphLoaded => loadedGraph != null && !ReferenceEquals(VisualizedSubGraph, null);
+        private bool IsGraphLoaded => loadedGraph != null;
 
         /// <summary>
         /// Draws the graph.
@@ -447,8 +463,8 @@ namespace SEE.Game.City
         {
             base.Reset();
             // Delete the underlying graph.
-            LoadedGraph?.Destroy();
-            LoadedGraph = null;
+            loadedGraph?.Destroy();
+            loadedGraph = null;
             visualizedSubGraph = null;
         }
 
