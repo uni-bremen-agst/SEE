@@ -44,7 +44,7 @@ namespace SEE.UI.DebugAdapterProtocol
             if (Adapter == null)
             {
                 Debug.LogError("Debug adapter not set.");
-                console.AddMessage("Debug adapter not set.\n", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
+                console.AddMessage("Debug adapter not set.", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
                 Destroyer.Destroy(this);
                 return;
             }
@@ -53,23 +53,25 @@ namespace SEE.UI.DebugAdapterProtocol
 
             if (!CreateAdapterProcess())
             {
-                console.AddMessage("Couldn't create the debug adapter process.\n", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
+                Debug.LogError("Couldn't create the debug adapter process.");
+                console.AddMessage("Couldn't create the debug adapter process.", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
                 Destroyer.Destroy(this);
                 return;
             }
             else
             {
-                console.AddMessage("Created the debug adapter process.\n", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
+                console.AddMessage("Created the debug adapter process.", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
             }
             if (!CreateAdapterHost())
             {
-                console.AddMessage("Couldn't create the debug adapter host.\n", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
+                Debug.LogError("Couldn't create the debug adapter host.");
+                console.AddMessage("Couldn't create the debug adapter host.", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
                 Destroyer.Destroy(this);
                 return;
             }
             else
             {
-                console.AddMessage("Created the debug adapter host.\n", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
+                console.AddMessage("Created the debug adapter host.", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
             }
 
             capabilities = adapterHost.SendRequestSync(new InitializeRequest()
@@ -225,6 +227,7 @@ namespace SEE.UI.DebugAdapterProtocol
             }
             catch (Exception e)
             {
+                Debug.LogError(e.ToString());
                 console.AddMessage(e.ToString(), ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
                 adapterProcess = null;
             }
@@ -244,6 +247,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 }
                 catch (Exception e)
                 {
+                    Debug.LogError(e.ToString());
                     console.AddMessage(e.ToString(), ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Error);
                 }
             }
@@ -251,19 +255,6 @@ namespace SEE.UI.DebugAdapterProtocol
 
         private void OnEventReceived(object sender, EventReceivedEventArgs e)
         {
-            switch (e.Body)
-            {
-                case InitializedEvent _:
-                    queuedActions.Enqueue(() => adapterHost.SendRequestSync(Adapter.GetLaunchRequest(capabilities)));
-                    queuedActions.Enqueue(() =>
-                    {
-                        if (capabilities.SupportsConfigurationDoneRequest == true)
-                        {
-                            adapterHost.SendRequestSync(new ConfigurationDoneRequest());
-                        }
-                    });
-                    break;
-            }
             if (e.Body is InitializedEvent)
             {
                 queuedActions.Enqueue(() => adapterHost.SendRequestSync(Adapter.GetLaunchRequest(capabilities)));
@@ -305,6 +296,10 @@ namespace SEE.UI.DebugAdapterProtocol
                 };
                 if (level is not null)
                 {
+                    if (level == ConsoleWindow.MessageLevel.Error)
+                    {
+                        Debug.LogError(outputEvent.Output);
+                    }
                     // FIXME: Why does it require a cast?
                     console.AddMessage(outputEvent.Output, source, (ConsoleWindow.MessageLevel)level);
                 }
@@ -312,18 +307,18 @@ namespace SEE.UI.DebugAdapterProtocol
             else if (e.Body is TerminatedEvent terminatedEvent)
             {
                 // TODO: Let user restart the program.
-                console.AddMessage("Terminated\n", ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Log);
+                console.AddMessage("Terminated", ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Log);
                 Destroyer.Destroy(this);
             }
             else if (e.Body is ExitedEvent exitedEvent)
             {
-                console.AddMessage($"Exited with exit code {exitedEvent.ExitCode}\n", ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Log);
+                console.AddMessage($"Exited with exit code {exitedEvent.ExitCode}", ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Log);
                 queuedActions.Enqueue(() => Destroyer.Destroy(this));
             }
             else if (e.Body is StoppedEvent stoppedEvent)
             {
                 threadId = stoppedEvent.ThreadId;
-                console.AddMessage($"Stopped\n", ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Log);
+                console.AddMessage($"Stopped", ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Log);
             }
         }
 
@@ -346,7 +341,7 @@ namespace SEE.UI.DebugAdapterProtocol
 
         private void OnDestroy()
         {
-            console.AddMessage("Debug session finished.\n");
+            console.AddMessage("Debug session finished.");
             if (controls)
             {
                 Destroyer.Destroy(controls);
