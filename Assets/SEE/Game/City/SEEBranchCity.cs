@@ -124,7 +124,7 @@ namespace SEE.Game.City
             Graph baseline = LoadGraph(pathBaselineGXL);
 
             tempGraph = null;
-            // TODO: Normally we would call LoadMetrics() to add additional metrics
+            // TODO (#696): Normally we would call LoadMetrics() to add additional metrics
             // for the graph stored in a separate CSV file. That is done for LoadedGraph.
             // Do we want to do that for this baseline graph, too? If so, we need to add
             // another CSV path to this class.
