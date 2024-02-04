@@ -11,7 +11,6 @@ using SEE.DataModel.DG;
 using System;
 using SEE.UI.Window;
 using SEE.Utils.History;
-using SEE.Game;
 using SEE.Game.City;
 
 namespace SEE.Controls.Actions
@@ -196,10 +195,11 @@ namespace SEE.Controls.Actions
         {
             GraphElement graphElement = graphElementRef.Elem;
             (string sourceFilename, string path) = GetPath(graphElement);
-            string versionControlSystem = city.gameObject.MustGetComponent<DiffCity>().VersionControlSystem;
-            string repositoryPath = city.gameObject.MustGetComponent<DiffCity>().RepositoryPath;
-            string oldCommitIdentifier = city.gameObject.MustGetComponent<DiffCity>().OldCommitIdentifier;
-            string newCommitIdentifier = city.gameObject.MustGetComponent<DiffCity>().NewCommitIdentifier;
+            DiffCity diffCity = city.gameObject.MustGetComponent<DiffCity>();
+            string versionControlSystem = diffCity.VersionControlSystem;
+            string repositoryPath = diffCity.RepositoryPath;
+            string oldCommitIdentifier = diffCity.OldCommitIdentifier;
+            string newCommitIdentifier = diffCity.NewCommitIdentifier;
             string relativePath = Path.GetRelativePath(repositoryPath, path).Replace("\\", "/");
             IVersionControl versionControl = SwitchVersionControlSystems.CreateVersionControl(versionControlSystem);
             string showOldRevision = versionControl.Show(repositoryPath, path, oldCommitIdentifier);

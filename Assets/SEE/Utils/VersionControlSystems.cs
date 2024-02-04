@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using LibGit2Sharp;
 using System.Linq;
-using DiffMatchPatch;
 using System.IO;
 
 /// <summary>
@@ -120,7 +117,7 @@ public class VersionControlSystems : MonoBehaviour
                 // Maybe use SharpSvn
                 return $"SVN show {fileName}";
             }
-            
+
             /// <summary>
             /// Returns the source code from the revision, that gets compared.
             /// </summary>
@@ -131,7 +128,7 @@ public class VersionControlSystems : MonoBehaviour
                 // Maybe use SharpSvn
                 return $"SVN show {fileName}";
             }
-            
+
             /// <summary>
             /// Returns the updated filename.
             /// When a renaming took place, the new name gets returned.

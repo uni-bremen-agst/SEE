@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 /// <summary>
 /// The interface for the version control systems, which holds
 /// the methods every version control system that we use must implement.
