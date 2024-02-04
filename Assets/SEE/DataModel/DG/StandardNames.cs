@@ -164,4 +164,25 @@
         /// </summary>
         public const string PercentageOfClassCovered = "Metric.CLASS_percentage";
     }
+
+    /// <summary>
+    /// Defines toggle attributes used to mark nodes.
+    /// </summary>
+    public static class SetToggleAttributes
+    {
+        /// <summary>
+        /// Name of the label marking a graph element as new (existing only in the newer version).
+        /// </summary>
+        public const string IsNew = "IsNew";
+        /// <summary>
+        /// Name of the label marking a graph element as deleted (existing only in the baseline version).
+        /// </summary>
+        public const string IsDeleted = "IsDeleted";
+        /// <summary>
+        /// Name of the label marking a graph element as changed (existing in both the newer and baseline
+        /// version). At least one numeric attribute has changed between the two (including the addition
+        /// or removal of an attribute).
+        /// </summary>
+        public const string IsChanged = "IsChanged";
+    }
 }

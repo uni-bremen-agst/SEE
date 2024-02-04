@@ -532,6 +532,12 @@ namespace SEE.Game.CityRendering
             ICollection<GameObject> leafNodes = FindLeafNodes(gameNodes);
             ICollection<GameObject> innerNodes = FindInnerNodes(gameNodes);
 
+            //Add markers if Settings is an instance of SEEBranchCity
+            if(Settings is SEEBranchCity)
+            {
+                AddMarkers(gameNodes);
+            }
+
             // Add software erosion decorators for all nodes if requested.
             if (Settings.ErosionSettings.ShowInnerErosions)
             {
@@ -546,6 +552,43 @@ namespace SEE.Game.CityRendering
                 ErosionIssues issueDecorator = new(Settings.LeafIssueMap(),
                                                    scaler, Settings.ErosionSettings.ErosionScalingFactor * 5);
                 issueDecorator.Add(leafNodes);
+            }
+        }
+
+        /// <summary>
+        /// Draw marks on Graph based on their toggle
+        /// </summary>
+        /// <param name="gameNodes"> List of gameNodes where the beams will be drawn on </param>
+        private void AddMarkers(ICollection<GameObject> gameNodes)
+        {
+            GameObject gameObject = Settings.gameObject;
+            GameObject[] gameObjectArray = gameNodes.ToArray();
+
+            if (gameObject.TryGetComponent(out SEEBranchCity sEEBranchCity))
+            {
+                MarkerFactory markerFactory = new MarkerFactory(markerWidth: sEEBranchCity.MarkerWidth,
+                                    markerHeight: sEEBranchCity.MarkerHeight,
+                                    additionColor: sEEBranchCity.AdditionBeamColor,
+                                    changeColor: sEEBranchCity.ChangeBeamColor,
+                                    deletionColor: sEEBranchCity.DeletionBeamColor);
+
+                //For every node draw the beams based on their toggle
+                for (int i = 0; i < gameObjectArray.Length; i++)
+                {
+                    Node node = gameObjectArray[i].GetNode();
+                    if (node.HasToggle(SetToggleAttributes.IsNew))
+                    {
+                        markerFactory.MarkBorn(GraphElementIDMap.Find(node.ID, true));
+                    }
+                    else if (node.HasToggle(SetToggleAttributes.IsDeleted))
+                    {
+                        markerFactory.MarkDead(GraphElementIDMap.Find(node.ID, true));
+                    }
+                    else if (node.HasToggle(SetToggleAttributes.IsChanged))
+                    {
+                        markerFactory.MarkChanged(GraphElementIDMap.Find(node.ID, true));
+                    }
+                }
             }
         }
 

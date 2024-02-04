@@ -70,6 +70,9 @@ namespace SEE.Game.City
         [SerializeField, ShowInInspector, Tooltip("The directory in which the GXL files are located."), FoldoutGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         public DirectoryPath GXLDirectory = new DirectoryPath();
 
+        /// <summary>
+        /// Determines if the graphs should be drawn. If set to true, the graph evolution will be calculated and displayed.
+        /// </summary>
         private bool isDrawn = false;
 
         //-----------------------------------------------------

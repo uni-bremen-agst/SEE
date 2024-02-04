@@ -256,21 +256,6 @@ namespace SEE.Game.Evolution
         #endregion
 
         /// <summary>
-        /// Sets the initializes the MarkerFactory to draw the beams on the graph.
-        /// </summary>
-        public void SetGraphDiff()
-        {
-            if (gameObject.TryGetComponent(out SEEBranchCity sEEBranchCity))
-            {
-                markerFactory = new MarkerFactory(markerWidth: sEEBranchCity.MarkerWidth,
-                                    markerHeight: sEEBranchCity.MarkerHeight,
-                                    additionColor: sEEBranchCity.AdditionBeamColor,
-                                    changeColor: sEEBranchCity.ChangeBeamColor,
-                                    deletionColor: sEEBranchCity.DeletionBeamColor);
-            }
-        }
-
-        /// <summary>
         /// Sets the evolving series of <paramref name="graphs"/> to be visualized.
         /// The actual visualization is triggered by <see cref="ShowGraphEvolution"/>
         /// that can be called next.
@@ -306,7 +291,6 @@ namespace SEE.Game.Evolution
             }
             Renderer.SetScaler(graphs);
         }
-
 
         /// <summary>
         /// Set of added nodes from the current to the next graph.
@@ -374,7 +358,6 @@ namespace SEE.Game.Evolution
             if (graphs.Count > 0)
             {
                 LoadingSpinner.Show(LoadingMessage);
-
             }
             CalculateAllGraphLayouts(graphs);
 
@@ -382,7 +365,6 @@ namespace SEE.Game.Evolution
 
             if (HasCurrentLaidOutGraph(out LaidOutGraph loadedGraph))
             {
-                Debug.Log("DisplayGraphAsNew");
                 DisplayGraphAsNew(loadedGraph);
             }
             else
@@ -616,29 +598,6 @@ namespace SEE.Game.Evolution
                           out equalEdges);
 
             Phase1RemoveDeletedGraphElements(next);
-        }
-
-        /// <summary>
-        /// Draw marks on Graph based on their toggle
-        /// </summary>
-        /// <param name="diffGraph"> graph where the beams will be drawn on </param>
-        public void DrawMarkOnGraph(Graph diffGraph)
-        {
-            foreach (Node node in diffGraph.Nodes())
-            {
-                if (node.HasToggle("IsNew"))
-                {
-                    markerFactory.MarkBorn(GraphElementIDMap.Find(node.ID, true));
-                }
-                else if (node.HasToggle("IsDeleted"))
-                {
-                    markerFactory.MarkDead(GraphElementIDMap.Find(node.ID, true));
-                }
-                else if (node.HasToggle("IsChanged"))
-                {
-                    markerFactory.MarkChanged(GraphElementIDMap.Find(node.ID, true));
-                }
-            }
         }
 
         /// <summary>

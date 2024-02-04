@@ -20,36 +20,14 @@ namespace SEE.Game.City
     public class SEEBranchCity : SEECity
     {
         /// <summary>
-        /// Name of the label marking a graph element as new (existing only in the newer version).
-        /// </summary>
-        public const string IsNew = "IsNew";
-        /// <summary>
-        /// Name of the label marking a graph element as deleted (existing only in the baseline version).
-        /// </summary>
-        public const string IsDeleted = "IsDeleted";
-        /// <summary>
-        /// Name of the label marking a graph element as changed (existing in both the newer and baseline
-        /// version). At least one numeric attribute has changed between the two (including the addition
-        /// or removal of an attribute).
-        /// </summary>
-        public const string IsChanged = "IsChanged";
-
-        /// <summary>
         /// Name of the Inspector foldout group for the specific evolution setttings.
         /// </summary>
         private const string diffFoldoutGroup = "Diff settings";
 
         /// <summary>
-        /// This Graph will be used to store a graph and will be used as a flag
+        /// This graph will be used to store a graph and will be used as a flag
         /// </summary>
         static Graph tempGraph = null;
-
-        /// <summary>
-        /// The renderer for rendering the evolution of the graph series.
-        ///
-        /// Neither serialized nor saved in the configuration file.
-        /// </summary>
-        private EvolutionRenderer evolutionRenderer; // not serialized by Unity; will be set in Start()
 
         /// <summary>
         /// The path to the GXL file containing the graph data.
@@ -96,21 +74,6 @@ namespace SEE.Game.City
         [Tooltip("The color of the beam for deleted nodes.")]
         [SerializeField, ShowInInspector, FoldoutGroup(diffFoldoutGroup), RuntimeTab(diffFoldoutGroup)]
         public Color DeletionBeamColor = Color.black;
-
-        /// <summary>
-        /// Factory method to create the used EvolutionRenderer.
-        /// </summary>
-        /// <returns>the current or new evolution renderer attached to this city</returns>
-        protected EvolutionRenderer CreateEvolutionRenderer()
-        {
-
-            if (!gameObject.TryGetComponent(out EvolutionRenderer result))
-            {
-                result = gameObject.AddComponent<EvolutionRenderer>();
-                result.SetGraphDiff();
-            }
-            return result;
-        }
 
         /// <summary>
         /// First, <see cref=">SEECity.LoadData"/> will be called.
@@ -262,7 +225,7 @@ namespace SEE.Game.City
             where T : GraphElement
         {
             //SetToggle will be IsDeleted if baseline and LoadedGraph have been swapped
-            _ = added.ForEach(node => { node.SetToggle(tempGraph != null ? IsDeleted : IsNew); });
+            _ = added.ForEach(node => { node.SetToggle(tempGraph != null ? SetToggleAttributes.IsDeleted : SetToggleAttributes.IsNew); });
             _ = changed.ForEach(node => { UpdateChanged(node); });
             _ = removed.ForEach(node => { MergeRemoved(node); });
 
@@ -272,14 +235,14 @@ namespace SEE.Game.City
                 T removedGraphElement = graphElement.Clone() as T;
                 addToGraph(removedGraphElement);
                 //SetToggle will be IsNew if baseline and LoadedGraph have been swapped
-                removedGraphElement.SetToggle(tempGraph != null ? IsNew : IsDeleted);
+                removedGraphElement.SetToggle(tempGraph != null ? SetToggleAttributes.IsNew : SetToggleAttributes.IsDeleted);
             }
 
             // Marks given graph element as changed.
             // Note: graphElement is from baseline graph.
             void UpdateChanged(T graphElement)
             {
-                graphElement.SetToggle(IsChanged);
+                graphElement.SetToggle(SetToggleAttributes.IsChanged);
                 //Calculates the diff between the corresponding metrics. Diff = new - old
 
                 //The corresponding Node from the baseline
@@ -308,22 +271,6 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Draws the graph and the beam according to if the node has been added, deleted or changed.
-        /// Precondition: The graph and its metrics have been loaded.
-        /// </summary>
-        [Button(ButtonSizes.Small, Name = "Draw Data")]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
-        [PropertyOrder(DataButtonsGroupOrderDraw)]
-        public override void DrawGraph()
-        {
-            base.DrawGraph();
-
-            evolutionRenderer = CreateEvolutionRenderer();
-            evolutionRenderer.DrawMarkOnGraph(LoadedGraph);
-
-        }
-
-        /// <summary>
         /// Resets everything that is specific to a given graph and removes the component.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
@@ -333,13 +280,11 @@ namespace SEE.Game.City
         {
             base.Reset();
             // Destroy Component.
-            if(gameObject.TryGetComponent(out EvolutionRenderer evolutionRenderer))
+            if (gameObject.TryGetComponent(out EvolutionRenderer evolutionRenderer))
             {
                 DestroyImmediate(evolutionRenderer);
             }
-
         }
-
 
         #region Configuration file input/output
         //--------------------------------
