@@ -1,3 +1,4 @@
+using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using Newtonsoft.Json.Linq;
 using SEE.UI.PropertyDialog;
@@ -18,13 +19,15 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         public override string AdapterFileName { get; set; } = "netcoredbg.exe";
         public override string AdapterArguments { get; set; } = "--interpreter=vscode --engineLogging=RunWithUnity.log";
 
+
+        private bool launchNoDebug = false;
         // https://github.com/Samsung/netcoredbg/blob/27606c317017beb81bc1b81846cdc460a7a6aed3/test-suite/NetcoreDbgTest/VSCode/VSCodeProtocolRequest.cs#L44
         private string launchName = ".NET Core Launch";
         private string launchType = "coreclr";
         private string launchPreLaunchTask = "build";
-        private string launchProgram = Path.Combine("D:" + Path.DirectorySeparatorChar + "ferdi", "SampleProjects", "HelloCS1", "src", "bin", "Debug", "net8.0", "src.dll");
+        private string launchProgram = Path.Combine("${cwd}", "bin", "Debug", "net8.0", "HelloCS2.dll");
         private List<string> launchArgs = new() { "Hello", "World"};
-        private string launchCwd = Path.Combine("D:" + Path.DirectorySeparatorChar + "ferdi", "SampleProjects", "HelloCS1");
+        private string launchCwd = Path.Combine("D:" + Path.DirectorySeparatorChar + "ferdi", "SampleProjects", "HelloCS2");
         private Dictionary<string, string> launchEnv = new();
         private string launchConsole = "internalConsole";
         private bool launchStopAtEntry = true;
@@ -37,9 +40,16 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         private StringProperty launchArgsProperty;
         private StringProperty launchCwdProperty;
         private BooleanProperty launchStopAtEntryProperty;
+        private BooleanProperty launchNoDebugProperty;
 
         public override void SetupLaunchConfig(GameObject go, PropertyGroup group)
         {
+            launchCwdProperty = go.AddComponent<StringProperty>();
+            launchCwdProperty.Name = "Cwd";
+            launchCwdProperty.Description = "The working directory.";
+            launchCwdProperty.Value = launchCwd;
+            group.AddProperty(launchCwdProperty);
+
             launchProgramProperty = go.AddComponent<StringProperty>();
             launchProgramProperty.Name = "Program";
             launchProgramProperty.Description = "The absolute path of a dll file.";
@@ -52,11 +62,11 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             launchArgsProperty.Value = espaceList(launchArgs);
             group.AddProperty(launchArgsProperty);
 
-            launchCwdProperty = go.AddComponent<StringProperty>();
-            launchCwdProperty.Name = "Cwd";
-            launchCwdProperty.Description = "The working directory.";
-            launchCwdProperty.Value = launchCwd;
-            group.AddProperty(launchCwdProperty);
+            launchNoDebugProperty = go.AddComponent<BooleanProperty>();
+            launchNoDebugProperty.Name = "No Debug";
+            launchNoDebugProperty.Description = "Launch the program without debugging.";
+            launchNoDebugProperty.Value = launchNoDebug;
+            group.AddProperty(launchNoDebugProperty);
 
             launchStopAtEntryProperty = go.AddComponent<BooleanProperty>();
             launchStopAtEntryProperty.Name = "Stop at Entry";
@@ -70,6 +80,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             launchProgram = launchProgramProperty.Value;
             launchArgs = parseList(launchArgsProperty.Value);
             launchCwd = launchCwdProperty.Value;
+            launchNoDebug = launchNoDebugProperty.Value;
             launchStopAtEntry = launchStopAtEntryProperty.Value;
         }
 
@@ -78,12 +89,13 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         {
             return new()
             {
+                NoDebug = launchNoDebug,
                 ConfigurationProperties = new Dictionary<string, JToken>
                 {
                     { "name", launchName },
                     { "type", launchType },
                     { "preLaunchTask", launchPreLaunchTask },
-                    { "program", launchProgram },
+                    { "program", launchProgram.Replace("${cwd}", launchCwd) },
                     { "args", JToken.FromObject(launchArgs) },
                     { "cwd", launchCwd },
                     { "env", JToken.FromObject(launchEnv) },
@@ -93,6 +105,19 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
                     { "enableStepFiltering", launchEnableStepFiltering },
                     { "internalConsoleOptions", launchInternalConsoleOptions },
                     { "__sessionId", launchSessionId },
+                }
+            };
+        }
+
+        public override List<Action> GetLaunchActions(DebugProtocolHost adapterHost, InitializeResponse capabilities)
+        {
+            return new() {
+                () => adapterHost.SendRequest(GetLaunchRequest(capabilities), _ => {}),
+                () => {
+                    if (capabilities.SupportsConfigurationDoneRequest == true)
+                    {
+                        adapterHost.SendRequest(new ConfigurationDoneRequest(), _ => {});
+                    }
                 }
             };
         }

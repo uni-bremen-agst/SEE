@@ -1,26 +1,30 @@
+using Michsky.UI.ModernUIPack;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
+using RootMotion;
 using SEE.Controls;
+using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.UI.Window;
+using SEE.UI.Window.CodeWindow;
 using SEE.UI.Window.ConsoleWindow;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
 using Encoding = System.Text.Encoding;
+using StackFrame = Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages.StackFrame;
 
 namespace SEE.UI.DebugAdapterProtocol
 {
     public class DebugAdapterProtocolSession : MonoBehaviour
     {
         private const string DebugControlsPrefab = "Prefabs/UI/DebugAdapterProtocolControls";
-
 
         public DebugAdapter.DebugAdapter Adapter;
 
@@ -30,11 +34,12 @@ namespace SEE.UI.DebugAdapterProtocol
         private DebugProtocolHost adapterHost;
         private InitializeResponse capabilities;
 
-        private Queue<Action> queuedActions = new();
+        private Queue<Action> actions = new();
 
-        private int? threadId;
+        private bool isRunning;
+        private List<int> threads = new();
+        private int? threadId => threads.Count > 0 ? threads.First() : null;
         private object? restartData;
-
 
         protected void Start()
         {
@@ -43,47 +48,50 @@ namespace SEE.UI.DebugAdapterProtocol
 
             if (Adapter == null)
             {
-                Debug.LogError("Debug adapter not set.");
-                console.AddMessage("Debug adapter not set.", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
+                LogError(new("Debug adapter not set."));
                 Destroyer.Destroy(this);
                 return;
             }
-            console.AddMessage($"Start debugging session: " +
-                $"{Adapter.Name} - {Adapter.AdapterFileName} - {Adapter.AdapterArguments} - {Adapter.AdapterWorkingDirectory}\n");
+            console.AddMessage($"Start debugging session: {Adapter.Name} - {Adapter.AdapterFileName} - {Adapter.AdapterArguments} - {Adapter.AdapterWorkingDirectory}\n");
 
             if (!CreateAdapterProcess())
             {
-                Debug.LogError("Couldn't create the debug adapter process.");
-                console.AddMessage("Couldn't create the debug adapter process.", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
+                LogError(new("Couldn't create the debug adapter process."));
                 Destroyer.Destroy(this);
                 return;
             }
             else
             {
-                console.AddMessage("Created the debug adapter process.", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
+                console.AddMessage("Created the debug adapter process.\n", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
             }
             if (!CreateAdapterHost())
             {
-                Debug.LogError("Couldn't create the debug adapter host.");
-                console.AddMessage("Couldn't create the debug adapter host.", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
+                LogError(new("Couldn't create the debug adapter host."));
                 Destroyer.Destroy(this);
                 return;
             }
             else
             {
-                console.AddMessage("Created the debug adapter host.", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
+                console.AddMessage("Created the debug adapter host.\n", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Log);
             }
 
-            capabilities = adapterHost.SendRequestSync(new InitializeRequest()
+            try
             {
-                PathFormat = InitializeArguments.PathFormatValue.Path,
-                ClientID = "vscode",
-                ClientName = "Visual Studio Code",
-                AdapterID = Adapter.Name,
-                Locale = "en",
-                LinesStartAt1 = true,
-                ColumnsStartAt1 = true,
-            });
+                capabilities = adapterHost.SendRequestSync(new InitializeRequest()
+                {
+                    PathFormat = InitializeArguments.PathFormatValue.Path,
+                    ClientID = "vscode",
+                    ClientName = "Visual Studio Code",
+                    AdapterID = Adapter.Name,
+                    Locale = "en",
+                    LinesStartAt1 = true,
+                    ColumnsStartAt1 = true,
+                });
+            } catch (Exception e)
+            {
+                LogError(e);
+                Destroyer.Destroy(this);
+            }
         }
 
         private void SetupControls()
@@ -91,86 +99,70 @@ namespace SEE.UI.DebugAdapterProtocol
             controls = PrefabInstantiator.InstantiatePrefab(DebugControlsPrefab, transform, false);
             controls.transform.position = new Vector3(Screen.width * 0.5f, Screen.height * 0.9f, 0);
 
-            Button continueButton = controls.transform.Find("Continue").gameObject.MustGetComponent<Button>();
-            continueButton.onClick.AddListener(() =>
+            Dictionary<string, Action> listeners = new Dictionary<string, Action>
             {
-                if (threadId is not null)
-                {
-                    queuedActions.Enqueue(() => adapterHost.SendRequest(new ContinueRequest { ThreadId = (int)threadId }, _ => { }));
-                }
-            });
-
-            Button pauseButton = controls.transform.Find("Pause").gameObject.MustGetComponent<Button>();
-            pauseButton.onClick.AddListener(() => queuedActions.Enqueue(() =>
+                {"Continue", Continue}, 
+                {"Pause", Pause}, 
+                {"Reverse", Reverse},
+                {"Next", Next},
+                {"StepBack", StepBack},
+                {"StepIn", StepIn},
+                {"StepOut", StepOut},
+                {"Restart", Restart},
+                {"Stop", Stop },
+            };
+            foreach (var kv in listeners)
             {
-                if (threadId is not null)
-                {
-                    adapterHost.SendRequest(new PauseRequest { ThreadId = (int)threadId }, _ => { });
-                }
-            }));
+                controls.transform.Find(kv.Key).gameObject.MustGetComponent<Button>().onClick.AddListener(() => actions.Enqueue(kv.Value));
+            }
+            controls.transform.Find("Terminal").gameObject.MustGetComponent<Button>().onClick.AddListener(OpenConsole);
 
-            Button reverseButton = controls.transform.Find("Reverse").gameObject.MustGetComponent<Button>();
-            reverseButton.onClick.AddListener(() =>
+            return;
+
+            void Continue()
             {
-                if (capabilities.SupportsStepBack == true && threadId is not null)
-                {
-                    queuedActions.Enqueue(() => adapterHost.SendRequest(new ReverseContinueRequest{ ThreadId = (int)threadId }, _ => { }));
-                }
-            });
-
-            Button nextButton = controls.transform.Find("Next").gameObject.MustGetComponent<Button>();
-            nextButton.onClick.AddListener(() =>
+                if (threadId is null || isRunning) return;
+                adapterHost.SendRequest(new ContinueRequest { ThreadId = (int)threadId }, _ => isRunning = true);
+            }
+            void Pause()
             {
-                if (threadId is not null)
-                {
-                    queuedActions.Enqueue(() => adapterHost.SendRequest(new NextRequest{ ThreadId = (int)threadId }, _ => { }));
-                }
-            });
-
-            Button stepBackButton = controls.transform.Find("StepBack").gameObject.MustGetComponent<Button>();
-            stepBackButton.onClick.AddListener(() =>
+                if (threadId is null || !isRunning) return;
+                adapterHost.SendRequest(new ContinueRequest { ThreadId = (int)threadId }, _ => isRunning = false);
+            }
+            void Reverse()
             {
-                if (capabilities.SupportsStepBack == true && threadId is not null)
-                {
-                    queuedActions.Enqueue(() => adapterHost.SendRequest(new StepBackRequest{ ThreadId = (int)threadId }, _ => { }));
-                }
-            });
-
-            Button stepInButton = controls.transform.Find("StepIn").gameObject.MustGetComponent<Button>();
-            stepInButton.onClick.AddListener(() =>
+                if (threadId is null || isRunning || capabilities.SupportsStepBack != true) return;
+                adapterHost.SendRequest(new ReverseContinueRequest { ThreadId = (int)threadId }, _ => isRunning = true);
+            }
+            void Next()
             {
-                if (threadId is not null)
-                {
-                    queuedActions.Enqueue(() => adapterHost.SendRequest(new StepInRequest{ ThreadId = (int)threadId }, _ => { }));
-                }
-            });
-
-            Button stepOutButton = controls.transform.Find("StepOut").gameObject.MustGetComponent<Button>();
-            stepOutButton.onClick.AddListener(() =>
+                if (threadId is null || isRunning) return;
+                adapterHost.SendRequest(new NextRequest { ThreadId = (int)threadId }, _ => isRunning = true);
+            }
+            void StepBack()
             {
-                if (threadId is not null)
-                {
-                    queuedActions.Enqueue(() => adapterHost.SendRequest(new StepOutRequest{ ThreadId = (int)threadId }, _ => { }));
-                }
-            });
-
-            Button restartButton = controls.transform.Find("Restart").gameObject.MustGetComponent<Button>();
-            restartButton.onClick.AddListener(() =>
+                if (threadId is null || isRunning || capabilities?.SupportsStepBack != true) return;
+                adapterHost.SendRequest(new StepBackRequest { ThreadId = (int)threadId }, _ => isRunning = true);
+            }
+            void StepIn()
             {
-                if (capabilities.SupportsRestartRequest==true && threadId is not null)
-                {
-                    queuedActions.Enqueue(() => adapterHost.SendRequest(new RestartRequest { Arguments = Adapter.GetLaunchRequest(capabilities) }, _ => { }));
-                }
-            });
-
-            Button stopButton = controls.transform.Find("Stop").gameObject.MustGetComponent<Button>();
-            stopButton.onClick.AddListener(() =>
+                if (threadId is null || isRunning) return;
+                adapterHost.SendRequest(new StepInRequest { ThreadId = (int)threadId }, _ => isRunning = true);
+            }
+            void StepOut()
             {
-                 queuedActions.Enqueue(() => adapterHost.SendRequest(new DisconnectRequest(), _ => { }));
-            });
-
-            Button terminalButton = controls.transform.Find("Terminal").gameObject.MustGetComponent<Button>();
-            terminalButton.onClick.AddListener(OpenConsole);
+                if (threadId is null || isRunning) return;
+                adapterHost.SendRequest(new StepOutRequest { ThreadId = (int)threadId }, _ => isRunning = true);
+            }
+            void Restart()
+            {
+                if (capabilities?.SupportsRestartRequest != true) return;
+                adapterHost.SendRequest(new RestartRequest { Arguments = Adapter.GetLaunchRequest(capabilities) }, _ => isRunning = true);
+            }
+            void Stop()
+            {
+                adapterHost.SendRequest(new DisconnectRequest(), _ => { });
+            }
         }
 
         private void OpenConsole()
@@ -179,12 +171,10 @@ namespace SEE.UI.DebugAdapterProtocol
             if (console == null)
             {
                 console = gameObject.AddComponent<ConsoleWindow>();
-                console.AddMessage("Console created\n");
                 manager.AddWindow(console);
             }
             if (manager.ActiveWindow != console)
             {
-                console.AddMessage("Console opened\n");
                 manager.ActiveWindow = console;
             }
         }
@@ -210,16 +200,16 @@ namespace SEE.UI.DebugAdapterProtocol
                 }
             };
             adapterProcess.EnableRaisingEvents = true;
-            adapterProcess.Exited += (_, args) => console.AddMessage($"Process: Exited! ({adapterProcess.ProcessName}", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
-            adapterProcess.Disposed += (_, args) => console.AddMessage($"Process: Exited! ({adapterProcess.ProcessName}", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
-            adapterProcess.ErrorDataReceived += (_, args) => console.AddMessage($"Process: ErrorDataReceived! ({adapterProcess.ProcessName}\t{args.Data}", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
-            adapterProcess.OutputDataReceived += (_, args) => console.AddMessage($"Process: OutputDataReceived! ({adapterProcess.ProcessName}\t{args.Data}", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
+            adapterProcess.Exited += (_, args) => console.AddMessage($"Process: Exited! ({adapterProcess.ProcessName})");
+            adapterProcess.Disposed += (_, args) => console.AddMessage($"Process: Exited! ({adapterProcess.ProcessName})");
+            adapterProcess.OutputDataReceived += (_, args) => console.AddMessage($"Process: OutputDataReceived! ({adapterProcess.ProcessName})\n\t{args.Data}");
+            adapterProcess.ErrorDataReceived += (_, args) => LogError(new($"Process: ErrorDataReceived! ({adapterProcess.ProcessName})\n\t{args.Data}"));
 
             string currentDirectory = Directory.GetCurrentDirectory();
             // working directory needs to be set manually so that executables can be found
-            Directory.SetCurrentDirectory(Adapter.AdapterWorkingDirectory);
             try
             {
+                Directory.SetCurrentDirectory(Adapter.AdapterWorkingDirectory);
                 if (!adapterProcess.Start())
                 {
                     adapterProcess = null;
@@ -227,8 +217,7 @@ namespace SEE.UI.DebugAdapterProtocol
             }
             catch (Exception e)
             {
-                Debug.LogError(e.ToString());
-                console.AddMessage(e.ToString(), ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
+                LogError(e);
                 adapterProcess = null;
             }
             // working directory needs to be reset (otherwise unity crashes)
@@ -239,16 +228,15 @@ namespace SEE.UI.DebugAdapterProtocol
 
         private void Update()
         {
-            if (queuedActions.Count > 0 && capabilities != null)
+            if (actions.Count > 0 && capabilities != null)
             {
                 try
                 {
-                    queuedActions.Dequeue()();
+                    actions.Dequeue()();
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError(e.ToString());
-                    console.AddMessage(e.ToString(), ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Error);
+                    LogError(e);
                 }
             }
         }
@@ -257,13 +245,12 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             if (e.Body is InitializedEvent)
             {
-                queuedActions.Enqueue(() => adapterHost.SendRequestSync(Adapter.GetLaunchRequest(capabilities)));
-                queuedActions.Enqueue(() =>
+                actions.Enqueue(() =>
                 {
-                    if (capabilities.SupportsConfigurationDoneRequest == true)
-                    {
-                        adapterHost.SendRequestSync(new ConfigurationDoneRequest());
-                    }
+                    List<Action> launchActions = Adapter.GetLaunchActions(adapterHost, capabilities);
+                    Action last = launchActions.Last();
+                    launchActions[launchActions.Count - 1] = () => { last(); isRunning = true; };
+                    launchActions.ForEach(actions.Enqueue);
                 });
             }
             else if (e.Body is OutputEvent outputEvent)
@@ -298,7 +285,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 {
                     if (level == ConsoleWindow.MessageLevel.Error)
                     {
-                        Debug.LogError(outputEvent.Output);
+                        Debug.LogWarning(outputEvent.Output);
                     }
                     // FIXME: Why does it require a cast?
                     console.AddMessage(outputEvent.Output, source, (ConsoleWindow.MessageLevel)level);
@@ -307,33 +294,95 @@ namespace SEE.UI.DebugAdapterProtocol
             else if (e.Body is TerminatedEvent terminatedEvent)
             {
                 // TODO: Let user restart the program.
-                console.AddMessage("Terminated", ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Log);
-                Destroyer.Destroy(this);
+                console.AddMessage("Terminated\n");
+                actions.Enqueue(() => Destroyer.Destroy(this));
             }
             else if (e.Body is ExitedEvent exitedEvent)
             {
-                console.AddMessage($"Exited with exit code {exitedEvent.ExitCode}", ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Log);
-                queuedActions.Enqueue(() => Destroyer.Destroy(this));
+                isRunning = false;
+
+                console.AddMessage($"Exited with exit code {exitedEvent.ExitCode}\n", ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Log);
+                actions.Enqueue(() => Destroyer.Destroy(this));
             }
             else if (e.Body is StoppedEvent stoppedEvent)
             {
-                threadId = stoppedEvent.ThreadId;
-                console.AddMessage($"Stopped", ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Log);
+                isRunning = false;
+                switch (stoppedEvent.Reason)
+                {
+                    case StoppedEvent.ReasonValue.Step:
+                        break;
+                    case StoppedEvent.ReasonValue.Breakpoint:
+                        break;
+                    case StoppedEvent.ReasonValue.Exception:
+                        break;
+                    case StoppedEvent.ReasonValue.Pause:
+                        break;
+                    case StoppedEvent.ReasonValue.Entry:
+                        break;
+                    case StoppedEvent.ReasonValue.InstructionBreakpoint:
+                        break;
+                    case StoppedEvent.ReasonValue.Restart:
+                        break;
+                    case StoppedEvent.ReasonValue.FunctionBreakpoint:
+                    case StoppedEvent.ReasonValue.DataBreakpoint:
+                    case StoppedEvent.ReasonValue.Goto:
+                    case StoppedEvent.ReasonValue.Unknown:
+                        break;
+                }
+                console.AddMessage($"Stopped - {stoppedEvent.Reason} - {stoppedEvent.PreserveFocusHint} - [{String.Join(", ", stoppedEvent.HitBreakpointIds)}]" +
+                    (stoppedEvent.Description != null ? $"\n\tDescription: {stoppedEvent.Description}" : "") +
+                    (stoppedEvent.Text != null ? $"\n\tDescription: {stoppedEvent.Text}" : "") +
+                    $"\n", ConsoleWindow.MessageSource.Debugee, ConsoleWindow.MessageLevel.Log);
+                actions.Enqueue(() =>
+                {
+                    if (threadId == null) return;
+                    StackTraceResponse response = adapterHost.SendRequestSync(new StackTraceRequest()
+                    {
+                        ThreadId = (int) threadId,
+                        Levels = 1
+                    });
+                    StackFrame stackFrame = response.StackFrames[0];
+                    UpdateCodePosition(stackFrame.Source.Path, stackFrame.Line);
+                });
             }
+            else if (e.Body is ThreadEvent threadEvent)
+            {
+                if (threadEvent.Reason == ThreadEvent.ReasonValue.Started)
+                {
+                    threads.Add(threadEvent.ThreadId);
+                } else if (threadEvent.Reason == ThreadEvent.ReasonValue.Exited)
+                {
+                    threads.Remove(threadEvent.ThreadId);
+                }
+            } else if (e.Body is ContinuedEvent)
+            {
+                isRunning = true;
+            }
+        }
+
+        private void UpdateCodePosition(string path, int line)
+        {
+            string title = Path.GetFileName(path);
+
+            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+            CodeWindow codeWindow = manager.Windows.OfType<CodeWindow>().FirstOrDefault(window => window.Title == title);
+            if (codeWindow == null)
+            {
+                codeWindow = gameObject.AddComponent<CodeWindow>();
+                codeWindow.Title = title;
+                codeWindow.EnterFromFile(path);
+                manager.AddWindow(codeWindow);
+            }
+            codeWindow.ScrolledVisibleLine = line;
+            manager.ActiveWindow = codeWindow;
         }
 
         private bool CreateAdapterHost()
         {
             adapterHost = new DebugProtocolHost(adapterProcess.StandardInput.BaseStream, adapterProcess.StandardOutput.BaseStream);
-            adapterHost.LogMessage += (sender, args) => Debug.Log($"LogMessage - {args.Category} - {args.Message}");
-            adapterHost.DispatcherError += (sender, args) => Debug.Log($"DispatcherError - {args.Exception}");
-            adapterHost.ResponseTimeThresholdExceeded += (_, args) => Debug.Log($"ResponseTimeThresholdExceeded - \t{args.Command}\t{args.SequenceId}\t{args.Threshold}");
-            adapterHost.EventReceived += (_, args) => Debug.Log($"EventReceived - {args.EventType}");
-            adapterHost.RequestReceived += (_, args) => Debug.Log($"RequestReceived - {args.Command}");
-            adapterHost.RequestCompleted += (_, args) => Debug.Log($"RequestCompleted - {args.Command} - {args.SequenceId} - {args.ElapsedTime}");
-
+            adapterHost.DispatcherError += (sender, args) => LogError(new($"DispatcherError - {args.Exception}"));
+            adapterHost.ResponseTimeThresholdExceeded += (_, args) => console.AddMessage($"ResponseTimeThresholdExceeded - \t{args.Command}\t{args.SequenceId}\t{args.Threshold}\n", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Warning);
             adapterHost.EventReceived += OnEventReceived;
-
             adapterHost.Run();
 
             return adapterHost.IsRunning;
@@ -341,7 +390,7 @@ namespace SEE.UI.DebugAdapterProtocol
 
         private void OnDestroy()
         {
-            console.AddMessage("Debug session finished.");
+            console.AddMessage("Debug session finished.\n");
             if (controls)
             {
                 Destroyer.Destroy(controls);
@@ -356,5 +405,10 @@ namespace SEE.UI.DebugAdapterProtocol
             }
         }
 
+        private void LogError(Exception e)
+        {
+            console.AddMessage(e.ToString() + "\n", ConsoleWindow.MessageSource.Adapter, ConsoleWindow.MessageLevel.Error);
+            throw e;
+        }
     }
 }

@@ -34,6 +34,7 @@ namespace SEE.UI.Window.ConsoleWindow
 
         private bool messagesCleared;
         private bool messageAdded;
+        private bool messageAppended;
 
         private Transform items;
         private TMP_InputField searchField;
@@ -60,8 +61,33 @@ namespace SEE.UI.Window.ConsoleWindow
         public void AddMessage(string text, MessageSource source = MessageSource.Adapter, MessageLevel level = MessageLevel.Log)
         {
             text = text.Replace("\t", tabReplacement);
-            messages.Add(new(text, source, level));
-            messageAdded = true;
+            int appendTo = AppendTo(source, level);
+            if (appendTo == -1)
+            {
+                messages.Add(new(text, source, level));
+                messageAdded = true;
+            } else
+            {
+                messages[appendTo].Text += text;
+                messageAppended = true;
+            }
+        }
+
+        private int AppendTo(MessageSource source, MessageLevel level)
+        {
+            for (int i=messages.Count-1; i>=0; i--)
+            {
+                Message message = messages[i];
+                if (message.Source == source && message.Level == level)
+                {
+                    if (!message.Text.EndsWith('\n'))
+                    {
+                        return i;
+                    }
+                }
+            }
+
+            return -1;
         }
 
         public void ClearMessages()
@@ -127,6 +153,14 @@ namespace SEE.UI.Window.ConsoleWindow
                     AddItem(messages[i]);
                 }
             }
+            else if (messageAppended)
+            {
+                messageAppended = false;
+                for (int i = items.childCount; i < messages.Count; i++)
+                {
+                    UpdateItem(i);
+                }
+            }
         }
 
         private void AddItem(Message message)
@@ -161,10 +195,13 @@ namespace SEE.UI.Window.ConsoleWindow
             UpdateFilter(message, item);
         }
 
-        private void UpdateItem(GameObject item, string text)
+        private void UpdateItem(int i)
         {
+            GameObject item = items.GetChild(i).gameObject;
+            Message message = messages[i];
             TextMeshProUGUI textMesh = item.transform.Find("Foreground/Text").gameObject.MustGetComponent<TextMeshProUGUI>();
-            textMesh.SetText(text);
+            textMesh.SetText(message.Text);
+            UpdateFilter(message, item);
         }
 
         private void UpdateFilters()

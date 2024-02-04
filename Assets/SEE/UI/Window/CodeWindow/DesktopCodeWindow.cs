@@ -45,7 +45,8 @@ namespace SEE.UI.Window.CodeWindow
                 textMesh.text = text;
             }
 
-            if (SceneQueries.GetCodeCity(transform).gameObject.TryGetComponentOrLog(out AbstractSEECity city)) {
+            var temp = SceneQueries.GetCodeCity(transform);
+            if (temp && temp.gameObject.TryGetComponentOrLog(out AbstractSEECity city)) {
                 // Get button for IDE interaction and register events.
                 Window.transform.Find("Dragger/IDEButton").gameObject.GetComponent<Button>()
                       .onClick.AddListener(() =>

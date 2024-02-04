@@ -352,7 +352,8 @@ namespace SEE.UI.Window.CodeWindow
                     try
                     {
                         EnterFromTokens(SEEToken.FromFile(filename));
-                        if (SceneQueries.GetCodeCity(transform).gameObject.TryGetComponentOrLog(out AbstractSEECity city)
+                        GameObject go = SceneQueries.GetCodeCity(transform)?.gameObject;
+                        if (go && go.TryGetComponentOrLog(out AbstractSEECity city)
                             && city.ErosionSettings.ShowIssuesInCodeWindow)
                         {
                             MarkIssuesAsync(filename).Forget(); // initiate issue search
