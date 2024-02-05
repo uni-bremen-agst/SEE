@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Sirenix.Serialization;
 using SEE.DataModel.DG;
