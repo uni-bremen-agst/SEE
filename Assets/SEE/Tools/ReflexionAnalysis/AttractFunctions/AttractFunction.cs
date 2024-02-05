@@ -19,41 +19,41 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         {
             CountAttract,
             NBAttract,
-            LSIAttract,
             ADCAttract
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        protected string candidateType;
+        public string CandidateType { get; set; }
+        public string ClusterType { get; set; }
 
         protected ReflexionGraph reflexionGraph;
 
         protected Dictionary<string, double> edgeWeights = new Dictionary<string, double>();
 
-        public AttractFunction(ReflexionGraph reflexionGraph, string candidateType)
+        public AttractFunction(ReflexionGraph reflexionGraph, AttractFunctionConfig config)
         {
             this.reflexionGraph= reflexionGraph;
-            this.candidateType = candidateType;
+            this.CandidateType = config.CandidateType;
+            this.ClusterType = config.ClusterType;
         }
-        public AttractFunction(ReflexionGraph reflexionGraph, 
-                                string candidateType, 
-                                Dictionary<string, double> edgeWeights) : this(reflexionGraph, candidateType)
+        public AttractFunction(ReflexionGraph reflexionGraph,
+                               AttractFunctionConfig config,
+                               Dictionary<string, double> edgeWeights) : this(reflexionGraph, config)
         {
             this.edgeWeights = edgeWeights;
         }
 
-        public static AttractFunction Create(AttractFunctionType attractFunctionType, ReflexionGraph reflexionGraph, string candidateType)
+        public static AttractFunction Create(AttractFunctionConfig config, ReflexionGraph reflexionGraph)
         {
-            // TODO: Resolve target language properly, when creating AttractFunctions
-            switch (attractFunctionType)
+            switch (config.AttractFunctionType)
             {
-                case AttractFunctionType.CountAttract: return new CountAttract(reflexionGraph, candidateType);
+                case AttractFunctionType.CountAttract: 
+                    return new CountAttract(reflexionGraph,(CountAttractConfig)config);
 
-                case AttractFunctionType.NBAttract: return new NBAttract(reflexionGraph, candidateType, useStandardTerms:true, TokenLanguage.Plain, useCda:true);
-
-                case AttractFunctionType.ADCAttract: return new ADCAttract(reflexionGraph, candidateType, TokenLanguage.Plain);
+                case AttractFunctionType.NBAttract: 
+                    return new NBAttract(reflexionGraph, (NBAttractConfig)config);
+                    
+                case AttractFunctionType.ADCAttract: 
+                    return new ADCAttract(reflexionGraph, (ADCAttractConfig)config);
             }
             throw new ArgumentException("Given attractFunctionType is currently not implemented");
         }

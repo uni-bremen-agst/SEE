@@ -1,0 +1,39 @@
+﻿using SEE.UI.Window.CodeWindow;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using UnityEngine;
+
+namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
+{
+    [System.Serializable]
+    public class NBAttractConfig : LanguageAttractConfig
+    {
+        [SerializeField]
+        private bool useCDA;
+
+        public bool UseCDA {get => useCDA; set => useCDA = value;}
+
+        [SerializeField]
+        private bool useStandardTerms;
+
+        public bool UseStandardTerms { get => useStandardTerms; set => useStandardTerms = value; }
+
+        public NBAttractConfig(bool useCda) : this(TokenLanguage.Plain, useCda)
+        {
+        }
+
+        public NBAttractConfig(TokenLanguage language, bool useCda = true) : this(language, useCda, true)
+        {
+        }
+
+        public NBAttractConfig(TokenLanguage language, bool useCda, bool useStandardTerms)
+        {
+            this.UseCDA = useCda;
+            this.UseStandardTerms = useStandardTerms;
+            this.TargetLanguage = TargetLanguage;
+        }
+    }
+}

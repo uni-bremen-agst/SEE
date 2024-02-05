@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
+using Cysharp.Threading.Tasks;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.Operator;
@@ -10,6 +11,7 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using static Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions.AttractFunction;
@@ -42,19 +44,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         private bool ProcessingEvents { get; set; }
 
-        public CandidateRecommendation CandidateRecommendation
-        {
-            get 
-            {
-                if (candidateRecommendation == null)
-                {
-                    candidateRecommendation = new CandidateRecommendation();
-                    candidateRecommendation.Statistics.CsvPath = csvPath; 
-                }
-                return candidateRecommendation; 
-            }
-        }
-
         private const string updateConfigurationButtonLabel = "Update Configuration";
         private const string createInitialMappingLabel = "Create Initial Mapping";
         private const string startAutomatedMappingLabel = "Start Automated Mapping";
@@ -70,27 +59,24 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         private const string mappingButtonGroup = "mappingButtonsGroup";
         private const string debugButtonGroup = "debugScenarioButtonGroup";
 
-        // TODO: include cda option into the updating of the configuration
-        [SerializeField]
-        public bool useCDA;
+        // TODO: Resolve target language properly, when creating AttractFunctions
+        public MappingExperimentConfig mappingConfig;
 
-        [SerializeField]
-        public AttractFunctionType attractFunctionType = AttractFunctionType.CountAttract;
+        private string csvFileName = "output.csv";
+        private string xmlFileName = "output.xml";
 
-        [SerializeField]
-        public string candidateType = "Class";
+        public void Awake()
+        {
+            candidateRecommendation = new CandidateRecommendation();
+        }
 
-        [SerializeField]
-        public FilePath csvPath;
-
-        [SerializeField]
-        public FilePath xmlPath;
-
-        [SerializeField]
-        public double initialMappingPercentage = 0.5;
-
-        [SerializeField]
-        public int initialMappingSeed = 593946;
+        public CandidateRecommendation CandidateRecommendation
+        {
+            get
+            {
+                return candidateRecommendation;
+            }
+        }
 
         public ReflexionGraph ReflexionGraphViz
         {
@@ -140,14 +126,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         public void SendEventToCalculationGraph(ChangeEvent value)
         {
             // UnityEngine.Debug.Log($"Try to send Change event {value} to calculation reflexion graph");
-            reflexionGraphCalc.StartCaching();
             switch (value)
             {
                 case NodeEvent nodeEvent:
 
                     if (value.Change == ChangeType.Addition)
                     {
-                        // TODO: Is cloning the node thread safe?
+                        // TODO: Cloning the node on a pool thread is not safe
                         Node nodeClone = (Node)nodeEvent.Node.Clone();
                         reflexionGraphCalc.AddNode(nodeClone);
                     } 
@@ -156,7 +141,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                         Node nodeToRemove = reflexionGraphCalc.GetNode(nodeEvent.Node.ID);
                         if (nodeToRemove == null) throw new Exception($"Node {nodeEvent.Node.ID} not found in calculation reflexion graph" +
                                                                       $" when trying to synchronize with visualization reflexion graph.");
-                        // TODO: What to do about orphans option? Add information to changeEvent?
+                        
+                        // TODO: Add the orphans option to the ChangeEvent object to copy the change consistently
                         reflexionGraphCalc.RemoveNode(nodeToRemove);
                     }
                     break;
@@ -176,7 +162,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                             // the reflexion graph for calculation will add them by itself
                             if (!edgeEvent.Edge.IsInArchitecture() || ReflexionGraph.IsSpecified(edgeEvent.Edge))
                             {
-                                // TODO: Is cloning the edge thread safe?
+                                // TODO: Cloning the edge on a pool thread is not safe
                                 Edge edgeClone = (Edge)edgeEvent.Edge.Clone();
                                 Node nodeSource = reflexionGraphCalc.GetNode(edgeEvent.Edge.Source.ID);
                                 Node nodeTarget = reflexionGraphCalc.GetNode(edgeEvent.Edge.Target.ID);
@@ -205,7 +191,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     break;
                 default: break;
             }
-            reflexionGraphCalc.ReleaseCaching();
+            
         }
 
         #endregion
@@ -246,7 +232,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 {
                     while (changeEventQueue.Count > 0)
                     {
+                        reflexionGraphCalc.StartCaching();
                         SendEventToCalculationGraph(changeEventQueue.Dequeue());
+                        reflexionGraphCalc.ReleaseCaching();
                     }
                 }
                 ProcessingEvents = false;
@@ -258,7 +246,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         [ButtonGroup(statisticButtonGroup)]
         public void StartRecording()
         {
-            CandidateRecommendation.Statistics.StartRecording();
+            string csvFile = Path.Combine(this.mappingConfig.OutputPath.Path, csvFileName);
+            CandidateRecommendation.Statistics.StartRecording(csvFile);
         }
 
         [Button(stopRecordingLabel, ButtonSizes.Small)]
@@ -272,13 +261,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         [ButtonGroup(statisticButtonGroup)]
         public void ProcessData()
         {
+            string csvFile = Path.Combine(this.mappingConfig.OutputPath.Path, csvFileName);
+            string xmlFile = Path.Combine(this.mappingConfig.OutputPath.Path, xmlFileName);
             CandidateRecommendation.Statistics.StopRecording();
-            CandidateRecommendation.Statistics.ProcessMappingData(csvPath.Path, xmlPath.Path);
+            CandidateRecommendation.Statistics.ProcessMappingData(csvFile, xmlFile);
         }
 
         public void UpdateConfiguration()
         {
-
                 lock (visualizedReflexionGraphLock)
                 {
                     reflexionGraphCalc = new ReflexionGraph(reflexionGraphViz);
@@ -291,8 +281,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 // or assignments of recommendations towards the graphs
                 lock (calculationReflexionGraphLock)
                 {
-                    CandidateRecommendation.UpdateConfiguration(reflexionGraphCalc, attractFunctionType, candidateType);
-                    CandidateRecommendation.Statistics.SetOracleMapping(oracleMapping);
+                    UnityEngine.Debug.Log($"Update Configuration called! {oracleMapping}");
+                    CandidateRecommendation.UpdateConfiguration(reflexionGraphCalc, 
+                                                                mappingConfig,
+                                                                oracleMapping);
+                    
                 }          
         }
        
@@ -314,14 +307,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         [Button(createInitialMappingLabel,ButtonSizes.Small)]
         [ButtonGroup(mappingButtonGroup)]
+        // TODO: Move into other class? CandidateRecommendation or ReflexionGraph class?
         public void CreateInitialMapping()
         {
             Dictionary<Node, HashSet<Node>> initialMapping;
-            UnityEngine.Debug.Log($"Create Initial mapping with seed {initialMappingSeed}");
+            UnityEngine.Debug.Log($"Create Initial mapping with seed {mappingConfig.InitialMappingPercentage}");
             lock (visualizedReflexionGraphLock)
             {
-                 initialMapping = CandidateRecommendation.Statistics.CreateInitialMapping(initialMappingPercentage,
-                                                                                          initialMappingSeed,
+                 initialMapping = CandidateRecommendation.Statistics.CreateInitialMapping(mappingConfig.InitialMappingPercentage,
+                                                                                          mappingConfig.MasterSeed,
                                                                                           reflexionGraphViz); 
             }
             foreach (Node cluster in initialMapping.Keys)
@@ -336,6 +330,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         [Button(resetMappingLabel, ButtonSizes.Small)]
         [ButtonGroup(mappingButtonGroup)]
+        // TODO: Move into other class? CandidateRecommendation or ReflexionGraph class?
         public void ResetMapping()
         {
             // TODO: Implement this within the reflexion graph itself?

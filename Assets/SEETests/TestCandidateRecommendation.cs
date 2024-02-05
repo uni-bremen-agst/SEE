@@ -71,7 +71,12 @@ namespace SEE.Tools.Architecture
         private void SetupCandidateRecommendation()
         {
             candidateRecommendation = new CandidateRecommendation();
-            candidateRecommendation.UpdateConfiguration(graph, AttractFunction.AttractFunctionType.CountAttract, "Class");
+            MappingExperimentConfig config = new MappingExperimentConfig();
+            CountAttractConfig attractConfig = new CountAttractConfig();
+            attractConfig.CandidateType = "Class";
+            attractConfig.ClusterType = "Cluster";
+            config.AttractFunctionConfig = attractConfig;
+            candidateRecommendation.UpdateConfiguration(graph, config);
             graph.Subscribe(candidateRecommendation);
         }
 

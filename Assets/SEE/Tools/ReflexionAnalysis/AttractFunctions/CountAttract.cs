@@ -1,4 +1,5 @@
-﻿using SEE.DataModel;
+﻿using Crosstales.RTVoice.Util;
+using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
 using System;
@@ -10,9 +11,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
     public class CountAttract : AttractFunction
     {
         // TODO: Implementation of delta
-        private float delta;
-
-        private float phi;
+        private CountAttractConfig config;
 
         private Dictionary<string, double> overallValues;
 
@@ -21,19 +20,18 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <summary>
         /// 
         /// </summary>
-        public float Phi { get => phi; set => phi = value; }
+        public float Phi { get => config.Phi; set => config.Phi = value; }
 
-        public CountAttract(ReflexionGraph graph, string candidateType) : base(graph, candidateType)
+        public CountAttract(ReflexionGraph graph, CountAttractConfig config) : base(graph, config)
         {
+            this.config = config;
             overallValues = new Dictionary<string, double>();
             mappingCount = new Dictionary<string, int>();
-            delta = 0;
-            Phi = 1f;
         }
 
         public override double GetAttractionValue(Node candidateNode, Node cluster)
         {
-            if (!candidateNode.Type.Equals(candidateType)) return 0;
+            if (!candidateNode.Type.Equals(this.CandidateType)) return 0;
             if (overallValues.TryGetValue(candidateNode.ID, out double overall))
             {
                 double toOthers = GetToOthersValue(candidateNode, cluster);

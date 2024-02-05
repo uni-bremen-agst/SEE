@@ -4,28 +4,18 @@ using SEE.Tools.ReflexionAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using SEE.UI.Window.CodeWindow;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
-    public class NBAttract : LanguageProcessingAttractFunction
+    public class NBAttract : LanguageAttract
     {
-        ITextClassifier naiveBayes;
+        private ITextClassifier naiveBayes;
 
-        bool useCda;
+        private new NBAttractConfig config;
 
-        bool useStandardTerms;
-
-        public NBAttract(ReflexionGraph reflexionGraph, 
-                        string candidateType,
-                        bool useStandardTerms,
-                        TokenLanguage targetLanguage,
-                        bool useCda
-                        ) : base(reflexionGraph, candidateType, targetLanguage)
+        public NBAttract(ReflexionGraph reflexionGraph, NBAttractConfig config) : base(reflexionGraph, config)
         {
             this.naiveBayes = new NaiveBayesAccord();   
-            this.useCda = useCda;
-            this.useStandardTerms = useStandardTerms;     
         }
 
         public override string DumpTrainingData()
@@ -56,7 +46,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         {
             Document doc = new Document();
 
-            if (this.useStandardTerms)
+            if (this.config.UseStandardTerms)
             {
                 this.AddStandardTerms(candidate, doc);
                 this.AddWordsOfAscendants(candidate, doc);
@@ -64,7 +54,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             Dictionary<string, Document> docCdaTerms = new Dictionary<string, Document>();
 
-            if (this.useCda)
+            if (this.config.UseCDA)
             {
                 this.reflexionGraph.AddToMappingSilent(cluster, candidate);
                 this.CreateCdaTerms(cluster, candidate, docCdaTerms);    
@@ -95,13 +85,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         {
             foreach(Node nodeChangedInMapping in nodesChangedInMapping)
             {
-                if (!nodeChangedInMapping.Type.Equals(candidateType)) continue;
+                if (!nodeChangedInMapping.Type.Equals(this.CandidateType)) continue;
 
                 Document docStandardTerms = new Document();
-                if(useStandardTerms) this.AddStandardTerms(nodeChangedInMapping, docStandardTerms);
+                if(this.config.UseStandardTerms) this.AddStandardTerms(nodeChangedInMapping, docStandardTerms);
 
                 Dictionary<string, Document> docCdaTerms = new Dictionary<string, Document>();
-                if (useCda) this.CreateCdaTerms(cluster, nodeChangedInMapping, docCdaTerms);
+                if (this.config.UseCDA) this.CreateCdaTerms(cluster, nodeChangedInMapping, docCdaTerms);
 
                 if(changeType == ChangeType.Addition)
                 {

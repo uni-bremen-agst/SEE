@@ -176,8 +176,8 @@ namespace SEE.Game.City
                     candidateRecommendationViz.OracleMapping = oracleMappingGraph;
                     LoadedGraph.Subscribe(candidateRecommendationViz);
                     Debug.Log("Registered CandidateRecommendation.");
+                    candidateRecommendationViz.UpdateConfiguration();
                 }
-                candidateRecommendationViz.UpdateConfiguration();
                 Debug.Log("Initialized Reflexion Analysis.\n");
             }
 

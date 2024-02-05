@@ -9,18 +9,18 @@ using System.Text;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
-    public class ADCAttract : LanguageProcessingAttractFunction
+    public class ADCAttract : LanguageAttract
     {
-        Dictionary<string, Document> wordsPerDependency = new Dictionary<string, Document>();
+        private Dictionary<string, Document> wordsPerDependency = new Dictionary<string, Document>();
 
-        HashSet<string> propagatedEdges = new HashSet<string>();
+        private HashSet<string> propagatedEdges = new HashSet<string>();
 
-        Document.DocumentMergingType mergingType = Document.DocumentMergingType.Union;
+        private new ADCAttractConfig config;
 
-        public ADCAttract(ReflexionGraph reflexionGraph,
-                            string targetType,
-                            TokenLanguage tokenLanguage) : base(reflexionGraph, targetType, tokenLanguage)
-        {
+        public ADCAttract(ReflexionGraph reflexionGraph, ADCAttractConfig config) : base(reflexionGraph, config)
+        {   
+            // TODO: Copy values from config?
+            this.config = config;
         }
 
         public override string DumpTrainingData()
@@ -85,7 +85,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                         Document documentTarget = new Document();
                         this.AddStandardTerms(edge.Source, documentSource);
                         this.AddStandardTerms(edge.Target, documentTarget);
-                        Document mergedDocument = documentSource.MergeDocuments(documentTarget, mergingType);
+                        Document mergedDocument = documentSource.MergeDocuments(documentTarget, config.MergingType);
                         attraction += Math.Abs(architectureEdgeDoc.CosineSimilarity(mergedDocument));
                     }
                 }
@@ -150,7 +150,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
                 this.propagatedEdges.Add(implEdge.ID);
 
-                Document mergedDocument = GetDocumentOfImplEdge(implEdge, mergingType);
+                Document mergedDocument = GetDocumentOfImplEdge(implEdge, config.MergingType);
 
                 if (!wordsPerDependency.ContainsKey(id))
                 {
@@ -187,7 +187,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             }
             return architectureId;
         }
-
 
         /// <summary>
         /// This method removes the documents of an architecture edge corresponding to a propagated implementation edge.
@@ -229,7 +228,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
                 this.propagatedEdges.Remove(implEdge.ID);
 
-                Document mergedDocument = GetDocumentOfImplEdge(implEdge, mergingType);
+                Document mergedDocument = GetDocumentOfImplEdge(implEdge, config.MergingType);
 
                 if (wordsPerDependency.ContainsKey(id))
                 {

@@ -34,16 +34,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// 
         /// </summary>
-        private string candidateType;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private string clusterType = "Cluster";
-
-        /// <summary>
-        /// 
-        /// </summary>
         private string recommendationEdgeType = "Recommended With";
 
         /// <summary>
@@ -74,42 +64,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         private IDisposable subscription;
 
-        /// <summary>
-        /// TODO: integrate into configuration
-        /// </summary>
-        public bool UseCDA
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private AttractFunctionType? attractFunctionType;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public AttractFunctionType? AttractFunctionType
-        {
-            get => attractFunctionType;
-        }
-
         public ReflexionGraph ReflexionGraph
         {
             get => reflexionGraph;
         }
-
-        public string CandidateType
-        {
-            get => candidateType;
-        }
-
-        public string ClusterType
-        {
-            get => clusterType;
-        } 
 
         public CandidateRecommendationStatistics Statistics { get; private set; }
 
@@ -187,16 +145,22 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         }
 
         public void UpdateConfiguration(ReflexionGraph reflexionGraph, 
-                                        AttractFunctionType? attractFunctionType, 
-                                        string candidateType)
+                                        MappingExperimentConfig config,
+                                        Graph oracleMapping = null)
         {
+            if (reflexionGraph == null)
+            {
+                throw new Exception("Could not update configuration. Reflexion graph is null.");
+            }
+
             this.reflexionGraph = reflexionGraph;
-            this.attractFunctionType = attractFunctionType;
-            this.candidateType = candidateType;
-            if (reflexionGraph == null || candidateType == null || attractFunctionType == null) return;
-            attractFunction = AttractFunction.Create((AttractFunctionType)attractFunctionType, 
-                                                      reflexionGraph, 
-                                                      CandidateType);
+            
+            if(config.AttractFunctionConfig == null)
+            {
+                throw new Exception("Could not update configuration. Attract function config is null");
+            }
+
+            attractFunction = AttractFunction.Create(config.AttractFunctionConfig, reflexionGraph);
 
             subscription?.Dispose();
             subscription = reflexionGraph.Subscribe(this);
@@ -205,13 +169,16 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             bool wasActive = Statistics.Active;
             Statistics.Reset();
             Statistics.SetCandidateRecommendation(this);
+            Statistics.SetOracleMapping(oracleMapping);
             recommendations.Clear();
             mappingPairs.Clear();
             ReflexionGraph.RunAnalysis();
 
+
             // Restart after the analysis was run, so initially/already
             // mapped candidates will not recorded twice
-            if(wasActive) Statistics.StartRecording();
+            // TODO: Does the CsvFile really have to be public?
+            if(wasActive) Statistics.StartRecording(Statistics.CsvFile);
         }
 
         public void OnCompleted()
@@ -228,7 +195,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         {
             if (value is EdgeEvent edgeEvent && edgeEvent.Affected == ReflexionSubgraphs.Mapping)
             {
-                // Debug.Log("Handle Change in Mapping... " + edgeEvent.ToString());
+                // Debug.Log($"In Recommendations: Handle Change in Mapping... {edgeEvent.ToString()} sender: {edgeEvent.Sender}");
 
                 // TODO: is this safe?
                 if (edgeEvent.Change == null) return;
@@ -236,7 +203,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 // Get targeted childs of currently mapped node
                 List<Node> nodesChangedInMapping = new List<Node>();
                 edgeEvent.Edge.Source.GetTargetedChilds(nodesChangedInMapping, 
-                                   node => node.Type.Equals(candidateType) && node.IsInImplementation());
+                                   node => node.Type.Equals(attractFunction.CandidateType) && node.IsInImplementation());
 
                 if (Statistics.Active)
                 {
@@ -268,12 +235,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         private List<Node> GetCandidates()
         {
-            return reflexionGraph.Nodes().Where(n => n.Type.Equals(CandidateType) && n.IsInImplementation()).ToList();
+            return reflexionGraph.Nodes().Where(n => n.Type.Equals(attractFunction.CandidateType) && n.IsInImplementation()).ToList();
         }
 
         private List<Node> GetCluster()
         {
-            return reflexionGraph.Nodes().Where(n => n.Type.Equals(ClusterType) && n.IsInArchitecture()).ToList();
+            return reflexionGraph.Nodes().Where(n => n.Type.Equals(attractFunction.ClusterType) && n.IsInArchitecture()).ToList();
         }
 
         private void UpdateRecommendations()

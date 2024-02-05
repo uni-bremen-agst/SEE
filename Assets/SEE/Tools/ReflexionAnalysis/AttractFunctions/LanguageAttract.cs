@@ -12,17 +12,18 @@ using UnityEngine;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
-    public abstract class LanguageProcessingAttractFunction : AttractFunction
+    public abstract class LanguageAttract : AttractFunction
     {
         private Dictionary<string, Document> cachedStandardTerms = new Dictionary<string, Document>();
 
-        public TokenLanguage TargetLanguage { get; set; }
+        public TokenLanguage TargetLanguage { get => config.TargetLanguage; set => config.TargetLanguage = value; }
 
-        protected LanguageProcessingAttractFunction(ReflexionGraph reflexionGraph, 
-                                                    string targetType, 
-                                                    TokenLanguage targetLanguage) : base(reflexionGraph, targetType)
+        public LanguageAttractConfig config;
+
+        protected LanguageAttract(ReflexionGraph reflexionGraph, 
+                                                    LanguageAttractConfig config) : base(reflexionGraph, config)
         {
-            TargetLanguage = targetLanguage;
+            this.config = config;
         }
 
         protected void CreateCdaTerms(Node cluster, Node nodeChangedInMapping, Dictionary<string, Document> documents)

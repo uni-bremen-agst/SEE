@@ -30,12 +30,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// </summary>
         private int numberMappedPairs;
 
-        private int seed;
-
         /// <summary>
         /// 
         /// </summary>
-        public FilePath CsvPath { get; set; }
+        private int seed;
+
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        public string CsvFile { get; set; }
 
         /// <summary>
         /// 
@@ -83,7 +86,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         public void SetCandidateRecommendation(CandidateRecommendation candidateRecommendation)
         {
             ReflexionGraph = candidateRecommendation.ReflexionGraph;
-            CandidateType = candidateRecommendation.CandidateType;
+            CandidateType = candidateRecommendation.AttractFunction.CandidateType;
             Reset();
         }
 
@@ -107,11 +110,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             Dictionary<Node, HashSet<Node>> initialMapping = new Dictionary<Node, HashSet<Node>>();
             if (percentage > 1 || percentage < 0) throw new Exception("Parameter percentage have to be a double value between 0.0 and 1.0");
             if (OracleGraph == null) throw new Exception("No OracleGraph loaded. Cannot generate initial mapping.");
-            if (ReflexionGraph == null) throw new Exception("No ReflexionGraph loaded. Cannot generate initial mapping.");
+            if (reflexionGraph == null) throw new Exception("No ReflexionGraph loaded. Cannot generate initial mapping.");
 
             List<Node> implementationNodes = reflexionGraph.Nodes().Where(n => n.IsInImplementation() 
                                                                           && n.Type.Equals(CandidateType)).ToList();
 
+            // TODO: Solve the setting of seed. Is it necessary to have the field within the statistic object?
             this.seed = seed;
             Random rand = new Random(seed);
 
@@ -211,7 +215,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             mappingProcess.Clear();
             mappingStep = 0;
             numberMappedPairs = 0;
-            File.AppendAllText(CsvPath.Path, csv);
+
+            File.AppendAllText(CsvFile, csv);
         }
 
         public void ProcessMappingData(string csvFile, string xmlFile)
@@ -222,6 +227,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 UnityEngine.Debug.LogWarning($"No Data found to be processed. File {csvFile} is not existing.");
                 return;
             }
+
             CreateCandidateResults(csvFile);
             CreateXml(results.Values.ToList(), xmlFile);
         }
@@ -384,21 +390,35 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
         }
 
-        public void StartRecording()
+        public void StartRecording(string csvFile)
         {
             if (Active) return;
+
             this.Reset();
+
             if(this.OracleGraph == null)
             {
                 // TODO: Is it really necessary to have the Oracle Graph selected during starting?
                 UnityEngine.Debug.LogWarning("No OracleGraph selected. No Data will be saved.");
                 return;
             }
-            if (File.Exists(CsvPath.Path))
+
+            try
             {
-                File.Delete(CsvPath.Path);
-                File.Create(CsvPath.Path).Close();
+                if (File.Exists(csvFile))
+                {
+                    File.Delete(csvFile);
+                    File.Create(csvFile).Close();
+                }
             }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.LogError($"Error occured while creating the output file for the mapping statistics. {e}");
+                return;
+            }
+
+            this.CsvFile = csvFile;
+
             IEnumerable<Node> implementationNodes = OracleGraph.Nodes().Where(n => n.IsInImplementation()
                                                                             && n.Type.Equals(CandidateType));
             foreach (Node node in implementationNodes)
