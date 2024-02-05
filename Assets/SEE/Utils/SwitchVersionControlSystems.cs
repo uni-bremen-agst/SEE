@@ -18,7 +18,6 @@ public class SwitchVersionControlSystems
         return system.ToLower() switch
         {
             "git" => new VersionControlSystems.GitVersionControl(),
-            "svn" => new VersionControlSystems.SvnVersionControl(),
             // Add cases for other version control systems
             _ => throw new ArgumentException("Unsupported version control system", nameof(system)),
         };

@@ -20,8 +20,11 @@ public class VersionControlSystems : MonoBehaviour
         private string name = null;
 
         /// <summary>
-        /// Returns the source code from the revision being compared against.
+        /// Returns the source code from the revision being compared against (<see cref="commitID">).
         /// </summary>
+        /// <param name="repositoryPath">The repository, which contains the commit.</param>
+        /// <param name="fileName">The file, which contains the content.</param>
+        /// <param name="commitID">The commit being compared against.</param>
         /// <returns>the source code from the revision being compared against.</returns>
         public string Show(string repositoryPath, string fileName, string commitID)
         {
@@ -41,8 +44,12 @@ public class VersionControlSystems : MonoBehaviour
         }
 
         /// <summary>
-        /// Returns the source code from the revision, that gets compared.
+        /// Returns the source code from the <see cref="newCommitID"> that gets compared against the <see cref="oldCommitID">.
         /// </summary>
+        /// <param name="repositoryPath">The repository, which contains the commit.</param>
+        /// <param name="fileName">The file, which contains the content.</param>
+        /// <param name="oldCommitID">The commit being compared against.</param>
+        /// <param name="newCommitID">The commit that gets compared.</param>
         /// <returns>the source code from the revision, that gets compared.</returns>
         public string ShowOriginal(string repositoryPath, string fileName, string oldCommitID, string newCommitID)
         {
@@ -60,7 +67,7 @@ public class VersionControlSystems : MonoBehaviour
             };
 
             // Compare the commits
-            var changes = repo.Diff.Compare<TreeChanges>(oldCommit.Tree, newCommit.Tree, compareOptions)
+            TreeChanges changes = (TreeChanges)repo.Diff.Compare<TreeChanges>(oldCommit.Tree, newCommit.Tree, compareOptions)
                 .Where(change => (change.Path == fileName || change.OldPath == fileName));
 
             foreach (TreeEntryChanges change in changes)
@@ -69,10 +76,10 @@ public class VersionControlSystems : MonoBehaviour
                 if ((change.Status == ChangeKind.Renamed || change.Status == ChangeKind.Copied) &&
                     (change.Path == fileName || change.OldPath == fileName))
                 {
-                    // Change the filename in the codewindow.
+                    // Change the filename.
                     name = change.Path;
                     // Get renamed file from commit.
-                    var renamedBlob = newCommit[change.Path]?.Target as Blob;
+                    Blob renamedBlob = newCommit[change.Path]?.Target as Blob;
                     if (renamedBlob != null)
                     {
                         return renamedBlob.GetContentText();
@@ -81,7 +88,7 @@ public class VersionControlSystems : MonoBehaviour
                 // Case: File got deleted.
                 if (change.Status == ChangeKind.Deleted && change.Path == fileName)
                 {
-                    // Mark filename in the codewindow as deleted.
+                    // Mark filename as deleted.
                     name = fileName;
                     return "";
                 }
@@ -102,43 +109,4 @@ public class VersionControlSystems : MonoBehaviour
             return name;
         }
     }
-        /// <summary>
-        /// Implements the functionality of IVersionControl for SVN.
-        /// </summary>
-        public class SvnVersionControl : IVersionControl
-        {
-            /// <summary>
-            /// Returns the source code from the revision being compared against.
-            /// </summary>
-            /// <returns>the source code from the revision being compared against.</returns>
-            public string Show(string repositoryPath, string fileName, string oldCommitID)
-            {
-                // Implement SVN-specific logic here
-                // Maybe use SharpSvn
-                return $"SVN show {fileName}";
-            }
-
-            /// <summary>
-            /// Returns the source code from the revision, that gets compared.
-            /// </summary>
-            /// <returns>the source code from the revision, that gets compared.</returns>
-            public string ShowOriginal(string repositoryPath, string fileName, string oldCommitID, string newCommitID)
-            {
-                // Implement SVN-specific logic here
-                // Maybe use SharpSvn
-                return $"SVN show {fileName}";
-            }
-
-            /// <summary>
-            /// Returns the updated filename.
-            /// When a renaming took place, the new name gets returned.
-            /// When a file got deleted, the original filename gets returned.
-            /// Otherwise null gets returned.
-            /// </summary>
-            /// <returns>the updated filename</returns>
-            public string ShowName() { return null; }
-        }
-
-        // Add more version control classes as needed
-
 }
