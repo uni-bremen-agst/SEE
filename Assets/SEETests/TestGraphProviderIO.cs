@@ -154,7 +154,6 @@ namespace SEE.GraphProviders
         {
             ReflexionGraphProvider saved = GetReflexionProvider();
             Save(saved);
-            Print();
             AreEqualReflexionGraphProviders(saved, Load());
         }
 
@@ -189,17 +188,6 @@ namespace SEE.GraphProviders
         {
             using ConfigWriter writer = new(filename);
             saved.Save(writer, providerLabel);
-        }
-
-        private void Print()
-        {
-            if (!string.IsNullOrWhiteSpace(filename) && File.Exists(filename))
-            {
-                foreach (string line in File.ReadAllLines(filename))
-                {
-                    Debug.Log(line);
-                }
-            }
         }
     }
 }

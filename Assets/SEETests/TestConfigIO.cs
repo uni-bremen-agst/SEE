@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.IO;
 using NUnit.Framework;
 using SEE.Game;
@@ -428,8 +430,11 @@ namespace SEE.Utils
                 savedCity.NodeTypes = new NodeTypeVisualsMap();
                 savedCity.NodeTypes["Function"] = function;
                 savedCity.NodeTypes["File"] = file;
+                CSVGraphProvider csvProvider = new();
+                csvProvider.Path.AbsolutePath = "mydir/myfile.csv";
+                savedCity.DataProvider.Add(csvProvider);
                 savedCity.Save(filename);
-
+                Print(filename);
                 // Create a new city with all its default values and then
                 // wipe out all its attributes to see whether they are correctly
                 // restored from the saved configuration file.
@@ -792,7 +797,7 @@ namespace SEE.Utils
         private static void WipeOutSEECityAttributes(SEECity city)
         {
             WipeOutAbstractSEECityAttributes(city);
-            city.DataProvider = new CSVGraphProvider();
+            city.DataProvider = new PipelineGraphProvider();
         }
 
         /// <summary>
