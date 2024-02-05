@@ -11,11 +11,15 @@ using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SEE.UI.Window.ConsoleWindow
 {
     public class ConsoleWindow : BaseWindow
     {
+        public event UnityAction<string> OnInputSubmit;
+        public event UnityAction<string> OnInputChanged;
+
         private const string windowPrefab = "Prefabs/UI/ConsoleWindow/ConsoleView";
         private const string itemPrefab = "Prefabs/UI/ConsoleWindow/ConsoleViewItem";
         /// <summary>
@@ -42,29 +46,44 @@ namespace SEE.UI.Window.ConsoleWindow
         private ButtonManagerBasic searchOptionsButton;
         private ButtonManagerBasic filterButton;
         private ButtonManagerBasic clearButton;
+        private TMP_InputField inputField;
 
         private bool matchCase = true;
         private bool fullMatch = false;
-        private Dictionary<MessageSource, Dictionary<MessageLevel, bool>> showSourceWithLevel = new() {
-            {MessageSource.Adapter, new() {
-                {MessageLevel.Log, false },
-                {MessageLevel.Warning, true },
-                {MessageLevel.Error, true },
-            }},
-            {MessageSource.Debugee, new() {
-                {MessageLevel.Log, true },
-                {MessageLevel.Warning, true },
-                {MessageLevel.Error, true },
-            }}
-        };
 
-        public void AddMessage(string text, MessageSource source = MessageSource.Adapter, MessageLevel level = MessageLevel.Log)
+        private Dictionary<string, Channel> channels = new() {};
+
+        public void AddChannel(string channel, char icon)
         {
+            channels[channel] = new Channel(channel, icon);
+        }
+
+        public void AddChannelLevel(string channel, string level, Color color)
+        {
+            channels[channel].Levels[level] = new(level, color, true);
+        }
+
+        public void SetChannelLevelEnabled(string channel, string level, bool enabled)
+        {
+            if (channels.TryGetValue(channel, out Channel c)) {
+                if (c.Levels.TryGetValue(level, out ChannelLevel l))
+                {
+                    l.enabled = enabled;
+                    if (HasStarted) UpdateFilters();
+                }
+            }
+        }
+
+        public void AddMessage(string text, string channel = null, string level = null)
+        {
+            channel ??= channels.First().Key;
+            level ??= channels.First().Value.Levels.First().Key;
+
             text = text.Replace("\t", tabReplacement);
-            int appendTo = AppendTo(source, level);
+            int appendTo = AppendTo(channel, level);
             if (appendTo == -1)
             {
-                messages.Add(new(text, source, level));
+                messages.Add(new(channel, level, text));
                 messageAdded = true;
             } else
             {
@@ -73,12 +92,12 @@ namespace SEE.UI.Window.ConsoleWindow
             }
         }
 
-        private int AppendTo(MessageSource source, MessageLevel level)
+        private int AppendTo(string channel, string level)
         {
             for (int i=messages.Count-1; i>=0; i--)
             {
                 Message message = messages[i];
-                if (message.Source == source && message.Level == level)
+                if (message.Channel == channel && message.Level == level)
                 {
                     if (!message.Text.EndsWith('\n'))
                     {
@@ -98,7 +117,7 @@ namespace SEE.UI.Window.ConsoleWindow
 
         protected override void Start()
         {
-            Title = "Console";
+            Title ??= "Console";
             base.Start();
         }
 
@@ -107,6 +126,10 @@ namespace SEE.UI.Window.ConsoleWindow
             base.StartDesktop();
             Transform root = PrefabInstantiator.InstantiatePrefab(windowPrefab, Window.transform.Find("Content"), false).transform;
             items = (RectTransform)root.Find("Content/Items");
+            foreach (Transform child in items)
+            {
+                Destroyer.Destroy(child.gameObject);
+            }
 
             searchField = root.Find("Search/SearchField").gameObject.MustGetComponent<TMP_InputField>();
             searchField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
@@ -124,13 +147,17 @@ namespace SEE.UI.Window.ConsoleWindow
             clearButton = root.Find("Search/Clear").gameObject.MustGetComponent<ButtonManagerBasic>();
             clearButton.clickEvent.AddListener(ClearMessages);
 
-            OnComponentInitialized += () =>
+            inputField = root.Find("InputField").gameObject.MustGetComponent<TMP_InputField>();
+            inputField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
+            inputField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
+            inputField.onValueChanged.AddListener(text => OnInputChanged?.Invoke(text));
+            inputField.onSubmit.AddListener(text => OnInputSubmit?.Invoke(text));
+            inputField.onSubmit.AddListener(_ =>
             {
-                foreach (Transform child in items)
-                {
-                    Destroyer.Destroy(child.gameObject);
-                }
-            };
+                inputField.DeactivateInputField();
+                inputField.text = "";
+                inputField.ActivateInputField();
+            });
         }
 
         protected override void Update()
@@ -167,26 +194,17 @@ namespace SEE.UI.Window.ConsoleWindow
         {
             GameObject item = PrefabInstantiator.InstantiatePrefab(itemPrefab, items, false);
 
-            var color = message.Level switch
-            {
-                MessageLevel.Error => Color.red.Lighter(),
-                MessageLevel.Warning => Color.yellow.Lighter(),
-                MessageLevel.Log => Color.gray.Lighter(),
-                _ => Color.white
-            };
+            Channel channel = channels.ContainsKey(message.Channel) ? channels[message.Channel] : null;
+            Color color = channel?.Levels[message.Level].Color ?? Color.white;
+            char icon = channel?.Icon ?? '\u003f';
 
             TextMeshProUGUI textMesh = item.transform.Find("Foreground/Text").gameObject.MustGetComponent<TextMeshProUGUI>();
             textMesh.text = message.Text;
             textMesh.color = color.IdealTextColor();
 
             TextMeshProUGUI iconMesh = item.transform.Find("Foreground/Type Icon").gameObject.MustGetComponent<TextMeshProUGUI>();
-            iconMesh.text = message.Source switch
-            {
-                MessageSource.Adapter => "\uf188",
-                MessageSource.Debugee => "\uf135",
-                _ => ""
-            };
-            iconMesh.color = color.IdealTextColor().Lighter();
+            iconMesh.text = icon.ToString();
+            iconMesh.color = color.IdealTextColor();
 
             item.transform.Find("Background").GetComponent<UIGradient>().EffectGradient.SetKeys(
                 new Color[] { color, color.Darker(0.3f) }.ToGradientColorKeys().ToArray(), 
@@ -225,7 +243,7 @@ namespace SEE.UI.Window.ConsoleWindow
             {
                 item.SetActive(false);
             }
-            if (!showSourceWithLevel[message.Source][message.Level])
+            if (!channels[message.Channel].Levels[message.Level].enabled)
             {
                 item.SetActive(false);
             }
@@ -259,17 +277,17 @@ namespace SEE.UI.Window.ConsoleWindow
         {
             popupMenu.ClearEntries();
 
-            foreach (var source in showSourceWithLevel)
+            foreach (Channel channel in channels.Values)
             {
-                popupMenu.AddEntry(new PopupMenuHeading(source.Key.ToString()));
-                foreach (var level in source.Value)
+                popupMenu.AddEntry(new PopupMenuHeading(channel.Name));
+                foreach (ChannelLevel level in channel.Levels.Values)
                 {
-                    popupMenu.AddEntry(new PopupMenuAction(level.Key.ToString(), () =>
+                    popupMenu.AddEntry(new PopupMenuAction(level.Name, () =>
                     {
-                        showSourceWithLevel[source.Key][level.Key] = !level.Value;
+                        level.enabled = !level.enabled;
                         UpdateFilters();
                         ShowFilterPopup(true);
-                    }, level.Value ? Icons.CheckedCheckbox : Icons.EmptyCheckbox, false));
+                    }, level.enabled ? Icons.CheckedCheckbox : Icons.EmptyCheckbox, false));
                 }
             }
             if (!refresh)
@@ -300,31 +318,44 @@ namespace SEE.UI.Window.ConsoleWindow
 
         private class Message
         {
+            public readonly string Channel;
+            public readonly string Level;
             public string Text;
-            public MessageSource Source;
-            public MessageLevel Level;
-            public Message(string text, MessageSource source, MessageLevel level)
+
+            public Message(string channel, string level, string text)
             {
-                this.Text = text;
-                this.Source = source;
-                this.Level = level;
+                Channel = channel;
+                Level = level;
+                Text = text;
             }
-
-
         }
-        public enum MessageLevel
+
+        private class Channel
         {
-            Log = 0,
-            Warning = 1,
-            Error = 2,
+            public readonly string Name;
+            public readonly char Icon;
+            public readonly Dictionary<string, ChannelLevel> Levels;
+
+            public Channel(string name, char icon)
+            {
+                this.Name = name;
+                this.Icon = icon;
+                this.Levels = new();
+            }
         }
 
-        public enum MessageSource
+        private class ChannelLevel
         {
-            Adapter,
-            Debugee
+            public readonly string Name;
+            public readonly Color Color;
+            public bool enabled;
+
+            public ChannelLevel(string name, Color color, bool enabled)
+            {
+                this.Name = name;
+                this.Color = color;
+                this.enabled = enabled;
+            }
         }
-
-
     }
 }
