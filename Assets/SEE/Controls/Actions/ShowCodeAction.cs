@@ -12,6 +12,7 @@ using System;
 using SEE.UI.Window;
 using SEE.Utils.History;
 using SEE.Game.City;
+using SEE.VCS;
 
 namespace SEE.Controls.Actions
 {

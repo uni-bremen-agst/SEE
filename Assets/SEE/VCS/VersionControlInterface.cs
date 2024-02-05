@@ -1,8 +1,10 @@
-/// <summary>
-/// The interface for the version control systems, which holds
-/// the methods every version control system that we use must implement.
-/// </summary>
-public interface IVersionControl
+namespace SEE.VCS
+{
+    /// <summary>
+    /// The interface for the version control systems, which holds
+    /// the methods every version control system that we use must implement.
+    /// </summary>
+    public interface IVersionControl
     {
         /// <summary>
         /// Returns the source code from the revision being compared against.
@@ -33,4 +35,4 @@ public interface IVersionControl
         string ShowName();
         // Add other version control operations as needed
     }
-
+}
