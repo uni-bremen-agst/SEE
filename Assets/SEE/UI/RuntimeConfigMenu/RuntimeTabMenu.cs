@@ -23,6 +23,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
+using SEE.GraphProviders;
 
 namespace SEE.UI.RuntimeConfigMenu
 {
@@ -220,6 +221,10 @@ namespace SEE.UI.RuntimeConfigMenu
         private void SetupMenu()
         {
             // creates the widgets for fields
+
+            // For all *public* fields of city annotated by RuntimeTab.
+            // Note that Type.GetMember yields only public members.
+            // A member can be a field, property, method, event, or other things.
             IOrderedEnumerable<MemberInfo> members = city.GetType().GetMembers().Where(IsCityAttribute).OrderBy(HasTabAttribute).ThenBy(GetTabName).ThenBy(SortIsNotNested);
             members.ForEach(memberInfo => CreateSetting(memberInfo, null, city));
             SelectEntry(Entries.First());
@@ -236,10 +241,15 @@ namespace SEE.UI.RuntimeConfigMenu
             string GetTabName(MemberInfo memberInfo) =>
                 memberInfo.GetCustomAttributes().OfType<RuntimeTabAttribute>().FirstOrDefault()?.Name;
 
+            // True if memberInfo is declared in a class that is or derives from AbstractSEECity;
+            // this is to ignore fields in AbstractSEECity that are inherited from classes from which
+            // AbstractSEECity derives.
+            // Note: A MemberInfo can be a field, property, method, event and other things.
             bool IsCityAttribute(MemberInfo memberInfo) =>
                 memberInfo.DeclaringType == typeof(AbstractSEECity) ||
                 memberInfo.DeclaringType!.IsSubclassOf(typeof(AbstractSEECity));
 
+            // True if memberInfo has a RuntimeTab annotation.
             bool HasTabAttribute(MemberInfo memberInfo) =>
                 !memberInfo.GetCustomAttributes().Any(a => a is RuntimeTabAttribute);
 
@@ -553,6 +563,14 @@ namespace SEE.UI.RuntimeConfigMenu
                                   attributeArray);
                     break;
 
+                case PipelineGraphProvider:
+                    FieldInfo pipeline = value.GetType().GetField("Pipeline")!;
+                    CreateSetting(() => pipeline.GetValue(value),
+                                  settingName,
+                                  parent,
+                                  null,
+                                  attributeArray);
+                    break;
                 // types that shouldn't be in the configuration menu
                 case Graph:
                     break;
@@ -567,6 +585,10 @@ namespace SEE.UI.RuntimeConfigMenu
                     OnUpdateMenuValues += () => UpdateDictChildren(parent, dict);
                     break;
                 case IList<string> list:
+                    parent = CreateNestedSetting(settingName, parent);
+                    CreateList(list, parent);
+                    break;
+                case List<GraphProvider> providerList:
                     parent = CreateNestedSetting(settingName, parent);
                     CreateList(list, parent);
                     break;

@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.City;
+using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils.Config;
 using UnityEngine;
 
@@ -13,17 +14,21 @@ namespace SEE.GraphProviders
     /// Reads metrics from the Axivion Dashboard and adds these to a graph.
     /// </summary>
     [Serializable]
-    internal class DashboardGraphProvider: GraphProvider
+    public class DashboardGraphProvider: GraphProvider
     {
         /// <summary>
         /// Whether metrics retrieved from the dashboard shall override existing metrics.
         /// </summary>
+        [Tooltip("Whether metrics retrieved from the dashboard shall override existing metrics."),
+            RuntimeTab(GraphProviderFoldoutGroup)]
         public bool OverrideMetrics = true;
 
         /// <summary>
         /// If empty, all issues will be retrieved. Otherwise, only those issues which have been added from
         /// the given version to the most recent one will be loaded.
         /// </summary>
+        [Tooltip("Version for which to retrieve issues. If empty, all issues are loaded."),
+            RuntimeTab(GraphProviderFoldoutGroup)]
         public string IssuesAddedFromVersion = "";
 
         /// <summary>

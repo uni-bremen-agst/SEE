@@ -1,4 +1,5 @@
 ﻿using SEE.Game.City;
+using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
@@ -14,12 +15,12 @@ namespace SEE.GraphProviders
     /// a single file.
     /// </summary>
     [Serializable]
-    internal abstract class FileBasedGraphProvider : GraphProvider
+    public abstract class FileBasedGraphProvider : GraphProvider
     {
         /// <summary>
         /// The path to the file containing the additional data to be added to a graph.
         /// </summary>
-        [Tooltip("Path to the input file."), HideReferenceObjectPicker]
+        [Tooltip("Path to the input file."), RuntimeTab(GraphProviderFoldoutGroup), HideReferenceObjectPicker]
         public FilePath Path = new();
 
         /// <summary>

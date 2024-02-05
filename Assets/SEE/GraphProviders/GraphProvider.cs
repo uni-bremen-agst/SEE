@@ -13,8 +13,10 @@ namespace SEE.GraphProviders
     /// are responsible for providing a graph based on the input graph by
     /// implementing the method <see cref="ProvideAsync(Graph, AbstractSEECity)"/>.
     /// </summary>
-    internal abstract class GraphProvider
+    public abstract class GraphProvider
     {
+        protected const string GraphProviderFoldoutGroup = "Data";
+
         /// <summary>
         /// Yields a new graph based on the input <paramref name="graph"/>.
         /// The input <paramref name="graph"/> may be empty. Subclasses are free to

@@ -35,8 +35,9 @@ namespace SEE.Game.City
         /// </summary>
         [OdinSerialize, ShowInInspector,
             Tooltip("A graph provider yielding the data to be visualized as code city."),
-            TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
-        internal GraphProvider DataProvider;
+            TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup),
+            HideReferenceObjectPicker]
+        public PipelineGraphProvider DataProvider = new();
 
         /// <summary>
         /// The graph that is visualized in the scene and whose visualization settings are
@@ -522,7 +523,7 @@ namespace SEE.Game.City
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
-            DataProvider = GraphProvider.Restore(attributes, dataProviderPathLabel);
+            DataProvider = GraphProvider.Restore(attributes, dataProviderPathLabel) as PipelineGraphProvider;
         }
         #endregion
     }

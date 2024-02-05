@@ -12,7 +12,7 @@ namespace SEE.GraphProviders
     /// Reads metrics from a CSV file and adds these to a graph.
     /// </summary>
     [Serializable]
-    internal class CSVGraphProvider : FileBasedGraphProvider
+    public class CSVGraphProvider : FileBasedGraphProvider
     {
         /// <summary>
         /// Reads metrics from a CSV file and adds these to <paramref name="graph"/>.

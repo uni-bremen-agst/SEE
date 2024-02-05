@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using Sirenix.OdinInspector;
 
 namespace SEE.GraphProviders
 {
@@ -16,12 +17,13 @@ namespace SEE.GraphProviders
     /// added from a CSV file.
     /// </summary>
     [Serializable]
-    internal class PipelineGraphProvider : GraphProvider
+    public class PipelineGraphProvider : GraphProvider
     {
         /// <summary>
         /// The list of nested providers in this pipeline. These will be executed
         /// from first to last.
         /// </summary>
+        [HideReferenceObjectPicker]
         public List<GraphProvider> Pipeline = new();
 
         /// <summary>
@@ -43,6 +45,12 @@ namespace SEE.GraphProviders
             return await Pipeline.Aggregate(initial,
                                             (current, provider) => current.ContinueWith(g => provider.ProvideAsync(g, city)));
         }
+
+        /// <summary>
+        /// Adds <paramref name="provider"/> at the end of the <see cref="Pipeline"/>.
+        /// </summary>
+        /// <param name="provider">graph provider to be added</param>
+        internal void Add(GraphProvider provider) => Pipeline.Add(provider);
 
         #region Config I/O
 
