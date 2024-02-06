@@ -926,7 +926,7 @@ namespace SEE.UI.RuntimeConfigMenu
             }
         }
 
-        void CreateTypeField(GameObject parent, GraphProvider provider)
+        private void CreateTypeField(GameObject parent, GraphProvider provider)
         {
             string[] graphProviderKinds = GetGraphProviderKinds();
 
