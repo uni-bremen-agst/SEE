@@ -15,6 +15,7 @@ using SEE.Utils.Config;
 using Sirenix.Serialization;
 using SEE.GraphProviders;
 using SEE.UI.Notification;
+using SEE.DataModel.DG.IO;
 
 namespace SEE.Game.City
 {
@@ -313,27 +314,21 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Saves the graph data to the GXL file with GXLPath().
+        /// Saves the graph data to a GXL file.
         /// </summary>
-        /*
-         * FIXME: Do we want to re-active this code? If so, it should query the path from
-         * the user with a file picker.
-         *
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Data")]
         [PropertyOrder(DataButtonsGroupOrderSave)]
+        [EnableIf(nameof(IsGraphLoaded))]
         public virtual void SaveData()
         {
-            if (string.IsNullOrEmpty(GXLPath.Path))
+            string outputFile = Application.streamingAssetsPath + "/output.gxl";
+            if (LoadedGraph != null)
             {
-                Debug.LogError("Empty graph path.\n");
-            }
-            else if (LoadedGraph != null)
-            {
-                GraphWriter.Save(GXLPath.Path, LoadedGraph, HierarchicalEdges.First());
+                GraphWriter.Save(outputFile, LoadedGraph, HierarchicalEdges.First());
+                Debug.Log($"Data was saved to '{outputFile}'.\n");
             }
         }
-        */
 
         /// <summary>
         /// Re-draws the graph without deleting the underlying loaded graph.
