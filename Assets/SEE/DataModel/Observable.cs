@@ -121,7 +121,7 @@ namespace SEE.DataModel
 
         /// <summary>
         /// This method Stops the caching of events. 
-        /// After this method is caclled all subscribed oberservers are notified 
+        /// After this method is called all subscribed oberservers are notified 
         /// about the cached changes.
         /// Postcondition: <see cref="CachingActive"/> is false. 
         ///                <see cref="cachedChanges"/> should be empty.
@@ -145,14 +145,14 @@ namespace SEE.DataModel
         /// <param name="change">information about the change of the state to be passed on to the observers</param>
         protected void Notify(T change)
         {
-            if(CachingActive)
+            if (SuppressNotifications)
             {
-                this.cachedChanges.Add(change);
                 return;
             }
 
-            if (SuppressNotifications)
+            if (CachingActive)
             {
+                this.cachedChanges.Add(change);
                 return;
             }
 
