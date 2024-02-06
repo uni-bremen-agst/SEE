@@ -9,9 +9,9 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
     /// <summary>
     /// This class is the controller of the coordinate system widget.
     /// </summary>
+    /// <remarks>It is attached to the CoordinateSystem.prefab.</remarks>
     internal class CoordinatesController : WidgetController
     {
-
         /// <summary>
         /// The labels on the y axis. The one at index 0 is the lowest, the one at index 5 is the highest.
         /// </summary>
