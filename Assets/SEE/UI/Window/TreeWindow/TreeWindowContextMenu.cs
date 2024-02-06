@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.DataModel.DG;
 using SEE.DataModel.GraphSearch;
 using SEE.Game.City;
@@ -43,17 +43,17 @@ namespace SEE.UI.Window.TreeWindow
         /// <summary>
         /// The button that opens the filter menu.
         /// </summary>
-        private readonly ButtonManagerBasic filterButton;
+        private readonly ButtonManager filterButton;
 
         /// <summary>
         /// The button that opens the sort menu.
         /// </summary>
-        private readonly ButtonManagerBasic sortButton;
+        private readonly ButtonManager sortButton;
 
         /// <summary>
         /// The button that opens the group menu.
         /// </summary>
-        private readonly ButtonManagerBasic groupButton;
+        private readonly ButtonManager groupButton;
 
         /// <summary>
         /// Constructor.
@@ -66,8 +66,8 @@ namespace SEE.UI.Window.TreeWindow
         /// <param name="sortButton">The button that opens the sort menu.</param>
         /// <param name="groupButton">The button that opens the group menu.</param>
         public TreeWindowContextMenu(PopupMenu.PopupMenu contextMenu, GraphSearch searcher, TreeWindowGrouper grouper,
-                                     Action rebuild, ButtonManagerBasic filterButton, ButtonManagerBasic sortButton,
-                                     ButtonManagerBasic groupButton)
+                                     Action rebuild, ButtonManager filterButton, ButtonManager sortButton,
+                                     ButtonManager groupButton)
         {
             this.contextMenu = contextMenu;
             this.searcher = searcher;
@@ -80,9 +80,9 @@ namespace SEE.UI.Window.TreeWindow
             ResetFilter();
             ResetSort();
             ResetGrouping();
-            this.filterButton.clickEvent.AddListener(ShowFilterMenu);
-            this.sortButton.clickEvent.AddListener(ShowSortMenu);
-            this.groupButton.clickEvent.AddListener(ShowGroupMenu);
+            this.filterButton.onClick.AddListener(ShowFilterMenu);
+            this.sortButton.onClick.AddListener(ShowSortMenu);
+            this.groupButton.onClick.AddListener(ShowGroupMenu);
         }
 
         /// <summary>

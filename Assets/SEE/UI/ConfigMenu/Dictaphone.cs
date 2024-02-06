@@ -20,7 +20,7 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Controls;
 using UnityEngine;
 using UnityEngine.UI;
@@ -32,7 +32,7 @@ namespace SEE.UI.ConfigMenu
     /// This is the wrapper script for the dictaphone object that utilizes the
     /// MS Windows speech API to take user input via voice.
     /// </summary>
-    [RequireComponent(typeof(ButtonManagerBasicIcon))]
+    [RequireComponent(typeof(ButtonManager))]
     public class Dictaphone : DynamicUIBehaviour
     {
         /// <summary>
@@ -49,7 +49,7 @@ namespace SEE.UI.ConfigMenu
         /// </summary>
         private static DictationInput dictationInput;
 
-        private ButtonManagerBasicIcon button;
+        private ButtonManager button;
         private Image buttonImage;
 
         private bool currentlyDictating;
@@ -61,7 +61,7 @@ namespace SEE.UI.ConfigMenu
         }
         private void Start()
         {
-            button.clickEvent.AddListener(ToggleDictation);
+            button.onClick.AddListener(ToggleDictation);
             initialColor = buttonImage.color;
         }
         private void ToggleDictation()

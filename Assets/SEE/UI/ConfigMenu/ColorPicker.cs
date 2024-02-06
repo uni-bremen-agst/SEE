@@ -20,7 +20,7 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using System;
 using System.Collections.Generic;
 using TMPro;
@@ -36,7 +36,7 @@ namespace SEE.UI.ConfigMenu
     public class ColorPicker : DynamicUIBehaviour
     {
         private TextMeshProUGUI labelText;
-        private ButtonManagerBasicWithIcon buttonManager;
+        private ButtonManager buttonManager;
 
         private readonly Queue<Color> valueUpdates = new();
 
@@ -79,7 +79,7 @@ namespace SEE.UI.ConfigMenu
             labelText.text = Label;
 
             MustGetComponentInChild("Trigger", out buttonManager);
-            buttonManager.clickEvent.AddListener(() => ColorPickerControl.RequestControl(this));
+            buttonManager.onClick.AddListener(() => ColorPickerControl.RequestControl(this));
 
             HandleQueuedUpdates();
         }

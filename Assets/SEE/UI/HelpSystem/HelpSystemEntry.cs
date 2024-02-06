@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Crosstales.RTVoice;
 using DynamicPanels;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Game.Avatars;
 using SEE.GO;
 using SEE.Utils;
@@ -83,17 +83,17 @@ namespace SEE.UI.HelpSystem
         /// <summary>
         /// The pause or rather the pause/play button which pauses or plays the video, respectively.
         /// </summary>
-        private ButtonManagerBasicIcon pauseButton;
+        private ButtonManager pauseButton;
 
         /// <summary>
         /// The forward-button, which skips a specific time of the video forwards.
         /// </summary>
-        private ButtonManagerBasicIcon forwardButton;
+        private ButtonManager forwardButton;
 
         /// <summary>
         /// The forward-button, which skips a specific time of the video backwards.
         /// </summary>
-        private ButtonManagerBasicIcon backwardButton;
+        private ButtonManager backwardButton;
 
         /// <summary>
         /// The helpSystemEntry-GameObject.
@@ -253,12 +253,12 @@ namespace SEE.UI.HelpSystem
             text.fontSize = 18;
 
             {
-                helpSystemEntry.transform.Find("Buttons/Content/Back").gameObject.TryGetComponentOrLog(out ButtonManagerWithIcon manager);
-                manager.clickEvent.AddListener(Back);
+                helpSystemEntry.transform.Find("Buttons/Content/Back").gameObject.TryGetComponentOrLog(out ButtonManager manager);
+                manager.onClick.AddListener(Back);
             }
             {
-                helpSystemEntry.transform.Find("Buttons/Content/Close").gameObject.TryGetComponentOrLog(out ButtonManagerWithIcon manager);
-                manager.clickEvent.AddListener(Close);
+                helpSystemEntry.transform.Find("Buttons/Content/Close").gameObject.TryGetComponentOrLog(out ButtonManager manager);
+                manager.onClick.AddListener(Close);
             }
             videoPlayer = GetVideoPlayer();
 
@@ -269,15 +269,15 @@ namespace SEE.UI.HelpSystem
 
             helpSystemEntry.transform.Find("Content/Lower Video/Buttons/Pause")
                            .gameObject.TryGetComponentOrLog(out pauseButton);
-            pauseButton.clickEvent.AddListener(TogglePlaying);
+            pauseButton.onClick.AddListener(TogglePlaying);
 
             helpSystemEntry.transform.Find("Content/Lower Video/Buttons/Forward")
                            .gameObject.TryGetComponentOrLog(out forwardButton);
-            forwardButton.clickEvent.AddListener(Forward);
+            forwardButton.onClick.AddListener(Forward);
 
             helpSystemEntry.transform.Find("Content/Lower Video/Buttons/Back")
                            .gameObject.TryGetComponentOrLog(out backwardButton);
-            backwardButton.clickEvent.AddListener(Backward);
+            backwardButton.onClick.AddListener(Backward);
 
             helpSystemEntry.transform.Find("Content/Lower Video/Progress").gameObject.TryGetComponentOrLog(out progress);
 

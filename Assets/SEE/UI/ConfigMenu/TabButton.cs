@@ -20,7 +20,7 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -32,13 +32,13 @@ namespace SEE.UI.ConfigMenu
     ///
     /// Note: This component is the child of the TabButton prefab.
     /// </summary>
-    [RequireComponent(typeof(ButtonManagerBasic))]
+    [RequireComponent(typeof(ButtonManager))]
     public class TabButton : MonoBehaviour
     {
         public bool IsDefaultActive;
         public string ButtonText;
 
-        private ButtonManagerBasic buttonManager;
+        private ButtonManager buttonManager;
         private UIGradient uiGradient;
         private TabGroup group;
 
@@ -67,14 +67,14 @@ namespace SEE.UI.ConfigMenu
             }
 
             uiGradient = GetComponent<UIGradient>();
-            buttonManager = GetComponent<ButtonManagerBasic>();
+            buttonManager = GetComponent<ButtonManager>();
             button = buttonManager.GetComponent<Button>();
 
             buttonManager.normalText.text = ButtonText;
 
             ResetStyles();
             group.Subscribe(this);
-            buttonManager.clickEvent.AddListener(() => group.OnTabSelected(this));
+            buttonManager.onClick.AddListener(() => group.OnTabSelected(this));
             ColorBlock buttonColors = button.colors;
             buttonColors.highlightedColor = HoverColor;
             button.colors = buttonColors;
