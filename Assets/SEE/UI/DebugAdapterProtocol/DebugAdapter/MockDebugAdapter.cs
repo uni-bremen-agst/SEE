@@ -15,12 +15,14 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         public override string AdapterFileName { get; set; } = "node";
         public override string AdapterArguments { get; set; } = "debugAdapter.js";
 
+        private bool launchNoDebug;
         // https://github.com/microsoft/vscode-mock-debug/blob/b8d3d3a436e94f73ca193bf0bfa7c5c416a8aa8c/package.json#L146
         private string launchProgram = Path.Combine(AdapterDirectory, "mock", "sampleWorkspace", "readme.md");
         private bool launchStopOnEntry = true;
-        private bool launchTrace = true;
-        private bool launchCompileError;
+        private bool launchTrace = false;
+        private bool launchCompileError = false;
 
+        private BooleanProperty launchNoDebugProperty;
         private StringProperty launchProgramProperty;
         private BooleanProperty launchStopOnEntryProperty;
         private BooleanProperty launchTraceProperty;
@@ -33,6 +35,12 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             launchProgramProperty.Value = launchProgram;
             launchProgramProperty.Description = "Absolute path to a text file.";
             group.AddProperty(launchProgramProperty);
+
+            launchNoDebugProperty = go.AddComponent<BooleanProperty>();
+            launchNoDebugProperty.Name = "No Debug";
+            launchNoDebugProperty.Description = "Whether the program should be launched without debugging.";
+            launchNoDebugProperty.Value = launchNoDebug;
+            group.AddProperty(launchNoDebugProperty);
 
             launchStopOnEntryProperty = go.AddComponent<BooleanProperty>();
             launchStopOnEntryProperty.Name = "Stop on Entry";
@@ -71,7 +79,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
                     {"program", launchProgram},
                     {"stopOnEntry", launchStopOnEntry },
                     {"trace", launchTrace },
-                    {"compileError", launchCompileError ? "show" : "hide"},
+                    {"compileError", launchCompileError ? "show" : null },
                 }
             };
         }

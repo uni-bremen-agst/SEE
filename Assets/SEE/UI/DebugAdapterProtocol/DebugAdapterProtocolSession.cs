@@ -1,21 +1,18 @@
-using Michsky.UI.ModernUIPack;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
-using RootMotion;
 using SEE.Controls;
-using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.UI.Window;
 using SEE.UI.Window.CodeWindow;
 using SEE.UI.Window.ConsoleWindow;
 using SEE.Utils;
+using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.InputSystem.Composites;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
 using Encoding = System.Text.Encoding;
@@ -39,13 +36,14 @@ namespace SEE.UI.DebugAdapterProtocol
         private Queue<Action> actions = new();
 
         private bool isRunning;
-        private List<int> threads = new();
-        private int? threadId => threads.Count > 0 ? threads.First() : null;
+        private List<Thread> threads = new();
+        private Thread? thread => threads.FirstOrDefault();
 
+        #region General
         protected void Start()
         {
             tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
-            OpenConsole();
+            SetupConsole();
             SetupControls();
 
             if (Adapter == null)
@@ -76,7 +74,6 @@ namespace SEE.UI.DebugAdapterProtocol
             {
                 console.AddMessage("Created the debug adapter host.\n", "Adapter", "Log");
             }
-
             try
             {
                 capabilities = adapterHost.SendRequestSync(new InitializeRequest()
@@ -95,7 +92,48 @@ namespace SEE.UI.DebugAdapterProtocol
                 Destroyer.Destroy(this);
             }
         }
+        private void Update()
+        {
+            if (actions.Count > 0 && capabilities != null)
+            {
+                try
+                {
+                    actions.Dequeue()();
+                }
+                catch (Exception e)
+                {
+                    LogError(e);
+                }
+            }
+        }
+        private void OnDestroy()
+        {
+            console.AddMessage("Debug session finished.\n");
+            actions.Clear();
+            if (console)
+            {
+                console.OnInputSubmit -= OnConsoleInput;
+            }
+            if (controls)
+            {
+                Destroyer.Destroy(controls);
+            }
+            if (tooltip)
+            {
+                Destroyer.Destroy(tooltip);
+            }
+            if (adapterHost != null && adapterHost.IsRunning)
+            {
+                adapterHost.Stop();
+            }
+            if (adapterProcess != null && !adapterProcess.HasExited)
+            {
+                adapterProcess.Close();
+            }
+        }
+        #endregion
 
+        #region Setup
         private void SetupControls()
         {
             controls = PrefabInstantiator.InstantiatePrefab(DebugControlsPrefab, transform, false);
@@ -105,22 +143,22 @@ namespace SEE.UI.DebugAdapterProtocol
             {
                 Dictionary<string, (bool, Action, string)> listeners = new Dictionary<string, (bool, Action, string)>
                 {
-                    {"Continue", (true, Continue, "Continue")},
-                    {"Pause", (true, Pause, "Pause")},
-                    {"Reverse", (capabilities.SupportsStepBack == true, Reverse, "Reverse")},
-                    {"Next", (true, Next, "Next")},
-                    {"StepBack", (capabilities.SupportsStepBack == true, StepBack, "Step Back")},
-                    {"StepIn", (true, StepIn, "Step In")},
-                    {"StepOut", (true, StepOut, "Step Out")},
-                    {"Restart", (capabilities.SupportsRestartRequest == true, Restart, "Restart")},
-                    {"Stop", (true, Stop , "Stop")},
-                    {"Terminal", (true, OpenConsole, "Open the Terminal")},
+                    {"Continue", (true, OnContinue, "Continue")},
+                    {"Pause", (true, OnPause, "Pause")},
+                    {"Reverse", (capabilities.SupportsStepBack == true, OnReverseContinue, "Reverse")},
+                    {"Next", (true, OnNext, "Next")},
+                    {"StepBack", (capabilities.SupportsStepBack == true, OnStepBack, "Step Back")},
+                    {"StepIn", (true, OnStepIn, "Step In")},
+                    {"StepOut", (true, OnStepOut, "Step Out")},
+                    {"Restart", (capabilities.SupportsRestartRequest == true, OnRestart, "Restart")},
+                    {"Stop", (true, OnStop , "Stop")},
+                    {"Terminal", (true, SetupConsole, "Open the Terminal")},
                 };
                 foreach (var (name, (active,action, description)) in listeners)
                 {
                     GameObject button = controls.transform.Find(name).gameObject;
                     button.SetActive(active);
-                    button.MustGetComponent<Button>().onClick.AddListener(() => actions.Enqueue(action));
+                    button.MustGetComponent<Button>().onClick.AddListener(() => action());
                     if (button.TryGetComponentOrLog(out PointerHelper pointerHelper))
                     {
                         pointerHelper.EnterEvent.AddListener(_ => tooltip.Show(description));
@@ -129,58 +167,20 @@ namespace SEE.UI.DebugAdapterProtocol
                 }
             });
             return;
-
-            void Continue()
-            {
-                if (threadId is null || isRunning) return;
-                adapterHost.SendRequest(new ContinueRequest { ThreadId = (int)threadId }, _ => isRunning = true);
-            }
-            void Pause()
-            {
-                if (threadId is null || !isRunning) return;
-                adapterHost.SendRequest(new ContinueRequest { ThreadId = (int)threadId }, _ => isRunning = false);
-            }
-            void Reverse()
-            {
-                if (threadId is null || isRunning) return;
-                adapterHost.SendRequest(new ReverseContinueRequest { ThreadId = (int)threadId }, _ => isRunning = true);
-            }
-            void Next()
-            {
-                if (threadId is null || isRunning) return;
-                adapterHost.SendRequest(new NextRequest { ThreadId = (int)threadId }, _ => isRunning = true);
-            }
-            void StepBack()
-            {
-                if (threadId is null || isRunning) return;
-                adapterHost.SendRequest(new StepBackRequest { ThreadId = (int)threadId }, _ => isRunning = true);
-            }
-            void StepIn()
-            {
-                if (threadId is null || isRunning) return;
-                adapterHost.SendRequest(new StepInRequest { ThreadId = (int)threadId }, _ => isRunning = true);
-            }
-            void StepOut()
-            {
-                if (threadId is null || isRunning) return;
-                adapterHost.SendRequest(new StepOutRequest { ThreadId = (int)threadId }, _ => isRunning = true);
-            }
-            void Restart()
-            {
-                adapterHost.SendRequest(new RestartRequest { Arguments = Adapter.GetLaunchRequest(capabilities) }, _ => isRunning = true);
-            }
-            void Stop()
-            {
-                adapterHost.SendRequest(new DisconnectRequest(), _ => { });
-            }
         }
-
-        private void OpenConsole()
+        private void SetupConsole()
         {
             WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
             if (console == null)
             {
-                console = manager.Windows.OfType<ConsoleWindow>().FirstOrDefault() ?? gameObject.AddComponent<ConsoleWindow>();
+                console = manager.Windows.OfType<ConsoleWindow>().FirstOrDefault();
+                if (console == null)
+                {
+                    console = gameObject.AddComponent<ConsoleWindow>();
+                    console.DefaultChannel = "Adapter";
+                    console.DefaultChannelLevel = "Log";
+                    manager.AddWindow(console);
+                }
                 foreach ((string channel, char icon) in new[] { ("Adapter", '\uf188'), ("Debugee", '\uf135') })
                 {
                     console.AddChannel(channel, icon);
@@ -191,16 +191,9 @@ namespace SEE.UI.DebugAdapterProtocol
                 }
                 console.SetChannelLevelEnabled("Adapter", "Log", false);
                 console.OnInputSubmit += OnConsoleInput;
-                manager.AddWindow(console);
             }
             manager.ActiveWindow = console;
         }
-
-        private void OnConsoleInput(string text)
-        {
-            Debug.Log($"On Console Input\t{text}");
-        }
-
         private bool CreateAdapterProcess()
         {
             adapterProcess = new Process()
@@ -247,32 +240,29 @@ namespace SEE.UI.DebugAdapterProtocol
 
             return adapterProcess != null && !adapterProcess.HasExited;
         }
-
-        private void Update()
+        private bool CreateAdapterHost()
         {
-            if (actions.Count > 0 && capabilities != null)
-            {
-                try
-                {
-                    actions.Dequeue()();
-                }
-                catch (Exception e)
-                {
-                    LogError(e);
-                }
-            }
-        }
+            adapterHost = new DebugProtocolHost(adapterProcess.StandardInput.BaseStream, adapterProcess.StandardOutput.BaseStream);
+            adapterHost.DispatcherError += (sender, args) => LogError(new($"DispatcherError - {args.Exception}"));
+            adapterHost.ResponseTimeThresholdExceeded += (_, args) => console.AddMessage($"ResponseTimeThresholdExceeded - \t{args.Command}\t{args.SequenceId}\t{args.Threshold}\n", "Adapter", "Warning");
+            adapterHost.EventReceived += OnEventReceived;
+            adapterHost.Run();
 
+            return adapterHost.IsRunning;
+        }
+        #endregion
+
+        #region Events
         private void OnEventReceived(object sender, EventReceivedEventArgs e)
         {
             if (e.Body is InitializedEvent)
             {
                 actions.Enqueue(() =>
                 {
-                    List<Action> launchActions = Adapter.GetLaunchActions(adapterHost, capabilities);
-                    Action last = launchActions.Last();
-                    launchActions[launchActions.Count - 1] = () => { last(); isRunning = true; };
-                    launchActions.ForEach(actions.Enqueue);
+                    adapterHost.SendRequestSync(new SetFunctionBreakpointsRequest() { Breakpoints = new() });
+                    adapterHost.SendRequestSync(new SetExceptionBreakpointsRequest() { Filters = new()});
+                    Adapter.Launch(adapterHost, capabilities);
+                    isRunning = true;
                 });
             }
             else if (e.Body is OutputEvent outputEvent)
@@ -282,15 +272,15 @@ namespace SEE.UI.DebugAdapterProtocol
                     OutputEvent.CategoryValue.Console => "Adapter",
                     OutputEvent.CategoryValue.Stdout => "Debugee",
                     OutputEvent.CategoryValue.Stderr => "Debugee",
-                    OutputEvent.CategoryValue.Telemetry => "Adapter",
+                    OutputEvent.CategoryValue.Telemetry => null,
                     OutputEvent.CategoryValue.MessageBox => "Adapter",
                     OutputEvent.CategoryValue.Exception => "Adapter",
                     OutputEvent.CategoryValue.Important => "Adapter",
                     OutputEvent.CategoryValue.Unknown => "Adapter",
                     null => "Adapter",
-                    _ => "",
+                    _ => "Adapter",
                 };
-                string? level = outputEvent.Category switch
+                string level = outputEvent.Category switch
                 {
                     OutputEvent.CategoryValue.Console => "Log",
                     OutputEvent.CategoryValue.Stdout => "Log",
@@ -303,7 +293,7 @@ namespace SEE.UI.DebugAdapterProtocol
                     null => "Log",
                     _ => "Log",
                 };
-                if (level is not null)
+                if (channel is not null && level is not null)
                 {
                     if (level == "Error")
                     {
@@ -329,34 +319,128 @@ namespace SEE.UI.DebugAdapterProtocol
             }
             else if (e.Body is StoppedEvent stoppedEvent)
             {
-                isRunning = false;
-                actions.Enqueue(UpdateCodePosition);
+                actions.Enqueue(() =>
+                {
+                    threads = adapterHost.SendRequestSync(new ThreadsRequest()).Threads;
+                    isRunning = false;
+                    UpdateCodePosition();
+                });
             }
             else if (e.Body is ThreadEvent threadEvent)
             {
                 if (threadEvent.Reason == ThreadEvent.ReasonValue.Started)
                 {
-                    threads.Add(threadEvent.ThreadId);
+                    threads.Add(new(threadEvent.ThreadId, threadEvent.ThreadId.ToString()));
                 } else if (threadEvent.Reason == ThreadEvent.ReasonValue.Exited)
                 {
-                    threads.Remove(threadEvent.ThreadId);
+                    threads.RemoveAll(t => t.Id == threadEvent.ThreadId);
                 }
-            } else if (e.Body is ContinuedEvent)
+            }
+            else if (e.Body is ContinuedEvent)
             {
                 isRunning = true;
             }
         }
+        private void OnConsoleInput(string text)
+        {
+            actions.Enqueue(() =>
+            {
+                if (thread == null) return;
+                StackFrame stackFrame = adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = thread.Id }).StackFrames[0];
+                EvaluateResponse result = adapterHost.SendRequestSync(new EvaluateRequest()
+                {
+                    Expression = text,
+                    Context = EvaluateArguments.ContextValue.Repl,
+                    FrameId = stackFrame.Id
+                });
+                console.AddMessage(result.Result, "Debugee", "Log");
+            });
+        }
+        void OnContinue()
+        {
+            actions.Enqueue(() =>
+            {
+                if (thread is null || isRunning) return;
+                adapterHost.SendRequest(new ContinueRequest { ThreadId = thread.Id }, _ => isRunning = true);
+            });
+        }
+        void OnPause()
+        {
+            actions.Enqueue(() =>
+            {
+                if (thread is null || !isRunning) return;
+                adapterHost.SendRequest(new ContinueRequest { ThreadId = thread.Id }, _ => isRunning = false);
+            });
+        }
+        void OnReverseContinue()
+        {
+            actions.Enqueue(() =>
+            {
+                if (thread is null || isRunning) return;
+                adapterHost.SendRequest(new ReverseContinueRequest { ThreadId = thread.Id }, _ => isRunning = true);
+            });
+        }
+        void OnNext()
+        {
+            actions.Enqueue(() =>
+            {
+                if (thread is null || isRunning) return;
+                adapterHost.SendRequest(new NextRequest { ThreadId = thread.Id }, _ => isRunning = true);
+            });
+        }
+        void OnStepBack()
+        {
+            actions.Enqueue(() =>
+            {
+                if (thread is null || isRunning) return;
+                adapterHost.SendRequest(new StepBackRequest { ThreadId = thread.Id }, _ => isRunning = true);
+            });
+        }
+        void OnStepIn()
+        {
+            actions.Enqueue(() =>
+            {
+                if (thread is null || isRunning) return;
+                adapterHost.SendRequest(new StepInRequest { ThreadId = thread.Id }, _ => isRunning = true);
+            });
+        }
+        void OnStepOut()
+        {
+            actions.Enqueue(() =>
+            {
+                if (thread is null || isRunning) return;
+                adapterHost.SendRequest(new StepOutRequest { ThreadId = thread.Id }, _ => isRunning = true);
+            });
+        }
+        void OnRestart()
+        {
+            actions.Enqueue(() =>
+            {
+                adapterHost.SendRequest(new RestartRequest { Arguments = Adapter.GetLaunchRequest(capabilities) }, _ => isRunning = true);
+            });
+        }
+        void OnStop()
+        {
+            actions.Enqueue(() =>
+            {
+                adapterHost.SendRequest(new DisconnectRequest(), _ => { });
+            });
+        }
+        #endregion
 
+        #region Utilities
+        private void LogError(Exception e)
+        {
+            console.AddMessage(e.ToString() + "\n", "Adapter", "Error");
+            throw e;
+        }
         private void UpdateCodePosition()
         {
-            if (threadId == null) return;
-            StackFrame stackFrame = adapterHost.SendRequestSync(new StackTraceRequest()
-            {
-                ThreadId = (int)threadId,
-                Levels = 1
-            }).StackFrames[0];
+            if (thread == null) return;
+
+            StackFrame stackFrame = adapterHost.SendRequestSync(new StackTraceRequest(){ ThreadId = thread.Id}).StackFrames[0];
+
             string path = stackFrame.Source.Path;
-            int line = stackFrame.Line;
             string title = Path.GetFileName(path);
 
             WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
@@ -365,60 +449,22 @@ namespace SEE.UI.DebugAdapterProtocol
             {
                 codeWindow = gameObject.AddComponent<CodeWindow>();
                 codeWindow.Title = title;
-                codeWindow.EnterFromFile(path);
+                codeWindow.EnterFromFile(path, false);
                 manager.AddWindow(codeWindow);
                 codeWindow.OnComponentInitialized += () =>
                 {
-                    codeWindow.ScrolledVisibleLine = line;
+                    codeWindow.ScrolledVisibleLine = stackFrame.Line;
                 };
-            } else
+            }
+            else
             {
-                codeWindow.ScrolledVisibleLine = line;
+                codeWindow.EnterFromFile(path, false);
+                codeWindow.ScrolledVisibleLine = stackFrame.Line;
             }
             manager.ActiveWindow = codeWindow;
         }
-
-        private bool CreateAdapterHost()
-        {
-            adapterHost = new DebugProtocolHost(adapterProcess.StandardInput.BaseStream, adapterProcess.StandardOutput.BaseStream);
-            adapterHost.DispatcherError += (sender, args) => LogError(new($"DispatcherError - {args.Exception}"));
-            adapterHost.ResponseTimeThresholdExceeded += (_, args) => console.AddMessage($"ResponseTimeThresholdExceeded - \t{args.Command}\t{args.SequenceId}\t{args.Threshold}\n", "Adapter", "Warning");
-            adapterHost.EventReceived += OnEventReceived;
-            adapterHost.Run();
-
-            return adapterHost.IsRunning;
-        }
-
-        private void OnDestroy()
-        {
-            console.AddMessage("Debug session finished.\n");
-            actions.Clear();
-            if (console)
-            {
-                console.OnInputSubmit -= OnConsoleInput;
-            }
-            if (controls)
-            {
-                Destroyer.Destroy(controls);
-            }
-            if (tooltip)
-            {
-                Destroyer.Destroy(tooltip);
-            }
-            if (adapterHost != null && adapterHost.IsRunning)
-            {
-                adapterHost.Stop();
-            }
-            if (adapterProcess != null && !adapterProcess.HasExited)
-            {
-                adapterProcess.Close();
-            }
-        }
-
-        private void LogError(Exception e)
-        {
-            console.AddMessage(e.ToString() + "\n", "Adapter", "Error");
-            throw e;
-        }
+        #endregion
     }
+
+
 }

@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using Newtonsoft.Json.Linq;
 using SEE.UI.PropertyDialog;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -109,17 +110,13 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             };
         }
 
-        public override List<Action> GetLaunchActions(DebugProtocolHost adapterHost, InitializeResponse capabilities)
+        public override void Launch(DebugProtocolHost adapterHost, InitializeResponse capabilities)
         {
-            return new() {
-                () => adapterHost.SendRequest(GetLaunchRequest(capabilities), _ => {}),
-                () => {
-                    if (capabilities.SupportsConfigurationDoneRequest == true)
-                    {
-                        adapterHost.SendRequest(new ConfigurationDoneRequest(), _ => {});
-                    }
-                }
-            };
+            adapterHost.SendRequestSync(GetLaunchRequest(capabilities));
+            if (capabilities.SupportsConfigurationDoneRequest == true)
+            {
+                adapterHost.SendRequestSync(new ConfigurationDoneRequest());
+            }
         }
 
         private static string espaceList(List<string> args)

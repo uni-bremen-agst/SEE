@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using SEE.UI.PropertyDialog;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -23,17 +24,13 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
 
         public abstract LaunchRequest GetLaunchRequest(InitializeResponse capabilities);
 
-        public virtual List<Action> GetLaunchActions(DebugProtocolHost adapterHost, InitializeResponse capabilities)
+        public virtual void Launch(DebugProtocolHost adapterHost, InitializeResponse capabilities)
         {
-            return new() {
-                () => {
-                    if (capabilities.SupportsConfigurationDoneRequest == true)
-                    {
-                        adapterHost.SendRequest(new ConfigurationDoneRequest(), _ => {});
-                    }
-                },
-                () => adapterHost.SendRequest(GetLaunchRequest(capabilities), _ => {})
-            };
+            if (capabilities.SupportsConfigurationDoneRequest == true)
+            {
+                adapterHost.SendRequestSync(new ConfigurationDoneRequest());
+            }
+            adapterHost.SendRequestSync(GetLaunchRequest(capabilities));
         }
     }
 }

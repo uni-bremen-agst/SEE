@@ -51,7 +51,13 @@ namespace SEE.UI.Window.ConsoleWindow
         private bool matchCase = true;
         private bool fullMatch = false;
 
-        private Dictionary<string, Channel> channels = new() {};
+        private Dictionary<string, Channel> channels = new() {
+            {"User Input", new Channel("User Input", '\uf007', new () {
+                {"Log", new ChannelLevel("Log", Color.gray.Darker(), true)},
+            })},
+        };
+        public string DefaultChannel = "";
+        public string DefaultChannelLevel = "";
 
         public void AddChannel(string channel, char icon)
         {
@@ -76,8 +82,8 @@ namespace SEE.UI.Window.ConsoleWindow
 
         public void AddMessage(string text, string channel = null, string level = null)
         {
-            channel ??= channels.First().Key;
-            level ??= channels.First().Value.Levels.First().Key;
+            channel ??= DefaultChannel;
+            level ??= DefaultChannelLevel;
 
             text = text.Replace("\t", tabReplacement);
             int appendTo = AppendTo(channel, level);
@@ -151,9 +157,11 @@ namespace SEE.UI.Window.ConsoleWindow
             inputField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
             inputField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
             inputField.onValueChanged.AddListener(text => OnInputChanged?.Invoke(text));
-            inputField.onSubmit.AddListener(text => OnInputSubmit?.Invoke(text));
-            inputField.onSubmit.AddListener(_ =>
+            inputField.onSubmit.AddListener(text =>
             {
+                Debug.Log($"Submit: {text}");
+                AddMessage(text + "\n", "User Input", "Log");
+                OnInputSubmit?.Invoke(text);
                 inputField.DeactivateInputField();
                 inputField.text = "";
                 inputField.ActivateInputField();
@@ -336,11 +344,11 @@ namespace SEE.UI.Window.ConsoleWindow
             public readonly char Icon;
             public readonly Dictionary<string, ChannelLevel> Levels;
 
-            public Channel(string name, char icon)
+            public Channel(string name, char icon, Dictionary<string, ChannelLevel> levels = null)
             {
                 this.Name = name;
                 this.Icon = icon;
-                this.Levels = new();
+                this.Levels = levels ?? new();
             }
         }
 
