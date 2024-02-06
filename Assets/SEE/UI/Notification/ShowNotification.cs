@@ -71,15 +71,14 @@ namespace SEE.UI.Notification
         /// <param name="description">Description of the notification.</param>
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
         /// <param name="log">Whether to log the given notification in Unity's log as well</param>
-        /// <returns>The created notification. Will be <c>null</c> as soon it's done playing.</returns>
-        public static Notification Info(string title, string description, float duration = defaultDuration,
+        public static void Info(string title, string description, float duration = defaultDuration,
                                         bool log = true)
         {
             if (log)
             {
                 Debug.Log($"{title}: {description}\n");
             }
-            return Show(title, description, infoIcon, infoColor, duration);
+            Show(title, description, infoIcon, infoColor, duration);
         }
 
         /// <summary>
@@ -124,16 +123,13 @@ namespace SEE.UI.Notification
         /// <param name="icon">The icon of the notification.</param>
         /// <param name="color">The color of the notification.</param>
         /// <param name="duration">The duration of the notification.</param>
-        /// <returns>The created notification. Will be <c>null</c> if this method is called
-        /// while the game is not running and as soon as the notification is done playing.</returns>
-        public static Notification Show(string title, string description, Sprite icon, Color color,
-                                        float duration = defaultDuration)
+        private static void Show(string title, string description, Sprite icon, Color color,
+                                 float duration = defaultDuration)
         {
             if (Application.isPlaying)
             {
-                return manager.Value.Show(title, description, icon, color, duration);
+                manager.Value.Show(title, description, icon, color, duration);
             }
-            return null;
         }
     }
 }
