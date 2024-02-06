@@ -7,6 +7,16 @@ namespace SEE.GraphProviders
     /// </summary>
     static class GraphProviderFactory
     {
+        /// <summary>
+        /// Returns a new instance of a suitable <see cref="GraphProvider"/> for the
+        /// given <paramref name="kind"/>.
+        ///
+        /// Postcondition: NewInstance(k).GetKind() == k.
+        /// </summary>
+        /// <param name="kind">the requested kind of <see cref="GraphProvider"/></param>
+        /// <returns>a new instance</returns>
+        /// <exception cref="NotImplementedException">thrown in case the given <paramref name="kind"/>
+        /// is not yet handled</exception>
         internal static GraphProvider NewInstance(GraphProviderKind kind)
         {
             return kind switch
