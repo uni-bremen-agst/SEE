@@ -123,7 +123,6 @@ namespace SEE.Game.City
         {
             get
             {
-                Debug.Log($"VisualizedSubGraph is null: {visualizedSubGraph == null}.\n");
                 if (LoadedGraph == null)
                 {
                     visualizedSubGraph = null;
@@ -203,8 +202,7 @@ namespace SEE.Game.City
             // Add EdgeMeshScheduler to convert edge lines to meshes over time.
             gameObject.AddOrGetComponent<EdgeMeshScheduler>().Init(EdgeLayoutSettings, EdgeSelectionSettings,
                                                                    subGraph);
-            // FIXME: Should this be LoadedGraph?
-            loadedGraph = subGraph;
+            LoadedGraph = subGraph;
 
             UpdateGraphElementIDMap(gameObject);
         }

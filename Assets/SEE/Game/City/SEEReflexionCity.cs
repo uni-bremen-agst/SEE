@@ -44,10 +44,8 @@ namespace SEE.Game.City
                 Reset();
             }
             LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this);
-            Debug.Log($"Loaded graph {LoadedGraph.Name}.\n");
             visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
             visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
-            Debug.Log("Initialized Reflexion Analysis.\n");
         }
 
         protected override void InitializeAfterDrawn()
