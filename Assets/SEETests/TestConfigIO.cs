@@ -434,7 +434,7 @@ namespace SEE.Utils
                 csvProvider.Path.AbsolutePath = "mydir/myfile.csv";
                 savedCity.DataProvider.Add(csvProvider);
                 savedCity.Save(filename);
-                Print(filename);
+
                 // Create a new city with all its default values and then
                 // wipe out all its attributes to see whether they are correctly
                 // restored from the saved configuration file.
