@@ -34,7 +34,7 @@ namespace SEE.Game.City
         /// A provider of the data shown as code city.
         /// </summary>
         [OdinSerialize, ShowInInspector,
-            Tooltip("A graph provider yielding the data to be visualized as code city."),
+            Tooltip("A graph provider yielding the data to be visualized as a code city."),
             TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup),
             HideReferenceObjectPicker]
         public PipelineGraphProvider DataProvider = new();
