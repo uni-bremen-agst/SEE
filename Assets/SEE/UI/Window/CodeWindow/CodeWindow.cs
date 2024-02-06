@@ -67,8 +67,9 @@ namespace SEE.UI.Window.CodeWindow
             markedLine = lineNumber;
             string[] allLines = textMesh.text.Split('\n').Select(x => x.EndsWith("</mark>") ? x.Substring(16, x.Length - 16 - 7) : x).ToArray();
             string markLine = $"<mark=#ff000044>{allLines[lineNumber - 1]}</mark>\n";
-            textMesh.text = string.Join("", allLines.Select(x => x + "\n").Take(lineNumber - 1).Append(markLine)
-                                                    .Concat(allLines.Select(x => x + "\n").Skip(lineNumber).Take(lines - lineNumber - 2)));
+            textMesh.text = string.Join("", allLines.
+                Select(x => x + "\n").Take(lineNumber - 1).Append(markLine).
+                Concat(allLines.Select(x => x + "\n").Skip(lineNumber).Take(lines - lineNumber + 1)));
         }
 
         #region Visible Line Calculation
