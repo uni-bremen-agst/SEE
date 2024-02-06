@@ -248,9 +248,9 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Informs the user about an error when attempting to load a layout.
         /// </summary>
-        private static Notification UserInfoNoLayout()
+        private static void UserInfoNoLayout()
         {
-            return ShowNotification.Error(notificationTitle, "Could not retrieve a layout for the graph.");
+            ShowNotification.Error(notificationTitle, "Could not retrieve a layout for the graph.");
         }
 
         #endregion

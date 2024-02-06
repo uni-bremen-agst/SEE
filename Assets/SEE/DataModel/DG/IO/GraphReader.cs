@@ -27,6 +27,10 @@ namespace SEE.DataModel.DG.IO
         /// <paramref name="rootID"/> is null or the empty string or has a single root, the graph
         /// will be loaded as stored in the GXL file.
         ///
+        /// The loaded graph will have the <paramref name="basePath"/> that will be used
+        /// to turn relative file-system paths into absolute ones. It should be chosen as
+        /// the root directory in which the source code can be found.
+        ///
         /// When the graph is loaded, the node levels are calculated.
         ///
         /// Precondition: <paramref name="rootID"/> must be unique.

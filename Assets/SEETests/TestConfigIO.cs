@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.IO;
 using NUnit.Framework;
 using SEE.Game;
 using SEE.Game.City;
+using SEE.GraphProviders;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Tools.RandomGraphs;
 using SEE.Utils.Config;
@@ -14,7 +17,7 @@ namespace SEE.Utils
     /// <summary>
     /// Test cases for ConfigIO.
     /// </summary>
-    internal class TestConfigIO
+    internal class TestConfigIO : AbstractTestConfigIO
     {
         [Test]
         public void TestConfigParseInteger1()
@@ -427,6 +430,9 @@ namespace SEE.Utils
                 savedCity.NodeTypes = new NodeTypeVisualsMap();
                 savedCity.NodeTypes["Function"] = function;
                 savedCity.NodeTypes["File"] = file;
+                CSVGraphProvider csvProvider = new();
+                csvProvider.Path.AbsolutePath = "mydir/myfile.csv";
+                savedCity.DataProvider.Add(csvProvider);
                 savedCity.Save(filename);
 
                 // Create a new city with all its default values and then
@@ -582,9 +588,7 @@ namespace SEE.Utils
         private static void SEECityAttributesAreEqual(SEECity expected, SEECity actual)
         {
             AbstractSEECityAttributesAreEqual(expected, actual);
-            AreEqual(expected.GXLPath, actual.GXLPath);
-            AreEqual(expected.CSVPath, actual.CSVPath);
-            AreEqual(expected.XMLPath, actual.XMLPath);
+            TestGraphProviderIO.AreEqual(expected.DataProvider, actual.DataProvider);
         }
 
         /// <summary>
@@ -781,19 +785,6 @@ namespace SEE.Utils
             Assert.AreEqual(expected.a, actual.a, 0.001f);
         }
 
-        /// <summary>
-        /// Checks whether the two data paths <paramref name="expected"/> and <paramref name="actual"/>
-        /// are equal (by value).
-        /// </summary>
-        /// <param name="expected">expected data path</param>
-        /// <param name="actual">actual data path</param>
-        private static void AreEqual(DataPath expected, DataPath actual)
-        {
-            Assert.AreEqual(expected.Root, actual.Root);
-            Assert.AreEqual(expected.RelativePath, actual.RelativePath);
-            Assert.AreEqual(expected.AbsolutePath, actual.AbsolutePath);
-        }
-
         //--------------------------------------------------------
         // attribute modifiers
         //--------------------------------------------------------
@@ -806,9 +797,7 @@ namespace SEE.Utils
         private static void WipeOutSEECityAttributes(SEECity city)
         {
             WipeOutAbstractSEECityAttributes(city);
-            city.GXLPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gxl");
-            city.CSVPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.csv");
-            city.XMLPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.xml");
+            city.DataProvider = new PipelineGraphProvider();
         }
 
         /// <summary>
@@ -948,9 +937,6 @@ namespace SEE.Utils
         {
             city.ErosionSettings.ShowInnerErosions = !city.ErosionSettings.ShowInnerErosions;
             city.ErosionSettings.ShowLeafErosions = !city.ErosionSettings.ShowLeafErosions;
-            city.ErosionSettings.LoadDashboardMetrics = !city.ErosionSettings.LoadDashboardMetrics;
-            city.ErosionSettings.IssuesAddedFromVersion = "XXX";
-            city.ErosionSettings.OverrideMetrics = !city.ErosionSettings.OverrideMetrics;
             city.ErosionSettings.ShowIssuesInCodeWindow = !city.ErosionSettings.ShowIssuesInCodeWindow;
             city.ErosionSettings.ErosionScalingFactor++;
 
@@ -975,9 +961,6 @@ namespace SEE.Utils
         {
             Assert.AreEqual(expected.ShowInnerErosions, actual.ShowInnerErosions);
             Assert.AreEqual(expected.ShowLeafErosions, actual.ShowLeafErosions);
-            Assert.AreEqual(expected.LoadDashboardMetrics, actual.LoadDashboardMetrics);
-            Assert.AreEqual(expected.IssuesAddedFromVersion, actual.IssuesAddedFromVersion);
-            Assert.AreEqual(expected.OverrideMetrics, actual.OverrideMetrics);
             Assert.AreEqual(expected.ShowIssuesInCodeWindow, actual.ShowIssuesInCodeWindow);
             Assert.AreEqual(expected.ErosionScalingFactor, actual.ErosionScalingFactor);
 
