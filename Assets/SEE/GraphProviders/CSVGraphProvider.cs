@@ -35,5 +35,10 @@ namespace SEE.GraphProviders
             }
             return UniTask.FromResult(graph);
         }
+
+        public override GraphProviderKind GetKind()
+        {
+            return GraphProviderKind.CSV;
+        }
     }
 }

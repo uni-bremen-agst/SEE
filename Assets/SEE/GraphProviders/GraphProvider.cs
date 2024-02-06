@@ -52,10 +52,16 @@ namespace SEE.GraphProviders
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(GraphProviderFactory.GetKind(this), kindLabel);
+            writer.Save(GetKind().ToString(), kindLabel);
             SaveAttributes(writer);
             writer.EndGroup();
         }
+
+        /// <summary>
+        /// Returns the kind of graph provider.
+        /// </summary>
+        /// <returns>kind of graph provider</returns>
+        public abstract GraphProviderKind GetKind();
 
         /// <summary>
         /// Subclasses must implement this so save their attributes. This class takes
@@ -100,8 +106,8 @@ namespace SEE.GraphProviders
         /// implement <see cref="RestoreAttributes(Dictionary{string, object})"/>.</remarks>
         protected static GraphProvider RestoreProvider(Dictionary<string, object> values)
         {
-            string kind = null;
-            if (ConfigIO.Restore(values, kindLabel, ref kind))
+            GraphProviderKind kind = GraphProviderKind.Pipeline;
+            if (ConfigIO.RestoreEnum(values, kindLabel, ref kind))
             {
                 GraphProvider provider = GraphProviderFactory.NewInstance(kind);
                 provider.RestoreAttributes(values);

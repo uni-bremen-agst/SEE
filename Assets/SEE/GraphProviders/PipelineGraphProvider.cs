@@ -46,6 +46,11 @@ namespace SEE.GraphProviders
                                             (current, provider) => current.ContinueWith(g => provider.ProvideAsync(g, city)));
         }
 
+        public override GraphProviderKind GetKind()
+        {
+            return GraphProviderKind.Pipeline;
+        }
+
         /// <summary>
         /// Adds <paramref name="provider"/> at the end of the <see cref="Pipeline"/>.
         /// </summary>

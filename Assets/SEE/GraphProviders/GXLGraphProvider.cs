@@ -41,5 +41,10 @@ namespace SEE.GraphProviders
             graphCreator.Load();
             return UniTask.FromResult(graphCreator.GetGraph());
         }
+
+        public override GraphProviderKind GetKind()
+        {
+            return GraphProviderKind.GXL;
+        }
     }
 }

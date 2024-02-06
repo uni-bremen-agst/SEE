@@ -45,6 +45,11 @@ namespace SEE.GraphProviders
         [Tooltip("The name of the resulting reflexion city.")]
         public string CityName = "Reflexion Analysis";
 
+        public override GraphProviderKind GetKind()
+        {
+            return GraphProviderKind.Reflexion;
+        }
+
         public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
         {
             if (city == null)
