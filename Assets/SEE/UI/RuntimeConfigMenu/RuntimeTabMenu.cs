@@ -950,14 +950,9 @@ namespace SEE.UI.RuntimeConfigMenu
             // index is the index of the changed enum
             void Setter(int index)
             {
-                // Debug.Log($"[{nameof(CreateTypeField)}].Setter({index}) selected {graphProviderKinds[index]}\n");
                 if (Enum.TryParse(graphProviderKinds[index], true, out GraphProviderKind newKind))
                 {
-                    if (provider.GetKind() == newKind)
-                    {
-                        Debug.Log("Same kind\n");
-                    }
-                    else
+                    if (provider.GetKind() != newKind)
                     {
                         // TODO (#698):
                         // We need to replace provider in the list it is contained in
