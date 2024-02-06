@@ -1378,12 +1378,11 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 if (parent.transform.Find(i.ToString()) == null)
                 {
-                    int iCopy = i; // FIXME: Why this copy?
                     CreateSetting(
-                        () => list[iCopy],
+                        () => list[i],
                         i.ToString(),
                         parent,
-                        changedValue => list[iCopy] = changedValue as T
+                        changedValue => list[i] = changedValue as T
                     );
                 }
             }
