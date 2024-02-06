@@ -1247,20 +1247,13 @@ namespace SEE.UI.RuntimeConfigMenu
         }
 
         /// <summary>
-        /// Declares a delegate that creates a new instance of a type.
-        /// </summary>
-        /// <typeparam name="T">type to be created</typeparam>
-        /// <returns>creates a new instance of <typeparamref name="T"/></returns>
-        delegate T NewT<T>();
-
-        /// <summary>
         /// Creates a list widget.
         /// </summary>
         /// <param name="list">list to create a widget for</param>
         /// <param name="parent">parent (container game object: <see cref="CreateNestedSetting"/>)</param>
         /// <param name="newT">creates a new instance of <typeparamref name="T"/></param>
         /// <typeparam name="T">the type of elements in <paramref name="list"/></typeparam>
-        private void CreateList<T>(IList<T> list, GameObject parent, NewT<T> newT) where T : class
+        private void CreateList<T>(IList<T> list, GameObject parent, Func<T> newT) where T : class
         {
             // TODO (#698):
             // We want to add and remove elements anywhere, not just at the end.
