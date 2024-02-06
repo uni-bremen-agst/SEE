@@ -73,18 +73,16 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
 
                 // Now we set the labels on the y axis.
                 bool isPercentage = minimum >= 0 && maximum <= 1;  // Handle differently if is percentage in [0, 1]
-                for (int i = 0; i < yLabels.Length; i++)
+                for (int i = 0; i < Mathf.Min(yLabels.Length, metricValues.Count); i++)
                 {
                     float yValue = minimum + stepLength * i;
                     if (isPercentage)
                     {
                         yValue *= 100;
                     }
-                    string labelText = yValue.ToString("F" + metricValues[i].DecimalPlaces);
-                    if (isPercentage)
-                    {
-                        labelText = $"{yValue.ToString($"F{metricValues[i].DecimalPlaces - 2}")}%";
-                    }
+                    string labelText = isPercentage ? $"{yValue.ToString($"F{metricValues[i].DecimalPlaces - 2}")}%"
+                                                    : yValue.ToString("F" + metricValues[i].DecimalPlaces);
+
                     yLabels[i].text = labelText;
                 }
 
@@ -111,8 +109,8 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
             }
             else
             {
-                throw new ArgumentException($"The type {metricValue.GetType()} cannot be displayed with" +
-                                            $"the CoordinateSystem widget.");
+                throw new ArgumentException($"The type {metricValue.GetType()} cannot be displayed with"
+                                            + "the CoordinateSystem widget.");
             }
         }
     }
