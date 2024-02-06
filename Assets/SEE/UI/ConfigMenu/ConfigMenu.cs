@@ -23,7 +23,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Controls;
 using SEE.Game.City;
 using SEE.GO;

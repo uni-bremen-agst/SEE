@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;

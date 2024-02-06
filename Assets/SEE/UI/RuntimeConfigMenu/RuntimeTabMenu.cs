@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using HSVPicker;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game;

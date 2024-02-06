@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using SEE.Controls.Actions;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 
 namespace SEE.UI.StateIndicator
 {

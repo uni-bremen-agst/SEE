@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Michsky.UI.ModernUIPack;
+using Michsky.MUIP;
 using SEE.Controls.Actions.HolisticMetrics;
 using SEE.DataModel;
 using SEE.Game.City;

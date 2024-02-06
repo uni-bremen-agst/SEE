@@ -1,4 +1,4 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Michsky.MUIP;
 using SEE.Utils;
 using Sirenix.Utilities;
 using UnityEngine;
