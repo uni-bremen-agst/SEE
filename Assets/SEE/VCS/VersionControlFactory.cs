@@ -16,7 +16,7 @@ namespace SEE.VCS
         {
             return system.ToLower() switch
             {
-                "git" => new VersionControlSystems.GitVersionControl(),
+                "git" => new GitVersionControl(),
                 // Add cases for other version control systems
                 _ => throw new ArgumentException("Unsupported version control system", nameof(system)),
             };
