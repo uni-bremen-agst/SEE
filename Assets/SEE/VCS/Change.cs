@@ -33,7 +33,8 @@
         Renamed = 4,
 
         /// <summary>
-        /// The file was copied.
+        /// The file was copied. Whether copied files can be detected, depends upon the
+        /// comparison options set.
         /// </summary>
         Copied = 5,
 
