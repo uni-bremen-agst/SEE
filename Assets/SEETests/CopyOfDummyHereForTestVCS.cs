@@ -9,7 +9,7 @@ namespace SEETests
     /// <summary>
     /// This class is here only to serve for tests of TestVCS.
     /// </summary>
-    internal class DummyHereForTestVCS
+    internal class CopyOfDummyHereForTestVCS
     {
     }
 }
