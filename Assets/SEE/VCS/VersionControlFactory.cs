@@ -5,14 +5,14 @@ namespace SEE.VCS
     /// <summary>
     /// Yields the version control system.
     /// </summary>
-    public static class VersionControlFactory
+    internal static class VersionControlFactory
     {
         /// <summary>
         /// Returns the functionality of the given version control system.
         /// </summary>
         /// <param name="system">the version control system</param>
         /// <returns>the functionality for the given version control system</returns>
-        public static IVersionControl GetVersionControl(string system, string repositoryPath)
+        internal static IVersionControl GetVersionControl(string system, string repositoryPath)
         {
             return system.ToLower() switch
             {
