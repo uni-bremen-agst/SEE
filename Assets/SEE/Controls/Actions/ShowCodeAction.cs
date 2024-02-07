@@ -183,11 +183,15 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Returns a new CodeWindow showing a diff for the given edge in a diff city.
+        /// Returns a new CodeWindow showing a diff for the given <paramref name="graphElementRef"/>
+        /// in <paramref name="city"/>.
         /// </summary>
-        /// <param name="edgeRef">The edge to get the CodeWindow for</param>
+        /// <param name="graphElementRef">The graph element to get the CodeWindow for</param>
+        /// <param name="city">the code city <paramref name="graphElementRef"/> is contained
+        /// in; it is used to determine version control information needed to
+        /// calculate the diff</param>
         /// <returns>new CodeWindow showing a diff</returns>
-        public static CodeWindow ShowDiff(GraphElementRef graphElementRef, DiffCity city)
+        public static CodeWindow ShowVCSDiff(GraphElementRef graphElementRef, DiffCity city)
         {
             GraphElement graphElement = graphElementRef.Elem;
             (string sourceFilename, string path) = GetPath(graphElement);
@@ -199,11 +203,11 @@ namespace SEE.Controls.Actions
             IVersionControl versionControl = SwitchVersionControlSystems.CreateVersionControl(versionControlSystem);
             string showOldRevision = versionControl.Show(repositoryPath, path, oldCommitIdentifier);
             string showNewRevision = versionControl.ShowOriginal(repositoryPath, relativePath, oldCommitIdentifier, newCommitIdentifier);
-            string[] diff = TextualDiff.VCSDiff(showNewRevision, showOldRevision);
+            string[] diff = TextualDiff.Diff(showNewRevision, showOldRevision);
             CodeWindow codeWindow = GetOrCreateCodeWindow(graphElementRef, sourceFilename);
             string changedName = versionControl.ShowName();
 
-            if (changedName != null)
+            if (!string.IsNullOrWhiteSpace(changedName))
             {
                 // Case: File got deleted.
                 if (changedName == relativePath)
