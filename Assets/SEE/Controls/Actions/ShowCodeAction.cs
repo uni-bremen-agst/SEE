@@ -200,7 +200,7 @@ namespace SEE.Controls.Actions
             string oldCommitIdentifier = city.OldCommitIdentifier;
             string newCommitIdentifier = city.NewCommitIdentifier;
             string relativePath = Path.GetRelativePath(repositoryPath, path).Replace("\\", "/");
-            IVersionControl versionControl = SwitchVersionControlSystems.CreateVersionControl(versionControlSystem);
+            IVersionControl versionControl = SwitchVersionControlSystems.GetVersionControl(versionControlSystem);
             string showOldRevision = versionControl.Show(repositoryPath, path, oldCommitIdentifier);
             string showNewRevision = versionControl.ShowOriginal(repositoryPath, relativePath, oldCommitIdentifier, newCommitIdentifier);
             string[] diff = TextualDiff.Diff(showNewRevision, showOldRevision);
