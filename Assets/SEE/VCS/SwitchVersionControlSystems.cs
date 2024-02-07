@@ -3,9 +3,9 @@ using System;
 namespace SEE.VCS
 {
     /// <summary>
-    /// Switches the version control system, to the one that the user gives as input to the DiffCity.
+    /// Switches the version control system.
     /// </summary>
-    public class SwitchVersionControlSystems
+    public static class SwitchVersionControlSystems
     {
         /// <summary>
         /// Returns the functionality of the given version control system.
