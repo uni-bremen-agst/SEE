@@ -1,7 +1,5 @@
 ﻿using NUnit.Framework;
 using SEE.Utils.Paths;
-using System.IO;
-using UnityEngine;
 
 namespace SEE.Utils
 {
@@ -21,21 +19,6 @@ namespace SEE.Utils
             Assert.AreEqual(expected.Root, actual.Root);
             Assert.AreEqual(expected.RelativePath, actual.RelativePath);
             Assert.AreEqual(expected.AbsolutePath, actual.AbsolutePath);
-        }
-
-        /// <summary>
-        /// Prints the content of <paramref name="filename"/> if it exists.
-        /// </summary>
-        /// <param name="filename">name of the file to be printed</param>
-        protected static void Print(string filename)
-        {
-            if (!string.IsNullOrWhiteSpace(filename) && File.Exists(filename))
-            {
-                foreach (string line in File.ReadAllLines(filename))
-                {
-                    Debug.Log(line);
-                }
-            }
         }
     }
 }
