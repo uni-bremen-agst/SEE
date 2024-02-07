@@ -142,6 +142,17 @@ namespace SEE.VCS
         }
 
         [Test]
+        public void TestCopied()
+        {
+            Assert.AreEqual(Change.Copied,
+                            vcs.GetFileChange("Assets/SEETests/CopyOfDummyHereForTestVCS.cs",
+                                              "a38c505030ce716e45aa023a3f60524ea7d22ec4",
+                                              "888ded45ae3b2dbe52afaa1306cfda93bc69371a",
+                                              out string oldFilename));
+            Assert.IsNull(oldFilename);
+        }
+
+        [Test]
         public void TestUnknownNewCommitID()
         {
             Assert.Throws<UnknownCommitID>(() => vcs.GetFileChange(gitVersionControl, oldCommit, "DOESNOTEXIST", out string _));

@@ -188,8 +188,8 @@ namespace SEE.VCS
                         return Change.Renamed;
 
                     case ChangeKind.Copied:
-                        Debug.LogError($"File was copied from {change.OldPath} to {change.Path}.\n");
-                        break;
+                        oldFilename += change.OldPath;
+                        return Change.Copied;
 
                     case ChangeKind.Ignored:
                         return Change.Ignored;
