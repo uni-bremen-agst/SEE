@@ -95,18 +95,18 @@ namespace SEE.UI.Window.TreeWindow
         /// <summary>
         /// The filter to use for determining which elements are included in the tree window.
         /// </summary>
-        private readonly GraphFilter Filter;
+        private readonly GraphFilter filter;
 
         /// <summary>
         /// The graph on which the tree window is based.
         /// </summary>
-        private readonly Graph Graph;
+        private readonly Graph graph;
 
         /// <summary>
         /// A mapping from node IDs and groups to the number of descendants of that node
         /// that are included in the tree window and belong to that group.
         /// </summary>
-        private readonly DefaultDictionary<(string nodeId, TreeWindowGroup group), int> DescendantCounts;
+        private readonly DefaultDictionary<(string nodeId, TreeWindowGroup group), int> descendantCounts;
 
         /// <summary>
         /// Creates a new <see cref="TreeWindowGrouper"/> with the given parameters.
@@ -115,9 +115,9 @@ namespace SEE.UI.Window.TreeWindow
         /// <param name="graph">The graph on which the tree window is based.</param>
         public TreeWindowGrouper(GraphFilter filter, Graph graph)
         {
-            Filter = filter;
-            Graph = graph;
-            DescendantCounts = new DefaultDictionary<(string, TreeWindowGroup), int>();
+            this.filter = filter;
+            this.graph = graph;
+            descendantCounts = new DefaultDictionary<(string, TreeWindowGroup), int>();
             Reset();
         }
 
@@ -127,7 +127,7 @@ namespace SEE.UI.Window.TreeWindow
         public void Reset()
         {
             Assignment = ITreeWindowGroupAssigment.Dummy();
-            DescendantCounts.Clear();
+            descendantCounts.Clear();
         }
 
         /// <summary>
@@ -158,14 +158,14 @@ namespace SEE.UI.Window.TreeWindow
         /// <param name="group">The group to which the descendants shall belong.</param>
         /// <returns>The number of descendants of the given <paramref name="node"/> that are included in the tree window
         /// and belong to the given <paramref name="group"/>.</returns>
-        public int DescendantsInGroup(Node node, TreeWindowGroup group) => DescendantCounts[(node.ID, group)];
+        public int DescendantsInGroup(Node node, TreeWindowGroup group) => descendantCounts[(node.ID, group)];
 
         /// <summary>
         /// Returns the number of members of the given <paramref name="group"/>.
         /// </summary>
         /// <param name="group">The group whose members shall be counted.</param>
         /// <returns>The number of members of the given <paramref name="group"/>.</returns>
-        public int MembersInGroup(TreeWindowGroup group) => Graph.GetRoots().Sum(x => DescendantsInGroup(x, group));
+        public int MembersInGroup(TreeWindowGroup group) => graph.GetRoots().Sum(x => DescendantsInGroup(x, group));
 
         /// <summary>
         /// Rebuilds the descendant counts for all nodes.
@@ -175,8 +175,8 @@ namespace SEE.UI.Window.TreeWindow
         /// </remarks>
         public void RebuildCounts()
         {
-            DescendantCounts.Clear();
-            foreach (Node root in Graph.GetRoots())
+            descendantCounts.Clear();
+            foreach (Node root in graph.GetRoots())
             {
                 BuildDescendantCounts(root);
             }
@@ -192,7 +192,7 @@ namespace SEE.UI.Window.TreeWindow
         /// and belong to the given <paramref name="group"/>.</returns>
         public IEnumerable<GraphElement> ChildrenInGroup(Node node, TreeWindowGroup group)
         {
-            return node.Children().Concat<GraphElement>(node.Edges).Where(x => Filter.Includes(x) && GetGroupFor(x) == group);
+            return node.Children().Concat<GraphElement>(node.Edges).Where(x => filter.Includes(x) && GetGroupFor(x) == group);
         }
 
         /// <summary>
@@ -205,12 +205,12 @@ namespace SEE.UI.Window.TreeWindow
         /// <returns>Whether the given <paramref name="element"/> is relevant for the given <paramref name="group"/>.</returns>
         public bool IsRelevantFor(GraphElement element, TreeWindowGroup group)
         {
-            return DescendantCounts[(element.ID, group)] > 0 || (Filter.Includes(element) && GetGroupFor(element) == group);
+            return descendantCounts[(element.ID, group)] > 0 || (filter.Includes(element) && GetGroupFor(element) == group);
         }
 
         /// <summary>
         /// Computes the descendant counts for the given <paramref name="node"/>
-        /// and stores them in <see cref="DescendantCounts"/>.
+        /// and stores them in <see cref="descendantCounts"/>.
         /// </summary>
         /// <param name="node">The node whose descendant counts shall be computed.</param>
         private void BuildDescendantCounts(Node node)
@@ -223,7 +223,7 @@ namespace SEE.UI.Window.TreeWindow
                     // We add the number of relevant children to the sum of the counts of *all* children.
                     // The latter uses all children, not just the relevant ones, because we want to include
                     // relevant descendants of irrelevant children as well.
-                    DescendantCounts[(descendant.ID, group)] = descendant.Children().Sum(x => DescendantCounts[(x.ID, group)]) + ChildrenInGroup(descendant, group).Count();
+                    descendantCounts[(descendant.ID, group)] = descendant.Children().Sum(x => descendantCounts[(x.ID, group)]) + ChildrenInGroup(descendant, group).Count();
                 }
             }
         }

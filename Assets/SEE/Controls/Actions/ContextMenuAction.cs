@@ -24,11 +24,11 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The popup menu that is shown when the user requests the context menu.
         /// </summary>
-        private PopupMenu PopupMenu;
+        private PopupMenu popupMenu;
 
         private void Start()
         {
-            PopupMenu = gameObject.AddComponent<PopupMenu>();
+            popupMenu = gameObject.AddComponent<PopupMenu>();
         }
 
         private void Update()
@@ -43,7 +43,7 @@ namespace SEE.Controls.Actions
                 }
 
                 IEnumerable<PopupMenuAction> actions = GetApplicableOptions(o.GraphElemRef.Elem, o.gameObject);
-                PopupMenu.ShowWith(actions, Input.mousePosition);
+                popupMenu.ShowWith(actions, Input.mousePosition);
             }
         }
 
@@ -83,10 +83,10 @@ namespace SEE.Controls.Actions
 
             if (gameObject != null)
             {
-                actions.Add(new("Highlight", Highlight, Icons.LightBulb));
+                actions.Add(new("Show in City", Highlight, Icons.LightBulb));
             }
 
-            if (graphElement.Filename() != null)
+            if (graphElement.Filename != null)
             {
                 actions.Add(new("Show Code", ShowCode, Icons.Code));
                 if (gameObject.ContainingCity<DiffCity>() != null)
@@ -190,7 +190,7 @@ namespace SEE.Controls.Actions
 
             void RevealInTreeView()
             {
-                ActivateTreeWindow(node, gameObject.transform).RevealElement(node).Forget();
+                ActivateTreeWindow(node, gameObject.transform).RevealElementAsync(node).Forget();
             }
         }
 
@@ -222,12 +222,12 @@ namespace SEE.Controls.Actions
 
             void RevealAtSource()
             {
-                ActivateTreeWindow(edge, gameObject.transform).RevealElement(edge, viaSource: true).Forget();
+                ActivateTreeWindow(edge, gameObject.transform).RevealElementAsync(edge, viaSource: true).Forget();
             }
 
             void RevealAtTarget()
             {
-                ActivateTreeWindow(edge, gameObject.transform).RevealElement(edge, viaSource: false).Forget();
+                ActivateTreeWindow(edge, gameObject.transform).RevealElementAsync(edge, viaSource: false).Forget();
             }
 
             void ShowUnifiedDiff()

@@ -59,22 +59,22 @@ namespace SEE.UI.Window.TreeWindow
         /// <summary>
         /// The input field in which the user can enter a search term.
         /// </summary>
-        private TMP_InputField SearchField;
+        private TMP_InputField searchField;
 
         /// <summary>
         /// The button that opens the filter menu.
         /// </summary>
-        private ButtonManagerBasic FilterButton;
+        private ButtonManagerBasic filterButton;
 
         /// <summary>
         /// The button that opens the grouping menu.
         /// </summary>
-        private ButtonManagerBasic GroupButton;
+        private ButtonManagerBasic groupButton;
 
         /// <summary>
         /// The button that opens the sorting menu.
         /// </summary>
-        private ButtonManagerBasic SortButton;
+        private ButtonManagerBasic sortButton;
 
         /// <summary>
         /// Orders the tree below the given <paramref name="orderBelow"/> group according to the graph hierarchy.
@@ -148,11 +148,11 @@ namespace SEE.UI.Window.TreeWindow
                 OrderItemHere(id, level);
                 if (expandedItems.Contains(id))
                 {
-                    IEnumerable<Node> children = Searcher.Sorter.Apply(WithHiddenChildren(node.Children(), inGroup));
+                    IEnumerable<Node> children = searcher.Sorter.Apply(WithHiddenChildren(node.Children(), inGroup));
                     // When grouping is active, we sort by the count of group elements in this node.
-                    if (Grouper.IsActive)
+                    if (grouper.IsActive)
                     {
-                        children = children.OrderByDescending(x => Grouper.DescendantsInGroup(x, inGroup));
+                        children = children.OrderByDescending(x => grouper.DescendantsInGroup(x, inGroup));
                     }
                     foreach (Node child in children)
                     {
@@ -207,7 +207,7 @@ namespace SEE.UI.Window.TreeWindow
         /// <param name="group">The group to be added.</param>
         private void AddGroup(TreeWindowGroup group)
         {
-            AddItem(CleanupID(group.Text), true, $"{group.Text} [{Grouper.MembersInGroup(group)}]",
+            AddItem(CleanupID(group.Text), true, $"{group.Text} [{grouper.MembersInGroup(group)}]",
                     group.IconGlyph, gradient: group.Gradient,
                     collapseItem: CollapseGroup, expandItem: ExpandGroup);
             if (expandedItems.Contains(CleanupID(group.Text)))
@@ -248,7 +248,7 @@ namespace SEE.UI.Window.TreeWindow
         /// <returns>Whether the given <paramref name="element"/> shall be displayed in the tree window.</returns>
         private bool ShouldBeDisplayed(GraphElement element, TreeWindowGroup inGroup = null)
         {
-            return (inGroup != null && Grouper.IsRelevantFor(element, inGroup)) || (inGroup == null && Searcher.Filter.Includes(element));
+            return (inGroup != null && grouper.IsRelevantFor(element, inGroup)) || (inGroup == null && searcher.Filter.Includes(element));
         }
 
         /// <summary>
@@ -269,8 +269,8 @@ namespace SEE.UI.Window.TreeWindow
                 {
                     // Not actually the number of direct children, but this doesn't matter, as we only
                     // need it for the text and to check whether there are any children at all.
-                    children = Grouper.DescendantsInGroup(node, inGroup);
-                    if (Grouper.GetGroupFor(node) != inGroup)
+                    children = grouper.DescendantsInGroup(node, inGroup);
+                    if (grouper.GetGroupFor(node) != inGroup)
                     {
                         // This node is only included because it has relevant descendants.
                         text = $"<i>{text}</i>";
@@ -411,10 +411,10 @@ namespace SEE.UI.Window.TreeWindow
                                                                    .Where(x => !x.Name.Contains("TreeWindow"));
                             actions = actions.Append(new PopupMenuAction("Hide in TreeWindow", () =>
                             {
-                                Searcher.Filter.ExcludeElements.Add(representedGraphElement);
+                                searcher.Filter.ExcludeElements.Add(representedGraphElement);
                                 Rebuild();
                             }, Icons.Hide));
-                            ContextMenu.ShowWith(actions, e.position);
+                            contextMenu.ShowWith(actions, e.position);
                         }
                         else
                         {
@@ -564,20 +564,20 @@ namespace SEE.UI.Window.TreeWindow
         /// <returns>The edges of the node, grouped by their type.</returns>
         private IEnumerable<(List<Edge> edges, string edgesType)> RelevantEdges(Node node, TreeWindowGroup inGroup = null)
         {
-            List<Edge> outgoings = Searcher.Filter.Apply(node.Outgoings).ToList();
-            List<Edge> incomings = Searcher.Filter.Apply(node.Incomings).ToList();
+            List<Edge> outgoings = searcher.Filter.Apply(node.Outgoings).ToList();
+            List<Edge> incomings = searcher.Filter.Apply(node.Incomings).ToList();
             // We need to lift edges of any hidden children upwards to the first visible parent, which is
             // this node. We then need to filter them again, since they may have been hidden by the filter.
             List<Node> hiddenChildren = HiddenChildren(node.Children(), inGroup).ToList();
-            List<Edge> liftedOutgoings = Searcher.Filter.Apply(hiddenChildren.SelectMany(x => x.Outgoings)).ToList();
-            List<Edge> liftedIncomings = Searcher.Filter.Apply(hiddenChildren.SelectMany(x => x.Incomings)).ToList();
+            List<Edge> liftedOutgoings = searcher.Filter.Apply(hiddenChildren.SelectMany(x => x.Outgoings)).ToList();
+            List<Edge> liftedIncomings = searcher.Filter.Apply(hiddenChildren.SelectMany(x => x.Incomings)).ToList();
             return new[]
                 {
                     (outgoings, "Outgoing"),
                     (incomings, "Incoming"),
                     (liftedOutgoings, "Lifted Outgoing"),
                     (liftedIncomings, "Lifted Incoming")
-                }.Select(x => inGroup == null ? x : (x.Item1.Where(y => Grouper.IsRelevantFor(y, inGroup)).ToList(), x.Item2))
+                }.Select(x => inGroup == null ? x : (x.Item1.Where(y => grouper.IsRelevantFor(y, inGroup)).ToList(), x.Item2))
                  .Where(x => x.Item1.Count > 0);
         }
 
@@ -688,16 +688,16 @@ namespace SEE.UI.Window.TreeWindow
             ClearTree();
             if (searchTerm == null || searchTerm.Trim().Length == 0)
             {
-                AddRoots().Forget();
+                AddRootsAsync().Forget();
                 return;
             }
 
-            foreach (Node node in Searcher.Search(searchTerm))
+            foreach (Node node in searcher.Search(searchTerm))
             {
                 GameObject nodeGameObject = GraphElementIDMap.Find(node.ID, mustFindElement: true);
                 AddItem(CleanupID(node.ID),
                         false, node.ToShortString(), Icons.Node, nodeGameObject, node,
-                        expandItem: (_, _) => RevealElement(node).Forget());
+                        expandItem: (_, _) => RevealElementAsync(node).Forget());
             }
 
             items.position = items.position.WithXYZ(y: 0);
@@ -711,25 +711,25 @@ namespace SEE.UI.Window.TreeWindow
         /// </summary>
         /// <param name="element">The element to be made visible.</param>
         /// <param name="viaSource">Whether to make the source or target node of the edge visible.</param>
-        public async UniTaskVoid RevealElement(GraphElement element, bool viaSource = false)
+        public async UniTaskVoid RevealElementAsync(GraphElement element, bool viaSource = false)
         {
-            TreeWindowGroup group = Grouper?.GetGroupFor(element);
-            if (SearchField == null)
+            TreeWindowGroup group = grouper?.GetGroupFor(element);
+            if (searchField == null)
             {
                 // We need to wait until the window is initialized.
                 // This case may occur when the method is called from the outside.
-                await UniTask.WaitUntil(() => SearchField != null);
+                await UniTask.WaitUntil(() => searchField != null);
             }
-            if (!ShouldBeDisplayed(element) || (group == null && Grouper != null && Grouper.IsActive))
+            if (!ShouldBeDisplayed(element) || (group == null && grouper != null && grouper.IsActive))
             {
                 ShowNotification.Warn("Element filtered out",
                                       "Element is not included in the current filter or group and thus can't be shown.");
                 return;
             }
-            SearchField.onValueChanged.RemoveListener(SearchFor);
-            SearchField.text = string.Empty;
-            SearchField.ReleaseSelection();
-            SearchField.onValueChanged.AddListener(SearchFor);
+            searchField.onValueChanged.RemoveListener(SearchFor);
+            searchField.text = string.Empty;
+            searchField.ReleaseSelection();
+            searchField.onValueChanged.AddListener(SearchFor);
             ClearTree();
 
             Node current = element switch
@@ -762,7 +762,7 @@ namespace SEE.UI.Window.TreeWindow
             }
 
             // We need to wait until the transform actually exists, hence the await.
-            await AddRoots();
+            await AddRootsAsync();
 
             RectTransform item = (RectTransform)items.Find(transformID);
             scrollRect.ScrollTo(item, duration: 1f);
@@ -797,17 +797,17 @@ namespace SEE.UI.Window.TreeWindow
             items = (RectTransform)root.Find("Content/Items");
             scrollRect = root.gameObject.MustGetComponent<ScrollRect>();
 
-            SearchField = root.Find("Search/SearchField").gameObject.MustGetComponent<TMP_InputField>();
-            SearchField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
-            SearchField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
-            SearchField.onValueChanged.AddListener(SearchFor);
+            searchField = root.Find("Search/SearchField").gameObject.MustGetComponent<TMP_InputField>();
+            searchField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
+            searchField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
+            searchField.onValueChanged.AddListener(SearchFor);
 
-            FilterButton = root.Find("Search/Filter").gameObject.MustGetComponent<ButtonManagerBasic>();
-            SortButton = root.Find("Search/Sort").gameObject.MustGetComponent<ButtonManagerBasic>();
-            GroupButton = root.Find("Search/Group").gameObject.MustGetComponent<ButtonManagerBasic>();
+            filterButton = root.Find("Search/Filter").gameObject.MustGetComponent<ButtonManagerBasic>();
+            sortButton = root.Find("Search/Sort").gameObject.MustGetComponent<ButtonManagerBasic>();
+            groupButton = root.Find("Search/Group").gameObject.MustGetComponent<ButtonManagerBasic>();
             PopupMenu.PopupMenu popupMenu = gameObject.AddComponent<PopupMenu.PopupMenu>();
-            ContextMenu = new TreeWindowContextMenu(popupMenu, Searcher, Grouper, Rebuild,
-                                                    FilterButton, SortButton, GroupButton);
+            contextMenu = new TreeWindowContextMenu(popupMenu, searcher, grouper, Rebuild,
+                                                    filterButton, sortButton, groupButton);
 
             Rebuild();
         }
@@ -818,8 +818,8 @@ namespace SEE.UI.Window.TreeWindow
         private void Rebuild()
         {
             ClearTree();
-            Grouper?.RebuildCounts();
-            AddRoots().Forget();
+            grouper?.RebuildCounts();
+            AddRootsAsync().Forget();
         }
     }
 }

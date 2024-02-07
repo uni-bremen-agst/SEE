@@ -49,11 +49,6 @@ namespace SEE.Controls.Actions
 
         public override void Awake()
         {
-            // In case we do not have an ID yet, we request one.
-            if (ICRDT.GetLocalID() == 0)
-            {
-                new NetCRDT().RequestID();
-            }
             spaceManager = WindowSpaceManager.ManagerInstance;
         }
 
@@ -113,7 +108,7 @@ namespace SEE.Controls.Actions
         /// </exception>
         private static (string filename, string absolutePlatformPath) GetPath(GraphElement graphElement)
         {
-            string filename = graphElement.Filename();
+            string filename = graphElement.Filename;
             if (filename == null)
             {
                 string message = $"Selected {GetName(graphElement)} has no filename.";
@@ -249,7 +244,7 @@ namespace SEE.Controls.Actions
             codeWindow.EnterFromFile(absolutePlatformPath);
 
             // Pass line number to automatically scroll to it, if it exists
-            if (graphElement.SourceLine() is { } line)
+            if (graphElement.SourceLine is { } line)
             {
                 codeWindow.ScrolledVisibleLine = line;
             }

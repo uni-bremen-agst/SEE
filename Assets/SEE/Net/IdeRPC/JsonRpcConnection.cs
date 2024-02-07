@@ -92,7 +92,7 @@ namespace SEE.Utils.IdeRPC
                 return;
             }
             started = true;
-            RunTask(tokenSource.Token).Forget();
+            RunTaskAsync(tokenSource.Token).Forget();
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace SEE.Utils.IdeRPC
         /// <see cref="Disconnected"/>.
         /// </summary>
         /// <returns>UniTask.</returns>
-        private async UniTask RunTask(CancellationToken token)
+        private async UniTask RunTaskAsync(CancellationToken token)
         {
             if (!InitiateJsonRpc())
             {

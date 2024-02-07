@@ -50,7 +50,7 @@ namespace SEE.IDE
         /// <summary>
         /// Path to external program to receive all information about Visual Studio.
         /// </summary>
-        private static readonly string vsWherePath = Application.streamingAssetsPath + "\\vswhere\\vswhere.exe";
+        private static readonly string vsWherePath = Application.streamingAssetsPath + @"\vswhere\vswhere.exe";
 
         /// <summary>
         /// Version range for Visual Studio 2019
@@ -95,7 +95,7 @@ namespace SEE.IDE
         /// <returns>Returns the output of the process</returns>
         private static async UniTask<string> ExecuteVSWhereAsync(string arguments)
         {
-            ProcessStartInfo start = new ProcessStartInfo
+            ProcessStartInfo start = new()
             {
                 FileName = vsWherePath,
                 Arguments = arguments,

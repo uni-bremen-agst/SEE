@@ -22,38 +22,38 @@ namespace SEE.UI.Window.TreeWindow
         /// <summary>
         /// The context menu that this class manages.
         /// </summary>
-        private readonly PopupMenu.PopupMenu ContextMenu;
+        private readonly PopupMenu.PopupMenu contextMenu;
 
         /// <summary>
         /// The graph search associated with the tree window.
         /// We also retrieve the graph from this.
         /// </summary>
-        private readonly GraphSearch Searcher;
+        private readonly GraphSearch searcher;
 
         /// <summary>
         /// The grouper that is used to group the elements in the tree window.
         /// </summary>
-        private readonly TreeWindowGrouper Grouper;
+        private readonly TreeWindowGrouper grouper;
 
         /// <summary>
         /// The function to call to rebuild the tree window.
         /// </summary>
-        private readonly Action Rebuild;
+        private readonly Action rebuild;
 
         /// <summary>
         /// The button that opens the filter menu.
         /// </summary>
-        private readonly ButtonManagerBasic FilterButton;
+        private readonly ButtonManagerBasic filterButton;
 
         /// <summary>
         /// The button that opens the sort menu.
         /// </summary>
-        private readonly ButtonManagerBasic SortButton;
+        private readonly ButtonManagerBasic sortButton;
 
         /// <summary>
         /// The button that opens the group menu.
         /// </summary>
-        private readonly ButtonManagerBasic GroupButton;
+        private readonly ButtonManagerBasic groupButton;
 
         /// <summary>
         /// Constructor.
@@ -69,26 +69,26 @@ namespace SEE.UI.Window.TreeWindow
                                      Action rebuild, ButtonManagerBasic filterButton, ButtonManagerBasic sortButton,
                                      ButtonManagerBasic groupButton)
         {
-            ContextMenu = contextMenu;
-            Searcher = searcher;
-            Grouper = grouper;
-            Rebuild = rebuild;
-            FilterButton = filterButton;
-            SortButton = sortButton;
-            GroupButton = groupButton;
+            this.contextMenu = contextMenu;
+            this.searcher = searcher;
+            this.grouper = grouper;
+            this.rebuild = rebuild;
+            this.filterButton = filterButton;
+            this.sortButton = sortButton;
+            this.groupButton = groupButton;
 
             ResetFilter();
             ResetSort();
             ResetGrouping();
-            FilterButton.clickEvent.AddListener(ShowFilterMenu);
-            SortButton.clickEvent.AddListener(ShowSortMenu);
-            GroupButton.clickEvent.AddListener(ShowGroupMenu);
+            this.filterButton.clickEvent.AddListener(ShowFilterMenu);
+            this.sortButton.clickEvent.AddListener(ShowSortMenu);
+            this.groupButton.clickEvent.AddListener(ShowGroupMenu);
         }
 
         /// <summary>
         /// Forwards to <see cref="PopupMenu.ShowWith(IEnumerable{PopupMenuEntry},Vector2)"/>.
         /// </summary>
-        public void ShowWith(IEnumerable<PopupMenuEntry> entries, Vector2 position) => ContextMenu.ShowWith(entries, position);
+        public void ShowWith(IEnumerable<PopupMenuEntry> entries, Vector2 position) => contextMenu.ShowWith(entries, position);
 
         #region Filter menu
 
@@ -98,7 +98,7 @@ namespace SEE.UI.Window.TreeWindow
         private void ShowFilterMenu()
         {
             UpdateFilterMenuEntries();
-            ContextMenu.ShowWith(position: FilterButton.transform.position);
+            contextMenu.ShowWith(position: filterButton.transform.position);
         }
 
         /// <summary>
@@ -106,8 +106,8 @@ namespace SEE.UI.Window.TreeWindow
         /// </summary>
         private void UpdateFilterMenuEntries()
         {
-            ISet<string> nodeToggles = Searcher.Graph.AllToggleNodeAttributes();
-            ISet<string> edgeToggles = Searcher.Graph.AllToggleEdgeAttributes();
+            ISet<string> nodeToggles = searcher.Graph.AllToggleNodeAttributes();
+            ISet<string> edgeToggles = searcher.Graph.AllToggleEdgeAttributes();
             ISet<string> commonToggles = nodeToggles.Intersect(edgeToggles).ToHashSet();
             // Don't include common toggles in node/edge toggles.
             nodeToggles.ExceptWith(commonToggles);
@@ -119,25 +119,25 @@ namespace SEE.UI.Window.TreeWindow
                 {
                     ResetFilter();
                     UpdateFilterMenuEntries();
-                    Rebuild();
+                    rebuild();
                 }, Icons.ArrowRotateLeft, CloseAfterClick: false),
                 new PopupMenuAction("Edges",
                                     () =>
                                     {
-                                        Searcher.Filter.IncludeEdges = !Searcher.Filter.IncludeEdges;
+                                        searcher.Filter.IncludeEdges = !searcher.Filter.IncludeEdges;
                                         UpdateFilterMenuEntries();
-                                        Rebuild();
+                                        rebuild();
                                     },
-                                    Checkbox(Searcher.Filter.IncludeEdges), CloseAfterClick: false),
+                                    Checkbox(searcher.Filter.IncludeEdges), CloseAfterClick: false),
             };
 
-            if (Searcher.Filter.ExcludeElements.Count > 0)
+            if (searcher.Filter.ExcludeElements.Count > 0)
             {
                 entries.Insert(0, new PopupMenuAction("Show hidden elements",
                                                       () =>
                                                       {
-                                                          Searcher.Filter.ExcludeElements.Clear();
-                                                          Rebuild();
+                                                          searcher.Filter.ExcludeElements.Clear();
+                                                          rebuild();
                                                       },
                                                       Icons.Show));
             }
@@ -158,8 +158,8 @@ namespace SEE.UI.Window.TreeWindow
                 entries.AddRange(edgeToggles.Select(FilterActionFor));
             }
 
-            ContextMenu.ClearEntries();
-            ContextMenu.AddEntries(entries);
+            contextMenu.ClearEntries();
+            contextMenu.AddEntries(entries);
         }
 
         /// <summary>
@@ -170,29 +170,29 @@ namespace SEE.UI.Window.TreeWindow
         private PopupMenuAction FilterActionFor(string toggleAttribute)
         {
             return new PopupMenuAction(toggleAttribute, ToggleFilterAction,
-                                       Searcher.Filter.ExcludeToggleAttributes.Contains(toggleAttribute)
+                                       searcher.Filter.ExcludeToggleAttributes.Contains(toggleAttribute)
                                            ? Icons.MinusCheckbox
-                                           : Checkbox(Searcher.Filter.IncludeToggleAttributes.Contains(toggleAttribute)),
+                                           : Checkbox(searcher.Filter.IncludeToggleAttributes.Contains(toggleAttribute)),
                                        CloseAfterClick: false);
 
             void ToggleFilterAction()
             {
                 // Toggle from include->exclude->none->include.
-                if (Searcher.Filter.IncludeToggleAttributes.Contains(toggleAttribute))
+                if (searcher.Filter.IncludeToggleAttributes.Contains(toggleAttribute))
                 {
-                    Searcher.Filter.IncludeToggleAttributes.Remove(toggleAttribute);
-                    Searcher.Filter.ExcludeToggleAttributes.Add(toggleAttribute);
+                    searcher.Filter.IncludeToggleAttributes.Remove(toggleAttribute);
+                    searcher.Filter.ExcludeToggleAttributes.Add(toggleAttribute);
                 }
-                else if (Searcher.Filter.ExcludeToggleAttributes.Contains(toggleAttribute))
+                else if (searcher.Filter.ExcludeToggleAttributes.Contains(toggleAttribute))
                 {
-                    Searcher.Filter.ExcludeToggleAttributes.Remove(toggleAttribute);
+                    searcher.Filter.ExcludeToggleAttributes.Remove(toggleAttribute);
                 }
                 else
                 {
-                    Searcher.Filter.IncludeToggleAttributes.Add(toggleAttribute);
+                    searcher.Filter.IncludeToggleAttributes.Add(toggleAttribute);
                 }
                 UpdateFilterMenuEntries();
-                Rebuild();
+                rebuild();
             }
         }
 
@@ -201,7 +201,7 @@ namespace SEE.UI.Window.TreeWindow
         /// </summary>
         private void ResetFilter()
         {
-            Searcher.Filter.Reset();
+            searcher.Filter.Reset();
         }
 
         /// <summary>
@@ -221,7 +221,7 @@ namespace SEE.UI.Window.TreeWindow
         private void ShowSortMenu()
         {
             UpdateSortMenuEntries();
-            ContextMenu.ShowWith(position: SortButton.transform.position);
+            contextMenu.ShowWith(position: sortButton.transform.position);
         }
 
         /// <summary>
@@ -235,25 +235,34 @@ namespace SEE.UI.Window.TreeWindow
                 {
                     ResetSort();
                     UpdateSortMenuEntries();
-                    Rebuild();
+                    rebuild();
                 }, Icons.ArrowRotateLeft, CloseAfterClick: false)
             };
 
-            if (Grouper.IsActive)
+            if (grouper.IsActive)
             {
                 entries.Add(new PopupMenuHeading("Grouping is active!"));
                 entries.Add(new PopupMenuHeading("Items ordered by group count."));
             }
 
-            // These are the attributes we want to sort by for the time being. We might want to include
-            // all other attributes in the future, in which case the following code needs to be adapted.
-            entries.Add(SortActionFor("Source Name", x => x is Node node ? node.SourceName : null, false));
-            entries.Add(SortActionFor("Source Line", x => x.SourceLine(), true));
-            entries.Add(SortActionFor("Filename", x => x.Filename(), false));
+            // In addition to the type, we want to be able to sort by all existing numeric and string attributes.
             entries.Add(SortActionFor("Type", x => x.Type, false));
+            entries.AddRange(searcher.Graph.AllNumericAttributes().Select(NumericAttributeSortAction));
+            entries.AddRange(searcher.Graph.AllStringAttributes().Select(StringAttributeSortAction));
 
-            ContextMenu.ClearEntries();
-            ContextMenu.AddEntries(entries);
+            contextMenu.ClearEntries();
+            contextMenu.AddEntries(entries);
+            return;
+
+            PopupMenuAction NumericAttributeSortAction(string attributeKey)
+            {
+                return SortActionFor(attributeKey, x => x.TryGetNumeric(attributeKey, out float value) ? value : null, true);
+            }
+
+            PopupMenuAction StringAttributeSortAction(string attributeKey)
+            {
+                return SortActionFor(attributeKey, x => x.TryGetString(attributeKey, out string value) ? value : null, false);
+            }
         }
 
         /// <summary>
@@ -266,27 +275,27 @@ namespace SEE.UI.Window.TreeWindow
         private PopupMenuAction SortActionFor(string name, Func<GraphElement, object> key, bool numeric)
         {
             return new PopupMenuAction(name, ToggleSortAction,
-                                       SortIcon(numeric, Searcher.Sorter.IsAttributeDescending(name)),
+                                       SortIcon(numeric, searcher.Sorter.IsAttributeDescending(name)),
                                        CloseAfterClick: false);
 
             void ToggleSortAction()
             {
                 // Switch from ascending->descending->none->ascending.
-                switch (Searcher.Sorter.IsAttributeDescending(name))
+                switch (searcher.Sorter.IsAttributeDescending(name))
                 {
                     case null:
-                        Searcher.Sorter.AddSortAttribute(name, key, false);
+                        searcher.Sorter.AddSortAttribute(name, key, false);
                         break;
                     case false:
-                        Searcher.Sorter.RemoveSortAttribute(name);
-                        Searcher.Sorter.AddSortAttribute(name, key, true);
+                        searcher.Sorter.RemoveSortAttribute(name);
+                        searcher.Sorter.AddSortAttribute(name, key, true);
                         break;
                     default:
-                        Searcher.Sorter.RemoveSortAttribute(name);
+                        searcher.Sorter.RemoveSortAttribute(name);
                         break;
                 }
                 UpdateSortMenuEntries();
-                Rebuild();
+                rebuild();
             }
         }
 
@@ -301,7 +310,8 @@ namespace SEE.UI.Window.TreeWindow
         {
             return (numeric, descending) switch
             {
-                (_, null) => ' ',
+                (true, null) => Icons.Hashtag,
+                (false, null) => Icons.Text,
                 (true, true) => Icons.SortNumericDown,
                 (true, false) => Icons.SortNumericUp,
                 (false, true) => Icons.SortAlphabeticalDown,
@@ -314,8 +324,8 @@ namespace SEE.UI.Window.TreeWindow
         /// </summary>
         private void ResetSort()
         {
-            Searcher.Sorter.Reset();
-            Searcher.Sorter.AddSortAttribute("Source Name", x => x is Node node ? node.SourceName : null, false);
+            searcher.Sorter.Reset();
+            searcher.Sorter.AddSortAttribute("Source Name", x => x is Node node ? node.SourceName : null, false);
         }
 
         #endregion
@@ -328,7 +338,7 @@ namespace SEE.UI.Window.TreeWindow
         private void ShowGroupMenu()
         {
             UpdateGroupMenuEntries();
-            ContextMenu.ShowWith(position: GroupButton.transform.position);
+            contextMenu.ShowWith(position: groupButton.transform.position);
         }
 
         /// <summary>
@@ -336,15 +346,15 @@ namespace SEE.UI.Window.TreeWindow
         /// </summary>
         private void UpdateGroupMenuEntries()
         {
-            ISet<TreeWindowGroup> currentGroups = Grouper.AllGroups.ToHashSet();
+            ISet<TreeWindowGroup> currentGroups = grouper.AllGroups.ToHashSet();
             List<PopupMenuEntry> entries = new()
             {
                 new PopupMenuAction("None", () =>
                 {
                     ResetGrouping();
-                    Rebuild();
+                    rebuild();
                     UpdateGroupMenuEntries();
-                }, Radio(!Grouper.IsActive), CloseAfterClick: true),
+                }, Radio(!grouper.IsActive), CloseAfterClick: true),
                 // Here we define the criteria by which a user can group. If new grouping criteria
                 // arise in the future, they need to be added here.
                 GroupActionFor("Reflexion State",
@@ -353,10 +363,10 @@ namespace SEE.UI.Window.TreeWindow
                                                                                       elementSelector: ReflexionStateToGroup),
                                                                     element => element is Edge edge ? edge.State() : null)),
                 GroupActionFor("Type",
-                               new TreeWindowGroupAssigment<string>(Searcher.Graph.AllElementTypes().ToDictionary(x => x, TypeToGroup), element => element.Type)),
+                               new TreeWindowGroupAssigment<string>(searcher.Graph.AllElementTypes().ToDictionary(x => x, TypeToGroup), element => element.Type)),
             };
-            ContextMenu.ClearEntries();
-            ContextMenu.AddEntries(entries);
+            contextMenu.ClearEntries();
+            contextMenu.AddEntries(entries);
             return;
 
             // Returns the group action for the given <paramref name="name"/> and <paramref name="assignment"/>.
@@ -364,8 +374,8 @@ namespace SEE.UI.Window.TreeWindow
             {
                 return new PopupMenuAction(name, () =>
                                            {
-                                               Grouper.Assignment = assignment;
-                                               Rebuild();
+                                               grouper.Assignment = assignment;
+                                               rebuild();
                                                UpdateGroupMenuEntries();
                                            }, Radio(currentGroups.SetEquals(assignment.AllGroups)),
                                            CloseAfterClick: true);
@@ -410,7 +420,7 @@ namespace SEE.UI.Window.TreeWindow
         /// </summary>
         private void ResetGrouping()
         {
-            Grouper.Reset();
+            grouper.Reset();
         }
 
         #endregion

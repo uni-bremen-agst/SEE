@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using Cysharp.Threading.Tasks;
 using SEE.GO;
 using SEE.Utils;
 using TMPro;
@@ -140,15 +138,27 @@ namespace SEE.UI
         }
 
         /// <summary>
+        /// Destroys <see cref="loadingSpinner"/>. Field <see cref="loadingSpinner"/>
+        /// will be <c>null</c> afterwards.
+        /// </summary>
+        /// <remarks>Called by Unity.</remarks>
+        private void OnDisable()
+        {
+            // AXIVION Routine C#-MethodShouldBeDeclaredStatic: This method is interpreted by Unity.
+            Destroyer.Destroy(loadingSpinner);
+            loadingSpinner = null;
+        }
+
+        /// <summary>
         /// A disposable that hides the loading spinner when disposed.
         /// </summary>
-        /// <param name="processName">The unique message for the loading process that this disposable represents</param>
-        private record LoadingSpinnerDisposable(string processName) : IDisposable
+        /// <param name="ProcessName">The unique message for the loading process that this disposable represents</param>
+        private record LoadingSpinnerDisposable(string ProcessName) : IDisposable
         {
             /// <summary>
-            /// Disposes this disposable, hiding the loading spinner for the given <paramref name="processName"/>.
+            /// Disposes this disposable, hiding the loading spinner for the given <paramref name="ProcessName"/>.
             /// </summary>
-            public void Dispose() => Hide(processName);
+            public void Dispose() => Hide(ProcessName);
         }
     }
 }

@@ -84,23 +84,34 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Sets the node factories for <see cref="nodeTypeToFactory"/> for all node types in <see cref="graphs"/>.
+        /// Sets the node factories for <see cref="nodeTypeToFactory"/> for all node types
+        /// in <see cref="Settings"/> and those in the <see cref="graphs"/> (i.e., <see cref="AllNodeTypes"/>.
+        /// There may be nodes in the graphs for which no specification exists in <see cref="Settings"/>,
+        /// in which case defaults are used. This could happen, for instance, if we add an artifical
+        /// root with an <see cref="Graph.UnknownType"/>.
         /// </summary>
         private void SetNodeFactories()
         {
-            foreach (string nodeType in AllNodeTypes())
+            // We add all node types in the settings even if there may not be any node
+            // in the graphs with a node type therein. That will not cause any harm.
+            ISet<string> specifiedNodeTypes = Settings.NodeTypes.Types;
+            foreach (string nodeType in specifiedNodeTypes)
             {
-                if (Settings.NodeTypes.TryGetValue(nodeType, out VisualNodeAttributes value))
-                {
-                    nodeTypeToFactory[nodeType] = GetNodeFactory(value);
-                    nodeTypeToAntennaDectorator[nodeType] = GetAntennaDecorator(value);
-                }
-                else
-                {
-                    Debug.LogWarning($"No specification of visual attributes for node type {nodeType}. Using a default.\n");
-                    nodeTypeToFactory[nodeType] = GetDefaultNodeFactory();
-                    nodeTypeToAntennaDectorator[nodeType] = null;
-                }
+                VisualNodeAttributes visualNodeAttributes = Settings.NodeTypes[nodeType];
+                nodeTypeToFactory[nodeType] = GetNodeFactory(visualNodeAttributes);
+                nodeTypeToAntennaDectorator[nodeType] = GetAntennaDecorator(visualNodeAttributes);
+            }
+
+            // Now we need defaults for node types in the graphs for which no setting could
+            // be found above.
+            ISet<string> nodeTypesInGraph = AllNodeTypes();
+            nodeTypesInGraph.ExceptWith(specifiedNodeTypes);
+
+            foreach (string nodeType in nodeTypesInGraph)
+            {
+                Debug.LogWarning($"No specification of visual attributes for node type {nodeType}. Using a default.\n");
+                nodeTypeToFactory[nodeType] = GetDefaultNodeFactory();
+                nodeTypeToAntennaDectorator[nodeType] = null;
             }
 
             // The default node factory that we use if the we cannot find a setting for a given node type.
@@ -243,7 +254,7 @@ namespace SEE.Game.CityRendering
         /// <returns>mapping of graph node onto its corresponding game node</returns>
         private static Dictionary<Node, T> NodeToGameNodeMap<T>(IEnumerable<T> gameNodes) where T : AbstractLayoutNode
         {
-            Dictionary<Node, T> map = new Dictionary<Node, T>();
+            Dictionary<Node, T> map = new();
             foreach (T node in gameNodes)
             {
                 map[node.ItsNode] = node;

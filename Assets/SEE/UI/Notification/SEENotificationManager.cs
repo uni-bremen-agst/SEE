@@ -60,7 +60,7 @@ namespace SEE.UI.Notification
             notification.Color = color;
             notification.DestroyAfterPlaying = true;
             notification.OnFinished = () => HandleClosedNotification(notification);
-            HandleNewNotification(notification).Forget();
+            HandleNewNotificationAsync(notification).Forget();
             return notification;
         }
 
@@ -68,7 +68,7 @@ namespace SEE.UI.Notification
         /// Handles newly created notifications by moving other notifications down.
         /// </summary>
         /// <param name="notification">The newly created notification</param>
-        private async UniTaskVoid HandleNewNotification(Notification notification)
+        private async UniTaskVoid HandleNewNotificationAsync(Notification notification)
         {
             // Notification will be initialized next frame.
             float finalHeight = 0;
@@ -99,7 +99,7 @@ namespace SEE.UI.Notification
             CancellationTokenSource token = new();
             notifications.Add(new NotificationData(notification, finalHeight + margin, token));
 
-            StartTimer(notification, token.Token).Forget();
+            StartTimerAsync(notification, token.Token).Forget();
         }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace SEE.UI.Notification
         /// </summary>
         /// <param name="notification">notification whose timer shall be started</param>
         /// <param name="token">cancellation token with which the timer can be cancelled</param>
-        private async UniTaskVoid StartTimer(Notification notification, CancellationToken token)
+        private async UniTaskVoid StartTimerAsync(Notification notification, CancellationToken token)
         {
             if (notification.Timer <= 0f)
             {
@@ -168,7 +168,7 @@ namespace SEE.UI.Notification
             {
                 // Top spot has changed. We start the timer for the new top notification.
                 CancellationTokenSource token = notifications[index - 1].Token = new CancellationTokenSource();
-                StartTimer(notifications[index - 1].Notification, token.Token).Forget();
+                StartTimerAsync(notifications[index - 1].Notification, token.Token).Forget();
             }
 
             // We also need to dispose the token.

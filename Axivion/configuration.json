@@ -71,6 +71,7 @@
             "allow_dependencies_to_parents": true,
             "architecture_file": "$(SEEDIRECTORY)\\Data\\GXL\\SEE\\Architecture.gxl",
             "base_view_name": "Code Facts",
+            "generate_violation_previews": false,
             "hierarchy_view_name": "Code Facts",
             "mapping_file": "$(SEEDIRECTORY)\\Data\\GXL\\SEE\\Mapping.gxl"
         },
@@ -176,6 +177,9 @@
             "_active": true
         },
         "CycleDetection-IncludeCycles": {
+            "_active": true
+        },
+        "FileWide": {
             "_active": true
         },
         "Generic-MarkupComments": {
@@ -394,7 +398,8 @@
             "_active": true
         },
         "Metric-Lines.Class.OnlyComment": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-Lines.Code": {
             "_active": true
@@ -418,13 +423,15 @@
             "_active": true
         },
         "Metric-Lines.File.OnlyComment": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-Lines.LOC": {
             "_active": true
         },
         "Metric-Lines.OnlyComment": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-Lines.PP.Define": {
             "_active": true
@@ -493,7 +500,8 @@
             "_active": true
         },
         "Metric-Lines.Routine.OnlyComment": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-LogNPathCeiling": {
             "_active": true
@@ -547,7 +555,8 @@
             "_active": true
         },
         "Metric-OO.CBOa": {
-            "_active": true
+            "_active": true,
+            "max_value": 15
         },
         "Metric-OO.CBOs": {
             "_active": true
@@ -577,7 +586,8 @@
             "_active": true
         },
         "Metric-OO.NOMA": {
-            "_active": true
+            "_active": true,
+            "max_value": 30
         },
         "Metric-OO.NOMO": {
             "_active": true
@@ -636,9 +646,24 @@
         "Metric-TokenMetric.XXX": {
             "_active": true
         },
+        "NextLine": {
+            "_active": true
+        },
+        "NextRoutine": {
+            "_active": true
+        },
+        "SameLine": {
+            "_active": true
+        },
+        "SameRoutine": {
+            "_active": true
+        },
         "SaveRFG": {
             "_active": true,
             "rfg_file": null
+        },
+        "SelectedRoutine": {
+            "_active": true
         }
     },
     "Project": {
@@ -703,16 +728,26 @@
                 }
             },
             "local_mode": {
-                "directory": "($userprofile)\\.bauhaus\\localbuild\\projects"
+                "directory": "$(SEEDIRECTORY)\\.bauhaus\\localbuild\\projects",
+                "provide_ir": {
+                    "provide_in_dashboard": false
+                },
+                "provide_rfg": {
+                    "backup_existing": true
+                }
             }
+        },
+        "JSONReport": {
+            "_active": true,
+            "filename": "$(SEEDIRECTORY)/issues.json"
         }
     },
     "_Format": "1.0",
-    "_Version": "7.6.3",
+    "_Version": "7.7.1",
     "_VersionNum": [
         7,
-        6,
-        3,
-        12797
+        7,
+        1,
+        13682
     ]
 }

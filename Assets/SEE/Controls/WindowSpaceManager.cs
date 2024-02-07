@@ -116,7 +116,7 @@ namespace SEE.Controls
                 }
 
                 // Close windows which are no longer open
-                closedWindows.ForEach(windowSpaces[playerName].CloseWindow);
+                closedWindows.ForEach(x => windowSpaces[playerName].CloseWindow(x));
 
                 // Set active window if it changed
                 if (windowSpaces[playerName].ActiveWindow.Title != valueObject.ActiveWindow.Title)

@@ -65,7 +65,7 @@ namespace SEE.DataModel.GraphSearch
         public IEnumerable<Node> Search(string query, int limit = 10, int cutoff = 40)
         {
             IEnumerable<(int Score, Node Element)> results = Process.ExtractTop(FilterString(query), elements.Keys, limit: limit, cutoff: cutoff)
-                                                                    .SelectMany(x => Modifiers.ApplyAll(elements[x.Value]).Select(Element => (x.Score, Element)));
+                                                                    .SelectMany(x => Modifiers.ApplyAll(elements[x.Value]).Select(element => (x.Score, element)));
             if (!Sorter.IsActive())
             {
                 // If we don't sort by any custom attribute, we sort by the fuzzy score.

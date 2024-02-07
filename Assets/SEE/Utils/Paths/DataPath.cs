@@ -264,6 +264,11 @@ namespace SEE.Utils.Paths
             }
         }
 
+        public override string ToString()
+        {
+            return $"root={Root} relativePath={relativePath} absolutePath={absolutePath}";
+        }
+
         /// <summary>
         /// The attribute label for the relative path of a DataPath in the stored configuration file.
         /// </summary>

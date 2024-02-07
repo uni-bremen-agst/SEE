@@ -34,6 +34,8 @@ namespace SEE.Utils
         public const char SortAlphabeticalDown = '\uF15D';
         public const char SortNumericUp = '\uF163';
         public const char SortNumericDown = '\uF162';
+        public const char Hashtag = '#';
+        public const char Text = '\uF031';
         public const char EmptyRadio = '\uF111';
         public const char CheckedRadio = '\uF192';
         public const char CircleMinus = '\uF056';

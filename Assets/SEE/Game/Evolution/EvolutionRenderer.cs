@@ -104,7 +104,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// The message to be displayed while rendering the evolution city.
         /// </summary>
-        private string loadingMessage => $"Rendering evolution city {gameObject.name}...";
+        private string LoadingMessage => $"Rendering evolution city {gameObject.name}...";
 
         /// <summary>
         /// The manager of the game objects created for the city.
@@ -248,9 +248,9 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Informs the user about an error when attempting to load a layout.
         /// </summary>
-        private static Notification UserInfoNoLayout()
+        private static void UserInfoNoLayout()
         {
-            return ShowNotification.Error(notificationTitle, "Could not retrieve a layout for the graph.");
+            ShowNotification.Error(notificationTitle, "Could not retrieve a layout for the graph.");
         }
 
         #endregion
@@ -357,7 +357,7 @@ namespace SEE.Game.Evolution
 
             if (graphs.Count > 0)
             {
-                LoadingSpinner.Show(loadingMessage);
+                LoadingSpinner.Show(LoadingMessage);
             }
             CalculateAllGraphLayouts(graphs);
 
@@ -618,7 +618,7 @@ namespace SEE.Game.Evolution
             UpdateGameNodeHierarchy();
             RenderPlane();
 
-            LoadingSpinner.Hide(loadingMessage);
+            LoadingSpinner.Hide(LoadingMessage);
             IsStillAnimating = false;
             animationFinishedEvent.Invoke();
 

@@ -35,16 +35,8 @@ namespace SEE.Net.Dashboard
         /// </summary>
         [EnvironmentVariable("DASHBOARD_PUBLIC_KEY")]
         [TextArea]
-        [Tooltip("The public key for the X.509 certificate authority from the dashboard's certificate.")]
-        public string PublicKey = "3082018A028201810084BA2FF29AB0282BEE362EA659FE9C5A90CC7C6E6AED7743847C2"
-            + "CE12FCAE85963CE613C4DA2B1685EB8B355A95072FF7FBC4D08D5545573A3BB8C21667D7FEE766DA410B22681AC"
-            + "CD028DB46CE5EAE8E9D455B350BA3E6867480F2990799F3D3130F87EAAC7B8AD4226634A28C99922C43C8CC8984"
-            + "EA92FB25FDC7510AEFA7793AF0042DF30498BC1F0507613ABB1A30F3954FF21A6631EB83A40A4DD7B5EB89B5CA1"
-            + "B2982605453A0B1B2A8D4064917E8C6582A6DBE4A032E3EB84B9B2A4500C8ADEA236787CBC709E30D893D08DC8B"
-            + "824D309C0AA4CFE976A4645B8EBDA797E618A5A22A775078C84BC536486D6F45E0659A1FEB03FEEC6944393025E"
-            + "1EFF3948E42ADF05A803770D327F85B900B1D7ADFB9B7BBE4E01E23E7653578B28917D4683DA4EC538758EF6A02"
-            + "532CD74CAA6B644D0FFCE5AA096A6CFE76E5C0BD30DA19DF4187E1E358077CD771B0B470441A934B8F991FE78EA"
-            + "A90B35AD7CF600B573272D9E2888DB0BB34FA374F29FDA92E2D3E2D36A1E1A1E40164648D63F930203010001";
+        [Tooltip("The public key for the X.509 certificate authority from the dashboard's self-signed certificate.")]
+        public string PublicKey = "";
 
         /// <summary>
         /// The URL to the Axivion Dashboard, up to the project name.
@@ -71,37 +63,37 @@ namespace SEE.Net.Dashboard
 
         [Header("Issue Retrieval")]
         /// <summary>
-        /// Whether <see cref="ArchitectureViolationIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssues"/>.
+        /// Whether <see cref="ArchitectureViolationIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssuesAsync"/>.
         /// </summary>
         [Tooltip("Whether to retrieve Architecture Violation Issues.")]
         public bool ArchitectureViolationIssues = true;
 
         /// <summary>
-        /// Whether <see cref="CloneIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssues"/>.
+        /// Whether <see cref="CloneIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssuesAsync"/>.
         /// </summary>
         [Tooltip("Whether to retrieve Clone Issues.")]
         public bool CloneIssues = true;
 
         /// <summary>
-        /// Whether <see cref="CycleIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssues"/>.
+        /// Whether <see cref="CycleIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssuesAsync"/>.
         /// </summary>
         [Tooltip("Whether to retrieve Cycle Issues.")]
         public bool CycleIssues = true;
 
         /// <summary>
-        /// Whether <see cref="DeadEntityIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssues"/>.
+        /// Whether <see cref="DeadEntityIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssuesAsync"/>.
         /// </summary>
         [Tooltip("Whether to retrieve Dead Entity Issues.")]
         public bool DeadEntityIssues = true;
 
         /// <summary>
-        /// Whether <see cref="MetricViolationIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssues"/>.
+        /// Whether <see cref="MetricViolationIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssuesAsync"/>.
         /// </summary>
         [Tooltip("Whether to retrieve Metric Violation Issues.")]
         public bool MetricViolationIssues = true;
 
         /// <summary>
-        /// Whether <see cref="StyleViolationIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssues"/>.
+        /// Whether <see cref="StyleViolationIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssuesAsync"/>.
         /// </summary>
         [Tooltip("Whether to retrieve Style Violation Issues.")]
         public bool StyleViolationIssues = true;
@@ -147,8 +139,8 @@ namespace SEE.Net.Dashboard
         /// <param name="apiPath">Whether the query path starts with <c>/api</c></param>
         /// <param name="accept">The HTTP Accept header value.</param>
         /// <returns>The result of the API call.</returns>
-        private async UniTask<DashboardResult> GetAtPath(string path, Dictionary<string, string> queryParameters = null,
-                                                         bool apiPath = true, string accept = "application/json")
+        private async UniTask<DashboardResult> GetAtPathAsync(string path, Dictionary<string, string> queryParameters = null,
+                                                              bool apiPath = true, string accept = "application/json")
         {
             string requestUrl = apiPath ? BaseUrl.Replace("/projects/", "/api/projects/") : BaseUrl;
             requestUrl += path;
@@ -158,12 +150,16 @@ namespace SEE.Net.Dashboard
             }
 
             UnityWebRequest request = UnityWebRequest.Get(requestUrl);
-            request.certificateHandler = new AxivionCertificateHandler(PublicKey);
+            if (!string.IsNullOrWhiteSpace(PublicKey))
+            {
+                // Only set certificate handler if public key is set (i.e. we're using a self-signed certificate)
+                request.certificateHandler = new AxivionCertificateHandler(PublicKey);
+            }
             request.SetRequestHeader("Accept", accept);
             request.SetRequestHeader("Authorization", $"AxToken {Token}");
 #pragma warning disable CS4014
             request.SendWebRequest(); // we don't need to await this, because of the next line
-            #pragma warning restore CS4014
+#pragma warning restore CS4014
             await UniTask.WaitUntil(() => request.isDone);
             DashboardResult result = request.result switch
             {
@@ -192,8 +188,8 @@ namespace SEE.Net.Dashboard
         /// <exception cref="DashboardException">If there was an error accessing the API entry point.</exception>
         /// <exception cref="ArgumentException">If the number of items in <paramref name="parameterValues"/>
         /// don't match the number of parameters from the caller.</exception>
-        private async UniTask<T> QueryDashboard<T>(string path, IReadOnlyList<string> parameterValues,
-                                                   bool apiPath = true, [CallerMemberName] string memberName = "")
+        private async UniTask<T> QueryDashboardAsync<T>(string path, IReadOnlyList<string> parameterValues,
+                                                        bool apiPath = true, [CallerMemberName] string memberName = "")
         {
             if (path == null || parameterValues == null)
             {
@@ -218,7 +214,7 @@ namespace SEE.Net.Dashboard
                                                                          .ToDictionary(x => x.Name, x => parameterValues[x.Position]);
 
             // Finally, actually query the dashboard
-            return await QueryDashboard<T>(path, queryParameters, apiPath);
+            return await QueryDashboardAsync<T>(path, queryParameters, apiPath);
         }
 
         /// <summary>
@@ -229,10 +225,10 @@ namespace SEE.Net.Dashboard
         /// <param name="apiPath">Whether the query path starts with <c>/api</c></param>
         /// <typeparam name="T">The type that is returned by the API call.</typeparam>
         /// <returns>The queried object of type <typeparamref name="T"/>.</returns>
-        private async UniTask<T> QueryDashboard<T>(string path, Dictionary<string, string> parameters = null,
-                                                   bool apiPath = true)
+        private async UniTask<T> QueryDashboardAsync<T>(string path, Dictionary<string, string> parameters = null,
+                                                        bool apiPath = true)
         {
-            DashboardResult result = await GetAtPath(path, parameters, apiPath);
+            DashboardResult result = await GetAtPathAsync(path, parameters, apiPath);
             return result.RetrieveObject<T>(StrictMode);
         }
 
@@ -240,9 +236,9 @@ namespace SEE.Net.Dashboard
         /// Compares the <see cref="SupportedDashboardVersion"/> with the actual version of the accessed dashboard
         /// and warns the user via notifications or a log message, depending on how critical the difference is.
         /// </summary>
-        private async UniTaskVoid VerifyVersionNumber()
+        private async UniTaskVoid VerifyVersionNumberAsync()
         {
-            DashboardVersion version = await GetDashboardVersion();
+            DashboardVersion version = await GetDashboardVersionAsync();
             Debug.Log($"Axivion Dashboard version {version}\n");
             switch (version.DifferenceToSupportedVersion)
             {
@@ -324,7 +320,7 @@ namespace SEE.Net.Dashboard
                                                     + "in a given scene!");
             }
 
-            if (new[] {BaseUrl, Token, PublicKey}.Any(string.IsNullOrEmpty))
+            if (new[] { BaseUrl, Token, PublicKey }.Any(string.IsNullOrEmpty))
             {
                 throw new ArgumentException("Necessary information not supplied. "
                                             + "Please set base URL, token, and public key before accessing this class.");
@@ -335,7 +331,7 @@ namespace SEE.Net.Dashboard
                 throw new ArgumentException("Base URL must be a HTTPS URL.\n");
             }
 
-            VerifyVersionNumber().Forget();
+            VerifyVersionNumberAsync().Forget();
         }
 
         /// <summary>

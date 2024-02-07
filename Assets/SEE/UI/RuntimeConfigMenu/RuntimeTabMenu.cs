@@ -23,6 +23,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
+using SEE.GraphProviders;
 
 namespace SEE.UI.RuntimeConfigMenu
 {
@@ -220,6 +221,10 @@ namespace SEE.UI.RuntimeConfigMenu
         private void SetupMenu()
         {
             // creates the widgets for fields
+
+            // For all *public* fields of city annotated by RuntimeTab.
+            // Note that Type.GetMember yields only public members.
+            // A member can be a field, property, method, event, or other things.
             IOrderedEnumerable<MemberInfo> members = city.GetType().GetMembers().Where(IsCityAttribute).OrderBy(HasTabAttribute).ThenBy(GetTabName).ThenBy(SortIsNotNested);
             members.ForEach(memberInfo => CreateSetting(memberInfo, null, city));
             SelectEntry(Entries.First());
@@ -236,10 +241,15 @@ namespace SEE.UI.RuntimeConfigMenu
             string GetTabName(MemberInfo memberInfo) =>
                 memberInfo.GetCustomAttributes().OfType<RuntimeTabAttribute>().FirstOrDefault()?.Name;
 
+            // True if memberInfo is declared in a class that is or derives from AbstractSEECity;
+            // this is to ignore fields in AbstractSEECity that are inherited from classes from which
+            // AbstractSEECity derives.
+            // Note: A MemberInfo can be a field, property, method, event and other things.
             bool IsCityAttribute(MemberInfo memberInfo) =>
                 memberInfo.DeclaringType == typeof(AbstractSEECity) ||
                 memberInfo.DeclaringType!.IsSubclassOf(typeof(AbstractSEECity));
 
+            // True if memberInfo has a RuntimeTab annotation.
             bool HasTabAttribute(MemberInfo memberInfo) =>
                 !memberInfo.GetCustomAttributes().Any(a => a is RuntimeTabAttribute);
 
@@ -446,10 +456,11 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Creates a widget for a setting.
         ///
-        /// If the setting has nested members the method is called recursively.
+        /// If the setting has nested members, the method is called recursively.
         /// </summary>
         /// <param name="getter">getter of the setting value</param>
-        /// <param name="settingName">setting name</param>
+        /// <param name="settingName">setting name; in case of a list element, this would be index of the list
+        /// element; otherwise this would be the name of the field</param>
         /// <param name="parent">parent game object</param>
         /// <param name="setter">setter of the setting value</param>
         /// <param name="attributes">attributes</param>
@@ -528,6 +539,11 @@ namespace SEE.UI.RuntimeConfigMenu
                     break;
                 case Enum:
                     CreateDropDown(settingName,
+                                   // changedValue is the enum value as an integer; here we will
+                                   // convert it back to the enum. We pass on the value to the
+                                   // setter of the caller because only the caller has the context to
+                                   // change the value. Here we have only the knowledge what value was
+                                   // selected from the drop-down menu.
                                    changedValue => setter!(Enum.ToObject(value.GetType(), changedValue)),
                                    value.GetType().GetEnumNames(),
                                    () => getter().ToString(),
@@ -536,6 +552,8 @@ namespace SEE.UI.RuntimeConfigMenu
                 // from here on come nested settings
                 case NodeTypeVisualsMap:
                 case ColorMap:
+                    /// Note: "map" refers to the private attribute map of <see cref="ColorMap"/>.
+                    /// We cannot refer to it using nameof(..) because of its private visibility.
                     FieldInfo mapInfo =
                         value.GetType().GetField("map", BindingFlags.Instance | BindingFlags.NonPublic)!;
                     CreateSetting(() => mapInfo.GetValue(value),
@@ -545,7 +563,7 @@ namespace SEE.UI.RuntimeConfigMenu
                                   attributeArray);
                     break;
                 case AntennaAttributes:
-                    FieldInfo antennaInfo = value.GetType().GetField("AntennaSections")!;
+                    FieldInfo antennaInfo = value.GetType().GetField(nameof(AntennaAttributes.AntennaSections))!;
                     CreateSetting(() => antennaInfo.GetValue(value),
                                   settingName,
                                   parent,
@@ -553,6 +571,14 @@ namespace SEE.UI.RuntimeConfigMenu
                                   attributeArray);
                     break;
 
+                case PipelineGraphProvider:
+                    FieldInfo pipeline = value.GetType().GetField(nameof(PipelineGraphProvider.Pipeline))!;
+                    CreateSetting(() => pipeline.GetValue(value),
+                                  settingName,
+                                  parent,
+                                  null,
+                                  attributeArray);
+                    break;
                 // types that shouldn't be in the configuration menu
                 case Graph:
                     break;
@@ -568,7 +594,11 @@ namespace SEE.UI.RuntimeConfigMenu
                     break;
                 case IList<string> list:
                     parent = CreateNestedSetting(settingName, parent);
-                    CreateList(list, parent);
+                    CreateList(list, parent, () => string.Empty);
+                    break;
+                case List<GraphProvider> providerList:
+                    parent = CreateNestedSetting(settingName, parent);
+                    CreateList(providerList, parent, () => new PipelineGraphProvider());
                     break;
 
                 // confirmed types where the nested fields should be edited
@@ -582,23 +612,19 @@ namespace SEE.UI.RuntimeConfigMenu
                 case ErosionAttributes:
                 case BoardAttributes:
                 case IncrementalTreeMapAttributes:
-                    parent = CreateNestedSetting(settingName, parent);
-                    value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
-                    break;
-
-                // unconfirmed types where the nested fields should be edited
                 case VisualAttributes:
                 case ConfigIO.IPersistentConfigItem:
                 case LabelAttributes:
-                    if (value.GetType() != typeof(VisualAttributes)
-                        && value.GetType() != typeof(ConfigIO.IPersistentConfigItem)
-                        && value.GetType() != typeof(LabelAttributes)
-                       )
-                    {
-                        Debug.LogWarning("Missing: (Maybe)" + settingName + " " +
-                                         value.GetType().GetNiceName() + "\n");
-                    }
                     parent = CreateNestedSetting(settingName, parent);
+                    value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
+                    break;
+                case CSVGraphProvider:
+                case DashboardGraphProvider:
+                case GXLGraphProvider:
+                case JaCoCoGraphProvider:
+                case ReflexionGraphProvider:
+                    parent = CreateNestedSetting(settingName, parent);
+                    CreateTypeField(parent, value as GraphProvider);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
 
@@ -607,6 +633,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     break;
             }
         }
+
 
         /// <summary>
         /// Creates a container game object which contains multiple settings.
@@ -899,6 +926,43 @@ namespace SEE.UI.RuntimeConfigMenu
             }
         }
 
+        private void CreateTypeField(GameObject parent, GraphProvider provider)
+        {
+            string[] graphProviderKinds = GetGraphProviderKinds();
+
+            CreateDropDown(settingName: "Type",
+                           setter: Setter,
+                           values: graphProviderKinds,
+                           getter: Getter,
+                           parent: parent);
+
+            // all values of enum GraphProviderKind as strings
+            string[] GetGraphProviderKinds()
+            {
+                return Enum.GetValues(typeof(GraphProviderKind)).Cast<GraphProviderKind>().Select(e => e.ToString()).ToArray();
+            }
+
+            string Getter()
+            {
+                return provider.GetKind().ToString();
+            }
+
+            // index is the index of the changed enum
+            void Setter(int index)
+            {
+                if (Enum.TryParse(graphProviderKinds[index], true, out GraphProviderKind newKind))
+                {
+                    if (provider.GetKind() != newKind)
+                    {
+                        // TODO (#698):
+                        // We need to replace provider in the list it is contained in
+                        // by a new instance of newKind.
+                        Debug.LogError("Changing the type of a data provider is currently not supported.\n");
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Creates a dropdown widget.
         /// </summary>
@@ -1137,7 +1201,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     filePicker.CloseDropdown();
                 }
             };
-            filePicker.OnMenuInitialized +=
+            filePicker.OnComponentInitialized +=
                 () => AddLayoutElement(parent.transform.Find(settingName).gameObject);
 
             // listener when the dropdown or path is changed
@@ -1185,10 +1249,16 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Creates a list widget.
         /// </summary>
-        /// <param name="list">list to create widget</param>
+        /// <param name="list">list to create a widget for</param>
         /// <param name="parent">parent (container game object: <see cref="CreateNestedSetting"/>)</param>
-        private void CreateList(IList<string> list, GameObject parent)
+        /// <param name="newT">creates a new instance of <typeparamref name="T"/></param>
+        /// <typeparam name="T">the type of elements in <paramref name="list"/></typeparam>
+        private void CreateList<T>(IList<T> list, GameObject parent, Func<T> newT) where T : class
         {
+            // TODO (#698):
+            // We want to add and remove elements anywhere, not just at the end.
+            // We want to change the order of elements.
+
             // init the add and remove buttons
             GameObject buttonContainer = new("ButtonContainer");
             buttonContainer.AddComponent<HorizontalLayoutGroup>();
@@ -1196,21 +1266,22 @@ namespace SEE.UI.RuntimeConfigMenu
 
             GameObject addButton =
                 PrefabInstantiator.InstantiatePrefab(addElementButtonPrefab, buttonContainer.transform);
+            addButton.name = "AddElementButton";
+            ButtonManagerWithIcon addButtonManager = addButton.GetComponent<ButtonManagerWithIcon>();
+
             GameObject removeButton =
                 PrefabInstantiator.InstantiatePrefab(removeElementButtonPrefab, buttonContainer.transform);
             removeButton.name = "RemoveElementButton";
             ButtonManagerWithIcon removeButtonManager = removeButton.GetComponent<ButtonManagerWithIcon>();
-            addButton.name = "AddElementButton";
-            ButtonManagerWithIcon addButtonManager = addButton.GetComponent<ButtonManagerWithIcon>();
 
             // list settings
             UpdateListChildren(list, parent);
             buttonContainer.transform.SetAsLastSibling();
 
-            // AddButton listener
+            // AddButton listener adding a new instance at the end of the list
             addButtonManager.clickEvent.AddListener(() =>
             {
-                list.Add("");
+                list.Add(newT());
                 UpdateListChildren(list, parent);
                 buttonContainer.transform.SetAsLastSibling();
                 AddListElementNetAction netAction = new()
@@ -1220,7 +1291,8 @@ namespace SEE.UI.RuntimeConfigMenu
                 };
                 netAction.Execute();
             });
-            // RemoveButton listener
+
+            // RemoveButton listener removing the last element in the list
             removeButtonManager.clickEvent.AddListener(() =>
             {
                 if (list.Count == 0)
@@ -1238,16 +1310,19 @@ namespace SEE.UI.RuntimeConfigMenu
                 netAction.Execute();
             });
 
-            // listeners for net actions
+            // listeners for net actions; broadcasts the addition of a new list
+            // element to all clients
             SyncAddListElement += widgetPath =>
             {
                 if (widgetPath == parent.FullName())
                 {
-                    list.Add("");
+                    list.Add(newT());
                     UpdateListChildren(list, parent);
                     buttonContainer.transform.SetAsLastSibling();
                 }
             };
+
+            // broadcasts the removal of the last list element to all clients
             SyncRemoveListElement += widgetPath =>
             {
                 if (widgetPath == parent.FullName())
@@ -1272,7 +1347,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         /// <param name="list">list elements</param>
         /// <param name="parent">list widget</param>
-        private void UpdateListChildren(IList<string> list, GameObject parent)
+        private void UpdateListChildren<T>(IList<T> list, GameObject parent) where T : class
         {
             // remove children that are no longer part of the list
             foreach (Transform child in parent.transform)
@@ -1291,12 +1366,11 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 if (parent.transform.Find(i.ToString()) == null)
                 {
-                    int iCopy = i;
                     CreateSetting(
-                        () => list[iCopy],
+                        () => list[i],
                         i.ToString(),
                         parent,
-                        changedValue => list[iCopy] = changedValue as string
+                        changedValue => list[i] = changedValue as T
                     );
                 }
             }
@@ -1380,7 +1454,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 return;
             }
 
-            city.Invoke(nameof(SEECity.LoadData), 0);
+            city.Invoke(nameof(SEECity.LoadDataAsync), 0);
             StartCoroutine(DrawNextFrame());
 
             IEnumerator DrawNextFrame()
