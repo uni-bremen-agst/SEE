@@ -5,7 +5,7 @@ namespace SEE.VCS
     /// <summary>
     /// Yields the version control system.
     /// </summary>
-    public static class SwitchVersionControlSystems
+    public static class VersionControlFactory
     {
         /// <summary>
         /// Returns the functionality of the given version control system.
