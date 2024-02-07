@@ -111,6 +111,12 @@ namespace SEE.VCS
         /// </summary>
         private const string newerCommit = "bfb9851d4469d3658bf43a7789601f81d29c18b8";
 
+        /// <summary>
+        /// Name of a dummy file we created, copied, modified, and deleted just to
+        /// leave a trace in our repository that we can test.
+        /// </summary>
+        private const string copyOfDummy = "Assets/SEETests/CopyOfDummyHereForTestVCS.cs";
+
         [Test]
         public void TestRenamed()
         {
@@ -144,12 +150,30 @@ namespace SEE.VCS
         [Test]
         public void TestCopied()
         {
-            Assert.AreEqual(Change.Copied,
-                            vcs.GetFileChange("Assets/SEETests/CopyOfDummyHereForTestVCS.cs",
+            // Even though this file is an exact copy of "Assets/SEETests/DummyHereForTestVCS.cs",
+            // it will be reported as Change.Added by the diff options we set. If we wanted to find
+            // such copies, we would need to set option RenameDetectionMode.Copies.
+            Assert.AreEqual(Change.Added,
+                            vcs.GetFileChange(copyOfDummy,
                                               "a38c505030ce716e45aa023a3f60524ea7d22ec4",
                                               "888ded45ae3b2dbe52afaa1306cfda93bc69371a",
                                               out string oldFilename));
             Assert.IsNull(oldFilename);
+        }
+
+        [Test]
+        public void TestModified()
+        {
+            // Even though this file is an exact copy of "Assets/SEETests/DummyHereForTestVCS.cs",
+            // it will be reported as Change.Added by the diff options we set. If we wanted to find
+            // such copies, we would need to set option RenameDetectionMode.Copies.
+            Assert.AreEqual(Change.Modified,
+                            vcs.GetFileChange(copyOfDummy,
+                                              "888ded45ae3b2dbe52afaa1306cfda93bc69371a",
+                                              "1ddd84e32dc3c307d9e8a05773be0c1fb2bd8dae",
+                                              out string oldFilename));
+            Assert.IsNotNull(oldFilename);
+            Assert.AreEqual(copyOfDummy, oldFilename);
         }
 
         [Test]
