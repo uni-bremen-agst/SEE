@@ -12,11 +12,11 @@ namespace SEE.VCS
         /// </summary>
         /// <param name="system">the version control system</param>
         /// <returns>the functionality for the given version control system</returns>
-        public static IVersionControl GetVersionControl(string system)
+        public static IVersionControl GetVersionControl(string system, string repositoryPath)
         {
             return system.ToLower() switch
             {
-                "git" => new GitVersionControl(),
+                "git" => new GitVersionControl(repositoryPath),
                 // Add cases for other version control systems
                 _ => throw new ArgumentException("Unsupported version control system", nameof(system)),
             };

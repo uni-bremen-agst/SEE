@@ -200,12 +200,11 @@ namespace SEE.Controls.Actions
             string oldCommitIdentifier = city.OldCommitIdentifier;
             string newCommitIdentifier = city.NewCommitIdentifier;
             string relativePath = Path.GetRelativePath(repositoryPath, path).Replace("\\", "/");
-            IVersionControl versionControl = VersionControlFactory.GetVersionControl(versionControlSystem);
-            string showOldRevision = versionControl.Show(repositoryPath, path, oldCommitIdentifier);
-            string showNewRevision = versionControl.ShowOriginal(repositoryPath, relativePath, oldCommitIdentifier, newCommitIdentifier);
+            IVersionControl versionControl = VersionControlFactory.GetVersionControl(versionControlSystem, repositoryPath);
+            string showOldRevision = versionControl.Show(path, oldCommitIdentifier);
+            string showNewRevision = versionControl.ShowOriginal(relativePath, oldCommitIdentifier, newCommitIdentifier, out string changedName);
             string[] diff = TextualDiff.Diff(showNewRevision, showOldRevision);
             CodeWindow codeWindow = GetOrCreateCodeWindow(graphElementRef, sourceFilename);
-            string changedName = versionControl.ShowName();
 
             if (!string.IsNullOrWhiteSpace(changedName))
             {
@@ -218,7 +217,7 @@ namespace SEE.Controls.Actions
                 else
                 {
                     codeWindow.Title = $"<color=\"red\"><s><noparse>{sourceFilename}</noparse></s></color>" +
-                        $" -> <color=\"green\"><u><noparse>{versionControl.ShowName()}</noparse></u></color>";
+                        $" -> <color=\"green\"><u><noparse>{changedName}</noparse></u></color>";
                 }
             }
             else
