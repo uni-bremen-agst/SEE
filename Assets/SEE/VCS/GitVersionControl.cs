@@ -150,6 +150,7 @@ namespace SEE.VCS
             IEnumerable<TreeEntryChanges> changes = repo.Diff.Compare<TreeChanges>(oldCommit.Tree, newCommit.Tree, compareOptions)
                 .Where(change => change.Path == fileName || change.OldPath == fileName);
 
+            Change result = Change.Unknown;
             oldFilename = null;
 
             int numberOfIterations = 0;
@@ -165,55 +166,66 @@ namespace SEE.VCS
                 {
                     case ChangeKind.Unmodified:
                         oldFilename = change.Path;
-                        return Change.Unmodified;
+                        result = Change.Unmodified;
+                        break;
 
                     case ChangeKind.Added:
                         // File was added in the newer commit.
-                        return Change.Added;
+                        result = Change.Added;
+                        break;
 
                     case ChangeKind.Deleted:
                         // File was deleted in the newer commit, but existed in the earlier commit.
                         oldFilename = change.OldPath;
-                        return Change.Deleted;
+                        result = Change.Deleted;
+                        break;
 
                     case ChangeKind.Modified:
                         // File was modified in the newer commit.
                         oldFilename = change.Path;
                         Assert.AreEqual(fileName, change.OldPath);
-                        return Change.Modified;
+                        result = Change.Modified;
+                        break;
 
                     case ChangeKind.Renamed:
                         // File was renamed in the newer commit.
                         oldFilename = change.OldPath;
-                        return Change.Renamed;
+                        result = Change.Renamed;
+                        break;
 
                     case ChangeKind.Copied:
-                        oldFilename += change.OldPath;
-                        return Change.Copied;
+                        oldFilename = change.OldPath;
+                        result = Change.Copied;
+                        break;
 
                     case ChangeKind.Ignored:
-                        return Change.Ignored;
+                        result = Change.Ignored;
+                        break;
 
                     case ChangeKind.Untracked:
-                        return Change.Untracked;
+                        result = Change.Untracked;
+                        break;
 
                     case ChangeKind.TypeChanged:
                         oldFilename = change.Path;
-                        return Change.TypeChanged;
+                        result = Change.TypeChanged;
+                        break;
 
                     case ChangeKind.Unreadable:
-                        return Change.Unreadable;
+                        result = Change.Unreadable;
+                        break;
 
                     case ChangeKind.Conflicted:
                         oldFilename = change.OldPath;
-                        return Change.Conflicted;
+                        result = Change.Conflicted;
+                        break;
 
                     default:
                         throw new System.NotImplementedException($"Unhandled change status: {change.Status}");
                 }
             }
             Assert.IsTrue(numberOfIterations <= 1);
-            return Change.Unknown;
+            return result;
         }
 
         private void Dump(TreeEntryChanges c)
