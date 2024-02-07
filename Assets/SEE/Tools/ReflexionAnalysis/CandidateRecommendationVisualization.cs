@@ -6,7 +6,6 @@ using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
-using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections;
@@ -14,27 +13,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using static Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions.AttractFunction;
-using static Assets.SEE.Tools.ReflexionAnalysis.CandidateRecommendation;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis
 {
     public class CandidateRecommendationVisualization : MonoBehaviour, IObserver<ChangeEvent>
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        private CandidateRecommendation candidateRecommendation;
-
         private static float BLINK_EFFECT_DELAY = 0.1f;
 
         private Coroutine blinkEffectCoroutine;
 
-        private ReflexionGraph reflexionGraphViz;
-
         private ReflexionGraph reflexionGraphCalc;
-
-        private Graph oracleMapping;
 
         private Queue<ChangeEvent> changeEventQueue = new Queue<ChangeEvent>();
 
@@ -67,36 +55,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         public void Awake()
         {
-            candidateRecommendation = new CandidateRecommendation();
+            CandidateRecommendation = new CandidateRecommendation();
         }
 
-        public CandidateRecommendation CandidateRecommendation
-        {
-            get
-            {
-                return candidateRecommendation;
-            }
-        }
+        public CandidateRecommendation CandidateRecommendation { get; private set; }
 
-        public ReflexionGraph ReflexionGraphViz
-        {
-            set 
-            {
-                reflexionGraphViz = value;
-            }
-        }
+        public ReflexionGraph ReflexionGraphViz { private get; set; }
 
-        public Graph OracleMapping
-        {
-            set
-            {
-                oracleMapping = value;
-            }
-            get
-            {
-                return CandidateRecommendation.Statistics.OracleGraph;
-            }
-        }
+        public Graph OracleMapping { get; set; }
 
         #region IObserver
         public void OnCompleted()
@@ -247,6 +213,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         public void StartRecording()
         {
             string csvFile = Path.Combine(this.mappingConfig.OutputPath.Path, csvFileName);
+            CandidateRecommendation.Statistics.AddConfigInformation(this.mappingConfig);
             CandidateRecommendation.Statistics.StartRecording(csvFile);
         }
 
@@ -271,7 +238,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         {
                 lock (visualizedReflexionGraphLock)
                 {
-                    reflexionGraphCalc = new ReflexionGraph(reflexionGraphViz);
+                    reflexionGraphCalc = new ReflexionGraph(ReflexionGraphViz);
                 }
                 reflexionGraphCalc.Name = "reflexionGraph for Recommendations";
                 
@@ -281,11 +248,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 // or assignments of recommendations towards the graphs
                 lock (calculationReflexionGraphLock)
                 {
-                    UnityEngine.Debug.Log($"Update Configuration called! {oracleMapping}");
+                    UnityEngine.Debug.Log($"Update Configuration called! {OracleMapping}");
                     CandidateRecommendation.UpdateConfiguration(reflexionGraphCalc, 
                                                                 mappingConfig,
-                                                                oracleMapping);
-                    
+                                                                OracleMapping);     
                 }          
         }
        
@@ -314,9 +280,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             UnityEngine.Debug.Log($"Create Initial mapping with seed {mappingConfig.InitialMappingPercentage}");
             lock (visualizedReflexionGraphLock)
             {
-                 initialMapping = CandidateRecommendation.Statistics.CreateInitialMapping(mappingConfig.InitialMappingPercentage,
-                                                                                          mappingConfig.MasterSeed,
-                                                                                          reflexionGraphViz); 
+                 initialMapping = this.CandidateRecommendation.CreateInitialMapping(mappingConfig.InitialMappingPercentage,
+                                                                               mappingConfig.MasterSeed,
+                                                                               ReflexionGraphViz); 
             }
             foreach (Node cluster in initialMapping.Keys)
             {
@@ -337,8 +303,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             // TODO: Make this call async
             lock (visualizedReflexionGraphLock)
             {
-                List<Node> nodes = reflexionGraphViz.Nodes().Where(n => n.IsInImplementation() && reflexionGraphViz.MapsTo(n) != null).ToList();
-                nodes.ForEach(n => reflexionGraphViz.RemoveFromMapping(n)); 
+                List<Node> nodes = ReflexionGraphViz.Nodes().Where(n => n.IsInImplementation() && ReflexionGraphViz.MapsTo(n) != null).ToList();
+                nodes.ForEach(n => ReflexionGraphViz.RemoveFromMapping(n)); 
             }
         }
 
@@ -357,12 +323,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 foreach (Node key in CandidateRecommendation.Recommendations.Keys)
                 {
                     HashSet<MappingPair> visualizedMappingPairs = new HashSet<MappingPair>();
-                    Node keyInViz = reflexionGraphViz.GetNode(key.ID);
+                    Node keyInViz = ReflexionGraphViz.GetNode(key.ID);
                     RecommendationsVisualized.Add(keyInViz, visualizedMappingPairs);
                     foreach (MappingPair mappingPair in CandidateRecommendation.Recommendations[key])
                     {
-                        Node visualizedCandidate = reflexionGraphViz.GetNode(mappingPair.CandidateID);
-                        Node visualizedCluster = reflexionGraphViz.GetNode(mappingPair.ClusterID);
+                        Node visualizedCandidate = ReflexionGraphViz.GetNode(mappingPair.CandidateID);
+                        Node visualizedCluster = ReflexionGraphViz.GetNode(mappingPair.ClusterID);
                         if (visualizedCandidate == null || visualizedCluster == null)
                         {
                             Debug.LogWarning($"Couldn't map recommendation to visualized reflexion graph." +
@@ -401,23 +367,23 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             string nameNode2 = "scanner.h";
             string clusterName1 = "Main";
             string clusterName2 = "FrontEnd";
-            Node node1 = reflexionGraphViz.Nodes().Where(n => n.ID.Contains(nameNode1)).FirstOrDefault();
-            Node node2 = reflexionGraphViz.Nodes().Where(n => n.ID.Contains(nameNode2)).FirstOrDefault();
+            Node node1 = ReflexionGraphViz.Nodes().Where(n => n.ID.Contains(nameNode1)).FirstOrDefault();
+            Node node2 = ReflexionGraphViz.Nodes().Where(n => n.ID.Contains(nameNode2)).FirstOrDefault();
 
-            Node cluster1 = reflexionGraphViz.Nodes().Where(n => n.ID.Contains(clusterName1)).FirstOrDefault();
-            Node cluster2 = reflexionGraphViz.Nodes().Where(n => n.ID.Contains(clusterName2)).FirstOrDefault();
+            Node cluster1 = ReflexionGraphViz.Nodes().Where(n => n.ID.Contains(clusterName1)).FirstOrDefault();
+            Node cluster2 = ReflexionGraphViz.Nodes().Where(n => n.ID.Contains(clusterName2)).FirstOrDefault();
 
             lock (calculationReflexionGraphLock)
             {
-                reflexionGraphViz.AddToMapping(node1, cluster1);
+                ReflexionGraphViz.AddToMapping(node1, cluster1);
             }
 
             lock (calculationReflexionGraphLock)
             {
-                reflexionGraphViz.AddToMapping(node2, cluster2); 
+                ReflexionGraphViz.AddToMapping(node2, cluster2); 
             }
 
-            foreach(Edge edge in reflexionGraphViz.Edges().Where(  e =>
+            foreach(Edge edge in ReflexionGraphViz.Edges().Where(  e =>
                                                                    (e.Source.ID.Contains(nameNode2) || e.Target.ID.Contains(nameNode2))
                                                                 && (e.Source.ID.Contains(nameNode1)  || e.Target.ID.Contains(nameNode1))  
                                                                 && (e.State() == State.Allowed || e.State() == State.ImplicitlyAllowed)
@@ -480,7 +446,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 // TODO: Wrap automatic mapping in action?
                 // TODO: Implement as action to visualize mapping/ Trigger Animation.
                 Debug.Log($"About to map: candidate {candidate.ID} in {candidate.ItsGraph.Name} Into cluster {cluster.ID} in {cluster.ItsGraph.Name}");
-                reflexionGraphViz.AddToMapping(candidate, cluster); 
+                ReflexionGraphViz.AddToMapping(candidate, cluster); 
             }
         }
     }
