@@ -1,6 +1,7 @@
 using LibGit2Sharp;
 using System.Linq;
 using System.IO;
+using System;
 using System.Collections.Generic;
 using UnityEngine.Assertions;
 using UnityEngine;
@@ -16,8 +17,14 @@ namespace SEE.VCS
         /// Constructor setting up the repository access.
         /// </summary>
         /// <param name="repositoryPath">the path to a Git repository</param>
+        /// <exception cref="ArgumentNullException">throw in case <paramref name="repositoryPath"/>
+        /// is null or just whitespace</exception>
         internal GitVersionControl(string repositoryPath)
         {
+            if (string.IsNullOrWhiteSpace(repositoryPath))
+            {
+                throw new ArgumentNullException("Repository path must not be null or empty.");
+            }
             this.repositoryPath = repositoryPath;
             repo = new(repositoryPath);
         }
@@ -35,8 +42,18 @@ namespace SEE.VCS
         /// <summary>
         /// See <see cref="IVersionControl.Show(string, string)"/>.
         /// </summary>
+        /// <exception cref="ArgumentNullException">throw in case <paramref name="fileName"/>
+        /// or <paramref name="commitID"/> are null or just whitespace</exception>
         public string Show(string fileName, string commitID)
         {
+            if (string.IsNullOrWhiteSpace(fileName))
+            {
+                throw new ArgumentNullException("Path must not be null or empty.");
+            }
+            if (string.IsNullOrWhiteSpace(commitID))
+            {
+                throw new ArgumentNullException("Commit ID must not be null or empty.");
+            }
             Blob blob = repo.Lookup<Blob>($"{commitID}:{Path.GetRelativePath(repositoryPath, fileName).Replace("\\", "/")}");
 
             if (blob != null)
