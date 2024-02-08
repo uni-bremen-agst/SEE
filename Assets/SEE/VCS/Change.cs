@@ -1,7 +1,7 @@
 ﻿namespace SEE.VCS
 {
     /// <summary>
-    /// The type of change for a file from between two revisions.
+    /// The type of change for a file between two revisions.
     ///
     /// These are identical to <see cref="LibGit2Sharp.ChangeKind"/>.
     /// </summary>
