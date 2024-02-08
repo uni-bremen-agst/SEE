@@ -1,6 +1,8 @@
 ﻿using NUnit.Framework;
 using SEE.Utils;
 using SEE.Utils.Paths;
+using System;
+using UnityEngine;
 
 namespace SEE.VCS
 {
@@ -28,7 +30,7 @@ namespace SEE.VCS
         {
             p = Performance.Begin(nameof(TestVCS));
             // We are using our own git repository of SEE as a guinea pig.
-            vcs = VersionControlFactory.GetVersionControl("git", DataPath.ProjectFolder());
+            vcs = VersionControlFactory.GetVersionControl(VCSKind.Git, DataPath.ProjectFolder());
             Assert.IsNotNull(vcs);
             Assert.IsTrue(vcs is GitVersionControl);
         }
@@ -176,6 +178,58 @@ namespace SEE.VCS
             Assert.AreEqual(copyOfDummy, oldFilename);
         }
 
+        private const string test = "Assets/StreamingAssets/Test.txt";
+        private const string renamed = "Assets/StreamingAssets/Renamed.txt";
+        private const string modifiedAndRenamed = "Assets/StreamingAssets/ModifiedAndRenamed.txt";
+
+        [Test]
+        public void TestTxtModified()
+        {
+            Assert.AreEqual(Change.Modified,
+                vcs.GetFileChange(test,
+                                  "15e2f949406321b61a27e5df213961ef695fdd4f",
+                                  "30366de209448a9ad30aea04c7fac6946d2ec00f",
+                                  out string oldFilename));
+            Assert.IsNotNull(oldFilename);
+            Assert.AreEqual(test, oldFilename);
+        }
+
+        [Test]
+        public void TestTxtModifiedRenamed()
+        {
+            Assert.AreEqual(Change.Renamed,
+                vcs.GetFileChange(renamed,
+                                  "15e2f949406321b61a27e5df213961ef695fdd4f",
+                                  "838e2887e6be66fa072c402b3d333f5c2b616389",
+                                  out string oldFilename));
+            Assert.IsNotNull(oldFilename);
+            Assert.AreEqual(test, oldFilename);
+        }
+
+        [Test]
+        public void TestTxtModifiedRenamedModified()
+        {
+            Assert.AreEqual(Change.Renamed,
+                vcs.GetFileChange(renamed,
+                                  "15e2f949406321b61a27e5df213961ef695fdd4f",
+                                  "d46f356872cb73c2987b1d4525e87e96e8fbd4fc",
+                                  out string oldFilename));
+            Assert.IsNotNull(oldFilename);
+            Assert.AreEqual(test, oldFilename);
+        }
+
+        [Test]
+        public void TestTxtModifiedRenamedModified_Then_Modified_And_Renamed()
+        {
+            Assert.AreEqual(Change.Renamed,
+                vcs.GetFileChange(modifiedAndRenamed,
+                                  "15e2f949406321b61a27e5df213961ef695fdd4f",
+                                  "3812c682de354e546342442f899af5d110976087",
+                                  out string oldFilename));
+            Assert.IsNotNull(oldFilename);
+            Assert.AreEqual(test, oldFilename);
+        }
+
         [Test]
         public void TestUnknownNewCommitID()
         {
@@ -192,8 +246,7 @@ namespace SEE.VCS
         public void TestUnknown()
         {
             Assert.AreEqual(Change.Unknown,
-                            vcs.GetFileChange("THIS_FILE_DOES_NOT_EXIST", slightlyOldCommit, newerCommit,
-                                                            out string _));
+                            vcs.GetFileChange("THIS_FILE_DOES_NOT_EXIST", slightlyOldCommit, newerCommit, out string _));
         }
     }
 }
