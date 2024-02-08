@@ -69,7 +69,7 @@ namespace SEE.UI.Window.CodeWindow
             string markLine = $"<mark=#ff000044>{allLines[lineNumber - 1]}</mark>\n";
             textMesh.text = string.Join("", allLines.
                 Select(x => x + "\n").Take(lineNumber - 1).Append(markLine).
-                Concat(allLines.Select(x => x + "\n").Skip(lineNumber).Take(lines - lineNumber + 1)));
+                Concat(allLines.Select(x => x + "\n").Skip(lineNumber).Take(lines - lineNumber)));
         }
 
         #region Visible Line Calculation
