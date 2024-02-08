@@ -47,7 +47,7 @@ namespace SEE.DataModel
         /// <returns>hash code</returns>
         public int GetHashCode(GraphElement graphElement)
         {
-            return graphElement.ID.GetHashCode();
+            return graphElement == null ? 0 : graphElement.ID.GetHashCode();
         }
     }
 }
