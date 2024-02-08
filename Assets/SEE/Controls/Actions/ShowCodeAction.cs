@@ -98,13 +98,13 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Returns the filename and the absolute platform-specific path of
-        /// given graphElement.
+        /// Returns the <see cref="GraphElement.Filename"/> and the absolute platform-specific path of
+        /// given <paramref name="graphElement"/>.
         /// </summary>
         /// <param name="graphElement">The graph element to get the filename and path for</param>
         /// <returns>filename and absolute path</returns>
         /// <exception cref="InvalidOperationException">
-        /// If the given graphElement has no filename or the path does not exist
+        /// If the given graphElement has no filename or the path does not exist.
         /// </exception>
         private static (string filename, string absolutePlatformPath) GetPath(GraphElement graphElement)
         {
@@ -195,37 +195,43 @@ namespace SEE.Controls.Actions
         {
             GraphElement graphElement = graphElementRef.Elem;
             (string sourceFilename, string path) = GetPath(graphElement);
-            string versionControlSystem = city.VersionControlSystem;
-            string repositoryPath = city.RepositoryPath;
-            string oldCommitIdentifier = city.OldCommitIdentifier;
-            string newCommitIdentifier = city.NewCommitIdentifier;
-            string relativePath = Path.GetRelativePath(repositoryPath, path).Replace("\\", "/");
-            IVersionControl versionControl = VersionControlFactory.GetVersionControl(versionControlSystem, repositoryPath);
-            string showOldRevision = versionControl.Show(path, oldCommitIdentifier);
-            string showNewRevision = versionControl.ShowOriginal(relativePath, oldCommitIdentifier, newCommitIdentifier, out string changedName);
-            string[] diff = TextualDiff.Diff(showNewRevision, showOldRevision);
+
             CodeWindow codeWindow = GetOrCreateCodeWindow(graphElementRef, sourceFilename);
 
-            if (!string.IsNullOrWhiteSpace(changedName))
+            IVersionControl vcs = VersionControlFactory.GetVersionControl(city.VersionControlSystem, city.VCSPath.Path);
+            // The path of the file relative to the root of the repository where / is used as separator.
+            string relativePath = Path.GetRelativePath(city.VCSPath.Path, path).Replace("\\", "/");
+            Change change = vcs.GetFileChange(relativePath, city.OldRevision, city.NewRevision, out string changedName);
+
+            switch (change)
             {
-                // Case: File got deleted.
-                if (changedName == relativePath)
-                {
-                    codeWindow.Title = $"<color=\"red\"><s><noparse>{sourceFilename}</noparse></s></color>";
-                }
-                // Case: File got renamed.
-                else
-                {
-                    codeWindow.Title = $"<color=\"red\"><s><noparse>{sourceFilename}</noparse></s></color>" +
-                        $" -> <color=\"green\"><u><noparse>{changedName}</noparse></u></color>";
-                }
-            }
-            else
-            {
-                codeWindow.Title = sourceFilename;
+                case Change.Unmodified or Change.Added or Change.TypeChanged or Change.Copied:
+                    // We can show the plain file in the newer revision.
+                    codeWindow.EnterFromText(vcs.Show(changedName, city.NewRevision).Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None));
+                    break;
+                case Change.Modified or Change.Deleted or Change.Renamed:
+                    // If a file was renamed, it can still have differences.
+                    // We need to show a difference.
+                    codeWindow.EnterFromText(TextualDiff.Diff(vcs.Show(relativePath, city.OldRevision), vcs.Show(changedName, city.NewRevision)), true);
+                    break;
+                default:
+                    throw new Exception($"Unexpected change type {change}");
             }
 
-            codeWindow.EnterFromText(diff, true);
+            switch (change)
+            {
+                case Change.Renamed:
+                    codeWindow.Title = $"<color=\"red\"><s><noparse>{sourceFilename}</noparse></s></color>"
+                        + $" -> <color=\"green\"><u><noparse>{changedName}</noparse></u></color>";
+                    break;
+                case Change.Deleted:
+                    codeWindow.Title = $"<color=\"red\"><s><noparse>{sourceFilename}</noparse></s></color>";
+                    break;
+                default:
+                    codeWindow.Title = sourceFilename;
+                    break;
+            }
+
             codeWindow.ScrolledVisibleLine = 1;
             return codeWindow;
         }
