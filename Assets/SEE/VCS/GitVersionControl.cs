@@ -22,23 +22,22 @@ namespace SEE.VCS
             repo = new(repositoryPath);
         }
 
+        /// <summary>
+        /// The repository.
+        /// </summary>
         private readonly Repository repo;
 
+        /// <summary>
+        /// The path to the root of the repository.
+        /// </summary>
         private readonly string repositoryPath;
 
         /// <summary>
-        /// Retrieves and returns the source code of the file with given <paramref name="fileName"/>
-        /// in the version control system for the given <paramref name="revisionID"/>.
-        /// In case that file does not exist, the empty string will be returned.
+        /// See <see cref="IVersionControl.Show(string, string)"/>.
         /// </summary>
-        /// <param name="fileName">The file whose content is to be retrieved; must be relative to the root of the repository</param>
-        /// <param name="revisionID">The identifier of the revision for which the file should be looked up</param>
-        /// <returns>the content of <paramref name="fileName"/> at <paramref name="revisionID"/> or empty if
-        /// the file does not exist</returns>
-        public string Show(string fileName, string revisionID)
+        public string Show(string fileName, string commitID)
         {
-            // Get file from commit
-            Blob blob = repo.Lookup<Blob>($"{revisionID}:{Path.GetRelativePath(repositoryPath, fileName).Replace("\\", "/")}");
+            Blob blob = repo.Lookup<Blob>($"{commitID}:{Path.GetRelativePath(repositoryPath, fileName).Replace("\\", "/")}");
 
             if (blob != null)
             {
@@ -46,83 +45,14 @@ namespace SEE.VCS
             }
             else
             {
-                // File got added and is only available in the other commit.
+                // File does not exist.
                 return "";
             }
         }
 
         /// <summary>
-        /// Returns the source code from the <see cref="newCommitID"> that gets compared against the <see cref="oldCommitID">.
+        /// See <see cref="IVersionControl.GetFileChange(string, string, string, out string)"/>.
         /// </summary>
-        /// <param name="fileName">The file, which contains the content.</param>
-        /// <param name="oldCommitID">The commit being compared against.</param>
-        /// <param name="newCommitID">The commit that gets compared.</param>
-        /// <returns>the source code from the revision, that gets compared.</returns>
-        public string ShowOriginal(string fileName, string oldCommitID, string newCommitID, out string oldFileName)
-        {
-            oldFileName = fileName;
-            Commit newCommit = repo.Lookup<Commit>(newCommitID);
-            Commit oldCommit = repo.Lookup<Commit>(oldCommitID);
-
-            CompareOptions compareOptions = new()
-            {
-                Algorithm = DiffAlgorithm.Myers,
-                Similarity = new SimilarityOptions
-                {
-                    RenameDetectionMode = RenameDetectionMode.Default,
-                }
-            };
-
-            // Compare the commits
-            IEnumerable<TreeEntryChanges> changes = repo.Diff.Compare<TreeChanges>(oldCommit.Tree, newCommit.Tree, compareOptions)
-                .Where(change => (change.Path == fileName || change.OldPath == fileName));
-
-            foreach (TreeEntryChanges change in changes)
-            {
-                // Case: file got renamed.
-                if ((change.Status == ChangeKind.Renamed || change.Status == ChangeKind.Copied)
-                     && (change.Path == fileName || change.OldPath == fileName))
-                {
-                    // Change the filename.
-                    oldFileName = change.Path;
-                    // Get renamed file from commit.
-                    Blob renamedBlob = newCommit[change.Path]?.Target as Blob;
-                    if (renamedBlob != null)
-                    {
-                        return renamedBlob.GetContentText();
-                    }
-                }
-                // Case: File got deleted.
-                if (change.Status == ChangeKind.Deleted && change.Path == fileName)
-                {
-                    // Mark filename as deleted.
-                    oldFileName = fileName;
-                    return "";
-                }
-            }
-            Blob blob = newCommit[fileName]?.Target as Blob;
-            return blob.GetContentText();
-        }
-
-        /// <summary>
-        /// Returns true if the repository has a file named <paramref name="fileName"/>
-        /// in the revision with the <paramref name="newCommitID"/>.
-        ///
-        /// If true, the name of that file in the revision with <paramref name="oldCommitID"/>
-        /// will be contained in <paramref name="oldFilename"/>. The value of <paramref name="oldFilename"/>
-        /// will be empty, if the file did not exist in the <paramref name="oldCommitID"/>.
-        ///
-        /// If false, <paramref name="oldFilename"/> will be undefined.
-        /// <paramref name="oldFilename"/> will be name of that file in the <paramref name="oldCommitID"/>
-        /// or the empty string
-        ///
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <param name="oldCommitID"></param>
-        /// <param name="newCommitID"></param>
-        /// <param name="oldFilename"></param>
-        /// <returns></returns>
-        /// <exception cref="UnknownCommitID"></exception>
         public Change GetFileChange(string fileName, string oldCommitID, string newCommitID, out string oldFilename)
         {
             Commit newCommit = repo.Lookup<Commit>(newCommitID);
@@ -160,7 +90,7 @@ namespace SEE.VCS
             foreach (TreeEntryChanges change in changes)
             {
                 numberOfIterations++;
-                Dump(change);
+                // Dump(change);
                 Assert.IsTrue(change.Path == fileName || change.OldPath == fileName);
                 switch (change.Status)
                 {
@@ -228,6 +158,10 @@ namespace SEE.VCS
             return result;
         }
 
+        /// <summary>
+        /// Dumps <paramref name="c"/>. Can be used for debugging.
+        /// </summary>
+        /// <param name="c">change to be dumped</param>
         private void Dump(TreeEntryChanges c)
         {
             Debug.Log($"Path={c.Path} OldPath={c.OldPath} Status={c.Status} Exists={c.Exists}\n");
