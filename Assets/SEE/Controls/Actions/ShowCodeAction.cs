@@ -194,28 +194,35 @@ namespace SEE.Controls.Actions
         public static CodeWindow ShowVCSDiff(GraphElementRef graphElementRef, DiffCity city)
         {
             GraphElement graphElement = graphElementRef.Elem;
-            (string sourceFilename, string path) = GetPath(graphElement);
+            string sourceFilename = graphElement.Filename;
+            if (sourceFilename == null)
+            {
+                string message = $"Selected {GetName(graphElement)} has no filename.";
+                ShowNotification.Error("No filename", message, log: false);
+                throw new InvalidOperationException(message);
+            }
 
             CodeWindow codeWindow = GetOrCreateCodeWindow(graphElementRef, sourceFilename);
 
             IVersionControl vcs = VersionControlFactory.GetVersionControl(city.VersionControlSystem, city.VCSPath.Path);
             // The path of the file relative to the root of the repository where / is used as separator.
-            string relativePath = Path.GetRelativePath(city.VCSPath.Path, path).Replace("\\", "/");
+            string relativePath = graphElement.Path();
             Change change = vcs.GetFileChange(relativePath, city.OldRevision, city.NewRevision, out string changedName);
 
             switch (change)
             {
-                case Change.Unmodified or Change.Added or Change.TypeChanged or Change.Copied:
+                case Change.Unmodified or Change.Added or Change.TypeChanged or Change.Copied or Change.Unknown:
                     // We can show the plain file in the newer revision.
-                    codeWindow.EnterFromText(vcs.Show(changedName, city.NewRevision).Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None));
+                    codeWindow.EnterFromText(vcs.Show(relativePath, city.NewRevision).Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None));
                     break;
                 case Change.Modified or Change.Deleted or Change.Renamed:
                     // If a file was renamed, it can still have differences.
                     // We need to show a difference.
-                    codeWindow.EnterFromText(TextualDiff.Diff(vcs.Show(relativePath, city.OldRevision), vcs.Show(changedName, city.NewRevision)), true);
+                    codeWindow.EnterFromText(TextualDiff.Diff(vcs.Show(relativePath, city.OldRevision),
+                                                              vcs.Show(changedName, city.NewRevision)), true);
                     break;
                 default:
-                    throw new Exception($"Unexpected change type {change}");
+                    throw new Exception($"Unexpected change type {change} for {relativePath}");
             }
 
             switch (change)
