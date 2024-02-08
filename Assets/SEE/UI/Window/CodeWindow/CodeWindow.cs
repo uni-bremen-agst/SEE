@@ -77,7 +77,7 @@ namespace SEE.UI.Window.CodeWindow
         /// Visually marks the line at the given <paramref name="lineNumber"/> and scrolls to it.
         /// Will also unmark any other line. Sets <see cref="markedLine"/> to
         /// <paramref name="lineNumber"/>.
-        /// Clears all lines for line numbers smaller than 1.
+        /// Clears the markers for line numbers smaller than 1.
         /// </summary>
         /// <param name="line">The line number of the line to mark and scroll to (1-indexed)</param>
         public void MarkLine(int lineNumber)

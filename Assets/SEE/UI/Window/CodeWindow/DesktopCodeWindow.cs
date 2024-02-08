@@ -72,7 +72,7 @@ namespace SEE.UI.Window.CodeWindow
 
                     int line = i;
                     Button button = breakpoint.MustGetComponent<Button>();
-                    button.onClick.AddListener(() => DebugBreakpointManager.ToggleBreakpoint(FilePath, line));
+                    button.onClick.AddListener(() => DebugBreakpointManager.ToggleBreakpoint(FilePath, line + 1));
 
                     TextMeshProUGUI buttonMesh = breakpoint.transform.Find("Content").gameObject.MustGetComponent<TextMeshProUGUI>();
                     buttonMesh.color = fileBreakpoints != null && fileBreakpoints.ContainsKey(i) ? breakpointColorActive : breakpointColorInactive;
@@ -200,7 +200,7 @@ namespace SEE.UI.Window.CodeWindow
         {
             if (path == FilePath)
             {
-                Transform breakpoint = scrollable.transform.Find("Code/Breakpoints").GetChild(line);
+                Transform breakpoint = scrollable.transform.Find("Code/Breakpoints").GetChild(line - 1);
 
                 TextMeshProUGUI buttonMesh = breakpoint.transform.Find("Content").gameObject.MustGetComponent<TextMeshProUGUI>();
                 buttonMesh.color = breakpointColorActive;
@@ -216,7 +216,7 @@ namespace SEE.UI.Window.CodeWindow
         {
             if (path == FilePath)
             {
-                Transform breakpoint = scrollable.transform.Find("Code/Breakpoints").GetChild(line);
+                Transform breakpoint = scrollable.transform.Find("Code/Breakpoints").GetChild(line - 1);
 
                 TextMeshProUGUI buttonMesh = breakpoint.transform.Find("Content").gameObject.MustGetComponent<TextMeshProUGUI>();
                 buttonMesh.color = breakpointColorInactive;
