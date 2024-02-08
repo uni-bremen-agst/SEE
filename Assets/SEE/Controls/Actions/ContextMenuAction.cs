@@ -91,7 +91,7 @@ namespace SEE.Controls.Actions
                 actions.Add(new("Show Code", ShowCode, Icons.Code));
                 if (gameObject.ContainingCity<DiffCity>() != null)
                 {
-                    actions.Add(new("Show DiffCode", ShowDiffCode, Icons.Code));
+                    actions.Add(new("Show Code Diff", ShowDiffCode, Icons.Code));
                 }
             }
 
