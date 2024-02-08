@@ -66,11 +66,6 @@ namespace SEE.Game.City
         private const string versionControlSystemLabel = "VersionControlSystem";
 
         /// <summary>
-        /// Label of attribute <see cref="RepositoryPath"/> in the configuration file.
-        /// </summary>
-        private const string repositoryPathLabel = "RepositoryPath";
-
-        /// <summary>
         /// Label of attribute <see cref="OldRevision"/> in the configuration file.
         /// </summary>
         private const string oldRevisionLabel = "OldRevision";
