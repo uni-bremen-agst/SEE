@@ -45,7 +45,6 @@ namespace SEE.VCS
             p.End(true);
         }
 
-
         /// <summary>
         /// A file existing revision 642531cb3cf12527135a81a8c466b30b3cb0e78f that was
         /// renamed to <see cref="gitVersionControl"/> in revision
