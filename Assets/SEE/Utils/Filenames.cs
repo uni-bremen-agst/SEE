@@ -202,5 +202,25 @@ namespace SEE.Utils
             sortedGraphNames = sortedGraphNames.Distinct().NumericalSort();
             return sortedGraphNames;
         }
+
+        /// <summary>
+        /// Returns the concatenation of <paramref name="directory"/> and <paramref name="filename"/>.
+        /// Both are assumed to be paths using <see cref="UnixDirectorySeparator"/> as a directory
+        /// separator. If <paramref name="directory"/> does not end with a <see cref="UnixDirectorySeparator"/>,
+        /// one will be added at the end of <paramref name="directory"/> before the concatenation takes place.
+        /// </summary>
+        /// <param name="directory">directory path</param>
+        /// <param name="filename">filename</param>
+        /// <returns>path concatenation</returns>
+        internal static string Join(string directory, string filename)
+        {
+            if (string.IsNullOrEmpty(directory))
+            {
+                return filename;
+            }
+            // directory has at least one character
+            return directory[^1] == UnixDirectorySeparator ?
+                directory + filename : directory + UnixDirectorySeparator + filename;
+        }
     }
 }
