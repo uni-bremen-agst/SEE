@@ -32,6 +32,7 @@ namespace SEE.UI.DebugAdapterProtocol
         private DebugProtocolHost adapterHost;
         private InitializeResponse capabilities;
         private Tooltip.Tooltip tooltip;
+        private CodeWindow lastCodeWindow;
 
         private Queue<Action> actions = new();
 
@@ -74,6 +75,10 @@ namespace SEE.UI.DebugAdapterProtocol
             {
                 console.AddMessage("Created the debug adapter host.\n", "Adapter", "Log");
             }
+
+            DebugBreakpointManager.OnBreakpointAdded += OnBreakpointsChanged;
+            DebugBreakpointManager.OnBreakpointRemoved += OnBreakpointsChanged;
+
             try
             {
                 capabilities = adapterHost.SendRequestSync(new InitializeRequest()
@@ -110,6 +115,9 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             console.AddMessage("Debug session finished.\n");
             actions.Clear();
+            ClearLastCodePosition();
+            DebugBreakpointManager.OnBreakpointAdded -= OnBreakpointsChanged;
+            DebugBreakpointManager.OnBreakpointRemoved -= OnBreakpointsChanged;
             if (console)
             {
                 console.OnInputSubmit -= OnConsoleInput;
@@ -253,12 +261,32 @@ namespace SEE.UI.DebugAdapterProtocol
         #endregion
 
         #region Events
+        private void OnBreakpointsChanged(string path, int line)
+        {
+            actions.Enqueue(() =>
+            {
+                adapterHost.SendRequestSync(new SetBreakpointsRequest()
+                {
+                    Source = new Source() { Path = path, Name = Path.GetFileName(path)},
+                    Breakpoints = DebugBreakpointManager.Breakpoints[path].Values.ToList(),
+                });
+                Debug.Log("Done");
+            });
+        }
         private void OnEventReceived(object sender, EventReceivedEventArgs e)
         {
             if (e.Body is InitializedEvent)
             {
                 actions.Enqueue(() =>
                 {
+                    foreach ((string path, Dictionary<int, SourceBreakpoint> breakpoints) in DebugBreakpointManager.Breakpoints)
+                    {
+                        adapterHost.SendRequestSync(new SetBreakpointsRequest()
+                        {
+                            Source = new Source() { Path = path, Name = Path.GetFileName(path) },
+                            Breakpoints = breakpoints.Values.ToList(),
+                        });
+                    }
                     adapterHost.SendRequestSync(new SetFunctionBreakpointsRequest() { Breakpoints = new() });
                     adapterHost.SendRequestSync(new SetExceptionBreakpointsRequest() { Filters = new()});
                     Adapter.Launch(adapterHost, capabilities);
@@ -307,7 +335,6 @@ namespace SEE.UI.DebugAdapterProtocol
             {
                 // TODO: Let user restart the program.
                 console.AddMessage("Terminated\n");
-                actions.Enqueue(UpdateCodePosition);
                 actions.Enqueue(() => Destroyer.Destroy(this));
             }
             else if (e.Body is ExitedEvent exitedEvent)
@@ -356,6 +383,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 console.AddMessage(result.Result, "Debugee", "Log");
             });
         }
+
         void OnContinue()
         {
             actions.Enqueue(() =>
@@ -423,7 +451,7 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             actions.Enqueue(() =>
             {
-                adapterHost.SendRequest(new DisconnectRequest(), _ => { });
+                adapterHost.SendRequest(new TerminateRequest(), _ => { });
             });
         }
         #endregion
@@ -432,11 +460,12 @@ namespace SEE.UI.DebugAdapterProtocol
         private void LogError(Exception e)
         {
             console.AddMessage(e.ToString() + "\n", "Adapter", "Error");
-            throw e;
+            Debug.LogWarning(e);
         }
         private void UpdateCodePosition()
         {
             if (thread == null) return;
+            ClearLastCodePosition();
 
             StackFrame stackFrame = adapterHost.SendRequestSync(new StackTraceRequest(){ ThreadId = thread.Id}).StackFrames[0];
 
@@ -458,10 +487,19 @@ namespace SEE.UI.DebugAdapterProtocol
             }
             else
             {
-                codeWindow.EnterFromFile(path, false);
-                codeWindow.ScrolledVisibleLine = stackFrame.Line;
+                codeWindow.MarkLine(stackFrame.Line);
             }
             manager.ActiveWindow = codeWindow;
+
+            lastCodeWindow = codeWindow;
+        }
+
+        private void ClearLastCodePosition()
+        {
+            if (lastCodeWindow)
+            {
+                lastCodeWindow.MarkLine(0);
+            }
         }
         #endregion
     }

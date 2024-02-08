@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using DG.Tweening;
+using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -57,19 +58,41 @@ namespace SEE.UI.Window.CodeWindow
         private const string codeWindowPrefab = "Prefabs/UI/CodeWindowContent";
 
         /// <summary>
+        /// Path to the breakpoint prefab.
+        /// </summary>
+        private const string breakpointPrefab = "Prefabs/UI/BreakpointButton";
+        
+        /// <summary>
+        /// The color for active breakpoints.
+        /// </summary>
+        private static readonly Color breakpointColorActive = Color.red.WithAlpha(0.5f);
+        
+        /// <summary>
+        /// The color for inactive breakpoints.
+        /// </summary>
+        private static readonly Color breakpointColorInactive = Color.gray.WithAlpha(0.5f);
+
+
+        /// <summary>
         /// Visually marks the line at the given <paramref name="lineNumber"/> and scrolls to it.
         /// Will also unmark any other line. Sets <see cref="markedLine"/> to
         /// <paramref name="lineNumber"/>.
+        /// Clears all lines for line numbers smaller than 1.
         /// </summary>
         /// <param name="line">The line number of the line to mark and scroll to (1-indexed)</param>
-        private void MarkLine(int lineNumber)
+        public void MarkLine(int lineNumber)
         {
             markedLine = lineNumber;
             string[] allLines = textMesh.text.Split('\n').Select(x => x.EndsWith("</mark>") ? x.Substring(16, x.Length - 16 - 7) : x).ToArray();
-            string markLine = $"<mark=#ff000044>{allLines[lineNumber - 1]}</mark>\n";
-            textMesh.text = string.Join("", allLines.
-                Select(x => x + "\n").Take(lineNumber - 1).Append(markLine).
-                Concat(allLines.Select(x => x + "\n").Skip(lineNumber).Take(lines - lineNumber)));
+            if (lineNumber < 1)
+            {
+                textMesh.text = String.Join("\n", allLines);
+            } else
+            {
+                string markLine = $"<mark=#ff000044>{allLines[lineNumber - 1]}</mark>";
+                textMesh.text = string.Join("\n", allLines.Take(lineNumber - 1).Append(markLine).Concat(allLines.Skip(lineNumber).Take(lines - lineNumber)));
+            }
+
         }
 
         #region Visible Line Calculation
