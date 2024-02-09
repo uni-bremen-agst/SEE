@@ -566,11 +566,11 @@ namespace SEE.Game.CityRendering
 
             if (gameObject.TryGetComponent(out SEEBranchCity sEEBranchCity))
             {
-                MarkerFactory markerFactory = new MarkerFactory(markerWidth: sEEBranchCity.MarkerWidth,
-                                    markerHeight: sEEBranchCity.MarkerHeight,
-                                    additionColor: sEEBranchCity.AdditionBeamColor,
-                                    changeColor: sEEBranchCity.ChangeBeamColor,
-                                    deletionColor: sEEBranchCity.DeletionBeamColor);
+                MarkerFactory markerFactory = new MarkerFactory(markerWidth: sEEBranchCity.markerAttributes.MarkerWidth,
+                                    markerHeight: sEEBranchCity.markerAttributes.MarkerHeight,
+                                    additionColor: sEEBranchCity.markerAttributes.AdditionBeamColor,
+                                    changeColor: sEEBranchCity.markerAttributes.ChangeBeamColor,
+                                    deletionColor: sEEBranchCity.markerAttributes.DeletionBeamColor);
 
                 //For every node draw the beams based on their toggle
                 for (int i = 0; i < gameObjectArray.Length; i++)

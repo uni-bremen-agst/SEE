@@ -729,11 +729,12 @@ namespace SEE.Utils
         {
             SEECityAttributesAreEqual(expected, actual);
             AreEqual(expected.BaselineGXLPath, actual.BaselineGXLPath);
-            Assert.AreEqual(expected.MarkerHeight, actual.MarkerHeight);
-            Assert.AreEqual(expected.MarkerWidth, actual.MarkerWidth);
-            AreEqual(expected.AdditionBeamColor, actual.AdditionBeamColor);
-            AreEqual(expected.ChangeBeamColor, actual.ChangeBeamColor);
-            AreEqual(expected.DeletionBeamColor, actual.DeletionBeamColor);
+            //Assert.AreEqual(expected.markerAttributes, actual.markerAttributes);
+            Assert.AreEqual(expected.markerAttributes.MarkerHeight, actual.markerAttributes.MarkerHeight);
+            Assert.AreEqual(expected.markerAttributes.MarkerWidth, actual.markerAttributes.MarkerWidth);
+            AreEqual(expected.markerAttributes.AdditionBeamColor, actual.markerAttributes.AdditionBeamColor);
+            AreEqual(expected.markerAttributes.ChangeBeamColor, actual.markerAttributes.ChangeBeamColor);
+            AreEqual(expected.markerAttributes.DeletionBeamColor, actual.markerAttributes.DeletionBeamColor);
         }
 
         /// <summary>
@@ -866,11 +867,11 @@ namespace SEE.Utils
         {
             WipeOutSEECityAttributes(city);
             city.BaselineGXLPath.Set("C:/MyAbsoluteDirectory/MyBaselineFile.gxl");
-            city.MarkerHeight++;
-            city.MarkerWidth++;
-            city.AdditionBeamColor = Color.clear;
-            city.ChangeBeamColor = Color.clear;
-            city.DeletionBeamColor = Color.clear;
+            city.markerAttributes.MarkerHeight++;
+            city.markerAttributes.MarkerWidth++;
+            city.markerAttributes.AdditionBeamColor = Color.clear;
+            city.markerAttributes.ChangeBeamColor = Color.clear;
+            city.markerAttributes.DeletionBeamColor = Color.clear;
         }
 
         /// <summary>
