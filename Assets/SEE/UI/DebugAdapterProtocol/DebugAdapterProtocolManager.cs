@@ -46,14 +46,16 @@ namespace SEE.UI.DebugAdapterProtocol
             debugAdapterProperty.Value = adapter.Name;
             group.AddProperty(debugAdapterProperty);
 
-            StringProperty workingDirectoryProperty = go.AddComponent<StringProperty>();
+            FilePathProperty workingDirectoryProperty = go.AddComponent<FilePathProperty>();
             workingDirectoryProperty.Name = "Working Directory";
             workingDirectoryProperty.Description = "The working directory of the debug adapter.";
+            workingDirectoryProperty.PickMode = SimpleFileBrowser.FileBrowser.PickMode.Folders;
             group.AddProperty(workingDirectoryProperty);
 
-            StringProperty fileNameProperty = go.AddComponent<StringProperty>();
+            FilePathProperty fileNameProperty = go.AddComponent<FilePathProperty>();
             fileNameProperty.Name = "File Name";
             fileNameProperty.Description = "The file name (executable) of the debug adapter.";
+            fileNameProperty.FallbackDirectory = adapter.AdapterWorkingDirectory;
             group.AddProperty(fileNameProperty);
 
             StringProperty argumentsProperty = go.AddComponent<StringProperty>();

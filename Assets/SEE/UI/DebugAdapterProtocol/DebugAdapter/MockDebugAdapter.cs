@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using SEE.UI.PropertyDialog;
+using SimpleFileBrowser;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -23,15 +24,16 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         private bool launchCompileError = false;
 
         private BooleanProperty launchNoDebugProperty;
-        private StringProperty launchProgramProperty;
+        private FilePathProperty launchProgramProperty;
         private BooleanProperty launchStopOnEntryProperty;
         private BooleanProperty launchTraceProperty;
         private BooleanProperty launchCompileErrorProperty;
 
         public override void SetupLaunchConfig(GameObject go, PropertyGroup group)
         {
-            launchProgramProperty = go.AddComponent<StringProperty>();
+            launchProgramProperty = go.AddComponent<FilePathProperty>();
             launchProgramProperty.Name = "Program";
+            launchProgramProperty.Filters = new[] { new FileBrowser.Filter("Markdown", ".md", ".markdown") };
             launchProgramProperty.Value = launchProgram;
             launchProgramProperty.Description = "Absolute path to a text file.";
             group.AddProperty(launchProgramProperty);

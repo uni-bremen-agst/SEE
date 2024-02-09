@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using Newtonsoft.Json.Linq;
 using SEE.UI.PropertyDialog;
+using SimpleFileBrowser;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,15 +21,14 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         public override string AdapterFileName { get; set; } = "netcoredbg.exe";
         public override string AdapterArguments { get; set; } = "--interpreter=vscode --engineLogging=RunWithUnity.log";
 
-
         private bool launchNoDebug = false;
         // https://github.com/Samsung/netcoredbg/blob/27606c317017beb81bc1b81846cdc460a7a6aed3/test-suite/NetcoreDbgTest/VSCode/VSCodeProtocolRequest.cs#L44
         private string launchName = ".NET Core Launch";
         private string launchType = "coreclr";
         private string launchPreLaunchTask = "build";
-        private string launchProgram = Path.Combine("${cwd}", "bin", "Debug", "net8.0", "HelloCS2.dll");
+        private string launchProgram = "HelloCS2.dll";
         private List<string> launchArgs = new() { "Hello", "World"};
-        private string launchCwd = Path.Combine("D:" + Path.DirectorySeparatorChar + "ferdi", "SampleProjects", "HelloCS2");
+        private string launchCwd = Path.Combine("D:" + Path.DirectorySeparatorChar + "ferdi", "SampleProjects", "HelloCS2", "bin", "Debug", "net8.0");
         private Dictionary<string, string> launchEnv = new();
         private string launchConsole = "internalConsole";
         private bool launchStopAtEntry = true;
@@ -37,23 +37,26 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         private string launchInternalConsoleOptions = "openOnSessionStart";
         private string launchSessionId = Guid.NewGuid().ToString();
 
-        private StringProperty launchProgramProperty;
+        private FilePathProperty launchCwdProperty;
+        private FilePathProperty launchProgramProperty;
         private StringProperty launchArgsProperty;
-        private StringProperty launchCwdProperty;
         private BooleanProperty launchStopAtEntryProperty;
         private BooleanProperty launchNoDebugProperty;
 
         public override void SetupLaunchConfig(GameObject go, PropertyGroup group)
         {
-            launchCwdProperty = go.AddComponent<StringProperty>();
+            launchCwdProperty = go.AddComponent<FilePathProperty>();
             launchCwdProperty.Name = "Cwd";
             launchCwdProperty.Description = "The working directory.";
+            launchCwdProperty.PickMode = SimpleFileBrowser.FileBrowser.PickMode.Folders;
             launchCwdProperty.Value = launchCwd;
             group.AddProperty(launchCwdProperty);
 
-            launchProgramProperty = go.AddComponent<StringProperty>();
+            launchProgramProperty = go.AddComponent<FilePathProperty>();
             launchProgramProperty.Name = "Program";
             launchProgramProperty.Description = "The absolute path of a dll file.";
+            launchProgramProperty.FallbackDirectory = launchCwd;
+            launchProgramProperty.Filters = new[] { new FileBrowser.Filter("Dll", ".dll")};
             launchProgramProperty.Value = launchProgram;
             group.AddProperty(launchProgramProperty);
 
@@ -119,6 +122,12 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             }
         }
 
+        /// <summary>
+        /// Escapes a list as a string.
+        /// <seealso cref="parseList(string)"/>
+        /// </summary>
+        /// <param name="args">The list.</param>
+        /// <returns></returns>
         private static string espaceList(List<string> args)
         {
             if (args.Count == 0) return "";
@@ -126,6 +135,12 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
                 args.Select(arg => arg.Replace("\\", "\\\\").Replace("\"", "\\\""))) + "\"";
         }
 
+        /// <summary>
+        /// Parses a string to a list.
+        /// <seealso cref="espaceList(List{string})"/>
+        /// </summary>
+        /// <param name="text">The string.</param>
+        /// <returns></returns>
         private static List<string> parseList(string text)
         {
             if (text.Length == 0) return new();

@@ -292,7 +292,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 foreach ((string channel, char icon) in new[] { ("Adapter", '\uf188'), ("Debugee", '\uf135') })
                 {
                     console.AddChannel(channel, icon);
-                    foreach ((string level, Color color) in new[] { ("Log", Color.gray), ("Warning", Color.yellow.Darker()), ("Error", Color.red) })
+                    foreach ((string level, Color color) in new[] { ("Log", Color.gray), ("Warning", Color.yellow.Darker()), ("Error", Color.red.Darker()) })
                     {
                         console.AddChannelLevel(channel, level, color);
                     }
@@ -638,6 +638,8 @@ namespace SEE.UI.DebugAdapterProtocol
 
             actions.Enqueue(() =>
             {
+                if (thread == null) return;
+
                 StackFrame stackFrame = adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = thread.Id }).StackFrames[0];
 
                 string path = stackFrame.Source.Path;
@@ -658,6 +660,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 }
                 else
                 {
+                    codeWindow.EnterFromFile(path, false);
                     codeWindow.MarkLine(stackFrame.Line);
                 }
                 manager.ActiveWindow = codeWindow;
