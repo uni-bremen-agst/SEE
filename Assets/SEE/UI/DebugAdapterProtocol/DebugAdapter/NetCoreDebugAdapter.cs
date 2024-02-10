@@ -4,7 +4,6 @@ using Newtonsoft.Json.Linq;
 using SEE.UI.PropertyDialog;
 using SimpleFileBrowser;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,7 +14,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
 {
     public class NetCoreDebugAdapter : DebugAdapter
     {
-        public override string Name => "coreclr";
+        public override string Name => "Netcore";
 
         public override string AdapterWorkingDirectory { get; set; } = Path.Combine(AdapterDirectory, "netcoredbg");
         public override string AdapterFileName { get; set; } = "netcoredbg.exe";
@@ -89,7 +88,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         }
 
         
-        public override LaunchRequest GetLaunchRequest(InitializeResponse capabilities)
+        public override LaunchRequest GetLaunchRequest()
         {
             return new()
             {
@@ -111,15 +110,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
                     { "__sessionId", launchSessionId },
                 }
             };
-        }
-
-        public override void Launch(DebugProtocolHost adapterHost, InitializeResponse capabilities)
-        {
-            adapterHost.SendRequestSync(GetLaunchRequest(capabilities));
-            if (capabilities.SupportsConfigurationDoneRequest == true)
-            {
-                adapterHost.SendRequestSync(new ConfigurationDoneRequest());
-            }
         }
 
         /// <summary>

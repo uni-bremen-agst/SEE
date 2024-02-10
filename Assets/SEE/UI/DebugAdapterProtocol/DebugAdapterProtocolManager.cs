@@ -31,7 +31,6 @@ namespace SEE.UI.DebugAdapterProtocol
 
         public void OpenDebugAdapterConfig()
         {
-            Debug.Log("OpenDebugAdapterConfig");
             GameObject go = new GameObject("Debug Adapter Configuration");
 
             // create property group

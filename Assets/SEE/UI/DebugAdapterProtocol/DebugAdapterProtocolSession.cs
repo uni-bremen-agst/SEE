@@ -36,11 +36,6 @@ namespace SEE.UI.DebugAdapterProtocol
         private SteppingGranularity? steppingGranularity = SteppingGranularity.Line;
 
         /// <summary>
-        /// The console window.
-        /// </summary>
-        private ConsoleWindow console;
-
-        /// <summary>
         /// The debug controls.
         /// </summary>
         private GameObject controls;
@@ -121,7 +116,7 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             // creates ui elements
             tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
-            SetupConsole();
+            SetupConsole(true);
             SetupControls();
 
             if (Adapter == null)
@@ -130,7 +125,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 Destroyer.Destroy(this);
                 return;
             }
-            console.AddMessage($"Start debugging session: {Adapter.Name} - {Adapter.AdapterFileName} - {Adapter.AdapterArguments} - {Adapter.AdapterWorkingDirectory}\n");
+            ConsoleWindow.AddMessage($"Start debugging session: {Adapter.Name} - {Adapter.AdapterFileName} - {Adapter.AdapterArguments} - {Adapter.AdapterWorkingDirectory}\n");
 
             // starts the debug adapter process
             if (!CreateAdapterProcess())
@@ -141,7 +136,7 @@ namespace SEE.UI.DebugAdapterProtocol
             }
             else
             {
-                console.AddMessage("Created the debug adapter process.\n", "Adapter", "Log");
+                ConsoleWindow.AddMessage("Created the debug adapter process.\n", "Adapter", "Log");
             }
             // starts the debug adapter host
             if (!CreateAdapterHost())
@@ -152,7 +147,7 @@ namespace SEE.UI.DebugAdapterProtocol
             }
             else
             {
-                console.AddMessage("Created the debug adapter host.\n", "Adapter", "Log");
+                ConsoleWindow.AddMessage("Created the debug adapter host.\n", "Adapter", "Log");
             }
 
             // adds breakpoint events
@@ -202,17 +197,16 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </summary>
         private void OnDestroy()
         {
-            console.AddMessage("Debug session finished.\n");
             actions.Clear();
+            threads.Clear();
+
+            ConsoleWindow.AddMessage("Debug session finished.\n");
             DebugBreakpointManager.OnBreakpointAdded -= OnBreakpointsChanged;
             DebugBreakpointManager.OnBreakpointRemoved -= OnBreakpointsChanged;
+            ConsoleWindow.OnInputSubmit -= OnConsoleInput;
             if (lastCodeWindow)
             {
                 lastCodeWindow.MarkLine(0);
-            }
-            if (console)
-            {
-                console.OnInputSubmit -= OnConsoleInput;
             }
             if (controls)
             {
@@ -222,13 +216,13 @@ namespace SEE.UI.DebugAdapterProtocol
             {
                 Destroyer.Destroy(tooltip);
             }
+            if (adapterProcess != null && !adapterProcess.HasExited)
+            {
+                adapterProcess.Kill();
+            }
             if (adapterHost != null && adapterHost.IsRunning)
             {
                 adapterHost.Stop();
-            }
-            if (adapterProcess != null && !adapterProcess.HasExited)
-            {
-                adapterProcess.Close();
             }
         }
         #endregion
@@ -256,7 +250,7 @@ namespace SEE.UI.DebugAdapterProtocol
                     {"StepOut", (true, OnStepOut, "Step Out")},
                     {"Restart", (capabilities.SupportsRestartRequest == true, OnRestart, "Restart")},
                     {"Stop", (true, OnStop , "Stop")},
-                    {"Terminal", (true, SetupConsole, "Open the Terminal")},
+                    {"Terminal", (true, () => SetupConsole(), "Open the Terminal")},
                 };
                 foreach (var (name, (active, action, description)) in listeners)
                 {
@@ -276,29 +270,29 @@ namespace SEE.UI.DebugAdapterProtocol
         /// Sets up the console.
         /// Can be recalled to reopen and/or focus the console.
         /// </summary>
-        private void SetupConsole()
+        private void SetupConsole(bool start = false)
         {
             WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+            ConsoleWindow console = manager.Windows.OfType<ConsoleWindow>().FirstOrDefault();
             if (console == null)
             {
-                console = manager.Windows.OfType<ConsoleWindow>().FirstOrDefault();
-                if (console == null)
+                console = gameObject.AddComponent<ConsoleWindow>();
+                ConsoleWindow.DefaultChannel = "Adapter";
+                ConsoleWindow.DefaultChannelLevel = "Log";
+                manager.AddWindow(console);
+                if (start)
                 {
-                    console = gameObject.AddComponent<ConsoleWindow>();
-                    console.DefaultChannel = "Adapter";
-                    console.DefaultChannelLevel = "Log";
-                    manager.AddWindow(console);
-                }
-                foreach ((string channel, char icon) in new[] { ("Adapter", '\uf188'), ("Debugee", '\uf135') })
-                {
-                    console.AddChannel(channel, icon);
-                    foreach ((string level, Color color) in new[] { ("Log", Color.gray), ("Warning", Color.yellow.Darker()), ("Error", Color.red.Darker()) })
+                    foreach ((string channel, char icon) in new[] { ("Adapter", '\uf188'), ("Debugee", '\uf135') })
                     {
-                        console.AddChannelLevel(channel, level, color);
+                        ConsoleWindow.AddChannel(channel, icon);
+                        foreach ((string level, Color color) in new[] { ("Log", Color.gray), ("Warning", Color.yellow.Darker()), ("Error", Color.red.Darker()) })
+                        {
+                            ConsoleWindow.AddChannelLevel(channel, level, color);
+                        }
                     }
+                    ConsoleWindow.SetChannelLevelEnabled("Adapter", "Log", false);
+                    ConsoleWindow.OnInputSubmit += OnConsoleInput;
                 }
-                console.SetChannelLevelEnabled("Adapter", "Log", false);
-                console.OnInputSubmit += OnConsoleInput;
             }
             manager.ActiveWindow = console;
         }
@@ -327,9 +321,9 @@ namespace SEE.UI.DebugAdapterProtocol
                 }
             };
             adapterProcess.EnableRaisingEvents = true;
-            adapterProcess.Exited += (_, args) => console.AddMessage($"Process: Exited! ({(!adapterProcess.HasExited ? adapterProcess.ProcessName : null)})");
-            adapterProcess.Disposed += (_, args) => console.AddMessage($"Process: Exited! ({(!adapterProcess.HasExited ? adapterProcess.ProcessName : null)})");
-            adapterProcess.OutputDataReceived += (_, args) => console.AddMessage($"Process: OutputDataReceived! ({adapterProcess.ProcessName})\n\t{args.Data}");
+            adapterProcess.Exited += (_, args) => ConsoleWindow.AddMessage($"Process: Exited! ({(!adapterProcess.HasExited ? adapterProcess.ProcessName : null)})");
+            adapterProcess.Disposed += (_, args) => ConsoleWindow.AddMessage($"Process: Exited! ({(!adapterProcess.HasExited ? adapterProcess.ProcessName : null)})");
+            adapterProcess.OutputDataReceived += (_, args) => ConsoleWindow.AddMessage($"Process: OutputDataReceived! ({adapterProcess.ProcessName})\n\t{args.Data}");
             adapterProcess.ErrorDataReceived += (_, args) => LogError(new($"Process: ErrorDataReceived! ({adapterProcess.ProcessName})\n\t{args.Data}"));
 
             string currentDirectory = Directory.GetCurrentDirectory();
@@ -361,7 +355,7 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             adapterHost = new DebugProtocolHost(adapterProcess.StandardInput.BaseStream, adapterProcess.StandardOutput.BaseStream);
             adapterHost.DispatcherError += (sender, args) => LogError(new($"DispatcherError - {args.Exception}"));
-            adapterHost.ResponseTimeThresholdExceeded += (_, args) => console.AddMessage($"ResponseTimeThresholdExceeded - \t{args.Command}\t{args.SequenceId}\t{args.Threshold}\n", "Adapter", "Warning");
+            adapterHost.ResponseTimeThresholdExceeded += (_, args) => ConsoleWindow.AddMessage($"ResponseTimeThresholdExceeded - \t{args.Command}\t{args.SequenceId}\t{args.Threshold}\n", "Adapter", "Warning");
             adapterHost.EventReceived += OnEventReceived;
             adapterHost.Run();
 
@@ -379,7 +373,7 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             actions.Enqueue(() =>
             {
-                var response = adapterHost.SendRequestSync(new SetBreakpointsRequest()
+                SetBreakpointsResponse response = adapterHost.SendRequestSync(new SetBreakpointsRequest()
                 {
                     Source = new Source() { Path = path, Name = Path.GetFileName(path) },
                     Breakpoints = DebugBreakpointManager.Breakpoints[path].Values.ToList(),
@@ -400,95 +394,148 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <param name="e"></param>
         private void OnEventReceived(object sender, EventReceivedEventArgs e)
         {
-            if (e.Body is InitializedEvent)
+            switch (e.Body)
             {
-                actions.Enqueue(() =>
-                {
-                    foreach ((string path, Dictionary<int, SourceBreakpoint> breakpoints) in DebugBreakpointManager.Breakpoints)
-                    {
-                        adapterHost.SendRequestSync(new SetBreakpointsRequest()
-                        {
-                            Source = new Source() { Path = path, Name = Path.GetFileName(path) },
-                            Breakpoints = breakpoints.Values.ToList(),
-                        });
-                    }
-                    adapterHost.SendRequestSync(new SetFunctionBreakpointsRequest() { Breakpoints = new() });
-                    adapterHost.SendRequestSync(new SetExceptionBreakpointsRequest() { Filters = new() });
-                    Adapter.Launch(adapterHost, capabilities);
-                    IsRunning = true;
-                });
+                case InitializedEvent initializedEvent:
+                    OnInitializedEvent(initializedEvent);
+                    break;
+                case OutputEvent outputEvent:
+                    OnOutputEvent(outputEvent);
+                    break;
+                case TerminatedEvent terminatedEvent:
+                    OnTerminatedEvent(terminatedEvent);
+                    break;
+                case ExitedEvent exitedEvent:
+                    OnExitedEvent(exitedEvent);
+                    break;
+                case StoppedEvent stoppedEvent:
+                    OnStoppedEvent(stoppedEvent);
+                    break;
+                case ThreadEvent threadEvent:
+                    OnThreadEvent(threadEvent);
+                    break;
+                case ContinuedEvent continuedEvent:
+                    OnContinuedEvent(continuedEvent);
+                    break;
             }
-            else if (e.Body is OutputEvent outputEvent)
-            {
-                string channel = outputEvent.Category switch
-                {
-                    OutputEvent.CategoryValue.Console => "Adapter",
-                    OutputEvent.CategoryValue.Stdout => "Debugee",
-                    OutputEvent.CategoryValue.Stderr => "Debugee",
-                    OutputEvent.CategoryValue.Telemetry => null,
-                    OutputEvent.CategoryValue.MessageBox => "Adapter",
-                    OutputEvent.CategoryValue.Exception => "Adapter",
-                    OutputEvent.CategoryValue.Important => "Adapter",
-                    OutputEvent.CategoryValue.Unknown => "Adapter",
-                    null => "Adapter",
-                    _ => "Adapter",
-                };
-                string level = outputEvent.Category switch
-                {
-                    OutputEvent.CategoryValue.Console => "Log",
-                    OutputEvent.CategoryValue.Stdout => "Log",
-                    OutputEvent.CategoryValue.Stderr => "Error",
-                    OutputEvent.CategoryValue.Telemetry => null,
-                    OutputEvent.CategoryValue.MessageBox => "Warning",
-                    OutputEvent.CategoryValue.Exception => "Error",
-                    OutputEvent.CategoryValue.Important => "Warning",
-                    OutputEvent.CategoryValue.Unknown => "Log",
-                    null => "Log",
-                    _ => "Log",
-                };
-                if (channel is not null && level is not null)
-                {
-                    if (level == "Error")
-                    {
-                        Debug.LogWarning(outputEvent.Output);
-                    }
-                    // FIXME: Why does it require a cast?
-                    console.AddMessage(outputEvent.Output, channel, level);
-                }
-            }
-            else if (e.Body is TerminatedEvent terminatedEvent)
-            {
-                // TODO: Let user restart the program.
-                console.AddMessage("Terminated\n");
-                actions.Enqueue(() => Destroyer.Destroy(this));
-            }
-            else if (e.Body is ExitedEvent exitedEvent)
-            {
-                IsRunning = false;
+        }
 
-                console.AddMessage($"Exited with exit code {exitedEvent.ExitCode}\n", "Debugee", "Log");
-                actions.Enqueue(() => Destroyer.Destroy(this));
-            }
-            else if (e.Body is StoppedEvent stoppedEvent)
+        /// <summary>
+        /// Handles the initialized event.
+        /// </summary>
+        private void OnInitializedEvent(InitializedEvent initializedEvent)
+        {
+            actions.Enqueue(() =>
             {
-                IsRunning = false;
-                actions.Enqueue(() => threads = adapterHost.SendRequestSync(new ThreadsRequest()).Threads);
-            }
-            else if (e.Body is ThreadEvent threadEvent)
-            {
-                if (threadEvent.Reason == ThreadEvent.ReasonValue.Started)
-                {
-                    threads.Add(new(threadEvent.ThreadId, threadEvent.ThreadId.ToString()));
-                }
-                else if (threadEvent.Reason == ThreadEvent.ReasonValue.Exited)
-                {
-                    threads.RemoveAll(t => t.Id == threadEvent.ThreadId);
-                }
-            }
-            else if (e.Body is ContinuedEvent)
-            {
+                adapterHost.SendRequest(Adapter.GetLaunchRequest(), _ => { });
                 IsRunning = true;
+                foreach ((string path, Dictionary<int, SourceBreakpoint> breakpoints) in DebugBreakpointManager.Breakpoints)
+                {
+                    adapterHost.SendRequest(new SetBreakpointsRequest()
+                    {
+                        Source = new Source() { Path = path, Name = Path.GetFileName(path) },
+                        Breakpoints = breakpoints.Values.ToList(),
+                    }, _ => {});
+                }
+                adapterHost.SendRequest(new SetFunctionBreakpointsRequest() { Breakpoints = new() }, _ => { });
+                adapterHost.SendRequest(new SetExceptionBreakpointsRequest() { Filters = new() }, _ => { });
+                if (capabilities.SupportsConfigurationDoneRequest == true)
+                {
+                    adapterHost.SendRequest(new ConfigurationDoneRequest(), _ => { });
+                }
+            });
+        }
+
+        /// <summary>
+        /// Handles output events.
+        /// </summary>
+        /// <param name="outputEvent">The event.</param>
+        private void OnOutputEvent(OutputEvent outputEvent)
+        {
+            string channel = outputEvent.Category switch
+            {
+                OutputEvent.CategoryValue.Console => "Adapter",
+                OutputEvent.CategoryValue.Stdout => "Debugee",
+                OutputEvent.CategoryValue.Stderr => "Debugee",
+                OutputEvent.CategoryValue.Telemetry => null,
+                OutputEvent.CategoryValue.MessageBox => "Adapter",
+                OutputEvent.CategoryValue.Exception => "Adapter",
+                OutputEvent.CategoryValue.Important => "Adapter",
+                OutputEvent.CategoryValue.Unknown => "Adapter",
+                null => "Adapter",
+                _ => "Adapter",
+            };
+            string level = outputEvent.Category switch
+            {
+                OutputEvent.CategoryValue.Console => "Log",
+                OutputEvent.CategoryValue.Stdout => "Log",
+                OutputEvent.CategoryValue.Stderr => "Error",
+                OutputEvent.CategoryValue.Telemetry => null,
+                OutputEvent.CategoryValue.MessageBox => "Warning",
+                OutputEvent.CategoryValue.Exception => "Error",
+                OutputEvent.CategoryValue.Important => "Warning",
+                OutputEvent.CategoryValue.Unknown => "Log",
+                null => "Log",
+                _ => "Log",
+            };
+            if (channel is not null && level is not null)
+            {
+                if (level == "Error")
+                {
+                    Debug.LogWarning(outputEvent.Output);
+                }
+                ConsoleWindow.AddMessage(outputEvent.Output, channel, level);
             }
+        }
+
+        /// <summary>
+        /// Handles the terminated event.
+        /// </summary>
+        /// <param name="terminatedEvent">The event.</param>
+        private void OnTerminatedEvent(TerminatedEvent terminatedEvent)
+        {
+            ConsoleWindow.AddMessage("Terminated\n");
+            actions.Enqueue(() => Destroyer.Destroy(this));
+        }
+
+        /// <summary>
+        /// Handles the exited event.
+        /// </summary>
+        /// <param name="exitEvent">The event.</param>
+        private void OnExitedEvent(ExitedEvent exitedEvent) {
+            ConsoleWindow.AddMessage($"Exited with exit code {exitedEvent.ExitCode}\n", "Debugee", "Log");
+            actions.Enqueue(() => Destroyer.Destroy(this));
+        }
+
+        /// <summary>
+        /// Handles stopped events.
+        /// </summary>
+        /// <param name="stoppedEvent">The event.</param>
+        private void OnStoppedEvent(StoppedEvent stoppedEvent)
+        {
+            IsRunning = false;
+            actions.Enqueue(() => threads = adapterHost.SendRequestSync(new ThreadsRequest()).Threads);
+        }
+
+        /// <summary>
+        /// Handles thread events.
+        /// </summary>
+        /// <param name="threadEvent">The event.</param>
+        private void OnThreadEvent(ThreadEvent threadEvent)
+        {
+            if (threadEvent.Reason == ThreadEvent.ReasonValue.Started)
+            {
+                threads.Add(new(threadEvent.ThreadId, threadEvent.ThreadId.ToString()));
+            }
+            else if (threadEvent.Reason == ThreadEvent.ReasonValue.Exited)
+            {
+                threads.RemoveAll(t => t.Id == threadEvent.ThreadId);
+            }
+        }
+
+        private void OnContinuedEvent(ContinuedEvent continuedEvent)
+        {
+            IsRunning = true;
         }
 
         /// <summary>
@@ -500,14 +547,23 @@ namespace SEE.UI.DebugAdapterProtocol
             actions.Enqueue(() =>
             {
                 if (thread == null) return;
-                StackFrame stackFrame = adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = thread.Id }).StackFrames[0];
-                EvaluateResponse result = adapterHost.SendRequestSync(new EvaluateRequest()
+                StackFrame stackFrame = !IsRunning ? 
+                    adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = thread.Id }).StackFrames[0] :
+                    null;
+                try
                 {
-                    Expression = text,
-                    Context = EvaluateArguments.ContextValue.Repl,
-                    FrameId = stackFrame.Id
-                });
-                console.AddMessage(result.Result, "Debugee", "Log");
+                    EvaluateResponse result = adapterHost.SendRequestSync(new EvaluateRequest()
+                    {
+                        Expression = text,
+                        Context = EvaluateArguments.ContextValue.Repl,
+                        FrameId = stackFrame?.Id
+                    });
+                    ConsoleWindow.AddMessage(result.Result + "\n", "Debugee", "Log");
+                } catch (ProtocolException e)
+                {
+                    ConsoleWindow.AddMessage(e.Message, "Debugee", "Error");
+                }
+
             });
         }
 
@@ -602,7 +658,8 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             actions.Enqueue(() =>
             {
-                adapterHost.SendRequest(new RestartRequest { Arguments = Adapter.GetLaunchRequest(capabilities) }, _ => { });
+                adapterHost.SendRequest(new RestartRequest { Arguments = Adapter.GetLaunchRequest() }, _ => { });
+                IsRunning = true;
             });
         }
 
@@ -625,7 +682,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <param name="e"></param>
         private void LogError(Exception e)
         {
-            console.AddMessage(e.ToString() + "\n", "Adapter", "Error");
+            ConsoleWindow.AddMessage(e.ToString() + "\n", "Adapter", "Error");
             Debug.LogWarning(e);
         }
 
@@ -634,8 +691,6 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </summary>
         private void UpdateCodePosition()
         {
-            if (thread == null) return;
-
             actions.Enqueue(() =>
             {
                 if (thread == null) return;
@@ -655,7 +710,7 @@ namespace SEE.UI.DebugAdapterProtocol
                     manager.AddWindow(codeWindow);
                     codeWindow.OnComponentInitialized += () =>
                     {
-                        codeWindow.ScrolledVisibleLine = stackFrame.Line;
+                        codeWindow.MarkLine(stackFrame.Line);
                     };
                 }
                 else

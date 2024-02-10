@@ -72,10 +72,11 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             launchCompileError = launchCompileErrorProperty.Value;
         }
 
-        public override LaunchRequest GetLaunchRequest(InitializeResponse capabilities)
+        public override LaunchRequest GetLaunchRequest()
         {
             return new()
             {
+                NoDebug = launchNoDebug,
                 ConfigurationProperties = new()
                 {
                     {"program", launchProgram},

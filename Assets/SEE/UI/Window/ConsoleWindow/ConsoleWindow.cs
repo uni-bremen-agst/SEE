@@ -17,88 +17,253 @@ namespace SEE.UI.Window.ConsoleWindow
 {
     public class ConsoleWindow : BaseWindow
     {
-        public event UnityAction<string> OnInputSubmit;
-        public event UnityAction<string> OnInputChanged;
+        /// <summary>
+        /// The user submitted the input.
+        /// </summary>
+        public static event UnityAction<string> OnInputSubmit;
+        /// <summary>
+        /// The user changed the input.
+        /// </summary>
+        public static event UnityAction<string> OnInputChanged;
 
+        /// <summary>
+        /// The window prefab.
+        /// </summary>
         private const string windowPrefab = "Prefabs/UI/ConsoleWindow/ConsoleView";
+        
+        /// <summary>
+        /// The prefab for each message.
+        /// </summary>
         private const string itemPrefab = "Prefabs/UI/ConsoleWindow/ConsoleViewItem";
+        
         /// <summary>
         /// The number of spaces to use for tabs.
+        /// <seealso cref="tabReplacement"/>.
         /// </summary>
         private const int tabSize = 4;
+
         /// <summary>
         /// The replacement for tabs in console messages.
         /// Tabs are replaced with spaces for two reasons:
         /// (1) TeshMeshPro doesn't work well with tabs. (weird spacing)
         /// (2) The search field doesn't allow tabs.
+        /// <seealso cref="tabSize"/>
         /// </summary>
         private static readonly string tabReplacement = new(' ', tabSize);
 
-        private List<Message> messages = new List<Message>();
+        /// <summary>
+        /// All console messages.
+        /// </summary>
+        private static List<Message> messages = new List<Message>();
+        
+        /// <summary>
+        /// The messages got cleared.
+        /// </summary>
+        private static event Action MessagesCleared;
+        
+        /// <summary>
+        /// A message was added.
+        /// </summary>
+        private static event Action MessageAdded;
+        
+        /// <summary>
+        /// A message was changed.
+        /// </summary>
+        private static event Action MessageChanged;
 
+        /// <summary>
+        /// A channel or level was changed.
+        /// </summary>
+        private static event Action ChannelChanged;
+
+        /// <summary>
+        /// The messages were cleared.
+        /// </summary>
         private bool messagesCleared;
-        private bool messageAdded;
-        private bool messageAppended;
 
+        /// <summary>
+        /// A message was added.
+        /// </summary>
+        private bool messageAdded;
+
+        /// <summary>
+        /// A message was changed.
+        /// </summary>
+        private bool messageChanged;
+
+        /// <summary>
+        /// A channel or level was changed.
+        /// </summary>
+        private bool channelChanged;
+
+        /// <summary>
+        /// Container for all messages.
+        /// </summary>
         private Transform items;
+
+        /// <summary>
+        /// The search field.
+        /// </summary>
         private TMP_InputField searchField;
+
+        /// <summary>
+        /// The popup menu.
+        /// </summary>
         private PopupMenu.PopupMenu popupMenu;
+
+        /// <summary>
+        /// The button to open the search options.
+        /// </summary>
         private ButtonManagerBasic searchOptionsButton;
+
+        /// <summary>
+        /// The button to open the filter options.
+        /// </summary>
         private ButtonManagerBasic filterButton;
+
+        /// <summary>
+        /// The button to clear all messages.
+        /// </summary>
         private ButtonManagerBasic clearButton;
+
+        /// <summary>
+        /// The input field.
+        /// </summary>
         private TMP_InputField inputField;
 
+        /// <summary>
+        /// Whether the search is case sensitive.
+        /// </summary>
         private bool matchCase = true;
+
+        /// <summary>
+        /// Whether the search must match the full message or only a part of the message.
+        /// </summary>
         private bool fullMatch = false;
 
-        private Dictionary<string, Channel> channels = new() {
+        /// <summary>
+        /// The channels and their levels.
+        /// </summary>
+        private static Dictionary<string, Channel> channels = new() {
             {"User Input", new Channel("User Input", '\uf007', new () {
                 {"Log", new ChannelLevel("Log", Color.gray.Darker(), true)},
             })},
         };
-        public string DefaultChannel = "";
-        public string DefaultChannelLevel = "";
+        /// <summary>
+        /// The default channel for messages.
+        /// </summary>
+        public static string DefaultChannel = "";
 
-        public void AddChannel(string channel, char icon)
-        {
-            channels[channel] = new Channel(channel, icon);
-        }
+        /// <summary>
+        /// The default level for messages.
+        /// </summary>
+        public static string DefaultChannelLevel = "";
 
-        public void AddChannelLevel(string channel, string level, Color color)
-        {
-            channels[channel].Levels[level] = new(level, color, true);
-        }
-
-        public void SetChannelLevelEnabled(string channel, string level, bool enabled)
-        {
-            if (channels.TryGetValue(channel, out Channel c)) {
-                if (c.Levels.TryGetValue(level, out ChannelLevel l))
-                {
-                    l.enabled = enabled;
-                    if (HasStarted) UpdateFilters();
-                }
-            }
-        }
-
-        public void AddMessage(string text, string channel = null, string level = null)
+        /// <summary>
+        /// Adds a console message.
+        /// </summary>
+        /// <param name="text">The text.</param>
+        /// <param name="channel">The channel.</param>
+        /// <param name="level">The level.</param>
+        public static void AddMessage(string text, string channel = null, string level = null)
         {
             channel ??= DefaultChannel;
             level ??= DefaultChannelLevel;
+
+            if (!channels.TryGetValue(channel, out Channel c))
+            {
+                Debug.LogWarning($"Channel {channel} doesn't exist.");
+            }
+            else if (!c.Levels.ContainsKey(level))
+            {
+                Debug.LogWarning($"Level {level} doesn't exist for channel {channel}.\n\t{text}");
+            }
 
             text = text.Replace("\t", tabReplacement);
             int appendTo = AppendTo(channel, level);
             if (appendTo == -1)
             {
                 messages.Add(new(channel, level, text));
-                messageAdded = true;
-            } else
+                MessageAdded?.Invoke();
+            }
+            else
             {
                 messages[appendTo].Text += text;
-                messageAppended = true;
+                MessageChanged?.Invoke();
             }
         }
 
-        private int AppendTo(string channel, string level)
+        /// <summary>
+        /// Clears all messages.
+        /// </summary>
+        public static void ClearMessages()
+        {
+            messages.Clear();
+            MessagesCleared?.Invoke();
+        }
+
+        /// <summary>
+        /// Adds a new channel.
+        /// </summary>
+        /// <param name="channel">The channel name.</param>
+        /// <param name="icon">The channel icon.</param>
+        public static void AddChannel(string channel, char icon)
+        {
+            channels[channel] = new Channel(channel, icon);
+            ChannelChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// Adds a level to a channel.
+        /// </summary>
+        /// <param name="channel">The channel name.</param>
+        /// <param name="level">The level name.</param>
+        /// <param name="color">The level color.</param>
+        public static void AddChannelLevel(string channel, string level, Color color)
+        {
+            if (channels.TryGetValue(channel, out Channel c))
+            {
+                c.Levels[level] = new(level, color, true);
+                ChannelChanged?.Invoke();
+            }
+            else
+            {
+                Debug.LogWarning($"Channel {channel} doesn't exist");
+            }
+        }
+
+        /// <summary>
+        /// Sets whether 
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <param name="level"></param>
+        /// <param name="enabled"></param>
+        public static void SetChannelLevelEnabled(string channel, string level, bool enabled)
+        {
+            if (channels.TryGetValue(channel, out Channel c)) {
+                if (c.Levels.TryGetValue(level, out ChannelLevel l))
+                {
+                    l.enabled = enabled;
+                    ChannelChanged?.Invoke();
+                } else
+                {
+                    Debug.LogWarning($"Level {channel} doesn't exist for channel {channel}.");
+                }
+            } else
+            {
+                Debug.LogWarning($"Channel {channel} doesn't exist.");
+            }
+        }
+
+
+        /// <summary>
+        /// Returns the message index to which a new message should be appended.
+        /// -1 if the a new message should be created.
+        /// </summary>
+        /// <param name="channel">The channel.</param>
+        /// <param name="level">The level.</param>
+        /// <returns></returns>
+        private static int AppendTo(string channel, string level)
         {
             for (int i=messages.Count-1; i>=0; i--)
             {
@@ -111,22 +276,25 @@ namespace SEE.UI.Window.ConsoleWindow
                     }
                 }
             }
-
             return -1;
         }
 
-        public void ClearMessages()
-        {
-            messages.Clear();
-            messagesCleared = true;
-        }
-
+        /// <summary>
+        /// Initializes the component.
+        /// </summary>
         protected override void Start()
         {
             Title ??= "Console";
             base.Start();
+            MessageAdded += OnMessageAdded;
+            MessageChanged += OnMessageChanged;
+            MessagesCleared += OnMessagesCleared;
+            ChannelChanged += OnChannelChanged;
         }
 
+        /// <summary>
+        /// Initializes the component for the desktop platform.
+        /// </summary>
         protected override void StartDesktop()
         {
             base.StartDesktop();
@@ -168,6 +336,9 @@ namespace SEE.UI.Window.ConsoleWindow
             });
         }
 
+        /// <summary>
+        /// Updates the displayed messages.
+        /// </summary>
         protected override void Update()
         {
             base.Update();
@@ -185,20 +356,71 @@ namespace SEE.UI.Window.ConsoleWindow
                 messageAdded = false;
                 for (int i = items.childCount; i < messages.Count; i++)
                 {
-                    AddItem(messages[i]);
+                    CreatemessageItem(messages[i]);
                 }
             }
-            else if (messageAppended)
+            else if (messageChanged)
             {
-                messageAppended = false;
+                messageChanged = false;
                 for (int i = items.childCount; i < messages.Count; i++)
                 {
                     UpdateItem(i);
                 }
+            } else if (channelChanged)
+            {
+                channelChanged = false;
+                UpdateFilters();
             }
         }
 
-        private void AddItem(Message message)
+        /// <summary>
+        /// Removes listeners.
+        /// </summary>
+        private void OnDestroy()
+        {
+            MessageAdded -= OnMessageAdded;
+            MessageChanged -= OnMessageChanged;
+            MessagesCleared -= OnMessagesCleared;
+            ChannelChanged -= OnChannelChanged;
+        }
+
+        /// <summary>
+        /// Listens to <see cref="MessageAdded"/>.
+        /// </summary>
+        private void OnMessageAdded()
+        {
+            messageAdded = true;
+        }
+
+        /// <summary>
+        /// Listens to <see cref="MessagesCleared"/>
+        /// </summary>
+        private void OnMessagesCleared()
+        {
+            messagesCleared = true;
+        }
+
+        /// <summary>
+        /// Listens to <see cref="MessageChanged"/>.
+        /// </summary>
+        private void OnMessageChanged()
+        {
+            messageChanged = true;
+        }
+
+        /// <summary>
+        /// Listens to <see cref="ChannelChanged"/>.
+        /// </summary>
+        private void OnChannelChanged()
+        {
+            channelChanged = true;
+        }
+
+        /// <summary>
+        /// Creates a message item.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        private void CreatemessageItem(Message message)
         {
             GameObject item = PrefabInstantiator.InstantiatePrefab(itemPrefab, items, false);
 
@@ -221,15 +443,23 @@ namespace SEE.UI.Window.ConsoleWindow
             UpdateFilter(message, item);
         }
 
+        /// <summary>
+        /// Updates a message item.
+        /// </summary>
+        /// <param name="i">The message index.</param>
         private void UpdateItem(int i)
         {
             GameObject item = items.GetChild(i).gameObject;
             Message message = messages[i];
             TextMeshProUGUI textMesh = item.transform.Find("Foreground/Text").gameObject.MustGetComponent<TextMeshProUGUI>();
+            Debug.Log($"Update Text - {i} - {message.Text}");
             textMesh.SetText(message.Text);
             UpdateFilter(message, item);
         }
 
+        /// <summary>
+        /// Updates the filters.
+        /// </summary>
         private void UpdateFilters()
         {
             for (int i = 0; i < items.childCount; i++)
@@ -238,6 +468,11 @@ namespace SEE.UI.Window.ConsoleWindow
             }
         }
 
+        /// <summary>
+        /// Updates the filter for a message.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="item">The message item.</param>
         private void UpdateFilter(Message message, GameObject item)
         {
             item.SetActive(true);
@@ -257,6 +492,10 @@ namespace SEE.UI.Window.ConsoleWindow
             }
         }
 
+        /// <summary>
+        /// Shows the search options.
+        /// </summary>
+        /// <param name="refresh"></param>
         private void ShowSearchOptionsPopup(bool refresh = false)
         {
             popupMenu.ClearEntries();
@@ -281,6 +520,10 @@ namespace SEE.UI.Window.ConsoleWindow
             }
         }
 
+        /// <summary>
+        /// Shows the filter options.
+        /// </summary>
+        /// <param name="refresh"></param>
         private void ShowFilterPopup(bool refresh = false)
         {
             popupMenu.ClearEntries();
@@ -324,12 +567,32 @@ namespace SEE.UI.Window.ConsoleWindow
             throw new System.NotImplementedException();
         }
 
+        /// <summary>
+        /// Container for a console message.
+        /// </summary>
         private class Message
         {
+            /// <summary>
+            /// The message channel.
+            /// </summary>
             public readonly string Channel;
+            
+            /// <summary>
+            /// The message level.
+            /// </summary>
             public readonly string Level;
+            
+            /// <summary>
+            /// The text.
+            /// </summary>
             public string Text;
 
+            /// <summary>
+            /// The constructor.
+            /// </summary>
+            /// <param name="channel">The channel.</param>
+            /// <param name="level">The level.</param>
+            /// <param name="text">The text.</param>
             public Message(string channel, string level, string text)
             {
                 Channel = channel;
@@ -338,12 +601,32 @@ namespace SEE.UI.Window.ConsoleWindow
             }
         }
 
+        /// <summary>
+        /// Container for a channel.
+        /// </summary>
         private class Channel
         {
+            /// <summary>
+            /// The name.
+            /// </summary>
             public readonly string Name;
+
+            /// <summary>
+            /// The channel icon.
+            /// </summary>
             public readonly char Icon;
+
+            /// <summary>
+            /// The channel levels.
+            /// </summary>
             public readonly Dictionary<string, ChannelLevel> Levels;
 
+            /// <summary>
+            /// The constructor.
+            /// </summary>
+            /// <param name="name">The name.</param>
+            /// <param name="icon">The icon.</param>
+            /// <param name="levels">The levels.</param>
             public Channel(string name, char icon, Dictionary<string, ChannelLevel> levels = null)
             {
                 this.Name = name;
@@ -352,12 +635,32 @@ namespace SEE.UI.Window.ConsoleWindow
             }
         }
 
+        /// <summary>
+        /// Container for a channel level.
+        /// </summary>
         private class ChannelLevel
         {
+            /// <summary>
+            /// The level name.
+            /// </summary>
             public readonly string Name;
+            
+            /// <summary>
+            /// The level color.
+            /// </summary>
             public readonly Color Color;
+
+            /// <summary>
+            /// Whether the channel is enabled.
+            /// </summary>
             public bool enabled;
 
+            /// <summary>
+            /// The constructor.
+            /// </summary>
+            /// <param name="name">The name.</param>
+            /// <param name="color">The color.</param>
+            /// <param name="enabled">Whether is it enabled.</param>
             public ChannelLevel(string name, Color color, bool enabled)
             {
                 this.Name = name;
