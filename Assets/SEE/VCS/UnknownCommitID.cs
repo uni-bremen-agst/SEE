@@ -1,7 +1,7 @@
 ﻿namespace SEE.VCS
 {
     /// <summary>
-    /// Thrown in cases where a commit id cannot be resolved in a version control system.
+    /// Thrown in cases where a commit ID cannot be resolved in a version control system.
     /// </summary>
     public class UnknownCommitID : System.Exception
     {
