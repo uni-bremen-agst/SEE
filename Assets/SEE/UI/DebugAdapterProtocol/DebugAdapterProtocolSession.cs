@@ -72,13 +72,12 @@ namespace SEE.UI.DebugAdapterProtocol
         private Queue<Action> actions = new();
 
         /// <summary>
-        /// Whether the debugger is current executing the debugee.
+        /// Whether the debug adapter is currently executing the program.
         /// </summary>
         private bool isRunning;
 
         /// <summary>
-        /// Whether the debugger is current executing the debugee.
-        /// Automatically updates the code position on change.
+        /// Whether the debug adapter is currently executing the program.
         /// </summary>
         private bool IsRunning
         {
@@ -87,13 +86,14 @@ namespace SEE.UI.DebugAdapterProtocol
             {
                 if (value == isRunning) return;
                 isRunning = value;
-                if (!value)
+                if (value)
                 {
-                    UpdateCodePosition();
-                }
-                else
+                    actions.Enqueue(ClearLastCodePosition);
+                } else
                 {
-                    ClearLastCodePosition();
+                    actions.Enqueue(UpdateThreads);
+                    actions.Enqueue(UpdateCodePosition);
+                    actions.Enqueue(UpdateVariables);
                 }
             }
         }
@@ -106,7 +106,12 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Returns the first active thread.
         /// </summary>
-        private Thread? thread => threads.FirstOrDefault();
+        private Thread thread => threads.FirstOrDefault();
+
+        /// <summary>
+        /// The variables.
+        /// </summary>
+        private Dictionary<StackFrame, Dictionary<Scope, List<Variable>>> variables = new();
 
         #region General
         /// <summary>
@@ -121,7 +126,9 @@ namespace SEE.UI.DebugAdapterProtocol
 
             if (Adapter == null)
             {
-                LogError(new("Debug adapter not set."));
+                string message = "Debug adapter not set.";
+                ConsoleWindow.AddMessage(message, "Adapter", "Error");
+                Debug.LogWarning(message);
                 Destroyer.Destroy(this);
                 return;
             }
@@ -130,7 +137,9 @@ namespace SEE.UI.DebugAdapterProtocol
             // starts the debug adapter process
             if (!CreateAdapterProcess())
             {
-                LogError(new("Couldn't create the debug adapter process."));
+                string message = "Couldn't create the debug adapter process.";
+                ConsoleWindow.AddMessage(message, "Adapter", "Error");
+                Debug.LogWarning(message);
                 Destroyer.Destroy(this);
                 return;
             }
@@ -141,7 +150,9 @@ namespace SEE.UI.DebugAdapterProtocol
             // starts the debug adapter host
             if (!CreateAdapterHost())
             {
-                LogError(new("Couldn't create the debug adapter host."));
+                string message = "Couldn't create the debug adapter host.";
+                ConsoleWindow.AddMessage(message, "Adapter", "Error");
+                Debug.LogWarning(message);
                 Destroyer.Destroy(this);
                 return;
             }
@@ -174,7 +185,8 @@ namespace SEE.UI.DebugAdapterProtocol
             }
             catch (Exception e)
             {
-                LogError(e);
+                ConsoleWindow.AddMessage(e.Message + "\n", "Adapter", "Error");
+                Debug.LogWarning(e);
                 Destroyer.Destroy(this);
             }
         }
@@ -185,10 +197,12 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </summary>
         private void Update()
         {
-            if (actions.Count > 0 && capabilities != null)
+            if (capabilities != null)
             {
-                // TODO: Try catch -> LogError
-                actions.Dequeue()();
+                while (actions.Count > 0)
+                {
+                    actions.Dequeue()();
+                }
             }
         }
 
@@ -199,15 +213,12 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             actions.Clear();
             threads.Clear();
+            ClearLastCodePosition();
 
             ConsoleWindow.AddMessage("Debug session finished.\n");
             DebugBreakpointManager.OnBreakpointAdded -= OnBreakpointsChanged;
             DebugBreakpointManager.OnBreakpointRemoved -= OnBreakpointsChanged;
             ConsoleWindow.OnInputSubmit -= OnConsoleInput;
-            if (lastCodeWindow)
-            {
-                lastCodeWindow.MarkLine(0);
-            }
             if (controls)
             {
                 Destroyer.Destroy(controls);
@@ -239,23 +250,22 @@ namespace SEE.UI.DebugAdapterProtocol
 
             actions.Enqueue(() =>
             {
-                Dictionary<string, (bool, Action, string)> listeners = new Dictionary<string, (bool, Action, string)>
+                Dictionary<string, (Action, string)> listeners = new()
                 {
-                    {"Continue", (true, OnContinue, "Continue")},
-                    {"Pause", (true, OnPause, "Pause")},
-                    {"Reverse", (capabilities.SupportsStepBack == true, OnReverseContinue, "Reverse")},
-                    {"Next", (true, OnNext, "Next")},
-                    {"StepBack", (capabilities.SupportsStepBack == true, OnStepBack, "Step Back")},
-                    {"StepIn", (true, OnStepIn, "Step In")},
-                    {"StepOut", (true, OnStepOut, "Step Out")},
-                    {"Restart", (capabilities.SupportsRestartRequest == true, OnRestart, "Restart")},
-                    {"Stop", (true, OnStop , "Stop")},
-                    {"Terminal", (true, () => SetupConsole(), "Open the Terminal")},
+                    {"Continue", (OnContinue, "Continue")},
+                    {"Pause", (OnPause, "Pause")},
+                    {"Reverse", (OnReverseContinue, "Reverse")},
+                    {"Next", (OnNext, "Next")},
+                    {"StepBack", (OnStepBack, "Step Back")},
+                    {"StepIn", (OnStepIn, "Step In")},
+                    {"StepOut", (OnStepOut, "Step Out")},
+                    {"Restart", (OnRestart, "Restart")},
+                    {"Stop", (OnStop , "Stop")},
+                    {"Terminal", (() => SetupConsole(), "Open the Terminal")},
                 };
-                foreach (var (name, (active, action, description)) in listeners)
+                foreach (var (name, (action, description)) in listeners)
                 {
                     GameObject button = controls.transform.Find(name).gameObject;
-                    button.SetActive(active);
                     button.MustGetComponent<Button>().onClick.AddListener(() => action());
                     if (button.TryGetComponentOrLog(out PointerHelper pointerHelper))
                     {
@@ -263,7 +273,31 @@ namespace SEE.UI.DebugAdapterProtocol
                         pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
                     }
                 }
+                UpdateVisibility();
+                adapterHost.EventReceived += (object sender, EventReceivedEventArgs e) =>
+                {
+                    if (e.Body is CapabilitiesEvent)
+                    {
+                        UpdateVisibility();
+                    }
+                };
+
+                void UpdateVisibility()
+                {
+                    Dictionary<string, bool?> activeButtons = new()
+                    {
+                        {"Reverse", capabilities.SupportsStepBack },
+                        {"StepBack", capabilities.SupportsStepBack },
+                        {"Restart", capabilities.SupportsRestartRequest },
+                    };
+                    foreach (var (name, active) in activeButtons)
+                    {
+                        controls.transform.Find(name).gameObject.SetActive(active == true);
+                    }
+                }
             });
+
+
         }
 
         /// <summary>
@@ -282,7 +316,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 manager.AddWindow(console);
                 if (start)
                 {
-                    foreach ((string channel, char icon) in new[] { ("Adapter", '\uf188'), ("Debugee", '\uf135') })
+                    foreach ((string channel, char icon) in new[] { ("Adapter", '\uf188'), ("Program", '\uf135') })
                     {
                         ConsoleWindow.AddChannel(channel, icon);
                         foreach ((string level, Color color) in new[] { ("Log", Color.gray), ("Warning", Color.yellow.Darker()), ("Error", Color.red.Darker()) })
@@ -324,7 +358,12 @@ namespace SEE.UI.DebugAdapterProtocol
             adapterProcess.Exited += (_, args) => ConsoleWindow.AddMessage($"Process: Exited! ({(!adapterProcess.HasExited ? adapterProcess.ProcessName : null)})");
             adapterProcess.Disposed += (_, args) => ConsoleWindow.AddMessage($"Process: Exited! ({(!adapterProcess.HasExited ? adapterProcess.ProcessName : null)})");
             adapterProcess.OutputDataReceived += (_, args) => ConsoleWindow.AddMessage($"Process: OutputDataReceived! ({adapterProcess.ProcessName})\n\t{args.Data}");
-            adapterProcess.ErrorDataReceived += (_, args) => LogError(new($"Process: ErrorDataReceived! ({adapterProcess.ProcessName})\n\t{args.Data}"));
+            adapterProcess.ErrorDataReceived += (_, args) =>
+            {
+                string message = $"Process: ErrorDataReceived! ({adapterProcess.ProcessName})\n\t{args.Data}";
+                ConsoleWindow.AddMessage(message + "\n", "Adapter", "Error");
+                Debug.LogWarning(message);
+            };
 
             string currentDirectory = Directory.GetCurrentDirectory();
             try
@@ -338,7 +377,8 @@ namespace SEE.UI.DebugAdapterProtocol
             }
             catch (Exception e)
             {
-                LogError(e);
+                ConsoleWindow.AddMessage(e.Message + "\n", "Adapter", "Error");
+                Debug.LogWarning(e);
                 adapterProcess = null;
             }
             // working directory needs to be reset (otherwise unity crashes)
@@ -354,8 +394,16 @@ namespace SEE.UI.DebugAdapterProtocol
         private bool CreateAdapterHost()
         {
             adapterHost = new DebugProtocolHost(adapterProcess.StandardInput.BaseStream, adapterProcess.StandardOutput.BaseStream);
-            adapterHost.DispatcherError += (sender, args) => LogError(new($"DispatcherError - {args.Exception}"));
-            adapterHost.ResponseTimeThresholdExceeded += (_, args) => ConsoleWindow.AddMessage($"ResponseTimeThresholdExceeded - \t{args.Command}\t{args.SequenceId}\t{args.Threshold}\n", "Adapter", "Warning");
+            adapterHost.DispatcherError += (sender, args) =>
+            {
+                string message = $"DispatcherError - {args.Exception}";
+                ConsoleWindow.AddMessage(message + "\n", "Adapter", "Error");
+                Debug.LogWarning(message);
+            };
+            adapterHost.ResponseTimeThresholdExceeded += (_, args) =>
+            {
+                ConsoleWindow.AddMessage($"ResponseTimeThresholdExceeded - \t{args.Command}\t{args.SequenceId}\t{args.Threshold}\n", "Adapter", "Warning");
+            };
             adapterHost.EventReceived += OnEventReceived;
             adapterHost.Run();
 
@@ -367,23 +415,17 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Updates the breakpoints.
         /// </summary>
-        /// <param name="path"></param>
-        /// <param name="line"></param>
+        /// <param name="path">The source code path.</param>
+        /// <param name="line">The code line.</param>
         private void OnBreakpointsChanged(string path, int line)
         {
             actions.Enqueue(() =>
             {
-                SetBreakpointsResponse response = adapterHost.SendRequestSync(new SetBreakpointsRequest()
+                adapterHost.SendRequest(new SetBreakpointsRequest()
                 {
                     Source = new Source() { Path = path, Name = Path.GetFileName(path) },
                     Breakpoints = DebugBreakpointManager.Breakpoints[path].Values.ToList(),
-                });
-                Debug.Log(String.Join(" ", DebugBreakpointManager.Breakpoints[path].Keys));
-                foreach (Breakpoint breakpoint in response.Breakpoints)
-                {
-                    Debug.Log($"Breakpoint\t{breakpoint.Id}\t{breakpoint.Source.Name}\t{breakpoint.Line}\t{breakpoint.Verified}");
-                }
-                Debug.Log("Done");
+                }, _ => {});
             });
         }
 
@@ -417,6 +459,9 @@ namespace SEE.UI.DebugAdapterProtocol
                 case ContinuedEvent continuedEvent:
                     OnContinuedEvent(continuedEvent);
                     break;
+                case CapabilitiesEvent capabilitiesEvent:
+                    OnCapabilitiesEvent(capabilitiesEvent); 
+                    break;
             }
         }
 
@@ -427,8 +472,7 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             actions.Enqueue(() =>
             {
-                adapterHost.SendRequest(Adapter.GetLaunchRequest(), _ => { });
-                IsRunning = true;
+                adapterHost.SendRequest(Adapter.GetLaunchRequest(), _ => IsRunning = true);
                 foreach ((string path, Dictionary<int, SourceBreakpoint> breakpoints) in DebugBreakpointManager.Breakpoints)
                 {
                     adapterHost.SendRequest(new SetBreakpointsRequest()
@@ -455,8 +499,8 @@ namespace SEE.UI.DebugAdapterProtocol
             string channel = outputEvent.Category switch
             {
                 OutputEvent.CategoryValue.Console => "Adapter",
-                OutputEvent.CategoryValue.Stdout => "Debugee",
-                OutputEvent.CategoryValue.Stderr => "Debugee",
+                OutputEvent.CategoryValue.Stdout => "Program",
+                OutputEvent.CategoryValue.Stderr => "Program",
                 OutputEvent.CategoryValue.Telemetry => null,
                 OutputEvent.CategoryValue.MessageBox => "Adapter",
                 OutputEvent.CategoryValue.Exception => "Adapter",
@@ -503,7 +547,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </summary>
         /// <param name="exitEvent">The event.</param>
         private void OnExitedEvent(ExitedEvent exitedEvent) {
-            ConsoleWindow.AddMessage($"Exited with exit code {exitedEvent.ExitCode}\n", "Debugee", "Log");
+            ConsoleWindow.AddMessage($"Exited with exit code {exitedEvent.ExitCode}\n", "Program", "Log");
             actions.Enqueue(() => Destroyer.Destroy(this));
         }
 
@@ -514,7 +558,6 @@ namespace SEE.UI.DebugAdapterProtocol
         private void OnStoppedEvent(StoppedEvent stoppedEvent)
         {
             IsRunning = false;
-            actions.Enqueue(() => threads = adapterHost.SendRequestSync(new ThreadsRequest()).Threads);
         }
 
         /// <summary>
@@ -533,9 +576,78 @@ namespace SEE.UI.DebugAdapterProtocol
             }
         }
 
+        /// <summary>
+        /// Handles continued events.
+        /// </summary>
+        /// <param name="continuedEvent"></param>
         private void OnContinuedEvent(ContinuedEvent continuedEvent)
         {
             IsRunning = true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="capabilitiesEvent"></param>
+        private void OnCapabilitiesEvent(CapabilitiesEvent capabilitiesEvent)
+        {
+            if (capabilities == null)
+            {
+                actions.Enqueue(UpdateCapabilities);
+            } else
+            {
+                UpdateCapabilities();
+            }
+
+            void UpdateCapabilities()
+            {
+                capabilities.SupportsConfigurationDoneRequest = capabilitiesEvent.Capabilities.SupportsConfigurationDoneRequest ?? capabilities.SupportsConfigurationDoneRequest;
+                capabilities.SupportsFunctionBreakpoints = capabilitiesEvent.Capabilities.SupportsFunctionBreakpoints ?? capabilities.SupportsFunctionBreakpoints;
+                capabilities.SupportsConditionalBreakpoints = capabilitiesEvent.Capabilities.SupportsConditionalBreakpoints ?? capabilities.SupportsConditionalBreakpoints;
+                capabilities.SupportsHitConditionalBreakpoints = capabilitiesEvent.Capabilities.SupportsHitConditionalBreakpoints ?? capabilities.SupportsHitConditionalBreakpoints;
+                capabilities.SupportsEvaluateForHovers = capabilitiesEvent.Capabilities.SupportsEvaluateForHovers ?? capabilities.SupportsEvaluateForHovers;
+                capabilities.ExceptionBreakpointFilters = capabilitiesEvent.Capabilities.ExceptionBreakpointFilters ?? capabilities.ExceptionBreakpointFilters;
+                capabilities.SupportsStepBack = capabilitiesEvent.Capabilities.SupportsStepBack ?? capabilities.SupportsStepBack;
+                capabilities.SupportsSetVariable = capabilitiesEvent.Capabilities.SupportsSetVariable ?? capabilities.SupportsSetVariable;
+                capabilities.SupportsRestartFrame = capabilitiesEvent.Capabilities.SupportsRestartFrame ?? capabilities.SupportsRestartFrame;
+                capabilities.SupportsGotoTargetsRequest = capabilitiesEvent.Capabilities.SupportsGotoTargetsRequest ?? capabilities.SupportsGotoTargetsRequest;
+                capabilities.SupportsStepInTargetsRequest = capabilitiesEvent.Capabilities.SupportsStepInTargetsRequest ?? capabilities.SupportsStepInTargetsRequest;
+                capabilities.SupportsCompletionsRequest = capabilitiesEvent.Capabilities.SupportsCompletionsRequest ?? capabilities.SupportsCompletionsRequest;
+                capabilities.CompletionTriggerCharacters = capabilitiesEvent.Capabilities.CompletionTriggerCharacters ?? capabilities.CompletionTriggerCharacters;
+                capabilities.SupportsModulesRequest = capabilitiesEvent.Capabilities.SupportsModulesRequest ?? capabilities.SupportsModulesRequest;
+                capabilities.AdditionalModuleColumns = capabilitiesEvent.Capabilities.AdditionalModuleColumns ?? capabilities.AdditionalModuleColumns;
+                capabilities.SupportedChecksumAlgorithms = capabilitiesEvent.Capabilities.SupportedChecksumAlgorithms ?? capabilities.SupportedChecksumAlgorithms;
+                capabilities.SupportsRestartRequest = capabilitiesEvent.Capabilities.SupportsRestartRequest ?? capabilities.SupportsRestartRequest;
+                capabilities.SupportsExceptionOptions = capabilitiesEvent.Capabilities.SupportsExceptionOptions ?? capabilities.SupportsExceptionOptions;
+                capabilities.SupportsValueFormattingOptions = capabilitiesEvent.Capabilities.SupportsValueFormattingOptions ?? capabilities.SupportsValueFormattingOptions;
+                capabilities.SupportsExceptionInfoRequest = capabilitiesEvent.Capabilities.SupportsExceptionInfoRequest ?? capabilities.SupportsExceptionInfoRequest;
+                capabilities.SupportTerminateDebuggee = capabilitiesEvent.Capabilities.SupportTerminateDebuggee ?? capabilities.SupportTerminateDebuggee;
+                capabilities.SupportSuspendDebuggee = capabilitiesEvent.Capabilities.SupportSuspendDebuggee ?? capabilities.SupportSuspendDebuggee;
+                capabilities.SupportsDelayedStackTraceLoading = capabilitiesEvent.Capabilities.SupportsDelayedStackTraceLoading ?? capabilities.SupportsDelayedStackTraceLoading;
+                capabilities.SupportsLoadedSourcesRequest = capabilitiesEvent.Capabilities.SupportsLoadedSourcesRequest ?? capabilities.SupportsLoadedSourcesRequest;
+                capabilities.SupportsLogPoints = capabilitiesEvent.Capabilities.SupportsLogPoints ?? capabilities.SupportsLogPoints;
+                capabilities.SupportsTerminateThreadsRequest = capabilitiesEvent.Capabilities.SupportsTerminateThreadsRequest ?? capabilities.SupportsTerminateThreadsRequest;
+                capabilities.SupportsSetExpression = capabilitiesEvent.Capabilities.SupportsSetExpression ?? capabilities.SupportsSetExpression;
+                capabilities.SupportsTerminateRequest = capabilitiesEvent.Capabilities.SupportsTerminateRequest ?? capabilities.SupportsTerminateRequest;
+                capabilities.SupportsDataBreakpoints = capabilitiesEvent.Capabilities.SupportsDataBreakpoints ?? capabilities.SupportsDataBreakpoints;
+                capabilities.SupportsReadMemoryRequest = capabilitiesEvent.Capabilities.SupportsReadMemoryRequest ?? capabilities.SupportsReadMemoryRequest;
+                capabilities.SupportsWriteMemoryRequest = capabilitiesEvent.Capabilities.SupportsWriteMemoryRequest ?? capabilities.SupportsWriteMemoryRequest;
+                capabilities.SupportsDisassembleRequest = capabilitiesEvent.Capabilities.SupportsDisassembleRequest ?? capabilities.SupportsDisassembleRequest;
+                capabilities.SupportsCancelRequest = capabilitiesEvent.Capabilities.SupportsCancelRequest ?? capabilities.SupportsCancelRequest;
+                capabilities.SupportsBreakpointLocationsRequest = capabilitiesEvent.Capabilities.SupportsBreakpointLocationsRequest ?? capabilities.SupportsBreakpointLocationsRequest;
+                capabilities.SupportsClipboardContext = capabilitiesEvent.Capabilities.SupportsClipboardContext ?? capabilities.SupportsClipboardContext;
+                capabilities.SupportsSteppingGranularity = capabilitiesEvent.Capabilities.SupportsSteppingGranularity ?? capabilities.SupportsSteppingGranularity;
+                capabilities.SupportsInstructionBreakpoints = capabilitiesEvent.Capabilities.SupportsInstructionBreakpoints ?? capabilities.SupportsInstructionBreakpoints;
+                capabilities.SupportsExceptionFilterOptions = capabilitiesEvent.Capabilities.SupportsExceptionFilterOptions ?? capabilities.SupportsExceptionFilterOptions;
+                capabilities.SupportsSingleThreadExecutionRequests = capabilitiesEvent.Capabilities.SupportsSingleThreadExecutionRequests ?? capabilities.SupportsSingleThreadExecutionRequests;
+                capabilities.SupportsResumableDisconnect = capabilitiesEvent.Capabilities.SupportsResumableDisconnect ?? capabilities.SupportsResumableDisconnect;
+                capabilities.SupportsExceptionConditions = capabilitiesEvent.Capabilities.SupportsExceptionConditions ?? capabilities.SupportsExceptionConditions;
+                capabilities.SupportsLoadSymbolsRequest = capabilitiesEvent.Capabilities.SupportsLoadSymbolsRequest ?? capabilities.SupportsLoadSymbolsRequest;
+                capabilities.SupportsModuleSymbolSearchLog = capabilitiesEvent.Capabilities.SupportsModuleSymbolSearchLog ?? capabilities.SupportsModuleSymbolSearchLog;
+                capabilities.SupportsDebuggerProperties = capabilitiesEvent.Capabilities.SupportsDebuggerProperties ?? capabilities.SupportsDebuggerProperties;
+                capabilities.SupportsSetSymbolOptions = capabilitiesEvent.Capabilities.SupportsSetSymbolOptions ?? capabilities.SupportsSetSymbolOptions;
+                capabilities.SupportsAuthenticatedSymbolServers = capabilitiesEvent.Capabilities.SupportsAuthenticatedSymbolServers ?? capabilities.SupportsAuthenticatedSymbolServers;
+            }
         }
 
         /// <summary>
@@ -558,184 +670,238 @@ namespace SEE.UI.DebugAdapterProtocol
                         Context = EvaluateArguments.ContextValue.Repl,
                         FrameId = stackFrame?.Id
                     });
-                    ConsoleWindow.AddMessage(result.Result + "\n", "Debugee", "Log");
+                    ConsoleWindow.AddMessage(result.Result + "\n", "Program", "Log");
                 } catch (ProtocolException e)
                 {
-                    ConsoleWindow.AddMessage(e.Message, "Debugee", "Error");
+                    ConsoleWindow.AddMessage(e.Message, "Program", "Error");
                 }
 
             });
         }
 
         /// <summary>
-        /// Sends a continue request.
+        /// Queues a continue request.
         /// </summary>
         void OnContinue()
         {
             actions.Enqueue(() =>
             {
-                if (thread is null || IsRunning) return;
+                if (IsRunning) return;
                 adapterHost.SendRequest(new ContinueRequest { ThreadId = thread.Id }, _ => { });
             });
         }
 
         /// <summary>
-        /// Sends a pause request.
+        /// Queues a pause request.
         /// </summary>
         void OnPause()
         {
             actions.Enqueue(() =>
             {
-                if (thread is null || !IsRunning) return;
+                if (!IsRunning) return;
                 adapterHost.SendRequest(new PauseRequest { ThreadId = thread.Id }, _ => { });
             });
         }
 
         /// <summary>
-        /// Sends a reverse continue request.
+        /// Queues a reverse continue request.
         /// </summary>
         void OnReverseContinue()
         {
             actions.Enqueue(() =>
             {
-                if (thread is null || IsRunning) return;
+                if (IsRunning) return;
                 adapterHost.SendRequest(new ReverseContinueRequest { ThreadId = thread.Id }, _ => { });
             });
         }
 
         /// <summary>
-        /// Sends a next request.
+        /// Queues a next request.
         /// </summary>
         void OnNext()
         {
             actions.Enqueue(() =>
             {
-                if (thread is null || IsRunning) return;
+                if (IsRunning) return;
                 adapterHost.SendRequest(new NextRequest { ThreadId = thread.Id, Granularity = steppingGranularity }, _ => { });
             });
         }
 
         /// <summary>
-        /// Sends a step back request.
+        /// Queues a step back request.
         /// </summary>
         void OnStepBack()
         {
             actions.Enqueue(() =>
             {
-                if (thread is null || IsRunning) return;
+                if (IsRunning) return;
                 adapterHost.SendRequest(new StepBackRequest { ThreadId = thread.Id, Granularity = steppingGranularity }, _ => { });
             });
         }
 
         /// <summary>
-        /// Sends a step in request.
+        /// Queues a step in request.
         /// </summary>
         void OnStepIn()
         {
             actions.Enqueue(() =>
             {
-                if (thread is null || IsRunning) return;
+                if (IsRunning) return;
                 adapterHost.SendRequest(new StepInRequest { ThreadId = thread.Id, Granularity = steppingGranularity }, _ => { });
             });
         }
 
         /// <summary>
-        /// Sends a step out request.
+        /// Queues a step out request.
         /// </summary>
         void OnStepOut()
         {
             actions.Enqueue(() =>
             {
-                if (thread is null || IsRunning) return;
+                if (IsRunning) return;
                 adapterHost.SendRequest(new StepOutRequest { ThreadId = thread.Id, Granularity = steppingGranularity }, _ => { });
             });
         }
 
         /// <summary>
-        /// Sends a restart request.
+        /// Queues a restart request.
         /// </summary>
         void OnRestart()
         {
             actions.Enqueue(() =>
             {
-                adapterHost.SendRequest(new RestartRequest { Arguments = Adapter.GetLaunchRequest() }, _ => { });
-                IsRunning = true;
+                adapterHost.SendRequest(new RestartRequest { Arguments = Adapter.GetLaunchRequest() }, _ => IsRunning = true);
             });
         }
 
         /// <summary>
-        /// Sends a terminate request.
+        /// Queues a terminate request.
         /// </summary>
         void OnStop()
         {
             actions.Enqueue(() =>
             {
-                adapterHost.SendRequest(new TerminateRequest(), _ => { });
+                if (capabilities.SupportsTerminateRequest == true)
+                {
+                    Terminate();
+                } else
+                {
+                    Disconnect();
+                }
             });
+
+            // Tries to stop the debuggee gracefully.
+            void Terminate()
+            {
+                adapterHost.SendRequest(new TerminateRequest(), _ => { }, (_, _) =>
+                {
+                    actions.Enqueue(Disconnect);
+                });
+            }
+            // Forcefully shuts down the debuggee.
+            void Disconnect()
+            {
+                adapterHost.SendRequest(new DisconnectRequest(), _ => { });
+            }
         }
         #endregion
 
+
         #region Utilities
         /// <summary>
-        /// Logs an error in the console window and in the unity console.
-        /// </summary>
-        /// <param name="e"></param>
-        private void LogError(Exception e)
-        {
-            ConsoleWindow.AddMessage(e.ToString() + "\n", "Adapter", "Error");
-            Debug.LogWarning(e);
-        }
-
-        /// <summary>
         /// Updates the code position.
+        /// Must be executed on the main thread.
         /// </summary>
         private void UpdateCodePosition()
         {
-            actions.Enqueue(() =>
+            if (IsRunning) return;
+
+            List<StackFrame> stackFrames = adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = thread.Id}).StackFrames;
+
+            StackFrame stackFrame = stackFrames.FirstOrDefault(frame => frame.Source != null);
+
+            if (stackFrame == null)
             {
-                if (thread == null) return;
+                Debug.LogError("No stack frame with source found.");
+                return;
+            }
 
-                StackFrame stackFrame = adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = thread.Id }).StackFrames[0];
+            string path = stackFrame.Source.Path;
+            string title = Path.GetFileName(path);
 
-                string path = stackFrame.Source.Path;
-                string title = Path.GetFileName(path);
-
-                WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
-                CodeWindow codeWindow = manager.Windows.OfType<CodeWindow>().FirstOrDefault(window => window.Title == title);
-                if (codeWindow == null)
+            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+            CodeWindow codeWindow = manager.Windows.OfType<CodeWindow>().FirstOrDefault(window => window.Title == title);
+            if (codeWindow == null)
+            {
+                codeWindow = gameObject.AddComponent<CodeWindow>();
+                codeWindow.Title = title;
+                codeWindow.EnterFromFile(path, false);
+                manager.AddWindow(codeWindow);
+                codeWindow.OnComponentInitialized += () =>
                 {
-                    codeWindow = gameObject.AddComponent<CodeWindow>();
-                    codeWindow.Title = title;
-                    codeWindow.EnterFromFile(path, false);
-                    manager.AddWindow(codeWindow);
-                    codeWindow.OnComponentInitialized += () =>
-                    {
-                        codeWindow.MarkLine(stackFrame.Line);
-                    };
-                }
-                else
-                {
-                    codeWindow.EnterFromFile(path, false);
                     codeWindow.MarkLine(stackFrame.Line);
-                }
-                manager.ActiveWindow = codeWindow;
+                };
+            }
+            else
+            {
+                codeWindow.EnterFromFile(path, false);
+                codeWindow.MarkLine(stackFrame.Line);
+            }
+            manager.ActiveWindow = codeWindow;
 
-                lastCodeWindow = codeWindow;
-            });
-
-
+            lastCodeWindow = codeWindow;
         }
 
+        /// <summary>
+        /// Clears the last code position. 
+        /// <see cref="lastCodeWindow"/>
+        /// </summary>
         private void ClearLastCodePosition()
         {
-            actions.Enqueue(() =>
+            if (lastCodeWindow)
             {
-                if (lastCodeWindow)
-                {
-                    lastCodeWindow.MarkLine(0);
-                }
-            });
+                lastCodeWindow.MarkLine(0);
+            }
+        }
 
+        /// <summary>
+        /// Updates <see cref="threads"/>.
+        /// Must be executed on the main thread.
+        /// </summary>
+        private void UpdateThreads()
+        {
+            if (IsRunning) return;
+
+            threads = adapterHost.SendRequestSync(new ThreadsRequest()).Threads;
+        }
+
+
+        /// <summary>
+        /// Updates <see cref="variables"/>.
+        /// Must be executed on the main thread.
+        /// </summary>
+        private void UpdateVariables()
+        {
+            if (IsRunning) return;
+
+            variables.Clear();
+            List<StackFrame> stackFrames = adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = thread.Id }).StackFrames;
+
+            foreach (StackFrame stackFrame in stackFrames)
+            {
+                variables.Add(stackFrame, new());
+                List<Scope> stackScopes = adapterHost.SendRequestSync(new ScopesRequest(){FrameId = stackFrame.Id}).Scopes;
+                foreach (Scope scope in stackScopes)
+                {
+                    if (scope.VariablesReference <= 0) continue;
+
+                    List<Variable> scopeVariables = adapterHost.SendRequestSync(new VariablesRequest() { VariablesReference = scope.VariablesReference }).Variables;
+                    variables[stackFrame].Add(scope, scopeVariables);
+                    foreach (Variable variable in scopeVariables)
+                    {
+                    }
+                }
+            }
         }
         #endregion
     }

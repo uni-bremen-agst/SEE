@@ -1,9 +1,6 @@
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
-using SEE.UI;
-using SEE.UI.Window.CodeWindow;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 public static class DebugBreakpointManager
 {
