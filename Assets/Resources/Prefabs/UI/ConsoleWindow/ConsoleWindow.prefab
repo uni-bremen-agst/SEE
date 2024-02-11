@@ -3202,7 +3202,7 @@ GameObject:
   - component: {fileID: 8823517661499080592}
   - component: {fileID: 9045457248675710052}
   m_Layer: 5
-  m_Name: ConsoleView
+  m_Name: ConsoleWindow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

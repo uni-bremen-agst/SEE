@@ -72,6 +72,15 @@ namespace SEE.UI.Window.CodeWindow
         /// </summary>
         private static readonly Color breakpointColorInactive = Color.gray.WithAlpha(0.5f);
 
+        /// <summary>
+        /// The user begins to hover over a word.
+        /// </summary>
+        public event Action<WordHoverEvent> OnWordHoverBegin;
+
+        /// <summary>
+        /// The user stops to hover over a word.
+        /// </summary>
+        public event Action<WordHoverEvent> OnWordHoverEnd;
 
         /// <summary>
         /// Visually marks the line at the given <paramref name="lineNumber"/> and scrolls to it.
@@ -299,5 +308,26 @@ namespace SEE.UI.Window.CodeWindow
         }
 
         #endregion
+
+        /// <summary>
+        /// Data container for a word hover event
+        /// </summary>
+        public struct WordHoverEvent
+        {
+            public readonly string Word;
+            public readonly CodeWindow CodeWindow;
+            public readonly string FilePath;
+            public readonly int Line;
+            public readonly int Column;
+
+            public WordHoverEvent(string word, CodeWindow codeWindow, string filePath, int line, int column)
+            {
+                CodeWindow = codeWindow;
+                FilePath = filePath;
+                Line = line;
+                Column = column;
+                Word = word;
+            }
+        }
     }
 }

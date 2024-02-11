@@ -27,12 +27,12 @@ namespace SEE.UI.Window.ConsoleWindow
         /// <summary>
         /// The window prefab.
         /// </summary>
-        private const string windowPrefab = "Prefabs/UI/ConsoleWindow/ConsoleView";
+        private const string windowPrefab = "Prefabs/UI/ConsoleWindow/ConsoleWindow";
         
         /// <summary>
         /// The prefab for each message.
         /// </summary>
-        private const string itemPrefab = "Prefabs/UI/ConsoleWindow/ConsoleViewItem";
+        private const string itemPrefab = "Prefabs/UI/ConsoleWindow/ConsoleWindowItem";
         
         /// <summary>
         /// The number of spaces to use for tabs.
@@ -325,12 +325,11 @@ namespace SEE.UI.Window.ConsoleWindow
             inputField.onValueChanged.AddListener(text => OnInputChanged?.Invoke(text));
             inputField.onSubmit.AddListener(text =>
             {
-                Debug.Log($"Submit: {text}");
-                AddMessage(text + "\n", "User Input", "Log");
-                OnInputSubmit?.Invoke(text);
                 inputField.DeactivateInputField();
                 inputField.text = "";
                 inputField.ActivateInputField();
+                AddMessage(text + "\n", "User Input", "Log");
+                OnInputSubmit?.Invoke(text);
             });
         }
 
@@ -422,8 +421,8 @@ namespace SEE.UI.Window.ConsoleWindow
         {
             GameObject item = PrefabInstantiator.InstantiatePrefab(itemPrefab, items, false);
 
-            Channel channel = channels.ContainsKey(message.Channel) ? channels[message.Channel] : null;
-            Color color = channel?.Levels[message.Level].Color ?? Color.white;
+            Channel channel = channels.GetValueOrDefault(message.Channel);
+            Color color = channel?.Levels.GetValueOrDefault(message.Level)?.Color ?? Color.white;
             char icon = channel?.Icon ?? '\u003f';
 
             TextMeshProUGUI textMesh = item.transform.Find("Foreground/Text").gameObject.MustGetComponent<TextMeshProUGUI>();

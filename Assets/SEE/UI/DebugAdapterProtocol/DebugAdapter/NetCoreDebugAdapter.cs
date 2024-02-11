@@ -25,15 +25,15 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         private string launchName = ".NET Core Launch";
         private string launchType = "coreclr";
         private string launchPreLaunchTask = "build";
-        private string launchProgram = "HelloCS2.dll";
-        private List<string> launchArgs = new() { "Hello", "World"};
-        private string launchCwd = Path.Combine("D:" + Path.DirectorySeparatorChar + "ferdi", "SampleProjects", "HelloCS2", "bin", "Debug", "net8.0");
+        private string launchProgram = "HelloWorld.dll";
+        private List<string> launchArgs = new();
+        private string launchCwd = Path.Combine("D:" + Path.DirectorySeparatorChar + "ferdi", "SampleProjects", "HelloWorld", "src", "bin", "Debug", "net8.0");
         private Dictionary<string, string> launchEnv = new();
-        private string launchConsole = "internalConsole";
+        private string launchConsole = null;
         private bool launchStopAtEntry = true;
         private bool launchJustMyCode = false;
         private bool launchEnableStepFiltering = true;
-        private string launchInternalConsoleOptions = "openOnSessionStart";
+        private string launchInternalConsoleOptions = null;
         private string launchSessionId = Guid.NewGuid().ToString();
 
         private FilePathProperty launchCwdProperty;

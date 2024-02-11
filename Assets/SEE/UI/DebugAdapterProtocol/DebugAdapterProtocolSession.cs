@@ -5,6 +5,7 @@ using SEE.GO;
 using SEE.UI.Window;
 using SEE.UI.Window.CodeWindow;
 using SEE.UI.Window.ConsoleWindow;
+using SEE.UI.Window.VariablesWindow;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ using StackFrame = Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages.St
 
 namespace SEE.UI.DebugAdapterProtocol
 {
-    public class DebugAdapterProtocolSession : MonoBehaviour
+    public class DebugAdapterProtocolSession : PlatformDependentComponent
     {
         /// <summary>
         /// The debug adapter.
@@ -59,6 +60,11 @@ namespace SEE.UI.DebugAdapterProtocol
         /// The tooltip.
         /// </summary>
         private Tooltip.Tooltip tooltip;
+
+        /// <summary>
+        /// The variables window.
+        /// </summary>
+        private VariablesWindow variablesWindow;
 
         /// <summary>
         /// The code window where the last code position was marked.
@@ -106,12 +112,12 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Returns the first active thread.
         /// </summary>
-        private Thread thread => threads.FirstOrDefault();
+        private Thread mainThread => threads.FirstOrDefault();
 
         /// <summary>
         /// The variables.
         /// </summary>
-        private Dictionary<StackFrame, Dictionary<Scope, List<Variable>>> variables = new();
+        private Dictionary<Thread, Dictionary<StackFrame, Dictionary<Scope, List<Variable>>>> variables = new();
 
         #region General
         /// <summary>
@@ -119,9 +125,10 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </summary>
         protected void Start()
         {
+            base.Start();
             // creates ui elements
             tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
-            SetupConsole(true);
+            OpenConsole(true);
             SetupControls();
 
             if (Adapter == null)
@@ -189,6 +196,13 @@ namespace SEE.UI.DebugAdapterProtocol
                 Debug.LogWarning(e);
                 Destroyer.Destroy(this);
             }
+        }
+
+        /// <summary>
+        /// This component supports the desktop platform.
+        /// </summary>
+        protected override void StartDesktop()
+        {
         }
 
         /// <summary>
@@ -261,7 +275,8 @@ namespace SEE.UI.DebugAdapterProtocol
                     {"StepOut", (OnStepOut, "Step Out")},
                     {"Restart", (OnRestart, "Restart")},
                     {"Stop", (OnStop , "Stop")},
-                    {"Terminal", (() => SetupConsole(), "Open the Terminal")},
+                    {"Terminal", (() => OpenConsole(), "Terminal")},
+                    {"Variables",  (OpenVariables, "Variables")},
                 };
                 foreach (var (name, (action, description)) in listeners)
                 {
@@ -296,21 +311,19 @@ namespace SEE.UI.DebugAdapterProtocol
                     }
                 }
             });
-
-
         }
 
         /// <summary>
-        /// Sets up the console.
-        /// Can be recalled to reopen and/or focus the console.
+        /// Opens up the console.
+        /// Can be recalled to reopen or focus the console.
         /// </summary>
-        private void SetupConsole(bool start = false)
+        private void OpenConsole(bool start = false)
         {
             WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
             ConsoleWindow console = manager.Windows.OfType<ConsoleWindow>().FirstOrDefault();
             if (console == null)
             {
-                console = gameObject.AddComponent<ConsoleWindow>();
+                console = Canvas.AddComponent<ConsoleWindow>();
                 ConsoleWindow.DefaultChannel = "Adapter";
                 ConsoleWindow.DefaultChannelLevel = "Log";
                 manager.AddWindow(console);
@@ -330,6 +343,25 @@ namespace SEE.UI.DebugAdapterProtocol
             }
             manager.ActiveWindow = console;
         }
+
+        /// <summary>
+        /// Opens the variables window.
+        /// Can be recalled to reopen or focus the console.
+        /// </summary>
+        private void OpenVariables()
+        {
+            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+            if (variablesWindow == null)
+            {
+                variablesWindow = Canvas.AddComponent<VariablesWindow>();
+                variablesWindow.Variables = variables;
+                manager.AddWindow(variablesWindow);
+            }
+
+            manager.ActiveWindow = variablesWindow;
+        }
+
+
         /// <summary>
         /// Creates the process for the debug adapter.
         /// </summary>
@@ -658,9 +690,8 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             actions.Enqueue(() =>
             {
-                if (thread == null) return;
                 StackFrame stackFrame = !IsRunning ? 
-                    adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = thread.Id }).StackFrames[0] :
+                    adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = mainThread.Id }).StackFrames[0] :
                     null;
                 try
                 {
@@ -687,7 +718,7 @@ namespace SEE.UI.DebugAdapterProtocol
             actions.Enqueue(() =>
             {
                 if (IsRunning) return;
-                adapterHost.SendRequest(new ContinueRequest { ThreadId = thread.Id }, _ => { });
+                adapterHost.SendRequest(new ContinueRequest { ThreadId = mainThread.Id }, _ => { });
             });
         }
 
@@ -699,7 +730,7 @@ namespace SEE.UI.DebugAdapterProtocol
             actions.Enqueue(() =>
             {
                 if (!IsRunning) return;
-                adapterHost.SendRequest(new PauseRequest { ThreadId = thread.Id }, _ => { });
+                adapterHost.SendRequest(new PauseRequest { ThreadId = mainThread.Id }, _ => { });
             });
         }
 
@@ -711,7 +742,7 @@ namespace SEE.UI.DebugAdapterProtocol
             actions.Enqueue(() =>
             {
                 if (IsRunning) return;
-                adapterHost.SendRequest(new ReverseContinueRequest { ThreadId = thread.Id }, _ => { });
+                adapterHost.SendRequest(new ReverseContinueRequest { ThreadId = mainThread.Id }, _ => { });
             });
         }
 
@@ -723,7 +754,7 @@ namespace SEE.UI.DebugAdapterProtocol
             actions.Enqueue(() =>
             {
                 if (IsRunning) return;
-                adapterHost.SendRequest(new NextRequest { ThreadId = thread.Id, Granularity = steppingGranularity }, _ => { });
+                adapterHost.SendRequest(new NextRequest { ThreadId = mainThread.Id, Granularity = steppingGranularity }, _ => { });
             });
         }
 
@@ -735,7 +766,7 @@ namespace SEE.UI.DebugAdapterProtocol
             actions.Enqueue(() =>
             {
                 if (IsRunning) return;
-                adapterHost.SendRequest(new StepBackRequest { ThreadId = thread.Id, Granularity = steppingGranularity }, _ => { });
+                adapterHost.SendRequest(new StepBackRequest { ThreadId = mainThread.Id, Granularity = steppingGranularity }, _ => { });
             });
         }
 
@@ -747,7 +778,7 @@ namespace SEE.UI.DebugAdapterProtocol
             actions.Enqueue(() =>
             {
                 if (IsRunning) return;
-                adapterHost.SendRequest(new StepInRequest { ThreadId = thread.Id, Granularity = steppingGranularity }, _ => { });
+                adapterHost.SendRequest(new StepInRequest { ThreadId = mainThread.Id, Granularity = steppingGranularity }, _ => { });
             });
         }
 
@@ -759,7 +790,7 @@ namespace SEE.UI.DebugAdapterProtocol
             actions.Enqueue(() =>
             {
                 if (IsRunning) return;
-                adapterHost.SendRequest(new StepOutRequest { ThreadId = thread.Id, Granularity = steppingGranularity }, _ => { });
+                adapterHost.SendRequest(new StepOutRequest { ThreadId = mainThread.Id, Granularity = steppingGranularity }, _ => { });
             });
         }
 
@@ -816,7 +847,7 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             if (IsRunning) return;
 
-            List<StackFrame> stackFrames = adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = thread.Id}).StackFrames;
+            List<StackFrame> stackFrames = adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = mainThread.Id}).StackFrames;
 
             StackFrame stackFrame = stackFrames.FirstOrDefault(frame => frame.Source != null);
 
@@ -833,7 +864,7 @@ namespace SEE.UI.DebugAdapterProtocol
             CodeWindow codeWindow = manager.Windows.OfType<CodeWindow>().FirstOrDefault(window => window.Title == title);
             if (codeWindow == null)
             {
-                codeWindow = gameObject.AddComponent<CodeWindow>();
+                codeWindow = Canvas.AddComponent<CodeWindow>();
                 codeWindow.Title = title;
                 codeWindow.EnterFromFile(path, false);
                 manager.AddWindow(codeWindow);
@@ -885,23 +916,33 @@ namespace SEE.UI.DebugAdapterProtocol
             if (IsRunning) return;
 
             variables.Clear();
-            List<StackFrame> stackFrames = adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = thread.Id }).StackFrames;
 
-            foreach (StackFrame stackFrame in stackFrames)
+            foreach (Thread thread in threads)
             {
-                variables.Add(stackFrame, new());
-                List<Scope> stackScopes = adapterHost.SendRequestSync(new ScopesRequest(){FrameId = stackFrame.Id}).Scopes;
-                foreach (Scope scope in stackScopes)
-                {
-                    if (scope.VariablesReference <= 0) continue;
+                Dictionary<StackFrame, Dictionary<Scope, List<Variable>>> threadVariables = new();
+                List<StackFrame> stackFrames = adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = thread.Id }).StackFrames;
+                variables.Add(thread, threadVariables);
 
-                    List<Variable> scopeVariables = adapterHost.SendRequestSync(new VariablesRequest() { VariablesReference = scope.VariablesReference }).Variables;
-                    variables[stackFrame].Add(scope, scopeVariables);
-                    foreach (Variable variable in scopeVariables)
+                foreach (StackFrame stackFrame in stackFrames)
+                {
+                    Dictionary<Scope, List<Variable>> stackVariables = new();
+                    threadVariables.Add(stackFrame, stackVariables);
+                    List<Scope> stackScopes = adapterHost.SendRequestSync(new ScopesRequest() { FrameId = stackFrame.Id }).Scopes;
+                    
+                    foreach (Scope scope in stackScopes)
                     {
+                        if (scope.VariablesReference <= 0) continue;
+
+                        List<Variable> scopeVariables = adapterHost.SendRequestSync(new VariablesRequest() { VariablesReference = scope.VariablesReference }).Variables;
+                        stackVariables.Add(scope, scopeVariables);
                     }
                 }
             }
+            if (variablesWindow != null)
+            {
+                variablesWindow.Variables = variables;
+            }
+
         }
         #endregion
     }
