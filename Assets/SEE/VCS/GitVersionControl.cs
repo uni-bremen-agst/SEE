@@ -17,7 +17,7 @@ namespace SEE.VCS
         /// Constructor setting up the repository access.
         /// </summary>
         /// <param name="repositoryPath">the path to a Git repository</param>
-        /// <exception cref="ArgumentNullException">throw in case <paramref name="repositoryPath"/>
+        /// <exception cref="ArgumentNullException">thrown in case <paramref name="repositoryPath"/>
         /// is null or just whitespace</exception>
         internal GitVersionControl(string repositoryPath)
         {
