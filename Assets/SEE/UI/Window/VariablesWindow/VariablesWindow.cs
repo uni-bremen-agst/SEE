@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using SEE.UI.Window;
 using SEE.Utils;
+using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,11 +31,6 @@ namespace SEE.UI.Window.VariablesWindow
         private static readonly Color scopeColor = Color.yellow.Darker();
 
         /// <summary>
-        /// Color for variables.
-        /// </summary>
-        private static readonly Color variableColor = Color.blue.Darker();
-
-        /// <summary>
         /// The variables.
         /// </summary>
         private Dictionary<Thread, Dictionary<StackFrame, Dictionary<Scope, List<Variable>>>> variables;
@@ -54,6 +50,11 @@ namespace SEE.UI.Window.VariablesWindow
                 }
             }
         }
+
+        /// <summary>
+        /// Function to retrieve nested variables.
+        /// </summary>
+        public Func<int,List<Variable>> RetrieveNestedVariables;
 
         /// <summary>
         /// Container for the items of the window.
@@ -97,6 +98,7 @@ namespace SEE.UI.Window.VariablesWindow
                 threadItem.Name = thread.Name;
                 threadItem.Text = thread.Name;
                 threadItem.BackgroundColor = threadColor;
+                threadItem.IsExpanded = true;
 
                 foreach ((StackFrame stackFrame, Dictionary<Scope, List<Variable>> stackFrameVariables) in threadVariables)
                 {
@@ -113,15 +115,10 @@ namespace SEE.UI.Window.VariablesWindow
                         scopeItem.Name = scope.Name;
                         scopeItem.Text = scope.Name;
                         scopeItem.BackgroundColor = scopeColor;
+                        // passed down to variables
+                        scopeItem.RetrieveNestedVariables = RetrieveNestedVariables;
 
-                        foreach (Variable variable in scopeVariables)
-                        {
-                            VariablesWindowItem variableItem = items.AddComponent<VariablesWindowItem>();
-                            scopeItem.AddChild(variableItem);
-                            variableItem.Name = variable.Name;
-                            variableItem.Text = variable.Name + ": " + variable.Value;
-                            variableItem.BackgroundColor = variableColor;
-                        }
+                        scopeVariables.ForEach(scopeItem.AddVariable);
                     }
                 }
             }

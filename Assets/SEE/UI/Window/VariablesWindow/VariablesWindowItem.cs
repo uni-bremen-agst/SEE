@@ -8,6 +8,9 @@ using SEE.GO;
 using Crosstales;
 using Michsky.UI.ModernUIPack;
 using System.Linq;
+using System;
+using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
+using UnityEngine.EventSystems;
 
 namespace SEE.UI.Window.VariablesWindow
 {
@@ -17,6 +20,11 @@ namespace SEE.UI.Window.VariablesWindow
         /// Path to the prefab for this item.
         /// </summary>
         private const string variablesWindowItemPrefab = "Prefabs/UI/VariablesWindow/VariablesWindowItem";
+
+        /// <summary>
+        /// Color for variables.
+        /// </summary>
+        private static readonly Color variableColor = Color.blue.Darker();
 
         /// <summary>
         /// The shift per indentation level.
@@ -39,6 +47,16 @@ namespace SEE.UI.Window.VariablesWindow
         public Color BackgroundColor;
 
         /// <summary>
+        /// The variable reference.
+        /// </summary>
+        public int VariableReference;
+
+        /// <summary>
+        /// Function to retrieve nested variables.
+        /// </summary>
+        public Func<int, List<Variable>> RetrieveNestedVariables;
+
+        /// <summary>
         /// The item.
         /// </summary>
         private GameObject item;
@@ -46,7 +64,18 @@ namespace SEE.UI.Window.VariablesWindow
         /// <summary>
         /// Whether to display the children.
         /// </summary>
-        private bool isExpanded = true;
+        private bool isExpanded = false;
+
+        public bool IsExpanded
+        {
+            get => isExpanded;
+            set
+            {
+                if (value == isExpanded) return;
+                isExpanded = value;
+                UpdateExpand();
+            }
+        }
 
         /// <summary>
         /// The background.
@@ -125,8 +154,19 @@ namespace SEE.UI.Window.VariablesWindow
             {
                 UpdateChildVisibility(child);
                 UpdateChildIndent(child);
-                expandIcon.gameObject.SetActive(true);
+                child.OnComponentInitialized += UpdateChildrenIndices;
             }
+        }
+
+        public void AddVariable(Variable variable)
+        {
+            VariablesWindowItem variableItem = gameObject.AddComponent<VariablesWindowItem>();
+            variableItem.Name = variable.Name;
+            variableItem.Text = variable.Name + ": " + variable.Value + " (" + variable.Type + ")";
+            variableItem.VariableReference = variable.VariablesReference;
+            variableItem.RetrieveNestedVariables = RetrieveNestedVariables;
+            variableItem.BackgroundColor = variableColor;
+            AddChild(variableItem);
         }
 
         /// <summary>
@@ -149,19 +189,47 @@ namespace SEE.UI.Window.VariablesWindow
                 new GradientAlphaKey[] { new(1, 0), new(1, 1) });
 
             expandIcon = item.transform.Find("Foreground/Expand Icon");
-            expandIcon.gameObject.SetActive(children.Count > 0);
 
-
-            if (item.TryGetComponent(out PointerHelper pointerHelper))
+            if (item.TryGetComponent<PointerHelper>(out PointerHelper pointerHelper))
             {
-                pointerHelper.ClickEvent.AddListener(e => {
-                    if (e.button == UnityEngine.EventSystems.PointerEventData.InputButton.Left)
-                    {
-                        isExpanded = !isExpanded;
-                        UpdateExpand();
-                    }
-                });
+                if (children.Count > 0)
+                {
+                    pointerHelper.ClickEvent.AddListener(ToggleChildren);
+                } else if (VariableReference > 0)
+                {
+                    IsExpanded = false;
+                    pointerHelper.ClickEvent.AddListener(RetrieveChildren);
+                } else
+                {
+                    expandIcon.gameObject.SetActive(false);
+                }
             }
+
+            void ToggleChildren(PointerEventData e)
+            {
+                if (e.button == PointerEventData.InputButton.Left)
+                {
+                    IsExpanded = !IsExpanded;
+                }
+            }
+            void RetrieveChildren(PointerEventData e)
+            {
+                if (e.button == PointerEventData.InputButton.Left)
+                {
+                    List<Variable> childVariables = RetrieveNestedVariables(VariableReference);
+                    childVariables.ForEach(AddVariable);
+                    pointerHelper.ClickEvent.RemoveListener(RetrieveChildren);
+                    if (children.Count > 0)
+                    {
+                        IsExpanded = true;
+                        pointerHelper.ClickEvent.AddListener(ToggleChildren);
+                    } else
+                    {
+                        expandIcon.gameObject.SetActive(false);
+                    }
+                }
+            }
+
             UpdateVisibility();
             UpdateIndent();
             UpdateExpand();
@@ -172,7 +240,6 @@ namespace SEE.UI.Window.VariablesWindow
         /// </summary>
         private void OnDestroy()
         {
-            Debug.Log($"OnDestroy - {Name}");
             Destroyer.Destroy(item);
             foreach (VariablesWindowItem child in children)
             {
@@ -210,6 +277,22 @@ namespace SEE.UI.Window.VariablesWindow
         private void UpdateChildVisibility(VariablesWindowItem child)
         {
             child.IsVisible = IsVisible && isExpanded;
+        }
+
+        private void UpdateChildrenIndices()
+        {
+            for (int i = children.Count-1; i >= 0; i--)
+            {
+                if (children[i].HasStarted)
+                {
+                    children[i].SetSiblingIndex(item.transform.GetSiblingIndex() + i);
+                }
+            }
+        }
+
+        private void SetSiblingIndex(int index)
+        {
+            item.transform.SetSiblingIndex(index);
         }
     }
 }

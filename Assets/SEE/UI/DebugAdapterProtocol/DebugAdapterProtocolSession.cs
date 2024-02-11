@@ -365,8 +365,9 @@ namespace SEE.UI.DebugAdapterProtocol
             WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
             if (variablesWindow == null)
             {
-                variablesWindow = Canvas.AddComponent<VariablesWindow>();
+                variablesWindow = manager.Windows.OfType<VariablesWindow>().FirstOrDefault() ?? Canvas.AddComponent<VariablesWindow>();
                 variablesWindow.Variables = variables;
+                variablesWindow.RetrieveNestedVariables = RetrieveNestedVariables;
                 manager.AddWindow(variablesWindow);
             }
 
@@ -652,6 +653,18 @@ namespace SEE.UI.DebugAdapterProtocol
         private void OnStoppedEvent(StoppedEvent stoppedEvent)
         {
             IsRunning = false;
+            if (stoppedEvent.Reason == StoppedEvent.ReasonValue.Exception)
+            {
+                actions.Enqueue(() =>
+                {
+                    ExceptionInfoResponse response = adapterHost.SendRequestSync(new ExceptionInfoRequest()
+                    {
+                        ThreadId = mainThread.Id,
+                    });
+                    string description = response.Description != null ? $": {response.Description}" : "";
+                    Debug.Log($"Exception ({response.ExceptionId}, {response.BreakMode}){description}");
+                });
+            }
         }
 
         /// <summary>
@@ -992,18 +1005,21 @@ namespace SEE.UI.DebugAdapterProtocol
                     
                     foreach (Scope scope in stackScopes)
                     {
-                        if (scope.VariablesReference <= 0) continue;
-
-                        List<Variable> scopeVariables = adapterHost.SendRequestSync(new VariablesRequest() { VariablesReference = scope.VariablesReference }).Variables;
-                        stackVariables.Add(scope, scopeVariables);
+                        stackVariables.Add(scope, RetrieveNestedVariables(scope.VariablesReference));
                     }
                 }
             }
+            variablesWindow ??= WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer].Windows.OfType<VariablesWindow>().FirstOrDefault();
             if (variablesWindow != null)
             {
                 variablesWindow.Variables = variables;
             }
+        }
 
+        private List<Variable> RetrieveNestedVariables(int variablesReference)
+        {
+            if (variablesReference <= 0 || IsRunning) return new();
+            return adapterHost.SendRequestSync(new VariablesRequest() { VariablesReference = variablesReference }).Variables;
         }
         #endregion
     }
