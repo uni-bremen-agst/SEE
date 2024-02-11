@@ -189,7 +189,6 @@ namespace SEE.DataModel.DG
             {
                 return directory.IsNullOrWhitespace() ? string.Empty : directory;
             }
-            //
             return directory.IsNullOrWhitespace() ? filename : Filenames.Join(directory, filename);
         }
 
