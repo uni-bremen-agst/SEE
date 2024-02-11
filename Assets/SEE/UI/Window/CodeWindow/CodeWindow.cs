@@ -75,12 +75,17 @@ namespace SEE.UI.Window.CodeWindow
         /// <summary>
         /// The user begins to hover over a word.
         /// </summary>
-        public event Action<WordHoverEvent> OnWordHoverBegin;
+        public static event Action<CodeWindow, TMP_WordInfo> OnWordHoverBegin;
 
         /// <summary>
         /// The user stops to hover over a word.
         /// </summary>
-        public event Action<WordHoverEvent> OnWordHoverEnd;
+        public static event Action<CodeWindow, TMP_WordInfo> OnWordHoverEnd;
+
+        /// <summary>
+        /// The word that was hovered last frame.
+        /// </summary>
+        private static TMP_WordInfo? lastHoveredWord;
 
         /// <summary>
         /// Visually marks the line at the given <paramref name="lineNumber"/> and scrolls to it.

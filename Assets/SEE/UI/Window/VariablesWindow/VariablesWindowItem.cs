@@ -167,6 +167,19 @@ namespace SEE.UI.Window.VariablesWindow
             UpdateExpand();
         }
 
+        /// <summary>
+        /// Destroys this item and its children.
+        /// </summary>
+        private void OnDestroy()
+        {
+            Debug.Log($"OnDestroy - {Name}");
+            Destroyer.Destroy(item);
+            foreach (VariablesWindowItem child in children)
+            {
+                Destroyer.Destroy(child);
+            }
+        }
+
         private void UpdateVisibility()
         {
             item.SetActive(IsVisible);

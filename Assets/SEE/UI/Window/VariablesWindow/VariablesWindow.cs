@@ -65,12 +65,17 @@ namespace SEE.UI.Window.VariablesWindow
         /// </summary>
         protected override void StartDesktop()
         {
+            Debug.Log("StartDesktop "+ this);
             Title ??= "Variables";
             base.StartDesktop();
 
             Transform root = PrefabInstantiator.InstantiatePrefab(variablesWindowPrefab, Window.transform.Find("Content"), false).transform;
 
             items = root.Find("Content/Items").gameObject;
+            foreach (Transform child in items.transform)
+            {
+                Destroyer.Destroy(child.gameObject);
+            }
 
             Rebuild();
         }
@@ -80,9 +85,10 @@ namespace SEE.UI.Window.VariablesWindow
         /// </summary>
         private void Rebuild()
         {
-            foreach (Transform item in items.transform)
+            Debug.Log("Rebuild " + this);
+            foreach (VariablesWindowItem child in items.GetComponents<VariablesWindowItem>())
             {
-                Destroyer.Destroy(item.gameObject);
+                Destroyer.Destroy(child);
             }
 
             foreach ((Thread thread, Dictionary<StackFrame, Dictionary<Scope, List<Variable>>> threadVariables) in Variables)
@@ -95,26 +101,26 @@ namespace SEE.UI.Window.VariablesWindow
                 foreach ((StackFrame stackFrame, Dictionary<Scope, List<Variable>> stackFrameVariables) in threadVariables)
                 {
                     VariablesWindowItem stackFrameItem = items.AddComponent<VariablesWindowItem>();
+                    threadItem.AddChild(stackFrameItem);
                     stackFrameItem.Name = stackFrame.Name;
                     stackFrameItem.Text = stackFrame.Name;
                     stackFrameItem.BackgroundColor = stackFrameColor;
-                    threadItem.AddChild(stackFrameItem);
 
                     foreach ((Scope scope, List<Variable> scopeVariables) in stackFrameVariables)
                     {
                         VariablesWindowItem scopeItem = items.AddComponent<VariablesWindowItem>();
+                        stackFrameItem.AddChild(scopeItem);
                         scopeItem.Name = scope.Name;
                         scopeItem.Text = scope.Name;
                         scopeItem.BackgroundColor = scopeColor;
-                        stackFrameItem.AddChild(scopeItem);
 
                         foreach (Variable variable in scopeVariables)
                         {
                             VariablesWindowItem variableItem = items.AddComponent<VariablesWindowItem>();
+                            scopeItem.AddChild(variableItem);
                             variableItem.Name = variable.Name;
                             variableItem.Text = variable.Name + ": " + variable.Value;
                             variableItem.BackgroundColor = variableColor;
-                            scopeItem.AddChild(variableItem);
                         }
                     }
                 }

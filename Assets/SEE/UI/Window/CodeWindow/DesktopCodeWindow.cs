@@ -13,6 +13,8 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
+using Michsky.UI.ModernUIPack;
+using SEE.Controls;
 
 namespace SEE.UI.Window.CodeWindow
 {
@@ -156,6 +158,27 @@ namespace SEE.UI.Window.CodeWindow
             {
                 // Hide tooltip by right-clicking
                 issueTooltip.Hide();
+            }
+
+            if (WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer].ActiveWindow == this)
+            {
+                // detecting word hovers
+                int index = TMP_TextUtilities.FindIntersectingWord(textMesh, Input.mousePosition, null);
+                TMP_WordInfo? hoveredWord = index >= 0 && index < textMesh.textInfo.wordCount ? textMesh.textInfo.wordInfo[index] : null;
+                if (lastHoveredWord is null && hoveredWord is not null)
+                {
+                    OnWordHoverBegin?.Invoke(this, (TMP_WordInfo)hoveredWord);
+                }
+                else if (lastHoveredWord is not null && hoveredWord is null)
+                {
+                    OnWordHoverEnd?.Invoke(this, (TMP_WordInfo)lastHoveredWord);
+                }
+                else if (!lastHoveredWord.Equals(hoveredWord))
+                {
+                    OnWordHoverEnd?.Invoke(this, (TMP_WordInfo)lastHoveredWord);
+                    OnWordHoverBegin?.Invoke(this, (TMP_WordInfo)hoveredWord);
+                }
+                lastHoveredWord = hoveredWord;
             }
         }
 

@@ -8,10 +8,12 @@ using SEE.UI.Window.ConsoleWindow;
 using SEE.UI.Window.VariablesWindow;
 using SEE.Utils;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
@@ -78,6 +80,11 @@ namespace SEE.UI.DebugAdapterProtocol
         private Queue<Action> actions = new();
 
         /// <summary>
+        /// Buffers the hovered word if the debuggee is currently running.
+        /// </summary>
+        private TMP_WordInfo? hoveredWord;
+
+        /// <summary>
         /// Whether the debug adapter is currently executing the program.
         /// </summary>
         private bool isRunning;
@@ -100,6 +107,7 @@ namespace SEE.UI.DebugAdapterProtocol
                     actions.Enqueue(UpdateThreads);
                     actions.Enqueue(UpdateCodePosition);
                     actions.Enqueue(UpdateVariables);
+                    actions.Enqueue(UpdateHoverTooltip);
                 }
             }
         }
@@ -130,6 +138,8 @@ namespace SEE.UI.DebugAdapterProtocol
             tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
             OpenConsole(true);
             SetupControls();
+            CodeWindow.OnWordHoverBegin += OnWordHoverBegin;
+            CodeWindow.OnWordHoverEnd += OnWordHoverEnd;
 
             if (Adapter == null)
             {
@@ -233,6 +243,8 @@ namespace SEE.UI.DebugAdapterProtocol
             DebugBreakpointManager.OnBreakpointAdded -= OnBreakpointsChanged;
             DebugBreakpointManager.OnBreakpointRemoved -= OnBreakpointsChanged;
             ConsoleWindow.OnInputSubmit -= OnConsoleInput;
+            CodeWindow.OnWordHoverBegin -= OnWordHoverBegin;
+            CodeWindow.OnWordHoverEnd -= OnWordHoverEnd;
             if (controls)
             {
                 Destroyer.Destroy(controls);
@@ -329,7 +341,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 manager.AddWindow(console);
                 if (start)
                 {
-                    foreach ((string channel, char icon) in new[] { ("Adapter", '\uf188'), ("Program", '\uf135') })
+                    foreach ((string channel, char icon) in new[] { ("Program", '\uf135'), ("Adapter", '\uf188') })
                     {
                         ConsoleWindow.AddChannel(channel, icon);
                         foreach ((string level, Color color) in new[] { ("Log", Color.gray), ("Warning", Color.yellow.Darker()), ("Error", Color.red.Darker()) })
@@ -459,6 +471,56 @@ namespace SEE.UI.DebugAdapterProtocol
                     Breakpoints = DebugBreakpointManager.Breakpoints[path].Values.ToList(),
                 }, _ => {});
             });
+        }
+
+        /// <summary>
+        /// Handles the begin of hovering a word.
+        /// </summary>
+        /// <param name="codeWindow"></param>
+        /// <param name="wordInfo"></param>
+        private void OnWordHoverBegin(CodeWindow codeWindow, TMP_WordInfo wordInfo)
+        {
+            hoveredWord = wordInfo;
+            actions.Enqueue(UpdateHoverTooltip);
+        }
+
+        /// <summary>
+        /// Handles the end of hovering a word.
+        /// </summary>
+        /// <param name="codeWindow"></param>
+        /// <param name="wordInfo"></param>
+        private void OnWordHoverEnd(CodeWindow codeWindow, TMP_WordInfo wordInfo)
+        {
+            hoveredWord = null;
+            tooltip.Hide();
+        }
+
+        /// <summary>
+        /// Evaluates the hovered word.
+        /// Only allowed on the main thread.
+        /// </summary>
+        private void UpdateHoverTooltip()
+        {
+            if (hoveredWord is null || IsRunning) return;
+
+            string expression = ((TMP_WordInfo)hoveredWord).GetWord();
+
+            StackFrame stackFrame = adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = mainThread.Id }).StackFrames[0];
+            try
+            {
+                EvaluateResponse result = adapterHost.SendRequestSync(new EvaluateRequest()
+                {
+                    Expression = expression,
+                    Context = capabilities.SupportsEvaluateForHovers == true ? EvaluateArguments.ContextValue.Hover : EvaluateArguments.ContextValue.Watch,
+                    FrameId = stackFrame.Id
+                });
+                tooltip.Show(result.Result, 0.25f);
+            } catch (ProtocolException e)
+            {
+                Debug.Log($"COuldn't evaluate '{expression}'");
+                ConsoleWindow.AddMessage($"{expression} - {e.Message}\n", "Adapter", "Log");
+            }
+
         }
 
         /// <summary>
@@ -866,7 +928,7 @@ namespace SEE.UI.DebugAdapterProtocol
             {
                 codeWindow = Canvas.AddComponent<CodeWindow>();
                 codeWindow.Title = title;
-                codeWindow.EnterFromFile(path, false);
+                codeWindow.EnterFromFile(path);
                 manager.AddWindow(codeWindow);
                 codeWindow.OnComponentInitialized += () =>
                 {
@@ -875,7 +937,7 @@ namespace SEE.UI.DebugAdapterProtocol
             }
             else
             {
-                codeWindow.EnterFromFile(path, false);
+                codeWindow.EnterFromFile(path);
                 codeWindow.MarkLine(stackFrame.Line);
             }
             manager.ActiveWindow = codeWindow;
@@ -914,8 +976,7 @@ namespace SEE.UI.DebugAdapterProtocol
         private void UpdateVariables()
         {
             if (IsRunning) return;
-
-            variables.Clear();
+            variables = new();
 
             foreach (Thread thread in threads)
             {
