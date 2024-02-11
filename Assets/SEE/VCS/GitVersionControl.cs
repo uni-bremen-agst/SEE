@@ -17,7 +17,7 @@ namespace SEE.VCS
         /// Constructor setting up the repository access.
         /// </summary>
         /// <param name="repositoryPath">the path to a Git repository</param>
-        /// <exception cref="ArgumentException">throw in case <paramref name="repositoryPath"/>
+        /// <exception cref="ArgumentException">thrown in case <paramref name="repositoryPath"/>
         /// is null or just whitespace</exception>
         internal GitVersionControl(string repositoryPath)
         {
@@ -42,7 +42,7 @@ namespace SEE.VCS
         /// <summary>
         /// See <see cref="IVersionControl.Show(string, string)"/>.
         /// </summary>
-        /// <exception cref="ArgumentException">throw in case <paramref name="fileName"/>
+        /// <exception cref="ArgumentException">thrown in case <paramref name="fileName"/>
         /// or <paramref name="commitID"/> are null or just whitespace</exception>
         public string Show(string fileName, string commitID)
         {
