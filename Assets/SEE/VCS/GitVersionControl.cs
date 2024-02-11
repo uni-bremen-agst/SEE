@@ -42,7 +42,7 @@ namespace SEE.VCS
         /// <summary>
         /// See <see cref="IVersionControl.Show(string, string)"/>.
         /// </summary>
-        /// <exception cref="ArgumentNullException">throw in case <paramref name="fileName"/>
+        /// <exception cref="ArgumentNullException">thrown in case <paramref name="fileName"/>
         /// or <paramref name="commitID"/> are null or just whitespace</exception>
         public string Show(string fileName, string commitID)
         {
