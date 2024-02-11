@@ -17,13 +17,13 @@ namespace SEE.VCS
         /// Constructor setting up the repository access.
         /// </summary>
         /// <param name="repositoryPath">the path to a Git repository</param>
-        /// <exception cref="ArgumentNullException">throw in case <paramref name="repositoryPath"/>
+        /// <exception cref="ArgumentException">throw in case <paramref name="repositoryPath"/>
         /// is null or just whitespace</exception>
         internal GitVersionControl(string repositoryPath)
         {
             if (string.IsNullOrWhiteSpace(repositoryPath))
             {
-                throw new ArgumentNullException("Repository path must not be null or empty.");
+                throw new ArgumentException("Repository path must not be null or empty.");
             }
             this.repositoryPath = repositoryPath;
             repo = new(repositoryPath);
@@ -42,17 +42,17 @@ namespace SEE.VCS
         /// <summary>
         /// See <see cref="IVersionControl.Show(string, string)"/>.
         /// </summary>
-        /// <exception cref="ArgumentNullException">throw in case <paramref name="fileName"/>
+        /// <exception cref="ArgumentException">throw in case <paramref name="fileName"/>
         /// or <paramref name="commitID"/> are null or just whitespace</exception>
         public string Show(string fileName, string commitID)
         {
             if (string.IsNullOrWhiteSpace(fileName))
             {
-                throw new ArgumentNullException("Path must not be null or empty.");
+                throw new ArgumentException("Path must not be null or empty.");
             }
             if (string.IsNullOrWhiteSpace(commitID))
             {
-                throw new ArgumentNullException("Commit ID must not be null or empty.");
+                throw new ArgumentException("Commit ID must not be null or empty.");
             }
             Blob blob = repo.Lookup<Blob>($"{commitID}:{Path.GetRelativePath(repositoryPath, fileName).Replace("\\", "/")}");
 
@@ -171,6 +171,7 @@ namespace SEE.VCS
                         throw new System.NotImplementedException($"Unhandled change status: {change.Status}");
                 }
             }
+            // FIXME (#703): This may or may not be removed.
             Assert.IsTrue(numberOfIterations <= 1);
             return result;
         }
