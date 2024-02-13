@@ -295,7 +295,7 @@ namespace SEE.Game.City
         {
             base.Start();
             Reset();
-            List<Graph> graphs = new List<Graph>();
+            List<Graph> graphs = new();
             if (isDrawn)
             {
                 graphs = LoadDataSeries();
