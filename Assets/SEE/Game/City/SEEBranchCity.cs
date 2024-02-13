@@ -185,7 +185,7 @@ namespace SEE.Game.City
             where T : GraphElement
         {
             //SetToggle will be IsDeleted if baseline and LoadedGraph have been swapped
-            _ = added.ForEach(node => { node.SetToggle(tempGraph != null ? SetToggleAttributes.IsDeleted : SetToggleAttributes.IsNew); });
+            _ = added.ForEach(node => { node.SetToggle(tempGraph != null ? ChangeMarkers.IsDeleted : ChangeMarkers.IsNew); });
             _ = changed.ForEach(node => { UpdateChanged(node); });
             _ = removed.ForEach(node => { MergeRemoved(node); });
 
@@ -195,14 +195,14 @@ namespace SEE.Game.City
                 T removedGraphElement = graphElement.Clone() as T;
                 addToGraph(removedGraphElement);
                 //SetToggle will be IsNew if baseline and LoadedGraph have been swapped
-                removedGraphElement.SetToggle(tempGraph != null ? SetToggleAttributes.IsNew : SetToggleAttributes.IsDeleted);
+                removedGraphElement.SetToggle(tempGraph != null ? ChangeMarkers.IsNew : ChangeMarkers.IsDeleted);
             }
 
             // Marks given graph element as changed.
             // Note: graphElement is from baseline graph.
             void UpdateChanged(T graphElement)
             {
-                graphElement.SetToggle(SetToggleAttributes.IsChanged);
+                graphElement.SetToggle(ChangeMarkers.IsChanged);
                 //Calculates the diff between the corresponding metrics. Diff = new - old
 
                 //The corresponding Node from the baseline

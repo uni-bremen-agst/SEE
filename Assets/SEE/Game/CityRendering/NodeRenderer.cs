@@ -576,15 +576,15 @@ namespace SEE.Game.CityRendering
                 for (int i = 0; i < gameObjectArray.Length; i++)
                 {
                     Node node = gameObjectArray[i].GetNode();
-                    if (node.HasToggle(SetToggleAttributes.IsNew))
+                    if (node.HasToggle(ChangeMarkers.IsNew))
                     {
                         markerFactory.MarkBorn(GraphElementIDMap.Find(node.ID, true));
                     }
-                    else if (node.HasToggle(SetToggleAttributes.IsDeleted))
+                    else if (node.HasToggle(ChangeMarkers.IsDeleted))
                     {
                         markerFactory.MarkDead(GraphElementIDMap.Find(node.ID, true));
                     }
-                    else if (node.HasToggle(SetToggleAttributes.IsChanged))
+                    else if (node.HasToggle(ChangeMarkers.IsChanged))
                     {
                         markerFactory.MarkChanged(GraphElementIDMap.Find(node.ID, true));
                     }

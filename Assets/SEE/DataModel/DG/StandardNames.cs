@@ -166,20 +166,21 @@
     }
 
     /// <summary>
-    /// Defines toggle attributes used to mark nodes.
+    /// Defines toggle attributes used to mark nodes as to whether they have been
+    /// changed, deleted, or added as new.
     /// </summary>
-    public static class SetToggleAttributes
+    public static class ChangeMarkers
     {
         /// <summary>
-        /// Name of the label marking a graph element as new (existing only in the newer version).
+        /// Name of the toggle marking a graph element as new (existing only in the newer version).
         /// </summary>
         public const string IsNew = "IsNew";
         /// <summary>
-        /// Name of the label marking a graph element as deleted (existing only in the baseline version).
+        /// Name of the toggle marking a graph element as deleted (existing only in the baseline version).
         /// </summary>
         public const string IsDeleted = "IsDeleted";
         /// <summary>
-        /// Name of the label marking a graph element as changed (existing in both the newer and baseline
+        /// Name of the toggle marking a graph element as changed (existing in both the newer and baseline
         /// version). At least one numeric attribute has changed between the two (including the addition
         /// or removal of an attribute).
         /// </summary>
