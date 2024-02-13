@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Printing;
+﻿using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
 using SEE.Game;
@@ -467,6 +465,7 @@ namespace SEE.Utils
             {
                 // First save a new city with all its default values.
                 DiffCity savedCity = NewVanillaSEECity<DiffCity>();
+                savedCity.VersionControlSystem = VCS.VCSKind.Git;
                 savedCity.VCSPath = new(vcsPath);
                 savedCity.OldRevision = "old revision";
                 savedCity.NewRevision = "new revision";
@@ -600,6 +599,7 @@ namespace SEE.Utils
         private static void DiffCityAttributesAreEqual(DiffCity expected, DiffCity actual)
         {
             SEECityAttributesAreEqual(expected, actual);
+            Assert.AreEqual(expected.VersionControlSystem, actual.VersionControlSystem);
             Assert.AreEqual(expected.OldRevision, actual.OldRevision);
             Assert.AreEqual(expected.NewRevision, actual.NewRevision);
             AreEqual(expected.VCSPath, actual.VCSPath);
@@ -808,6 +808,7 @@ namespace SEE.Utils
         private static void WipeOutDiffCityAttributes(DiffCity city)
         {
             WipeOutSEECityAttributes(city);
+            city.VersionControlSystem = VCS.VCSKind.None;
             city.VCSPath.Set("C:/MyAbsoluteDirectory/MyVCSDirectory");
             city.OldRevision = "XXX";
             city.NewRevision = "YYY";
