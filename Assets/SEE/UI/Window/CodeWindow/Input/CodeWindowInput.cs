@@ -357,6 +357,9 @@ namespace SEE.UI.Window.CodeWindow
                             && city.ErosionSettings.ShowIssuesInCodeWindow)
                         {
                             MarkIssuesAsync(filename).Forget(); // initiate issue search
+                        } else if (HasStarted)
+                        {
+                            textMesh.SetText(text);
                         }
                     }
                     catch (ArgumentException e)
@@ -431,6 +434,7 @@ namespace SEE.UI.Window.CodeWindow
 
                 try
                 {
+                    Debug.Log("Set text\tMarkIssueAsync");
                     textMesh.text = text;
                     textMesh.ForceMeshUpdate();
                 }

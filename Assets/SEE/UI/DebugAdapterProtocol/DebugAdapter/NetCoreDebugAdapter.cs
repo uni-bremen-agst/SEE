@@ -27,7 +27,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         private string launchPreLaunchTask = "build";
         private string launchProgram = "HelloWorld.dll";
         private List<string> launchArgs = new();
-        private string launchCwd = Path.Combine("D:" + Path.DirectorySeparatorChar + "ferdi", "SampleProjects", "HelloWorld", "src", "bin", "Debug", "net8.0");
+        private string launchCwd = Path.Combine("D:\\", "ferdi", "HelloWorld", "bin", "Debug", "net8.0");
         private Dictionary<string, string> launchEnv = new();
         private string launchConsole = null;
         private bool launchStopAtEntry = true;
@@ -40,7 +40,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         private FilePathProperty launchProgramProperty;
         private StringProperty launchArgsProperty;
         private BooleanProperty launchStopAtEntryProperty;
-        private BooleanProperty launchNoDebugProperty;
 
         public override void SetupLaunchConfig(GameObject go, PropertyGroup group)
         {
@@ -65,12 +64,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             launchArgsProperty.Value = espaceList(launchArgs);
             group.AddProperty(launchArgsProperty);
 
-            launchNoDebugProperty = go.AddComponent<BooleanProperty>();
-            launchNoDebugProperty.Name = "No Debug";
-            launchNoDebugProperty.Description = "Launch the program without debugging.";
-            launchNoDebugProperty.Value = launchNoDebug;
-            group.AddProperty(launchNoDebugProperty);
-
             launchStopAtEntryProperty = go.AddComponent<BooleanProperty>();
             launchStopAtEntryProperty.Name = "Stop at Entry";
             launchStopAtEntryProperty.Description = "Automatically stops after launch.";
@@ -83,7 +76,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             launchProgram = launchProgramProperty.Value;
             launchArgs = parseList(launchArgsProperty.Value);
             launchCwd = launchCwdProperty.Value;
-            launchNoDebug = launchNoDebugProperty.Value;
             launchStopAtEntry = launchStopAtEntryProperty.Value;
         }
 

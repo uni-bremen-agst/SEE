@@ -50,6 +50,7 @@ namespace SEE.UI.Window.CodeWindow
             GameObject code = scrollable.transform.Find("Code").gameObject;
             if (code.TryGetComponentOrLog(out textMesh))
             {
+                Debug.Log("SetText\tStartDesktop");
                 textMesh.fontSize = FontSize;
                 textMesh.text = text;
             }

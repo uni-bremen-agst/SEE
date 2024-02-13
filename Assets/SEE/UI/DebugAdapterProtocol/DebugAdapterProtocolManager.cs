@@ -1,9 +1,13 @@
+using Michsky.UI.ModernUIPack;
 using SEE.Controls;
+using SEE.GO;
 using SEE.UI.DebugAdapterProtocol.DebugAdapter;
 using SEE.UI.PropertyDialog;
+using SEE.UI.Tooltip;
 using SEE.Utils;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SEE.UI.DebugAdapterProtocol
 {
@@ -17,8 +21,47 @@ namespace SEE.UI.DebugAdapterProtocol
         private static DebugAdapter.DebugAdapter adapter = adapters[0];
         private static DebugAdapterProtocolSession session;
 
-        protected override void StartDesktop() {}
+        private Tooltip.Tooltip tooltip;
 
+        public GameObject RunButton;
+
+        public GameObject DebugAdapterConfigButton;
+
+        public GameObject LaunchConfigButton;
+
+        protected override void StartDesktop() {
+            tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
+
+            RunButton.MustGetComponent<ButtonManagerBasic>().clickEvent.AddListener(Run);
+            DebugAdapterConfigButton.MustGetComponent<ButtonManagerBasic>().clickEvent.AddListener(OpenDebugAdapterConfig);
+            LaunchConfigButton.MustGetComponent<ButtonManagerBasic>().clickEvent.AddListener(OpenLaunchConfig);
+
+            PointerHelper pointerHelper;
+            if (RunButton.TryGetComponent<PointerHelper>(out pointerHelper))
+            {
+                pointerHelper.EnterEvent.AddListener(_ =>
+                {
+                    tooltip.Show("Run");
+                });
+                pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
+            }
+            if (DebugAdapterConfigButton.TryGetComponent<PointerHelper>(out pointerHelper))
+            {
+                pointerHelper.EnterEvent.AddListener(_ =>
+                {
+                    tooltip.Show("Debug Adapter Configuration");
+                });
+                pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
+            }
+            if (LaunchConfigButton.TryGetComponent<PointerHelper>(out pointerHelper))
+            {
+                pointerHelper.EnterEvent.AddListener(_ =>
+                {
+                    tooltip.Show("Launch Request Configuration");
+                });
+                pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
+            }
+        }
 
         public void Run()
         {

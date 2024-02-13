@@ -1,3 +1,4 @@
+using Michsky.UI.ModernUIPack;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using SEE.Controls;
@@ -272,7 +273,7 @@ namespace SEE.UI.DebugAdapterProtocol
         private void SetupControls()
         {
             controls = PrefabInstantiator.InstantiatePrefab(DebugControlsPrefab, transform, false);
-            controls.transform.position = new Vector3(Screen.width * 0.5f, Screen.height * 0.9f, 0);
+            controls.transform.position = new Vector3(Screen.width * 0.5f, Screen.height * 0.1f, 0);
 
             actions.Enqueue(() =>
             {
@@ -293,7 +294,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 foreach (var (name, (action, description)) in listeners)
                 {
                     GameObject button = controls.transform.Find(name).gameObject;
-                    button.MustGetComponent<Button>().onClick.AddListener(() => action());
+                    button.MustGetComponent<ButtonManagerBasic>().clickEvent.AddListener(() => action());
                     if (button.TryGetComponentOrLog(out PointerHelper pointerHelper))
                     {
                         pointerHelper.EnterEvent.AddListener(_ => tooltip.Show(description));
@@ -518,8 +519,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 tooltip.Show(result.Result, 0.25f);
             } catch (ProtocolException e)
             {
-                Debug.Log($"COuldn't evaluate '{expression}'");
-                ConsoleWindow.AddMessage($"{expression} - {e.Message}\n", "Adapter", "Log");
+                tooltip.Show("?", 0f);
             }
 
         }
@@ -642,6 +642,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </summary>
         /// <param name="exitEvent">The event.</param>
         private void OnExitedEvent(ExitedEvent exitedEvent) {
+            OpenConsole();
             ConsoleWindow.AddMessage($"Exited with exit code {exitedEvent.ExitCode}\n", "Program", "Log");
             actions.Enqueue(() => Destroyer.Destroy(this));
         }
@@ -657,12 +658,15 @@ namespace SEE.UI.DebugAdapterProtocol
             {
                 actions.Enqueue(() =>
                 {
-                    ExceptionInfoResponse response = adapterHost.SendRequestSync(new ExceptionInfoRequest()
+                    if (capabilities.SupportsExceptionInfoRequest != true) return;
+
+                    ExceptionInfoResponse exceptionInfo = adapterHost.SendRequestSync(new ExceptionInfoRequest()
                     {
                         ThreadId = mainThread.Id,
                     });
-                    string description = response.Description != null ? $": {response.Description}" : "";
-                    Debug.Log($"Exception ({response.ExceptionId}, {response.BreakMode}){description}");
+                    string description = $"{exceptionInfo.ExceptionId}" + (exceptionInfo.Description != null ? $"\n{exceptionInfo.Description}" : "");
+                    OpenConsole();
+                    ConsoleWindow.AddMessage(description + "\n", "Program", "Error");
                 });
             }
         }
@@ -899,15 +903,21 @@ namespace SEE.UI.DebugAdapterProtocol
             // Tries to stop the debuggee gracefully.
             void Terminate()
             {
-                adapterHost.SendRequest(new TerminateRequest(), _ => { }, (_, _) =>
-                {
-                    actions.Enqueue(Disconnect);
-                });
+                adapterHost.SendRequest(new TerminateRequest(), 
+                    _ => QueueDestroy(), 
+                    (_, _) => actions.Enqueue(Disconnect));
             }
             // Forcefully shuts down the debuggee.
             void Disconnect()
             {
-                adapterHost.SendRequest(new DisconnectRequest(), _ => { });
+                adapterHost.SendRequest(new DisconnectRequest(),
+                    _ => QueueDestroy(),
+                    (_, _) => QueueDestroy()
+                );
+            }
+            void QueueDestroy()
+            {
+                actions.Enqueue(() => Destroyer.Destroy(this));
             }
         }
         #endregion
@@ -936,7 +946,7 @@ namespace SEE.UI.DebugAdapterProtocol
             string title = Path.GetFileName(path);
 
             WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
-            CodeWindow codeWindow = manager.Windows.OfType<CodeWindow>().FirstOrDefault(window => window.Title == title);
+            CodeWindow codeWindow = manager.Windows.OfType<CodeWindow>().FirstOrDefault(window => IsPathEqual(window.FilePath, path));
             if (codeWindow == null)
             {
                 codeWindow = Canvas.AddComponent<CodeWindow>();
@@ -950,12 +960,25 @@ namespace SEE.UI.DebugAdapterProtocol
             }
             else
             {
+                codeWindow.Title = title;
                 codeWindow.EnterFromFile(path);
                 codeWindow.MarkLine(stackFrame.Line);
             }
             manager.ActiveWindow = codeWindow;
 
             lastCodeWindow = codeWindow;
+        }
+
+        /// <summary>
+        /// Compares two paths.
+        /// Ignores the difference of \ and /.
+        /// </summary>
+        /// <param name="path1">The first path.</param>
+        /// <param name="path2">The first path.</param>
+        /// <returns></returns>
+        private static bool IsPathEqual(string path1, string path2)
+        {
+            return path1.Replace("\\", "/") == path2.Replace("\\", "/");
         }
 
         /// <summary>

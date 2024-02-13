@@ -104,7 +104,7 @@ namespace SEE.UI.Window.CodeWindow
             } else
             {
                 string markLine = $"<mark=#ff000044>{allLines[lineNumber - 1]}</mark>";
-                textMesh.text = string.Join("\n", allLines.Take(lineNumber - 1).Append(markLine).Concat(allLines.Skip(lineNumber).Take(lines - lineNumber)));
+                textMesh.text = string.Join("\n", allLines.Take(lineNumber - 1).Append(markLine).Concat(allLines.Skip(lineNumber).Take(lines - lineNumber + 1)));
             }
 
         }

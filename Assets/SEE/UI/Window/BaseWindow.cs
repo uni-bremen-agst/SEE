@@ -15,7 +15,24 @@ namespace SEE.UI.Window
         /// <summary>
         /// The title (e.g. filename) for the window.
         /// </summary>
-        public string Title;
+        private string title;
+
+        /// <summary>
+        /// The title (e.g. filename) for the window.
+        /// </summary>
+        public string Title
+        {
+            get => title;
+            set
+            {
+                title = value;
+                if (HasStarted)
+                {
+                    Window.name = Title;
+                    Window.transform.Find("Dragger/Title").gameObject.GetComponent<TextMeshProUGUI>().text = Title;
+                }
+            }
+        }
 
         /// <summary>
         /// Resolution of the window.
