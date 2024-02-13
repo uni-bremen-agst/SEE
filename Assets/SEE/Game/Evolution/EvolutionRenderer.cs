@@ -277,11 +277,7 @@ namespace SEE.Game.Evolution
                 edgesAreDrawn = Renderer.AreEdgesDrawn();
 
                 objectManager = new ObjectManager(Renderer, gameObject);
-                markerFactory = new MarkerFactory(markerWidth: cityEvolution.MarkerWidth,
-                                    markerHeight: cityEvolution.MarkerHeight,
-                                    additionColor: cityEvolution.AdditionBeamColor,
-                                    changeColor: cityEvolution.ChangeBeamColor,
-                                    deletionColor: cityEvolution.DeletionBeamColor);
+                markerFactory = new MarkerFactory(cityEvolution.MarkerAttributes);
                 animationWatchDog = new CountingJoin();
             }
             else
