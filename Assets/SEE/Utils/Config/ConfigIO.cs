@@ -148,7 +148,7 @@ namespace SEE.Utils.Config
                     foreach (object item in items)
                     {
                         Dictionary<string, object> dict = (Dictionary<string, object>)item;
-                        T t = new T();
+                        T t = new();
                         t.Restore(dict, "");
                         value.Add(t);
                     }

@@ -38,10 +38,7 @@ namespace SEE.DataModel.DG.SourceRange
         /// <returns>true if consistent</returns>
         public bool IsIsomorphic()
         {
-            bool result = true;
-
             Stack<Range> stack = new();
-
             return files.Values.SelectMany(file => file.Children).All(IsHomomorphic);
 
             bool IsHomomorphic(Range range)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Tools.RandomGraphs;
@@ -82,10 +83,11 @@ namespace SEE.Game.City
         /// <summary>
         /// Loads the graph data and draws the graph.
         /// </summary>
-        public override void LoadAndDrawGraph()
+        public override UniTaskVoid LoadAndDrawGraphAsync()
         {
-            LoadData();
+            LoadDataAsync().Forget();
             DrawGraph();
+            return new UniTaskVoid();
         }
 
         /// <summary>
@@ -95,9 +97,10 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup)]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
-        public override void LoadData()
+        public override UniTask LoadDataAsync()
         {
             LoadedGraph = RandomGraphs.Create(LeafConstraint, InnerNodeConstraint, LeafAttributes, true);
+            return UniTask.CompletedTask;
         }
 
         /// <summary>

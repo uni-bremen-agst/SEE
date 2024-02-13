@@ -252,6 +252,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="attributeName">name of an integer or float attribute</param>
         /// <returns>value of numeric attribute <paramref name="attributeName"/></returns>
+        /// <exception cref="UnknownAttribute">thrown in case there is no such <paramref name="attributeName"/></exception>
         public float GetNumeric(string attributeName)
         {
             if (FloatAttributes.TryGetValue(attributeName, out float floatValue))
@@ -262,9 +263,7 @@ namespace SEE.DataModel.DG
             {
                 return intValue;
             }
-            {
-                throw new UnknownAttribute(attributeName);
-            }
+            throw new UnknownAttribute(attributeName);
         }
 
         /// <summary>
@@ -280,7 +279,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="attributeName">name of an attribute</param>
         /// <returns>value of attribute <paramref name="attributeName"/></returns>
-        /// <exception cref="UnknownAttribute">if <paramref name="attributeName"/> is not an attribute of this node</exception>
+        /// <exception cref="UnknownAttribute">if <paramref name="attributeName"/> is not an attribute of this attributable</exception>
         public object GetAny(string attributeName)
         {
             if (FloatAttributes.TryGetValue(attributeName, out float floatValue))

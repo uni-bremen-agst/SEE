@@ -68,7 +68,7 @@ namespace SEE.Game.City
         /// The directory in which the GXL files of the graph series are located.
         /// </summary>
         [SerializeField, ShowInInspector, Tooltip("The directory in which the GXL files are located."), FoldoutGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
-        public DirectoryPath GXLDirectory = new DirectoryPath();
+        public DirectoryPath GXLDirectory = new();
 
         /// <summary>
         /// Determines if the graphs should be drawn. If set to true, the graph evolution will be calculated and displayed.
@@ -159,7 +159,7 @@ namespace SEE.Game.City
         /// </summary>
         private List<Graph> LoadDataSeries()
         {
-            GraphsReader graphsReader = new GraphsReader();
+            GraphsReader graphsReader = new();
             // Load all GXL graphs and CSV files in directory PathPrefix but not more than maxRevisionsToLoad many.
             graphsReader.Load(GXLDirectory.Path, HierarchicalEdges, basePath: SourceCodeDirectory.Path, rootName: GXLDirectory.Path, MaxRevisionsToLoad);
             return graphsReader.Graphs;
@@ -262,7 +262,7 @@ namespace SEE.Game.City
         /// <returns>the loaded graph or null if none could be found</returns>
         private Graph LoadFirstGraph()
         {
-            GraphsReader reader = new GraphsReader();
+            GraphsReader reader = new();
             reader.Load(GXLDirectory.Path, HierarchicalEdges, basePath: SourceCodeDirectory.Path, rootName: GXLDirectory.Path, 1);
             List<Graph> graphs = reader.Graphs;
             if (graphs.Count == 0)
@@ -326,7 +326,7 @@ namespace SEE.Game.City
                     relevantGraph.AddSingleRoot(out Node _, name: "ROOT", type: Graph.UnknownType);
                 }
                 graphs[i] = relevantGraph;
-                LoadDataForGraphListing(graphs[i]);
+                SetupCompoundSpringEmbedder(graphs[i]);
             }
         }
 
