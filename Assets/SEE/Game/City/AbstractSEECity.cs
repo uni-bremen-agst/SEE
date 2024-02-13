@@ -109,7 +109,7 @@ namespace SEE.Game.City
         /// of an IDE for a particular project. Concretely, if the IDE is Visual Studio,
         /// this is the VS solution file.
         /// </summary>
-        [SerializeField, Tooltip("Path of Visual Studio solution file."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        [Tooltip("Path of Visual Studio solution file."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         public FilePath SolutionPath = new();
 
         /// <summary>
@@ -123,8 +123,17 @@ namespace SEE.Game.City
         /// they should be visualized or not and if so, how.
         /// </summary>
         [NonSerialized, OdinSerialize, Tooltip("Visual attributes of nodes."), HideReferenceObjectPicker]
-        [DictionaryDrawerSettings(KeyLabel = "Node type", ValueLabel = "Visual attributes", DisplayMode = DictionaryDisplayOptions.CollapsedFoldout), TabGroup(NodeFoldoutGroup), RuntimeTab(NodeFoldoutGroup)]
+        [DictionaryDrawerSettings(KeyLabel = "Node type", ValueLabel = "Visual attributes",
+            DisplayMode = DictionaryDisplayOptions.CollapsedFoldout), TabGroup(NodeFoldoutGroup), RuntimeTab(NodeFoldoutGroup)]
         public NodeTypeVisualsMap NodeTypes = new();
+
+        /// <summary>
+        /// Attributes to mark changes of nodes.
+        /// </summary>
+        [Tooltip("How changes of nodes should be marked."),
+            TabGroup(NodeFoldoutGroup), RuntimeTab(NodeFoldoutGroup), HideReferenceObjectPicker]
+        [NonSerialized, OdinSerialize]
+        public MarkerAttributes MarkerAttributes = new();
 
         /// <summary>
         /// If true, lifted edges whose source and target nodes are the same are ignored.

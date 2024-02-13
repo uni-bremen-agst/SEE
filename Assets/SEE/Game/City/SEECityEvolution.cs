@@ -75,45 +75,6 @@ namespace SEE.Game.City
         /// </summary>
         private bool isDrawn = false;
 
-        //-----------------------------------------------------
-        // Attributes to mark changes
-        //-----------------------------------------------------
-
-        /// <summary>
-        /// The height of posts used as markers for new and deleted elements.
-        /// </summary>
-        [Tooltip("The height of posts used as markers for new, changed, and deleted elements (>=0).")]
-        [SerializeField, ShowInInspector, FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
-        public float MarkerHeight = 0.2f;
-
-        /// <summary>
-        /// The width (x and z lengths) of posts used as markers for new and deleted elements.
-        /// </summary>
-        [Tooltip("The width (x and z lengths) of posts used as markers for new and deleted elements (>=0).")]
-        [SerializeField, ShowInInspector, FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
-        public float MarkerWidth = 0.01f;
-
-        /// <summary>
-        /// Color for power beams of newly added nodes, can be set in inspector
-        /// </summary>
-        [Tooltip("The color of the beam for newly created nodes.")]
-        [SerializeField, ShowInInspector, FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
-        public Color AdditionBeamColor = Color.green;
-
-        /// <summary>
-        /// Changed nodes beam color to be pickable in inspector
-        /// </summary>
-        [Tooltip("The color of the beam for changed nodes.")]
-        [SerializeField, ShowInInspector, FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
-        public Color ChangeBeamColor = Color.yellow;
-
-        /// <summary>
-        /// Deleted nodes beam color to be pickable in inspector
-        /// </summary>
-        [Tooltip("The color of the beam for deleted nodes.")]
-        [SerializeField, ShowInInspector, FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
-        public Color DeletionBeamColor = Color.black;
-
         /// <summary>
         /// Yields the graph renderer that draws this city.
         /// </summary>
@@ -357,37 +318,12 @@ namespace SEE.Game.City
         /// Label of attribute <see cref="MaxRevisionsToLoad"/> in the configuration file.
         /// </summary>
         private const string maxRevisionsToLoadLabel = "MaxRevisionsToLoad";
-        /// <summary>
-        /// Label of attribute <see cref="MarkerHeight"/> in the configuration file.
-        /// </summary>
-        private const string markerHeightLabel = "MarkerHeight";
-        /// <summary>
-        /// Label of attribute <see cref="MarkerWidth"/> in the configuration file.
-        /// </summary>
-        private const string markerWidthLabel = "MarkerWidth";
-        /// <summary>
-        /// Label of attribute <see cref="AdditionBeamColor"/> in the configuration file.
-        /// </summary>
-        private const string additionBeamColorLabel = "AdditionBeamColor";
-        /// <summary>
-        /// Label of attribute <see cref="ChangeBeamColor"/> in the configuration file.
-        /// </summary>
-        private const string changeBeamColorLabel = "ChangeBeamColor";
-        /// <summary>
-        /// Label of attribute <see cref="DeletionBeamColor"/> in the configuration file.
-        /// </summary>
-        private const string deletionBeamColorLabel = "DeletionBeamColor";
 
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
             GXLDirectory.Save(writer, gxlDirectoryLabel);
             writer.Save(MaxRevisionsToLoad, maxRevisionsToLoadLabel);
-            writer.Save(MarkerHeight, markerHeightLabel);
-            writer.Save(MarkerWidth, markerWidthLabel);
-            writer.Save(AdditionBeamColor, additionBeamColorLabel);
-            writer.Save(ChangeBeamColor, changeBeamColorLabel);
-            writer.Save(DeletionBeamColor, deletionBeamColorLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
@@ -395,11 +331,6 @@ namespace SEE.Game.City
             base.Restore(attributes);
             GXLDirectory.Restore(attributes, gxlDirectoryLabel);
             ConfigIO.Restore(attributes, maxRevisionsToLoadLabel, ref MaxRevisionsToLoad);
-            ConfigIO.Restore(attributes, markerHeightLabel, ref MarkerHeight);
-            ConfigIO.Restore(attributes, markerWidthLabel, ref MarkerWidth);
-            ConfigIO.Restore(attributes, additionBeamColorLabel, ref AdditionBeamColor);
-            ConfigIO.Restore(attributes, changeBeamColorLabel, ref ChangeBeamColor);
-            ConfigIO.Restore(attributes, deletionBeamColorLabel, ref DeletionBeamColor);
         }
     }
 }

@@ -716,11 +716,6 @@ namespace SEE.Utils
             AbstractSEECityAttributesAreEqual(expected, actual);
             AreEqual(expected.GXLDirectory, actual.GXLDirectory);
             Assert.AreEqual(expected.MaxRevisionsToLoad, actual.MaxRevisionsToLoad);
-            Assert.AreEqual(expected.MarkerHeight, actual.MarkerHeight);
-            Assert.AreEqual(expected.MarkerWidth, actual.MarkerWidth);
-            AreEqual(expected.AdditionBeamColor, actual.AdditionBeamColor);
-            AreEqual(expected.ChangeBeamColor, actual.ChangeBeamColor);
-            AreEqual(expected.DeletionBeamColor, actual.DeletionBeamColor);
         }
 
         /// <summary>
@@ -733,12 +728,21 @@ namespace SEE.Utils
         {
             SEECityAttributesAreEqual(expected, actual);
             AreEqual(expected.BaselineGXLPath, actual.BaselineGXLPath);
-            //Assert.AreEqual(expected.markerAttributes, actual.markerAttributes);
-            Assert.AreEqual(expected.MarkerAttributes.MarkerHeight, actual.MarkerAttributes.MarkerHeight);
-            Assert.AreEqual(expected.MarkerAttributes.MarkerWidth, actual.MarkerAttributes.MarkerWidth);
-            AreEqual(expected.MarkerAttributes.AdditionBeamColor, actual.MarkerAttributes.AdditionBeamColor);
-            AreEqual(expected.MarkerAttributes.ChangeBeamColor, actual.MarkerAttributes.ChangeBeamColor);
-            AreEqual(expected.MarkerAttributes.DeletionBeamColor, actual.MarkerAttributes.DeletionBeamColor);
+            AreEqual(expected.MarkerAttributes, actual.MarkerAttributes);
+        }
+
+        /// <summary>
+        /// Checks whether <paramref name="actual"/> has the same values as <paramref name="expected"/>.
+        /// </summary>
+        /// <param name="expected">expected values</param>
+        /// <param name="actual">actual values</param>
+        private static void AreEqual(MarkerAttributes expected, MarkerAttributes actual)
+        {
+            Assert.AreEqual(expected.MarkerHeight, actual.MarkerHeight);
+            Assert.AreEqual(expected.MarkerWidth, actual.MarkerWidth);
+            AreEqual(expected.AdditionBeamColor, actual.AdditionBeamColor);
+            AreEqual(expected.ChangeBeamColor, actual.ChangeBeamColor);
+            AreEqual(expected.DeletionBeamColor, actual.DeletionBeamColor);
         }
 
         /// <summary>
@@ -856,11 +860,19 @@ namespace SEE.Utils
         {
             WipeOutSEECityAttributes(city);
             city.BaselineGXLPath.Set("C:/MyAbsoluteDirectory/MyBaselineFile.gxl");
-            city.MarkerAttributes.MarkerHeight++;
-            city.MarkerAttributes.MarkerWidth++;
-            city.MarkerAttributes.AdditionBeamColor = Color.clear;
-            city.MarkerAttributes.ChangeBeamColor = Color.clear;
-            city.MarkerAttributes.DeletionBeamColor = Color.clear;
+        }
+
+        /// <summary>
+        /// Wipes out all attributes of <paramref name="markerAttributes"/>.
+        /// </summary>
+        /// <param name="markerAttributes">to be wiped out</param>
+        private static void WipeOutMarkerAttributes(MarkerAttributes markerAttributes)
+        {
+            markerAttributes.MarkerHeight++;
+            markerAttributes.MarkerWidth++;
+            markerAttributes.AdditionBeamColor = Color.clear;
+            markerAttributes.ChangeBeamColor = Color.clear;
+            markerAttributes.DeletionBeamColor = Color.clear;
         }
 
         /// <summary>
@@ -911,11 +923,6 @@ namespace SEE.Utils
             WipeOutAbstractSEECityAttributes(city);
             city.GXLDirectory.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gxl");
             city.MaxRevisionsToLoad++;
-            city.MarkerHeight++;
-            city.MarkerWidth++;
-            city.AdditionBeamColor = Color.clear;
-            city.ChangeBeamColor = Color.clear;
-            city.DeletionBeamColor = Color.clear;
         }
 
         /// <summary>
@@ -933,6 +940,7 @@ namespace SEE.Utils
             WipeOutEdgeSelectionSettings(city.EdgeSelectionSettings);
             WipeOutErosionSettings(city);
             WipeOutCoseGraphSettings(city);
+            WipeOutMarkerAttributes(city.MarkerAttributes);
         }
 
         /// <summary>

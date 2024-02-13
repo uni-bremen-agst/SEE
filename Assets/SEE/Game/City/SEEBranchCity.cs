@@ -1,7 +1,7 @@
 using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
 using SEE.Game.Evolution;
 using SEE.UI.RuntimeConfigMenu;
-using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
@@ -31,11 +31,6 @@ namespace SEE.Game.City
         public FilePath BaselineGXLPath = new();
 
         /// <summary>
-        /// Attributes to mark changes
-        /// </summary>
-        public MarkerAttributes MarkerAttributes = new();
-
-        /// <summary>
         /// First, <see cref=">SEECity.LoadData"/> will be called.
         /// The resulting graph is available in <see cref="LoadedGraph"/> afterwards.
         /// Then, the differences of <see cref="LoadedGraph"/> with respect to a
@@ -57,12 +52,13 @@ namespace SEE.Game.City
         /// graph element is determined by their <see cref="Node.ID"/>.
         /// </summary>
         /// <remarks>This method loads only the data, but does not actually render the graph.</remarks>
+        /*
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
-        public override void LoadData()
+        public override async void LoadDataAsync()
         {
-            base.LoadData();
+            base.LoadDataAsync();
             if (string.IsNullOrEmpty(BaselineGXLPath.Path))
             {
                 Debug.LogError("Empty path for baseline GXL.\n");
@@ -72,6 +68,7 @@ namespace SEE.Game.City
                 Merge(BaselineGXLPath.Path);
             }
         }
+        */
 
         /// <summary>
         /// Merges the changes of nodes and edges of the <see cref="LoadedGraph"/> with
@@ -81,7 +78,10 @@ namespace SEE.Game.City
         /// <param name="pathBaselineGXL"></param>
         private void Merge(string pathBaselineGXL)
         {
-            Graph baseline = LoadGraph(pathBaselineGXL);
+            //Graph baseline = LoadGraph(pathBaselineGXL);
+            GraphReader graphReader = new(pathBaselineGXL, HierarchicalEdges, SourceCodeDirectory.Path);
+            graphReader.Load();
+            Graph baseline = graphReader.GetGraph();
 
             tempGraph = null;
             // TODO (#696): Normally we would call LoadMetrics() to add additional metrics
