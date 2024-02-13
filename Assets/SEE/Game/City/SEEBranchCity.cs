@@ -33,7 +33,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Attributes to mark changes
         /// </summary>
-        public MarkerAttributes markerAttributes = new MarkerAttributes();
+        public MarkerAttributes MarkerAttributes = new();
 
         /// <summary>
         /// First, <see cref=">SEECity.LoadData"/> will be called.
@@ -257,7 +257,7 @@ namespace SEE.Game.City
         private const string baselineGXLPathLabel = "BaselineGXLPath";
 
         /// <summary>
-        /// Label of attribute <see cref="markerAttributes"/> in the configuration file.
+        /// Label of attribute <see cref="MarkerAttributes"/> in the configuration file.
         /// </summary>
         private const string markerAttributesLabel = "markerAttributes";
 
@@ -265,14 +265,14 @@ namespace SEE.Game.City
         {
             base.Save(writer);
             BaselineGXLPath.Save(writer, baselineGXLPathLabel);
-            markerAttributes.Save(writer, markerAttributesLabel);
+            MarkerAttributes.Save(writer, markerAttributesLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
             BaselineGXLPath.Restore(attributes, baselineGXLPathLabel);
-            markerAttributes.Restore(attributes);
+            MarkerAttributes.Restore(attributes);
         }
         #endregion
     }

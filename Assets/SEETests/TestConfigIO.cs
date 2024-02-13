@@ -734,11 +734,11 @@ namespace SEE.Utils
             SEECityAttributesAreEqual(expected, actual);
             AreEqual(expected.BaselineGXLPath, actual.BaselineGXLPath);
             //Assert.AreEqual(expected.markerAttributes, actual.markerAttributes);
-            Assert.AreEqual(expected.markerAttributes.MarkerHeight, actual.markerAttributes.MarkerHeight);
-            Assert.AreEqual(expected.markerAttributes.MarkerWidth, actual.markerAttributes.MarkerWidth);
-            AreEqual(expected.markerAttributes.AdditionBeamColor, actual.markerAttributes.AdditionBeamColor);
-            AreEqual(expected.markerAttributes.ChangeBeamColor, actual.markerAttributes.ChangeBeamColor);
-            AreEqual(expected.markerAttributes.DeletionBeamColor, actual.markerAttributes.DeletionBeamColor);
+            Assert.AreEqual(expected.MarkerAttributes.MarkerHeight, actual.MarkerAttributes.MarkerHeight);
+            Assert.AreEqual(expected.MarkerAttributes.MarkerWidth, actual.MarkerAttributes.MarkerWidth);
+            AreEqual(expected.MarkerAttributes.AdditionBeamColor, actual.MarkerAttributes.AdditionBeamColor);
+            AreEqual(expected.MarkerAttributes.ChangeBeamColor, actual.MarkerAttributes.ChangeBeamColor);
+            AreEqual(expected.MarkerAttributes.DeletionBeamColor, actual.MarkerAttributes.DeletionBeamColor);
         }
 
         /// <summary>
@@ -856,11 +856,11 @@ namespace SEE.Utils
         {
             WipeOutSEECityAttributes(city);
             city.BaselineGXLPath.Set("C:/MyAbsoluteDirectory/MyBaselineFile.gxl");
-            city.markerAttributes.MarkerHeight++;
-            city.markerAttributes.MarkerWidth++;
-            city.markerAttributes.AdditionBeamColor = Color.clear;
-            city.markerAttributes.ChangeBeamColor = Color.clear;
-            city.markerAttributes.DeletionBeamColor = Color.clear;
+            city.MarkerAttributes.MarkerHeight++;
+            city.MarkerAttributes.MarkerWidth++;
+            city.MarkerAttributes.AdditionBeamColor = Color.clear;
+            city.MarkerAttributes.ChangeBeamColor = Color.clear;
+            city.MarkerAttributes.DeletionBeamColor = Color.clear;
         }
 
         /// <summary>
