@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Utils
+namespace SEE.Game.City
 {
     /// <summary>
     /// Attributes to mark changes
