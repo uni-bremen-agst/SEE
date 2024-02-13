@@ -556,38 +556,27 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Draw marks on Graph based on their toggle
+        /// Adds markers to all <paramref name="gameNodes"/>.
         /// </summary>
-        /// <param name="gameNodes"> List of gameNodes where the beams will be drawn on </param>
+        /// <param name="gameNodes">List of gamenodes to be marked</param>
         private void AddMarkers(ICollection<GameObject> gameNodes)
         {
-            GameObject gameObject = Settings.gameObject;
-            GameObject[] gameObjectArray = gameNodes.ToArray();
+            MarkerFactory markerFactory = new(Settings.MarkerAttributes);
 
-            if (gameObject.TryGetComponent(out SEEBranchCity sEEBranchCity))
+            foreach (GameObject gameNode in gameNodes)
             {
-                MarkerFactory markerFactory = new MarkerFactory(markerWidth: sEEBranchCity.MarkerAttributes.MarkerWidth,
-                                    markerHeight: sEEBranchCity.MarkerAttributes.MarkerHeight,
-                                    additionColor: sEEBranchCity.MarkerAttributes.AdditionBeamColor,
-                                    changeColor: sEEBranchCity.MarkerAttributes.ChangeBeamColor,
-                                    deletionColor: sEEBranchCity.MarkerAttributes.DeletionBeamColor);
-
-                //For every node draw the beams based on their toggle
-                for (int i = 0; i < gameObjectArray.Length; i++)
+                Node node = gameNode.GetNode();
+                if (node.HasToggle(ChangeMarkers.IsNew))
                 {
-                    Node node = gameObjectArray[i].GetNode();
-                    if (node.HasToggle(ChangeMarkers.IsNew))
-                    {
-                        markerFactory.MarkBorn(GraphElementIDMap.Find(node.ID, true));
-                    }
-                    else if (node.HasToggle(ChangeMarkers.IsDeleted))
-                    {
-                        markerFactory.MarkDead(GraphElementIDMap.Find(node.ID, true));
-                    }
-                    else if (node.HasToggle(ChangeMarkers.IsChanged))
-                    {
-                        markerFactory.MarkChanged(GraphElementIDMap.Find(node.ID, true));
-                    }
+                    markerFactory.MarkBorn(gameNode);
+                }
+                else if (node.HasToggle(ChangeMarkers.IsDeleted))
+                {
+                    markerFactory.MarkDead(gameNode);
+                }
+                else if (node.HasToggle(ChangeMarkers.IsChanged))
+                {
+                    markerFactory.MarkChanged(gameNode);
                 }
             }
         }
