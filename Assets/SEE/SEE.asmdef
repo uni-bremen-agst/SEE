@@ -53,7 +53,8 @@
         "MathNet.Numerics.dll",
         "Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.dll",
         "Newtonsoft.Json.dll",
-        "NetworkCommsDotNet.dll"
+        "NetworkCommsDotNet.dll",
+        "LibGit2Sharp.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

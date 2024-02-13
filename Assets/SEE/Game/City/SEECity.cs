@@ -16,6 +16,7 @@ using Sirenix.Serialization;
 using SEE.GraphProviders;
 using SEE.UI.Notification;
 using SEE.DataModel.DG.IO;
+using SEE.DataModel;
 
 namespace SEE.Game.City
 {
@@ -187,7 +188,9 @@ namespace SEE.Game.City
             {
                 // All graph elements that are only in the LoadedGraph but not in the VisualizedSubGraph
                 // are toggled as GraphElement.IsVirtualToggle. These are not intended to be drawn.
-                foreach (GraphElement graphElement in LoadedGraph.Elements().Except(subGraph.Elements()))
+                // Because the graph elements stem from two different graphs (LoadedGraph versus subGraph),
+                // we need to provide a suitable comparer taking into account only the ID.
+                foreach (GraphElement graphElement in LoadedGraph.Elements().Except(subGraph.Elements(), new GraphElementIDComparer()))
                 {
                     // All other elements are virtual, i.e., should not be drawn.
                     graphElement.SetToggle(GraphElement.IsVirtualToggle);
@@ -203,7 +206,8 @@ namespace SEE.Game.City
             // Add EdgeMeshScheduler to convert edge lines to meshes over time.
             gameObject.AddOrGetComponent<EdgeMeshScheduler>().Init(EdgeLayoutSettings, EdgeSelectionSettings,
                                                                    subGraph);
-            LoadedGraph = subGraph;
+            // This must be loadedGraph. It must not be LoadedGraph. The latter would reset the graph.
+            loadedGraph = subGraph;
 
             UpdateGraphElementIDMap(gameObject);
         }

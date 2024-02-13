@@ -144,7 +144,8 @@ namespace SEE.DataModel.DG
         public string RelativeDirectory(string projectFolder = null)
         {
             // FIXME: The data model (graph) should be independent of Unity (here: DataPath.ProjectFolder()).
-            return Directory?.Replace(projectFolder ?? DataPath.ProjectFolder(), string.Empty).TrimStart('/');
+            return Directory?.Replace(projectFolder ?? DataPath.ProjectFolder(), string.Empty)
+                .TrimStart(Filenames.UnixDirectorySeparator);
         }
 
         /// <summary>
@@ -174,6 +175,8 @@ namespace SEE.DataModel.DG
         /// A path is the concatenation of its directory and filename.
         /// Not all graph elements have this information, in which case the result
         /// may be empty.
+        /// Note: <see cref="Filenames.UnixDirectorySeparator"/> will used as a directory
+        /// separator.
         /// </summary>
         /// <returns>path of the source file containing this graph element; may be empty</returns>
         /// <remarks>Unlike <see cref="Filename()"/> and <see cref="Directory"/> the result
@@ -186,7 +189,7 @@ namespace SEE.DataModel.DG
             {
                 return directory.IsNullOrWhitespace() ? string.Empty : directory;
             }
-            return directory.IsNullOrWhitespace() ? filename : System.IO.Path.Combine(directory, filename);
+            return directory.IsNullOrWhitespace() ? filename : Filenames.Join(directory, filename);
         }
 
         /// <summary>

@@ -40,6 +40,30 @@ namespace SEE.Utils
             string newRegion = FileIO.Read(newPath, newStartLine, newEndLine);
             return Diff2RichText(diff.diff_main(oldRegion, newRegion));
         }
+        /// <summary>
+        /// Returns the differences of <paramref name="current"/> relative to
+        /// <paramref name="old"/>.
+        /// The diff contains Rich Text markup that indicates the additions
+        /// and deletions between the two inputs. An addition is text that is contained
+        /// in <paramref name="current"/> but not in <paramref name="old"/> and a
+        /// deletion is text that is contained only in <paramref name="old"/>.
+        ///
+        /// The Rich Text markup of a deletion renders the deleted text in red
+        /// and struck through. The markup of an addition renders the added text
+        /// in green and underlined.
+        ///
+        /// Each entry in the result is a line of text of <paramref name="current"/>.
+        /// </summary>
+        /// <param name="old">the old region</param>
+        /// <param name="current">the new region</param>
+        /// <returns>diff in Rich Text markup</returns>
+        public static string[] Diff(string old, string current)
+        {
+            diff_match_patch diff = new();
+            List<Diff> diffs = diff.diff_main(old, current);
+            diff.diff_cleanupSemantic(diffs);
+            return Diff2RichText(diffs);
+        }
 
         /// <summary>
         /// Converts given list of <paramref name="diffs"/> into a Rich Text markup

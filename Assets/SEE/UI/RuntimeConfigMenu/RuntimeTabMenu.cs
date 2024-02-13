@@ -1366,11 +1366,13 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 if (parent.transform.Find(i.ToString()) == null)
                 {
+                    // Note: This iCopy is truly needed althought I do not understand why.
+                    int iCopy = i;
                     CreateSetting(
-                        () => list[i],
+                        () => list[iCopy],
                         i.ToString(),
                         parent,
-                        changedValue => list[i] = changedValue as T
+                        changedValue => list[iCopy] = changedValue as T
                     );
                 }
             }
