@@ -532,11 +532,7 @@ namespace SEE.Game.CityRendering
             ICollection<GameObject> leafNodes = FindLeafNodes(gameNodes);
             ICollection<GameObject> innerNodes = FindInnerNodes(gameNodes);
 
-            //Add markers if Settings is an instance of SEEBranchCity
-            if(Settings is SEEBranchCity)
-            {
-                AddMarkers(gameNodes);
-            }
+            AddMarkers(gameNodes);
 
             // Add software erosion decorators for all nodes if requested.
             if (Settings.ErosionSettings.ShowInnerErosions)

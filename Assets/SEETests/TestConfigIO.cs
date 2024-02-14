@@ -574,35 +574,6 @@ namespace SEE.Utils
             }
         }
 
-        /// <summary>
-        /// Test for SEEBranchCity
-        /// </summary>
-        [Test]
-        public void TestSEEBranchCity()
-        {
-            string filename = Path.GetTempFileName();
-            try
-            {
-                // First save a new city with all its default values.
-                SEEBranchCity savedCity = NewVanillaSEECity<SEEBranchCity>();
-                savedCity.Save(filename);
-
-                // Create a new city with all its default values and then
-                // wipe out all its attributes to see whether they are correctly
-                // restored from the saved configuration file.
-                SEEBranchCity loadedCity = NewVanillaSEECity<SEEBranchCity>();
-                WipeOutSEEBranchCityAttributs(loadedCity);
-                // Load the saved attributes from the configuration file.
-                loadedCity.Load(filename);
-
-                SEEBranchCityAttributesAreEqual(savedCity, loadedCity);
-            }
-            finally
-            {
-                FileIO.DeleteIfExists(filename);
-            }
-        }
-
         //--------------------------------------------------------
         // AreEqual comparisons
         //--------------------------------------------------------
@@ -716,19 +687,6 @@ namespace SEE.Utils
             AbstractSEECityAttributesAreEqual(expected, actual);
             AreEqual(expected.GXLDirectory, actual.GXLDirectory);
             Assert.AreEqual(expected.MaxRevisionsToLoad, actual.MaxRevisionsToLoad);
-        }
-
-        /// <summary>
-        /// Checks whether the configuration attributes of <paramref name="expected"/> and
-        /// <paramref name="actual"/> are equal.
-        /// </summary>
-        /// <param name="expected">expected settings</param>
-        /// <param name="actual">actual settings</param>
-        private static void SEEBranchCityAttributesAreEqual(SEEBranchCity expected, SEEBranchCity actual)
-        {
-            SEECityAttributesAreEqual(expected, actual);
-            AreEqual(expected.BaselineGXLPath, actual.BaselineGXLPath);
-            AreEqual(expected.MarkerAttributes, actual.MarkerAttributes);
         }
 
         /// <summary>
@@ -849,17 +807,6 @@ namespace SEE.Utils
         {
             WipeOutAbstractSEECityAttributes(city);
             city.DataProvider = new PipelineGraphProvider();
-        }
-
-        /// <summary>
-        /// Assigns all attribute of given <paramref name="city"/> to arbitrary values
-        /// differnet from their default values.
-        /// </summary>
-        /// <param name="city">the city whose attributes are to be re-assigned</param>
-        private static void WipeOutSEEBranchCityAttributs(SEEBranchCity city)
-        {
-            WipeOutSEECityAttributes(city);
-            city.BaselineGXLPath.Set("C:/MyAbsoluteDirectory/MyBaselineFile.gxl");
         }
 
         /// <summary>
