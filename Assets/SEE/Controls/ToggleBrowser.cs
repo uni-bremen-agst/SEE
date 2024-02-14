@@ -13,6 +13,7 @@ namespace SEE.Controls
         /// </summary>
         /// <remarks>This field will be set in the inspector and is assumed
         /// to refer to the browser to be toggled.</remarks>
+        [Tooltip("The Internet browser. A game object with a Browser component attached to.")]
         public GameObject Browser;
 
         /// <summary>
