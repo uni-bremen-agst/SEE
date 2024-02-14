@@ -10,6 +10,9 @@ using SEE.Net.Dashboard.Model.Issues;
 using SEE.Net.Dashboard.Model.Metric;
 using SEE.Tools;
 using UnityEngine;
+using CsvHelper;
+using CsvHelper.Configuration;
+using Newtonsoft.Json.Linq;
 
 namespace SEE.DataModel.DG.IO
 {
@@ -171,105 +174,102 @@ namespace SEE.DataModel.DG.IO
                 Debug.LogWarning($"Metric file {filename} does not exist. CSV Metrics will not be available.\n");
                 return 0;
             }
-            int numberOfErrors = 0;
-            try
+
+            CsvConfiguration config = new(CultureInfo.InvariantCulture)
             {
-                using StreamReader reader = new(filename);
-                if (reader.EndOfStream)
+                Delimiter = separator.ToString(),
+            };
+
+            using StreamReader reader = new(filename);
+            using CsvReader csv = new(reader, config);
+
+            int numberOfErrors = 0;
+            int lineCount = 1;
+
+            csv.Read();
+            if (csv.ReadHeader())
+            {
+                string[] header = csv.HeaderRecord;
+                if (header.Length == 0)
                 {
-                    Debug.LogError($"Empty file: {filename}.\n");
+                    string errorMessage = $"Header must not be empty. It must include at least column {IDColumnName}.\n";
+                    Debug.LogError(errorMessage + "\n");
+                    throw new IOException(errorMessage);
                 }
-                else
+                if (header[0] != IDColumnName)
                 {
-                    // The line number in the CSV file currently processed.
-                    int lineCount = 1;
-                    // Header row
-                    string headerLine = reader.ReadLine();
-                    // The names of the columns
-                    string[] columnNames = headerLine?.Split(separator);
+                    string errorMessage = $"First header column in file {filename} is not {IDColumnName}.";
+                    Debug.LogError(errorMessage + "\n");
+                    throw new IOException(errorMessage);
+                }
+
+                string[] columns = header[1..];
+                if (columns.Length == 0)
+                {
+                    Debug.LogWarning($"There are no data columns in {filename}.\n");
+                    return 0;
+                }
+                while (csv.Read())
+                {
                     lineCount++;
-                    // We expect the ID plus at least one metric
-                    if (columnNames?.Length > 1)
+                    string id = csv.GetField<string>(IDColumnName);
+
+                    if (graph.TryGetNode(id, out Node node))
                     {
-                        // The first column must be the ID
-                        if (columnNames[0] != IDColumnName)
+                        // Process the remaining data columns of this row starting at index 1
+                        foreach (string column in columns)
                         {
-                            string errorMessage = $"First header column in file {filename} is not {IDColumnName}.";
-                            Debug.LogError(errorMessage + "\n");
-                            throw new IOException(errorMessage);
-                        }
-                        // Process each data row
-                        while (!reader.EndOfStream)
-                        {
-                            // Currently processed data row
-                            string line = reader.ReadLine();
-                            // The values of the data row
-                            string[] values = line.Split(separator);
-                            // Number of named columns and data entries must correspond
-                            if (columnNames.Length != values.Length)
+                            string entry = csv.GetField<string>(column);
+
+                            try
                             {
-                                Debug.LogError($"Unexpected number of entries in file {filename} at line {lineCount}.\n");
-                                numberOfErrors++;
-                            }
-                            // ID is expected to be in the first column. Try to
-                            // retrieve the corresponding node from the graph
-                            if (graph.TryGetNode(values[0], out Node node))
-                            {
-                                // Process the remaining data columns of this row starting at index 1
-                                for (int i = 1; i < Mathf.Min(columnNames.Length, values.Length); i++)
+                                if (entry.Contains("."))
                                 {
-                                    try
-                                    {
-                                        if (values[i].Contains("."))
-                                        {
-                                            float value = float.Parse(values[i], CultureInfo.InvariantCulture);
-                                            node.SetFloat(columnNames[i], value);
-                                        }
-                                        else
-                                        {
-                                            int value = int.Parse(values[i]);
-                                            node.SetInt(columnNames[i], value);
-                                        }
-                                    }
-                                    catch (ArgumentNullException)
-                                    {
-                                        Debug.LogError($"Missing value in file {filename} at line {lineCount}.\n");
-                                        numberOfErrors++;
-                                    }
-                                    catch (FormatException)
-                                    {
-                                        Debug.LogError($"Value {values[i]} does not represent a number in a valid format in file {filename} at line {lineCount}.\n");
-                                        numberOfErrors++;
-                                    }
-                                    catch (OverflowException)
-                                    {
-                                        Debug.LogError($"Value {values[i]} represents a number less than minimum or greater than maximum in file {filename} at line {lineCount}.\n");
-                                        numberOfErrors++;
-                                    }
+                                    node.SetFloat(column, (float)float.Parse(entry, CultureInfo.InvariantCulture));
+                                }
+                                else
+                                {
+                                    node.SetInt(column, int.Parse(entry));
                                 }
                             }
-                            else
+                            catch (CsvHelper.MissingFieldException)
                             {
-                                Debug.LogWarning($"Unknown node {values[0]} in file {filename} at line {lineCount}.\n");
+                                Debug.LogError($"{SourceLocation()} Missing value.\n");
                                 numberOfErrors++;
                             }
-                            lineCount++;
+                            catch (FormatException)
+                            {
+                                Debug.LogError($"{SourceLocation()} Value {entry} does not represent a number in a valid format.\n");
+                                numberOfErrors++;
+                            }
+                            catch (OverflowException)
+                            {
+                                Debug.LogError($"{SourceLocation()} Value {entry} represents a number less than minimum or greater than maximum.\n");
+                                numberOfErrors++;
+                            }
                         }
                     }
                     else
                     {
-                        string errorMessage = $"Not enough columns in file {filename}.";
-                        Debug.LogError(errorMessage + "\n");
-                        throw new IOException(errorMessage);
+                        Debug.LogWarning($"{SourceLocation()} Unknown node id '{id}'.\n");
+                        numberOfErrors++;
                     }
                 }
             }
-            catch (Exception e)
+            else
             {
-                Debug.LogError($"Exception {e.Message} while loading data from CSV file {filename}.\n");
-                throw;
+                string errorMessage = "There is no header.";
+                Debug.LogError(errorMessage + "\n");
+                throw new IOException(errorMessage);
+
             }
+
             return numberOfErrors;
+
+            string SourceLocation()
+            {
+                return $"{filename}:{lineCount}: ";
+            }
         }
     }
 }
