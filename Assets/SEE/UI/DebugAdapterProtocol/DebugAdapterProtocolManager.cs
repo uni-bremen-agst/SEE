@@ -1,13 +1,14 @@
 using Michsky.UI.ModernUIPack;
 using SEE.Controls;
+using SEE.Game;
+using SEE.Game.City;
 using SEE.GO;
 using SEE.UI.DebugAdapterProtocol.DebugAdapter;
 using SEE.UI.PropertyDialog;
-using SEE.UI.Tooltip;
 using SEE.Utils;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace SEE.UI.DebugAdapterProtocol
 {
@@ -29,6 +30,16 @@ namespace SEE.UI.DebugAdapterProtocol
 
         public GameObject LaunchConfigButton;
 
+        IEnumerable<AbstractSEECity> cities;
+        AbstractSEECity city;
+
+        protected override void Start()
+        {
+            base.Start();
+            cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity).Select(go => go.MustGetComponent<AbstractSEECity>()).OrderBy(c => c.name);
+            city = cities.First();
+        }
+
         protected override void StartDesktop() {
             tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
 
@@ -39,26 +50,17 @@ namespace SEE.UI.DebugAdapterProtocol
             PointerHelper pointerHelper;
             if (RunButton.TryGetComponent<PointerHelper>(out pointerHelper))
             {
-                pointerHelper.EnterEvent.AddListener(_ =>
-                {
-                    tooltip.Show("Run");
-                });
+                pointerHelper.EnterEvent.AddListener(_ => tooltip.Show("Run"));
                 pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
             }
             if (DebugAdapterConfigButton.TryGetComponent<PointerHelper>(out pointerHelper))
             {
-                pointerHelper.EnterEvent.AddListener(_ =>
-                {
-                    tooltip.Show("Debug Adapter Configuration");
-                });
+                pointerHelper.EnterEvent.AddListener(_ => tooltip.Show("Debug Adapter Configuration"));
                 pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
             }
             if (LaunchConfigButton.TryGetComponent<PointerHelper>(out pointerHelper))
             {
-                pointerHelper.EnterEvent.AddListener(_ =>
-                {
-                    tooltip.Show("Launch Request Configuration");
-                });
+                pointerHelper.EnterEvent.AddListener(_ => tooltip.Show("Launch Request Configuration"));
                 pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
             }
         }
@@ -69,6 +71,7 @@ namespace SEE.UI.DebugAdapterProtocol
             {
                 session = Canvas.AddComponent<DebugAdapterProtocolSession>();
                 session.Adapter = adapter;
+                session.City = city;
             }
         }
 
@@ -105,15 +108,20 @@ namespace SEE.UI.DebugAdapterProtocol
             argumentsProperty.Description = "The arguments of the debug adapter.";
             group.AddProperty(argumentsProperty);
 
-            UpdateUIValues();
+            SelectionProperty cityProperty = go.AddComponent<SelectionProperty>();
+            cityProperty.AddOptions(cities.Select(c => c.name));
+            cityProperty.Value = city.name;
+            cityProperty.Description = "City used where current execution position is highlighted.";
+            group.AddProperty(cityProperty);
 
+            OnAdapterChanged();
             debugAdapterProperty.OnComponentInitialized += () =>
             {
                 debugAdapterProperty.horizontalSelector.selectorEvent.AddListener(_ =>
                 {
-                    UpdateAdapterValues();
+                    UpdateValues();
                     adapter = adapters[debugAdapterProperty.horizontalSelector.index];
-                    UpdateUIValues();
+                    OnAdapterChanged();
                 });
             };
 
@@ -122,7 +130,7 @@ namespace SEE.UI.DebugAdapterProtocol
             dialog.Title = "Debug Adapter";
             dialog.Description = "Enter the debug adapter configuration.";
             dialog.AddGroup(group);
-            dialog.OnConfirm.AddListener(UpdateAdapterValues);
+            dialog.OnConfirm.AddListener(UpdateValues);
 
             // open dialog
             SEEInput.KeyboardShortcutsEnabled = false;
@@ -135,17 +143,18 @@ namespace SEE.UI.DebugAdapterProtocol
                 SEEInput.KeyboardShortcutsEnabled = true;
                 Destroyer.Destroy(go);
             }
-            void UpdateUIValues()
+            void OnAdapterChanged()
             {
                 workingDirectoryProperty.Value = adapter.AdapterWorkingDirectory;
                 fileNameProperty.Value = adapter.AdapterFileName;
                 argumentsProperty.Value = adapter.AdapterArguments;
             }
-            void UpdateAdapterValues()
+            void UpdateValues()
             {
                 adapter.AdapterWorkingDirectory = workingDirectoryProperty.Value ;
                 adapter.AdapterFileName = fileNameProperty.Value ;
                 adapter.AdapterArguments  = argumentsProperty.Value ;
+                city = cities.First(c => c.name == cityProperty.Value);
             }
         }
 
@@ -154,7 +163,7 @@ namespace SEE.UI.DebugAdapterProtocol
             GameObject go = new GameObject("Launch Request");
 
             // create property group
-            PropertyGroup group = go.gameObject.AddComponent<PropertyGroup>();
+            PropertyGroup group = go.AddComponent<PropertyGroup>();
             group.Name = "Launch Request Group";
             group.Compact = true;
             adapter.SetupLaunchConfig(go, group);
@@ -173,12 +182,12 @@ namespace SEE.UI.DebugAdapterProtocol
             dialog.OnConfirm.AddListener(OnClose);
             dialog.DialogShouldBeShown = true;
 
+
             void OnClose()
             {
                 Destroyer.Destroy(go);
                 SEEInput.KeyboardShortcutsEnabled = true;
             }
-
         }
     }
 }

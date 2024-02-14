@@ -133,7 +133,7 @@ namespace SEE.UI.FilePicker
                 FileBrowser.ShowLoadDialog(HandleFileBrowserSuccess,
                                            () => { },
                                            allowMultiSelection: false,
-                                           pickMode: FileBrowser.PickMode.Files,
+                                           pickMode: FileBrowser.PickMode.FilesAndFolders,
                                            title: "Pick a file/folder",
                                            initialPath: DataPathInstance.RootPath);
 

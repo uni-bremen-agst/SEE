@@ -123,11 +123,15 @@ namespace SEE.Game.Operator
         /// proportional to the absolute value of <paramref name="duration"/>.
         /// </param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> Highlight(float duration)
+        public IOperationCallback<Action> Highlight(float duration, bool showNotification = true)
         {
-            ShowNotification.Info($"Highlighting '{name}'",
-                                  $"The selected element will be blinking and marked by a spear for {duration} seconds.",
-                                  log: false);
+            if (showNotification)
+            {
+                ShowNotification.Info($"Highlighting '{name}'",
+                      $"The selected element will be blinking and marked by a spear for {duration} seconds.",
+                      log: false);
+            }
+
             // Display marker above the element
             // FIXME: marker is not displayed above edge.
             MarkerFactory marker = new(markerWidth: 0.01f, markerHeight: 1f, Color.red, default, default);

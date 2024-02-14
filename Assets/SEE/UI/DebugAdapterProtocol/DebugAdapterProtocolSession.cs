@@ -2,6 +2,10 @@ using Michsky.UI.ModernUIPack;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using SEE.Controls;
+using SEE.DataModel.DG;
+using SEE.DataModel.DG.SourceRange;
+using SEE.Game;
+using SEE.Game.City;
 using SEE.GO;
 using SEE.UI.Window;
 using SEE.UI.Window.CodeWindow;
@@ -9,14 +13,12 @@ using SEE.UI.Window.ConsoleWindow;
 using SEE.UI.Window.VariablesWindow;
 using SEE.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
 using Encoding = System.Text.Encoding;
 using StackFrame = Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages.StackFrame;
@@ -26,9 +28,20 @@ namespace SEE.UI.DebugAdapterProtocol
     public class DebugAdapterProtocolSession : PlatformDependentComponent
     {
         /// <summary>
+        /// Duration of highlighting the code position in the city.
+        /// </summary>
+        private const float highlightDuration = 5f;
+
+        /// <summary>
         /// The debug adapter.
         /// </summary>
         public DebugAdapter.DebugAdapter Adapter;
+
+        /// <summary>
+        /// Used for highlighing code position.
+        /// <see cref="HighlightInCity(string, int)"/>
+        /// </summary>
+        public AbstractSEECity City;
 
         /// <summary>
         /// The prefab for the debug controls.
@@ -91,6 +104,11 @@ namespace SEE.UI.DebugAdapterProtocol
         private bool isRunning;
 
         /// <summary>
+        /// The source range index to find graph element corresponding to code position.
+        /// </summary>
+        private SourceRangeIndex sourceRangeIndex;
+
+        /// <summary>
         /// Whether the debug adapter is currently executing the program.
         /// </summary>
         private bool IsRunning
@@ -141,6 +159,10 @@ namespace SEE.UI.DebugAdapterProtocol
             SetupControls();
             CodeWindow.OnWordHoverBegin += OnWordHoverBegin;
             CodeWindow.OnWordHoverEnd += OnWordHoverEnd;
+            if (City && City.LoadedGraph != null)
+            {
+                sourceRangeIndex = new SourceRangeIndex(City.LoadedGraph);
+            }
 
             if (Adapter == null)
             {
@@ -519,7 +541,6 @@ namespace SEE.UI.DebugAdapterProtocol
                 tooltip.Show(result.Result, 0.25f);
             } catch (ProtocolException e)
             {
-                tooltip.Show("?", 0f);
             }
 
         }
@@ -926,6 +947,7 @@ namespace SEE.UI.DebugAdapterProtocol
         #region Utilities
         /// <summary>
         /// Updates the code position.
+        /// Marks it in the code window and highlights it in the city.
         /// Must be executed on the main thread.
         /// </summary>
         private void UpdateCodePosition()
@@ -944,9 +966,10 @@ namespace SEE.UI.DebugAdapterProtocol
 
             string path = stackFrame.Source.Path;
             string title = Path.GetFileName(path);
+            int line = stackFrame.Line;
 
             WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
-            CodeWindow codeWindow = manager.Windows.OfType<CodeWindow>().FirstOrDefault(window => IsPathEqual(window.FilePath, path));
+            CodeWindow codeWindow = manager.Windows.OfType<CodeWindow>().FirstOrDefault(window => Filenames.OnCurrentPlatform(window.FilePath) == Filenames.OnCurrentPlatform(path));
             if (codeWindow == null)
             {
                 codeWindow = Canvas.AddComponent<CodeWindow>();
@@ -955,30 +978,39 @@ namespace SEE.UI.DebugAdapterProtocol
                 manager.AddWindow(codeWindow);
                 codeWindow.OnComponentInitialized += () =>
                 {
-                    codeWindow.MarkLine(stackFrame.Line);
+                    codeWindow.MarkLine(line);
                 };
             }
             else
             {
-                codeWindow.Title = title;
                 codeWindow.EnterFromFile(path);
-                codeWindow.MarkLine(stackFrame.Line);
+                codeWindow.MarkLine(line);
             }
             manager.ActiveWindow = codeWindow;
-
             lastCodeWindow = codeWindow;
+            if (sourceRangeIndex != null)
+            {
+                // TODO: Does SourceRangeIndex always has the slash as a path separator?
+                path = path.Replace("\\", "/");
+                if (path.StartsWith(City.SourceCodeDirectory.AbsolutePath))
+                {
+                    path = path.Substring(City.SourceCodeDirectory.AbsolutePath.Length);
+                    if (path.StartsWith("/"))
+                    {
+                        path = path.Substring(1);
+                    }
+                }
+                Node node;
+                if (sourceRangeIndex.TryGetValue(path, line, out node) || sourceRangeIndex.TryGetValue(path, line - 1, out node))
+                {
+                    node.Operator().Highlight(highlightDuration, false);
+                }
+            }
         }
 
-        /// <summary>
-        /// Compares two paths.
-        /// Ignores the difference of \ and /.
-        /// </summary>
-        /// <param name="path1">The first path.</param>
-        /// <param name="path2">The first path.</param>
-        /// <returns></returns>
-        private static bool IsPathEqual(string path1, string path2)
+        private void TempLog(GraphElement element, string prefix)
         {
-            return path1.Replace("\\", "/") == path2.Replace("\\", "/");
+            Debug.Log($"{prefix}{element.ID} - {element.Type} (Type) - {element.SourceLine}(Line) - {element.SourceLength}(Length)", element.GameObject());
         }
 
         /// <summary>
