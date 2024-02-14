@@ -32,6 +32,10 @@
         /// <summary>
         /// For <see cref="ReflexionGraphProvider"/>.
         /// </summary>
-        Reflexion
+        Reflexion,
+        /// <summary>
+        /// For <see cref="MergeDiffGraphProvider"/>.
+        /// </summary>
+        MergeDiff
     }
 }
