@@ -14,7 +14,7 @@ namespace SEE.GraphProviders
     internal class TestGraphProviders
     {
         [UnityTest]
-        public IEnumerator TestGXLGraphProviderAsync() =>
+        public IEnumerator TestGXLGraphProvider() =>
             UniTask.ToCoroutine(async () =>
             {
                 GraphProvider provider = new GXLGraphProvider()
@@ -30,7 +30,7 @@ namespace SEE.GraphProviders
             });
 
         [UnityTest]
-        public IEnumerator TestCSVJaCoCoGXLGraphProviderAsync() =>
+        public IEnumerator TestCSVJaCoCoGXLGraphProvider() =>
             UniTask.ToCoroutine(async () =>
             {
                 GameObject go = new();
@@ -72,8 +72,55 @@ namespace SEE.GraphProviders
                     Assert.IsTrue(node.TryGetInt("Metric.Developers", out int value));
                     Assert.AreEqual(3, value);
                 }
-
-                //GraphWriter.Save("result.gxl", loaded, "Enclosing");
             });
+
+        [UnityTest]
+        public IEnumerator TestMergeDiffGraphProvider() =>
+                UniTask.ToCoroutine(async () =>
+                {
+                    GameObject go = new();
+                    SEECity city = go.AddComponent<SEECity>();
+
+                    // Newer graph
+                    Graph graph;
+                    {
+                        GraphProvider provider = new GXLGraphProvider()
+                        { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mini-evolution/CodeFacts-5.gxl") };
+                        graph = await provider.ProvideAsync(new Graph(""), city);
+                    }
+
+                    {
+                        // Older graph
+                        GraphProvider provider = new GXLGraphProvider()
+                        { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mini-evolution/CodeFacts-1.gxl") };
+
+                        MergeDiffGraphProvider mergeDiffProvider = new()
+                        {
+                            OldGraph = provider
+                        };
+
+                        Graph diffGraph = await mergeDiffProvider.ProvideAsync(graph, city);
+
+                        Assert.IsNotNull(diffGraph);
+                        Assert.IsTrue(diffGraph.NodeCount > 0);
+                        Assert.IsTrue(diffGraph.EdgeCount > 0);
+
+                        // Just a few checks. The underlying Diff-Merge algorithm is tested in more depth elsewhere.
+                        {
+                            Assert.IsTrue(diffGraph.TryGetNode("p1.c1", out Node node));
+                            Assert.IsTrue(node.HasToggle(ChangeMarkers.IsChanged));
+                        }
+
+                        {
+                            Assert.IsTrue(diffGraph.TryGetNode("p1.c2", out Node node));
+                            Assert.IsTrue(node.HasToggle(ChangeMarkers.IsNew));
+                        }
+
+                        {
+                            Assert.IsTrue(diffGraph.TryGetEdge("Call#p1.c1#p1.c4", out Edge edge));
+                            Assert.IsTrue(edge.HasToggle(ChangeMarkers.IsDeleted));
+                        }
+                    }
+                });
     }
 }
