@@ -70,7 +70,7 @@ namespace SEE.UI.Window.CodeWindow
         /// <summary>
         /// The color for inactive breakpoints.
         /// </summary>
-        private static readonly Color breakpointColorInactive = Color.gray.WithAlpha(0.5f);
+        private static readonly Color breakpointColorInactive = Color.gray.WithAlpha(0.25f);
 
         /// <summary>
         /// The user begins to hover over a word.
