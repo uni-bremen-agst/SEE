@@ -166,7 +166,7 @@ namespace SEE.DataModel.DG.SourceRange
         [SetUp]
         public void SetUp()
         {
-            g = NewGraph();
+            g = NewEmptyGraph();
             c1 = NewNode(g, "c1", type: "Class", directory: "mydir/", filename: "myfile.java", line: 50, length: 20);
 
             c1m1 = Child(g, c1, "c1.m1", type: "Method", directory: "mydir/", filename: "myfile.java", line: 52, length: 6);
@@ -192,7 +192,7 @@ namespace SEE.DataModel.DG.SourceRange
         [Test]
         public void SameRangeTwice()
         {
-            g = NewGraph();
+            g = NewEmptyGraph();
             NewNode(g, "c1", type: "Class", directory: "mydir/", filename: "myfile.java", line: 50, length: 20);
             NewNode(g, "c2", type: "Class", directory: "mydir/", filename: "myfile.java", line: 50, length: 20);
             NewNode(g, "c3", type: "Class", directory: "mydir/", filename: "myfile.java", line: 50, length: 30);
