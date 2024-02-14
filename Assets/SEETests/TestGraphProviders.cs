@@ -18,7 +18,7 @@ namespace SEE.GraphProviders
             UniTask.ToCoroutine(async () =>
             {
                 GraphProvider provider = new GXLGraphProvider()
-                { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl") };
+                { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
 
                 GameObject go = new();
                 SEECity city = go.AddComponent<SEECity>();
@@ -40,7 +40,7 @@ namespace SEE.GraphProviders
 
                 {
                     GraphProvider provider = new GXLGraphProvider()
-                    { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl") };
+                    { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
                     pipeline.Add(provider);
                 }
                 {
