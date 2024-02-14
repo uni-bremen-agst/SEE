@@ -4428,12 +4428,78 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: MarkerAttributes
+      Entry: 7
+      Data: 88|SEE.Game.City.MarkerAttributes, SEE
+    - Name: MarkerHeight
+      Entry: 4
+      Data: 0.2
+    - Name: MarkerWidth
+      Entry: 4
+      Data: 0.01
+    - Name: AdditionBeamColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ChangeBeamColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: DeletionBeamColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: MetricToColor
       Entry: 7
-      Data: 88|SEE.Game.City.ColorMap, SEE
+      Data: 89|SEE.Game.City.ColorMap, SEE
     - Name: map
       Entry: 7
-      Data: 89|SEE.Game.City.ColorRangeMapping, SEE
+      Data: 90|SEE.Game.City.ColorRangeMapping, SEE
     - Name: comparer
       Entry: 9
       Data: 3
@@ -4829,7 +4895,7 @@ MonoBehaviour:
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 90|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 91|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -4859,11 +4925,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 91|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 92|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 92|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 93|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -4879,11 +4945,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 93|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 94|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 92
+      Data: 93
     - Name: 
       Entry: 12
       Data: 0
@@ -4895,11 +4961,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 94|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+      Data: 95|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 92
+      Data: 93
     - Name: 
       Entry: 12
       Data: 0
@@ -4911,11 +4977,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 95|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 96|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 92
+      Data: 93
     - Name: 
       Entry: 12
       Data: 0
@@ -4936,20 +5002,20 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 96|SEE.GraphProviders.PipelineGraphProvider, SEE
+      Data: 97|SEE.GraphProviders.PipelineGraphProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 97|System.Collections.Generic.List`1[[SEE.GraphProviders.GraphProvider,
+      Data: 98|System.Collections.Generic.List`1[[SEE.GraphProviders.GraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 98|SEE.GraphProviders.GXLGraphProvider, SEE
+      Data: 99|SEE.GraphProviders.GXLGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 99|SEE.Utils.Paths.FilePath, SEE
+      Data: 100|SEE.Utils.Paths.FilePath, SEE
     - Name: Root
       Entry: 3
       Data: 1
@@ -6601,12 +6667,78 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: MarkerAttributes
+      Entry: 7
+      Data: 28|SEE.Game.City.MarkerAttributes, SEE
+    - Name: MarkerHeight
+      Entry: 4
+      Data: 0.2
+    - Name: MarkerWidth
+      Entry: 4
+      Data: 0.01
+    - Name: AdditionBeamColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ChangeBeamColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: DeletionBeamColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: MetricToColor
       Entry: 7
-      Data: 28|SEE.Game.City.ColorMap, SEE
+      Data: 29|SEE.Game.City.ColorMap, SEE
     - Name: map
       Entry: 7
-      Data: 29|SEE.Game.City.ColorRangeMapping, SEE
+      Data: 30|SEE.Game.City.ColorRangeMapping, SEE
     - Name: comparer
       Entry: 9
       Data: 3
@@ -6840,7 +6972,7 @@ MonoBehaviour:
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 30|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 31|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -6870,11 +7002,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 31|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 32|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 32|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 33|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -6890,11 +7022,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 33|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 34|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 32
+      Data: 33
     - Name: 
       Entry: 12
       Data: 0
@@ -6906,11 +7038,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 34|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+      Data: 35|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 32
+      Data: 33
     - Name: 
       Entry: 12
       Data: 0
@@ -6922,11 +7054,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 35|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 36|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 32
+      Data: 33
     - Name: 
       Entry: 12
       Data: 0
@@ -7018,11 +7150,6 @@ MonoBehaviour:
     Root: 3
     relativePath: /mini-evolution
     absolutePath: 
-  MarkerHeight: 0.5
-  MarkerWidth: 0.01
-  AdditionBeamColor: {r: 0, g: 1, b: 0, a: 1}
-  ChangeBeamColor: {r: 1, g: 0.9215686, b: 0.01568628, a: 1}
-  DeletionBeamColor: {r: 0, g: 0, b: 0, a: 1}
 --- !u!114 &336951278
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13662,12 +13789,78 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: MarkerAttributes
+      Entry: 7
+      Data: 64|SEE.Game.City.MarkerAttributes, SEE
+    - Name: MarkerHeight
+      Entry: 4
+      Data: 0.2
+    - Name: MarkerWidth
+      Entry: 4
+      Data: 0.01
+    - Name: AdditionBeamColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ChangeBeamColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: DeletionBeamColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: MetricToColor
       Entry: 7
-      Data: 64|SEE.Game.City.ColorMap, SEE
+      Data: 65|SEE.Game.City.ColorMap, SEE
     - Name: map
       Entry: 7
-      Data: 65|SEE.Game.City.ColorRangeMapping, SEE
+      Data: 66|SEE.Game.City.ColorRangeMapping, SEE
     - Name: comparer
       Entry: 9
       Data: 3
@@ -13739,7 +13932,7 @@ MonoBehaviour:
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 66|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 67|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -13769,11 +13962,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 67|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 68|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 68|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 69|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -13789,11 +13982,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 69|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 70|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 68
+      Data: 69
     - Name: 
       Entry: 12
       Data: 0
@@ -13805,11 +13998,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 70|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+      Data: 71|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 68
+      Data: 69
     - Name: 
       Entry: 12
       Data: 0
@@ -13821,11 +14014,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 71|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 72|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 68
+      Data: 69
     - Name: 
       Entry: 12
       Data: 0
@@ -13846,20 +14039,20 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 72|SEE.GraphProviders.PipelineGraphProvider, SEE
+      Data: 73|SEE.GraphProviders.PipelineGraphProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 73|System.Collections.Generic.List`1[[SEE.GraphProviders.GraphProvider,
+      Data: 74|System.Collections.Generic.List`1[[SEE.GraphProviders.GraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 74|SEE.GraphProviders.GXLGraphProvider, SEE
+      Data: 75|SEE.GraphProviders.GXLGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 75|SEE.Utils.Paths.FilePath, SEE
+      Data: 76|SEE.Utils.Paths.FilePath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -13877,10 +14070,10 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 76|SEE.GraphProviders.JaCoCoGraphProvider, SEE
+      Data: 77|SEE.GraphProviders.JaCoCoGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 77|SEE.Utils.Paths.FilePath, SEE
+      Data: 78|SEE.Utils.Paths.FilePath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -17018,12 +17211,78 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: MarkerAttributes
+      Entry: 7
+      Data: 88|SEE.Game.City.MarkerAttributes, SEE
+    - Name: MarkerHeight
+      Entry: 4
+      Data: 0.2
+    - Name: MarkerWidth
+      Entry: 4
+      Data: 0.01
+    - Name: AdditionBeamColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ChangeBeamColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: DeletionBeamColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: MetricToColor
       Entry: 7
-      Data: 88|SEE.Game.City.ColorMap, SEE
+      Data: 89|SEE.Game.City.ColorMap, SEE
     - Name: map
       Entry: 7
-      Data: 89|SEE.Game.City.ColorRangeMapping, SEE
+      Data: 90|SEE.Game.City.ColorRangeMapping, SEE
     - Name: comparer
       Entry: 9
       Data: 3
@@ -17311,7 +17570,7 @@ MonoBehaviour:
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 90|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 91|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -17341,11 +17600,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 91|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 92|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 92|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 93|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -17361,11 +17620,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 93|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 94|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 92
+      Data: 93
     - Name: 
       Entry: 12
       Data: 0
@@ -17377,11 +17636,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 94|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+      Data: 95|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 92
+      Data: 93
     - Name: 
       Entry: 12
       Data: 0
@@ -17393,11 +17652,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 95|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 96|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 92
+      Data: 93
     - Name: 
       Entry: 12
       Data: 0
@@ -17418,20 +17677,20 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 96|SEE.GraphProviders.PipelineGraphProvider, SEE
+      Data: 97|SEE.GraphProviders.PipelineGraphProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 97|System.Collections.Generic.List`1[[SEE.GraphProviders.GraphProvider,
+      Data: 98|System.Collections.Generic.List`1[[SEE.GraphProviders.GraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 98|SEE.GraphProviders.GXLGraphProvider, SEE
+      Data: 99|SEE.GraphProviders.GXLGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 99|SEE.Utils.Paths.FilePath, SEE
+      Data: 100|SEE.Utils.Paths.FilePath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -17449,10 +17708,10 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 100|SEE.GraphProviders.CSVGraphProvider, SEE
+      Data: 101|SEE.GraphProviders.CSVGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 101|SEE.Utils.Paths.FilePath, SEE
+      Data: 102|SEE.Utils.Paths.FilePath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -19532,12 +19791,78 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: MarkerAttributes
+      Entry: 7
+      Data: 28|SEE.Game.City.MarkerAttributes, SEE
+    - Name: MarkerHeight
+      Entry: 4
+      Data: 0.2
+    - Name: MarkerWidth
+      Entry: 4
+      Data: 0.01
+    - Name: AdditionBeamColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ChangeBeamColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: DeletionBeamColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: MetricToColor
       Entry: 7
-      Data: 28|SEE.Game.City.ColorMap, SEE
+      Data: 29|SEE.Game.City.ColorMap, SEE
     - Name: map
       Entry: 7
-      Data: 29|SEE.Game.City.ColorRangeMapping, SEE
+      Data: 30|SEE.Game.City.ColorRangeMapping, SEE
     - Name: comparer
       Entry: 9
       Data: 3
@@ -19663,7 +19988,7 @@ MonoBehaviour:
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 30|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 31|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -19693,11 +20018,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 31|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 32|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 32|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 33|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -19713,11 +20038,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 33|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 34|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 32
+      Data: 33
     - Name: 
       Entry: 12
       Data: 0
@@ -19729,11 +20054,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 34|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+      Data: 35|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 32
+      Data: 33
     - Name: 
       Entry: 12
       Data: 0
@@ -19745,11 +20070,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 35|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 36|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 32
+      Data: 33
     - Name: 
       Entry: 12
       Data: 0
@@ -19770,20 +20095,20 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 36|SEE.GraphProviders.PipelineGraphProvider, SEE
+      Data: 37|SEE.GraphProviders.PipelineGraphProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 37|System.Collections.Generic.List`1[[SEE.GraphProviders.GraphProvider,
+      Data: 38|System.Collections.Generic.List`1[[SEE.GraphProviders.GraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 38|SEE.GraphProviders.ReflexionGraphProvider, SEE
+      Data: 39|SEE.GraphProviders.ReflexionGraphProvider, SEE
     - Name: Architecture
       Entry: 7
-      Data: 39|SEE.Utils.Paths.FilePath, SEE
+      Data: 40|SEE.Utils.Paths.FilePath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -19798,7 +20123,7 @@ MonoBehaviour:
       Data: 
     - Name: Implementation
       Entry: 7
-      Data: 40|SEE.Utils.Paths.FilePath, SEE
+      Data: 41|SEE.Utils.Paths.FilePath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -19813,7 +20138,7 @@ MonoBehaviour:
       Data: 
     - Name: Mapping
       Entry: 7
-      Data: 41|SEE.Utils.Paths.FilePath, SEE
+      Data: 42|SEE.Utils.Paths.FilePath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -38336,7 +38661,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1968741441}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a16c24e19989c674099e0cd52e23e3b2, type: 3}
+  m_Script: {fileID: 11500000, guid: 97367dca91c085946a770b4d6321a428, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Browser: {fileID: 1581808193}
