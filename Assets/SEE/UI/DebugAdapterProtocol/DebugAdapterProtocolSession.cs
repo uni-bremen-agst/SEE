@@ -30,7 +30,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Duration of highlighting the code position in the city.
         /// </summary>
-        private const float highlightDuration = 5f;
+        private const float highlightDuration = 3f;
 
         /// <summary>
         /// The debug adapter.

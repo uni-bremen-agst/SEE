@@ -55,12 +55,12 @@ namespace SEE.UI.DebugAdapterProtocol
             }
             if (DebugAdapterConfigButton.TryGetComponent<PointerHelper>(out pointerHelper))
             {
-                pointerHelper.EnterEvent.AddListener(_ => tooltip.Show("Debug Adapter Configuration"));
+                pointerHelper.EnterEvent.AddListener(_ => tooltip.Show("Debug Adapter"));
                 pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
             }
             if (LaunchConfigButton.TryGetComponent<PointerHelper>(out pointerHelper))
             {
-                pointerHelper.EnterEvent.AddListener(_ => tooltip.Show("Launch Request Configuration"));
+                pointerHelper.EnterEvent.AddListener(_ => tooltip.Show("Launch Configuration"));
                 pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
             }
         }
@@ -171,7 +171,7 @@ namespace SEE.UI.DebugAdapterProtocol
             // create dialog
             PropertyDialog.PropertyDialog dialog = go.AddComponent<PropertyDialog.PropertyDialog>();
 
-            dialog.Title = "Launch Request Configuration";
+            dialog.Title = "Launch Configuration";
             dialog.Description = "Enter the launch request configuration.";
             dialog.AddGroup(group);
             dialog.OnConfirm.AddListener(adapter.SaveLaunchConfig);

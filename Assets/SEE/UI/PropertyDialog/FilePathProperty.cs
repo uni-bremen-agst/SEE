@@ -164,8 +164,14 @@ namespace SEE.UI.PropertyDialog
                         FileBrowser.SetDefaultFilter(Filters[0].extensions.First());
                     }
                     FileBrowser.ShowLoadDialog(
-                        paths => Value = paths[0], 
-                        () => { }, 
+                        paths =>
+                        {
+                            Value = paths[0];
+                            FileBrowser.SetFilters(true, new string[] {});
+                        }, 
+                        () => {
+                            FileBrowser.SetFilters(true, new string[] {});
+                        }, 
                         PickMode, 
                         AllowMultiSelection,
                         FileBrowserHelpers.GetDirectoryName(Value) != "" ? FileBrowserHelpers.GetDirectoryName(Value) : FallbackDirectory, 

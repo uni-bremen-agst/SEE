@@ -27,7 +27,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         private string launchPreLaunchTask = "build";
         private string launchProgram = "HelloWorld.dll";
         private List<string> launchArgs = new();
-        private string launchCwd = Path.Combine("C:\\", "path", "to", "dll");
+        private string launchCwd = Path.Combine("C:\\", "path", "containing", "dll");
         private Dictionary<string, string> launchEnv = new();
         private string launchConsole = null;
         private bool launchStopAtEntry = true;
