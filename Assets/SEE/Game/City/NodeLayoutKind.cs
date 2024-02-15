@@ -12,6 +12,7 @@
         CirclePacking,
         Manhattan,
         CompoundSpringEmbedder,
+        IncrementalTreeMap,
         FromFile
     }
 }

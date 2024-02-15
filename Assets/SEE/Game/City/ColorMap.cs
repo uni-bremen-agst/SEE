@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using SEE.Utils;
+using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -11,14 +11,16 @@ namespace SEE.Game.City
     /// Specifies which color is used to render a named property.
     /// </summary>
     [Serializable]
-    public class ColorMap : ConfigIO.PersistentConfigItem, IEnumerable<KeyValuePair<string, ColorRange>>
+    public class ColorMap : ConfigIO.IPersistentConfigItem, IEnumerable<KeyValuePair<string, ColorRange>>
     {
         /// <summary>
         /// Mapping of property name onto color.
         /// </summary>
+        /// <remarks>This field is used in <see cref="RuntimeTabMenu"/>. If you rename it here, you need
+        /// to adjust it there, too.</remarks>
         [SerializeField]
         [DictionaryDrawerSettings(KeyLabel = "Name", ValueLabel = "Color")]
-        private ColorRangeMapping map = new ColorRangeMapping();
+        private ColorRangeMapping map = new();
 
         /// <summary>
         /// Operator [].
@@ -93,8 +95,8 @@ namespace SEE.Game.City
             foreach (var item in map)
             {
                 writer.BeginGroup();
-                writer.Save(item.Key, NameLabel);
-                item.Value.Save(writer, ColorLabel);
+                writer.Save(item.Key, nameLabel);
+                item.Value.Save(writer, colorLabel);
                 writer.EndGroup();
             }
             writer.EndList();
@@ -117,16 +119,16 @@ namespace SEE.Game.City
                     Dictionary<string, object> dict = item as Dictionary<string, object>;
                     // name
                     string name = null;
-                    if (!ConfigIO.Restore(dict, NameLabel, ref name))
+                    if (!ConfigIO.Restore(dict, nameLabel, ref name))
                     {
-                        Debug.LogError($"Entry of {typeof(ColorMap)} has no value for {NameLabel}\n");
+                        Debug.LogError($"Entry of {typeof(ColorMap)} has no value for {nameLabel}\n");
                         continue;
                     }
                     // color
                     ColorRange color = new ColorRange();
-                    if (!color.Restore(dict, ColorLabel))
+                    if (!color.Restore(dict, colorLabel))
                     {
-                        Debug.LogError($"Entry of {typeof(ColorMap)} has no value for {ColorLabel}\n");
+                        Debug.LogError($"Entry of {typeof(ColorMap)} has no value for {colorLabel}\n");
                         continue;
                     }
                     map[name] = color;
@@ -143,11 +145,11 @@ namespace SEE.Game.City
         /// <summary>
         /// The label of the name of the property in the configuration file.
         /// </summary>
-        private const string NameLabel = "name";
+        private const string nameLabel = "name";
 
         /// <summary>
         /// The label of the color of the property in the configuration file.
         /// </summary>
-        private const string ColorLabel = "color";
+        private const string colorLabel = "color";
     }
 }

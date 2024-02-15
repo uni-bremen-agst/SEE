@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using SEE.Game.HolisticMetrics;
-using SEE.Game.UI.HolisticMetrics;
-using SEE.Game.UI.Notification;
-using SEE.Game.UI.PropertyDialog.HolisticMetrics;
+using SEE.UI.HolisticMetrics;
+using SEE.UI.Notification;
+using SEE.UI.PropertyDialog.HolisticMetrics;
 using SEE.Utils;
+using SEE.Utils.History;
 using UnityEngine;
 
 namespace SEE.Controls.Actions.HolisticMetrics
@@ -63,12 +64,12 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// <summary>
             /// The name of the file in which the board's config has been written.
             /// </summary>
-            internal readonly string filename;
+            internal readonly string Filename;
 
             /// <summary>
             /// The WidgetsManager of the board of which the configuration was saved here.
             /// </summary>
-            internal readonly WidgetsManager widgetsManager;
+            internal readonly WidgetsManager WidgetsManager;
 
             /// <summary>
             /// The constructor of this struct.
@@ -77,8 +78,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// <param name="widgetsManager">The WidgetsManager to save into this file</param>
             internal Memento(string filename, WidgetsManager widgetsManager)
             {
-                this.filename = filename;
-                this.widgetsManager = widgetsManager;
+                this.Filename = filename;
+                this.WidgetsManager = widgetsManager;
             }
         }
 
@@ -121,8 +122,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
                             out WidgetsManager widgetsManager))
                     {
                         memento = new Memento(filename, widgetsManager);
-                        ConfigManager.SaveBoard(memento.widgetsManager, memento.filename);
-                        currentState = ReversibleAction.Progress.Completed;
+                        ConfigManager.SaveBoard(memento.WidgetsManager, memento.Filename);
+                        CurrentState = IReversibleAction.Progress.Completed;
                         progress = ProgressState.Finished;
                         return true;
                     }
@@ -154,7 +155,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         public override void Undo()
         {
             base.Undo();
-            ConfigManager.DeleteBoard(memento.filename);
+            ConfigManager.DeleteBoard(memento.Filename);
         }
 
         /// <summary>
@@ -164,14 +165,14 @@ namespace SEE.Controls.Actions.HolisticMetrics
         public override void Redo()
         {
             base.Redo();
-            ConfigManager.SaveBoard(memento.widgetsManager, memento.filename);
+            ConfigManager.SaveBoard(memento.WidgetsManager, memento.Filename);
         }
 
         /// <summary>
         /// Returns a new instance of <see cref="SaveBoardAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new SaveBoardAction();
         }
@@ -180,7 +181,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// Returns a new instance of <see cref="SaveBoardAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }
@@ -200,7 +201,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <returns>A HashSet with one entry which is the name of the file into which the config was written.</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new HashSet<string> { memento.filename };
+            return new HashSet<string> { memento.Filename };
         }
     }
 }

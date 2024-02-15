@@ -13,12 +13,12 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Stored LipShapeTables
         /// </summary>
-        [SerializeField] private List<LipShapeTable_v2> LipShapeTables;
-        
+        [SerializeField] private List<LipShapeTable_v2> lipShapeTables;
+
         /// <summary>
         /// Lip Weightings
         /// </summary>
-        private Dictionary<LipShape_v2, float> LipWeightings;
+        private Dictionary<LipShape_v2, float> lipWeightings;
 
         /// <summary>
         /// In order to use our fake blendshapes from <see cref="AvatarBlendshapeExpressions"/>, we need to create a
@@ -34,37 +34,37 @@ namespace SEE.Game.Avatars
             }
 
             // Create new LipShapeTable
-            LipShapeTables = new List<LipShapeTable_v2>(new LipShapeTable_v2[1]);
+            lipShapeTables = new List<LipShapeTable_v2>(new LipShapeTable_v2[1]);
 
             // Add empty LipShapeTable to list of LipShapeTables.
-            LipShapeTables[0] = new LipShapeTable_v2();
+            lipShapeTables[0] = new LipShapeTable_v2();
 
             SkinnedMeshRenderer skinnedMeshRenderer = gameObject.GetComponent<SkinnedMeshRenderer>();
 
             if (skinnedMeshRenderer != null && skinnedMeshRenderer.sharedMesh.blendShapeCount > 0)
             {
-                LipShapeTables[0].skinnedMeshRenderer = skinnedMeshRenderer;
+                lipShapeTables[0].skinnedMeshRenderer = skinnedMeshRenderer;
                 int lipShapeTableSize = skinnedMeshRenderer.sharedMesh.blendShapeCount;
 
-                LipShapeTables[0].lipShapes = new LipShape_v2[lipShapeTableSize];
+                lipShapeTables[0].lipShapes = new LipShape_v2[lipShapeTableSize];
 
                 for (int i = 0; i < skinnedMeshRenderer.sharedMesh.blendShapeCount; ++i)
                 {
                     string elementName = skinnedMeshRenderer.sharedMesh.GetBlendShapeName(i);
 
-                    LipShapeTables[0].lipShapes[i] = LipShape_v2.None;
+                    lipShapeTables[0].lipShapes[i] = LipShape_v2.None;
                     foreach (LipShape_v2 lipShape in (LipShape_v2[])Enum.GetValues(typeof(LipShape_v2)))
                     {
                         // Match blendshape name with lip shape name.
                         if (elementName == lipShape.ToString())
                         {
                             // Add correct lip shape to list of lip shapes.
-                            LipShapeTables[0].lipShapes[i] = lipShape;
+                            lipShapeTables[0].lipShapes[i] = lipShape;
                         }
                     }
                 }
             }
-            SetLipShapeTables(LipShapeTables);
+            SetLipShapeTables(lipShapeTables);
         }
 
         /// <summary>
@@ -77,9 +77,9 @@ namespace SEE.Game.Avatars
             {
                 return;
             }
-            
-            SRanipal_Lip_v2.GetLipWeightings(out LipWeightings);
-            UpdateLipShapes(LipWeightings);
+
+            SRanipal_Lip_v2.GetLipWeightings(out lipWeightings);
+            UpdateLipShapes(lipWeightings);
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace SEE.Game.Avatars
             }
             if (valid)
             {
-                LipShapeTables = lipShapeTables;
+                this.lipShapeTables = lipShapeTables;
             }
         }
 
@@ -124,16 +124,16 @@ namespace SEE.Game.Avatars
         /// </summary>
         public void UpdateLipShapes(Dictionary<LipShape_v2, float> lipWeightings)
         {
-            foreach (LipShapeTable_v2 table in LipShapeTables)
+            foreach (LipShapeTable_v2 table in lipShapeTables)
             {
                 RenderModelLipShape(table, lipWeightings);
             }
         }
 
         /// <summary>
-        /// Sets Blendshape Weights. 
+        /// Sets Blendshape Weights.
         /// </summary>
-        private void RenderModelLipShape(LipShapeTable_v2 lipShapeTable, Dictionary<LipShape_v2, float> weighting)
+        private static void RenderModelLipShape(LipShapeTable_v2 lipShapeTable, Dictionary<LipShape_v2, float> weighting)
         {
             for (int i = 0; i < lipShapeTable.lipShapes.Length; i++)
             {

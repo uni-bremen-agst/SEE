@@ -1,11 +1,12 @@
 ﻿using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
-using SEE.Utils;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.UI.PropertyDialog;
 using UnityEngine;
 using UnityEngine.Assertions;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions
 {
@@ -22,7 +23,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The list of currently selected objects.
         /// </summary>
-        private readonly HashSet<GameObject> selectedObjects = new HashSet<GameObject>();
+        private readonly HashSet<GameObject> selectedObjects = new();
 
         /// <summary>
         /// The list of currently hidden objects.
@@ -58,7 +59,7 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="HideAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new HideAction();
         }
@@ -67,7 +68,7 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="HideAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }
@@ -89,17 +90,19 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void OpenDialog()
         {
-            Game.UI.PropertyDialog.HidePropertyDialog dialog = new Game.UI.PropertyDialog.HidePropertyDialog();
+            HidePropertyDialog dialog = new();
 
             dialog.OnConfirm.AddListener(OKButtonPressed);
             dialog.OnCancel.AddListener(Cancelled);
 
             dialog.Open();
+            return;
 
             void OKButtonPressed()
             {
-                mode = dialog.mode;
+                mode = dialog.Mode;
             }
+
             void Cancelled()
             {
                 Stop();
@@ -119,7 +122,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// See <see cref="ReversibleAction.Update"/>.
+        /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
@@ -130,69 +133,69 @@ namespace SEE.Controls.Actions
                 case HideModeSelector.HideAll:
                     if (HideAllEdges())
                     {
-                        currentState = ReversibleAction.Progress.Completed;
+                        CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideSelected:
                     if (HideSelected())
                     {
-                        currentState = ReversibleAction.Progress.Completed;
+                        CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideUnselected:
                     if (HideUnselected())
                     {
-                        currentState = ReversibleAction.Progress.Completed;
+                        CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideOutgoing:
                     if (HideOutgoingEdges())
                     {
-                        currentState = ReversibleAction.Progress.Completed;
+                        CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideIncoming:
                     if (HideIncomingEdges())
                     {
-                        currentState = ReversibleAction.Progress.Completed;
+                        CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideAllEdgesOfSelected:
                     if (HideAllConnectedEdges())
                     {
-                        currentState = ReversibleAction.Progress.Completed;
+                        CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideForwardTransitiveClosure:
                     if (HideForwardTransitive())
                     {
-                        currentState = ReversibleAction.Progress.Completed;
+                        CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideBackwardTransitiveClosure:
                     if (HideBackwardTransitive())
                     {
-                        currentState = ReversibleAction.Progress.Completed;
+                        CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideAllTransitiveClosure:
                     if (HideAllTransitive())
                     {
-                        currentState = ReversibleAction.Progress.Completed;
+                        CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HighlightEdges:
                     HighlightEdges();
-                    currentState = ReversibleAction.Progress.Completed;
+                    CurrentState = IReversibleAction.Progress.Completed;
                     return true;
                 default: return false;
             }
@@ -364,7 +367,8 @@ namespace SEE.Controls.Actions
                 if (childGameObject.CompareTag(Tags.Edge))
                 {
                     HideEdge(childGameObject);
-                } else if (childGameObject.CompareTag(Tags.Node))
+                }
+                else if (childGameObject.CompareTag(Tags.Node))
                 {
                     HideNodeIncludingConnectedEdges(childGameObject);
                 }
@@ -491,8 +495,8 @@ namespace SEE.Controls.Actions
         {
             if (selectedObject != null && selectedObject.TryGetComponent(out NodeRef nodeRef))
             {
-                HashSet<string> edgeIDs = new HashSet<string>();
-                HashSet<string> nodeIDs = new HashSet<string>();
+                HashSet<string> edgeIDs = new();
+                HashSet<string> nodeIDs = new();
 
                 foreach (Edge edge in nodeRef.Value.Outgoings)
                 {
@@ -510,7 +514,6 @@ namespace SEE.Controls.Actions
                 }
                 foreach (GameObject node in GameObject.FindGameObjectsWithTag(Tags.Node))
                 {
-
                     if (node.activeInHierarchy && nodeIDs.Contains(node.name))
                     {
                         HideNodeIncludingConnectedEdges(node);
@@ -529,8 +532,8 @@ namespace SEE.Controls.Actions
         {
             if (selectedObject != null && selectedObject.TryGetComponent(out NodeRef nodeRef))
             {
-                HashSet<string> edgeIDs = new HashSet<string>();
-                HashSet<string> nodeIDs = new HashSet<string>();
+                HashSet<string> edgeIDs = new();
+                HashSet<string> nodeIDs = new();
 
                 foreach (Edge edge in nodeRef.Value.Incomings)
                 {
@@ -753,7 +756,7 @@ namespace SEE.Controls.Actions
         /// <returns>IDs of all incoming and outgoing edges</returns>
         private static HashSet<string> GetEdgeIds(NodeRef nodeRef)
         {
-            HashSet<string> edgeIDs = new HashSet<string>();
+            HashSet<string> edgeIDs = new();
             foreach (Edge edge in nodeRef.Value.Outgoings)
             {
                 edgeIDs.Add(edge.ID);
@@ -790,7 +793,7 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Returns the set of IDs of all game objects hidden by this action.
-        /// <see cref="ReversibleAction.GetChangedObjects"/>.
+        /// <see cref="IReversibleAction.GetChangedObjects"/>.
         /// </summary>
         /// <returns>The set of the IDs of all game objects hidden by this action</returns>
         public override HashSet<string> GetChangedObjects()

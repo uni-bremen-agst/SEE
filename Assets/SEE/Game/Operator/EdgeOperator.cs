@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using SEE.Game.City;
 using SEE.GO;
@@ -154,22 +155,26 @@ namespace SEE.Game.Operator
         {
             // Assigned so that the expensive getter isn't called everytime.
             GameObject go = gameObject;
-            go.MustGetComponent(out spline);
+            spline = go.MustGetComponent<SEESpline>();
             base.OnEnable();
+
+            morphism = new MorphismOperation(AnimateToMorphismAction, spline.Spline, null);
+            construction = new TweenOperation<bool>(ConstructAction, spline.SubsplineEndT >= 1);
+            return;
 
             SplineMorphism AnimateToMorphismAction((BSpline targetSpline, GameObject temporaryGameObject) s, float d)
             {
-                SplineMorphism Animator = go.AddOrGetComponent<SplineMorphism>();
+                SplineMorphism animator = go.AddOrGetComponent<SplineMorphism>();
 
-                if (Animator.IsActive())
+                if (animator.IsActive())
                 {
                     // A tween already exists, we simply need to change its target.
-                    Animator.ChangeTarget(s.targetSpline);
+                    animator.ChangeTarget(s.targetSpline);
                 }
                 else
                 {
-                    go.MustGetComponent(out SEESpline sourceSpline);
-                    Animator.CreateTween(sourceSpline.Spline, s.targetSpline, d)
+                    SEESpline sourceSpline = go.MustGetComponent<SEESpline>();
+                    animator.CreateTween(sourceSpline.Spline, s.targetSpline, d)
                             .OnComplete(() =>
                             {
                                 if (s.temporaryGameObject != null)
@@ -179,10 +184,8 @@ namespace SEE.Game.Operator
                             }).Play();
                 }
 
-                return Animator;
+                return animator;
             }
-
-            morphism = new MorphismOperation(AnimateToMorphismAction, spline.Spline, null);
 
             Tween[] ConstructAction(bool extending, float duration)
             {
@@ -194,8 +197,6 @@ namespace SEE.Game.Operator
                                duration).SetEase(Ease.InOutExpo).Play()
                 };
             }
-
-            construction = new TweenOperation<bool>(ConstructAction, spline.SubsplineEndT >= 1);
         }
 
         protected override TweenOperation<(Color start, Color end)> InitializeColorOperation()
@@ -214,6 +215,31 @@ namespace SEE.Game.Operator
             return new TweenOperation<(Color start, Color end)>(AnimateToColorAction, spline.GradientColors);
         }
 
+        protected override Tween[] BlinkAction(int count, float duration)
+        {
+            // If we're interrupting another blinking, we need to make sure the color still has the correct value.
+            spline.GradientColors = Color.TargetValue;
+
+            if (count != 0)
+            {
+                Color newStart = Color.TargetValue.start.Invert();
+                Color newEnd = Color.TargetValue.end.Invert();
+                float loopDuration = duration / (2 * Mathf.Abs(count));
+
+                Tween startTween = DOTween.To(() => spline.GradientColors.start,
+                                              c => spline.GradientColors = (c, spline.GradientColors.end),
+                                              newStart, loopDuration);
+                Tween endTween = DOTween.To(() => spline.GradientColors.end,
+                                            c => spline.GradientColors = (spline.GradientColors.start, c),
+                                            newEnd, loopDuration);
+                return new[] { startTween, endTween }.Select(x => x.SetEase(Ease.Linear).SetLoops(2 * count, LoopType.Yoyo).Play()).ToArray();
+            }
+            else
+            {
+                return new Tween[] { };
+            }
+        }
+
         protected override (Color start, Color end) ModifyColor((Color start, Color end) color, Func<Color, Color> modifier)
         {
             return (modifier(color.start), modifier(color.end));
@@ -225,6 +251,8 @@ namespace SEE.Game.Operator
             base.OnDisable();
             morphism.KillAnimator();
             morphism = null;
+            construction.KillAnimator();
+            construction = null;
         }
     }
 }

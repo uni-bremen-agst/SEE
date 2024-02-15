@@ -1,13 +1,14 @@
 ﻿using SEE.Controls;
 using SEE.GO;
-using SEE.Utils;
+using SEE.Utils.Paths;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using Cysharp.Threading.Tasks;
 using OpenAI;
 using OpenAI.Chat;
-using SEE.Game.UI.Notification;
+using SEE.UI;
+using SEE.UI.Notification;
 using UnityEngine;
 using UnityEngine.Windows.Speech;
 
@@ -64,14 +65,14 @@ namespace SEE.Game.Avatars
         /// </summary>
         private readonly IList<Message> chatGptHistory = new List<Message>
         {
-            new(Role.System, string.Format(PROMPT, DateTime.Now.Year))
+            new(Role.System, string.Format(prompt, DateTime.Now.Year))
         };
 
         /// <summary>
         /// The prompt to use for ChatGPT.
         /// Note that the string should be formatted with the current year.
         /// </summary>
-        private const string PROMPT = "You are the digital assistant for SEE, which stands for "
+        private const string prompt = "You are the digital assistant for SEE, which stands for "
             + "Software Engineering Experience. You are also named SEE yourself. "
             + "You are helpful, concise and friendly. You will not hallucinate features that don't exist.\n"
             + "SEE let's you visualize your software as code cities in 3D, using the Unity game engine. "
@@ -219,17 +220,19 @@ namespace SEE.Game.Avatars
             if (confidence != ConfidenceLevel.Rejected)
             {
                 chatGptHistory.Add(new Message(Role.User, text));
-                Notification notification = ShowNotification.Info("Thinking...",
-                                                                  "Please wait while I think about what you said...");
-                SendChatMessage(new ChatRequest(chatGptHistory, "gpt-3.5-turbo"), notification).Forget();
+                SendChatMessage(new ChatRequest(chatGptHistory, "gpt-3.5-turbo")).Forget();
             }
+            return;
 
-            async UniTaskVoid SendChatMessage(ChatRequest request, Notification notification)
+            async UniTaskVoid SendChatMessage(ChatRequest request)
             {
-                ChatResponse result = await openAiClient.ChatEndpoint.GetCompletionAsync(request);
-                notification.Close();
-                string message = result.FirstChoice.Message.Content;
-                chatGptHistory.Add(new Message(Role.Assistant, message));
+                string message;
+                using (LoadingSpinner.Show("ChatGPT is thinking about what you said..."))
+                {
+                    ChatResponse result = await openAiClient.ChatEndpoint.GetCompletionAsync(request);
+                    message = result.FirstChoice.Message.Content.ToString();
+                    chatGptHistory.Add(new Message(Role.Assistant, message));
+                }
                 // We need to stop listening before we start speaking, else we will hear our own voice.
                 StopListening();
                 brain.Say(message, StartListening);

@@ -50,7 +50,7 @@ namespace SEE.Net.Actions
         /// is set up for VR. This controller will be assigned to the remote UMA avatar
         /// as the default race animation controller.
         /// </summary>
-        private const string AnimatorForVrik = "Prefabs/Players/VRIKAnimatedLocomotion";
+        private const string animatorForVrik = "Prefabs/Players/VRIKAnimatedLocomotion";
 
         /// <summary>
         /// Initializes all variables that should be transferred to the remote avatars.
@@ -81,7 +81,7 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            VRIKActions.ExecuteOnClient(NetworkObjectID, AnimatorForVrik,
+            VRIKActions.ExecuteOnClient(NetworkObjectID, animatorForVrik,
                 RemoteHeadPosition, RemoteRightHandPosition, RemoteLeftHandPosition,
                 RemoteHeadRotation, RemoteRightHandRotation, RemoteLeftHandRotation);
         }

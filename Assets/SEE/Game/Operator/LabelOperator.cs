@@ -33,7 +33,7 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Prefix for game object names of node labels.
         /// </summary>
-        private const string LABEL_PREFIX = "Label ";
+        private const string labelPrefix = "Label ";
 
         /// <summary>
         /// Updates the position of the attached label, including its text and line.
@@ -43,11 +43,11 @@ namespace SEE.Game.Operator
         {
             // Assumption: There are only very few active labels, compared to all active and inactive labels
             //             that may exist in the descendants of this node. Hence, we go through all active ones.
-            foreach (NodeOperator nodeOperator in ShowLabel.DisplayedLabelOperators.Where(x => x.LabelAlpha.TargetValue > 0f))
+            foreach (NodeOperator nodeOperator in ShowLabel.DisplayedLabelOperators.Where(x => x.labelAlpha.TargetValue > 0f))
             {
-                nodeOperator.LabelTextPosition.AnimateTo(nodeOperator.DesiredLabelTextPosition, duration);
-                nodeOperator.LabelStartLinePosition.AnimateTo(nodeOperator.DesiredLabelStartLinePosition, duration);
-                nodeOperator.LabelEndLinePosition.AnimateTo(nodeOperator.DesiredLabelEndLinePosition, duration);
+                nodeOperator.labelTextPosition.AnimateTo(nodeOperator.DesiredLabelTextPosition, duration);
+                nodeOperator.labelStartLinePosition.AnimateTo(nodeOperator.DesiredLabelStartLinePosition, duration);
+                nodeOperator.labelEndLinePosition.AnimateTo(nodeOperator.DesiredLabelEndLinePosition, duration);
             }
         }
 
@@ -57,12 +57,12 @@ namespace SEE.Game.Operator
         /// </summary>
         private void PrepareLabel()
         {
-            Color textColor = Color.white;
-            Color lineColor = Color.white;
+            Color textColor = UnityEngine.Color.white;
+            Color lineColor = UnityEngine.Color.white;
 
-            string shownText = Node.SourceName;
+            string shownText = Node?.SourceName ?? gameObject.name;
 
-            nodeLabel = transform.Find(LABEL_PREFIX + shownText)?.gameObject;
+            nodeLabel = transform.Find(labelPrefix + shownText)?.gameObject;
             if (nodeLabel == null)
             {
                 // The text of the label appears above the hull of the labeled game object
@@ -71,19 +71,20 @@ namespace SEE.Game.Operator
                 // First we create the label.
                 // We define starting and ending positions for the animation.
                 Vector3 startLabelPosition = gameObject.GetTop();
+                float fontSize = Node != null ? City.NodeTypes[Node.Type].LabelSettings.FontSize : LabelAttributes.DefaultFontSize;
                 nodeLabel = TextFactory.GetTextWithSize(shownText,
                                                         startLabelPosition,
-                                                        City.NodeTypes[Node.Type].LabelSettings.FontSize,
+                                                        fontSize,
                                                         lift: true,
                                                         textColor: textColor);
-                nodeLabel.name = LABEL_PREFIX + shownText;
+                nodeLabel.name = labelPrefix + shownText;
                 nodeLabel.transform.SetParent(gameObject.transform);
 
                 // Second, add connecting line between "roof" of the game object and the text.
                 Vector3 startLinePosition = gameObject.GetRoofCenter();
                 GameObject line = new()
                 {
-                    name = $"{LABEL_PREFIX}{shownText} (Connecting Line)"
+                    name = $"{labelPrefix}{shownText} (Connecting Line)"
                 };
                 LineFactory.Draw(line, new[] { startLinePosition, startLinePosition }, 0.01f,
                                  LineMaterial(lineColor));
@@ -100,6 +101,10 @@ namespace SEE.Game.Operator
                     labelLineRenderer.startColor = labelLineRenderer.startColor.WithAlpha(0f);
                     labelLineRenderer.endColor = labelLineRenderer.endColor.WithAlpha(0f);
                 }
+            }
+            else if (!nodeLabel.activeSelf)
+            {
+                nodeLabel.SetActive(true);
             }
         }
 
@@ -128,11 +133,11 @@ namespace SEE.Game.Operator
         {
             get
             {
-                Vector3 endLabelPosition = gameObject.GetTop(t => !t.name.StartsWith(LABEL_PREFIX));
-                if (LabelAlpha.TargetValue > 0)
+                Vector3 endLabelPosition = gameObject.GetTop(t => !t.name.StartsWith(labelPrefix));
+                if (labelAlpha.TargetValue > 0)
                 {
                     // Only put line and label up if the label should actually be shown.
-                    endLabelPosition.y += City.NodeTypes[Node.Type].LabelSettings.Distance;
+                    endLabelPosition.y += Node != null ? City.NodeTypes[Node.Type].LabelSettings.Distance : LabelAttributes.DefaultDistance;
                 }
 
                 return endLabelPosition;
@@ -152,7 +157,7 @@ namespace SEE.Game.Operator
             get
             {
                 // Due to the line not using world space, we need to transform its position accordingly.
-                Vector3 endLinePosition = LabelTextPosition.TargetValue;
+                Vector3 endLinePosition = labelTextPosition.TargetValue;
                 float labelTextExtent = labelText.textBounds.extents.y;
                 endLinePosition.y -= labelTextExtent * 1.3f; // add slight gap to make it more aesthetic
                 return endLinePosition;

@@ -66,7 +66,7 @@ namespace SEE.Controls.Interactables
         [Serializable]
         private class ListVector3
         {
-            public List<Vector3> data;
+            public List<Vector3> Data;
         }
 
         [SerializeField] private Mode outlineMode;
@@ -93,10 +93,10 @@ namespace SEE.Controls.Interactables
         private bool needsUpdate;
 
         // Cached shader property IDs for improved lookup.
-        private static readonly int OutlineColor1 = Shader.PropertyToID("_OutlineColor");
-        private static readonly int ZTestMask = Shader.PropertyToID("_ZTestMask");
-        private static readonly int ZTestFill = Shader.PropertyToID("_ZTestFill");
-        private static readonly int Width = Shader.PropertyToID("_OutlineWidth");
+        private static readonly int outlineColor1 = Shader.PropertyToID("_OutlineColor");
+        private static readonly int zTestMask = Shader.PropertyToID("_ZTestMask");
+        private static readonly int zTestFill = Shader.PropertyToID("_ZTestFill");
+        private static readonly int width = Shader.PropertyToID("_OutlineWidth");
 
         /// <summary>
         /// The default width of outline.
@@ -268,7 +268,7 @@ namespace SEE.Controls.Interactables
                 List<Vector3> smoothNormals = SmoothNormals(meshFilter.sharedMesh);
 
                 bakeKeys.Add(meshFilter.sharedMesh);
-                bakeValues.Add(new ListVector3 { data = smoothNormals });
+                bakeValues.Add(new ListVector3 { Data = smoothNormals });
             }
         }
 
@@ -286,7 +286,7 @@ namespace SEE.Controls.Interactables
                 // Retrieve or generate smooth normals
                 int index = bakeKeys.IndexOf(meshFilter.sharedMesh);
                 List<Vector3> smoothNormals =
-                    (index >= 0) ? bakeValues[index].data : SmoothNormals(meshFilter.sharedMesh);
+                    (index >= 0) ? bakeValues[index].Data : SmoothNormals(meshFilter.sharedMesh);
 
                 // Store smooth normals in UV3
                 meshFilter.sharedMesh.SetUVs(3, smoothNormals);
@@ -346,8 +346,8 @@ namespace SEE.Controls.Interactables
 
             return smoothNormals;
         }
-        
-        void CombineSubmeshes(Mesh mesh, IReadOnlyCollection<Material> materials) {
+
+        static void CombineSubmeshes(Mesh mesh, IReadOnlyCollection<Material> materials) {
 
             // Skip meshes with a single submesh
             if (mesh.subMeshCount == 1) {
@@ -372,38 +372,38 @@ namespace SEE.Controls.Interactables
             }
 
             // Apply properties according to mode
-            outlineMaterial.SetColor(OutlineColor1, outlineColor);
+            outlineMaterial.SetColor(outlineColor1, outlineColor);
 
             switch (outlineMode)
             {
                 case Mode.OutlineAll:
-                    outlineMaterial.SetFloat(ZTestMask, (float)UnityEngine.Rendering.CompareFunction.Always);
-                    outlineMaterial.SetFloat(ZTestFill, (float)UnityEngine.Rendering.CompareFunction.Always);
-                    outlineMaterial.SetFloat(Width, outlineWidth);
+                    outlineMaterial.SetFloat(zTestMask, (float)UnityEngine.Rendering.CompareFunction.Always);
+                    outlineMaterial.SetFloat(zTestFill, (float)UnityEngine.Rendering.CompareFunction.Always);
+                    outlineMaterial.SetFloat(width, outlineWidth);
                     break;
 
                 case Mode.OutlineVisible:
-                    outlineMaterial.SetFloat(ZTestMask, (float)UnityEngine.Rendering.CompareFunction.Always);
-                    outlineMaterial.SetFloat(ZTestFill, (float)UnityEngine.Rendering.CompareFunction.LessEqual);
-                    outlineMaterial.SetFloat(Width, outlineWidth);
+                    outlineMaterial.SetFloat(zTestMask, (float)UnityEngine.Rendering.CompareFunction.Always);
+                    outlineMaterial.SetFloat(zTestFill, (float)UnityEngine.Rendering.CompareFunction.LessEqual);
+                    outlineMaterial.SetFloat(width, outlineWidth);
                     break;
 
                 case Mode.OutlineHidden:
-                    outlineMaterial.SetFloat(ZTestMask, (float)UnityEngine.Rendering.CompareFunction.Always);
-                    outlineMaterial.SetFloat(ZTestFill, (float)UnityEngine.Rendering.CompareFunction.Greater);
-                    outlineMaterial.SetFloat(Width, outlineWidth);
+                    outlineMaterial.SetFloat(zTestMask, (float)UnityEngine.Rendering.CompareFunction.Always);
+                    outlineMaterial.SetFloat(zTestFill, (float)UnityEngine.Rendering.CompareFunction.Greater);
+                    outlineMaterial.SetFloat(width, outlineWidth);
                     break;
 
                 case Mode.OutlineAndSilhouette:
-                    outlineMaterial.SetFloat(ZTestMask, (float)UnityEngine.Rendering.CompareFunction.LessEqual);
-                    outlineMaterial.SetFloat(ZTestFill, (float)UnityEngine.Rendering.CompareFunction.Always);
-                    outlineMaterial.SetFloat(Width, outlineWidth);
+                    outlineMaterial.SetFloat(zTestMask, (float)UnityEngine.Rendering.CompareFunction.LessEqual);
+                    outlineMaterial.SetFloat(zTestFill, (float)UnityEngine.Rendering.CompareFunction.Always);
+                    outlineMaterial.SetFloat(width, outlineWidth);
                     break;
 
                 case Mode.SilhouetteOnly:
-                    outlineMaterial.SetFloat(ZTestMask, (float)UnityEngine.Rendering.CompareFunction.LessEqual);
-                    outlineMaterial.SetFloat(ZTestFill, (float)UnityEngine.Rendering.CompareFunction.Greater);
-                    outlineMaterial.SetFloat(Width, 0);
+                    outlineMaterial.SetFloat(zTestMask, (float)UnityEngine.Rendering.CompareFunction.LessEqual);
+                    outlineMaterial.SetFloat(zTestFill, (float)UnityEngine.Rendering.CompareFunction.Greater);
+                    outlineMaterial.SetFloat(width, 0);
                     break;
             }
         }

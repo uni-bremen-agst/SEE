@@ -1,4 +1,4 @@
-﻿using SEE.Utils;
+﻿using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
@@ -15,6 +15,16 @@ namespace SEE.Game
     public class LabelAttributes
     {
         /// <summary>
+        /// The default value for <see cref="Show"/>.
+        /// </summary>
+        public const float DefaultFontSize = 0.4f;
+
+        /// <summary>
+        /// The default value for <see cref="Distance"/>.
+        /// </summary>
+        public const float DefaultDistance = 0.2f;
+
+        /// <summary>
         /// If true, a label with the node's SourceName will be displayed above each node.
         /// </summary>
         [Tooltip("Whether the label should be shown during hovering.")]
@@ -24,13 +34,13 @@ namespace SEE.Game
         /// The distance between the top of the node and its label.
         /// </summary>
         [Tooltip("The distance between the top of the node and its label.")]
-        public float Distance = 0.2f;
+        public float Distance = DefaultDistance;
 
         /// <summary>
         /// The font size of the node's label.
         /// </summary>
         [Tooltip("The font size of the label.")]
-        public float FontSize = 0.4f;
+        public float FontSize = DefaultFontSize;
 
         /// <summary>
         /// How fast the label should (dis)appear.
@@ -46,11 +56,11 @@ namespace SEE.Game
         [Tooltip("The alpha value (degree of transparency) of the label.")]
         public float LabelAlpha = 1f;
 
-        private const string ShowLabel = "Show";
-        private const string DistanceLabel = "Distance";
-        private const string FontSizeLabel = "FontSize";
-        private const string AnimationFactorLabel = "AnimationDuration";
-        private const string LabelAlphaLabel = "LabelAlpha";
+        private const string showLabel = "Show";
+        private const string distanceLabel = "Distance";
+        private const string fontSizeLabel = "FontSize";
+        private const string animationFactorLabel = "AnimationDuration";
+        private const string labelAlphaLabel = "LabelAlpha";
 
         /// <summary>
         /// Saves these LabelSettings using <paramref name="writer"/> under the given <paramref name="label"/>.
@@ -60,11 +70,11 @@ namespace SEE.Game
         internal void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(Show, ShowLabel);
-            writer.Save(Distance, DistanceLabel);
-            writer.Save(FontSize, FontSizeLabel);
-            writer.Save(AnimationFactor, AnimationFactorLabel);
-            writer.Save(LabelAlpha, LabelAlphaLabel);
+            writer.Save(Show, showLabel);
+            writer.Save(Distance, distanceLabel);
+            writer.Save(FontSize, fontSizeLabel);
+            writer.Save(AnimationFactor, animationFactorLabel);
+            writer.Save(LabelAlpha, labelAlphaLabel);
             writer.EndGroup();
         }
 
@@ -81,11 +91,11 @@ namespace SEE.Game
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
                 {
-                    ConfigIO.Restore(values, ShowLabel, ref Show);
-                    ConfigIO.Restore(values, DistanceLabel, ref Distance);
-                    ConfigIO.Restore(values, FontSizeLabel, ref FontSize);
-                    ConfigIO.Restore(values, AnimationFactorLabel, ref AnimationFactor);
-                    ConfigIO.Restore(values, LabelAlphaLabel, ref LabelAlpha);
+                    ConfigIO.Restore(values, showLabel, ref Show);
+                    ConfigIO.Restore(values, distanceLabel, ref Distance);
+                    ConfigIO.Restore(values, fontSizeLabel, ref FontSize);
+                    ConfigIO.Restore(values, animationFactorLabel, ref AnimationFactor);
+                    ConfigIO.Restore(values, labelAlphaLabel, ref LabelAlpha);
                 }
             }
         }

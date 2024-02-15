@@ -1,3 +1,4 @@
+using System.Linq;
 using SEE.IDE;
 using SEE.Utils;
 using UnityEngine;
@@ -31,7 +32,7 @@ namespace SEE.Controls.Actions
             if (SEEInput.Unselect())
             {
                 InteractableObject.UnselectAll(true);
-                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
+                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
             }
             else if (SEEInput.Select())
             {
@@ -42,7 +43,10 @@ namespace SEE.Controls.Actions
                 }
                 if (Input.GetKey(KeyCode.LeftControl))
                 {
-                    obj?.SetSelect(!obj.IsSelected, true);
+                    if (obj != null)
+                    {
+                        obj.SetSelect(!obj.IsSelected, true);
+                    }
                 }
                 else
                 {
@@ -53,9 +57,9 @@ namespace SEE.Controls.Actions
             {
                 InteractableObject.UnselectAll(false);
 
-                foreach (InteractableObject elem in IDEIntegration.Instance?.PopPendingSelections())
+                foreach (InteractableObject elem in IDEIntegration.Instance.PopPendingSelections().Where(e => e != null))
                 {
-                    elem?.SetSelect(true, true);
+                    elem.SetSelect(true, true);
                 }
             }
         }

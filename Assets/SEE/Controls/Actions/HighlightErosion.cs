@@ -170,7 +170,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The default animation duration in case we cannot derive a city for the interactable object.
         /// </summary>
-        private const float DefaultAnimationDuration = 1.0f;
+        private const float defaultAnimationDuration = 1.0f;
 
         /// <summary>
         /// Returns the animation duration using values defined in AbstractSEECity.
@@ -181,7 +181,7 @@ namespace SEE.Controls.Actions
         private float AnimationDuration(Node node, AbstractSEECity city = null)
         {
             city ??= City();
-            float baseDuration = city == null ? DefaultAnimationDuration : city.BaseAnimationDuration;
+            float baseDuration = city == null ? defaultAnimationDuration : city.BaseAnimationDuration;
             float factor = city == null ? 1f : city.NodeTypes[node.Type].LabelSettings.AnimationFactor;
             return baseDuration * factor;
         }
@@ -201,7 +201,7 @@ namespace SEE.Controls.Actions
                 if (gameObject.TryGetComponent(out NodeRef nodeRef) && nodeRef.Value != null)
                 {
                     float duration = AnimationDuration(nodeRef.Value);
-                    const float SCALING_FACTOR = 1.3f;
+                    const float scalingFactor = 1.3f;
                     ForEachErosion((sprite, textMesh, _) =>
                     {
                         // We have to delete the text first to animate it more nicely, so we save it here before that.
@@ -211,7 +211,7 @@ namespace SEE.Controls.Actions
                                 .InsertCallback(0.02f, () => textMesh.gameObject.SetActive(!sequence.isBackwards))
                                 .Insert(0.03f, DOTween.To(() => sprite.transform.localScale,
                                                           s => sprite.transform.localScale = s,
-                                                          sprite.transform.localScale * SCALING_FACTOR, duration))
+                                                          sprite.transform.localScale * scalingFactor, duration))
                                 .Insert(0.03f, DOTween.ToAlpha(() => sprite.color, color => sprite.color = color,
                                                                1f, duration))
                                 .Insert(0.03f, DOTween.To(() => textMesh.text, t => textMesh.text = t,
@@ -241,7 +241,7 @@ namespace SEE.Controls.Actions
 
             foreach (Transform childTransform in gameObject.transform)
             {
-                if (childTransform.name.StartsWith(ErosionIssues.EROSION_SPRITE_PREFIX))
+                if (childTransform.name.StartsWith(ErosionIssues.ErosionSpritePrefix))
                 {
                     HorizontalLayoutGroup layoutGroup = childTransform.GetComponent<HorizontalLayoutGroup>();
                     SpriteRenderer spriteRenderer = childTransform.GetComponentInChildren<SpriteRenderer>();

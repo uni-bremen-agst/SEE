@@ -61,72 +61,72 @@ namespace SEE.GO.NodeFactories
 
             Vector3[] vertices = {
                 // back rectangle
-                /*  0 */ new Vector3(r, d,  b),
-                /*  1 */ new Vector3(l, d,  b),
-                /*  2 */ new Vector3(r, u,  b),
-                /*  3 */ new Vector3(l, u,  b),
+                new(r, d,  b), // 0
+                new(l, d,  b), // 1
+                new(r, u,  b), // 2
+                new(l, u,  b), // 3
 
                 // front rectangle
-                /*  4 */ new Vector3(r, u, f),
-                /*  5 */ new Vector3(l, u, f),
-                /*  6 */ new Vector3(r, d, f),
-                /*  7 */ new Vector3(l, d, f),
+                new(r, u, f), // 4
+                new(l, u, f), // 5
+                new(r, d, f), // 6
+                new(l, d, f), // 7
 
                 // top rectangle
-                /*  8 */ new Vector3(r, u, b),
-                /*  9 */ new Vector3(l, u, b),
-                /* 10 */ new Vector3(r, u, f),
-                /* 11 */ new Vector3(l, u, f),
+                new(r, u, b), // 8
+                new(l, u, b), // 9
+                new(r, u, f), // 10
+                new(l, u, f), // 11
 
                 // bottom rectangle
-                /* 12 */ new Vector3(r, d, f),
-                /* 13 */ new Vector3(r, d, b),
-                /* 14 */ new Vector3(l, d, b),
-                /* 15 */ new Vector3(l, d, f),
+                new(r, d, f), // 12
+                new(r, d, b), // 13
+                new(l, d, b), // 14
+                new(l, d, f), // 15
 
                 // left rectangle
-                /* 16 */ new Vector3(l, d, b),
-                /* 17 */ new Vector3(l, u, b),
-                /* 18 */ new Vector3(l, u, f),
-                /* 19 */ new Vector3(l, d, f),
+                new(l, d, b), // 16
+                new(l, u, b), // 17
+                new(l, u, f), // 18
+                new(l, d, f), // 19
 
                 // right rectangle
-                /* 20 */ new Vector3(r, d, f),
-                /* 21 */ new Vector3(r, u, f),
-                /* 22 */ new Vector3(r, u, b),
-                /* 23 */ new Vector3(r, d, b),
+                new(r, d, f), // 20
+                new(r, u, f), // 21
+                new(r, u, b), // 22
+                new(r, d, b), // 23
             };
 
             Vector3[] normals = {
-                /*  0 */ new Vector3(0.0f, 0.0f, 1.0f),
-                /*  1 */ new Vector3(0.0f, 0.0f, 1.0f),
-                /*  2 */ new Vector3(0.0f, 0.0f, 1.0f),
-                /*  3 */ new Vector3(0.0f, 0.0f, 1.0f),
+                new(0.0f, 0.0f, 1.0f), // 0
+                new(0.0f, 0.0f, 1.0f), // 1
+                new(0.0f, 0.0f, 1.0f), // 2
+                new(0.0f, 0.0f, 1.0f), // 3
 
-                /*  4 */ new Vector3(0.0f, 0.0f, -1.0f),
-                /*  5 */ new Vector3(0.0f, 0.0f, -1.0f),
-                /*  6 */ new Vector3(0.0f, 0.0f, -1.0f),
-                /*  7 */ new Vector3(0.0f, 0.0f, -1.0f),
+                new(0.0f, 0.0f, -1.0f), // 4
+                new(0.0f, 0.0f, -1.0f), // 5
+                new(0.0f, 0.0f, -1.0f), // 6
+                new(0.0f, 0.0f, -1.0f), // 7
 
-                /*  8 */ new Vector3(0.0f, 1.0f, 0.0f),
-                /*  9 */ new Vector3(0.0f, 1.0f, 0.0f),
-                /* 10 */ new Vector3(0.0f, 1.0f, 0.0f),
-                /* 11 */ new Vector3(0.0f, 1.0f, 0.0f),
+                new(0.0f, 1.0f, 0.0f), // 8
+                new(0.0f, 1.0f, 0.0f), // 9
+                new(0.0f, 1.0f, 0.0f), // 10
+                new(0.0f, 1.0f, 0.0f), // 11
 
-                /* 12 */ new Vector3(0.0f, -1.0f, 0.0f),
-                /* 13 */ new Vector3(0.0f, -1.0f, 0.0f),
-                /* 14 */ new Vector3(0.0f, -1.0f, 0.0f),
-                /* 15 */ new Vector3(0.0f, -1.0f, 0.0f),
+                new(0.0f, -1.0f, 0.0f), // 12
+                new(0.0f, -1.0f, 0.0f), // 13
+                new(0.0f, -1.0f, 0.0f), // 14
+                new(0.0f, -1.0f, 0.0f), // 15
 
-                /* 16 */ new Vector3(-1.0f, 0.0f, 0.0f),
-                /* 17 */ new Vector3(-1.0f, 0.0f, 0.0f),
-                /* 18 */ new Vector3(-1.0f, 0.0f, 0.0f),
-                /* 19 */ new Vector3(-1.0f, 0.0f, 0.0f),
+                new(-1.0f, 0.0f, 0.0f), // 16
+                new(-1.0f, 0.0f, 0.0f), // 17
+                new(-1.0f, 0.0f, 0.0f), // 18
+                new(-1.0f, 0.0f, 0.0f), // 19
 
-                /* 20 */ new Vector3(1.0f, 0.0f, 0.0f),
-                /* 21 */ new Vector3(1.0f, 0.0f, 0.0f),
-                /* 22 */ new Vector3(1.0f, 0.0f, 0.0f),
-                /* 23 */ new Vector3(1.0f, 0.0f, 0.0f)
+                new(1.0f, 0.0f, 0.0f), // 20
+                new(1.0f, 0.0f, 0.0f), // 21
+                new(1.0f, 0.0f, 0.0f), // 22
+                new(1.0f, 0.0f, 0.0f)  // 23
              };
 
             // The triangles forming the cube.
@@ -172,40 +172,40 @@ namespace SEE.GO.NodeFactories
             Vector2[] uvs =
             {
                 // back rectangle
-                /* 0 */ new Vector2(0.0f, 0.0f),
-                /* 1 */ new Vector2(1.0f, 0.0f),
-                /* 2 */ new Vector2(0.0f, 1.0f),
-                /* 3 */ new Vector2(1.0f, 1.0f),
+                new(0.0f, 0.0f), // 0
+                new(1.0f, 0.0f), // 1
+                new(0.0f, 1.0f), // 2
+                new(1.0f, 1.0f), // 3
 
                 // front rectangle
-                /* 4 */ new Vector2(1.0f, 1.0f),
-                /* 5 */ new Vector2(0.0f, 1.0f),
-                /* 6 */ new Vector2(1.0f, 0.0f),
-                /* 7 */ new Vector2(0.0f, 0.0f),
+                new(1.0f, 1.0f), // 4
+                new(0.0f, 1.0f), // 5
+                new(1.0f, 0.0f), // 6
+                new(0.0f, 0.0f), // 7
 
                 // top rectangle
-                /*  8 */ new Vector2(1.0f, 1.0f),
-                /*  9 */ new Vector2(0.0f, 1.0f),
-                /* 10 */ new Vector2(1.0f, 0.0f),
-                /* 11 */ new Vector2(0.0f, 0.0f),
+                new(1.0f, 1.0f), // 8
+                new(0.0f, 1.0f), // 9
+                new(1.0f, 0.0f), // 10
+                new(0.0f, 0.0f), // 11
 
                 // bottom rectangle
-                /* 12 */ new Vector2(0.0f, 0.0f),
-                /* 13 */ new Vector2(0.0f, 1.0f),
-                /* 14 */ new Vector2(1.0f, 1.0f),
-                /* 15 */ new Vector2(1.0f, 0.0f),
+                new(0.0f, 0.0f), // 12
+                new(0.0f, 1.0f), // 13
+                new(1.0f, 1.0f), // 14
+                new(1.0f, 0.0f), // 15
 
                 // left rectangle
-                /* 16 */ new Vector2(0.0f, 0.0f),
-                /* 17 */ new Vector2(0.0f, 1.0f),
-                /* 18 */ new Vector2(1.0f, 1.0f),
-                /* 19 */ new Vector2(1.0f, 0.0f),
+                new(0.0f, 0.0f), // 16
+                new(0.0f, 1.0f), // 17
+                new(1.0f, 1.0f), // 18
+                new(1.0f, 0.0f), // 19
 
                 // right rectangle
-                /* 20 */ new Vector2(0.0f, 0.0f),
-                /* 21 */ new Vector2(0.0f, 1.0f),
-                /* 22 */ new Vector2(1.0f, 1.0f),
-                /* 23 */ new Vector2(1.0f, 0.0f),
+                new(0.0f, 0.0f), // 20
+                new(0.0f, 1.0f), // 21
+                new(1.0f, 1.0f), // 22
+                new(1.0f, 0.0f), // 23
             };
 
             modelMesh.SetVertices(vertices);

@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Cysharp.Threading.Tasks;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.Net.Dashboard.Model.Issues;
 using SEE.Utils;
 using UnityEngine;
@@ -35,35 +35,23 @@ namespace SEE.Net.Dashboard
         /// </summary>
         [EnvironmentVariable("DASHBOARD_PUBLIC_KEY")]
         [TextArea]
-        [Tooltip("The public key for the X.509 certificate authority from the dashboard's certificate.")]
-        public string PublicKey = "3082020A0282020100B20ACB6E1639D673B6AF9E9F36578F66068AFDA50327DC2AB0F804E2F8"
-                                  + "3765BCB7AD74FED31EC8812FF9AA9C2461D53F7DC08449C765F0ECFA9C0787B9D1E1AE92F8D"
-                                  + "1919EDB6871E70601DB0834FF34389EDBA30BFF48F3EA8D07786E976B04F5232AC3A63D07DA"
-                                  + "5EAD5F5450026C9E2FB9294D32FC0172E9F0DFF33CDCB35180DB22E6985C15B02BBFAD02499"
-                                  + "D0E52AA916ADD5F9E7A40E22B8EC5427E02E47FD78CFEF30B5A2EDB53EA47E8B70230FB9EAE"
-                                  + "57B4B7042BD8829F67F4DCDA0230BB933741AF42992CD9164C4F5E2C126A46DC42AE5BD2268"
-                                  + "2C97880F8D0A82FA36FEC89CE9318E0DE2CAA3352F92F6231B18DF29913445AA323931106B0"
-                                  + "764066DB4A2F8764CE4FAC2500F5A084AE3133C6C82D18181655FC1050629257A54B44FBACB"
-                                  + "1BE43E51C7FA80DD7CE68D2F86AF448CA2E03B3C81A1289AA355E926CF221D881BFCD82BE7B"
-                                  + "0FA99F1B04A95D23F9B030B6CDF81E90197868BC72F314E2DFBA5F9965517F8C33BF056C005"
-                                  + "0DB08D285C988EFF7F212CC9D652E70B8FE67BC632F17ECFAE57603F5592C831951442F8215"
-                                  + "75139D193B4DC4F2EB46FEE09495CCF67259A3F4516873612582B84512019A1157F621B46D4"
-                                  + "5BCEE471BCE855C068B701F40C4CBB78F8E11550C83D7E6897967FD0B90C4BD25B0E3884492"
-                                  + "66293CF52814112B7F1A95A8EC3D6CBB5567B6B0916A995D5EB8254E31647B2F810203010001";
+        [Tooltip("The public key for the X.509 certificate authority from the dashboard's self-signed certificate.")]
+        public string PublicKey = "";
 
         /// <summary>
         /// The URL to the Axivion Dashboard, up to the project name.
         /// </summary>
         [EnvironmentVariable("DASHBOARD_BASE_URL")]
         [Tooltip("The URL to the Axivion Dashboard, up to the project name.")]
-        public string BaseUrl = "https://stvive.informatik.uni-bremen.de:9443/axivion/projects/SEE/";
+        public string BaseUrl = "https://stvr2.informatik.uni-bremen.de:9443/axivion/projects/SEE/";
 
         /// <summary>
         /// The API token for the Axivion Dashboard.
         /// </summary>
+        /// <remarks>This must be a log-in token to have the necessary rights.</remarks>
         [EnvironmentVariable("DASHBOARD_TOKEN")]
         [Tooltip("The API token for the Axivion Dashboard.")]
-        public string Token = "0.0000000000016.9SGjXPqUhOKygmJuKLo63yNhyx6bx4RQbMD2h2BlIEU";
+        public string Token = "0.000000000000Q.2Jb6PIgB1pk4g8ss-DtnfdtDp0xlcugYQHFRcRvBRH4";
 
         /// <summary>
         /// When true, receiving Dashboard models which have more fields than the C# models will throw an error
@@ -75,37 +63,37 @@ namespace SEE.Net.Dashboard
 
         [Header("Issue Retrieval")]
         /// <summary>
-        /// Whether <see cref="ArchitectureViolationIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssues"/>.
+        /// Whether <see cref="ArchitectureViolationIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssuesAsync"/>.
         /// </summary>
         [Tooltip("Whether to retrieve Architecture Violation Issues.")]
         public bool ArchitectureViolationIssues = true;
 
         /// <summary>
-        /// Whether <see cref="CloneIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssues"/>.
+        /// Whether <see cref="CloneIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssuesAsync"/>.
         /// </summary>
         [Tooltip("Whether to retrieve Clone Issues.")]
         public bool CloneIssues = true;
 
         /// <summary>
-        /// Whether <see cref="CycleIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssues"/>.
+        /// Whether <see cref="CycleIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssuesAsync"/>.
         /// </summary>
         [Tooltip("Whether to retrieve Cycle Issues.")]
         public bool CycleIssues = true;
 
         /// <summary>
-        /// Whether <see cref="DeadEntityIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssues"/>.
+        /// Whether <see cref="DeadEntityIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssuesAsync"/>.
         /// </summary>
         [Tooltip("Whether to retrieve Dead Entity Issues.")]
         public bool DeadEntityIssues = true;
 
         /// <summary>
-        /// Whether <see cref="MetricViolationIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssues"/>.
+        /// Whether <see cref="MetricViolationIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssuesAsync"/>.
         /// </summary>
         [Tooltip("Whether to retrieve Metric Violation Issues.")]
         public bool MetricViolationIssues = true;
 
         /// <summary>
-        /// Whether <see cref="StyleViolationIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssues"/>.
+        /// Whether <see cref="StyleViolationIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssuesAsync"/>.
         /// </summary>
         [Tooltip("Whether to retrieve Style Violation Issues.")]
         public bool StyleViolationIssues = true;
@@ -130,7 +118,7 @@ namespace SEE.Net.Dashboard
         /// </summary>
         /// <seealso cref="Lazy{T}"/>
         private static readonly Lazy<DashboardRetriever> instance =
-            new Lazy<DashboardRetriever>(FindObjectOfType<DashboardRetriever>);
+            new(FindObjectOfType<DashboardRetriever>);
 
         /// <summary>
         /// Will automatically search for this component when it's accessed first, afterwards the single instance
@@ -151,8 +139,8 @@ namespace SEE.Net.Dashboard
         /// <param name="apiPath">Whether the query path starts with <c>/api</c></param>
         /// <param name="accept">The HTTP Accept header value.</param>
         /// <returns>The result of the API call.</returns>
-        private async UniTask<DashboardResult> GetAtPath(string path, Dictionary<string, string> queryParameters = null,
-                                                         bool apiPath = true, string accept = "application/json")
+        private async UniTask<DashboardResult> GetAtPathAsync(string path, Dictionary<string, string> queryParameters = null,
+                                                              bool apiPath = true, string accept = "application/json")
         {
             string requestUrl = apiPath ? BaseUrl.Replace("/projects/", "/api/projects/") : BaseUrl;
             requestUrl += path;
@@ -162,12 +150,16 @@ namespace SEE.Net.Dashboard
             }
 
             UnityWebRequest request = UnityWebRequest.Get(requestUrl);
-            request.certificateHandler = new AxivionCertificateHandler(PublicKey);
+            if (!string.IsNullOrWhiteSpace(PublicKey))
+            {
+                // Only set certificate handler if public key is set (i.e. we're using a self-signed certificate)
+                request.certificateHandler = new AxivionCertificateHandler(PublicKey);
+            }
             request.SetRequestHeader("Accept", accept);
             request.SetRequestHeader("Authorization", $"AxToken {Token}");
-            #pragma warning disable CS4014
+#pragma warning disable CS4014
             request.SendWebRequest(); // we don't need to await this, because of the next line
-            #pragma warning restore CS4014
+#pragma warning restore CS4014
             await UniTask.WaitUntil(() => request.isDone);
             DashboardResult result = request.result switch
             {
@@ -196,8 +188,8 @@ namespace SEE.Net.Dashboard
         /// <exception cref="DashboardException">If there was an error accessing the API entry point.</exception>
         /// <exception cref="ArgumentException">If the number of items in <paramref name="parameterValues"/>
         /// don't match the number of parameters from the caller.</exception>
-        private async UniTask<T> QueryDashboard<T>(string path, IReadOnlyList<string> parameterValues,
-                                                   bool apiPath = true, [CallerMemberName] string memberName = "")
+        private async UniTask<T> QueryDashboardAsync<T>(string path, IReadOnlyList<string> parameterValues,
+                                                        bool apiPath = true, [CallerMemberName] string memberName = "")
         {
             if (path == null || parameterValues == null)
             {
@@ -222,7 +214,7 @@ namespace SEE.Net.Dashboard
                                                                          .ToDictionary(x => x.Name, x => parameterValues[x.Position]);
 
             // Finally, actually query the dashboard
-            return await QueryDashboard<T>(path, queryParameters, apiPath);
+            return await QueryDashboardAsync<T>(path, queryParameters, apiPath);
         }
 
         /// <summary>
@@ -233,10 +225,10 @@ namespace SEE.Net.Dashboard
         /// <param name="apiPath">Whether the query path starts with <c>/api</c></param>
         /// <typeparam name="T">The type that is returned by the API call.</typeparam>
         /// <returns>The queried object of type <typeparamref name="T"/>.</returns>
-        private async UniTask<T> QueryDashboard<T>(string path, Dictionary<string, string> parameters = null,
-                                                   bool apiPath = true)
+        private async UniTask<T> QueryDashboardAsync<T>(string path, Dictionary<string, string> parameters = null,
+                                                        bool apiPath = true)
         {
-            DashboardResult result = await GetAtPath(path, parameters, apiPath);
+            DashboardResult result = await GetAtPathAsync(path, parameters, apiPath);
             return result.RetrieveObject<T>(StrictMode);
         }
 
@@ -244,13 +236,14 @@ namespace SEE.Net.Dashboard
         /// Compares the <see cref="SupportedDashboardVersion"/> with the actual version of the accessed dashboard
         /// and warns the user via notifications or a log message, depending on how critical the difference is.
         /// </summary>
-        private async UniTaskVoid VerifyVersionNumber()
+        private async UniTaskVoid VerifyVersionNumberAsync()
         {
-            DashboardVersion version = await GetDashboardVersion();
+            DashboardVersion version = await GetDashboardVersionAsync();
+            Debug.Log($"Axivion Dashboard version {version}\n");
             switch (version.DifferenceToSupportedVersion)
             {
-                case DashboardVersion.Difference.MAJOR_OLDER:
-                case DashboardVersion.Difference.MINOR_OLDER:
+                case DashboardVersion.Difference.MajorOlder:
+                case DashboardVersion.Difference.MinorOlder:
                     // If major or minor version of the dashboard is older, we may use features that aren't existent
                     // in it yet, so we have to notify the user with a warning.
                     ShowNotification.Error("Dashboard Version too old",
@@ -258,35 +251,35 @@ namespace SEE.Net.Dashboard
                                            + $"has been written for version {DashboardVersion.SupportedVersion}."
                                            + $" Please update your dashboard.");
                     break;
-                case DashboardVersion.Difference.PATCH_OLDER:
+                case DashboardVersion.Difference.PathOlder:
                     // If patch version is older, there may be some bugfixes / security problems not accounted for.
                     ShowNotification.Warn("Dashboard Version outdated",
                                           $"Your dashboard has version {version} but this API supports "
                                           + $"{DashboardVersion.SupportedVersion}. The difference in versions is small,"
                                           + "so this shouldn't be too critical, but please update your dashboard to avoid any issues.");
                     break;
-                case DashboardVersion.Difference.MAJOR_NEWER:
+                case DashboardVersion.Difference.MajorNewer:
                     // Major new version can introduce breaking changes
                     ShowNotification.Error("Dashboard Version unsupported",
                                            $"Your dashboard has a major new version ({version}) compared to the supported version "
                                            + $"({DashboardVersion.SupportedVersion}), which may have introduced breaking changes. "
                                            + "Please update SEE's retrieval code accordingly.");
                     break;
-                case DashboardVersion.Difference.MINOR_NEWER:
-                case DashboardVersion.Difference.PATCH_NEWER:
+                case DashboardVersion.Difference.MinorNewer:
+                case DashboardVersion.Difference.PatchNewer:
                     // Minor and patch updates shouldn't impact existing functionality, but the retrieval code
                     // should still be updated by a developer.
                     Debug.LogWarning($"The dashboard uses version {version} while the retrieval code has been "
                                      + $"written for version {DashboardVersion.SupportedVersion}. Please update SEE's retrieval "
                                      + "code accordingly.");
                     break;
-                case DashboardVersion.Difference.EXTRA_OLDER:
-                case DashboardVersion.Difference.EXTRA_NEWER:
+                case DashboardVersion.Difference.ExtraOlder:
+                case DashboardVersion.Difference.ExtraNewer:
                     // Extra changes are assumed to be small enough to not even warrant a warning.
                     Debug.Log($"Dashboard version {version} differs slightly from supported version "
                               + $"{DashboardVersion.SupportedVersion}.");
                     break;
-                case DashboardVersion.Difference.EQUAL:
+                case DashboardVersion.Difference.Equal:
                     // No need to do anything
                     break;
                 default: throw new ArgumentOutOfRangeException();
@@ -327,7 +320,7 @@ namespace SEE.Net.Dashboard
                                                     + "in a given scene!");
             }
 
-            if (new[] {BaseUrl, Token, PublicKey}.Any(string.IsNullOrEmpty))
+            if (new[] { BaseUrl, Token, PublicKey }.Any(string.IsNullOrEmpty))
             {
                 throw new ArgumentException("Necessary information not supplied. "
                                             + "Please set base URL, token, and public key before accessing this class.");
@@ -338,7 +331,7 @@ namespace SEE.Net.Dashboard
                 throw new ArgumentException("Base URL must be a HTTPS URL.\n");
             }
 
-            VerifyVersionNumber().Forget();
+            VerifyVersionNumberAsync().Forget();
         }
 
         /// <summary>
@@ -350,7 +343,7 @@ namespace SEE.Net.Dashboard
             /// <summary>
             /// Public key of the accepted certificate.
             /// </summary>
-            private readonly string AcceptKey;
+            private readonly string acceptKey;
 
             /// <summary>
             /// Instantiates a new <see cref="AxivionCertificateHandler"/> with the given <paramref name="acceptKey"/>
@@ -359,11 +352,11 @@ namespace SEE.Net.Dashboard
             /// <param name="acceptKey">The public key of the accepted certificate.</param>
             public AxivionCertificateHandler(string acceptKey)
             {
-                AcceptKey = acceptKey;
+                this.acceptKey = acceptKey;
             }
 
             /// <summary>
-            /// Validates the given <paramref name="certificateData"/> by comparing it with <see cref="AcceptKey"/>.
+            /// Validates the given <paramref name="certificateData"/> by comparing it with <see cref="acceptKey"/>.
             /// </summary>
             /// <param name="certificateData">Certificate which shall be validated</param>
             /// <returns>True iff the certificate's validation was successful</returns>
@@ -371,9 +364,15 @@ namespace SEE.Net.Dashboard
             {
                 // Code adapted from:
                 // https://docs.unity3d.com/ScriptReference/Networking.CertificateHandler.ValidateCertificate.html
-                X509Certificate2 certificate = new X509Certificate2(certificateData);
+                X509Certificate2 certificate = new(certificateData);
                 string certPublicKey = certificate.GetPublicKeyString();
-                return certPublicKey?.Equals(AcceptKey) ?? false;
+
+                bool result = certPublicKey?.Equals(acceptKey) ?? false;
+                if (!result)
+                {
+                    Debug.LogError($"Public keys do not match:\nOurs: {acceptKey}\nServer's: {certPublicKey}\n");
+                }
+                return result;
             }
         }
     }

@@ -12,7 +12,7 @@ namespace SEE.Utils
         /// The Viridis color palette as computed by an R script.
         /// See: https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html
         /// </summary>
-        private static readonly Color[] ViridisColorPalette = {
+        private static readonly Color[] viridisColorPalette = {
             new Color(0.267f, 0.004f, 0.333f, 1.0f),
             new Color(0.275f, 0.125f, 0.024f, 1.0f),
             new Color(0.259f, 0.235f, 0.506f, 1.0f),
@@ -31,14 +31,14 @@ namespace SEE.Utils
         /// Yields a color of the Viridis color palette for given <paramref name="colorIndex"/>.
         /// The Viridis color palette offers twelve different colors of high contrast
         /// that be distinguished by most people suffering from different types of color blindness.
-        /// The parameter <paramref name="colorIndex"/> will be rounded to an integer and 
+        /// The parameter <paramref name="colorIndex"/> will be rounded to an integer and
         /// clamped into the value range of the Viridis color palette.
         /// </summary>
         /// <param name="colorIndex">the index of the requested color</param>
         /// <returns>the color with the given <paramref name="colorIndex"/> in the Viridis color palette</returns>
         public static Color Viridis(float colorIndex)
         {
-            return ViridisColorPalette[Mathf.Clamp(Mathf.RoundToInt(colorIndex * (ViridisColorPalette.Length - 1)), 0, ViridisColorPalette.Length - 1)];
+            return viridisColorPalette[Mathf.Clamp(Mathf.RoundToInt(colorIndex * (viridisColorPalette.Length - 1)), 0, viridisColorPalette.Length - 1)];
         }
     }
 }

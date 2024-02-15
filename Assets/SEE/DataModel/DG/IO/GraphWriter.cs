@@ -45,7 +45,6 @@ namespace SEE.DataModel.DG.IO
                 Debug.LogError($"Could not save graph to GXL file '{filename}' due to: {e.Message}.\n");
                 throw;
             }
-            Debug.Log($"Successfully saved graph to file '{filename}'!");
         }
 
         /// <summary>
@@ -154,9 +153,9 @@ namespace SEE.DataModel.DG.IO
             foreach (Node node in graph.Nodes())
             {
                 XmlElement xmlNode = doc.CreateElement("node");
-                string ID = $"N{nodeCount}";
-                result[node.ID] = ID;
-                xmlNode.SetAttribute("id", ID);
+                string id = $"N{nodeCount}";
+                result[node.ID] = id;
+                xmlNode.SetAttribute("id", id);
 
                 AppendType(doc, xmlNode, node);
                 AppendAttributes(doc, xmlNode, node);
@@ -354,19 +353,19 @@ namespace SEE.DataModel.DG.IO
         /// <param name="xmlNode">the XML node this attribute description should be appended</param>
         /// <param name="type">the type name of the attribute</param>
         /// <param name="attributes">the attributes whose description is to be appended to <paramref name="xmlNode"/></param>
-        /// <param name="AsString">the delegate to convert each attribute value into a string</param>
+        /// <param name="asString">the delegate to convert each attribute value into a string</param>
         private static void AppendAttributes<V>(XmlDocument doc,
                                                 XmlNode xmlNode,
                                                 string type,
                                                 Dictionary<string, V> attributes,
-                                                AsString<V> AsString)
+                                                AsString<V> asString)
         {
             foreach (KeyValuePair<string, V> attribute in attributes)
             {
                 XmlElement attr = doc.CreateElement("attr");
                 attr.SetAttribute("name", attribute.Key);
                 XmlElement value = doc.CreateElement(type);
-                value.InnerText = AsString(attribute.Value);
+                value.InnerText = asString(attribute.Value);
                 attr.AppendChild(value);
                 xmlNode.AppendChild(attr);
             }

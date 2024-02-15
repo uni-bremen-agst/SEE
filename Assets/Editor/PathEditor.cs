@@ -10,7 +10,7 @@ using UnityEngine;
 namespace SEEEditor
 {
     /// <summary>
-    /// Implements an editor for camera path data to be used at game-design time.
+    /// Implements an editor for camera path data to be used at game-design Time.
     /// Allows a user to load and visualize recordered camera paths.
     /// </summary>
     [Serializable]
@@ -75,7 +75,7 @@ namespace SEEEditor
 
             if (current.type == EventType.ContextClick)
             {
-                Debug.LogFormat("mouse position: {0}\n", current.mousePosition);
+                Debug.LogFormat("mouse Position: {0}\n", current.mousePosition);
             }
 
             if (clickArea.Contains(current.mousePosition) && current.type == EventType.ContextClick)

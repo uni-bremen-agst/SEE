@@ -14,27 +14,41 @@ namespace SEE.Net.Dashboard.Model
         /// A parseable version number indicating the server version.
         /// </summary>
         /// <remarks>This can be parsed using <see cref="DashboardVersion"/>.</remarks>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string dashboardVersionNumber;
+        [JsonProperty(PropertyName = "dashboardVersionNumber", Required = Required.Always)]
+        public readonly string DashboardVersionNumber;
 
         /// <summary>
         /// The name of the error kind.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string type;
+        [JsonProperty(PropertyName = "type", Required = Required.Always)]
+        public readonly string Type;
 
         /// <summary>
         /// A human readable english message describing the error.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string message;
+        [JsonProperty(PropertyName = "message", Required = Required.Always)]
+        public readonly string Message;
 
         /// <summary>
         /// Use this instead of message in order to display a message translated according to your language preferences.
         /// Will contain exactly the same contents as message in case no translation is available.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string localizedMessage;
+        [JsonProperty(PropertyName = "localizedMessage", Required = Required.Always)]
+        public readonly string LocalizedMessage;
+
+        /// <summary>
+        /// The email address for Axivion support.
+        /// </summary>
+        [JsonProperty(PropertyName = "supportAddress")]
+        public readonly string SupportAddress;
+
+        /// <summary>
+        /// If this is true, this is an indication by the server, that this error is probably a bug
+        /// on server-side and clients are encouraged to encourage users to escalate this problem,
+        /// e.g. using supportAddress.
+        /// </summary>
+        [JsonProperty(PropertyName = "displayServerBugHint")]
+        public readonly string DisplayServerBugHint;
 
         /// <summary>
         /// Optional field containing additional error information meant for automatic processing.
@@ -42,16 +56,16 @@ namespace SEE.Net.Dashboard.Model
         /// understand and communicate certain types of error to the user.
         /// Always inspect the type so you know what keys you can expect.
         /// </summary>
-        [JsonProperty(Required = Required.Default)]
-        public readonly DashboardErrorData data;
+        [JsonProperty(PropertyName = "data", Required = Required.Default)]
+        public readonly DashboardErrorData Data;
 
         public DashboardError(string dashboardVersionNumber, string type, string message, string localizedMessage, DashboardErrorData data)
         {
-            this.dashboardVersionNumber = dashboardVersionNumber;
-            this.type = type;
-            this.message = message;
-            this.localizedMessage = localizedMessage;
-            this.data = data;
+            this.DashboardVersionNumber = dashboardVersionNumber;
+            this.Type = type;
+            this.Message = message;
+            this.LocalizedMessage = localizedMessage;
+            this.Data = data;
         }
 
         /// <summary>
@@ -64,42 +78,42 @@ namespace SEE.Net.Dashboard.Model
             /// References the column that has the invalid filter value.
             /// The file filter is referred to by the string "any path"
             /// </summary>
-            [JsonProperty(Required = Required.Default)]
-            public readonly string column;
+            [JsonProperty(PropertyName = "column", Required = Required.Default)]
+            public readonly string Column;
 
             /// <summary>
             /// Provides an ASCII-encoded URL pointing to human-readable help that might help a user understand
             /// and resolve the error. If the URL is relative, then it is meant relative to the Dashboard the error originated from.
             /// </summary>
-            [JsonProperty(Required = Required.Default)]
-            public readonly string help;
+            [JsonProperty(PropertyName = "help", Required = Required.Default)]
+            public readonly string Help;
 
             /// <summary>
             /// Indicates that the provided password may be used as API token with the respective API.
             /// E.g. use 'Authorization: AxToken …' header instead of HTTP basic auth.
             /// </summary>
-            [JsonProperty(Required = Required.Default)]
-            public readonly bool? passwordMayBeUsedAsApiToken;
+            [JsonProperty(PropertyName = "passwordMayBeUsedAsApiToken", Required = Required.Default)]
+            public readonly bool? PasswordMayBeUsedAsApiToken;
 
             public DashboardErrorData(string column, string help, bool? passwordMayBeUsedAsApiToken)
             {
-                this.column = column;
-                this.help = help;
-                this.passwordMayBeUsedAsApiToken = passwordMayBeUsedAsApiToken;
+                this.Column = column;
+                this.Help = help;
+                this.PasswordMayBeUsedAsApiToken = passwordMayBeUsedAsApiToken;
             }
 
             public override string ToString()
             {
-                return $"{nameof(column)}: {column}, {nameof(help)}: {help}, "
-                       + $"{nameof(passwordMayBeUsedAsApiToken)}: {passwordMayBeUsedAsApiToken}";
+                return $"{nameof(Column)}: {Column}, {nameof(Help)}: {Help}, "
+                       + $"{nameof(PasswordMayBeUsedAsApiToken)}: {PasswordMayBeUsedAsApiToken}";
             }
         }
 
         public override string ToString()
         {
-            return $"{nameof(dashboardVersionNumber)}: {dashboardVersionNumber}, "
-                   + $"{nameof(type)}: {type}, {nameof(message)}: {message}, "
-                   + $"{nameof(localizedMessage)}: {localizedMessage}, {nameof(data)}: {data}";
+            return $"{nameof(DashboardVersionNumber)}: {DashboardVersionNumber}, "
+                   + $"{nameof(Type)}: {Type}, {nameof(Message)}: {Message}, "
+                   + $"{nameof(LocalizedMessage)}: {LocalizedMessage}, {nameof(Data)}: {Data}";
         }
     }
 }

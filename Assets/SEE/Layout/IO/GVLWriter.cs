@@ -196,13 +196,13 @@ namespace SEE.Layout.IO
         /// <param name="node">node whose layout information is to be emitted</param>
         private static void AppendNode(XmlDocument doc, XmlElement xmlParent, ILayoutNode node)
         {
-            string ID = node.ID;
+            string id = node.ID;
             ILayoutNode parent = node.Parent;
             bool isRoot = parent == null;
             Vector3 parentPosition = isRoot ? Vector3.zero : parent.CenterPosition;
             Vector3 parentScale = isRoot ? Vector3.zero : parent.AbsoluteScale;
             XmlElement xmlNode = AppendNode(doc, xmlParent,
-                                            ID, node.CenterPosition, node.AbsoluteScale,
+                                            id, node.CenterPosition, node.AbsoluteScale,
                                             isRoot, parentPosition, parentScale);
 
             foreach (ILayoutNode child in node.Children())
@@ -232,13 +232,13 @@ namespace SEE.Layout.IO
         /// <param name="node">node whose layout information is to be emitted</param>
         private static void AppendNode(XmlDocument doc, XmlElement xmlParent, GameObject node)
         {
-            string ID = node.ID();
+            string id = node.ID();
             GameObject parent = GameObjectHierarchy.Parent(node, Tags.Node);
             bool isRoot = parent == null;
             Vector3 parentPosition = isRoot ? Vector3.zero : parent.transform.position;
             Vector3 parentScale = isRoot ? Vector3.zero : parent.transform.lossyScale;
             XmlElement xmlNode = AppendNode(doc, xmlParent,
-                                            ID, node.transform.position, node.transform.lossyScale,
+                                            id, node.transform.position, node.transform.lossyScale,
                                             isRoot, parentPosition, parentScale);
 
             foreach (GameObject child in GameObjectHierarchy.Children(node, Tags.Node))
@@ -251,7 +251,7 @@ namespace SEE.Layout.IO
         /// Appends
         ///   <Node Id="L*NAME*" X="*X*" Y="*Y*" W="*W* H="*H*" CS="14.14" Exp="True" />
         ///   where
-        ///     *NAME* is <paramref name="ID"/>
+        ///     *NAME* is <paramref name="id"/>
         ///     *X* is the x co-ordinate of the left upper corner of the rectangle containing node
         ///     *Y* is the z co-ordinate of the left upper corner of the rectangle containing node
         ///     *W* is the width (x axis) of the rectangle containing node
@@ -265,7 +265,7 @@ namespace SEE.Layout.IO
         /// </summary>
         /// <param name="doc">the XML document in which to create the XML node</param>
         /// <param name="xmlParent">the containing XML element</param>
-        /// <param name="ID">the unique identifier of the node</param>
+        /// <param name="id">the unique identifier of the node</param>
         /// <param name="nodeCenterPosition">the center position of the node in world space</param>
         /// <param name="nodeAbsoluteScale">the scale of the node in world space</param>
         /// <param name="isRoot">whether the node is a root node, that is, has no parent</param>
@@ -276,7 +276,7 @@ namespace SEE.Layout.IO
         private static XmlElement AppendNode
             (XmlDocument doc,
             XmlElement xmlParent,
-            string ID,
+            string id,
             Vector3 nodeCenterPosition,
             Vector3 nodeAbsoluteScale,
             bool isRoot,
@@ -288,7 +288,7 @@ namespace SEE.Layout.IO
 
             XmlElement xmlNode = doc.CreateElement(null, "Node", null);
             xmlParent.AppendChild(xmlNode);
-            xmlNode.SetAttribute("Id", "L" + ID);
+            xmlNode.SetAttribute("Id", "L" + id);
 
             if (isRoot)
             {
@@ -296,15 +296,15 @@ namespace SEE.Layout.IO
                 // assert: (X, Y) in GVL relates to absolute world space of the left upper corner,
                 // whereas (nodeCenterPosition.x, nodeCenterPosition.z) relates to the center within the x/z plane.
                 // Transform from center position of Unity to (X, Y) co-ordinate system in GVL.
-                float X = nodeCenterPosition.x - nodeAbsoluteScale.x / 2.0f;
+                float x = nodeCenterPosition.x - nodeAbsoluteScale.x / 2.0f;
 
                 // Gravis's Y is Unity's inverted z axis, i.e., we need to mirror Unity's z
                 // as follows: Y = -z. By mirroring z, the left upper corner of a node
                 // becomes its left lower corner.
-                float Y = -nodeCenterPosition.z - nodeAbsoluteScale.z / 2.0f;
+                float y = -nodeCenterPosition.z - nodeAbsoluteScale.z / 2.0f;
 
-                xmlNode.SetAttribute("X", FloatToString(X));
-                xmlNode.SetAttribute("Y", FloatToString(Y));
+                xmlNode.SetAttribute("X", FloatToString(x));
+                xmlNode.SetAttribute("Y", FloatToString(y));
             }
             else
             {
@@ -322,11 +322,11 @@ namespace SEE.Layout.IO
                 nodeCornerPosition.z += nodeAbsoluteScale.z / 2.0f;
 
                 // Calculate the offset between the two corners.
-                float X = nodeCornerPosition.x - parentCornerPosition.x;
-                float Y = parentCornerPosition.z - nodeCornerPosition.z;
+                float x = nodeCornerPosition.x - parentCornerPosition.x;
+                float y = parentCornerPosition.z - nodeCornerPosition.z;
 
-                xmlNode.SetAttribute("X", FloatToString(X));
-                xmlNode.SetAttribute("Y", FloatToString(Y));
+                xmlNode.SetAttribute("X", FloatToString(x));
+                xmlNode.SetAttribute("Y", FloatToString(y));
 
             }
             xmlNode.SetAttribute("W", FloatToString(nodeAbsoluteScale.x));

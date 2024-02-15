@@ -49,8 +49,8 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                 }
                 // We subtract 2 from the number of decimal places because we shifted all digits to the left by 2 by
                 // multiplying percentage with 100
-                valueText.text = percentage.ToString("F" + metricValueRange.DecimalPlaces) + "%";
-                titleText.text = metricValueRange.Name;
+                ValueText.text = percentage.ToString("F" + metricValueRange.DecimalPlaces) + "%";
+                TitleText.text = metricValueRange.Name;
             }
             else if (metricValue is MetricValueCollection metricValueCollection)
             {

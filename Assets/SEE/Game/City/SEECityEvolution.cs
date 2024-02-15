@@ -23,11 +23,13 @@ using System.Linq;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.Evolution;
-using SEE.Game.UI.RuntimeConfigMenu;
+using SEE.UI.RuntimeConfigMenu;
 using SEE.GO;
-using SEE.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using SEE.Game.CityRendering;
+using SEE.Utils.Config;
+using SEE.Utils.Paths;
 
 namespace SEE.Game.City
 {
@@ -47,12 +49,12 @@ namespace SEE.Game.City
         /// <summary>
         /// Name of the Inspector foldout group for the specific evolution setttings.
         /// </summary>
-        private const string EvolutionFoldoutGroup = "Evolution settings";
+        private const string evolutionFoldoutGroup = "Evolution settings";
 
         /// <summary>
         /// Sets the maximum number of revisions to load.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Maximum number of revisions to load."), FoldoutGroup(EvolutionFoldoutGroup), RuntimeTab(EvolutionFoldoutGroup)]
+        [SerializeField, ShowInInspector, Tooltip("Maximum number of revisions to load."), FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
         public int MaxRevisionsToLoad = 500;  // serialized by Unity
 
         /// <summary>
@@ -66,7 +68,7 @@ namespace SEE.Game.City
         /// The directory in which the GXL files of the graph series are located.
         /// </summary>
         [SerializeField, ShowInInspector, Tooltip("The directory in which the GXL files are located."), FoldoutGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
-        public DirectoryPath GXLDirectory = new DirectoryPath();
+        public DirectoryPath GXLDirectory = new();
 
         //-----------------------------------------------------
         // Attributes to mark changes
@@ -76,35 +78,35 @@ namespace SEE.Game.City
         /// The height of posts used as markers for new and deleted elements.
         /// </summary>
         [Tooltip("The height of posts used as markers for new, changed, and deleted elements (>=0).")]
-        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup), RuntimeTab(EvolutionFoldoutGroup)]
+        [SerializeField, ShowInInspector, FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
         public float MarkerHeight = 0.2f;
 
         /// <summary>
         /// The width (x and z lengths) of posts used as markers for new and deleted elements.
         /// </summary>
         [Tooltip("The width (x and z lengths) of posts used as markers for new and deleted elements (>=0).")]
-        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup), RuntimeTab(EvolutionFoldoutGroup)]
+        [SerializeField, ShowInInspector, FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
         public float MarkerWidth = 0.01f;
 
         /// <summary>
         /// Color for power beams of newly added nodes, can be set in inspector
         /// </summary>
         [Tooltip("The color of the beam for newly created nodes.")]
-        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup), RuntimeTab(EvolutionFoldoutGroup)]
+        [SerializeField, ShowInInspector, FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
         public Color AdditionBeamColor = Color.green;
 
         /// <summary>
         /// Changed nodes beam color to be pickable in inspector
         /// </summary>
         [Tooltip("The color of the beam for changed nodes.")]
-        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup), RuntimeTab(EvolutionFoldoutGroup)]
+        [SerializeField, ShowInInspector, FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
         public Color ChangeBeamColor = Color.yellow;
 
         /// <summary>
         /// Deleted nodes beam color to be pickable in inspector
         /// </summary>
         [Tooltip("The color of the beam for deleted nodes.")]
-        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup), RuntimeTab(EvolutionFoldoutGroup)]
+        [SerializeField, ShowInInspector, FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
         public Color DeletionBeamColor = Color.black;
 
         /// <summary>
@@ -152,10 +154,10 @@ namespace SEE.Game.City
         /// </summary>
         private List<Graph> LoadDataSeries()
         {
-            GraphsReader graphsReader = new GraphsReader();
+            GraphsReader graphsReader = new();
             // Load all GXL graphs and CSV files in directory PathPrefix but not more than maxRevisionsToLoad many.
             graphsReader.Load(GXLDirectory.Path, HierarchicalEdges, basePath: SourceCodeDirectory.Path, rootName: GXLDirectory.Path, MaxRevisionsToLoad);
-            return graphsReader.graphs;
+            return graphsReader.Graphs;
         }
 
         /// <summary>
@@ -253,9 +255,9 @@ namespace SEE.Game.City
         /// <returns>the loaded graph or null if none could be found</returns>
         private Graph LoadFirstGraph()
         {
-            GraphsReader reader = new GraphsReader();
+            GraphsReader reader = new();
             reader.Load(GXLDirectory.Path, HierarchicalEdges, basePath: SourceCodeDirectory.Path, rootName: GXLDirectory.Path, 1);
-            List<Graph> graphs = reader.graphs;
+            List<Graph> graphs = reader.Graphs;
             if (graphs.Count == 0)
             {
                 return null;
@@ -311,10 +313,10 @@ namespace SEE.Game.City
                 {
                     // Node types have been filtered out. Because of that
                     // there may now be multiple roots again.
-                    relevantGraph.AddSingleRoot(name: "ROOT", type: Graph.UnknownType);
+                    relevantGraph.AddSingleRoot(out Node _, name: "ROOT", type: Graph.UnknownType);
                 }
                 graphs[i] = relevantGraph;
-                LoadDataForGraphListing(graphs[i]);
+                SetupCompoundSpringEmbedder(graphs[i]);
             }
         }
 
@@ -340,54 +342,54 @@ namespace SEE.Game.City
         /// <summary>
         /// Label of attribute <see cref="GXLDirectory"/> in the configuration file.
         /// </summary>
-        private const string GXLDirectoryLabel = "GXLDirectory";
+        private const string gxlDirectoryLabel = "GXLDirectory";
         /// <summary>
         /// Label of attribute <see cref="MaxRevisionsToLoad"/> in the configuration file.
         /// </summary>
-        private const string MaxRevisionsToLoadLabel = "MaxRevisionsToLoad";
+        private const string maxRevisionsToLoadLabel = "MaxRevisionsToLoad";
         /// <summary>
         /// Label of attribute <see cref="MarkerHeight"/> in the configuration file.
         /// </summary>
-        private const string MarkerHeightLabel = "MarkerHeight";
+        private const string markerHeightLabel = "MarkerHeight";
         /// <summary>
         /// Label of attribute <see cref="MarkerWidth"/> in the configuration file.
         /// </summary>
-        private const string MarkerWidthLabel = "MarkerWidth";
+        private const string markerWidthLabel = "MarkerWidth";
         /// <summary>
         /// Label of attribute <see cref="AdditionBeamColor"/> in the configuration file.
         /// </summary>
-        private const string AdditionBeamColorLabel = "AdditionBeamColor";
+        private const string additionBeamColorLabel = "AdditionBeamColor";
         /// <summary>
         /// Label of attribute <see cref="ChangeBeamColor"/> in the configuration file.
         /// </summary>
-        private const string ChangeBeamColorLabel = "ChangeBeamColor";
+        private const string changeBeamColorLabel = "ChangeBeamColor";
         /// <summary>
         /// Label of attribute <see cref="DeletionBeamColor"/> in the configuration file.
         /// </summary>
-        private const string DeletionBeamColorLabel = "DeletionBeamColor";
+        private const string deletionBeamColorLabel = "DeletionBeamColor";
 
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
-            GXLDirectory.Save(writer, GXLDirectoryLabel);
-            writer.Save(MaxRevisionsToLoad, MaxRevisionsToLoadLabel);
-            writer.Save(MarkerHeight, MarkerHeightLabel);
-            writer.Save(MarkerWidth, MarkerWidthLabel);
-            writer.Save(AdditionBeamColor, AdditionBeamColorLabel);
-            writer.Save(ChangeBeamColor, ChangeBeamColorLabel);
-            writer.Save(DeletionBeamColor, DeletionBeamColorLabel);
+            GXLDirectory.Save(writer, gxlDirectoryLabel);
+            writer.Save(MaxRevisionsToLoad, maxRevisionsToLoadLabel);
+            writer.Save(MarkerHeight, markerHeightLabel);
+            writer.Save(MarkerWidth, markerWidthLabel);
+            writer.Save(AdditionBeamColor, additionBeamColorLabel);
+            writer.Save(ChangeBeamColor, changeBeamColorLabel);
+            writer.Save(DeletionBeamColor, deletionBeamColorLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
-            GXLDirectory.Restore(attributes, GXLDirectoryLabel);
-            ConfigIO.Restore(attributes, MaxRevisionsToLoadLabel, ref MaxRevisionsToLoad);
-            ConfigIO.Restore(attributes, MarkerHeightLabel, ref MarkerHeight);
-            ConfigIO.Restore(attributes, MarkerWidthLabel, ref MarkerWidth);
-            ConfigIO.Restore(attributes, AdditionBeamColorLabel, ref AdditionBeamColor);
-            ConfigIO.Restore(attributes, ChangeBeamColorLabel, ref ChangeBeamColor);
-            ConfigIO.Restore(attributes, DeletionBeamColorLabel, ref DeletionBeamColor);
+            GXLDirectory.Restore(attributes, gxlDirectoryLabel);
+            ConfigIO.Restore(attributes, maxRevisionsToLoadLabel, ref MaxRevisionsToLoad);
+            ConfigIO.Restore(attributes, markerHeightLabel, ref MarkerHeight);
+            ConfigIO.Restore(attributes, markerWidthLabel, ref MarkerWidth);
+            ConfigIO.Restore(attributes, additionBeamColorLabel, ref AdditionBeamColor);
+            ConfigIO.Restore(attributes, changeBeamColorLabel, ref ChangeBeamColor);
+            ConfigIO.Restore(attributes, deletionBeamColorLabel, ref DeletionBeamColor);
         }
     }
 }

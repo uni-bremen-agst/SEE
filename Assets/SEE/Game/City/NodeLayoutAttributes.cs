@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Sirenix.Serialization;
 using SEE.Utils;
+using SEE.Utils.Config;
+using SEE.Utils.Paths;
 
 namespace SEE.Game.City
 {
@@ -17,6 +19,11 @@ namespace SEE.Game.City
         public NodeLayoutKind Kind = NodeLayoutKind.Balloon;
 
         /// <summary>
+        /// Settings for the <see cref="SEE.Layout.NodeLayouts.IncrementalTreeMapLayout"/>.
+        /// </summary>
+        public IncrementalTreeMapAttributes IncrementalTreeMap = new();
+
+        /// <summary>
         /// The path for the layout file containing the node layout information.
         /// If the file extension is <see cref="Filenames.GVLExtension"/>, the layout is expected
         /// to be stored in Axivion's Gravis layout (GVL) with 2D co-ordinates.
@@ -24,15 +31,14 @@ namespace SEE.Game.City
         /// data of a game object.
         /// </summary>
         [OdinSerialize]
-        public FilePath LayoutPath = new FilePath();
-
-        private const string LayoutPathLabel = "LayoutPath";
+        public FilePath LayoutPath = new();
 
         public override void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(Kind.ToString(), NodeLayoutLabel);
-            LayoutPath.Save(writer, LayoutPathLabel);
+            writer.Save(Kind.ToString(), nodeLayoutLabel);
+            LayoutPath.Save(writer, layoutPathLabel);
+            IncrementalTreeMap.Save(writer, incrementalTreeMapLabel);
             writer.EndGroup();
         }
 
@@ -42,11 +48,23 @@ namespace SEE.Game.City
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
 
-                ConfigIO.RestoreEnum(values, NodeLayoutLabel, ref Kind);
-                LayoutPath.Restore(values, LayoutPathLabel);
+                ConfigIO.RestoreEnum(values, nodeLayoutLabel, ref Kind);
+                LayoutPath.Restore(values, layoutPathLabel);
+                IncrementalTreeMap.Restore(values, incrementalTreeMapLabel);
             }
         }
 
-        private const string NodeLayoutLabel = "NodeLayout";
+        /// <summary>
+        /// Configuration label for <see cref="LayoutPath"/>.
+        /// </summary>
+        private const string layoutPathLabel = "LayoutPath";
+        /// <summary>
+        /// Configuration label for <see cref="IncrementalTreeMap"/>.
+        /// </summary>
+        private const string incrementalTreeMapLabel = "IncrementalTreeMap";
+        /// <summary>
+        /// Configuration label for <see cref="Kind"/>.
+        /// </summary>
+        private const string nodeLayoutLabel = "NodeLayout";
     }
 }

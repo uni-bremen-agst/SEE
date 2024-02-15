@@ -42,7 +42,7 @@ namespace SEE.Utils
             /// <summary>
             /// The user-specific data associated with this node.
             /// </summary>
-            internal readonly T item;
+            internal readonly T Item;
             /// <summary>
             /// The parent of this node. May be null, in which case it is considered
             /// a root of the forest.
@@ -59,7 +59,7 @@ namespace SEE.Utils
             /// <param name="item">the user-specific data to be associated with this node</param>
             internal Node(T item)
             {
-                this.item = item;
+                this.Item = item;
             }
 
             /// <summary>
@@ -139,7 +139,7 @@ namespace SEE.Utils
 
             bool FindChild(Node current, Node _)
             {
-                if (current.item.Equals(item))
+                if (current.Item.Equals(item))
                 {
                     result = current;
                     return false;
@@ -189,7 +189,7 @@ namespace SEE.Utils
 
             bool Visit(Node node, Node parent)
             {
-                return visitor(node.item, parent != null ? parent.item : default);
+                return visitor(node.Item, parent != null ? parent.Item : default);
             }
         }
 
@@ -225,7 +225,7 @@ namespace SEE.Utils
         /// </remarks>
         public IList<T> ToList()
         {
-            return roots.Select(r => r.item).ToList();
+            return roots.Select(r => r.Item).ToList();
         }
 
         /// <summary>
@@ -240,7 +240,7 @@ namespace SEE.Utils
 
             bool AddToList(Node node, Node _)
             {
-                result.Add(node.item);
+                result.Add(node.Item);
                 return true;
             }
         }

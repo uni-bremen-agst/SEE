@@ -1,6 +1,7 @@
 ﻿using SEE.Game;
 using SEE.Game.Operator;
 using SEE.GO;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Net.Actions
@@ -36,15 +37,7 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameObject gameObject = GraphElementIDMap.Find(GameObjectID);
-            if (gameObject != null)
-            {
-                gameObject.AddOrGetComponent<NodeOperator>().MoveTo(Position, 0);
-            }
-            else
-            {
-                throw new System.Exception($"There is no game object with the ID {GameObjectID}.");
-            }
+            Find(GameObjectID).NodeOperator().MoveTo(Position, 0);
         }
 
         /// <summary>

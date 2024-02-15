@@ -34,14 +34,14 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Contains all loaded graphs after calling Load().
         /// </summary>
-        public readonly List<Graph> graphs = new();
+        public readonly List<Graph> Graphs = new();
 
         /// <summary>
         /// Loads all GXL and their associated CSV files (limited to <paramref name="maxRevisionsToLoad"/> many
-        /// files) from <paramref name="directory"/> and saves these in <see cref="graphs"/>.
+        /// files) from <paramref name="directory"/> and saves these in <see cref="Graphs"/>.
         ///
         /// For every GXL file, F.gxl , contained in <paramref name="directory"/>, the graph
-        /// data therein will be loaded into a new graph that is then added to <see cref="graphs"/>.
+        /// data therein will be loaded into a new graph that is then added to <see cref="Graphs"/>.
         /// If there is a file F.csv contained in <paramref name="directory"/>, this file is assumed
         /// to carry additional metrics for the graph nodes. These metrics will be read and added to
         /// the nodes in the loaded graph where the unique node ID is used to identify the node to
@@ -59,7 +59,7 @@ namespace SEE.DataModel.DG.IO
             {
                 throw new Exception($"Directory '{directory}' has no GXL files.");
             }
-            graphs.Clear();
+            Graphs.Clear();
 
             Performance p = Performance.Begin($"Loading GXL files from {directory}");
             // for all found GXL files load and save the graph data
@@ -96,7 +96,7 @@ namespace SEE.DataModel.DG.IO
                         Debug.LogWarning($"CSV file {csvFilename} does not exist.\n");
                     }
                     maxRevisionsToLoad--;
-                    graphs.Add(graph);
+                    Graphs.Add(graph);
                 }
                 if (maxRevisionsToLoad <= 0)
                 {
@@ -104,7 +104,7 @@ namespace SEE.DataModel.DG.IO
                 }
             }
             p.End();
-            Debug.Log($"Number of graphs loaded: {graphs.Count}\n");
+            Debug.Log($"Number of graphs loaded: {Graphs.Count}\n");
         }
     }
 }

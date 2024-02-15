@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Sirenix.Serialization;
 using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
 using SEE.GO;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Tools;
@@ -12,7 +10,10 @@ using SEE.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
-using SEE.Game.UI.RuntimeConfigMenu;
+using SEE.UI.RuntimeConfigMenu;
+using SEE.Game.CityRendering;
+using SEE.Utils.Config;
+using SEE.Utils.Paths;
 
 namespace SEE.Game.City
 {
@@ -67,7 +68,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The path where the settings (the attributes of this class) are stored.
         /// </summary>
-        [SerializeField, Tooltip("Path of configuration file."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        [Tooltip("Path of configuration file."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         public FilePath ConfigurationPath = new();
 
         /// <summary>
@@ -81,7 +82,7 @@ namespace SEE.Game.City
         /// The path to project where the source code can be found. This attribute
         /// is needed to show the source code of nodes and edges.
         /// </summary>
-        [SerializeField, TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        [TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         [PropertyTooltip("Directory where the source code is located")]
         [HideReferenceObjectPicker]
         public DirectoryPath SourceCodeDirectory
@@ -108,7 +109,7 @@ namespace SEE.Game.City
         /// of an IDE for a particular project. Concretely, if the IDE is Visual Studio,
         /// this is the VS solution file.
         /// </summary>
-        [SerializeField, Tooltip("Path of VS solution file."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        [SerializeField, Tooltip("Path of Visual Studio solution file."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         public FilePath SolutionPath = new();
 
         /// <summary>
@@ -290,7 +291,7 @@ namespace SEE.Game.City
         /// <param name="filename">name of the file from which the settings are restored</param>
         public void Load(string filename)
         {
-            using ConfigReader stream = new(filename);
+            using Utils.Config.ConfigReader stream = new(filename);
             Restore(stream.Read());
         }
 
@@ -491,7 +492,7 @@ namespace SEE.Game.City
                 ErosionSettings.ArchitectureIssue,
                 ErosionSettings.CloneIssue,
                 ErosionSettings.CycleIssue,
-                ErosionSettings.Dead_CodeIssue,
+                ErosionSettings.DeadCodeIssue,
                 ErosionSettings.MetricIssue,
                 ErosionSettings.StyleIssue,
                 ErosionSettings.UniversalIssue
@@ -505,13 +506,13 @@ namespace SEE.Game.City
         public IList<string> AllInnerNodeIssues() =>
             new List<string>
             {
-                ErosionSettings.ArchitectureIssue_SUM,
-                ErosionSettings.CloneIssue_SUM,
-                ErosionSettings.CycleIssue_SUM,
-                ErosionSettings.Dead_CodeIssue_SUM,
-                ErosionSettings.MetricIssue_SUM,
-                ErosionSettings.StyleIssue_SUM,
-                ErosionSettings.UniversalIssue_SUM
+                ErosionSettings.ArchitectureIssueSum,
+                ErosionSettings.CloneIssueSum,
+                ErosionSettings.CycleIssueSum,
+                ErosionSettings.DeadCodeIssueSum,
+                ErosionSettings.MetricIssueSum,
+                ErosionSettings.StyleIssueSum,
+                ErosionSettings.UniversalIssueSum
             };
 
         /// <summary>
@@ -530,10 +531,10 @@ namespace SEE.Game.City
         public Dictionary<string, IconFactory.Erosion> LeafIssueMap() =>
             new()
             {
-                { ErosionSettings.ArchitectureIssue, IconFactory.Erosion.Architecture_Violation },
+                { ErosionSettings.ArchitectureIssue, IconFactory.Erosion.ArchitectureViolation },
                 { ErosionSettings.CloneIssue, IconFactory.Erosion.Clone },
                 { ErosionSettings.CycleIssue, IconFactory.Erosion.Cycle },
-                { ErosionSettings.Dead_CodeIssue, IconFactory.Erosion.Dead_Code },
+                { ErosionSettings.DeadCodeIssue, IconFactory.Erosion.DeadCode },
                 { ErosionSettings.MetricIssue, IconFactory.Erosion.Metric },
                 { ErosionSettings.StyleIssue, IconFactory.Erosion.Style },
                 { ErosionSettings.UniversalIssue, IconFactory.Erosion.Universal }
@@ -543,52 +544,12 @@ namespace SEE.Game.City
         /// Yields a mapping of all node attribute names that define erosion issues
         /// for inner nodes onto the icons to be used for visualizing them.
         /// These are usually the same attributes from <see cref="LeafIssueMap"/>, appended with
-        /// <see cref="MetricAggregator.SUM_EXTENSION"/>, i.e., they represent the aggregated issue metrics.
+        /// <see cref="MetricAggregator.SumExtension"/>, i.e., they represent the aggregated issue metrics.
         /// </summary>
         /// <returns>mapping of all node attribute names for inner nodes onto icon ids</returns>
         public Dictionary<string, IconFactory.Erosion> InnerIssueMap() =>
-            LeafIssueMap().Select(x => (Key: x.Key + MetricAggregator.SUM_EXTENSION, x.Value))
+            LeafIssueMap().Select(x => (Key: x.Key + MetricAggregator.SumExtension, x.Value))
                           .ToDictionary(x => x.Key, x => x.Value);
-
-        /// <summary>
-        /// Loads and returns the graph data from the GXL file with given <paramref name="filename"/>.
-        /// </summary>
-        /// <param name="filename">GXL filename from which to load the graph</param>
-        /// <param name="rootName">the name of the artificial root if any needs to be added;
-        /// if null is given, <paramref name="filename"/> will be used instead</param>
-        /// <returns>the loaded graph (may be empty if a graph could not be loaded)</returns>
-        protected Graph LoadGraph(string filename, string rootName = null)
-        {
-            if (string.IsNullOrEmpty(filename))
-            {
-                Debug.LogError("Empty graph path.\n");
-                Graph graph = new(SourceCodeDirectory.Path);
-                return graph;
-            }
-
-            if (File.Exists(filename))
-            {
-                Performance p = Performance.Begin("loading graph data from " + filename);
-                GraphReader graphCreator = new(filename, HierarchicalEdges,
-                                               basePath: SourceCodeDirectory.Path,
-                                               rootID: rootName ?? filename,
-                                               logger: new SEELogger());
-                graphCreator.Load();
-                Graph graph = graphCreator.GetGraph();
-                p.End();
-                Debug.Log($"Loaded graph data for city {name} from {filename} successfully:\n"
-                          + $"Number of nodes: {graph.NodeCount}\n"
-                          + $"Number of edges: {graph.EdgeCount}\n"
-                          + $"Elapsed time: {p.GetElapsedTime()} [h:m:s:ms]\n");
-                LoadDataForGraphListing(graph);
-                return graph;
-            }
-            else
-            {
-                Debug.LogError($"GXL file {filename} of city {name} does not exist.\n");
-                return new Graph(SourceCodeDirectory.Path);
-            }
-        }
 
         /// <summary>
         /// Lists the metrics for each node type.
@@ -673,7 +634,8 @@ namespace SEE.Game.City
         /// Saves all data needed for the listing of the dirs in gui in cosegraphSettings
         /// </summary>
         /// <param name="graph"></param>
-        public void LoadDataForGraphListing(Graph graph)
+        [Obsolete]
+        public void SetupCompoundSpringEmbedder(Graph graph)
         {
             if (NodeLayoutSettings.Kind == NodeLayoutKind.CompoundSpringEmbedder)
             {
@@ -711,6 +673,8 @@ namespace SEE.Game.City
                                                                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.IsRelevant);
             }
         }
+
+        #region Odin Inspector Attributes
 
         //----------------------------------------------------------------
         // Odin Inspector Attributes
@@ -796,5 +760,6 @@ namespace SEE.Game.City
         /// </summary>
         protected const string ErosionFoldoutGroup = "Erosion";
 
+        #endregion
     }
 }

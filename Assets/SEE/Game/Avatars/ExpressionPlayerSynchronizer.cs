@@ -48,7 +48,7 @@ namespace SEE.Game.Avatars
         {
             if (expressionPlayer != null)
             {
-                new ExpressionPlayerNetAction(expressionPlayer, networkObject.NetworkObjectId).Execute();
+                new ExpressionPlayerNetAction(expressionPlayer, NetworkObject.NetworkObjectId).Execute();
             }
         }
     }

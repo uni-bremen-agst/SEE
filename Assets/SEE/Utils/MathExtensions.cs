@@ -96,7 +96,7 @@ namespace SEE.Utils
         /// <param name="b">The denominator.</param>
         /// <returns>The pairwise divided vector.</returns>
         public static Vector2 DividePairwise(this Vector2 a, Vector2 b) =>
-            new Vector2(
+            new(
                 b.x == 0.0f ? 0.0f : a.x / b.x,
                 b.y == 0.0f ? 0.0f : a.y / b.y
             );
@@ -147,7 +147,7 @@ namespace SEE.Utils
         /// <param name="b">The denominator.</param>
         /// <returns>The pairwise divided vector.</returns>
         public static Vector3 DividePairwise(this Vector3 a, Vector3 b) =>
-            new Vector3(
+            new(
                 b.x == 0.0f ? 0.0f : a.x / b.x,
                 b.y == 0.0f ? 0.0f : a.y / b.y,
                 b.z == 0.0f ? 0.0f : a.z / b.z
@@ -160,7 +160,7 @@ namespace SEE.Utils
         /// <param name="a">The vector.</param>
         /// <returns>The floored vector.</returns>
         public static Vector3Int FloorToInt(this Vector3 a) =>
-            new Vector3Int(Mathf.FloorToInt(a.x), Mathf.FloorToInt(a.y), Mathf.FloorToInt(a.z));
+            new(Mathf.FloorToInt(a.x), Mathf.FloorToInt(a.y), Mathf.FloorToInt(a.z));
 
         /// <summary>
         /// Returns the largest component of given vector.
@@ -206,8 +206,8 @@ namespace SEE.Utils
 
             Vector2[] centers = {
                 min,
-                new Vector2(max.x, min.y),
-                new Vector2(min.x, max.y),
+                new(max.x, min.y),
+                new(min.x, max.y),
                 max
             };
 
@@ -222,13 +222,13 @@ namespace SEE.Utils
             }
 
             Vector2[] aabbMins = {
-                new Vector2(min.x - radius, min.y),
-                new Vector2(min.x, min.y - radius)
+                new(min.x - radius, min.y),
+                new(min.x, min.y - radius)
             };
 
             Vector2[] aabbMaxs = {
-                new Vector2(max.x + radius, max.y),
-                new Vector2(max.x, max.y + radius)
+                new(max.x + radius, max.y),
+                new(max.x, max.y + radius)
             };
 
             for (int i = 0; i < 2; i++)
@@ -247,77 +247,91 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="a">The vector.</param>
         /// <returns>The copied components as a 2d-vector.</returns>
-        public static Vector2 XY(this Vector3 a) => new Vector2(a.x, a.y);
+        public static Vector2 XY(this Vector3 a) => new(a.x, a.y);
 
         /// <summary>
         /// Creates and returns a copy of the x- and z-components of given 3d-vector.
         /// </summary>
         /// <param name="a">The vector.</param>
         /// <returns>The copied components as a 2d-vector.</returns>
-        public static Vector2 XZ(this Vector3 a) => new Vector2(a.x, a.z);
+        public static Vector2 XZ(this Vector3 a) => new(a.x, a.z);
 
         /// <summary>
         /// Creates and returns a copy of the y- and z-components of given 3d-vector.
         /// </summary>
         /// <param name="a">The vector.</param>
         /// <returns>The copied components as a 2d-vector.</returns>
-        public static Vector2 YZ(this Vector3 a) => new Vector2(a.y, a.z);
+        public static Vector2 YZ(this Vector3 a) => new(a.y, a.z);
 
         /// <summary>
         /// Creates and returns a copy of the x, y- and z-components of given 4d-vector.
         /// </summary>
         /// <param name="a">The vector.</param>
         /// <returns>The copied components as a 3d-vector.</returns>
-        public static Vector3 XYZ(this Vector4 a) => new Vector3(a.x, a.y, a.z);
+        public static Vector3 XYZ(this Vector4 a) => new(a.x, a.y, a.z);
 
         /// <summary>
         /// Creates and returns a copy of the y, z- and w-components of given 4d-vector.
         /// </summary>
         /// <param name="a">The vector.</param>
         /// <returns>The copied components as a 3d-vector.</returns>
-        public static Vector3 YZW(this Vector4 a) => new Vector3(a.y, a.z, a.w);
+        public static Vector3 YZW(this Vector4 a) => new(a.y, a.z, a.w);
 
         /// <summary>
         /// Creates and returns a copy of the x- and y-components of given 4d-vector.
         /// </summary>
         /// <param name="a">The vector.</param>
         /// <returns>The copied components as a 2d-vector.</returns>
-        public static Vector2 XY(this Vector4 a) => new Vector2(a.x, a.y);
+        public static Vector2 XY(this Vector4 a) => new(a.x, a.y);
 
         /// <summary>
         /// Creates and returns a copy of the x- and z-components of given 4d-vector.
         /// </summary>
         /// <param name="a">The vector.</param>
         /// <returns>The copied components as a 2d-vector.</returns>
-        public static Vector2 XZ(this Vector4 a) => new Vector2(a.x, a.z);
+        public static Vector2 XZ(this Vector4 a) => new(a.x, a.z);
 
         /// <summary>
         /// Creates and returns a copy of the x- and w-components of given 4d-vector.
         /// </summary>
         /// <param name="a">The vector.</param>
         /// <returns>The copied components as a 2d-vector.</returns>
-        public static Vector2 XW(this Vector4 a) => new Vector2(a.x, a.w);
+        public static Vector2 XW(this Vector4 a) => new(a.x, a.w);
 
         /// <summary>
         /// Creates and returns a copy of the y- and z-components of given 4d-vector.
         /// </summary>
         /// <param name="a">The vector.</param>
         /// <returns>The copied components as a 2d-vector.</returns>
-        public static Vector2 YZ(this Vector4 a) => new Vector2(a.y, a.z);
+        public static Vector2 YZ(this Vector4 a) => new(a.y, a.z);
 
         /// <summary>
         /// Creates and returns a copy of the y- and w-components of given 4d-vector.
         /// </summary>
         /// <param name="a">The vector.</param>
         /// <returns>The copied components as a 2d-vector.</returns>
-        public static Vector2 YW(this Vector4 a) => new Vector2(a.y, a.w);
+        public static Vector2 YW(this Vector4 a) => new(a.y, a.w);
 
         /// <summary>
         /// Creates and returns a copy of the z- and w-components of given 4d-vector.
         /// </summary>
         /// <param name="a">The vector.</param>
         /// <returns>The copied components as a 2d-vector.</returns>
-        public static Vector2 ZW(this Vector4 a) => new Vector2(a.z, a.w);
+        public static Vector2 ZW(this Vector4 a) => new(a.z, a.w);
+
+        /// <summary>
+        /// Returns the given <paramref name="vector2"/>, replacing any of its components with
+        /// <paramref name="x"/>, and/or <paramref name="y"/> respectively, if they were given.
+        /// If no parameters are given, this method will be equivalent to the identity function.
+        /// </summary>
+        /// <param name="vector2">The vector whose components shall be replaced</param>
+        /// <param name="x">New X component</param>
+        /// <param name="y">New Y component</param>
+        /// <returns><paramref name="vector2"/> with its components replaced</returns>
+        public static Vector2 WithXY(this Vector2 vector2, float? x = null, float? y = null)
+        {
+            return new Vector2(x ?? vector2.x, y ?? vector2.y);
+        }
 
         /// <summary>
         /// Returns the given <paramref name="vector3"/>, replacing any of its components with
@@ -335,18 +349,14 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Returns the given <paramref name="vector2"/>, replacing any of its components with
-        /// <paramref name="x"/>, and/or <paramref name="y"/> respectively, if they were given.
-        /// If no parameters are given, this method will be equivalent to the identity function.
+        /// Returns a new <see cref="Vector4"/> with the same x, y, and z components as the given
+        /// <paramref name="vector3"/>, and the given <paramref name="w"/> component.
         /// </summary>
-        /// <param name="vector2">The vector whose components shall be replaced</param>
-        /// <param name="x">New X component</param>
-        /// <param name="y">New Y component</param>
-        /// <returns><paramref name="vector2"/> with its components replaced</returns>
-        public static Vector2 WithXY(this Vector2 vector2, float? x = null, float? y = null)
-        {
-            return new Vector2(x ?? vector2.x, y ?? vector2.y);
-        }
+        /// <param name="vector3">The vector whose components shall be used</param>
+        /// <param name="w">New W component</param>
+        /// <returns>A new <see cref="Vector4"/> with the same x, y, and z components as the given
+        /// <paramref name="vector3"/>, and the given <paramref name="w"/> component.</returns>
+        public static Vector4 WithW(this Vector3 vector3, float w) => new(vector3.x, vector3.y, vector3.z, w);
 
         /// <summary>
         /// Performs a collision test between a point and a circle. The distance and a

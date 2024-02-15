@@ -17,23 +17,23 @@ namespace SEE.Net.Actions
         /// <summary>
         /// The id of the interactable.
         /// </summary>
-        public string id;
+        public string ID;
 
         /// <summary>
         /// The position of the interactable.
         /// </summary>
-        public Vector3 position;
+        public Vector3 Position;
 
         /// <summary>
         /// The rotation of the interactable.
         /// </summary>
-        public Quaternion rotation;
+        public Quaternion Rotation;
 
         /// <summary>
         /// The local scale of the interactable or <c>null</c>, if the
         /// local scale is not to be synchronized.
         /// </summary>
-        public Vector3? localScale = null;
+        public Vector3? LocalScale = null;
 
         /// <summary>
         /// Constructor.
@@ -45,17 +45,18 @@ namespace SEE.Net.Actions
         {
             Assert.IsNotNull(interactable);
 
-            id = interactable.name;
-            position = interactable.transform.position;
-            rotation = interactable.transform.rotation;
+            ID = interactable.name;
+            Position = interactable.transform.position;
+            Rotation = interactable.transform.rotation;
             if (syncLocalScale)
             {
-                localScale = interactable.transform.localScale;
+                LocalScale = interactable.transform.localScale;
             }
         }
 
         public override void ExecuteOnServer()
         {
+            // Intentionally left blank.
         }
 
         /// <summary>
@@ -64,15 +65,15 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            InteractableObject interactable = InteractableObject.Get(id);
+            InteractableObject interactable = InteractableObject.Get(ID);
             if (interactable)
             {
                 interactable.InteractableSynchronizer?.NotifyJustReceivedUpdate();
-                interactable.transform.position = position;
-                interactable.transform.rotation = rotation;
-                if (localScale.HasValue)
+                interactable.transform.position = Position;
+                interactable.transform.rotation = Rotation;
+                if (LocalScale.HasValue)
                 {
-                    interactable.transform.localScale = localScale.Value;
+                    interactable.transform.localScale = LocalScale.Value;
                 }
             }
         }

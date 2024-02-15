@@ -176,6 +176,6 @@ namespace SEE.Layout
         public bool IsSublayoutRoot { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public Sublayout Sublayout { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public ILayoutNode SublayoutRoot { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public GameObject gameObject => throw new NotImplementedException();
+        public GameObject GameObject => throw new NotImplementedException();
     }
 }

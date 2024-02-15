@@ -40,7 +40,7 @@ namespace SEE.Controls.Actions
                 {
                     if (gameEdge.TryGetEdge(out Edge edge))
                     {
-                        EdgeOperator edgeOperator = gameEdge.AddOrGetComponent<EdgeOperator>();
+                        EdgeOperator edgeOperator = gameEdge.EdgeOperator();
                         if (edge.HasToggle(Edge.IsHiddenToggle))
                         {
                             edge.UnsetToggle(Edge.IsHiddenToggle);

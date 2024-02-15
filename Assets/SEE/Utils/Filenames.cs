@@ -14,7 +14,7 @@ namespace SEE.Utils
         /// Directory separator on Windows.
         /// </summary>
         public const char WindowsDirectorySeparator = '\\';
-        
+
         /// <summary>
         /// Directory separator on Unix.
         /// </summary>
@@ -78,7 +78,7 @@ namespace SEE.Utils
         /// <summary>
         /// Returns the last part of the given <paramref name="extension"/>
         /// without the period.
-        /// 
+        ///
         /// Precondition: <paramref name="extension"/> must start with a period.
         /// </summary>
         /// <param name="extension"></param>
@@ -134,7 +134,7 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Returns path where all directory separators of the current operating 
+        /// Returns path where all directory separators of the current operating
         /// system platform have been replaced by the Unix (or Unity) directory separator.
         /// </summary>
         /// <param name="path">path to be adjusted</param>
@@ -147,7 +147,7 @@ namespace SEE.Utils
         /// <summary>
         /// Returns the sorted list of GXL filenames of the given <paramref name="directory"/>.
         /// Note that this also finds compressed GXL files.
-        /// 
+        ///
         /// Precondition: <paramref name="directory"/> must not be null or empty and must exist
         /// as a directory in the file system.
         /// </summary>
@@ -161,7 +161,7 @@ namespace SEE.Utils
 
         /// <summary>
         /// Returns the sorted list of CSV filenames of the given <paramref name="directory"/>.
-        /// 
+        ///
         /// Precondition: <paramref name="directory"/> must not be null or empty and must exist
         /// as a directory in the file system.
         /// </summary>
@@ -173,15 +173,15 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Returns the sorted list of filenames matching the <paramref name="globbing"/> in the 
+        /// Returns the sorted list of filenames matching the <paramref name="globbing"/> in the
         /// given <paramref name="directory"/>.
-        /// 
+        ///
         /// Precondition: <paramref name="directory"/> must not be null or empty and must exist
         /// as a directory in the file system.
         /// </summary>
         /// <param name="directory">name of the directory in which to search for files</param>
         /// <param name="globbing">globbing parameter that the filenames are to match</param>
-        /// <returns>sorted list of filenames in <paramref name="directory"/> matching the 
+        /// <returns>sorted list of filenames in <paramref name="directory"/> matching the
         /// <paramref name="globbing"/></returns>
         public static IEnumerable<string> FilenamesInDirectory(string directory, string globbing)
         {
@@ -201,6 +201,26 @@ namespace SEE.Utils
 
             sortedGraphNames = sortedGraphNames.Distinct().NumericalSort();
             return sortedGraphNames;
+        }
+
+        /// <summary>
+        /// Returns the concatenation of <paramref name="directory"/> and <paramref name="filename"/>.
+        /// Both are assumed to be paths using <see cref="UnixDirectorySeparator"/> as a directory
+        /// separator. If <paramref name="directory"/> does not end with a <see cref="UnixDirectorySeparator"/>,
+        /// one will be added at the end of <paramref name="directory"/> before the concatenation takes place.
+        /// </summary>
+        /// <param name="directory">directory path</param>
+        /// <param name="filename">filename</param>
+        /// <returns>path concatenation</returns>
+        internal static string Join(string directory, string filename)
+        {
+            if (string.IsNullOrEmpty(directory))
+            {
+                return filename;
+            }
+            // directory has at least one character
+            return directory[^1] == UnixDirectorySeparator ?
+                directory + filename : directory + UnixDirectorySeparator + filename;
         }
     }
 }

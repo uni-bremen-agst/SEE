@@ -11,29 +11,29 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// The animator attached to the game object (the avatar) that is used to
         /// animate the movements of the avatar. This animator is assumed to have
-        /// the two parameters <see cref="ForwardSpeedParameterName"/> and
-        /// <see cref="SidewardSpeedParameterName"/>.
+        /// the two parameters <see cref="forwardSpeedParameterName"/> and
+        /// <see cref="sidewardSpeedParameterName"/>.
         /// </summary>
         [Tooltip("Reference to the animator component.")]
-        public Animator animator;
+        public Animator Animator;
 
         /// <summary>
         /// The name of the animator's parameter for forward speed.
         /// </summary>
-        private const string ForwardSpeedParameterName = "ForwardSpeed";
+        private const string forwardSpeedParameterName = "ForwardSpeed";
         /// <summary>
         /// The name of the animator's parameter for sideward speed.
         /// </summary>
-        private const string SidewardSpeedParameterName = "SidewardSpeed";
+        private const string sidewardSpeedParameterName = "SidewardSpeed";
 
         /// <summary>
-        /// The parameter of the <see cref="animator"/> controller for the forward speed,
-        /// namely, <see cref="ForwardSpeedParameterName"/>.
+        /// The parameter of the <see cref="Animator"/> controller for the forward speed,
+        /// namely, <see cref="forwardSpeedParameterName"/>.
         /// </summary>
         private int forwardSpeedParameter;
         /// <summary>
-        /// The parameter of the <see cref="animator"/> controller for the sideward speed,
-        /// namely, <see cref="SidewardSpeedParameterName"/>.
+        /// The parameter of the <see cref="Animator"/> controller for the sideward speed,
+        /// namely, <see cref="sidewardSpeedParameterName"/>.
         /// </summary>
         private int sidewardSpeedParameter;
 
@@ -43,18 +43,18 @@ namespace SEE.Game.Avatars
         private Vector3 lastPosition;
 
         /// <summary>
-        /// If <see cref="animator"/> is defined, initializes the two animator-controller
+        /// If <see cref="Animator"/> is defined, initializes the two animator-controller
         /// parameters <see cref="forwardSpeedParameter"/> and <see cref="sidewardSpeedParameter"/>
         /// and sets <see cref="lastPosition"/> to the current position of the avatar.
-        /// If <see cref="animator"/> is undefined, emits an error message and disables this
+        /// If <see cref="Animator"/> is undefined, emits an error message and disables this
         /// component.
         /// </summary>
         private void Start()
         {
-            if (animator)
+            if (Animator)
             {
-                forwardSpeedParameter = Animator.StringToHash(ForwardSpeedParameterName);
-                sidewardSpeedParameter = Animator.StringToHash(SidewardSpeedParameterName);
+                forwardSpeedParameter = Animator.StringToHash(forwardSpeedParameterName);
+                sidewardSpeedParameter = Animator.StringToHash(sidewardSpeedParameterName);
                 lastPosition = transform.position;
             }
             else
@@ -74,8 +74,8 @@ namespace SEE.Game.Avatars
         private void LateUpdate()
         {
             Vector3 localSpeed = transform.InverseTransformDirection(transform.position - lastPosition) / Time.deltaTime;
-            animator.SetFloat(forwardSpeedParameter, localSpeed.z);
-            animator.SetFloat(sidewardSpeedParameter, localSpeed.x);
+            Animator.SetFloat(forwardSpeedParameter, localSpeed.z);
+            Animator.SetFloat(sidewardSpeedParameter, localSpeed.x);
             lastPosition = transform.position;
         }
     }

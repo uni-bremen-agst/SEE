@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
-using SEE.Game.UI.Menu;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SEETests.UI
+namespace SEE.UI.Menu
 {
     /// <summary>
     /// Tests for the <see cref="MenuEntry"/> class.

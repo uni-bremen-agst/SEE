@@ -28,7 +28,7 @@ namespace SEE.Layout.NodeLayouts
                              float depth)
         : base(groundLevel)
         {
-            name = "Treemap";
+            Name = "Treemap";
             this.width = width;
             this.depth = depth;
         }
@@ -46,7 +46,7 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// The node layout we compute as a result.
         /// </summary>
-        private Dictionary<ILayoutNode, NodeTransform> layout_result;
+        private Dictionary<ILayoutNode, NodeTransform> layoutResult;
 
         /// <summary>
         /// Return a treemap layout where are all nodes are fit into a given rectangle
@@ -58,7 +58,7 @@ namespace SEE.Layout.NodeLayouts
         /// <returns>treemap layout scaled in x and z axes</returns>
         public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes)
         {
-            layout_result = new Dictionary<ILayoutNode, NodeTransform>();
+            layoutResult = new Dictionary<ILayoutNode, NodeTransform>();
 
             IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
             switch (layoutNodeList.Count)
@@ -73,7 +73,7 @@ namespace SEE.Layout.NodeLayouts
                         // MoveNext() must be called before we can call Current.
                         ILayoutNode gameNode = enumerator.Current;
                         UnityEngine.Assertions.Assert.AreEqual(gameNode.AbsoluteScale, gameNode.LocalScale);
-                        layout_result[gameNode] = new NodeTransform(Vector3.zero,
+                        layoutResult[gameNode] = new NodeTransform(Vector3.zero,
                             new Vector3(width, gameNode.LocalScale.y, depth));
                     }
                     else
@@ -84,17 +84,17 @@ namespace SEE.Layout.NodeLayouts
                     break;
                 }
                 default:
-                    roots = LayoutNodes.GetRoots(layoutNodeList);
+                    Roots = LayoutNodes.GetRoots(layoutNodeList);
                     CalculateSize();
                     CalculateLayout();
                     break;
             }
 
-            return layout_result;
+            return layoutResult;
         }
 
         /// <summary>
-        /// Adds positioning and scales to <see cref="layout_result"/> for all root nodes (nodes with no parent)
+        /// Adds positioning and scales to <see cref="layoutResult"/> for all root nodes (nodes with no parent)
         /// within a rectangle whose center position is Vector3.zero and whose width and depth is
         /// as specified by the constructor call. This function is then called recursively for the
         /// children of each root (until leaves are reached).
@@ -106,17 +106,17 @@ namespace SEE.Layout.NodeLayouts
             /// assumes the rectangle's location be specified by its left front corner.
             /// Hence, we need to transform the center of the "logical" rectangle to the left front
             /// corner of the rectangle by -width/2 and -depth/2, respectively.
-            if (roots.Count == 1)
+            if (Roots.Count == 1)
             {
-                ILayoutNode root = roots[0];
+                ILayoutNode root = Roots[0];
                 Assert.AreEqual(root.AbsoluteScale, root.LocalScale);
-                layout_result[root] = new NodeTransform(Vector3.zero,
+                layoutResult[root] = new NodeTransform(Vector3.zero,
                                                         new Vector3(width, root.LocalScale.y, depth));
                 CalculateLayout(root.Children(), x: -width / 2.0f, z: -depth / 2.0f, width, depth);
             }
             else
             {
-                CalculateLayout(roots, x: -width / 2.0f, z: -depth / 2.0f, width, depth);
+                CalculateLayout(Roots, x: -width / 2.0f, z: -depth / 2.0f, width, depth);
             }
         }
 
@@ -146,12 +146,12 @@ namespace SEE.Layout.NodeLayouts
                     // Note: nodeTransform.position is the center position, while
                     // CalculateLayout assumes co-ordinates x and z as the left front corner
                     Assert.AreEqual(node.AbsoluteScale, node.LocalScale);
-                    NodeTransform nodeTransform = layout_result[node];
+                    NodeTransform nodeTransform = layoutResult[node];
                     CalculateLayout(children,
-                                    nodeTransform.position.x - nodeTransform.scale.x / 2.0f,
-                                    nodeTransform.position.z - nodeTransform.scale.z / 2.0f,
-                                    nodeTransform.scale.x,
-                                    nodeTransform.scale.z);
+                                    nodeTransform.Position.x - nodeTransform.Scale.x / 2.0f,
+                                    nodeTransform.Position.z - nodeTransform.Scale.z / 2.0f,
+                                    nodeTransform.Scale.x,
+                                    nodeTransform.Scale.z);
                 }
             }
         }
@@ -160,17 +160,17 @@ namespace SEE.Layout.NodeLayouts
         /// Some padding will be added between nodes. That padding depends upon the minimum
         /// of the width and depth of a node, multiplied by this factor.
         /// </summary>
-        private const float PaddingFactor = 0.05f;
+        private const float paddingFactor = 0.05f;
 
         /// <summary>
         /// The minimal padding between nodes in absolute (world space) terms.
         /// </summary>
-        private const float MinimimalAbsolutePadding = 0.01f;
+        private const float minimimalAbsolutePadding = 0.01f;
 
         /// <summary>
         /// The maximal padding between nodes in absolute (world space) terms.
         /// </summary>
-        private const float MaximalAbsolutePadding = 0.1f;
+        private const float maximalAbsolutePadding = 0.1f;
 
         /// <summary>
         /// Returns the padding to be added between neighboring nodes (on a per node basis,
@@ -181,7 +181,7 @@ namespace SEE.Layout.NodeLayouts
         /// <returns>padding to be added</returns>
         private static float Padding(float width, float depth)
         {
-            return Mathf.Clamp(Mathf.Min(width, depth) * PaddingFactor, MinimimalAbsolutePadding, MaximalAbsolutePadding);
+            return Mathf.Clamp(Mathf.Min(width, depth) * paddingFactor, minimimalAbsolutePadding, maximalAbsolutePadding);
         }
 
         /// <summary>
@@ -195,12 +195,12 @@ namespace SEE.Layout.NodeLayouts
         /// <returns>total size of all node</returns>
         private float CalculateSize()
         {
-            float total_size = 0.0f;
-            foreach (ILayoutNode root in roots)
+            float totalSize = 0.0f;
+            foreach (ILayoutNode root in Roots)
             {
-                total_size += CalculateSize(root);
+                totalSize += CalculateSize(root);
             }
-            return total_size;
+            return totalSize;
         }
 
         /// <summary>
@@ -231,13 +231,13 @@ namespace SEE.Layout.NodeLayouts
             }
             else
             {
-                float total_size = 0.0f;
+                float totalSize = 0.0f;
                 foreach (ILayoutNode child in node.Children())
                 {
-                    total_size += CalculateSize(child);
+                    totalSize += CalculateSize(child);
                 }
-                sizes[node] = new RectangleTiling.NodeSize(node, total_size);
-                return total_size;
+                sizes[node] = new RectangleTiling.NodeSize(node, totalSize);
+                return totalSize;
             }
         }
 
@@ -259,7 +259,7 @@ namespace SEE.Layout.NodeLayouts
 
         /// <summary>
         /// Adds the transforms (position, scale) of the game objects (nodes) according to their
-        /// corresponding rectangle in rects to <see cref="layout_result"/>.
+        /// corresponding rectangle in rects to <see cref="layoutResult"/>.
         ///
         /// The x and z co-ordinates for the resulting <see cref="NodeTransform"/> are determined
         /// by the rectangles, but the y co-ordinate is the original value of the input
@@ -277,11 +277,11 @@ namespace SEE.Layout.NodeLayouts
             int i = 0;
             foreach (RectangleTiling.Rectangle rect in rects)
             {
-                ILayoutNode o = nodes[i].gameNode;
-                Vector3 position = new Vector3(rect.x + rect.width / 2.0f, groundLevel, rect.z + rect.depth / 2.0f);
-                Vector3 scale = new Vector3(rect.width, o.LocalScale.y, rect.depth);
+                ILayoutNode o = nodes[i].GameNode;
+                Vector3 position = new Vector3(rect.X + rect.Width / 2.0f, GroundLevel, rect.Z + rect.Depth / 2.0f);
+                Vector3 scale = new Vector3(rect.Width, o.LocalScale.y, rect.Depth);
                 Assert.AreEqual(o.AbsoluteScale, o.LocalScale, $"{o.ID}: {o.AbsoluteScale} != {o.LocalScale}");
-                layout_result[o] = new NodeTransform(position, scale);
+                layoutResult[o] = new NodeTransform(position, scale);
                 i++;
             }
         }

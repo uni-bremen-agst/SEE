@@ -1,5 +1,6 @@
 ﻿using SEE.Game.Operator;
 using SEE.GO;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Net.Actions
@@ -51,7 +52,7 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            Find(GameObjectID).AddOrGetComponent<NodeOperator>().ScaleTo(LocalScale, AnimationFactor);
+            Find(GameObjectID).NodeOperator().ScaleTo(LocalScale, AnimationFactor);
         }
     }
 }

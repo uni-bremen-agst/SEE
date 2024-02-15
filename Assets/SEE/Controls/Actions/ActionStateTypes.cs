@@ -111,6 +111,11 @@ namespace SEE.Controls.Actions
                   Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                   DrawAction.CreateReversibleAction);
 
+            AcceptDivergence =
+              new("Accept Divergence", "Accept a diverging edge into the architecture",
+                  Color.grey.Darker(), "Materials/ModernUIPack/Arrow Bold",
+                  AcceptDivergenceAction.CreateReversibleAction);
+
             // Metric Board actions
             MetricBoard =
               new("Metric Board", "Manipulate a metric board",
@@ -165,6 +170,7 @@ namespace SEE.Controls.Actions
                   parent: MetricBoard);
         }
 
+
         public readonly static ActionStateType Move;
         public readonly static ActionStateType Rotate;
         public readonly static ActionStateType Hide;
@@ -175,6 +181,7 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType Delete;
         public readonly static ActionStateType ShowCode;
         public readonly static ActionStateType Draw;
+        public readonly static ActionStateType AcceptDivergence;
 
         public readonly static ActionStateTypeGroup MetricBoard;
         public readonly static ActionStateType AddBoard;
@@ -204,8 +211,8 @@ namespace SEE.Controls.Actions
 
             string Name(AbstractActionStateType type)
             {
-                const string None = "<NONE>";
-                return type == null ? None : type.Name;
+                const string none = "<NONE>";
+                return type == null ? none : type.Name;
             }
         }
     }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using SEE.Utils;
+using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -11,7 +11,7 @@ namespace SEE.Game.City
     /// </summary>
     [Serializable]
     [HideReferenceObjectPicker]
-    public sealed class AntennaAttributes : ConfigIO.PersistentConfigItem
+    public sealed class AntennaAttributes : ConfigIO.IPersistentConfigItem
     {
         /// <summary>
         /// This parameter determines the sections of the antenna.
@@ -23,14 +23,14 @@ namespace SEE.Game.City
         /// <summary>
         /// Saves the settings in the configuration file.
         ///
-        /// Implements <see cref="ConfigIO.PersistentConfigItem.Save(ConfigWriter, string)"/>.
+        /// Implements <see cref="ConfigIO.IPersistentConfigItem.Save(ConfigWriter, string)"/>.
         /// </summary>
         /// <param name="writer">to be used for writing the settings</param>
         /// <param name="label">the outer label grouping the settings</param>
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(AntennaSections, AntennaSectionsLabel);
+            writer.Save(AntennaSections, antennaSectionsLabel);
             writer.EndGroup();
         }
 
@@ -39,7 +39,7 @@ namespace SEE.Game.City
         /// The latter must be the label under which the settings were grouped, i.e., the same
         /// value originally passed in <see cref="Save(ConfigWriter, string)"/>.
         ///
-        /// Implements <see cref="ConfigIO.PersistentConfigItem.Save(ConfigWriter, string)"/>.
+        /// Implements <see cref="ConfigIO.IPersistentConfigItem.Save(ConfigWriter, string)"/>.
         /// </summary>
         /// <param name="attributes">dictionary of attributes from which to retrieve the settings</param>
         /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>
@@ -50,7 +50,7 @@ namespace SEE.Game.City
             {
                 bool result = false;
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-                ConfigIO.RestoreStringList(values, AntennaSectionsLabel, ref AntennaSections);
+                ConfigIO.RestoreStringList(values, antennaSectionsLabel, ref AntennaSections);
                 return result;
             }
             else
@@ -62,6 +62,6 @@ namespace SEE.Game.City
         /// <summary>
         /// Label in the configuration file for the antenna sections.
         /// </summary>
-        private const string AntennaSectionsLabel = "AntennaSections";
+        private const string antennaSectionsLabel = "AntennaSections";
     }
 }

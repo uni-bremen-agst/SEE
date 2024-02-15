@@ -42,23 +42,23 @@ namespace SEE.Game.Avatars
         public bool IsLocallyControlled = true;
 
         [Tooltip("The laser beam for pointing. If null, one will be created at run-time.")]
-        public LaserPointer laser;
+        public LaserPointer Laser;
 
         /// <summary>
         /// AimPoser is a tool that returns an animation name based on direction.
-        /// It will be searched in the scene by the name <see cref="AimPoserName"/>.
-        /// There is only one <see cref="AimPoser"/> in the scene. That is why this
+        /// It will be searched in the scene by the name <see cref="aimPoserName"/>.
+        /// There is only one <see cref="aimPoser"/> in the scene. That is why this
         /// field can be static.
         /// </summary>
-        private static AimPoser AimPoser;
+        private static AimPoser aimPoser;
 
         /// <summary>
-        /// The name of the <see cref="AimPoser"/> game object. Must be present in the scene.
+        /// The name of the <see cref="aimPoser"/> game object. Must be present in the scene.
         /// </summary>
-        private const string AimPoserName = "Aim Poser";
+        private const string aimPoserName = "Aim Poser";
 
         /// <summary>
-        /// The pose of the <see cref="AimPoser"/> while aiming at the target.
+        /// The pose of the <see cref="aimPoser"/> while aiming at the target.
         /// </summary>
         private AimPoser.Pose aimPose;
 
@@ -106,13 +106,13 @@ namespace SEE.Game.Avatars
                 gameObject.TryGetComponentOrLog(out aimIK);
             }
             // Laser beam should be active only while we are pointing.
-            if (laser == null)
+            if (Laser == null)
             {
-                laser = gameObject.AddOrGetComponent<LaserPointer>();
-                laser.Source = aimIK.solver.transform;
+                Laser = gameObject.AddOrGetComponent<LaserPointer>();
+                Laser.Source = aimIK.solver.transform;
             }
-            UnityEngine.Assertions.Assert.IsNotNull(laser);
-            laser.On = IsPointing;
+            UnityEngine.Assertions.Assert.IsNotNull(Laser);
+            Laser.On = IsPointing;
 
             // Activate the aimed target. FIXME: What for?
             if (aimIK != null && aimIK.solver != null && aimIK.solver.target != null)
@@ -130,20 +130,20 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// Retrieves the <see cref="AimPoser"/> from the scene when not already set.
+        /// Retrieves the <see cref="aimPoser"/> from the scene when not already set.
         /// Disables the IK components <see cref="Aim"/> and <see cref="LookAt"/>
         /// so that we can manage their updating order by ourselves. Retrieves
-        /// the <see cref="laser"/> from the aiming transform <see cref="aimIK.solver.transform"/>.
+        /// the <see cref="Laser"/> from the aiming transform <see cref="aimIK.solver.transform"/>.
         /// </summary>
         private void Start()
         {
             // Retrieve the aim poser.
-            if (AimPoser == null)
+            if (aimPoser == null)
             {
-                GameObject aimPoser = GameObject.Find(AimPoserName);
-                if (aimPoser == null || !aimPoser.TryGetComponent(out AimPoser))
+                GameObject aimPoser = GameObject.Find(aimPoserName);
+                if (aimPoser == null || !aimPoser.TryGetComponent(out AvatarAimingSystem.aimPoser))
                 {
-                    Debug.LogError($"There is no game object named {AimPoserName} with a {typeof(AimPoser)} component in the scene.\n");
+                    Debug.LogError($"There is no game object named {aimPoserName} with a {typeof(AimPoser)} component in the scene.\n");
                     enabled = false;
                     return;
                 }
@@ -156,8 +156,8 @@ namespace SEE.Game.Avatars
 
             if (gameObject.TryGetComponent(out aimIK))
             {
-                laser = gameObject.AddOrGetComponent<LaserPointer>();
-                laser.Source = aimIK.solver.transform;
+                Laser = gameObject.AddOrGetComponent<LaserPointer>();
+                Laser.Source = aimIK.solver.transform;
             }
             else
             {
@@ -188,7 +188,7 @@ namespace SEE.Game.Avatars
             if (IsPointing)
             {
                 // This code will be run for a non-local player currently pointing.
-                laser.Draw(aimIK.solver.target.position);
+                Laser.Draw(aimIK.solver.target.position);
             }
         }
 
@@ -200,7 +200,7 @@ namespace SEE.Game.Avatars
         {
             if (IsPointing)
             {
-                aimIK.solver.target.position = laser.Point();
+                aimIK.solver.target.position = Laser.Point();
             }
         }
 
@@ -249,21 +249,21 @@ namespace SEE.Game.Avatars
         private void AimTowards(Vector3 localDirection)
         {
             // Get the Pose from AimPoser
-            aimPose = AimPoser.GetPose(localDirection);
+            aimPose = aimPoser.GetPose(localDirection);
 
             // If the Pose has changed
             if (aimPose != lastPose)
             {
                 // Increase the angle buffer of the pose so we won't switch back too soon if
                 // the direction changes a bit.
-                AimPoser.SetPoseActive(aimPose);
+                aimPoser.SetPoseActive(aimPose);
 
                 // Store the pose so we know if it changes.
                 lastPose = aimPose;
             }
 
             // Direct blending
-            foreach (AimPoser.Pose pose in AimPoser.poses)
+            foreach (AimPoser.Pose pose in aimPoser.poses)
             {
                 if (pose == aimPose)
                 {

@@ -1,4 +1,4 @@
-using SEE.Game.UI.RuntimeConfigMenu;
+using SEE.UI.RuntimeConfigMenu;
 using UnityEngine;
 
 namespace SEE.Net.Actions.RuntimeConfig

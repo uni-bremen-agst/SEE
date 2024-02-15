@@ -18,7 +18,7 @@ namespace SEE.Net.Dashboard
         /// Instantiates a new <see cref="DashboardException"/> with the given <paramref name="error"/>.
         /// </summary>
         /// <param name="error">The error which occurred in the dashboard.</param>
-        public DashboardException(DashboardError error) : this($"{error.type}: {error.localizedMessage}")
+        public DashboardException(DashboardError error) : this($"{error.Type}: {error.LocalizedMessage}")
         {
             Error = error;
         }
@@ -31,9 +31,9 @@ namespace SEE.Net.Dashboard
         {
             // Intentionally empty, the other constructor that's being called is already doing all the work.
         }
-        
+
         #region Usual Constructors
-        
+
         private DashboardException(string message): base(message)
         {
             // Intentionally empty. Base call defines behavior.
@@ -43,7 +43,7 @@ namespace SEE.Net.Dashboard
         {
             // Intentionally empty. Base call defines behavior.
         }
-        
+
         #endregion
     }
 }

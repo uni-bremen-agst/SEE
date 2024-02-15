@@ -2,8 +2,9 @@
 using System.Linq;
 using SEE.Controls;
 using SEE.Controls.Actions;
-using SEE.Game.UI.Menu;
-using SEE.Game.UI.StateIndicator;
+using SEE.Game;
+using SEE.UI.Menu;
+using SEE.UI.StateIndicator;
 using SEE.Utils;
 using UnityEngine;
 
@@ -190,6 +191,13 @@ namespace SEE.GO.Menu
 
                 if (GlobalActionHistory.IsEmpty())
                 {
+                    // The first/default action is assumed to be at top level of the
+                    // player menu hierarchy. If the last action is undone and we create
+                    // a new first action to be pushed onto the action history, it could
+                    // happen that we are currently in a submenu, in which case the
+                    // first/default would not exist in this submenu level; hence we
+                    // need to reset the menu to the top level.
+                    modeMenu.ResetToBase();
                     // We always want to have an action running.
                     // The default action will be the first action state type.
                     GlobalActionHistory.Execute(ActionStateTypes.FirstActionStateType());
@@ -212,10 +220,10 @@ namespace SEE.GO.Menu
         /// <summary>
         /// Sets the currently selected menu entry in PlayerMenu to the action with given <paramref name="actionName"/>.
         /// </summary>
-        /// <param name="actionName">name of the menu entry to be </param>
-        private void SetPlayerMenu(string actionName)
+        /// <param name="actionName">name of the menu entry to be set</param>
+        private static void SetPlayerMenu(string actionName)
         {
-            if (SceneSettings.LocalPlayer.TryGetComponentOrLog(out PlayerMenu playerMenu))
+            if (LocalPlayer.TryGetPlayerMenu(out PlayerMenu playerMenu))
             {
                 // We cannot use PlayerActionHistory.Current here
                 playerMenu.modeMenu.ActiveEntry = playerMenu.modeMenu.Entries.First(x => x.Title.Equals(actionName));

@@ -28,25 +28,25 @@ namespace SEE.GO
         /// <summary>
         /// Name of the material for opaque objects (located in folder Resources).
         /// </summary>
-        private const string OpaqueMaterialName = "Materials/OpaquePortalMaterial";
+        private const string opaqueMaterialName = "Materials/OpaquePortalMaterial";
         /// <summary>
         /// Name of the material for transparent lines (located in folder Resources).
         /// </summary>
-        private const string TransparentLineMaterialName = "Materials/TransparentLinePortalMaterial";
+        private const string transparentLineMaterialName = "Materials/TransparentLinePortalMaterial";
         /// <summary>
         /// Name of the material for opaque, metallic meshes (located in folder Resources).
         /// </summary>
-        private const string OpaqueMetallicMaterialName = "Materials/SEEMaterial";
+        private const string opaqueMetallicMaterialName = "Materials/SEEMaterial";
         /// <summary>
         /// Name of the material for materials seen everywhere, i.e., not only within a portal
         /// (located in folder Resources).
         /// </summary>
-        private const string PortalFreeMaterialName = "Materials/PortalFreeMaterial";
+        private const string portalFreeMaterialName = "Materials/PortalFreeMaterial";
 
         /// <summary>
         /// The id of the shader property for the texture.
         /// </summary>
-        private static readonly int TexturePropertyID = Shader.PropertyToID("_Texture");
+        private static readonly int texturePropertyID = Shader.PropertyToID("_Texture");
 
         /// <summary>
         /// The type of the shaders of this material instance.
@@ -187,35 +187,6 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Adds a texture to <paramref name="material"/>.
-        /// </summary>
-        /// <param name="material">material to which a texture should be added</param>
-        private static void AddTexture(Material material)
-        {
-            if (material.HasProperty(TexturePropertyID))
-            {
-                if (false)
-                {
-                    material.SetTexture(TexturePropertyID, NewTexture());
-                }
-                else
-                {
-                    const string TextureName = "Textures/TestTexture";
-                    Texture texture = Resources.Load<Texture>(TextureName);
-                    if (texture == null)
-                    {
-                        Debug.LogError($"No such texture {TextureName}\n");
-                    }
-                    else
-                    {
-                        //Debug.Log($"_Texture: {texture.name}\n");
-                        material.SetTexture(TexturePropertyID, texture);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// Adds <paramref name="texture"/> to <paramref name="material"/> as <see cref="TexturePropertyName"/>
         /// if <paramref name="material"/> has this property. If not, nothing happens. Likewise, if <paramref name="texture"/>
         /// is null, nothing happens.
@@ -224,49 +195,9 @@ namespace SEE.GO
         /// <param name="texture">texture to be added; can be null</param>
         private static void AddTexture(Material material, Texture texture)
         {
-            if (texture != null && material.HasProperty(TexturePropertyID))
+            if (texture != null && material.HasProperty(texturePropertyID))
             {
-                material.SetTexture(TexturePropertyID, texture);
-            }
-        }
-
-        /// <summary>
-        /// Creates and returns a new texture.
-        /// Note: This method is currently used only to demonstrate on how to
-        /// create a texture.
-        /// </summary>
-        /// <returns>a new texture</returns>
-        private static Texture NewTexture()
-        {
-            Texture2D result = new Texture2D(512, 512);
-
-            Color visible = new Color(1, 1, 1, 1);
-            Color invisible = new Color(0, 0, 0, 0);
-
-            for (int x = 0; x < result.width; x++)
-            {
-                for (int y = 0; y < result.height; y++)
-                {
-                    if (y % 5 == 0)
-                    {
-                        result.SetPixel(x, y, invisible);
-                    }
-                    else
-                    {
-                        result.SetPixel(x, y, visible);
-                    }
-                }
-            }
-            result.Apply();
-            // SaveTexture(result);
-            return result;
-
-            static void SaveTexture(Texture2D result)
-            {
-                byte[] bytes = result.EncodeToPNG();
-                string path = Application.dataPath + "/Resources/Textures/TestTexture.png";
-                System.IO.File.WriteAllBytes(path, bytes);
-                Debug.Log($"Texture written to {path}.\n");
+                material.SetTexture(texturePropertyID, texture);
             }
         }
 
@@ -310,16 +241,16 @@ namespace SEE.GO
             switch (shaderType)
             {
                 case ShaderType.Opaque:
-                    name = OpaqueMaterialName;
+                    name = opaqueMaterialName;
                     break;
                 case ShaderType.TransparentLine:
-                    name = TransparentLineMaterialName;
+                    name = transparentLineMaterialName;
                     break;
                 case ShaderType.OpaqueMetallic:
-                    name = OpaqueMetallicMaterialName;
+                    name = opaqueMetallicMaterialName;
                     break;
                 case ShaderType.PortalFree:
-                    name = PortalFreeMaterialName;
+                    name = portalFreeMaterialName;
                     break;
                 default:
                     Assertions.InvalidCodePath();

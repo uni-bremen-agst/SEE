@@ -11,7 +11,7 @@ namespace SEE.Game
     ///
     /// This component assumes that there is a game object in the scene with a
     /// <see cref="RTGApp"/> component attached to it. That game object
-    /// is assumed to have a child named <see cref="RTGFocusCameraName"/> with a
+    /// is assumed to have a child named <see cref="rtgFocusCameraName"/> with a
     /// <see cref="RTFocusCamera"/> component attached to it. The game object holding the
     /// <see cref="RTGApp"/> is assumed to be set inactive initially.
     /// This component will set it active on request. This capability is intended to
@@ -30,7 +30,7 @@ namespace SEE.Game
         /// holding a component <see cref="RTFocusCamera"/> requiring the camera
         /// to be set.
         /// </summary>
-        private const string RTGFocusCameraName = "RTFocusCamera";
+        private const string rtgFocusCameraName = "RTFocusCamera";
 
         /// <summary>
         /// Sets the <see cref="RTFocusCamera"/> to the <see cref="MainCamera"/>.
@@ -51,17 +51,17 @@ namespace SEE.Game
         /// activates <see cref="RTGApp"/>.
         /// </summary>
         /// <param name="camera">the main camera</param>
-        private void Initialize(Camera camera)
+        private static void Initialize(Camera camera)
         {
             UnityEngine.Assertions.Assert.IsNotNull(camera);
 
             GameObject rtgApp = GetRTGApp();
             if (rtgApp != null)
             {
-                Transform rtFocusCamera = rtgApp.transform.Find(RTGFocusCameraName);
+                Transform rtFocusCamera = rtgApp.transform.Find(rtgFocusCameraName);
                 if (rtFocusCamera == null)
                 {
-                    Debug.LogError($"Game object {rtgApp.FullName()} is expected to have a child named {RTGFocusCameraName}.\n");
+                    Debug.LogError($"Game object {rtgApp.FullName()} is expected to have a child named {rtgFocusCameraName}.\n");
                     return;
                 }
 

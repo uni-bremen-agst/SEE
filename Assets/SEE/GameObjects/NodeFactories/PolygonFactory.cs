@@ -108,7 +108,7 @@ namespace SEE.GO.NodeFactories
         /// </summary>
         /// <param name="metrics">metrics determining the lengths of the polygon's sides</param>
         /// <returns>vertices of the polygon</returns>
-        private Vector2[] MetricsToVertices(float[] metrics)
+        private static Vector2[] MetricsToVertices(float[] metrics)
         {
             Vector2[] result = new Vector2[metrics.Length];
             float radius = FindRadius(metrics, 0.001f);

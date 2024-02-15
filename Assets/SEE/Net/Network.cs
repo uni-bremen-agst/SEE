@@ -11,8 +11,9 @@ using Dissonance;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.Utils;
+using SEE.Utils.Config;
+using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
-using Sirenix.Utilities;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEditor;
@@ -36,7 +37,7 @@ namespace SEE.Net
         /// <summary>
         /// The maximal port number.
         /// </summary>
-        private const int MaxServerPort = 65535;
+        private const int maxServerPort = 65535;
 
         /// <summary>
         /// The id of the server to fetch files from backend
@@ -52,7 +53,7 @@ namespace SEE.Net
         /// The port of the server where the server listens to SEE action requests.
         /// Note: This field is accessed in NetworkEditor, hence, the name must not change.
         /// </summary>
-        [Range(0, MaxServerPort), Tooltip("The TCP port of the server where it listens to SEE actions.")]
+        [Range(0, maxServerPort), Tooltip("The TCP port of the server where it listens to SEE actions.")]
         public int ServerActionPort = 12345;
 
         /// <summary>
@@ -63,9 +64,9 @@ namespace SEE.Net
         {
             set
             {
-                if (value < 0 || value > MaxServerPort)
+                if (value < 0 || value > maxServerPort)
                 {
-                    throw new ArgumentOutOfRangeException($"A port must be in [0..{MaxServerPort}. Received: {value}.");
+                    throw new ArgumentOutOfRangeException($"A port must be in [0..{maxServerPort}. Received: {value}.");
                 }
                 UnityTransport netTransport = GetNetworkTransport();
                 netTransport.ConnectionData.Port = (ushort)value;
@@ -95,8 +96,8 @@ namespace SEE.Net
         /// in the editor or in game play because <see cref="NetworkManager.Singleton"/> is
         /// available only during run-time.
         /// </summary>
-        /// <returns>underlying <see cref="UnityTransport"/> of the <see cref="NetworkManager"/></returns>
-        private UnityTransport GetNetworkTransport()
+        /// <returns>underlying <see cref="UNetTransport"/> of the <see cref="NetworkManager"/></returns>
+        private static UnityTransport GetNetworkTransport()
         {
             NetworkManager networkManager = GetNetworkManager();
             NetworkConfig networkConfig = networkManager.NetworkConfig;
@@ -118,11 +119,11 @@ namespace SEE.Net
         private static NetworkManager GetNetworkManager()
         {
 #if UNITY_EDITOR
-            const string NetworkManagerName = "NetworkManager";
-            GameObject networkManagerGO = GameObject.Find(NetworkManagerName);
+            const string metworkManagerName = "NetworkManager";
+            GameObject networkManagerGO = GameObject.Find(metworkManagerName);
             if (networkManagerGO == null)
             {
-                throw new Exception($"The scene currently opened in the editor does not have a game object {NetworkManagerName}.");
+                throw new Exception($"The scene currently opened in the editor does not have a game object {metworkManagerName}.");
             }
             if (networkManagerGO.TryGetComponentOrLog(out NetworkManager result))
             {
@@ -130,7 +131,7 @@ namespace SEE.Net
             }
             else
             {
-                throw new Exception($"The game object {NetworkManagerName} in the scene currently opened in the editor does not have a component {nameof(NetworkManager)}.");
+                throw new Exception($"The game object {metworkManagerName} in the scene currently opened in the editor does not have a component {nameof(NetworkManager)}.");
             }
 #else
             // NetworkManager.Singleton is available only during run-time.
@@ -173,30 +174,26 @@ namespace SEE.Net
         [Tooltip("The name of the game scene.")]
         public string GameScene = "SEEWorld";
 
-        /// <summary>
-        /// Whether the city should be loaded on start up. Is ignored, if this client
-        /// does not host the server.
-        ///
-        /// FIXME: This is currently not supported. That is why we hide it in the Inspector.
-        /// </summary>
-        [SerializeField, HideInInspector] private bool loadCityOnStart = false;
-
 #if UNITY_EDITOR
 
         /// <summary>
         /// Name of the Inspector foldout group for the logging setttings.
         /// </summary>
-        private const string LoggingFoldoutGroup = "Logging";
+        private const string loggingFoldoutGroup = "Logging";
 
         /// <summary>
         /// Whether the internal logging should be enabled.
         /// </summary>
-        [SerializeField, FoldoutGroup(LoggingFoldoutGroup)]
+        [SerializeField, FoldoutGroup(loggingFoldoutGroup)]
         [PropertyTooltip("Whether the network logging should be enabled.")]
         private bool internalLoggingEnabled = true;
 
-#endif
+        /// <summary>
+        /// <see cref="internalLoggingEnabled"/>
+        /// </summary>
+        public static bool InternalLoggingEnabled => Instance && Instance.internalLoggingEnabled;
 
+#endif
         /// <summary>
         /// True if we are running a host or server.
         /// </summary>
@@ -208,18 +205,6 @@ namespace SEE.Net
         /// if none is set.
         /// </summary>
         public static string RemoteServerIPAddress => NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.ServerListenAddress;
-
-        /// <summary>
-        /// <see cref="loadCityOnStart"/>
-        /// </summary>
-        public static bool LoadCityOnStart => Instance && Instance.loadCityOnStart;
-
-#if UNITY_EDITOR
-        /// <summary>
-        /// <see cref="internalLoggingEnabled"/>
-        /// </summary>
-        public static bool InternalLoggingEnabled => Instance && Instance.internalLoggingEnabled;
-#endif
 
         /// <summary>
         /// The Unity main thread. Note that we cannot initialize its value here
@@ -283,7 +268,7 @@ namespace SEE.Net
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
             NetworkManager.Singleton.NetworkConfig.ConnectionApproval = true;
 
-            string[] arguments = Environment.GetCommandLineArgs(); 
+            string[] arguments = Environment.GetCommandLineArgs();
 
             //Check command line arguments
             for (int i = 0; i < arguments.Length; i++)
@@ -355,7 +340,7 @@ namespace SEE.Net
         /// Enables/disables Dissonance as the voice chat system.
         /// </summary>
         /// <param name="enable">whether to enable Dissonance</param>
-        private void EnableDissonance(bool enable)
+        private static void EnableDissonance(bool enable)
         {
             // The DissonanceComms is initially active and the local player is not muted and not deafened.
             DissonanceComms dissonanceComms = FindObjectOfType<DissonanceComms>(includeInactive: true);
@@ -376,50 +361,19 @@ namespace SEE.Net
         /// </summary>
         private void InitializeGame()
         {
-            if (HostServer && loadCityOnStart)
+            if (HostServer)
             {
                 foreach (AbstractSEECity city in FindObjectsOfType<AbstractSEECity>())
                 {
                     if (city is SEECity seeCity)
                     {
-                        seeCity.LoadAndDrawGraph();
+                        seeCity.LoadAndDrawGraphAsync().Forget();
                     }
                     else
                     {
                         Util.Logger.LogError("Unsupported city type!");
                     }
                 }
-            }
-
-            GameObject rig = GameObject.Find("Player Rig");
-            if (rig)
-            {
-                // FIXME this has to adapted once VR-hardware is available. Also, this is now initialized in Server.cs
-#if false
-                ControlMode mode = rig.GetComponent<ControlMode>();
-#if UNITY_EDITOR
-                if (mode.ViveController && mode.LeapMotion)
-                {
-                    Logger.LogError("Only one mode should be enabled!");
-                }
-#endif
-                if (mode.ViveController)
-                {
-                    new InstantiateAction("SEENetViveControllerLeft").Execute();
-                    new InstantiateAction("SEENetViveControllerRight").Execute();
-                    new InstantiateAction("SEENetViveControllerRay").Execute();
-                }
-                else if (mode.LeapMotion)
-                {
-                    throw new NotImplementedException("Multiplayer does not support Leap Motion!");
-                }
-#if UNITY_EDITOR
-                else
-                {
-                    Logger.LogError("No mode selected!");
-                }
-#endif
-#endif
             }
         }
 
@@ -437,7 +391,7 @@ namespace SEE.Net
         {
             // FIXME there must be a better way to stop the logging spam!
             string currentDirectory = Directory.GetCurrentDirectory();
-            DirectoryInfo directoryInfo = new DirectoryInfo(currentDirectory);
+            DirectoryInfo directoryInfo = new(currentDirectory);
             FileInfo[] fileInfos = directoryInfo.GetFiles();
             foreach (FileInfo fileInfo in fileInfos)
             {
@@ -546,7 +500,7 @@ namespace SEE.Net
             void InternalStartServer()
             {
                 ServerIP4Address = "0.0.0.0";
-                Debug.Log($"Server is starting to listen at {ServerIP4Address}:{ServerPort}...\n");
+                Debug.Log($"Server is starting to listen at {ServerAddress}...\n");
                 try
                 {
                     NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
@@ -556,7 +510,7 @@ namespace SEE.Net
                     }
                     else
                     {
-                        throw new CannotStartServer($"Could not start host {ServerIP4Address}:{ServerPort}");
+                        throw new CannotStartServer($"Could not start host {ServerAddress}.");
                     }
                 }
                 catch (Exception exception)
@@ -564,9 +518,12 @@ namespace SEE.Net
                     callBack(false, exception.Message);
                     throw;
                 }
-                callBack(true, $"Server started at {ServerIP4Address}:{ServerPort}.");
+                callBack(true, $"Server started at {ServerAddress}.");
             }
         }
+        /// The IP4 address, port, and protocol.
+        /// </summary>
+        private string ServerAddress => $"{ServerIP4Address}:{ServerPort} (UDP)";
 
         /// <summary>
         /// Starts a host process, i.e., a server and a local client.
@@ -583,8 +540,8 @@ namespace SEE.Net
 
             void InternalStartHost()
             {
-                Debug.Log($"Server is starting to listen at {ServerIP4Address}:{ServerPort}...\n");
-                Debug.Log($"Local client is trying to connect to server {ServerIP4Address}:{ServerPort}...\n");
+                Debug.Log($"Server is starting to listen at {ServerAddress}...\n");
+                Debug.Log($"Local client is trying to connect to server {ServerAddress}...\n");
                 try
                 {
                     NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
@@ -594,7 +551,7 @@ namespace SEE.Net
                     }
                     else
                     {
-                        throw new CannotStartServer($"Could not start host {ServerIP4Address}:{ServerPort}");
+                        throw new CannotStartServer($"Could not start host {ServerAddress}");
                     }
                 }
                 catch (Exception exception)
@@ -602,7 +559,7 @@ namespace SEE.Net
                     callBack(false, exception.Message);
                     throw;
                 }
-                callBack(true, $"Host started at {ServerIP4Address}:{ServerPort}.");
+                callBack(true, $"Host started at {ServerAddress}.");
             }
         }
 
@@ -617,15 +574,15 @@ namespace SEE.Net
         {
             if (RoomPassword == System.Text.Encoding.ASCII.GetString(request.Payload))
             {
-                Debug.Log($"Client {request.ClientNetworkId} has send right room password");
+                Debug.Log($"Client {request.ClientNetworkId} has sent right room password");
                 response.Approved = true;
-                
+
             }
             else
             {
                 response.Approved = false;
                 response.Reason = "Invalid password";
-                Debug.LogWarning($"Client {request.ClientNetworkId} has send wrong room password");
+                Debug.LogWarning($"Client {request.ClientNetworkId} has sent wrong room password");
             }
         }
 
@@ -666,7 +623,7 @@ namespace SEE.Net
 
             void InternalStartClient()
             {
-                Debug.Log($"Client is trying to connect to server {ServerIP4Address}:{ServerPort}...\n");
+                Debug.Log($"Client is trying to connect to server {ServerAddress}...\n");
 
                 NetworkManager.Singleton.NetworkConfig.ConnectionData = Encoding.ASCII.GetBytes(RoomPassword);
                 NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnectedCallback;
@@ -674,7 +631,7 @@ namespace SEE.Net
 
                 if (NetworkManager.Singleton.StartClient())
                 {
-                        InitializeGame();
+                    InitializeGame();
                 }
             }
         }
@@ -683,7 +640,7 @@ namespace SEE.Net
         /// The maximal waiting time in seconds a client is willing to wait until a connection
         /// can be established.
         /// </summary>
-        private const float MaxWaitingTime = 5 * 60;
+        private const float maxWaitingTime = 5 * 60;
 
         /// <summary>
         /// A delegate that will be called in <see cref="ShutdownNetwork(OnShutdownFinished)"/> when
@@ -739,14 +696,14 @@ namespace SEE.Net
         /// <summary>
         /// Name of the Inspector foldout group for the logging setttings.
         /// </summary>
-        private const string VoiceChatFoldoutGroup = "Voice Chat";
+        private const string voiceChatFoldoutGroup = "Voice Chat";
 
         /// <summary>
         /// The voice chat system as selected by the user. Note: This attribute
         /// can be changed in the editor via <see cref="NetworkEditor"/> as well
         /// as at the start up in the <see cref="OpeningDialog"/>.
         /// </summary>
-        [Tooltip("The voice chat system to be used. 'None' for no voice chat."), FoldoutGroup(VoiceChatFoldoutGroup)]
+        [Tooltip("The voice chat system to be used. 'None' for no voice chat."), FoldoutGroup(voiceChatFoldoutGroup)]
         public VoiceChatSystems VoiceChat = VoiceChatSystems.None;
 
         /// <summary>
@@ -775,7 +732,7 @@ namespace SEE.Net
         /// This is used only for informational purposes in <see cref="AddressesInfo"/>.
         /// </summary>
         [Serializable]
-        private struct AddressInfo
+        private readonly struct AddressInfo
         {
             /// <summary>
             /// The address family of the TCP/IP protocol, e.g., InterNetworkV6
@@ -818,20 +775,19 @@ namespace SEE.Net
         /// <summary>
         /// The name of the group for the fold-out group of the configuration file.
         /// </summary>
-        private const string ConfigurationFoldoutGroup = "Configuration File";
+        private const string configurationFoldoutGroup = "Configuration File";
 
         /// <summary>
         /// The name of the group for the Inspector buttons loading and saving the configuration file.
         /// </summary>
-        private const string ConfigurationButtonsGroup = "ConfigurationButtonsGroup";
+        private const string configurationButtonsGroup = "ConfigurationButtonsGroup";
 
         /// <summary>
         /// Default path of the configuration file (path and filename).
         /// </summary>
-        [SerializeField]
         [PropertyTooltip("Path of the file containing the network configuration.")]
-        [HideReferenceObjectPicker, FoldoutGroup(ConfigurationFoldoutGroup)]
-        public FilePath ConfigPath = new FilePath();
+        [HideReferenceObjectPicker, FoldoutGroup(configurationFoldoutGroup)]
+        public FilePath ConfigPath = new();
 
         /// <summary>
         /// Saves the settings of this network configuration to <see cref="ConfigPath()"/>.
@@ -839,7 +795,7 @@ namespace SEE.Net
         /// </summary>
         [Button(ButtonSizes.Small)]
         [PropertyTooltip("Saves the network settings in a configuration file.")]
-        [ButtonGroup(ConfigurationButtonsGroup)]
+        [ButtonGroup(configurationButtonsGroup)]
         public void Save()
         {
             Save(ConfigPath.Path);
@@ -851,7 +807,7 @@ namespace SEE.Net
         /// </summary>
         [Button(ButtonSizes.Small)]
         [PropertyTooltip("Loads the network configuration file.")]
-        [ButtonGroup(ConfigurationButtonsGroup)]
+        [ButtonGroup(configurationButtonsGroup)]
         public void Load()
         {
             Load(ConfigPath.Path);
@@ -866,32 +822,27 @@ namespace SEE.Net
         /// <summary>
         /// Label of attribute <see cref="ServerActionPort"/> in the configuration file.
         /// </summary>
-        private const string ServerActionPortLabel = "serverActionPort";
-        /// <summary>
-        /// Label of attribute <see cref="loadCityOnStart"/> in the configuration file.
-        /// </summary>
-        private const string LoadCityOnStartLabel = "loadCityOnStart";
+        private const string serverActionPortLabel = "serverActionPort";
         /// <summary>
         /// Label of attribute <see cref="GameScene"/> in the configuration file.
         /// </summary>
-        private const string GameSceneLabel = "gameScene";
+        private const string gameSceneLabel = "gameScene";
         /// <summary>
         /// Label of attribute <see cref="VoiceChat"/> in the configuration file.
         /// </summary>
-        private const string VoiceChatLabel = "voiceChat";
+        private const string voiceChatLabel = "voiceChat";
         /// <summary>
         /// Label of attribute <see cref="ServerPort"/> in the configuration file.
         /// </summary>
-        private const string ServerPortLabel = "serverPort";
-
+        private const string serverPortLabel = "serverPort";
         /// <summary>
         /// Label of attribute <see cref="RoomPassword"/> in the configuration file.
         /// </summary>
-        private const string RoomPasswordLabel = "roomPassword";
+        private const string roomPasswordLabel = "roomPassword";
         /// <summary>
         /// Label of attribute <see cref="ServerIP4Address"/> in the configuration file.
         /// </summary>
-        private const string ServerIP4AddressLabel = "serverIP4Address";
+        private const string serverIP4AddressLabel = "serverIP4Address";
 
         /// <summary>
         /// Saves the settings of this network configuration to <paramref name="filename"/>.
@@ -926,13 +877,12 @@ namespace SEE.Net
         /// <param name="writer">the writer to be used to save the settings</param>
         protected virtual void Save(ConfigWriter writer)
         {
-            writer.Save(ServerActionPort, ServerActionPortLabel);
-            writer.Save(loadCityOnStart, LoadCityOnStartLabel);
-            writer.Save(GameScene, GameSceneLabel);
-            writer.Save(VoiceChat.ToString(), VoiceChatLabel);
-            writer.Save(ServerPort, ServerPortLabel);
-            writer.Save(RoomPassword, RoomPasswordLabel);
-            writer.Save(ServerIP4Address, ServerIP4AddressLabel);
+            writer.Save(ServerActionPort, serverActionPortLabel);
+            writer.Save(GameScene, gameSceneLabel);
+            writer.Save(VoiceChat.ToString(), voiceChatLabel);
+            writer.Save(ServerPort, serverPortLabel);
+            writer.Save(ServerIP4Address, serverIP4AddressLabel);
+            writer.Save(RoomPassword, roomPasswordLabel);
         }
 
         /// <summary>
@@ -941,19 +891,18 @@ namespace SEE.Net
         /// <param name="attributes">the attributes from which to restore the settings</param>
         protected virtual void Restore(Dictionary<string, object> attributes)
         {
-            ConfigIO.Restore(attributes, ServerActionPortLabel, ref ServerActionPort);
-            ConfigIO.Restore(attributes, LoadCityOnStartLabel, ref loadCityOnStart);
-            ConfigIO.Restore(attributes, GameSceneLabel, ref GameScene);
-            ConfigIO.Restore(attributes, RoomPasswordLabel, ref RoomPassword);
-            ConfigIO.RestoreEnum(attributes, VoiceChatLabel, ref VoiceChat);
+            ConfigIO.Restore(attributes, serverActionPortLabel, ref ServerActionPort);
+            ConfigIO.Restore(attributes, gameSceneLabel, ref GameScene);
+            ConfigIO.RestoreEnum(attributes, voiceChatLabel, ref VoiceChat);
+            ConfigIO.Restore(attributes, roomPasswordLabel, ref RoomPassword);
             {
                 int value = ServerPort;
-                ConfigIO.Restore(attributes, ServerPortLabel, ref value);
+                ConfigIO.Restore(attributes, serverPortLabel, ref value);
                 ServerPort = value;
             }
             {
                 string value = ServerIP4Address;
-                ConfigIO.Restore(attributes, ServerIP4AddressLabel, ref value);
+                ConfigIO.Restore(attributes, serverIP4AddressLabel, ref value);
                 ServerIP4Address = value;
             }
         }
@@ -973,7 +922,7 @@ namespace SEE.Net
         public static VivoxUnity.IChannelSession VivoxChannelSession { get; private set; } = null;
 
         [SerializeField]
-        [Tooltip("The channel name for Vivox."), FoldoutGroup(VoiceChatFoldoutGroup)]
+        [Tooltip("The channel name for Vivox."), FoldoutGroup(voiceChatFoldoutGroup)]
         [ShowIf("VoiceChat", VoiceChatSystems.Vivox)]
         private string vivoxChannelName = string.Empty;
         public static string VivoxChannelName { get => Instance ? Instance.vivoxChannelName : string.Empty; }

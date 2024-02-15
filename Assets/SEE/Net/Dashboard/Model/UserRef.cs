@@ -12,33 +12,33 @@ namespace SEE.Net.Dashboard.Model
         /// <summary>
         /// User name. Use this to refer to the same user.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string name;
+        [JsonProperty(PropertyName = "name", Required = Required.Always)]
+        public readonly string Name;
 
         /// <summary>
         /// Use this for display of the user in a UI.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string displayName;
+        [JsonProperty(PropertyName = "displayName", Required = Required.Always)]
+        public readonly string DisplayName;
 
         /// <summary>
         /// User type.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string type;
+        [JsonProperty(PropertyName = "type", Required = Required.Always)]
+        public readonly string Type;
 
         /// <summary>
         /// Whether this user is a so-called public readonly user.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly bool isPublic;
+        [JsonProperty(PropertyName = "isPublic", Required = Required.Always)]
+        public readonly bool IsPublic;
 
         public UserRef(string name, string displayName, string type, bool isPublic)
         {
-            this.name = name;
-            this.displayName = displayName;
-            this.type = type;
-            this.isPublic = isPublic;
+            this.Name = name;
+            this.DisplayName = displayName;
+            this.Type = type;
+            this.IsPublic = isPublic;
         }
     }
 }

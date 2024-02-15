@@ -1,0 +1,32 @@
+name: Axivion Suite
+
+on:
+  push:
+    branches: [master]
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: read-all
+
+jobs:
+  run:
+    name: Run Axivion CI
+    runs-on: [self-hosted, axivion]
+    steps:
+      - name: Setup GitLab LFS
+        shell: cmd
+        run: |
+          echo %CREDENTIALS% > %USERPROFILE%\.git-credentials
+          git config --global credential.helper store
+          git config --global lfs.url %CREDENTIALS%\project-see\see-lfs.git\info\lfs
+        env:
+          # NOTE: must be of the form https://koschke:token-here@gitlab.informatik.uni-bremen.de/
+          CREDENTIALS: ${{secrets.GITLAB_LFS_TOKEN}}
+      - name: Run Axivion CI
+        shell: cmd
+        run: | 
+            cd e:\koschke\SEE
+            nugetforunity restore .
+            Axivion\axivion-jenkins.bat axivion_ci

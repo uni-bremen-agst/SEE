@@ -6,12 +6,12 @@ namespace SEE.DataModel
 {
     /// <summary>
     /// An event representing a change to a graph component.
-    /// May be used outside of reflexion analysis contexts, in which case the <see cref="ReflexionSubgraph"/> will be
+    /// May be used outside of reflexion analysis contexts, in which case the <see cref="ReflexionSubgraphs"/> will be
     /// <c>None</c>.
     /// </summary>
     public abstract class GraphEvent : ChangeEvent
     {
-        protected GraphEvent(Guid version, ReflexionSubgraph? affectedGraph = null, ChangeType? change = null) : base(version, affectedGraph, change)
+        protected GraphEvent(Guid version, ReflexionSubgraphs? affectedGraph = null, ChangeType? change = null) : base(version, affectedGraph, change)
         {
         }
     }
@@ -19,15 +19,15 @@ namespace SEE.DataModel
     /// <summary>
     /// An event representing a new version being introduced.
     /// Events following this one will have the new <see cref="VersionId"/>, while events before this
-    /// (up until the last <see cref="VersionChangeEvent"/>) will have <see cref="OldVersion"/>.
+    /// (up until the last <see cref="VersionChangeEvent"/>) will have <see cref="oldVersion"/>.
     /// </summary>
     public class VersionChangeEvent : GraphEvent
     {
         /// <summary>
         /// The version before this one.
         /// </summary>
-        private readonly Guid OldVersion;
-        
+        private readonly Guid oldVersion;
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -35,10 +35,10 @@ namespace SEE.DataModel
         /// <param name="oldVersion">old version ID</param>
         public VersionChangeEvent(Guid newVersion, Guid oldVersion) : base(newVersion)
         {
-            OldVersion = oldVersion;
+            this.oldVersion = oldVersion;
         }
 
-        protected override string Description() => $"Changed version from {OldVersion} to {VersionId}.";
+        protected override string Description() => $"Changed version from {oldVersion} to {VersionId}.";
     }
 
     /// <summary>
@@ -60,7 +60,7 @@ namespace SEE.DataModel
         /// <param name="edge">the edge being added or removed</param>
         /// <param name="change">the type of change to <paramref name="edge"/></param>
         /// <param name="affectedGraph">The graph the edge was added to or removed from</param>
-        public EdgeEvent(Guid version, Edge edge, ChangeType change, ReflexionSubgraph? affectedGraph = null) : base(version, affectedGraph ?? edge.GetSubgraph(), change)
+        public EdgeEvent(Guid version, Edge edge, ChangeType change, ReflexionSubgraphs? affectedGraph = null) : base(version, affectedGraph ?? edge.GetSubgraph(), change)
         {
             Edge = edge;
         }
@@ -86,9 +86,9 @@ namespace SEE.DataModel
         /// </summary>
         public readonly Node Child;
 
-        public HierarchyEvent(Guid version, Node parent, Node child, ChangeType change, ReflexionSubgraph? affectedGraph = null) : base(version, affectedGraph ?? child.GetSubgraph(), change)
+        public HierarchyEvent(Guid version, Node parent, Node child, ChangeType change, ReflexionSubgraphs? affectedGraph = null) : base(version, affectedGraph ?? child.GetSubgraph(), change)
         {
-            if (affectedGraph == ReflexionSubgraph.Mapping || affectedGraph == ReflexionSubgraph.FullReflexion)
+            if (affectedGraph == ReflexionSubgraphs.Mapping || affectedGraph == ReflexionSubgraphs.FullReflexion)
             {
                 throw new ArgumentException("Only architecture or implementation hierarchy can be changed!");
             }
@@ -113,9 +113,9 @@ namespace SEE.DataModel
         /// </summary>
         public readonly Node Node;
 
-        public NodeEvent(Guid version, Node node, ChangeType change, ReflexionSubgraph? affectedGraph = null) : base(version, affectedGraph ?? node.GetSubgraph(), change)
+        public NodeEvent(Guid version, Node node, ChangeType change, ReflexionSubgraphs? affectedGraph = null) : base(version, affectedGraph ?? node.GetSubgraph(), change)
         {
-            if (affectedGraph == ReflexionSubgraph.Mapping || affectedGraph == ReflexionSubgraph.FullReflexion)
+            if (affectedGraph == ReflexionSubgraphs.Mapping || affectedGraph == ReflexionSubgraphs.FullReflexion)
             {
                 throw new ArgumentException("Nodes can only be added to architecture or implementation!");
             }
@@ -169,7 +169,7 @@ namespace SEE.DataModel
         {
             get;
         }
-        
+
         /// <summary>
         /// The value of the changed attribute.
         /// Will be <c>null</c> either if the attribute has been unset, or if it is a toggle attribute.
@@ -187,7 +187,7 @@ namespace SEE.DataModel
     }
 
     /// <summary>
-    /// An event fired when the <see cref="GraphElement.Type"/> of a graph element changes. 
+    /// An event fired when the <see cref="GraphElement.Type"/> of a graph element changes.
     /// </summary>
     public class GraphElementTypeEvent : GraphEvent
     {
@@ -195,12 +195,12 @@ namespace SEE.DataModel
         /// The previous type of the graph element.
         /// </summary>
         public readonly string OldType;
-        
+
         /// <summary>
         /// The new type of the graph element.
         /// </summary>
         public readonly string NewType;
-        
+
         /// <summary>
         /// The element whose type was changed.
         /// </summary>

@@ -12,12 +12,12 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Time in between two update cycles for the synchronization in seconds.
         /// </summary>
-        private const float RepeatCycle = 0.05f;
+        private const float repeatCycle = 0.05f;
 
         /// <summary>
         /// The network object.
         /// </summary>
-        protected NetworkObject networkObject;
+        protected NetworkObject NetworkObject;
 
         /// <summary>
         /// Timer to count the elapsed time in seconds for one cycle.
@@ -25,12 +25,12 @@ namespace SEE.Game.Avatars
         private float timer;
 
         /// <summary>
-        /// Executes <see cref="Synchronize"/> every <see cref="RepeatCycle"/> seconds.
+        /// Executes <see cref="Synchronize"/> every <see cref="repeatCycle"/> seconds.
         /// </summary>
         private void Update()
         {
             timer += Time.deltaTime;
-            if (timer >= RepeatCycle)
+            if (timer >= repeatCycle)
             {
                 Synchronize();
                 timer = 0f;
@@ -38,16 +38,16 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// Method to be called periodically every <see cref="RepeatCycle"/>.
+        /// Method to be called periodically every <see cref="repeatCycle"/>.
         /// </summary>
         protected abstract void Synchronize();
 
         /// <summary>
-        /// Resets <see cref="timer"/> and sets <see cref="networkObject"/>.
+        /// Resets <see cref="timer"/> and sets <see cref="NetworkObject"/>.
         /// </summary>
         protected virtual void Start()
         {
-            networkObject = gameObject.AddOrGetComponent<NetworkObject>();
+            NetworkObject = gameObject.AddOrGetComponent<NetworkObject>();
             timer = 0;
         }
     }

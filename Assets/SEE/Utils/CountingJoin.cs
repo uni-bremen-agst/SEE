@@ -14,7 +14,7 @@
         /// <summary>
         /// The callback to be called when there are no more outstanding events.
         /// </summary>
-        private CallBackFunction CallBack;
+        private CallBackFunction callBack;
 
         /// <summary>
         /// The number of outstanding events that need to be awaited before the
@@ -34,11 +34,11 @@
         public void Await(int expectedNumberOfEvents, CallBackFunction callBack)
         {
             UnityEngine.Assertions.Assert.IsNotNull(callBack);
-            CallBack = callBack;
+            this.callBack = callBack;
             outstandingEvents = expectedNumberOfEvents;
             if (outstandingEvents == 0)
             {
-                CallBack();
+                this.callBack();
             }
         }
 
@@ -53,7 +53,7 @@
             UnityEngine.Assertions.Assert.IsTrue(outstandingEvents >= 0);
             if (outstandingEvents == 0)
             {
-                CallBack();
+                callBack();
             }
         }
 
@@ -67,11 +67,11 @@
         /// </summary>
         public void Skip()
         {
-            UnityEngine.Assertions.Assert.IsNotNull(CallBack);
+            UnityEngine.Assertions.Assert.IsNotNull(callBack);
             if (outstandingEvents > 0)
             {
                 outstandingEvents = 0;
-                CallBack();
+                callBack();
             }
         }
     }

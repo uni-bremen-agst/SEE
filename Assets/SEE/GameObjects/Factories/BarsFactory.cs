@@ -42,14 +42,14 @@ namespace SEE.GO.NodeFactories
         /// <summary>
         /// The width of the bar chart.
         /// </summary>
-        private const float TargetWidth = 1.0f;
+        private const float targetWidth = 1.0f;
 
         protected override Mesh GetMesh(float[] metrics)
         {
             float[] allButHeight = AllButHeight(metrics).ToArray();
             uint numberOfBars = (uint)allButHeight.Length;
-            float widthOfBar = TargetWidth / numberOfBars;
-            float xOffset = -TargetWidth / 2;
+            float widthOfBar = targetWidth / numberOfBars;
+            float xOffset = -targetWidth / 2;
             float zOffset = -allButHeight.Max() / 2;
 
             // Four vertices per bar.

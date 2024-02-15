@@ -34,12 +34,12 @@ namespace SEE.Game.Charts.VR
         /// <summary>
         /// A cube behind the chart to make it look three dimensional.
         /// </summary>
-        public GameObject physicalOpen;
+        public GameObject PhysicalOpen;
 
         /// <summary>
         /// The minimized chart displayed as a cube.
         /// </summary>
-        public GameObject physicalClosed;
+        public GameObject PhysicalClosed;
 
         /// <summary>
         /// FIXME: Obsolete. Should be removed. Is this used in the prefab?
@@ -64,12 +64,12 @@ namespace SEE.Game.Charts.VR
         /// <param name="max">The max value of the bounds.</param>
         public override void AreaSelection(Vector2 min, Vector2 max)
         {
-            foreach (ChartMarker marker in activeMarkers)
+            foreach (ChartMarker marker in ActiveMarkers)
             {
                 Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
                 if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                 {
-                    List<string> ids = marker.ids;
+                    List<string> ids = marker.Ids;
                     foreach (string id in ids)
                     {
                         InteractableObject o = InteractableObject.Get(id);

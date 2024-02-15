@@ -328,12 +328,12 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         }
 
         /// <summary>
-        /// Adds <see cref="child"/> to the <see cref="Children"/> of this node.
+        /// Adds <see cref="child"/> to the <see cref="children"/> of this node.
         /// </summary>
         /// <param name="child">immediate child to be added</param>
         public void AddChild(ENode child)
         {
-            Children.Add(child);
+            children.Add(child);
         }
 
         /// <summary>
@@ -343,7 +343,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         public override void Print()
         {
             base.Print();
-            foreach (ENode child in Children)
+            foreach (ENode child in children)
             {
                 child.Print();
             }
@@ -352,27 +352,27 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
         /// The children of this inner node in the hierarchy.
         /// </summary>
-        private readonly List<ENode> Children = new List<ENode>();
+        private readonly List<ENode> children = new List<ENode>();
 
         /// <summary>
         /// This is the rectangle for the street itself representing the inner node.
         /// The attribute <see cref="Rectangle"/> relates to the rectangle enclosing
         /// this street and all children of this inner node.
         /// </summary>
-        private Rectangle Street;
+        private Rectangle street;
 
         /// <summary>
-        /// Calculates and sets the necessary size of <see cref="Rectangle"/> and <see cref="Street"/>
+        /// Calculates and sets the necessary size of <see cref="Rectangle"/> and <see cref="street"/>
         /// for this node as follows:
         ///
         /// 1) This method recurses into its descendants first to calculate their respective size.
         ///
-        /// 2) The <see cref="Children"/> of this node will be aligned along the <see cref="Street"/> left or right
-        ///    with respect to the given <paramref name="orientation"/> in the predefined order of <see cref="Children"/>
-        ///    in such a way that both sides of the streets occupy a similar sum of lengths of those <see cref="Children"/>.
-        ///    The distribution is greedy, that is, does not guarantee that the overall length of the <see cref="Street"/>
-        ///    is minimized. At the beginning and end of the <see cref="Street"/> as well as between neighboring <see cref="Children"/>,
-        ///    <paramref name="treeDescriptor.OffsetBetweenBuildings"/> will be added. The length of the <see cref="Street"/>
+        /// 2) The <see cref="children"/> of this node will be aligned along the <see cref="street"/> left or right
+        ///    with respect to the given <paramref name="orientation"/> in the predefined order of <see cref="children"/>
+        ///    in such a way that both sides of the streets occupy a similar sum of lengths of those <see cref="children"/>.
+        ///    The distribution is greedy, that is, does not guarantee that the overall length of the <see cref="street"/>
+        ///    is minimized. At the beginning and end of the <see cref="street"/> as well as between neighboring <see cref="children"/>,
+        ///    <paramref name="treeDescriptor.OffsetBetweenBuildings"/> will be added. The length of the <see cref="street"/>
         ///    is chosen to cover exactly the length of this alignment. The street width (which would be <see cref="Street.Depth"/>
         ///    if <paramref name="orientation"/> is <see cref="Orientation.East"/> and <see cref="Street.Width"/>
         ///    if <paramref name="orientation"/> is <see cref="Orientation.North"/>) is a relative proportion of
@@ -380,12 +380,12 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         ///    <paramref name="treeDescriptor.MaximalDepth"/>.
         ///
         ///  3) In addition, this method stores the distance from the edge of the outermost <see cref="Rectangle"/>
-        ///     to the center of the street in one of the length attributes of <see cref="Street"/>.
+        ///     to the center of the street in one of the length attributes of <see cref="street"/>.
         ///     If <paramref name="orientation"/> equals <see cref="Orientation.East"/> the relevant edge is the
         ///     left edge of <see cref="Rectangle"/>; otherwise it is its lower edge.
         ///     This value is just a relative value and requires an update towards world space when the inner is
         ///     actually located in <see cref="SetLocation(Orientation, Location)"/>. It allows us to determine
-        ///     the position of <see cref="Street"/> within <see cref="Rectangle"/>.
+        ///     the position of <see cref="street"/> within <see cref="Rectangle"/>.
         ///
         /// Precondition:
         /// Here we accept only <see cref="Orientation.East"/> or <see cref="Orientation.North"/>
@@ -409,7 +409,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
             {
                 // First determine the size of all descendants.
                 Orientation childOrientation = orientation == Orientation.North ? Orientation.East : Orientation.North;
-                foreach (ENode child in Children)
+                foreach (ENode child in children)
                 {
                     child.SetSize(childOrientation, treeDescriptor);
                 }
@@ -419,7 +419,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
             float leftOffset = treeDescriptor.OffsetBetweenBuildings;
             float rightOffset = treeDescriptor.OffsetBetweenBuildings;
 
-            foreach (ENode child in Children)
+            foreach (ENode child in children)
             {
                 child.Left = leftOffset <= rightOffset;
                 if (child.Left)
@@ -434,28 +434,28 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
 
             if (orientation == Orientation.East)
             {
-                Street.Width = Mathf.Max(leftOffset, rightOffset);
-                Street.Depth = RelativeStreetWidth(this);
-                Rectangle.Width = Street.Width;
-                float depthForRightChildren = Max(Children, left: false, width: false);
+                street.Width = Mathf.Max(leftOffset, rightOffset);
+                street.Depth = RelativeStreetWidth(this);
+                Rectangle.Width = street.Width;
+                float depthForRightChildren = Max(children, left: false, width: false);
                 /// As a temporary value, we store the distance from the lower edge of the outermost rectangle
                 /// to the center depth of the street. This value is just a relative value and requires an
                 /// update when the inner is actually located in <see cref="SetLocation(Orientation, Location)"/>.
-                Street.Center.Y = depthForRightChildren + Street.Depth / 2;
-                Rectangle.Depth = Street.Depth + Max(Children, left: true, width: false) + depthForRightChildren;
+                street.Center.Y = depthForRightChildren + street.Depth / 2;
+                Rectangle.Depth = street.Depth + Max(children, left: true, width: false) + depthForRightChildren;
             }
             else
             {
                 AreEqual(orientation, Orientation.North);
-                Street.Depth = Mathf.Max(leftOffset, rightOffset);
-                Street.Width = RelativeStreetWidth(this);
-                Rectangle.Depth = Street.Depth;
-                float widthForLeftChildren = Max(Children, left: true, width: true);
+                street.Depth = Mathf.Max(leftOffset, rightOffset);
+                street.Width = RelativeStreetWidth(this);
+                Rectangle.Depth = street.Depth;
+                float widthForLeftChildren = Max(children, left: true, width: true);
                 /// As a temporary value, we store the distance from the left edge of the outermost rectangle
                 /// to the center width of the street. This value is just a relative value and requires an
                 /// update when the inner is actually located in <see cref="SetLocation(Orientation, Location)"/>.
-                Street.Center.X = widthForLeftChildren + Street.Width / 2;
-                Rectangle.Width = Street.Width + widthForLeftChildren + Max(Children, left: false, width: true);
+                street.Center.X = widthForLeftChildren + street.Width / 2;
+                Rectangle.Width = street.Width + widthForLeftChildren + Max(children, left: false, width: true);
             }
 
             float RelativeStreetWidth(EInner node)
@@ -525,7 +525,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
         /// Sets the center location of <see cref="Rectangle"/> of the node to
         /// <paramref name="centerLocation"/> based on <paramref name="orientation"/>.
-        /// Sets the center location of the <see cref="Street"/>.
+        /// Sets the center location of the <see cref="street"/>.
         /// </summary>
         /// <param name="orientation">the orientation of this node</param>
         /// <param name="centerLocation">center location to be set</param>
@@ -535,20 +535,20 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
             Rectangle.Center = centerLocation;
             if (horizontal)
             {
-                Street.Center.X = Rectangle.Center.X;
+                street.Center.X = Rectangle.Center.X;
                 /// We have set <see cref="Rectangle.Center.Y"/> as a relative value in <see cref="SetSize(Orientation, LayoutDescriptor)"/>.
-                Street.Center.Y += Rectangle.Center.Y - Rectangle.Depth / 2;
+                street.Center.Y += Rectangle.Center.Y - Rectangle.Depth / 2;
             }
             else
             {
-                Street.Center.Y = Rectangle.Center.Y;
+                street.Center.Y = Rectangle.Center.Y;
                 /// We have set <see cref="Rectangle.Center.X"/> as a relative value in <see cref="SetSize(Orientation, LayoutDescriptor)"/>.
-                Street.Center.X += Rectangle.Center.X - Rectangle.Width / 2;
+                street.Center.X += Rectangle.Center.X - Rectangle.Width / 2;
             }
-            Location origin = MoveTo(Street.Center, Length(orientation) / 2, Invert(orientation));
+            Location origin = MoveTo(street.Center, Length(orientation) / 2, Invert(orientation));
 
-            float streetExtent = (horizontal ? Street.Depth : Street.Width) / 2;
-            foreach (ENode child in Children)
+            float streetExtent = (horizontal ? street.Depth : street.Width) / 2;
+            foreach (ENode child in children)
             {
                 Orientation childOrientation = child.Rotate(orientation);
                 // Move child parallel to the street.
@@ -563,7 +563,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// Adds the layout information of this <see cref="EInner"/> to the <paramref name="layoutResult"/>.
         ///
         /// Unlike <see cref="ELeaf.ToLayout(ref Dictionary{ILayoutNode, NodeTransform}, float, float)"/>, this
-        /// method adds the data from <see cref="Street"/> because that rectangle is used to depict an inner
+        /// method adds the data from <see cref="street"/> because that rectangle is used to depict an inner
         /// node. The attribute <see cref="Rectangle"/> is just the area enclosing this street and all
         /// representations of the descendants of this node.
         /// </summary>
@@ -573,10 +573,10 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         public override void ToLayout(ref Dictionary<ILayoutNode, NodeTransform> layoutResult, float groundLevel, float streetHeight)
         {
             layoutResult[GraphNode]
-                = new NodeTransform(new Vector3(Street.Center.X, groundLevel, Street.Center.Y),
-                                    new Vector3(Street.Width, streetHeight, Street.Depth),
+                = new NodeTransform(new Vector3(street.Center.X, groundLevel, street.Center.Y),
+                                    new Vector3(street.Width, streetHeight, street.Depth),
                                     0);
-            foreach (ENode child in Children)
+            foreach (ENode child in children)
             {
                 child.ToLayout(ref layoutResult, groundLevel, streetHeight);
             }

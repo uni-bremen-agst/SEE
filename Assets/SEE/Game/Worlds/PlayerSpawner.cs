@@ -31,7 +31,7 @@ namespace SEE.Game.Worlds
         /// The information needed to spawn player avatars.
         /// </summary>
         [Tooltip("The information to be used to spawn players."), ShowInInspector, SerializeField]
-        private List<SpawnInfo> PlayerSpawns = new List<SpawnInfo>();
+        private List<SpawnInfo> playerSpawns = new();
 
         /// <summary>
         /// The dissonance communication. Its game object holds the remote players as its children.
@@ -83,7 +83,7 @@ namespace SEE.Game.Worlds
             // to spawn a player whenever a client connects.
             networkManager.OnClientConnectedCallback += Spawn;
             networkManager.OnClientDisconnectCallback += ClientDisconnects;
-            // Spawn the local player.
+            // Spawn the local player. This code is executed by the server.
             Spawn(networkManager.LocalClientId);
         }
 
@@ -93,25 +93,65 @@ namespace SEE.Game.Worlds
         private int numberOfSpawnedPlayers = 0;
 
         /// <summary>
-        /// Spawns a player using the <see cref="PlayerSpawns"/>.
+        /// Spawns a player using the <see cref="playerSpawns"/>.
         /// </summary>
         /// <param name="owner">the network ID of the owner</param>
+        /// <remarks>This code can be executed only on the server.</remarks>
         private void Spawn(ulong owner)
         {
             if (owner == NetworkManager.Singleton.LocalClientId && NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost)
             {
                 return;
             }
-            int index = numberOfSpawnedPlayers % PlayerSpawns.Count;
-            GameObject player = Instantiate(PlayerSpawns[index].PlayerPrefab,
-                                            PlayerSpawns[index].Position,
-                                            Quaternion.Euler(new Vector3(0, PlayerSpawns[index].Rotation, 0)));
+            int index = numberOfSpawnedPlayers % playerSpawns.Count;
+            GameObject player = Instantiate(playerSpawns[index].PlayerPrefab,
+                                            playerSpawns[index].Position,
+                                            Quaternion.Euler(new Vector3(0, playerSpawns[index].Rotation, 0)));
             numberOfSpawnedPlayers++;
             player.name = "Player " + numberOfSpawnedPlayers;
-            Debug.Log($"Spawned {player.name} (network id: {owner}, local: {IsLocal(owner)}) at position {player.transform.position}.\n");
+#if DEBUG
+            Debug.Log($"Spawned {player.name} (network id of owner: {owner}, local: {IsLocal(owner)}) at position {player.transform.position}.\n");
+#endif
             if (player.TryGetComponent(out NetworkObject net))
             {
+                // By default a newly spawned network Prefab instance is owned by the server
+                // unless otherwise specified.
                 net.SpawnAsPlayerObject(owner, destroyWithScene: true);
+#if DEBUG
+                Debug.Log($"Is local player: {net.IsLocalPlayer}. Owner of player {player.name} is server: {net.IsOwnedByServer} or is local client: {net.IsOwner}\n");
+#endif
+                // A network Prefab is any unity Prefab asset that has one NetworkObject
+                // component attached to a GameObject within the prefab.
+                // player is a network Prefab, i.e., it has a NetworkObject attached to it.
+                // More commonly, the NetworkObject component is attached to the root GameObject
+                // of the Prefab asset because this allows any child GameObject to have
+                // NetworkBehaviour components automatically assigned to the NetworkObject.
+                // The reason for this is that a NetworkObject component attached to a
+                // GameObject will be assigned (associated with) any NetworkBehaviour components on:
+                //
+                // (1) the same GameObject that the NetworkObject component is attached to
+                // (2) any child or children of the GameObject that the NetworkObject is attached to.
+                //
+                // A caveat of the above two rules is when one of the children GameObjects also
+                // has a NetworkObject component assigned to it (a.k.a. "Nested NetworkObjects").
+                // Nested NetworkObject components aren't permitted in network prefabs.
+
+                //GameObject faceCam = PrefabInstantiator.InstantiatePrefab("Prefabs/FaceCam/FaceCam", parent: player.transform);
+
+#if false // FIXME: The FaceCam is already added in the prefab of the player. No need to add it by the code below.
+
+#if !PLATFORM_LUMIN || UNITY_EDITOR
+                if (networkManager.IsServer)
+                {
+                    // Netcode uses a server authoritative networking model so spawning netcode objects
+                    // can only be done on a server or host.
+                    // Add the FaceCam to the player.
+                    GameObject faceCam = PrefabInstantiator.InstantiatePrefab("Prefabs/FaceCam/FaceCam");
+                    faceCam.GetComponent<NetworkObject>().Spawn();
+                    faceCam.transform.parent = player.transform;
+                }
+#endif
+#endif
             }
             else
             {
@@ -123,7 +163,7 @@ namespace SEE.Game.Worlds
         /// Emits that the client with given <paramref name="networkID"/> has disconnected.
         /// </summary>
         /// <param name="networkID">the network ID of the disconnecting client</param>
-        private void ClientDisconnects(ulong networkID)
+        private static void ClientDisconnects(ulong networkID)
         {
             Debug.Log($"Player with ID {networkID} (local: {IsLocal(networkID)}) disconnects.\n");
         }
@@ -134,7 +174,7 @@ namespace SEE.Game.Worlds
         /// <param name="owner">the network ID of the owner</param>
         /// <returns>true iff <paramref name="owner"/> identifies
         /// <see cref="NetworkManager.Singleton.LocalClientId"/></returns>
-        private bool IsLocal(ulong owner)
+        private static bool IsLocal(ulong owner)
         {
             return owner == NetworkManager.Singleton.LocalClientId;
         }

@@ -146,11 +146,11 @@ namespace SEE.Game.Avatars
         /// Adds required components.
         /// </summary>
         /// <param name="networkObject">The existing network object</param>
-        /// <param name="IsLocallyControlled">Boolean value to determine the locally controlled status, set to false when a network object is provided.</param>
-        public static void AddComponents(GameObject gameObject, bool IsLocallyControlled)
+        /// <param name="isLocallyControlled">Boolean value to determine the locally controlled status, set to false when a network object is provided.</param>
+        public static void AddComponents(GameObject gameObject, bool isLocallyControlled)
         {
             VRAvatarAimingSystem aiming = gameObject.AddOrGetComponent<VRAvatarAimingSystem>();
-            aiming.IsLocallyControlled = IsLocallyControlled;
+            aiming.IsLocallyControlled = isLocallyControlled;
             if (gameObject.TryGetComponentOrLog(out AimIK aimIK))
             {
                 aiming.Source = aimIK.solver.transform;

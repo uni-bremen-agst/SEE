@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using SEE.Game.HolisticMetrics;
 using SEE.Net.Actions.HolisticMetrics;
 using SEE.Utils;
+using SEE.Utils.History;
 using UnityEngine;
 
 namespace SEE.Controls.Actions.HolisticMetrics
@@ -25,11 +26,11 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// <summary>
             /// The entire configuration of the board for creating it again when the player wants to undo the action.
             /// </summary>
-            public readonly BoardConfig boardConfig;
+            public readonly BoardConfig BoardConfig;
 
             public Memento(BoardConfig boardConfig)
             {
-                this.boardConfig = boardConfig;
+                this.BoardConfig = boardConfig;
             }
         }
 
@@ -51,9 +52,9 @@ namespace SEE.Controls.Actions.HolisticMetrics
                 if (widgetsManager != null)
                 {
                     memento = new Memento(ConfigManager.GetBoardConfig(widgetsManager));
-                    BoardsManager.Delete(memento.boardConfig.Title);
-                    new DeleteBoardNetAction(memento.boardConfig.Title).Execute();
-                    currentState = ReversibleAction.Progress.Completed;
+                    BoardsManager.Delete(memento.BoardConfig.Title);
+                    new DeleteBoardNetAction(memento.BoardConfig.Title).Execute();
+                    CurrentState = IReversibleAction.Progress.Completed;
                     return true;
                 }
             }
@@ -67,8 +68,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
         public override void Undo()
         {
             base.Undo();
-            BoardsManager.Create(memento.boardConfig);
-            new CreateBoardNetAction(memento.boardConfig).Execute();
+            BoardsManager.Create(memento.BoardConfig);
+            new CreateBoardNetAction(memento.BoardConfig).Execute();
         }
 
         /// <summary>
@@ -77,15 +78,15 @@ namespace SEE.Controls.Actions.HolisticMetrics
         public override void Redo()
         {
             base.Redo();
-            BoardsManager.Delete(memento.boardConfig.Title);
-            new DeleteBoardNetAction(memento.boardConfig.Title).Execute();
+            BoardsManager.Delete(memento.BoardConfig.Title);
+            new DeleteBoardNetAction(memento.BoardConfig.Title).Execute();
         }
 
         /// <summary>
         /// Returns a new instance of <see cref="DeleteBoardAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new DeleteBoardAction();
         }
@@ -94,7 +95,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// Returns a new instance of <see cref="DeleteBoardAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }
@@ -105,7 +106,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <returns></returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new HashSet<string> { memento.boardConfig.Title };
+            return new HashSet<string> { memento.BoardConfig.Title };
         }
 
         /// <summary>

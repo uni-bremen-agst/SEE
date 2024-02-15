@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Net;
 using SEE.Controls;
 using UnityEngine.Assertions;
 
@@ -15,8 +14,7 @@ namespace SEE.Net.Actions
         /// Every hovered object of the end point of every client. This is only used by
         /// the server.
         /// </summary>
-        internal static readonly Dictionary<ulong, HashSet<InteractableObject>> HoveredObjects
-            = new Dictionary<ulong, HashSet<InteractableObject>>();
+        internal static readonly Dictionary<ulong, HashSet<InteractableObject>> HoveredObjects = new();
 
         /// <summary>
         /// Should not be sent to newly connecting clients
@@ -26,12 +24,12 @@ namespace SEE.Net.Actions
         /// <summary>
         /// The id of the interactable.
         /// </summary>
-        public string id;
+        public string ID;
 
         /// <summary>
         /// The hover flags of the interactable.
         /// </summary>
-        public uint hoverFlags;
+        public uint HoverFlags;
 
         /// <summary>
         /// Constructor.
@@ -42,8 +40,8 @@ namespace SEE.Net.Actions
         {
             Assert.IsNotNull(interactable);
 
-            id = interactable.name;
-            this.hoverFlags = hoverFlags;
+            ID = interactable.name;
+            this.HoverFlags = hoverFlags;
         }
 
         /// <summary>
@@ -52,9 +50,9 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnServer()
         {
-            if (hoverFlags != 0)
+            if (HoverFlags != 0)
             {
-                InteractableObject interactable = InteractableObject.Get(id);
+                InteractableObject interactable = InteractableObject.Get(ID);
                 if (interactable)
                 {
                     ulong requester = Requester;
@@ -68,7 +66,7 @@ namespace SEE.Net.Actions
             }
             else
             {
-                InteractableObject interactable = InteractableObject.Get(id);
+                InteractableObject interactable = InteractableObject.Get(ID);
                 if (interactable)
                 {
                     ulong requester = Requester;
@@ -89,10 +87,10 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            InteractableObject interactable = InteractableObject.Get(id);
+            InteractableObject interactable = InteractableObject.Get(ID);
             if (interactable)
             {
-                interactable.SetHoverFlags(hoverFlags, false);
+                interactable.SetHoverFlags(HoverFlags, false);
             }
         }
     }

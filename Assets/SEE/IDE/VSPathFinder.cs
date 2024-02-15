@@ -50,17 +50,17 @@ namespace SEE.IDE
         /// <summary>
         /// Path to external program to receive all information about Visual Studio.
         /// </summary>
-        private static readonly string VSWherePath = Application.streamingAssetsPath + "\\vswhere\\vswhere.exe";
+        private static readonly string vsWherePath = Application.streamingAssetsPath + @"\vswhere\vswhere.exe";
 
         /// <summary>
         /// Version range for Visual Studio 2019
         /// </summary>
-        private static readonly string VS2019 = "[16.0,17.0)";
+        private static readonly string vsS2019 = "[16.0,17.0)";
 
         /// <summary>
         /// Version range for Visual Studio 2022
         /// </summary>
-        private static readonly string VS2022 = "[17.0,18.0)";
+        private static readonly string vs2022 = "[17.0,18.0)";
 
         /// <summary>
         /// Gets the requested path with executable. If executed by other operating than windows
@@ -76,8 +76,8 @@ namespace SEE.IDE
             }
             string requestedInstance = version switch
             {
-                Version.VS2019 => VS2019,
-                Version.VS2022 => VS2022,
+                Version.VS2019 => vsS2019,
+                Version.VS2022 => vs2022,
                 _ => throw new NotImplementedException(
                     $"Implementation of case {version} not found!")
             };
@@ -95,9 +95,9 @@ namespace SEE.IDE
         /// <returns>Returns the output of the process</returns>
         private static async UniTask<string> ExecuteVSWhereAsync(string arguments)
         {
-            ProcessStartInfo start = new ProcessStartInfo
+            ProcessStartInfo start = new()
             {
-                FileName = VSWherePath,
+                FileName = vsWherePath,
                 Arguments = arguments,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,

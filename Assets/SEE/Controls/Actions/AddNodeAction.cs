@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
-using SEE.Game;
 using SEE.GO;
 using SEE.Net.Actions;
-using SEE.Utils;
+using SEE.Utils.History;
 using UnityEngine;
 using SEE.Audio;
+using SEE.Game.SceneManipulation;
+using SEE.Utils;
 
 namespace SEE.Controls.Actions
 {
@@ -16,7 +17,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// If the user clicks with the mouse hitting a game object representing a graph node,
         /// this graph node is a parent to which a new node is created and added as a child.
-        /// <see cref="ReversibleAction.Update"/>.
+        /// <see cref="IReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
@@ -39,8 +40,8 @@ namespace SEE.Controls.Actions
                 memento.NodeID = addedGameNode.name;
                 new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
                 result = true;
-                currentState = ReversibleAction.Progress.Completed;
-                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NEW_NODE_SOUND, parent);
+                CurrentState = IReversibleAction.Progress.Completed;
+                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewNodeSound, parent);
             }
             return result;
         }
@@ -125,7 +126,7 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="AddNodeAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new AddNodeAction();
         }
@@ -134,7 +135,7 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="AddNodeAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }

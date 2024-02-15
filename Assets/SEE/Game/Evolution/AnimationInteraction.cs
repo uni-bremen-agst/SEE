@@ -49,7 +49,7 @@ namespace SEE.Game.Evolution
         /// of revisions and the auto-play toggle. If the ESC key is hit, the
         /// RevisionSelectionCanvas is shown again.
         /// </summary>
-        private GameObject AnimationCanvas; // serialized by Unity
+        private GameObject animationCanvas; // serialized by Unity
 
         /// <summary>
         /// The user-data model for AnimationCanvas.
@@ -62,7 +62,7 @@ namespace SEE.Game.Evolution
         /// menu, it also contains a close button. If this button is pressed, the
         /// AnimationCanvas is shown again.
         /// </summary>
-        private GameObject RevisionSelectionCanvas; // serialized by Unity
+        private GameObject revisionSelectionCanvas; // serialized by Unity
 
         /// <summary>
         /// The factor applied to the animation speed when fast-forwarding, or the divisor when slowing down.
@@ -124,52 +124,52 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Path to the prefab of the AnimationCanvas excluding the file extension ".prefab".
         /// </summary>
-        private const string AnimationCanvasPrefab = "Prefabs/Animation/AnimationCanvas";
+        private const string animationCanvasPrefab = "Prefabs/Animation/AnimationCanvas";
 
         /// <summary>
-        /// The name of the game object instantiated via <see cref="AnimationCanvasPrefab"/>.
+        /// The name of the game object instantiated via <see cref="animationCanvasPrefab"/>.
         /// </summary>
-        private const string AnimationCanvasGameObjectName = "AnimationCanvas";
+        private const string animationCanvasGameObjectName = "AnimationCanvas";
 
         /// <summary>
         /// Path to the prefab of the AnimationCanvas excluding the file extension ".prefab".
         /// </summary>
-        private const string RevisionSelectionCanvasPrefab = "Prefabs/Animation/RevisionSelectionCanvas";
+        private const string revisionSelectionCanvasPrefab = "Prefabs/Animation/RevisionSelectionCanvas";
 
         /// <summary>
-        /// The name of the game object instantiated via <see cref="RevisionSelectionCanvasPrefab"/>.
+        /// The name of the game object instantiated via <see cref="revisionSelectionCanvasPrefab"/>.
         /// </summary>
-        private const string RevisionSelectionCanvasGameObjectName = "RevisionSelectionCanvas";
+        private const string revisionSelectionCanvasGameObjectName = "RevisionSelectionCanvas";
 
         /// <summary>
         /// The name of the graph attribute providing the commit ID.
         /// </summary>
-        private const string CommitIdAttributeName = "CommitId";
+        private const string commitIdAttributeName = "CommitId";
 
         /// <summary>
         /// The name of the graph attribute providing the name of the author of a commit.
         /// </summary>
-        private const string CommitAuthorAttributeName = "CommitAuthor";
+        private const string commitAuthorAttributeName = "CommitAuthor";
 
         /// <summary>
         /// The name of the graph attribute providing the name of the timestamp of a commit.
         /// </summary>
-        private const string CommitTimestampAttributeName = "CommitTimestamp";
+        private const string commitTimestampAttributeName = "CommitTimestamp";
 
         /// <summary>
         /// The name of the graph attribute providing the commit message.
         /// </summary>
-        private const string CommitMessageAttributeName = "CommitMessage";
+        private const string commitMessageAttributeName = "CommitMessage";
 
         private void Init()
         {
-            AnimationCanvas = GetCanvas(AnimationCanvasGameObjectName, AnimationCanvasPrefab);
-            RevisionSelectionCanvas = GetCanvas(RevisionSelectionCanvasGameObjectName, RevisionSelectionCanvasPrefab);
+            animationCanvas = GetCanvas(animationCanvasGameObjectName, animationCanvasPrefab);
+            revisionSelectionCanvas = GetCanvas(revisionSelectionCanvasGameObjectName, revisionSelectionCanvasPrefab);
 
             StartCoroutine(SetAnimationCanvasCamera());
 
-            revisionSelectionDataModel = RevisionSelectionCanvas.GetComponent<RevisionSelectionDataModel>();
-            animationDataModel = AnimationCanvas.GetComponent<AnimationDataModel>();
+            revisionSelectionDataModel = revisionSelectionCanvas.GetComponent<RevisionSelectionDataModel>();
+            animationDataModel = animationCanvas.GetComponent<AnimationDataModel>();
 
             revisionSelectionDataModel.AssertNotNull("revisionSelectionDataModel");
             animationDataModel.AssertNotNull("animationDataModel");
@@ -215,7 +215,7 @@ namespace SEE.Game.Evolution
 
         /// <summary>
         /// Waits until a camera becomes a available. When a camera is
-        /// available, the world camera of the <see cref="AnimationCanvas"/>
+        /// available, the world camera of the <see cref="animationCanvas"/>
         /// will be set to this camera.
         ///
         /// Intended to be run as a co-routine.
@@ -223,7 +223,7 @@ namespace SEE.Game.Evolution
         /// <returns>whether to continue the co-routine</returns>
         private IEnumerator SetAnimationCanvasCamera()
         {
-            Canvas canvas = AnimationCanvas.GetComponent<Canvas>();
+            Canvas canvas = animationCanvas.GetComponent<Canvas>();
             Camera camera = MainCamera.Camera;
 
             while (camera == null)
@@ -276,7 +276,7 @@ namespace SEE.Game.Evolution
         {
             foreach (KeyValuePair<Button, InputField> p in markerDictionary)
             {
-                SliderMarker sliderMarker = sliderMarkerContainer.getSliderMarkerForLocation(p.Key.transform.position);
+                SliderMarker sliderMarker = sliderMarkerContainer.GetSliderMarkerForLocation(p.Key.transform.position);
                 sliderMarker.SetComment(p.Value.text);
             }
 
@@ -467,7 +467,7 @@ namespace SEE.Game.Evolution
             Button newMarker = Instantiate(animationDataModel.MarkerPrefab, animationDataModel.Slider.transform, false);
             newMarker.transform.position = markerPos;
             newMarker.onClick.AddListener(() => TaskOnClickMarker(newMarker));
-            if (sliderMarkerContainer.getSliderMarkerForLocation(markerPos) == null)
+            if (sliderMarkerContainer.GetSliderMarkerForLocation(markerPos) == null)
             {
                 SliderMarker newSliderMarker = new()
                 {
@@ -487,7 +487,7 @@ namespace SEE.Game.Evolution
         /// <param name="marker"> Marker to remove </param>
         private void RemoveMarker(Button marker)
         {
-            SliderMarker sliderMarker = sliderMarkerContainer.getSliderMarkerForLocation(marker.transform.position);
+            SliderMarker sliderMarker = sliderMarkerContainer.GetSliderMarkerForLocation(marker.transform.position);
             sliderMarkerContainer.SliderMarkers.Remove(sliderMarker);
             InputField comment = markerDictionary[marker];
             markerDictionary.Remove(marker);
@@ -528,7 +528,7 @@ namespace SEE.Game.Evolution
                 {
                     Vector3 handlePos = animationDataModel.Slider.handleRect.transform.position;
                     Vector3 markerPos = new(handlePos.x, handlePos.y + .08f, handlePos.z);
-                    if (sliderMarkerContainer.getSliderMarkerForLocation(markerPos) == null)
+                    if (sliderMarkerContainer.GetSliderMarkerForLocation(markerPos) == null)
                     {
                         AddMarker(markerPos);
                     }
@@ -588,8 +588,8 @@ namespace SEE.Game.Evolution
         {
             IsRevisionSelectionOpen = enabled;
 
-            AnimationCanvas.SetActive(!IsRevisionSelectionOpen);
-            RevisionSelectionCanvas.SetActive(IsRevisionSelectionOpen);
+            animationCanvas.SetActive(!IsRevisionSelectionOpen);
+            revisionSelectionCanvas.SetActive(IsRevisionSelectionOpen);
             evolutionRenderer.SetAutoPlay(false);
             if (IsRevisionSelectionOpen)
             {
@@ -625,7 +625,7 @@ namespace SEE.Game.Evolution
         /// <returns>commit ID</returns>
         private string CurrentCommitId()
         {
-            return GetAttributeOfCurrentGraph(CommitIdAttributeName);
+            return GetAttributeOfCurrentGraph(commitIdAttributeName);
         }
 
         /// <summary>
@@ -634,7 +634,7 @@ namespace SEE.Game.Evolution
         /// <returns>commit author</returns>
         private string CurrentAuthor()
         {
-            return GetAttributeOfCurrentGraph(CommitAuthorAttributeName);
+            return GetAttributeOfCurrentGraph(commitAuthorAttributeName);
         }
 
         /// <summary>
@@ -643,7 +643,7 @@ namespace SEE.Game.Evolution
         /// <returns>commit timestamp</returns>
         private string CurrentCommitTimestamp()
         {
-            return GetAttributeOfCurrentGraph(CommitTimestampAttributeName);
+            return GetAttributeOfCurrentGraph(commitTimestampAttributeName);
         }
 
         /// <summary>
@@ -652,7 +652,7 @@ namespace SEE.Game.Evolution
         /// <returns>commit message</returns>
         private string CurrentCommitMessage()
         {
-            return GetAttributeOfCurrentGraph(CommitMessageAttributeName);
+            return GetAttributeOfCurrentGraph(commitMessageAttributeName);
         }
 
         /// <summary>

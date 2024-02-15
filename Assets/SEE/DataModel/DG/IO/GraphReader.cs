@@ -27,6 +27,10 @@ namespace SEE.DataModel.DG.IO
         /// <paramref name="rootID"/> is null or the empty string or has a single root, the graph
         /// will be loaded as stored in the GXL file.
         ///
+        /// The loaded graph will have the <paramref name="basePath"/> that will be used
+        /// to turn relative file-system paths into absolute ones. It should be chosen as
+        /// the root directory in which the source code can be found.
+        ///
         /// When the graph is loaded, the node levels are calculated.
         ///
         /// Precondition: <paramref name="rootID"/> must be unique.
@@ -251,11 +255,11 @@ namespace SEE.DataModel.DG.IO
                 List<Node> roots = graph.GetRoots();
                 if (roots.Count == 0)
                 {
-                    Debug.LogWarning($"Graph stored in {name} is empty.\n");
+                    Debug.LogWarning($"Graph stored in {Name} is empty.\n");
                 }
                 else if (roots.Count > 1)
                 {
-                    Debug.LogWarning($"Graph stored in {name} has multiple roots. Adding an artificial single root {rootName}.\n");
+                    Debug.LogWarning($"Graph stored in {Name} has multiple roots. Adding an artificial single root {rootName}.\n");
                     Node singleRoot = new()
                     {
                         Type = Graph.UnknownType,
@@ -323,15 +327,15 @@ namespace SEE.DataModel.DG.IO
             // We don't know the base path yet, hence, we use the empty string.
             graph = new Graph("")
             {
-                Path = name
+                Path = Name
             };
-            if (reader.HasAttributes)
+            if (Reader.HasAttributes)
             {
-                while (reader.MoveToNextAttribute())
+                while (Reader.MoveToNextAttribute())
                 {
-                    if (reader.Name == "id")
+                    if (Reader.Name == "id")
                     {
-                        graph.Name = reader.Value;
+                        graph.Name = Reader.Value;
                     }
                 }
                 // You can move the reader back to the element node as follows:
@@ -350,13 +354,13 @@ namespace SEE.DataModel.DG.IO
             }
 
             current = new Node();
-            if (reader.HasAttributes)
+            if (Reader.HasAttributes)
             {
-                while (reader.MoveToNextAttribute())
+                while (Reader.MoveToNextAttribute())
                 {
-                    if (reader.Name == "id")
+                    if (Reader.Name == "id")
                     {
-                        nodes.Add(reader.Value, (Node)current);
+                        nodes.Add(Reader.Value, (Node)current);
                         break;
                     }
                 }
@@ -451,7 +455,7 @@ namespace SEE.DataModel.DG.IO
                 LogError("There is still a pending graph element when new edge declaration has begun.");
             }
 
-            if (reader.HasAttributes)
+            if (Reader.HasAttributes)
             {
                 // We will first collect those attributes and then create the edge
                 // because the constructor of Edge requires an ID.
@@ -460,24 +464,24 @@ namespace SEE.DataModel.DG.IO
                 string id = "";
 
                 // determine id, fromNode and toNode
-                while (reader.MoveToNextAttribute())
+                while (Reader.MoveToNextAttribute())
                 {
-                    switch (reader.Name)
+                    switch (Reader.Name)
                     {
                         case "from" when fromNode != "":
                             LogError("Edge has multiple source nodes.");
                             break;
                         case "from":
-                            fromNode = reader.Value;
+                            fromNode = Reader.Value;
                             break;
                         case "to" when toNode != "":
                             LogError("Edge has multiple target nodes.");
                             break;
                         case "to":
-                            toNode = reader.Value;
+                            toNode = Reader.Value;
                             break;
                         case "id":
-                            id = reader.Value;
+                            id = Reader.Value;
                             break;
                     }
                 } // while
@@ -581,13 +585,13 @@ namespace SEE.DataModel.DG.IO
             }
             else
             {
-                if (reader.HasAttributes)
+                if (Reader.HasAttributes)
                 {
-                    while (reader.MoveToNextAttribute())
+                    while (Reader.MoveToNextAttribute())
                     {
-                        if (reader.Name == "xlink:href")
+                        if (Reader.Name == "xlink:href")
                         {
-                            current.Type = reader.Value;
+                            current.Type = Reader.Value;
                             break;
                         }
                     }
@@ -613,14 +617,14 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         protected override void StartAttr()
         {
-            if (reader.HasAttributes)
+            if (Reader.HasAttributes)
             {
-                while (reader.MoveToNextAttribute())
+                while (Reader.MoveToNextAttribute())
                 {
-                    if (reader.Name == "name")
+                    if (Reader.Name == "name")
                     {
                         // save for later when we know the attribute type
-                        currentAttributeName = reader.Value;
+                        currentAttributeName = Reader.Value;
                         break;
                     }
                 }

@@ -11,12 +11,12 @@ namespace SEE.Utils
         /// <summary>
         /// Returns the text contained in the file with given <paramref name="fileName"/>
         /// in the range <paramref name="fromLine"/> to <paramref name="toLine"/>.
-        /// 
+        ///
         /// If the file has less lines than <paramref name="fromLine"/>, the empty
         /// string will be returned. If the file has less lines than  <paramref name="toLine"/>
         /// only the lines from <paramref name="fromLine"/> to the last line in the file
         /// will be returned.
-        /// 
+        ///
         /// Precondition: <paramref name="fromLine"/> must be greater than zero
         /// and must the less than or equal to <paramref name="toLine"/>.
         /// </summary>
@@ -24,7 +24,7 @@ namespace SEE.Utils
         /// <param name="fromLine">the start of the requested line range</param>
         /// <param name="toLine">the end of the requested line range</param>
         /// <returns>file content in the specified line range</returns>
-        public static string Read(string fileName, int fromLine, int toLine)
+        internal static string Read(string fileName, int fromLine, int toLine)
         {
             UnityEngine.Assertions.Assert.IsTrue(fromLine > 0 && fromLine <= toLine);
 
@@ -48,6 +48,19 @@ namespace SEE.Utils
                 }
             }
             return result.ToString();
+        }
+
+        /// <summary>
+        /// If a file named <paramref name="filename"/> exists, it will be deleted.
+        /// If it does not exist, nothing happens.
+        /// </summary>
+        /// <param name="filename">file to be deleted</param>
+        internal static void DeleteIfExists(string filename)
+        {
+            if (File.Exists(filename))
+            {
+                File.Delete(filename);
+            }
         }
     }
 }

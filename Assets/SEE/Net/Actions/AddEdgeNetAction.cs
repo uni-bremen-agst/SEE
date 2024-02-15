@@ -1,5 +1,5 @@
 ﻿using SEE.Game;
-using UnityEngine;
+using SEE.Game.SceneManipulation;
 
 namespace SEE.Net.Actions
 {
@@ -50,23 +50,7 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameObject fromGO = GraphElementIDMap.Find(FromId);
-            if (fromGO)
-            {
-                GameObject toGO = GraphElementIDMap.Find(ToId);
-                if (toGO)
-                {
-                    GameEdgeAdder.Add(fromGO, toGO, EdgeType);
-                }
-                else
-                {
-                    Debug.LogError($"There is no game node named {ToId} for the target of new edge {EdgeType}.\n");
-                }
-            }
-            else
-            {
-                Debug.LogError($"There is no game node named {FromId} for the source of new edge {EdgeType}.\n");
-            }
+            GameEdgeAdder.Add(Find(FromId), GraphElementIDMap.Find(ToId), EdgeType);
         }
     }
 }

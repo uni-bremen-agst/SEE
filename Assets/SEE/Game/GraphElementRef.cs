@@ -10,6 +10,6 @@ namespace SEE.GO
     /// </summary>
     public abstract class GraphElementRef : SerializedMonoBehaviour
     {
-        [NonSerialized] public GraphElement elem;
+        [NonSerialized] public GraphElement Elem;
     }
 }

@@ -24,8 +24,8 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         {
             if (metricValue is MetricValueRange metricValueRange)
             {
-                titleText.text = metricValueRange.Name;
-                valueText.text = metricValueRange.Value.ToString($"F{metricValueRange.DecimalPlaces}");
+                TitleText.text = metricValueRange.Name;
+                ValueText.text = metricValueRange.Value.ToString($"F{metricValueRange.DecimalPlaces}");
                 float maximum = metricValueRange.Higher - metricValueRange.Lower;
                 float actual = metricValueRange.Value - metricValueRange.Lower;
                 circle.fillAmount = actual / maximum;

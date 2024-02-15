@@ -29,7 +29,7 @@ namespace SEE.Audio
         /// </summary>
         /// <param name="soundEffect">The sound effect to play.</param>
         /// <param name="gameObjectName">The name of the game object that the sound should eminate from.</param>
-        public SoundEffectNetAction(SoundEffect soundEffect, string gameObjectName) 
+        public SoundEffectNetAction(SoundEffect soundEffect, string gameObjectName)
         {
             this.SoundEffectName = soundEffect.ToString();
             this.TargetGameObjectName = gameObjectName;

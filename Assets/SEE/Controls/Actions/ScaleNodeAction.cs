@@ -1,9 +1,8 @@
-﻿
-using SEE.Net.Actions;
+﻿using SEE.Net.Actions;
 using SEE.Game.Operator;
 using RTG;
 using UnityEngine;
-using SEE.Utils;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions
 {
@@ -41,8 +40,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void Initialize()
         {
-            currentState = ReversibleAction.Progress.NoEffect;
-            gizmo = new ScaleGizmo();
+            CurrentState = IReversibleAction.Progress.NoEffect;
+            UsedGizmo = new ScaleGizmo();
         }
 
         #endregion Constructors
@@ -53,7 +52,7 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="ScaleNodeAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new ScaleNodeAction();
         }
@@ -62,11 +61,11 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="ScaleNodeAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
-            if (gameNodeToBeContinuedInNextAction)
+            if (GameNodeToBeContinuedInNextAction)
             {
-                return new ScaleNodeAction(gameNodeToBeContinuedInNextAction);
+                return new ScaleNodeAction(GameNodeToBeContinuedInNextAction);
             }
             else
             {
@@ -113,7 +112,7 @@ namespace SEE.Controls.Actions
             protected override void Transform(Vector3 localScale)
             {
                 base.Transform(localScale);
-                nodeOperator.ScaleTo(localScale);
+                NodeOperator.ScaleTo(localScale);
             }
 
             /// <summary>
@@ -122,7 +121,7 @@ namespace SEE.Controls.Actions
             /// <param name="localScale">local scale to be broadcast</param>
             protected override void BroadcastState(Vector3 localScale)
             {
-                new ScaleNodeNetAction(nodeOperator.name, localScale).Execute();
+                new ScaleNodeNetAction(NodeOperator.name, localScale).Execute();
             }
         }
 
@@ -133,7 +132,7 @@ namespace SEE.Controls.Actions
         protected override void FinalizeAction()
         {
             base.FinalizeAction();
-            memento.Finalize(gameNodeSelected.transform.localScale);
+            GameNodeMemento.Finalize(GameNodeSelected.transform.localScale);
         }
 
         /// <summary>
@@ -143,7 +142,7 @@ namespace SEE.Controls.Actions
         /// <returns>true if the object to be manipulated has had a change</returns>
         protected override bool HasChanges()
         {
-            return gameNodeSelected.transform.localScale != memento.InitialState;
+            return GameNodeSelected.transform.localScale != GameNodeMemento.InitialState;
         }
 
         protected override Memento<Vector3> CreateMemento(GameObject gameNode)
@@ -165,7 +164,7 @@ namespace SEE.Controls.Actions
             /// </summary>
             public ScaleGizmo()
             {
-                objectTransformationGizmo = RTGizmosEngine.Get.CreateObjectScaleGizmo();
+                ObjectTransformationGizmo = RTGizmosEngine.Get.CreateObjectScaleGizmo();
             }
         }
         #endregion

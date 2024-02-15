@@ -21,12 +21,12 @@ namespace SEE.Net.Actions
         /// <summary>
         /// The id of the interactable.
         /// </summary>
-        public string id;
+        public string ID;
 
         /// <summary>
         /// Whether the interactable should be selected.
         /// </summary>
-        public bool select;
+        public bool Select;
 
         /// <summary>
         /// Constructor.
@@ -37,8 +37,8 @@ namespace SEE.Net.Actions
         {
             Assert.IsNotNull(interactable);
 
-            id = interactable.name;
-            this.select = select;
+            ID = interactable.name;
+            Select = select;
         }
 
         /// <summary>
@@ -47,9 +47,9 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnServer()
         {
-            if (select)
+            if (Select)
             {
-                InteractableObject interactable = InteractableObject.Get(id);
+                InteractableObject interactable = InteractableObject.Get(ID);
                 if (interactable)
                 {
                     ulong requester = Requester;
@@ -63,7 +63,7 @@ namespace SEE.Net.Actions
             }
             else
             {
-                InteractableObject interactable = InteractableObject.Get(id);
+                InteractableObject interactable = InteractableObject.Get(ID);
                 if (interactable)
                 {
                     ulong requester = Requester;
@@ -84,10 +84,10 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            InteractableObject interactable = InteractableObject.Get(id);
+            InteractableObject interactable = InteractableObject.Get(ID);
             if (interactable)
             {
-                interactable.SetSelect(select, false);
+                interactable.SetSelect(Select, false);
             }
         }
     }

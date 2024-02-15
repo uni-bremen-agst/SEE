@@ -2,10 +2,9 @@
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
-using SEE.Controls.Actions;
 using SEE.Utils;
 
-namespace SEETests
+namespace SEE.Controls.Actions
 {
     /// <summary>
     /// Tests for the <see cref="AbstractActionStateType"/> class and its subclasses

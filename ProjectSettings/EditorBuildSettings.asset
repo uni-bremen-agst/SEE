@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/Scenes/SEEStart.unity
     guid: f0ffd1879ec1ac440b7e28cd35b500bf
   - enabled: 1
-    path: Assets/Scenes/SEEReflexion.unity
+    path: Assets/Scenes/SEEWorld.unity
     guid: 077ae3d112f905849b6dd5427be72ce8
   - enabled: 1
     path: Assets/Scenes/Empty.unity

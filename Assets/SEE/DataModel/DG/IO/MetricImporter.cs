@@ -4,12 +4,11 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using SEE.Utils;
+using SEE.Utils.Paths;
 using SEE.Net.Dashboard;
 using SEE.Net.Dashboard.Model.Issues;
 using SEE.Net.Dashboard.Model.Metric;
 using SEE.Tools;
-using Sirenix.Utilities;
 using UnityEngine;
 
 namespace SEE.DataModel.DG.IO
@@ -26,28 +25,31 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="graph">The graph whose nodes' metrics shall be set</param>
         /// <param name="override">Whether any existing metrics present in the graph's nodes shall be updated</param>
-        public static async UniTask LoadDashboard(Graph graph, bool @override = true, string addedFrom = "")
+        /// <param name="addedFrom">If empty, all issues will be retrieved. Otherwise, only those issues which have been added from
+        /// the given version to the most recent one will be loaded.</param>
+        /// <returns>The graph with the updated metrics and issues</returns>
+        public static async UniTask<Graph> LoadDashboardAsync(Graph graph, bool @override = true, string addedFrom = "")
         {
-            IDictionary<(string path, string entity), List<MetricValueTableRow>> metrics = await DashboardRetriever.Instance.GetAllMetricRows();
-            IDictionary<string, List<Issue>> issues = await LoadIssueMetrics(addedFrom.IsNullOrWhitespace() ? null : addedFrom, null);
+            IDictionary<(string path, string entity), List<MetricValueTableRow>> metrics = await DashboardRetriever.Instance.GetAllMetricRowsAsync();
+            IDictionary<string, List<Issue>> issues = await LoadIssueMetrics(string.IsNullOrWhiteSpace(addedFrom) ? null : addedFrom);
             string projectFolder = DataPath.ProjectFolder();
 
             await UniTask.SwitchToThreadPool();
 
-            HashSet<Node> encounteredIssueNodes = new HashSet<Node>();
+            HashSet<Node> encounteredIssueNodes = new();
             int updatedMetrics = 0;
             // Go through all nodes, checking whether any metric in the dashboard matches it.
             foreach (Node node in graph.Nodes())
             {
-                string nodePath = $"{node.RelativePath(projectFolder)}{node.Filename() ?? string.Empty}";
+                string nodePath = $"{node.RelativeDirectory(projectFolder)}{node.Filename ?? string.Empty}";
                 if (metrics.TryGetValue((nodePath, node.SourceName), out List<MetricValueTableRow> metricValues))
                 {
                     foreach (MetricValueTableRow metricValue in metricValues)
                     {
                         // Only set if value doesn't already exist, or if we're supposed to override and the value differs
-                        if (!node.TryGetFloat(metricValue.metric, out float value) || @override && !Mathf.Approximately(metricValue.value, value))
+                        if (!node.TryGetFloat(metricValue.Metric, out float value) || @override && !Mathf.Approximately(metricValue.Value, value))
                         {
-                            node.SetFloat(metricValue.metric, metricValue.value);
+                            node.SetFloat(metricValue.Metric, metricValue.Value);
                             updatedMetrics++;
                         }
                     }
@@ -55,7 +57,7 @@ namespace SEE.DataModel.DG.IO
 
                 if (issues.TryGetValue(nodePath, out List<Issue> issueList))
                 {
-                    int? line = node.SourceLine();
+                    int? line = node.SourceLine;
                     IEnumerable<Issue> relevantIssues;
                     if (!line.HasValue)
                     {
@@ -64,13 +66,13 @@ namespace SEE.DataModel.DG.IO
                     }
                     else
                     {
-                        int? length = node.SourceLength();
+                        int? length = node.SourceLength;
                         // Note: In .NET 7 there is a Enumerable.ToHashSet() which could be used instead of the constructor.
-                        HashSet<int> lineRange = new HashSet<int>(Enumerable.Range(line.Value, length ?? 1), null);
+                        HashSet<int> lineRange = new(Enumerable.Range(line.Value, length ?? 1), null);
                         // Relevant issues are those which are entirely contained by the source region of this node
                         relevantIssues = issueList.Where(
-                            x => x.Entities.Any(e => lineRange.Contains(e.line) &&
-                                                     (!e.endLine.HasValue || lineRange.Contains(e.endLine.Value))));
+                            x => x.Entities.Any(e => lineRange.Contains(e.Line) &&
+                                                     (!e.EndLine.HasValue || lineRange.Contains(e.EndLine.Value))));
                     }
 
                     foreach (Issue issue in relevantIssues)
@@ -107,7 +109,7 @@ namespace SEE.DataModel.DG.IO
             {
                 NumericAttributeNames.Clone, NumericAttributeNames.Complexity, NumericAttributeNames.Cycle,
                 NumericAttributeNames.Metric, NumericAttributeNames.Style,
-                NumericAttributeNames.Architecture_Violations, NumericAttributeNames.Dead_Code
+                NumericAttributeNames.ArchitectureViolations, NumericAttributeNames.DeadCode
             };
             //FIXME: Aggregation from lower levels to classes doesn't work due to issues spanning multiple lines
             // Maybe simply ignore aggregated value when a non-aggregated value is present (which it would be)
@@ -116,21 +118,22 @@ namespace SEE.DataModel.DG.IO
             await UniTask.SwitchToMainThread();
             Debug.Log($"Updated {updatedMetrics} metric values and {encounteredIssueNodes.Count} issues "
                       + "using the Axivion dashboard.\n");
+            return graph;
 
 
-            static async UniTask<IDictionary<string, List<Issue>>> LoadIssueMetrics(string start, string end = null)
+            static async UniTask<IDictionary<string, List<Issue>>> LoadIssueMetrics(string start)
             {
                 IDictionary<string, List<Issue>> issues = new Dictionary<string, List<Issue>>();
-                IList<Issue> allIssues = await DashboardRetriever.Instance.GetConfiguredIssues(start, end, Issue.IssueState.added);
+                IList<Issue> allIssues = await DashboardRetriever.Instance.GetConfiguredIssuesAsync(start, end: null, state: Issue.IssueState.added);
                 foreach (Issue issue in allIssues)
                 {
                     foreach (SourceCodeEntity entity in issue.Entities)
                     {
-                        if (!issues.ContainsKey(entity.path))
+                        if (!issues.ContainsKey(entity.Path))
                         {
-                            issues[entity.path] = new List<Issue>();
+                            issues[entity.Path] = new List<Issue>();
                         }
-                        issues[entity.path].Add(issue);
+                        issues[entity.Path].Add(issue);
                     }
                 }
 
@@ -171,7 +174,7 @@ namespace SEE.DataModel.DG.IO
             int numberOfErrors = 0;
             try
             {
-                using StreamReader reader = new StreamReader(filename);
+                using StreamReader reader = new(filename);
                 if (reader.EndOfStream)
                 {
                     Debug.LogError($"Empty file: {filename}.\n");

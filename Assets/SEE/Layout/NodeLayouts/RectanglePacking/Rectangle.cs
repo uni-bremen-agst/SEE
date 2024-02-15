@@ -7,26 +7,44 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
     /// </summary>
     public class PRectangle
     {
-        // width (x) and depth (y) of the rectangle
-        public Vector2 size;
-        // position of the rectangle relative to the origin that is the left upper corner of the original available space
-        public Vector2 position;
+        /// <summary>
+        /// Size - width (x) and depth (y) -- of the rectangle.
+        /// </summary>
+        public Vector2 Size;
 
+        /// <summary>
+        /// Position of the rectangle relative to the origin, i.e., the left upper corner
+        /// of the original available space.
+        /// </summary>
+        public Vector2 Position;
+
+        /// <summary>
+        /// Constructor. Equivalent to <see cref="PRectangle"/>(Vector2.zero, Vector2.zero).
+        /// </summary>
         public PRectangle()
         {
-            size = Vector2.zero;
-            position = Vector2.zero;
+            Size = Vector2.zero;
+            Position = Vector2.zero;
         }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="position">position of the rectangle relative to the origin</param>
+        /// <param name="size">size - width (x) and depth (y) -- of the rectangle</param>
         public PRectangle(Vector2 position, Vector2 size)
         {
-            this.size = size;
-            this.position = position;
+            this.Size = size;
+            this.Position = position;
         }
 
+        /// <summary>
+        /// The rectangle as a string. Used for debugging.
+        /// </summary>
+        /// <returns>rectangle in human-readable form</returns>
         public override string ToString()
         {
-            return "[position=" + position + ", size=" + size + "]";
+            return "[position=" + Position + ", size=" + Size + "]";
         }
     }
 }

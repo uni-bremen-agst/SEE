@@ -9,7 +9,6 @@ using UnityEngine.Assertions;
 #if INCLUDE_STEAM_VR
 using Valve.VR.InteractionSystem;
 #endif
-using SEE.Game;
 using SEE.Net.Actions;
 using SEE.Audio;
 
@@ -54,122 +53,39 @@ namespace SEE.Controls
         /// <summary>
         /// The interactable objects.
         /// </summary>
-        private static readonly Dictionary<string, InteractableObject> idToInteractableObjectDict =
-            new Dictionary<string, InteractableObject>();
+        private static readonly Dictionary<string, InteractableObject> idToInteractableObjectDict = new();
 
         /// <summary>
         /// The hovered objects.
         /// </summary>
-        public static readonly HashSet<InteractableObject> HoveredObjects = new HashSet<InteractableObject>();
+        public static readonly HashSet<InteractableObject> HoveredObjects = new();
 
         /// <summary>
         /// The object, that is currently hovered by this player. There is always only ever
         /// one object hovered by this player with the flag <see cref="HoverFlag.World"/>
         /// set.
         /// </summary>
-        public static InteractableObject HoveredObjectWithWorldFlag { get; private set; } = null;
+        public static InteractableObject HoveredObjectWithWorldFlag { get; private set; }
 
         /// <summary>
         /// The selected objects.
         /// </summary>
-        public static readonly HashSet<InteractableObject> SelectedObjects = new HashSet<InteractableObject>();
+        public static readonly HashSet<InteractableObject> SelectedObjects = new();
 
         /// <summary>
         /// The grabbed objects.
         /// </summary>
-        public static readonly HashSet<InteractableObject> GrabbedObjects = new HashSet<InteractableObject>();
+        public static readonly HashSet<InteractableObject> GrabbedObjects = new();
 
         /// <summary>
         /// The selected objects per graph.
         /// </summary>
-        private static readonly Dictionary<Graph, HashSet<InteractableObject>> graphToSelectedIOs =
-            new Dictionary<Graph, HashSet<InteractableObject>>();
+        private static readonly Dictionary<Graph, HashSet<InteractableObject>> graphToSelectedIOs = new();
 
         /// <summary>
-        /// The graph element, this interactable object is attached to.
+        /// The graph element this interactable object is attached to.
         /// </summary>
         public GraphElementRef GraphElemRef { get; private set; }
-
-        public bool TryGetNodeRef(out NodeRef nodeRef)
-        {
-            bool result = false;
-            nodeRef = null;
-            if (GraphElemRef is NodeRef @ref)
-            {
-                result = true;
-                nodeRef = @ref;
-            }
-
-            return result;
-        }
-
-        public bool TryGetEdgeRef(out EdgeRef edgeRef)
-        {
-            bool result = false;
-            edgeRef = null;
-            if (GraphElemRef is EdgeRef @ref)
-            {
-                result = true;
-                edgeRef = @ref;
-            }
-
-            return result;
-        }
-
-        public bool TryGetNode(out Node node)
-        {
-            bool result = false;
-            node = null;
-            if (GraphElemRef is NodeRef nodeRef)
-            {
-                node = nodeRef.Value;
-                result = node != null;
-            }
-
-            return result;
-        }
-
-        public bool TryGetEdge(out Edge edge)
-        {
-            bool result = false;
-            edge = null;
-            if (GraphElemRef is EdgeRef edgeRef)
-            {
-                edge = edgeRef.Value;
-                result = edge != null;
-            }
-
-            return result;
-        }
-
-        public NodeRef GetNodeRef()
-        {
-            Assert.IsTrue(GraphElemRef is NodeRef);
-            return (NodeRef)GraphElemRef;
-        }
-
-        public EdgeRef GetEdgeRef()
-        {
-            Assert.IsTrue(GraphElemRef is EdgeRef);
-            return (EdgeRef)GraphElemRef;
-        }
-
-        public Node GetNode()
-        {
-            Assert.IsTrue(GraphElemRef is NodeRef);
-            return (Node)GraphElemRef.elem;
-        }
-
-        public Edge GetEdge()
-        {
-            Assert.IsTrue(GraphElemRef is EdgeRef);
-            return (Edge)GraphElemRef.elem;
-        }
-
-        /// <summary>
-        /// <see cref="GraphElement.ItsGraph"/>
-        /// </summary>
-        public Graph ItsGraph => GraphElemRef.elem.ItsGraph;
 
         /// <summary>
         /// A bit vector for hovering flags. Each flag is a bit as defined in <see cref="HoverFlag"/>.
@@ -225,18 +141,12 @@ namespace SEE.Controls
         /// </summary>
         public Synchronizer InteractableSynchronizer { get; private set; }
 
-        /// <summary>
-        /// Will be used to flash the selected object while it is selected.
-        /// </summary>
-        private GameObjectFlasher flasher;
-
         private void Awake()
         {
 #if INCLUDE_STEAM_VR
             gameObject.TryGetComponentOrLog(out interactable);
 #endif
             GraphElemRef = GetComponent<GraphElementRef>();
-            flasher = new GameObjectFlasher(gameObject);
         }
 
         private void OnDestroy()
@@ -341,7 +251,7 @@ namespace SEE.Controls
                     // Non-local player are not concerned here.
                     LocalHoverIn?.Invoke(this);
                     LocalAnyHoverIn?.Invoke(this);
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.HOVER_SOUND, this.gameObject);
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.HoverSound, this.gameObject);
                 }
 
                 HoveredObjects.Add(this);
@@ -452,7 +362,7 @@ namespace SEE.Controls
                 SelectedObjects.Add(this);
 
                 // Update all selected object list per graph
-                Graph graph = GraphElemRef.elem.ItsGraph;
+                Graph graph = GraphElemRef.Elem.ItsGraph;
                 if (!graphToSelectedIOs.ContainsKey(graph))
                 {
                     graphToSelectedIOs[graph] = new HashSet<InteractableObject>();
@@ -460,7 +370,8 @@ namespace SEE.Controls
 
                 graphToSelectedIOs[graph].Add(this);
 
-                flasher.StartFlashing();
+                // Start blinking indefinitely.
+                gameObject.Operator().Blink(-1);
 
                 // Invoke events
                 SelectIn?.Invoke(this, isInitiator);
@@ -479,9 +390,10 @@ namespace SEE.Controls
                 SelectedObjects.Remove(this);
 
                 // Update all selected object list per graph
-                graphToSelectedIOs[GraphElemRef.elem.ItsGraph].Remove(this);
+                graphToSelectedIOs[GraphElemRef.Elem.ItsGraph].Remove(this);
 
-                flasher.StopFlashing();
+                // Stop blinking.
+                gameObject.Operator().Blink(0);
 
                 // Invoke events
                 SelectOut?.Invoke(this, isInitiator);
@@ -517,7 +429,7 @@ namespace SEE.Controls
         private static void UnselectAllInternal(bool isInitiator, bool invokeReplaceEvent)
         {
             List<InteractableObject> replaced = SelectedObjects.ToList();
-            List<InteractableObject> by = new List<InteractableObject>();
+            List<InteractableObject> by = new();
             if (replaced.Count > 0 || by.Count > 0)
             {
                 // Note: This is no endless loop because SetSelect will remove this
@@ -543,7 +455,7 @@ namespace SEE.Controls
         public static void ReplaceSelection(InteractableObject interactableObject, bool isInitiator)
         {
             List<InteractableObject> replaced = SelectedObjects.ToList();
-            List<InteractableObject> by = new List<InteractableObject>(1);
+            List<InteractableObject> by = new(1);
             if (interactableObject)
             {
                 by.Add(interactableObject);

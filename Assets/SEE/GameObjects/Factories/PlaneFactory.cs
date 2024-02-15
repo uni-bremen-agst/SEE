@@ -13,7 +13,7 @@ namespace SEE.GO
         /// <summary>
         /// The id of this shader property.
         /// </summary>
-        private static readonly int SpecularHighlights = Shader.PropertyToID("_SpecularHighlights");
+        private static readonly int specularHighlights = Shader.PropertyToID("_SpecularHighlights");
 
         /// <summary>
         /// The divisor to transform a scale unit of PrimitiveType.Plane into a Unity unit.
@@ -43,7 +43,7 @@ namespace SEE.GO
             // Turn off reflection of plane
             planeRenderer.sharedMaterial.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
             planeRenderer.sharedMaterial.EnableKeyword("_GLOSSYREFLECTIONS_OFF");
-            planeRenderer.sharedMaterial.SetFloat(SpecularHighlights, 0.0f);
+            planeRenderer.sharedMaterial.SetFloat(specularHighlights, 0.0f);
             // To turn reflection on again, use (_SPECULARHIGHLIGHTS_OFF and _GLOSSYREFLECTIONS_OFF
             // work as toggle, there is no _SPECULARHIGHLIGHTS_ON and _GLOSSYREFLECTIONS_ON):
             //planeRenderer.sharedMaterial.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");

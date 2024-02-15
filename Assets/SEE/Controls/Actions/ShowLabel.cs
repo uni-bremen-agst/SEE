@@ -32,7 +32,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Operator component for this object.
         /// </summary>
-        private NodeOperator Operator;
+        private NodeOperator nodeOperator;
 
         /// <summary>
         /// List of operators of currently displayed node labels.
@@ -156,20 +156,20 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Creates a text label above the object with its node's SourceName if the label doesn't exist yet.
         /// </summary>
-        private void On()
+        public void On()
         {
-            if (Operator == null)
+            if (nodeOperator == null)
             {
-                Operator = gameObject.AddOrGetComponent<NodeOperator>();
+                nodeOperator = gameObject.NodeOperator();
             }
 
-            if (Operator.Node != null)
+            if (nodeOperator.Node != null)
             {
-                LabelAttributes settings = GetLabelSettings(Operator.Node, Operator.City);
+                LabelAttributes settings = GetLabelSettings(nodeOperator.Node, nodeOperator.City);
                 if (settings.Show)
                 {
-                    DisplayedLabelOperators.Add(Operator);
-                    Operator.FadeLabel(settings.LabelAlpha, settings.AnimationFactor);
+                    DisplayedLabelOperators.Add(nodeOperator);
+                    nodeOperator.FadeLabel(settings.LabelAlpha, settings.AnimationFactor);
                 }
             }
         }
@@ -179,11 +179,14 @@ namespace SEE.Controls.Actions
         ///
         /// </summary>
         /// <seealso cref="SelectionOn"/>
-        private void Off()
+        public void Off()
         {
-            LabelAttributes settings = GetLabelSettings(Operator.Node, Operator.City);
-            Operator.FadeLabel(0f, settings.AnimationFactor);
-            DisplayedLabelOperators.Remove(Operator);
+            if (nodeOperator.Node != null)
+            {
+                LabelAttributes settings = GetLabelSettings(nodeOperator.Node, nodeOperator.City);
+                nodeOperator.FadeLabel(0f, settings.AnimationFactor);
+                DisplayedLabelOperators.Remove(nodeOperator);
+            }
         }
 
         /// <summary>
