@@ -247,7 +247,7 @@ namespace SEE.UI.PropertyDialog
             {
                 // Room Password
                 networkConfig.RoomPassword = roomPassword.Value.ToString();
-                ShowNotification.Info("Password Set", "Youve set the password to " + roomPassword.Value.ToString());
+                ShowNotification.Info("Password Set", $"You have set the password to {roomPassword.Value}.");
             }
             {
                 // Voice Chat
@@ -258,7 +258,7 @@ namespace SEE.UI.PropertyDialog
                 }
                 else
                 {
-                    ShowNotification.Error("Invalid Voice Chat", "Your choice of a voice chat is not available");
+                    ShowNotification.Error("Invalid Voice Chat", "Your choice of a voice chat is not available.");
                     errorOccurred = true;
                 }
             }
