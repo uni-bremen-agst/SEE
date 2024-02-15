@@ -71,11 +71,6 @@ namespace SEE.Game.City
         public DirectoryPath GXLDirectory = new();
 
         /// <summary>
-        /// Determines if the graphs should be drawn. If set to true, the graph evolution will be calculated and displayed.
-        /// </summary>
-        private bool isDrawn = false;
-
-        /// <summary>
         /// Yields the graph renderer that draws this city.
         /// </summary>
         /// <remarks>Implements <see cref="AbstractSEECity.Renderer"/>.</remarks>
@@ -185,7 +180,6 @@ namespace SEE.Game.City
             // Delete the underlying graph.
             firstGraph?.Destroy();
             firstGraph = null;
-            isDrawn = false;
         }
 
         /// <summary>
@@ -199,9 +193,8 @@ namespace SEE.Game.City
         {
             if (firstGraph)
             {
-                GraphRenderer graphRenderer = new GraphRenderer(this, firstGraph);
+                GraphRenderer graphRenderer = new(this, firstGraph);
                 graphRenderer.DrawGraph(firstGraph, gameObject);
-                isDrawn = true;
             }
             else
             {
@@ -256,16 +249,10 @@ namespace SEE.Game.City
         {
             base.Start();
             Reset();
-            List<Graph> graphs = new();
-            if (isDrawn)
-            {
-                graphs = LoadDataSeries();
-            }
+            List<Graph> graphs = LoadDataSeries();
             evolutionRenderer = CreateEvolutionRenderer(graphs);
             DrawGraphs(graphs);
-
             gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
-
             evolutionRenderer.ShowGraphEvolution();
         }
 
