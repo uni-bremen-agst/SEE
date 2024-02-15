@@ -49,7 +49,6 @@ ExportedObj/
 *.mdb
 *.opendb
 *.VC.db
-.vsconfig
 
 # Java class files
 **/*.class
