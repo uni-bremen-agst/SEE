@@ -66,6 +66,11 @@ namespace SEE.UI.Menu
         /// </summary>
         private bool searchActive;
 
+        /// <summary>
+        /// True, if the search-input is focused, else false.
+        /// </summary>
+        public bool IsSearchFocused => searchInput.isFocused;
+
         public override void SelectEntry(T entry)
         {
             if (entry is NestedMenuEntry<T> nestedEntry)
@@ -192,6 +197,10 @@ namespace SEE.UI.Menu
                         searchInput.text = string.Empty;
                     });
                 }
+            }
+            else
+            {
+                Debug.Log("Search field must be present in the prefab for the nested menu to work properly.");
             }
             MenuManager.onCancel.AddListener(DescendLevel); // Go one level higher when clicking "back"
             if (ResetLevelOnClose)
