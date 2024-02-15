@@ -9,7 +9,6 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 using static SEE.Net.Network;
-using System.ComponentModel;
 
 namespace SEE.UI.PropertyDialog
 {
@@ -246,7 +245,7 @@ namespace SEE.UI.PropertyDialog
                 }
             }
             {
-                // Room Password               
+                // Room Password
                 networkConfig.RoomPassword = roomPassword.Value.ToString();
                 ShowNotification.Info("Password Set", "Youve set the password to " + roomPassword.Value.ToString());
             }
