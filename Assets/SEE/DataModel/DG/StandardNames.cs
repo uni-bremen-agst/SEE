@@ -116,7 +116,7 @@
         /// this line has been executed.
         /// This metric counts the number of such lines missed.
         /// </summary>
-        public const string LineMissed = "Metric.JaCoCo.JaCoCo.LINE_missed";
+        public const string LineMissed = "Metric.JaCoCo.LINE_missed";
         /// <summary>
         /// This metric is defined for all class files that have been compiled with debug information,
         /// such that coverage information for individual lines can be calculated.
