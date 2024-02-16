@@ -193,7 +193,7 @@ namespace SEE.DataModel.DG.IO
                 if (header.Length == 0)
                 {
                     string errorMessage = $"Header must not be empty. It must include at least column {IDColumnName}.\n";
-                    Debug.LogError(errorMessage + "\n");
+                    Debug.LogError(errorMessage);
                     throw new IOException(errorMessage);
                 }
                 if (header[0] != IDColumnName)
