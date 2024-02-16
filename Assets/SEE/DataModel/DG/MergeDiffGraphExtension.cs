@@ -126,13 +126,6 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// A method that adds <paramref name="graphElement"/> to the newer graph.
-        /// </summary>
-        /// <typeparam name="T">type of <see cref="GraphElement"/></typeparam>
-        /// <param name="graphElement">the element to be added</param>
-        private delegate void AddToGraph<T>(T graphElement) where T : GraphElement;
-
-        /// <summary>
         /// Marks all <paramref name="added"/> as <see cref="ChangeMarkers.IsNew"/>.
         /// Marks all <paramref name="changed"/> as <see cref="ChangeMarkers.IsChanged"/>.
         /// Adds all <paramref name="removed"/> to the newer graph using <paramref name="addToGraph"/>
@@ -147,15 +140,15 @@ namespace SEE.DataModel.DG
         /// <param name="changed">changed graph elements (these are in the newer graph)</param>
         /// <param name="addToGraph">adds its argument to the newer graph and
         /// will be called for all elements in <paramref name="removed"/></param>
-        private static void MergeGraphElements<T>(ISet<T> added, ISet<T> removed, ISet<T> changed, AddToGraph<T> addToGraph, Graph baseline)
+        private static void MergeGraphElements<T>(ISet<T> added, ISet<T> removed, ISet<T> changed, Action<T> addToGraph, Graph baseline)
             where T : GraphElement
         {
             // here graphElement stems from the newer graph
-            _ = added.ForEach(graphElement => { graphElement.SetToggle(ChangeMarkers.IsNew); });
+            added.ForEach(graphElement => graphElement.SetToggle(ChangeMarkers.IsNew));
             // here graphElement stems from the newer graph
-            _ = changed.ForEach(graphElement => { UpdateChanged(graphElement); });
+            changed.ForEach(UpdateChanged);
             // here graphElement stems from the baseline graph
-            _ = removed.ForEach(graphElement => { MergeRemoved(graphElement); });
+            removed.ForEach(MergeRemoved);
 
             // Adds graphElement to newer graph and marks it as deleted.
             // This graphElement is assumed to be in the baseline graph.
@@ -230,8 +223,8 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <typeparam name="T">type of graph element</typeparam>
         /// <typeparam name="V">value type of a graph-element attribute</typeparam>
-        /// <param name="graphElementInNew"></param>
-        /// <param name="graphElementInOld"></param>
+        /// <param name="graphElementInNew">the graph element in the new graph</param>
+        /// <param name="graphElementInOld">the graph element in the old graph correspoinding to <paramref name="graphElementInNew"/></param>
         /// <param name="allAttributeNames">yields the names of the attributes to be merged</param>
         /// <param name="get">yields the value of an attribute of a given name for a graph element</param>
         /// <param name="tryGet">see <see cref="TryGet{T, V}"/></param>

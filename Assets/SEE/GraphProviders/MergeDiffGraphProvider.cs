@@ -31,7 +31,8 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="graph">graph in which to merge</param>
         /// <param name="city"></param>
-        /// <returns></returns>
+        /// <returns>the resulting graph where changes between <paramref name="graph"/>
+        /// and <see cref="OldGraph"/> have been merged into</returns>
         /// <exception cref="NotImplementedException"></exception>
         public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
         {

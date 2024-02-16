@@ -798,6 +798,11 @@ namespace SEE.Utils
         // attribute modifiers
         //--------------------------------------------------------
 
+        // A general note on the following methods wiping out cities:
+        // "Wiping out" means in those cases just that a value different from the
+        // default or from a value previously set value is assigned so that we
+        // could notice any difference between the "wiped out" and loaded values.
+
         /// <summary>
         /// Assigns all attributes of given <paramref name="city"/> to arbitrary values
         /// different from their default values.

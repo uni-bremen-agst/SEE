@@ -38,35 +38,32 @@ namespace SEE.Game.City
         /// The height of posts used as markers.
         /// </summary>
         [Tooltip("The height of posts used as markers for new, changed, and deleted elements (>=0).")]
-        [SerializeField, ShowInInspector]
+        [Range(0, 1)]
         public float MarkerHeight = 0.2f;
 
         /// <summary>
         /// The width (x and z lengths) of posts used as markers.
         /// </summary>
         [Tooltip("The width (x and z lengths) of posts used as markers for new and deleted elements (>=0).")]
-        [SerializeField, ShowInInspector]
+        [Range(0, 1)]
         public float MarkerWidth = 0.01f;
 
         /// <summary>
         /// Color for beams of newly added nodes.
         /// </summary>
         [Tooltip("The color of the beam for newly created nodes.")]
-        [SerializeField, ShowInInspector]
         public Color AdditionBeamColor = Color.green;
 
         /// <summary>
         /// Color for beams of changed nodes.
         /// </summary>
         [Tooltip("The color of the beam for changed nodes.")]
-        [SerializeField, ShowInInspector]
         public Color ChangeBeamColor = Color.yellow;
 
         /// <summary>
         /// Color for beams of newly deleted nodes.
         /// </summary>
         [Tooltip("The color of the beam for deleted nodes.")]
-        [SerializeField, ShowInInspector]
         public Color DeletionBeamColor = Color.black;
 
         #region Configuration file input/output
