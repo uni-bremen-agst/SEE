@@ -29,7 +29,7 @@ namespace SEE.UI.Menu
     public class NestedListMenu<T> : SimpleListMenu<T> where T : MenuEntry
     {
         /// <summary>
-        /// The menu levels we have ascended through.
+        /// The menu levels we have descended through.
         /// </summary>
         private readonly Stack<MenuLevel> levels = new();
 
@@ -76,7 +76,7 @@ namespace SEE.UI.Menu
             if (entry is NestedMenuEntry<T> nestedEntry)
             {
                 // If this contains another menu level, repopulate list with new level after saving the current one
-                AscendLevel(nestedEntry);
+                DescendLevel(nestedEntry);
             }
             else
             {
@@ -88,7 +88,7 @@ namespace SEE.UI.Menu
         /// <summary>
         /// Appends the <see cref="backMenuCommand"/> to the keywords.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The titles the menu should listen to</returns>
         protected override IEnumerable<string> GetKeywords()
         {
             return base.GetKeywords().Append(backMenuCommand);
@@ -98,7 +98,7 @@ namespace SEE.UI.Menu
         {
             if (args.text == backMenuCommand)
             {
-                DescendLevel();
+                AscendLevel();
             }
             else
             {
@@ -107,10 +107,10 @@ namespace SEE.UI.Menu
         }
 
         /// <summary>
-        /// Ascends up in the menu hierarchy by creating a new level from the given <paramref name="nestedEntry"/>.
+        /// Descends down in the menu hierarchy by creating a new level from the given <paramref name="nestedEntry"/>.
         /// </summary>
         /// <param name="nestedEntry">The entry from which to construct the new level</param>
-        private void AscendLevel(NestedMenuEntry<T> nestedEntry)
+        private void DescendLevel(NestedMenuEntry<T> nestedEntry)
         {
             levels.Push(new MenuLevel(Title, Description, Icon, Entries));
             while (Entries.Count != 0)
@@ -137,9 +137,9 @@ namespace SEE.UI.Menu
         private string GetBreadcrumb() => string.Join(" / ", levels.Reverse().Select(x => x.Title));
 
         /// <summary>
-        /// Descends down a level in the menu hierarchy and removes the entry from the <see cref="levels"/>.
+        /// Ascends up a level in the menu hierarchy and removes the current level from the <see cref="levels"/>.
         /// </summary>
-        private void DescendLevel()
+        private void AscendLevel()
         {
             if (levels.Count != 0)
             {
@@ -161,7 +161,7 @@ namespace SEE.UI.Menu
         }
 
         /// <summary>
-        /// Resets to the lowest level, i.e. resets the menu to the state it was in before any
+        /// Resets to the highest level, i.e. resets the menu to the state it was in before any
         /// <see cref="NestedMenuEntry"/> was clicked.
         /// </summary>
         public void ResetToBase()
@@ -172,7 +172,7 @@ namespace SEE.UI.Menu
             }
             while (levels.Count > 0)
             {
-                DescendLevel();
+                AscendLevel();
             }
         }
 
@@ -202,7 +202,7 @@ namespace SEE.UI.Menu
             {
                 Debug.Log("Search field must be present in the prefab for the nested menu to work properly.");
             }
-            MenuManager.onCancel.AddListener(DescendLevel); // Go one level higher when clicking "back"
+            MenuManager.onCancel.AddListener(AscendLevel); // Go one level higher when clicking "back"
             if (ResetLevelOnClose)
             {
                 // When closing the menu, its level will be reset to the top.
@@ -219,12 +219,12 @@ namespace SEE.UI.Menu
         /// <returns>All leaf-entries of the nestedMenu.</returns>
         private IEnumerable<T> GetAllEntries()
         {
-            IList<T> allEntries = levels.LastOrDefault()?.Entries ?? Entries;
-            return GetAllEntries(allEntries);
+            IList<T> allMenuEntries = levels.LastOrDefault()?.Entries ?? Entries;
+            return GetAllEntries(allMenuEntries);
         }
 
         /// <summary>
-        /// Searchs through the complete tree of the nestedMenu and selects all MenuEntries.
+        /// Searches through the complete tree of the nestedMenu and selects all MenuEntries.
         /// </summary>
         /// <param name="startingEntries">the entries to research.</param>
         /// <returns>All leafEntries of the nestedMenu.</returns>
@@ -248,14 +248,14 @@ namespace SEE.UI.Menu
 
         /// <summary>
         /// The action which is called by typing inside of the fuzzy-search input field.
-        /// Displays all results of the fuzzySearch inside of the menu ordered by matching-specifity.
+        /// Displays all results of the fuzzySearch inside of the menu ordered by matching-specificity.
         /// </summary>
         /// <param name="text">the text inside of the fuzzy-search.</param>
         private void SearchTextEntered(string text)
         {
             if (searchActive)
             {
-                DescendLevel();
+                AscendLevel();
             }
 
             searchActive = text.Length != 0;
@@ -272,7 +272,7 @@ namespace SEE.UI.Menu
 
             NestedMenuEntry<T> resultEntry = new(results, "Results", $"Found {results.Count()} help pages.",
                                                  default, default, Resources.Load<Sprite>("Materials/Notification/info"));
-            AscendLevel(resultEntry);
+            DescendLevel(resultEntry);
         }
 
         /// <summary>
