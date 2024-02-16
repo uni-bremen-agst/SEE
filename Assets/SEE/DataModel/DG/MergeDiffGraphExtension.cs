@@ -84,7 +84,7 @@ namespace SEE.DataModel.DG
                           out ISet<Node> changedNodes,
                           out ISet<Node> equalNodes);
 
-            MergeGraphElements(addedNodes, removedNodes, changedNodes, n => { newGraph.AddNode(n); }, oldGraph);
+            MergeGraphElements(addedNodes, removedNodes, changedNodes, newGraph.AddNode, oldGraph);
         }
 
         /// <summary>
