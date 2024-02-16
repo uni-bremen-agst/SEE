@@ -37,7 +37,7 @@ namespace SEE.DataModel.DG
         /// named A appended by the <see cref="AttributeOldValuePostfix"/>
         /// will be added to N with the value of O.A.
         ///
-        /// Whether two attribute values are the equal/different is determined
+        /// Whether two attribute values are equal/different is determined
         /// by <see cref="Object.Equals(object, object)"/>.
         ///
         /// Whether two graph elements are the same in the two graphs is determined by
