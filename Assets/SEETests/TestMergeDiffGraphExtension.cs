@@ -62,6 +62,17 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// New graph is null.
+        /// </summary>
+        [Test]
+        public void TestNullNewGraph2()
+        {
+            Graph newGraph = null;
+            Graph oldGraph = NewEmptyGraph();
+            Assert.Throws<ArgumentNullException>(() => MergeDiffGraphExtension.MergeDiff(newGraph, oldGraph));
+        }
+
+        /// <summary>
         /// Merging null into a new graph.
         /// </summary>
         [Test]
