@@ -48,7 +48,7 @@ namespace SEE.DataModel.DG
         /// <param name="newGraph">the newer graph in which to merge the differences</param>
         /// <param name="oldGraph">the old graph whose difference to <paramref name="newGraph"/>
         /// should be merged into <paramref name="newGraph"/></param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">thrown in case <paramref name="newGraph"/> is null</exception>
         public static void MergeDiff(this Graph newGraph, Graph oldGraph)
         {
             if (newGraph == null)
