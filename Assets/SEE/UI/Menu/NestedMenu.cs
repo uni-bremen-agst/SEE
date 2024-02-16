@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using FuzzySharp;
 using SEE.Controls;
 using SEE.DataModel.GraphSearch;
@@ -67,6 +69,11 @@ namespace SEE.UI.Menu
         private bool searchActive;
 
         /// <summary>
+        /// A semaphore to prevent multiple searches from happening at the same time.
+        /// </summary>
+        private SemaphoreSlim searchSemaphore = new(1, 1);
+
+        /// <summary>
         /// True, if the search-input is focused, else false.
         /// </summary>
         public bool IsSearchFocused => searchInput.isFocused;
@@ -110,7 +117,9 @@ namespace SEE.UI.Menu
         /// Descends down in the menu hierarchy by creating a new level from the given <paramref name="nestedEntry"/>.
         /// </summary>
         /// <param name="nestedEntry">The entry from which to construct the new level</param>
-        private void DescendLevel(NestedMenuEntry<T> nestedEntry)
+        /// <param name="withBreadcrumb">Whether to include a breadcrumb indicating the hierarchy
+        /// in the description of the newly descended level</param>
+        private void DescendLevel(NestedMenuEntry<T> nestedEntry, bool withBreadcrumb = true)
         {
             levels.Push(new MenuLevel(Title, Description, Icon, Entries));
             while (Entries.Count != 0)
@@ -121,7 +130,7 @@ namespace SEE.UI.Menu
             // TODO: Instead of abusing the description for this, use a proper individual text object
             // (Maybe displaying it above the title in a different color or something would work,
             // as the title is technically the last element in the breadcrumb)
-            string breadcrumb = GetBreadcrumb();
+            string breadcrumb = withBreadcrumb ? GetBreadcrumb() : string.Empty;
             Description = nestedEntry.Description + (breadcrumb.Length > 0 ? $"\n{GetBreadcrumb()}" : "");
             Icon = nestedEntry.Icon;
             nestedEntry.InnerEntries.ForEach(AddEntry);
@@ -139,7 +148,8 @@ namespace SEE.UI.Menu
         /// <summary>
         /// Ascends up a level in the menu hierarchy and removes the current level from the <see cref="levels"/>.
         /// </summary>
-        private void AscendLevel()
+        /// <param name="exitOnEmpty">Whether to exit the menu when the top level is reached</param>
+        private void AscendLevel(bool exitOnEmpty = true)
         {
             if (levels.Count != 0)
             {
@@ -153,7 +163,7 @@ namespace SEE.UI.Menu
                 }
                 level.Entries.ForEach(AddEntry);
             }
-            else
+            else if (exitOnEmpty)
             {
                 ShowMenu = false;
             }
@@ -190,7 +200,7 @@ namespace SEE.UI.Menu
             {
                 if (searchField.gameObject.TryGetComponentOrLog(out searchInput))
                 {
-                    searchInput.onValueChanged.AddListener(SearchTextEntered);
+                    searchInput.onValueChanged.AddListener(_ => SearchTextEnteredAsync().Forget());
                     MenuManager.onCancel.AddListener(() =>
                     {
                         searchActive = false;
@@ -202,15 +212,25 @@ namespace SEE.UI.Menu
             {
                 Debug.Log("Search field must be present in the prefab for the nested menu to work properly.");
             }
-            MenuManager.onCancel.AddListener(AscendLevel); // Go one level higher when clicking "back"
+            MenuManager.onCancel.AddListener(() => AscendLevel()); // Go one level higher when clicking "back"
             if (ResetLevelOnClose)
             {
                 // When closing the menu, its level will be reset to the top.
                 MenuManager.onConfirm.AddListener(ResetToBase);
             }
 
-            // If the menu is enabled, keyboard shortcuts must be disabled and vice versa.
-            OnShowMenuChanged += () => SEEInput.KeyboardShortcutsEnabled = !ShowMenu;
+            OnShowMenuChanged += () =>
+            {
+                // If the menu is enabled, keyboard shortcuts must be disabled and vice versa.
+                SEEInput.KeyboardShortcutsEnabled = !ShowMenu;
+                // Additionally, if the menu is disabled, the search input must be cleared
+                // and the level must be reset to the top.
+                if (!ShowMenu)
+                {
+                    searchInput.text = string.Empty;
+                    ResetToBase();
+                }
+            };
         }
 
         /// <summary>
@@ -250,29 +270,52 @@ namespace SEE.UI.Menu
         /// The action which is called by typing inside of the fuzzy-search input field.
         /// Displays all results of the fuzzySearch inside of the menu ordered by matching-specificity.
         /// </summary>
-        /// <param name="text">the text inside of the fuzzy-search.</param>
-        private void SearchTextEntered(string text)
+        /// <remarks>
+        /// This method is async because the menu may need an additional frame to reset properly.
+        /// </remarks>
+        private async UniTaskVoid SearchTextEnteredAsync()
         {
-            if (searchActive)
+            if (!await searchSemaphore.WaitAsync(0))
             {
-                AscendLevel();
-            }
-
-            searchActive = text.Length != 0;
-            if (text.Length == 0)
-            {
+                // If the semaphore is locked, a search is already in progress.
                 return;
             }
 
-            allEntries ??= GetAllEntries().ToDictionary(x => x.Title, x => x);
-            IEnumerable<T> results = Process.ExtractTop(GraphSearch.FilterString(text), allEntries.Keys, cutoff: 10)
-                                            .OrderByDescending(x => x.Score)
-                                            .Select(x => allEntries[x.Value])
-                                            .ToList();
+            try
+            {
+                if (searchActive)
+                {
+                    AscendLevel(exitOnEmpty: false);
+                    // We need to wait for the next frame to ensure that the level has been reset properly.
+                    await UniTask.WaitForEndOfFrame();
+                }
 
-            NestedMenuEntry<T> resultEntry = new(results, "Results", $"Found {results.Count()} help pages.",
-                                                 default, default, Resources.Load<Sprite>("Materials/Notification/info"));
-            DescendLevel(resultEntry);
+                if (!ShowMenu)
+                {
+                    // If the menu has been hidden in the meantime, we don't want to search.
+                    return;
+                }
+
+                searchActive = searchInput.text.Length != 0;
+                if (searchInput.text.Length == 0)
+                {
+                    return;
+                }
+
+                allEntries ??= GetAllEntries().ToDictionary(x => x.Title, x => x);
+                IEnumerable<T> results = Process.ExtractTop(GraphSearch.FilterString(searchInput.text), allEntries.Keys, cutoff: 10)
+                                                .OrderByDescending(x => x.Score)
+                                                .Select(x => allEntries[x.Value])
+                                                .ToList();
+
+                NestedMenuEntry<T> resultEntry = new(results, Title, Description,
+                                                     default, default, Icon);
+                DescendLevel(resultEntry, withBreadcrumb: false);
+            }
+            finally
+            {
+                searchSemaphore.Release();
+            }
         }
 
         /// <summary>
