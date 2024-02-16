@@ -192,15 +192,11 @@ namespace SEE.DataModel.DG.IO
                 string[] header = csv.HeaderRecord;
                 if (header.Length == 0)
                 {
-                    string errorMessage = $"Header must not be empty. It must include at least column {IDColumnName}.\n";
-                    Debug.LogError(errorMessage);
-                    throw new IOException(errorMessage);
+                    throw new IOException($"Header must not be empty. It must include at least column {IDColumnName}.\n");
                 }
                 if (header[0] != IDColumnName)
                 {
-                    string errorMessage = $"First header column in file {filename} is not {IDColumnName}.";
-                    Debug.LogError(errorMessage + "\n");
-                    throw new IOException(errorMessage);
+                    throw new IOException($"First header column in file {filename} is not {IDColumnName}.");
                 }
 
                 string[] columns = header[1..];
