@@ -54,7 +54,8 @@
         "Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.dll",
         "Newtonsoft.Json.dll",
         "NetworkCommsDotNet.dll",
-        "LibGit2Sharp.dll"
+        "LibGit2Sharp.dll",
+        "CsvHelper.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
