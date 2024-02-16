@@ -224,7 +224,7 @@ namespace SEE.DataModel.DG
         /// <typeparam name="T">type of graph element</typeparam>
         /// <typeparam name="V">value type of a graph-element attribute</typeparam>
         /// <param name="graphElementInNew">the graph element in the new graph</param>
-        /// <param name="graphElementInOld">the graph element in the old graph correspoinding to <paramref name="graphElementInNew"/></param>
+        /// <param name="graphElementInOld">the graph element in the old graph corresponding to <paramref name="graphElementInNew"/></param>
         /// <param name="allAttributeNames">yields the names of the attributes to be merged</param>
         /// <param name="get">yields the value of an attribute of a given name for a graph element</param>
         /// <param name="tryGet">see <see cref="TryGet{T, V}"/></param>
