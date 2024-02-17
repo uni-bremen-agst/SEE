@@ -24,6 +24,11 @@ namespace SEE.Net
         private string AbsoluteServerContentDirectory => Application.streamingAssetsPath + RelativeServertContentDirectory;
 
         /// <summary>
+        /// The name of the zip file containing the source code.
+        /// </summary>
+        private const string zippedSourcesFilename = "src.zip";
+
+        /// <summary>
         /// Fetches the multiplayer city files from the backend and syncs the current
         /// server state with this client.
         /// </summary>
@@ -87,6 +92,12 @@ namespace SEE.Net
         }
 
 
+        /// <summary>
+        /// Retrieves all data files from the server. These are: (1) the source
+        /// code archived in a ZIP file, the GXL file, the configuration file,
+        /// the CSV file, and the solution file.
+        /// </summary>
+        /// <returns>coroutine enumerator</returns>
         private IEnumerator GetAllData()
         {
             Debug.Log($"Server REST API is: {Network.ClientRestAPI}.\n");
@@ -110,10 +121,8 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// The name of the zip file containing the source code.
+        /// Unzips the source-code ZIP archive if it exists.
         /// </summary>
-        const string zippedSourcesFilename = "src.zip";
-
         private void UnzipSources()
         {
             string absoluteSourceArchiveFileName = AbsoluteServerContentDirectory + zippedSourcesFilename;
@@ -136,7 +145,7 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Fetches the source-code zip file from the backend.
+        /// Fetches the source-code ZIP file from the backend.
         /// </summary>
         private IEnumerator GetSource()
         {
@@ -144,15 +153,46 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Fetches the Gxl file from the backend.
+        /// Fetches the GXL file from the backend.
         /// </summary>
         private IEnumerator GetGxl()
         {
             return GetFile("gxl", "multiplayer.gxl");
         }
 
+        /// <summary>
+        /// Fetches the configuration file from the backend.
+        /// </summary>
+        private IEnumerator GetConfig()
+        {
+            return GetFile("config", "multiplayer.cfg");
+        }
+
+        /// <summary>
+        /// Fetches the solution file from the backend.
+        /// </summary>
+        private IEnumerator GetSolution()
+        {
+            return GetFile("solution", "multiplayer.sln");
+        }
+
+        /// <summary>
+        /// Fetches the CSV file from the backend.
+        /// </summary>
+        private IEnumerator GetCsv()
+        {
+            return GetFile("csv", "multiplayer.csv");
+        }
+
+        /// <summary>
+        /// Fetches a file from the backend.
+        /// </summary>
+        /// <param name="dataType">the type of file</param>
+        /// <param name="filename">the name of the file</param>
+        /// <returns></returns>
         private IEnumerator GetFile(string dataType, string filename)
         {
+            // FIXME: The room password is submitted in plain text if http and not https is used.
             string url = Network.ClientRestAPI + dataType + "?serverId=" + Network.ServerId
                          + "&roomPassword=" + Network.Instance.RoomPassword;
 
@@ -164,77 +204,9 @@ namespace SEE.Net
 
             if (webRequest.result != UnityWebRequest.Result.Success)
             {
+                // FIXME: The url contains the room password. We should not log it.
                 Debug.LogError($"Error fetching {filename} from backend via {url}: {webRequest.error}.\n");
             }
-        }
-
-        /// <summary>
-        /// Fetches the configuration file from the backend.
-        /// </summary>
-        private IEnumerator GetConfig()
-        {
-            return GetFile("config", "multiplayer.cfg");
-            /*
-
-            using UnityWebRequest webRequest = UnityWebRequest.Get(Network.ClientRestAPI + "csv?serverId=" + Network.ServerId
-                                                                   + "&roomPassword=" + Network.Instance.RoomPassword);
-            webRequest.downloadHandler = new DownloadHandlerFile(AbsoluteServerContentDirectory + "multiplayer.cfg");
-
-            // Request and wait for the desired page.
-            yield return webRequest.SendWebRequest();
-
-            if (webRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Error fetching source from backend: " + webRequest.error);
-            }
-            StartCoroutine(GetSolution());
-            */
-        }
-
-        /// <summary>
-        /// Fetches the solution file from the backend.
-        /// </summary>
-        private IEnumerator GetSolution()
-        {
-            // FIXME: The code commented out below used GetCsv.
-            return GetFile("solution", "multiplayer.sln");
-            /*
-
-            using UnityWebRequest webRequest = UnityWebRequest.Get(Network.ClientRestAPI + "solution?serverId=" + Network.ServerId
-                                                                   + "&roomPassword=" + Network.Instance.RoomPassword);
-            webRequest.downloadHandler = new DownloadHandlerFile(AbsoluteServerContentDirectory + "multiplayer.sln");
-
-            // Request and wait for the desired page.
-            yield return webRequest.SendWebRequest();
-
-            if (webRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Error fetching source from backend: " + webRequest.error);
-            }
-            StartCoroutine(GetCsv());
-            */
-        }
-
-        /// <summary>
-        /// Fetches the csv file from the backend
-        /// </summary>
-        private IEnumerator GetCsv()
-        {
-            return GetFile("csv", "multiplayer.csv");
-
-            /*
-            using UnityWebRequest webRequest = UnityWebRequest.Get(Network.ClientRestAPI + "csv?serverId=" + Network.ServerId
-                                                                   + "&roomPassword=" + Network.Instance.RoomPassword);
-            webRequest.downloadHandler = new DownloadHandlerFile(AbsoluteServerContentDirectory + "multiplayer.csv");
-
-            // Request and wait for the desired page.
-            yield return webRequest.SendWebRequest();
-
-            if (webRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Error fetching source from backend: " + webRequest.error);
-            }
-            */
         }
     }
 }
