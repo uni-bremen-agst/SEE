@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using InControl;
 using SEE.Controls;
 using SEE.Controls.Actions;
+using SEE.Controls.KeyActions;
 using SEE.Game;
 using SEE.UI.Menu;
 using SEE.UI.StateIndicator;
@@ -135,7 +137,7 @@ namespace SEE.GO.Menu
         }
 
         /// <summary>
-        /// This creates and returns the <see cref="StateIndicator.ActionStateIndicator"/>, which displays the current mode.
+        /// This creates and returns the <see cref="ActionStateIndicator"/>, which displays the current mode.
         /// The indicator will either be attached to the given GameObject or to a new GameObject if
         /// <paramref name="attachTo"/> is null.
         /// </summary>
@@ -180,7 +182,12 @@ namespace SEE.GO.Menu
                 }
             }
 
-            if (SEEInput.ToggleMenu())
+            // When the menu is shown, we still want the ToggleMenu key to work,
+            // except if the search field is focussed. Hence, we cannot rely on
+            // SEEInput here, but need to check the key directly.
+            bool shouldReactToToggleMenu = (modeMenu.ShowMenu && !modeMenu.IsSearchFocused)
+                || (!modeMenu.ShowMenu && SEEInput.KeyboardShortcutsEnabled);
+            if (shouldReactToToggleMenu && KeyBindings.IsDown(KeyAction.ToggleMenu))
             {
                 modeMenu.ToggleMenu();
             }
