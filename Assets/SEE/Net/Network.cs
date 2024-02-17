@@ -50,13 +50,6 @@ namespace SEE.Net
         public static string BackendDomain;
 
         /// <summary>
-        /// The port of the server where the server listens to SEE action requests.
-        /// Note: This field is accessed in NetworkEditor, hence, the name must not change.
-        /// </summary>
-        [Range(0, maxServerPort), Tooltip("The TCP port of the server where it listens to SEE actions.")]
-        public int ServerActionPort = 12345;
-
-        /// <summary>
         /// The UDP port where the server listens to NetCode and Dissonance traffic.
         /// Valid range is [0, 65535].
         /// </summary>
@@ -820,10 +813,6 @@ namespace SEE.Net
         //--------------------------------
 
         /// <summary>
-        /// Label of attribute <see cref="ServerActionPort"/> in the configuration file.
-        /// </summary>
-        private const string serverActionPortLabel = "serverActionPort";
-        /// <summary>
         /// Label of attribute <see cref="GameScene"/> in the configuration file.
         /// </summary>
         private const string gameSceneLabel = "gameScene";
@@ -850,7 +839,7 @@ namespace SEE.Net
         /// <param name="filename">name of the file in which the settings are stored</param>
         public void Save(string filename)
         {
-            using ConfigWriter writer = new ConfigWriter(filename);
+            using ConfigWriter writer = new(filename);
             Save(writer);
         }
 
@@ -862,7 +851,7 @@ namespace SEE.Net
         {
             if (File.Exists(filename))
             {
-                using ConfigReader stream = new ConfigReader(filename);
+                using ConfigReader stream = new(filename);
                 Restore(stream.Read());
             }
             else
@@ -877,7 +866,6 @@ namespace SEE.Net
         /// <param name="writer">the writer to be used to save the settings</param>
         protected virtual void Save(ConfigWriter writer)
         {
-            writer.Save(ServerActionPort, serverActionPortLabel);
             writer.Save(GameScene, gameSceneLabel);
             writer.Save(VoiceChat.ToString(), voiceChatLabel);
             writer.Save(ServerPort, serverPortLabel);
@@ -891,7 +879,6 @@ namespace SEE.Net
         /// <param name="attributes">the attributes from which to restore the settings</param>
         protected virtual void Restore(Dictionary<string, object> attributes)
         {
-            ConfigIO.Restore(attributes, serverActionPortLabel, ref ServerActionPort);
             ConfigIO.Restore(attributes, gameSceneLabel, ref GameScene);
             ConfigIO.RestoreEnum(attributes, voiceChatLabel, ref VoiceChat);
             ConfigIO.Restore(attributes, roomPasswordLabel, ref RoomPassword);

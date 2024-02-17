@@ -123,13 +123,6 @@ namespace SEE.UI.PropertyDialog
                 group.AddProperty(serverPort);
             }
             {
-                serverActionPort = dialog.AddComponent<StringProperty>();
-                serverActionPort.Name = "Server Action TCP Port";
-                serverActionPort.Value = networkConfig.ServerActionPort.ToString();
-                serverActionPort.Description = "Server TCP port for SEE actions";
-                group.AddProperty(serverActionPort);
-            }
-            {
                 roomPassword = dialog.AddComponent<StringProperty>();
                 roomPassword.Name = "Room Password";
                 roomPassword.Value = networkConfig.RoomPassword.ToString();
@@ -228,19 +221,6 @@ namespace SEE.UI.PropertyDialog
                 else
                 {
                     ShowPortError("Server");
-                    errorOccurred = true;
-                }
-            }
-            {
-                // Server Action Port Number
-                if (Int32.TryParse(serverActionPort.Value.Trim(), out int serverActionPortNumber)
-                    && 0 <= serverActionPortNumber && serverActionPortNumber <= maximalPortNumber)
-                {
-                    networkConfig.ServerActionPort = serverActionPortNumber;
-                }
-                else
-                {
-                    ShowPortError("Server Action");
                     errorOccurred = true;
                 }
             }
