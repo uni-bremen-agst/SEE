@@ -1,46 +1,64 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Net;
 using SEE.Net.Actions;
-using SEE.Net.Util;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.SocialPlatforms;
 
 namespace SEE.Net
-{ 
+{
     /// <summary>
     /// DOC
     /// </summary>
     public class ClientActionNetwork : NetworkBehaviour
     {
         /// <summary>
-        /// Fetches the multiplayer city files from the backend and syncs the current server state with this client.
+        /// The protocol. Either "http://" or "https://".
+        /// </summary>
+        private const string Protocol = "http://";
+        /// <summary>
+        /// The URL part identifying the client REST API.
+        /// </summary>
+        private const string ClientAPI = "/api/v1/file/client/";
+        /// <summary>
+        /// Where files are stored locally on the server side (relative directory).
+        /// </summary>
+        private const string RelativeServertContentDirectory = "/Multiplayer/";
+
+        /// <summary>
+        /// Where files are stored locally on the server side (absolute directory).
+        /// </summary>
+        private string AbsoluteServerContentDirectory => Application.streamingAssetsPath + RelativeServertContentDirectory;
+
+        /// <summary>
+        /// The complete URL of the Client REST API.
+        /// </summary>
+        private string ClientRestAPI => Protocol + Network.BackendDomain + ClientAPI;
+
+        /// <summary>
+        /// Fetches the multiplayer city files from the backend and syncs the current
+        /// server state with this client.
         /// </summary>
         public void Start()
         {
-            if(!IsServer && !IsHost)
+            if (!IsServer && !IsHost)
             {
                 ServerActionNetwork serverNetwork = GameObject.Find("Server").GetComponent<ServerActionNetwork>();
                 serverNetwork.SyncFilesServerRpc();
             }
         }
 
-
-
         /// <summary>
         /// Fetches the Source file from the backend which should be a zipped file and unzips it.
         /// </summary>
         IEnumerator GetSource()
         {
-            Debug.Log("DOMAIN IS: " + Network.BackendDomain);
-            using UnityWebRequest webRequest = UnityWebRequest.Get("http://"  + Network.BackendDomain + "/api/v1/file/client/source?serverId=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
-            webRequest.downloadHandler = new DownloadHandlerFile(Application.streamingAssetsPath + "/Multiplayer/src.zip");
+            Debug.Log($"DOMAIN IS: {Network.BackendDomain}.\n");
+            using UnityWebRequest webRequest = UnityWebRequest.Get(ClientRestAPI + "source?serverId=" + Network.ServerId
+                                                                   + "&roomPassword=" + Network.Instance.RoomPassword);
+            webRequest.downloadHandler = new DownloadHandlerFile(AbsoluteServerContentDirectory + "src.zip");
 
             // Request and wait for the desired page.
             yield return webRequest.SendWebRequest();
@@ -55,7 +73,8 @@ namespace SEE.Net
                 try
                 {
                     // unzip the source code
-                    ZipFile.ExtractToDirectory(Application.streamingAssetsPath + "/Multiplayer/src.zip", Application.streamingAssetsPath + "/Multiplayer/src");
+                    ZipFile.ExtractToDirectory(AbsoluteServerContentDirectory + "src.zip",
+                                               AbsoluteServerContentDirectory + "src");
                     StartCoroutine(GetGxl());
                 }
                 catch (Exception e)
@@ -66,12 +85,13 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Fetches the Gxl file from the backend
+        /// Fetches the Gxl file from the backend.
         /// </summary>
         IEnumerator GetGxl()
         {
-            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.BackendDomain + "/api/v1/file/client/gxl?serverId=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
-            webRequest.downloadHandler = new DownloadHandlerFile(Application.streamingAssetsPath + "/Multiplayer/multiplayer.gxl");
+            using UnityWebRequest webRequest = UnityWebRequest.Get(ClientRestAPI + "gxl?serverId=" + Network.ServerId
+                                                                   + "&roomPassword=" + Network.Instance.RoomPassword);
+            webRequest.downloadHandler = new DownloadHandlerFile(AbsoluteServerContentDirectory + "multiplayer.gxl");
 
             // Request and wait for the desired page.
             yield return webRequest.SendWebRequest();
@@ -84,12 +104,13 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Fetches the Gxl file from the backend
+        /// Fetches the Gxl file from the backend.
         /// </summary>
         IEnumerator GetConfig()
         {
-            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.BackendDomain + "/api/v1/file/client/csv?serverId=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
-            webRequest.downloadHandler = new DownloadHandlerFile(Application.streamingAssetsPath + "/Multiplayer/multiplayer.cfg");
+            using UnityWebRequest webRequest = UnityWebRequest.Get(ClientRestAPI + "csv?serverId=" + Network.ServerId
+                                                                   + "&roomPassword=" + Network.Instance.RoomPassword);
+            webRequest.downloadHandler = new DownloadHandlerFile(AbsoluteServerContentDirectory + "multiplayer.cfg");
 
             // Request and wait for the desired page.
             yield return webRequest.SendWebRequest();
@@ -102,12 +123,13 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Fetches the solution file from the backend
+        /// Fetches the solution file from the backend.
         /// </summary>
         IEnumerator GetSolution()
         {
-            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.BackendDomain + "/api/v1/file/client/solution?serverId=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
-            webRequest.downloadHandler = new DownloadHandlerFile(Application.streamingAssetsPath + "/Multiplayer/multiplayer.sln");
+            using UnityWebRequest webRequest = UnityWebRequest.Get(ClientRestAPI + "solution?serverId=" + Network.ServerId
+                                                                   + "&roomPassword=" + Network.Instance.RoomPassword);
+            webRequest.downloadHandler = new DownloadHandlerFile(AbsoluteServerContentDirectory + "multiplayer.sln");
 
             // Request and wait for the desired page.
             yield return webRequest.SendWebRequest();
@@ -124,8 +146,9 @@ namespace SEE.Net
         /// </summary>
         IEnumerator GetCsv()
         {
-            using UnityWebRequest webRequest = UnityWebRequest.Get("http://" + Network.BackendDomain + "/api/v1/file/client/csv?serverId=" + Network.ServerId + "&roomPassword=" + Network.Instance.RoomPassword);
-            webRequest.downloadHandler = new DownloadHandlerFile(Application.streamingAssetsPath + "/Multiplayer/multiplayer.csv");
+            using UnityWebRequest webRequest = UnityWebRequest.Get(ClientRestAPI + "csv?serverId=" + Network.ServerId
+                                                                   + "&roomPassword=" + Network.Instance.RoomPassword);
+            webRequest.downloadHandler = new DownloadHandlerFile(AbsoluteServerContentDirectory + "multiplayer.csv");
 
             // Request and wait for the desired page.
             yield return webRequest.SendWebRequest();
@@ -139,7 +162,8 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Executes an Action, even if the sender and this client are the same, this is used for synchronizing server state
+        /// Executes an Action, even if the sender and this client are the same, this is used
+        /// for synchronizing server state.
         /// </summary>
         [ClientRpc]
         public void ExecuteActionUnsafeClientRpc(string serializedAction)
@@ -171,17 +195,17 @@ namespace SEE.Net
 
         /// <summary>
         /// Allows the server to set the server id given by the backend.
-        /// Then fetches the 
+        /// Then fetches the source file.
         /// </summary>
         [ClientRpc]
         public void SyncFilesClientRpc(string serverId, string backendDomain)
         {
             Network.ServerId = serverId;
             Network.BackendDomain = backendDomain;
-            if(Directory.Exists(Application.streamingAssetsPath + "/Multiplayer/"))
+            if(Directory.Exists(AbsoluteServerContentDirectory))
             {
-                Directory.Delete(Application.streamingAssetsPath + "/Multiplayer/", true);
-                Directory.CreateDirectory(Application.streamingAssetsPath + "/Multiplayer/");
+                Directory.Delete(AbsoluteServerContentDirectory, true);
+                Directory.CreateDirectory(AbsoluteServerContentDirectory);
             }
             StartCoroutine(GetSource());
         }
