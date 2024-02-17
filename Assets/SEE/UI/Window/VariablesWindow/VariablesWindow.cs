@@ -54,7 +54,7 @@ namespace SEE.UI.Window.VariablesWindow
         /// <summary>
         /// Function to retrieve nested variables.
         /// </summary>
-        public Func<int,List<Variable>> RetrieveNestedVariables;
+        public Func<int, List<Variable>> RetrieveNestedVariables;
 
         /// <summary>
         /// Container for the items of the window.
@@ -66,7 +66,6 @@ namespace SEE.UI.Window.VariablesWindow
         /// </summary>
         protected override void StartDesktop()
         {
-            Debug.Log("StartDesktop "+ this);
             Title ??= "Variables";
             base.StartDesktop();
 
@@ -86,26 +85,28 @@ namespace SEE.UI.Window.VariablesWindow
         /// </summary>
         private void Rebuild()
         {
-            Debug.Log("Rebuild " + this);
             foreach (VariablesWindowItem child in items.GetComponents<VariablesWindowItem>())
             {
                 Destroyer.Destroy(child);
             }
 
+            bool topThread = true;
             foreach ((Thread thread, Dictionary<StackFrame, Dictionary<Scope, List<Variable>>> threadVariables) in Variables)
             {
                 VariablesWindowItem threadItem = items.AddComponent<VariablesWindowItem>();
                 threadItem.Name = thread.Name;
                 threadItem.Text = thread.Name;
                 threadItem.BackgroundColor = threadColor;
-                threadItem.IsExpanded = true;
+                threadItem.IsExpanded = topThread;
 
+                bool topStack = true;
                 foreach ((StackFrame stackFrame, Dictionary<Scope, List<Variable>> stackFrameVariables) in threadVariables)
                 {
                     VariablesWindowItem stackFrameItem = items.AddComponent<VariablesWindowItem>();
                     threadItem.AddChild(stackFrameItem);
                     stackFrameItem.Name = stackFrame.Name;
                     stackFrameItem.Text = stackFrame.Name;
+                    stackFrameItem.IsExpanded = topThread && topStack;
                     stackFrameItem.BackgroundColor = stackFrameColor;
 
                     foreach ((Scope scope, List<Variable> scopeVariables) in stackFrameVariables)
@@ -115,12 +116,16 @@ namespace SEE.UI.Window.VariablesWindow
                         scopeItem.Name = scope.Name;
                         scopeItem.Text = scope.Name;
                         scopeItem.BackgroundColor = scopeColor;
+                        scopeItem.IsExpanded = topThread && topStack;
                         // passed down to variables
                         scopeItem.RetrieveNestedVariables = RetrieveNestedVariables;
 
                         scopeVariables.ForEach(scopeItem.AddVariable);
                     }
+
+                    topStack = false;
                 }
+                topThread = false;
             }
         }
 

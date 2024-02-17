@@ -25,7 +25,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         private string launchName = ".NET Core Launch";
         private string launchType = "coreclr";
         private string launchPreLaunchTask = "build";
-        private string launchProgram = "HelloWorld.dll";
+        private string launchProgram = "program.dll";
         private List<string> launchArgs = new();
         private string launchCwd = Path.Combine("C:\\", "path", "containing", "dll");
         private Dictionary<string, string> launchEnv = new();

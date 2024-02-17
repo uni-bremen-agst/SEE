@@ -33,6 +33,12 @@ namespace SEE.UI.DebugAdapterProtocol
         private const float highlightDuration = 3f;
 
         /// <summary>
+        /// Duration of repeated highlighting the code position in the city.
+        /// Occurs when code stays in the same method.
+        /// </summary>
+        private const float highlightDurationRepeated = 2f;
+
+        /// <summary>
         /// The debug adapter.
         /// </summary>
         public DebugAdapter.DebugAdapter Adapter;
@@ -156,6 +162,7 @@ namespace SEE.UI.DebugAdapterProtocol
             // creates ui elements
             tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
             OpenConsole(true);
+            ConsoleWindow.OnInputSubmit += OnConsoleInput;
             SetupControls();
             CodeWindow.OnWordHoverBegin += OnWordHoverBegin;
             CodeWindow.OnWordHoverEnd += OnWordHoverEnd;
@@ -304,13 +311,13 @@ namespace SEE.UI.DebugAdapterProtocol
                     {"Continue", (OnContinue, "Continue")},
                     {"Pause", (OnPause, "Pause")},
                     {"Reverse", (OnReverseContinue, "Reverse")},
-                    {"Next", (OnNext, "Next")},
+                    {"StepOver", (OnNext, "Step Over")},
                     {"StepBack", (OnStepBack, "Step Back")},
                     {"StepIn", (OnStepIn, "Step In")},
                     {"StepOut", (OnStepOut, "Step Out")},
                     {"Restart", (OnRestart, "Restart")},
                     {"Stop", (OnStop , "Stop")},
-                    {"Terminal", (() => OpenConsole(), "Terminal")},
+                    {"Console", (() => OpenConsole(), "Console")},
                     {"Variables",  (OpenVariables, "Variables")},
                 };
                 foreach (var (name, (action, description)) in listeners)
@@ -373,7 +380,6 @@ namespace SEE.UI.DebugAdapterProtocol
                         }
                     }
                     ConsoleWindow.SetChannelLevelEnabled("Adapter", "Log", false);
-                    ConsoleWindow.OnInputSubmit += OnConsoleInput;
                 }
             }
             manager.ActiveWindow = console;
@@ -788,21 +794,21 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <param name="text"></param>
         private void OnConsoleInput(string text)
         {
+            Debug.Log("On Console INput: " + text);
             actions.Enqueue(() =>
             {
-                StackFrame stackFrame = !IsRunning ? 
-                    adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = mainThread.Id }).StackFrames[0] :
-                    null;
                 try
                 {
-                    EvaluateResponse result = adapterHost.SendRequestSync(new EvaluateRequest()
+                    StackFrame stackFrame = !IsRunning ?
+                        adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = mainThread.Id }).StackFrames[0] :
+                        null; EvaluateResponse result = adapterHost.SendRequestSync(new EvaluateRequest()
                     {
                         Expression = text,
                         Context = EvaluateArguments.ContextValue.Repl,
                         FrameId = stackFrame?.Id
                     });
                     ConsoleWindow.AddMessage(result.Result + "\n", "Program", "Log");
-                } catch (ProtocolException e)
+                } catch (Exception e)
                 {
                     ConsoleWindow.AddMessage(e.Message, "Program", "Error");
                 }
@@ -944,6 +950,8 @@ namespace SEE.UI.DebugAdapterProtocol
         #endregion
 
 
+        Node previouslyHighlighted;
+
         #region Utilities
         /// <summary>
         /// Updates the code position.
@@ -978,13 +986,13 @@ namespace SEE.UI.DebugAdapterProtocol
                 manager.AddWindow(codeWindow);
                 codeWindow.OnComponentInitialized += () =>
                 {
-                    codeWindow.MarkLine(line);
+                   codeWindow.ScrolledVisibleLine = line;
                 };
             }
             else
             {
                 codeWindow.EnterFromFile(path);
-                codeWindow.MarkLine(line);
+                codeWindow.ScrolledVisibleLine = line;
             }
             manager.ActiveWindow = codeWindow;
             lastCodeWindow = codeWindow;
@@ -1001,9 +1009,24 @@ namespace SEE.UI.DebugAdapterProtocol
                     }
                 }
                 Node node;
-                if (sourceRangeIndex.TryGetValue(path, line, out node) || sourceRangeIndex.TryGetValue(path, line - 1, out node))
+                if (sourceRangeIndex.TryGetValue(path, line, out node))
                 {
-                    node.Operator().Highlight(highlightDuration, false);
+                    if (previouslyHighlighted != null)
+                    {
+                        Edge edge = previouslyHighlighted.Outgoings.FirstOrDefault(e => e.Target.ID == node.ID);
+                        if (edge != null) {
+                            Debug.Log("Highlight edge");
+                            edge.Operator().Highlight(highlightDuration, false);
+                        }
+                    }
+                    if (previouslyHighlighted != null && node.ID == previouslyHighlighted.ID)
+                    {
+                        node.Operator().Highlight(highlightDurationRepeated, false);
+                    } else
+                    {
+                        node.Operator().Highlight(highlightDuration, false);
+                    }
+                    previouslyHighlighted = node;
                 }
             }
         }

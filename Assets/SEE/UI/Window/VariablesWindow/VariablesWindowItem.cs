@@ -285,7 +285,7 @@ namespace SEE.UI.Window.VariablesWindow
             {
                 if (children[i].HasStarted)
                 {
-                    children[i].SetSiblingIndex(item.transform.GetSiblingIndex() + i);
+                    children[i].SetSiblingIndex(item.transform.GetSiblingIndex() + i + 1);
                 }
             }
         }

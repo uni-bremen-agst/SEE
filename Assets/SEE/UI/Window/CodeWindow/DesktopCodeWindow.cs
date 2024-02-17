@@ -64,7 +64,7 @@ namespace SEE.UI.Window.CodeWindow
                 {
                     Destroyer.Destroy(child.gameObject);
                 }
-                Dictionary<int, SourceBreakpoint> fileBreakpoints = DebugBreakpointManager.Breakpoints.GetValueOrDefault(FilePath);
+                Dictionary<int, SourceBreakpoint> fileBreakpoints = DebugBreakpointManager.Breakpoints.GetValueOrDefault(FilePath.Replace("/", "\\"));
                 for (int i = 0; i < lines; i++)
                 {
                     GameObject breakpoint = PrefabInstantiator.InstantiatePrefab(breakpointPrefab, breakpoints, false);
@@ -74,7 +74,7 @@ namespace SEE.UI.Window.CodeWindow
 
                     int line = i;
                     Button button = breakpoint.MustGetComponent<Button>();
-                    button.onClick.AddListener(() => DebugBreakpointManager.ToggleBreakpoint(FilePath, line + 1));
+                    button.onClick.AddListener(() => DebugBreakpointManager.ToggleBreakpoint(FilePath.Replace("/", "\\"), line + 1));
 
                     TextMeshProUGUI buttonMesh = breakpoint.transform.Find("Content").gameObject.MustGetComponent<TextMeshProUGUI>();
                     buttonMesh.color = fileBreakpoints != null && fileBreakpoints.ContainsKey(i) ? breakpointColorActive : breakpointColorInactive;
@@ -221,7 +221,7 @@ namespace SEE.UI.Window.CodeWindow
         /// <param name="line">The source code line.</param>
         private void OnBreakpointAdded(string path, int line)
         {
-            if (path == FilePath)
+            if (path == FilePath.Replace("/", "\\"))
             {
                 Transform breakpoint = scrollable.transform.Find("Code/Breakpoints").GetChild(line - 1);
 

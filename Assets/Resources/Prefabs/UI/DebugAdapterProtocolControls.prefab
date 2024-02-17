@@ -645,7 +645,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a12ddbc47b17cd478cb447d1113a22b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonText: "\uF04B"
+  buttonText: "\uF04E"
   clickEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -943,7 +943,7 @@ GameObject:
   - component: {fileID: 192767084735697979}
   - component: {fileID: 7599628197890964800}
   m_Layer: 5
-  m_Name: Terminal
+  m_Name: Console
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1600,7 +1600,7 @@ GameObject:
   - component: {fileID: 6540490319496588723}
   - component: {fileID: 3705747216100283487}
   m_Layer: 5
-  m_Name: Next
+  m_Name: StepOver
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2350,7 +2350,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uF04B"
+  m_text: "\uF04E"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4ebb98a3c87fa521a888029274c92b79, type: 2}
   m_sharedMaterial: {fileID: -8620075009897487826, guid: 4ebb98a3c87fa521a888029274c92b79,

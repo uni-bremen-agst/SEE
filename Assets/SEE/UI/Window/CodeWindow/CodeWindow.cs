@@ -39,7 +39,7 @@ namespace SEE.UI.Window.CodeWindow
         /// <summary>
         /// Size of the font used in the code window.
         /// </summary>
-        public float FontSize = 20f;
+        public float FontSize = 16f;
 
         /// <summary>
         /// An event which gets called whenever the scrollbar is used to scroll to a different line.
