@@ -45,9 +45,21 @@ namespace SEE.Net
         public static string ServerId;
 
         /// <summary>
-        /// Address of the backend server where the files are stored
+        /// The protocol of the backend server. Either "http://" or "https://".
         /// </summary>
-        public static string BackendDomain;
+        public static string Protocol = "http://";
+        /// <summary>
+        /// Base URL of the backend server where the files are stored
+        /// </summary>
+        public static string BackendDomain = "localhost";
+        /// <summary>
+        /// REST resource path, i.e., the URL part identifying the client REST API.
+        /// </summary>
+        public static string ClientAPI = "/api/v1/file/client/";
+        /// <summary>
+        /// The complete URL of the Client REST API.
+        /// </summary>
+        public static string ClientRestAPI => Protocol + Network.BackendDomain + ClientAPI;
 
         /// <summary>
         /// The UDP port where the server listens to NetCode and Dissonance traffic.
