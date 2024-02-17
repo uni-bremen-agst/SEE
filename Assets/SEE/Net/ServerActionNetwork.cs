@@ -1,7 +1,5 @@
-﻿using SEE.Audio;
-using SEE.Net.Actions;
+﻿using SEE.Net.Actions;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
@@ -19,13 +17,16 @@ namespace SEE.Net
         [ServerRpc(RequireOwnership = false)]
         public void SyncClientServerRpc(ulong client)
         {
-            NetworkClient networkClient = NetworkManager.Singleton.ConnectedClientsList.FirstOrDefault((connectedClient) => connectedClient.ClientId == client);
+            NetworkClient networkClient = NetworkManager.Singleton.ConnectedClientsList.FirstOrDefault
+                                                ((connectedClient) => connectedClient.ClientId == client);
             if (networkClient == null)
             {
+                Debug.LogError($"There is no {nameof(NetworkClient)}.\n");
                 return;
             }
-            if(!networkClient.PlayerObject.TryGetComponent<ClientActionNetwork>(out var clientNetwork))
+            if (!networkClient.PlayerObject.TryGetComponent(out ClientActionNetwork clientNetwork))
             {
+                Debug.LogError($"The player object does not have a {nameof(ClientActionNetwork)} component.\n");
                 return;
             }
 
@@ -41,11 +42,11 @@ namespace SEE.Net
         [ServerRpc(RequireOwnership = false)]
         public void BroadcastActionServerRpc(string serializedAction, ulong[] recipients)
         {
-            if (!IsServer && !IsHost) 
+            if (!IsServer && !IsHost)
             {
                 return;
             }
-            
+
             AbstractNetAction deserializedAction = ActionSerializer.Deserialize(serializedAction);
             if (deserializedAction.ShouldBeSentToNewClient)
             {
@@ -71,7 +72,7 @@ namespace SEE.Net
             {
                 return;
             }
-            var clientId = serverRpcParams.Receive.SenderClientId;
+            ulong clientId = serverRpcParams.Receive.SenderClientId;
             if (NetworkManager.Singleton.ConnectedClients[clientId] != null)
             {
                 NetworkClient client = NetworkManager.Singleton.ConnectedClients[clientId];
