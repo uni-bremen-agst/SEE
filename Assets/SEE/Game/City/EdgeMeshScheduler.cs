@@ -34,7 +34,7 @@ namespace SEE.Game.City
         /// <see cref="Update"/> is called). The default value is 5, which
         /// turned out to be a good compromise between load and speed.
         /// </summary>
-        [SerializeField, Min(1)]
+        [Min(1)]
         public int EdgesPerFrame = 5;
 
         /// <summary>
@@ -187,7 +187,8 @@ namespace SEE.Game.City
             if (value is EdgeEvent { Change: ChangeType.Addition } edgeEvent)
             {
                 // If this is an added edge, we are going to need to turn it into a mesh.
-                LoadingSpinner.Show(LoadingText);
+                // FIXME: Disabled temporarily. Do we want to activate it again?
+                // LoadingSpinner.Show(LoadingText);
                 edges.Enqueue(edgeEvent.Edge);
             }
 
