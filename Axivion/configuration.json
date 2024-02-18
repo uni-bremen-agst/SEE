@@ -251,7 +251,7 @@
         },
         "Metric-Fan.Out.Call": {
             "_active": true,
-            "max_value": 20
+            "max_value": 50
         },
         "Metric-HIS.APCGCYCLE": {
             "_active": false
@@ -272,7 +272,8 @@
             "_active": true
         },
         "Metric-HIS.LEVEL": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-HIS.NOMV": {
             "_active": false
@@ -285,20 +286,21 @@
             "max_value": 7
         },
         "Metric-HIS.PATH": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-HIS.RETURN": {
             "_active": true,
-            "max_value": 5
+            "max_value": 20
         },
         "Metric-HIS.STMT": {
             "_active": true,
-            "max_value": 100,
+            "max_value": 500,
             "min_value": null
         },
         "Metric-HIS.VG": {
             "_active": true,
-            "max_value": 20
+            "max_value": null
         },
         "Metric-HIS.VOCF": {
             "_active": true,
@@ -383,7 +385,8 @@
             "_active": true
         },
         "Metric-LOC": {
-            "_active": true
+            "_active": true,
+            "max_value": 1000
         },
         "Metric-Lines.Class.Code": {
             "_active": true
@@ -488,7 +491,8 @@
             "_active": true
         },
         "Metric-Lines.Routine.Comment": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-Lines.Routine.CommentRatio": {
             "_active": true
@@ -497,7 +501,8 @@
             "_active": true
         },
         "Metric-Lines.Routine.LOC": {
-            "_active": true
+            "_active": true,
+            "max_value": 1000
         },
         "Metric-Lines.Routine.OnlyComment": {
             "_active": true,
@@ -517,10 +522,11 @@
         },
         "Metric-MaximumNesting": {
             "_active": true,
-            "max_value": 10
+            "max_value": 20
         },
         "Metric-McCabeComplexity": {
-            "_active": true
+            "_active": true,
+            "max_value": 200
         },
         "Metric-NPath": {
             "_active": true
@@ -543,7 +549,8 @@
             "_active": true
         },
         "Metric-NumberOfReturns": {
-            "_active": true
+            "_active": true,
+            "max_value": 20
         },
         "Metric-NumberOfSCCs": {
             "_active": false
@@ -552,26 +559,35 @@
             "_active": true
         },
         "Metric-OO.CBO": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-OO.CBOa": {
             "_active": true,
-            "max_value": 15
+            "max_value": null
         },
         "Metric-OO.CBOs": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-OO.DAC": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-OO.DIT": {
-            "_active": true
+            "_active": true,
+            "max_value": 20
         },
         "Metric-OO.LCOM": {
-            "_active": true
+            "_active": true,
+            "max_value": null
+        },
+        "Metric-OO.LCOM4": {
+            "max_value": null
         },
         "Metric-OO.LCOMs": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-OO.NIVOC": {
             "_active": true
@@ -596,13 +612,16 @@
             "_active": true
         },
         "Metric-OO.RFC": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-OO.WMC.McCabeComplexity": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-OO.WMC.One": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-SwitchComplexity": {
             "_active": true
