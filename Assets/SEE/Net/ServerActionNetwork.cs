@@ -7,7 +7,7 @@ using UnityEngine;
 namespace SEE.Net
 {
     /// <summary>
-    /// DOC
+    /// Gateway to the server.
     /// </summary>
     public class ServerActionNetwork : NetworkBehaviour
     {
