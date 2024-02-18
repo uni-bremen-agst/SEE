@@ -306,6 +306,33 @@ namespace SEE.Net
             }
         }
 
+        /// <summary>
+        /// The <see cref="ServerActionNetwork"/> component attached to the server game object.
+        /// </summary>
+        private static ServerActionNetwork serverNetwork;
+        /// <summary>
+        /// The gateway to the server.
+        /// </summary>
+        public static ServerActionNetwork ServerNetwork
+        {
+            get
+            {
+                if (serverNetwork == null)
+                {
+                    const string serverName = "Server";
+                    GameObject server = GameObject.Find(serverName);
+                    if (server != null)
+                    {
+                        server.TryGetComponentOrLog(out serverNetwork);
+                    }
+                    else
+                    {
+                        Debug.LogError($"There is no game object named {serverName} in the scene.\n");
+                    }
+                }
+                return serverNetwork;
+            }
+        }
 
         /// <summary>
         /// Broadcasts a serialized action.
@@ -314,8 +341,7 @@ namespace SEE.Net
         /// <param name="recipients">List of recipients to broadcast to, will broadcast to all if this is null.</param>
         public static void BroadcastAction(String serializedAction, ulong[] recipients)
         {
-            ServerActionNetwork serverNetwork = GameObject.Find("Server").GetComponent<ServerActionNetwork>();
-            serverNetwork.BroadcastActionServerRpc(serializedAction, recipients);
+            ServerNetwork?.BroadcastActionServerRpc(serializedAction, recipients);
         }
 
         /// <summary>

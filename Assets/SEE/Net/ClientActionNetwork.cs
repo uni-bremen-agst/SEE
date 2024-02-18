@@ -10,18 +10,18 @@ using UnityEngine.Networking;
 namespace SEE.Net
 {
     /// <summary>
-    /// DOC
+    /// RPCs on the client side.
     /// </summary>
     public class ClientActionNetwork : NetworkBehaviour
     {
         /// <summary>
         /// Where files are stored locally on the server side (relative directory).
         /// </summary>
-        public string RelativeServertContentDirectory = "/Multiplayer/";
+        private const string RelativeServerContentDirectory = "/Multiplayer/";
         /// <summary>
         /// Where files are stored locally on the server side (absolute directory).
         /// </summary>
-        private string AbsoluteServerContentDirectory => Application.streamingAssetsPath + RelativeServertContentDirectory;
+        private string AbsoluteServerContentDirectory => Application.streamingAssetsPath + RelativeServerContentDirectory;
 
         /// <summary>
         /// The name of the zip file containing the source code.
@@ -36,8 +36,7 @@ namespace SEE.Net
         {
             if (!IsServer && !IsHost)
             {
-                ServerActionNetwork serverNetwork = GameObject.Find("Server").GetComponent<ServerActionNetwork>();
-                serverNetwork.SyncFilesServerRpc();
+                Network.ServerNetwork?.SyncFilesServerRpc();
             }
         }
 
@@ -116,8 +115,7 @@ namespace SEE.Net
 
             UnzipSources();
 
-            ServerActionNetwork serverNetwork = GameObject.Find("Server").GetComponent<ServerActionNetwork>();
-            serverNetwork.SyncClientServerRpc(NetworkManager.Singleton.LocalClientId);
+            Network.ServerNetwork?.SyncClientServerRpc(NetworkManager.Singleton.LocalClientId);
         }
 
         /// <summary>
