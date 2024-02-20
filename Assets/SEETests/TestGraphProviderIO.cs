@@ -132,7 +132,8 @@ namespace SEE.GraphProviders
         {
             return new JaCoCoGraphProvider()
             {
-                Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
+                Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mydir/jacoco.xml"),
+                Prefix = "someprefix"
             };
         }
 
@@ -141,6 +142,7 @@ namespace SEE.GraphProviders
             Assert.IsTrue(saved.GetType() == loaded.GetType());
             JaCoCoGraphProvider loadedProvider = loaded as JaCoCoGraphProvider;
             AreEqual(saved.Path, loadedProvider.Path);
+            Assert.AreEqual(saved.Prefix, loadedProvider.Prefix);
         }
 
         #endregion

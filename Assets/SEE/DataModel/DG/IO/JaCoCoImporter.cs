@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Xml;
 using UnityEngine;
+using static RTG.Object2ObjectSnap;
 
 namespace SEE.DataModel.DG.IO
 {
@@ -32,12 +33,19 @@ namespace SEE.DataModel.DG.IO
         private const string methodContext = "method";
 
         /// <summary>
-        /// Loads a JaCoCo test report from the given JaCoCo XML <paramref name="filepath"/>.
+        /// Loads a JaCoCo test report from the given JaCoCo XML <paramref name="filename"/>.
         /// The retrieved coverage metrics will be added to nodes of <paramref name="graph"/>.
+        ///
+        /// If <paramref name="prefix"/> is neither null nor just whitespace, it will be
+        /// prepended to every path that is extracted from the JaCoCo report. This addition
+        /// may be necessary to match paths retrieved from the JaCoCo report and the path attributes
+        /// <see cref="GraphElement.Path"/> of nodes in the graph the coverage metrics are
+        /// to be added.
         /// </summary>
         /// <param name="graph">Graph where to add the metrics</param>
-        /// <param name="filepath">Path of the XML file</param>
-        public static void Load(Graph graph, string filepath)
+        /// <param name="filename">Path of the XML file</param>
+        /// <param name="prefix">the path prefix to be added at the front of the path (may be empty)</param>
+        public static void Load(Graph graph, string filename, string prefix)
         {
             if (graph == null)
             {
@@ -48,20 +56,20 @@ namespace SEE.DataModel.DG.IO
                 // graph is empty. Nothing to do.
                 return;
             }
-            if (string.IsNullOrEmpty(filepath))
+            if (string.IsNullOrEmpty(filename))
             {
                 throw new ArgumentException("File path must neither be null nor empty.");
             }
-            if (!File.Exists(filepath))
+            if (!File.Exists(filename))
             {
-                Debug.LogError($"The JaCoCo XML file named {filepath} does not exist.\n");
+                Debug.LogError($"The JaCoCo XML file named {filename} does not exist.\n");
                 return;
             }
 
             SourceRangeIndex index = new(graph);
 
             XmlReaderSettings settings = new() { DtdProcessing = DtdProcessing.Parse };
-            using XmlReader xmlReader = XmlReader.Create(filepath, settings);
+            using XmlReader xmlReader = XmlReader.Create(filename, settings);
 
             // The fully qualified name of the package currently processed.
             // The name is retrieved from JaCoCo's XML report, where
@@ -87,6 +95,9 @@ namespace SEE.DataModel.DG.IO
             // be C.java, but its qualified name will be P/D$I. The delimiter $ is used
             // to separate inner classes from the classes they are nested in.
             string qualifiedClassName = null;
+
+            // Name of the currently processed method. This value is used only for error messages.
+            string methodName = string.Empty;
 
             // The name of the source-code file for a class in JaCoCo's report,
             // e.g. CountConsonants.java. This filename is apparently always a
@@ -145,17 +156,31 @@ namespace SEE.DataModel.DG.IO
                                 // Attribute line refers to the line in which the opening curly bracket
                                 // of the method's body occurs within its source file.
                                 sourceLine = int.Parse(xmlReader.GetAttribute("line"));
+                                methodName = xmlReader.GetAttribute("name");
                             }
                             else if (xmlReader.Name == packageContext)
                             {
                                 packageName = xmlReader.GetAttribute("name");
                                 if (string.IsNullOrWhiteSpace(packageName))
                                 {
-                                    Debug.LogWarning($"{XMLSourcePosition(filepath, xmlReader)}: "
+                                    Debug.LogWarning($"{XMLSourcePosition(filename, xmlReader)}: "
                                          + "Data for the default Java package (without name) were given. These will be ignored.\n");
                                 }
                             }
-                            nodeTypeStack.Push(xmlReader.Name);
+                            if (!xmlReader.IsEmptyElement)
+                            {
+                                // This is not a self-closing (empty) element, e.g., <item/>.
+                                // Note: A corresponding EndElement node is not generated for empty elements.
+                                // That is why we push a context onto the context stack only if the element is
+                                // not self-closing.
+                                nodeTypeStack.Push(xmlReader.Name);
+                            }
+                            else
+                            {
+                                Debug.LogWarning($"{XMLSourcePosition(filename, xmlReader)}: "
+                                       + "Report does not provide coverage data for this entity.\n");
+                            }
+
                         }
                         // skip sourcefile and its counter XML nodes
                         else if (xmlReader.Name == "sourcefile")
@@ -190,7 +215,7 @@ namespace SEE.DataModel.DG.IO
                                         // We do that via the unique ID of a package node, which is assumed to be
                                         // the fully qualified name of the packages where individual packages are
                                         // separated by a period.
-                                        AddMetricsToClassOrPackage(graph, xmlReader, packageName);
+                                        AddMetricsToClassOrPackage(graph, xmlReader, packageName, filename);
                                     }
                                 }
                                 else if (nodeType == classContext)
@@ -209,7 +234,7 @@ namespace SEE.DataModel.DG.IO
                                     // file declaring a main class C as a sibling to X within P in the package hierarchy.
                                     // Both would have the name P.C in our graph. Yet, that would be illegal Java
                                     // code and, hence, cannot happen.
-                                    AddMetricsToClassOrPackage(graph, xmlReader, qualifiedClassName);
+                                    AddMetricsToClassOrPackage(graph, xmlReader, qualifiedClassName, filename);
                                 }
                                 else if (nodeType == reportContext)
                                 {
@@ -219,20 +244,21 @@ namespace SEE.DataModel.DG.IO
                                     // root -- that we processed previously and for which we added metrics.
                                     AddMetrics(xmlReader, graph.GetRoots()[0]);
                                 }
-                                else if (index.TryGetValue(GetPath("", qualifiedClassName, sourceFilename),
+                                else if (index.TryGetValue(GetPath(prefix, qualifiedClassName, sourceFilename),
                                                            sourceLine, out Node nodeToAddMetrics))
                                 {
                                     AddMetrics(xmlReader, nodeToAddMetrics);
                                 }
                                 else
                                 {
-                                    Debug.LogError($"{XMLSourcePosition(filepath, xmlReader)}: "
-                                        + $"No node found for: {qualifiedClassName}:{sourceLine}  [{nodeType}].\n");
+                                    // We are in a method context.
+                                    Debug.LogError($"{XMLSourcePosition(filename, xmlReader)}: "
+                                        + $"No node found for {nodeType} {qualifiedClassName}.{methodName} using {GetPath(prefix, qualifiedClassName, sourceFilename)}:{sourceLine}.\n");
                                 }
                             }
                             catch (Exception e)
                             {
-                                Debug.LogError($"{XMLSourcePosition(filepath, xmlReader)}: {e.Message}.\n");
+                                Debug.LogError($"{XMLSourcePosition(filename, xmlReader)}: {e.Message}.\n");
                                 throw;
                             }
                         }
@@ -249,6 +275,7 @@ namespace SEE.DataModel.DG.IO
                             {
                                 qualifiedClassName = null;
                                 sourceFilename = null;
+                                methodName = string.Empty;
                             }
                             else if (xmlReader.Name == methodContext)
                             {
@@ -285,10 +312,14 @@ namespace SEE.DataModel.DG.IO
             // Retrieves the counter metrics from xmlReader and adds them to a package or class
             // node retrieved from the given graph having the given uniqueID.
             // Note: the actually used node ID is uniqueID where every / is replaced by a period.
-            void AddMetricsToClassOrPackage(Graph graph, XmlReader xmlReader, string uniqueID)
+            static void AddMetricsToClassOrPackage(Graph graph, XmlReader xmlReader, string uniqueID, string filename)
             {
                 // JaCoCo uses "/" as a separator for packages and classes while our graph is
                 // assumed to use a period "." to separate package/class names in unique IDs.
+                if (uniqueID == null)
+                {
+                    Debug.LogError($"{XMLSourcePosition(filename, xmlReader)}: uniqueID is null.\n");
+                }
                 Node packageOrClassNode = graph.GetNode(uniqueID.Replace("/", "."));
                 if (packageOrClassNode != null)
                 {
@@ -296,7 +327,7 @@ namespace SEE.DataModel.DG.IO
                 }
                 else
                 {
-                    Debug.LogError($"{XMLSourcePosition(filepath, xmlReader)}: No node found for package/class {uniqueID}.\n");
+                    Debug.LogError($"{XMLSourcePosition(filename, xmlReader)}: No node found for package/class {uniqueID}.\n");
                 }
             }
         }
@@ -322,6 +353,12 @@ namespace SEE.DataModel.DG.IO
         }
 
         /// <summary>
+        /// The character used to separate elements in a path. This separator is used
+        /// both in the JaCoCo XML report for qualified class names and the prefix.
+        /// </summary>
+        private const char jacocoSeparator = '/';
+
+        /// <summary>
         /// A qualified name is a set of words separated by delimiter /.
         /// This method returns the qualified name given in <paramref name="qualifiedClassName"/>
         /// where its last word is replaced by <paramref name="sourceFilename"/>.
@@ -339,19 +376,19 @@ namespace SEE.DataModel.DG.IO
         /// <exception cref="ArgumentException">thrown in case <paramref name="qualifiedClassName"/>
         /// is null or empty</exception>
         private static string GetPath(string prefix, string qualifiedClassName, string sourceFilename)
-        {            
+        {
             if (string.IsNullOrEmpty(qualifiedClassName))
             {
                 throw new ArgumentException("The qualified name of a class must not be empty.");
             }
-            const char jacocoSeparator = '/';
+
             if (string.IsNullOrWhiteSpace(prefix))
             {
                 prefix = string.Empty;
             }
             else
             {
-                prefix = prefix + jacocoSeparator;
+                prefix = AddSeparatorAtTheEndIfNecessary(prefix);
             }
             int lastSeparatorPosition = qualifiedClassName.LastIndexOf(jacocoSeparator);
             if (lastSeparatorPosition == -1)
@@ -360,7 +397,24 @@ namespace SEE.DataModel.DG.IO
             }
             else
             {
+                // An example class name could be: "org/jabref/logic/msbib/MSBibEntry" where the last element
+                // is a class and everything else are packages. jacocoSeparator is used to separate
+                // these names from each other. A sourceFilename could be "MSBibEntry.java"; it is
+                // always a plain filename without the directories it is contained in.
+                // We remove the last element (which is a class and append the sourceFilename
+                // and prepand the prefix. Let prefix be "src/main/java/", then the final result
+                // would be "src/main/java/org/jabref/logic/msbib/MSBibEntry.java".
                 return prefix + qualifiedClassName.Remove(lastSeparatorPosition) + jacocoSeparator + sourceFilename;
+            }
+
+            // Returns the given path with a jacocoSeparator at the end if not already present.
+            static string AddSeparatorAtTheEndIfNecessary(string path)
+            {
+                if (path.Length == 0)
+                {
+                    return path;
+                }
+                return path[^1] == jacocoSeparator ? path : path + jacocoSeparator;
             }
         }
     }
