@@ -219,7 +219,7 @@ namespace SEE.DataModel.DG.IO
                                     // root -- that we processed previously and for which we added metrics.
                                     AddMetrics(xmlReader, graph.GetRoots()[0]);
                                 }
-                                else if (index.TryGetValue(GetPath(qualifiedClassName, sourceFilename),
+                                else if (index.TryGetValue(GetPath("", qualifiedClassName, sourceFilename),
                                                            sourceLine, out Node nodeToAddMetrics))
                                 {
                                     AddMetrics(xmlReader, nodeToAddMetrics);
@@ -326,30 +326,41 @@ namespace SEE.DataModel.DG.IO
         /// This method returns the qualified name given in <paramref name="qualifiedClassName"/>
         /// where its last word is replaced by <paramref name="sourceFilename"/>.
         /// For instance, let the qualified name be A/B and F be the source file name,
-        /// then A/F is returned. If the qualified name were only A, just F would be returned.
+        /// then {P}A/F is returned. If the qualified name were only A, just {P}F would be returned;
+        /// where {P} is the given <paramref name="prefix"/> appended by delimiter / if <paramref name="prefix"/>
+        /// is not the empty string; if <paramref name="prefix"/> is the empty string {P} is the
+        /// empty string.
         /// </summary>
+        /// <param name="prefix">the path prefix to be added at the front of the path (may be empty)</param>
         /// <param name="qualifiedClassName">qualified name to be processed</param>
         /// <param name="sourceFilename">source filename to be appended</param>
         /// <returns>qualified name whose last word is replaced by <paramref name="sourceFilename"/>
         /// </returns>
         /// <exception cref="ArgumentException">thrown in case <paramref name="qualifiedClassName"/>
         /// is null or empty</exception>
-        private static string GetPath(string qualifiedClassName, string sourceFilename)
-        {
-            const char jacocoSeparator = '/';
+        private static string GetPath(string prefix, string qualifiedClassName, string sourceFilename)
+        {            
             if (string.IsNullOrEmpty(qualifiedClassName))
             {
                 throw new ArgumentException("The qualified name of a class must not be empty.");
             }
-
-            int lastSeparatorPosition = qualifiedClassName.LastIndexOf(jacocoSeparator);
-            if (lastSeparatorPosition == -1)
+            const char jacocoSeparator = '/';
+            if (string.IsNullOrWhiteSpace(prefix))
             {
-                return sourceFilename;
+                prefix = string.Empty;
             }
             else
             {
-                return qualifiedClassName.Remove(lastSeparatorPosition) + jacocoSeparator + sourceFilename;
+                prefix = prefix + jacocoSeparator;
+            }
+            int lastSeparatorPosition = qualifiedClassName.LastIndexOf(jacocoSeparator);
+            if (lastSeparatorPosition == -1)
+            {
+                return prefix + sourceFilename;
+            }
+            else
+            {
+                return prefix + qualifiedClassName.Remove(lastSeparatorPosition) + jacocoSeparator + sourceFilename;
             }
         }
     }
