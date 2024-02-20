@@ -992,7 +992,7 @@ namespace SEE.UI.DebugAdapterProtocol
             else
             {
                 codeWindow.EnterFromFile(path);
-                codeWindow.ScrolledVisibleLine = line;
+                codeWindow.MarkLine(line);
             }
             manager.ActiveWindow = codeWindow;
             lastCodeWindow = codeWindow;
@@ -1015,7 +1015,6 @@ namespace SEE.UI.DebugAdapterProtocol
                     {
                         Edge edge = previouslyHighlighted.Outgoings.FirstOrDefault(e => e.Target.ID == node.ID);
                         if (edge != null) {
-                            Debug.Log("Highlight edge");
                             edge.Operator().Highlight(highlightDuration, false);
                         }
                     }
@@ -1024,6 +1023,7 @@ namespace SEE.UI.DebugAdapterProtocol
                         node.Operator().Highlight(highlightDurationRepeated, false);
                     } else
                     {
+                        codeWindow.ScrolledVisibleLine = line;
                         node.Operator().Highlight(highlightDuration, false);
                     }
                     previouslyHighlighted = node;
