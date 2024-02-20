@@ -116,6 +116,11 @@ namespace SEE.Controls.Actions
                   Color.grey.Darker(), "Materials/ModernUIPack/Arrow Bold",
                   AcceptDivergenceAction.CreateReversibleAction);
 
+            LiveDocumentation =
+                new("LiveDocumentation", "displays the documentation of a node",
+                    Color.magenta.Lighter(), "Materials/ModernUIPack/Document",
+                    LiveDocumentationAction.CreateReversibleAction);
+
             // Metric Board actions
             MetricBoard =
               new("Metric Board", "Manipulate a metric board",
@@ -182,6 +187,7 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType ShowCode;
         public readonly static ActionStateType Draw;
         public readonly static ActionStateType AcceptDivergence;
+        public readonly static ActionStateType LiveDocumentation;
 
         public readonly static ActionStateTypeGroup MetricBoard;
         public readonly static ActionStateType AddBoard;

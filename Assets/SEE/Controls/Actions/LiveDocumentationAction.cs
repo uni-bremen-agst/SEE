@@ -1,0 +1,180 @@
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using SEE.Game.UI.LiveDocumentation;
+using SEE.Game.UI.LiveDocumentation.Buffer;
+using SEE.Game.UI.Notification;
+using SEE.GO;
+using SEE.Net.Actions;
+using SEE.Utils;
+using SEE.Utils.LiveDocumentation;
+using Sirenix.Utilities;
+using UnityEngine;
+
+namespace SEE.Controls.Actions
+{
+    /// <summary>
+    /// An action for displaying the source code documentation of a node with clickable links.
+    /// </summary>
+    public class LiveDocumentationAction : AbstractPlayerAction
+    {
+        /// <summary>
+        /// Instance of <see cref="WindowSpaceManager"/> for managing the UI
+        /// </summary>
+        private WindowSpaceManager spaceManager;
+
+        /// <summary>
+        /// Creates a new instance of <see cref="LiveDocumentationAction"/>
+        /// </summary>
+        /// <returns>The new created instance</returns>
+        public static ReversibleAction CreateReversibleAction()
+        {
+            return new LiveDocumentationAction();
+        }
+
+        /// <summary>
+        /// Override of method from <see cref="AbstractPlayerAction"/>.
+        ///
+        /// Always returns an empty list.
+        /// </summary>
+        /// <returns>An empty list of strings</returns>
+        public override HashSet<string> GetChangedObjects() => new();
+
+        /// <summary>
+        /// Returns the ActionStateType of this action
+        /// </summary>
+        /// <returns>The ActionStateType (<see cref="ActionStateTypes.LiveDocumentation"/>)</returns>
+        public override ActionStateType GetActionStateType() => ActionStateTypes.LiveDocumentation;
+
+        /// <summary>
+        /// Creates a new instance of the action
+        /// </summary>
+        /// <returns>The new instance</returns>
+        public override ReversibleAction NewInstance() => CreateReversibleAction();
+
+        /// <summary>
+        /// Awake method
+        ///
+        /// Copied from <see cref="ShowCodeAction"/> works the same way.
+        /// </summary>
+        public override void Awake()
+        {
+            // In case we do not have an ID yet, we request one.
+            if (ICRDT.GetLocalID() == 0)
+            {
+                new NetCRDT().RequestID();
+            }
+
+            spaceManager = WindowSpaceManager.ManagerInstance;
+        }
+
+        /// <summary>
+        /// Update method - see <see cref="ReversibleAction.Update"/> for more info
+        /// </summary>
+        /// <returns>returns always false</returns>
+        public override bool Update()
+        {
+            // Only allow local player to open new code windows
+            if (Input.GetMouseButtonDown(0)
+                && Raycasting.RaycastGraphElement(out RaycastHit hit, out GraphElementRef g) == HitGraphElement.Node)
+            {
+                NodeRef selectedNode = hit.collider.gameObject.GetComponent<NodeRef>();
+
+                // When the node the user has clicked on has no file attached.
+                // In this case an error is displayed.
+                if (string.IsNullOrWhiteSpace(selectedNode.Value.Path())
+                    || string.IsNullOrWhiteSpace(selectedNode.Value.Filename()))
+                {
+                    ShowNotification.Error("Node has no File", "The selected node has no source code file attached");
+                    return false;
+                }
+
+                // Concat the path and the file name to get the relative path of the file in the project
+                string path = selectedNode.Value.Path() + selectedNode.elem.Filename();
+
+
+                // When the node the user has clicked on wasn't a class
+                // In this case an error message is displayed and the LiveDocumentation windows is not going to open, since only classes can be opened.
+                if (selectedNode.Value.Type != "Class")
+                {
+                    ShowNotification.Error("Node not supported", "Only class nodes can be analysed");
+                    return false;
+                }
+
+                if (!selectedNode.TryGetComponent(out LiveDocumentationWindow documentationWindow))
+                {
+                    string fileName = selectedNode.Value.Filename();
+
+                    // Copied from ShowCodeAction
+                    if (string.IsNullOrWhiteSpace(fileName))
+                    {
+                        ShowNotification.Warn("No file",
+                            $"Selected node '{selectedNode.Value.SourceName}' has no filename.");
+                        return false;
+                    }
+
+                    string absolutePlatformPath = selectedNode.Value.AbsolutePlatformPath();
+                    if (!File.Exists(absolutePlatformPath))
+                    {
+                        ShowNotification.Warn("File does not exist",
+                            $"Path {absolutePlatformPath} of selected node '{selectedNode.Value.SourceName}' does not exist.");
+                        return false;
+                    }
+
+                    string selectedFile = selectedNode.Value.Filename();
+
+                    documentationWindow = selectedNode.gameObject.AddComponent<LiveDocumentationWindow>();
+
+                    documentationWindow.Title = "Doc: " + selectedNode.Value.SourceName;
+
+                    if (!documentationWindow.Title.Replace(".", "").Equals(selectedFile.Split('.').Reverse().Skip(1)
+                            .Aggregate("", (acc, s) => s + acc)))
+                    {
+                        documentationWindow.Title += $" ({selectedFile})";
+                    }
+
+                    documentationWindow.SourceName = documentationWindow.Title;
+                    documentationWindow.NodeOfClass = selectedNode.Value;
+
+                    // Try initialise the FileParser
+                    FileParser parser;
+                    try
+                    {
+                        parser = new FileParser(selectedNode.Value.AbsolutePlatformPath());
+                    }
+                    // If the source code file can't be found display an error and abort the action.
+                    catch (FileNotFoundException)
+                    {
+                        ShowNotification.Error("File not found",
+                            $"The file with the name {selectedNode.Value.AbsolutePlatformPath()} can't be found");
+                        return false;
+                    }
+
+                    LiveDocumentationBuffer buffer = parser.ParseClassDoc(selectedNode.Value.SourceName);
+
+                    List<LiveDocumentationBuffer> classMembers = new List<LiveDocumentationBuffer>();
+                    parser.ParseClassMethods(selectedNode.Value.SourceName)
+                        .ForEach(x => classMembers.Add(x));
+                    if (buffer == null || classMembers == null)
+                    {
+                        return false;
+                    }
+
+                    documentationWindow.DocumentationBuffer = buffer;
+                    documentationWindow.ClassMembers = classMembers;
+                    documentationWindow.ImportedNamespaces = parser.ParseNamespaceImports();
+                }
+
+                // Add code window to our space of code window, if it isn't in there yet
+                if (!spaceManager[WindowSpaceManager.LOCAL_PLAYER].Windows.Contains(documentationWindow))
+                {
+                    spaceManager[WindowSpaceManager.LOCAL_PLAYER].AddWindow(documentationWindow);
+                }
+
+                spaceManager[WindowSpaceManager.LOCAL_PLAYER].ActiveWindow = documentationWindow;
+            }
+
+            return false;
+        }
+    }
+}

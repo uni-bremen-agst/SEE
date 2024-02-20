@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE Gravis2_Layout>
+<Gravis2_Layout W="Hierarchy" V="Architecture">
+  <Visualization>
+    <Zoom Factor="3.65324" Center_X="-214.604" Center_Y="-251.959"/>
+    <Option Name="Mute_Edges" Value="False"/>
+    <Option Name="Semi_Transparent_Edges" Value="False"/>
+    <Option Name="Edges_Behind_Nodes" Value="False"/>
+    <Option Name="Show_Lifted_Edges" Value="False"/>
+    <Option Name="Semi_Transparent_Backgrounds" Value="True"/>
+    <Option Name="Show_Node_Names" Value="True"/>
+    <Option Name="Show_Attributes" Value="True"/>
+    <Hidden_Node_Types>
+    </Hidden_Node_Types>
+    <Hidden_Edge_Types>
+    </Hidden_Edge_Types>
+  </Visualization>
+  <Node Id="LArchitecture" X="-320.537" Y="-247.169" W="172.65" H="87.9743" CS="14.14" Exp="True">
+    <Node Id="LH3" X="117.65" Y="32.8794" W="40" H="40" CS="10" Exp="True">
+    </Node>
+    <Node Id="LH2" X="64.1352" Y="32.9743" W="40" H="40" CS="10" Exp="True">
+    </Node>
+    <Node Id="LH1" X="10.0955" Y="32.7955" W="40" H="40" CS="10" Exp="True">
+    </Node>
+  </Node>
+</Gravis2_Layout>

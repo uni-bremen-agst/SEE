@@ -1,0 +1,3564 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="Code Facts" edgeids="true">
+    <node id="N1752">
+      <type xlink:href="Member"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum/>
+      </attr>
+      <attr name="Element.Is_Property">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>86923</int>
+      </attr>
+      <attr name="Source.Line">
+        <int>17</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>23</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>17</int>
+      </attr>
+      <attr name="Source.Physical_Region_Start">
+        <int>17</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>1</int>
+      </attr>
+      <attr name="Source.Physical_Region_Length">
+        <int>1</int>
+      </attr>
+      <attr name="Source.Declaration_Start">
+        <int>17</int>
+      </attr>
+      <attr name="Source.Signature_Start">
+        <int>17</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Preproc">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_If">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Elif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Else">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Endif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Define">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Undef">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Pragma">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Line">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Error">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Warning">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Sharp">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Check">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Debug">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>7</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>7</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary_Frequency">
+        <float>1.000000</float>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>19.651485</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>2.000000</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>39.302971</float>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>p global:mini:Calculator:Operator^:!23+8!:Left</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>Left</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Operator.cs</string>
+      </attr>
+      <attr name="Source.Physical_Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.Physical_File">
+        <string>Operator.cs</string>
+      </attr>
+    </node>
+    <node id="N1753">
+      <type xlink:href="Member"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum/>
+      </attr>
+      <attr name="Element.Is_Property">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>86924</int>
+      </attr>
+      <attr name="Source.Line">
+        <int>22</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>23</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>22</int>
+      </attr>
+      <attr name="Source.Physical_Region_Start">
+        <int>22</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>1</int>
+      </attr>
+      <attr name="Source.Physical_Region_Length">
+        <int>1</int>
+      </attr>
+      <attr name="Source.Declaration_Start">
+        <int>22</int>
+      </attr>
+      <attr name="Source.Signature_Start">
+        <int>22</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Preproc">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_If">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Elif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Else">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Endif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Define">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Undef">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Pragma">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Line">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Error">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Warning">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Sharp">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Check">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Debug">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>7</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>7</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary_Frequency">
+        <float>1.000000</float>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>19.651485</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>2.000000</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>39.302971</float>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>p global:mini:Calculator:Operator^:!23+8!:Right</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>Right</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Operator.cs</string>
+      </attr>
+      <attr name="Source.Physical_Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.Physical_File">
+        <string>Operator.cs</string>
+      </attr>
+    </node>
+    <node id="N5195">
+      <type xlink:href="Class"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Element.Has_Internal_Visibility">
+        <enum/>
+      </attr>
+      <attr name="Element.Is_Reference_Type">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>167</int>
+      </attr>
+      <attr name="Source.Line">
+        <int>6</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>5</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>6</int>
+      </attr>
+      <attr name="Source.Physical_Region_Start">
+        <int>6</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>24</int>
+      </attr>
+      <attr name="Source.Physical_Region_Length">
+        <int>24</int>
+      </attr>
+      <attr name="Source.Declaration_Start">
+        <int>6</int>
+      </attr>
+      <attr name="Source.Signature_Start">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>24</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>21</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Preproc">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_If">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Elif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Else">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Endif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Define">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Undef">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Pragma">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Line">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Error">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Warning">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Sharp">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Check">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Debug">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Class.LOC">
+        <int>24</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Code">
+        <int>21</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>66</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>34</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>17</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>18</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>100</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>35</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary_Frequency">
+        <float>2.857143</float>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>512.928284</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>16.055555</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>8235.348633</float>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>C global:mini:MainClass^:!12+9!</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>MainClass</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>MainClass.cs</string>
+      </attr>
+      <attr name="Source.Physical_Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.Physical_File">
+        <string>MainClass.cs</string>
+      </attr>
+    </node>
+    <node id="N5609">
+      <type xlink:href="Class"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum/>
+      </attr>
+      <attr name="Element.Is_Reference_Type">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>581</int>
+      </attr>
+      <attr name="Source.Line">
+        <int>5</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>12</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>5</int>
+      </attr>
+      <attr name="Source.Physical_Region_Start">
+        <int>5</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>38</int>
+      </attr>
+      <attr name="Source.Physical_Region_Length">
+        <int>38</int>
+      </attr>
+      <attr name="Source.Declaration_Start">
+        <int>5</int>
+      </attr>
+      <attr name="Source.Signature_Start">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>38</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>27</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>10</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>10</int>
+      </attr>
+      <attr name="Metric.Lines.Preproc">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_If">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Elif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Else">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Endif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Define">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Undef">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Pragma">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Line">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Error">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Warning">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Sharp">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Check">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Debug">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Class.LOC">
+        <int>38</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Code">
+        <int>27</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Comment">
+        <int>10</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>78</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>37</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>21</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>20</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>115</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>41</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary_Frequency">
+        <float>2.804878</float>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>616.118469</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>19.424999</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>11968.100586</float>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>C global:mini:Calculator:!14+10!^:!23+10!</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>Calculator</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Calculator.cs</string>
+      </attr>
+      <attr name="Source.Physical_Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.Physical_File">
+        <string>Calculator.cs</string>
+      </attr>
+    </node>
+    <node id="N5610">
+      <type xlink:href="Class"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum/>
+      </attr>
+      <attr name="Element.Is_Reference_Type">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>582</int>
+      </attr>
+      <attr name="Source.Line">
+        <int>6</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>12</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>6</int>
+      </attr>
+      <attr name="Source.Physical_Region_Start">
+        <int>6</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>11</int>
+      </attr>
+      <attr name="Source.Physical_Region_Length">
+        <int>11</int>
+      </attr>
+      <attr name="Source.Declaration_Start">
+        <int>6</int>
+      </attr>
+      <attr name="Source.Signature_Start">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>11</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>10</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Preproc">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_If">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Elif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Else">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Endif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Define">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Undef">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Pragma">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Line">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Error">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Warning">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Sharp">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Check">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Debug">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Class.LOC">
+        <int>11</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Code">
+        <int>10</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>28</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>10</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>14</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>7</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>38</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>21</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary_Frequency">
+        <float>1.809524</float>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>166.908051</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>10.000000</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>1669.080566</float>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>C global:mini:Calculator:Minus^:Minus</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>Minus</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Minus.cs</string>
+      </attr>
+      <attr name="Source.Physical_Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.Physical_File">
+        <string>Minus.cs</string>
+      </attr>
+    </node>
+    <node id="N5611">
+      <type xlink:href="Class"/>
+      <attr name="Element.Is_Abstract">
+        <enum/>
+      </attr>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum/>
+      </attr>
+      <attr name="Element.Is_Reference_Type">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>583</int>
+      </attr>
+      <attr name="Source.Line">
+        <int>12</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>21</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>12</int>
+      </attr>
+      <attr name="Source.Physical_Region_Start">
+        <int>12</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>33</int>
+      </attr>
+      <attr name="Source.Physical_Region_Length">
+        <int>33</int>
+      </attr>
+      <attr name="Source.Declaration_Start">
+        <int>12</int>
+      </attr>
+      <attr name="Source.Signature_Start">
+        <int>12</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>33</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>11</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>19</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>19</int>
+      </attr>
+      <attr name="Metric.Lines.Preproc">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_If">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Elif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Else">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Endif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Define">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Undef">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Pragma">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Line">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Error">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Warning">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Sharp">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Check">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Debug">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Class.LOC">
+        <int>33</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Code">
+        <int>11</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Comment">
+        <int>19</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>30</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>16</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>12</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>8</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>46</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>20</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary_Frequency">
+        <float>2.300000</float>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>198.808685</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>12.000000</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>2385.704102</float>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>C global:mini:Calculator:Operator^:!23+8!</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>Operator</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Operator.cs</string>
+      </attr>
+      <attr name="Source.Physical_Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.Physical_File">
+        <string>Operator.cs</string>
+      </attr>
+    </node>
+    <node id="N5612">
+      <type xlink:href="Class"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum/>
+      </attr>
+      <attr name="Element.Is_Reference_Type">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>584</int>
+      </attr>
+      <attr name="Source.Line">
+        <int>6</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>12</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>6</int>
+      </attr>
+      <attr name="Source.Physical_Region_Start">
+        <int>6</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>11</int>
+      </attr>
+      <attr name="Source.Physical_Region_Length">
+        <int>11</int>
+      </attr>
+      <attr name="Source.Declaration_Start">
+        <int>6</int>
+      </attr>
+      <attr name="Source.Signature_Start">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>11</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>10</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Preproc">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_If">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Elif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Else">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Endif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Define">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Undef">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Pragma">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Line">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Error">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Warning">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Sharp">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Check">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Debug">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Class.LOC">
+        <int>11</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Code">
+        <int>10</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>28</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>10</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>14</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>7</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>38</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>21</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary_Frequency">
+        <float>1.809524</float>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>166.908051</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>10.000000</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>1669.080566</float>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>C global:mini:Calculator:Plus^:Plus</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>Plus</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Plus.cs</string>
+      </attr>
+      <attr name="Source.Physical_Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.Physical_File">
+        <string>Plus.cs</string>
+      </attr>
+    </node>
+    <node id="N20544">
+      <type xlink:href="Method"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>95525</int>
+      </attr>
+      <attr name="Source.Line">
+        <int>17</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>23</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>17</int>
+      </attr>
+      <attr name="Source.Physical_Region_Start">
+        <int>17</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>25</int>
+      </attr>
+      <attr name="Source.Physical_Region_Length">
+        <int>25</int>
+      </attr>
+      <attr name="Source.Declaration_Start">
+        <int>17</int>
+      </attr>
+      <attr name="Source.Signature_Start">
+        <int>17</int>
+      </attr>
+      <attr name="Metric.Number_Of_Parameters">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Number_Of_Statements">
+        <int>15</int>
+      </attr>
+      <attr name="Metric.Number_Of_Returns">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Number_Of_Gotos">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Invocations">
+        <int>9</int>
+      </attr>
+      <attr name="Metric.McCabe_Complexity">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Extended_McCabe">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Switch_Complexity">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Maximum_Nesting">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.Maximum_Extended_Nesting">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>24</int>
+      </attr>
+      <attr name="Metric.NPath">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.LogNPath_Floor">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.LogNPath_Ceiling">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Comment.Preceding">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>25</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>24</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Preproc">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_If">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Elif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Else">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Endif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Define">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Undef">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Pragma">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Line">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Error">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Warning">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Sharp">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Check">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Debug">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Routine.LOC">
+        <int>25</int>
+      </attr>
+      <attr name="Metric.Lines.Routine.Code">
+        <int>24</int>
+      </attr>
+      <attr name="Metric.Lines.Routine.Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>74</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>36</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>20</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>19</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>110</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>39</int>
+      </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Called_Routines">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Number_Of_Calling_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary_Frequency">
+        <float>2.820513</float>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>581.394226</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>18.947369</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>11015.890625</float>
+      </attr>
+      <attr name="Metric.Comment.Density">
+        <float>0.066667</float>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>R global:mini:Calculator:!14+10!^:!23+10!:!14+8!e(!0+6!System:String@C:/Windows/Microsoft.NET/Framework/v4.0.30319/mscorlib.dll^,!53+78!,!134+7!)_s-&gt;!53+11!Double@C:!76+56!</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>Calculate</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Calculator.cs</string>
+      </attr>
+      <attr name="Source.Physical_Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.Physical_File">
+        <string>Calculator.cs</string>
+      </attr>
+    </node>
+    <node id="N20545">
+      <type xlink:href="Method"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>95526</int>
+      </attr>
+      <attr name="Source.Line">
+        <int>8</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>32</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>8</int>
+      </attr>
+      <attr name="Source.Physical_Region_Start">
+        <int>8</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>4</int>
+      </attr>
+      <attr name="Source.Physical_Region_Length">
+        <int>4</int>
+      </attr>
+      <attr name="Source.Declaration_Start">
+        <int>8</int>
+      </attr>
+      <attr name="Source.Signature_Start">
+        <int>8</int>
+      </attr>
+      <attr name="Metric.Number_Of_Parameters">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Statements">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Number_Of_Returns">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Number_Of_Gotos">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Invocations">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.McCabe_Complexity">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Extended_McCabe">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Switch_Complexity">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Maximum_Nesting">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Maximum_Extended_Nesting">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.NPath">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.LogNPath_Floor">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.LogNPath_Ceiling">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Comment.Preceding">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Preproc">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_If">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Elif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Else">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Endif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Define">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Undef">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Pragma">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Line">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Error">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Warning">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Sharp">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Check">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Debug">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Routine.LOC">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.Lines.Routine.Code">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.Lines.Routine.Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>10</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>10</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>13</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>13</int>
+      </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Called_Routines">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Number_Of_Calling_Routines">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary_Frequency">
+        <float>1.000000</float>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>48.105713</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>5.000000</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>240.528564</float>
+      </attr>
+      <attr name="Metric.Comment.Density">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>R global:mini:Calculator:Minus^:Minus:Execute()_s-&gt;!0+6!System:Double@C:/Windows/Microsoft.NET/Framework/v4.0.30319/mscorlib.dll</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>Execute</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Minus.cs</string>
+      </attr>
+      <attr name="Source.Physical_Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.Physical_File">
+        <string>Minus.cs</string>
+      </attr>
+    </node>
+    <node id="N20546">
+      <type xlink:href="Method"/>
+      <attr name="Element.Is_Abstract">
+        <enum/>
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>95527</int>
+      </attr>
+      <attr name="Source.Line">
+        <int>43</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>32</int>
+      </attr>
+      <attr name="Source.Declaration_Start">
+        <int>43</int>
+      </attr>
+      <attr name="Source.Signature_Start">
+        <int>43</int>
+      </attr>
+      <attr name="Metric.Number_Of_Parameters">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Called_Routines">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Calling_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>R global:mini:Calculator:Operator^:!23+8!:Execute()_s-&gt;!0+6!System:Double@C:/Windows/Microsoft.NET/Framework/v4.0.30319/mscorlib.dll</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>Execute</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Operator.cs</string>
+      </attr>
+      <attr name="Source.Physical_Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.Physical_File">
+        <string>Operator.cs</string>
+      </attr>
+    </node>
+    <node id="N20547">
+      <type xlink:href="Method"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>95528</int>
+      </attr>
+      <attr name="Source.Line">
+        <int>8</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>32</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>8</int>
+      </attr>
+      <attr name="Source.Physical_Region_Start">
+        <int>8</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>4</int>
+      </attr>
+      <attr name="Source.Physical_Region_Length">
+        <int>4</int>
+      </attr>
+      <attr name="Source.Declaration_Start">
+        <int>8</int>
+      </attr>
+      <attr name="Source.Signature_Start">
+        <int>8</int>
+      </attr>
+      <attr name="Metric.Number_Of_Parameters">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Statements">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Number_Of_Returns">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Number_Of_Gotos">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Invocations">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.McCabe_Complexity">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Extended_McCabe">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Switch_Complexity">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Maximum_Nesting">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Maximum_Extended_Nesting">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.NPath">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.LogNPath_Floor">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.LogNPath_Ceiling">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Comment.Preceding">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Preproc">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_If">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Elif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Else">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Endif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Define">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Undef">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Pragma">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Line">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Error">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Warning">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Sharp">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Check">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Debug">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Routine.LOC">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.Lines.Routine.Code">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.Lines.Routine.Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>10</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>10</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>13</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>13</int>
+      </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Called_Routines">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Number_Of_Calling_Routines">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary_Frequency">
+        <float>1.000000</float>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>48.105713</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>5.000000</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>240.528564</float>
+      </attr>
+      <attr name="Metric.Comment.Density">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>R global:mini:Calculator:Plus^:Plus:Execute()_s-&gt;!0+6!System:Double@C:/Windows/Microsoft.NET/Framework/v4.0.30319/mscorlib.dll</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>Execute</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Plus.cs</string>
+      </attr>
+      <attr name="Source.Physical_Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.Physical_File">
+        <string>Plus.cs</string>
+      </attr>
+    </node>
+    <node id="N29785">
+      <type xlink:href="Method"/>
+      <attr name="Element.Has_Public_Visibility">
+        <enum/>
+      </attr>
+      <attr name="Element.Is_Getter">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>104766</int>
+      </attr>
+      <attr name="Source.Line">
+        <int>17</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>30</int>
+      </attr>
+      <attr name="Source.Declaration_Start">
+        <int>17</int>
+      </attr>
+      <attr name="Source.Signature_Start">
+        <int>17</int>
+      </attr>
+      <attr name="Metric.Number_Of_Parameters">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Called_Routines">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Calling_Routines">
+        <int>2</int>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>R global:mini:Calculator:Operator^:!23+8!:get_Left[Left]()_s-&gt;!0+6!System:Double@C:/Windows/Microsoft.NET/Framework/v4.0.30319/mscorlib.dll</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>get_Left</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Operator.cs</string>
+      </attr>
+      <attr name="Source.Physical_Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.Physical_File">
+        <string>Operator.cs</string>
+      </attr>
+    </node>
+    <node id="N29786">
+      <type xlink:href="Method"/>
+      <attr name="Element.Has_Public_Visibility">
+        <enum/>
+      </attr>
+      <attr name="Element.Is_Getter">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>104767</int>
+      </attr>
+      <attr name="Source.Line">
+        <int>22</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>31</int>
+      </attr>
+      <attr name="Source.Declaration_Start">
+        <int>22</int>
+      </attr>
+      <attr name="Source.Signature_Start">
+        <int>22</int>
+      </attr>
+      <attr name="Metric.Number_Of_Parameters">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Called_Routines">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Calling_Routines">
+        <int>2</int>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>R global:mini:Calculator:Operator^:!23+8!:get_Right[Right]()_s-&gt;!0+6!System:Double@C:/Windows/Microsoft.NET/Framework/v4.0.30319/mscorlib.dll</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>get_Right</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Operator.cs</string>
+      </attr>
+      <attr name="Source.Physical_Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.Physical_File">
+        <string>Operator.cs</string>
+      </attr>
+    </node>
+    <node id="N35731">
+      <type xlink:href="Method"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Element.Has_Private_Visibility">
+        <enum/>
+      </attr>
+      <attr name="Element.Is_Static">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>110712</int>
+      </attr>
+      <attr name="Source.Line">
+        <int>8</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>21</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>8</int>
+      </attr>
+      <attr name="Source.Physical_Region_Start">
+        <int>8</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>21</int>
+      </attr>
+      <attr name="Source.Physical_Region_Length">
+        <int>21</int>
+      </attr>
+      <attr name="Source.Declaration_Start">
+        <int>8</int>
+      </attr>
+      <attr name="Source.Signature_Start">
+        <int>8</int>
+      </attr>
+      <attr name="Metric.Number_Of_Parameters">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Number_Of_Statements">
+        <int>11</int>
+      </attr>
+      <attr name="Metric.Number_Of_Returns">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Gotos">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Invocations">
+        <int>10</int>
+      </attr>
+      <attr name="Metric.McCabe_Complexity">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Extended_McCabe">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Switch_Complexity">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Maximum_Nesting">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Maximum_Extended_Nesting">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>20</int>
+      </attr>
+      <attr name="Metric.NPath">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.LogNPath_Floor">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.LogNPath_Ceiling">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Comment.Preceding">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>21</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>18</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Preproc">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_If">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Elif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Else">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Endif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Define">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Undef">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Pragma">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Line">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Error">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Warning">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Sharp">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Check">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Debug">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Routine.LOC">
+        <int>21</int>
+      </attr>
+      <attr name="Metric.Lines.Routine.Code">
+        <int>18</int>
+      </attr>
+      <attr name="Metric.Lines.Routine.Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>63</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>33</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>16</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>17</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>96</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>33</int>
+      </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Called_Routines">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Number_Of_Calling_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary_Frequency">
+        <float>2.909091</float>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>484.261841</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>15.529411</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>7520.301270</float>
+      </attr>
+      <attr name="Metric.Comment.Density">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>R global:mini:MainClass^:!12+9!:Main(!0+6!System:!35+11!String@C:/Windows/Microsoft.NET/Framework/v4.0.30319/mscorlib.dll^[]^)_s-&gt;!35+11!Void@C:!65+56!</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>Main</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>MainClass.cs</string>
+      </attr>
+      <attr name="Source.Physical_Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.Physical_File">
+        <string>MainClass.cs</string>
+      </attr>
+    </node>
+    <node id="N42186">
+      <type xlink:href="Method"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum/>
+      </attr>
+      <attr name="Element.Is_Constructor">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>117167</int>
+      </attr>
+      <attr name="Source.Line">
+        <int>13</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>16</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>13</int>
+      </attr>
+      <attr name="Source.Physical_Region_Start">
+        <int>13</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>3</int>
+      </attr>
+      <attr name="Source.Physical_Region_Length">
+        <int>3</int>
+      </attr>
+      <attr name="Source.Declaration_Start">
+        <int>13</int>
+      </attr>
+      <attr name="Source.Signature_Start">
+        <int>13</int>
+      </attr>
+      <attr name="Metric.Number_Of_Parameters">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Number_Of_Statements">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Returns">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Gotos">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Invocations">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.McCabe_Complexity">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Extended_McCabe">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Switch_Complexity">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Maximum_Nesting">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Maximum_Extended_Nesting">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.NPath">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.LogNPath_Floor">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.LogNPath_Ceiling">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Comment.Preceding">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Preproc">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_If">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Elif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Else">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Endif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Define">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Undef">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Pragma">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Line">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Error">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Warning">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Sharp">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Check">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Debug">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Routine.LOC">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Lines.Routine.Code">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Lines.Routine.Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>13</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>9</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>18</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>12</int>
+      </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Called_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Number_Of_Calling_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary_Frequency">
+        <float>1.500000</float>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>64.529320</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>7.500000</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>483.969910</float>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>R global:mini:Calculator:Minus^:Minus:Minus(.ctor)(!0+6!System:Double@C:/Windows/Microsoft.NET/Framework/v4.0.30319/mscorlib.dll,!49+77!)_s-&gt;!49+11!Void@C:!72+56!</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>Minus</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Minus.cs</string>
+      </attr>
+      <attr name="Source.Physical_Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.Physical_File">
+        <string>Minus.cs</string>
+      </attr>
+    </node>
+    <node id="N42187">
+      <type xlink:href="Method"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Element.Has_Protected_Visibility">
+        <enum/>
+      </attr>
+      <attr name="Element.Is_Constructor">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>117168</int>
+      </attr>
+      <attr name="Source.Line">
+        <int>31</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>19</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>31</int>
+      </attr>
+      <attr name="Source.Physical_Region_Start">
+        <int>31</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>5</int>
+      </attr>
+      <attr name="Source.Physical_Region_Length">
+        <int>5</int>
+      </attr>
+      <attr name="Source.Declaration_Start">
+        <int>31</int>
+      </attr>
+      <attr name="Source.Signature_Start">
+        <int>31</int>
+      </attr>
+      <attr name="Metric.Number_Of_Parameters">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Number_Of_Statements">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Number_Of_Returns">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Gotos">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Invocations">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.McCabe_Complexity">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Extended_McCabe">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Switch_Complexity">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Maximum_Nesting">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Maximum_Extended_Nesting">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.NPath">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.LogNPath_Floor">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.LogNPath_Ceiling">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Comment.Preceding">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Preproc">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_If">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Elif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Else">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Endif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Define">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Undef">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Pragma">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Line">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Error">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Warning">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Sharp">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Check">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Debug">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Routine.LOC">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Lines.Routine.Code">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Lines.Routine.Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>12</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>7</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>9</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>19</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>14</int>
+      </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Called_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Number_Of_Calling_Routines">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary_Frequency">
+        <float>1.357143</float>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>72.339745</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>6.300000</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>455.740417</float>
+      </attr>
+      <attr name="Metric.Comment.Density">
+        <float>0.500000</float>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>R global:mini:Calculator:Operator^:!23+8!:!25+8!(.ctor)(!0+6!System:Double@C:/Windows/Microsoft.NET/Framework/v4.0.30319/mscorlib.dll,!56+77!)_s-&gt;!56+11!Void@C:!79+56!</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>Operator</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Operator.cs</string>
+      </attr>
+      <attr name="Source.Physical_Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.Physical_File">
+        <string>Operator.cs</string>
+      </attr>
+    </node>
+    <node id="N42188">
+      <type xlink:href="Method"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum/>
+      </attr>
+      <attr name="Element.Is_Constructor">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>117169</int>
+      </attr>
+      <attr name="Source.Line">
+        <int>13</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>16</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>13</int>
+      </attr>
+      <attr name="Source.Physical_Region_Start">
+        <int>13</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>3</int>
+      </attr>
+      <attr name="Source.Physical_Region_Length">
+        <int>3</int>
+      </attr>
+      <attr name="Source.Declaration_Start">
+        <int>13</int>
+      </attr>
+      <attr name="Source.Signature_Start">
+        <int>13</int>
+      </attr>
+      <attr name="Metric.Number_Of_Parameters">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Number_Of_Statements">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Returns">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Gotos">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Invocations">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.McCabe_Complexity">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Extended_McCabe">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Switch_Complexity">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Maximum_Nesting">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Maximum_Extended_Nesting">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.NPath">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.LogNPath_Floor">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.LogNPath_Ceiling">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Comment.Preceding">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Preproc">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_If">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Elif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Else">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Endif">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Define">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Undef">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Pragma">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Line">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Error">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Warning">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.PP_Sharp">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Check">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Debug">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Routine.LOC">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Lines.Routine.Code">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Lines.Routine.Comment">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>13</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>9</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>18</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>12</int>
+      </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Number_Of_Called_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Number_Of_Calling_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary_Frequency">
+        <float>1.500000</float>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>64.529320</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>7.500000</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>483.969910</float>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>R global:mini:Calculator:Plus^:Plus:Plus(.ctor)(!0+6!System:Double@C:/Windows/Microsoft.NET/Framework/v4.0.30319/mscorlib.dll,!46+77!)_s-&gt;!46+11!Void@C:!69+56!</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>Plus</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Plus.cs</string>
+      </attr>
+      <attr name="Source.Physical_Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.Physical_File">
+        <string>Plus.cs</string>
+      </attr>
+    </node>
+    <node id="N46284">
+      <type xlink:href="Member"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Element.Has_Private_Visibility">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>16990</int>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>F global:mini:Calculator:Operator^:!23+8!:&lt;Left&gt;k__BackingField</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>&lt;Left&gt;k__BackingField</string>
+      </attr>
+    </node>
+    <node id="N46285">
+      <type xlink:href="Member"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Element.Has_Private_Visibility">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>16991</int>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>F global:mini:Calculator:Operator^:!23+8!:&lt;Right&gt;k__BackingField</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>&lt;Right&gt;k__BackingField</string>
+      </attr>
+    </node>
+    <node id="N54407">
+      <type xlink:href="Namespace"/>
+      <attr name="Linkage.LIR_Node">
+        <int>90203</int>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>N global:mini</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>mini</string>
+      </attr>
+    </node>
+    <node id="N54408">
+      <type xlink:href="Namespace"/>
+      <attr name="Linkage.LIR_Node">
+        <int>90222</int>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>N global:mini:Calculator</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>Calculator</string>
+      </attr>
+    </node>
+    <edge id="E4334" from="N5195" to="N54407">
+      <type xlink:href="Enclosing"/>
+      <attr name="Source.Line">
+        <int>6</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>5</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>167</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>MainClass.cs</string>
+      </attr>
+    </edge>
+    <edge id="E4939" from="N5609" to="N54408">
+      <type xlink:href="Enclosing"/>
+      <attr name="Source.Line">
+        <int>5</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>12</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>581</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Calculator.cs</string>
+      </attr>
+    </edge>
+    <edge id="E4941" from="N5610" to="N54408">
+      <type xlink:href="Enclosing"/>
+      <attr name="Source.Line">
+        <int>6</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>12</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>582</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Minus.cs</string>
+      </attr>
+    </edge>
+    <edge id="E4942" from="N5610" to="N5611">
+      <type xlink:href="Extend"/>
+      <attr name="Element.Has_Public_Visibility">
+        <enum/>
+      </attr>
+      <attr name="Source.Line">
+        <int>6</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>26</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>582</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Minus.cs</string>
+      </attr>
+    </edge>
+    <edge id="E4943" from="N5611" to="N54408">
+      <type xlink:href="Enclosing"/>
+      <attr name="Source.Line">
+        <int>12</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>21</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>583</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Operator.cs</string>
+      </attr>
+    </edge>
+    <edge id="E4945" from="N5612" to="N54408">
+      <type xlink:href="Enclosing"/>
+      <attr name="Source.Line">
+        <int>6</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>12</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>584</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Plus.cs</string>
+      </attr>
+    </edge>
+    <edge id="E4946" from="N5612" to="N5611">
+      <type xlink:href="Extend"/>
+      <attr name="Element.Has_Public_Visibility">
+        <enum/>
+      </attr>
+      <attr name="Source.Line">
+        <int>6</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>25</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>584</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Plus.cs</string>
+      </attr>
+    </edge>
+    <edge id="E20560" from="N46284" to="N5611">
+      <type xlink:href="Enclosing"/>
+      <attr name="Linkage.LIR_Node">
+        <int>16990</int>
+      </attr>
+    </edge>
+    <edge id="E20562" from="N46285" to="N5611">
+      <type xlink:href="Enclosing"/>
+      <attr name="Linkage.LIR_Node">
+        <int>16991</int>
+      </attr>
+    </edge>
+    <edge id="E40621" from="N1752" to="N5611">
+      <type xlink:href="Enclosing"/>
+      <attr name="Source.Line">
+        <int>17</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>23</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>86923</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Operator.cs</string>
+      </attr>
+    </edge>
+    <edge id="E40623" from="N1753" to="N5611">
+      <type xlink:href="Enclosing"/>
+      <attr name="Source.Line">
+        <int>22</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>23</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>86924</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Operator.cs</string>
+      </attr>
+    </edge>
+    <edge id="E47290" from="N54408" to="N54407">
+      <type xlink:href="Enclosing"/>
+      <attr name="Source.Line">
+        <int>3</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>1</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>90222</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Calculator.cs</string>
+      </attr>
+    </edge>
+    <edge id="E65247" from="N20544" to="N5609">
+      <type xlink:href="Enclosing"/>
+      <attr name="Source.Line">
+        <int>17</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>23</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>95525</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Calculator.cs</string>
+      </attr>
+    </edge>
+    <edge id="E65250" from="N20544" to="N5611">
+      <type xlink:href="Local_Var_Of_Type"/>
+      <attr name="Source.Line">
+        <int>19</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>22</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>95525</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Calculator.cs</string>
+      </attr>
+    </edge>
+    <edge id="E65252" from="N20545" to="N5610">
+      <type xlink:href="Enclosing"/>
+      <attr name="Source.Line">
+        <int>8</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>32</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>95526</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Minus.cs</string>
+      </attr>
+    </edge>
+    <edge id="E65254" from="N20545" to="N20546">
+      <type xlink:href="Override"/>
+      <attr name="Source.Line">
+        <int>8</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>32</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>95526</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Minus.cs</string>
+      </attr>
+    </edge>
+    <edge id="E65255" from="N20546" to="N5611">
+      <type xlink:href="Enclosing"/>
+      <attr name="Source.Line">
+        <int>43</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>32</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>95527</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Operator.cs</string>
+      </attr>
+    </edge>
+    <edge id="E65257" from="N20547" to="N5612">
+      <type xlink:href="Enclosing"/>
+      <attr name="Source.Line">
+        <int>8</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>32</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>95528</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Plus.cs</string>
+      </attr>
+    </edge>
+    <edge id="E65259" from="N20547" to="N20546">
+      <type xlink:href="Override"/>
+      <attr name="Source.Line">
+        <int>8</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>32</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>95528</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Plus.cs</string>
+      </attr>
+    </edge>
+    <edge id="E94824" from="N29785" to="N1752">
+      <type xlink:href="Enclosing"/>
+      <attr name="Source.Line">
+        <int>17</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>30</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>104766</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Operator.cs</string>
+      </attr>
+    </edge>
+    <edge id="E94826" from="N29786" to="N1753">
+      <type xlink:href="Enclosing"/>
+      <attr name="Source.Line">
+        <int>22</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>31</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>104767</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Operator.cs</string>
+      </attr>
+    </edge>
+    <edge id="E112745" from="N35731" to="N5195">
+      <type xlink:href="Enclosing"/>
+      <attr name="Source.Line">
+        <int>8</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>21</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>110712</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>MainClass.cs</string>
+      </attr>
+    </edge>
+    <edge id="E112748" from="N35731" to="N5609">
+      <type xlink:href="Local_Var_Of_Type"/>
+      <attr name="Source.Line">
+        <int>19</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>35</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>110712</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>MainClass.cs</string>
+      </attr>
+    </edge>
+    <edge id="E135868" from="N42186" to="N5610">
+      <type xlink:href="Enclosing"/>
+      <attr name="Source.Line">
+        <int>13</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>16</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>117167</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Minus.cs</string>
+      </attr>
+    </edge>
+    <edge id="E135871" from="N42187" to="N5611">
+      <type xlink:href="Enclosing"/>
+      <attr name="Source.Line">
+        <int>31</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>19</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>117168</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Operator.cs</string>
+      </attr>
+    </edge>
+    <edge id="E135874" from="N42188" to="N5612">
+      <type xlink:href="Enclosing"/>
+      <attr name="Source.Line">
+        <int>13</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>16</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>117169</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Plus.cs</string>
+      </attr>
+    </edge>
+    <edge id="E142779" from="N20544" to="N42188">
+      <type xlink:href="Static_Call"/>
+      <attr name="Source.Line">
+        <int>25</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>30</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>160976</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Calculator.cs</string>
+      </attr>
+    </edge>
+    <edge id="E142780" from="N20544" to="N5612">
+      <type xlink:href="New_Of_Type"/>
+      <attr name="Source.Line">
+        <int>25</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>30</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>160976</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Calculator.cs</string>
+      </attr>
+    </edge>
+    <edge id="E142781" from="N20544" to="N42186">
+      <type xlink:href="Static_Call"/>
+      <attr name="Source.Line">
+        <int>28</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>30</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>160977</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Calculator.cs</string>
+      </attr>
+    </edge>
+    <edge id="E142782" from="N20544" to="N5610">
+      <type xlink:href="New_Of_Type"/>
+      <attr name="Source.Line">
+        <int>28</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>30</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>160977</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Calculator.cs</string>
+      </attr>
+    </edge>
+    <edge id="E142788" from="N20544" to="N20546">
+      <type xlink:href="Dispatching_Call"/>
+      <attr name="Linkage.LIR_Nodes0">
+        <int>583</int>
+      </attr>
+      <attr name="Source.Line">
+        <int>40</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>30</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>160970</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Calculator.cs</string>
+      </attr>
+    </edge>
+    <edge id="E142797" from="N29785" to="N46284">
+      <type xlink:href="Member_Use"/>
+      <attr name="Element.Is_Artificial">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Nodes0">
+        <int>583</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>160929</int>
+      </attr>
+    </edge>
+    <edge id="E142798" from="N29786" to="N46285">
+      <type xlink:href="Member_Use"/>
+      <attr name="Element.Is_Artificial">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Nodes0">
+        <int>583</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>160931</int>
+      </attr>
+    </edge>
+    <edge id="E142802" from="N35731" to="N5609">
+      <type xlink:href="New_Of_Type"/>
+      <attr name="Source.Line">
+        <int>19</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>39</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>160975</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>MainClass.cs</string>
+      </attr>
+    </edge>
+    <edge id="E142803" from="N35731" to="N20544">
+      <type xlink:href="Dispatching_Call"/>
+      <attr name="Linkage.LIR_Nodes0">
+        <int>581</int>
+      </attr>
+      <attr name="Source.Line">
+        <int>22</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>65</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>160969</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>MainClass.cs</string>
+      </attr>
+    </edge>
+    <edge id="E142808" from="N42186" to="N42187">
+      <type xlink:href="Static_Call"/>
+      <attr name="Source.Line">
+        <int>13</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>51</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>160966</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Minus.cs</string>
+      </attr>
+    </edge>
+    <edge id="E142809" from="N42187" to="N46284">
+      <type xlink:href="Member_Set"/>
+      <attr name="Element.Is_Artificial">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Nodes0">
+        <int>583</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>160979</int>
+      </attr>
+    </edge>
+    <edge id="E142810" from="N42187" to="N46285">
+      <type xlink:href="Member_Set"/>
+      <attr name="Element.Is_Artificial">
+        <enum/>
+      </attr>
+      <attr name="Linkage.LIR_Nodes0">
+        <int>583</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>160980</int>
+      </attr>
+    </edge>
+    <edge id="E142812" from="N42188" to="N42187">
+      <type xlink:href="Static_Call"/>
+      <attr name="Source.Line">
+        <int>13</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>50</int>
+      </attr>
+      <attr name="Linkage.LIR_Node">
+        <int>160968</int>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Plus.cs</string>
+      </attr>
+    </edge>
+  </graph>
+</gxl>
