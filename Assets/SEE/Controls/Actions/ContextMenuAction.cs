@@ -6,6 +6,7 @@ using SEE.Game;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
+using SEE.UI;
 using SEE.UI.Notification;
 using SEE.UI.PopupMenu;
 using SEE.UI.Window;
@@ -78,6 +79,8 @@ namespace SEE.Controls.Actions
                 new("Delete", DeleteElement, Icons.Trash),
                 // TODO (#666): Better properties view
                 new("Properties", ShowProperties, Icons.Info),
+
+                new("Show Metrics Window", ShowMetrics, Icons.Info),
             };
 
             if (gameObject != null)
@@ -107,6 +110,12 @@ namespace SEE.Controls.Actions
             void ShowProperties()
             {
                 ShowNotification.Info("Node Properties", graphElement.ToString(), log: false);
+            }
+
+            void ShowMetrics()
+            {
+                MetricMenu.Instance.OpenWindow();
+                Debug.Log("metricMenu created");
             }
 
             void ShowCode()
