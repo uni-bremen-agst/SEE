@@ -1,7 +1,6 @@
 ﻿using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
-using SEE.UI.Window.CodeWindow;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,7 +64,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                     Node clusterSource = isCandidateSource ? cluster : neighborCluster;
                     Node clusterTarget = isCandidateSource ? neighborCluster : cluster;
 
-                    string id = this.GetPropagatedDependencyID(clusterSource, clusterTarget, edge.Type);
+                    string id = this.GetMatchingArchitectureDepedency(clusterSource, clusterTarget, /*edge.Type*/"Source_Dependency");
 
                     if (id != null)
                     {
@@ -104,7 +103,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         {
             string nodes = string.Empty;
             nodesChangedInMapping.ForEach(node => { nodes += node.ID + ","; });
-            UnityEngine.Debug.Log($"Handle changed nodes {nodes} for {cluster.ID} in ADCAttract");
+            // UnityEngine.Debug.Log($"Handle changed nodes {nodes} for {cluster.ID} in ADCAttract");
             
             foreach (Node nodeChangedInMapping in nodesChangedInMapping)
             {
@@ -146,7 +145,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 Node mapsToSource = this.reflexionGraph.MapsTo(implEdge.Source);
                 Node mapsToTarget = this.reflexionGraph.MapsTo(implEdge.Target);
 
-                string id = GetPropagatedDependencyID(mapsToSource, mapsToTarget, implEdge.Type);
+                string id = GetMatchingArchitectureDepedency(mapsToSource, mapsToTarget, /*implEdge.Type*/"Source_Dependency");
 
                 this.propagatedEdges.Add(implEdge.ID);
 
@@ -167,7 +166,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             }
         }
 
-        private string GetPropagatedDependencyID(Node source, Node target, string type) 
+        private string GetMatchingArchitectureDepedency(Node source, Node target, string type) 
         {
             string architectureId;
 
@@ -178,6 +177,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 //                                                            type);
                 // TODO: Is this correct?
                 Edge architectureEdge = source.FromTo(target, type).SingleOrDefault(edge => ReflexionGraph.IsSpecified(edge));
+
+                if(architectureEdge == null)
+                {
+                    throw new Exception($"No matching Architecture edge could be found. {source.ID} -{type}-> {target.ID}");
+                }
+
                 architectureId = architectureEdge.ID;
             }
             else
@@ -224,7 +229,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             if(propagatedEdges.Contains(implEdge.ID) && mapsToSource != null && mapsToTarget != null)
             {
-                string id = GetPropagatedDependencyID(mapsToSource, mapsToTarget, implEdge.Type);
+                string id = GetMatchingArchitectureDepedency(mapsToSource, mapsToTarget, /*implEdge.Type*/ "Source_Dependency");
 
                 this.propagatedEdges.Remove(implEdge.ID);
 

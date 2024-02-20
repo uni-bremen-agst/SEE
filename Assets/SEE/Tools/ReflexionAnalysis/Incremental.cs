@@ -358,6 +358,26 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         /// <summary>
+        /// Removes all explicitly mapped nodes from the mapping mapping graph.
+        /// Postcondition: MapsTo() should return null for every node contained
+        /// within the implementation graph
+        /// </summary>
+        public void ResetMapping()
+        {
+            List<Node> nodes = this.explicitMapsToTable.Values.ToList();
+            Node node;
+            IEnumerable<string> nodeIds = this.explicitMapsToTable.Keys.ToList();
+            foreach (string nodeId in nodeIds)
+            {
+                node = this.GetNode(nodeId);
+                if(node != null)
+                {
+                    this.RemoveFromMapping(node);
+                }
+            }
+        }
+
+        /// <summary>
         /// Removes the Maps_To edge starting from <paramref name="from"/> from the mapping graph.
         /// Precondition: a Maps_To edge between <paramref name="from"/> and <paramref name="to"/>
         /// must be contained in the mapping graph, <paramref name="from"/> is contained in implementation graph

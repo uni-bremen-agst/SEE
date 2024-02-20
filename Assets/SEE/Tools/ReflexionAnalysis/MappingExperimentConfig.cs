@@ -38,16 +38,19 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         public DirectoryPath OutputPath { get => outputPath; set => outputPath = value; }
 
         [SerializeField]
+        public bool measurePercentileRanks;
+
+        [SerializeField]
         [ShowIf("@this.attractFunctionType", AttractFunction.AttractFunctionType.CountAttract)]
-        private CountAttractConfig countAttractConfig = null;
+        private CountAttractConfig countAttractConfig = new CountAttractConfig();
 
         [SerializeField]
         [ShowIf("@this.attractFunctionType", AttractFunction.AttractFunctionType.ADCAttract)]
-        private ADCAttractConfig ADCAttractConfig = null;
+        private ADCAttractConfig ADCAttractConfig = new ADCAttractConfig();
 
         [SerializeField]
         [ShowIf("@this.attractFunctionType", AttractFunction.AttractFunctionType.NBAttract)]
-        private NBAttractConfig NBAttractConfig = null;
+        private NBAttractConfig NBAttractConfig = new NBAttractConfig();
 
         public AttractFunctionConfig AttractFunctionConfig 
         {

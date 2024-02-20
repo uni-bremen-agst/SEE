@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using UnityEngine;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
@@ -21,7 +22,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         public bool UseStandardTerms { get => useStandardTerms; set => useStandardTerms = value; }
 
-        public NBAttractConfig(bool useCda) : this(TokenLanguage.Plain, useCda)
+        public NBAttractConfig(bool useCda = true) : this(TokenLanguage.Plain, useCda)
         {
         }
 
@@ -34,6 +35,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             this.UseCDA = useCda;
             this.UseStandardTerms = useStandardTerms;
             this.TargetLanguage = TargetLanguage;
+            this.AttractFunctionType = AttractFunction.AttractFunctionType.NBAttract;
+        }
+
+        public override XElement ToXElement()
+        {
+            XElement config = base.ToXElement();
+            XAttribute useStandardTerms = new XAttribute("UseCda", UseStandardTerms);
+            config.Add(useStandardTerms);
+            XAttribute useCda = new XAttribute("UseCda", UseCDA);
+            config.Add(useCda);
+            return config;
         }
     }
 }

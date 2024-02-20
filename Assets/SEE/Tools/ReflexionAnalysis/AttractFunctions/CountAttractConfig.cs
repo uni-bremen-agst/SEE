@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using UnityEngine;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
@@ -25,6 +26,16 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             this.Phi = phi;
             this.Delta = delta;
             this.AttractFunctionType = AttractFunction.AttractFunctionType.CountAttract;
+        }
+
+        public override XElement ToXElement()
+        {
+            XElement config = base.ToXElement();
+            XAttribute phi = new XAttribute("Phi", Phi);
+            XAttribute delta = new XAttribute("Delta", Delta);
+            config.Add(phi);
+            config.Add(delta);
+            return config;
         }
     }
 }

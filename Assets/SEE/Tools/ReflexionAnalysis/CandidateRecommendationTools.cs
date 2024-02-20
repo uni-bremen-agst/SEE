@@ -43,7 +43,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             reflexionGraph.SuppressNotifications = suppressNotifications;
         }
 
-        public static void GetTargetedChilds(this Node node, List<Node> entities, Func<Node,bool> selector)
+        public static void SelectChilds(this Node node, List<Node> entities, Func<Node,bool> selector)
         {
             if (selector.Invoke(node))
             {
@@ -51,7 +51,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
             foreach (Node child in node.Children())
             {
-                GetTargetedChilds(child, entities, selector);
+                SelectChilds(child, entities, selector);
             }
             return;
         }

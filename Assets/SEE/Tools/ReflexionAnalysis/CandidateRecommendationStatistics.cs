@@ -13,7 +13,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// 
         /// </summary>
-        private readonly static int FLUSH_TRESHOLD = 5000;
+        private readonly static int FLUSH_TRESHOLD = 50000;
 
         /// <summary>
         /// 
@@ -50,7 +50,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// </summary>
         public bool Active { get; set; }
 
-        private MappingExperimentStatisticResult mappingResult;
+        /// <summary>
+        /// 
+        /// </summary>
+        private MappingExperimentResult mappingResult;
+
+        MappingExperimentConfig config;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private bool recordAllMappingPairs;
 
         /// <summary>
         /// 
@@ -58,7 +68,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <param name="oracleMappingPath"></param>
         public CandidateRecommendationStatistics()
         {
-            mappingResult = new MappingExperimentStatisticResult();
+            mappingResult = new MappingExperimentResult();
         }
 
         /// <summary>
@@ -71,9 +81,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             Reset();
         }
 
-        public void AddConfigInformation(MappingExperimentConfig config)
+        public void SetConfigInformation(MappingExperimentConfig config)
         {
             this.mappingResult.AddConfigInformation(config);
+            this.config = config;
+            this.recordAllMappingPairs = config.measurePercentileRanks;
         }
 
         public void Reset()
@@ -83,12 +95,16 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             {
                 new List<MappingPair>()
             };
-            mappingResult.Clear();
+            mappingResult = new MappingExperimentResult();
+            mappingResult.AddConfigInformation(config);
         }
 
         public void RecordMappingPairs(List<MappingPair> attractionValues)
         {
-            mappingProcess[mappingStep].AddRange(attractionValues);
+            if (recordAllMappingPairs)
+            {
+                mappingProcess[mappingStep].AddRange(attractionValues); 
+            }
         }
 
         public void RecordChosenMappingPair(MappingPair chosenMappingPair)
@@ -136,11 +152,21 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 return;
             }
 
-            MappingExperimentStatisticResult result = CalculateResults(csvFile);
+            MappingExperimentResult result = CalculateResults(csvFile);
             result.CreateXml().Save(new FileStream(xmlFile, FileMode.Create));
         }
 
-        private MappingExperimentStatisticResult CalculateResults(string csvFile)
+        public MappingExperimentResult ProcessMappingData(string csvFile)
+        {
+            if (!File.Exists(csvFile))
+            {
+                throw new Exception($"No Data found to be processed. File {csvFile} is not existing.");
+            }
+
+            return CalculateResults(csvFile);            
+        }
+
+        private MappingExperimentResult CalculateResults(string csvFile)
         {
             Dictionary<string, List<double>> percentileRanks = new Dictionary<string, List<double>>();
            
@@ -173,15 +199,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                         // only use remaining mappingPairs without chosen mapping
                         mappingPairs = mappingPairs.GetRange(1, mappingPairs.Count - 1);
 
-                        List<Node> candidates = CandidateRecommendation.GetCandidates();
-
-                        foreach (Node candidate in candidates)
+                        if (recordAllMappingPairs)
                         {
-                            if (mappingResult.ContainsCandidateStatisticResult(candidate.ID))
+                            List<Node> candidates = CandidateRecommendation.GetCandidates();
+                            foreach (Node candidate in candidates)
                             {
-                                double percentileRank = CandidateRecommendation.CalculatePercentileRank(candidate.ID, mappingPairs);
-                                mappingResult.GetCandidateStatisticResult(candidate.ID).AddPercentileRank(percentileRank); 
-                            }
+                                if (mappingResult.ContainsCandidateStatisticResult(candidate.ID))
+                                {
+                                    double percentileRank = CandidateRecommendation.CalculatePercentileRank(candidate.ID, mappingPairs);
+                                    mappingResult.GetCandidateStatisticResult(candidate.ID).AddPercentileRank(percentileRank);
+                                }
+                            } 
                         }
 
                         mappingResult.FinishCandidateStatisticResult(candidateStatisticResult.CandidateID);
@@ -190,6 +218,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     }
                 }
 
+                mappingResult.FinishCandidateStatisticResults();
                 mappingResult.CalculateResults();
                 return mappingResult;
             }
@@ -229,13 +258,18 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             this.CsvFile = csvFile;
 
-            IEnumerable<Node> mappedCandidates = CandidateRecommendation.GetCandidates();
+            IEnumerable<Node> candidates = CandidateRecommendation.GetCandidates();
+            UnityEngine.Debug.Log($"Add results for {candidates.Count()} candidates.");
 
-            foreach (Node node in mappedCandidates)
+            foreach (Node node in candidates)
             {
                 mappingResult.AddCandidateStatisticResult(node, CandidateRecommendation);
             }
+
+            UnityEngine.Debug.Log($"Active Results: {this.mappingResult.ActiveResultsCount} Finished Results: {this.mappingResult.FinishedResultsCount}");
+
             Active = true;
+
         }
 
         public void StopRecording()

@@ -176,6 +176,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 bool wasActive = Statistics.Active;
                 Statistics.Reset();
                 Statistics.SetCandidateRecommendation(this);
+                Statistics.SetConfigInformation(config);
                 recommendations.Clear();
                 mappingPairs.Clear();
                 ReflexionGraph.RunAnalysis();
@@ -212,10 +213,24 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 // TODO: is this safe?
                 if (edgeEvent.Change == null) return;
 
+                
+                bool AnyParentMapped = this.AnyParentMapped(edgeEvent.Edge.Source, ReflexionGraph);
+
+                // If a node is mapped/unmapped and the parent is already mapped this changed node 
+                // was already handled as a child during previous events.
+                if(AnyParentMapped)
+                {
+                    return;
+                }
+
                 // Get targeted childs of currently mapped node
                 List<Node> nodesChangedInMapping = new List<Node>();
-                edgeEvent.Edge.Source.GetTargetedChilds(nodesChangedInMapping, 
-                                   node => node.Type.Equals(attractFunction.CandidateType) && node.IsInImplementation());
+                nodesChangedInMapping.Add(edgeEvent.Edge.Source);
+                this.GetImplicitlyMappedChilds(nodesChangedInMapping, edgeEvent.Edge.Source, ReflexionGraph);
+
+                //// Get only unmapped child candidates, because the child might already be mapped.
+                //edgeEvent.Edge.Source.SelectChilds(nodesChangedInMapping,
+                //                   node => this.IsUnmappedCandidate(node));
 
                 if (Statistics.Active)
                 {
@@ -235,18 +250,49 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                         AttractFunction.HandleChangedNodes(edgeEvent.Edge.Target, new List<Node> { nodeChangedInMapping }, (ChangeType)edgeEvent.Change);
                         UpdateRecommendations();
                         chosenMappingPair.ChangeType = (ChangeType)edgeEvent.Change;
+                        // UnityEngine.Debug.Log($"Record chosen mapping Pair:{chosenMappingPair.CandidateID}  --> {chosenMappingPair.ClusterID}");
                         Statistics.RecordChosenMappingPair(chosenMappingPair);
                     }
                 } 
                 else
                 {
                     AttractFunction.HandleChangedNodes(edgeEvent.Edge.Target, nodesChangedInMapping, (ChangeType)edgeEvent.Change);
-                    UpdateRecommendations();
                 }
             }
         }
 
-        private void UpdateRecommendations()
+        private bool AnyParentMapped(Node node, ReflexionGraph graph)
+        {
+            for(Node parent = node.Parent; parent != null; parent = parent.Parent)
+            {
+                if(parent.IsInImplementation() && graph.MapsTo(parent) != null) 
+                {
+                    return true;
+                }
+            } 
+            return false;
+        }
+
+        private void GetImplicitlyMappedChilds(List<Node> implicitlyMappedChilds, Node node, ReflexionGraph graph)
+        {
+            List<Node> childs = new List<Node>();
+
+            foreach (Node child in node.Children())
+            {
+                if(!graph.IsExplicitlyMapped(node))
+                {
+                    if(this.IsCandidate(node))
+                    {
+                        implicitlyMappedChilds.Add(child);
+                    }
+                    GetImplicitlyMappedChilds(implicitlyMappedChilds, child, graph);
+                }
+            }
+            return;
+        }
+
+
+        public void UpdateRecommendations()
         {
             List<Node> unmappedCandidates = GetUnmappedCandidates();
             List<Node> clusters = GetCluster();
@@ -300,7 +346,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
         }
 
-        private static Dictionary<Node, HashSet<Node>> CreateInitialMapping(double percentage,
+        private /*static*/ Dictionary<Node, HashSet<Node>> CreateInitialMapping(double percentage,
                                                                             int seed,
                                                                             string candidateType,
                                                                             ReflexionGraph reflexionGraph,
@@ -313,17 +359,18 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             List<Node> candidates = GetCandidates(reflexionGraph, candidateType);
 
+            UnityEngine.Debug.Log($"Generate initial mapping with seed {seed} for {candidates.Count}");
             Random rand = new Random(seed);
 
-            int implementationNodesCount = candidates.Count;
+            int candidatesCount = candidates.Count;
             HashSet<int> usedIndices = new HashSet<int>();
             double alreadyMappedNodesCount = 0;
             double artificallyMappedNodes = 0;
             double currentPercentage = 0;
-            for (int i = 0; i < implementationNodesCount && currentPercentage < percentage;)
+            for (int i = 0; i < candidatesCount && currentPercentage < percentage;)
             {
                 // manage next random index
-                int randomIndex = rand.Next(implementationNodesCount);
+                int randomIndex = rand.Next(candidatesCount);
                 if (usedIndices.Contains(randomIndex)) continue;
                 Node node = candidates[randomIndex];
                 usedIndices.Add(randomIndex);
@@ -333,6 +380,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 if (mapsTo == null)
                 {
                     Node oracleMapsTo = oracleGraph.MapsTo(node);
+
+                    if (oracleMapsTo == null)
+                    {
+                        throw new Exception($"There is no information where to map node {node.ID} within the oracle graph." +
+                            $"{Environment.NewLine}{node}");
+                    }
+
                     mapsTo = reflexionGraph.GetNode(oracleMapsTo.ID);
                     if (mapsTo != null)
                     {
@@ -345,8 +399,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     alreadyMappedNodesCount++;
                 }
 
-                currentPercentage = (artificallyMappedNodes + alreadyMappedNodesCount) / implementationNodesCount;
+                currentPercentage = (artificallyMappedNodes + alreadyMappedNodesCount) / candidatesCount;
+                UnityEngine.Debug.Log($"Node={node.ID} currentPercentage={currentPercentage} artificallyMappedNodes={artificallyMappedNodes} alreadyMappedNodesCount={alreadyMappedNodesCount} candidatesCount={candidatesCount}");
                 i++;
+
             }
 
             return initialMapping;
@@ -368,6 +424,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                                                                     ReflexionGraph graph)
         {
             return CreateInitialMapping(percentage, seed, AttractFunction.CandidateType, graph, OracleGraph);
+        }
+
+        public Dictionary<Node, HashSet<Node>> CreateInitialMapping(double percentage,
+                                                            int seed)
+        {
+            return CreateInitialMapping(percentage, seed, AttractFunction.CandidateType, ReflexionGraph, OracleGraph);
         }
 
         public static bool IsHit(string candidateID, string clusterID, ReflexionGraph oracleGraph)
@@ -480,7 +542,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             return percentileRank;
         }
 
-
         public static bool IsRecommendationDefinite(Dictionary<Node, HashSet<MappingPair>> recommendations)
         {
             Node cluster = recommendations.Keys.First<Node>();
@@ -501,12 +562,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
         }
 
-        public static List<Node> GetCandidates(ReflexionGraph graph, string candidateType)
+        public /*static*/ List<Node> GetCandidates(ReflexionGraph graph, string candidateType)
         {
-            return graph.Nodes().Where(n => n.Type.Equals(candidateType) && n.IsInImplementation()).ToList();
+            return graph.Nodes().Where(n => this.IsCandidate(n)).ToList();
         }
 
-        public List<Node> GetCandidates()
+        public List<Node> GetCandidates() 
         {
             return GetCandidates(ReflexionGraph, attractFunction.CandidateType);
         }
@@ -521,7 +582,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             return GetCluster(ReflexionGraph, attractFunction.ClusterType);
         }
 
-        public static List<Node> GetUnmappedCandidates(ReflexionGraph graph, string candidateType)
+        public /*static*/ List<Node> GetUnmappedCandidates(ReflexionGraph graph, string candidateType)
         {
             return GetCandidates(graph, candidateType).Where(c => graph.MapsTo(c) == null).ToList();
         }
@@ -531,7 +592,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             return GetUnmappedCandidates(ReflexionGraph, attractFunction.CandidateType);
         }
 
-        public static List<Node> GetMappedCandidates(ReflexionGraph graph, string candidateType)
+        public /*static*/ List<Node> GetMappedCandidates(ReflexionGraph graph, string candidateType)
         {
             return GetCandidates(graph, candidateType).Where(c => graph.MapsTo(c) != null).ToList();
         }
@@ -539,6 +600,30 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         public List<Node> GetMappedCandidates()
         {
             return GetMappedCandidates(ReflexionGraph, attractFunction.CandidateType);
+        }
+
+        public static bool IsCandidate(Node node, string candidateType, ReflexionGraph oracleGraph)
+        {
+            return node.Type.Equals(candidateType)
+                    && node.IsInImplementation()
+                    && oracleGraph.MapsTo(node) != null // TODO: This should not always be a condition
+                    && !node.ToggleAttributes.Contains("Element.Is_Artificial")
+                    && !node.ToggleAttributes.Contains("Element.Is_Anonymous");
+        }
+
+        public static bool IsUnmappedCandidate(Node node, string candidateType, ReflexionGraph oracleGraph, ReflexionGraph graph)
+        {
+            return IsCandidate(node, candidateType, oracleGraph) && graph.MapsTo(node) == null;
+        }
+
+        public bool IsCandidate(Node node)
+        {
+            return IsCandidate(node, this.AttractFunction.CandidateType, OracleGraph);
+        }
+
+        public bool IsUnmappedCandidate(Node node)
+        {
+            return IsCandidate(node) && this.ReflexionGraph.MapsTo(node) == null;
         }
     }
 }
