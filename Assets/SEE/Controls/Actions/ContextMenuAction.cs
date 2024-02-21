@@ -114,8 +114,7 @@ namespace SEE.Controls.Actions
 
             void ShowMetrics()
             {
-                MetricMenu.Instance.OpenWindow();
-                Debug.Log("metricMenu created");
+                CreateWindow(graphElement);
             }
 
             void ShowCode()
@@ -156,6 +155,12 @@ namespace SEE.Controls.Actions
             }
             manager.ActiveWindow = openWindow;
             return openWindow;
+        }
+
+        private static void CreateWindow(GraphElement graphElement)
+        {
+            MetricMenu.Instance.UpdateTable(graphElement);
+            MetricMenu.Instance.OpenWindow();
         }
 
         /// <summary>

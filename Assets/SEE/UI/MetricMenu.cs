@@ -19,7 +19,7 @@ namespace SEE.UI
         /// <summary>
         /// Prefab for the <see cref="MetricMenu"/>.
         /// </summary>
-        private string SettingsPrefab => UIPrefabFolder + "MetricMenu";
+        private string SettingsPrefab => UIPrefabFolder + "MetricMenu2";
 
         private Transform ScrollViewContent;
         private string itemPrefab => UIPrefabFolder + "MetricRowPanelREAL";
@@ -47,20 +47,31 @@ namespace SEE.UI
             menu = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, Canvas.transform, false);
 
             //Button Exit
-            menu.transform.Find("MetricPanelREAL/CloseButton").gameObject.MustGetComponent<Button>().onClick.AddListener(exitWindow);
+            menu.transform.Find("MovableWindow/Dragger/CloseButton").gameObject.MustGetComponent<Button>().onClick.AddListener(exitWindow);
 
-            //Attribute Name
-            /*TextMeshProUGUI attributeText = menu.transform.Find("MetricPanelREAL/ScrollView/Viewport/Content/MetricRowPanelREAL/MetricRow/AttributeLine").gameObject.MustGetComponent<TextMeshProUGUI>();
-            attributeText.text = "hello world";
-            //Value
-            TextMeshProUGUI valueText = menu.transform.Find("MetricPanelREAL/ScrollView/Viewport/Content/MetricRowPanelREAL/MetricRow/ValueLine").gameObject.MustGetComponent<TextMeshProUGUI>();
-            valueText.text = "10";*/
+
+            // Set resolution to preferred values
+            /*if (menu.TryGetComponentOrLog(out RectTransform rect))
+            {
+                Debug.Log("Resolution bestätigt");
+                //rect.sizeDelta = Resolution;
+            }*/
+        }
+
+        protected override void UpdateDesktop()
+        {
+
+        }
+
+            public void UpdateTable(GraphElement graphElement)
+        {
+            //Delete the table
+            DeleteTable();
 
             //Parent for itemPrefab
-            ScrollViewContent = menu.transform.Find("MetricPanelREAL/ScrollView/Viewport/Content").transform;
-            Debug.Log("MetricMenu: " + ScrollViewContent);
+            ScrollViewContent = menu.transform.Find("MovableWindow/Content/ScrollView/Viewport/Content").transform;
 
-            foreach(KeyValuePair<string, int> kvp in testNode.IntAttributes)
+            foreach (KeyValuePair<string, int> kvp in graphElement.IntAttributes)
             {
                 //Create GameObject
                 //GameObject newItems = Instantiate<GameObject>(itemPrefab, ScrollViewContent);
@@ -72,17 +83,15 @@ namespace SEE.UI
                 TextMeshProUGUI valueTextClone = newItems.transform.Find("MetricRow/ValueLine").gameObject.MustGetComponent<TextMeshProUGUI>();
                 valueTextClone.text = kvp.Value.ToString();
             }
-            LayoutRebuilder.ForceRebuildLayoutImmediate(menu.transform.Find("MetricPanelREAL/ScrollView/Viewport/Content").gameObject.GetComponent<RectTransform>());
-        }
-
-        void UpdateTable(GraphElement graphElement)
-        {
-            DeleteTable();
         }
 
         void DeleteTable()
         {
-
+            GameObject content = menu.transform.Find("MovableWindow/Content/ScrollView/Viewport/Content").gameObject;
+            foreach(Transform child in content.transform)
+            {
+                Destroy(child.gameObject);
+            }
         }
 
 
@@ -105,12 +114,6 @@ namespace SEE.UI
             testNode.SetInt("M", 131);
             testNode.SetInt("N", 31);
             testNode.SetInt("O", -1);
-        }
-
-        // Update is called once per frame
-        protected override void UpdateDesktop()
-        {
-
         }
 
         public void OpenWindow()
