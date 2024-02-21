@@ -57,11 +57,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         private string csvFileName = "output.csv";
         private string xmlFileName = "output.xml";
 
-        public void Awake()
-        {
-            CandidateRecommendation = new CandidateRecommendation();
-        }
-
         public CandidateRecommendation CandidateRecommendation { get; private set; }
 
         public ReflexionGraph ReflexionGraphViz { private get; set; }
@@ -244,6 +239,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             if(CandidateRecommendation == null)
             {
                 CandidateRecommendation = new CandidateRecommendation();
+            }
+
+            if(mappingConfig == null)
+            {
+                mappingConfig = new MappingExperimentConfig();
             }
 
             lock (visualizedReflexionGraphLock)

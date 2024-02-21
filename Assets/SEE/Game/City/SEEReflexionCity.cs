@@ -5,6 +5,7 @@ using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using Assets.SEE.Tools.ReflexionAnalysis;
 
 namespace SEE.Game.City
 {
@@ -44,8 +45,25 @@ namespace SEE.Game.City
                 Reset();
             }
             LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this);
+            AddCandidateRecommendation(LoadedGraph as ReflexionGraph);
             visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
             visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
+        }
+
+        private void AddCandidateRecommendation(ReflexionGraph loadedGraph)
+        {
+            CandidateRecommendationVisualization candidateRecommendationViz = gameObject.AddOrGetComponent<CandidateRecommendationVisualization>();
+            if (candidateRecommendationViz != null)
+            {
+                candidateRecommendationViz.ReflexionGraphViz = loadedGraph;
+
+                // TODO:
+                //candidateRecommendationViz.OracleMapping = oracleMappingGraph;
+
+                LoadedGraph.Subscribe(candidateRecommendationViz);
+                Debug.Log("Registered CandidateRecommendation.");
+                candidateRecommendationViz.UpdateConfiguration();
+            }
         }
 
         protected override void InitializeAfterDrawn()

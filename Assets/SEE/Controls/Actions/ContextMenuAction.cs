@@ -229,7 +229,7 @@ namespace SEE.Controls.Actions
 
             void RevealInCandidateRecommendation()
             {
-                ActivateCandidateRecommendationWindow(node, gameObject.transform, candidateRecommendationViz.CandidateRecommendation).RevealElement(node).Forget();
+                ActivateCandidateRecommendationWindow(node, gameObject.transform, candidateRecommendationViz.CandidateRecommendation).RevealElementAsync(node).Forget();
             }
         }
 
