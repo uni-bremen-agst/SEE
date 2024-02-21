@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using SEE.DataModel.DG;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using SEE.DataModel.DG;
 
 namespace SEE.Net.Dashboard.Model.Issues
 {
@@ -84,13 +84,13 @@ namespace SEE.Net.Dashboard.Model.Issues
         public Issue(int id, IssueState state, bool suppressed, string justification,
                      IList<IssueTag> tag, IList<IssueComment> comments, IList<UserRef> owners)
         {
-            this.ID = id;
-            this.State = state;
-            this.Suppressed = suppressed;
-            this.Justification = justification;
-            this.Tag = tag;
-            this.Comments = comments;
-            this.Owners = owners;
+            ID = id;
+            State = state;
+            Suppressed = suppressed;
+            Justification = justification;
+            Tag = tag;
+            Comments = comments;
+            Owners = owners;
         }
 
         /// <summary>
@@ -114,8 +114,8 @@ namespace SEE.Net.Dashboard.Model.Issues
 
             public IssueTag(string tag, string color)
             {
-                this.Tag = tag;
-                this.Color = color;
+                Tag = tag;
+                Color = color;
             }
         }
 
@@ -170,17 +170,17 @@ namespace SEE.Net.Dashboard.Model.Issues
             public IssueComment(string username, string userDisplayName, DateTime date,
                                 string displayDate, string text, string commentDeletionId)
             {
-                this.Username = username;
-                this.UserDisplayName = userDisplayName;
-                this.Date = date;
-                this.DisplayDate = displayDate;
-                this.Text = text;
-                this.CommentDeletionId = commentDeletionId;
+                Username = username;
+                UserDisplayName = userDisplayName;
+                Date = date;
+                DisplayDate = displayDate;
+                Text = text;
+                CommentDeletionId = commentDeletionId;
             }
         }
 
         /// <summary>
-        /// Number of characters to wrap the string in <see cref="ToDisplayString"/> at.
+        /// Number of characters to wrap the string in <see cref="ToDisplayStringAsync"/> at.
         /// </summary>
         protected const int WrapAt = 120;
 
@@ -189,7 +189,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// TextMeshPro's rich tags are used in here, so the string shouldn't be displayed elsewhere.
         /// </summary>
         /// <returns>A string describing this issue which is suitable for display in a TextMeshPro</returns>
-        public abstract UniTask<string> ToDisplayString();
+        public abstract UniTask<string> ToDisplayStringAsync();
 
         /// <summary>
         /// The kind of issue this is.

@@ -23,8 +23,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Michsky.UI.ModernUIPack;
-using SEE.Controls;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.Utils;
@@ -151,7 +151,7 @@ namespace SEE.UI.ConfigMenu
             MustGetComponentInChild("Canvas/TabNavigation/Sidebar/CityLoadButton", out cityLoadButton);
             cityLoadButton.clickEvent.AddListener(() =>
             {
-                city.LoadData();
+                city.LoadDataAsync().Forget();
                 actions.SetActive(true);
                 cityLoadButton.gameObject.SetActive(false);
             });
@@ -480,22 +480,8 @@ namespace SEE.UI.ConfigMenu
                 .SetOnChangeHandler(b => city.ErosionSettings.ShowInnerErosions = b)
                 .Build();
 
-            // loadDashboardMetrics
-            SwitchBuilder.Init(controls.transform)
-                .SetLabel("Load dashboard metrics")
-                .SetDefaultValue(city.ErosionSettings.LoadDashboardMetrics)
-                .SetOnChangeHandler(b => city.ErosionSettings.LoadDashboardMetrics = b)
-                .Build();
-
             // FIXME: Provide an configuration input for city.nodeLayoutSettings.issuesAddedFromVersion.
             // Apparently, there is no string input field.
-
-            // overrideMetrics
-            SwitchBuilder.Init(controls.transform)
-                .SetLabel("Dashboard metrics override")
-                .SetDefaultValue(city.ErosionSettings.OverrideMetrics)
-                .SetOnChangeHandler(b => city.ErosionSettings.OverrideMetrics = b)
-                .Build();
 
             // Erosion scaling factor
             SliderBuilder.Init(controls.transform)
@@ -569,18 +555,6 @@ namespace SEE.UI.ConfigMenu
                 .SetRange((0f, 1f))
                 .SetDefaultValue(city.LODCulling)
                 .SetOnChangeHandler(f => city.LODCulling = f);
-
-            // GXL file
-            FilePickerBuilder.Init(controls.transform)
-                .SetLabel("GXL file")
-                .SetPathInstance(city.GXLPath)
-                .Build();
-
-            // Metric file
-            FilePickerBuilder.Init(controls.transform)
-                .SetLabel("Metric file")
-                .SetPathInstance(city.CSVPath)
-                .Build();
         }
 
         private GameObject CreateAndInsertPage(string headline)

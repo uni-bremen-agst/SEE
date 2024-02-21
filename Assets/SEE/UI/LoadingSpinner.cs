@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using Cysharp.Threading.Tasks;
 using SEE.GO;
 using SEE.Utils;
 using TMPro;
@@ -137,6 +135,18 @@ namespace SEE.UI
                 return;
             }
             processCountText.text = loadingProcesses.Count <= 1 ? "" : $"{loadingProcesses.Count}";
+        }
+
+        /// <summary>
+        /// Destroys <see cref="loadingSpinner"/>. Field <see cref="loadingSpinner"/>
+        /// will be <c>null</c> afterwards.
+        /// </summary>
+        /// <remarks>Called by Unity.</remarks>
+        private void OnDisable()
+        {
+            // AXIVION Routine C#-MethodShouldBeDeclaredStatic: This method is interpreted by Unity.
+            Destroyer.Destroy(loadingSpinner);
+            loadingSpinner = null;
         }
 
         /// <summary>

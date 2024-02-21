@@ -1,18 +1,17 @@
 ﻿using System.Collections;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
-using SEE.Net.Dashboard;
 using SEE.Net.Dashboard.Model.Issues;
 using SEE.Net.Dashboard.Model.Metric;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace SEETests
+namespace SEE.Net.Dashboard
 {
     /// <summary>
     /// Class which tests the dashboard retrieval, i.e. everything in the <see cref="SEE.Net.Dashboard"/> namespace.
     /// </summary>
-    //[Category("NonDeterministic")]
+    [Category("NonDeterministic")]
     public class TestDashboard
     {
         /**
@@ -31,16 +30,15 @@ namespace SEETests
         [UnityTest]
         public IEnumerator TestDashboardVersionCorrect() => UniTask.ToCoroutine(async () =>
         {
-            DashboardVersion version = await DashboardRetriever.Instance.GetDashboardVersion();
+            DashboardVersion version = await DashboardRetriever.Instance.GetDashboardVersionAsync();
             Assert.AreEqual(DashboardVersion.SupportedVersion.MajorVersion, version.MajorVersion);
             Assert.AreEqual(DashboardVersion.SupportedVersion.MinorVersion, version.MinorVersion);
-
         });
 
         [UnityTest]
         public IEnumerator TestDashboardSystemEntity() => UniTask.ToCoroutine(async () =>
         {
-            EntityList list = await DashboardRetriever.Instance.GetSystemEntity("latest");
+            EntityList list = await DashboardRetriever.Instance.GetSystemEntityAsync("latest");
             Assert.IsNotNull(list);
             Assert.AreEqual(1, list.Entities.Count);
         });
@@ -48,7 +46,7 @@ namespace SEETests
         [UnityTest]
         public IEnumerator TestDashboardEntities() => UniTask.ToCoroutine(async () =>
         {
-            EntityList list = await DashboardRetriever.Instance.GetEntities("latest");
+            EntityList list = await DashboardRetriever.Instance.GetEntitiesAsync("latest");
             Assert.IsNotNull(list);
             Assert.IsNotEmpty(list.Entities);
         });
@@ -56,7 +54,7 @@ namespace SEETests
         [UnityTest]
         public IEnumerator TestDashboardMetrics() => UniTask.ToCoroutine(async () =>
         {
-            MetricList list = await DashboardRetriever.Instance.GetMetrics("latest");
+            MetricList list = await DashboardRetriever.Instance.GetMetricsAsync("latest");
             Assert.IsNotNull(list);
             Assert.IsNotEmpty(list.Metrics);
         });
@@ -66,7 +64,7 @@ namespace SEETests
         {
             const string entity = "81"; // This entity does not exist.
             const string metric = "Metric.LOC";
-            MetricValueRange range = await DashboardRetriever.Instance.GetMetricValueRange(entity, metric);
+            MetricValueRange range = await DashboardRetriever.Instance.GetMetricValueRangeAsync(entity, metric);
             Assert.IsNotNull(range);
             Assert.IsNotEmpty(range.Values);
             Assert.AreEqual(range.Entity, entity);
@@ -77,7 +75,7 @@ namespace SEETests
         [UnityTest]
         public IEnumerator TestDashboardMetricTable() => UniTask.ToCoroutine(async () =>
         {
-            MetricValueTable table = await DashboardRetriever.Instance.GetMetricValueTable();
+            MetricValueTable table = await DashboardRetriever.Instance.GetMetricValueTableAsync();
             Assert.IsNotNull(table);
             Assert.IsNotEmpty(table.Rows);
         });
@@ -85,14 +83,14 @@ namespace SEETests
         [UnityTest]
         public IEnumerator TestDashboardIssueDescription() => UniTask.ToCoroutine(async () =>
         {
-            string description = await DashboardRetriever.Instance.GetIssueDescription("SV4");
+            string description = await DashboardRetriever.Instance.GetIssueDescriptionAsync("SV4");
             Assert.IsNotNull(description);
             Assert.IsTrue(description.StartsWith("This rule"));
         });
 
         private static IEnumerator TestDashboardIssues<T>() where T : Issue, new() => UniTask.ToCoroutine(async () =>
         {
-            IssueTable<T> table = await DashboardRetriever.Instance.GetIssues<T>();
+            IssueTable<T> table = await DashboardRetriever.Instance.GetIssuesAsync<T>();
             Assert.IsNotNull(table);
         });
 

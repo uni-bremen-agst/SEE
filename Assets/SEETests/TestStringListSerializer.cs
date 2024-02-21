@@ -1,11 +1,10 @@
 ﻿using NUnit.Framework;
-using SEE.Utils;
 using System.Collections.Generic;
 
-namespace SEETests
+namespace SEE.Utils
 {
     /// <summary>
-    /// Test cases for <see cref="SEE.Utils.StringListSerializer"/>.
+    /// Test cases for <see cref="StringListSerializer"/>.
     /// </summary>
     class TestStringListSerializer
     {

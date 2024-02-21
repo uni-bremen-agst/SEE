@@ -1312,7 +1312,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>Source.File attribute or empty string</returns>
         private static string GetFilename(GraphElement graphElement)
         {
-            return graphElement.Filename() ?? string.Empty;
+            return graphElement.Filename ?? string.Empty;
         }
 
         /// <summary>
@@ -1322,7 +1322,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>Source.Line attribute or empty string</returns>
         private static string GetSourceLine(GraphElement graphElement)
         {
-            int? result = graphElement.SourceLine();
+            int? result = graphElement.SourceLine;
             return result.HasValue ? result.ToString() : string.Empty;
         }
 

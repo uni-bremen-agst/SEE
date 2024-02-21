@@ -130,8 +130,8 @@ namespace SEE.Tools.ReflexionAnalysis
                 NodeEvent nodeChangeEvent => events.Incorporate(nodeChangeEvent, e => e.Node == nodeChangeEvent.Node),
                 VersionChangeEvent versionChangeEvent => events.IncorporateVersionEvent(versionChangeEvent),
                 AttributeEvent<string> attributeEvent => events.IncorporateAttributeEvent(attributeEvent),
-                AttributeEvent<int> attributeEvent => events.IncorporateAttributeEvent(attributeEvent),
-                AttributeEvent<float> attributeEvent => events.IncorporateAttributeEvent(attributeEvent),
+                AttributeEvent<int?> attributeEvent => events.IncorporateAttributeEvent(attributeEvent),
+                AttributeEvent<float?> attributeEvent => events.IncorporateAttributeEvent(attributeEvent),
                 AttributeEvent<Attributable.UnitType> attributeEvent => events.IncorporateAttributeEvent(attributeEvent),
                 _ => throw new ArgumentOutOfRangeException(nameof(newEvent), newEvent.GetType(), "Unknown event type!")
             };

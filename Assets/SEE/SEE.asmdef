@@ -48,7 +48,6 @@
         "Sirenix.Utilities.dll",
         "Sirenix.OdinInspector.Attributes.dll",
         "Antlr4.Runtime.Standard.dll",
-        "NetworkCommsDotNetComplete.dll",
         "DOTween.dll",
         "Joveler.Compression.XZ.dll",
         "MathNet.Numerics.dll",
@@ -57,7 +56,12 @@
 		"Accord.MachineLearning.dll",
 		"Accord.dll",
 		"Accord.Math.dll",		
-		"Accord.Math.Core.dll"		
+		"Accord.Math.Core.dll",
+        "Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.dll",
+        "Newtonsoft.Json.dll",
+        "NetworkCommsDotNet.dll",
+        "LibGit2Sharp.dll",
+        "CsvHelper.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

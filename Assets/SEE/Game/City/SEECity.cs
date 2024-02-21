@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.GO;
 using SEE.Utils;
@@ -13,7 +12,11 @@ using UnityEngine.Assertions;
 using SEE.Game.CityRendering;
 using SEE.UI;
 using SEE.Utils.Config;
-using SEE.Utils.Paths;
+using Sirenix.Serialization;
+using SEE.GraphProviders;
+using SEE.UI.Notification;
+using SEE.DataModel.DG.IO;
+using SEE.DataModel;
 
 namespace SEE.Game.City
 {
@@ -28,18 +31,15 @@ namespace SEE.Game.City
         /// <see cref="SEECity.Save(ConfigWriter)"/> and
         /// <see cref="SEECity.Restore(Dictionary{string,object})"/>,
         /// respectively. You should also extend the test cases in TestConfigIO.
-        /// <summary>
-        /// The path to the GXL file containing the graph data.
-        /// Note that any deriving class may use multiple GXL paths from which the single city is constructed.
-        /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Path of GXL file"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
-        public FilePath GXLPath = new();
 
         /// <summary>
-        /// The path to the CSV file containing the additional metric values.
+        /// A provider of the data shown as code city.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Path of metric CSV file"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
-        public FilePath CSVPath = new();
+        [OdinSerialize, ShowInInspector,
+            Tooltip("A graph provider yielding the data to be visualized as a code city."),
+            TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup),
+            HideReferenceObjectPicker]
+        public PipelineGraphProvider DataProvider = new();
 
         /// <summary>
         /// The graph that is visualized in the scene and whose visualization settings are
@@ -62,6 +62,7 @@ namespace SEE.Game.City
         ///
         /// Neither serialized nor saved to the config file.
         /// </summary>
+        /// <remarks>Do not use this field directly. Use <see cref="LoadedGraph"/> instead.</remarks>
         [NonSerialized]
         private Graph loadedGraph = null;
 
@@ -77,6 +78,11 @@ namespace SEE.Game.City
             get => loadedGraph;
             protected set
             {
+                if (loadedGraph  != null)
+                {
+                    Reset();
+                }
+                Assert.IsNull(visualizedSubGraph);
                 loadedGraph = value;
                 InspectSchema(loadedGraph);
             }
@@ -89,39 +95,45 @@ namespace SEE.Game.City
         /// </summary>
         protected override void ProjectPathChanged()
         {
-            if (loadedGraph != null)
+            if (LoadedGraph != null)
             {
-                loadedGraph.BasePath = SourceCodeDirectory.Path;
+                LoadedGraph.BasePath = SourceCodeDirectory.Path;
             }
         }
 
         /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
-        /// containing only nodes with relevant node types or the original LoadedGraph
+        /// containing only nodes with relevant node types or the original <see cref="LoadedGraph"/>
         /// if all node types are relevant. It is null if no graph has been loaded yet
         /// (i.e. <see cref="LoadedGraph"/> is null).
         /// </summary>
-        private Graph visualizedSubGraph;
+        [NonSerialized]
+        private Graph visualizedSubGraph = null;
 
         /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
-        /// containing only nodes with relevant node types or the original LoadedGraph
+        /// containing only nodes with relevant node types or the original <see cref="LoadedGraph"/>
         /// if all node types are relevant. It is null if no graph has been loaded yet
         /// (i.e. <see cref="LoadedGraph"/> is null).
         /// </summary>
+        /// <remarks>Accessing this value has a side effect on <see cref="visualizedSubGraph"/>.
+        /// If <see cref="LoadedGraph"/> is null, <see cref="visualizedSubGraph"/> will
+        /// become null, too. If <see cref="LoadedGraph"/> is null and <see cref="visualizedSubGraph"/> is
+        /// currently null, too, then <see cref="visualizedSubGraph"/> will be set to the
+        /// <see cref="RelevantGraph(LoadedGraph)"/>.</remarks>
         protected Graph VisualizedSubGraph
         {
             get
             {
-                if (loadedGraph == null)
+                if (LoadedGraph == null)
                 {
                     visualizedSubGraph = null;
                     return null;
                 }
                 else if (visualizedSubGraph == null)
                 {
-                    visualizedSubGraph = RelevantGraph(loadedGraph);
-                    LoadDataForGraphListing(visualizedSubGraph);
+                    visualizedSubGraph = RelevantGraph(LoadedGraph);
+                    SetupCompoundSpringEmbedder(visualizedSubGraph);
                 }
                 return visualizedSubGraph;
             }
@@ -134,6 +146,9 @@ namespace SEE.Game.City
         {
             base.Start();
 
+            loadedGraph = null;
+            visualizedSubGraph = null;
+
             using (LoadingSpinner.Show($"Loading city \"{gameObject.name}\""))
             {
                 if (!gameObject.IsCodeCityDrawn())
@@ -141,19 +156,29 @@ namespace SEE.Game.City
                     Debug.LogWarning($"There is no drawn code city for {gameObject.name}.");
                     return;
                 }
-                LoadData();
+                LoadAsync().Forget();
+            }
+            return;
+
+            async UniTaskVoid LoadAsync()
+            {
+                await LoadDataAsync();
                 InitializeAfterDrawn();
                 BoardSettings.LoadBoard();
             }
         }
 
         /// <summary>
-        /// Loads the graph and metric data and sets all NodeRef and EdgeRef components to the
-        /// loaded nodes and edges. This "deserializes" the graph to make it available at runtime.
-        /// Note: <see cref="LoadedGraph"/> will be <see cref="VisualizedSubGraph"/> afterwards,
-        /// that is, if node types are filtered, <see cref="LoadedGraph"/> may not contain all
-        /// nodes saved in the underlying GXL file.
-        /// Also note that this method may only be called after the code city has been drawn.
+        /// Sets the <see cref="NodeRef"/> and <see cref="EdgeRef"/>, respectively, for all
+        /// game objects representing nodes or edges in the <see cref="VisualizedSubGraph"/>.
+        ///
+        /// Sets the toggle attribute <see cref="GraphElement.IsVirtualToggle"/> for all
+        /// nodes and edges in <see cref="LoadedGraph"/> that are not in the <see cref="VisualizedSubGraph"/>.
+        /// This toggle prevents them to be drawn. This is necessary because <see cref="LoadedGraph"/>
+        /// and <see cref="VisualizedSubGraph"/> co-exist and the latter may only be a subgraph
+        /// of the former.
+        ///
+        /// Note that this method may only be called after the code city has been drawn.
         /// </summary>
         protected virtual void InitializeAfterDrawn()
         {
@@ -161,7 +186,11 @@ namespace SEE.Game.City
             Graph subGraph = VisualizedSubGraph;
             if (subGraph != null)
             {
-                foreach (GraphElement graphElement in loadedGraph.Elements().Except(subGraph.Elements()))
+                // All graph elements that are only in the LoadedGraph but not in the VisualizedSubGraph
+                // are toggled as GraphElement.IsVirtualToggle. These are not intended to be drawn.
+                // Because the graph elements stem from two different graphs (LoadedGraph versus subGraph),
+                // we need to provide a suitable comparer taking into account only the ID.
+                foreach (GraphElement graphElement in LoadedGraph.Elements().Except(subGraph.Elements(), new GraphElementIDComparer()))
                 {
                     // All other elements are virtual, i.e., should not be drawn.
                     graphElement.SetToggle(GraphElement.IsVirtualToggle);
@@ -176,7 +205,8 @@ namespace SEE.Game.City
 
             // Add EdgeMeshScheduler to convert edge lines to meshes over time.
             gameObject.AddOrGetComponent<EdgeMeshScheduler>().Init(EdgeLayoutSettings, EdgeSelectionSettings,
-                                                                   visualizedSubGraph);
+                                                                   subGraph);
+            // This must be loadedGraph. It must not be LoadedGraph. The latter would reset the graph.
             loadedGraph = subGraph;
 
             UpdateGraphElementIDMap(gameObject);
@@ -192,7 +222,7 @@ namespace SEE.Game.City
         /// </summary>
         public void SetNodeEdgeRefs()
         {
-            if (loadedGraph != null)
+            if (LoadedGraph != null)
             {
                 SetNodeEdgeRefs(loadedGraph, gameObject);
                 Debug.Log($"Node and edge references for {gameObject.name} are resolved.\n");
@@ -244,62 +274,14 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Loads the metrics from CSVPath() and aggregates and adds them to the graph.
-        /// Precondition: graph must have been loaded before.
-        /// </summary>
-        private void LoadMetrics()
-        {
-            LoadGraphMetrics(LoadedGraph, CSVPath.Path, ErosionSettings).Forget();
-        }
-
-        /// <summary>
-        /// Loads the metrics available at the CSV file <paramref name="csvPath"/> into the given
-        /// <paramref name="graph"/>. Depending on <paramref name="erosionSettings"/>, metrics will also be integrated
-        /// from the Axivion Dashboard.
-        /// </summary>
-        /// <param name="graph">The graph into which the metrics shall be loaded</param>
-        /// <param name="csvPath">The CSV file containing the metrics for the given <paramref name="graph"/></param>
-        /// <param name="erosionSettings">
-        /// Will be used to determine whether metric data from the Axivion Dashboard shall be imported into the graph.
-        /// For this, <see cref="ErosionAttributes.LoadDashboardMetrics"/>,
-        /// <see cref="ErosionAttributes.OverrideMetrics"/>, and <see cref="erosionSettings.IssuesAddedFromVersion"/>
-        /// will be used.
-        /// </param>
-        /// <remarks>
-        /// Note that the import of metrics from the dashboard will happen asynchronously due to
-        /// involving a network call. If you simply want to call it synchronously without querying the dashboard,
-        /// set <paramref name="erosionSettings"/> to an appropriate value and use <c>LoadGraphMetrics.Forget()</c>.
-        /// </remarks>
-        protected static async UniTask LoadGraphMetrics(Graph graph, string csvPath, ErosionAttributes erosionSettings)
-        {
-            Performance p = Performance.Begin($"loading metric data data from CSV file {csvPath}");
-            int numberOfErrors = MetricImporter.LoadCsv(graph, csvPath);
-            if (numberOfErrors > 0)
-            {
-                Debug.LogWarning($"CSV file {csvPath} has {numberOfErrors} many errors.\n");
-            }
-
-            p.End();
-
-            // Substitute missing values from the dashboard
-            if (erosionSettings.LoadDashboardMetrics)
-            {
-                string startVersion = string.IsNullOrEmpty(erosionSettings.IssuesAddedFromVersion) ? "EMPTY" : erosionSettings.IssuesAddedFromVersion;
-                Debug.Log($"Loading metrics and added issues from the Axivion Dashboard for start version {startVersion}.\n");
-                await MetricImporter.LoadDashboard(graph, erosionSettings.OverrideMetrics,
-                                                   erosionSettings.IssuesAddedFromVersion);
-            }
-        }
-
-        /// <summary>
         /// Loads the graph data from the GXL file with GXLPath() and the metrics
         /// from the CSV file with CSVPath() and then draws it. Equivalent to:
-        ///   LoadData();
+        ///   LoadDataAsync();
         ///   DrawGraph();
         /// </summary>
-        public virtual void LoadAndDrawGraph()
+        public virtual async UniTaskVoid LoadAndDrawGraphAsync()
         {
-            LoadData();
+            await LoadDataAsync();
             DrawGraph();
         }
 
@@ -312,42 +294,43 @@ namespace SEE.Game.City
         ///
         /// This method loads only the data, but does not actually render the graph.
         /// </summary>
-        [Button(ButtonSizes.Small)]
+        [Button(ButtonSizes.Small, Name = "Load Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
-        public virtual void LoadData()
+        public virtual async UniTask LoadDataAsync()
         {
-            if (string.IsNullOrEmpty(GXLPath.Path))
+            if (DataProvider != null)
             {
-                Debug.LogError("Empty graph path.\n");
+                try
+                {
+                    LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this);
+                }
+                catch (Exception ex)
+                {
+                    ShowNotification.Error("Data failure", $"Graph provider failed with: {ex}\n");
+                    Debug.LogException(ex);
+                }
             }
             else
             {
-                if (LoadedGraph != null)
-                {
-                    Reset();
-                }
-
-                LoadedGraph = LoadGraph(GXLPath.Path);
-                LoadMetrics();
+                ShowNotification.Error("No data provider", "You must set a data provider before you can load the data.");
             }
         }
 
         /// <summary>
-        /// Saves the graph data to the GXL file with GXLPath().
+        /// Saves the graph data to a GXL file.
         /// </summary>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Data")]
         [PropertyOrder(DataButtonsGroupOrderSave)]
+        [EnableIf(nameof(IsGraphLoaded))]
         public virtual void SaveData()
         {
-            if (string.IsNullOrEmpty(GXLPath.Path))
+            string outputFile = Application.streamingAssetsPath + "/output.gxl";
+            if (LoadedGraph != null)
             {
-                Debug.LogError("Empty graph path.\n");
-            }
-            else if (LoadedGraph != null)
-            {
-                GraphWriter.Save(GXLPath.Path, LoadedGraph, HierarchicalEdges.First());
+                GraphWriter.Save(outputFile, LoadedGraph, HierarchicalEdges.First());
+                Debug.Log($"Data was saved to '{outputFile}'.\n");
             }
         }
 
@@ -358,7 +341,7 @@ namespace SEE.Game.City
         /// </summary>
         public void ReDrawGraph()
         {
-            if (loadedGraph == null)
+            if (LoadedGraph == null)
             {
                 Debug.LogError("No graph loaded.\n");
             }
@@ -370,15 +353,21 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Returns whether the graph has been loaded.
+        /// </summary>
+        private bool IsGraphLoaded => loadedGraph != null;
+
+        /// <summary>
         /// Draws the graph.
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Draw Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
         [PropertyOrder(DataButtonsGroupOrderDraw)]
+        [EnableIf(nameof(IsGraphLoaded))]
         public virtual void DrawGraph()
         {
-            if (loadedGraph == null)
+            if (LoadedGraph == null)
             {
                 Debug.LogError("No graph loaded.\n");
             }
@@ -437,7 +426,7 @@ namespace SEE.Game.City
             Debug.Log($"Saving layout data to {path}.\n");
             if (Filenames.HasExtension(path, Filenames.GVLExtension))
             {
-                Layout.IO.GVLWriter.Save(path, loadedGraph.Name, AllNodeDescendants(gameObject));
+                Layout.IO.GVLWriter.Save(path, LoadedGraph.Name, AllNodeDescendants(gameObject));
             }
             else
             {
@@ -462,8 +451,9 @@ namespace SEE.Game.City
 
         /// <summary>
         /// Resets everything that is specific to a given graph. Here: the selected node types,
-        /// the underlying graph, and all game objects visualizing information about it.
+        /// the underlying and visualized graph, and all game objects visualizing information about it.
         /// </summary>
+        /// <remarks>This method should be called whenever <see cref="loadedGraph"/> is re-assigned.</remarks>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
         [PropertyOrder(ResetButtonsGroupOrderReset)]
@@ -472,7 +462,7 @@ namespace SEE.Game.City
             base.Reset();
             // Delete the underlying graph.
             loadedGraph?.Destroy();
-            LoadedGraph = null;
+            loadedGraph = null;
             visualizedSubGraph = null;
         }
 
@@ -486,13 +476,13 @@ namespace SEE.Game.City
         /// <returns>names of all existing node metrics</returns>
         public override ISet<string> AllExistingMetrics()
         {
-            if (loadedGraph == null)
+            if (LoadedGraph == null)
             {
                 return new HashSet<string>();
             }
             else
             {
-                return loadedGraph.AllNumericNodeAttributes();
+                return LoadedGraph.AllNumericNodeAttributes();
             }
         }
 
@@ -501,7 +491,7 @@ namespace SEE.Game.City
         /// </summary>
         protected override void DumpNodeMetrics()
         {
-            if (loadedGraph == null)
+            if (LoadedGraph == null)
             {
                 Debug.Log("No graph loaded yet.");
             }
@@ -511,32 +501,27 @@ namespace SEE.Game.City
             }
         }
 
+        #region Config I/O
         //--------------------------------
         // Configuration file input/output
         //--------------------------------
 
         /// <summary>
-        /// Label of attribute <see cref="GXLPath"/> in the configuration file.
+        /// Label of attribute <see cref="DataProvider"/> in the configuration file.
         /// </summary>
-        private const string gxlPathLabel = "GXLPath";
-
-        /// <summary>
-        /// Label of attribute <see cref="CSVPath"/> in the configuration file.
-        /// </summary>
-        private const string csvPathLabel = "CSVPath";
+        private const string dataProviderPathLabel = "data";
 
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
-            GXLPath.Save(writer, gxlPathLabel);
-            CSVPath.Save(writer, csvPathLabel);
+            DataProvider?.Save(writer, dataProviderPathLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
-            GXLPath.Restore(attributes, gxlPathLabel);
-            CSVPath.Restore(attributes, csvPathLabel);
+            DataProvider = GraphProvider.Restore(attributes, dataProviderPathLabel) as PipelineGraphProvider;
         }
+        #endregion
     }
 }

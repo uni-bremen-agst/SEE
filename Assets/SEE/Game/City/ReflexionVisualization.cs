@@ -228,7 +228,7 @@ namespace SEE.Game.City
             switch (changeEvent)
             {
                 case EdgeChange edgeChange:
-                    HandleEdgeChange(edgeChange).Forget();
+                    HandleEdgeChangeAsync(edgeChange).Forget();
                     break;
                 case EdgeEvent edgeEvent:
                     HandleEdgeEvent(edgeEvent);
@@ -279,7 +279,7 @@ namespace SEE.Game.City
         /// Handles the given <paramref name="edgeChange"/> by modifying the scene accordingly.
         /// </summary>
         /// <param name="edgeChange">The event which shall be handled.</param>
-        private async UniTaskVoid HandleEdgeChange(EdgeChange edgeChange)
+        private async UniTaskVoid HandleEdgeChangeAsync(EdgeChange edgeChange)
         {
             // We first check if the corresponding edge should be hidden.
             if (hiddenEdgeStates.Contains(edgeChange.NewState))

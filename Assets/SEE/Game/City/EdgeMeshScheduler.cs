@@ -128,6 +128,11 @@ namespace SEE.Game.City
             for (int i = 0; i < remaining; i++)
             {
                 Edge edge = edges.Dequeue();
+                if (edge == null)
+                {
+                    Debug.LogWarning("Edge is null. Ignoring.\n");
+                    continue;
+                }
                 GameObject gameEdge = GetGameEdge(edge);
                 if (gameEdge == null)
                 {

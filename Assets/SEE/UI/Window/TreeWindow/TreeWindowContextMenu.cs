@@ -245,15 +245,24 @@ namespace SEE.UI.Window.TreeWindow
                 entries.Add(new PopupMenuHeading("Items ordered by group count."));
             }
 
-            // These are the attributes we want to sort by for the time being. We might want to include
-            // all other attributes in the future, in which case the following code needs to be adapted.
-            entries.Add(SortActionFor("Source Name", x => x is Node node ? node.SourceName : null, false));
-            entries.Add(SortActionFor("Source Line", x => x.SourceLine(), true));
-            entries.Add(SortActionFor("Filename", x => x.Filename(), false));
+            // In addition to the type, we want to be able to sort by all existing numeric and string attributes.
             entries.Add(SortActionFor("Type", x => x.Type, false));
+            entries.AddRange(searcher.Graph.AllNumericAttributes().Select(NumericAttributeSortAction));
+            entries.AddRange(searcher.Graph.AllStringAttributes().Select(StringAttributeSortAction));
 
             contextMenu.ClearEntries();
             contextMenu.AddEntries(entries);
+            return;
+
+            PopupMenuAction NumericAttributeSortAction(string attributeKey)
+            {
+                return SortActionFor(attributeKey, x => x.TryGetNumeric(attributeKey, out float value) ? value : null, true);
+            }
+
+            PopupMenuAction StringAttributeSortAction(string attributeKey)
+            {
+                return SortActionFor(attributeKey, x => x.TryGetString(attributeKey, out string value) ? value : null, false);
+            }
         }
 
         /// <summary>
@@ -301,7 +310,8 @@ namespace SEE.UI.Window.TreeWindow
         {
             return (numeric, descending) switch
             {
-                (_, null) => ' ',
+                (true, null) => Icons.Hashtag,
+                (false, null) => Icons.Text,
                 (true, true) => Icons.SortNumericDown,
                 (true, false) => Icons.SortNumericUp,
                 (false, true) => Icons.SortAlphabeticalDown,

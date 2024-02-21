@@ -66,6 +66,32 @@ namespace SEE.DataModel.DG
             return Version = newVersion;
         }
 
+        /// <summary>
+        /// If <paramref name="value"/> is true, the toggle with <paramref name="attributeName"/>
+        /// will be set, otherwise it will be removed.
+        /// </summary>
+        /// <param name="attributeName">name of toggle attribute</param>
+        /// <param name="value">value to be set</param>
+        /// <remarks>All listeners will be notified in case of a change.</remarks>
+        public void SetToggle(string attributeName, bool value)
+        {
+            if (value)
+            {
+                SetToggle(attributeName);
+            }
+            else
+            {
+                UnsetToggle(attributeName);
+            }
+        }
+
+        /// <summary>
+        /// Removes the toggle attribute with <paramref name="attributeName"/> if not
+        /// already set. All listeners will be notified of this change.
+        /// If the attribute is set already, nothing happens.
+        /// </summary>
+        /// <param name="attributeName">name of toggle attribute</param>
+        /// <remarks>All listeners will be notified in case of a change.</remarks>
         public void SetToggle(string attributeName)
         {
             if (!toggleAttributes.Contains(attributeName))
@@ -75,6 +101,13 @@ namespace SEE.DataModel.DG
             }
         }
 
+        /// <summary>
+        /// Removes the toggle attribute with <paramref name="attributeName"/> if set.
+        /// All listeners will be notified of this change.
+        /// If no such attribute exists, nothing happens.
+        /// </summary>
+        /// <param name="attributeName">name of toggle attribute</param>
+        /// <remarks>All listeners will be notified in case of a change.</remarks>
         public void UnsetToggle(string attributeName)
         {
             if (toggleAttributes.Contains(attributeName))
@@ -84,6 +117,11 @@ namespace SEE.DataModel.DG
             }
         }
 
+        /// <summary>
+        /// True if the toggle attribute with <paramref name="attributeName"/> is set.
+        /// </summary>
+        /// <param name="attributeName">name of toggle attribute</param>
+        /// <returns>true if set</returns>
         public bool HasToggle(string attributeName)
         {
             return toggleAttributes.Contains(attributeName);
@@ -95,9 +133,24 @@ namespace SEE.DataModel.DG
 
         public Dictionary<string, string> StringAttributes { get; private set; } = new Dictionary<string, string>();
 
+        /// <summary>
+        /// Sets the string attribute with given <paramref name="attributeName"/> to <paramref name="value"/>
+        /// if <paramref name="value"/> is different from <c>null</c>. If <paramref name="value"/> is <c>null</c>,
+        /// the attribute will be removed.
+        /// </summary>
+        /// <param name="attributeName">name of the attribute</param>
+        /// <param name="value">new value of the attribute</param>
+        /// <remarks>This method will notify all listeners of this attributable</remarks>
         public void SetString(string attributeName, string value)
         {
-            StringAttributes[attributeName] = value;
+            if (value == null)
+            {
+                StringAttributes.Remove(attributeName);
+            }
+            else
+            {
+                StringAttributes[attributeName] = value;
+            }
             Notify(new AttributeEvent<string>(Version, this, attributeName, value, Addition));
         }
 
@@ -124,11 +177,26 @@ namespace SEE.DataModel.DG
 
         public Dictionary<string, float> FloatAttributes { get; private set; } = new Dictionary<string, float>();
 
-        public void SetFloat(string attributeName, float value)
+        /// <summary>
+        /// Sets the float attribute with given <paramref name="attributeName"/> to <paramref name="value"/>
+        /// if <paramref name="value"/> is different from <c>null</c>. If <paramref name="value"/> is <c>null</c>,
+        /// the attribute will be removed.
+        /// </summary>
+        /// <param name="attributeName">name of the attribute</param>
+        /// <param name="value">new value of the attribute</param>
+        /// <remarks>This method will notify all listeners of this attributable</remarks>
+        public void SetFloat(string attributeName, float? value)
         {
-            FloatAttributes[attributeName] = value;
-            NumericAttributeNames.Add(attributeName);
-            Notify(new AttributeEvent<float>(Version, this, attributeName, value, Addition));
+            if (value.HasValue)
+            {
+                FloatAttributes[attributeName] = value.Value;
+                NumericAttributeNames.Add(attributeName);
+            }
+            else
+            {
+                FloatAttributes.Remove(attributeName);
+            }
+            Notify(new AttributeEvent<float?>(Version, this, attributeName, value, Addition));
         }
 
         public float GetFloat(string attributeName)
@@ -154,11 +222,26 @@ namespace SEE.DataModel.DG
 
         public Dictionary<string, int> IntAttributes { get; private set; } = new Dictionary<string, int>();
 
-        public void SetInt(string attributeName, int value)
+        /// <summary>
+        /// Sets the integer attribute with given <paramref name="attributeName"/> to <paramref name="value"/>
+        /// if <paramref name="value"/> is different from <c>null</c>. If <paramref name="value"/> is <c>null</c>,
+        /// the attribute will be removed.
+        /// </summary>
+        /// <param name="attributeName">name of the attribute</param>
+        /// <param name="value">new value of the attribute</param>
+        /// <remarks>This method will notify all listeners of this attributable</remarks>
+        public void SetInt(string attributeName, int? value)
         {
-            IntAttributes[attributeName] = value;
-            NumericAttributeNames.Add(attributeName);
-            Notify(new AttributeEvent<int>(Version, this, attributeName, value, Addition));
+            if (value.HasValue)
+            {
+                IntAttributes[attributeName] = value.Value;
+                NumericAttributeNames.Add(attributeName);
+            }
+            else
+            {
+                IntAttributes.Remove(attributeName);
+            }
+            Notify(new AttributeEvent<int?>(Version, this, attributeName, value, Addition));
         }
 
         public int GetInt(string attributeName)
@@ -207,6 +290,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="attributeName">name of an integer or float attribute</param>
         /// <returns>value of numeric attribute <paramref name="attributeName"/></returns>
+        /// <exception cref="UnknownAttribute">thrown in case there is no such <paramref name="attributeName"/></exception>
         public float GetNumeric(string attributeName)
         {
             if (FloatAttributes.TryGetValue(attributeName, out float floatValue))
@@ -217,9 +301,7 @@ namespace SEE.DataModel.DG
             {
                 return intValue;
             }
-            {
-                throw new UnknownAttribute(attributeName);
-            }
+            throw new UnknownAttribute(attributeName);
         }
 
         /// <summary>
@@ -235,7 +317,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="attributeName">name of an attribute</param>
         /// <returns>value of attribute <paramref name="attributeName"/></returns>
-        /// <exception cref="UnknownAttribute">if <paramref name="attributeName"/> is not an attribute of this node</exception>
+        /// <exception cref="UnknownAttribute">if <paramref name="attributeName"/> is not an attribute of this attributable</exception>
         public object GetAny(string attributeName)
         {
             if (FloatAttributes.TryGetValue(attributeName, out float floatValue))

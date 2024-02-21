@@ -45,7 +45,6 @@ namespace SEE.DataModel.DG.IO
                 Debug.LogError($"Could not save graph to GXL file '{filename}' due to: {e.Message}.\n");
                 throw;
             }
-            Debug.Log($"Successfully saved graph to file '{filename}'!");
         }
 
         /// <summary>

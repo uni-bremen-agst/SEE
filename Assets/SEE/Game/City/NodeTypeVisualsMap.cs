@@ -18,7 +18,7 @@ namespace SEE.Game.City
         /// </summary>
         [SerializeField]
         [DictionaryDrawerSettings(KeyLabel = "Node Type", ValueLabel = "Visual Attributes")]
-        private VisualNodeAttributesMapping map = new VisualNodeAttributesMapping();
+        private VisualNodeAttributesMapping map = new();
 
         /// <summary>
         /// Operator [].
@@ -55,6 +55,11 @@ namespace SEE.Game.City
         /// Returns all <see cref="VisualNodeAttributes"/> stored in this map.
         /// </summary>
         public ICollection<VisualNodeAttributes> Values => map.Values;
+
+        /// <summary>
+        /// Returns all node types stored in this map.
+        /// </summary>
+        public ISet<string> Types => new HashSet<string>(map.Keys);
 
         /// <summary>
         /// Resets this <see cref="NodeTypeVisualsMap"/> to an empty mapping.

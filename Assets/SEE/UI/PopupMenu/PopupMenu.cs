@@ -33,7 +33,23 @@ namespace SEE.UI.PopupMenu
         /// <summary>
         /// The transform under which the entries are listed.
         /// </summary>
-        private RectTransform entryList;
+        private RectTransform actionList;
+
+        /// <summary>
+        /// The scroll view containing the popup items.
+        /// </summary>
+        private RectTransform scrollView;
+
+        /// <summary>
+        /// The scale factor of the canvas.
+        /// Should only be accessed through the <see cref="ScaleFactor"/> property.
+        /// </summary>
+        private float? scaleFactor;
+
+        /// <summary>
+        /// The scale factor of the canvas.
+        /// </summary>
+        private float ScaleFactor => scaleFactor ??= Canvas.MustGetComponent<Canvas>().scaleFactor;
 
         /// <summary>
         /// The content size fitter of the popup menu.
@@ -67,7 +83,8 @@ namespace SEE.UI.PopupMenu
             menu = (RectTransform)PrefabInstantiator.InstantiatePrefab(menuPrefabPath, Canvas.transform, false).transform;
             contentSizeFitter = menu.gameObject.MustGetComponent<ContentSizeFitter>();
             menuCanvasGroup = menu.gameObject.MustGetComponent<CanvasGroup>();
-            entryList = (RectTransform)menu.Find("Action List");
+            scrollView = (RectTransform)menu.Find("Scroll View");
+            actionList = (RectTransform)scrollView.Find("Viewport/Action List");
 
             // The menu should be hidden when the user moves the mouse away from it.
             PointerHelper pointerHelper = menu.gameObject.MustGetComponent<PointerHelper>();
@@ -77,7 +94,7 @@ namespace SEE.UI.PopupMenu
                 // menu entries being rebuilt instead of the mouse moving outside of the menu.
                 if (x.IsPointerMoving())
                 {
-                    HideMenu().Forget();
+                    HideMenuAsync().Forget();
                 }
             });
 
@@ -89,8 +106,6 @@ namespace SEE.UI.PopupMenu
 
             // We hide the menu by default.
             menu.gameObject.SetActive(false);
-
-            // TODO (#679): Make this scrollable once it gets too big.
         }
 
         /// <summary>
@@ -126,7 +141,7 @@ namespace SEE.UI.PopupMenu
         /// <param name="action">The action to be added.</param>
         private void AddAction(PopupMenuAction action)
         {
-            GameObject actionItem = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuButton", entryList, false);
+            GameObject actionItem = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuButton", actionList, false);
             ButtonManagerBasic button = actionItem.MustGetComponent<ButtonManagerBasic>();
             button.buttonText = action.Name;
 
@@ -142,7 +157,7 @@ namespace SEE.UI.PopupMenu
                 action.Action();
                 if (action.CloseAfterClick)
                 {
-                    HideMenu().Forget();
+                    HideMenuAsync().Forget();
                 }
             }
         }
@@ -153,7 +168,7 @@ namespace SEE.UI.PopupMenu
         /// <param name="heading">The heading to be added.</param>
         private void AddHeading(PopupMenuHeading heading)
         {
-            GameObject headingItem = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuHeading", entryList, false);
+            GameObject headingItem = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuHeading", actionList, false);
             TextMeshProUGUI text = headingItem.MustGetComponent<TextMeshProUGUI>();
             text.text = heading.Text;
         }
@@ -181,7 +196,7 @@ namespace SEE.UI.PopupMenu
                 return;
             }
 
-            foreach (Transform child in entryList)
+            foreach (Transform child in actionList)
             {
                 Destroyer.Destroy(child.gameObject);
             }
@@ -193,11 +208,11 @@ namespace SEE.UI.PopupMenu
         /// <param name="position">The position to which the menu should be moved.</param>
         public void MoveTo(Vector2 position)
         {
-            float scaleFactor = Canvas.MustGetComponent<Canvas>().scaleFactor;
-            if (position.y < MenuHeight * scaleFactor)
+            AdjustMenuHeight();
+            if (position.y < MenuHeight * ScaleFactor)
             {
                 // If the menu is too close to the bottom of the screen, expand it upwards instead.
-                position.y += MenuHeight * scaleFactor;
+                position.y += MenuHeight * ScaleFactor;
                 // The mouse should hover over the first menu item already rather than being just outside of it,
                 // so we move the menu down and to the left a bit.
                 position += new Vector2(-5, -5);
@@ -212,10 +227,21 @@ namespace SEE.UI.PopupMenu
         }
 
         /// <summary>
+        /// Adjusts the height of the menu (specifically, the scroll view) to fit the content
+        /// while ensuring that the menu does not take up more than 40% of the screen.
+        /// </summary>
+        private void AdjustMenuHeight()
+        {
+            // Menu should not take up more than 40% of the screen.
+            float height = Mathf.Clamp(actionList.sizeDelta.y, 100f, Screen.height / (2.5f*ScaleFactor));
+            scrollView.sizeDelta = new Vector2(scrollView.sizeDelta.x, height);
+        }
+
+        /// <summary>
         /// Activates the menu and fades it in.
         /// This asynchronous method will return once the menu is fully shown.
         /// </summary>
-        public async UniTask ShowMenu()
+        public async UniTask ShowMenuAsync()
         {
             shouldShowMenu = true;
             menu.gameObject.SetActive(true);
@@ -226,6 +252,7 @@ namespace SEE.UI.PopupMenu
             contentSizeFitter.enabled = false;
             await UniTask.WaitForEndOfFrame();
             contentSizeFitter.enabled = true;
+            AdjustMenuHeight();
             await UniTask.WhenAll(menu.DOScale(1, animationDuration).AsyncWaitForCompletion().AsUniTask(),
                                   menuCanvasGroup.DOFade(1, animationDuration / 2).AsyncWaitForCompletion().AsUniTask());
         }
@@ -234,7 +261,7 @@ namespace SEE.UI.PopupMenu
         /// Hides the menu and fades it out.
         /// This asynchronous method will return once the menu is fully hidden and deactivated.
         /// </summary>
-        public async UniTask HideMenu()
+        public async UniTask HideMenuAsync()
         {
             shouldShowMenu = false;
             // We use a fade effect rather than DOScale because it looks better.
@@ -264,7 +291,7 @@ namespace SEE.UI.PopupMenu
             {
                 MoveTo(position.Value);
             }
-            ShowMenu().Forget();
+            ShowMenuAsync().Forget();
         }
     }
 }
