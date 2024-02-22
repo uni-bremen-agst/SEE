@@ -30,7 +30,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Duration of highlighting the code position in the city.
         /// </summary>
-        private const float highlightDuration = 3f;
+        private const float highlightDurationInitial = 3f;
 
         /// <summary>
         /// Duration of repeated highlighting the code position in the city.
@@ -89,7 +89,23 @@ namespace SEE.UI.DebugAdapterProtocol
         private VariablesWindow variablesWindow;
 
         /// <summary>
+        /// The path of the last code position.
+        /// </summary>
+        private string lastCodePath;
+
+        /// <summary>
+        /// THe line of the last code position.
+        /// </summary>
+        private int lastCodeLine;
+
+        /// <summary>
+        /// Last highlighted node.
+        /// </summary>
+        private Node lastHighlighted;
+
+        /// <summary>
         /// The code window where the last code position was marked.
+        /// Used for clearing previous marked line.
         /// </summary>
         private CodeWindow lastCodeWindow;
 
@@ -130,6 +146,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 } else
                 {
                     actions.Enqueue(UpdateThreads);
+                    actions.Enqueue(UpdateStackFrames);
                     actions.Enqueue(UpdateCodePosition);
                     actions.Enqueue(UpdateVariables);
                     actions.Enqueue(UpdateHoverTooltip);
@@ -146,6 +163,25 @@ namespace SEE.UI.DebugAdapterProtocol
         /// Returns the first active thread.
         /// </summary>
         private Thread mainThread => threads.FirstOrDefault();
+
+        /// <summary>
+        /// The currently active stack frames.
+        /// </summary>
+        private List<StackFrame> stackFrames = new();
+
+        /// <summary>
+        /// The current stack frame.
+        /// </summary>
+        private StackFrame stackFrame{
+            get
+            {
+                if (IsRunning)
+                {
+                    Debug.LogError("StackFrame should only be retrieved while execution is paused.");
+                }
+                return stackFrames.FirstOrDefault();
+            }
+        }
 
         /// <summary>
         /// The variables.
@@ -267,6 +303,7 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             actions.Clear();
             threads.Clear();
+            stackFrames.Clear();
             ClearLastCodePosition();
 
             ConsoleWindow.AddMessage("Debug session finished.\n");
@@ -319,6 +356,7 @@ namespace SEE.UI.DebugAdapterProtocol
                     {"Stop", (OnStop , "Stop")},
                     {"Console", (() => OpenConsole(), "Console")},
                     {"Variables",  (OpenVariables, "Variables")},
+                    {"CodePosition", (() => ShowCodePosition(true, true, highlightDurationInitial), "Code Position") }
                 };
                 foreach (var (name, (action, description)) in listeners)
                 {
@@ -397,6 +435,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 variablesWindow = manager.Windows.OfType<VariablesWindow>().FirstOrDefault() ?? Canvas.AddComponent<VariablesWindow>();
                 variablesWindow.Variables = variables;
                 variablesWindow.RetrieveNestedVariables = RetrieveNestedVariables;
+                variablesWindow.RetrieveVariableValue = RetrieveVariableValue;
                 manager.AddWindow(variablesWindow);
             }
 
@@ -497,7 +536,7 @@ namespace SEE.UI.DebugAdapterProtocol
             {
                 adapterHost.SendRequest(new SetBreakpointsRequest()
                 {
-                    Source = new Source() { Path = path, Name = Path.GetFileName(path) },
+                    Source = new Source() { Path = path, Name = path },
                     Breakpoints = DebugBreakpointManager.Breakpoints[path].Values.ToList(),
                 }, _ => {});
             });
@@ -535,13 +574,12 @@ namespace SEE.UI.DebugAdapterProtocol
 
             string expression = ((TMP_WordInfo)hoveredWord).GetWord();
 
-            StackFrame stackFrame = adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = mainThread.Id }).StackFrames[0];
             try
             {
                 EvaluateResponse result = adapterHost.SendRequestSync(new EvaluateRequest()
                 {
                     Expression = expression,
-                    Context = capabilities.SupportsEvaluateForHovers == true ? EvaluateArguments.ContextValue.Hover : EvaluateArguments.ContextValue.Watch,
+                    Context = capabilities.SupportsEvaluateForHovers == true ? EvaluateArguments.ContextValue.Hover : null,
                     FrameId = stackFrame.Id
                 });
                 tooltip.Show(result.Result, 0.25f);
@@ -599,7 +637,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 {
                     adapterHost.SendRequest(new SetBreakpointsRequest()
                     {
-                        Source = new Source() { Path = path, Name = Path.GetFileName(path) },
+                        Source = new Source() { Path = path, Name = path },
                         Breakpoints = breakpoints.Values.ToList(),
                     }, _ => {});
                 }
@@ -799,13 +837,11 @@ namespace SEE.UI.DebugAdapterProtocol
             {
                 try
                 {
-                    StackFrame stackFrame = !IsRunning ?
-                        adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = mainThread.Id }).StackFrames[0] :
-                        null; EvaluateResponse result = adapterHost.SendRequestSync(new EvaluateRequest()
+                    EvaluateResponse result = adapterHost.SendRequestSync(new EvaluateRequest()
                     {
                         Expression = text,
                         Context = EvaluateArguments.ContextValue.Repl,
-                        FrameId = stackFrame?.Id
+                        FrameId = IsRunning ? null : stackFrame.Id
                     });
                     ConsoleWindow.AddMessage(result.Result + "\n", "Program", "Log");
                 } catch (Exception e)
@@ -950,7 +986,6 @@ namespace SEE.UI.DebugAdapterProtocol
         #endregion
 
 
-        Node previouslyHighlighted;
 
         #region Utilities
         /// <summary>
@@ -962,79 +997,95 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             if (IsRunning) return;
 
-            List<StackFrame> stackFrames = adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = mainThread.Id}).StackFrames;
-
-            StackFrame stackFrame = stackFrames.FirstOrDefault(frame => frame.Source != null);
-
-            if (stackFrame == null)
+            StackFrame stackFrameWithSource = stackFrames.FirstOrDefault(frame => frame.Source != null);
+            if (stackFrameWithSource == null)
             {
                 Debug.LogError("No stack frame with source found.");
                 return;
             }
 
-            string path = stackFrame.Source.Path;
-            string title = Path.GetFileName(path);
-            int line = stackFrame.Line;
+            lastCodePath = stackFrameWithSource.Source.Path;
+            lastCodeLine = stackFrameWithSource.Line;
 
-            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
-            CodeWindow codeWindow = manager.Windows.OfType<CodeWindow>().FirstOrDefault(window => Filenames.OnCurrentPlatform(window.FilePath) == Filenames.OnCurrentPlatform(path));
-            if (codeWindow == null)
-            {
-                codeWindow = Canvas.AddComponent<CodeWindow>();
-                codeWindow.Title = title;
-                codeWindow.EnterFromFile(path);
-                manager.AddWindow(codeWindow);
-                codeWindow.OnComponentInitialized += () =>
-                {
-                   codeWindow.ScrolledVisibleLine = line;
-                };
-            }
-            else
-            {
-                codeWindow.EnterFromFile(path);
-                codeWindow.MarkLine(line);
-            }
-            manager.ActiveWindow = codeWindow;
-            lastCodeWindow = codeWindow;
             if (sourceRangeIndex != null)
             {
                 // TODO: Does SourceRangeIndex always has the slash as a path separator?
-                path = path.Replace("\\", "/");
-                if (path.StartsWith(City.SourceCodeDirectory.AbsolutePath))
+                string sourceRangeIndexPath = lastCodePath.Replace("\\", "/");
+                if (sourceRangeIndexPath.StartsWith(City.SourceCodeDirectory.AbsolutePath))
                 {
-                    path = path.Substring(City.SourceCodeDirectory.AbsolutePath.Length);
-                    if (path.StartsWith("/"))
+                    sourceRangeIndexPath = sourceRangeIndexPath.Substring(City.SourceCodeDirectory.AbsolutePath.Length);
+                    if (sourceRangeIndexPath.StartsWith("/"))
                     {
-                        path = path.Substring(1);
+                        sourceRangeIndexPath = sourceRangeIndexPath.Substring(1);
                     }
                 }
                 Node node;
-                if (sourceRangeIndex.TryGetValue(path, line, out node))
+                if (sourceRangeIndex.TryGetValue(sourceRangeIndexPath, lastCodeLine, out node))
                 {
-                    if (previouslyHighlighted != null)
+                    if (lastHighlighted == null)
                     {
-                        Edge edge = previouslyHighlighted.Outgoings.FirstOrDefault(e => e.Target.ID == node.ID);
-                        if (edge != null) {
-                            edge.Operator().Highlight(highlightDuration, false);
+                        lastHighlighted = node;
+                        ShowCodePosition(true, true, highlightDurationInitial);
+                    }
+                    else if (node.ID != lastHighlighted.ID)
+                    {
+                        Edge edge = lastHighlighted.Outgoings.FirstOrDefault(e => e.Target.ID == node.ID);
+                        if (edge)
+                        {
+                            edge.Operator().Highlight(highlightDurationInitial, false);
                         }
+                        lastHighlighted = node;
+                        ShowCodePosition(true, true, highlightDurationInitial);
                     }
-                    if (previouslyHighlighted != null && node.ID == previouslyHighlighted.ID)
+                    else
                     {
-                        node.Operator().Highlight(highlightDurationRepeated, false);
-                    } else
-                    {
-                        codeWindow.ScrolledVisibleLine = line;
-                        node.Operator().Highlight(highlightDuration, false);
+                        ShowCodePosition(true, false, highlightDurationRepeated);
                     }
-                    previouslyHighlighted = node;
+                }
+            } else
+            {
+                ShowCodePosition(true, true, -1);
+            }
+        }
+
+        private void ShowCodePosition(bool makeActive = false, bool scroll = false, float highlightDuration = highlightDurationInitial)
+        {
+            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+            CodeWindow codeWindow = manager.Windows.OfType<CodeWindow>().FirstOrDefault(window => Filenames.OnCurrentPlatform(window.FilePath) == Filenames.OnCurrentPlatform(lastCodePath));
+            if (codeWindow == null)
+            {
+                codeWindow = Canvas.AddComponent<CodeWindow>();
+                codeWindow.Title = Path.GetFileName(lastCodePath);
+                codeWindow.EnterFromFile(lastCodePath);
+                manager.AddWindow(codeWindow);
+                codeWindow.OnComponentInitialized += Mark;
+                
+            } else
+            {
+                Mark();
+            }
+            if (makeActive)
+            {
+                manager.ActiveWindow = codeWindow;
+            }
+            lastCodeWindow = codeWindow;
+            if (lastHighlighted && highlightDuration > 0)
+            {
+                lastHighlighted.Operator().Highlight(highlightDuration, false);
+            }
+
+            void Mark()
+            {
+                if (scroll)
+                {
+                    codeWindow.ScrolledVisibleLine = lastCodeLine;
+                } else
+                {
+                    codeWindow.MarkLine(lastCodeLine);
                 }
             }
         }
 
-        private void TempLog(GraphElement element, string prefix)
-        {
-            Debug.Log($"{prefix}{element.ID} - {element.Type} (Type) - {element.SourceLine}(Line) - {element.SourceLength}(Length)", element.GameObject());
-        }
 
         /// <summary>
         /// Clears the last code position. 
@@ -1059,6 +1110,13 @@ namespace SEE.UI.DebugAdapterProtocol
             threads = adapterHost.SendRequestSync(new ThreadsRequest()).Threads;
         }
 
+        private void UpdateStackFrames()
+        {
+            if (IsRunning) return;
+
+            stackFrames = adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = mainThread.Id }).StackFrames;
+        }
+
 
         /// <summary>
         /// Updates <see cref="variables"/>.
@@ -1072,7 +1130,6 @@ namespace SEE.UI.DebugAdapterProtocol
             foreach (Thread thread in threads)
             {
                 Dictionary<StackFrame, Dictionary<Scope, List<Variable>>> threadVariables = new();
-                List<StackFrame> stackFrames = adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = thread.Id }).StackFrames;
                 variables.Add(thread, threadVariables);
 
                 foreach (StackFrame stackFrame in stackFrames)
@@ -1098,6 +1155,21 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             if (variablesReference <= 0 || IsRunning) return new();
             return adapterHost.SendRequestSync(new VariablesRequest() { VariablesReference = variablesReference }).Variables;
+        }
+
+        private string RetrieveVariableValue(Variable variable)
+        {
+            if (IsRunning && variable.EvaluateName != null)
+            {
+                EvaluateResponse value = adapterHost.SendRequestSync(new EvaluateRequest()
+                {
+                    Expression = variable.EvaluateName,
+                    FrameId = IsRunning ? null : stackFrame.Id
+                });
+                return value.Result;
+            }
+
+            return variable.Value;
         }
         #endregion
     }

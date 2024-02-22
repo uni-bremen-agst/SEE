@@ -11,6 +11,7 @@ using System.Linq;
 using System;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using UnityEngine.EventSystems;
+using System.Collections;
 
 namespace SEE.UI.Window.VariablesWindow
 {
@@ -55,6 +56,11 @@ namespace SEE.UI.Window.VariablesWindow
         /// Function to retrieve nested variables.
         /// </summary>
         public Func<int, List<Variable>> RetrieveNestedVariables;
+
+        /// <summary>
+        /// Function to retrieve string representing the variable value.
+        /// </summary>
+        public Func<Variable, string> RetrieveVariableValue;
 
         /// <summary>
         /// The item.
@@ -162,11 +168,13 @@ namespace SEE.UI.Window.VariablesWindow
         {
             VariablesWindowItem variableItem = gameObject.AddComponent<VariablesWindowItem>();
             variableItem.Name = variable.Name;
-            variableItem.Text = variable.Name + ": " + variable.Value + " (" + variable.Type + ")";
+            variableItem.Text = variable.Name + ": " + RetrieveVariableValue(variable);
             variableItem.VariableReference = variable.VariablesReference;
             variableItem.RetrieveNestedVariables = RetrieveNestedVariables;
+            variableItem.RetrieveVariableValue = RetrieveVariableValue;
             variableItem.BackgroundColor = variableColor;
             AddChild(variableItem);
+            
         }
 
         /// <summary>
@@ -198,7 +206,14 @@ namespace SEE.UI.Window.VariablesWindow
                 } else if (VariableReference > 0)
                 {
                     IsExpanded = false;
-                    pointerHelper.ClickEvent.AddListener(RetrieveChildren);
+                    pointerHelper.ClickEvent.AddListener(e =>
+                    {
+                        if (e.button == PointerEventData.InputButton.Left)
+                        {
+                            pointerHelper.ClickEvent.RemoveAllListeners();
+                            StartCoroutine(RetrieveChildren());
+                        }
+                    });
                 } else
                 {
                     expandIcon.gameObject.SetActive(false);
@@ -212,23 +227,23 @@ namespace SEE.UI.Window.VariablesWindow
                     IsExpanded = !IsExpanded;
                 }
             }
-            void RetrieveChildren(PointerEventData e)
+            // Retrieve the children (on the main thread)
+            IEnumerator RetrieveChildren()
             {
-                if (e.button == PointerEventData.InputButton.Left)
+                List<Variable> childVariables = RetrieveNestedVariables(VariableReference);
+                childVariables.ForEach(AddVariable);
+                if (children.Count > 0)
                 {
-                    List<Variable> childVariables = RetrieveNestedVariables(VariableReference);
-                    childVariables.ForEach(AddVariable);
-                    pointerHelper.ClickEvent.RemoveListener(RetrieveChildren);
-                    if (children.Count > 0)
-                    {
-                        IsExpanded = true;
-                        pointerHelper.ClickEvent.AddListener(ToggleChildren);
-                    } else
-                    {
-                        expandIcon.gameObject.SetActive(false);
-                    }
+                    IsExpanded = true;
+                    pointerHelper.ClickEvent.AddListener(ToggleChildren);
                 }
+                else
+                {
+                    expandIcon.gameObject.SetActive(false);
+                }
+                yield return null;
             }
+
 
             UpdateVisibility();
             UpdateIndent();

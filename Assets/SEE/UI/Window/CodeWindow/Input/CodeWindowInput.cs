@@ -360,6 +360,7 @@ namespace SEE.UI.Window.CodeWindow
                         } else if (HasStarted)
                         {
                             textMesh.SetText(text);
+                            SetupBreakpoints();
                         }
                     }
                     catch (ArgumentException e)
@@ -437,6 +438,7 @@ namespace SEE.UI.Window.CodeWindow
                     Debug.Log("Set text\tMarkIssueAsync");
                     textMesh.text = text;
                     textMesh.ForceMeshUpdate();
+                    SetupBreakpoints();
                 }
                 catch (IndexOutOfRangeException)
                 {

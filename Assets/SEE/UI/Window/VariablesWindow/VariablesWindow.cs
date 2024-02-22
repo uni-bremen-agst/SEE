@@ -4,6 +4,7 @@ using SEE.Utils;
 using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.UI.Window.VariablesWindow
@@ -55,6 +56,12 @@ namespace SEE.UI.Window.VariablesWindow
         /// Function to retrieve nested variables.
         /// </summary>
         public Func<int, List<Variable>> RetrieveNestedVariables;
+
+
+        /// <summary>
+        /// Function to retrieve the string representing the variable value.
+        /// </summary>
+        public Func<Variable, string> RetrieveVariableValue;
 
         /// <summary>
         /// Container for the items of the window.
@@ -119,6 +126,7 @@ namespace SEE.UI.Window.VariablesWindow
                         scopeItem.IsExpanded = topThread && topStack;
                         // passed down to variables
                         scopeItem.RetrieveNestedVariables = RetrieveNestedVariables;
+                        scopeItem.RetrieveVariableValue = RetrieveVariableValue;
 
                         scopeVariables.ForEach(scopeItem.AddVariable);
                     }

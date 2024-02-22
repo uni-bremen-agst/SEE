@@ -208,6 +208,7 @@ namespace SEE.UI.Window.CodeWindow
         public override void RebuildLayout()
         {
             RecalculateExcessLines();
+            SetupBreakpoints();
         }
 
         #endregion

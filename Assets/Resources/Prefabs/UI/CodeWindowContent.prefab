@@ -333,10 +333,10 @@ RectTransform:
   - {fileID: 6958973956311744204}
   m_Father: {fileID: 8823517660942610107}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -20, y: 0}
-  m_SizeDelta: {x: 200, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!222 &3184298365556920756
 CanvasRenderer:
@@ -453,7 +453,7 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 2
+  m_ChildAlignment: 0
   m_Spacing: 0
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
@@ -640,7 +640,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Hello World
+  m_text: Hello World.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 92937507b904a7642830aa23bef85941, type: 2}
   m_sharedMaterial: {fileID: 21347512826212414, guid: 92937507b904a7642830aa23bef85941,
@@ -704,7 +704,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 1
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 18.846508, w: 0}
+  m_margin: {x: 20.96, y: 0, z: 18.846508, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1090,7 +1090,7 @@ PrefabInstance:
     - target: {fileID: 4581364779648440311, guid: b6f810ffe5e8142448bb32a98e3c53b1,
         type: 3}
       propertyPath: m_Pivot.x
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4581364779648440311, guid: b6f810ffe5e8142448bb32a98e3c53b1,
         type: 3}
@@ -1120,12 +1120,12 @@ PrefabInstance:
     - target: {fileID: 4581364779648440311, guid: b6f810ffe5e8142448bb32a98e3c53b1,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 50
+      value: 20.96
       objectReference: {fileID: 0}
     - target: {fileID: 4581364779648440311, guid: b6f810ffe5e8142448bb32a98e3c53b1,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 20.96
       objectReference: {fileID: 0}
     - target: {fileID: 4581364779648440311, guid: b6f810ffe5e8142448bb32a98e3c53b1,
         type: 3}
@@ -1165,7 +1165,7 @@ PrefabInstance:
     - target: {fileID: 4581364779648440311, guid: b6f810ffe5e8142448bb32a98e3c53b1,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 175
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4581364779648440311, guid: b6f810ffe5e8142448bb32a98e3c53b1,
         type: 3}
