@@ -107,7 +107,6 @@ namespace SEE.Game.City
             {
                 return gameEdge;
             }
-
             return null;
         }
 
@@ -143,7 +142,7 @@ namespace SEE.Game.City
                 // fail-safe
                 if (!gameEdge.TryGetComponent(out SEESpline spline))
                 {
-                    Debug.LogWarning("Game object without SEESpline component. Ignoring.\n");
+                    Debug.LogWarning($"Game object without {nameof(SEESpline)} component. Ignoring.\n");
                     continue;
                 }
 
