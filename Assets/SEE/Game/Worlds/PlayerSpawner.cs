@@ -1,5 +1,6 @@
 ﻿using Dissonance;
 using SEE.Game.Drawable;
+using SEE.Game.UI.Notification;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections;

@@ -320,6 +320,8 @@ namespace SEE.Game.Drawable
                 GameMindMap.ChangeNodeKind(node, conf.nodeKind, conf.borderConf);
                 GameMindMap.ChangeParent(node, parent);
 
+                GameMindMap.ChangeBoxSize(node);
+
                 GameFinder.FindChildWithTag(node, Tags.Line).GetComponent<MeshCollider>().enabled = false;
                 GameFinder.FindChildWithTag(node, Tags.DText).GetComponent<MeshCollider>().enabled = false;
                 if (conf.branchLineToParent != "")
@@ -328,6 +330,7 @@ namespace SEE.Game.Drawable
                     ChangeLine(branch, conf.branchLineConf);
                     branch.GetComponent<MeshCollider>().enabled = false;
                 }
+
             }
         }
     }

@@ -9,6 +9,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using static SEE.Game.Drawable.GameDrawer;
+using UnityEngine.UIElements;
 
 namespace SEE.Game.Drawable
 {
@@ -239,6 +240,8 @@ namespace SEE.Game.Drawable
                 Vector3[] positions = GetBorderPositions(ellipse, Vector3.zero, nodeText);
                 /// Re-draws the border.
                 Drawing(GameFinder.FindChildWithTag(node, Tags.Line), positions);
+                /// Renew the size of the BoxCollider.
+                ChangeBoxSize(node);
                 /// Re-draws the branch lines, because changes to the border might necessitate adjustments.
                 ReDrawBranchLines(node);
             }
@@ -267,6 +270,20 @@ namespace SEE.Game.Drawable
             /// Calculates the z size.
             float z = Mathf.Abs(shape.transform.localPosition.z);
             return new Vector3(x, y, z);
+        }
+
+        /// <summary>
+        /// Renew the size of the BoxCollider, adjusted to the border size.
+        /// </summary>
+        /// <param name="node">The mind map node</param>
+        public static void ChangeBoxSize(GameObject node)
+        {
+            if (node.CompareTag(Tags.MindMapNode))
+            {
+                BoxCollider box = node.GetComponent<BoxCollider>();
+                GameObject border = GameFinder.FindChildWithTag(node, Tags.Line);
+                box.size = GetBoxSize(border);
+            }
         }
 
         /// <summary>
@@ -612,6 +629,9 @@ namespace SEE.Game.Drawable
                 
                 /// Refreshes the border line.
                 Drawing(nodeBorder, positions);
+
+                /// Renew the size of the BoxCollider.
+                ChangeBoxSize(node);
 
                 /// Restores the old border appearance, if the new node kind is not a Leaf.
                 if (newNodeKind != NodeKind.Leaf && borderConf != null

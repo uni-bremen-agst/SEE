@@ -39,10 +39,24 @@ namespace SEE.Game.UI.Menu.Drawable
         /// </summary>
         /// <param name="node">The node that should be edit.</param>
         /// <param name="newValueHolder">The configuration which holds the changes.</param>
-        public static void Enable(GameObject node, DrawableType newValueHolder)
+        /// <param name="returned">Specifies whether the return was from the parent selection menu 
+        /// or the child menu of the change node.</param>
+        public static void Enable(GameObject node, DrawableType newValueHolder, bool returned = false)
         {
             if (newValueHolder is MindMapNodeConf conf && instance == null)
             {
+                /// Apply the changes from ChangeParent and ChangeNodeKind if returned.
+                if (returned)
+                {
+                    MindMapNodeConf confOfReturn = (MindMapNodeConf)DrawableType.Get(node);
+                    conf.parentNode = confOfReturn.parentNode;
+                    conf.branchLineToParent = confOfReturn.branchLineToParent;
+                    conf.branchLineConf = confOfReturn.branchLineConf;
+                    conf.nodeKind = confOfReturn.nodeKind;
+                    conf.id = confOfReturn.id;
+                    conf.textConf = confOfReturn.textConf;
+                }
+                
                 /// Instantiates the menu.
                 instance = PrefabInstantiator.InstantiatePrefab(mmEditPrefab,
                     GameObject.Find("UI Canvas").transform, false);
@@ -60,9 +74,19 @@ namespace SEE.Game.UI.Menu.Drawable
                     MindMapChangeNodeKindMenu.Disable();
                 };
 
+                /// The return call back with destroying. Will be needed to get the changes of parent and node kind change.
+                UnityAction callBackWithDestroy = () =>
+                {
+                    Enable(node, conf, true);
+                    LineMenu.DisableLineMenu();
+                    TextMenu.Disable();
+                    MindMapParentSelectionMenu.Disable();
+                    MindMapChangeNodeKindMenu.Disable();
+                };
+
                 /// Initialize the buttons for the modification options.
-                InitializeChangeParent(attached, node, conf, callback);
-                InitializeChangeNodeKind(attached, node, conf, callback);
+                InitializeChangeParent(attached, node, conf, callBackWithDestroy);
+                InitializeChangeNodeKind(attached, node, conf, callBackWithDestroy);
                 InitializeChangeBorder(node, conf, callback);
                 InitializeChangeText(node, conf, callback);
                 InitializeChangeBranchLine(attached, conf, callback);
@@ -84,7 +108,8 @@ namespace SEE.Game.UI.Menu.Drawable
                     .GetComponent<ButtonManagerBasic>();
             changeParent.clickEvent.AddListener(() =>
             {
-                instance.SetActive(false);
+                /// At this point, immediately is required because Destroyer.Destroy() does not delete quickly enough in case a theme node has been selected.
+                GameObject.DestroyImmediate(instance);
                 MindMapParentSelectionMenu.EnableForEditing(attached, node, conf, callback);
             });
         }
@@ -104,7 +129,7 @@ namespace SEE.Game.UI.Menu.Drawable
                     .GetComponent<ButtonManagerBasic>();
             changeNodeKind.clickEvent.AddListener(() =>
             {
-                instance.SetActive(false);
+                Destroyer.Destroy(instance);
                 MindMapChangeNodeKindMenu.Enable(node, conf, callback);
             });
         }
