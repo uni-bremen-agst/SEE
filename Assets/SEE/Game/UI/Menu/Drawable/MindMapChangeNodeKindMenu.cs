@@ -96,6 +96,12 @@ namespace SEE.Game.UI.Menu.Drawable
                     GameMindMap.ChangeNodeKind(addedNode, newNodeKind, boarderConf);
                     new MindMapChangeNodeKindNetAction(drawable.name, drawableParent, newConf, newNodeKind).Execute();
                     newConf.nodeKind = newNodeKind;
+                    newConf.textConf = ((MindMapNodeConf)DrawableType.Get(addedNode)).textConf;
+                    if (newNodeKind == GameMindMap.NodeKind.Theme)
+                    {
+                        newConf.parentNode = "";
+                        newConf.branchLineToParent = "";
+                    }
 
                     /// If the new one is not a <see cref="GameMindMap.NodeKind.Theme"/> 
                     /// and the node has no parent, initiate the parent selection.

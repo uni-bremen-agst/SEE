@@ -312,12 +312,12 @@ namespace SEE.Game.Drawable
         {
             if (node.CompareTag(Tags.MindMapNode))
             {
+                GameMindMap.ChangeNodeKind(node, conf.nodeKind, conf.borderConf);
                 ChangeLine(GameFinder.FindChildWithTag(node, Tags.Line), conf.borderConf);
                 ChangeText(GameFinder.FindChildWithTag(node, Tags.DText), conf.textConf);
                 GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(
                         GameFinder.GetDrawable(node));
                 GameObject parent = GameFinder.FindChild(attachedObjects, conf.parentNode);
-                GameMindMap.ChangeNodeKind(node, conf.nodeKind, conf.borderConf);
                 GameMindMap.ChangeParent(node, parent);
 
                 GameMindMap.ChangeBoxSize(node);

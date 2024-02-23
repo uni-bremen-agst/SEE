@@ -55,6 +55,7 @@ namespace SEE.Game.UI.Menu.Drawable
                     conf.nodeKind = confOfReturn.nodeKind;
                     conf.id = confOfReturn.id;
                     conf.textConf = confOfReturn.textConf;
+                    conf.borderConf = confOfReturn.borderConf;
                 }
                 
                 /// Instantiates the menu.
