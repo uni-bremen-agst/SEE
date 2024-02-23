@@ -22,11 +22,23 @@ namespace SEE.Controls
 
         private CameraState cameraState;
 
+        private CharacterController controller;
+
         [Tooltip("The code city which the player is focusing on.")]
         public GO.Plane FocusedObject;
 
         private void Start()
         {
+            controller = GetComponent<CharacterController>();
+
+            // Default Layer is ignored by collider
+            controller.excludeLayers = 1;
+
+            // Defines the build in collider of the charactercontroller
+            controller.center = new Vector3(0.0f, 1.55f, 0.21f);
+            controller.radius = 0.44f;
+            controller.height = 0.0f;
+
             if (FocusedObject != null)
             {
                 cameraState.Distance = 2.0f;
@@ -116,7 +128,8 @@ namespace SEE.Controls
                 }
                 velocity.Normalize();
                 velocity *= speed;
-                transform.position += velocity;
+                controller.Move(velocity);
+                controller.Move(Vector3.zero);
 
                 HandleRotation();
                 // Players Yaw
