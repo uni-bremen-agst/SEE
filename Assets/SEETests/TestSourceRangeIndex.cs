@@ -11,10 +11,15 @@ namespace SEE.DataModel.DG.SourceRange
     /// </summary>
     internal class TestSourceRangeIndex : TestGraphBase
     {
+        private SourceRangeIndex GetIndexByPath(Graph graph)
+        {
+            return new(graph, node => node.Path());
+        }
+
         [Test]
         public void TestConsistent1()
         {
-            SourceRangeIndex index = new(g);
+            SourceRangeIndex index = GetIndexByPath(g);
             Assert.IsTrue(index.IsIsomorphic());
             // 11 nodes were added to the graph, but 3 are ignored because of incomplete
             // source-location information.
@@ -73,7 +78,7 @@ namespace SEE.DataModel.DG.SourceRange
             // This node should fit.
             Node c1m1M4 = Child(g, c1m1, "c1.m1.M4", type: "Method", directory: "mydir/", filename: "myfile.java", line: 54, length: 1);
 
-            SourceRangeIndex index = new(g);
+            SourceRangeIndex index = GetIndexByPath(g);
             Assert.IsTrue(index.IsIsomorphic());
             AssertFound(index, c1m1M4, 54);
         }
@@ -104,7 +109,7 @@ namespace SEE.DataModel.DG.SourceRange
             // This node is logically in c1m1, but spatially nested in c1m1M3
             Child(g, c1m1, "c1.m1.M4", type: "Method", directory: "mydir/", filename: "myfile.java", line: 56, length: 1);
 
-            SourceRangeIndex index = new(g);
+            SourceRangeIndex index = GetIndexByPath(g);
             Assert.IsFalse(index.IsIsomorphic());
 
             LogAssert.Expect(LogType.Error, new Regex(@"Range c1.m1.M4.* is subsumed by c1.m1.M3.M1.*"));
@@ -116,7 +121,7 @@ namespace SEE.DataModel.DG.SourceRange
             // This node is subsumed by c1.m1.M2, but is not in parent-child relation in the node hierarchy
             Child(g, c1m1, "c1.m1.M4", type: "Method", directory: "mydir/", filename: "myfile.java", line: 53, length: 1);
 
-            SourceRangeIndex index = new(g);
+            SourceRangeIndex index = GetIndexByPath(g);
             Assert.IsFalse(index.IsIsomorphic());
 
             LogAssert.Expect(LogType.Error, new Regex("Range .* is subsumed by .*"));
@@ -131,7 +136,7 @@ namespace SEE.DataModel.DG.SourceRange
             // thrown.
             Child(g, c1m1, "c1.m1.M4", type: "Method", directory: "mydir/", filename: "myfile.java", line: 54, length: 3);
 
-            Assert.Throws<ArgumentException>(() =>  new SourceRangeIndex(g));
+            Assert.Throws<ArgumentException>(() =>  new SourceRangeIndex(g, node => node.Path()));
         }
 
         private Graph g;
@@ -197,7 +202,7 @@ namespace SEE.DataModel.DG.SourceRange
             NewNode(g, "c2", type: "Class", directory: "mydir/", filename: "myfile.java", line: 50, length: 20);
             NewNode(g, "c3", type: "Class", directory: "mydir/", filename: "myfile.java", line: 50, length: 30);
 
-            SourceRangeIndex index = new(g);
+            SourceRangeIndex index = GetIndexByPath(g);
             Assert.IsFalse(index.IsIsomorphic());
 
             LogAssert.Expect(LogType.Error, new Regex(@"Range c2.* is subsumed by c1.*"));

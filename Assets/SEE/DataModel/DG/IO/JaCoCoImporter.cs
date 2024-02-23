@@ -66,7 +66,7 @@ namespace SEE.DataModel.DG.IO
                 return;
             }
 
-            SourceRangeIndex index = new(graph);
+            SourceRangeIndex index = new(graph, GetClassName);
 
             XmlReaderSettings settings = new() { DtdProcessing = DtdProcessing.Parse };
             using XmlReader xmlReader = XmlReader.Create(filename, settings);
@@ -330,6 +330,18 @@ namespace SEE.DataModel.DG.IO
                     Debug.LogError($"{XMLSourcePosition(filename, xmlReader)}: No node found for package/class {uniqueID}.\n");
                 }
             }
+        }
+
+        /// <summary>
+        /// Yields the fully qualified name of the parent of <paramref name="node"/>
+        /// where a forward slash is used as a separator.
+        /// </summary>
+        /// <param name="node">node whose class name is to be retrieved</param>
+        /// <returns>ully qualified name of the parent</returns>
+        private static string GetClassName(Node node)
+        {
+            Debug.Log($"GetClassName({node.Type} {node.ID})\n");
+            return node.Path();
         }
 
         /// <summary>
