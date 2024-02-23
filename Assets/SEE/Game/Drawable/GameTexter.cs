@@ -121,7 +121,7 @@ namespace SEE.Game.Drawable
         /// <param name="fontAsset">The font asset of the text</param>
         /// <param name="fontSize">The font size of the text</param>
         /// <param name="styles">The font styles of the text</param>
-        /// <returns></returns>
+        /// <returns>calculated width and height</returns>
         public static Vector2 CalculateWidthAndHeight(string text, TMP_FontAsset fontAsset, 
             float fontSize, FontStyles styles)
         {
