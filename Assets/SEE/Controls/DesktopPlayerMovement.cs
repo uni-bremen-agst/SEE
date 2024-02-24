@@ -39,7 +39,7 @@ namespace SEE.Controls
             // Default Layer is ignored by collider
             controller.excludeLayers = 1;
 
-            // Defines the built-in collider of the charactercontroller, by default the collider is a capsule.
+            // Defines the built-in collider of the CharacterController, by default the collider is a capsule.
             // We choosed the following values to minimize the collider to roughly fit around the players head as a sphere.
             controller.center = new Vector3(0.0f, 1.55f, 0.21f);
             controller.radius = 0.44f;
