@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.GO;
+using UnityEngine;
 
 namespace SEE.Controls
 {
@@ -22,6 +23,10 @@ namespace SEE.Controls
 
         private CameraState cameraState;
 
+        /// <summary>
+        /// Unity component that does movement constrained by collisions.
+        /// It moves with its own Move-method.
+        /// </summary>
         private CharacterController controller;
 
         [Tooltip("The code city which the player is focusing on.")]
@@ -29,12 +34,13 @@ namespace SEE.Controls
 
         private void Start()
         {
-            controller = GetComponent<CharacterController>();
+            controller = gameObject.MustGetComponent<CharacterController>();
 
             // Default Layer is ignored by collider
             controller.excludeLayers = 1;
 
-            // Defines the build in collider of the charactercontroller
+            // Defines the built-in collider of the charactercontroller, by default the collider is a capsule.
+            // We choosed the following values to minimize the collider to roughly fit around the players head as a sphere.
             controller.center = new Vector3(0.0f, 1.55f, 0.21f);
             controller.radius = 0.44f;
             controller.height = 0.0f;
@@ -128,8 +134,8 @@ namespace SEE.Controls
                 }
                 velocity.Normalize();
                 velocity *= speed;
-                controller.Move(velocity);
-                controller.Move(Vector3.zero);
+                controller.Move(velocity); // this is the actual movement
+                controller.Move(Vector3.zero); // this prevents the player from sliding without input
 
                 HandleRotation();
                 // Players Yaw
