@@ -6,6 +6,8 @@ using SEE.Tools.ReflexionAnalysis;
 using UnityEngine;
 using Sirenix.OdinInspector;
 using Assets.SEE.Tools.ReflexionAnalysis;
+using SEE.GraphProviders;
+using System.Collections.Generic;
 
 namespace SEE.Game.City
 {
@@ -28,6 +30,10 @@ namespace SEE.Game.City
         /// </summary>
         private ReflexionVisualization visualization;
 
+        private string oracleProviderPathLabel = "OracleGraph";
+
+        private PipelineGraphProvider OracleMappingProvider { get; set; }
+
         /// <summary>
         /// First, if a graph was already loaded, everything will be reset by calling <see cref="Reset"/>.
         /// Second, the graph data from the three GXL files are loaded. The loaded graph is available
@@ -45,24 +51,20 @@ namespace SEE.Game.City
                 Reset();
             }
             LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this);
-            AddCandidateRecommendation(LoadedGraph as ReflexionGraph);
+            Graph oracleMapping = await OracleMappingProvider.ProvideAsync(new Graph(""), this);
+            AddCandidateRecommendation(LoadedGraph as ReflexionGraph, oracleMapping);
             visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
             visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
         }
 
-        private void AddCandidateRecommendation(ReflexionGraph loadedGraph)
+        private void AddCandidateRecommendation(ReflexionGraph loadedGraph, Graph oracleMapping)
         {
             CandidateRecommendationVisualization candidateRecommendationViz = gameObject.AddOrGetComponent<CandidateRecommendationVisualization>();
             if (candidateRecommendationViz != null)
             {
-                candidateRecommendationViz.ReflexionGraphViz = loadedGraph;
-
-                // TODO:
-                //candidateRecommendationViz.OracleMapping = oracleMappingGraph;
-
                 LoadedGraph.Subscribe(candidateRecommendationViz);
                 Debug.Log("Registered CandidateRecommendation.");
-                candidateRecommendationViz.UpdateConfiguration();
+                candidateRecommendationViz.UpdateConfiguration(loadedGraph, oracleMapping);
             }
         }
 
@@ -76,6 +78,11 @@ namespace SEE.Game.City
             {
                 scheduler.OnInitialEdgesDone += visualization.InitializeEdges;
             }
+        }
+        protected override void Restore(Dictionary<string, object> attributes)
+        {
+            base.Restore(attributes);
+            OracleMappingProvider = GraphProvider.Restore(attributes, oracleProviderPathLabel) as PipelineGraphProvider;
         }
     }
 }

@@ -181,7 +181,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 mappingPairs.Clear();
                 ReflexionGraph.RunAnalysis();
 
-
                 // Restart after the analysis was run, so initially/already
                 // mapped candidates will not recorded twice
                 // TODO: Does the CsvFile really have to be public?
