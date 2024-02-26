@@ -681,8 +681,7 @@ namespace SEE.Controls.Actions.Drawable
                         includeChildren);
                     Destroyer.Destroy(selectedObject.GetComponent<Rigidbody>());
                     Destroyer.Destroy(selectedObject.GetComponent<CollisionController>());
-                    GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(GameFinder.
-                        GetAttachedObjectsObject(selectedObject));
+                    GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(selectedObject);
                     new RbAndCCDestroyerNetAction(memento.drawable.ID, memento.drawable.ParentID,
                         memento.selectedObject.name).Execute();
                     RotationMenu.Disable();
@@ -703,6 +702,12 @@ namespace SEE.Controls.Actions.Drawable
             else
             {
                 /// Block for reset.
+                Destroyer.Destroy(selectedObject.GetComponent<Rigidbody>());
+                Destroyer.Destroy(selectedObject.GetComponent<CollisionController>());
+                GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(selectedObject);
+                GameObject drawable = GameFinder.GetDrawable(selectedObject);
+                new RbAndCCDestroyerNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
+                    selectedObject.name).Execute();
                 selectedObject = null;
                 RotationMenu.Disable();
                 MoveMenu.Disable();

@@ -277,8 +277,8 @@ namespace SEE.Controls.Actions.Drawable
 
                 /// Adds and activates the necessary components to detect a collision. 
                 /// Additionally, the selection is highlighted by the blink effect.
-                selectedObj.AddComponent<Rigidbody>().isKinematic = true;
-                selectedObj.AddComponent<CollisionController>();
+                selectedObj.AddOrGetComponent<Rigidbody>().isKinematic = true;
+                selectedObj.AddOrGetComponent<CollisionController>();
                 selectedObj.AddOrGetComponent<BlinkEffect>();
 
                 oldScale = selectedObj.transform.localScale;
@@ -387,8 +387,10 @@ namespace SEE.Controls.Actions.Drawable
             }
             else
             {
-                selectedObj = null;
                 progressState = ProgressState.SelectObject;
+                Destroyer.Destroy(selectedObj.GetComponent<Rigidbody>());
+                Destroyer.Destroy(selectedObj.GetComponent<CollisionController>());
+                selectedObj = null;
             }
             return false;
         }

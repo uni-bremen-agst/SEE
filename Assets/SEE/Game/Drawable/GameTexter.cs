@@ -60,7 +60,7 @@ namespace SEE.Game.Drawable
         /// This font styles affects the width.
         /// 
         /// Method based on the method from Stephan_B's comment in
-        /// https://forum.unity.com/threads/calculate-width-of-a-text-before-without-assigning-it-to-a-tmp-object.758867/
+        /// https://forum.unity.com/threads/calculate-width-of-a-text-before-without-assigning-it-to-a-tmp-object.758867/#post-5057900
         /// </summary>
         /// <param name="text">the first line of the text.</param>
         /// <param name="fontAsset">the used font asset.</param>
