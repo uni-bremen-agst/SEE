@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Xml;
 using UnityEngine;
-using static RTG.Object2ObjectSnap;
 
 namespace SEE.DataModel.DG.IO
 {
@@ -66,7 +66,7 @@ namespace SEE.DataModel.DG.IO
                 return;
             }
 
-            SourceRangeIndex index = new(graph, GetClassName);
+            SourceRangeIndex index = new(graph, QualifiedName);
 
             XmlReaderSettings settings = new() { DtdProcessing = DtdProcessing.Parse };
             using XmlReader xmlReader = XmlReader.Create(filename, settings);
@@ -244,8 +244,7 @@ namespace SEE.DataModel.DG.IO
                                     // root -- that we processed previously and for which we added metrics.
                                     AddMetrics(xmlReader, graph.GetRoots()[0]);
                                 }
-                                else if (index.TryGetValue(GetPath(prefix, qualifiedClassName, sourceFilename),
-                                                           sourceLine, out Node nodeToAddMetrics))
+                                else if (index.TryGetValue(AsQualifiedName(qualifiedClassName), sourceLine, out Node nodeToAddMetrics))
                                 {
                                     AddMetrics(xmlReader, nodeToAddMetrics);
                                 }
@@ -253,7 +252,7 @@ namespace SEE.DataModel.DG.IO
                                 {
                                     // We are in a method context.
                                     Debug.LogError($"{XMLSourcePosition(filename, xmlReader)}: "
-                                        + $"No node found for {nodeType} {qualifiedClassName}.{methodName} using {GetPath(prefix, qualifiedClassName, sourceFilename)}:{sourceLine}.\n");
+                                        + $"No node found for {nodeType} {qualifiedClassName}.{methodName}:{sourceLine}.\n");
                                 }
                             }
                             catch (Exception e)
@@ -333,18 +332,6 @@ namespace SEE.DataModel.DG.IO
         }
 
         /// <summary>
-        /// Yields the fully qualified name of the parent of <paramref name="node"/>
-        /// where a forward slash is used as a separator.
-        /// </summary>
-        /// <param name="node">node whose class name is to be retrieved</param>
-        /// <returns>ully qualified name of the parent</returns>
-        private static string GetClassName(Node node)
-        {
-            Debug.Log($"GetClassName({node.Type} {node.ID})\n");
-            return node.Path();
-        }
-
-        /// <summary>
         /// Returns the source position of the XML code currently processed by <paramref name="xmlReader"/>.
         /// The position is reported as <paramref name="filepath"/>:line:column. In case no source position
         /// can be retrieved <paramref name="filepath"/>:<unknown> will returned.
@@ -380,53 +367,59 @@ namespace SEE.DataModel.DG.IO
         /// is not the empty string; if <paramref name="prefix"/> is the empty string {P} is the
         /// empty string.
         /// </summary>
-        /// <param name="prefix">the path prefix to be added at the front of the path (may be empty)</param>
         /// <param name="qualifiedClassName">qualified name to be processed</param>
         /// <param name="sourceFilename">source filename to be appended</param>
         /// <returns>qualified name whose last word is replaced by <paramref name="sourceFilename"/>
         /// </returns>
         /// <exception cref="ArgumentException">thrown in case <paramref name="qualifiedClassName"/>
         /// is null or empty</exception>
-        private static string GetPath(string prefix, string qualifiedClassName, string sourceFilename)
+        private static string AsQualifiedName(string qualifiedClassName)
         {
             if (string.IsNullOrEmpty(qualifiedClassName))
             {
                 throw new ArgumentException("The qualified name of a class must not be empty.");
             }
+            return qualifiedClassName.Replace(jacocoSeparator, '.');
+        }
 
-            if (string.IsNullOrWhiteSpace(prefix))
-            {
-                prefix = string.Empty;
-            }
-            else
-            {
-                prefix = AddSeparatorAtTheEndIfNecessary(prefix);
-            }
-            int lastSeparatorPosition = qualifiedClassName.LastIndexOf(jacocoSeparator);
-            if (lastSeparatorPosition == -1)
-            {
-                return prefix + sourceFilename;
-            }
-            else
-            {
-                // An example class name could be: "org/jabref/logic/msbib/MSBibEntry" where the last element
-                // is a class and everything else are packages. jacocoSeparator is used to separate
-                // these names from each other. A sourceFilename could be "MSBibEntry.java"; it is
-                // always a plain filename without the directories it is contained in.
-                // We remove the last element (which is a class and append the sourceFilename
-                // and prepand the prefix. Let prefix be "src/main/java/", then the final result
-                // would be "src/main/java/org/jabref/logic/msbib/MSBibEntry.java".
-                return prefix + qualifiedClassName.Remove(lastSeparatorPosition) + jacocoSeparator + sourceFilename;
-            }
+        private static readonly HashSet<string> relevantNodeTypes = new() { "Class", "Interface", "Class_Template", "Package" };
 
-            // Returns the given path with a jacocoSeparator at the end if not already present.
-            static string AddSeparatorAtTheEndIfNecessary(string path)
+        /// <summary>
+        /// Yields the fully qualified name of paramref name="node"/> appended
+        /// by the <see cref="GraphElement.Filename"/> where a forward slash is used
+        /// as a separator. The fully qualified name is the sequence of names of
+        /// all ascendants of a node.
+        /// </summary>
+        /// <param name="node">node whose fully qualified name is to be retrieved</param>
+        /// <returns>ully qualified name of the parent</returns>
+        private static string QualifiedName(Node node)
+        {
+            // counter/unterordner/UnterOrdnerTest$InnereKlasse
+            Debug.Log($"GetClassName({node.Type} {node.ID}) {GetQualifiedName(node.Parent)}\n");
+
+            // Node must be a type (class, interface)
+            return node.Path();
+
+            static string GetQualifiedName(Node node)
             {
-                if (path.Length == 0)
+                if (node == null)
                 {
-                    return path;
+                    return string.Empty;
                 }
-                return path[^1] == jacocoSeparator ? path : path + jacocoSeparator;
+                StringBuilder sb = new(node.SourceName);
+                Node cursor = node.Parent;
+
+                while (cursor != null && relevantNodeTypes.Contains(cursor.Type))
+                {
+                    // umgekehrte Reihenfolge
+                    sb.Append(cursor.SourceName);
+                    cursor = cursor.Parent;
+                    if (cursor != null)
+                    {
+                        sb.Append(jacocoSeparator);
+                    }
+                }
+                return sb.ToString();
             }
         }
     }
