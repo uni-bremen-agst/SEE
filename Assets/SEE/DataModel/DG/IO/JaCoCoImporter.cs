@@ -447,7 +447,13 @@ namespace SEE.DataModel.DG.IO
                 // The ID of an inner type W nested in a type Z declared in a
                 // package p is p.Z$W. The delimiter $ is used to separate inner
                 // types from their containing type.
-                return OuterMostType(node.ID);
+                string outerMostType = OuterMostType(node.ID);
+                // outerMostType could denote a main type or another top-level
+                // type that is not a main type. The two can be distinguished
+                // using the source filename.
+                string simpleName = SimpleName(outerMostType);
+                // FIXME: CONTINUE HERE.
+                return outerMostType;
             }
             else
             {
@@ -465,11 +471,25 @@ namespace SEE.DataModel.DG.IO
                 int i = id.IndexOf('$');
                 if (i == -1)
                 {
-                    // This type is a main type.
+                    // This type is already an outer-most type.
                     return id;
                 }
-                // i == 0 is impossible.
-                return id[0..i];
+                // Note: i == 0 is impossible; otherwise the type's name were only $.
+                return id[..i];
+            }
+
+            // Returns the last name in the given qualified name.
+            static string SimpleName(string qualifiedName)
+            {
+                int i = qualifiedName.LastIndexOf(".");
+                if (i == -1)
+                {
+                    return qualifiedName;
+                }
+                else
+                {
+                    return qualifiedName[..^i];
+                }
             }
         }
     }
