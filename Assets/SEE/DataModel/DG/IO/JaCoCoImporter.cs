@@ -66,7 +66,7 @@ namespace SEE.DataModel.DG.IO
                 return;
             }
 
-            SourceRangeIndex index = new(graph, QualifiedName);
+            SourceRangeIndex index = new(graph, IndexPath);
 
             XmlReaderSettings settings = new() { DtdProcessing = DtdProcessing.Parse };
             using XmlReader xmlReader = XmlReader.Create(filename, settings);
@@ -382,44 +382,94 @@ namespace SEE.DataModel.DG.IO
             return qualifiedClassName.Replace(jacocoSeparator, '.');
         }
 
-        private static readonly HashSet<string> relevantNodeTypes = new() { "Class", "Interface", "Class_Template", "Package" };
+        private static readonly HashSet<string> typeNodeTypes = new() { "Class", "Interface", "Class_Template", "Interface_Template"};
 
         /// <summary>
-        /// Yields the fully qualified name of paramref name="node"/> appended
-        /// by the <see cref="GraphElement.Filename"/> where a forward slash is used
-        /// as a separator. The fully qualified name is the sequence of names of
-        /// all ascendants of a node.
+        /// Yields the path name of <paramref name="node"/>.
+        ///
+        /// If <paramref name="node"/> is a type, that is, its <see cref="GraphElement.Type"/>
+        /// is contained in <see cref="typeNodeTypes"/>, the fully qualified name of the
+        /// main type corresponding to this type is returned.
+        ///
+        /// The fully qualified name of a main type is the name of the type including
+        /// all the packages it is contained in, e.g., org.uni-bremen.mypackage.myclass
+        /// for a class named myclass declared in package org.uni-bremen.mypackage.
+        ///
+        /// What is a main type corresponding to a type? Java allows a file to declare multiple
+        /// types in the same file even at the top level. Only one of those declared at top
+        /// level may be public, however. Other type declarations may be nested in types.
+        /// If there is only one type declared at the top level, that type is the main type.
+        /// If there are multiple types declared at the top level, the one declared as
+        /// public is the main type. For inner (nested, not at the top level) types, the
+        /// main type is the main type corresponding to the outer-most (top-level) type
+        /// the inner type is contained in.
+        ///
+        /// The filename for a main type T must be T.java.
+        ///
+        /// For instance, if we have a file T.java with a main class T in package p
+        /// and a non-main class Z which in turn contains a nested class W, then the
+        /// result for T would be p.T, the result for Z would be p.T, the result for
+        /// W would again be p.T.
+        ///
+        /// If <paramref name="node"/> is a method with <see cref="Node.Parent"/> p (obviously
+        /// a type in which the method is declared), then <see cref="IndexPath(Node)"/> applied
+        /// to p is returned. For instance, if W had a method m in the example above,
+        /// then again p.T would be returned.
+        ///
+        /// For all other node types, null is returned.
+        ///
         /// </summary>
         /// <param name="node">node whose fully qualified name is to be retrieved</param>
         /// <returns>ully qualified name of the parent</returns>
-        private static string QualifiedName(Node node)
+        private static string IndexPath(Node node)
         {
             // counter/unterordner/UnterOrdnerTest$InnereKlasse
-            Debug.Log($"GetClassName({node.Type} {node.ID}) {GetQualifiedName(node.Parent)}\n");
+            Debug.Log($"GetClassName({node.Type} {node.ID})\n");
 
-            // Node must be a type (class, interface)
-            return node.Path();
-
-            static string GetQualifiedName(Node node)
+            if (node.Type == "Method")
             {
-                if (node == null)
-                {
-                    return string.Empty;
-                }
-                StringBuilder sb = new(node.SourceName);
-                Node cursor = node.Parent;
+                // A Java method can be declared only within a type, thus, its
+                // parent node must be a type.
+                return IndexPath(node.Parent);
+            }
+            else if (typeNodeTypes.Contains(node.Type))
+            {
+                // The ID (Linkage.Name) of a main type Y declared in package p
+                // is p.Y.
+                //
+                // Likewise, the ID of a type Z declared at top level, but
+                // different from the main type, is p.Z where p is the package
+                // the corresponding main type is declared in. Whether a top-level
+                // type is a non-main type can be determined by checking the
+                // source filename. A main type T is contained in a file named
+                // T.java; if that is not the case, a type is not a main type.
+                //
+                // The ID of an inner type W nested in a type Z declared in a
+                // package p is p.Z$W. The delimiter $ is used to separate inner
+                // types from their containing type.
+                return OuterMostType(node.ID);
+            }
+            else
+            {
+                // Node types different from a type and method will be ignored.
+                return null;
+            }
 
-                while (cursor != null && relevantNodeTypes.Contains(cursor.Type))
+            // If id does not contain the delimiter $, id is returned.
+            // Otherwise the substring from the first character of id
+            // until (and excluding) the first occurrence of the delimiter $
+            // is returned.
+            static string OuterMostType(string id)
+            {
+                // First occurrence of the delimiter for a nested type.
+                int i = id.IndexOf('$');
+                if (i == -1)
                 {
-                    // umgekehrte Reihenfolge
-                    sb.Append(cursor.SourceName);
-                    cursor = cursor.Parent;
-                    if (cursor != null)
-                    {
-                        sb.Append(jacocoSeparator);
-                    }
+                    // This type is a main type.
+                    return id;
                 }
-                return sb.ToString();
+                // i == 0 is impossible.
+                return id[0..i];
             }
         }
     }
