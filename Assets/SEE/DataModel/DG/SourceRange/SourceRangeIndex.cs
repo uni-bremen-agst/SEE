@@ -22,7 +22,9 @@ namespace SEE.DataModel.DG.SourceRange
         /// </summary>
         /// <param name="graph">graph whose nodes are to be indexed</param>
         /// <param name="getPath">yields a unique path for a node; its result will be used as a
-        /// key in <see cref="files"/></param>
+        /// key in <see cref="files"/> if different from null and non-empty; if it yields null, the
+        /// node will be ignored silently; if it yields the empty string, a
+        /// warning will be emitted</param>
         public SourceRangeIndex(Graph graph, Func<Node, string> getPath)
         {
             foreach (Node root in graph.GetRoots())
@@ -188,7 +190,9 @@ namespace SEE.DataModel.DG.SourceRange
         /// </summary>
         /// <param name="root">root node of the graph</param>
         /// <param name="getPath">yields a unique path for a node; its result will be used as a
-        /// key in <see cref="files"/></param>
+        /// key in <see cref="files"/> if different from null and non-empty; if it yields null, the
+        /// node will be ignored silently; if it yields the empty string, a
+        /// warning will be emitted</param>
         private void BuildIndex(Node root, Func<Node, string> getPath)
         {
             AddToIndex(root, getPath);
@@ -212,25 +216,30 @@ namespace SEE.DataModel.DG.SourceRange
         /// </summary>
         /// <param name="node">graph node to be added</param>
         /// <param name="getPath">yields a unique path for a node; its result will be used as a
-        /// key in <see cref="files"/></param>
+        /// key in <see cref="files"/> if different from null and non-empty; if it yields null, the
+        /// node will be ignored silently; if it yields the empty string, a
+        /// warning will be emitted</param>
         private void AddToIndex(Node node, Func<Node, string> getPath)
         {
-            // Only nodes with a filename can be added to the index because
-            // the index is organized by filenames.
-            if (!string.IsNullOrEmpty(node.Filename))
+            string path = getPath(node);
+            // Only nodes with a path can be added to the index because
+            // the index is organized by paths. If getPath yields null, the
+            // node is to be ignored.
+            if (path != null)
             {
-                // Note: path cannot be empty because node.Filename is not empty.
-                string path = getPath(node);
-                // If we do not already have a File for path, we will add one to the index.
-                if (!files.TryGetValue(path, out FileRanges file))
+                if (path.Length > 0)
                 {
-                    files.Add(path, file = new FileRanges());
+                    // If we do not already have a File for path, we will add one to the index.
+                    if (!files.TryGetValue(path, out FileRanges file))
+                    {
+                        files.Add(path, file = new FileRanges());
+                    }
+                    file.Add(node);
                 }
-                file.Add(node);
-            }
-            else
-            {
-                Debug.LogWarning($"{node.ID} does not have a filename. Will be ignored.\n");
+                else
+                {
+                    Debug.LogWarning($"{node.ID} does not have a path. Will be ignored.\n");
+                }
             }
         }
     }

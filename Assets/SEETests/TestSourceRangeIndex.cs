@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using LibGit2Sharp;
+using NUnit.Framework;
 using System;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -21,9 +22,9 @@ namespace SEE.DataModel.DG.SourceRange
         {
             SourceRangeIndex index = GetIndexByPath(g);
             Assert.IsTrue(index.IsIsomorphic());
-            // 11 nodes were added to the graph, but 3 are ignored because of incomplete
-            // source-location information.
-            Assert.AreEqual(8, index.Count);
+            // 11 nodes were added to the graph, but 2 are ignored because of an
+            // empty path.
+            Assert.AreEqual(9, index.Count);
 
             AssertNotFound(index, c1, 1);
             AssertNotFound(index, c1, 49);
@@ -70,6 +71,11 @@ namespace SEE.DataModel.DG.SourceRange
             AssertNotFound(index, c1m5, 65);
             AssertFound(index, c1m5, 66);
             AssertNotFound(index, c1m5, 67);
+
+            AssertNotFound(index, c1m4, 59);
+            AssertFound(index, c1m4, 60);
+            AssertFound(index, c1m4, 64);
+            AssertNotFound(index, c1m4, 65);
         }
 
         [Test]
@@ -164,9 +170,14 @@ namespace SEE.DataModel.DG.SourceRange
         /// 1.1.3.1       c1.m1.M3.M1@[56, 56]
         /// 1.2       c1.m2@[60, 64]
         ///
+        /// *** mydir/ ***
+        /// 1 c1.m4 @mydir/:60-64
+        ///
         /// *** myfile.java ***
         /// 1 c1.m5@[66, 66]
         ///
+        /// c1.m3 does not have a path. Will be ignored.
+        /// c1.m6 does not have a source line. Will be ignored.
         /// </summary>
         [SetUp]
         public void SetUp()
@@ -183,9 +194,9 @@ namespace SEE.DataModel.DG.SourceRange
             c1m1M3M1 = Child(g, c1m1M3, "c1.m1.M3.M1", type: "Method", directory: "mydir/", filename: "myfile.java", line: 56, length: 1);
 
             c1m2 = Child(g, c1, "c1.m2", type: "Method", directory: "mydir/", filename: "myfile.java", line: 60, length: 5);
-            // No filename => will be ignored.
+            // Empty path => will be ignored.
             c1m3 = Child(g, c1, "c1.m3", type: "Method");
-            // No filename => will be ignored.
+            // Path consists of only a directory without filename => will still be added to the index, because path is not empty.
             c1m4 = Child(g, c1, "c1.m4", type: "Method", directory: "mydir/", line: 60, length: 5);
 
             // In a new file, because the directory is missing.
