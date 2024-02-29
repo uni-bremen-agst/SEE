@@ -150,6 +150,16 @@ namespace SEE.UI.Window.VariablesWindow
         }
 
         /// <summary>
+        /// The pointer helper.
+        /// </summary>
+        private PointerHelper pointerHelper;
+
+        /// <summary>
+        /// Whether to retrieve the children on the next update.
+        /// </summary>
+        private bool queueRetrieveChildren;
+
+        /// <summary>
         /// Adds an item.
         /// </summary>
         /// <param name="child"></param>
@@ -198,7 +208,7 @@ namespace SEE.UI.Window.VariablesWindow
 
             expandIcon = item.transform.Find("Foreground/Expand Icon");
 
-            if (item.TryGetComponent<PointerHelper>(out PointerHelper pointerHelper))
+            if (item.TryGetComponent<PointerHelper>(out pointerHelper))
             {
                 if (children.Count > 0)
                 {
@@ -210,8 +220,7 @@ namespace SEE.UI.Window.VariablesWindow
                     {
                         if (e.button == PointerEventData.InputButton.Left)
                         {
-                            pointerHelper.ClickEvent.RemoveAllListeners();
-                            StartCoroutine(RetrieveChildren());
+                            queueRetrieveChildren = true;
                         }
                     });
                 } else
@@ -220,34 +229,20 @@ namespace SEE.UI.Window.VariablesWindow
                 }
             }
 
-            void ToggleChildren(PointerEventData e)
-            {
-                if (e.button == PointerEventData.InputButton.Left)
-                {
-                    IsExpanded = !IsExpanded;
-                }
-            }
-            // Retrieve the children (on the main thread)
-            IEnumerator RetrieveChildren()
-            {
-                List<Variable> childVariables = RetrieveNestedVariables(VariableReference);
-                childVariables.ForEach(AddVariable);
-                if (children.Count > 0)
-                {
-                    IsExpanded = true;
-                    pointerHelper.ClickEvent.AddListener(ToggleChildren);
-                }
-                else
-                {
-                    expandIcon.gameObject.SetActive(false);
-                }
-                yield return null;
-            }
-
 
             UpdateVisibility();
             UpdateIndent();
             UpdateExpand();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            if (queueRetrieveChildren)
+            {
+                queueRetrieveChildren = false;
+                RetrieveChildren();
+            }
         }
 
         /// <summary>
@@ -308,6 +303,30 @@ namespace SEE.UI.Window.VariablesWindow
         private void SetSiblingIndex(int index)
         {
             item.transform.SetSiblingIndex(index);
+        }
+
+        private void RetrieveChildren()
+        {
+            pointerHelper.ClickEvent.RemoveAllListeners();
+            List<Variable> childVariables = RetrieveNestedVariables(VariableReference);
+            childVariables.ForEach(AddVariable);
+            if (children.Count > 0)
+            {
+                IsExpanded = true;
+                pointerHelper.ClickEvent.AddListener(ToggleChildren);
+            }
+            else
+            {
+                expandIcon.gameObject.SetActive(false);
+            }
+        }
+
+        private void ToggleChildren(PointerEventData e)
+        {
+            if (e.button == PointerEventData.InputButton.Left)
+            {
+                IsExpanded = !IsExpanded;
+            }
         }
     }
 }
