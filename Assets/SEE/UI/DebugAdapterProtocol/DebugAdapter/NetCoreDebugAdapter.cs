@@ -18,7 +18,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
 
         public override string AdapterWorkingDirectory { get; set; } = Path.Combine(AdapterDirectory, "netcoredbg");
         public override string AdapterFileName { get; set; } = "netcoredbg.exe";
-        public override string AdapterArguments { get; set; } = "--interpreter=vscode --engineLogging=RunWithUnity.log";
+        public override string AdapterArguments { get; set; } = "--interpreter=vscode";
 
         private bool launchNoDebug = false;
         // https://github.com/Samsung/netcoredbg/blob/27606c317017beb81bc1b81846cdc460a7a6aed3/test-suite/NetcoreDbgTest/VSCode/VSCodeProtocolRequest.cs#L44
