@@ -127,7 +127,7 @@ namespace SEE.UI.Window.CodeWindow
             textMesh.margin = margin;
 
             // doesn't need breakpoints without file path
-            if (needsBreakpoints)
+            if (!needsBreakpoints)
             {
                 return;
             }
