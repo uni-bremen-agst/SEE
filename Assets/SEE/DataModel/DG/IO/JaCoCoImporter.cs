@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Text;
 using System.Xml;
 using UnityEngine;
 
@@ -402,7 +401,7 @@ namespace SEE.DataModel.DG.IO
         ///
         /// For instance, if we have a file T.java with a main class T in package p
         /// and a non-main class Z which in turn contains a nested class W, then the
-        /// result for T would be p.T, the result for Z would be p.T, the result for
+        /// result for T would be p.T, the result for Z would be p.T, too, the result for
         /// W would again be p.T.
         ///
         /// Note: The filename for a main type T must be T.java in Java. This fact allows
@@ -414,7 +413,6 @@ namespace SEE.DataModel.DG.IO
         /// then again p.T would be returned.
         ///
         /// For all other node types, null is returned.
-        ///
         /// </summary>
         /// <param name="node">node whose fully qualified name is to be retrieved</param>
         /// <returns>fully qualified name of the main type for the given <paramref name="node"/></returns>
@@ -438,7 +436,7 @@ namespace SEE.DataModel.DG.IO
         }
 
         /// <summary>
-        /// Returns a fully qualified Java name for main type corresponding to the
+        /// Returns a fully qualified Java name for the main type corresponding to the
         /// given <paramref name="qualifiedJavaTypeName"/>.
         /// </summary>
         /// <param name="qualifiedJavaTypeName">fully qualified Java name of a type</param>
@@ -455,7 +453,7 @@ namespace SEE.DataModel.DG.IO
             // the corresponding main type is declared in. Whether a top-level
             // type is the main type can be determined by checking the
             // source filename. A main type T is contained in a file named
-            // T.java; if that is not the case, a type is not a main type.
+            // T.java; if that is not the case, the type is not a main type.
             //
             // The ID of an inner type W nested in a type Z declared in a
             // package p is p.Z$W. The delimiter $ is used to separate inner
@@ -476,7 +474,8 @@ namespace SEE.DataModel.DG.IO
             {
                 // It is a top-leven type that is not the main type. The filename
                 // gives us the name of the main type this type corresponds to.
-                return parentName + "." + typeAccordingToFilename;
+                return parentName.Length == 0 ?
+                    typeAccordingToFilename : parentName + "." + typeAccordingToFilename;
             }
 
             // If id does not contain the delimiter $, id is returned.

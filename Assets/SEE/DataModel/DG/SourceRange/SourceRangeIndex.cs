@@ -75,9 +75,11 @@ namespace SEE.DataModel.DG.SourceRange
 
         /// <summary>
         /// The source-code range index as a mapping of the path of a file
-        /// onto <see cref="FileRanges"/>. The children of <see cref="FileRanges"/>
-        /// are the code ranges for nodes in the graph whose declaration
-        /// is contained in that file.
+        /// onto <see cref="FileRanges"/>. The path is determined by a
+        /// delegate provide by the client.
+        ///
+        /// The children of <see cref="FileRanges"/> are the code ranges
+        /// for nodes in the graph whose declaration is contained in that file.
         /// </summary>
         private readonly Dictionary<string, FileRanges> files = new();
 
