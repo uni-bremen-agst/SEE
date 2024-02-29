@@ -186,8 +186,7 @@ namespace SEE.Game.City
             if (value is EdgeEvent { Change: ChangeType.Addition } edgeEvent)
             {
                 // If this is an added edge, we are going to need to turn it into a mesh.
-                // FIXME: Disabled temporarily. Do we want to activate it again?
-                // LoadingSpinner.Show(LoadingText);
+                LoadingSpinner.Show(LoadingText);
                 edges.Enqueue(edgeEvent.Edge);
             }
 
