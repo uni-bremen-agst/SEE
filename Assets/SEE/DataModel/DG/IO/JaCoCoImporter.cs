@@ -420,9 +420,6 @@ namespace SEE.DataModel.DG.IO
         /// <returns>fully qualified name of the main type for the given <paramref name="node"/></returns>
         private static string IndexPath(Node node)
         {
-            // counter/unterordner/UnterOrdnerTest$InnereKlasse
-            Debug.Log($"GetClassName({node.Type} {node.ID})\n");
-
             if (node.Type == "Method")
             {
                 // A Java method can be declared only within a type, thus, its
@@ -440,6 +437,14 @@ namespace SEE.DataModel.DG.IO
             }
         }
 
+        /// <summary>
+        /// Returns a fully qualified Java name for main type corresponding to the
+        /// given <paramref name="qualifiedJavaTypeName"/>.
+        /// </summary>
+        /// <param name="qualifiedJavaTypeName">fully qualified Java name of a type</param>
+        /// <param name="filename">the Java filename in which the type is declared</param>
+        /// <returns>fully qualified Java name for main type corresponding to the
+        /// given <paramref name="qualifiedJavaTypeName"/></returns>
         private static string MainTypeName(string qualifiedJavaTypeName, string filename)
         {
             // The ID (Linkage.Name) of a main type Y declared in package p
