@@ -832,7 +832,6 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <param name="text"></param>
         private void OnConsoleInput(string text)
         {
-            Debug.Log("On Console INput: " + text);
             actions.Enqueue(() =>
             {
                 try
@@ -1000,7 +999,6 @@ namespace SEE.UI.DebugAdapterProtocol
             StackFrame stackFrameWithSource = stackFrames.FirstOrDefault(frame => frame.Source != null);
             if (stackFrameWithSource == null)
             {
-                Debug.LogError("No stack frame with source found.");
                 return;
             }
 
@@ -1009,7 +1007,7 @@ namespace SEE.UI.DebugAdapterProtocol
 
             if (sourceRangeIndex != null)
             {
-                // TODO: Does SourceRangeIndex always has the slash as a path separator?
+                // TODO: Does SourceRangeIndex always have slashes?
                 string sourceRangeIndexPath = lastCodePath.Replace("\\", "/");
                 if (sourceRangeIndexPath.StartsWith(City.SourceCodeDirectory.AbsolutePath))
                 {
@@ -1022,25 +1020,20 @@ namespace SEE.UI.DebugAdapterProtocol
                 Node node;
                 if (sourceRangeIndex.TryGetValue(sourceRangeIndexPath, lastCodeLine, out node))
                 {
-                    if (lastHighlighted == null)
-                    {
-                        lastHighlighted = node;
-                        ShowCodePosition(true, true, highlightDurationInitial);
-                    }
-                    else if (node.ID != lastHighlighted.ID)
+                    if (lastHighlighted != null && lastHighlighted.ID != node.ID)
                     {
                         Edge edge = lastHighlighted.Outgoings.FirstOrDefault(e => e.Target.ID == node.ID);
                         if (edge)
                         {
                             edge.Operator().Highlight(highlightDurationInitial, false);
                         }
-                        lastHighlighted = node;
-                        ShowCodePosition(true, true, highlightDurationInitial);
                     }
-                    else
-                    {
-                        ShowCodePosition(true, false, highlightDurationRepeated);
-                    }
+                    float duration = lastHighlighted == null || lastHighlighted.ID != node.ID ? highlightDurationInitial : highlightDurationRepeated;
+                    lastHighlighted = node;
+                    ShowCodePosition(true, true, highlightDurationInitial);
+                } else
+                {
+                    ShowCodePosition(true, true, -1);
                 }
             } else
             {
@@ -1059,21 +1052,28 @@ namespace SEE.UI.DebugAdapterProtocol
                 codeWindow.EnterFromFile(lastCodePath);
                 manager.AddWindow(codeWindow);
                 codeWindow.OnComponentInitialized += Mark;
+                codeWindow.OnComponentInitialized += MakeActive;
                 
             } else
             {
                 Mark();
+                MakeActive();
             }
-            if (makeActive)
-            {
-                manager.ActiveWindow = codeWindow;
-            }
-            lastCodeWindow = codeWindow;
             if (lastHighlighted && highlightDuration > 0)
             {
                 lastHighlighted.Operator().Highlight(highlightDuration, false);
             }
 
+            lastCodeWindow = codeWindow;
+
+
+            void MakeActive()
+            {
+                if (makeActive)
+                {
+                    manager.ActiveWindow = codeWindow;
+                }
+            }
             void Mark()
             {
                 if (scroll)
