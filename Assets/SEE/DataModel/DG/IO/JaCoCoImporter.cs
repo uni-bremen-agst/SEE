@@ -33,19 +33,12 @@ namespace SEE.DataModel.DG.IO
         private const string methodContext = "method";
 
         /// <summary>
-        /// Loads a JaCoCo test report from the given JaCoCo XML <paramref name="filename"/>.
+        /// Loads a JaCoCo test report from the given JaCoCo XML <paramref name="jaCoCoFilename"/>.
         /// The retrieved coverage metrics will be added to nodes of <paramref name="graph"/>.
-        ///
-        /// If <paramref name="prefix"/> is neither null nor just whitespace, it will be
-        /// prepended to every path that is extracted from the JaCoCo report. This addition
-        /// may be necessary to match paths retrieved from the JaCoCo report and the path attributes
-        /// <see cref="GraphElement.Path"/> of nodes in the graph the coverage metrics are
-        /// to be added.
         /// </summary>
         /// <param name="graph">Graph where to add the metrics</param>
-        /// <param name="filename">Path of the XML file</param>
-        /// <param name="prefix">the path prefix to be added at the front of the path (may be empty)</param>
-        public static void Load(Graph graph, string filename, string prefix)
+        /// <param name="jaCoCoFilename">Path of the XML file</param>
+        public static void Load(Graph graph, string jaCoCoFilename)
         {
             if (graph == null)
             {
@@ -56,20 +49,20 @@ namespace SEE.DataModel.DG.IO
                 // graph is empty. Nothing to do.
                 return;
             }
-            if (string.IsNullOrEmpty(filename))
+            if (string.IsNullOrEmpty(jaCoCoFilename))
             {
                 throw new ArgumentException("File path must neither be null nor empty.");
             }
-            if (!File.Exists(filename))
+            if (!File.Exists(jaCoCoFilename))
             {
-                Debug.LogError($"The JaCoCo XML file named {filename} does not exist.\n");
+                Debug.LogError($"The JaCoCo XML file named {jaCoCoFilename} does not exist.\n");
                 return;
             }
 
             SourceRangeIndex index = new(graph, IndexPath);
 
             XmlReaderSettings settings = new() { DtdProcessing = DtdProcessing.Parse };
-            using XmlReader xmlReader = XmlReader.Create(filename, settings);
+            using XmlReader xmlReader = XmlReader.Create(jaCoCoFilename, settings);
 
             // The fully qualified name of the package currently processed.
             // The name is retrieved from JaCoCo's XML report, where
@@ -163,7 +156,7 @@ namespace SEE.DataModel.DG.IO
                                 packageName = xmlReader.GetAttribute("name");
                                 if (string.IsNullOrWhiteSpace(packageName))
                                 {
-                                    Debug.LogWarning($"{XMLSourcePosition(filename, xmlReader)}: "
+                                    Debug.LogWarning($"{XMLSourcePosition(jaCoCoFilename, xmlReader)}: "
                                          + "Data for the default Java package (without name) were given. These will be ignored.\n");
                                 }
                             }
@@ -177,7 +170,7 @@ namespace SEE.DataModel.DG.IO
                             }
                             else
                             {
-                                Debug.LogWarning($"{XMLSourcePosition(filename, xmlReader)}: "
+                                Debug.LogWarning($"{XMLSourcePosition(jaCoCoFilename, xmlReader)}: "
                                        + "Report does not provide coverage data for this entity.\n");
                             }
 
@@ -215,7 +208,7 @@ namespace SEE.DataModel.DG.IO
                                         // We do that via the unique ID of a package node, which is assumed to be
                                         // the fully qualified name of the packages where individual packages are
                                         // separated by a period.
-                                        AddMetricsToClassOrPackage(graph, xmlReader, packageName, filename);
+                                        AddMetricsToClassOrPackage(graph, xmlReader, packageName, jaCoCoFilename);
                                     }
                                 }
                                 else if (nodeType == classContext)
@@ -234,7 +227,7 @@ namespace SEE.DataModel.DG.IO
                                     // file declaring a main class C as a sibling to X within P in the package hierarchy.
                                     // Both would have the name P.C in our graph. Yet, that would be illegal Java
                                     // code and, hence, cannot happen.
-                                    AddMetricsToClassOrPackage(graph, xmlReader, qualifiedClassName, filename);
+                                    AddMetricsToClassOrPackage(graph, xmlReader, qualifiedClassName, jaCoCoFilename);
                                 }
                                 else if (nodeType == reportContext)
                                 {
@@ -244,20 +237,22 @@ namespace SEE.DataModel.DG.IO
                                     // root -- that we processed previously and for which we added metrics.
                                     AddMetrics(xmlReader, graph.GetRoots()[0]);
                                 }
-                                else if (index.TryGetValue(AsQualifiedName(qualifiedClassName), sourceLine, out Node nodeToAddMetrics))
+                                else if (index.TryGetValue(MainTypeName(AsJavaQualifiedName(qualifiedClassName), sourceFilename),
+                                                           sourceLine, out Node nodeToAddMetrics))
                                 {
                                     AddMetrics(xmlReader, nodeToAddMetrics);
                                 }
                                 else
                                 {
                                     // We are in a method context.
-                                    Debug.LogError($"{XMLSourcePosition(filename, xmlReader)}: "
-                                        + $"No node found for {nodeType} {qualifiedClassName}.{methodName}:{sourceLine}.\n");
+                                    Debug.LogError($"{XMLSourcePosition(jaCoCoFilename, xmlReader)}: "
+                                        + $"No node found for {nodeType} {AsJavaQualifiedName(qualifiedClassName)}.{methodName}:{sourceLine} "
+                                        + $"using key {MainTypeName(AsJavaQualifiedName(qualifiedClassName), sourceFilename)}.\n");
                                 }
                             }
                             catch (Exception e)
                             {
-                                Debug.LogError($"{XMLSourcePosition(filename, xmlReader)}: {e.Message}.\n");
+                                Debug.LogError($"{XMLSourcePosition(jaCoCoFilename, xmlReader)}: {e.Message}.\n");
                                 throw;
                             }
                         }
@@ -311,13 +306,13 @@ namespace SEE.DataModel.DG.IO
             // Retrieves the counter metrics from xmlReader and adds them to a package or class
             // node retrieved from the given graph having the given uniqueID.
             // Note: the actually used node ID is uniqueID where every / is replaced by a period.
-            static void AddMetricsToClassOrPackage(Graph graph, XmlReader xmlReader, string uniqueID, string filename)
+            static void AddMetricsToClassOrPackage(Graph graph, XmlReader xmlReader, string uniqueID, string jaCoCoFilename)
             {
                 // JaCoCo uses "/" as a separator for packages and classes while our graph is
                 // assumed to use a period "." to separate package/class names in unique IDs.
                 if (uniqueID == null)
                 {
-                    Debug.LogError($"{XMLSourcePosition(filename, xmlReader)}: uniqueID is null.\n");
+                    Debug.LogError($"{XMLSourcePosition(jaCoCoFilename, xmlReader)}: uniqueID is null.\n");
                 }
                 Node packageOrClassNode = graph.GetNode(uniqueID.Replace("/", "."));
                 if (packageOrClassNode != null)
@@ -326,7 +321,7 @@ namespace SEE.DataModel.DG.IO
                 }
                 else
                 {
-                    Debug.LogError($"{XMLSourcePosition(filename, xmlReader)}: No node found for package/class {uniqueID}.\n");
+                    Debug.LogError($"{XMLSourcePosition(jaCoCoFilename, xmlReader)}: No node found for package/class {uniqueID}.\n");
                 }
             }
         }
@@ -358,31 +353,30 @@ namespace SEE.DataModel.DG.IO
         private const char jacocoSeparator = '/';
 
         /// <summary>
-        /// A qualified name is a set of words separated by delimiter /.
-        /// This method returns the qualified name given in <paramref name="qualifiedClassName"/>
-        /// where its last word is replaced by <paramref name="sourceFilename"/>.
-        /// For instance, let the qualified name be A/B and F be the source file name,
-        /// then {P}A/F is returned. If the qualified name were only A, just {P}F would be returned;
-        /// where {P} is the given <paramref name="prefix"/> appended by delimiter / if <paramref name="prefix"/>
-        /// is not the empty string; if <paramref name="prefix"/> is the empty string {P} is the
-        /// empty string.
+        /// A qualified name in Java is a set of words separated by a period as a delimiter.
+        /// JaCoCo, however, uses a forward slash as a delimiter. This method returns
+        /// <paramref name="qualifiedJaCoCoTypeName"/> where each forward slash has
+        /// been replaced by a period.
         /// </summary>
-        /// <param name="qualifiedClassName">qualified name to be processed</param>
-        /// <param name="sourceFilename">source filename to be appended</param>
-        /// <returns>qualified name whose last word is replaced by <paramref name="sourceFilename"/>
-        /// </returns>
-        /// <exception cref="ArgumentException">thrown in case <paramref name="qualifiedClassName"/>
+        /// <param name="qualifiedJaCoCoTypeName">qualified name in JaCoCo syntax to be converted</param>
+        /// <returns><paramref name="qualifiedJaCoCoTypeName"/> where each forward slash was replaced
+        /// by a period</returns>
+        /// <exception cref="ArgumentException">thrown in case <paramref name="qualifiedJaCoCoTypeName"/>
         /// is null or empty</exception>
-        private static string AsQualifiedName(string qualifiedClassName)
+        private static string AsJavaQualifiedName(string qualifiedJaCoCoTypeName)
         {
-            if (string.IsNullOrEmpty(qualifiedClassName))
+            if (string.IsNullOrEmpty(qualifiedJaCoCoTypeName))
             {
                 throw new ArgumentException("The qualified name of a class must not be empty.");
             }
-            return qualifiedClassName.Replace(jacocoSeparator, '.');
+            return qualifiedJaCoCoTypeName.Replace(jacocoSeparator, '.');
         }
 
-        private static readonly HashSet<string> typeNodeTypes = new() { "Class", "Interface", "Class_Template", "Interface_Template"};
+        /// <summary>
+        /// The name of all node types representing types in Java.
+        /// </summary>
+        private static readonly HashSet<string> typeNodeTypes
+            = new() { "Class", "Interface", "Class_Template", "Interface_Template"};
 
         /// <summary>
         /// Yields the path name of <paramref name="node"/>.
@@ -393,23 +387,26 @@ namespace SEE.DataModel.DG.IO
         ///
         /// The fully qualified name of a main type is the name of the type including
         /// all the packages it is contained in, e.g., org.uni-bremen.mypackage.myclass
-        /// for a class named myclass declared in package org.uni-bremen.mypackage.
+        /// for a class named myclass declared in package org.uni-bremen.mypackage. A
+        /// period is used as a delimiter.
         ///
         /// What is a main type corresponding to a type? Java allows a file to declare multiple
         /// types in the same file even at the top level. Only one of those declared at top
-        /// level may be public, however. Other type declarations may be nested in types.
+        /// level may be public, however.
         /// If there is only one type declared at the top level, that type is the main type.
         /// If there are multiple types declared at the top level, the one declared as
-        /// public is the main type. For inner (nested, not at the top level) types, the
-        /// main type is the main type corresponding to the outer-most (top-level) type
-        /// the inner type is contained in.
-        ///
-        /// The filename for a main type T must be T.java.
+        /// public is the main type.
+        /// Other type declarations may be nested in types in Java. For inner (nested, not at
+        /// the top level) types, the main type is the main type corresponding to the
+        /// outer-most (top-level) type the inner type is contained in.
         ///
         /// For instance, if we have a file T.java with a main class T in package p
         /// and a non-main class Z which in turn contains a nested class W, then the
         /// result for T would be p.T, the result for Z would be p.T, the result for
         /// W would again be p.T.
+        ///
+        /// Note: The filename for a main type T must be T.java in Java. This fact allows
+        /// us to distinguish the main type from other top-level types in a file.
         ///
         /// If <paramref name="node"/> is a method with <see cref="Node.Parent"/> p (obviously
         /// a type in which the method is declared), then <see cref="IndexPath(Node)"/> applied
@@ -420,7 +417,7 @@ namespace SEE.DataModel.DG.IO
         ///
         /// </summary>
         /// <param name="node">node whose fully qualified name is to be retrieved</param>
-        /// <returns>ully qualified name of the parent</returns>
+        /// <returns>fully qualified name of the main type for the given <paramref name="node"/></returns>
         private static string IndexPath(Node node)
         {
             // counter/unterordner/UnterOrdnerTest$InnereKlasse
@@ -434,31 +431,47 @@ namespace SEE.DataModel.DG.IO
             }
             else if (typeNodeTypes.Contains(node.Type))
             {
-                // The ID (Linkage.Name) of a main type Y declared in package p
-                // is p.Y.
-                //
-                // Likewise, the ID of a type Z declared at top level, but
-                // different from the main type, is p.Z where p is the package
-                // the corresponding main type is declared in. Whether a top-level
-                // type is a non-main type can be determined by checking the
-                // source filename. A main type T is contained in a file named
-                // T.java; if that is not the case, a type is not a main type.
-                //
-                // The ID of an inner type W nested in a type Z declared in a
-                // package p is p.Z$W. The delimiter $ is used to separate inner
-                // types from their containing type.
-                string outerMostType = OuterMostType(node.ID);
-                // outerMostType could denote a main type or another top-level
-                // type that is not a main type. The two can be distinguished
-                // using the source filename.
-                string simpleName = SimpleName(outerMostType);
-                // FIXME: CONTINUE HERE.
-                return outerMostType;
+                return MainTypeName(node.ID, node.Filename);
             }
             else
             {
                 // Node types different from a type and method will be ignored.
                 return null;
+            }
+        }
+
+        private static string MainTypeName(string qualifiedJavaTypeName, string filename)
+        {
+            // The ID (Linkage.Name) of a main type Y declared in package p
+            // is p.Y.
+            //
+            // Likewise, the ID of a type Z declared at top level, but
+            // different from the main type, is p.Z where p is the package
+            // the corresponding main type is declared in. Whether a top-level
+            // type is the main type can be determined by checking the
+            // source filename. A main type T is contained in a file named
+            // T.java; if that is not the case, a type is not a main type.
+            //
+            // The ID of an inner type W nested in a type Z declared in a
+            // package p is p.Z$W. The delimiter $ is used to separate inner
+            // types from their containing type.
+
+            string outerMostType = OuterMostType(qualifiedJavaTypeName);
+            // outerMostType could denote a main type or another top-level
+            // type that is not a main type. The two can be distinguished
+            // using the source filename.
+            (string parentName, string simpleName) = SimpleName(outerMostType);
+            string typeAccordingToFilename = Path.GetFileNameWithoutExtension(filename);
+            if (simpleName == typeAccordingToFilename)
+            {
+                // It is a main type.
+                return outerMostType;
+            }
+            else
+            {
+                // It is a top-leven type that is not the main type. The filename
+                // gives us the name of the main type this type corresponds to.
+                return parentName + "." + typeAccordingToFilename;
             }
 
             // If id does not contain the delimiter $, id is returned.
@@ -479,16 +492,18 @@ namespace SEE.DataModel.DG.IO
             }
 
             // Returns the last name in the given qualified name.
-            static string SimpleName(string qualifiedName)
+            // The first element of the result is the fully qualified name
+            // of the parent and the second element is the last simple name.
+            static (string, string) SimpleName(string qualifiedName)
             {
                 int i = qualifiedName.LastIndexOf(".");
                 if (i == -1)
                 {
-                    return qualifiedName;
+                    return (string.Empty, qualifiedName);
                 }
                 else
                 {
-                    return qualifiedName[..^i];
+                    return (qualifiedName[..i], qualifiedName[..^i]);
                 }
             }
         }

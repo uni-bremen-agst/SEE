@@ -31,6 +31,7 @@ namespace SEE.DataModel.DG.SourceRange
             {
                 BuildIndex(root, getPath);
             }
+            Dump();
         }
 
         /// <summary>
@@ -167,18 +168,18 @@ namespace SEE.DataModel.DG.SourceRange
                 int i = 1;
                 foreach (Range range in file.Children)
                 {
-                    DumpRange(range, i.ToString());
+                    DumpRange(i.ToString(), range);
                     i++;
                 }
             }
 
-            void DumpRange(Range range, string prefix)
+            void DumpRange(string enumeration, Range range)
             {
-                Debug.Log($"{prefix} {range}\n");
+                Debug.Log($"{enumeration} {range}\n");
                 int i = 1;
                 foreach (Range child in range.Children)
                 {
-                    DumpRange(child, prefix + "." + i.ToString());
+                    DumpRange(enumeration + "." + i.ToString(), child);
                     i++;
                 }
             }
