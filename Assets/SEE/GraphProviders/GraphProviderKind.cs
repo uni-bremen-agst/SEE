@@ -30,6 +30,10 @@
         /// </summary>
         Dashboard,
         /// <summary>
+        /// For <see cref="VCSGraphProvider"/>.
+        /// </summary>
+        VCS,
+        /// <summary>
         /// For <see cref="ReflexionGraphProvider"/>.
         /// </summary>
         Reflexion

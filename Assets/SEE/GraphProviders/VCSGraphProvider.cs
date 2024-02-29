@@ -7,14 +7,26 @@ using LibGit2Sharp;
 using System.IO;
 using System.Linq;
 using SEE.Game.City;
+using Cysharp.Threading.Tasks;
+using SEE.Utils.Config;
+using System;
 
 namespace SEE.GraphProviders
 {
-    public class VCSGraphProvider : MonoBehaviour
+    public class VCSGraphProvider : GraphProvider
     {
-        //TODO: Only for test, we need to remove Start() etc. and replace it like in the other GraphProvider.
-        // Start is called before the first frame update
-        void Start()
+        /// <summary>
+        /// Loads the metrics available at the Axivion Dashboard into the <paramref name="graph"/>.
+        /// </summary>
+        /// <param name="graph">The graph into which the metrics shall be loaded</param>
+        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
+        {
+            Debug.Log(GetVCSGraph().ToString());
+            return await UniTask.FromResult<Graph>(GetVCSGraph());
+            //return GetVCSGraph();
+        }
+
+        static Graph GetVCSGraph()
         {
             //TODO: Only for test, we need to get the repositoryPath from the user.
             string assetsPfad = Application.dataPath;
@@ -31,11 +43,11 @@ namespace SEE.GraphProviders
                     .Select(entry => entry.Path)
                     .Where(path => !string.IsNullOrEmpty(path))
                     .ToList().Take(200);
-
+                Debug.Log(files.Count());
                 // Build the graph structure.
                 foreach (var filePath in files.Where(path => !string.IsNullOrEmpty(path)))
                 {
-                    string[] filePathSegments = filePath.Split(Path.DirectorySeparatorChar);
+                    string[] filePathSegments = filePath.Split(Path.AltDirectorySeparatorChar);
                     // Files in the main directory.
                     if (filePathSegments.Length == 1)
                     {
@@ -50,31 +62,53 @@ namespace SEE.GraphProviders
                 //TODO: Only for testing.
                 Debug.Log(graph.ToString());
             }
+            return graph;
+        }
+        public override GraphProviderKind GetKind()
+        {
+            return GraphProviderKind.Dashboard;
+        }
+        /// <summary>
+        /// Label of attribute <see cref="OverrideMetrics"/> in the configuration file.
+        /// </summary>
+        private const string overrideMetricsLabel = "OverrideMetrics";
 
+        /// <summary>
+        /// Label of attribute <see cref="IssuesAddedFromVersion"/> in the configuration file.
+        /// </summary>
+        private const string issuesAddedFromVersionLabel = "IssuesAddedFromVersion";
+        protected override void SaveAttributes(ConfigWriter writer)
+        {
+            writer.Save(GetVCSGraph(), overrideMetricsLabel);
+        }
+
+        protected override void RestoreAttributes(Dictionary<string, object> attributes)
+        {
+            
         }
         //TODO: Documentation.
-        static void BuildGraphFromPath(string path, Node parent, string parentPath, Graph graph, Node repositoryNode)
+        static void BuildGraphFromPath(string path, Node parent, string parentPath, Graph graph, Node mainNode)
         {
-            string[] pathSegments = path.Split(Path.DirectorySeparatorChar);
-            string nodePath = string.Join(Path.DirectorySeparatorChar.ToString(), pathSegments, 1, pathSegments.Length - 1);
+            string[] pathSegments = path.Split(Path.AltDirectorySeparatorChar);
+            string nodePath = string.Join(Path.AltDirectorySeparatorChar.ToString(), pathSegments, 1, pathSegments.Length - 1);
             // Current pathSegment is in the main directory.
             if (parentPath == null)
             {
                 // Directory already exists.
                 if (graph.GetNode(pathSegments[0]) != null)
                 {
-                    BuildGraphFromPath(nodePath, graph.GetNode(pathSegments[0]), pathSegments[0], graph, repositoryNode);
+                    BuildGraphFromPath(nodePath, graph.GetNode(pathSegments[0]), pathSegments[0], graph, mainNode);
                 }
                 // Directory does not exist.
                 if (graph.GetNode(pathSegments[0]) == null && pathSegments.Length > 1 && parent == null)
                 {
-                    repositoryNode.AddChild(NewNode(graph, pathSegments[0], "directory"));
-                    BuildGraphFromPath(nodePath, graph.GetNode(pathSegments[0]), parentPath + Path.DirectorySeparatorChar + pathSegments[0], graph, repositoryNode);
+                    mainNode.AddChild(NewNode(graph, pathSegments[0], "directory"));
+                    BuildGraphFromPath(nodePath, graph.GetNode(pathSegments[0]), parentPath + Path.DirectorySeparatorChar + pathSegments[0], graph, mainNode);
                 }
                 // I dont know, if this code ever gets used -> I dont know, how to handle empty directorys.
                 if (graph.GetNode(pathSegments[0]) == null && pathSegments.Length == 1 && parent == null)
                 {
-                    repositoryNode.AddChild(NewNode(graph, pathSegments[0], "directory"));
+                    mainNode.AddChild(NewNode(graph, pathSegments[0], "directory"));
                 }
             }
             // Current pathSegment is not in the main directory.
@@ -83,13 +117,13 @@ namespace SEE.GraphProviders
                 // The node for the current pathSegment exists.
                 if (graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]) != null)
                 {
-                    BuildGraphFromPath(nodePath, graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]), parentPath + Path.DirectorySeparatorChar + pathSegments[0], graph, repositoryNode);
+                    BuildGraphFromPath(nodePath, graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]), parentPath + Path.DirectorySeparatorChar + pathSegments[0], graph, mainNode);
                 }
                 // The node for the current pathSegment does not exist, and the node is a directory.
                 if (graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]) == null && pathSegments.Length > 1)
                 {
                     parent.AddChild(NewNode(graph, parentPath + Path.DirectorySeparatorChar + pathSegments[0], "directory"));
-                    BuildGraphFromPath(nodePath, graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]), parentPath + Path.DirectorySeparatorChar + pathSegments[0], graph, repositoryNode);
+                    BuildGraphFromPath(nodePath, graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]), parentPath + Path.DirectorySeparatorChar + pathSegments[0], graph, mainNode);
                 }
                 // The node for the current pathSegment does not exist, and the node is file.
                 if (graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]) == null && pathSegments.Length == 1)
