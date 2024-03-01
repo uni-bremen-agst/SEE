@@ -34,6 +34,11 @@ namespace SEE.Controls
 
         private void Start()
         {
+            GameObject head = GameObject.Find("/Local Player 1/Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/HeadAdjust");
+
+            //We want to fit the head completly into the CharacterController collider, so we use max value to calculate the radius
+            float headRadius = Mathf.Max(head.transform.localScale.x, head.transform.localScale.y, head.transform.localScale.z)/2;
+
             controller = gameObject.MustGetComponent<CharacterController>();
 
             // Default Layer is ignored by collider
@@ -43,7 +48,7 @@ namespace SEE.Controls
             // Defines the built-in collider of the CharacterController, by default the collider is a capsule.
             // We chose the following values to minimize the collider to roughly fit around the player's head as a sphere.
             controller.center = new Vector3(0.0f, 1.55f, 0.21f);
-            controller.radius = 0.44f;
+            controller.radius = headRadius;
             controller.height = 0.0f;
 
             if (FocusedObject != null)
