@@ -472,7 +472,7 @@ namespace SEE.DataModel.DG.IO
             }
             else
             {
-                // It is a top-leven type that is not the main type. The filename
+                // It is a top-level type that is not the main type. The filename
                 // gives us the name of the main type this type corresponds to.
                 return parentName.Length == 0 ?
                     typeAccordingToFilename : parentName + "." + typeAccordingToFilename;
