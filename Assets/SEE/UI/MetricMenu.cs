@@ -61,12 +61,12 @@ namespace SEE.UI
         protected override void StartDesktop()
         {
             CreateNode();
-            
+
             canvasObject = PrefabInstantiator.InstantiatePrefab(CanvasPrefab, Canvas.transform, false);
             canvasObject.transform.name = "MetricSpace";
 
             // instantiates the Metric Menu
-            menu = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, canvasObject.transform, false);
+            /*menu = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, canvasObject.transform, false);
 
             //Button Exit
             Transform outTrans = menu.transform.Find("Dragger/ExitButton");
@@ -103,7 +103,7 @@ namespace SEE.UI
                 Element[i] = ScrollViewContent.transform.GetChild(i).gameObject;
             }
 
-            InputField.MustGetComponent<TMP_InputField>().onValueChanged.AddListener(str => InputSearchField(str, Element, InputField));
+            InputField.MustGetComponent<TMP_InputField>().onValueChanged.AddListener(str => InputSearchField(str, Element, InputField));*/
         }
 
         protected override void UpdateDesktop()
