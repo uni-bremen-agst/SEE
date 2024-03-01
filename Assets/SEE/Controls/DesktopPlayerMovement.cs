@@ -37,7 +37,8 @@ namespace SEE.Controls
             controller = gameObject.MustGetComponent<CharacterController>();
 
             // Default Layer is ignored by collider
-            controller.excludeLayers = 1;
+            // LayerMask are working with Bitmask so we need that 1<< shifting to get the right Layer
+            controller.excludeLayers = 1<<LayerMask.NameToLayer("Default");
 
             // Defines the built-in collider of the CharacterController, by default the collider is a capsule.
             // We choosed the following values to minimize the collider to roughly fit around the players head as a sphere.
