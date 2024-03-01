@@ -159,8 +159,17 @@ namespace SEE.Controls.Actions
 
         private static void CreateWindow(GraphElement graphElement)
         {
-            MetricMenu.Instance.UpdateTable(graphElement);
-            MetricMenu.Instance.OpenWindow();
+            if (MetricMenu.Instance != null && MetricMenu.Instance.gameObject.activeSelf)
+            {
+                Debug.Log("Ist AKtiv");
+                MetricMenu.Instance.CreateUIInstance(graphElement);
+            }
+            else
+            {
+                Debug.Log("Ist nicht aktiv");
+                MetricMenu.Instance.UpdateTable(graphElement);
+                MetricMenu.Instance.OpenWindow();
+            }
         }
 
         /// <summary>
