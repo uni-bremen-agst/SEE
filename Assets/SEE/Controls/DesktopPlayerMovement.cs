@@ -24,8 +24,8 @@ namespace SEE.Controls
         private CameraState cameraState;
 
         /// <summary>
-        /// Unity component that does movement constrained by collisions.
-        /// It moves with its own Move-method.
+        /// Unity component that moves the player constrained by collisions.
+        /// It moves the player with its own <see cref="CharacterController.Move(Vector3)"/> method.
         /// </summary>
         private CharacterController controller;
 
@@ -41,7 +41,7 @@ namespace SEE.Controls
             controller.excludeLayers = 1<<LayerMask.NameToLayer("Default");
 
             // Defines the built-in collider of the CharacterController, by default the collider is a capsule.
-            // We choosed the following values to minimize the collider to roughly fit around the players head as a sphere.
+            // We chose the following values to minimize the collider to roughly fit around the player's head as a sphere.
             controller.center = new Vector3(0.0f, 1.55f, 0.21f);
             controller.radius = 0.44f;
             controller.height = 0.0f;
@@ -135,6 +135,7 @@ namespace SEE.Controls
                 }
                 velocity.Normalize();
                 velocity *= speed;
+                // The following two lines may look strange, yet both are actually needed.
                 controller.Move(velocity); // this is the actual movement
                 controller.Move(Vector3.zero); // this prevents the player from sliding without input
 
