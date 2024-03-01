@@ -66,6 +66,32 @@ namespace SEE.DataModel.DG
             return Version = newVersion;
         }
 
+        /// <summary>
+        /// If <paramref name="value"/> is true, the toggle with <paramref name="attributeName"/>
+        /// will be set, otherwise it will be removed.
+        /// </summary>
+        /// <param name="attributeName">name of toggle attribute</param>
+        /// <param name="value">value to be set</param>
+        /// <remarks>All listeners will be notified in case of a change.</remarks>
+        public void SetToggle(string attributeName, bool value)
+        {
+            if (value)
+            {
+                SetToggle(attributeName);
+            }
+            else
+            {
+                UnsetToggle(attributeName);
+            }
+        }
+
+        /// <summary>
+        /// Removes the toggle attribute with <paramref name="attributeName"/> if not
+        /// already set. All listeners will be notified of this change.
+        /// If the attribute is set already, nothing happens.
+        /// </summary>
+        /// <param name="attributeName">name of toggle attribute</param>
+        /// <remarks>All listeners will be notified in case of a change.</remarks>
         public void SetToggle(string attributeName)
         {
             if (!toggleAttributes.Contains(attributeName))
@@ -75,6 +101,13 @@ namespace SEE.DataModel.DG
             }
         }
 
+        /// <summary>
+        /// Removes the toggle attribute with <paramref name="attributeName"/> if set.
+        /// All listeners will be notified of this change.
+        /// If no such attribute exists, nothing happens.
+        /// </summary>
+        /// <param name="attributeName">name of toggle attribute</param>
+        /// <remarks>All listeners will be notified in case of a change.</remarks>
         public void UnsetToggle(string attributeName)
         {
             if (toggleAttributes.Contains(attributeName))
@@ -84,6 +117,11 @@ namespace SEE.DataModel.DG
             }
         }
 
+        /// <summary>
+        /// True if the toggle attribute with <paramref name="attributeName"/> is set.
+        /// </summary>
+        /// <param name="attributeName">name of toggle attribute</param>
+        /// <returns>true if set</returns>
         public bool HasToggle(string attributeName)
         {
             return toggleAttributes.Contains(attributeName);

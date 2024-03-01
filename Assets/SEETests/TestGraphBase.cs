@@ -10,6 +10,23 @@ namespace SEE.DataModel.DG
     internal abstract class TestGraphBase
     {
         /// <summary>
+        /// Name of the toggle attribute.
+        /// </summary>
+        protected const string ToggleAttribute = "Toggle";
+        /// <summary>
+        /// Name of the float attribute.
+        /// </summary>
+        protected const string FloatAttribute = "Float";
+        /// <summary>
+        /// Name of the int attribute.
+        /// </summary>
+        protected const string IntAttribute = "Int";
+        /// <summary>
+        /// Name of the string attribute.
+        /// </summary>
+        protected const string StringAttribute = "String";
+
+        /// <summary>
         /// Creates and returns a new node to <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">where to add the node</param>
@@ -75,7 +92,7 @@ namespace SEE.DataModel.DG
         /// <param name="graph">graph where to look up the ID of <paramref name="node"/></param>
         /// <param name="node">node whose counterpart in <paramref name="graph"/> is requested</param>
         /// <returns>node in <paramref name="graph"/> that has the same ID as <paramref name="node"/> or null</returns>
-        protected Node Pendant(Graph graph, Node node) => graph.GetNode(node.ID);
+        protected GraphElement Pendant(Graph graph, GraphElement node) => node is Node ? graph.GetNode(node.ID) : graph.GetEdge(node.ID);
 
         /// <summary>
         /// Returns true if <paramref name="source"/> has an outgoing edge with given <paramref name="target"/>
@@ -101,16 +118,17 @@ namespace SEE.DataModel.DG
         /// <param name="child">child node</param>
         protected void AssertHasChild(Graph graph, Node parent, Node child)
         {
-            Assert.AreSame(Pendant(graph, parent), Pendant(graph, child).Parent);
+            Assert.AreSame(Pendant(graph, parent), (Pendant(graph, child) as Node).Parent);
         }
 
         /// <summary>
         /// Creates a new graph with default basepath and graph name.
+        /// It will have no nodes or edges.
         /// </summary>
         /// <param name="viewName">the name of the graph</param>
         /// <param name="basePath">the basepath of the graph for looking up the source code files</param>
         /// <returns>new graph</returns>
-        protected static Graph NewGraph(string viewName = "CodeFacts", string basePath = "DUMMYBASEPATH")
+        protected static Graph NewEmptyGraph(string viewName = "CodeFacts", string basePath = "DUMMYBASEPATH")
         {
             return new Graph(basePath, viewName);
         }

@@ -59,30 +59,34 @@
     public static class JaCoCo
     {
         /// <summary>
+        /// The prefix of each JaCoCo metric.
+        /// </summary>
+        public const string Prefix = "Metric.JaCoCo";
+        /// <summary>
         /// The number of instructions that were not executed.
         /// </summary>
-        public const string InstructionMissed = "Metric.INSTRUCTION_missed";
+        public const string InstructionMissed = "Metric.JaCoCo.INSTRUCTION_missed";
         /// <summary>
         /// The number of instructions that were executed.
         /// </summary>
-        public const string InstructionCovered = "Metric.INSTRUCTION_covered";
+        public const string InstructionCovered = "Metric.JaCoCo.INSTRUCTION_covered";
         /// <summary>
         /// InstructionCovered / (InstructionCovered + InstructionMissed).
         /// </summary>
-        public const string PercentageOfInstructionCovered = "Metric.INSTRUCTION_percentage";
+        public const string PercentageOfInstructionCovered = "Metric.JaCoCo.INSTRUCTION_percentage";
 
         /// <summary>
         /// The number of branches (conditional statement constitute branches) that were not executed.
         /// </summary>
-        public const string BranchMissed = "Metric.BRANCH_missed";
+        public const string BranchMissed = "Metric.JaCoCo.BRANCH_missed";
         /// <summary>
         /// The number of branches (conditional statement constitute branches) that were executed.
         /// </summary>
-        public const string BranchCovered = "Metric.BRANCH_covered";
+        public const string BranchCovered = "Metric.JaCoCo.BRANCH_covered";
         /// <summary>
         /// BranchCovered / (BranchMissed + BranchCovered).
         /// </summary>
-        public const string PercentageOfBranchCovered = "Metric.BRANCH_percentage";
+        public const string PercentageOfBranchCovered = "Metric.JaCoCo.BRANCH_percentage";
 
         /// <summary>
         /// Cyclomatic complexity is defined for each non-abstract method and is also
@@ -91,7 +95,7 @@
         /// in (linear) combination, generate all possible paths through a method.
         /// This metric counts the missed such paths.
         /// </summary>
-        public const string ComplexityMissed = "Metric.COMPLEXITY_missed";
+        public const string ComplexityMissed = "Metric.JaCoCo.COMPLEXITY_missed";
         /// <summary>
         /// Cyclomatic complexity is defined for each non-abstract method and is also
         /// aggregated from methods to classes, packages, and groups they are contained.
@@ -99,11 +103,11 @@
         /// in (linear) combination, generate all possible paths through a method.
         /// This metric counts the covered such paths.
         /// </summary>
-        public const string ComplexityCovered = "Metric.COMPLEXITY_covered";
+        public const string ComplexityCovered = "Metric.JaCoCo.COMPLEXITY_covered";
         /// <summary>
         /// ComplexityCovered / (ComplexityMissed + ComplexityCovered).
         /// </summary>
-        public const string PercentageOfComplexityCovered = "Metric.COMPLEXITY_percentage";
+        public const string PercentageOfComplexityCovered = "Metric.JaCoCo.COMPLEXITY_percentage";
 
         /// <summary>
         /// This metric is defined for all class files that have been compiled with debug information,
@@ -112,7 +116,7 @@
         /// this line has been executed.
         /// This metric counts the number of such lines missed.
         /// </summary>
-        public const string LineMissed = "Metric.LINE_missed";
+        public const string LineMissed = "Metric.JaCoCo.LINE_missed";
         /// <summary>
         /// This metric is defined for all class files that have been compiled with debug information,
         /// such that coverage information for individual lines can be calculated.
@@ -120,11 +124,11 @@
         /// this line has been executed
         /// This metric counts the number of such lines covered.
         /// </summary>
-        public const string LineCovered = "Metric.LINE_covered";
+        public const string LineCovered = "Metric.JaCoCo.LINE_covered";
         /// <summary>
         /// LineCovered / (LineMissed + LineCovered).
         /// </summary>
-        public const string PercentageOfLineCovered = "Metric.LINE_percentage";
+        public const string PercentageOfLineCovered = "Metric.JaCoCo.LINE_percentage";
 
         /// <summary>
         /// A method is considered as executed when at least one of its instructions has been executed.
@@ -133,7 +137,7 @@
         /// like implicit and thus generated default constructors or initializers for constants.
         /// This metric counts the number of missed methods.
         /// </summary>
-        public const string MethodMissed = "Metric.METHOD_missed";
+        public const string MethodMissed = "Metric.JaCoCo.METHOD_missed";
         /// <summary>
         /// A method is considered as executed when at least one of its instructions has been executed.
         /// As JaCoCo works on byte code level also constructors and static initializers are counted as methods.
@@ -141,27 +145,49 @@
         /// like implicit and thus generated default constructors or initializers for constants.
         /// This metric counts the number of covered methods.
         /// </summary>
-        public const string MethodCovered = "Metric.METHOD_covered";
+        public const string MethodCovered = "Metric.JaCoCo.METHOD_covered";
         /// <summary>
         /// MethodCovered / (MethodMissed + MethodCovered).
         /// </summary>
-        public const string PercentageOfMethodCovered = "Metric.METHOD_percentage";
+        public const string PercentageOfMethodCovered = "Metric.JaCoCo.METHOD_percentage";
 
         /// <summary>
         /// A class is considered as executed when at least one of its methods has been executed.
         /// Note that JaCoCo considers constructors as well as static initializers as methods.
         /// This metric counts the number of missed classes.
         /// </summary>
-        public const string ClassMissed = "Metric.CLASS_missed";
+        public const string ClassMissed = "Metric.JaCoCo.CLASS_missed";
         /// <summary>
         /// A class is considered as executed when at least one of its methods has been executed.
         /// Note that JaCoCo considers constructors as well as static initializers as methods.
         /// This metric counts the number of covered classes.
         /// </summary>
-        public const string ClassCovered = "Metric.CLASS_covered";
+        public const string ClassCovered = "Metric.JaCoCo.CLASS_covered";
         /// <summary>
         /// ClassCovered / (ClassMissed + ClassCovered).
         /// </summary>
-        public const string PercentageOfClassCovered = "Metric.CLASS_percentage";
+        public const string PercentageOfClassCovered = "Metric.JaCoCo.CLASS_percentage";
+    }
+
+    /// <summary>
+    /// Defines toggle attributes used to mark nodes as to whether they have been
+    /// changed, deleted, or added as new.
+    /// </summary>
+    public static class ChangeMarkers
+    {
+        /// <summary>
+        /// Name of the toggle marking a graph element as new (existing only in the newer version).
+        /// </summary>
+        public const string IsNew = "Change.IsNew";
+        /// <summary>
+        /// Name of the toggle marking a graph element as deleted (existing only in the baseline version).
+        /// </summary>
+        public const string IsDeleted = "Change.IsDeleted";
+        /// <summary>
+        /// Name of the toggle marking a graph element as changed (existing in both the newer and baseline
+        /// version). At least one numeric attribute has changed between the two (including the addition
+        /// or removal of an attribute).
+        /// </summary>
+        public const string IsChanged = "Change.IsChanged";
     }
 }
