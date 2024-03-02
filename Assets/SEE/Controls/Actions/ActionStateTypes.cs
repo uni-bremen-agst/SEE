@@ -171,27 +171,27 @@ namespace SEE.Controls.Actions
         }
 
 
-        public readonly static ActionStateType Move;
-        public readonly static ActionStateType Rotate;
-        public readonly static ActionStateType Hide;
-        public readonly static ActionStateType NewEdge;
-        public readonly static ActionStateType NewNode;
-        public readonly static ActionStateType EditNode;
-        public readonly static ActionStateType ScaleNode;
-        public readonly static ActionStateType Delete;
-        public readonly static ActionStateType ShowCode;
-        public readonly static ActionStateType Draw;
-        public readonly static ActionStateType AcceptDivergence;
+        public static readonly ActionStateType Move;
+        public static readonly ActionStateType Rotate;
+        public static readonly ActionStateType Hide;
+        public static readonly ActionStateType NewEdge;
+        public static readonly ActionStateType NewNode;
+        public static readonly ActionStateType EditNode;
+        public static readonly ActionStateType ScaleNode;
+        public static readonly ActionStateType Delete;
+        public static readonly ActionStateType ShowCode;
+        public static readonly ActionStateType Draw;
+        public static readonly ActionStateType AcceptDivergence;
 
-        public readonly static ActionStateTypeGroup MetricBoard;
-        public readonly static ActionStateType AddBoard;
-        public readonly static ActionStateType AddWidget;
-        public readonly static ActionStateType MoveBoard;
-        public readonly static ActionStateType MoveWidget;
-        public readonly static ActionStateType DeleteBoard;
-        public readonly static ActionStateType DeleteWidget;
-        public readonly static ActionStateType LoadBoard;
-        public readonly static ActionStateType SaveBoard;
+        public static readonly ActionStateTypeGroup MetricBoard;
+        public static readonly ActionStateType AddBoard;
+        public static readonly ActionStateType AddWidget;
+        public static readonly ActionStateType MoveBoard;
+        public static readonly ActionStateType MoveWidget;
+        public static readonly ActionStateType DeleteBoard;
+        public static readonly ActionStateType DeleteWidget;
+        public static readonly ActionStateType LoadBoard;
+        public static readonly ActionStateType SaveBoard;
 
         #endregion
 
