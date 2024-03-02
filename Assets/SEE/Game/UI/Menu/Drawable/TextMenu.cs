@@ -745,6 +745,8 @@ namespace SEE.Game.UI.Menu.Drawable
                 thicknessLayer.SetActive(false);
                 outlineSwitchLayer.SetActive(false);
             }
+            /// Re-calculate the text menu height.
+            MenuHelper.CalculateHeight(instance, true);
         }
 
         /// <summary>
