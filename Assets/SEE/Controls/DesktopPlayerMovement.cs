@@ -34,21 +34,16 @@ namespace SEE.Controls
 
         private void Start()
         {
-            GameObject head = GameObject.Find("/Local Player 1/Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/HeadAdjust");
-
-            //We want to fit the head completly into the CharacterController collider, so we use max value to calculate the radius
-            float headRadius = Mathf.Max(head.transform.localScale.x, head.transform.localScale.y, head.transform.localScale.z)/2;
-
             controller = gameObject.MustGetComponent<CharacterController>();
 
-            // Default Layer is ignored by collider
-            // LayerMask are working with Bitmask so we need that 1<< shifting to get the right Layer
-            controller.excludeLayers = 1<<LayerMask.NameToLayer("Default");
+            // The default layer should be ignored by the collider.
+            // LayerMasks are bit masks, so we need that 1 << shifting to get the right layer.
+            controller.excludeLayers = 1 << LayerMask.NameToLayer("Default");
 
             // Defines the built-in collider of the CharacterController, by default the collider is a capsule.
             // We chose the following values to minimize the collider to roughly fit around the player's head as a sphere.
             controller.center = new Vector3(0.0f, 1.55f, 0.21f);
-            controller.radius = headRadius;
+            controller.radius = HeadRadius();
             controller.height = 0.0f;
 
             if (FocusedObject != null)
@@ -69,6 +64,21 @@ namespace SEE.Controls
                 cameraState.FreeMode = true;
             }
             lastAxis = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+
+            // Returns the radius of the player's head.
+            float HeadRadius()
+            {
+                const string headName = "Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/HeadAdjust";
+                Transform head = transform.Find(headName);
+                if (head == null)
+                {
+                    Debug.LogError($"Player {gameObject.name} does not have a child {headName}.\n");
+                    return 1.0f;
+                }
+                // We want to fit the head completely into the CharacterController collider, so we use the maximum value
+                // to calculate the radius
+                return Mathf.Max(head.transform.localScale.x, head.transform.localScale.y, head.transform.localScale.z) / 2;
+            }
         }
 
         private void Update()
@@ -107,8 +117,7 @@ namespace SEE.Controls
                 cameraState.Distance -= d;
 
                 HandleRotation();
-                transform.position = FocusedObject.CenterTop;
-                transform.rotation = Quaternion.Euler(cameraState.Pitch, cameraState.Yaw, 0.0f);
+                transform.SetPositionAndRotation(FocusedObject.CenterTop, Quaternion.Euler(cameraState.Pitch, cameraState.Yaw, 0.0f));
                 transform.position -= transform.forward * cameraState.Distance;
             }
             else // cameraState.freeMode == true
