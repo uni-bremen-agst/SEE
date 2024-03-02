@@ -624,7 +624,7 @@ namespace SEE.Net
         /// </summary>
         private void OnClientConnectedCallback(ulong owner)
         {
-            callbackToMenu(true, "You are connected to " + ServerIP4Address);
+            callbackToMenu(true, "You are connected to " + ServerAddress);
             callbackToMenu = null;
         }
 
@@ -634,7 +634,9 @@ namespace SEE.Net
         /// </summary>
         private void OnClientDisconnectCallback(ulong owner)
         {
-            callbackToMenu(false, "The server " + ServerIP4Address + " has refused the connection due to the following reason: " + NetworkManager.Singleton.DisconnectReason);
+            callbackToMenu(false,
+                $"The server {ServerAddress} has refused the connection due to the following reason: "
+                 + NetworkManager.Singleton.DisconnectReason);
             callbackToMenu = null;
         }
 
