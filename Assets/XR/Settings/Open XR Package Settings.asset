@@ -459,6 +459,7 @@ MonoBehaviour:
   - {fileID: 7242976004462796141}
   m_renderMode: 0
   m_depthSubmissionMode: 0
+  m_optimizeBufferDiscards: 0
   m_symmetricProjection: 0
 --- !u!114 &2722789916443922232
 MonoBehaviour:
@@ -651,4 +652,5 @@ MonoBehaviour:
   features: []
   m_renderMode: 1
   m_depthSubmissionMode: 0
+  m_optimizeBufferDiscards: 0
   m_symmetricProjection: 0
