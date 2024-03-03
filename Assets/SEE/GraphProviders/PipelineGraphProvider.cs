@@ -23,7 +23,7 @@ namespace SEE.GraphProviders
         /// The list of nested providers in this pipeline. These will be executed
         /// from first to last.
         /// </summary>
-        [HideReferenceObjectPicker]
+        [HideReferenceObjectPicker, ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = nameof(GetKind))]
         public List<GraphProvider> Pipeline = new();
 
         /// <summary>
