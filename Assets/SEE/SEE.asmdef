@@ -55,7 +55,12 @@
         "Newtonsoft.Json.dll",
         "NetworkCommsDotNet.dll",
         "LibGit2Sharp.dll",
-        "CsvHelper.dll"
+        "CsvHelper.dll",
+        "OmniSharp.Extensions.LanguageClient.dll",
+        "OmniSharp.Extensions.LanguageProtocol.dll",
+        "OmniSharp.Extensions.LanguageServer.Shared.dll",
+        "OmniSharp.Extensions.JsonRpc.dll",
+        "System.IO.Pipelines.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
