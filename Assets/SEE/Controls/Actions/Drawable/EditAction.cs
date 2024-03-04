@@ -156,7 +156,8 @@ namespace SEE.Controls.Actions.Drawable
             if (oldHolder is ImageConf oldImageHolder && newHolder is ImageConf newImageHolder)
             {
                 return oldImageHolder.orderInLayer.Equals(newImageHolder.orderInLayer)
-                    && oldImageHolder.imageColor.Equals(newImageHolder.imageColor);
+                    && oldImageHolder.imageColor.Equals(newImageHolder.imageColor)
+                    && oldImageHolder.eulerAngles.Equals(newImageHolder.eulerAngles);
             }
 
             if (oldHolder is MindMapNodeConf oldConf && newHolder is MindMapNodeConf newConf)
