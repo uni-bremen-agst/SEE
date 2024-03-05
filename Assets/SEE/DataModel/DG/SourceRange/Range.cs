@@ -1,43 +1,23 @@
-﻿using UnityEngine.Assertions;
-
 namespace SEE.DataModel.DG.SourceRange
 {
     /// <summary>
-    /// A representation of a source-code range in the index.
+    /// Represents a range in a source file, going from the <see cref="StartLine"/> to the <see cref="EndLine"/>
+    /// and optionally from the <see cref="StartCharacter"/> to the <see cref="EndCharacter"/>.
+    ///
+    /// Note that <see cref="StartLine"/> and <see cref="StartCharacter"/> are inclusive, while
+    /// <see cref="EndLine"/> and <see cref="EndCharacter"/> are exclusive.
     /// </summary>
-    internal class Range : FileRanges
+    /// <param name="StartLine">Line number of the start of the range (inclusive).</param>
+    /// <param name="EndLine">Line number of the end of the range (exclusive).</param>
+    /// <param name="StartCharacter">Character offset of the start of the range (inclusive).</param>
+    /// <param name="EndCharacter">Character offset of the end of the range (exclusive).</param>
+    public record Range(int StartLine, int EndLine, int? StartCharacter = null, int? EndCharacter = null)
     {
-        /// <summary>
-        /// Start line of the range.
-        /// </summary>
-        public int Start;
-        /// <summary>
-        /// End line of the range.
-        /// </summary>
-        public int End;
-        /// <summary>
-        /// The node whose source-code range is represented.
-        /// </summary>
-        public Node Node;
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="start">Start line of the range.</param>
-        /// <param name="end">End line of the range.</param>
-        /// <param name="node">The node whose source-code range is represented.</param>
-        public Range(int start, int end, Node node)
-        {
-            Assert.IsNotNull(node);
-            Assert.IsTrue(start <= end);
-
-            Start = start;
-            End = end;
-            Node = node;
-        }
-
         public override string ToString()
         {
-            return $"{Node.ID} declared at {Node.Path()}:{Start}-{End}";
+            return StartCharacter.HasValue && EndCharacter.HasValue
+                ? $"{StartLine}:{StartCharacter} – {EndLine}:{EndCharacter}"
+                : $"{StartLine} – {EndLine}";
         }
     }
 }

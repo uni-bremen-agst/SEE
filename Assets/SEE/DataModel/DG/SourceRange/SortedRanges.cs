@@ -6,14 +6,14 @@ using UnityEngine;
 namespace SEE.DataModel.DG.SourceRange
 {
     /// <summary>
-    /// Represents sorted lists of <see cref="Range"/>s.
+    /// Represents sorted lists of <see cref="SourceRange"/>s.
     /// </summary>
-    internal class SortedRanges : IEnumerable<Range>
+    internal class SortedRanges : IEnumerable<SourceRange>
     {
         /// <summary>
         /// The sorted list of ranges.
         /// </summary>
-        private readonly List<Range> values = new();
+        private readonly List<SourceRange> values = new();
 
         /// <summary>
         /// The number of ranges contained.
@@ -27,16 +27,16 @@ namespace SEE.DataModel.DG.SourceRange
         /// </summary>
         /// <param name="range">the range to be added</param>
         /// <exception cref="ArgumentException">thrown if there is an overlap with an existing range</exception>
-        internal void Add(Range range)
+        internal void Add(SourceRange range)
         {
-            if (TryGetIndex(range.Start, out int index))
+            if (TryGetIndex(range.Range.StartLine, out int index))
             {
                 throw new ArgumentException($"A range {values[index]} overlapping with {range} already exists.");
             }
             // index is the position at which this element would be inserted;
             // but it is not yet inserted
-            if ((index < values.Count && values[index].Start <= range.End)
-                || (index - 1 >= 0 && range.Start <= values[index - 1].End))
+            if ((index < values.Count && values[index].Range.StartLine <= range.Range.EndLine)
+                || (index - 1 >= 0 && range.Range.StartLine <= values[index - 1].Range.EndLine))
             {
                 throw new ArgumentException($"A range {values[index]} overlapping with {range} already exists.");
             }
@@ -51,7 +51,7 @@ namespace SEE.DataModel.DG.SourceRange
         /// </summary>
         /// <param name="index">index of the requested range</param>
         /// <returns>the range at given <paramref name="index"/></returns>
-        internal Range this[int index]
+        internal SourceRange this[int index]
         {
             get => values[index];
             set => values[index] = value;
@@ -67,7 +67,7 @@ namespace SEE.DataModel.DG.SourceRange
         /// <param name="range">if true is returned, the range containing <paramref name="line"/>;
         /// otherwise undefined</param>
         /// <returns>true if a range exists containing <paramref name="line"/></returns>
-        internal bool TryGetValue(int line, out Range range)
+        internal bool TryGetValue(int line, out SourceRange range)
         {
             if (TryGetIndex(line, out int index))
             {
@@ -100,11 +100,11 @@ namespace SEE.DataModel.DG.SourceRange
             while (low <= high)
             {
                 index = (low + high) / 2;
-                if (line > values[index].End)
+                if (line > values[index].Range.EndLine)
                 {
                     low = index + 1;
                 }
-                else if (line < values[index].Start)
+                else if (line < values[index].Range.StartLine)
                 {
                     high = index - 1;
                 }
@@ -124,7 +124,7 @@ namespace SEE.DataModel.DG.SourceRange
         internal void Dump()
         {
             int i = 0;
-            foreach (Range range in values)
+            foreach (SourceRange range in values)
             {
                 Debug.Log($"{i} => {range}\n");
                 i++;
@@ -135,7 +135,7 @@ namespace SEE.DataModel.DG.SourceRange
         /// Allows to enumerate on the sorted ranges.
         /// </summary>
         /// <returns>enumerator for the sorted ranges</returns>
-        IEnumerator<Range> IEnumerable<Range>.GetEnumerator()
+        IEnumerator<SourceRange> IEnumerable<SourceRange>.GetEnumerator()
         {
             return values.GetEnumerator();
         }

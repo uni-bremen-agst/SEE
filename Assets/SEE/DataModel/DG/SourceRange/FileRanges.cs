@@ -23,13 +23,13 @@ namespace SEE.DataModel.DG.SourceRange
             int? sourceLine = node.SourceLine;
             if (sourceLine.HasValue)
             {
-                Range descendant = Find(sourceLine.Value);
+                SourceRange descendant = Find(sourceLine.Value);
                 if (descendant == null)
                 {
                     int? endLine = node.EndLine();
                     if (endLine.HasValue)
                     {
-                        Children.Add(new Range(sourceLine.Value, endLine.Value, node));
+                        Children.Add(new SourceRange(sourceLine.Value, endLine.Value, node));
                     }
                     else
                     {
@@ -54,13 +54,13 @@ namespace SEE.DataModel.DG.SourceRange
         /// </summary>
         /// <param name="line">source line to be searched for</param>
         /// <returns>innermost source-code range or <c>null</c></returns>
-        public Range Find(int line)
+        public SourceRange Find(int line)
         {
-            if (Children.TryGetValue(line, out Range range))
+            if (Children.TryGetValue(line, out SourceRange range))
             {
                 // We are looking for the innermost range, hence we need to
                 // recurse into the Children of the found range.
-                Range child = range.Find(line);
+                SourceRange child = range.Find(line);
                 return child ?? range;
             }
             else
