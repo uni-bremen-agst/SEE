@@ -41,7 +41,7 @@ namespace SEE.DataModel.DG
         /// list, otherwise it is unset. Conceptually, toggleAttributes is a HashSet,
         /// but HashSets are not serialized by Unity. That is why we use List instead.
         /// </summary>
-        private HashSet<string> toggleAttributes = new HashSet<string>();
+        private HashSet<string> toggleAttributes = new();
         public ISet<string> ToggleAttributes => toggleAttributes;
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace SEE.DataModel.DG
         // String attributes
         //----------------------------------
 
-        public Dictionary<string, string> StringAttributes { get; private set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> StringAttributes { get; private set; } = new();
 
         /// <summary>
         /// Sets the string attribute with given <paramref name="attributeName"/> to <paramref name="value"/>
@@ -175,7 +175,7 @@ namespace SEE.DataModel.DG
         // Float attributes
         //----------------------------------
 
-        public Dictionary<string, float> FloatAttributes { get; private set; } = new Dictionary<string, float>();
+        public Dictionary<string, float> FloatAttributes { get; private set; } = new();
 
         /// <summary>
         /// Sets the float attribute with given <paramref name="attributeName"/> to <paramref name="value"/>
@@ -220,7 +220,7 @@ namespace SEE.DataModel.DG
         // Integer attributes
         //----------------------------------
 
-        public Dictionary<string, int> IntAttributes { get; private set; } = new Dictionary<string, int>();
+        public Dictionary<string, int> IntAttributes { get; private set; } = new();
 
         /// <summary>
         /// Sets the integer attribute with given <paramref name="attributeName"/> to <paramref name="value"/>
@@ -550,6 +550,7 @@ namespace SEE.DataModel.DG
             // we are using only those two attribute kinds to avoid unnecessary
             // computation in the hope that they suffice; nodes and edges should
             // have some attributes of this kind sufficiently different to others
+            // TODO (@koschke): If IntAttributes or StringAttributes are ever modified, won't this cause problems?
             return IntAttributes.GetHashCode() ^ StringAttributes.GetHashCode();
         }
 

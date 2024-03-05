@@ -58,13 +58,13 @@ namespace SEE.DataModel.DG.SourceRange
                 if (stack.Count > 0)
                 {
                     Range parentRange = stack.Peek();
-                    bool isdescendant = range.Node.IsDescendantOf(parentRange.Node);
-                    if (!isdescendant)
+                    bool isDescendant = range.Node.IsDescendantOf(parentRange.Node);
+                    if (!isDescendant)
                     {
                         Debug.LogError($"Range {range} is subsumed by {parentRange}, but {range.Node.ID} is "
                             + $"not a descendant of {parentRange.Node.ID} in the node hierarchy.\n");
                     }
-                    result &= isdescendant;
+                    result &= isDescendant;
                 }
                 stack.Push(range);
                 result &= range.Children.All(IsHomomorphic);

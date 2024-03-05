@@ -126,10 +126,7 @@ namespace SEE.DataModel.DG
                 return result;
             }
 
-            set
-            {
-                SetString(sourcePathAttribute, value);
-            }
+            set => SetString(sourcePathAttribute, value);
         }
 
         /// <summary>
@@ -164,10 +161,7 @@ namespace SEE.DataModel.DG
                 return result;
             }
 
-            set
-            {
-                SetString(sourceFileAttribute, value);
-            }
+            set => SetString(sourceFileAttribute, value);
         }
 
         /// <summary>
