@@ -223,6 +223,7 @@ namespace SEE.Game.Drawable
         /// For this purpose, the child nodes are added to the parent node.
         /// </summary>
         /// <param name="node">The parent node</param>
+        /// <param name="setMode">true, if this method will be called from a set method</param>
         /// <param name="rotationSetMode">true, if this method will be called from rotation action.</param>
         private static void PrepareNodeChilds(GameObject node, bool setMode, bool rotationSetMode = false)
         {
