@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -12,13 +13,23 @@ namespace SEE.DataModel.DG.SourceRange
     {
         /// <summary>
         /// Creates the index for <paramref name="graph"/>.
+        ///
+        /// Parameter <paramref name="getPath"/> is used to index all nodes in the
+        /// same file. It is assumed to yield a unique path for all nodes in the
+        /// same file. This could be <see cref="GraphElement.Path()"/>, for instance,
+        /// but it could as well be the fully qualified name of a class for languages
+        /// where a class is declared completely in a single file.
         /// </summary>
         /// <param name="graph">graph whose nodes are to be indexed</param>
-        public SourceRangeIndex(Graph graph)
+        /// <param name="getPath">yields a unique path for a node; its result will be used as a
+        /// key in <see cref="files"/> if different from null and non-empty; if it yields null, the
+        /// node will be ignored silently; if it yields the empty string, a
+        /// warning will be emitted</param>
+        public SourceRangeIndex(Graph graph, Func<Node, string> getPath)
         {
             foreach (Node root in graph.GetRoots())
             {
-                BuildIndex(root);
+                BuildIndex(root, getPath);
             }
         }
 
@@ -64,9 +75,11 @@ namespace SEE.DataModel.DG.SourceRange
 
         /// <summary>
         /// The source-code range index as a mapping of the path of a file
-        /// onto <see cref="FileRanges"/>. The children of <see cref="FileRanges"/>
-        /// are the code ranges for nodes in the graph whose declaration
-        /// is contained in that file.
+        /// onto <see cref="FileRanges"/>. The path is determined by a
+        /// delegate provide by the client.
+        ///
+        /// The children of <see cref="FileRanges"/> are the code ranges
+        /// for nodes in the graph whose declaration is contained in that file.
         /// </summary>
         private readonly Dictionary<string, FileRanges> files = new();
 
@@ -156,18 +169,18 @@ namespace SEE.DataModel.DG.SourceRange
                 int i = 1;
                 foreach (Range range in file.Children)
                 {
-                    DumpRange(range, i.ToString());
+                    DumpRange(i.ToString(), range);
                     i++;
                 }
             }
 
-            void DumpRange(Range range, string prefix)
+            void DumpRange(string enumeration, Range range)
             {
-                Debug.Log($"{prefix} {range}\n");
+                Debug.Log($"{enumeration} {range}\n");
                 int i = 1;
                 foreach (Range child in range.Children)
                 {
-                    DumpRange(child, prefix + "." + i.ToString());
+                    DumpRange(enumeration + "." + i.ToString(), child);
                     i++;
                 }
             }
@@ -178,13 +191,17 @@ namespace SEE.DataModel.DG.SourceRange
         /// recurses into its descendants to add these to the index, too.
         /// </summary>
         /// <param name="root">root node of the graph</param>
-        private void BuildIndex(Node root)
+        /// <param name="getPath">yields a unique path for a node; its result will be used as a
+        /// key in <see cref="files"/> if different from null and non-empty; if it yields null, the
+        /// node will be ignored silently; if it yields the empty string, a
+        /// warning will be emitted</param>
+        private void BuildIndex(Node root, Func<Node, string> getPath)
         {
-            AddToIndex(root);
+            AddToIndex(root, getPath);
 
             foreach (Node child in root.Children())
             {
-                BuildIndex(child);
+                BuildIndex(child, getPath);
             }
         }
 
@@ -200,24 +217,31 @@ namespace SEE.DataModel.DG.SourceRange
         /// passing F.
         /// </summary>
         /// <param name="node">graph node to be added</param>
-        private void AddToIndex(Node node)
+        /// <param name="getPath">yields a unique path for a node; its result will be used as a
+        /// key in <see cref="files"/> if different from null and non-empty; if it yields null, the
+        /// node will be ignored silently; if it yields the empty string, a
+        /// warning will be emitted</param>
+        private void AddToIndex(Node node, Func<Node, string> getPath)
         {
-            // Only nodes with a filename can be added to the index because
-            // the index is organized by filenames.
-            if (!string.IsNullOrEmpty(node.Filename))
+            string path = getPath(node);
+            // Only nodes with a path can be added to the index because
+            // the index is organized by paths. If getPath yields null, the
+            // node is to be ignored.
+            if (path != null)
             {
-                // Note: path cannot be empty because node.Filename is not empty.
-                string path = node.Path();
-                // If we do not already have a File for path, we will add one to the index.
-                if (!files.TryGetValue(path, out FileRanges file))
+                if (path.Length > 0)
                 {
-                    files.Add(path, file = new FileRanges());
+                    // If we do not already have a File for path, we will add one to the index.
+                    if (!files.TryGetValue(path, out FileRanges file))
+                    {
+                        files.Add(path, file = new FileRanges());
+                    }
+                    file.Add(node);
                 }
-                file.Add(node);
-            }
-            else
-            {
-                Debug.LogWarning($"{node.ID} does not have a filename. Will be ignored.\n");
+                else
+                {
+                    Debug.LogWarning($"{node.ID} does not have a path. Will be ignored.\n");
+                }
             }
         }
     }
