@@ -18,7 +18,7 @@ namespace SEE.GraphProviders
             UniTask.ToCoroutine(async () =>
             {
                 GraphProvider provider = new GXLGraphProvider()
-                { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
+                { Path = new Utils.Paths.LocalFilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
 
                 GameObject go = new();
                 SEECity city = go.AddComponent<SEECity>();
@@ -40,18 +40,18 @@ namespace SEE.GraphProviders
 
                 {
                     GraphProvider provider = new GXLGraphProvider()
-                    { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
+                    { Path = new Utils.Paths.LocalFilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
                     pipeline.Add(provider);
                 }
                 {
                     GraphProvider provider = new JaCoCoGraphProvider()
-                    { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/jacoco.xml") };
+                    { Path = new Utils.Paths.LocalFilePath(Application.streamingAssetsPath + "/JLGExample/jacoco.xml") };
                     pipeline.Add(provider);
                 }
 
                 {
                     GraphProvider provider = new CSVGraphProvider()
-                    { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.csv") };
+                    { Path = new Utils.Paths.LocalFilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.csv") };
                     pipeline.Add(provider);
                 }
 
@@ -85,14 +85,14 @@ namespace SEE.GraphProviders
                     Graph graph;
                     {
                         GraphProvider provider = new GXLGraphProvider()
-                        { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mini-evolution/CodeFacts-5.gxl") };
+                        { Path = new Utils.Paths.LocalFilePath(Application.streamingAssetsPath + "/mini-evolution/CodeFacts-5.gxl") };
                         graph = await provider.ProvideAsync(new Graph(""), city);
                     }
 
                     {
                         // Older graph
                         GraphProvider provider = new GXLGraphProvider()
-                        { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mini-evolution/CodeFacts-1.gxl") };
+                        { Path = new Utils.Paths.LocalFilePath(Application.streamingAssetsPath + "/mini-evolution/CodeFacts-1.gxl") };
 
                         MergeDiffGraphProvider mergeDiffProvider = new()
                         {

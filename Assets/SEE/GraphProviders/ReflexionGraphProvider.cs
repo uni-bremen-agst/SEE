@@ -25,19 +25,19 @@ namespace SEE.GraphProviders
         /// The path to the GXL file containing the architecture.
         /// </summary>
         [Tooltip("Path to the GXL file containing the architecture."), HideReferenceObjectPicker]
-        public FilePath Architecture = new();
+        public FilePath Architecture = new LocalFilePath();
 
         /// <summary>
         /// The path to the GXL file containing the implementation.
         /// </summary>
         [Tooltip("Path to the GXL file containing the implementation."), HideReferenceObjectPicker]
-        public FilePath Implementation = new();
+        public FilePath Implementation = new LocalFilePath();
 
         /// <summary>
         /// The path to the GXL file containing the mapping.
         /// </summary>
         [Tooltip("Path to the GXL file containing the mapping. Can be left undefined."), HideReferenceObjectPicker]
-        public FilePath Mapping = new();
+        public FilePath Mapping = new LocalFilePath();
 
         /// <summary>
         /// Name of resulting reflexion city.

@@ -29,28 +29,28 @@ namespace SEE.Utils.Paths
             Absolute,
             /// <summary>
             /// Is is a path relative to the project folder (which is the parent
-            /// of the Assets folder). Application.dataPath (excluding "/Assets"
+            /// of the Assets folder). <see cref="Application.dataPath"/> (excluding "/Assets"
             /// at the end) is the prefix.
             /// </summary>
             ProjectFolder,
             /// <summary>
-            /// Is is a path relative to the Assets folder. Application.dataPath
+            /// Is is a path relative to the Assets folder. <see cref="Application.dataPath"/>
             /// is the prefix.
             /// </summary>
             AssetsFolder,
             /// <summary>
             /// Is is a path relative to the streaming assets.
-            /// Application.streamingAssetsPath is the prefix.
+            /// <see cref="Application.streamingAssetsPath"/> is the prefix.
             /// </summary>
             StreamingAssets,
             /// <summary>
             /// Is is a path relative to the folder for persistent data.
-            /// Application.persistentDataPath is the prefix.
+            /// <see cref="Application.persistentDataPath"/> is the prefix.
             /// </summary>
             PersistentData,
             /// <summary>
             /// Is is a path relative to the temporary cache.
-            /// Application.temporaryCachePath is the prefix.
+            /// <see cref="Application.temporaryCachePath"/> is the prefix.
             /// </summary>
             TemporaryCache,
         }

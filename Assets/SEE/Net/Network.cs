@@ -603,7 +603,7 @@ namespace SEE.Net
         /// </summary>
         private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
         {
-            if (RoomPassword == System.Text.Encoding.ASCII.GetString(request.Payload))
+            if (RoomPassword == Encoding.ASCII.GetString(request.Payload))
             {
                 Debug.Log($"Client {request.ClientNetworkId} has sent right room password");
                 response.Approved = true;
@@ -820,7 +820,7 @@ namespace SEE.Net
         /// </summary>
         [PropertyTooltip("Path of the file containing the network configuration.")]
         [HideReferenceObjectPicker, FoldoutGroup(configurationFoldoutGroup)]
-        public FilePath ConfigPath = new();
+        public FilePath ConfigPath = new LocalFilePath();
 
         /// <summary>
         /// Saves the settings of this network configuration to <see cref="ConfigPath()"/>.

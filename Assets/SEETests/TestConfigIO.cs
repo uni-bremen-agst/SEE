@@ -862,7 +862,7 @@ namespace SEE.Utils
         private void WipeOutSEEJlgCityAttributes(SEEJlgCity city)
         {
             WipeOutSEECityAttributes(city);
-            city.JLGPath = new FilePath("C:/MyAbsoluteDirectory/MyAbsoluteFile.jlg");
+            city.JLGPath = new LocalFilePath("C:/MyAbsoluteDirectory/MyAbsoluteFile.jlg");
         }
 
         /// <summary>

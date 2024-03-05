@@ -80,7 +80,7 @@ namespace SEE.GraphProviders
         {
             return new GXLGraphProvider()
             {
-                Path = new Utils.Paths.FilePath("mydir/myfile.gxl")
+                Path = new Utils.Paths.LocalFilePath("mydir/myfile.gxl")
             };
         }
 
@@ -106,7 +106,7 @@ namespace SEE.GraphProviders
         {
             return new CSVGraphProvider()
             {
-                Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mydir/myfile.csv")
+                Path = new Utils.Paths.LocalFilePath(Application.streamingAssetsPath + "/mydir/myfile.csv")
             };
         }
 
@@ -132,7 +132,7 @@ namespace SEE.GraphProviders
         {
             return new JaCoCoGraphProvider()
             {
-                Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
+                Path = new Utils.Paths.LocalFilePath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
             };
         }
 
@@ -207,9 +207,9 @@ namespace SEE.GraphProviders
         {
             return new ReflexionGraphProvider()
             {
-                Architecture = new Utils.Paths.FilePath("mydir/Architecture.gxl"),
-                Implementation = new Utils.Paths.FilePath("mydir/Implementation.gxl"),
-                Mapping = new Utils.Paths.FilePath("mydir/Mapping.gxl"),
+                Architecture = new Utils.Paths.LocalFilePath("mydir/Architecture.gxl"),
+                Implementation = new Utils.Paths.LocalFilePath("mydir/Implementation.gxl"),
+                Mapping = new Utils.Paths.LocalFilePath("mydir/Mapping.gxl"),
             };
         }
 
@@ -240,7 +240,7 @@ namespace SEE.GraphProviders
             {
                 OldGraph = new JaCoCoGraphProvider()
                 {
-                    Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
+                    Path = new Utils.Paths.LocalFilePath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
                 }
             };
         }

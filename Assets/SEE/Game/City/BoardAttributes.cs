@@ -18,7 +18,7 @@ namespace SEE.Game.City
         public bool LoadBoardOnStartup;
 
         [SerializeField, Tooltip("Path to the board that shall be loaded."), ShowIf(nameof(LoadBoardOnStartup))]
-        public FilePath BoardPath = new();
+        public FilePath BoardPath = new LocalFilePath();
 
         /// <summary>
         /// Loads the board specified at <see cref="BoardPath"/> if

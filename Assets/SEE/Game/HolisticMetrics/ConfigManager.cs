@@ -89,7 +89,7 @@ namespace SEE.Game.HolisticMetrics
         internal static BoardConfig LoadBoard(string fileName)
         {
             EnsureBoardsDirectoryExists();
-            return LoadBoard(new FilePath(metricsBoardsPath + fileName + Filenames.ConfigExtension));
+            return LoadBoard(new LocalFilePath(metricsBoardsPath + fileName + Filenames.ConfigExtension));
         }
 
         /// <summary>

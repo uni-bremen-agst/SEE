@@ -69,7 +69,7 @@ namespace SEE.Game.City
         /// The path where the settings (the attributes of this class) are stored.
         /// </summary>
         [Tooltip("Path of configuration file."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
-        public FilePath ConfigurationPath = new();
+        public FilePath ConfigurationPath = new LocalFilePath();
 
         /// <summary>
         /// The path to project where the source code can be found.
@@ -110,7 +110,7 @@ namespace SEE.Game.City
         /// this is the VS solution file.
         /// </summary>
         [Tooltip("Path of Visual Studio solution file."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
-        public FilePath SolutionPath = new();
+        public FilePath SolutionPath = new LocalFilePath();
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
