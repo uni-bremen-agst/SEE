@@ -32,8 +32,10 @@ namespace SEE.DataModel.DG.IO
         /// <returns>The graph with the updated metrics and issues</returns>
         public static async UniTask<Graph> LoadDashboardAsync(Graph graph, bool @override = true, string addedFrom = "")
         {
-            IDictionary<(string path, string entity), List<MetricValueTableRow>> metrics = await DashboardRetriever.Instance.GetAllMetricRowsAsync();
-            IDictionary<string, List<Issue>> issues = await LoadIssueMetrics(string.IsNullOrWhiteSpace(addedFrom) ? null : addedFrom);
+            IDictionary<(string path, string entity), List<MetricValueTableRow>> metrics
+                = await DashboardRetriever.Instance.GetAllMetricRowsAsync();
+            IDictionary<string, List<Issue>> issues
+                = await LoadIssueMetrics(string.IsNullOrWhiteSpace(addedFrom) ? null : addedFrom);
             string projectFolder = DataPath.ProjectFolder();
 
             await UniTask.SwitchToThreadPool();
@@ -144,6 +146,21 @@ namespace SEE.DataModel.DG.IO
         }
 
         /// <summary>
+        /// Analogous to <see cref="LoadCsv(Graph, string, char)"/> except that the
+        /// data are read from the given <paramref name="stream"/>.
+        /// </summary>
+        /// <param name="graph">graph for which node metrics are to be imported</param>
+        /// <param name="stream">stream containing CSV data from which to import node metrics</param>
+        /// <param name="separator">used to separate column entries</param>
+        /// <returns>the number of errors</returns>
+        public static async UniTask<int> LoadCsvAsync(Graph graph, DataPath path, char separator = ';')
+        {
+            Stream stream = await path.LoadAsync();
+            using StreamReader reader = new(stream);
+            return LoadCsv(graph, separator, reader, "");
+        }
+
+        /// <summary>
         /// Loads node metric values from given CSV file with given separator.
         /// The file must contain a header with the column names. The first column
         /// name must be the Node.ID. Values must be either integers or
@@ -174,14 +191,27 @@ namespace SEE.DataModel.DG.IO
                 return 0;
             }
 
+            using StreamReader reader = new(filename);
+            return LoadCsv(graph, separator, reader, filename);
+        }
+
+        /// <summary>
+        /// Does the actual CSV import.
+        /// </summary>
+        /// <param name="graph">graph for which node metrics are to be imported</param>
+        /// <param name="separator">used to separate column entries</param>
+        /// <param name="reader">a reader yielding the CSV data</param>
+        /// <param name="filename">the name of the CSV; will be used only for
+        /// error messages; can be empty</param>
+        /// <returns></returns>
+        /// <exception cref="IOException"></exception>
+        private static int LoadCsv(Graph graph, char separator, StreamReader reader, string filename)
+        {
             CsvConfiguration config = new(CultureInfo.InvariantCulture)
             {
                 Delimiter = separator.ToString(),
             };
-
-            using StreamReader reader = new(filename);
-            using CsvReader csv = new(reader, config);
-
+            CsvReader csv = new(reader, config);
             int numberOfErrors = 0;
             int lineCount = 1;
 
@@ -195,13 +225,13 @@ namespace SEE.DataModel.DG.IO
                 }
                 if (header[0] != IDColumnName)
                 {
-                    throw new IOException($"First header column in file {filename} is not {IDColumnName}.");
+                    throw new IOException($"First header column in {Input()} is not {IDColumnName}.");
                 }
 
                 string[] columns = header[1..];
                 if (columns.Length == 0)
                 {
-                    Debug.LogWarning($"There are no data columns in {filename}.\n");
+                    Debug.LogWarning($"There are no data columns in {Input()}.\n");
                     return 0;
                 }
                 while (csv.Read())
@@ -261,9 +291,16 @@ namespace SEE.DataModel.DG.IO
 
             return numberOfErrors;
 
+            string Input()
+            {
+                return string.IsNullOrWhiteSpace(filename) ? "CSV data" : filename;
+            }
+
             string SourceLocation()
             {
-                return $"{filename}:{lineCount}: ";
+                return string.IsNullOrWhiteSpace(filename) ?
+                          $"{lineCount}: "
+                       :  $"{filename}:{lineCount}: ";
             }
         }
     }
