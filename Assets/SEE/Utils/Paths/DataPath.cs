@@ -12,7 +12,7 @@ using Network = SEE.Net.Network;
 namespace SEE.Utils.Paths
 {
     /// <summary>
-    /// A representation of URL or paths of files, and directories containing data.
+    /// A representation of URL or local disk paths of files and directories containing data.
     /// Files and directories can be set absolute in the file system or relative to one of
     /// Unity's standard folders such as Assets, Project, etc. URLs can be relative to
     /// our server at <see cref="Network.ClientRestAPI"/> or relate to other servers.
@@ -21,7 +21,7 @@ namespace SEE.Utils.Paths
     public class DataPath
     {
         /// <summary>
-        /// Defines how the path is to be interpreted. If it is absolute,
+        /// Defines how the path is to be interpreted. If it is absolute or a URL,
         /// nothing will be prepended to the path. In all other cases,
         /// a prefix will be prepended to the path. The kind of prefix
         /// is specified by the other root kinds.
@@ -65,11 +65,6 @@ namespace SEE.Utils.Paths
             Url
         }
 
-        public DataPath()
-        {
-            // intentionally left blank
-        }
-
         /// <summary>
         /// Defines how the stored path is to be interpreted.
         /// </summary>
@@ -81,6 +76,8 @@ namespace SEE.Utils.Paths
         /// <see cref="<paramref name="rootKind"/>; see also <seealso cref="RootKind"/>.
         /// The character / will be used as directory separator for that path.
         /// The last character in the path will never be the directory separator /.
+        ///
+        /// Note: This method should not be called for a <see cref="RootKind.Url"/>.
         /// </summary>
         /// <param name="rootKind">the kind of root</param>
         /// <returns>root path</returns>
@@ -109,22 +106,25 @@ namespace SEE.Utils.Paths
         }
 
         /// <summary>
-        /// If the <see cref="Root"/> is <see cref="RootKind.Url"/>, the empty string
+        /// If <see cref="Root"/> is <see cref="RootKind.Url"/>, the empty string
         /// is returned.
         ///
-        /// If the <see cref="Root"/> is <see cref="RootKind.Absolute"/>, the directory
-        /// enclosing this path is returned (may be empty). The directory separator of the
-        /// resulting absolute root path is the one that was used for setting the absolute
-        /// path. If it was set on a different operating system, it may not be
-        /// the one used for the operating system we are currently running on.
+        /// If <see cref="Root"/> is <see cref="RootKind.Absolute"/>, the directory
+        /// enclosing this path (i.e., the parent) is returned (may be empty).
+        /// The directory separator of the resulting absolute root path is the
+        /// one that was used for setting the absolute path. If it was set on
+        /// a different operating system, it may not be the one used for the
+        /// operating system we are currently running on.
         ///
         /// Otherwise yields Unity's folders as absolute paths depending upon
-        /// <paramref name="rootKind"/>; see also <seealso cref="RootKind"/>.
+        /// <see cref="Root"/>; see also <seealso cref="RootKind"/>.
         /// The character / will then be used as directory separator for that path.
         /// The last character in the path will never be the directory separator /.
         ///
         /// IMPORTANT NOTE: This method is intended for situations in which a
-        /// file system path is to be picked. It should not be used for URIs.
+        /// file system path is to be picked. It should not be used for
+        /// <see cref="RootKind.Url"/>. If this path represents a <see cref="RootKind.Url"/>,
+        /// the empty string is returned.
         /// </summary>
         /// <returns>root path</returns>
         public string RootFileSystemPath
@@ -332,6 +332,14 @@ namespace SEE.Utils.Paths
             }
         }
 
+        /// <summary>
+        /// Yields a stream containing the data retrieved from <see cref="Path"/>.
+        ///
+        /// If the data path represents a <see cref="RootKind.Url"/>, the file is
+        /// downloaded from a server. Otherwise it is read from a local file.
+        /// </summary>
+        /// <returns>stream containing the data</returns>
+        /// <exception cref="IOException">in case the data cannot be loaded</exception>
         public async Task<Stream> LoadAsync()
         {
             string path = Path;
@@ -347,8 +355,7 @@ namespace SEE.Utils.Paths
             {
                 if (File.Exists(Path))
                 {
-                    FileStream fileStream = File.OpenRead(path);
-                    return fileStream;
+                    return File.OpenRead(path);
                 }
                 else
                 {
@@ -357,32 +364,26 @@ namespace SEE.Utils.Paths
             }
         }
 
-        private static async Task<Stream> LoadFromServerAsync(string path)
+        /// <summary>
+        /// Downloads and returns a file from the given <paramref name="url"/>.
+        /// </summary>
+        /// <param name="url">URL of the file to be downloaded</param>
+        /// <returns>a stream containing the downloaded data</returns>
+        /// <exception cref="IOException">if file cannot be downloaded</exception>
+        private static async Task<Stream> LoadFromServerAsync(string url)
         {
-            Uri uri = new(path);
+            Uri uri = new(url);
             HttpClient client = new();
             HttpRequestMessage request = new(HttpMethod.Get, uri);
             HttpResponseMessage response = await client.SendAsync(request);
-            Debug.Log(response.IsSuccessStatusCode ? "SUCCESS\n" : "FAILURE\n");
-            Debug.Log($"Reason: {response.ReasonPhrase}\n");
-            Debug.Log($"Status code: {response.StatusCode}\n");
-            Debug.Log($"Content: {response.Content}\n");
-            Debug.Log($"Response: {response}\n");
 
             if (response.IsSuccessStatusCode)
             {
-                Task<Stream> task = response.Content.ReadAsStreamAsync();
-                return await task;
-                //Stream stream = await task;
-                //Debug.Log($"Content length in bytes: {stream.Length}\n");
-                //using FileStream fileStream = File.Create(filename);
-                //stream.Seek(0, SeekOrigin.Begin);
-                //Debug.Log($"Saving to {filename}.\n");
-                //await stream.CopyToAsync(fileStream);
+                return await response.Content.ReadAsStreamAsync();
             }
             else
             {
-                throw new IOException($"Failed to download from URI {uri}.\n");
+                throw new IOException($"Failed to download from URI {uri}. Reason: {response.ReasonPhrase}. Status code: {response.StatusCode}.\n");
             }
         }
 
