@@ -12,7 +12,6 @@ using SEE.Tools;
 using UnityEngine;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Newtonsoft.Json.Linq;
 
 namespace SEE.DataModel.DG.IO
 {
