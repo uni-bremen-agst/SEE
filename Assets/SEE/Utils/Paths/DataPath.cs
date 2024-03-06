@@ -155,38 +155,23 @@ namespace SEE.Utils.Paths
         }
 
         /// <summary>
-        /// The internal representation of property <see cref="RelativePath"/>.
+        /// The path relative to the <see cref="Root"/>.
         /// The internal representation of this path is always in the Unix style
         /// (or also Unity style), independent from the operating system we are currently
         /// running on.
-        /// </summary>
-        [SerializeField, HideInInspector] private string relativePath = "";
-
-        /// <summary>
-        /// The path relative to the <see cref="Root"/>. The directory separator will be /.
         /// Retrieve this value only if <see cref="Root"/> is not the absolute path.
         /// </summary>
-        public string RelativePath
-        {
-            get => relativePath;
-            set => relativePath = value;
-        }
+        [SerializeField, HideInInspector]
+        public string RelativePath { get; set; }
 
-        /// <summary>
-        /// The internal representation of property <see cref="AbsolutePath"/>.
-        /// </summary>
-        [SerializeField, HideInInspector] private string absolutePath = "";
         /// <summary>
         /// The absolute path. Retrieve this value only if <see cref="Root"/> is the absolute path.
         /// The directory separator used here is the exactly the same how it was set in the
-        /// last assignment. It may be a Windows, Mac, or Unix separator, no matter on which
+        /// last assignment. It may be a URL, Windows, Mac, or Unix separator, no matter on which
         /// operating system we are currently running on.
         /// </summary>
-        public string AbsolutePath
-        {
-            get => absolutePath;
-            set => absolutePath = value;
-        }
+        [SerializeField, HideInInspector]
+        public string AbsolutePath { get; set; }
 
         /// <summary>
         /// The stored full path.
@@ -217,28 +202,28 @@ namespace SEE.Utils.Paths
                 // absolutePath is set only for foreign servers, in which case relativePath
                 // will be empty. If the absolutePath is empty, the relativePath is interpreted relative
                 // to our server.
-                Uri baseUri = absolutePath.Length > 0 ? new(absolutePath) : new(Network.ClientRestAPI);
-                Uri relativeUri = new(relativePath, UriKind.Relative);
+                Uri baseUri = AbsolutePath.Length > 0 ? new(AbsolutePath) : new(Network.ClientRestAPI);
+                Uri relativeUri = new(RelativePath, UriKind.Relative);
                 return new Uri(baseUri, relativeUri).ToString();
             }
             else if (Root == RootKind.Absolute)
             {
-                return absolutePath;
+                return AbsolutePath;
             }
             else
             {
                 // Path is relative to root.
-                if (string.IsNullOrEmpty(relativePath))
+                if (string.IsNullOrEmpty(RelativePath))
                 {
                     return Filenames.OnCurrentPlatform(RootFileSystemPath);
                 }
-                else if (!relativePath.StartsWith("/"))
+                else if (!RelativePath.StartsWith("/"))
                 {
-                    return Filenames.OnCurrentPlatform(RootFileSystemPath + "/" + relativePath);
+                    return Filenames.OnCurrentPlatform(RootFileSystemPath + "/" + RelativePath);
                 }
                 else
                 {
-                    return Filenames.OnCurrentPlatform(RootFileSystemPath + relativePath);
+                    return Filenames.OnCurrentPlatform(RootFileSystemPath + RelativePath);
                 }
             }
         }
@@ -279,21 +264,21 @@ namespace SEE.Utils.Paths
                     if (path.Contains(Network.ClientRestAPI))
                     {
                         // The path relates to our server.
-                        absolutePath = string.Empty;
-                        relativePath = path.Replace(Network.ClientRestAPI, string.Empty);
+                        AbsolutePath = string.Empty;
+                        AbsolutePath = path.Replace(Network.ClientRestAPI, string.Empty);
                     }
                     else
                     {
                         // The path relates to a different server.
-                        absolutePath = path;
-                        relativePath = string.Empty;
+                        AbsolutePath = path;
+                        RelativePath = string.Empty;
                     }
                 }
                 else
                 {
                     // It is a relative path.
-                    absolutePath = string.Empty;
-                    relativePath = path;
+                    AbsolutePath = string.Empty;
+                    RelativePath = path;
                 }
                 // Summary: absolutePath is set only for foreign servers, in which case relativePath
                 // will be empty. If the absolutePath is empty, the relativePath is interpreted relative
@@ -303,32 +288,32 @@ namespace SEE.Utils.Paths
             else if (path.Contains(Application.streamingAssetsPath))
             {
                 Root = RootKind.StreamingAssets;
-                relativePath = path.Replace(Application.streamingAssetsPath, string.Empty);
+                RelativePath = path.Replace(Application.streamingAssetsPath, string.Empty);
             }
             else if (path.Contains(Application.dataPath))
             {
                 Root = RootKind.AssetsFolder;
-                relativePath = path.Replace(Application.dataPath, string.Empty);
+                RelativePath = path.Replace(Application.dataPath, string.Empty);
             }
             else if (path.Contains(Application.persistentDataPath))
             {
                 Root = RootKind.PersistentData;
-                relativePath = path.Replace(Application.persistentDataPath, string.Empty);
+                RelativePath = path.Replace(Application.persistentDataPath, string.Empty);
             }
             else if (path.Contains(Application.temporaryCachePath))
             {
                 Root = RootKind.TemporaryCache;
-                relativePath = path.Replace(Application.temporaryCachePath, string.Empty);
+                RelativePath = path.Replace(Application.temporaryCachePath, string.Empty);
             }
             else if (path.Contains(ProjectFolder()))
             {
                 Root = RootKind.ProjectFolder;
-                relativePath = path.Replace(ProjectFolder(), string.Empty);
+                RelativePath = path.Replace(ProjectFolder(), string.Empty);
             }
             else
             {
                 Root = RootKind.Absolute;
-                absolutePath = path;
+                AbsolutePath = path;
             }
         }
 
@@ -389,7 +374,7 @@ namespace SEE.Utils.Paths
 
         public override string ToString()
         {
-            return $"root={Root} relativePath={relativePath} absolutePath={absolutePath}";
+            return $"root={Root} relativePath={RelativePath} absolutePath={AbsolutePath}";
         }
 
         #region Config I/O
