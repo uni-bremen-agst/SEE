@@ -3,7 +3,6 @@ using NUnit.Framework;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Utils.Paths;
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.TestTools;
