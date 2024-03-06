@@ -820,7 +820,7 @@ namespace SEE.Net
         /// </summary>
         [PropertyTooltip("Path of the file containing the network configuration.")]
         [HideReferenceObjectPicker, FoldoutGroup(configurationFoldoutGroup)]
-        public FilePath ConfigPath = new LocalFilePath();
+        public DataPath ConfigPath = new();
 
         /// <summary>
         /// Saves the settings of this network configuration to <see cref="ConfigPath()"/>.

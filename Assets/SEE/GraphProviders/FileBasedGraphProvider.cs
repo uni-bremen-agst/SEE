@@ -21,7 +21,7 @@ namespace SEE.GraphProviders
         /// The path to the file containing the additional data to be added to a graph.
         /// </summary>
         [Tooltip("Path to the input file."), RuntimeTab(GraphProviderFoldoutGroup), HideReferenceObjectPicker]
-        public FilePath Path = new LocalFilePath();
+        public DataPath Path = new();
 
         /// <summary>
         /// Checks whether the assumptions on <see cref="Path"/> and <paramref name="city"/> hold.

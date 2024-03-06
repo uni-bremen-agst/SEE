@@ -59,7 +59,7 @@ namespace SEE.Game.HolisticMetrics
         /// </summary>
         /// <param name="path">The path to the file which shall be loaded</param>
         /// <returns>The GameObject that represents the metrics displays</returns>
-        internal static BoardConfig LoadBoard(FilePath path)
+        internal static BoardConfig LoadBoard(DataPath path)
         {
             BoardConfig config = new();
             try
@@ -89,7 +89,10 @@ namespace SEE.Game.HolisticMetrics
         internal static BoardConfig LoadBoard(string fileName)
         {
             EnsureBoardsDirectoryExists();
-            return LoadBoard(new LocalFilePath(metricsBoardsPath + fileName + Filenames.ConfigExtension));
+            return LoadBoard(new DataPath()
+            {
+                Path = metricsBoardsPath + fileName + Filenames.ConfigExtension
+            });
         }
 
         /// <summary>

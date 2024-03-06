@@ -1,18 +1,24 @@
 ﻿using SEE.Utils.Config;
+using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using UnityEngine;
+using Network = SEE.Net.Network;
 
 namespace SEE.Utils.Paths
 {
     /// <summary>
-    /// A representation of paths for files and directories containing data
-    /// that can be set absolute in the file system or relative to one of
-    /// Unity's standard folders such as Assets, Project, etc.
+    /// A representation of URL or paths of files, and directories containing data.
+    /// Files and directories can be set absolute in the file system or relative to one of
+    /// Unity's standard folders such as Assets, Project, etc. URLs can be relative to
+    /// our server at <see cref="Network.ClientRestAPI"/> or relate to other servers.
     /// </summary>
     [Serializable]
-    public abstract class DataPath
+    public class DataPath
     {
         /// <summary>
         /// Defines how the path is to be interpreted. If it is absolute,
@@ -53,63 +59,15 @@ namespace SEE.Utils.Paths
             /// <see cref="Application.temporaryCachePath"/> is the prefix.
             /// </summary>
             TemporaryCache,
+            /// <summary>
+            /// The path is a universal resource identifier (URI).
+            /// </summary>
+            Url
         }
 
         public DataPath()
         {
             // intentionally left blank
-        }
-
-        /// <summary>
-        /// Constructor where the kind of root and relative or absolute path is
-        /// derived from given <paramref name="path"/> (analogously to <see cref="Set(string)"/>).
-        /// </summary>
-        /// <param name="path">path from which to derive the kind of root and relative/absolute path</param>
-        public DataPath(string path)
-        {
-            Set(path);
-        }
-
-        /// <summary>
-        /// Adjusts the root and path information of this data path based on the given <paramref name="path"/>.
-        /// If none of Unity's path prefixes for standard folders match, <paramref name="path"/> is considered
-        /// an absolute path. Otherwise the <see cref="Root"/> will be set depending on which of Unity's
-        /// path prefixes matches (<seealso cref="RootKind"/>) and the relative path will be set to
-        /// <paramref name="path"/> excluding the matched prefix.
-        /// </summary>
-        /// <param name="path">an absolute path</param>
-        public void Set(string path)
-        {
-            if (path.Contains(Application.streamingAssetsPath))
-            {
-                Root = RootKind.StreamingAssets;
-                relativePath = path.Replace(Application.streamingAssetsPath, string.Empty);
-            }
-            else if (path.Contains(Application.dataPath))
-            {
-                Root = RootKind.AssetsFolder;
-                relativePath = path.Replace(Application.dataPath, string.Empty);
-            }
-            else if (path.Contains(Application.persistentDataPath))
-            {
-                Root = RootKind.PersistentData;
-                relativePath = path.Replace(Application.persistentDataPath, string.Empty);
-            }
-            else if (path.Contains(Application.temporaryCachePath))
-            {
-                Root = RootKind.TemporaryCache;
-                relativePath = path.Replace(Application.temporaryCachePath, string.Empty);
-            }
-            else if (path.Contains(ProjectFolder()))
-            {
-                Root = RootKind.ProjectFolder;
-                relativePath = path.Replace(ProjectFolder(), string.Empty);
-            }
-            else
-            {
-                Root = RootKind.Absolute;
-                absolutePath = path;
-            }
         }
 
         /// <summary>
@@ -151,8 +109,11 @@ namespace SEE.Utils.Paths
         }
 
         /// <summary>
-        /// If the <see cref="Root"/> is absolute, the directory enclosing this
-        /// path is returned (may be empty). The directory separator of the
+        /// If the <see cref="Root"/> is <see cref="RootKind.Url"/>, the empty string
+        /// is returned.
+        ///
+        /// If the <see cref="Root"/> is <see cref="RootKind.Absolute"/>, the directory
+        /// enclosing this path is returned (may be empty). The directory separator of the
         /// resulting absolute root path is the one that was used for setting the absolute
         /// path. If it was set on a different operating system, it may not be
         /// the one used for the operating system we are currently running on.
@@ -161,13 +122,20 @@ namespace SEE.Utils.Paths
         /// <paramref name="rootKind"/>; see also <seealso cref="RootKind"/>.
         /// The character / will then be used as directory separator for that path.
         /// The last character in the path will never be the directory separator /.
+        ///
+        /// IMPORTANT NOTE: This method is intended for situations in which a
+        /// file system path is to be picked. It should not be used for URIs.
         /// </summary>
         /// <returns>root path</returns>
-        public string RootPath
+        public string RootFileSystemPath
         {
             get
             {
-                if (Root == RootKind.Absolute)
+                if (Root is RootKind.Url)
+                {
+                    return string.Empty;
+                }
+                else if (Root is RootKind.Absolute)
                 {
                     string path = Path;
                     if (string.IsNullOrEmpty(path))
@@ -231,36 +199,190 @@ namespace SEE.Utils.Paths
         /// system we are running on, that is, the directory separator will be \
         /// on Windows and / on all other platforms.
         /// </summary>
-        public abstract string Path { get; set; }
-
-        protected string Get()
+        [ShowInInspector, FilePath(AbsolutePath = true)]
+        public string Path
         {
-            if (Root == RootKind.Absolute)
+            get => Get();
+            set => Set(value);
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
+        private string Get()
+        {
+            if (Root == RootKind.Url)
             {
-                if (string.IsNullOrEmpty(absolutePath))
-                {
-                    return "";
-                }
-                else
-                {
-                    return absolutePath;
-                }
+                // absolutePath is set only for foreign servers, in which case relativePath
+                // will be empty. If the absolutePath is empty, the relativePath is interpreted relative
+                // to our server.
+                Uri baseUri = absolutePath.Length > 0 ? new(absolutePath) : new(Network.ClientRestAPI);
+                Uri relativeUri = new(relativePath, UriKind.Relative);
+                return new Uri(baseUri, relativeUri).ToString();
+            }
+            else if (Root == RootKind.Absolute)
+            {
+                return absolutePath;
             }
             else
             {
                 // Path is relative to root.
                 if (string.IsNullOrEmpty(relativePath))
                 {
-                    return Filenames.OnCurrentPlatform(RootPath);
+                    return Filenames.OnCurrentPlatform(RootFileSystemPath);
                 }
                 else if (!relativePath.StartsWith("/"))
                 {
-                    return Filenames.OnCurrentPlatform(RootPath + "/" + relativePath);
+                    return Filenames.OnCurrentPlatform(RootFileSystemPath + "/" + relativePath);
                 }
                 else
                 {
-                    return Filenames.OnCurrentPlatform(RootPath + relativePath);
+                    return Filenames.OnCurrentPlatform(RootFileSystemPath + relativePath);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Adjusts the root and path information of this data path based on the given <paramref name="path"/>.
+        ///
+        /// If <paramref name="isURI"/> is true and the URI prefix matches <see cref="Network.ClientRestAPI"/>,
+        /// the path will be stored as a relative path (where <see cref="Network.ClientRestAPI"/> is removed
+        /// from <paramref name="path"/>. If the URI prefix does not match, <paramref name="path"/> will
+        /// stored as relative or absolute path, respectively, depending upon <paramref name="path"/>
+        /// interpreted as a universal resource identifier is relative or absolute. The <see cref="Root"/>
+        /// will be <see cref="RootKind.Url"/>.
+        ///
+        /// If <paramref name="isURI"/> is false, the path is interpreted as a disk path.
+        /// If none of Unity's path prefixes for standard folders match, <paramref name="path"/> is considered
+        /// an absolute path. Otherwise the <see cref="Root"/> will be set depending on which of Unity's
+        /// path prefixes matches (<seealso cref="RootKind"/>) and the relative path will be set to
+        /// <paramref name="path"/> excluding the matched prefix.
+        /// </summary>
+        /// <param name="path">an absolute path</param>
+        /// <exception cref="ArgumentNullException">thrown if <paramref name="path"/> is null</exception>
+        /// <exception cref="UriFormatException">thrown if this path is supposed to be a <see cref="RootKind.Url"/>
+        /// but <paramref name="path"/> does not conform to the URI syntax</exception>
+        private void Set(string path)
+        {
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+            if (Root == RootKind.Url)
+            {
+                // The constructor will check whether path is a valid URI
+                // and if not, throw an exception.
+                Uri uri = new(path);
+                if (uri.IsAbsoluteUri)
+                {
+                    if (path.Contains(Network.ClientRestAPI))
+                    {
+                        // The path relates to our server.
+                        absolutePath = string.Empty;
+                        relativePath = path.Replace(Network.ClientRestAPI, string.Empty);
+                    }
+                    else
+                    {
+                        // The path relates to a different server.
+                        absolutePath = path;
+                        relativePath = string.Empty;
+                    }
+                }
+                else
+                {
+                    // It is a relative path.
+                    absolutePath = string.Empty;
+                    relativePath = path;
+                }
+                // Summary: absolutePath is set only for foreign servers, in which case relativePath
+                // will be empty. If the absolutePath is empty, the relativePath is interpreted relative
+                // to our server.
+
+            }
+            else if (path.Contains(Application.streamingAssetsPath))
+            {
+                Root = RootKind.StreamingAssets;
+                relativePath = path.Replace(Application.streamingAssetsPath, string.Empty);
+            }
+            else if (path.Contains(Application.dataPath))
+            {
+                Root = RootKind.AssetsFolder;
+                relativePath = path.Replace(Application.dataPath, string.Empty);
+            }
+            else if (path.Contains(Application.persistentDataPath))
+            {
+                Root = RootKind.PersistentData;
+                relativePath = path.Replace(Application.persistentDataPath, string.Empty);
+            }
+            else if (path.Contains(Application.temporaryCachePath))
+            {
+                Root = RootKind.TemporaryCache;
+                relativePath = path.Replace(Application.temporaryCachePath, string.Empty);
+            }
+            else if (path.Contains(ProjectFolder()))
+            {
+                Root = RootKind.ProjectFolder;
+                relativePath = path.Replace(ProjectFolder(), string.Empty);
+            }
+            else
+            {
+                Root = RootKind.Absolute;
+                absolutePath = path;
+            }
+        }
+
+        public async Task<Stream> LoadAsync()
+        {
+            string path = Path;
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new IOException("Path is empty or null.");
+            }
+            if (Root == RootKind.Url)
+            {
+                return await LoadFromServerAsync(path);
+            }
+            else
+            {
+                if (File.Exists(Path))
+                {
+                    FileStream fileStream = File.OpenRead(path);
+                    return fileStream;
+                }
+                else
+                {
+                    throw new IOException($"Path '{path}' does not exist.");
+                }
+            }
+        }
+
+        private static async Task<Stream> LoadFromServerAsync(string path)
+        {
+            Uri uri = new(path);
+            HttpClient client = new();
+            HttpRequestMessage request = new(HttpMethod.Get, uri);
+            HttpResponseMessage response = await client.SendAsync(request);
+            Debug.Log(response.IsSuccessStatusCode ? "SUCCESS\n" : "FAILURE\n");
+            Debug.Log($"Reason: {response.ReasonPhrase}\n");
+            Debug.Log($"Status code: {response.StatusCode}\n");
+            Debug.Log($"Content: {response.Content}\n");
+            Debug.Log($"Response: {response}\n");
+
+            if (response.IsSuccessStatusCode)
+            {
+                Task<Stream> task = response.Content.ReadAsStreamAsync();
+                return await task;
+                //Stream stream = await task;
+                //Debug.Log($"Content length in bytes: {stream.Length}\n");
+                //using FileStream fileStream = File.Create(filename);
+                //stream.Seek(0, SeekOrigin.Begin);
+                //Debug.Log($"Saving to {filename}.\n");
+                //await stream.CopyToAsync(fileStream);
+            }
+            else
+            {
+                throw new IOException($"Failed to download from URI {uri}.\n");
             }
         }
 
@@ -268,6 +390,8 @@ namespace SEE.Utils.Paths
         {
             return $"root={Root} relativePath={relativePath} absolutePath={absolutePath}";
         }
+
+        #region Config I/O
 
         /// <summary>
         /// The attribute label for the relative path of a DataPath in the stored configuration file.
@@ -328,5 +452,7 @@ namespace SEE.Utils.Paths
                 ConfigIO.RestoreEnum(path, rootLabel, ref Root);
             }
         }
+
+        #endregion
     }
 }

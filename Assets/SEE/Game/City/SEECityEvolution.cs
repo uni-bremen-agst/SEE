@@ -68,7 +68,7 @@ namespace SEE.Game.City
         /// The directory in which the GXL files of the graph series are located.
         /// </summary>
         [SerializeField, ShowInInspector, Tooltip("The directory in which the GXL files are located."), FoldoutGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
-        public DirectoryPath GXLDirectory = new();
+        public DataPath GXLDirectory = new();
 
         /// <summary>
         /// Yields the graph renderer that draws this city.
