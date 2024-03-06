@@ -20,21 +20,17 @@ namespace SEE.DataModel.DG.SourceRange
         /// <param name="node">node whose source-code range is to be added</param>
         public void Add(Node node)
         {
+            // TODO (@koschke): Should this be Region_Start instead (now SourceRange.Start)?
             int? sourceLine = node.SourceLine;
             if (sourceLine.HasValue)
             {
                 SourceRange descendant = Find(sourceLine.Value);
                 if (descendant == null)
                 {
-                    int? endLine = node.EndLine();
-                    if (endLine.HasValue)
-                    {
-                        Children.Add(new SourceRange(sourceLine.Value, endLine.Value, node));
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"{node.ID} does not have an end line. Will be ignored.\n");
-                    }
+                    // We need to subtract 1 from the end line because the end line is exclusive
+                    // in the source range, but inclusive for the purpose of the index.
+                    int endLine = node.SourceRange?.EndLine-1 ?? sourceLine.Value;
+                    Children.Add(new SourceRange(sourceLine.Value, endLine, node));
                 }
                 else
                 {

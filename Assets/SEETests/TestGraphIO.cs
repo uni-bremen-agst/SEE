@@ -34,7 +34,7 @@ namespace SEE.DataModel.DG.IO
         [Test]
         public void TestReadingRealBigGraph()
         {
-            string filename = Application.dataPath + "/../Data/GXL/SEE/CodeFacts.gxl.xz";
+            string filename = Application.streamingAssetsPath + "/SEE/CodeFacts.gxl.xz";
             Performance p = Performance.Begin("Loading big GXL file " + filename);
             LoadGraph(filename);
             p.End();

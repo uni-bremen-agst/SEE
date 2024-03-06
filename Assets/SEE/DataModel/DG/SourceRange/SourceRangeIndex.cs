@@ -158,10 +158,10 @@ namespace SEE.DataModel.DG.SourceRange
         /// <remarks>Can be used for debugging.</remarks>
         private void Dump()
         {
-            foreach (var entry in files)
+            foreach ((string key, FileRanges value) in files)
             {
-                Debug.Log($"*** {entry.Key} ***\n");
-                DumpFile(entry.Value);
+                Debug.Log($"*** {key} ***\n");
+                DumpFile(value);
             }
 
             void DumpFile(FileRanges file)
@@ -180,7 +180,7 @@ namespace SEE.DataModel.DG.SourceRange
                 int i = 1;
                 foreach (SourceRange child in range.Children)
                 {
-                    DumpRange(enumeration + "." + i.ToString(), child);
+                    DumpRange($"{enumeration}.{i}", child);
                     i++;
                 }
             }

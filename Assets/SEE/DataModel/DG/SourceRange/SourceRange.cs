@@ -26,7 +26,7 @@ namespace SEE.DataModel.DG.SourceRange
         public SourceRange(int start, int end, Node node)
         {
             Assert.IsNotNull(node);
-            Assert.IsTrue(start <= end);
+            Assert.IsTrue(start <= end, $"Start line {start} must be less than or equal to end line {end}");
 
             Range = new Range(start, end);
             Node = node;

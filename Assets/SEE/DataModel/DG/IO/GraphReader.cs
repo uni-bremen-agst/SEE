@@ -84,9 +84,9 @@ namespace SEE.DataModel.DG.IO
             // the hardware architecture (e.g., x86_64; see also
             // https://docs.unity3d.com/Manual/PluginInspector.html).
 
-            string libDir = Application.isEditor ?
-                                Path.Combine(Path.GetFullPath(Application.dataPath), "Plugins", "Native", "LZMA")
-                              : Path.Combine(Path.GetFullPath(Application.dataPath), "Plugins");
+            string libDir = Application.isEditor
+                ? Path.Combine(Path.GetFullPath(Application.dataPath), "Plugins", "Native", "LZMA")
+                : Path.Combine(Path.GetFullPath(Application.dataPath), "Plugins");
 
             if (Application.isEditor)
             {
@@ -198,8 +198,7 @@ namespace SEE.DataModel.DG.IO
                 }
                 else
                 {
-                    throw new PlatformNotSupportedException
-                        ("Only Windows, Linux, and OSX are supported operating systems.");
+                    throw new PlatformNotSupportedException("Only Windows, Linux, and OSX are supported operating systems.");
                 }
             }
         }
@@ -241,6 +240,18 @@ namespace SEE.DataModel.DG.IO
         /// The base path of the graph to be loaded.
         /// </summary>
         private readonly string basePath;
+
+        /// <summary>
+        /// The attribute name for the source region line length.
+        /// We need to use this attribute for our SourceRange attribute.
+        /// </summary>
+        public const string RegionLengthAttribute = "Source.Region_Length";
+
+        /// <summary>
+        /// The attribute name for the source region starting line.
+        /// We need to use this attribute for our SourceRange attribute.
+        /// </summary>
+        public const string RegionStartAttribute = "Source.Region_Start";
 
         /// <summary>
         /// Loads the graph from the GXL file and adds an artificial root node if requested
@@ -744,7 +755,24 @@ namespace SEE.DataModel.DG.IO
             }
             else
             {
-                current.SetInt(currentAttributeName, value);
+                // In the Axivion Suite, the Source.Region_Length and Source.Region_Start attributes are used to
+                // denote ranges. In SEE, we use the SourceRange attribute to denote ranges, which works with an
+                // explicit end line rather than a length. We hence need to convert the Source.Region_Length and
+                // Source.Region_Start attributes to SourceRange attributes.
+                switch (currentAttributeName)
+                {
+                    case RegionLengthAttribute:
+                        // NOTE: This assumes the Region_Length is always declared *after* the Region_Start.
+                        int endLine = current.GetInt(GraphElement.SourceRangeStartLineAttribute) + value;
+                        current.SetInt(GraphElement.SourceRangeEndLineAttribute, endLine);
+                        break;
+                    case RegionStartAttribute:
+                        current.SetInt(GraphElement.SourceRangeStartLineAttribute, value);
+                        break;
+                    default:
+                        current.SetInt(currentAttributeName, value);
+                        break;
+                }
             }
         }
     }

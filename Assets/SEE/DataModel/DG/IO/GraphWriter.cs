@@ -6,6 +6,7 @@ using System.Xml;
 using Joveler.Compression.XZ;
 using SEE.Utils;
 using UnityEngine;
+using UnityEngine.Assertions;
 using Stream = System.IO.Stream;
 
 namespace SEE.DataModel.DG.IO
@@ -295,19 +296,25 @@ namespace SEE.DataModel.DG.IO
                 attr.AppendChild(value);
                 xmlNode.AppendChild(attr);
             }
+            Dictionary<string, int> intAttributes = new(attributable.IntAttributes);
+            // In SEE, we use the SourceRange attribute to denote ranges, which works with an explicit end line.
+            // In the Axivion Suite, the Source.Region_Length and Source.Region_Start attributes are used instead.
+            // We hence need to convert the attributes to be Axivion-compatible here.
+            // We will not consider character ranges, as they are not used in the Axivion Suite.
+            if (intAttributes.Remove(GraphElement.SourceRangeStartLineAttribute, out int startLine))
+            {
+                intAttributes.Add(GraphReader.RegionStartAttribute, startLine);
+
+                Assert.IsTrue(intAttributes.ContainsKey(GraphElement.SourceRangeEndLineAttribute),
+                              "Ranges must consist of both start and end line.");
+                intAttributes.Remove(GraphElement.SourceRangeEndLineAttribute, out int endLine);
+                intAttributes.Add(GraphReader.RegionLengthAttribute, endLine - startLine);
+            }
 
             AppendAttributes(doc, xmlNode, "string", attributable.StringAttributes, StringToString);
             AppendAttributes(doc, xmlNode, "float", attributable.FloatAttributes, FloatToString);
-            AppendAttributes(doc, xmlNode, "int", attributable.IntAttributes, IntToString);
+            AppendAttributes(doc, xmlNode, "int", intAttributes, IntToString);
         }
-
-        /// <summary>
-        /// A specification for delegates converting a value into a string.
-        /// </summary>
-        /// <typeparam name="T">the type of the value</typeparam>
-        /// <param name="value">the value to be converted</param>
-        /// <returns>value as a string</returns>
-        private delegate string AsString<T>(T value);
 
         /// <summary>
         /// Implementation of delegate AsString for string values. No conversion is needed here.
@@ -358,15 +365,15 @@ namespace SEE.DataModel.DG.IO
                                                 XmlNode xmlNode,
                                                 string type,
                                                 Dictionary<string, V> attributes,
-                                                AsString<V> asString)
+                                                Func<V, string> asString)
         {
-            foreach (KeyValuePair<string, V> attribute in attributes)
+            foreach ((string key, V value) in attributes)
             {
                 XmlElement attr = doc.CreateElement("attr");
-                attr.SetAttribute("name", attribute.Key);
-                XmlElement value = doc.CreateElement(type);
-                value.InnerText = asString(attribute.Value);
-                attr.AppendChild(value);
+                attr.SetAttribute("name", key);
+                XmlElement valueElement = doc.CreateElement(type);
+                valueElement.InnerText = asString(value);
+                attr.AppendChild(valueElement);
                 xmlNode.AppendChild(attr);
             }
         }
