@@ -19,7 +19,7 @@ namespace SEE.GraphProviders
             UniTask.ToCoroutine(async () =>
             {
                 GraphProvider provider = new GXLGraphProvider()
-                { Path = NewDataPath("CodeFacts.gxl.xz") };
+                { Path = NewDataPath("JLGExample/CodeFacts.gxl.xz") };
 
                 GameObject go = new();
                 SEECity city = go.AddComponent<SEECity>();
