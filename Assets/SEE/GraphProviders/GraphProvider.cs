@@ -64,7 +64,7 @@ namespace SEE.GraphProviders
         public abstract GraphProviderKind GetKind();
 
         /// <summary>
-        /// Subclasses must implement this so save their attributes. This class takes
+        /// Subclasses must implement this to save their attributes. This class takes
         /// care only to begin and end the grouping and to emit the key-value pair
         /// for the 'kind'.
         /// </summary>
