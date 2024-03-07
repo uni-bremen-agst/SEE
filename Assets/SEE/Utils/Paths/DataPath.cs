@@ -162,7 +162,7 @@ namespace SEE.Utils.Paths
         /// Retrieve this value only if <see cref="Root"/> is not the absolute path.
         /// </summary>
         [SerializeField, HideInInspector]
-        public string RelativePath { get; set; }
+        public string RelativePath { get; set; } = string.Empty;
 
         /// <summary>
         /// The absolute path. Retrieve this value only if <see cref="Root"/> is the absolute path.
@@ -171,7 +171,7 @@ namespace SEE.Utils.Paths
         /// operating system we are currently running on.
         /// </summary>
         [SerializeField, HideInInspector]
-        public string AbsolutePath { get; set; }
+        public string AbsolutePath { get; set; } = string.Empty;
 
         /// <summary>
         /// The stored full path.
@@ -192,9 +192,23 @@ namespace SEE.Utils.Paths
         }
 
         /// <summary>
+        /// Returns the absolute path.
         ///
+        /// If this path represents a <see cref="RootKind.Url"/>, an absolute URL
+        /// is returned. The absolute URL can be either one of a foreign server or
+        /// our own data server.
+        ///
+        /// Otherwise, the returned path refers to an element in the file system.
+        ///
+        /// If this path represents a <see cref="RootKind.Absolute"/> path, that
+        /// absolute path is returned as is, that is, without replacing any directory
+        /// separator.
+        ///
+        /// Otherwise, the returned path is an absolute path as a combination of
+        /// the relative path prepended by the <see cref="GetRootPath()"/> where
+        /// a platform-dependent directory separator will be used.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>absolute path</returns>
         private string Get()
         {
             if (Root == RootKind.Url)
@@ -340,7 +354,7 @@ namespace SEE.Utils.Paths
             {
                 if (File.Exists(Path))
                 {
-                    return File.OpenRead(path);
+                    return Compressor.Uncompress(path);
                 }
                 else
                 {
@@ -364,11 +378,13 @@ namespace SEE.Utils.Paths
 
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadAsStreamAsync();
+                Stream stream = await response.Content.ReadAsStreamAsync();
+                return Compressor.IsCompressed(url) ? Compressor.Uncompress(stream) : stream;
             }
             else
             {
-                throw new IOException($"Failed to download from URI {uri}. Reason: {response.ReasonPhrase}. Status code: {response.StatusCode}.\n");
+                throw new IOException($"Failed to download from URI {uri}. "
+                    + $"Reason: {response.ReasonPhrase}. Status code: {response.StatusCode}.\n");
             }
         }
 
