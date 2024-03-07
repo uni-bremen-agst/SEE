@@ -14,6 +14,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis
 {
@@ -75,8 +76,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         public void OnNext(ChangeEvent value)
         {
-            changeEventQueue.Enqueue(value);
-            // UnityEngine.Debug.Log($"Received Change event {value}. Enqueued event.");
+            if (value is NodeEvent || value is EdgeEvent || value is HierarchyEvent)
+            {
+                changeEventQueue.Enqueue(value);
+                // UnityEngine.Debug.Log($"Received Change event {value}. Enqueued event.");
+            }
 
             // TODO: How to solve event filtering in both classes, EventFilter class?
             if (!ProcessingEvents && value is EdgeEvent edgeEvent && edgeEvent.Affected == ReflexionSubgraphs.Mapping)
@@ -149,9 +153,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     break;
                 case HierarchyEvent e:
                 // TODO Handling of Hierarchy event necessary? Yes, this needs to be handled.
-                    break;
-                case AttributeEvent<int> e:
-                // TODO Handling of Attribute events necessary?
                     break;
                 default: break;
             }
@@ -235,6 +236,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         public void UpdateConfiguration(ReflexionGraph visualizedGraph, Graph oracleMapping = null)
         {
+            ProcessingEvents = false;
+            changeEventQueue.Clear();
+
             if (visualizedGraph != null) 
             {
                 this.reflexionGraphViz = visualizedGraph;     
@@ -242,6 +246,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             else
             {
                 throw new Exception("Given Reflexion Graph was null. Cannot update Candidate Recommendation configuration.");
+            }
+
+            if(oracleMapping != null)
+            {
+                this.oracleMapping = oracleMapping;
             }
 
             if(CandidateRecommendation == null)
@@ -273,20 +282,20 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }          
         }
        
-        public async UniTask UpdateConfigurationAsync()
-        {
-            await UniTask.RunOnThreadPool(async () => 
-            {
-            	await UniTask.WaitWhile(() => ProcessingEvents);
-                await UniTask.SwitchToMainThread();
-                UpdateConfiguration(reflexionGraphViz, oracleMapping);
-            });
-        }
+        //public async UniTask UpdateConfigurationAsync()
+        //{
+        //    await UniTask.RunOnThreadPool(async () => 
+        //    {
+        //    	await UniTask.WaitWhile(() => ProcessingEvents);
+        //        await UniTask.SwitchToMainThread();
+        //        UpdateConfiguration(reflexionGraphViz, oracleMapping);
+        //    });
+        //}
 
         [Button(updateConfigurationButtonLabel, ButtonSizes.Small)]
         public void UpdateConfigurationCommand()
         {
-            UpdateConfigurationAsync().Forget();
+            UpdateConfiguration(this.reflexionGraphViz, this.oracleMapping);
         }
 
         [Button(createInitialMappingLabel,ButtonSizes.Small)]
@@ -378,7 +387,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         [Button(runExperimentLabel, ButtonSizes.Small)]
         [ButtonGroup(mappingButtonGroup)]
-        public void RunMappingExperiment()
+        public async void RunMappingExperiment()
         {
             ReflexionGraph graph = reflexionGraphViz;
 
@@ -388,7 +397,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
             graph.Name = "reflexionGraph for Experiment";
 
-            RunExperiment(this.mappingConfig, graph, oracleMapping);
+
+            await UniTask.RunOnThreadPool(() =>
+            {
+                RunExperiment(this.mappingConfig, graph, oracleMapping);
+            });
         }
 
         [Button(showRecommendationLabel, ButtonSizes.Small)]
@@ -438,6 +451,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         {
             ReflexionGraph graph = CandidateRecommendation.ReflexionGraph;
             ReflexionGraph oracleGraph = CandidateRecommendation.OracleGraph;
+
+            if(oracleGraph == null)
+            {
+                UnityEngine.Debug.Log("Could not generate Oracle mapping test. No Oracle Graph loaded.");
+                return;
+            }
+
             StringBuilder sb = new StringBuilder();
 
             IEnumerable<Node> nodes = graph.Nodes().Where(n => n.IsInImplementation() 
@@ -469,7 +489,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                                          ReflexionGraph graph, 
                                          Graph oracleMapping)
         {
-            System.Random rand = new System.Random(config.MasterSeed); 
+            Debug.Log($"Start Experiment for graph {graph.Name}({graph.Nodes().Count} nodes, {graph.Edges().Count} edges)");
+
+            System.Random rand = new System.Random(config.MasterSeed);
             int currentSeed = rand.Next(int.MaxValue);
 
             double initialMappingPercentage = config.InitialMappingPercentage;
@@ -481,12 +503,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             CandidateRecommendation recommendations = new CandidateRecommendation();
             recommendations.UpdateConfiguration(graph, config, oracleMapping);
 
-            for(int i = 0; i < config.Iterations; ++i)
+            FileStream stream;
+
+            for (int i = 0; i < config.Iterations; ++i)
             {
                 // STEPS
                 // 1. Create initial mapping based on current seed
-                Dictionary<Node, HashSet<Node>> initialMapping = recommendations.CreateInitialMapping(initialMappingPercentage, 
-                                                                                                     currentSeed);
+                Dictionary<Node, HashSet<Node>> initialMapping = recommendations.CreateInitialMapping(initialMappingPercentage,                                                                                                     currentSeed);
+                                                                                                     
+                UnityEngine.Debug.Log($"initialMapping keys={initialMapping.Keys.Count} values={initialMapping.Values.Count}");
                 // TODO:
                 // case 1.1 create initial mapping for calc graph
                 if (true)
@@ -507,7 +532,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     // TODO:
                 }
 
-                //TODO: Delete later
+                
                 Debug.Log(recommendations.AttractFunction.DumpTrainingData());
 
                 // 2. Generate csv file based on seed name/output path
@@ -534,7 +559,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 result.Seed = currentSeed;
                 results.Add(result);
                 string xmlFile = Path.Combine(config.OutputPath.Path, $"output{currentSeed}.xml");
-                result.CreateXml().Save(new FileStream(xmlFile, FileMode.Create));
+                stream = new FileStream(xmlFile, FileMode.Create);
+                result.CreateXml().Save(stream);
+                stream.Close();
+                Debug.Log($"Saved Result of Run to {xmlFile}");
 
                 // 6. Delete csv File?
                 // TODO:
@@ -556,7 +584,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             // 9. save Average Results
             MappingExperimentResult averageResult = MappingExperimentResult.AverageResults(results, config);
             string resultXml = Path.Combine(config.OutputPath.Path, $"result.xml");
-            averageResult.CreateXml().Save(new FileStream(resultXml, FileMode.Create));
+            stream = new FileStream(resultXml, FileMode.Create);
+            averageResult.CreateXml().Save(stream);
+            stream.Close();
+            UnityEngine.Debug.Log($"Finished Experiment for seed {config.MasterSeed}. Saved averaged result to {resultXml}");
         }
 
         /// <summary>
@@ -619,6 +650,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 // Debug.Log($"Chosen Mapping Pair {chosenMappingPair.CandidateID} --> {chosenMappingPair.CandidateID}");
 
                 //await MapRecommendation(chosenMappingPair.Candidate, chosenMappingPair.Cluster);
+                Debug.Log($"Automatically map candidate {chosenMappingPair.Candidate.ID} to the cluster {chosenMappingPair.Cluster.ID}. candidates left: {recommendation.UnmappedCandidates.Count}");
                 graph.AddToMapping(chosenMappingPair.Candidate, chosenMappingPair.Cluster);
 
                 recommendations = recommendation.Recommendations;
@@ -633,7 +665,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             yield return new WaitForSeconds(BLINK_EFFECT_DELAY);
 
             // Start blink effect
-            nodeOperators.ForEach((n) => n.Blink(10, 2));
+            try
+            {
+                nodeOperators.ForEach((n) => n.Blink(10, 2));
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Exception occured during blink operation." + Environment.NewLine + e.ToString());
+            }
         }
 
         private async UniTask MapRecommendation(Node candidate, Node cluster)

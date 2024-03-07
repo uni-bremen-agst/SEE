@@ -15,6 +15,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         public NBAttract(ReflexionGraph reflexionGraph, NBAttractConfig config) : base(reflexionGraph, config)
         {
+            this.config = config;
             this.naiveBayes = new NaiveBayesAccord();   
         }
 
@@ -59,6 +60,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 this.reflexionGraph.AddToMappingSilent(cluster, candidate);
                 this.CreateCdaTerms(cluster, candidate, docCdaTerms);    
                 this.reflexionGraph.RemoveFromMappingSilent(cluster, candidate);
+                doc.AddWords(docCdaTerms[cluster.ID]);
             }
 
             // TODO : check and formulate cda problems
@@ -68,8 +70,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             //}
 
-            Document document = new Document(doc);
-            doc.AddWords(docCdaTerms[cluster.ID]);
             double attraction = naiveBayes.ProbabilityForClass(cluster.ID, doc);
 
             // remove cda terms from naiveBayes classifier

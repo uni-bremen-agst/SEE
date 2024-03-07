@@ -151,6 +151,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             naiveBayesLearning.Options.InnerOption.UseLaplaceRule = true;
             int[][] inputJagged = inputs.ToJagged();
             classifier = naiveBayesLearning.Learn(inputJagged, outputs);
+            dirty = false;
         }
 
         public Dictionary<string, int> GetTrainingsData(string clazz)

@@ -2,6 +2,7 @@
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
+using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,7 +54,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// 
         /// </summary>
-        private Dictionary<string, MappingPair> mappingPairs; 
+        private Dictionary<string, MappingPair> mappingPairs;
+
+        public HashSet<string> UnmappedCandidates { get; private set; }
 
         /// <summary>
         /// 
@@ -181,6 +184,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 mappingPairs.Clear();
                 ReflexionGraph.RunAnalysis();
 
+                this.UnmappedCandidates = this.GetUnmappedCandidates().Select(n => n.ID).ToHashSet();
+
                 // Restart after the analysis was run, so initially/already
                 // mapped candidates will not recorded twice
                 // TODO: Does the CsvFile really have to be public?
@@ -223,39 +228,51 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 }
 
                 // Get targeted childs of currently mapped node
-                List<Node> nodesChangedInMapping = new List<Node>();
-                nodesChangedInMapping.Add(edgeEvent.Edge.Source);
-                this.GetImplicitlyMappedChilds(nodesChangedInMapping, edgeEvent.Edge.Source, ReflexionGraph);
+                List<Node> candidatesChangedInMapping = new List<Node>
+                {
+                    edgeEvent.Edge.Source
+                };
 
-                //// Get only unmapped child candidates, because the child might already be mapped.
-                //edgeEvent.Edge.Source.SelectChilds(nodesChangedInMapping,
-                //                   node => this.IsUnmappedCandidate(node));
+                this.GetImplicitlyMappedCandidates(candidatesChangedInMapping, edgeEvent.Edge.Source, ReflexionGraph);
+
+                if((ChangeType)edgeEvent.Change == ChangeType.Removal)
+                {
+                    candidatesChangedInMapping.ForEach(c => this.UnmappedCandidates.Add(c.ID));
+                } 
+                else if((ChangeType)edgeEvent.Change == ChangeType.Addition)
+                {
+                    candidatesChangedInMapping.ForEach(c => this.UnmappedCandidates.Remove(c.ID));
+                } 
+                else
+                {
+                    throw new Exception("Unkown Changetype in ChangeType. Can not process ChangeEvent in when calculating recommendations.");
+                }
 
                 if (Statistics.Active)
                 {
                     // Update and calculate attraction values for each mapped node
                     // to make sure the statistic is consistent
-                    foreach (Node nodeChangedInMapping in nodesChangedInMapping)
+                    foreach (Node candidateChangedInMapping in candidatesChangedInMapping)
                     {
                         MappingPair chosenMappingPair;
-                        if (!mappingPairs.TryGetValue(nodeChangedInMapping.ID + edgeEvent.Edge.Target.ID, out chosenMappingPair))
+                        if (!mappingPairs.TryGetValue(candidateChangedInMapping.ID + edgeEvent.Edge.Target.ID, out chosenMappingPair))
                         {
                             // For the very first mapped node and nodes removed form the mapping
                             // there is no previously calculated mappingpair available.
                             // So we create a corresponding mapping pair manually
-                            chosenMappingPair = new MappingPair(nodeChangedInMapping, edgeEvent.Edge.Target, -1.0d);
+                            chosenMappingPair = new MappingPair(candidateChangedInMapping, edgeEvent.Edge.Target, -1.0d);
                         }
 
-                        AttractFunction.HandleChangedNodes(edgeEvent.Edge.Target, new List<Node> { nodeChangedInMapping }, (ChangeType)edgeEvent.Change);
+                        AttractFunction.HandleChangedNodes(edgeEvent.Edge.Target, new List<Node> { candidateChangedInMapping }, (ChangeType)edgeEvent.Change);
                         UpdateRecommendations();
                         chosenMappingPair.ChangeType = (ChangeType)edgeEvent.Change;
-                        // UnityEngine.Debug.Log($"Record chosen mapping Pair:{chosenMappingPair.CandidateID}  --> {chosenMappingPair.ClusterID}");
+                        // Debug.Log($"Record chosen mapping Pair:{chosenMappingPair.CandidateID}  --> {chosenMappingPair.ClusterID}");
                         Statistics.RecordChosenMappingPair(chosenMappingPair);
                     }
                 } 
                 else
                 {
-                    AttractFunction.HandleChangedNodes(edgeEvent.Edge.Target, nodesChangedInMapping, (ChangeType)edgeEvent.Change);
+                    AttractFunction.HandleChangedNodes(edgeEvent.Edge.Target, candidatesChangedInMapping, (ChangeType)edgeEvent.Change);
                 }
             }
         }
@@ -272,28 +289,26 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             return false;
         }
 
-        private void GetImplicitlyMappedChilds(List<Node> implicitlyMappedChilds, Node node, ReflexionGraph graph)
+        private void GetImplicitlyMappedCandidates(List<Node> implicitlyMappedChilds, Node node, ReflexionGraph graph)
         {
             List<Node> childs = new List<Node>();
 
             foreach (Node child in node.Children())
             {
-                if(!graph.IsExplicitlyMapped(node))
+                if(!graph.IsExplicitlyMapped(child))
                 {
-                    if(this.IsCandidate(node))
+                    if(this.IsCandidate(child))
                     {
                         implicitlyMappedChilds.Add(child);
                     }
-                    GetImplicitlyMappedChilds(implicitlyMappedChilds, child, graph);
+                    GetImplicitlyMappedCandidates(implicitlyMappedChilds, child, graph);
                 }
             }
             return;
         }
 
-
         public void UpdateRecommendations()
         {
-            List<Node> unmappedCandidates = GetUnmappedCandidates();
             List<Node> clusters = GetCluster();
 
             double maxAttractionValue = double.MinValue;
@@ -304,8 +319,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             foreach (Node cluster in clusters)
             {
-                foreach (Node candidate in unmappedCandidates)
+                foreach (string candidateId in this.UnmappedCandidates)
                 {
+                    Node candidate = this.ReflexionGraph.GetNode(candidateId);
                     // Calculate the attraction value for current node and current cluster
                     double attractionValue = AttractFunction.GetAttractionValue(candidate, cluster);
                     
@@ -381,9 +397,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     Node oracleMapsTo = oracleGraph.MapsTo(node);
 
                     if (oracleMapsTo == null)
-                    {
-                        throw new Exception($"There is no information where to map node {node.ID} within the oracle graph." +
-                            $"{Environment.NewLine}{node}");
+                    {                                       
+                        Debug.LogWarning($"There is no information where to map node {node.ID} " +
+                                         $"within the oracle graph {Environment.NewLine}{node}");
+                        i++;
+                        continue;
                     }
 
                     mapsTo = reflexionGraph.GetNode(oracleMapsTo.ID);
@@ -401,7 +419,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 currentPercentage = (artificallyMappedNodes + alreadyMappedNodesCount) / candidatesCount;
                 UnityEngine.Debug.Log($"Node={node.ID} currentPercentage={currentPercentage} artificallyMappedNodes={artificallyMappedNodes} alreadyMappedNodesCount={alreadyMappedNodesCount} candidatesCount={candidatesCount}");
                 i++;
-
             }
 
             return initialMapping;
@@ -605,7 +622,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         {
             return node.Type.Equals(candidateType)
                     && node.IsInImplementation()
-                    && oracleGraph.MapsTo(node) != null // TODO: This should not always be a condition
                     && !node.ToggleAttributes.Contains("Element.Is_Artificial")
                     && !node.ToggleAttributes.Contains("Element.Is_Anonymous");
         }

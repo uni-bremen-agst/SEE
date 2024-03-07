@@ -17,6 +17,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         public double Hits { get; private set; }
         public double Fails { get; private set; }
         public double InitiallyMapped { get; private set; }
+        public double LeftOver { get; private set; }
         public int Chosen { get; private set; }
         public double AveragePercentileRankGlobally { get; private set; }
 
@@ -77,7 +78,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             Node mapsTo = recommendation.ReflexionGraph.MapsTo(candidate);
 
             Node expectedCluster = recommendation.OracleGraph.MapsTo(candidate);
-            statisticResult.ExpectedClusterID = expectedCluster.ID;
+            statisticResult.ExpectedClusterID = expectedCluster?.ID;
 
             if (mapsTo != null)
             {
@@ -124,6 +125,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 new XElement("fails", Fails),
                 new XElement("AveragePercentileRankGlobally", AveragePercentileRankGlobally),
                 new XElement("initiallyMapped", InitiallyMapped),
+                new XElement("leftOver", LeftOver),
                 new XElement("chosen", Chosen),
                 new XElement("candidateType", config.AttractFunctionConfig.CandidateType),
                 new XElement("clusterType", config.AttractFunctionConfig.ClusterType),
@@ -153,7 +155,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             resultsOrdered.ForEach(r => r.CalculateResults());         
             Hits = resultsOrdered.Where(r => r.Hit && r.MappedAtMappingStep >= 0).Count();
             Fails = resultsOrdered.Where(r => !r.Hit && r.MappedAtMappingStep >= 0).Count();
-            InitiallyMapped = resultsOrdered.Where((r) => r.MappedAtMappingStep < 0).Count();
+            InitiallyMapped = resultsOrdered.Where((r) => r.MappedAtMappingStep == -1).Count();
+            LeftOver = resultsOrdered.Where((r) => r.MappedAtMappingStep == -2).Count();
             Chosen = resultsOrdered.Where((r) => r.Chosen == true).Count();
 
             IEnumerable<double> validPercentileRankValues = resultsOrdered.Where(r => r.AveragePercentileRank >= 0)
@@ -171,6 +174,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             averageResult.Hits = results.Select(r => r.Hits).Average();
             averageResult.Fails = results.Select(r => r.Fails).Average();
             averageResult.InitiallyMapped = results.Select(r => r.InitiallyMapped).Average();
+            averageResult.LeftOver = results.Select(r => r.LeftOver).Average();
 
             averageResult.AddConfigInformation(config);
             averageResult.CalculateResults();

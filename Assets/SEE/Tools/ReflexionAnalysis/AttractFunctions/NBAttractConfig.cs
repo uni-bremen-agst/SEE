@@ -34,14 +34,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         {
             this.UseCDA = useCda;
             this.UseStandardTerms = useStandardTerms;
-            this.TargetLanguage = TargetLanguage;
+            this.TargetLanguage = language;
             this.AttractFunctionType = AttractFunction.AttractFunctionType.NBAttract;
         }
 
         public override XElement ToXElement()
         {
             XElement config = base.ToXElement();
-            XAttribute useStandardTerms = new XAttribute("UseCda", UseStandardTerms);
+            XAttribute useStandardTerms = new XAttribute("UseStandardTerms", UseStandardTerms);
             config.Add(useStandardTerms);
             XAttribute useCda = new XAttribute("UseCda", UseCDA);
             config.Add(useCda);

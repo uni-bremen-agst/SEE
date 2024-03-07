@@ -100,11 +100,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         }
 
         public override void HandleChangedNodes(Node cluster, List<Node> nodesChangedInMapping, ChangeType changeType)
-        {
-            string nodes = string.Empty;
-            nodesChangedInMapping.ForEach(node => { nodes += node.ID + ","; });
-            // UnityEngine.Debug.Log($"Handle changed nodes {nodes} for {cluster.ID} in ADCAttract");
-            
+        {   
             foreach (Node nodeChangedInMapping in nodesChangedInMapping)
             {
                 // TODO: duplicate implementationEdges problem
@@ -145,7 +141,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 Node mapsToSource = this.reflexionGraph.MapsTo(implEdge.Source);
                 Node mapsToTarget = this.reflexionGraph.MapsTo(implEdge.Target);
 
-                string id = GetMatchingArchitectureDepedency(mapsToSource, mapsToTarget, /*implEdge.Type*/"Source_Dependency");
+                string id = GetMatchingArchitectureDepedency(mapsToSource, mapsToTarget, implEdge.Type);
 
                 this.propagatedEdges.Add(implEdge.ID);
 
@@ -172,11 +168,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             if (!source.ID.Equals(target.ID))
             {
-                //Edge architectureEdge = ReflexionGraph.GetPropagatedDependency(source,
-                //                                                            target,
-                //                                                            type);
                 // TODO: Is this correct?
-                Edge architectureEdge = source.FromTo(target, type).SingleOrDefault(edge => ReflexionGraph.IsSpecified(edge));
+                // TODO: Use type hierarchy in the future
+                Edge architectureEdge = source.FromTo(target, null).SingleOrDefault(edge => ReflexionGraph.IsSpecified(edge));
 
                 if(architectureEdge == null)
                 {
@@ -229,7 +223,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             if(propagatedEdges.Contains(implEdge.ID) && mapsToSource != null && mapsToTarget != null)
             {
-                string id = GetMatchingArchitectureDepedency(mapsToSource, mapsToTarget, /*implEdge.Type*/ "Source_Dependency");
+                string id = GetMatchingArchitectureDepedency(mapsToSource, mapsToTarget, implEdge.Type);
 
                 this.propagatedEdges.Remove(implEdge.ID);
 
