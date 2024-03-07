@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using System.Threading.Tasks;
 
 namespace SEE.GraphProviders
 {
@@ -50,14 +51,14 @@ namespace SEE.GraphProviders
             return GraphProviderKind.Reflexion;
         }
 
-        public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
+        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
         {
             if (city == null)
             {
                 throw new ArgumentException("The given city is null.\n");
             }
-            Graph architectureGraph = LoadGraph(Architecture.Path, city);
-            Graph implementationGraph = LoadGraph(Implementation.Path, city);
+            Graph architectureGraph = await LoadGraphAsync(Architecture, city);
+            Graph implementationGraph = await LoadGraphAsync(Implementation, city);
             Graph mappingGraph;
             if (string.IsNullOrEmpty(Mapping.Path))
             {
@@ -69,10 +70,10 @@ namespace SEE.GraphProviders
             }
             else
             {
-                mappingGraph = LoadGraph(Mapping.Path, city);
+                mappingGraph = await LoadGraphAsync(Mapping, city);
             }
 
-            return UniTask.FromResult<Graph>(new ReflexionGraph(implementationGraph, architectureGraph, mappingGraph, CityName));
+            return new ReflexionGraph(implementationGraph, architectureGraph, mappingGraph, CityName);
         }
 
         /// <summary>
@@ -84,21 +85,13 @@ namespace SEE.GraphProviders
         /// <returns>loaded graph</returns>
         /// <exception cref="ArgumentException">thrown if <paramref name="path"/> is null or empty
         /// or does not exist</exception>
-        private Graph LoadGraph(string path, AbstractSEECity city)
+        private async Task<Graph> LoadGraphAsync(DataPath path, AbstractSEECity city)
         {
-            if (string.IsNullOrEmpty(path))
+            if (path == null)
             {
-                throw new ArgumentException("Empty GXL path.\n");
+                throw new ArgumentNullException(nameof(path));
             }
-            if (!File.Exists(path))
-            {
-                throw new ArgumentException($"File {path} does not exist.\n");
-            }
-            GraphReader graphCreator = new(path, city.HierarchicalEdges,
-                                           basePath: city.SourceCodeDirectory.Path,
-                                           logger: new SEELogger());
-            graphCreator.Load();
-            return graphCreator.GetGraph();
+            return await GraphReader.LoadAsync(path, city.HierarchicalEdges, city.SourceCodeDirectory.Path);
         }
 
         #region Configuration file input/output

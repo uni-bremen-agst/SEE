@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using SEE.Tools.RandomGraphs;
 using SEE.Utils;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace SEE.DataModel.DG.IO
 {
@@ -31,32 +35,30 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         private const string hierarchicalEdgeType = "Enclosing";
 
-        [Test]
-        public void TestReadingRealBigGraph()
+        [UnityTest]
+        public IEnumerator TestMinilaxComparison() =>
+             UniTask.ToCoroutine(async () =>
         {
             string filename = Application.dataPath + "/../Data/GXL/SEE/CodeFacts.gxl.xz";
             Performance p = Performance.Begin("Loading big GXL file " + filename);
-            LoadGraph(filename);
+            await LoadGraphAsync(filename);
             p.End();
-        }
+        });
 
-        [Test]
-        public void TestReadingArchitecture()
-        {
-            LoadGraph(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/Architecture.gxl");
-        }
+        [UnityTest]
+        public IEnumerator TestReadingArchitecture() =>
+             UniTask.ToCoroutine(async ()
+                 => await LoadGraphAsync(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/Architecture.gxl"));
 
-        [Test]
-        public void TestReadingMapping()
-        {
-            LoadGraph(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/Mapping.gxl");
-        }
+        [UnityTest]
+        public IEnumerator TestReadingMapping() =>
+             UniTask.ToCoroutine(async ()
+                 => await LoadGraphAsync(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/Mapping.gxl"));
 
-        [Test]
-        public void TestReadingCodeFacts()
-        {
-            LoadGraph(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/CodeFacts.gxl.xz");
-        }
+        [UnityTest]
+        public IEnumerator TestReadingCodeFacts() =>
+             UniTask.ToCoroutine(async ()
+                 => await LoadGraphAsync(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/CodeFacts.gxl.xz"));
 
         private static bool CompressedWritingSupported()
         {
@@ -75,7 +77,7 @@ namespace SEE.DataModel.DG.IO
         /// Test for a simple artificially created graph.
         /// </summary>
         [Test, Sequential]
-        public void TestGraphWriter([Values(true, false)] bool compress)
+        public async Task TestGraphWriterAsync([Values(true, false)] bool compress)
         {
             const string basename = "test";
 
@@ -89,7 +91,7 @@ namespace SEE.DataModel.DG.IO
 
             if (!compress || CompressedWritingSupported())
             {
-                WriteReadGraph(basename, outGraph, compress);
+                await WriteReadGraphAsync(basename, outGraph, compress);
             }
         }
 
@@ -97,7 +99,7 @@ namespace SEE.DataModel.DG.IO
         /// Test with randomly generated graphs with increasing number of nodes.
         /// </summary>
         [Test, Sequential]
-        public void TestRandomGraphWriter([Values(true, false)] bool compress)
+        public async Task TestRandomGraphWriterAsync([Values(true, false)] bool compress)
         {
             Constraint leafConstraint = new("Routine", 10, "calls", 0.01f);
             Constraint innerNodesConstraint = new("File", 3, "imports", 0.01f);
@@ -126,7 +128,7 @@ namespace SEE.DataModel.DG.IO
 
                 if (!compress || CompressedWritingSupported())
                 {
-                    WriteReadGraph(basename, outGraph, compress);
+                    await WriteReadGraphAsync(basename, outGraph, compress);
                 }
             }
         }
@@ -156,7 +158,7 @@ namespace SEE.DataModel.DG.IO
         /// <param name="basename">basename of the filename for storing graphs</param>
         /// <param name="outGraph">the initial graph to be written</param>
         /// <param name="compress">whether to LZMA compress the graph</param>
-        private static void WriteReadGraph(string basename, Graph outGraph, bool compress)
+        private static async Task WriteReadGraphAsync(string basename, Graph outGraph, bool compress)
         {
             string Extension = compress ? CompressedExtension : NormalExtension;
             string filename = basename + Extension;
@@ -174,14 +176,14 @@ namespace SEE.DataModel.DG.IO
                 GraphWriter.Save(filename, outGraph, hierarchicalEdgeType);
 
                 // Read the saved outGraph again
-                Graph inGraph = LoadGraph(filename);
+                Graph inGraph = await LoadGraphAsync(filename);
                 Assert.AreEqual(filename, inGraph.Path);
 
                 // Write the loaded saved initial graph again as a backup
                 GraphWriter.Save(backupFilename, inGraph, hierarchicalEdgeType);
 
                 // Read the backup graph again
-                Graph backupGraph = LoadGraph(backupFilename);
+                Graph backupGraph = await LoadGraphAsync(backupFilename);
                 // The path of backupGraph will be backupFilename.
                 Assert.AreEqual(backupFilename, backupGraph.Path);
                 // For the comparison, we need to reset the path.
@@ -197,11 +199,9 @@ namespace SEE.DataModel.DG.IO
             }
         }
 
-        private static Graph LoadGraph(string filename)
+        private static async Task<Graph> LoadGraphAsync(string filename)
         {
-            GraphReader graphReader = new(filename, new HashSet<string> { hierarchicalEdgeType }, basePath: "");
-            graphReader.Load();
-            return graphReader.GetGraph();
+            return await GraphReader.LoadAsync(filename, new HashSet<string> { hierarchicalEdgeType }, basePath: "");
         }
 
         private static Node NewNode(Graph graph, string linkname)

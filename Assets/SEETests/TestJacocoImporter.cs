@@ -4,6 +4,7 @@ using SEE.DataModel.DG.IO;
 using SEE.Utils.Paths;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.TestTools;
 
@@ -25,25 +26,23 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="filename">GXL file</param>
         /// <returns>loaded graph</returns>
-        private static Graph LoadGraph(string filename)
+        private static async Task<Graph> LoadGraphAsync(string filename)
         {
-            GraphReader graphReader = new(filename, new HashSet<string> { hierarchicalEdgeType }, basePath: "");
-            graphReader.Load();
-            return graphReader.GetGraph();
+            return await GraphReader.LoadAsync(filename, new HashSet<string> { hierarchicalEdgeType }, basePath: "");
         }
 
         /// <summary>
-        /// The graph that was loaded by <see cref="SetUp"/> before each test case is executed.
+        /// The graph that was loaded by <see cref="SetUpAsync"/> before each test case is executed.
         /// </summary>
         private Graph graph;
 
         [SetUp]
-        public void SetUp()
+        public async Task SetUpAsync()
         {
             string gxlPath = Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz";
             string xmlPath = Application.streamingAssetsPath + "/JLGExample/jacoco.xml";
 
-            graph = LoadGraph(gxlPath);
+            graph = await LoadGraphAsync(gxlPath);
             JaCoCoImporter.Load(graph, xmlPath);
         }
 
