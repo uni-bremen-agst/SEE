@@ -12,24 +12,12 @@ namespace SEE.Utils
     public class GXLParser : IDisposable
     {
         /// <summary>
-        /// Creates a new GXL Parser for the given <paramref name="filename"/>.
+        /// Creates a new GXL Parser.
         /// </summary>
-        /// <param name="gxl">Content of the GXL file that shall be parsed, given as a stream</param>
-        /// <param name="name">Name of the GXL file. Only used for display purposes in log messages</param>
         /// <param name="logger">Logger to use for log messages</param>
-        protected GXLParser(Stream gxl, string name = "[unknown]", ILogger logger = null)
+        protected GXLParser(ILogger logger = null)
         {
-            this.Name = name;
-            this.Logger = logger;
-            XmlReaderSettings settings = new()
-            {
-                CloseInput = true,
-                IgnoreWhitespace = true,
-                IgnoreComments = true,
-                // TODO: Apparently enabling the below has security implications due to the URL being resolved.
-                DtdProcessing = DtdProcessing.Parse
-            };
-            Reader = XmlReader.Create(gxl, settings);
+            Logger = logger;
         }
 
         /// <summary>
@@ -179,10 +167,24 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Loads the GXL file and parses it.
+        /// Processes the GXL data provided in the <paramref name="gxl"/> stream.
         /// </summary>
-        public virtual void Load()
+        /// <param name="gxl">Stream containing GXL data that shall be processed</param>
+        /// <param name="name">Name of the GXL data stream. Only used for display purposes in log messages</param>
+        public virtual void Load(Stream gxl, string name = "[unknown]")
         {
+            this.Name = name;
+
+            XmlReaderSettings settings = new()
+            {
+                CloseInput = true,
+                IgnoreWhitespace = true,
+                IgnoreComments = true,
+                // TODO: Apparently enabling the below has security implications due to the URL being resolved.
+                DtdProcessing = DtdProcessing.Parse
+            };
+            Reader = XmlReader.Create(gxl, settings);
+
             // Preserves the last text content of an XML node seen,
             // e.g., "mystring" in <string>mystring</string>.
             // Defined only at the EndElement, e.g. </string> here.
