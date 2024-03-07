@@ -5,7 +5,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using FuzzySharp;
 using SEE.Controls;
-using SEE.DataModel.GraphSearch;
+using SEE.DataModel.DG.GraphSearch;
 using SEE.GO;
 using TMPro;
 using UnityEngine;

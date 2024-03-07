@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.DataModel.DG.SourceRange
+namespace SEE.DataModel.DG.GraphIndex
 {
     /// <summary>
     /// Represents sorted lists of <see cref="SourceRange"/>s.
@@ -35,8 +35,8 @@ namespace SEE.DataModel.DG.SourceRange
             }
             // index is the position at which this element would be inserted;
             // but it is not yet inserted
-            if ((index < values.Count && values[index].Range.StartLine <= range.Range.EndLine)
-                || (index - 1 >= 0 && range.Range.StartLine <= values[index - 1].Range.EndLine))
+            if ((index < values.Count && values[index].Range.StartLine < range.Range.EndLine)
+                || (index - 1 >= 0 && range.Range.StartLine < values[index - 1].Range.EndLine))
             {
                 throw new ArgumentException($"A range {values[index]} overlapping with {range} already exists.");
             }
@@ -100,7 +100,7 @@ namespace SEE.DataModel.DG.SourceRange
             while (low <= high)
             {
                 index = (low + high) / 2;
-                if (line > values[index].Range.EndLine)
+                if (line >= values[index].Range.EndLine)
                 {
                     low = index + 1;
                 }

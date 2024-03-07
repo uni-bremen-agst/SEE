@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using System;
 using System.Text.RegularExpressions;
+using SEE.DataModel.DG.GraphIndex;
 using UnityEngine;
 using UnityEngine.TestTools;
 

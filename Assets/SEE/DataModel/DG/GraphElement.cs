@@ -2,7 +2,6 @@
 using SEE.Utils.Paths;
 using Sirenix.Utilities;
 using System.Diagnostics;
-using SEE.DataModel.DG.SourceRange;
 
 namespace SEE.DataModel.DG
 {

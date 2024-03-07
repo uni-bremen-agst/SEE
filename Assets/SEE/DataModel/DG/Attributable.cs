@@ -460,36 +460,6 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Returns true if <paramref name="other"/> meets all of the following conditions:
-        /// (1) is not null
-        /// (2) has exactly the same C# type
-        /// (3) has exactly the same attributes with exactly the same values as this attributable.
-        /// </summary>
-        /// <param name="other">to be compared to</param>
-        /// <returns>true if equal</returns>
-        public override bool Equals(object other)
-        {
-            if (other == null)
-            {
-                Report("other is null");
-                return false;
-            }
-            else if (ReferenceEquals(this, other))
-            {
-                return true;
-            }
-            else if (GetType() != other.GetType())
-            {
-                Report("other has different C# type");
-                return false;
-            }
-            else
-            {
-                return HasSameAttributes(other as Attributable);
-            }
-        }
-
-        /// <summary>
         /// Yields true if this <see cref="Attributable"/> has exactly the same attributes
         /// as <paramref name="other"/>.
         /// </summary>
@@ -539,19 +509,6 @@ namespace SEE.DataModel.DG
         protected static bool AreEqual<V>(IDictionary<string, V> left, IDictionary<string, V> right)
         {
             return left.Count == right.Count && !left.Except(right).Any();
-        }
-
-        /// <summary>
-        /// Returns a hash code.
-        /// </summary>
-        /// <returns>hash code</returns>
-        public override int GetHashCode()
-        {
-            // we are using only those two attribute kinds to avoid unnecessary
-            // computation in the hope that they suffice; nodes and edges should
-            // have some attributes of this kind sufficiently different to others
-            // TODO (@koschke): If IntAttributes or StringAttributes are ever modified, won't this cause problems?
-            return IntAttributes.GetHashCode() ^ StringAttributes.GetHashCode();
         }
 
         /// <summary>

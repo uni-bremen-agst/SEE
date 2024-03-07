@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.DataModel.DG.SourceRange
+namespace SEE.DataModel.DG.GraphIndex
 {
     /// <summary>
     /// A source-location based node index that allows to search for graph nodes

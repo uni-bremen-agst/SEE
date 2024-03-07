@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.DataModel.DG.SourceRange
+namespace SEE.DataModel.DG.GraphIndex
 {
     /// <summary>
     /// A representation of the source-code ranges of a file. This
@@ -20,17 +20,13 @@ namespace SEE.DataModel.DG.SourceRange
         /// <param name="node">node whose source-code range is to be added</param>
         public void Add(Node node)
         {
-            // TODO (@koschke): Should this be Region_Start instead (now SourceRange.Start)?
-            int? sourceLine = node.SourceLine;
-            if (sourceLine.HasValue)
+            Range range = node.SourceRange;
+            if (range != null)
             {
-                SourceRange descendant = Find(sourceLine.Value);
+                SourceRange descendant = Find(range.StartLine);
                 if (descendant == null)
                 {
-                    // We need to subtract 1 from the end line because the end line is exclusive
-                    // in the source range, but inclusive for the purpose of the index.
-                    int endLine = node.SourceRange?.EndLine-1 ?? sourceLine.Value;
-                    Children.Add(new SourceRange(sourceLine.Value, endLine, node));
+                    Children.Add(new SourceRange(range, node));
                 }
                 else
                 {
@@ -39,7 +35,7 @@ namespace SEE.DataModel.DG.SourceRange
             }
             else
             {
-                Debug.LogWarning($"{node.ID} does not have a source line. Will be ignored.\n");
+                Debug.LogWarning($"{node.ID} does not have a source range. Will be ignored.\n");
             }
         }
 

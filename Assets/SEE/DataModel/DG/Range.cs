@@ -1,4 +1,4 @@
-namespace SEE.DataModel.DG.SourceRange
+namespace SEE.DataModel.DG
 {
     /// <summary>
     /// Represents a range in a source file, going from the <see cref="StartLine"/> to the <see cref="EndLine"/>

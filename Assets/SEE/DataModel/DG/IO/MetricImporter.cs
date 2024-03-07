@@ -69,7 +69,7 @@ namespace SEE.DataModel.DG.IO
                     }
                     else
                     {
-                        SEE.DataModel.DG.SourceRange.Range lineRange = node.SourceRange ?? new SEE.DataModel.DG.SourceRange.Range(line.Value, line.Value + 1);
+                        Range lineRange = node.SourceRange ?? new Range(line.Value, line.Value + 1);
                         // Relevant issues are those which are entirely contained by the source region of this node
                         relevantIssues = issueList.Where(
                             x => x.Entities.Any(e => lineRange.Contains(e.Line) && (!e.EndLine.HasValue || lineRange.Contains(e.EndLine.Value))));
