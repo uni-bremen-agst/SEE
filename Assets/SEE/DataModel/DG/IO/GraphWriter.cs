@@ -8,13 +8,14 @@ using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Stream = System.IO.Stream;
+using XmlElement = System.Xml.XmlElement;
 
 namespace SEE.DataModel.DG.IO
 {
     /// <summary>
     /// Saves graphs in GXL format on disk.
     /// </summary>
-    public static class GraphWriter
+    public class GraphWriter: GraphIO
     {
         /// <summary>
         /// Saves given <paramref name="graph"/> in GXL format in a file with given <paramref name="filename"/>.
@@ -303,12 +304,12 @@ namespace SEE.DataModel.DG.IO
             // We will not consider character ranges, as they are not used in the Axivion Suite.
             if (intAttributes.Remove(GraphElement.SourceRangeStartLineAttribute, out int startLine))
             {
-                intAttributes.Add(GraphReader.RegionStartAttribute, startLine);
+                intAttributes.Add(RegionStartAttribute, startLine);
 
                 Assert.IsTrue(intAttributes.ContainsKey(GraphElement.SourceRangeEndLineAttribute),
                               "Ranges must consist of both start and end line.");
                 intAttributes.Remove(GraphElement.SourceRangeEndLineAttribute, out int endLine);
-                intAttributes.Add(GraphReader.RegionLengthAttribute, endLine - startLine);
+                intAttributes.Add(RegionLengthAttribute, endLine - startLine);
             }
 
             AppendAttributes(doc, xmlNode, "string", attributable.StringAttributes, StringToString);

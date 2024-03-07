@@ -242,18 +242,6 @@ namespace SEE.DataModel.DG.IO
         private readonly string basePath;
 
         /// <summary>
-        /// The attribute name for the source region line length.
-        /// We need to use this attribute for our SourceRange attribute.
-        /// </summary>
-        public const string RegionLengthAttribute = "Source.Region_Length";
-
-        /// <summary>
-        /// The attribute name for the source region starting line.
-        /// We need to use this attribute for our SourceRange attribute.
-        /// </summary>
-        public const string RegionStartAttribute = "Source.Region_Start";
-
-        /// <summary>
         /// Loads the graph from the GXL file and adds an artificial root node if requested
         /// (see constructor). The node levels will be calculated, too.
         /// </summary>
