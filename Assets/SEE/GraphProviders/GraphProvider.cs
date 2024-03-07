@@ -15,8 +15,6 @@ namespace SEE.GraphProviders
     /// </summary>
     public abstract class GraphProvider
     {
-        protected const string GraphProviderFoldoutGroup = "Data";
-
         /// <summary>
         /// Yields a new graph based on the input <paramref name="graph"/>.
         /// The input <paramref name="graph"/> may be empty. Subclasses are free to
@@ -26,6 +24,20 @@ namespace SEE.GraphProviders
         /// <param name="city">settings possibly necessary to provide a graph</param>
         /// <returns>provided graph based on <paramref name="graph"/></returns>
         public abstract UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city);
+
+        /// <summary>
+        /// Returns the kind of graph provider.
+        /// </summary>
+        /// <returns>kind of graph provider</returns>
+        public abstract GraphProviderKind GetKind();
+
+        /// <summary>
+        /// Name of the fold-out group in the Unity inspector and runtime-configuration
+        /// editor.
+        /// </summary>
+        protected const string GraphProviderFoldoutGroup = "Data";
+
+        #region Config I/O
 
         /// <summary>
         /// Saves the settings in the configuration file.
@@ -56,12 +68,6 @@ namespace SEE.GraphProviders
             SaveAttributes(writer);
             writer.EndGroup();
         }
-
-        /// <summary>
-        /// Returns the kind of graph provider.
-        /// </summary>
-        /// <returns>kind of graph provider</returns>
-        public abstract GraphProviderKind GetKind();
 
         /// <summary>
         /// Subclasses must implement this to save their attributes. This class takes
@@ -129,5 +135,7 @@ namespace SEE.GraphProviders
         /// The label for kind of graph provider in the configuration file.
         /// </summary>
         private const string kindLabel = "kind";
+
+        #endregion
     }
 }
