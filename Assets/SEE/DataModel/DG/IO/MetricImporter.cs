@@ -150,7 +150,7 @@ namespace SEE.DataModel.DG.IO
         /// data are read from the given <paramref name="stream"/>.
         /// </summary>
         /// <param name="graph">graph for which node metrics are to be imported</param>
-        /// <param name="stream">stream containing CSV data from which to import node metrics</param>
+        /// <param name="path">path to a data file containing CSV data from which to import node metrics</param>
         /// <param name="separator">used to separate column entries</param>
         /// <returns>the number of errors</returns>
         public static async UniTask<int> LoadCsvAsync(Graph graph, DataPath path, char separator = ';')

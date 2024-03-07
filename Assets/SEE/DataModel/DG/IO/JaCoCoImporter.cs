@@ -1,4 +1,6 @@
-﻿using SEE.DataModel.DG.SourceRange;
+﻿using Cysharp.Threading.Tasks;
+using SEE.DataModel.DG.SourceRange;
+using SEE.Utils.Paths;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -32,12 +34,56 @@ namespace SEE.DataModel.DG.IO
         private const string methodContext = "method";
 
         /// <summary>
+        /// Loads a JaCoCo test report from the given <paramref name="path"/> assumed to
+        /// conform to the JaCoCo coverage report syntax.
+        /// The retrieved coverage metrics will be added to nodes of <paramref name="graph"/>.
+        /// </summary>
+        /// <param name="graph">graph for which node metrics are to be imported</param>
+        /// <param name="path">path to a data file containing JaCoCo data from which to import node metrics</param>
+        /// <exception cref="ArgumentNullException">if <paramref name="graph"/> is null</exception>
+        /// <exception cref="ArgumentException">if <paramref name="path"/> is null or empty</exception>
+        public static async UniTask LoadAsync(Graph graph, DataPath path)
+        {
+            if (string.IsNullOrEmpty(path.Path))
+            {
+                throw new ArgumentException("Data path must neither be null nor empty.");
+            }
+            Stream stream = await path.LoadAsync();
+            Load(graph, stream, path.Path);
+        }
+
+        /// <summary>
         /// Loads a JaCoCo test report from the given JaCoCo XML <paramref name="jaCoCoFilename"/>.
         /// The retrieved coverage metrics will be added to nodes of <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">Graph where to add the metrics</param>
-        /// <param name="jaCoCoFilename">Path of the XML file</param>
+        /// <param name="jaCoCoFilename">Path of the JaCoCo XML file</param>
+        /// <exception cref="ArgumentNullException">if <paramref name="graph"/> is null</exception>
+        /// <exception cref="ArgumentException">if <paramref name="jaCoCoFilename"/> is null or empty</exception>
         public static void Load(Graph graph, string jaCoCoFilename)
+        {
+            if (!File.Exists(jaCoCoFilename))
+            {
+                Debug.LogError($"The JaCoCo XML file named {jaCoCoFilename} does not exist.\n");
+                return;
+            }
+            if (string.IsNullOrEmpty(jaCoCoFilename))
+            {
+                throw new ArgumentException("Filename must neither be null nor empty.");
+            }
+            using Stream stream = File.OpenRead(jaCoCoFilename);
+            Load(graph, stream, jaCoCoFilename);
+        }
+
+        /// <summary>
+        /// Loads a JaCoCo test report from the given <paramref name="stream"/>.
+        /// The retrieved coverage metrics will be added to nodes of <paramref name="graph"/>.
+        /// </summary>
+        /// <param name="graph">Graph where to add the metrics</param>
+        /// <param name="stream"></param>
+        /// <param name="jaCoCoFilename"></param>
+        /// <exception cref="ArgumentNullException">if <paramref name="graph"/> is null</exception>
+        private static void Load(Graph graph, Stream stream, string jaCoCoFilename)
         {
             if (graph == null)
             {
@@ -48,20 +94,11 @@ namespace SEE.DataModel.DG.IO
                 // graph is empty. Nothing to do.
                 return;
             }
-            if (string.IsNullOrEmpty(jaCoCoFilename))
-            {
-                throw new ArgumentException("File path must neither be null nor empty.");
-            }
-            if (!File.Exists(jaCoCoFilename))
-            {
-                Debug.LogError($"The JaCoCo XML file named {jaCoCoFilename} does not exist.\n");
-                return;
-            }
 
             SourceRangeIndex index = new(graph, IndexPath);
 
             XmlReaderSettings settings = new() { DtdProcessing = DtdProcessing.Parse };
-            using XmlReader xmlReader = XmlReader.Create(jaCoCoFilename, settings);
+            XmlReader xmlReader = XmlReader.Create(stream, settings);
 
             // The fully qualified name of the package currently processed.
             // The name is retrieved from JaCoCo's XML report, where
@@ -298,7 +335,7 @@ namespace SEE.DataModel.DG.IO
                 nodeToAddMetrics.SetInt(metricNamePrefix + "_missed", missed);
                 nodeToAddMetrics.SetInt(metricNamePrefix + "_covered", covered);
 
-                float percentage = covered + missed > 0 ? (float) covered / (covered + missed) * 100 : 0;
+                float percentage = covered + missed > 0 ? (float)covered / (covered + missed) * 100 : 0;
                 nodeToAddMetrics.SetFloat(metricNamePrefix + "_percentage", percentage);
             }
 

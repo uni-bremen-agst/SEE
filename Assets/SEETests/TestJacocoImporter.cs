@@ -1,7 +1,11 @@
-﻿using NUnit.Framework;
+﻿using Cysharp.Threading.Tasks;
+using NUnit.Framework;
 using SEE.DataModel.DG.IO;
+using SEE.Utils.Paths;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace SEE.DataModel.DG
 {
@@ -155,6 +159,27 @@ namespace SEE.DataModel.DG
 
             Assert.AreEqual(0, nodeToTest.GetInt(JaCoCo.MethodMissed));
             Assert.AreEqual(1, nodeToTest.GetInt(JaCoCo.MethodCovered));
+        }
+
+        /// <summary>
+        /// Here we only test whether data can be read from a URL. The nodes in the
+        /// referenced file are not actually in the graph. So we expect error
+        /// messages. But these are indication that the download and processing as
+        /// such work.
+        /// </summary>
+        [Test]
+        public void TestLoadAsyncMethod()
+        {
+            DataPath path = new()
+            {
+                Root = DataPath.RootKind.Url,
+                Path = "https://raw.githubusercontent.com/vokal/jacoco-parse/master/test/assets/sample.xml"
+            };
+            UniTask.ToCoroutine(async () =>
+            {
+                await JaCoCoImporter.LoadAsync(graph, path);
+                LogAssert.Expect(LogType.Error, new Regex(@".*No node found for.*"));
+            });
         }
     }
 }
