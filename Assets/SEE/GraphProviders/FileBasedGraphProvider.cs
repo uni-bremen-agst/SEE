@@ -32,13 +32,9 @@ namespace SEE.GraphProviders
         /// is undefined or does not exist or <paramref name="city"/> is null</exception>
         protected void CheckArguments(AbstractSEECity city)
         {
-            if (string.IsNullOrEmpty(Path.Path))
+            if (Path == null || string.IsNullOrWhiteSpace(Path.Path))
             {
-                throw new ArgumentException("Empty graph path.\n");
-            }
-            if (!File.Exists(Path.Path))
-            {
-                throw new ArgumentException($"File {Path.Path} does not exist.\n");
+                throw new ArgumentException("Undefined data path.\n");
             }
             if (city == null)
             {
