@@ -20,7 +20,7 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <returns>enumerator to continue</returns>
         [UnityTest]
-        public IEnumerator TestLoadCsvAsync() =>
+        public IEnumerator TestLoadCsvAsyncMethod() =>
             UniTask.ToCoroutine(async () =>
             {
                 DataPath path = new()
