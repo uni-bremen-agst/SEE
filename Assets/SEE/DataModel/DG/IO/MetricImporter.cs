@@ -69,13 +69,10 @@ namespace SEE.DataModel.DG.IO
                     }
                     else
                     {
-                        int? length = node.SourceLength;
-                        // Note: In .NET 7 there is a Enumerable.ToHashSet() which could be used instead of the constructor.
-                        HashSet<int> lineRange = new(Enumerable.Range(line.Value, length ?? 1), null);
+                        Range lineRange = node.SourceRange ?? new Range(line.Value, line.Value + 1);
                         // Relevant issues are those which are entirely contained by the source region of this node
                         relevantIssues = issueList.Where(
-                            x => x.Entities.Any(e => lineRange.Contains(e.Line) &&
-                                                     (!e.EndLine.HasValue || lineRange.Contains(e.EndLine.Value))));
+                            x => x.Entities.Any(e => lineRange.Contains(e.Line) && (!e.EndLine.HasValue || lineRange.Contains(e.EndLine.Value))));
                     }
 
                     foreach (Issue issue in relevantIssues)

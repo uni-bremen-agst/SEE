@@ -25,11 +25,11 @@ SET MSBUILD="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBui
 
 REM Generate RFG for SEE:
 %MSBUILD% /t:AxivionBuild SEE.csproj
-ir2rfg Temp\bin\Debug\SEE.dll.ir  Data\GXL\SEE\SEE.rfg
+ir2rfg Temp\bin\Debug\SEE.dll.ir  Assets\StreamingAssets\SEE\SEE.rfg
 
 REM Generate RFG for SEEEditor:
 REM %MSBUILD% /t:AxivionBuild SEE_Editor.csproj
-REM ir2rfg Temp\bin\Debug\SEE_Editor.dll.ir  Data\GXL\SEE\SEE_Editor.rfg
+REM ir2rfg Temp\bin\Debug\SEE_Editor.dll.ir  Assets\StreamingAssets\SEE\SEE_Editor.rfg
 
 REM Generate IR for all C# projects
 REM FOR %%f IN (*.csproj) DO (
@@ -48,7 +48,7 @@ REM Generate RFGs for all IRs
 REM FOR %%f IN (Temp\bin\Debug\*.ir) DO (
 REM  Echo %%f
 REM  REM %%~nf expands f to a file name only.
-REM  ir2rfg %%f Data\GXL\SEE\%%~nf.rfg
+REM  ir2rfg %%f Assets\StreamingAssets\SEE\%%~nf.rfg
 REM )
 
 

@@ -98,6 +98,12 @@ namespace SEE.UI
                 throw new ArgumentNullException(nameof(processMessage));
             }
 
+            if (Application.isEditor && !Application.isPlaying)
+            {
+                // If the game is not running, we'll just use a simple log message.
+                Debug.Log($"Running: {processMessage}");
+            }
+
             if (loadingProcesses.Add(processMessage) && !ReferenceEquals(loadingSpinner, null))
             {
                 loadingSpinner.SetActive(true);
@@ -113,6 +119,12 @@ namespace SEE.UI
         /// <param name="processMessage">The unique message for the loading process</param>
         public static void Hide(string processMessage)
         {
+            if (Application.isEditor && !Application.isPlaying)
+            {
+                // If the game is not running, we'll just use a simple log message.
+                Debug.Log($"Finished: {processMessage}");
+            }
+
             if (!loadingProcesses.Remove(processMessage) || ReferenceEquals(loadingSpinner, null))
             {
                 return;

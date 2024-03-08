@@ -107,9 +107,70 @@ namespace SEE.DataModel.DG
         private const string sourceColumnAttribute = "Source.Column";
 
         /// <summary>
-        /// The attribute name for the source region length. The source region may not exist.
+        /// The attribute name for the source range start line. The source range start line may not exist.
         /// </summary>
-        private const string regionLengthAttribute = "Source.Region_Length";
+        public const string SourceRangeStartLineAttribute = "SourceRange.Start.Line";
+
+        /// <summary>
+        /// The attribute name for the source range start character. The source range start character may not exist.
+        /// </summary>
+        private const string sourceRangeStartCharacterAttribute = "SourceRange.Start.Character";
+
+        /// <summary>
+        /// The attribute name for the source range end line. The source range end line may not exist.
+        /// </summary>
+        public const string SourceRangeEndLineAttribute = "SourceRange.End.Line";
+
+        /// <summary>
+        /// The attribute name for the source range end character. The source range end character may not exist.
+        /// </summary>
+        private const string sourceRangeEndCharacterAttribute = "SourceRange.End.Character";
+
+        /// <summary>
+        /// The source range of this graph element.
+        /// May be null if the graph element does not have a source range.
+        /// </summary>
+        public Range SourceRange
+        {
+            get
+            {
+                if (!TryGetInt(SourceRangeStartLineAttribute, out int startLine) ||
+                    !TryGetInt(SourceRangeEndLineAttribute, out int endLine))
+                {
+                    if (SourceLine.HasValue)
+                    {
+                        // If either the start or end line cannot be found, an explicit range is not defined.
+                        // In this case, we will construct a one character (or one line) long range
+                        // based on the source line and column.
+                        return new Range(SourceLine.Value, SourceLine.Value+1, SourceColumn, SourceColumn+1);
+                    }
+                    return null;
+                }
+                if (!TryGetInt(sourceRangeStartCharacterAttribute, out int startCharacter) ||
+                    !TryGetInt(sourceRangeEndCharacterAttribute, out int endCharacter))
+                {
+                    return new Range(startLine, endLine);
+                }
+                return new Range(startLine, endLine, startCharacter, endCharacter);
+            }
+            set
+            {
+                if (value == null)
+                {
+                    SetInt(SourceRangeStartLineAttribute, null);
+                    SetInt(SourceRangeEndLineAttribute, null);
+                    SetInt(sourceRangeStartCharacterAttribute, null);
+                    SetInt(sourceRangeEndCharacterAttribute, null);
+                }
+                else
+                {
+                    SetInt(SourceRangeStartLineAttribute, value.StartLine);
+                    SetInt(SourceRangeEndLineAttribute, value.EndLine);
+                    SetInt(sourceRangeStartCharacterAttribute, value.StartCharacter);
+                    SetInt(sourceRangeEndCharacterAttribute, value.EndCharacter);
+                }
+            }
+        }
 
         /// <summary>
         /// The directory of the source file for this graph element.
@@ -126,10 +187,7 @@ namespace SEE.DataModel.DG
                 return result;
             }
 
-            set
-            {
-                SetString(sourcePathAttribute, value);
-            }
+            set => SetString(sourcePathAttribute, value);
         }
 
         /// <summary>
@@ -145,7 +203,7 @@ namespace SEE.DataModel.DG
         {
             // FIXME: The data model (graph) should be independent of Unity (here: DataPath.ProjectFolder()).
             return Directory?.Replace(projectFolder ?? DataPath.ProjectFolder(), string.Empty)
-                .TrimStart(Filenames.UnixDirectorySeparator);
+                            .TrimStart(Filenames.UnixDirectorySeparator);
         }
 
         /// <summary>
@@ -164,10 +222,7 @@ namespace SEE.DataModel.DG
                 return result;
             }
 
-            set
-            {
-                SetString(sourceFileAttribute, value);
-            }
+            set => SetString(sourceFileAttribute, value);
         }
 
         /// <summary>
@@ -230,56 +285,6 @@ namespace SEE.DataModel.DG
                 Debug.Assert(value == null || value > 0);
                 SetInt(sourceLineAttribute, value);
             }
-
-        }
-
-        /// <summary>
-        /// Returns the line in the source file where the declaration of this graph element
-        /// ends, i.e., <see cref="SourceLine()"/> + <see cref="SourceLength()"/> - 1 if
-        /// both are defined.
-        ///
-        /// If <see cref="SourceLine()"/> is undefined, <c>null</c> will be returned.
-        ///
-        /// If <see cref="SourceLength()"/> is undefined, <see cref="SourceLine()"/> will
-        /// be returned.
-        /// </summary>
-        /// <returns>line in source file where declaration ends or <c>null</c></returns>
-        public int? EndLine()
-        {
-            int? sourceLine = SourceLine;
-            if (sourceLine.HasValue)
-            {
-                int? sourceLength = SourceLength;
-                return sourceLength.HasValue ? sourceLine + sourceLength - 1 : sourceLine;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// The length of this graph element, measured in number of lines.
-        /// Note that not all graph elements may have a length.
-        /// If the graph element does not have this attribute, its value is null.
-        /// </summary>
-        public int? SourceLength
-        {
-            get
-            {
-                if (TryGetInt(regionLengthAttribute, out int result))
-                {
-                    return result;
-                }
-                // If this attribute cannot be found, result will be null
-                return null;
-            }
-
-            set
-            {
-                Debug.Assert(value == null || value > 0);
-                SetInt(regionLengthAttribute, value);
-            }
         }
 
         /// <summary>
@@ -314,7 +319,7 @@ namespace SEE.DataModel.DG
         /// <returns>string representation of type and all attributes</returns>
         public override string ToString()
         {
-            return " \"type\": \"" + type + "\",\n" + base.ToString();
+            return $" \"type\": \"{type}\",\n{base.ToString()}";
         }
 
         /// <summary>
