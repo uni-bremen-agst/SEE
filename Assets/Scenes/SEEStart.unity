@@ -312,17 +312,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68cd993404524eb45918638d10b68356, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ServerActionPort: 55555
+  RoomPassword: 
   GameScene: SEEWorld
-  loadCityOnStart: 0
   internalLoggingEnabled: 1
-  minimalSeverity: 2
-  networkCommsLoggingEnabled: 0
   VoiceChat: 1
   ConfigPath:
     Root: 3
-    relativePath: /network.cfg
-    absolutePath: 
+    RelativePath: /network.cfg
+    AbsolutePath: 
   vivoxChannelName: 
 --- !u!114 &831127269
 MonoBehaviour:
