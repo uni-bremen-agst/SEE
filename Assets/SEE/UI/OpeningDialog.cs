@@ -161,6 +161,7 @@ namespace SEE.UI
             {
                 menu.ShowMenu = true;
                 ShowNotification.Error("Server cannot be started", exception.Message);
+                throw;
             }
         }
 
