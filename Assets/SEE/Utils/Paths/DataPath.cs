@@ -161,8 +161,8 @@ namespace SEE.Utils.Paths
         /// running on.
         /// Retrieve this value only if <see cref="Root"/> is not the absolute path.
         /// </summary>
-        [SerializeField, HideInInspector]
-        public string RelativePath { get; set; } = string.Empty;
+        [HideInInspector]
+        public string RelativePath = string.Empty;
 
         /// <summary>
         /// The absolute path. Retrieve this value only if <see cref="Root"/> is the absolute path.
@@ -170,8 +170,8 @@ namespace SEE.Utils.Paths
         /// last assignment. It may be a URL, Windows, Mac, or Unix separator, no matter on which
         /// operating system we are currently running on.
         /// </summary>
-        [SerializeField, HideInInspector]
-        public string AbsolutePath { get; set; } = string.Empty;
+        [HideInInspector]
+        public string AbsolutePath = string.Empty;
 
         /// <summary>
         /// The stored full path.
