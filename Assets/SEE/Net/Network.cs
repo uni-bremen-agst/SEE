@@ -527,7 +527,7 @@ namespace SEE.Net
 
         /// <summary>
         /// Unregisters itself from <see cref="SceneManager.sceneLoaded"/>.
-        /// Note: This method is assumed to be called when the new scene is fully loaded.
+        /// Note: This method is assumed to be called when the new scene is fully unloaded.
         /// </summary>
         /// <param name="scene">scene that was loaded</param>
         private void OnSceneUnloaded(Scene scene)
@@ -537,7 +537,6 @@ namespace SEE.Net
             {
                 SceneManager.sceneUnloaded -= OnSceneUnloaded;
                 ShutdownNetwork();
-                // FIXME: Why are we destroying the Network? As a consequence the config path will be lost.
                 Destroyer.Destroy(Instance);
             }
         }
