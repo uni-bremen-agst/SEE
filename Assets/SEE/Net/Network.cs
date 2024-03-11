@@ -14,6 +14,7 @@ using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEditor;
@@ -91,7 +92,7 @@ namespace SEE.Net
 
 
         /// <summary>
-        /// Used to tell the caller if the routine has been completed
+        /// Used to tell the caller whether the routine has been completed.
         /// </summary>
         private CallBack callbackToMenu = null;
 
@@ -256,6 +257,29 @@ namespace SEE.Net
         }
 
         /// <summary>
+        /// Name of command-line argument for room password <see cref="RoomPassword"/>.
+        /// </summary>
+        private const string passwordArgument = "-password";
+
+        /// <summary>
+        /// Name of command-line argument for UDP port <see cref="ServerPort"/>.
+        /// </summary>
+        private const string portArgument = "-port";
+        /// <summary>
+        /// Name of command-line argument for backend domain URL  <see cref="BackendDomain"/>.
+        /// </summary>
+        private const string domainArgument = "-domain";
+        /// <summary>
+        /// Name of command-line argument for the server id  <see cref="ServerId"/>.
+        /// </summary>
+        private const string serverIdArgument = "-id";
+        /// <summary>
+        /// Name of command-line argument for launching this Unity instance
+        /// as a dedicated server.
+        /// </summary>
+        private const string launchAsServerArgument = "-launch-as-server";
+
+        /// <summary>
         /// Makes sure that we have only one <see cref="Instance"/> and check command line arguments.
         /// </summary>
         private void Start()
@@ -275,33 +299,44 @@ namespace SEE.Net
 
             string[] arguments = Environment.GetCommandLineArgs();
 
-            //Check command line arguments
+            // Check command line arguments
             for (int i = 0; i < arguments.Length; i++)
             {
-                if (arguments[i] == "-port")
+                if (arguments[i] == portArgument)
                 {
-                    ServerPort = Int32.Parse(arguments[i+1]);
+                    CheckArgumentValue(arguments, i, portArgument);
+                    ServerPort = Int32.Parse(arguments[i + 1]);
                 }
-
-                if (arguments[i] == "-password")
+                else if (arguments[i] == passwordArgument)
                 {
+                    CheckArgumentValue(arguments, i, passwordArgument);
                     RoomPassword = arguments[i+1];
                 }
-
-                if (arguments[i] == "-domain")
+                else if (arguments[i] == domainArgument)
                 {
+                    CheckArgumentValue(arguments, i, domainArgument);
                     BackendDomain = arguments[i+1];
                 }
-
-                if (arguments[i] == "-id")
+                else if (arguments[i] == serverIdArgument)
                 {
+                    CheckArgumentValue(arguments, i, serverIdArgument);
                     ServerId = arguments[i+1];
                 }
-
-
-                if (arguments[i] == "-launch-as-server")
+                else if (arguments[i] == launchAsServerArgument)
                 {
                     StartServer(null);
+                }
+                else
+                {
+                    Debug.LogWarning($"Unknown command-line parameter {arguments[i]} will be ignored.\n");
+                }
+            }
+
+            static void CheckArgumentValue(string[] arguments, int i, string argument)
+            {
+                if (i + 1 >= arguments.Length)
+                {
+                    throw new ArgumentException($"Argument value for {argument} is missing.");
                 }
             }
         }
@@ -502,6 +537,7 @@ namespace SEE.Net
             {
                 SceneManager.sceneUnloaded -= OnSceneUnloaded;
                 ShutdownNetwork();
+                // FIXME: Why are we destroying the Network? As a consequence the config path will be lost.
                 Destroyer.Destroy(Instance);
             }
         }
@@ -530,7 +566,15 @@ namespace SEE.Net
 
             void InternalStartServer()
             {
-                ServerIP4Address = "0.0.0.0";
+                // Using an IP address of 0.0.0.0 for the server listen address will make a
+                // server or host listen on all IP addresses assigned to the local system.
+                // This can be particularly helpful if you are testing a client instance
+                // on the same system as well as one or more client instances connecting
+                // from other systems on your local area network. Another scenario is while
+                // developing and debugging you might sometimes test local client instances
+                // on the same system and sometimes test client instances running on external
+                // systems.
+                // ServerIP4Address = "0.0.0.0"; FIXME: Why this assignment?
                 Debug.Log($"Server is starting to listen at {ServerAddress}...\n");
                 try
                 {
@@ -538,6 +582,8 @@ namespace SEE.Net
                     if (NetworkManager.Singleton.StartServer())
                     {
                         InitializeGame();
+                        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnectedCallbackForServer;
+                        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallbackForServer;
                     }
                     else
                     {
@@ -552,6 +598,17 @@ namespace SEE.Net
                 callBack(true, $"Server started at {ServerAddress}.");
             }
         }
+
+        private void OnClientConnectedCallbackForServer(ulong owner)
+        {
+            Debug.Log($"Client {owner} has connected.\n");
+        }
+
+        private void OnClientDisconnectCallbackForServer(ulong owner)
+        {
+            Debug.Log($"Client {owner} has disconnected.\n");
+        }
+
         /// The IP4 address, port, and protocol.
         /// </summary>
         private string ServerAddress => $"{ServerIP4Address}:{ServerPort} (UDP)";
@@ -571,7 +628,7 @@ namespace SEE.Net
 
             void InternalStartHost()
             {
-                Debug.Log($"Server is starting to listen at {ServerAddress}...\n");
+                Debug.Log($"Host is starting to listen at {ServerAddress}...\n");
                 Debug.Log($"Local client is trying to connect to server {ServerAddress}...\n");
                 try
                 {
@@ -579,6 +636,8 @@ namespace SEE.Net
                     if (NetworkManager.Singleton.StartHost())
                     {
                         InitializeGame();
+                        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnectedCallbackForServer;
+                        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallbackForServer;
                     }
                     else
                     {
@@ -620,8 +679,9 @@ namespace SEE.Net
         /// <summary>
         /// Removes the reference to the callback used to send the client back to the main menu
         /// because the connection was successfully established.
-        /// The <paramref name="owner"/> is not used
+        /// The <paramref name="owner"/> is not used.
         /// </summary>
+        /// <param name="owner">ID of the owner</param>
         private void OnClientConnectedCallback(ulong owner)
         {
             callbackToMenu(true, "You are connected to " + ServerAddress);
@@ -630,13 +690,13 @@ namespace SEE.Net
 
         /// <summary>
         /// Sends the client back to the main menu because the connection could not be established
-        /// The <paramref name="owner"/> is not used
+        /// The <paramref name="owner"/> is not used.
         /// </summary>
         private void OnClientDisconnectCallback(ulong owner)
         {
-            callbackToMenu(false,
-                $"The server {ServerAddress} has refused the connection due to the following reason: "
-                 + NetworkManager.Singleton.DisconnectReason);
+            callbackToMenu?.Invoke(false,
+                                   $"The server {ServerAddress} has refused the connection due to the following reason: "
+                                     + NetworkManager.Singleton.DisconnectReason);
             callbackToMenu = null;
         }
 
@@ -799,7 +859,7 @@ namespace SEE.Net
         {
             get
             {
-                return Network.LookupLocalIPAddresses()
+                return LookupLocalIPAddresses()
                               .Select(ip => new AddressInfo(ip.AddressFamily.ToString(), ip.ToString()))
                               .ToList();
             }
@@ -819,7 +879,7 @@ namespace SEE.Net
         /// Default path of the configuration file (path and filename).
         /// </summary>
         [PropertyTooltip("Path of the file containing the network configuration.")]
-        [HideReferenceObjectPicker, FoldoutGroup(configurationFoldoutGroup)]
+        [OdinSerialize, HideReferenceObjectPicker, FoldoutGroup(configurationFoldoutGroup)]
         public DataPath ConfigPath = new();
 
         /// <summary>
@@ -891,12 +951,13 @@ namespace SEE.Net
         {
             if (File.Exists(filename))
             {
+                Debug.Log($"Loading network configuration file from {filename}.\n");
                 using ConfigReader stream = new(filename);
                 Restore(stream.Read());
             }
             else
             {
-                Debug.LogError($"Configuration file {filename} does not exist.\n");
+                Debug.LogError($"Network configuration file {filename} does not exist.\n");
             }
         }
 
