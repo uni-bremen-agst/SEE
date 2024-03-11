@@ -39,7 +39,7 @@ namespace SEE.DataModel.DG.IO
         public IEnumerator TestMinilaxComparison() =>
              UniTask.ToCoroutine(async () =>
         {
-            string filename = Application.dataPath + "/../Data/GXL/SEE/CodeFacts.gxl.xz";
+            string filename = Application.streamingAssetsPath + "/SEE/CodeFacts.gxl.xz";
             Performance p = Performance.Begin("Loading big GXL file " + filename);
             await LoadGraphAsync(filename);
             p.End();

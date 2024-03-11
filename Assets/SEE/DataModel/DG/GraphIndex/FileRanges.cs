@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.DataModel.DG.SourceRange
+namespace SEE.DataModel.DG.GraphIndex
 {
     /// <summary>
     /// A representation of the source-code ranges of a file. This
@@ -20,21 +20,13 @@ namespace SEE.DataModel.DG.SourceRange
         /// <param name="node">node whose source-code range is to be added</param>
         public void Add(Node node)
         {
-            int? sourceLine = node.SourceLine;
-            if (sourceLine.HasValue)
+            Range range = node.SourceRange;
+            if (range != null)
             {
-                Range descendant = Find(sourceLine.Value);
+                SourceRange descendant = Find(range.StartLine);
                 if (descendant == null)
                 {
-                    int? endLine = node.EndLine();
-                    if (endLine.HasValue)
-                    {
-                        Children.Add(new Range(sourceLine.Value, endLine.Value, node));
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"{node.ID} does not have an end line. Will be ignored.\n");
-                    }
+                    Children.Add(new SourceRange(range, node));
                 }
                 else
                 {
@@ -43,7 +35,7 @@ namespace SEE.DataModel.DG.SourceRange
             }
             else
             {
-                Debug.LogWarning($"{node.ID} does not have a source line. Will be ignored.\n");
+                Debug.LogWarning($"{node.ID} does not have a source range. Will be ignored.\n");
             }
         }
 
@@ -54,13 +46,13 @@ namespace SEE.DataModel.DG.SourceRange
         /// </summary>
         /// <param name="line">source line to be searched for</param>
         /// <returns>innermost source-code range or <c>null</c></returns>
-        public Range Find(int line)
+        public SourceRange Find(int line)
         {
-            if (Children.TryGetValue(line, out Range range))
+            if (Children.TryGetValue(line, out SourceRange range))
             {
                 // We are looking for the innermost range, hence we need to
                 // recurse into the Children of the found range.
-                Range child = range.Find(line);
+                SourceRange child = range.Find(line);
                 return child ?? range;
             }
             else

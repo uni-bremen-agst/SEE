@@ -41,7 +41,7 @@ namespace SEE.DataModel.DG
         /// list, otherwise it is unset. Conceptually, toggleAttributes is a HashSet,
         /// but HashSets are not serialized by Unity. That is why we use List instead.
         /// </summary>
-        private HashSet<string> toggleAttributes = new HashSet<string>();
+        private HashSet<string> toggleAttributes = new();
         public ISet<string> ToggleAttributes => toggleAttributes;
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace SEE.DataModel.DG
         // String attributes
         //----------------------------------
 
-        public Dictionary<string, string> StringAttributes { get; private set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> StringAttributes { get; private set; } = new();
 
         /// <summary>
         /// Sets the string attribute with given <paramref name="attributeName"/> to <paramref name="value"/>
@@ -175,7 +175,7 @@ namespace SEE.DataModel.DG
         // Float attributes
         //----------------------------------
 
-        public Dictionary<string, float> FloatAttributes { get; private set; } = new Dictionary<string, float>();
+        public Dictionary<string, float> FloatAttributes { get; private set; } = new();
 
         /// <summary>
         /// Sets the float attribute with given <paramref name="attributeName"/> to <paramref name="value"/>
@@ -220,7 +220,7 @@ namespace SEE.DataModel.DG
         // Integer attributes
         //----------------------------------
 
-        public Dictionary<string, int> IntAttributes { get; private set; } = new Dictionary<string, int>();
+        public Dictionary<string, int> IntAttributes { get; private set; } = new();
 
         /// <summary>
         /// Sets the integer attribute with given <paramref name="attributeName"/> to <paramref name="value"/>
@@ -460,36 +460,6 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Returns true if <paramref name="other"/> meets all of the following conditions:
-        /// (1) is not null
-        /// (2) has exactly the same C# type
-        /// (3) has exactly the same attributes with exactly the same values as this attributable.
-        /// </summary>
-        /// <param name="other">to be compared to</param>
-        /// <returns>true if equal</returns>
-        public override bool Equals(object other)
-        {
-            if (other == null)
-            {
-                Report("other is null");
-                return false;
-            }
-            else if (ReferenceEquals(this, other))
-            {
-                return true;
-            }
-            else if (GetType() != other.GetType())
-            {
-                Report("other has different C# type");
-                return false;
-            }
-            else
-            {
-                return HasSameAttributes(other as Attributable);
-            }
-        }
-
-        /// <summary>
         /// Yields true if this <see cref="Attributable"/> has exactly the same attributes
         /// as <paramref name="other"/>.
         /// </summary>
@@ -539,18 +509,6 @@ namespace SEE.DataModel.DG
         protected static bool AreEqual<V>(IDictionary<string, V> left, IDictionary<string, V> right)
         {
             return left.Count == right.Count && !left.Except(right).Any();
-        }
-
-        /// <summary>
-        /// Returns a hash code.
-        /// </summary>
-        /// <returns>hash code</returns>
-        public override int GetHashCode()
-        {
-            // we are using only those two attribute kinds to avoid unnecessary
-            // computation in the hope that they suffice; nodes and edges should
-            // have some attributes of this kind sufficiently different to others
-            return IntAttributes.GetHashCode() ^ StringAttributes.GetHashCode();
         }
 
         /// <summary>

@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using System;
 using System.Text.RegularExpressions;
+using SEE.DataModel.DG.GraphIndex;
 using UnityEngine;
 using UnityEngine.TestTools;
 
@@ -12,7 +13,7 @@ namespace SEE.DataModel.DG.SourceRange
     /// </summary>
     internal class TestSourceRangeIndex : TestGraphBase
     {
-        private SourceRangeIndex GetIndexByPath(Graph graph)
+        private static SourceRangeIndex GetIndexByPath(Graph graph)
         {
             return new(graph, node => node.Path());
         }
@@ -110,7 +111,7 @@ namespace SEE.DataModel.DG.SourceRange
         }
 
         [Test]
-        public void TestNonHomormorphicGraph()
+        public void TestNonHomomorphicGraph()
         {
             // This node is logically in c1m1, but spatially nested in c1m1M3
             Child(g, c1m1, "c1.m1.M4", type: "Method", directory: "mydir/", filename: "myfile.java", line: 56, length: 1);
@@ -118,7 +119,7 @@ namespace SEE.DataModel.DG.SourceRange
             SourceRangeIndex index = GetIndexByPath(g);
             Assert.IsFalse(index.IsIsomorphic());
 
-            LogAssert.Expect(LogType.Error, new Regex(@"Range c1.m1.M4.* is subsumed by c1.m1.M3.M1.*"));
+            LogAssert.Expect(LogType.Error, new Regex("Range c1.m1.M4.* is subsumed by c1.m1.M3.M1.*"));
         }
 
         [Test]
@@ -216,8 +217,8 @@ namespace SEE.DataModel.DG.SourceRange
             SourceRangeIndex index = GetIndexByPath(g);
             Assert.IsFalse(index.IsIsomorphic());
 
-            LogAssert.Expect(LogType.Error, new Regex(@"Range c2.* is subsumed by c1.*"));
-            LogAssert.Expect(LogType.Error, new Regex(@"Range c3.* is subsumed by c2.*"));
+            LogAssert.Expect(LogType.Error, new Regex("Range c2.* is subsumed by c1.*"));
+            LogAssert.Expect(LogType.Error, new Regex("Range c3.* is subsumed by c2.*"));
         }
 
         [TearDown]

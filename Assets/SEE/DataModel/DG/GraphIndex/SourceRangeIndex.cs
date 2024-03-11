@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.DataModel.DG.SourceRange
+namespace SEE.DataModel.DG.GraphIndex
 {
     /// <summary>
     /// A source-location based node index that allows to search for graph nodes
@@ -49,22 +49,22 @@ namespace SEE.DataModel.DG.SourceRange
         /// <returns>true if consistent</returns>
         public bool IsIsomorphic()
         {
-            Stack<Range> stack = new();
+            Stack<SourceRange> stack = new();
             return files.Values.SelectMany(file => file.Children).All(IsHomomorphic);
 
-            bool IsHomomorphic(Range range)
+            bool IsHomomorphic(SourceRange range)
             {
                 bool result = true;
                 if (stack.Count > 0)
                 {
-                    Range parentRange = stack.Peek();
-                    bool isdescendant = range.Node.IsDescendantOf(parentRange.Node);
-                    if (!isdescendant)
+                    SourceRange parentRange = stack.Peek();
+                    bool isDescendant = range.Node.IsDescendantOf(parentRange.Node);
+                    if (!isDescendant)
                     {
                         Debug.LogError($"Range {range} is subsumed by {parentRange}, but {range.Node.ID} is "
                             + $"not a descendant of {parentRange.Node.ID} in the node hierarchy.\n");
                     }
-                    result &= isdescendant;
+                    result &= isDescendant;
                 }
                 stack.Push(range);
                 result &= range.Children.All(IsHomomorphic);
@@ -100,7 +100,7 @@ namespace SEE.DataModel.DG.SourceRange
         {
             if (files.TryGetValue(path, out FileRanges file))
             {
-                Range range = file.Find(line);
+                SourceRange range = file.Find(line);
                 if (range == null)
                 {
                     node = null;
@@ -134,7 +134,7 @@ namespace SEE.DataModel.DG.SourceRange
             int count = 0;
             foreach (FileRanges file in files.Values)
             {
-                foreach (Range range in file.Children)
+                foreach (SourceRange range in file.Children)
                 {
                     CountRanges(range, ref count);
                 }
@@ -142,10 +142,10 @@ namespace SEE.DataModel.DG.SourceRange
 
             return count;
 
-            static void CountRanges(Range range, ref int count)
+            static void CountRanges(SourceRange range, ref int count)
             {
                 count++;
-                foreach (Range child in range.Children)
+                foreach (SourceRange child in range.Children)
                 {
                     CountRanges(child, ref count);
                 }
@@ -158,29 +158,29 @@ namespace SEE.DataModel.DG.SourceRange
         /// <remarks>Can be used for debugging.</remarks>
         private void Dump()
         {
-            foreach (var entry in files)
+            foreach ((string key, FileRanges value) in files)
             {
-                Debug.Log($"*** {entry.Key} ***\n");
-                DumpFile(entry.Value);
+                Debug.Log($"*** {key} ***\n");
+                DumpFile(value);
             }
 
             void DumpFile(FileRanges file)
             {
                 int i = 1;
-                foreach (Range range in file.Children)
+                foreach (SourceRange range in file.Children)
                 {
                     DumpRange(i.ToString(), range);
                     i++;
                 }
             }
 
-            void DumpRange(string enumeration, Range range)
+            void DumpRange(string enumeration, SourceRange range)
             {
                 Debug.Log($"{enumeration} {range}\n");
                 int i = 1;
-                foreach (Range child in range.Children)
+                foreach (SourceRange child in range.Children)
                 {
-                    DumpRange(enumeration + "." + i.ToString(), child);
+                    DumpRange($"{enumeration}.{i}", child);
                     i++;
                 }
             }

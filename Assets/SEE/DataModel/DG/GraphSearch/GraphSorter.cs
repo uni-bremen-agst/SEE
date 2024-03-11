@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.DataModel.DG;
 
-namespace SEE.DataModel.GraphSearch
+namespace SEE.DataModel.DG.GraphSearch
 {
     /// <summary>
     /// A configurable sorter for graph elements, mainly intended for use with <see cref="GraphSearch"/>.

@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Xml;
+using SEE.Utils;
 
-namespace SEE.Utils
+namespace SEE.DataModel.DG.IO
 {
     /// <summary>
     /// Class responsible for parsing GXL files.
     /// </summary>
-    public class GXLParser : IDisposable
+    public class GXLParser : GraphIO, IDisposable
     {
         /// <summary>
         /// Creates a new GXL Parser.
