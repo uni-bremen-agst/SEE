@@ -296,31 +296,41 @@ namespace SEE.Net
 
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
             NetworkManager.Singleton.NetworkConfig.ConnectionApproval = true;
+            ProcessCommandLineArguments();
+        }
 
+        private void ProcessCommandLineArguments()
+        {
             string[] arguments = Environment.GetCommandLineArgs();
 
             // Check command line arguments
-            for (int i = 0; i < arguments.Length; i++)
+            // The first element in the array contains the file name of the executing program.
+            // If the file name is not available, the first element is equal to String.Empty.
+            for (int i = 1; i < arguments.Length; i++)
             {
                 if (arguments[i] == portArgument)
                 {
                     CheckArgumentValue(arguments, i, portArgument);
                     ServerPort = Int32.Parse(arguments[i + 1]);
+                    i++;
                 }
                 else if (arguments[i] == passwordArgument)
                 {
                     CheckArgumentValue(arguments, i, passwordArgument);
-                    RoomPassword = arguments[i+1];
+                    RoomPassword = arguments[i + 1];
+                    i++;
                 }
                 else if (arguments[i] == domainArgument)
                 {
                     CheckArgumentValue(arguments, i, domainArgument);
-                    BackendDomain = arguments[i+1];
+                    BackendDomain = arguments[i + 1];
+                    i++;
                 }
                 else if (arguments[i] == serverIdArgument)
                 {
                     CheckArgumentValue(arguments, i, serverIdArgument);
-                    ServerId = arguments[i+1];
+                    ServerId = arguments[i + 1];
+                    i++;
                 }
                 else if (arguments[i] == launchAsServerArgument)
                 {
