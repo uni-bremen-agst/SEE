@@ -10,11 +10,34 @@ using SEE.Game.City;
 using Cysharp.Threading.Tasks;
 using SEE.Utils.Config;
 using System;
+using SEE.UI.RuntimeConfigMenu;
+using Sirenix.OdinInspector;
+using SEE.Utils.Paths;
+using SEE;
 
 namespace SEE.GraphProviders
 {
+    // Enum für die Auswahl zwischen Inklusion und Exklusion
+    public enum InclusionType
+    {
+        Included,
+        Excluded
+    }
+
+    [Serializable]
+    public class AddPath
+    {
+        public string fileType;
+        [HorizontalGroup("InclusionType")]
+        [EnumToggleButtons]
+        public InclusionType inclusionType;
+    }
+
     public class VCSGraphProvider : GraphProvider
     {
+        [ShowInInspector, ListDrawerSettings(ShowItemCount = true), Tooltip("Paths and their inclusion/exclusion status."), RuntimeTab(GraphProviderFoldoutGroup), HideReferenceObjectPicker]
+        private static List<AddPath> pathGlobbing = new List<AddPath>();
+
         /// <summary>
         /// Loads the metrics available at the Axivion Dashboard into the <paramref name="graph"/>.
         /// </summary>
@@ -22,6 +45,7 @@ namespace SEE.GraphProviders
         public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
         {
             Debug.Log(GetVCSGraph().ToString());
+            
             return await UniTask.FromResult<Graph>(GetVCSGraph());
             //return GetVCSGraph();
         }
@@ -35,13 +59,27 @@ namespace SEE.GraphProviders
             Graph graph = NewGraph();
             // The main directory.
             NewNode(graph, pathSegments[^1], "directory");
+
+            var includedFiles = pathGlobbing
+                .Where(path => path.inclusionType == InclusionType.Included)
+                .Select(path => path.fileType);
+
+            var excludedFiles = pathGlobbing
+                .Where(path => path.inclusionType == InclusionType.Excluded)
+                .Select(path => path.fileType);
+
             using (var repo = new Repository(repositoryPath))
             {
                 // Get all files using "git ls-files".
                 //TODO: I limited the output to 200 for testing, because SEE is huge.
                 var files = repo.Index
                     .Select(entry => entry.Path)
-                    .Where(path => !string.IsNullOrEmpty(path))
+                    .Where(path => !string.IsNullOrEmpty(path) &&
+                    ((excludedFiles.Any() && excludedFiles.Contains(Path.GetExtension(path))) &&
+                    (includedFiles.Any() &&  includedFiles.Contains(Path.GetExtension(path)))) ||
+                    ((excludedFiles.Any() && !excludedFiles.Contains(Path.GetExtension(path))) ||
+                    (!excludedFiles.Any() && (includedFiles.Any() && includedFiles.Contains(Path.GetExtension(path)))) ||
+                    (!excludedFiles.Any() && !includedFiles.Any())))
                     .ToList().Take(200);
                 Debug.Log(files.Count());
                 // Build the graph structure.
@@ -132,6 +170,7 @@ namespace SEE.GraphProviders
                 }
             }
         }
+
         /// <summary>
         /// Creates and returns a new node to <paramref name="graph"/>.
         /// </summary>
