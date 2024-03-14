@@ -45,7 +45,7 @@ namespace SEE.GraphProviders
         public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
         {
             Debug.Log(GetVCSGraph().ToString());
-            
+
             return await UniTask.FromResult<Graph>(GetVCSGraph());
             //return GetVCSGraph();
         }
@@ -56,6 +56,9 @@ namespace SEE.GraphProviders
             string assetsPfad = Application.dataPath;
             string repositoryPath = System.IO.Path.GetDirectoryName(assetsPfad);
             string[] pathSegments = repositoryPath.Split(Path.DirectorySeparatorChar);
+            string commit1Sha = ""; // give the 2 commits you wanna compare
+            string commit2Sha = "";
+
             Graph graph = NewGraph();
             // The main directory.
             NewNode(graph, pathSegments[^1], "directory");
@@ -100,6 +103,19 @@ namespace SEE.GraphProviders
                 //TODO: Only for testing.
                 Debug.Log(graph.ToString());
             }
+            //compare 2 commits and save the changes
+            using (var repo = new Repository(repositoryPath))
+            {
+                var commit1 = repo.Lookup<Commit>(commit1Sha);
+                var commit2 = repo.Lookup<Commit>(commit2Sha);
+
+                var changes = repo.Diff.Compare<Patch>(commit1.Tree, commit2.Tree);
+
+                foreach (var change in changes)
+                {
+                    Debug.Log($"{change.Path}: {change.LinesAdded} lines added, {change.LinesDeleted} lines deleted");
+                }
+            }
             return graph;
         }
         public override GraphProviderKind GetKind()
@@ -122,7 +138,7 @@ namespace SEE.GraphProviders
 
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
-            
+
         }
         //TODO: Documentation.
         static void BuildGraphFromPath(string path, Node parent, string parentPath, Graph graph, Node mainNode)
