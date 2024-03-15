@@ -583,7 +583,7 @@ namespace SEE.Net
                 // developing and debugging you might sometimes test local client instances
                 // on the same system and sometimes test client instances running on external
                 // systems.
-                // ServerIP4Address = "0.0.0.0"; FIXME: Why this assignment?
+                ServerIP4Address = "0.0.0.0"; //FIXME: Why this assignment?
                 Debug.Log($"Server is starting to listen at {ServerAddress}...\n");
                 try
                 {
