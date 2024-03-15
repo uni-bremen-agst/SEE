@@ -190,6 +190,10 @@ namespace SEE.Net
         /// <returns></returns>
         private IEnumerator GetFile(string dataType, string filename)
         {
+            if (string.IsNullOrEmpty(Network.ServerId))
+            {
+                Debug.LogError("Server ID is not set.\n");
+            }
             // FIXME: The room password is submitted in plain text if http and not https is used.
             string url = Network.ClientRestAPI + dataType + "?serverId=" + Network.ServerId
                          + "&roomPassword=" + Network.Instance.RoomPassword;
