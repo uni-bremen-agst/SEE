@@ -13,11 +13,11 @@ namespace SEE.Utils.Paths
     internal class TestDataPath
     {
         /// <summary>
-        /// Test for downloading a file from a server based on a URL.
+        /// Test for downloading a file from a foreign server based on a URL.
         /// </summary>
         /// <returns>enumerator to continue</returns>
         [UnityTest]
-        public IEnumerator LoadFromServer() =>
+        public IEnumerator LoadFromForeignServer() =>
             UniTask.ToCoroutine(async () =>
             {
                 const string filename = "psnfss2e.pdf";
@@ -25,6 +25,32 @@ namespace SEE.Utils.Paths
                 {
                     Root = DataPath.RootKind.Url,
                     Path = $"https://mirror.physik.tu-berlin.de/pub/CTAN/macros/latex/required/psnfss/{filename}"
+                };
+                Assert.AreEqual(DataPath.RootKind.Url, dataPath.Root);
+                using Stream stream = await dataPath.LoadAsync();
+                Debug.Log($"Content length in bytes: {stream.Length}\n");
+                using (FileStream fileStream = File.Create(filename))
+                {
+                    stream.Seek(0, SeekOrigin.Begin);
+                    Debug.Log($"Saving to {filename}.\n");
+                    await stream.CopyToAsync(fileStream);
+                }
+                FileIO.DeleteIfExists(filename);
+            });
+
+        /// <summary>
+        /// Test for downloading a file from our own data backend server based on a URL.
+        /// </summary>
+        /// <returns>enumerator to continue</returns>
+        [UnityTest]
+        public IEnumerator LoadFromOurBackend() =>
+            UniTask.ToCoroutine(async () =>
+            {
+                const string filename = "solution.sln";
+                DataPath dataPath = new()
+                {
+                    Root = DataPath.RootKind.Url,
+                    Path = "http://localhost/api/v1/file/client/solution/serverId=&roomPassword=password"
                 };
                 Assert.AreEqual(DataPath.RootKind.Url, dataPath.Root);
                 using Stream stream = await dataPath.LoadAsync();
