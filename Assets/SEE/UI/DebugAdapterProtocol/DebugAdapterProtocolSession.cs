@@ -25,6 +25,35 @@ using StackFrame = Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages.St
 
 namespace SEE.UI.DebugAdapterProtocol
 {
+    /// <summary>
+    /// Manages a debug session.
+    /// 
+    /// <para>
+    /// Takes care of the following things:
+    /// <list type="bullet">
+    ///     <item>
+    ///         <term>Actions</term>
+    ///         <description>Creates the button bar for start-, stop- and step-actions.</description>
+    ///     </item>
+    ///     <item>
+    ///         <term>Variables</term>
+    ///         <description>Shows variable values in the variable window and on hover.</description>
+    ///     </item>
+    ///     <item>
+    ///         <term>Sending/Receiving Events</term>
+    ///         <description>Handles sending and receiving information to and from the debug adapter.</description>
+    ///     </item>
+    ///     <item>
+    ///         <term>Console</term>
+    ///         <description>Displays program outputs in the console and evaluates user inputs.</description>
+    ///     </item>
+    ///     <item>
+    ///         <term>Code Position</term>
+    ///         <description>Shows the code position in the code window and the city.</description>
+    ///     </item>
+    /// </list>
+    /// </para>
+    /// </summary>
     public class DebugAdapterProtocolSession : PlatformDependentComponent
     {
         /// <summary>
@@ -111,6 +140,10 @@ namespace SEE.UI.DebugAdapterProtocol
 
         /// <summary>
         /// Queued actions that are executed on the main thread.
+        /// 
+        /// <para>
+        ///     Ensures that the actions are executed after the debug adapter is initialized.
+        /// </para>
         /// <seealso cref="Update"/>
         /// </summary>
         private Queue<Action> actions = new();
@@ -446,7 +479,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Creates the process for the debug adapter.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Whether the creation was sucessful.</returns>
         private bool CreateAdapterProcess()
         {
             adapterProcess = new Process()
@@ -503,7 +536,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Creates the debug adapter host.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Whether the creation was successful.</returns>
         private bool CreateAdapterHost()
         {
             adapterHost = new DebugProtocolHost(adapterProcess.StandardInput.BaseStream, adapterProcess.StandardOutput.BaseStream);
@@ -583,8 +616,9 @@ namespace SEE.UI.DebugAdapterProtocol
                     FrameId = stackFrame.Id
                 });
                 tooltip.Show(result.Result, 0.25f);
-            } catch (ProtocolException e)
+            } catch (ProtocolException)
             {
+                // Ignore exceptions on hover
             }
 
         }
@@ -592,8 +626,8 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Handles events of the debug adapter.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The event.</param>
         private void OnEventReceived(object sender, EventReceivedEventArgs e)
         {
             switch (e.Body)
@@ -628,6 +662,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Handles the initialized event.
         /// </summary>
+        /// <param name="initializedEvent">The event.</param>
         private void OnInitializedEvent(InitializedEvent initializedEvent)
         {
             actions.Enqueue(() =>
@@ -755,16 +790,16 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Handles continued events.
         /// </summary>
-        /// <param name="continuedEvent"></param>
+        /// <param name="continuedEvent">The event.</param>
         private void OnContinuedEvent(ContinuedEvent continuedEvent)
         {
             IsRunning = true;
         }
 
         /// <summary>
-        /// 
+        /// Updates the capabilities.
         /// </summary>
-        /// <param name="capabilitiesEvent"></param>
+        /// <param name="capabilitiesEvent">The changed capabilities.</param>
         private void OnCapabilitiesEvent(CapabilitiesEvent capabilitiesEvent)
         {
             if (capabilities == null)
@@ -829,7 +864,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Handles user input of the console.
         /// </summary>
-        /// <param name="text"></param>
+        /// <param name="text">The text.</param>
         private void OnConsoleInput(string text)
         {
             actions.Enqueue(() =>
@@ -1041,6 +1076,12 @@ namespace SEE.UI.DebugAdapterProtocol
             }
         }
 
+        /// <summary>
+        /// Shows the code position.
+        /// </summary>
+        /// <param name="makeActive">Whether to make the code window active.</param>
+        /// <param name="scroll">Whether to scroll the code window.</param>
+        /// <param name="highlightDuration">The highlight duration in the city.</param>
         private void ShowCodePosition(bool makeActive = false, bool scroll = false, float highlightDuration = highlightDurationInitial)
         {
             WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
@@ -1089,7 +1130,6 @@ namespace SEE.UI.DebugAdapterProtocol
 
         /// <summary>
         /// Clears the last code position. 
-        /// <see cref="lastCodeWindow"/>
         /// </summary>
         private void ClearLastCodePosition()
         {
@@ -1110,6 +1150,10 @@ namespace SEE.UI.DebugAdapterProtocol
             threads = adapterHost.SendRequestSync(new ThreadsRequest()).Threads;
         }
 
+        /// <summary>
+        /// Updates the stack frames.
+        /// Must be executed on the main thread.
+        /// </summary>
         private void UpdateStackFrames()
         {
             if (IsRunning) return;
@@ -1152,12 +1196,24 @@ namespace SEE.UI.DebugAdapterProtocol
             }
         }
 
+        /// <summary>
+        /// Retrieves nested variables.
+        /// Must be executed on the main thread.
+        /// </summary>
+        /// <param name="variablesReference">The variable reference.</param>
+        /// <returns>The nested variables.</returns>
         private List<Variable> RetrieveNestedVariables(int variablesReference)
         {
             if (variablesReference <= 0 || IsRunning) return new();
             return adapterHost.SendRequestSync(new VariablesRequest() { VariablesReference = variablesReference }).Variables;
         }
 
+        /// <summary>
+        /// Retrieves the value of a variable.
+        /// Must be executed on the main thread.
+        /// </summary>
+        /// <param name="variable">The variable.</param>
+        /// <returns>The variable value.</returns>
         private string RetrieveVariableValue(Variable variable)
         {
             if (IsRunning && variable.EvaluateName != null)
