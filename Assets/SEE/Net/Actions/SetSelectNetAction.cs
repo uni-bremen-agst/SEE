@@ -15,8 +15,8 @@ namespace SEE.Net.Actions
         /// Every selected object of the end point of every client. This is only used by
         /// the server.
         /// </summary>
-        internal static readonly Dictionary<IPEndPoint, HashSet<InteractableObject>> SelectedObjects
-            = new Dictionary<IPEndPoint, HashSet<InteractableObject>>();
+        internal static readonly Dictionary<ulong, HashSet<InteractableObject>> SelectedObjects
+            = new Dictionary<ulong, HashSet<InteractableObject>>();
 
         /// <summary>
         /// The id of the interactable.
@@ -45,14 +45,14 @@ namespace SEE.Net.Actions
         /// Adds/removes the interactable objects of given id to
         /// <see cref="SelectedObjects"/>.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             if (Select)
             {
                 InteractableObject interactable = InteractableObject.Get(ID);
                 if (interactable)
                 {
-                    IPEndPoint requester = GetRequester();
+                    ulong requester = Requester;
                     if (!SelectedObjects.TryGetValue(requester, out HashSet<InteractableObject> interactables))
                     {
                         interactables = new HashSet<InteractableObject>();
@@ -66,7 +66,7 @@ namespace SEE.Net.Actions
                 InteractableObject interactable = InteractableObject.Get(ID);
                 if (interactable)
                 {
-                    IPEndPoint requester = GetRequester();
+                    ulong requester = Requester;
                     if (SelectedObjects.TryGetValue(requester, out HashSet<InteractableObject> interactables))
                     {
                         interactables.Remove(interactable);
@@ -82,15 +82,12 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Sets the select value for the interactable object of given id.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            InteractableObject interactable = InteractableObject.Get(ID);
+            if (interactable)
             {
-                InteractableObject interactable = InteractableObject.Get(ID);
-                if (interactable)
-                {
-                    interactable.SetSelect(Select, false);
-                }
+                interactable.SetSelect(Select, false);
             }
         }
     }

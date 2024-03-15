@@ -37,7 +37,7 @@ namespace SEE.Game.Avatars
         /// following semantics: help, time, about.
         /// </summary>
         [Tooltip("Path to the SRGS grammar file defining the speech input language.")]
-        public FilePath GrammarFilePath;
+        public DataPath GrammarFilePath;
 
         /// <summary>
         /// The grammar recognizer used to interpret the speech input.

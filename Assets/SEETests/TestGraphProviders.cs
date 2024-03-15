@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using SEE.DataModel.DG;
 using SEE.Game.City;
+using SEE.Utils.Paths;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -18,7 +19,7 @@ namespace SEE.GraphProviders
             UniTask.ToCoroutine(async () =>
             {
                 GraphProvider provider = new GXLGraphProvider()
-                { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
+                { Path = NewDataPath("JLGExample/CodeFacts.gxl.xz") };
 
                 GameObject go = new();
                 SEECity city = go.AddComponent<SEECity>();
@@ -28,6 +29,14 @@ namespace SEE.GraphProviders
                 Assert.IsTrue(loaded.NodeCount > 0);
                 Assert.IsTrue(loaded.EdgeCount > 0);
             });
+
+        private static DataPath NewDataPath(string filename)
+        {
+            return new DataPath()
+            {
+                Path = Application.streamingAssetsPath + "/" + filename
+            };
+        }
 
         [UnityTest]
         public IEnumerator TestCSVJaCoCoGXLGraphProvider() =>
@@ -40,18 +49,18 @@ namespace SEE.GraphProviders
 
                 {
                     GraphProvider provider = new GXLGraphProvider()
-                    { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
+                    { Path = NewDataPath("JLGExample/CodeFacts.gxl.xz") };
                     pipeline.Add(provider);
                 }
                 {
                     GraphProvider provider = new JaCoCoGraphProvider()
-                    { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/jacoco.xml") };
+                    { Path = NewDataPath("JLGExample/jacoco.xml") };
                     pipeline.Add(provider);
                 }
 
                 {
                     GraphProvider provider = new CSVGraphProvider()
-                    { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.csv") };
+                    { Path = NewDataPath("JLGExample/CodeFacts.csv") };
                     pipeline.Add(provider);
                 }
 
@@ -85,14 +94,14 @@ namespace SEE.GraphProviders
                     Graph graph;
                     {
                         GraphProvider provider = new GXLGraphProvider()
-                        { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mini-evolution/CodeFacts-5.gxl") };
+                        { Path = NewDataPath("mini-evolution/CodeFacts-5.gxl") };
                         graph = await provider.ProvideAsync(new Graph(""), city);
                     }
 
                     {
                         // Older graph
                         GraphProvider provider = new GXLGraphProvider()
-                        { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mini-evolution/CodeFacts-1.gxl") };
+                        { Path = NewDataPath("mini-evolution/CodeFacts-1.gxl") };
 
                         MergeDiffGraphProvider mergeDiffProvider = new()
                         {

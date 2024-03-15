@@ -1,9 +1,14 @@
-﻿using NUnit.Framework;
+﻿using Cysharp.Threading.Tasks;
+using NUnit.Framework;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
+using System;
+using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace SEE.Tools.Architecture
 {
@@ -15,16 +20,13 @@ namespace SEE.Tools.Architecture
         /// <summary>
         /// Non-incremental reflexion analysis for minilax example.
         /// </summary>
-        [Test]
-        public void TestMinilaxNonIncrementally()
-        {
-            NonIncrementally("minilax");
-            //reflexion.DumpArchitecture();
-        }
+        [UnityTest]
+        public IEnumerator TestMinilaxNonIncrementally() =>
+            UniTask.ToCoroutine(async () => await NonIncrementallyAsync("minilax"));
 
-        private void NonIncrementally(string folderName)
+        private async Task NonIncrementallyAsync(string folderName)
         {
-            LoadAll(folderName, out Graph impl, out Graph arch, out Graph mapping);
+            (Graph impl, Graph arch, Graph mapping) = await LoadAllAsync(folderName);
             Performance p = Performance.Begin("Running non-incremental reflexion analysis");
             graph = new ReflexionGraph(impl, arch, mapping);
             graph.Subscribe(this);
@@ -35,16 +37,13 @@ namespace SEE.Tools.Architecture
         /// <summary>
         /// Incremental reflexion analysis for minilax example.
         /// </summary>
-        [Test]
-        public void TestMinilaxIncrementally()
-        {
-            Incrementally("minilax");
-            //reflexion.DumpArchitecture();
-        }
+        [UnityTest]
+        public IEnumerator TestMinilaxIncrementally() =>
+            UniTask.ToCoroutine(async () => await IncrementallyAsync("minilax"));
 
-        private void Incrementally(string folderName)
+        private async Task IncrementallyAsync(string folderName)
         {
-            LoadAll(folderName, out Graph impl, out Graph arch, out Graph mapping);
+            (Graph impl, Graph arch, Graph mapping) = await LoadAllAsync(folderName);
             Performance p = Performance.Begin("Running incremental reflexion analysis");
             // Passing the empty graph as mapping argument to reflexion.
             graph = new ReflexionGraph(impl, arch, new Graph("DUMMYBASEPATH"));
@@ -67,40 +66,40 @@ namespace SEE.Tools.Architecture
         /// <summary>
         /// Compares the result of incremental and non-incremental reflexion analysis for minilax example.
         /// </summary>
-        [Test]
-        public void TestMinilaxComparison()
-        {
-            const string folderName = "minilax";
-            NonIncrementally(folderName);
-            int[] incrementally = graph.Summary();
-            Teardown();
-            Setup();
-            Incrementally(folderName);
-            int[] nonIncrementally = graph.Summary();
-            Assert.AreEqual(incrementally, nonIncrementally);
-        }
+        [UnityTest]
+        public IEnumerator TestMinilaxComparison() =>
+             UniTask.ToCoroutine(async () =>
+             {
+                 const string folderName = "minilax";
+                 await NonIncrementallyAsync(folderName);
+                 int[] incrementally = graph.Summary();
+                 Teardown();
+                 Setup();
+                 await IncrementallyAsync(folderName);
+                 int[] nonIncrementally = graph.Summary();
+                 Assert.AreEqual(incrementally, nonIncrementally);
+             });
 
-        private Graph Load(string path)
+        private async Task<Graph> LoadAsync(string path)
         {
             string platformPath = Filenames.OnCurrentPlatform(path);
-            Debug.LogFormat("Loading graph from {0}...\n", platformPath);
-            GraphReader graphCreator = new(platformPath, HierarchicalEdges, basePath: "", rootID: "", logger);
-            graphCreator.Load();
-            Graph result = graphCreator.GetGraph();
+            Debug.Log($"Loading graph from {platformPath}...\n");;
+            Graph result = await GraphReader.LoadAsync(platformPath, HierarchicalEdges, basePath: "", logger);
             Assert.That(result, !Is.Null);
-            Debug.LogFormat("Loaded {0} nodes and {1} edges.\n", result.NodeCount, result.EdgeCount);
+            Debug.Log($"Loaded {result.NodeCount} nodes and {result.EdgeCount} edges.\n");
             //result.DumpTree();
             return result;
         }
 
-        private void LoadAll(string folderName, out Graph impl, out Graph arch, out Graph mapping)
+        private async Task<Tuple<Graph, Graph, Graph>> LoadAllAsync(string folderName)
         {
             string path = $"{Application.streamingAssetsPath}/reflexion/{folderName}/";
             Performance p = Performance.Begin("Loading graphs");
-            impl = Load($"{path}CodeFacts.gxl.xz");
-            arch = Load($"{path}Architecture.gxl");
-            mapping = Load($"{path}Mapping.gxl");
+            Graph impl = await LoadAsync($"{path}CodeFacts.gxl.xz");
+            Graph arch = await LoadAsync($"{path}Architecture.gxl");
+            Graph mapping = await LoadAsync($"{path}Mapping.gxl");
             p.End();
+            return new Tuple<Graph, Graph, Graph>(impl, arch, mapping);
         }
     }
 }

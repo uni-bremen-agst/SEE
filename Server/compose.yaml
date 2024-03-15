@@ -1,0 +1,73 @@
+version: "3.8"
+
+networks:
+  server-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16
+
+services:
+  frontend-server:
+    build: ./Frontend
+    container_name: frontend
+    depends_on:
+      - backend-server
+    networks:
+      server-network:
+        ipv4_address: 172.18.0.6
+    ports:
+      - "80:80"
+
+  backend-server:
+    privileged: true
+    build: ./Backend
+    container_name: backend
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - database-server
+      - storage-server
+    networks:
+      server-network:
+        ipv4_address: 172.18.0.2
+    ports:
+      - "8080:8080"
+    environment:
+      MYSQL_HOST: 172.18.0.3  # IP-Adresse des MySQL-Servers
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: app_db
+      MYSQL_USER: db_user
+      MYSQL_PASSWORD: db_user_pass
+      MINIO_URL: 172.18.0.4  # IP-Adresse des Minio-Servers
+      MINIO_PORT: 9000
+      MINIO_DEFAULT_BUCKETS: test
+      MINIO_ROOT_PASSWORD: your_password
+      MINIO_ROOT_USER: your_username
+      DOMAIN: localhost
+      DOMAIN_PORT: 80
+      JWT_SECRET: 1RNG9ja6MtadMuLsRC5ci3fy53KcQJmdEWWrp3hV5dnukvW5SQ
+
+  database-server:
+    image: mysql:latest
+    container_name: database
+    networks:
+      server-network:
+        ipv4_address: 172.18.0.3
+    environment:
+      MYSQL_ROOT_PASSWORD: my_secret_password
+      MYSQL_DATABASE: app_db
+      MYSQL_USER: db_user
+      MYSQL_PASSWORD: db_user_pass
+
+  storage-server:
+    image: docker.io/bitnami/minio:latest
+    container_name: storage
+    networks:
+      server-network:
+        ipv4_address: 172.18.0.4
+    environment:
+      MINIO_ROOT_USER: your_username
+      MINIO_ROOT_PASSWORD: your_password
+      MINIO_DEFAULT_BUCKETS: test

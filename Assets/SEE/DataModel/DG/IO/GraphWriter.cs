@@ -65,18 +65,7 @@ namespace SEE.DataModel.DG.IO
             source.Flush();
             source.Position = 0;
 
-            Stream fileStream = new FileStream(filename, FileMode.Create);
-            if (filename.ToLower().EndsWith(Filenames.CompressedGXLExtension))
-            {
-                // Compress to XZ, if necessary.
-                XZCompressOptions options = new()
-                {
-                    LeaveOpen = false
-                };
-                fileStream = new XZStream(fileStream, options);
-            }
-            source.CopyTo(fileStream);
-            fileStream.Close();
+            Compressor.Save(filename, source);
         }
 
         /// <summary>

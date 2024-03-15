@@ -42,18 +42,15 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Movement in all clients except the requesting client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                GameNodeMover.MoveTo(Find(GameObjectID), TargetPosition, AnimationFactor);
-            }
+            GameNodeMover.MoveTo(Find(GameObjectID), TargetPosition, AnimationFactor);
         }
 
         /// <summary>
         /// Does not do anything.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank.
         }

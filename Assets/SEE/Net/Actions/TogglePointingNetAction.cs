@@ -17,6 +17,11 @@ namespace SEE.Net.Actions
         public ulong NetworkObjectID;
 
         /// <summary>
+        /// Should not be sent to newly connecting clients
+        /// </summary>
+        public override bool ShouldBeSentToNewClient { get => false; }
+
+        /// <summary>
         /// Whether pointing should be activated or deactivated.
         /// </summary>
         public bool Activate;
@@ -35,37 +40,34 @@ namespace SEE.Net.Actions
         /// If executed by the initiating client, nothing happens. Otherwise the pointing
         /// mode of the avatar identified by <see cref="NetworkObjectID"/> will be toggled.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            NetworkManager networkManager = NetworkManager.Singleton;
+            if (networkManager != null)
             {
-                NetworkManager networkManager = NetworkManager.Singleton;
-                if (networkManager != null)
+                NetworkSpawnManager networkSpawnManager = networkManager.SpawnManager;
+                if (networkSpawnManager.SpawnedObjects.TryGetValue(NetworkObjectID, out NetworkObject networkObject))
                 {
-                    NetworkSpawnManager networkSpawnManager = networkManager.SpawnManager;
-                    if (networkSpawnManager.SpawnedObjects.TryGetValue(NetworkObjectID, out NetworkObject networkObject))
+                    if (networkObject.gameObject.TryGetComponentOrLog(out AvatarAimingSystem aimingSystem))
                     {
-                        if (networkObject.gameObject.TryGetComponentOrLog(out AvatarAimingSystem aimingSystem))
-                        {
-                            aimingSystem.SetPointing(Activate);
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogError($"There is no network object with ID {NetworkObjectID}.\n");
+                        aimingSystem.SetPointing(Activate);
                     }
                 }
                 else
                 {
-                    Debug.LogError($"There is no component {typeof(NetworkManager)} in the scene.\n");
+                    Debug.LogError($"There is no network object with ID {NetworkObjectID}.\n");
                 }
+            }
+            else
+            {
+                Debug.LogError($"There is no component {typeof(NetworkManager)} in the scene.\n");
             }
         }
 
         /// <summary>
         /// Nothing will happen.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank.
         }

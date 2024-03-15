@@ -40,11 +40,11 @@ namespace SEEEditor
             if (GUILayout.Button("...", GUILayout.Width(20)))
             {
                 string selectedPath = fileDialogue ?
-                      EditorUtility.OpenFilePanel("Select file", dataPath.RootPath, extension)
-                    : EditorUtility.OpenFolderPanel("Select directory", dataPath.RootPath, extension);
+                      EditorUtility.OpenFilePanel("Select file", dataPath.RootFileSystemPath, extension)
+                    : EditorUtility.OpenFolderPanel("Select directory", dataPath.RootFileSystemPath, extension);
                 if (!string.IsNullOrEmpty(selectedPath))
                 {
-                    dataPath.Set(selectedPath);
+                    dataPath.Path = selectedPath;
                 }
             }
             EditorGUILayout.EndHorizontal();

@@ -21,7 +21,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using SEE.Utils;
+using SEE.Utils.Paths;
 using UnityEngine;
 
 namespace SEE.DataModel.DG.IO
@@ -52,7 +54,8 @@ namespace SEE.DataModel.DG.IO
         /// <param name="basePath">the base path of the graphs</param>
         /// <param name="rootName">name of the root node if any needs to be added to have a unique root</param>
         /// <param name="maxRevisionsToLoad">the upper limit of files to be loaded</param>
-        public void Load(string directory, HashSet<string> hierarchicalEdgeTypes, string basePath, string rootName, int maxRevisionsToLoad)
+        public async Task LoadAsync(string directory, HashSet<string> hierarchicalEdgeTypes,
+                                    string basePath, string rootName, int maxRevisionsToLoad)
         {
             IEnumerable<string> sortedGraphNames = Filenames.GXLFilenames(directory).ToList();
             if (!sortedGraphNames.Any())
@@ -61,20 +64,26 @@ namespace SEE.DataModel.DG.IO
             }
             Graphs.Clear();
 
+            GraphReader graphCreator = new(hierarchicalEdgeTypes,
+                               basePath: basePath,
+                               rootID: rootName,
+                               logger: new SEELogger());
+
             Performance p = Performance.Begin($"Loading GXL files from {directory}");
             // for all found GXL files load and save the graph data
             foreach (string gxlPath in sortedGraphNames)
             {
                 // load graph (we can safely assume that the file exists because we retrieved its
                 // name just from the directory
-                GraphReader graphCreator = new(gxlPath, hierarchicalEdgeTypes,
-                                               basePath: basePath,
-                                               rootID: rootName,
-                                               logger: new SEELogger());
-                graphCreator.Load();
+                DataPath dataPath = new()
+                {
+                    Path = gxlPath
+                };
+
+                graphCreator.Load(await dataPath.LoadAsync(), dataPath.Path);
                 Graph graph = graphCreator.GetGraph();
 
-                // if graph was loaded put in graph list
+                // if graph was loaded, put in graph list
                 if (graph == null)
                 {
                     Debug.LogError($"Graph {gxlPath} could not be loaded.\n");

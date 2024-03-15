@@ -5,6 +5,7 @@ using SEE.Utils;
 using System;
 using System.IO;
 using Cysharp.Threading.Tasks;
+using SEE.Utils.Paths;
 
 namespace SEE.GraphProviders
 {
@@ -32,14 +33,10 @@ namespace SEE.GraphProviders
         /// is undefined or does not exist or <paramref name="city"/> is null</exception>
         /// <exception cref="NotImplementedException">thrown if <paramref name="graph"/>
         /// has nodes; this case is currently not yet handled</exception>
-        public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
+        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
         {
             CheckArguments(city);
-            GraphReader graphCreator = new(Path.Path, city.HierarchicalEdges,
-                                           basePath: city.SourceCodeDirectory.Path,
-                                           logger: new SEELogger());
-            graphCreator.Load();
-            return UniTask.FromResult(graphCreator.GetGraph());
+            return await GraphReader.LoadAsync(Path, city.HierarchicalEdges, city.SourceCodeDirectory.Path);
         }
 
         public override GraphProviderKind GetKind()

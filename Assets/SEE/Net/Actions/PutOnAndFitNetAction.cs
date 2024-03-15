@@ -57,21 +57,18 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Movement in all clients except the requesting client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                GameObject child = Find(ChildID);
-                GameObject newParent = Find(NewParentID);
-                GameObject originalParent = Find(OriginalParentID);
-                GameNodeMover.PutOnAndFit(child.transform, newParent, originalParent, OriginalLocalScale);
-            }
+            GameObject child = Find(ChildID);
+            GameObject newParent = Find(NewParentID);
+            GameObject originalParent = Find(OriginalParentID);
+            GameNodeMover.PutOnAndFit(child.transform, newParent, originalParent, OriginalLocalScale);
         }
 
         /// <summary>
         /// Does not do anything.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank.
         }

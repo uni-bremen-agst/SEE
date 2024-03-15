@@ -43,28 +43,25 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Zooming in all clients except the requesting client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            GameObject gameObject = GraphElementIDMap.Find(GameObjectID);
+            if (gameObject != null)
             {
-                GameObject gameObject = GraphElementIDMap.Find(GameObjectID);
-                if (gameObject != null)
-                {
-                    NodeOperator nodeOperator = gameObject.NodeOperator();
-                    nodeOperator.MoveTo(Position, ZoomAction.AnimationFactor);
-                    nodeOperator.ScaleTo(LocalScale, ZoomAction.AnimationFactor);
-                }
-                else
-                {
-                    throw new System.Exception($"There is no game object with the ID {GameObjectID}.");
-                }
+                NodeOperator nodeOperator = gameObject.NodeOperator();
+                nodeOperator.MoveTo(Position, ZoomAction.AnimationFactor);
+                nodeOperator.ScaleTo(LocalScale, ZoomAction.AnimationFactor);
+            }
+            else
+            {
+                throw new System.Exception($"There is no game object with the ID {GameObjectID}.");
             }
         }
 
         /// <summary>
         /// Does not do anything.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank.
         }

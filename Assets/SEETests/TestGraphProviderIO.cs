@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using SEE.Utils;
 using SEE.Utils.Config;
+using SEE.Utils.Paths;
 using System.IO;
 using UnityEngine;
 
@@ -67,6 +68,14 @@ namespace SEE.GraphProviders
             FileIO.DeleteIfExists(filename);
         }
 
+        private static DataPath NewDataPath(string filename)
+        {
+            return new DataPath()
+            {
+                Path = filename
+            };
+        }
+
         #region GXL provider
         [Test]
         public void TestGXLGraphProvider()
@@ -80,7 +89,7 @@ namespace SEE.GraphProviders
         {
             return new GXLGraphProvider()
             {
-                Path = new Utils.Paths.FilePath("mydir/myfile.gxl")
+                Path = NewDataPath("mydir/myfile.gxl")
             };
         }
 
@@ -106,7 +115,7 @@ namespace SEE.GraphProviders
         {
             return new CSVGraphProvider()
             {
-                Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mydir/myfile.csv")
+                Path = NewDataPath(Application.streamingAssetsPath + "/mydir/myfile.csv")
             };
         }
 
@@ -132,7 +141,7 @@ namespace SEE.GraphProviders
         {
             return new JaCoCoGraphProvider()
             {
-                Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
+                Path = NewDataPath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
             };
         }
 
@@ -207,9 +216,9 @@ namespace SEE.GraphProviders
         {
             return new ReflexionGraphProvider()
             {
-                Architecture = new Utils.Paths.FilePath("mydir/Architecture.gxl"),
-                Implementation = new Utils.Paths.FilePath("mydir/Implementation.gxl"),
-                Mapping = new Utils.Paths.FilePath("mydir/Mapping.gxl"),
+                Architecture = NewDataPath("mydir/Architecture.gxl"),
+                Implementation = NewDataPath("mydir/Implementation.gxl"),
+                Mapping = NewDataPath("mydir/Mapping.gxl"),
             };
         }
 
@@ -240,7 +249,7 @@ namespace SEE.GraphProviders
             {
                 OldGraph = new JaCoCoGraphProvider()
                 {
-                    Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
+                    Path = NewDataPath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
                 }
             };
         }

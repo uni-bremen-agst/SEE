@@ -36,17 +36,14 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Rotation of node in all clients except the requesting client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                GameObject gameObject = Find(GameObjectID);
-                NodeOperator nodeOperator = gameObject.NodeOperator();
-                nodeOperator.RotateTo(Rotation, 0);
-            }
+            GameObject gameObject = Find(GameObjectID);
+            NodeOperator nodeOperator = gameObject.NodeOperator ();
+            nodeOperator.RotateTo(Rotation, 0);
         }
 
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank.
         }

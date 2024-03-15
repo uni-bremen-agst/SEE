@@ -1,7 +1,12 @@
-﻿using NUnit.Framework;
+﻿using Cysharp.Threading.Tasks;
+using NUnit.Framework;
 using SEE.DataModel.DG.IO;
+using SEE.Utils.Paths;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace SEE.DataModel.DG
 {
@@ -21,25 +26,23 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="filename">GXL file</param>
         /// <returns>loaded graph</returns>
-        private static Graph LoadGraph(string filename)
+        private static async Task<Graph> LoadGraphAsync(string filename)
         {
-            GraphReader graphReader = new(filename, new HashSet<string> { hierarchicalEdgeType }, basePath: "");
-            graphReader.Load();
-            return graphReader.GetGraph();
+            return await GraphReader.LoadAsync(filename, new HashSet<string> { hierarchicalEdgeType }, basePath: "");
         }
 
         /// <summary>
-        /// The graph that was loaded by <see cref="SetUp"/> before each test case is executed.
+        /// The graph that was loaded by <see cref="SetUpAsync"/> before each test case is executed.
         /// </summary>
         private Graph graph;
 
         [SetUp]
-        public void SetUp()
+        public async Task SetUpAsync()
         {
             string gxlPath = Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz";
             string xmlPath = Application.streamingAssetsPath + "/JLGExample/jacoco.xml";
 
-            graph = LoadGraph(gxlPath);
+            graph = await LoadGraphAsync(gxlPath);
             JaCoCoImporter.Load(graph, xmlPath);
         }
 
@@ -155,6 +158,27 @@ namespace SEE.DataModel.DG
 
             Assert.AreEqual(0, nodeToTest.GetInt(JaCoCo.MethodMissed));
             Assert.AreEqual(1, nodeToTest.GetInt(JaCoCo.MethodCovered));
+        }
+
+        /// <summary>
+        /// Here we only test whether data can be read from a URL. The nodes in the
+        /// referenced file are not actually in the graph. So we expect error
+        /// messages. But these are indication that the download and processing as
+        /// such work.
+        /// </summary>
+        [Test]
+        public void TestLoadAsyncMethod()
+        {
+            DataPath path = new()
+            {
+                Root = DataPath.RootKind.Url,
+                Path = "https://raw.githubusercontent.com/vokal/jacoco-parse/master/test/assets/sample.xml"
+            };
+            UniTask.ToCoroutine(async () =>
+            {
+                await JaCoCoImporter.LoadAsync(graph, path);
+                LogAssert.Expect(LogType.Error, new Regex(@".*No node found for.*"));
+            });
         }
     }
 }
