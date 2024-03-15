@@ -12,34 +12,94 @@ using UnityEngine;
 
 namespace SEE.UI.DebugAdapterProtocol
 {
+    /// <summary>
+    /// Manages the buttons of the BaseWindow that are used for debugging.
+    /// 
+    /// <para>
+    /// Listens to these buttons of the *BaseWindow*:
+    /// </para>
+    /// <list type="table">
+    /// <item>
+    ///     <term>Run</term>
+    ///     <description>Starts the debug session.</description>
+    /// </item>
+    /// <item>
+    ///     <term>Adapter Configuration</term>
+    ///     <description>Opens the debug adapter configration dialog.</description>
+    /// </item>
+    /// <item>
+    ///     <term>Launch Configuration</term>
+    ///     <description>Opens the launch configuration dialog.</description>
+    /// </item>
+    /// </list>
+    /// </summary>
     public class DebugAdapterProtocolManager : PlatformDependentComponent
     {
+        /// <summary>
+        /// List of possible debug adapters.
+        /// </summary>
         private static readonly DebugAdapter.DebugAdapter[] adapters =
         {
             new NetCoreDebugAdapter(),
             new MockDebugAdapter(),
         };
+        /// <summary>
+        /// Selected debug adapter.
+        /// </summary>
         private static DebugAdapter.DebugAdapter adapter = adapters[0];
+
+        /// <summary>
+        /// All cities.
+        /// </summary>
+        private static IEnumerable<AbstractSEECity> cities;
+
+        /// <summary>
+        /// Selected city in which the code position should be highlighted.
+        /// </summary>
+        private static AbstractSEECity city;
+
+        /// <summary>
+        /// Active debug session.
+        /// </summary>
         private static DebugAdapterProtocolSession session;
 
+        /// <summary>
+        /// The tooltip.
+        /// </summary>
         private Tooltip.Tooltip tooltip;
 
+        /// <summary>
+        /// The run button.
+        /// </summary>
         public GameObject RunButton;
 
+        /// <summary>
+        /// The debug adapter configuration button.
+        /// </summary>
         public GameObject DebugAdapterConfigButton;
 
+        /// <summary>
+        /// The launch configuration button.
+        /// </summary>
         public GameObject LaunchConfigButton;
 
-        IEnumerable<AbstractSEECity> cities;
-        AbstractSEECity city;
 
+        /// <summary>
+        /// Retrieves all cities.
+        /// </summary>
         protected override void Start()
         {
             base.Start();
-            cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity).Select(go => go.MustGetComponent<AbstractSEECity>()).OrderBy(c => c.name);
-            city = cities.First();
+            if (cities == null)
+            {
+                cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity).Select(go => go.MustGetComponent<AbstractSEECity>()).OrderBy(c => c.name);
+                city = cities.First();
+            }
         }
 
+        /// <summary>
+        /// Adds listeners and tooltips to the BaseWindow buttons.
+        /// </summary>
         protected override void StartDesktop() {
             tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
 
@@ -65,7 +125,10 @@ namespace SEE.UI.DebugAdapterProtocol
             }
         }
 
-        public void Run()
+        /// <summary>
+        /// Starts a debug session.
+        /// </summary>
+        public static void Run()
         {
             if (session == null)
             {
@@ -75,7 +138,10 @@ namespace SEE.UI.DebugAdapterProtocol
             }
         }
 
-        public void OpenDebugAdapterConfig()
+        /// <summary>
+        /// Opens the debug adapter configuration dialog.
+        /// </summary>
+        public static void OpenDebugAdapterConfig()
         {
             GameObject go = new GameObject("Debug Adapter Configuration");
 
@@ -158,7 +224,10 @@ namespace SEE.UI.DebugAdapterProtocol
             }
         }
 
-        public void OpenLaunchConfig()
+        /// <summary>
+        /// Opens the launch configuration dialog.
+        /// </summary>
+        public static void OpenLaunchConfig()
         {
             GameObject go = new GameObject("Launch Request");
 
@@ -181,7 +250,6 @@ namespace SEE.UI.DebugAdapterProtocol
             dialog.OnCancel.AddListener(OnClose);
             dialog.OnConfirm.AddListener(OnClose);
             dialog.DialogShouldBeShown = true;
-
 
             void OnClose()
             {
