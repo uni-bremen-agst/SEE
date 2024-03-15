@@ -114,7 +114,8 @@ namespace SEE.Controls.Actions
 
             void ShowMetrics()
             {
-                CreateWindow(graphElement);
+                ActivateWindow(CreateMetricWindow(gameObject.MustGetComponent<GraphElementRef>()));
+                //CreateMetricWindow(gameObject.MustGetComponent<GraphElementRef>());
             }
 
             void ShowCode()
@@ -157,19 +158,20 @@ namespace SEE.Controls.Actions
             return openWindow;
         }
 
-        private static void CreateWindow(GraphElement graphElement)
+        private static MetricMenu CreateMetricWindow(GraphElementRef graphElementRef)
         {
-            if (MetricMenu.Instance != null && MetricMenu.Instance.gameObject.activeSelf)
+            int i = 1;
+            // Create new window for active selection, or use existing one
+            if (!graphElementRef.TryGetComponent(out MetricMenu metricMenu))
             {
-                Debug.Log("Ist AKtiv");
-                MetricMenu.Instance.CreateUIInstance(graphElement);
+                metricMenu = graphElementRef.gameObject.AddComponent<MetricMenu>();
+                
+                metricMenu.Title = "MetricMenu " + i;
+                metricMenu.graphElement2 = graphElementRef.Elem;
+                i++;
             }
-            else
-            {
-                Debug.Log("Ist nicht aktiv");
-                MetricMenu.Instance.UpdateTable(graphElement);
-                MetricMenu.Instance.OpenWindow();
-            }
+            return metricMenu;
+
         }
 
         /// <summary>

@@ -1,22 +1,25 @@
+using DynamicPanels;
+using FuzzySharp;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.UI.Window;
 using SEE.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace SEE.UI
 {
-    public class MetricMenu : PlatformDependentComponent
-    {
+    public class MetricMenu : BaseWindow
+    {   
         //private List<string> windows = new List<string>();
         private Dictionary<string, GameObject> windows = new Dictionary<string, GameObject>();
-
-        private GameObject canvasObject;
 
         //private GameObject[] Element;
 
@@ -24,86 +27,30 @@ namespace SEE.UI
 
         private int totalElements;
 
+        public GraphElement graphElement2;
+
         public Node testNode;
 
         private GameObject menu;
 
         private int i = 0;
 
-        private string CanvasPrefab => UIPrefabFolder + "WindowSpace";
-
         /// <summary>
         /// Prefab for the <see cref="MetricMenu"/>.
         /// </summary>
-        private string SettingsPrefab => UIPrefabFolder + "BuildWindowToTest";
+        private string SettingsPrefab => UIPrefabFolder + "DeleteAfterTest";
 
         private Transform ScrollViewContent;
         private string itemPrefab => UIPrefabFolder + "MetricRowLine";
 
         private GameObject InputField;
 
-        public static MetricMenu Instance { get; private set; }
-
-        private void Awake()
-        {
-            if (Instance == null)
-            {
-                Instance = this;
-            }
-            else
-            {
-                Debug.LogWarning("Another instance of MetricMenu already exists.");
-                Destroy(gameObject);
-            }
-        }
-
         // Start is called before the first frame update
         protected override void StartDesktop()
         {
             CreateNode();
-
-            canvasObject = PrefabInstantiator.InstantiatePrefab(CanvasPrefab, Canvas.transform, false);
-            canvasObject.transform.name = "MetricSpace";
-
-            // instantiates the Metric Menu
-            /*menu = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, canvasObject.transform, false);
-
-            //Button Exit
-            Transform outTrans = menu.transform.Find("Dragger/ExitButton");
-
-            menu.transform.Find("Dragger/ExitButton").gameObject.MustGetComponent<Button>().onClick.AddListener(() => exitWindow(outTrans.gameObject.MustGetComponent<Button>()));
-
-            //Parent Content
-            ScrollViewContent = menu.transform.Find("Content/ScrollView/Viewport/Content").transform;
-
-            //Input Field
-            InputField = menu.transform.Find("Content/SearchField").gameObject.MustGetComponent<TMP_InputField>().gameObject;
-
-            InputField.MustGetComponent<TMP_InputField>().onSelect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = false) ;
-            InputField.MustGetComponent<TMP_InputField>().onDeselect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = true);
-
-            foreach (KeyValuePair<string, int> kvp in testNode.IntAttributes)
-            {
-                //Create GameObject
-                //GameObject newItems = Instantiate<GameObject>(itemPrefab, ScrollViewContent);
-                GameObject newItems = PrefabInstantiator.InstantiatePrefab(itemPrefab, ScrollViewContent, false);
-                //Attribute Name
-                TextMeshProUGUI attributeTextClone = newItems.transform.Find("AttributeLine").gameObject.MustGetComponent<TextMeshProUGUI>();
-                attributeTextClone.text = kvp.Key;
-                //Value Name
-                TextMeshProUGUI valueTextClone = newItems.transform.Find("ValueLine").gameObject.MustGetComponent<TextMeshProUGUI>();
-                valueTextClone.text = kvp.Value.ToString();
-            }
-
-            totalElements = ScrollViewContent.transform.childCount;
-            GameObject[] Element = new GameObject[totalElements];
-
-            for (int i = 0; i < totalElements; i++)
-            {
-                Element[i] = ScrollViewContent.transform.GetChild(i).gameObject;
-            }
-
-            InputField.MustGetComponent<TMP_InputField>().onValueChanged.AddListener(str => InputSearchField(str, Element, InputField));*/
+            base.StartDesktop();
+            CreateUIInstance(testNode);
         }
 
         protected override void UpdateDesktop()
@@ -111,16 +58,16 @@ namespace SEE.UI
 
         }
 
-        private void InputSearchField(string str, GameObject[] elements, GameObject gameObject)
+        private void InputSearchField(string str, GameObject[] elements)
         {
-            Debug.Log(gameObject);
-            Debug.Log("Elements.Length: " + elements.Length);
+            var searchList = Search(str, elements);
             foreach (GameObject ele in elements)
             {
                 if (ele != null)
                 {
                     string eleText = ele.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text;
-                    if (eleText.ToLower().Contains(str.ToLower()))
+                    
+                    if (searchList.Contains(eleText))
                     {
                         ele.SetActive(true);
                     }
@@ -132,42 +79,29 @@ namespace SEE.UI
             }
         }
 
-        public void UpdateTable(GraphElement graphElement)
+        /// <summary>
+        /// Performs a fuzzy search for the given <paramref name="query"/> in the graph,
+        /// by comparing it to the source name of the nodes.
+        /// Case will be ignored, and the query may be a substring of the source name (this is a fuzzy search).
+        /// </summary>
+        /// <param name="query">The query to be searched for.</param>
+        /// <returns>A list of nodes which match the query.</returns>
+        public IEnumerable<string> Search(string query, GameObject[] ObjectList, int limit = 10, int cutoff = 50)
         {
-            //Delete the table
-            //DeleteTable();
+            string[] attributesList = new string[ObjectList.Length];
 
-            foreach (KeyValuePair<string, int> kvp in graphElement.IntAttributes)
+            for(int i = 0; i < ObjectList.Length; i++)
             {
-                //Create GameObject
-                GameObject newItems = PrefabInstantiator.InstantiatePrefab(itemPrefab, ScrollViewContent, false);
-                //Attribute Name
-                TextMeshProUGUI attributeTextClone = newItems.transform.Find("AttributeLine").gameObject.MustGetComponent<TextMeshProUGUI>();
-                attributeTextClone.text = kvp.Key;
-                //Value Name
-                TextMeshProUGUI valueTextClone = newItems.transform.Find("ValueLine").gameObject.MustGetComponent<TextMeshProUGUI>();
-                valueTextClone.text = kvp.Value.ToString();
+                attributesList[i] = ObjectList[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text;
             }
 
-            //Save GameObjects in Array for SearchField
-            totalElements = ScrollViewContent.transform.childCount;
-            GameObject[] Element = new GameObject[totalElements];
+            var listTest = Process.ExtractAll(query, attributesList, cutoff: cutoff);
+            IEnumerable<(int score, string attribute)> listTest2 = listTest.Select(x => (x.Score, x.Value));
 
-            for (int i = 0; i < totalElements; i++)
-            {
-                    Element[i] = ScrollViewContent.transform.GetChild(i).gameObject;
-            }
+            listTest2 = listTest2.OrderByDescending(x => x.score);
+
+            return listTest2.Select(x => x.attribute);
         }
-
-        /*void DeleteTable()
-        {
-            GameObject content = menu.transform.Find("Content/ScrollView/Viewport/Content").gameObject;
-            foreach(Transform child in content.transform)
-            {
-                Destroy(child.gameObject);
-            }
-            Element = null;
-        }*/
 
         public void CreateUIInstance(GraphElement graphElement)
         {
@@ -177,29 +111,23 @@ namespace SEE.UI
             }
             else
             {
-                newUIInstance = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, canvasObject.transform, false);
+                newUIInstance = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, Window.transform.Find("Content"), false);
 
-                newUIInstance.transform.name = graphElement.ID;
-
-                windows.Add(newUIInstance.transform.name, newUIInstance);
-
-                //Button Exit
-                Transform outTrans = newUIInstance.transform.Find("Dragger/ExitButton");
-
-                Button exitButton = newUIInstance.transform.Find("Dragger/ExitButton").gameObject.MustGetComponent<Button>();
-                exitButton.onClick.AddListener(() => exitWindow(exitButton));
+                //newUIInstance.transform.name = graphElement.ID;
+                newUIInstance.name = "Scrollable";
 
                 //Parent Content
-                ScrollViewContent = newUIInstance.transform.Find("Content/ScrollView/Viewport/Content").transform;
+                ScrollViewContent = newUIInstance.transform.Find("Content/Items").transform;
+                Debug.Log("ScrollViewContent: " + ScrollViewContent.gameObject);
 
                 //Input Field
-                InputField = newUIInstance.transform.Find("Content/SearchField").gameObject.MustGetComponent<TMP_InputField>().gameObject;
-                TMP_InputField inputField = newUIInstance.transform.Find("Content/SearchField").gameObject.MustGetComponent<TMP_InputField>();
+                InputField = newUIInstance.transform.Find("Search/SearchField").gameObject.MustGetComponent<TMP_InputField>().gameObject;
+                TMP_InputField inputField = newUIInstance.transform.Find("Search/SearchField").gameObject.MustGetComponent<TMP_InputField>();
 
                 inputField.onSelect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = false);
                 inputField.onDeselect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = true);
 
-                foreach (KeyValuePair<string, int> kvp in graphElement.IntAttributes)
+                foreach (KeyValuePair<string, int> kvp in graphElement2.IntAttributes)
                 {
                     //Create GameObject
                     //GameObject newItems = Instantiate<GameObject>(itemPrefab, ScrollViewContent);
@@ -221,9 +149,10 @@ namespace SEE.UI
                     Element[i] = ScrollViewContent.transform.GetChild(i).gameObject;
                 }
 
+
                 InputField.name = i.ToString();
                 i++;
-                inputField.onValueChanged.AddListener(str => InputSearchField(str, Element, inputField.gameObject));
+                inputField.onValueChanged.AddListener(str => InputSearchField(str, Element));
             }
         }
 
@@ -279,23 +208,37 @@ namespace SEE.UI
             testNode.SetInt("Otö8", -1);
         }
 
-        public void OpenWindow()
-        {
-            menu.SetActive(true);
-            newUIInstance.SetActive(true);
-        }
-
         private void exitWindow(Button exitButton)
         {
             //Debug.Log("exitButton: " + exitButton);
             GameObject windowToClose = exitButton.transform.parent.parent.gameObject;
 
-            Debug.Log("windowToClose: " + windowToClose);
 
             windowToClose.SetActive(false);
 
             TMP_InputField inputField = windowToClose.transform.Find("Content/SearchField").gameObject.MustGetComponent<TMP_InputField>();
             inputField.text = "";
+        }
+
+        public override void RebuildLayout()
+        {
+            // Nothing needs to be done.
+        }
+
+        protected override void InitializeFromValueObject(WindowValues valueObject)
+        {
+            // TODO: Should tree windows be sent over the network?
+            throw new NotImplementedException();
+        }
+
+        public override void UpdateFromNetworkValueObject(WindowValues valueObject)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override WindowValues ToValueObject()
+        {
+            throw new NotImplementedException();
         }
     }
 }
