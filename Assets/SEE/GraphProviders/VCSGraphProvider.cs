@@ -1,19 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using SEE.DataModel;
-using SEE.DataModel.DG;
+using Cysharp.Threading.Tasks;
 using LibGit2Sharp;
+using SEE.DataModel.DG;
+using SEE.Game.City;
+using SEE.UI.RuntimeConfigMenu;
+using SEE.Utils.Config;
+using Sirenix.OdinInspector;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using SEE.Game.City;
-using Cysharp.Threading.Tasks;
-using SEE.Utils.Config;
-using System;
-using SEE.UI.RuntimeConfigMenu;
-using Sirenix.OdinInspector;
-using SEE.Utils.Paths;
-using SEE;
+using UnityEngine;
 
 namespace SEE.GraphProviders
 {
@@ -56,8 +52,8 @@ namespace SEE.GraphProviders
             string assetsPfad = Application.dataPath;
             string repositoryPath = System.IO.Path.GetDirectoryName(assetsPfad);
             string[] pathSegments = repositoryPath.Split(Path.DirectorySeparatorChar);
-            string commit1Sha = ""; // give the 2 commits you wanna compare
-            string commit2Sha = "";
+            string oldCommit = ""; // give the 2 commits you wanna compare
+            string newCommit = "";
 
             Graph graph = NewGraph();
             // The main directory.
@@ -79,7 +75,7 @@ namespace SEE.GraphProviders
                     .Select(entry => entry.Path)
                     .Where(path => !string.IsNullOrEmpty(path) &&
                     ((excludedFiles.Any() && excludedFiles.Contains(Path.GetExtension(path))) &&
-                    (includedFiles.Any() &&  includedFiles.Contains(Path.GetExtension(path)))) ||
+                    (includedFiles.Any() && includedFiles.Contains(Path.GetExtension(path)))) ||
                     ((excludedFiles.Any() && !excludedFiles.Contains(Path.GetExtension(path))) ||
                     (!excludedFiles.Any() && (includedFiles.Any() && includedFiles.Contains(Path.GetExtension(path)))) ||
                     (!excludedFiles.Any() && !includedFiles.Any())))
@@ -103,19 +99,10 @@ namespace SEE.GraphProviders
                 //TODO: Only for testing.
                 Debug.Log(graph.ToString());
             }
-            //compare 2 commits and save the changes
-            using (var repo = new Repository(repositoryPath))
-            {
-                var commit1 = repo.Lookup<Commit>(commit1Sha);
-                var commit2 = repo.Lookup<Commit>(commit2Sha);
 
-                var changes = repo.Diff.Compare<Patch>(commit1.Tree, commit2.Tree);
+            AddNumberofDevelopersMetric(graph, repositoryPath, oldCommit, newCommit);
+            AddLineofCodeChurnMetric(graph, repositoryPath, oldCommit, newCommit);
 
-                foreach (var change in changes)
-                {
-                    Debug.Log($"{change.Path}: {change.LinesAdded} lines added, {change.LinesDeleted} lines deleted");
-                }
-            }
             return graph;
         }
         public override GraphProviderKind GetKind()
@@ -237,6 +224,88 @@ namespace SEE.GraphProviders
         protected static Graph NewGraph(string viewName = "CodeFacts", string basePath = "DUMMYBASEPATH")
         {
             return new Graph(basePath, viewName);
+        }
+
+        protected static void AddLineofCodeChurnMetric(Graph graph, String repositoryPath, String oldCommit, String newCommit)
+        {
+            using (var repo = new Repository(repositoryPath))
+            {
+                var commit1 = repo.Lookup<Commit>(oldCommit);
+                var commit2 = repo.Lookup<Commit>(newCommit);
+
+                if (oldCommit != null && newCommit != null)
+                {
+                    var changes = repo.Diff.Compare<Patch>(commit1.Tree, commit2.Tree);
+
+                    foreach (var change in changes)
+                    {
+                        foreach (var node in graph.Nodes())
+                        {
+                            if (node.ID.Replace('\\', '/') == change.Path)
+                            {
+                                node.SetInt("Lines Added", change.LinesAdded);
+                                node.SetInt("Lines Deleted", change.LinesDeleted);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.Log("Commit not found");
+                }
+            }
+        }
+
+        protected static void AddNumberofDevelopersMetric(Graph graph, String repositoryPath, String oldCommit, String newCommit)
+        {
+            using (var repo = new Repository(repositoryPath))
+            {
+                var commit1 = repo.Lookup<Commit>(oldCommit);
+                var commit2 = repo.Lookup<Commit>(newCommit);
+
+                if (oldCommit != null && newCommit != null)
+                {
+                    var changes = repo.Diff.Compare<Patch>(commit1.Tree, commit2.Tree);
+
+                    Dictionary<string, HashSet<string>> fileAuthors = new Dictionary<string, HashSet<string>>();
+
+                    foreach (var change in changes)
+                    {
+                        string filePath = change.Path;
+
+                        HashSet<string> authors = new HashSet<string>();
+
+                        foreach (LogEntry commitLogEntry in repo.Commits.QueryBy(filePath))
+                        {
+                            Commit commit = commitLogEntry.Commit;
+                            authors.Add(commit.Author.Name);
+                        }
+                        if (fileAuthors.ContainsKey(filePath))
+                        {
+                            fileAuthors[filePath].UnionWith(authors);
+                        }
+                        else
+                        {
+                            fileAuthors[filePath] = authors;
+                        }
+                    }
+                    foreach (var entry in fileAuthors)
+                    {
+                        foreach (var node in graph.Nodes())
+                        {
+
+                            if (node.ID.Replace('\\', '/') == entry.Key)
+                            {
+                                node.SetInt("Developers", entry.Value.Count);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.Log("Commit not found");
+                }
+            }
         }
     }
 }
