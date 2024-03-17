@@ -100,8 +100,9 @@ namespace SEE.GraphProviders
                 Debug.Log(graph.ToString());
             }
 
-            AddNumberofDevelopersMetric(graph, repositoryPath, oldCommit, newCommit);
             AddLineofCodeChurnMetric(graph, repositoryPath, oldCommit, newCommit);
+            AddNumberofDevelopersMetric(graph, repositoryPath, oldCommit, newCommit);
+            AddCommitFrequencyMetric(graph, repositoryPath, oldCommit, newCommit);
 
             return graph;
         }
@@ -233,25 +234,18 @@ namespace SEE.GraphProviders
                 var commit1 = repo.Lookup<Commit>(oldCommit);
                 var commit2 = repo.Lookup<Commit>(newCommit);
 
-                if (oldCommit != null && newCommit != null)
-                {
-                    var changes = repo.Diff.Compare<Patch>(commit1.Tree, commit2.Tree);
+                var changes = repo.Diff.Compare<Patch>(commit1.Tree, commit2.Tree);
 
-                    foreach (var change in changes)
+                foreach (var change in changes)
+                {
+                    foreach (var node in graph.Nodes())
                     {
-                        foreach (var node in graph.Nodes())
+                        if (node.ID.Replace('\\', '/') == change.Path)
                         {
-                            if (node.ID.Replace('\\', '/') == change.Path)
-                            {
-                                node.SetInt("Lines Added", change.LinesAdded);
-                                node.SetInt("Lines Deleted", change.LinesDeleted);
-                            }
+                            node.SetInt("Lines Added", change.LinesAdded);
+                            node.SetInt("Lines Deleted", change.LinesDeleted);
                         }
                     }
-                }
-                else
-                {
-                    Debug.Log("Commit not found");
                 }
             }
         }
@@ -263,47 +257,84 @@ namespace SEE.GraphProviders
                 var commit1 = repo.Lookup<Commit>(oldCommit);
                 var commit2 = repo.Lookup<Commit>(newCommit);
 
-                if (oldCommit != null && newCommit != null)
+                var changes = repo.Diff.Compare<Patch>(commit1.Tree, commit2.Tree);
+
+                Dictionary<string, HashSet<string>> fileAuthors = new Dictionary<string, HashSet<string>>();
+
+                foreach (var change in changes)
                 {
-                    var changes = repo.Diff.Compare<Patch>(commit1.Tree, commit2.Tree);
+                    string filePath = change.Path;
 
-                    Dictionary<string, HashSet<string>> fileAuthors = new Dictionary<string, HashSet<string>>();
+                    HashSet<string> authors = new HashSet<string>();
 
-                    foreach (var change in changes)
+                    foreach (LogEntry commitLogEntry in repo.Commits.QueryBy(filePath))
                     {
-                        string filePath = change.Path;
-
-                        HashSet<string> authors = new HashSet<string>();
-
-                        foreach (LogEntry commitLogEntry in repo.Commits.QueryBy(filePath))
-                        {
-                            Commit commit = commitLogEntry.Commit;
-                            authors.Add(commit.Author.Name);
-                        }
-                        if (fileAuthors.ContainsKey(filePath))
-                        {
-                            fileAuthors[filePath].UnionWith(authors);
-                        }
-                        else
-                        {
-                            fileAuthors[filePath] = authors;
-                        }
+                        Commit commit = commitLogEntry.Commit;
+                        authors.Add(commit.Author.Name);
                     }
-                    foreach (var entry in fileAuthors)
+                    if (fileAuthors.ContainsKey(filePath))
                     {
-                        foreach (var node in graph.Nodes())
-                        {
+                        fileAuthors[filePath].UnionWith(authors);
+                    }
+                    else
+                    {
+                        fileAuthors[filePath] = authors;
+                    }
+                }
+                foreach (var entry in fileAuthors)
+                {
+                    foreach (var node in graph.Nodes())
+                    {
 
-                            if (node.ID.Replace('\\', '/') == entry.Key)
-                            {
-                                node.SetInt("Developers", entry.Value.Count);
-                            }
+                        if (node.ID.Replace('\\', '/') == entry.Key)
+                        {
+                            node.SetInt("Number of Developers", entry.Value.Count);
                         }
                     }
                 }
-                else
+            }
+        }
+
+        protected static void AddCommitFrequencyMetric(Graph graph, String repositoryPath, String oldCommit, String newCommit)
+        {
+            using (var repo = new Repository(repositoryPath))
+            {
+                var commit1 = repo.Lookup<Commit>(oldCommit);
+                var commit2 = repo.Lookup<Commit>(newCommit);
+
+                var commitsBetween = repo.Commits.QueryBy(new CommitFilter
                 {
-                    Debug.Log("Commit not found");
+                    IncludeReachableFrom = commit2,
+                    ExcludeReachableFrom = commit1
+                });
+
+                Dictionary<string, int> fileCommitCounts = new Dictionary<string, int>();
+
+                foreach (var commit in commitsBetween)
+                {
+                    foreach (var parent in commit.Parents)
+                    {
+                        var changes = repo.Diff.Compare<TreeChanges>(parent.Tree, commit.Tree);
+                        foreach (var change in changes)
+                        {
+                            var filePath = change.Path;
+                            if (fileCommitCounts.ContainsKey(filePath))
+                                fileCommitCounts[filePath]++;
+                            else
+                                fileCommitCounts.Add(filePath, 1);
+                        }
+                    }
+                }
+
+                foreach (var entry in fileCommitCounts.OrderByDescending(x => x.Value))
+                {
+                    foreach (var node in graph.Nodes())
+                    {
+                        if (node.ID.Replace('\\', '/') == entry.Key)
+                        {
+                            node.SetInt("Commit Frequency", entry.Value);
+                        }
+                    }
                 }
             }
         }
