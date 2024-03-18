@@ -15,6 +15,13 @@ using System.Collections;
 
 namespace SEE.UI.Window.VariablesWindow
 {
+    /// <summary>
+    /// Represents an item in the <see cref="VariablesWindow"/>.
+    /// 
+    /// <para>
+    ///     Can be used to group items and/or the represent an actual variable.
+    /// </para>
+    /// </summary>
     public class VariablesWindowItem : PlatformDependentComponent
     {
         /// <summary>
@@ -59,6 +66,9 @@ namespace SEE.UI.Window.VariablesWindow
 
         /// <summary>
         /// Function to retrieve string representing the variable value.
+        /// <para>
+        ///     Is executed on the main thread.
+        /// </para>
         /// </summary>
         public Func<Variable, string> RetrieveVariableValue;
 
@@ -72,6 +82,9 @@ namespace SEE.UI.Window.VariablesWindow
         /// </summary>
         private bool isExpanded = false;
 
+        /// <summary>
+        /// Whether the item is expanded.
+        /// </summary>
         public bool IsExpanded
         {
             get => isExpanded;
@@ -174,6 +187,10 @@ namespace SEE.UI.Window.VariablesWindow
             }
         }
 
+        /// <summary>
+        /// Adds a variable.
+        /// </summary>
+        /// <param name="variable"></param>
         public void AddVariable(Variable variable)
         {
             VariablesWindowItem variableItem = gameObject.AddComponent<VariablesWindowItem>();
@@ -235,6 +252,13 @@ namespace SEE.UI.Window.VariablesWindow
             UpdateExpand();
         }
 
+        /// <summary>
+        /// Updates the item.
+        /// 
+        /// <para>
+        ///     Retrieves child items if necessary.
+        /// </para>
+        /// </summary>
         protected override void Update()
         {
             base.Update();
@@ -257,12 +281,19 @@ namespace SEE.UI.Window.VariablesWindow
             }
         }
 
+        /// <summary>
+        /// Updates the visibility.
+        /// </summary>
         private void UpdateVisibility()
         {
             item.SetActive(IsVisible);
             children.ForEach(UpdateChildVisibility);
         }
 
+
+        /// <summary>
+        /// Updates the indent.
+        /// </summary>
         private void UpdateIndent()
         {
             background.localPosition = background.localPosition.WithXYZ(x: Indent * indentShift);
@@ -279,16 +310,27 @@ namespace SEE.UI.Window.VariablesWindow
             children.ForEach(UpdateChildVisibility);
         }
 
+        /// <summary>
+        ///     Updates the indentation level of all children.
+        /// </summary>
+        /// <param name="child"></param>
         private void UpdateChildIndent(VariablesWindowItem child)
         {
             child.Indent = Indent + 1;
         }
 
+        /// <summary>
+        ///     Updates the visibility of all children.
+        /// </summary>
+        /// <param name="child"></param>
         private void UpdateChildVisibility(VariablesWindowItem child)
         {
             child.IsVisible = IsVisible && isExpanded;
         }
 
+        /// <summary>
+        ///     Updates (sorts) all children.
+        /// </summary>
         private void UpdateChildrenIndices()
         {
             for (int i = children.Count-1; i >= 0; i--)
@@ -300,11 +342,18 @@ namespace SEE.UI.Window.VariablesWindow
             }
         }
 
+        /// <summary>
+        ///     Updates the sibling index.
+        /// </summary>
+        /// <param name="index">The index.</param>
         private void SetSiblingIndex(int index)
         {
             item.transform.SetSiblingIndex(index);
         }
 
+        /// <summary>
+        ///     Retrieves all children.
+        /// </summary>
         private void RetrieveChildren()
         {
             pointerHelper.ClickEvent.RemoveAllListeners();
@@ -321,6 +370,10 @@ namespace SEE.UI.Window.VariablesWindow
             }
         }
 
+        /// <summary>
+        ///     Toggles all children.
+        /// </summary>
+        /// <param name="e">The click event.</param>
         private void ToggleChildren(PointerEventData e)
         {
             if (e.button == PointerEventData.InputButton.Left)
