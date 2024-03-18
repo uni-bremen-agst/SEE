@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls;
+using SEE.UI.DebugAdapterProtocol;
 
 namespace SEE.UI.Window.CodeWindow
 {
@@ -27,6 +28,10 @@ namespace SEE.UI.Window.CodeWindow
         /// The scroll area.
         /// </summary>
         private GameObject scrollable;
+
+        /// <summary>
+        /// The container for breakpoints.
+        /// </summary>
 
         private GameObject breakpoints;
 
