@@ -9,6 +9,9 @@ using UnityEngine;
 
 namespace SEE.UI.Window.VariablesWindow
 {
+    /// <summary>
+    /// Represents a movable, scrollable window containing the variables of a debug session.
+    /// </summary>
     public class VariablesWindow : BaseWindow
     {
         /// <summary>
@@ -145,7 +148,6 @@ namespace SEE.UI.Window.VariablesWindow
 
         protected override void InitializeFromValueObject(WindowValues valueObject)
         {
-            // TODO: Should tree windows be sent over the network?
             throw new NotImplementedException();
         }
 

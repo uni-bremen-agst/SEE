@@ -568,6 +568,7 @@ namespace SEE.UI.Window.ConsoleWindow
 
         public override void RebuildLayout()
         {
+            // Nothing needs to be done
         }
 
         protected override void InitializeFromValueObject(WindowValues valueObject)
