@@ -43,7 +43,6 @@ namespace SEE.UI.PropertyDialog
         /// </summary>
         private const string filePathInputFieldPrefab = "Prefabs/UI/InputFields/FilePathInputField";
 
-
         /// <summary>
         /// The text field in which the value will be entered by the user.
         /// Note: The input field has a child Text Area/Text with a TextMeshProUGUI

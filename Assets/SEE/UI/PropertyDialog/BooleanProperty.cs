@@ -1,71 +1,101 @@
 using Michsky.UI.ModernUIPack;
 using SEE.GO;
-using SEE.UI.PropertyDialog;
-using SEE.UI.Tooltip;
 using SEE.Utils;
-using System;
 using TMPro;
 using UnityEngine;
 
-public class BooleanProperty : Property<bool>
+namespace SEE.UI.PropertyDialog
 {
-    private const string inputFieldPrefab = "Prefabs/UI/InputFields/BooleanInputField";
-    private SwitchManager switchManager;
-    private GameObject inputField;
-    private GameObject parentOfInputField;
-    private Tooltip tooltip;
+    /// <summary>
+    /// A boolean input field (switch) for a property dialog.
+    /// </summary>
+    public class BooleanProperty : Property<bool>
+    {
+        /// <summary>
+        /// The prefab.
+        /// </summary>
+        private const string inputFieldPrefab = "Prefabs/UI/InputFields/BooleanInputField";
+        
+        /// <summary>
+        /// The switch manager.
+        /// </summary>
+        private SwitchManager switchManager;
 
-    private bool savedValue;
-    public override bool Value { 
-        get => switchManager != null ? switchManager.isOn : savedValue; 
-        set 
+        /// <summary>
+        /// The input field game object.
+        /// </summary>
+        private GameObject inputField;
+
+        /// <summary>
+        /// The parent of the input field.
+        /// </summary>
+        private GameObject parentOfInputField;
+
+        /// <summary>
+        /// The tooltip.
+        /// </summary>
+        private Tooltip.Tooltip tooltip;
+
+        /// <summary>
+        /// The value before the <see cref="switchManager"/> is initialized.
+        /// </summary>
+        private bool savedValue;
+
+        /// <summary>
+        /// The value.
+        /// </summary>
+        public override bool Value
         {
-            savedValue = value;
-            if (switchManager != null)
+            get => switchManager != null ? switchManager.isOn : savedValue;
+            set
             {
-                switchManager.isOn = value;
-                switchManager.UpdateUI();
+                savedValue = value;
+                if (switchManager != null)
+                {
+                    switchManager.isOn = value;
+                    switchManager.UpdateUI();
+                }
             }
         }
-    }
 
-    protected override void StartDesktop()
-    {
-        inputField = PrefabInstantiator.InstantiatePrefab(inputFieldPrefab, instantiateInWorldSpace: false);
-        switchManager = inputField.transform.Find("Switch").gameObject.MustGetComponent<SwitchManager>();
-        switchManager.isOn = savedValue;
-        switchManager.UpdateUI();
-        
-        if (parentOfInputField != null)
+        protected override void StartDesktop()
         {
-            SetParent(parentOfInputField);
-        }
-        inputField.gameObject.name = Name;
+            inputField = PrefabInstantiator.InstantiatePrefab(inputFieldPrefab, instantiateInWorldSpace: false);
+            switchManager = inputField.transform.Find("Switch").gameObject.MustGetComponent<SwitchManager>();
+            switchManager.isOn = savedValue;
+            switchManager.UpdateUI();
 
-        Transform placeHolder = inputField.transform.Find("Label");
-        if (placeHolder.gameObject.TryGetComponentOrLog(out TextMeshProUGUI nameTextMeshPro))
-        {
-            nameTextMeshPro.text = Name;
+            if (parentOfInputField != null)
+            {
+                SetParent(parentOfInputField);
+            }
+            inputField.gameObject.name = Name;
+
+            Transform placeHolder = inputField.transform.Find("Label");
+            if (placeHolder.gameObject.TryGetComponentOrLog(out TextMeshProUGUI nameTextMeshPro))
+            {
+                nameTextMeshPro.text = Name;
+            }
+
+            tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
+            if (inputField.TryGetComponentOrLog(out PointerHelper pointerHelper))
+            {
+                pointerHelper.EnterEvent.AddListener(_ => tooltip.Show(Description));
+                pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
+            }
         }
 
-        tooltip = gameObject.AddComponent<Tooltip>();
-        if (inputField.TryGetComponentOrLog(out PointerHelper pointerHelper))
+        public override void SetParent(GameObject parent)
         {
-            pointerHelper.EnterEvent.AddListener(_ => tooltip.Show(Description));
-            pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
-        }
-    }
-
-    public override void SetParent(GameObject parent)
-    {
-        if (inputField != null)
-        {
-            inputField.transform.SetParent(parent.transform);
-        }
-        else
-        {
-            /// save for later assignment in <see cref="StartDesktop"/>
-            parentOfInputField = parent;
+            if (inputField != null)
+            {
+                inputField.transform.SetParent(parent.transform);
+            }
+            else
+            {
+                /// save for later assignment in <see cref="StartDesktop"/>
+                parentOfInputField = parent;
+            }
         }
     }
 }
