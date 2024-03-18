@@ -7,27 +7,72 @@ using UnityEngine;
 
 namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
 {
+    /// <summary>
+    /// Configration for the mock debug adapter.
+    /// <para>
+    /// Repository: <seealso href="https://github.com/microsoft/vscode-mock-debug"/><br/>
+    /// Properties: <seealso href="https://github.com/microsoft/vscode-mock-debug/blob/main/package.json#L146"/>
+    /// </para>
+    /// </summary>
     public class MockDebugAdapter : DebugAdapter
     {
-
         public override string Name => "Mock";
 
         public override string AdapterWorkingDirectory { get; set; } = Path.Combine(AdapterDirectory, "mock", "out");
         public override string AdapterFileName { get; set; } = "node";
         public override string AdapterArguments { get; set; } = "debugAdapter.js";
 
+
+        /// <summary>
+        /// The <c>noDebug</c> property.
+        /// </summary>
         private bool launchNoDebug;
-        // https://github.com/microsoft/vscode-mock-debug/blob/b8d3d3a436e94f73ca193bf0bfa7c5c416a8aa8c/package.json#L146
+        
+        /// <summary>
+        /// The <c>program</c> property.
+        /// </summary>
         private string launchProgram = Path.Combine(AdapterDirectory, "mock", "sampleWorkspace", "readme.md");
+        
+        /// <summary>
+        /// The <c>stopOnEntry</c> property.
+        /// </summary>
         private bool launchStopOnEntry = true;
+
+        /// <summary>
+        /// The <c>trace</c> property.
+        /// </summary>
         private bool launchTrace = false;
+
+        /// <summary>
+        /// The <c>compileError</c> property.
+        /// </summary>
         private bool launchCompileError = false;
 
+        /// <summary>
+        ///     The input field for the <c>noDebug</c> property.
+        /// </summary>
         private BooleanProperty launchNoDebugProperty;
+
+        /// <summary>
+        ///     The input field for the <c>program</c> property.
+        /// </summary>
         private FilePathProperty launchProgramProperty;
+
+        /// <summary>
+        ///     The input field for the <c>stopOnEntry</c> property.
+        /// </summary>
         private BooleanProperty launchStopOnEntryProperty;
+
+        /// <summary>
+        ///     The input field for the <c>trace</c> property.
+        /// </summary>
         private BooleanProperty launchTraceProperty;
+
+        /// <summary>
+        ///     The input field for the <c>compileError</c> property.
+        /// </summary>
         private BooleanProperty launchCompileErrorProperty;
+
 
         public override void SetupLaunchConfig(GameObject go, PropertyGroup group)
         {
