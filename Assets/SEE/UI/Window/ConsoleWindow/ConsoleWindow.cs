@@ -10,16 +10,31 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 
 namespace SEE.UI.Window.ConsoleWindow
 {
+    /// <summary>
+    /// Represents a movable, scrollable console window.
+    /// Displays text outputs, provides search and filter options and has an input field.
+    /// <para>
+    ///     The console messages can be categorized by channels and levels:
+    ///     <list type="bullet">
+    ///         <item><description>Each channel has a fontawesome icon, which is displayed in front of each console message.</description></item>
+    ///         <item><description>Each level (in every channel) specifies the color which is used for the message backgrounds.</description></item>
+    ///         <item><description>The channels and levels be used to filter specific messages.</description></item>
+    ///         <item><description>By default only the channel `User Input` with one level `Log` exists.</description></item>
+    ///     </list>
+    /// </para>
+    /// <seealso cref="Channel"/>
+    /// <seealso cref="ChannelLevel"/>
+    /// </summary>
     public class ConsoleWindow : BaseWindow
     {
         /// <summary>
         /// The user submitted the input.
         /// </summary>
         public static event UnityAction<string> OnInputSubmit;
+
         /// <summary>
         /// The user changed the input.
         /// </summary>
@@ -148,6 +163,7 @@ namespace SEE.UI.Window.ConsoleWindow
                 {"Log", new ChannelLevel("Log", Color.gray.Darker(), true)},
             })},
         };
+
         /// <summary>
         /// The default channel for messages.
         /// </summary>
@@ -160,6 +176,10 @@ namespace SEE.UI.Window.ConsoleWindow
 
         /// <summary>
         /// Adds a console message.
+        /// 
+        /// <para>
+        ///     Uses <see cref="DefaultChannel"/> and <see cref="DefaultChannelLevel"/> as default if these parameters are omitted.
+        /// </para>
         /// </summary>
         /// <param name="text">The text.</param>
         /// <param name="channel">The channel.</param>
