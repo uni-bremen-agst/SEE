@@ -122,6 +122,7 @@ namespace SEE.Game.Operator
         /// If this is set to a negative value, the element will be highlighted indefinitely, with a blink rate
         /// proportional to the absolute value of <paramref name="duration"/>.
         /// </param>
+        /// <param name="showNotification">Whether to display a notification.</param>
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> Highlight(float duration, bool showNotification = true)
         {

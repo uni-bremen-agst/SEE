@@ -2,113 +2,121 @@ using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using System;
 using System.Collections.Generic;
 
-public static class DebugBreakpointManager
+namespace SEE.UI.DebugAdapterProtocol
 {
     /// <summary>
-    /// Triggers when a breakpoint was added.
+    /// Manages the breakpoints of all code windows.
     /// </summary>
-    public static event Action<string, int> OnBreakpointAdded;
-
-    /// <summary>
-    /// Triggers when a breakpoint was removed.
-    /// </summary>
-    public static event Action<string, int> OnBreakpointRemoved;
-
-    /// <summary>
-    /// All breakpoints as a readonly collection.
-    /// </summary>
-    public static IReadOnlyDictionary<string, Dictionary<int, SourceBreakpoint>> Breakpoints => breakpoints;
-    
-    /// <summary>
-    /// All breakpoints.
-    /// </summary>
-    private static readonly Dictionary<string, Dictionary<int, SourceBreakpoint>> breakpoints = new Dictionary<string, Dictionary<int, SourceBreakpoint>>();
-
-    /// <summary>
-    /// Adds a breakpoint.
-    /// </summary>
-    /// <param name="path">The file path.</param>
-    /// <param name="line">The source code line.</param>
-    /// <returns>Whether the breakpoints changed as a result of this call.</returns>
-    public static bool AddBreakpoint(string path, int line)
+    public static class DebugBreakpointManager
     {
-        if (!breakpoints.ContainsKey(path))
-        {
-            breakpoints.Add(path, new());
-        }
-        Dictionary<int, SourceBreakpoint> fileBreakpoints = breakpoints[path];
-        if (!fileBreakpoints.ContainsKey(line))
-        {
-            fileBreakpoints.Add(line, new SourceBreakpoint()
-            {
-                Line = line,
-            });
-            OnBreakpointAdded?.Invoke(path, line);
-            return true;
-        }
-        return false;
-    }
+        /// <summary>
+        /// Triggers when a breakpoint was added.
+        /// </summary>
+        public static event Action<string, int> OnBreakpointAdded;
 
-    /// <summary>
-    /// Removes a breakpoint.
-    /// </summary>
-    /// <param name="path">The file path.</param>
-    /// <param name="line">The source code line.</param>
-    /// <returns>Whether the breakpoints changed as a result of this call.</returns>
-    public static bool RemoveBreakpoint(string path, int line)
-    {
-        if (breakpoints.TryGetValue(path, out var fileBreakpoints))
+        /// <summary>
+        /// Triggers when a breakpoint was removed.
+        /// </summary>
+        public static event Action<string, int> OnBreakpointRemoved;
+
+        /// <summary>
+        /// All breakpoints as a readonly collection.
+        /// </summary>
+        public static IReadOnlyDictionary<string, Dictionary<int, SourceBreakpoint>> Breakpoints => breakpoints;
+
+        /// <summary>
+        /// All breakpoints.
+        /// </summary>
+        private static readonly Dictionary<string, Dictionary<int, SourceBreakpoint>> breakpoints = new Dictionary<string, Dictionary<int, SourceBreakpoint>>();
+
+        /// <summary>
+        /// Adds a breakpoint.
+        /// </summary>
+        /// <param name="path">The file path.</param>
+        /// <param name="line">The source code line.</param>
+        /// <returns>Whether the breakpoints changed as a result of this call.</returns>
+        public static bool AddBreakpoint(string path, int line)
         {
-            if (fileBreakpoints.Remove(line))
+            if (!breakpoints.ContainsKey(path))
             {
-                OnBreakpointRemoved?.Invoke(path, line);
+                breakpoints.Add(path, new());
+            }
+            Dictionary<int, SourceBreakpoint> fileBreakpoints = breakpoints[path];
+            if (!fileBreakpoints.ContainsKey(line))
+            {
+                fileBreakpoints.Add(line, new SourceBreakpoint()
+                {
+                    Line = line,
+                });
+                OnBreakpointAdded?.Invoke(path, line);
                 return true;
             }
+            return false;
         }
-        return false;
-    }
 
-    /// <summary>
-    /// Adds or removes a breakpoint.
-    /// </summary>
-    /// <param name="path">The file path.</param>
-    /// <param name="line">The source code line.</param>
-    /// <param name="value">Whether to add or remove.</param>
-    /// <returns>Whether the breakpoints changed as a result of this call.</returns>
-    public static bool SetBreakpoint(string path, int line, bool value)
-    {
-        if (value)
+        /// <summary>
+        /// Removes a breakpoint.
+        /// </summary>
+        /// <param name="path">The file path.</param>
+        /// <param name="line">The source code line.</param>
+        /// <returns>Whether the breakpoints changed as a result of this call.</returns>
+        public static bool RemoveBreakpoint(string path, int line)
         {
-            return AddBreakpoint(path, line);
-        } else
-        {
-            return RemoveBreakpoint(path, line);
+            if (breakpoints.TryGetValue(path, out var fileBreakpoints))
+            {
+                if (fileBreakpoints.Remove(line))
+                {
+                    OnBreakpointRemoved?.Invoke(path, line);
+                    return true;
+                }
+            }
+            return false;
         }
-    }
 
-    /// <summary>
-    /// Toggles a breakpoint.
-    /// </summary>
-    /// <param name="path">The file path.</param>
-    /// <param name="line">The source code line.</param>
-    public static void ToggleBreakpoint(string path, int line)
-    {
-        if (!breakpoints.ContainsKey(path))
+        /// <summary>
+        /// Adds or removes a breakpoint.
+        /// </summary>
+        /// <param name="path">The file path.</param>
+        /// <param name="line">The source code line.</param>
+        /// <param name="value">Whether to add or remove.</param>
+        /// <returns>Whether the breakpoints changed as a result of this call.</returns>
+        public static bool SetBreakpoint(string path, int line, bool value)
         {
-            breakpoints.Add(path, new()
+            if (value)
+            {
+                return AddBreakpoint(path, line);
+            }
+            else
+            {
+                return RemoveBreakpoint(path, line);
+            }
+        }
+
+        /// <summary>
+        /// Toggles a breakpoint.
+        /// </summary>
+        /// <param name="path">The file path.</param>
+        /// <param name="line">The source code line.</param>
+        public static void ToggleBreakpoint(string path, int line)
+        {
+            if (!breakpoints.ContainsKey(path))
+            {
+                breakpoints.Add(path, new()
             {
                 {line, new SourceBreakpoint(line) }
             });
-            OnBreakpointAdded(path, line);
-        } else if (!breakpoints[path].ContainsKey(line))
-        {
-            breakpoints[path].Add(line, new SourceBreakpoint(line));
-            OnBreakpointAdded(path, line);
-        }
-        else
-        {
-            breakpoints[path].Remove(line);
-            OnBreakpointRemoved(path, line);
+                OnBreakpointAdded(path, line);
+            }
+            else if (!breakpoints[path].ContainsKey(line))
+            {
+                breakpoints[path].Add(line, new SourceBreakpoint(line));
+                OnBreakpointAdded(path, line);
+            }
+            else
+            {
+                breakpoints[path].Remove(line);
+                OnBreakpointRemoved(path, line);
+            }
         }
     }
 }
