@@ -12,6 +12,13 @@ using UnityEngine;
 
 namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
 {
+    /// <summary>
+    /// Represents the NetCore debug adapter.
+    /// <para>
+    /// Repository: <seealso href="https://github.com/Samsung/netcoredbg"/><br/>
+    /// Properties: https://github.com/Samsung/netcoredbg/blob/master/test-suite/NetcoreDbgTest/VSCode/VSCodeProtocolRequest.cs#L44
+    /// </para>
+    /// </summary>
     public class NetCoreDebugAdapter : DebugAdapter
     {
         public override string Name => "Netcore";
@@ -20,25 +27,95 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         public override string AdapterFileName { get; set; } = "netcoredbg.exe";
         public override string AdapterArguments { get; set; } = "--interpreter=vscode";
 
+
+        /// <summary>
+        /// The <c>noDebug</c> property.
+        /// </summary>
         private bool launchNoDebug = false;
-        // https://github.com/Samsung/netcoredbg/blob/27606c317017beb81bc1b81846cdc460a7a6aed3/test-suite/NetcoreDbgTest/VSCode/VSCodeProtocolRequest.cs#L44
+
+        /// <summary>
+        /// The <c>name</c> property.
+        /// </summary>
         private string launchName = ".NET Core Launch";
+
+        /// <summary>
+        /// The <c>type</c> property.
+        /// </summary>
         private string launchType = "coreclr";
+
+        /// <summary>
+        /// The <c>preLaunchTask</c> property.
+        /// </summary>
         private string launchPreLaunchTask = "build";
+
+        /// <summary>
+        /// The <c>program</c> property.
+        /// </summary>
         private string launchProgram = "program.dll";
+
+        /// <summary>
+        /// The <c>args</c> property.
+        /// </summary>
         private List<string> launchArgs = new();
+
+        /// <summary>
+        /// The <c>cwd</c> property.
+        /// </summary>
         private string launchCwd = Path.Combine("C:\\", "path", "containing", "dll");
+        
+        /// <summary>
+        /// The <c>env</c> property.
+        /// </summary>
         private Dictionary<string, string> launchEnv = new();
+        
+        /// <summary>
+        /// The <c>console</c> property.
+        /// </summary>
         private string launchConsole = null;
+
+        /// <summary>
+        /// The <c>stopAtEntry</c> property.
+        /// </summary>
         private bool launchStopAtEntry = true;
+
+        /// <summary>
+        /// The <c>justMyCode</c> property.
+        /// </summary>
         private bool launchJustMyCode = false;
+
+        /// <summary>
+        /// The <c>enableStepFiltering</c> property.
+        /// </summary>
         private bool launchEnableStepFiltering = true;
+
+        /// <summary>
+        /// The <c>internalConsoleOptions</c> property.
+        /// </summary>
         private string launchInternalConsoleOptions = null;
+
+        /// <summary>
+        /// The <c>__sessionId</c> property.
+        /// </summary>
         private string launchSessionId = Guid.NewGuid().ToString();
 
+        /// <summary>
+        /// The input field for the <c>cwd</c> property.
+        /// </summary>
         private FilePathProperty launchCwdProperty;
+
+        /// <summary>
+        /// The input field for the <c>program</c> property.
+        /// </summary>
         private FilePathProperty launchProgramProperty;
+
+        /// <summary>
+        /// The input field for the <c>args</c> property.
+        /// </summary>
         private StringProperty launchArgsProperty;
+
+        /// <summary>
+        /// The input field for the <c>stopAtEntry</c> property.
+        /// </summary>
         private BooleanProperty launchStopAtEntryProperty;
 
         public override void SetupLaunchConfig(GameObject go, PropertyGroup group)
