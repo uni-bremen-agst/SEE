@@ -435,7 +435,6 @@ namespace SEE.UI.Window.CodeWindow
 
                 try
                 {
-                    Debug.Log("Set text\tMarkIssueAsync");
                     textMesh.text = text;
                     textMesh.ForceMeshUpdate();
                     SetupBreakpoints();
