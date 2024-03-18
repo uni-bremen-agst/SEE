@@ -16,11 +16,13 @@ namespace SEE.UI.PropertyDialog
         /// Name of the property group.
         /// </summary>
         public string Name;
+
         /// <summary>
         /// Icon for the property group.
         /// TODO: This is unused.
         /// </summary>
         public Sprite Icon;
+        
         /// <summary>
         /// Whether to display the properties more compact.
         /// </summary>

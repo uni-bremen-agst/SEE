@@ -52,6 +52,9 @@ namespace SEE.UI.PropertyDialog
         /// </summary>
         private Tooltip.Tooltip tooltip;
 
+        /// <summary>
+        /// The horizontal selector.
+        /// </summary>
         public HorizontalSelector horizontalSelector { get; private set; }
 
         /// <summary>
