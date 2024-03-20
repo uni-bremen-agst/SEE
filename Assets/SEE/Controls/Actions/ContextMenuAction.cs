@@ -158,7 +158,6 @@ namespace SEE.Controls.Actions
             return openWindow;
         }
 
-        private static int i = 1;
         private static MetricMenu CreateMetricWindow(GraphElementRef graphElementRef)
         {
             // Create new window for active selection, or use existing one
@@ -166,9 +165,8 @@ namespace SEE.Controls.Actions
             {
                 metricMenu = graphElementRef.gameObject.AddComponent<MetricMenu>();
 
-                metricMenu.Title = "MetricMenu " + i;
-                metricMenu.graphElement2 = graphElementRef.Elem;
-                i++;
+                metricMenu.Title = "MetricWindow " + graphElementRef.Elem.ToShortString();
+                metricMenu.graphElement = graphElementRef.Elem;
             }
             return metricMenu;
 
