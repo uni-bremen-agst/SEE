@@ -58,6 +58,7 @@ namespace SEE.UI.PropertyDialog
             }
         }
 
+        /// <inheritdoc/>
         protected override void StartDesktop()
         {
             inputField = PrefabInstantiator.InstantiatePrefab(inputFieldPrefab, instantiateInWorldSpace: false);
@@ -85,6 +86,7 @@ namespace SEE.UI.PropertyDialog
             }
         }
 
+        /// <inheritdoc/>
         public override void SetParent(GameObject parent)
         {
             if (inputField != null)

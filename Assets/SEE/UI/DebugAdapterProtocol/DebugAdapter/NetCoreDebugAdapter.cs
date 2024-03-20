@@ -1,5 +1,3 @@
-using Assets.SEE.UI.PropertyDialog;
-using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using Newtonsoft.Json.Linq;
 using SEE.UI.PropertyDialog;
@@ -22,12 +20,25 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
     /// </summary>
     public class NetCoreDebugAdapter : DebugAdapter
     {
+        /// <summary>
+        /// The name.
+        /// </summary>
         public override string Name => "Netcore";
 
+        /// <summary>
+        /// The working directory of the debug adapter.
+        /// </summary>
         public override string AdapterWorkingDirectory { get; set; } = Path.Combine(AdapterDirectory, "netcoredbg");
+        
+        /// <summary>
+        /// The executable (file name) of the debug adapter.
+        /// </summary>
         public override string AdapterFileName { get; set; } = "netcoredbg.exe";
+        
+        /// <summary>
+        /// The arguments of the debug adapter.
+        /// </summary>
         public override string AdapterArguments { get; set; } = "--interpreter=vscode";
-
 
         /// <summary>
         /// The <c>noDebug</c> property.
@@ -119,12 +130,13 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// </summary>
         private BooleanProperty launchStopAtEntryProperty;
 
+        /// <inheritdoc/>
         public override void SetupLaunchConfig(GameObject go, PropertyGroup group)
         {
             launchCwdProperty = go.AddComponent<FilePathProperty>();
             launchCwdProperty.Name = "Cwd";
             launchCwdProperty.Description = "The working directory.";
-            launchCwdProperty.PickMode = SimpleFileBrowser.FileBrowser.PickMode.Folders;
+            launchCwdProperty.PickMode = FileBrowser.PickMode.Folders;
             launchCwdProperty.Value = launchCwd;
             group.AddProperty(launchCwdProperty);
 
@@ -149,6 +161,8 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             group.AddProperty(launchStopAtEntryProperty);
         }
 
+
+        /// <inheritdoc/>
         public override void SaveLaunchConfig()
         {
             launchProgram = launchProgramProperty.Value;
@@ -157,7 +171,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             launchStopAtEntry = launchStopAtEntryProperty.Value;
         }
 
-        
+        /// <inheritdoc/>
         public override LaunchRequest GetLaunchRequest()
         {
             return new()

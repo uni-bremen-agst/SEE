@@ -1,4 +1,3 @@
-using Assets.SEE.UI.PropertyDialog;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using SEE.UI.PropertyDialog;
 using SimpleFileBrowser;
@@ -17,12 +16,25 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
     /// </summary>
     public class MockDebugAdapter : DebugAdapter
     {
+        /// <summary>
+        /// The name.
+        /// </summary>
         public override string Name => "Mock";
 
+        /// <summary>
+        /// The working directory of the debug adapter.
+        /// </summary>
         public override string AdapterWorkingDirectory { get; set; } = Path.Combine(AdapterDirectory, "mock", "out");
+        
+        /// <summary>
+        /// The executable (file name) of the debug adapter.
+        /// </summary>
         public override string AdapterFileName { get; set; } = "node";
-        public override string AdapterArguments { get; set; } = "debugAdapter.js";
 
+        /// <summary>
+        /// The arguments of the debug adapter.
+        /// </summary>
+        public override string AdapterArguments { get; set; } = "debugAdapter.js";
 
         /// <summary>
         /// The <c>noDebug</c> property.
@@ -74,7 +86,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// </summary>
         private BooleanProperty launchCompileErrorProperty;
 
-
+        /// <inheritdoc/>
         public override void SetupLaunchConfig(GameObject go, PropertyGroup group)
         {
             launchProgramProperty = go.AddComponent<FilePathProperty>();
@@ -110,6 +122,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
 
         }
 
+        /// <inheritdoc/>
         public override void SaveLaunchConfig()
         {
             launchProgram = launchProgramProperty.Value;
@@ -118,6 +131,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             launchCompileError = launchCompileErrorProperty.Value;
         }
 
+        /// <inheritdoc/>
         public override LaunchRequest GetLaunchRequest()
         {
             return new()

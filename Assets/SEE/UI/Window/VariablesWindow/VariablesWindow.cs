@@ -71,9 +71,7 @@ namespace SEE.UI.Window.VariablesWindow
         /// </summary>
         private GameObject items;
 
-        /// <summary>
-        /// Setup for the desktop platform.
-        /// </summary>
+        /// <inheritdoc/>
         protected override void StartDesktop()
         {
             Title ??= "Variables";
@@ -90,9 +88,7 @@ namespace SEE.UI.Window.VariablesWindow
             Rebuild();
         }
 
-        /// <summary>
-        /// Rebuilds the items.
-        /// </summary>
+        /// <inheritdoc/>
         private void Rebuild()
         {
             foreach (VariablesWindowItem child in items.GetComponents<VariablesWindowItem>())
@@ -140,22 +136,25 @@ namespace SEE.UI.Window.VariablesWindow
             }
         }
 
-
+        /// <inheritdoc/>
         public override void RebuildLayout()
         {
             // Nothing needs to be done.
         }
 
+        /// <inheritdoc/>
         protected override void InitializeFromValueObject(WindowValues valueObject)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public override void UpdateFromNetworkValueObject(WindowValues valueObject)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public override WindowValues ToValueObject()
         {
             throw new NotImplementedException();

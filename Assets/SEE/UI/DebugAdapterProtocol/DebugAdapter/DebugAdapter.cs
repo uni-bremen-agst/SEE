@@ -43,14 +43,14 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         public abstract string AdapterArguments { get; set; }
 
         /// <summary>
-        /// Adds properties to the launch request configuration.
+        /// Creates input fields for the launch properties.
         /// </summary>
-        /// <param name="go"></param>
-        /// <param name="group"></param>
+        /// <param name="go">Game object for components which create the input fields.</param>
+        /// <param name="group">The property group.</param>
         public abstract void SetupLaunchConfig(GameObject go, PropertyGroup group);
 
         /// <summary>
-        /// Saves propertes of the launch request configuration.
+        /// Saves properties of the launch request configuration.
         /// </summary>
         public abstract void SaveLaunchConfig();
 
