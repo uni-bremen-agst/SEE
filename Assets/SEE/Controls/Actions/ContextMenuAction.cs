@@ -80,7 +80,7 @@ namespace SEE.Controls.Actions
                 // TODO (#666): Better properties view
                 new("Properties", ShowProperties, Icons.Info),
 
-                new("Show Metrics Window", ShowMetrics, Icons.Info),
+                new("Show Metric Window", ShowMetrics, Icons.Info),
             };
 
             if (gameObject != null)
