@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using SEE.UI.Notification;
 using SEE.Controls.KeyActions;
 
-namespace SEE.UI
+namespace SEE.UI.Window
 {
     /// <summary>
     /// Handles the user interactions with the settings menu.
