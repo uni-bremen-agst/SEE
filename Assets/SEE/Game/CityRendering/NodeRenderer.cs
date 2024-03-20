@@ -532,6 +532,8 @@ namespace SEE.Game.CityRendering
             ICollection<GameObject> leafNodes = FindLeafNodes(gameNodes);
             ICollection<GameObject> innerNodes = FindInnerNodes(gameNodes);
 
+            AddMarkers(gameNodes);
+
             // Add software erosion decorators for all nodes if requested.
             if (Settings.ErosionSettings.ShowInnerErosions)
             {
@@ -546,6 +548,32 @@ namespace SEE.Game.CityRendering
                 ErosionIssues issueDecorator = new(Settings.LeafIssueMap(),
                                                    scaler, Settings.ErosionSettings.ErosionScalingFactor * 5);
                 issueDecorator.Add(leafNodes);
+            }
+        }
+
+        /// <summary>
+        /// Adds markers to all <paramref name="gameNodes"/>.
+        /// </summary>
+        /// <param name="gameNodes">List of gamenodes to be marked</param>
+        private void AddMarkers(ICollection<GameObject> gameNodes)
+        {
+            MarkerFactory markerFactory = new(Settings.MarkerAttributes);
+
+            foreach (GameObject gameNode in gameNodes)
+            {
+                Node node = gameNode.GetNode();
+                if (node.HasToggle(ChangeMarkers.IsNew))
+                {
+                    markerFactory.MarkBorn(gameNode);
+                }
+                else if (node.HasToggle(ChangeMarkers.IsDeleted))
+                {
+                    markerFactory.MarkDead(gameNode);
+                }
+                else if (node.HasToggle(ChangeMarkers.IsChanged))
+                {
+                    markerFactory.MarkChanged(gameNode);
+                }
             }
         }
 

@@ -11,6 +11,8 @@ using SEE.DataModel.DG;
 using System;
 using SEE.UI.Window;
 using SEE.Utils.History;
+using SEE.Game.City;
+using SEE.VCS;
 
 namespace SEE.Controls.Actions
 {
@@ -96,13 +98,13 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Returns the filename and the absolute platform-specific path of
-        /// given graphElement.
+        /// Returns the <see cref="GraphElement.Filename"/> and the absolute platform-specific path of
+        /// given <paramref name="graphElement"/>.
         /// </summary>
         /// <param name="graphElement">The graph element to get the filename and path for</param>
         /// <returns>filename and absolute path</returns>
         /// <exception cref="InvalidOperationException">
-        /// If the given graphElement has no filename or the path does not exist
+        /// If the given graphElement has no filename or the path does not exist.
         /// </exception>
         private static (string filename, string absolutePlatformPath) GetPath(GraphElement graphElement)
         {
@@ -181,6 +183,67 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Returns a new CodeWindow showing a diff for the given <paramref name="graphElementRef"/>
+        /// in <paramref name="city"/>.
+        /// </summary>
+        /// <param name="graphElementRef">The graph element to get the CodeWindow for</param>
+        /// <param name="city">the code city <paramref name="graphElementRef"/> is contained
+        /// in; it is used to determine version control information needed to
+        /// calculate the diff</param>
+        /// <returns>new CodeWindow showing a diff</returns>
+        public static CodeWindow ShowVCSDiff(GraphElementRef graphElementRef, DiffCity city)
+        {
+            GraphElement graphElement = graphElementRef.Elem;
+            string sourceFilename = graphElement.Filename;
+            if (sourceFilename == null)
+            {
+                string message = $"Selected {GetName(graphElement)} has no filename.";
+                ShowNotification.Error("No filename", message, log: false);
+                throw new InvalidOperationException(message);
+            }
+
+            CodeWindow codeWindow = GetOrCreateCodeWindow(graphElementRef, sourceFilename);
+
+            IVersionControl vcs = VersionControlFactory.GetVersionControl(city.VersionControlSystem, city.VCSPath.Path);
+            // The path of the file relative to the root of the repository where / is used as separator.
+            string relativePath = graphElement.Path();
+            Change change = vcs.GetFileChange(relativePath, city.OldRevision, city.NewRevision, out string changedName);
+
+            switch (change)
+            {
+                case Change.Unmodified or Change.Added or Change.TypeChanged or Change.Copied or Change.Unknown:
+                    // We can show the plain file in the newer revision.
+                    codeWindow.EnterFromText(vcs.Show(relativePath, city.NewRevision).Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None));
+                    break;
+                case Change.Modified or Change.Deleted or Change.Renamed:
+                    // If a file was renamed, it can still have differences.
+                    // We need to show a difference.
+                    codeWindow.EnterFromText(TextualDiff.Diff(vcs.Show(relativePath, city.OldRevision),
+                                                              vcs.Show(changedName, city.NewRevision)), true);
+                    break;
+                default:
+                    throw new Exception($"Unexpected change type {change} for {relativePath}");
+            }
+
+            switch (change)
+            {
+                case Change.Renamed:
+                    codeWindow.Title = $"<color=\"red\"><s><noparse>{sourceFilename}</noparse></s></color>"
+                        + $" -> <color=\"green\"><u><noparse>{changedName}</noparse></u></color>";
+                    break;
+                case Change.Deleted:
+                    codeWindow.Title = $"<color=\"red\"><s><noparse>{sourceFilename}</noparse></s></color>";
+                    break;
+                default:
+                    codeWindow.Title = sourceFilename;
+                    break;
+            }
+
+            codeWindow.ScrolledVisibleLine = 1;
+            return codeWindow;
+        }
+
+        /// <summary>
         /// Returns a CodeWindow showing the code range of the given graph element
         /// retrieved from a file. The path of the file is retrieved from
         /// the absolute path as specified by the graph element's source location
@@ -223,7 +286,6 @@ namespace SEE.Controls.Actions
                 CodeWindow codeWindow = graphElementRef is EdgeRef { Value: { Type: "Clone" } } edgeRef
                     ? ShowUnifiedDiff(edgeRef)
                     : ShowCode(graphElementRef);
-
                 // Add code window to our space of code window, if it isn't in there yet
                 WindowSpace manager = spaceManager[WindowSpaceManager.LocalPlayer];
                 if (!manager.Windows.Contains(codeWindow))

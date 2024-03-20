@@ -16,9 +16,11 @@ namespace SEE.Game.City
         /// <summary>
         /// Mapping of property name onto color.
         /// </summary>
+        /// <remarks>This field is used in <see cref="RuntimeTabMenu"/>. If you rename it here, you need
+        /// to adjust it there, too.</remarks>
         [SerializeField]
         [DictionaryDrawerSettings(KeyLabel = "Name", ValueLabel = "Color")]
-        private ColorRangeMapping map = new ColorRangeMapping();
+        private ColorRangeMapping map = new();
 
         /// <summary>
         /// Operator [].

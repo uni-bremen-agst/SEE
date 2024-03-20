@@ -371,7 +371,7 @@ namespace SEE.Net
                 {
                     if (city is SEECity seeCity)
                     {
-                        seeCity.LoadAndDrawGraph();
+                        seeCity.LoadAndDrawGraphAsync().Forget();
                     }
                     else
                     {

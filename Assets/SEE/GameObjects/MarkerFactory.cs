@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using DG.Tweening;
 using SEE.Game;
+using SEE.Game.City;
 using SEE.GO.NodeFactories;
 using SEE.Utils;
 using UnityEngine;
@@ -22,27 +23,25 @@ namespace SEE.GO
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="markerWidth">the width (x and z lengths) of the markers</param>
-        /// <param name="markerHeight">the height (y length) of the markers</param>
-        /// <param name="additionColor">the color for the markers for added nodes</param>
-        /// <param name="changeColor">the color for the markers for changed nodes</param>
-        /// <param name="deletionColor">the color for the markers for deleted nodes</param>
-        public MarkerFactory(float markerWidth, float markerHeight,
-                             Color additionColor, Color changeColor, Color deletionColor)
+        /// <param name="markerAttributes">the attributes to be used</param>
+        public MarkerFactory(MarkerAttributes markerAttributes)
         {
-            additionMarkerFactory = new CylinderFactory(Opaque, new ColorRange(additionColor, additionColor, 1));
-            changeMarkerFactory = new CylinderFactory(Opaque, new ColorRange(changeColor, changeColor, 1));
-            deletionMarkerFactory = new CylinderFactory(Opaque, new ColorRange(deletionColor, deletionColor, 1));
+            additionMarkerFactory = new CylinderFactory(Opaque,
+                new ColorRange(markerAttributes.AdditionBeamColor, markerAttributes.AdditionBeamColor, 1));
+            changeMarkerFactory = new CylinderFactory(Opaque,
+                new ColorRange(markerAttributes.ChangeBeamColor, markerAttributes.ChangeBeamColor, 1));
+            deletionMarkerFactory = new CylinderFactory(Opaque,
+                new ColorRange(markerAttributes.DeletionBeamColor, markerAttributes.DeletionBeamColor, 1));
 
-            if (markerHeight < 0)
+            if (markerAttributes.MarkerHeight < 0)
             {
                 throw new ArgumentException("SEE.Game.Evolution.Marker received a negative marker height.\n");
             }
-            if (markerWidth < 0)
+            if (markerAttributes.MarkerWidth < 0)
             {
                 throw new ArgumentException("SEE.Game.Evolution.Marker received a negative marker width.\n");
             }
-            markerScale = new Vector3(markerWidth, markerHeight, markerWidth);
+            markerScale = new Vector3(markerAttributes.MarkerWidth, markerAttributes.MarkerHeight, markerAttributes.MarkerWidth);
         }
 
         /// <summary>

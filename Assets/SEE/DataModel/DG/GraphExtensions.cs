@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.DataModel.GraphSearch;
+using SEE.DataModel.DG.GraphSearch;
 
 namespace SEE.DataModel.DG
 {
@@ -24,8 +24,10 @@ namespace SEE.DataModel.DG
         /// <param name="comparer">yields true if two graph elements are to be considered identical</param>
         /// <param name="added">the nodes that are only in <paramref name="newGraph"/></param>
         /// <param name="removed">the nodes that are only in <paramref name="oldGraph"/></param>
-        /// <param name="changed">the elements in both graphs that have differences according to <paramref name="diff"/></param>
-        /// <param name="equal">the elements in both graphs that have no differences according to <paramref name="diff"/></param>
+        /// <param name="changed">the elements in both graphs that have differences according
+        /// to <paramref name="diff"/>; it belongs to <paramref name="newGraph"/></param>
+        /// <param name="equal">the elements in both graphs that have no differences according
+        /// to <paramref name="diff"/>; it belongs to <paramref name="newGraph"/></param>
         public static void Diff<T>
            (this Graph newGraph,
             Graph oldGraph,
@@ -89,6 +91,7 @@ namespace SEE.DataModel.DG
 
                 foreach (T sharedFromOldGraph in sharedElements)
                 {
+                    // sharedFromNewGraph is in newGraph and corresponds to sharedFromOldGraph
                     T sharedFromNewGraph = getElement(newGraph, sharedFromOldGraph.ID);
                     if (diff.AreDifferent(sharedFromOldGraph, sharedFromNewGraph))
                     {

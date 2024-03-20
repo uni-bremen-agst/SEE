@@ -13,6 +13,7 @@ using SEE.UI.Window;
 using SEE.UI.Window.TreeWindow;
 using SEE.Utils;
 using UnityEngine;
+using SEE.Game.City;
 
 namespace SEE.Controls.Actions
 {
@@ -91,6 +92,10 @@ namespace SEE.Controls.Actions
             if (graphElement.Filename != null)
             {
                 actions.Add(new("Show Code", ShowCode, Icons.Code));
+                if (gameObject.ContainingCity<DiffCity>() != null)
+                {
+                    actions.Add(new("Show Code Diff", ShowDiffCode, Icons.Code));
+                }
             }
 
             return actions;
@@ -120,6 +125,12 @@ namespace SEE.Controls.Actions
             void ShowCode()
             {
                 ActivateWindow(ShowCodeAction.ShowCode(gameObject.MustGetComponent<GraphElementRef>()));
+            }
+
+            void ShowDiffCode()
+            {
+                ActivateWindow(ShowCodeAction.ShowVCSDiff(gameObject.MustGetComponent<GraphElementRef>(),
+                                                          gameObject.ContainingCity<DiffCity>()));
             }
 
             void Highlight()

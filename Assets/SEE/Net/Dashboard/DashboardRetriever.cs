@@ -164,7 +164,11 @@ namespace SEE.Net.Dashboard
             }
 
             UnityWebRequest request = UnityWebRequest.Get(requestUrl);
-            request.certificateHandler = new AxivionCertificateHandler(PublicKey);
+            if (!string.IsNullOrWhiteSpace(PublicKey))
+            {
+                // Only set certificate handler if public key is set (i.e. we're using a self-signed certificate)
+                request.certificateHandler = new AxivionCertificateHandler(PublicKey);
+            }
             request.SetRequestHeader("Accept", accept);
             request.SetRequestHeader("Authorization", $"AxToken {Token}");
 #pragma warning disable CS4014
