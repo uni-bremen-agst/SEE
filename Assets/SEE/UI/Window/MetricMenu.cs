@@ -12,8 +12,11 @@ using UnityEngine;
 
 namespace SEE.UI
 {
+    /// <summary>
+    /// Represents a movable, scrollable window containing metrics of the GraphElement.
+    /// </summary>
     public class MetricMenu : BaseWindow
-    {   
+    {
         /// <summary>
         /// Gameobject of the Metric Window
         /// </summary>
@@ -35,11 +38,10 @@ namespace SEE.UI
         private string SettingsPrefab => UIPrefabFolder + "MetricWindow";
 
         /// <summary>
-        /// Prefab for the <see cref="itemRow"/>
+        /// Prefab for the <see cref="MetricRowLine"/>
         /// </summary>
         private string itemPrefab => UIPrefabFolder + "MetricRowLine";
 
-        // Start is called before the first frame update
         protected override void StartDesktop()
         {
             base.StartDesktop();
@@ -83,13 +85,13 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// Performs a fuzzy search for the given <paramref name="query"/> in the graph,
-        /// by comparing it to the source name of the nodes.
-        /// Case will be ignored, and the query may be a substring of the source name (this is a fuzzy search).
+        /// Performs a fuzzy search
         /// </summary>
-        /// <param name="query">The query to be searched for.</param>
-        /// <returns>A list of nodes which match the query.</returns>
-        public IEnumerable<string> Search(string query, GameObject[] ObjectList, int limit = 10, int cutoff = 62)
+        /// <param name="query"> the search query </param>
+        /// <param name="ObjectList"> array of GameObjects containing the objects to search through</param>
+        /// <param name="cutoff"> representing the cutoff score for relevance </param>
+        /// <returns> An iterable collection of strings representing the attributes of the GameObject instances, ordered by relevance to the search query </returns>
+        public IEnumerable<string> Search(string query, GameObject[] ObjectList, int cutoff = 62)
         {
             string[] attributesList = new string[ObjectList.Length];
 
@@ -125,7 +127,7 @@ namespace SEE.UI
             inputField.onSelect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = false);
             inputField.onDeselect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = true);
 
-            //TODO: Do it for every numeric Attribute
+            //Int Attributes
             foreach (KeyValuePair<string, int> kvp in graphElement.IntAttributes)
             {
                 //Create GameObject
@@ -138,6 +140,7 @@ namespace SEE.UI
                 valueTextClone.text = kvp.Value.ToString();
             }
 
+            //Float Attributes
             foreach (KeyValuePair<string, float> kvp in graphElement.FloatAttributes)
             {
                 //Create GameObject
