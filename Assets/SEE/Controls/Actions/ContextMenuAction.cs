@@ -115,7 +115,6 @@ namespace SEE.Controls.Actions
             void ShowMetrics()
             {
                 ActivateWindow(CreateMetricWindow(gameObject.MustGetComponent<GraphElementRef>()));
-                //CreateMetricWindow(gameObject.MustGetComponent<GraphElementRef>());
             }
 
             void ShowCode()
@@ -158,18 +157,22 @@ namespace SEE.Controls.Actions
             return openWindow;
         }
 
-        private static MetricMenu CreateMetricWindow(GraphElementRef graphElementRef)
+        /// <summary>
+        /// Returns a MetricWindow showing the attributes of the given graph element.
+        /// </summary>
+        /// <param name="graphElementRef">The graph element to activate the metric window for</param>
+        /// <returns></returns>
+        private static MetricWindow CreateMetricWindow(GraphElementRef graphElementRef)
         {
             // Create new window for active selection, or use existing one
-            if (!graphElementRef.TryGetComponent(out MetricMenu metricMenu))
+            if (!graphElementRef.TryGetComponent(out MetricWindow metricMenu))
             {
-                metricMenu = graphElementRef.gameObject.AddComponent<MetricMenu>();
+                metricMenu = graphElementRef.gameObject.AddComponent<MetricWindow>();
 
                 metricMenu.Title = "MetricWindow " + graphElementRef.Elem.ToShortString();
                 metricMenu.graphElement = graphElementRef.Elem;
             }
             return metricMenu;
-
         }
 
         /// <summary>

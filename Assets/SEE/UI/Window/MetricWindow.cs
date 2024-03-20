@@ -10,17 +10,17 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 
-namespace SEE.UI
+namespace SEE.UI.Window
 {
     /// <summary>
     /// Represents a movable, scrollable window containing metrics of the GraphElement.
     /// </summary>
-    public class MetricMenu : BaseWindow
+    public class MetricWindow : BaseWindow
     {
         /// <summary>
         /// Gameobject of the Metric Window
         /// </summary>
-        private GameObject MetricWindow;
+        private GameObject MetricWindowObject;
 
         /// <summary>
         /// GameObject for a row
@@ -115,14 +115,14 @@ namespace SEE.UI
         public void CreateUIInstance()
         {
             //Instantiate MetricWindow
-            MetricWindow = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, Window.transform.Find("Content"), false);
-            MetricWindow.name = "Scrollable";
+            MetricWindowObject = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, Window.transform.Find("Content"), false);
+            MetricWindowObject.name = "Scrollable";
 
             //Parent Content
-            Transform ScrollViewContent = MetricWindow.transform.Find("Content/Items").transform;
+            Transform ScrollViewContent = MetricWindowObject.transform.Find("Content/Items").transform;
 
             //Input Field
-            TMP_InputField inputField = MetricWindow.transform.Find("Search/SearchField").gameObject.MustGetComponent<TMP_InputField>();
+            TMP_InputField inputField = MetricWindowObject.transform.Find("Search/SearchField").gameObject.MustGetComponent<TMP_InputField>();
 
             inputField.onSelect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = false);
             inputField.onDeselect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = true);
