@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace SEE.GraphProviders
 {
-    
+
 
     [Serializable]
     public class AddPath
@@ -89,7 +89,7 @@ namespace SEE.GraphProviders
                 }
                 else if (excludedFiles.Any())
                 {
-                   files = repo.Index.Select(entry => entry.Path).Where(path => !excludedFiles.Contains(Path.GetExtension(path))).Take(200);
+                    files = repo.Index.Select(entry => entry.Path).Where(path => !excludedFiles.Contains(Path.GetExtension(path))).Take(200);
                 }
                 else
                 {
@@ -233,6 +233,12 @@ namespace SEE.GraphProviders
             return child;
         }
 
+        /// <summary>
+        /// Calculates the number of lines of code added and deleted for each file changed between two commits and adds them as metrics to <paramref name="graph"/>.
+        /// <param name="graph">Graph where to add the metrics</param>
+        /// <param name="repositoryPath">Path of the repository</param>
+        /// <param name="oldCommit">Commit hash of the older Commit</param>
+        /// <param name="newCommit">Commit hash of the newer Commit</param>
         protected static void AddLineofCodeChurnMetric(Graph graph, String repositoryPath, String oldCommit, String newCommit)
         {
             using (var repo = new Repository(repositoryPath))
@@ -256,6 +262,13 @@ namespace SEE.GraphProviders
             }
         }
 
+        /// <summary>
+        /// Calculates the number of unique developers who contributed to each file for each file changed between two commits and adds it as a metric to <paramref name="graph"/>
+        /// </summary>
+        /// <param name="graph">Graph where to add the metrics</param>
+        /// <param name="repositoryPath">Path of the repository</param>
+        /// <param name="oldCommit">Commit hash of the older Commit</param>
+        /// <param name="newCommit">Commit hash of the newer Commit</param>
         protected static void AddNumberofDevelopersMetric(Graph graph, String repositoryPath, String oldCommit, String newCommit)
         {
             using (var repo = new Repository(repositoryPath))
@@ -278,6 +291,7 @@ namespace SEE.GraphProviders
                         Commit commit = commitLogEntry.Commit;
                         authors.Add(commit.Author.Name);
                     }
+
                     if (fileAuthors.ContainsKey(filePath))
                     {
                         fileAuthors[filePath].UnionWith(authors);
@@ -287,6 +301,7 @@ namespace SEE.GraphProviders
                         fileAuthors[filePath] = authors;
                     }
                 }
+
                 foreach (var entry in fileAuthors)
                 {
                     foreach (var node in graph.Nodes())
@@ -301,6 +316,13 @@ namespace SEE.GraphProviders
             }
         }
 
+        /// <summary>
+        /// Calculates the number of times each file was changed for each file changed between two commits and adds it as a metric to <paramref name="graph"/>
+        /// </summary>
+        /// <param name="graph">Graph where to add the metrics</param>
+        /// <param name="repositoryPath">Path of the repository</param>
+        /// <param name="oldCommit">Commit hash of the older Commit</param>
+        /// <param name="newCommit">Commit hash of the newer Commit</param>
         protected static void AddCommitFrequencyMetric(Graph graph, String repositoryPath, String oldCommit, String newCommit)
         {
             using (var repo = new Repository(repositoryPath))
