@@ -13,17 +13,28 @@ using UnityEngine;
 
 namespace SEE.GraphProviders
 {
-    // Enum für die Auswahl zwischen Inklusion und Exklusion
-    public enum InclusionType
-    {
-        Included,
-        Excluded
-    }
+    
 
     [Serializable]
     public class AddPath
     {
+        /// <summary>
+        /// The inclusiontype.
+        /// </summary>
+        public enum InclusionType
+        {
+            Included,
+            Excluded
+        }
+
+        /// <summary>
+        /// The fileType that gets included/excluded.
+        /// </summary>
         public string fileType;
+
+        /// <summary>
+        /// The inclusiontype that gets selected.
+        /// </summary>
         [HorizontalGroup("InclusionType")]
         [EnumToggleButtons]
         public InclusionType inclusionType;
@@ -31,8 +42,11 @@ namespace SEE.GraphProviders
 
     public class VCSGraphProvider : GraphProvider
     {
+        /// <summary>
+        /// The List of filetypes that get included/excluded.
+        /// </summary>
         [ShowInInspector, ListDrawerSettings(ShowItemCount = true), Tooltip("Paths and their inclusion/exclusion status."), RuntimeTab(GraphProviderFoldoutGroup), HideReferenceObjectPicker]
-        private static List<AddPath> pathGlobbing = new List<AddPath>();
+        private static List<AddPath> pathGlobbing = new();
 
         /// <summary>
         /// Loads the metrics available at the Axivion Dashboard into the <paramref name="graph"/>.
@@ -40,8 +54,6 @@ namespace SEE.GraphProviders
         /// <param name="graph">The graph into which the metrics shall be loaded</param>
         public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
         {
-            Debug.Log(GetVCSGraph().ToString());
-
             return await UniTask.FromResult<Graph>(GetVCSGraph());
             //return GetVCSGraph();
         }
@@ -55,34 +67,39 @@ namespace SEE.GraphProviders
             string oldCommit = ""; // give the 2 commits you wanna compare
             string newCommit = "";
 
-            Graph graph = NewGraph();
+            Graph graph = new(repositoryPath, pathSegments[^1]);
             // The main directory.
             NewNode(graph, pathSegments[^1], "directory");
 
-            var includedFiles = pathGlobbing
-                .Where(path => path.inclusionType == InclusionType.Included)
+            IEnumerable<string> includedFiles = pathGlobbing
+                .Where(path => path.inclusionType == AddPath.InclusionType.Included)
                 .Select(path => path.fileType);
 
-            var excludedFiles = pathGlobbing
-                .Where(path => path.inclusionType == InclusionType.Excluded)
+            IEnumerable<string> excludedFiles = pathGlobbing
+                .Where(path => path.inclusionType == AddPath.InclusionType.Excluded)
                 .Select(path => path.fileType);
-
-            using (var repo = new Repository(repositoryPath))
+            using (Repository repo = new(repositoryPath))
             {
                 // Get all files using "git ls-files".
                 //TODO: I limited the output to 200 for testing, because SEE is huge.
-                var files = repo.Index
-                    .Select(entry => entry.Path)
-                    .Where(path => !string.IsNullOrEmpty(path) &&
-                    ((excludedFiles.Any() && excludedFiles.Contains(Path.GetExtension(path))) &&
-                    (includedFiles.Any() && includedFiles.Contains(Path.GetExtension(path)))) ||
-                    ((excludedFiles.Any() && !excludedFiles.Contains(Path.GetExtension(path))) ||
-                    (!excludedFiles.Any() && (includedFiles.Any() && includedFiles.Contains(Path.GetExtension(path)))) ||
-                    (!excludedFiles.Any() && !includedFiles.Any())))
-                    .ToList().Take(200);
+                IEnumerable<string> files;
+                if (includedFiles.Any() && !string.IsNullOrEmpty(includedFiles.First()))
+                {
+                    files = repo.Index.Select(entry => entry.Path).Where(path => includedFiles.Contains(Path.GetExtension(path))).Take(200);
+                }
+                else if (excludedFiles.Any())
+                {
+                   files = repo.Index.Select(entry => entry.Path).Where(path => !excludedFiles.Contains(Path.GetExtension(path))).Take(200);
+                }
+                else
+                {
+                    files = repo.Index.Select(entry => entry.Path).Where(path => !string.IsNullOrEmpty(path)).Take(200);
+                }
+
                 Debug.Log(files.Count());
+                Debug.Log(graph.BasePath);
                 // Build the graph structure.
-                foreach (var filePath in files.Where(path => !string.IsNullOrEmpty(path)))
+                foreach (string filePath in files.Where(path => !string.IsNullOrEmpty(path)))
                 {
                     string[] filePathSegments = filePath.Split(Path.AltDirectorySeparatorChar);
                     // Files in the main directory.
@@ -108,7 +125,7 @@ namespace SEE.GraphProviders
         }
         public override GraphProviderKind GetKind()
         {
-            return GraphProviderKind.Dashboard;
+            return GraphProviderKind.VCS;
         }
         /// <summary>
         /// Label of attribute <see cref="OverrideMetrics"/> in the configuration file.
@@ -145,7 +162,7 @@ namespace SEE.GraphProviders
                 if (graph.GetNode(pathSegments[0]) == null && pathSegments.Length > 1 && parent == null)
                 {
                     mainNode.AddChild(NewNode(graph, pathSegments[0], "directory"));
-                    BuildGraphFromPath(nodePath, graph.GetNode(pathSegments[0]), parentPath + Path.DirectorySeparatorChar + pathSegments[0], graph, mainNode);
+                    BuildGraphFromPath(nodePath, graph.GetNode(pathSegments[0]), pathSegments[0], graph, mainNode);
                 }
                 // I dont know, if this code ever gets used -> I dont know, how to handle empty directorys.
                 if (graph.GetNode(pathSegments[0]) == null && pathSegments.Length == 1 && parent == null)
@@ -214,17 +231,6 @@ namespace SEE.GraphProviders
             Node child = NewNode(graph, id, type, directory, filename, line, length);
             parent.AddChild(child);
             return child;
-        }
-        //TODO: Only for testing.
-        /// <summary>
-        /// Creates a new graph with default basepath and graph name.
-        /// </summary>
-        /// <param name="viewName">the name of the graph</param>
-        /// <param name="basePath">the basepath of the graph for looking up the source code files</param>
-        /// <returns>new graph</returns>
-        protected static Graph NewGraph(string viewName = "CodeFacts", string basePath = "DUMMYBASEPATH")
-        {
-            return new Graph(basePath, viewName);
         }
 
         protected static void AddLineofCodeChurnMetric(Graph graph, String repositoryPath, String oldCommit, String newCommit)
