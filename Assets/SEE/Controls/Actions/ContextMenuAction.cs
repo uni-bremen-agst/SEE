@@ -80,7 +80,7 @@ namespace SEE.Controls.Actions
                 new("Delete", DeleteElement, Icons.Trash),
                 // TODO (#666): Better properties view
                 new("Properties", ShowProperties, Icons.Info),
-                new("Show Metric Window", ShowMetrics, Icons.Info),
+                new("Show Metrics", ShowMetrics, Icons.Info),
             };
 
             if (gameObject != null)
@@ -178,7 +178,7 @@ namespace SEE.Controls.Actions
             if (!graphElementRef.TryGetComponent(out MetricWindow metricMenu))
             {
                 metricMenu = graphElementRef.gameObject.AddComponent<MetricWindow>();
-                metricMenu.Title = "MetricWindow " + graphElementRef.Elem.ToShortString();
+                metricMenu.Title = "Metrics for " + graphElementRef.Elem.ToShortString();
                 metricMenu.graphElement = graphElementRef.Elem;
             }
             return metricMenu;
