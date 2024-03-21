@@ -179,7 +179,7 @@ namespace SEE.Controls.Actions
             {
                 metricMenu = graphElementRef.gameObject.AddComponent<MetricWindow>();
                 metricMenu.Title = "Metrics for " + graphElementRef.Elem.ToShortString();
-                metricMenu.graphElement = graphElementRef.Elem;
+                metricMenu.GraphElement = graphElementRef.Elem;
             }
             return metricMenu;
         }

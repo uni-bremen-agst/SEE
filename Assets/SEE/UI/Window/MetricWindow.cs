@@ -20,7 +20,7 @@ namespace SEE.UI.Window
         /// <summary>
         /// Gameobject of the Metric Window
         /// </summary>
-        private GameObject MetricWindowObject;
+        private GameObject metricWindowObject;
 
         /// <summary>
         /// GameObject for a row
@@ -30,7 +30,7 @@ namespace SEE.UI.Window
         /// <summary>
         /// GraphElement to read its Attributes
         /// </summary>
-        public GraphElement graphElement;
+        public GraphElement GraphElement;
 
         /// <summary>
         /// Prefab for the <see cref="MetricWindow"/>.
@@ -115,20 +115,20 @@ namespace SEE.UI.Window
         public void CreateUIInstance()
         {
             //Instantiate MetricWindow
-            MetricWindowObject = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, Window.transform.Find("Content"), false);
-            MetricWindowObject.name = "Scrollable";
+            metricWindowObject = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, Window.transform.Find("Content"), false);
+            metricWindowObject.name = "Scrollable";
 
             //Parent Content
-            Transform ScrollViewContent = MetricWindowObject.transform.Find("Content/Items").transform;
+            Transform ScrollViewContent = metricWindowObject.transform.Find("Content/Items").transform;
 
             //Input Field
-            TMP_InputField inputField = MetricWindowObject.transform.Find("Search/SearchField").gameObject.MustGetComponent<TMP_InputField>();
+            TMP_InputField inputField = metricWindowObject.transform.Find("Search/SearchField").gameObject.MustGetComponent<TMP_InputField>();
 
             inputField.onSelect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = false);
             inputField.onDeselect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = true);
 
             //Int Attributes
-            foreach (KeyValuePair<string, int> kvp in graphElement.IntAttributes)
+            foreach (KeyValuePair<string, int> kvp in GraphElement.IntAttributes)
             {
                 //Create GameObject
                 itemRow = PrefabInstantiator.InstantiatePrefab(itemPrefab, ScrollViewContent, false);
@@ -141,7 +141,7 @@ namespace SEE.UI.Window
             }
 
             //Float Attributes
-            foreach (KeyValuePair<string, float> kvp in graphElement.FloatAttributes)
+            foreach (KeyValuePair<string, float> kvp in GraphElement.FloatAttributes)
             {
                 //Create GameObject
                 itemRow = PrefabInstantiator.InstantiatePrefab(itemPrefab, ScrollViewContent, false);
