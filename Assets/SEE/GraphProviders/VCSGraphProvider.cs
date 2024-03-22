@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -112,6 +113,9 @@ namespace SEE.GraphProviders
                     {
                         BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(pathSegments[^1]));
                     }
+
+                    AddMcCabeMetric(graph, repositoryPath);
+                    AddHalsteadMetrics(graph, repositoryPath);
                 }
                 //TODO: Only for testing.
                 Debug.Log(graph.ToString());
@@ -365,6 +369,91 @@ namespace SEE.GraphProviders
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Calculates the McCabe cyclomatic complexity metric for a given file and adds it as a metric to the corresponding node.
+        /// </summary>
+        /// <param name="graph">The graph where the metric should be added.</param>
+        /// <param name="filePath">The path to the file for which the metric should be calculated.</param>
+        protected static void AddMcCabeMetric(Graph graph, string filePath)
+        {
+            string fileContent = File.ReadAllText(filePath);
+            int complexity = CalculateMcCabeComplexity(fileContent);
+
+            foreach (var node in graph.Nodes())
+            {
+                if (node.ID.Replace('\\', '/') == filePath)
+                {
+                    node.SetInt("McCabe Complexity", complexity);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Calculates the Halstead metrics for a given file and adds them as metrics to the corresponding node.
+        /// </summary>
+        /// <param name="graph">The graph where the metrics should be added.</param>
+        /// <param name="filePath">The path to the file for which the metrics should be calculated.</param>
+        protected static void AddHalsteadMetrics(Graph graph, string filePath)
+        {
+            string fileContent = File.ReadAllText(filePath);
+            (int distinctOperators, int distinctOperands, int totalOperators, int totalOperands) = CalculateHalsteadMetrics(fileContent);
+
+            foreach (var node in graph.Nodes())
+            {
+                if (node.ID.Replace('\\', '/') == filePath)
+                {
+                    node.SetInt("Halstead Distinct Operators", distinctOperators);
+                    node.SetInt("Halstead Distinct Operands", distinctOperands);
+                    node.SetInt("Halstead Total Operators", totalOperators);
+                    node.SetInt("Halstead Total Operands", totalOperands);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Calculates the McCabe cyclomatic complexity for provided code.
+        /// </summary>
+        /// <param name="code">The code for which the complexity should be calculated.</param>
+        /// <returns>Returns the McCabe cyclomatic complexity.</returns>
+        private static int CalculateMcCabeComplexity(string code)
+        {
+            int complexity = 1; // Starting complexity for a single method or function.
+
+            // Count decision points (if, for, while, case, &&, ||, ?, ternary operator).
+            complexity += Regex.Matches(code, @"\b(if|else|for|while|case|&&|\|\||\?)\b").Count;
+
+            // Count nested cases (i.e. switch statements).
+            complexity += Regex.Matches(code, @"\bcase\b").Count;
+
+            return complexity;
+        }
+
+        /// <summary>
+        /// Calculates the Halstead metrics for provided code.
+        /// </summary>
+        /// <param name="code">The code for which the metrics should be calculated.</param>
+        /// <returns>Returns distinct operators and operands and their total amounts.</returns>
+        private static (int, int, int, int) CalculateHalsteadMetrics(string code)
+        {
+            // Remove comments and string literals.
+            code = Regex.Replace(code, @"/\*.*?\*/|//.*?$|"".*?""", string.Empty, RegexOptions.Multiline);
+
+            // Identify operands (identifiers and literals).
+            var operands = new HashSet<string>(Regex.Matches(code, @"\b\w+\b|\d+(\.\d+)?")
+            // Convert into matches.
+            .Cast<Match>()
+            // Projects each match object to a value, containing matched text as string.
+            .Select(m => m.Value));
+
+            // Identify operators (everything else but whitespace).
+            var operators = new HashSet<string>(Regex.Matches(code, @"\S+")
+            .Cast<Match>()
+            .Select(m => m.Value)
+            .Except(operands));
+
+            return (operators.Count, operands.Count, operators.Count, operands.Count);
         }
     }
 }
