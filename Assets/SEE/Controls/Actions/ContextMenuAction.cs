@@ -171,7 +171,7 @@ namespace SEE.Controls.Actions
         /// Returns a MetricWindow showing the attributes of the given graph element.
         /// </summary>
         /// <param name="graphElementRef">The graph element to activate the metric window for</param>
-        /// <returns></returns>
+        /// <returns>The MetricWindow object showing the attributes of the specified graph element.</returns>
         private static MetricWindow CreateMetricWindow(GraphElementRef graphElementRef)
         {
             // Create new window for active selection, or use existing one

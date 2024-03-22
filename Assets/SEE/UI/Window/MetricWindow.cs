@@ -18,17 +18,17 @@ namespace SEE.UI.Window
     public class MetricWindow : BaseWindow
     {
         /// <summary>
-        /// Gameobject of the Metric Window
+        /// Gameobject of the Metric Window.
         /// </summary>
         private GameObject metricWindowObject;
 
         /// <summary>
-        /// GameObject for a row
+        /// GameObject for a row.
         /// </summary>
         private GameObject itemRow;
 
         /// <summary>
-        /// GraphElement to read its Attributes
+        /// GraphElement to read its attributes.
         /// </summary>
         public GraphElement GraphElement;
 
@@ -38,7 +38,7 @@ namespace SEE.UI.Window
         private string SettingsPrefab => UIPrefabFolder + "MetricWindow";
 
         /// <summary>
-        /// Prefab for the <see cref="MetricRowLine"/>
+        /// Prefab for the <see cref="MetricRowLine"/>.
         /// </summary>
         private string itemPrefab => UIPrefabFolder + "MetricRowLine";
 
@@ -70,15 +70,7 @@ namespace SEE.UI.Window
                     if (ele != null)
                     {
                         string eleText = ele.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text;
-
-                        if (searchList.Contains(eleText))
-                        {
-                            ele.SetActive(true);
-                        }
-                        else
-                        {
-                            ele.SetActive(false);
-                        }
+                        ele.SetActive(searchList.Contains(eleText));
                     }
                 }
             }
@@ -91,21 +83,20 @@ namespace SEE.UI.Window
         /// <param name="ObjectList"> array of GameObjects containing the objects to search through</param>
         /// <param name="cutoff"> representing the cutoff score for relevance </param>
         /// <returns> An iterable collection of strings representing the attributes of the GameObject instances, ordered by relevance to the search query </returns>
-        public IEnumerable<string> Search(string query, GameObject[] ObjectList, int cutoff = 62)
+        public IEnumerable<string> Search(string query, GameObject[] objectList, int cutoff = 62)
         {
-            string[] attributesList = new string[ObjectList.Length];
+            string[] attributesList = new string[objectList.Length];
 
-            for(int i = 0; i < ObjectList.Length; i++)
+            for(int i = 0; i < objectList.Length; i++)
             {
-                attributesList[i] = ObjectList[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text;
+                attributesList[i] = objectList[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text;
             }
 
-            var listTest = Process.ExtractAll(query, attributesList, cutoff: cutoff);
-            IEnumerable<(int score, string attribute)> listTest2 = listTest.Select(x => (x.Score, x.Value));
+            IEnumerable<(int score, string attribute)> listTest = Process.ExtractAll(query, attributesList, cutoff: cutoff).Select(x => (x.Score, x.Value));
 
-            listTest2 = listTest2.OrderByDescending(x => x.score);
+            listTest = listTest.OrderByDescending(x => x.score);
 
-            return listTest2.Select(x => x.attribute);
+            return listTest.Select(x => x.attribute);
         }
 
         /// <summary>
@@ -127,31 +118,11 @@ namespace SEE.UI.Window
             inputField.onSelect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = false);
             inputField.onDeselect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = true);
 
-            //Int Attributes
-            foreach (KeyValuePair<string, int> kvp in GraphElement.IntAttributes)
-            {
-                //Create GameObject
-                itemRow = PrefabInstantiator.InstantiatePrefab(itemPrefab, ScrollViewContent, false);
-                //Attribute Name
-                TextMeshProUGUI attributeTextClone = itemRow.transform.Find("AttributeLine").gameObject.MustGetComponent<TextMeshProUGUI>();
-                attributeTextClone.text = kvp.Key;
-                //Value Name
-                TextMeshProUGUI valueTextClone = itemRow.transform.Find("ValueLine").gameObject.MustGetComponent<TextMeshProUGUI>();
-                valueTextClone.text = kvp.Value.ToString();
-            }
+            // Int Attributes
+            DisplayAttributes(GraphElement.IntAttributes);
 
-            //Float Attributes
-            foreach (KeyValuePair<string, float> kvp in GraphElement.FloatAttributes)
-            {
-                //Create GameObject
-                itemRow = PrefabInstantiator.InstantiatePrefab(itemPrefab, ScrollViewContent, false);
-                //Attribute Name
-                TextMeshProUGUI attributeTextClone = itemRow.transform.Find("AttributeLine").gameObject.MustGetComponent<TextMeshProUGUI>();
-                attributeTextClone.text = kvp.Key;
-                //Value Name
-                TextMeshProUGUI valueTextClone = itemRow.transform.Find("ValueLine").gameObject.MustGetComponent<TextMeshProUGUI>();
-                valueTextClone.text = kvp.Value.ToString();
-            }
+            // Float Attributes
+            DisplayAttributes(GraphElement.FloatAttributes);
 
             //Save GameObjects in Array for SearchField
             int totalElements = ScrollViewContent.transform.childCount;
@@ -163,6 +134,23 @@ namespace SEE.UI.Window
             }
 
             inputField.onValueChanged.AddListener(str => InputSearchField(str, Element));
+        }
+
+        private void DisplayAttributes<T>(Dictionary<string, T> attributes)
+        {
+            //Parent Content
+            Transform ScrollViewContent = metricWindowObject.transform.Find("Content/Items").transform;
+            foreach (KeyValuePair<string, T> kvp in attributes)
+            {
+                //Create GameObject
+                itemRow = PrefabInstantiator.InstantiatePrefab(itemPrefab, ScrollViewContent, false);
+                //Attribute Name
+                TextMeshProUGUI attributeTextClone = itemRow.transform.Find("AttributeLine").gameObject.MustGetComponent<TextMeshProUGUI>();
+                attributeTextClone.text = kvp.Key;
+                //Value Name
+                TextMeshProUGUI valueTextClone = itemRow.transform.Find("ValueLine").gameObject.MustGetComponent<TextMeshProUGUI>();
+                valueTextClone.text = kvp.Value.ToString();
+            }
         }
 
         public override void RebuildLayout()
