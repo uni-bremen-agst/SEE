@@ -13,7 +13,7 @@ using UnityEngine;
 namespace SEE.UI.Window
 {
     /// <summary>
-    /// Represents a movable, scrollable window containing metrics of the GraphElement.
+    /// Represents a movable, scrollable window containing metrics of a <see cref="GraphElement"/>.
     /// </summary>
     public class MetricWindow : BaseWindow
     {
@@ -51,11 +51,11 @@ namespace SEE.UI.Window
         /// <summary>
         /// Searches for a specified string within an array of GameObject elements and activates or deactivates them based on the search results.
         /// </summary>
-        /// <param name="str"> string to search for </param>
+        /// <param name="searchQuery"> string to search for </param>
         /// <param name="elements"> array of GameObjects to search in </param>
-        private void InputSearchField(string str, GameObject[] elements)
+        private void InputSearchField(string searchQuery, GameObject[] elements)
         {
-            if(str.Length == 0)
+            if (searchQuery.Length == 0)
             {
                 foreach (GameObject ele in elements)
                 {
@@ -64,7 +64,7 @@ namespace SEE.UI.Window
             }
             else
             {
-                var searchList = Search(str, elements);
+                var searchList = Search(searchQuery, elements);
                 foreach (GameObject ele in elements)
                 {
                     if (ele != null)
@@ -77,42 +77,36 @@ namespace SEE.UI.Window
         }
 
         /// <summary>
-        /// Performs a fuzzy search
+        /// Performs a fuzzy search operation on a collection of GameObject instances based on a provided query.
         /// </summary>
         /// <param name="query"> the search query </param>
-        /// <param name="ObjectList"> array of GameObjects containing the objects to search through</param>
+        /// <param name="objectList"> array of GameObjects containing the objects to search through</param>
         /// <param name="cutoff"> representing the cutoff score for relevance </param>
         /// <returns> An iterable collection of strings representing the attributes of the GameObject instances, ordered by relevance to the search query </returns>
         public IEnumerable<string> Search(string query, GameObject[] objectList, int cutoff = 62)
         {
-            string[] attributesList = new string[objectList.Length];
-
-            for(int i = 0; i < objectList.Length; i++)
+            List<string> attributesList = new List<string>();
+            foreach (GameObject obj in objectList)
             {
-                attributesList[i] = objectList[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text;
+                attributesList.Add(obj.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text);
             }
 
-            IEnumerable<(int score, string attribute)> listTest = Process.ExtractAll(query, attributesList, cutoff: cutoff).Select(x => (x.Score, x.Value));
+            IEnumerable<(int score, string attribute)> searchResults = Process.ExtractAll(query, attributesList, cutoff: cutoff).Select(x => (x.Score, x.Value));
+            searchResults = searchResults.OrderByDescending(x => x.score);
 
-            listTest = listTest.OrderByDescending(x => x.score);
-
-            return listTest.Select(x => x.attribute);
+            return searchResults.Select(x => x.attribute);
         }
 
         /// <summary>
         /// Creates the Metric Window
         /// </summary>
-        /// <param name="graphElement"></param>
         public void CreateUIInstance()
         {
-            //Instantiate MetricWindow
+            // Instantiate MetricWindow
             metricWindowObject = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, Window.transform.Find("Content"), false);
             metricWindowObject.name = "Scrollable";
 
-            //Parent Content
             Transform ScrollViewContent = metricWindowObject.transform.Find("Content/Items").transform;
-
-            //Input Field
             TMP_InputField inputField = metricWindowObject.transform.Find("Search/SearchField").gameObject.MustGetComponent<TMP_InputField>();
 
             inputField.onSelect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = false);
@@ -124,7 +118,7 @@ namespace SEE.UI.Window
             // Float Attributes
             DisplayAttributes(GraphElement.FloatAttributes);
 
-            //Save GameObjects in Array for SearchField
+            // Save GameObjects in Array for SearchField
             int totalElements = ScrollViewContent.transform.childCount;
             GameObject[] Element = new GameObject[totalElements];
 
@@ -138,16 +132,15 @@ namespace SEE.UI.Window
 
         private void DisplayAttributes<T>(Dictionary<string, T> attributes)
         {
-            //Parent Content
             Transform ScrollViewContent = metricWindowObject.transform.Find("Content/Items").transform;
             foreach (KeyValuePair<string, T> kvp in attributes)
             {
-                //Create GameObject
+                // Create GameObject
                 itemRow = PrefabInstantiator.InstantiatePrefab(itemPrefab, ScrollViewContent, false);
-                //Attribute Name
+                // Attribute Name
                 TextMeshProUGUI attributeTextClone = itemRow.transform.Find("AttributeLine").gameObject.MustGetComponent<TextMeshProUGUI>();
                 attributeTextClone.text = kvp.Key;
-                //Value Name
+                // Value Name
                 TextMeshProUGUI valueTextClone = itemRow.transform.Find("ValueLine").gameObject.MustGetComponent<TextMeshProUGUI>();
                 valueTextClone.text = kvp.Value.ToString();
             }
