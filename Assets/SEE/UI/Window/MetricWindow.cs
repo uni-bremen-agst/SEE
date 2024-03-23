@@ -35,7 +35,7 @@ namespace SEE.UI.Window
         /// <summary>
         /// Prefab for the <see cref="MetricWindow"/>.
         /// </summary>
-        private string SettingsPrefab => UIPrefabFolder + "MetricWindow";
+        private string windowPrefab => UIPrefabFolder + "MetricWindow";
 
         /// <summary>
         /// Prefab for the <see cref="MetricRowLine"/>.
