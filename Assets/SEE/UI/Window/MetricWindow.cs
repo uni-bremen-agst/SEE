@@ -106,7 +106,7 @@ namespace SEE.UI.Window
             metricWindowObject = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, Window.transform.Find("Content"), false);
             metricWindowObject.name = "Scrollable";
 
-            Transform ScrollViewContent = metricWindowObject.transform.Find("Content/Items").transform;
+            Transform scrollViewContent = metricWindowObject.transform.Find("Content/Items").transform;
             TMP_InputField inputField = metricWindowObject.transform.Find("Search/SearchField").gameObject.MustGetComponent<TMP_InputField>();
 
             inputField.onSelect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = false);
@@ -119,12 +119,12 @@ namespace SEE.UI.Window
             DisplayAttributes(GraphElement.FloatAttributes);
 
             // Save GameObjects in Array for SearchField
-            int totalElements = ScrollViewContent.transform.childCount;
+            int totalElements = scrollViewContent.transform.childCount;
             GameObject[] Element = new GameObject[totalElements];
 
             for (int i = 0; i < totalElements; i++)
             {
-                Element[i] = ScrollViewContent.transform.GetChild(i).gameObject;
+                Element[i] = scrollViewContent.transform.GetChild(i).gameObject;
             }
 
             inputField.onValueChanged.AddListener(str => InputSearchField(str, Element));
@@ -132,11 +132,11 @@ namespace SEE.UI.Window
 
         private void DisplayAttributes<T>(Dictionary<string, T> attributes)
         {
-            Transform ScrollViewContent = metricWindowObject.transform.Find("Content/Items").transform;
+            Transform scrollViewContent = metricWindowObject.transform.Find("Content/Items").transform;
             foreach (KeyValuePair<string, T> kvp in attributes)
             {
                 // Create GameObject
-                itemRow = PrefabInstantiator.InstantiatePrefab(itemPrefab, ScrollViewContent, false);
+                itemRow = PrefabInstantiator.InstantiatePrefab(itemPrefab, scrollViewContent, false);
                 // Attribute Name
                 TextMeshProUGUI attributeTextClone = itemRow.transform.Find("AttributeLine").gameObject.MustGetComponent<TextMeshProUGUI>();
                 attributeTextClone.text = kvp.Key;
