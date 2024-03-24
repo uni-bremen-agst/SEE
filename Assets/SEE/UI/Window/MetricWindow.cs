@@ -103,7 +103,7 @@ namespace SEE.UI.Window
         public void CreateUIInstance()
         {
             // Instantiate MetricWindow
-            metricWindowObject = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, Window.transform.Find("Content"), false);
+            metricWindowObject = PrefabInstantiator.InstantiatePrefab(windowPrefab, Window.transform.Find("Content"), false);
             metricWindowObject.name = "Scrollable";
 
             Transform scrollViewContent = metricWindowObject.transform.Find("Content/Items").transform;
