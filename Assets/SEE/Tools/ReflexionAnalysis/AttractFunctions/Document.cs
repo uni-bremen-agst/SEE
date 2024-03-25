@@ -1,4 +1,4 @@
-﻿using Sirenix.Utilities;
+﻿using Accord.Math.Distances;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,8 +6,12 @@ using System.Linq;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
-    public class Document : IEnumerable<string>
+    public class Document : IDocument, IEnumerable<string>
     {
+        //private static int GlobalWords = 0;
+
+        //private static Dictionary<string, int> GlobalWordIndices = new Dictionary<string, int>();
+
         public enum DocumentMergingType
         {
             Union,
@@ -16,11 +20,21 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         private Dictionary<string, int> wordFrequencies;
 
-        public int NumberWords { get => wordFrequencies.Keys.Count; }
+        public int WordCount { get => wordFrequencies.Keys.Count; }
 
-        public Document(IEnumerable<string> words) : this()
+        public IEnumerable<string> GetContainedWords()
         {
-            this.AddWords(words);
+            return wordFrequencies.Keys;
+        }
+
+        private HashSet<string> GetContainedWordsAsHashSet()
+        {
+            return new HashSet<string>(wordFrequencies.Keys);
+        }
+
+        public Document Clone()
+        {
+            return new Document(new Dictionary<string, int>(this.wordFrequencies));
         }
 
         public Document(Dictionary<string, int> words)
@@ -38,33 +52,82 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return new Dictionary<string, int>(this.wordFrequencies);
         }
 
+        public void AddWords(Document document)
+        {
+            IEnumerable<string> containedWords = document != this ?
+                                                   document.GetContainedWords()
+                                                 : document.GetContainedWords().ToList();
+
+            foreach (string word in containedWords)
+            {
+                int count = document.GetFrequency(word);
+                this.AddWord(word, count);
+            }
+        }
+
+        public void RemoveWords(Document document)
+        {
+            IEnumerable<string> containedWords = document != this ? 
+                                                 document.GetContainedWords() 
+                                                 : document.GetContainedWords().ToList();
+
+            foreach (string word in containedWords)
+            {
+                int count = document.GetFrequency(word);
+                this.RemoveWord(word, count);
+            }
+        }
+
         public void AddWords(IEnumerable<string> words)
         {
-            foreach (string word in words) this.AddWord(word);
+            foreach (string word in words)
+            {
+                this.AddWord(word);
+            }
         }
 
         public void RemoveWords(IEnumerable<string> words)
         {
-            foreach (string word in words) this.RemoveWord(word);
+            foreach (string word in words)
+            {
+                this.RemoveWord(word);
+            }
         }
 
         public void AddWord(string word)
         {
-            if (!wordFrequencies.ContainsKey(word)) wordFrequencies.Add(word, 0);
-            wordFrequencies[word]++;
+            AddWord(word, 1);
         }
 
         public void AddWord(string word, int count)
         {
-            if (!wordFrequencies.ContainsKey(word)) wordFrequencies.Add(word, 0);
+            if (!wordFrequencies.ContainsKey(word)) 
+            {
+                // EnsureGlobalWordIndex(word); 
+                wordFrequencies.Add(word, 0); 
+            }
             wordFrequencies[word] += count;
         }
 
+        //private static void EnsureGlobalWordIndex(string word)
+        //{
+            //if (GlobalWordIndices.ContainsKey(word)) return;
+            //GlobalWordIndices.Add(word, GlobalWords);
+            //GlobalWords++;
+        //}
+
         public void RemoveWord(string word) 
         {
+            RemoveWord(word, 1);
+        }
+
+        public void RemoveWord(string word, int count)
+        {
             if (!wordFrequencies.ContainsKey(word)) return;
-            if (wordFrequencies[word] <= 0) throw new Exception($"Cannot remove word {word}. Count word would be negative."); 
-            wordFrequencies[word]--;
+            wordFrequencies[word]-= count;
+            if (wordFrequencies[word] < 0) throw new Exception($"Cannot remove word {word} {count} times. " +
+                                                               $"Word count would be negative.");
+            if (wordFrequencies[word] == 0) wordFrequencies.Remove(word);
         }
 
         public int GetFrequency(string word)
@@ -95,11 +158,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             }
         }
 
-        public IEnumerable<string> GetContainedWords()
-        {
-            return wordFrequencies.Keys;
-        }
-
         public override string ToString()
         {
             string doc = "Document {" + Environment.NewLine;
@@ -111,13 +169,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return doc;
         }
 
-        public Document MergeDocuments(Document otherDocument, DocumentMergingType type = DocumentMergingType.Union)
+        public static Document MergeDocuments(Document doc1, Document doc2, DocumentMergingType type = DocumentMergingType.Union)
         {
             Document mergedDocument = new Document();
-            IEnumerable<string> wordsThis = this.GetContainedWords();
-            IEnumerable<string> wordsOther = otherDocument.GetContainedWords();
+            IEnumerable<string> wordsThis = doc1.GetContainedWords();
+            IEnumerable<string> wordsOther = doc2.GetContainedWords();
 
             IEnumerable<string> wordsMerged;
+
             if(type == DocumentMergingType.Intersection)
             {
                 wordsMerged = wordsThis.Intersect(wordsOther);
@@ -133,7 +192,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             foreach (string word in wordsMerged)
             {
-                mergedDocument.AddWord(word, otherDocument.GetFrequency(word) + this.GetFrequency(word));
+                mergedDocument.AddWord(word, doc2.GetFrequency(word) + doc1.GetFrequency(word));
             }
 
             return mergedDocument;
@@ -144,40 +203,69 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return this.GetEnumerator();
         }
 
-        public double CosineSimilarity(Document otherDocument)
+        public static double CosineSimilarityByFrequency(Document doc1, Document doc2)
         {
-            if (otherDocument == null)
+            HashSet<string> doc1Set = doc1.GetContainedWordsAsHashSet();
+            HashSet<string> doc2Set = doc2.GetContainedWordsAsHashSet();
+            doc1Set.UnionWith(doc2Set);
+
+            double[] doc1Array = new double[doc1Set.Count];
+            double[] doc2Array = new double[doc1Set.Count];
+
+            int i = 0;
+            foreach(string word in doc1Set)
             {
-                throw new ArgumentNullException(nameof(otherDocument));
+                doc1Array[i] = doc1.GetFrequency(word);
+                doc2Array[i] = doc2.GetFrequency(word);
+                i++;
             }
 
-            IEnumerable<string> allWords = wordFrequencies.Keys.Union(otherDocument.GetContainedWords());
-
-            var vectorA = allWords.Select(word => wordFrequencies.TryGetValue(word, out var freqA) ? freqA : 0).ToArray();
-            var vectorB = allWords.Select(word => otherDocument.wordFrequencies.TryGetValue(word, out var freqB) ? freqB : 0).ToArray();
-
-            var dotProduct = DotProduct(vectorA, vectorB);
-            var magnitudeA = Magnitude(vectorA);
-            var magnitudeB = Magnitude(vectorB);
-
-            if (magnitudeA > 0 && magnitudeB > 0)
-            {
-                return dotProduct / (magnitudeA * magnitudeB);
-            }
-            else
-            {
-                return 0.0;
-            }
+            Cosine cos = new Cosine();
+            double result = cos.Similarity(doc1Array, doc2Array);
+            return result;
         }
 
-        private double DotProduct(int[] vectorA, int[] vectorB)
+        public static double DotProduct(Document doc1, Document doc2)
         {
-            return vectorA.Zip(vectorB, (a, b) => a * b).Sum();
+            Document smallerDoc = doc1.WordCount <= doc2.WordCount ? doc1 : doc2;
+            Document biggerDoc = doc1.WordCount <= doc2.WordCount ? doc2 : doc1;
+
+            IEnumerable<string> words = smallerDoc.GetContainedWords();
+            double val = 0.0;
+            foreach (var word in words)
+            {
+                int val1 = biggerDoc.GetFrequency(word) > 0 ? 1 : 0;
+                int val2 = smallerDoc.GetFrequency(word) > 0 ? 1 : 0;
+                val += val1 * val2;
+            }
+            return val;
         }
 
-        private double Magnitude(int[] vector)
+        //public double[] ToFrequencyArray()
+        //{
+        //    double[] documentArray = new double[GlobalWords];
+        //    IEnumerable<string> containedWords = this.GetContainedWords();
+        //    foreach (string containedWord in containedWords)
+        //    {
+        //        documentArray[GlobalWordIndices[containedWord]] = this.GetFrequency(containedWord);
+        //    }
+        //    return documentArray;
+        //}
+
+        //public int[] ToOccurenceArray()
+        //{
+        //    int[] documentArray = new int[GlobalWords];
+        //    IEnumerable<string> containedWords = this.GetContainedWords();
+        //    foreach (string containedWord in containedWords)
+        //    {
+        //        documentArray[GlobalWordIndices[containedWord]] = this.GetFrequency(containedWord) > 0 ? 1 : 0;
+        //    }
+        //    return documentArray;
+        //}
+
+        IDocument IDocument.Clone()
         {
-            return Math.Sqrt(vector.Select(x => (double)(x * x)).Sum());
+            return this.Clone();
         }
     }
 }

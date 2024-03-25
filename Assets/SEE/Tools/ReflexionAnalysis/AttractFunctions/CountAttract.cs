@@ -47,24 +47,24 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             };
         }
 
-        public double GetToOthersValue(Node candidateNode, Node cluster)
+        public double GetToOthersValue(Node candidate, Node cluster)
         {
-            List<Edge> implementationEdges = candidateNode.GetImplementationEdges();
+            List<Edge> implementationEdges = candidate.GetImplementationEdges();
             double toOthers = 0;
-
-            this.reflexionGraph.SuppressNotifications = true;
-            this.reflexionGraph.AddToMapping(candidateNode, cluster);
 
             foreach (Edge edge in implementationEdges)
             {
-                Node candidateNeighbor = edge.Source.Equals(candidateNode) ? edge.Target : edge.Source;
+                Node candidateNeighbor = edge.Source.Equals(candidate) ? edge.Target : edge.Source;
                 Node neighborCluster = reflexionGraph.MapsTo(candidateNeighbor);
   
                 if (neighborCluster == null || neighborCluster.ID.Equals(cluster.ID)) continue;
 
                 double weight = GetEdgeWeight(edge);
+
+                State edgeState = this.edgeStatesCache.GetFromCache(cluster.ID, candidate.ID, candidateNeighbor.ID, edge.ID);
                 
-                if (edge.State() == State.Allowed || edge.State() == State.ImplicitlyAllowed)
+                // UnityEngine.Debug.Log($"stateCache: candidate id = {candidate.ID} cluster id = {cluster.ID} edge id = {edge.ID} State={edgeState}");
+                if (edgeState == State.Allowed || edgeState == State.ImplicitlyAllowed)
                 {
                     // UnityEngine.Debug.Log($"State is allowed. Phi value will be applied.");
                     weight *= Phi;
@@ -72,9 +72,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
                 toOthers += weight;
             }
-
-            this.reflexionGraph.RemoveFromMapping(candidateNode);
-            this.reflexionGraph.SuppressNotifications = false;
 
             // UnityEngine.Debug.Log($"ToOthers({candidateNode.ID},{cluster.ID}) = {toOthers}");
             return toOthers;
@@ -122,6 +119,21 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 sb.Append($" :{overallValues[nodeID]}{Environment.NewLine}");
             }
             return sb.ToString();
+        }
+
+        public override bool EmptyTrainingData()
+        {
+            foreach(string key in this.overallValues.Keys)
+            {
+                if (this.overallValues[key] > 0) return false;
+            }
+            return true;
+        }
+
+        public override void Reset()
+        {
+            this.overallValues.Clear();
+            this.edgeStatesCache.ClearCache();
         }
     }
 }

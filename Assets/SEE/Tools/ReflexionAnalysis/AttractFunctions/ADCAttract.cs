@@ -1,6 +1,7 @@
 ﻿using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
+using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +13,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
     {
         private Dictionary<string, Document> wordsPerDependency = new Dictionary<string, Document>();
 
+        // TODO: is this datastructure still necessary?
         private HashSet<string> propagatedEdges = new HashSet<string>();
 
         private new ADCAttractConfig config;
+
+        private HashSet<string> handledAsIncoming = new HashSet<string>();
+
+        private HashSet<string> handledAsOutgoing = new HashSet<string>();
 
         public ADCAttract(ReflexionGraph reflexionGraph, ADCAttractConfig config) : base(reflexionGraph, config)
         {   
@@ -32,20 +38,18 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 if (edge != null)
                 {
                     sb.Append($"{edge.Source.ID} -{edge.Type}-> {edge.Target.ID}"); 
-                } 
+                }
                 else
                 {
                     sb.Append(edgeID);
                 }
-                sb.Append($" :{wordsPerDependency[edgeID]}{Environment.NewLine}");
+                sb.Append($" :{Environment.NewLine}{wordsPerDependency[edgeID]}{Environment.NewLine}");
             }
             return sb.ToString();
         }
 
         public override double GetAttractionValue(Node candidate, Node cluster)
         {
-            this.reflexionGraph.SuppressNotifications = true;
-            this.reflexionGraph.AddToMapping(candidate, cluster);
             List<Edge> implementationEdges = candidate.GetImplementationEdges();
 
             double attraction = 0;
@@ -58,13 +62,22 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 Node candidateNeighbor = isCandidateSource ? edge.Target : edge.Source;
                 Node neighborCluster = reflexionGraph.MapsTo(candidateNeighbor);
 
-                if (neighborCluster != null &&
-                   edge.State() != State.Divergent)
+                if(neighborCluster == null)
+                {
+                    continue;
+                }
+
+                State edgeState = this.edgeStatesCache.GetFromCache(clusterId: cluster.ID,
+                                                                    candidateId: candidate.ID,
+                                                                    candidateNeighborId: candidateNeighbor.ID,
+                                                                    edgeId: edge.ID);
+
+                if (edgeState == State.Allowed || edgeState == State.ImplicitlyAllowed)
                 {
                     Node clusterSource = isCandidateSource ? cluster : neighborCluster;
                     Node clusterTarget = isCandidateSource ? neighborCluster : cluster;
 
-                    string id = this.GetMatchingArchitectureDepedency(clusterSource, clusterTarget, /*edge.Type*/"Source_Dependency");
+                    string id = this.GetMatchingArchitectureDepedency(clusterSource, clusterTarget, edge.Type);
 
                     if (id != null)
                     {
@@ -79,43 +92,42 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                         }
 
                         Document architectureEdgeDoc = this.wordsPerDependency[id];
-
-                        Document documentSource = new Document();
-                        Document documentTarget = new Document();
-                        this.AddStandardTerms(edge.Source, documentSource);
-                        this.AddStandardTerms(edge.Target, documentTarget);
-                        Document mergedDocument = documentSource.MergeDocuments(documentTarget, config.MergingType);
-                        attraction += Math.Abs(architectureEdgeDoc.CosineSimilarity(mergedDocument));
+                        Document mergedDocument = this.GetMergedTerms(edge.Source, edge.Target, config.MergingType);
+                        double similarity = Document.DotProduct(mergedDocument, architectureEdgeDoc);
+                        attraction += similarity;/*Math.Abs(similarity);*/
                     }
                 }
-                else
-                {
-                    // Implementation edge has to be in undefined state
-                }
             }
-
-            this.reflexionGraph.RemoveFromMapping(candidate, cluster);
-            this.reflexionGraph.SuppressNotifications = false;
             return attraction;
+        }
+
+        private void HandleAddedEdges(IEnumerable<Edge> edges, HashSet<string> handledEdges)
+        {
+            foreach (Edge edge in edges)
+            {
+                handledEdges.Add(edge.ID);
+                AddDocumentsOfPropagatedEdge(edge);
+            }
         }
 
         public override void HandleChangedNodes(Node cluster, List<Node> nodesChangedInMapping, ChangeType changeType)
         {   
             foreach (Node nodeChangedInMapping in nodesChangedInMapping)
             {
-                // TODO: duplicate implementationEdges problem
-                List<Edge> implementationEdges = nodeChangedInMapping.GetImplementationEdges();
+                IEnumerable<Edge> edgesIncoming = nodeChangedInMapping.Incomings.Where(e => e.IsInImplementation() 
+                                                                                    && !handledAsIncoming.Contains(e.ID));
+                IEnumerable<Edge> edgesOutgoing = nodeChangedInMapping.Outgoings.Where(e => e.IsInImplementation()
+                                                                                    && !handledAsOutgoing.Contains(e.ID));
 
-                foreach (Edge edge in implementationEdges)
+                if (changeType == ChangeType.Addition)
                 {
-                    if (changeType == ChangeType.Addition)
-                    {
-                        AddDocumentsOfPropagatedEdge(edge); 
-                    } 
-                    else
-                    {
-                        DeleteDocumentsOfPropagatedEdge(nodeChangedInMapping, cluster, edge);
-                    }
+                    HandleAddedEdges(edgesIncoming, handledAsIncoming);
+                    HandleAddedEdges(edgesOutgoing, handledAsOutgoing);
+                } 
+                else
+                {
+                    edgesIncoming.ForEach(e => DeleteDocumentsOfPropagatedEdge(nodeChangedInMapping, cluster, e, handledAsIncoming));
+                    edgesOutgoing.ForEach(e => DeleteDocumentsOfPropagatedEdge(nodeChangedInMapping, cluster, e, handledAsOutgoing));
                 }
             }
         }
@@ -136,7 +148,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         public void AddDocumentsOfPropagatedEdge(Edge implEdge)
         {
             // UnityEngine.Debug.Log($"Try to add Documents of edge {implEdge.Source.ID} --> {implEdge.Target.ID} (State: {implEdge.State()}, Graph: {implEdge.ItsGraph.Name})");
-            if (implEdge.State() == State.Allowed || implEdge.State() == State.ImplicitlyAllowed)
+            State state = implEdge.State();
+            if (state == State.Allowed || state == State.ImplicitlyAllowed)
             {
                 Node mapsToSource = this.reflexionGraph.MapsTo(implEdge.Source);
                 Node mapsToTarget = this.reflexionGraph.MapsTo(implEdge.Target);
@@ -145,21 +158,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
                 this.propagatedEdges.Add(implEdge.ID);
 
-                Document mergedDocument = GetDocumentOfImplEdge(implEdge, config.MergingType);
+                Document mergedDocument = this.GetMergedTerms(implEdge.Source, implEdge.Target, config.MergingType);
 
                 if (!wordsPerDependency.ContainsKey(id))
                 {
-                    wordsPerDependency.Add(id, mergedDocument);
+                    wordsPerDependency.Add(id, mergedDocument.Clone());
                 }
                 else
                 {
                     wordsPerDependency[id].AddWords(mergedDocument);
                 }
             } 
-            else
-            {
-                // UnityEngine.Debug.Log($"Edge {implEdge.Source.ID} --> {implEdge.Target.ID} is not in an allowed State.(State: {implEdge.State()})");
-            }
         }
 
         private string GetMatchingArchitectureDepedency(Node source, Node target, string type) 
@@ -170,10 +179,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             {
                 // TODO: Is this correct?
                 // TODO: Use type hierarchy in the future
+                List<Edge> edges = source.FromTo(target, null);
                 Edge architectureEdge = source.FromTo(target, null).SingleOrDefault(edge => ReflexionGraph.IsSpecified(edge));
 
                 if(architectureEdge == null)
                 {
+                    return null;
                     throw new Exception($"No matching Architecture edge could be found. {source.ID} -{type}-> {target.ID}");
                 }
 
@@ -205,8 +216,20 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <param name="changedNode">Node add or removed from the cluster</param>
         /// <param name="oldCluster">cluster from which the Node was removed</param>
         /// <param name="implEdge">incoming or outgoing implementation edge associated with the changed node</param>
-        public void DeleteDocumentsOfPropagatedEdge(Node changedNode, Node oldCluster, Edge implEdge)
+        public void DeleteDocumentsOfPropagatedEdge(Node changedNode, 
+                                                    Node oldCluster, 
+                                                    Edge implEdge, 
+                                                    HashSet<string> handledEdges)
         {
+            if(!handledEdges.Contains(implEdge.ID))
+            {
+                return;
+            } 
+            else
+            {
+                handledEdges.Remove(implEdge.ID); 
+            }
+
             Node mapsToSource;
             Node mapsToTarget;
 
@@ -227,7 +250,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
                 this.propagatedEdges.Remove(implEdge.ID);
 
-                Document mergedDocument = GetDocumentOfImplEdge(implEdge, config.MergingType);
+                Document mergedDocument = this.GetMergedTerms(implEdge.Source, implEdge.Target, config.MergingType);
 
                 if (wordsPerDependency.ContainsKey(id))
                 {
@@ -236,13 +259,26 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             }
         }
 
-        private Document GetDocumentOfImplEdge(Edge edge, Document.DocumentMergingType mergingType)
+        public override bool EmptyTrainingData()
         {
-            Document documentSource = new Document();
-            Document documentTarget = new Document();
-            this.AddStandardTerms(edge.Source, documentSource);
-            this.AddStandardTerms(edge.Target, documentTarget);
-            return documentSource.MergeDocuments(documentTarget, mergingType);
+            foreach (string id in wordsPerDependency.Keys)
+            {
+                if (wordsPerDependency[id].WordCount > 0)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public override void Reset()
+        {
+            this.edgeStatesCache.ClearCache();
+            this.ClearDocumentCache();
+            this.wordsPerDependency.Clear();
+            this.propagatedEdges.Clear();
+            this.handledAsIncoming.Clear();
+            this.handledAsOutgoing.Clear();
         }
     }
 }

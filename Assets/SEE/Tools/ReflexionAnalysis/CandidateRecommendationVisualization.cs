@@ -2,11 +2,15 @@
 using Cysharp.Threading.Tasks;
 using SEE.DataModel;
 using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
+using SEE.Game;
+using SEE.Game.City;
 using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using Sirenix.OdinInspector;
+using Sirenix.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,7 +18,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using UnityEngine.Profiling;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis
 {
@@ -46,6 +49,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         private const string resetMappingLabel = "Reset Mapping";
         private const string debugScenarioLabel = "Debug Scenario";
         private const string testOracleLabel = "Test Oracle";
+        private const string generateOracleLabel = "Generate Oracle";
 
         private const string statisticButtonGroup = "statisticButtonsGroup";
         private const string mappingButtonGroup = "mappingButtonsGroup";
@@ -208,6 +212,34 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         }
 
         #region Buttons
+
+        [Button(generateOracleLabel, ButtonSizes.Small)]
+        [ButtonGroup(debugButtonGroup)]
+        public void GenerateOracleLabel()
+        {            
+            GameObject codeCityObject = SceneQueries.GetCodeCity(this.transform)?.gameObject;
+            if (codeCityObject == null)
+            {
+                throw new Exception("Could not get Reflexion city when loading oracle instructions.");
+            }
+
+            codeCityObject.TryGetComponent(out AbstractSEECity city);
+
+            string configPath = Path.GetDirectoryName(city.ConfigurationPath.Path);
+
+            string instructions = Path.Combine(configPath, "oracleInstructions.txt");
+
+            (Graph implementation, _, _) = this.reflexionGraphViz.Disassemble();
+            ReflexionGraph oracleGraph = CandidateRecommendation.GenerateOracleMapping(implementation, instructions);
+            (_, Graph architecture, Graph mapping) = oracleGraph.Disassemble();
+            string architectureGxl = Path.Combine(configPath, "Architecture.gxl");
+            string oracleMappingGxl = Path.Combine(configPath, "OracleMapping.gxl");
+            GraphWriter.Save(oracleMappingGxl, mapping, AbstractSEECity.HierarchicalEdgeTypes().First());
+            GraphWriter.Save(architectureGxl, architecture, AbstractSEECity.HierarchicalEdgeTypes().First());
+            UnityEngine.Debug.Log($"Saved oracle mapping to {oracleMappingGxl}");
+            UnityEngine.Debug.Log($"Saved architecture to {architectureGxl}");
+        }
+
         [Button(startRecordingLabel,ButtonSizes.Small)]
         [ButtonGroup(statisticButtonGroup)]
         public void StartRecording()
@@ -532,8 +564,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     // TODO:
                 }
 
-                
+                string trainingData = recommendations.AttractFunction.DumpTrainingData();
                 Debug.Log(recommendations.AttractFunction.DumpTrainingData());
+                string trainingDataFile = Path.Combine(config.OutputPath.Path, $"trainingData_{currentSeed}.txt");
+                File.WriteAllText(trainingDataFile, trainingData);
 
                 // 2. Generate csv file based on seed name/output path
                 string csvFile = Path.Combine(config.OutputPath.Path, $"output{currentSeed}.csv");
@@ -550,6 +584,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 // case 4.1 sync with viz
                 // case 4.2 sync not with viz
                 StartAutomatedMapping(recommendations, graph);
+
+                trainingData = recommendations.AttractFunction.DumpTrainingData();
+                Debug.Log(recommendations.AttractFunction.DumpTrainingData());
+                trainingDataFile = Path.Combine(config.OutputPath.Path, $"trainingData2_{currentSeed}.txt");
+                File.WriteAllText(trainingDataFile, trainingData);
 
                 // 5. Stop Recording
                 recommendations.Statistics.StopRecording();
@@ -574,7 +613,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 // 7. ResetMapping
                 // case 7.1 sync with viz
                 // case 7.2 sync not with viz
+                graph.StartCaching();
                 graph.ResetMapping();
+                graph.ReleaseCaching();
 
 
                 // 8. Create next seed
@@ -606,7 +647,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 if(CandidateRecommendation.IsRecommendationDefinite(recommendations))
                 {
                     chosenMappingPair = CandidateRecommendation.GetDefiniteRecommendation(recommendations);
-                    Debug.Log($"Automatically map candidate {chosenMappingPair.Candidate.ID} to the cluster {chosenMappingPair.Cluster.ID}");
+                    // Debug.Log($"Automatically map candidate {chosenMappingPair.Candidate.ID} to the cluster {chosenMappingPair.Cluster.ID}");
                 } 
                 else
                 {
@@ -650,7 +691,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 // Debug.Log($"Chosen Mapping Pair {chosenMappingPair.CandidateID} --> {chosenMappingPair.CandidateID}");
 
                 //await MapRecommendation(chosenMappingPair.Candidate, chosenMappingPair.Cluster);
-                Debug.Log($"Automatically map candidate {chosenMappingPair.Candidate.ID} to the cluster {chosenMappingPair.Cluster.ID}. candidates left: {recommendation.UnmappedCandidates.Count}");
+                // Debug.Log($"Automatically map candidate {chosenMappingPair.Candidate.ID} to the cluster {chosenMappingPair.Cluster.ID}. candidates left: {recommendation.UnmappedCandidates.Count}");
                 graph.AddToMapping(chosenMappingPair.Candidate, chosenMappingPair.Cluster);
 
                 recommendations = recommendation.Recommendations;

@@ -8,13 +8,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
     public interface ITextClassifier : IEnumerable<string>
     {
-        void AddDocument(string clazz, Document document);
+        void AddDocument(string clazz, IDocument document);
 
-        void DeleteDocument(string clazz, Document document);
+        void DeleteDocument(string clazz, IDocument document);
 
-        string ClassifyDocument(Document document);
+        void Reset();
 
-        double ProbabilityForClass(string clazz, Document doc);
+        string ClassifyDocument(IDocument document);
+
+        double ProbabilityForClass(string clazz, IDocument doc);
 
         Dictionary<string, int> GetTrainingsData(string clazz);
     }

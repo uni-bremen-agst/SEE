@@ -35,7 +35,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             }
         }
 
-        public void AddDocument(string clazz, Document document) 
+        public void AddDocument(string clazz, IDocument document) 
         {
             this.EnsureClass(clazz);
 
@@ -43,7 +43,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             DocumentCountGlobal++;
         }
 
-        public void DeleteDocument(string clazz, Document document)
+        public void DeleteDocument(string clazz, IDocument document)
         {
             if (clazz == null) throw new Exception("Invalid class given.");
 
@@ -56,7 +56,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             DocumentCountGlobal--;
         }
 
-        public string ClassifyDocument(Document document)
+        public string ClassifyDocument(IDocument document)
         {
             double highestProbability = 0;
             string highestClass = null;
@@ -74,7 +74,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return highestClass;
         }
 
-        public double ProbabilityForClass(string clazz, Document doc)
+        public double ProbabilityForClass(string clazz, IDocument doc)
         {
             this.EnsureClass(clazz);
             double prob = trainingData[clazz].GetPriorProbability();
@@ -99,6 +99,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
+        }
+
+        public void Reset()
+        {
+            
         }
 
         internal class ClassInformation
@@ -145,7 +150,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 return wordProbability;
             }
 
-            public void Add(Document document)
+            public void Add(IDocument document)
             {
                 foreach (string word in document)
                 {
@@ -158,7 +163,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 DocumentCount++;
             }
 
-            public void Remove(Document document)
+
+            public void Remove(IDocument document)
             {
                 foreach (string word in document)
                 {

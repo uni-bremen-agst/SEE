@@ -4,6 +4,7 @@ using SEE.Tools.ReflexionAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
@@ -43,6 +44,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return sb.ToString();
         }
 
+        public override bool EmptyTrainingData()
+        {
+            throw new NotImplementedException();
+        }
+
         public override double GetAttractionValue(Node candidate, Node cluster)
         {
             Document doc = new Document();
@@ -53,7 +59,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 this.AddWordsOfAscendants(candidate, doc);
             }
 
-            Dictionary<string, Document> docCdaTerms = new Dictionary<string, Document>();
+            Dictionary<string, IDocument> docCdaTerms = new Dictionary<string, IDocument>();
 
             if (this.config.UseCDA)
             {
@@ -90,7 +96,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 Document docStandardTerms = new Document();
                 if(this.config.UseStandardTerms) this.AddStandardTerms(nodeChangedInMapping, docStandardTerms);
 
-                Dictionary<string, Document> docCdaTerms = new Dictionary<string, Document>();
+                Dictionary<string, IDocument> docCdaTerms = new Dictionary<string, IDocument>();
                 if (this.config.UseCDA) this.CreateCdaTerms(cluster, nodeChangedInMapping, docCdaTerms);
 
                 if(changeType == ChangeType.Addition)
@@ -112,6 +118,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                     }
                 }
             }
+        }
+
+        public override void Reset()
+        {
+            this.naiveBayes.Reset();
+            this.edgeStatesCache.ClearCache();
+            this.ClearDocumentCache();
         }
     }
 }

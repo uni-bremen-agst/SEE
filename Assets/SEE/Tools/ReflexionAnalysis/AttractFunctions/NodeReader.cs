@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
-    public class NodeRegionReader
+    public class NodeReader : INodeReader
     {
-        public static string ReadRegion(Node node)
+        public string ReadRegion(Node node)
         {
             string fileName;
             int sourceRegionStart;
@@ -59,5 +59,4 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return region;
         }
     }
-
 }

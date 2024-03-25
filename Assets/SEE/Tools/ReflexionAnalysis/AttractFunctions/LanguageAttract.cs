@@ -1,6 +1,4 @@
 ﻿using Accord.MachineLearning.Text.Stemmers;
-using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
-using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.Window.CodeWindow;
@@ -8,25 +6,39 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UnityEngine;
+using static Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions.Document;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
     public abstract class LanguageAttract : AttractFunction
     {
-        private Dictionary<string, Document> cachedStandardTerms = new Dictionary<string, Document>();
+        private Dictionary<string, Document> cachedDocuments = new Dictionary<string, Document>();
 
         public TokenLanguage TargetLanguage { get => config.TargetLanguage; set => config.TargetLanguage = value; }
 
         public LanguageAttractConfig config;
 
+        public INodeReader nodeReader;
+
+        // TODO: What to do about keywords???
+        HashSet<string> Keywords = new HashSet<string>
+        {
+            "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const",
+            "continue", "default", "do", "double", "else", "enum", "extends", "final", "finally", /*"float",*/
+            "for", "goto", "if", "implements", "import", "instanceof", /*"int",*/ "interface", /*"long",*/ "native",
+            "new", "package", "private", "protected", "public", "return", /*"short",*/ "static", "strictfp",
+            "super", "switch", "synchronized", "this", "throw", "throws", "transient", "try", "void",
+            "volatile", "while"
+        };
+
         protected LanguageAttract(ReflexionGraph reflexionGraph, 
                                                     LanguageAttractConfig config) : base(reflexionGraph, config)
         {
             this.config = config;
+            nodeReader = new NodeReader();
         }
 
-        protected void CreateCdaTerms(Node cluster, Node nodeChangedInMapping, Dictionary<string, Document> documents)
+        protected void CreateCdaTerms(Node cluster, Node nodeChangedInMapping, Dictionary<string, IDocument> documents)
         {
             // Debug.Log($"Try to create CDA Terms for {nodeChangedInMapping.ID} and cluster {cluster.ID}...");
 
@@ -53,7 +65,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                     // add for current changed cluster
                     documents[cluster.ID].AddWord(term);
 
-                    if (!documents.TryGetValue(neighborCluster.ID, out Document neighborDocument))
+                    if (!documents.TryGetValue(neighborCluster.ID, out IDocument neighborDocument))
                     {
                         neighborDocument = new Document();
                         documents[neighborCluster.ID] = neighborDocument;
@@ -66,7 +78,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <summary>
         /// 
         /// </summary>
-        protected void AddWordsOfAscendants(Node node, Document document)
+        protected void AddWordsOfAscendants(Node node, IDocument document)
         {
             // TODO: use name of class AND name of file within the descendants?
             foreach (Node ascendant in node.Ascendants())
@@ -89,21 +101,48 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             }
             return;
         }
-
-        protected void ClearTermCache()
+        public void ClearDocumentCache()
         {
-            this.cachedStandardTerms.Clear();
+            this.cachedDocuments.Clear();
+        }
+
+        protected Document GetMergedTerms(Node node1, Node node2, DocumentMergingType mergingType)
+        {
+            string mergedDocId = node1.ID + mergingType.ToString() + node2.ID;
+
+            if (!cachedDocuments.ContainsKey(mergedDocId))
+            {
+                Document document1 = this.GetStandardTerms(node1);
+                Document document2 = this.GetStandardTerms(node2);
+                Document mergedDocument = Document.MergeDocuments(document1, document2, mergingType);
+                cachedDocuments[mergedDocId] = mergedDocument;
+            }
+            return cachedDocuments[mergedDocId];
+        }
+
+        protected Document GetStandardTerms(Node node)
+        {
+            if (cachedDocuments.ContainsKey(node.ID))
+            {
+                return cachedDocuments[node.ID].Clone();     
+            } 
+            else
+            {
+                Document doc = new Document();
+                this.AddStandardTerms(node, doc);
+                return doc;
+            }
         }
 
         protected void AddStandardTerms(Node node, Document document)
         {
-            if(cachedStandardTerms.ContainsKey(node.ID))
+            if(cachedDocuments.ContainsKey(node.ID))
             {
-                document.AddWords(cachedStandardTerms[node.ID]);
+                document.AddWords(cachedDocuments[node.ID]);
                 return;
             }
             
-            string codeRegion = NodeRegionReader.ReadRegion(node);
+            string codeRegion = nodeReader.ReadRegion(node);
 
             IList<SEEToken> tokens = SEEToken.FromString(codeRegion, TargetLanguage);
 
@@ -112,9 +151,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             // TODO: What exactly are String literals?
             foreach (SEEToken token in tokens)
             {
-                if (token.TokenType == SEEToken.Type.Comment ||
-                   token.TokenType == SEEToken.Type.Identifier )
-                   //|| token.TokenType == SEEToken.Type.StringLiteral)
+                if ((token.TokenType == SEEToken.Type.Comment ||
+                   token.TokenType == SEEToken.Type.Identifier ||
+                   token.TokenType == SEEToken.Type.StringLiteral) 
+                   && !Keywords.Contains(token.Text))
                 {
                     words.Add(token.Text);
                 }
@@ -130,10 +170,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             words = words.Where(x => x.Length > 3).Select(x => x.ToLower()).ToList();
 
-            document.AddWords(words);
             Document cachedDocument = new Document();
             cachedDocument.AddWords(words);
-            cachedStandardTerms.Add(node.ID, cachedDocument);
+            document.AddWords(cachedDocument);
+            cachedDocuments.Add(node.ID, cachedDocument);
         }
 
         private List<string> Split(string word, Func<char[], int, bool> splitFunction, bool keepCharAtSplit)
@@ -224,6 +264,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             }
 
             return splittedWords;
+        }
+
+        public void SetNodeReader(INodeReader nodeReader)
+        {
+            this.nodeReader = nodeReader;
         }
     }
 }

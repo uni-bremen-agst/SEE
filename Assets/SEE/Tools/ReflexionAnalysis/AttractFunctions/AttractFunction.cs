@@ -23,18 +23,23 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         }
 
         public string CandidateType { get; set; }
+        
         public string ClusterType { get; set; }
 
         protected ReflexionGraph reflexionGraph;
 
         protected Dictionary<string, double> edgeWeights = new Dictionary<string, double>();
 
+        protected EdgeStatesCache edgeStatesCache;
+        
         public AttractFunction(ReflexionGraph reflexionGraph, AttractFunctionConfig config)
         {
             this.reflexionGraph= reflexionGraph;
             this.CandidateType = config.CandidateType;
             this.ClusterType = config.ClusterType;
+            this.edgeStatesCache = new EdgeStatesCache(this.reflexionGraph);
         }
+        
         public AttractFunction(ReflexionGraph reflexionGraph,
                                AttractFunctionConfig config,
                                Dictionary<string, double> edgeWeights) : this(reflexionGraph, config)
@@ -63,10 +68,20 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return this.edgeWeights.TryGetValue(edge.ID, out var weight) ? weight : 1.0;
         }
 
+        public void ClearStateCache()
+        {
+            this.edgeStatesCache.ClearCache();
+        }
+
         public abstract void HandleChangedNodes(Node cluster, List<Node> nodesChangedInMapping, ChangeType changeType);
 
         public abstract double GetAttractionValue(Node node, Node cluster);
 
         public abstract string DumpTrainingData();
+
+        public abstract bool EmptyTrainingData();
+
+        public abstract void Reset();
+
     }
 }

@@ -33,7 +33,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         ///// <summary>
         ///// 
         ///// </summary>
-        public string CsvFile { get; set; }
+        private string CsvFile { get; set; }
 
         /// <summary>
         /// 
@@ -229,6 +229,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
         }
 
+        public void StartRecording()
+        {
+            this.StartRecording(this.CsvFile);
+        }
+
         public void StartRecording(string csvFile)
         {
             if (Active) return;
@@ -269,7 +274,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             UnityEngine.Debug.Log($"Active Results: {this.mappingResult.ActiveResultsCount} Finished Results: {this.mappingResult.FinishedResultsCount}");
 
             Active = true;
-
         }
 
         public void StopRecording()

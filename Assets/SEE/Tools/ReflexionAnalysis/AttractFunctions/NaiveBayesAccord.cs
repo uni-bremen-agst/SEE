@@ -1,25 +1,17 @@
-﻿using Accord;
+﻿
 using Accord.MachineLearning.Bayes;
 using Accord.Math;
-using Accord.Statistics.Filters;
-using OpenCVForUnityExample;
 using Sirenix.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static RootMotion.FinalIK.Finger;
-using static RTG.CameraFocus;
 using NaiveBayesModel = Accord.MachineLearning.Bayes.NaiveBayes;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
     public class NaiveBayesAccord : ITextClassifier
     {
-        private Dictionary<string, Document> trainingData = new Dictionary<string, Document>();
+        private Dictionary<string, IDocument> trainingData = new Dictionary<string, IDocument>();
 
         private string[] classIdxToStringMapper;
         private string[] wordIdxToStringMapper;
@@ -39,7 +31,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         private bool dirty;
 
-        public void AddDocument(string clazz, Document document)
+        public void AddDocument(string clazz, IDocument document)
         {
             if (!trainingData.ContainsKey(clazz))
             {
@@ -52,7 +44,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             dirty = true;
         }
 
-        public string ClassifyDocument(Document document)
+        public string ClassifyDocument(IDocument document)
         {
             if (dirty) UpdateModel();
             int[] input = CreateInputRepresentation(document);
@@ -62,7 +54,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return classIdxToStringMapper[decision];
         }
 
-        public void DeleteDocument(string clazz, Document document)
+        public void DeleteDocument(string clazz, IDocument document)
         {
             if (clazz == null) throw new Exception("Invalid class given.");
 
@@ -75,7 +67,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             dirty = true;
         }
 
-        public double ProbabilityForClass(string clazz, Document document)
+        public double ProbabilityForClass(string clazz, IDocument document)
         {
             if (dirty) UpdateModel();
 
@@ -88,7 +80,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return classifier.Probability(input, classIdx);
         }
 
-        private int[] CreateInputRepresentation(Document document)
+        private int[] CreateInputRepresentation(IDocument document)
         {
             int[] input = new int[wordIdxToStringMapper.Length];
             for (int wordIdx = 0; wordIdx < wordIdxToStringMapper.Length; wordIdx++)
@@ -101,16 +93,16 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         private void UpdateModel()
         {
-            Document allDocuments = new Document();
+            IDocument allDocuments = new Document();
             trainingData.Values.ForEach(d => allDocuments.AddWords(d));
 
-            int[,] inputs = new int[this.trainingData.Keys.Count, allDocuments.NumberWords];
+            int[,] inputs = new int[this.trainingData.Keys.Count, allDocuments.WordCount];
             int[] outputs = new int[this.trainingData.Keys.Count];
 
             classStringToIdxMapper.Clear();
             wordStringToIdxMapper.Clear();
             classIdxToStringMapper = new string[this.trainingData.Keys.Count];
-            wordIdxToStringMapper = new string[allDocuments.NumberWords];
+            wordIdxToStringMapper = new string[allDocuments.WordCount];
 
             // setup word mapping
             int wordIdx = 0;
@@ -129,7 +121,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 classIdxToStringMapper[classIdx] = currentClass;
                 classStringToIdxMapper.Add(currentClass, classIdx);
 
-                for (wordIdx = 0; wordIdx < allDocuments.NumberWords; wordIdx++)
+                for (wordIdx = 0; wordIdx < allDocuments.WordCount; wordIdx++)
                 {
                     int frequency = trainingData[currentClass].GetFrequency(wordIdxToStringMapper[wordIdx]);
                     if (frequency > highestFrequency) highestFrequency = frequency;
@@ -140,7 +132,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 classIdx++;
             }
 
-            int[] symbols = new int[allDocuments.NumberWords];
+            int[] symbols = new int[allDocuments.WordCount];
             Array.Fill(symbols, highestFrequency + 1);
 
             // Add one artifical extra class because at least two classes are required
@@ -168,6 +160,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
+        }
+
+        public void Reset()
+        {
+            dirty = true;
+            this.wordIdxToStringMapper.Clear();
+            this.wordStringToIdxMapper.Clear();
+            this.trainingData.Clear();
         }
     }
 }
