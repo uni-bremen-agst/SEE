@@ -4,6 +4,7 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils.Config;
+using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,9 @@ using UnityEngine;
 namespace SEE.GraphProviders
 {
 
-
+    /// <summary>
+    /// Implements the functionality for adding file paths with a specified inclusion type.
+    /// </summary>
     [Serializable]
     public class AddPath
     {
@@ -41,8 +44,30 @@ namespace SEE.GraphProviders
         public InclusionType inclusionType;
     }
 
+    /// <summary>
+    /// Provides a version control system graph based on a git repository.
+    /// </summary>
     public class VCSGraphProvider : GraphProvider
     {
+        //ToDo: Include, and fix. Currently it does not get safed.
+        /// <summary>
+        /// The path to the git repository.
+        /// </summary>
+        //[ShowInInspector, Tooltip("Path to the git repository."), HideReferenceObjectPicker]
+        //private static readonly FilePath RepositoryPath = new();
+
+        /// <summary>
+        /// The commit id against which to compare.
+        /// </summary>
+        //[ShowInInspector, Tooltip("The commit id against which to compare."), HideReferenceObjectPicker]
+        //private static string OldCommitID;
+
+        /// <summary>
+        /// The new commit id.
+        /// </summary>
+        //[ShowInInspector, Tooltip("The new commit id."), HideReferenceObjectPicker]
+        //private static string NewCommitID;
+
         /// <summary>
         /// The List of filetypes that get included/excluded.
         /// </summary>
@@ -67,7 +92,7 @@ namespace SEE.GraphProviders
             string[] pathSegments = repositoryPath.Split(Path.DirectorySeparatorChar);
             string oldCommit = ""; // give the 2 commits you wanna compare
             string newCommit = "";
-
+            Debug.Log(repositoryPath);
             Graph graph = new(repositoryPath, pathSegments[^1]);
             // The main directory.
             NewNode(graph, pathSegments[^1], "directory");
@@ -106,7 +131,7 @@ namespace SEE.GraphProviders
                     // Files in the main directory.
                     if (filePathSegments.Length == 1)
                     {
-                        graph.GetNode(pathSegments[^1]).AddChild(NewNode(graph, filePath, "file"));
+                        graph.GetNode(pathSegments[^1]).AddChild(NewNode(graph, filePath, "file", filePath));
                     }
                     // Other directorys/files.
                     else
@@ -149,7 +174,15 @@ namespace SEE.GraphProviders
         {
 
         }
-        //TODO: Documentation.
+        /// <summary>
+        /// Creates a new node for each element of a filepath, that does not
+        /// already exists in the graph.
+        /// </summary>
+        /// <param name="path">the remaining part of the path</param>
+        /// <param name="parent">the parent node from the current element of the path</param>
+        /// <param name="parentPath">the path of the current parent, which will eventually be part of the ID</param>
+        /// <param name="graph">the graph to which the new node belongs to</param>
+        /// <param name="mainNode">the root node of the main directory</param>
         static void BuildGraphFromPath(string path, Node parent, string parentPath, Graph graph, Node mainNode)
         {
             string[] pathSegments = path.Split(Path.AltDirectorySeparatorChar);
@@ -165,7 +198,7 @@ namespace SEE.GraphProviders
                 // Directory does not exist.
                 if (graph.GetNode(pathSegments[0]) == null && pathSegments.Length > 1 && parent == null)
                 {
-                    mainNode.AddChild(NewNode(graph, pathSegments[0], "directory"));
+                    mainNode.AddChild(NewNode(graph, pathSegments[0], "directory", pathSegments[0]));
                     BuildGraphFromPath(nodePath, graph.GetNode(pathSegments[0]), pathSegments[0], graph, mainNode);
                 }
                 // I dont know, if this code ever gets used -> I dont know, how to handle empty directorys.
@@ -185,13 +218,13 @@ namespace SEE.GraphProviders
                 // The node for the current pathSegment does not exist, and the node is a directory.
                 if (graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]) == null && pathSegments.Length > 1)
                 {
-                    parent.AddChild(NewNode(graph, parentPath + Path.DirectorySeparatorChar + pathSegments[0], "directory"));
+                    parent.AddChild(NewNode(graph, parentPath + Path.DirectorySeparatorChar + pathSegments[0], "directory", pathSegments[0]));
                     BuildGraphFromPath(nodePath, graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]), parentPath + Path.DirectorySeparatorChar + pathSegments[0], graph, mainNode);
                 }
                 // The node for the current pathSegment does not exist, and the node is file.
                 if (graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]) == null && pathSegments.Length == 1)
                 {
-                    parent.AddChild(NewNode(graph, parentPath + Path.DirectorySeparatorChar + pathSegments[0], "file"));
+                    parent.AddChild(NewNode(graph, parentPath + Path.DirectorySeparatorChar + pathSegments[0], "file", pathSegments[0]));
                 }
             }
         }
@@ -202,18 +235,16 @@ namespace SEE.GraphProviders
         /// <param name="graph">where to add the node</param>
         /// <param name="id">unique ID of the new node</param>
         /// <param name="type">type of the new node</param>
+        /// <param name="name">the name of the node</param>
+        /// <param name="length">the length of the graph element, measured in number of lines</param>
         /// <returns>a new node added to <paramref name="graph"/></returns>
-        protected static Node NewNode(Graph graph, string id, string type = "Routine",
-            string directory = null, string filename = null, int? line = null, int? length = null)
+        protected static Node NewNode(Graph graph, string id, string type = "Routine", string name = null, int? length = null)
         {
             Node result = new()
             {
                 SourceName = id,
                 ID = id,
                 Type = type,
-                Directory = directory,
-                Filename = filename,
-                SourceLine = line,
                 SourceLength = length
             };
 
@@ -228,11 +259,12 @@ namespace SEE.GraphProviders
         /// <param name="parent">the parent of the new node; must not be null</param>
         /// <param name="id">unique ID of the new node</param>
         /// <param name="type">type of the new node</param>
+        /// <param name="name">the name of the node</param>
+        /// <param name="length">the length of the graph element, measured in number of lines</param>
         /// <returns>a new node added to <paramref name="graph"/></returns>
-        protected static Node Child(Graph graph, Node parent, string id, string type = "Routine",
-            string directory = null, string filename = null, int? line = null, int? length = null)
+        protected static Node Child(Graph graph, Node parent, string id, string type = "Routine", string name = null, int? length = null)
         {
-            Node child = NewNode(graph, id, type, directory, filename, line, length);
+            Node child = NewNode(graph, id, type, name, length);
             parent.AddChild(child);
             return child;
         }
