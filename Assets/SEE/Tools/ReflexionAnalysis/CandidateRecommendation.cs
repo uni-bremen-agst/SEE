@@ -1,4 +1,5 @@
-﻿using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
+﻿using Accord.MachineLearning;
+using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
@@ -37,25 +38,37 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         private string recommendationEdgeType = "Recommended With";
 
         /// <summary>
-        /// Dictionary representing the the mapping of nodes and their clusters regarding the highest 
-        /// attraction value
+        /// 
         /// </summary>
-        private Dictionary<Node, HashSet<MappingPair>> recommendations;
+        RecommendedNodes recommendedNodes = new RecommendedNodes();
 
         /// <summary>
         /// 
         /// </summary>
-        public Dictionary<Node, HashSet<MappingPair>> Recommendations { get => recommendations; set => recommendations = value; }
+        public Dictionary<Node, HashSet<MappingPair>> Recommendations { get
+            {
+                // TODO: ADJUST INTERFACE!
+                Dictionary<Node, HashSet<MappingPair>> recommendations = new();
+                foreach (MappingPair mappingPair in recommendedNodes.Recommendations.Values)
+                {
+                    Node cluster = ReflexionGraph.GetNode(mappingPair.ClusterID);
+                    HashSet<MappingPair> mappingPairs;
+                    if (!recommendations.TryGetValue(cluster, out mappingPairs))
+                    {
+                        recommendations[cluster] = new HashSet<MappingPair>();
+                        mappingPairs = recommendations[cluster];
+                    }
+                    mappingPairs.Add(mappingPair);
+                }
+                
+                return recommendations; 
+            } 
+        }
 
         /// <summary>
         /// 
         /// </summary>
-        public List<MappingPair> MappingPairs { get { return mappingPairs.Values.ToList(); } }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private Dictionary<string, MappingPair> mappingPairs;
+        public IEnumerable<MappingPair> MappingPairs { get { return recommendedNodes.MappingPairs; } }
 
         public HashSet<string> UnmappedCandidates { get; private set; }
 
@@ -70,8 +83,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         public CandidateRecommendation()
         {
-            recommendations = new Dictionary<Node, HashSet<MappingPair>>();
-            mappingPairs = new Dictionary<string, MappingPair>();
             Statistics = new CandidateRecommendationStatistics();
         }
 
@@ -89,14 +100,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             HashSet<string> visisited = new HashSet<string>();
             List<MappingPair> currentMappingPairs = new List<MappingPair>();
 
-            if (MappingPairs.Count == 0) return graph;
+            if (MappingPairs.Count() == 0) return graph;
 
             foreach (Node relatedNode in relatedNodes)
             {
                 // skip mapped implementation nodes
                 if (relatedNode.IsInImplementation() && this.ReflexionGraph.MapsTo(relatedNode) != null) continue;
-                string key = examinedNode.IsInArchitecture() ? relatedNode.ID + examinedNode.ID : examinedNode.ID + relatedNode.ID;
-                currentMappingPairs.Add(mappingPairs[key]);
+                MappingPair mappingPair = examinedNode.IsInArchitecture() ? 
+                            recommendedNodes.GetMappingPair(relatedNode.ID,examinedNode.ID)
+                          : recommendedNodes.GetMappingPair(examinedNode.ID, relatedNode.ID);
+                
+                currentMappingPairs.Add(mappingPair);
             }
 
             currentMappingPairs.Sort((x,y) => y.CompareTo(x));
@@ -124,11 +138,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         {
             Graph graph = new Graph("", "Recommendations");
 
-            foreach (Node cluster in recommendations.Keys)
+            foreach (Node cluster in Recommendations.Keys)
             {
                 Node clusterClone = (Node)cluster.Clone();
                 graph.AddNode(clusterClone);
-                foreach (MappingPair mappingPair in recommendations[cluster])
+                foreach (MappingPair mappingPair in Recommendations[cluster])
                 {
                     Node candidate = mappingPair.Candidate;
                     Node candidateClone = (Node) candidate.Clone();
@@ -181,15 +195,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 Statistics.Reset();
                 Statistics.SetCandidateRecommendation(this);
                 Statistics.SetConfigInformation(config);
-                recommendations.Clear();
-                mappingPairs.Clear();
-                ReflexionGraph.RunAnalysis();
-
+                recommendedNodes.Reset();
                 this.UnmappedCandidates = this.GetUnmappedCandidates().Select(n => n.ID).ToHashSet();
+                ReflexionGraph.RunAnalysis();
 
                 // Restart after the analysis was run, so initially/already
                 // mapped candidates will not recorded twice
-                // TODO: Does the CsvFile really have to be public?
                 if (wasActive)
                 {
                     Statistics.StartRecording();
@@ -241,13 +252,21 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     List<Node> candidatesChangedInMapping = new List<Node>();
                     this.GetImplicitlyMappedCandidates(candidatesChangedInMapping, edgeEvent.Edge.Source, ReflexionGraph);
 
+
                     if ((ChangeType)edgeEvent.Change == ChangeType.Removal)
                     {
-                        candidatesChangedInMapping.ForEach(c => this.UnmappedCandidates.Add(c.ID));
+                        foreach (Node candidate in candidatesChangedInMapping)
+                        {
+                            this.UnmappedCandidates.Add(candidate.ID);
+                        }
                     }
                     else if ((ChangeType)edgeEvent.Change == ChangeType.Addition)
                     {
-                        candidatesChangedInMapping.ForEach(c => this.UnmappedCandidates.Remove(c.ID));
+                        foreach (Node candidate in candidatesChangedInMapping)
+                        {
+                            this.UnmappedCandidates.Remove(candidate.ID);
+                            recommendedNodes.RemoveCandidate(candidate.ID);
+                        }
                     }
                     else
                     {
@@ -260,8 +279,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                         // to make sure the statistic is consistent
                         foreach (Node candidateChangedInMapping in candidatesChangedInMapping)
                         {
-                            MappingPair chosenMappingPair;
-                            if (!mappingPairs.TryGetValue(candidateChangedInMapping.ID + edgeEvent.Edge.Target.ID, out chosenMappingPair))
+                            MappingPair chosenMappingPair = recommendedNodes.GetMappingPair(candidateChangedInMapping.ID, edgeEvent.Edge.Target.ID);
+                            
+                            if (chosenMappingPair == null)
                             {
                                 // For the very first mapped node and nodes removed form the mapping
                                 // there is no previously calculated mappingpair available.
@@ -319,52 +339,22 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         {
             List<Node> clusters = GetCluster();
 
-            double maxAttractionValue = double.MinValue;
-
-            recommendations.Clear();
-            mappingPairs.Clear();
-            // Debug.Log($"Calculate attraction values... candidates.Count={unmappedCandidates.Count} clusters.Count={clusters.Count}");
-
             foreach (Node cluster in clusters)
             {
                 foreach (string candidateId in this.UnmappedCandidates)
                 {
                     Node candidate = this.ReflexionGraph.GetNode(candidateId);
-                    // Calculate the attraction value for current node and current cluster
-                    double attractionValue = AttractFunction.GetAttractionValue(candidate, cluster);
-                    
+
+                    double attractionValue = AttractFunction.GetAttractionValue(candidate, cluster);                    
                     // Debug.Log($"Candidate {candidate.ID} attracted to cluster {cluster.ID} with attraction value {attractionValue}");
-
-                    // Keep track of all attractions for statistical purposes
                     MappingPair mappingPair = new MappingPair(candidate: candidate, cluster: cluster, attractionValue: attractionValue);
-                    mappingPairs.Add(candidate.ID + cluster.ID, mappingPair);
-
-                    // Only do a recommendation if attraction is above 0
-                    if (attractionValue <= 0) continue;
-
-                    if (maxAttractionValue < attractionValue)
-                    {
-                        recommendations.Clear();
-                        recommendations.Add(cluster, new HashSet<MappingPair>() { mappingPair });
-                        maxAttractionValue = attractionValue;
-                    }
-                    else if (Math.Abs(maxAttractionValue - attractionValue) < ATTRACTION_VALUE_DELTA)
-                    {
-                        HashSet<MappingPair> nodes;
-                        if (recommendations.TryGetValue(cluster, out nodes))
-                        {
-                            nodes.Add(mappingPair);
-                        }
-                        else
-                        {
-                            recommendations.Add(cluster, new HashSet<MappingPair>() { mappingPair });
-                        }
-                    }
+                    recommendedNodes.UpdateMappingPair(mappingPair);
                 }
             }
 
             if (Statistics?.Active ?? false)
             {
+                // Keep track of all attractions for statistical purposes
                 Statistics.RecordMappingPairs(MappingPairs);
             }
         }

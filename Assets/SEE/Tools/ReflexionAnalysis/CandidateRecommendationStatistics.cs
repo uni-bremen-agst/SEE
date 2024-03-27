@@ -99,7 +99,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             mappingResult.AddConfigInformation(config);
         }
 
-        public void RecordMappingPairs(List<MappingPair> attractionValues)
+        public void RecordMappingPairs(IEnumerable<MappingPair> attractionValues)
         {
             if (recordAllMappingPairs)
             {
