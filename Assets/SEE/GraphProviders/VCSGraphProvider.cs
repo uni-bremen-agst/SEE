@@ -6,6 +6,7 @@ using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,64 +16,39 @@ using UnityEngine;
 
 namespace SEE.GraphProviders
 {
-
-    /// <summary>
-    /// Implements the functionality for adding file paths with a specified inclusion type.
-    /// </summary>
-    [Serializable]
-    public class AddPath
-    {
-        /// <summary>
-        /// The inclusiontype.
-        /// </summary>
-        public enum InclusionType
-        {
-            Included,
-            Excluded
-        }
-
-        /// <summary>
-        /// The fileType that gets included/excluded.
-        /// </summary>
-        public string fileType;
-
-        /// <summary>
-        /// The inclusiontype that gets selected.
-        /// </summary>
-        [HorizontalGroup("InclusionType")]
-        [EnumToggleButtons]
-        public InclusionType inclusionType;
-    }
-
     /// <summary>
     /// Provides a version control system graph based on a git repository.
     /// </summary>
     public class VCSGraphProvider : GraphProvider
     {
-        //ToDo: Include, and fix. Currently it does not get safed.
         /// <summary>
         /// The path to the git repository.
         /// </summary>
-        //[ShowInInspector, Tooltip("Path to the git repository."), HideReferenceObjectPicker]
-        //private static readonly FilePath RepositoryPath = new();
+        [ShowInInspector, Tooltip("Path to the git repository."), HideReferenceObjectPicker]
+        public readonly FilePath RepositoryPath = new();
 
         /// <summary>
         /// The commit id against which to compare.
         /// </summary>
-        //[ShowInInspector, Tooltip("The commit id against which to compare."), HideReferenceObjectPicker]
-        //private static string OldCommitID;
+        [ShowInInspector, Tooltip("The commit id against which to compare."), HideReferenceObjectPicker]
+        public string OldCommitID = "";
 
         /// <summary>
         /// The new commit id.
         /// </summary>
-        //[ShowInInspector, Tooltip("The new commit id."), HideReferenceObjectPicker]
-        //private static string NewCommitID;
+        [ShowInInspector, Tooltip("The new commit id."), HideReferenceObjectPicker]
+        public string NewCommitID = "";
 
         /// <summary>
         /// The List of filetypes that get included/excluded.
         /// </summary>
-        [ShowInInspector, ListDrawerSettings(ShowItemCount = true), Tooltip("Paths and their inclusion/exclusion status."), RuntimeTab(GraphProviderFoldoutGroup), HideReferenceObjectPicker]
-        private static List<AddPath> pathGlobbing = new();
+        [OdinSerialize]
+        [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
+            Tooltip("Paths and their inclusion/exclusion status."), RuntimeTab(GraphProviderFoldoutGroup), HideReferenceObjectPicker]
+        public Dictionary<string, bool> PathGlobbing = new()
+        {
+            {"", false}
+        };
 
         /// <summary>
         /// Loads the metrics available at the Axivion Dashboard into the <paramref name="graph"/>.
@@ -80,30 +56,64 @@ namespace SEE.GraphProviders
         /// <param name="graph">The graph into which the metrics shall be loaded</param>
         public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
         {
-            return await UniTask.FromResult<Graph>(GetVCSGraph());
-            //return GetVCSGraph();
+            CheckArguments(city);
+            return await UniTask.FromResult<Graph>(GetVCSGraph(PathGlobbing, RepositoryPath.Path, OldCommitID, NewCommitID));
         }
 
-        static Graph GetVCSGraph()
+        /// <summary>
+        /// Checks whether the assumptions on <see cref="RepositoryPath"/>, <see cref="OldCommitID"/>,
+        /// <see cref="NewCommitID"/> and <paramref name="city"/> hold.
+        /// If not, exceptions are thrown accordingly.
+        /// </summary>
+        /// <param name="city">to be checked</param>
+        /// <exception cref="ArgumentException">thrown in case <see cref="RepositoryPath"/>,
+        /// <see cref="OldCommitID"/> or <see cref="NewCommitID"/>
+        /// is undefined or does not exist or <paramref name="city"/> is null</exception>
+        protected void CheckArguments(AbstractSEECity city)
         {
-            //TODO: Only for test, we need to get the repositoryPath from the user.
-            string assetsPfad = Application.dataPath;
-            string repositoryPath = System.IO.Path.GetDirectoryName(assetsPfad);
+            if (string.IsNullOrEmpty(RepositoryPath.Path))
+            {
+                throw new ArgumentException("Empty repository path.\n");
+            }
+            if (!Directory.Exists(RepositoryPath.Path))
+            {
+                throw new ArgumentException($"Directory {RepositoryPath.Path} does not exist.\n");
+            }
+            if (string.IsNullOrEmpty(OldCommitID))
+            {
+                throw new ArgumentException("Empty oldCommitID.\n");
+            }
+            if (string.IsNullOrEmpty(NewCommitID))
+            {
+                throw new ArgumentException("Empty newCommitID.\n");
+            }
+            if (city == null)
+            {
+                throw new ArgumentException("The given city is null.\n");
+            }
+        }
+
+        /// <summary>
+        /// Builds the VCS graph with specific metrics.
+        /// </summary>
+        /// <param name="pathGlobbing">The paths which get included/excluded.</param>
+        /// <param name="repositoryPath">The path to the repository.</param>
+        static Graph GetVCSGraph(Dictionary<string,bool> pathGlobbing, string repositoryPath, string oldCommitID, string newCommitID)
+        {
             string[] pathSegments = repositoryPath.Split(Path.DirectorySeparatorChar);
-            string oldCommit = ""; // give the 2 commits you wanna compare
-            string newCommit = "";
             Debug.Log(repositoryPath);
             Graph graph = new(repositoryPath, pathSegments[^1]);
             // The main directory.
             NewNode(graph, pathSegments[^1], "directory");
 
             IEnumerable<string> includedFiles = pathGlobbing
-                .Where(path => path.inclusionType == AddPath.InclusionType.Included)
-                .Select(path => path.fileType);
+                .Where(path => path.Value == true)
+                .Select(path => path.Key);
 
             IEnumerable<string> excludedFiles = pathGlobbing
-                .Where(path => path.inclusionType == AddPath.InclusionType.Excluded)
-                .Select(path => path.fileType);
+                .Where(path => path.Value == false)
+                .Select(path => path.Key);
+
             using (Repository repo = new(repositoryPath))
             {
                 // Get all files using "git ls-files".
@@ -121,7 +131,6 @@ namespace SEE.GraphProviders
                 {
                     files = repo.Index.Select(entry => entry.Path).Where(path => !string.IsNullOrEmpty(path)).Take(200);
                 }
-
                 Debug.Log(files.Count());
                 Debug.Log(graph.BasePath);
                 // Build the graph structure.
@@ -146,9 +155,9 @@ namespace SEE.GraphProviders
                 Debug.Log(graph.ToString());
             }
 
-            AddLineofCodeChurnMetric(graph, repositoryPath, oldCommit, newCommit);
-            AddNumberofDevelopersMetric(graph, repositoryPath, oldCommit, newCommit);
-            AddCommitFrequencyMetric(graph, repositoryPath, oldCommit, newCommit);
+            AddLineofCodeChurnMetric(graph, repositoryPath, oldCommitID, newCommitID);
+            AddNumberofDevelopersMetric(graph, repositoryPath, oldCommitID, newCommitID);
+            AddCommitFrequencyMetric(graph, repositoryPath, oldCommitID, newCommitID);
 
             return graph;
         }
@@ -157,22 +166,40 @@ namespace SEE.GraphProviders
             return GraphProviderKind.VCS;
         }
         /// <summary>
-        /// Label of attribute <see cref="OverrideMetrics"/> in the configuration file.
+        /// Label of attribute <see cref="PathGlobbing"/> in the configuration file.
         /// </summary>
-        private const string overrideMetricsLabel = "OverrideMetrics";
+        private const string pathGlobbingLabel = "PathGlobbing";
 
         /// <summary>
-        /// Label of attribute <see cref="IssuesAddedFromVersion"/> in the configuration file.
+        /// Label of attribute <see cref="RepositoryPath"/> in the configuration file.
         /// </summary>
-        private const string issuesAddedFromVersionLabel = "IssuesAddedFromVersion";
+        private const string repositoryPathLabel = "RepositoryPath";
+
+        /// <summary>
+        /// Label of attribute <see cref="OldCommitID"/> in the configuration file.
+        /// </summary>
+        private const string oldCommitIDLabel = "OldCommitID";
+
+        /// <summary>
+        /// Label of attribute <see cref="NewCommitID"/> in the configuration file.
+        /// </summary>
+        private const string newCommitIDLabel = "NewCommitID";
+
         protected override void SaveAttributes(ConfigWriter writer)
         {
-            writer.Save(GetVCSGraph(), overrideMetricsLabel);
+            Dictionary<string,bool> pathGlobbing = string.IsNullOrEmpty(PathGlobbing.ToString()) ? null : PathGlobbing;
+            writer.Save(pathGlobbing, pathGlobbingLabel);
+            writer.Save(OldCommitID, oldCommitIDLabel);
+            writer.Save(NewCommitID,newCommitIDLabel);
+            RepositoryPath.Save(writer, repositoryPathLabel);
         }
 
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
-
+            ConfigIO.Restore(attributes, pathGlobbingLabel, ref PathGlobbing);
+            ConfigIO.Restore(attributes, oldCommitIDLabel, ref OldCommitID);
+            ConfigIO.Restore(attributes, newCommitIDLabel, ref NewCommitID);
+            RepositoryPath.Restore(attributes, repositoryPathLabel);
         }
         /// <summary>
         /// Creates a new node for each element of a filepath, that does not
@@ -198,7 +225,7 @@ namespace SEE.GraphProviders
                 // Directory does not exist.
                 if (graph.GetNode(pathSegments[0]) == null && pathSegments.Length > 1 && parent == null)
                 {
-                    mainNode.AddChild(NewNode(graph, pathSegments[0], "directory", pathSegments[0]));
+                    mainNode.AddChild(NewNode(graph, pathSegments[0], "directory"));
                     BuildGraphFromPath(nodePath, graph.GetNode(pathSegments[0]), pathSegments[0], graph, mainNode);
                 }
                 // I dont know, if this code ever gets used -> I dont know, how to handle empty directorys.
@@ -218,13 +245,13 @@ namespace SEE.GraphProviders
                 // The node for the current pathSegment does not exist, and the node is a directory.
                 if (graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]) == null && pathSegments.Length > 1)
                 {
-                    parent.AddChild(NewNode(graph, parentPath + Path.DirectorySeparatorChar + pathSegments[0], "directory", pathSegments[0]));
+                    parent.AddChild(NewNode(graph, parentPath + Path.DirectorySeparatorChar + pathSegments[0], "directory"));
                     BuildGraphFromPath(nodePath, graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]), parentPath + Path.DirectorySeparatorChar + pathSegments[0], graph, mainNode);
                 }
                 // The node for the current pathSegment does not exist, and the node is file.
                 if (graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]) == null && pathSegments.Length == 1)
                 {
-                    parent.AddChild(NewNode(graph, parentPath + Path.DirectorySeparatorChar + pathSegments[0], "file", pathSegments[0]));
+                    parent.AddChild(NewNode(graph, parentPath + Path.DirectorySeparatorChar + pathSegments[0], "file"));
                 }
             }
         }
