@@ -25,7 +25,7 @@ namespace SEE.GraphProviders
         /// The path to the git repository.
         /// </summary>
         [ShowInInspector, Tooltip("Path to the git repository."), HideReferenceObjectPicker]
-        public readonly FilePath RepositoryPath = new();
+        public readonly DirectoryPath RepositoryPath = new();
 
         /// <summary>
         /// The commit id against which to compare.
@@ -98,7 +98,7 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="pathGlobbing">The paths which get included/excluded.</param>
         /// <param name="repositoryPath">The path to the repository.</param>
-        static Graph GetVCSGraph(Dictionary<string,bool> pathGlobbing, string repositoryPath, string oldCommitID, string newCommitID)
+        static Graph GetVCSGraph(Dictionary<string, bool> pathGlobbing, string repositoryPath, string oldCommitID, string newCommitID)
         {
             string[] pathSegments = repositoryPath.Split(Path.DirectorySeparatorChar);
             Debug.Log(repositoryPath);
@@ -147,9 +147,10 @@ namespace SEE.GraphProviders
                     {
                         BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(pathSegments[^1]));
                     }
-
+                    /*
                     AddMcCabeMetric(graph, repositoryPath);
                     AddHalsteadMetrics(graph, repositoryPath);
+                    */
                 }
                 //TODO: Only for testing.
                 Debug.Log(graph.ToString());
@@ -187,10 +188,10 @@ namespace SEE.GraphProviders
 
         protected override void SaveAttributes(ConfigWriter writer)
         {
-            Dictionary<string,bool> pathGlobbing = string.IsNullOrEmpty(PathGlobbing.ToString()) ? null : PathGlobbing;
+            Dictionary<string, bool> pathGlobbing = string.IsNullOrEmpty(PathGlobbing.ToString()) ? null : PathGlobbing;
             writer.Save(pathGlobbing, pathGlobbingLabel);
             writer.Save(OldCommitID, oldCommitIDLabel);
-            writer.Save(NewCommitID,newCommitIDLabel);
+            writer.Save(NewCommitID, newCommitIDLabel);
             RepositoryPath.Save(writer, repositoryPathLabel);
         }
 
@@ -497,7 +498,7 @@ namespace SEE.GraphProviders
         private static (int, int, int, int) CalculateHalsteadMetrics(string code)
         {
             // Remove comments and string literals.
-            code = Regex.Replace(code, @"/\*.*?\*/|//.*?$|"".*?""", string.Empty, RegexOptions.Multiline);
+            code = Regex.Replace(code, @"/\*.*?\*///.*?$|"".*?""", string.Empty, RegexOptions.Multiline);
 
             // Identify operands (identifiers and literals).
             var operands = new HashSet<string>(Regex.Matches(code, @"\b\w+\b|\d+(\.\d+)?")
