@@ -365,7 +365,6 @@ namespace SEE.GraphProviders
                         fileAuthors[filePath] = authors;
                     }
                 }
-
                 foreach (var entry in fileAuthors)
                 {
                     foreach (var node in graph.Nodes())
@@ -438,14 +437,14 @@ namespace SEE.GraphProviders
         /// <param name="filePath">The path to the file for which the metric should be calculated.</param>
         protected static void AddMcCabeMetric(Graph graph, string filePath)
         {
-            string fileContent = File.ReadAllText(filePath);
-            int complexity = CalculateMcCabeComplexity(fileContent);
+            string fileContent;
 
             foreach (var node in graph.Nodes())
             {
-                if (node.ID.Replace('\\', '/') == filePath)
+                if (node.Type == "file")
                 {
-                    node.SetInt("McCabe Complexity", complexity);
+                    fileContent = File.ReadAllText(node.ID.Replace('\\', '/'));
+                    node.SetInt("McCabe Complexity", CalculateMcCabeComplexity(fileContent));
                 }
             }
         }
@@ -457,13 +456,14 @@ namespace SEE.GraphProviders
         /// <param name="filePath">The path to the file for which the metrics should be calculated.</param>
         protected static void AddHalsteadMetrics(Graph graph, string filePath)
         {
-            string fileContent = File.ReadAllText(filePath);
-            (int distinctOperators, int distinctOperands, int totalOperators, int totalOperands) = CalculateHalsteadMetrics(fileContent);
+            string fileContent;
 
             foreach (var node in graph.Nodes())
             {
-                if (node.ID.Replace('\\', '/') == filePath)
+                if (node.Type == "file")
                 {
+                    fileContent = File.ReadAllText(node.ID.Replace('\\', '/'));
+                    (int distinctOperators, int distinctOperands, int totalOperators, int totalOperands) = CalculateHalsteadMetrics(fileContent);
                     node.SetInt("Halstead Distinct Operators", distinctOperators);
                     node.SetInt("Halstead Distinct Operands", distinctOperands);
                     node.SetInt("Halstead Total Operators", totalOperators);
