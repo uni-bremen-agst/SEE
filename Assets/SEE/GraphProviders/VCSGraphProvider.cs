@@ -147,10 +147,10 @@ namespace SEE.GraphProviders
                     {
                         BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(pathSegments[^1]));
                     }
-                    /*
+
                     AddMcCabeMetric(graph, repositoryPath);
                     AddHalsteadMetrics(graph, repositoryPath);
-                    */
+
                 }
                 //TODO: Only for testing.
                 Debug.Log(graph.ToString());
@@ -498,7 +498,7 @@ namespace SEE.GraphProviders
         private static (int, int, int, int) CalculateHalsteadMetrics(string code)
         {
             // Remove comments and string literals.
-            code = Regex.Replace(code, @"/\*.*?\*///.*?$|"".*?""", string.Empty, RegexOptions.Multiline);
+            code = Regex.Replace(code, @"/\*.*?\*/|/.*?$|"".*?""", string.Empty, RegexOptions.Multiline);
 
             // Identify operands (identifiers and literals).
             var operands = new HashSet<string>(Regex.Matches(code, @"\b\w+\b|\d+(\.\d+)?")
