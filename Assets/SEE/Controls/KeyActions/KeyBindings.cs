@@ -136,6 +136,8 @@ namespace SEE.Controls.KeyActions
                      KeyActionCategory.General, "Turns on/off the settings menu.");
             Register(KeyAction.ToggleBrowser, KeyCode.F4, "Toggle browser",
                      KeyActionCategory.General, "Turns on/off the browser.");
+            Register(KeyAction.ToggleMirror, KeyCode.F10, "Toggle mirror",
+                     KeyActionCategory.General, "Turns on/off the mirror.");
             Register(KeyAction.SearchMenu, KeyCode.F, "Search",
                      KeyActionCategory.General, "Opens the search menu.");
             Register(KeyAction.Undo, KeyCode.Z, "Undo",
