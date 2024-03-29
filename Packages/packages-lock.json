@@ -36,11 +36,11 @@
       "hash": "17c6330d51a140eac037b9ea6f5d157a846535af"
     },
     "com.openai.unity": {
-      "version": "7.7.4",
+      "version": "7.7.6",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.utilities.rest": "2.5.3",
+        "com.utilities.rest": "2.5.5",
         "com.utilities.encoder.wav": "1.1.5"
       },
       "url": "https://package.openupm.com"
@@ -70,7 +70,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.burst": {
-      "version": "1.8.12",
+      "version": "1.8.13",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -410,7 +410,7 @@
       "url": "https://package.openupm.com"
     },
     "com.utilities.rest": {
-      "version": "2.5.3",
+      "version": "2.5.5",
       "depth": 1,
       "source": "registry",
       "dependencies": {
