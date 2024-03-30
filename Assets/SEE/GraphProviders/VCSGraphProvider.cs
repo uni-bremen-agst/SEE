@@ -463,11 +463,19 @@ namespace SEE.GraphProviders
                 if (node.Type == "file")
                 {
                     fileContent = File.ReadAllText(node.ID.Replace('\\', '/'));
-                    (int distinctOperators, int distinctOperands, int totalOperators, int totalOperands) = CalculateHalsteadMetrics(fileContent);
+                    (int distinctOperators, int distinctOperands, int totalOperators, int totalOperands, int programVocabulary, int programLength, float estimatedProgramLength, float volume, float difficulty, float effort, float timeRequiredToProgram, float numberOfDeliveredBugs) = CalculateHalsteadMetrics(fileContent);
                     node.SetInt("Halstead Distinct Operators", distinctOperators);
                     node.SetInt("Halstead Distinct Operands", distinctOperands);
                     node.SetInt("Halstead Total Operators", totalOperators);
                     node.SetInt("Halstead Total Operands", totalOperands);
+                    node.SetInt("Halstead Program Vocabulary", programVocabulary);
+                    node.SetInt("Halstead Program Length", programLength);
+                    node.SetFloat("Halstead Calculated Estimated Program Length", estimatedProgramLength);
+                    node.SetFloat("Halstead Volume", volume);
+                    node.SetFloat("Halstead Difficulty", difficulty);
+                    node.SetFloat("Halstead Effort", effort);
+                    node.SetFloat("Halstead Time Required to Program", timeRequiredToProgram);
+                    node.SetFloat("Halstead Number of Delivered Bugs", numberOfDeliveredBugs);
                 }
             }
         }
@@ -495,7 +503,7 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="code">The code for which the metrics should be calculated.</param>
         /// <returns>Returns distinct operators and operands and their total amounts.</returns>
-        private static (int, int, int, int) CalculateHalsteadMetrics(string code)
+        private static (int, int, int, int, int, int, float, float, float, float, float, float) CalculateHalsteadMetrics(string code)
         {
             // Remove comments and string literals.
             code = Regex.Replace(code, @"/\*.*?\*/|/.*?$|"".*?""", string.Empty, RegexOptions.Multiline);
@@ -513,7 +521,7 @@ namespace SEE.GraphProviders
                 .Select(m => m.Value)
                 .Except(operands));
 
-            // Count the total number of operands and operators
+            // Count the total number of operands and operators.
             int totalOperands = Regex.Matches(code, @"\b\w+\b|\d+(\.\d+)?")
                 .Cast<Match>()
                 .Select(m => m.Value)
@@ -524,7 +532,16 @@ namespace SEE.GraphProviders
                 .Select(m => m.Value)
                 .Count();
 
-            return (operators.Count, operands.Count, totalOperators, totalOperands);
+            int programVocabulary = operators.Count + operands.Count;
+            int programLength = totalOperators + totalOperands;
+            float estimatedProgramLength = (float)(operators.Count * Math.Log(operators.Count, 2) + operands.Count() * Math.Log(operands.Count, 2));
+            float volume = (float)(programLength * Math.Log(programVocabulary, 2));
+            float difficulty = operators.Count == 0 ? 0 : (totalOperators / 2.0f) * (totalOperands / (float)operators.Count);
+            float effort = difficulty * volume;
+            float timeRequiredToProgram = effort / 18.0f;
+            float numberOfDeliveredBugs = volume / 3000.0f;
+
+            return (operators.Count, operands.Count, totalOperators, totalOperands, programVocabulary, programLength, estimatedProgramLength, volume, difficulty, effort, timeRequiredToProgram, numberOfDeliveredBugs);
         }
     }
 }
