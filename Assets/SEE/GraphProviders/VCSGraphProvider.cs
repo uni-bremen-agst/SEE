@@ -150,7 +150,7 @@ namespace SEE.GraphProviders
 
                     AddMcCabeMetric(graph, repositoryPath);
                     AddHalsteadMetrics(graph, repositoryPath);
-
+                    AddLinesOfCodeMetric(graph, repositoryPath);
                 }
                 //TODO: Only for testing.
                 Debug.Log(graph.ToString());
@@ -542,6 +542,27 @@ namespace SEE.GraphProviders
             float numberOfDeliveredBugs = volume / 3000.0f;
 
             return (operators.Count, operands.Count, totalOperators, totalOperands, programVocabulary, programLength, estimatedProgramLength, volume, difficulty, effort, timeRequiredToProgram, numberOfDeliveredBugs);
+        }
+
+        /// <summary>
+        /// Calculates the number of lines of code for each file and adds it as a metric to the corresponding node. Comments are excluded.
+        /// </summary>
+        /// <param name="graph">The graph where the metric should be added.</param>
+        /// <param name="filePath">The path to the file for which the metric should be calculated.</param>
+        protected static void AddLinesOfCodeMetric(Graph graph, string filePath)
+        {
+            foreach (var node in graph.Nodes())
+            {
+                if (node.Type == "file")
+                {
+                    string fileContent = File.ReadAllText(node.ID.Replace('\\', '/'));
+                    // Split the file content into lines, excluding empty lines and lines containing only whitespace.
+                    IEnumerable<string> lines = fileContent.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries).Where(line => !string.IsNullOrWhiteSpace(line));
+                    // Exclude lines that start with "//" or are enclosed within "/*" and "*/".
+                    int linesOfCode = lines.Count(line => !line.Trim().StartsWith("//") && !line.Trim().StartsWith("/*") && !line.Trim().EndsWith("*/"));
+                    node.SetInt("Lines of Code", linesOfCode);
+                }
+            }
         }
     }
 }
