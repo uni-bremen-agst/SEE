@@ -439,7 +439,7 @@ namespace SEE.GraphProviders
         {
             string fileContent;
 
-            foreach (var node in graph.Nodes())
+            foreach (Node node in graph.Nodes())
             {
                 if (node.Type == "file")
                 {
@@ -458,7 +458,7 @@ namespace SEE.GraphProviders
         {
             string fileContent;
 
-            foreach (var node in graph.Nodes())
+            foreach (Node node in graph.Nodes())
             {
                 if (node.Type == "file")
                 {
@@ -509,14 +509,14 @@ namespace SEE.GraphProviders
             code = Regex.Replace(code, @"/\*.*?\*/|/.*?$|"".*?""", string.Empty, RegexOptions.Multiline);
 
             // Identify operands (identifiers and literals).
-            var operands = new HashSet<string>(Regex.Matches(code, @"\b\w+\b|\d+(\.\d+)?")
+            HashSet<string> operands = new(Regex.Matches(code, @"\b\w+\b|\d+(\.\d+)?")
                 // Convert into matches.
                 .Cast<Match>()
                 // Projects each match object to a value, containing matched text as string.
                 .Select(m => m.Value));
 
             // Identify operators (everything else but whitespace).
-            var operators = new HashSet<string>(Regex.Matches(code, @"\S+")
+            HashSet<string> operators = new(Regex.Matches(code, @"\S+")
                 .Cast<Match>()
                 .Select(m => m.Value)
                 .Except(operands));
@@ -534,9 +534,9 @@ namespace SEE.GraphProviders
 
             int programVocabulary = operators.Count + operands.Count;
             int programLength = totalOperators + totalOperands;
-            float estimatedProgramLength = (float)(operators.Count * Math.Log(operators.Count, 2) + operands.Count() * Math.Log(operands.Count, 2));
+            float estimatedProgramLength = (float)((operators.Count * Math.Log(operators.Count, 2)) + operands.Count() * Math.Log(operands.Count, 2));
             float volume = (float)(programLength * Math.Log(programVocabulary, 2));
-            float difficulty = operators.Count == 0 ? 0 : (totalOperators / 2.0f) * (totalOperands / (float)operators.Count);
+            float difficulty = operators.Count == 0 ? 0 : totalOperators / 2.0f * (totalOperands / (float)operators.Count);
             float effort = difficulty * volume;
             float timeRequiredToProgram = effort / 18.0f;
             float numberOfDeliveredBugs = volume / 3000.0f;
@@ -551,7 +551,7 @@ namespace SEE.GraphProviders
         /// <param name="filePath">The path to the file for which the metric should be calculated.</param>
         protected static void AddLinesOfCodeMetric(Graph graph, string filePath)
         {
-            foreach (var node in graph.Nodes())
+            foreach (Node node in graph.Nodes())
             {
                 if (node.Type == "file")
                 {
