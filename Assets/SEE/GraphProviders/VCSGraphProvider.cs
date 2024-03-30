@@ -502,18 +502,29 @@ namespace SEE.GraphProviders
 
             // Identify operands (identifiers and literals).
             var operands = new HashSet<string>(Regex.Matches(code, @"\b\w+\b|\d+(\.\d+)?")
-            // Convert into matches.
-            .Cast<Match>()
-            // Projects each match object to a value, containing matched text as string.
-            .Select(m => m.Value));
+                // Convert into matches.
+                .Cast<Match>()
+                // Projects each match object to a value, containing matched text as string.
+                .Select(m => m.Value));
 
             // Identify operators (everything else but whitespace).
             var operators = new HashSet<string>(Regex.Matches(code, @"\S+")
-            .Cast<Match>()
-            .Select(m => m.Value)
-            .Except(operands));
+                .Cast<Match>()
+                .Select(m => m.Value)
+                .Except(operands));
 
-            return (operators.Count, operands.Count, operators.Count, operands.Count);
+            // Count the total number of operands and operators
+            int totalOperands = Regex.Matches(code, @"\b\w+\b|\d+(\.\d+)?")
+                .Cast<Match>()
+                .Select(m => m.Value)
+                .Count();
+
+            int totalOperators = Regex.Matches(code, @"\S+")
+                .Cast<Match>()
+                .Select(m => m.Value)
+                .Count();
+
+            return (operators.Count, operands.Count, totalOperators, totalOperands);
         }
     }
 }
