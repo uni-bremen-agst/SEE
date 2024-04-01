@@ -207,7 +207,7 @@ namespace SEE.Controls.Actions
             IVersionControl vcs = VersionControlFactory.GetVersionControl(city.VersionControlSystem, city.VCSPath.Path);
             // The path of the file relative to the root of the repository where / is used as separator.
             string relativePath = graphElement.Path();
-            Change change = vcs.GetFileChange(relativePath, city.OldRevision, city.NewRevision, out string changedName);
+            Change change = vcs.GetFileChange(relativePath, city.OldRevision, city.NewRevision, out string oldRelativePath);
 
             switch (change)
             {
@@ -218,8 +218,8 @@ namespace SEE.Controls.Actions
                 case Change.Modified or Change.Deleted or Change.Renamed:
                     // If a file was renamed, it can still have differences.
                     // We need to show a difference.
-                    codeWindow.EnterFromText(TextualDiff.Diff(vcs.Show(relativePath, city.OldRevision),
-                                                              vcs.Show(changedName, city.NewRevision)), true);
+                    codeWindow.EnterFromText(TextualDiff.Diff(vcs.Show(oldRelativePath, city.OldRevision),
+                                                              vcs.Show(relativePath, city.NewRevision)), true);
                     break;
                 default:
                     throw new Exception($"Unexpected change type {change} for {relativePath}");
@@ -228,8 +228,8 @@ namespace SEE.Controls.Actions
             switch (change)
             {
                 case Change.Renamed:
-                    codeWindow.Title = $"<color=\"red\"><s><noparse>{sourceFilename}</noparse></s></color>"
-                        + $" -> <color=\"green\"><u><noparse>{changedName}</noparse></u></color>";
+                    codeWindow.Title = $"<color=\"red\"><s><noparse>{oldRelativePath}</noparse></s></color>"
+                        + $" -> <color=\"green\"><u><noparse>{sourceFilename}</noparse></u></color>";
                     break;
                 case Change.Deleted:
                     codeWindow.Title = $"<color=\"red\"><s><noparse>{sourceFilename}</noparse></s></color>";
