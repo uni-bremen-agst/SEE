@@ -13,6 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using SEE.VCS;
 
 namespace SEE.GraphProviders
 {
@@ -65,7 +66,7 @@ namespace SEE.GraphProviders
         /// <see cref="NewCommitID"/> and <paramref name="city"/> hold.
         /// If not, exceptions are thrown accordingly.
         /// </summary>
-        /// <param name="city">to be checked</param>
+        /// <param name="city">To be checked</param>
         /// <exception cref="ArgumentException">thrown in case <see cref="RepositoryPath"/>,
         /// <see cref="OldCommitID"/> or <see cref="NewCommitID"/>
         /// is undefined or does not exist or <paramref name="city"/> is null</exception>
@@ -98,6 +99,7 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="pathGlobbing">The paths which get included/excluded.</param>
         /// <param name="repositoryPath">The path to the repository.</param>
+        /// <returns>the graph.</returns>
         static Graph GetVCSGraph(Dictionary<string, bool> pathGlobbing, string repositoryPath, string oldCommitID, string newCommitID)
         {
             string[] pathSegments = repositoryPath.Split(Path.DirectorySeparatorChar);
@@ -116,22 +118,34 @@ namespace SEE.GraphProviders
 
             using (Repository repo = new(repositoryPath))
             {
+                LibGit2Sharp.Tree tree = repo.Lookup<Commit>(newCommitID).Tree;
                 // Get all files using "git ls-files".
                 //TODO: I limited the output to 200 for testing, because SEE is huge.
                 IEnumerable<string> files;
                 if (includedFiles.Any() && !string.IsNullOrEmpty(includedFiles.First()))
                 {
-                    files = repo.Index.Select(entry => entry.Path).Where(path => includedFiles.Contains(Path.GetExtension(path))).Take(200);
+                    files = ListTree(tree).Where(path => includedFiles.Contains(Path.GetExtension(path))).Take(200);
                 }
                 else if (excludedFiles.Any())
                 {
-                    files = repo.Index.Select(entry => entry.Path).Where(path => !excludedFiles.Contains(Path.GetExtension(path))).Take(200);
+                    //files = repo.Index.Select(entry => entry.Path).Where(path => !excludedFiles.Contains(Path.GetExtension(path)));
+                    files = ListTree(tree).Where(path => !excludedFiles.Contains(Path.GetExtension(path))).Take(200);
                 }
                 else
                 {
-                    files = repo.Index.Select(entry => entry.Path).Where(path => !string.IsNullOrEmpty(path)).Take(200);
+                    files = ListTree(tree).Take(200);
                 }
                 Debug.Log(files.Count());
+                string json = Newtonsoft.Json.JsonConvert.SerializeObject(files.ToList());
+                //ToDO: ALLES NUR FÜR DEBUGGING
+                // Teile die Zeichenkette anhand des Kommas auf, um einzelne Elemente zu erhalten
+                string[] elements = json.Split(',');
+
+                // Füge einen Zeilenumbruch nach jedem Element hinzu und erstelle eine neue Zeichenkette
+                string output = string.Join("\n", elements.Select(e => e.Replace("\"", "")));
+
+                // Gib die resultierende Zeichenkette aus
+                Debug.Log(output);
                 Debug.Log(graph.BasePath);
                 // Build the graph structure.
                 foreach (string filePath in files.Where(path => !string.IsNullOrEmpty(path)))
@@ -148,9 +162,9 @@ namespace SEE.GraphProviders
                         BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(pathSegments[^1]));
                     }
 
-                    AddMcCabeMetric(graph, repositoryPath);
-                    AddHalsteadMetrics(graph, repositoryPath);
-                    AddLinesOfCodeMetric(graph, repositoryPath);
+                    AddMcCabeMetric(graph, repo, newCommitID);
+                    AddHalsteadMetrics(graph, repo, newCommitID);
+                    AddLinesOfCodeMetric(graph, repo, newCommitID);
                 }
                 //TODO: Only for testing.
                 Debug.Log(graph.ToString());
@@ -162,6 +176,33 @@ namespace SEE.GraphProviders
 
             return graph;
         }
+
+        /// <summary>
+        /// Gets the paths from a repository at the time of a given commitID.
+        /// It is equivalent to "git ls-tree --name-only -r commitID"
+        /// </summary>
+        /// <param name="tree">The tree of the given commit.</param>
+        /// <returns>a list of paths.</returns>
+        static List<string> ListTree(LibGit2Sharp.Tree tree)
+        {
+            var fileList = new List<string>();
+
+            foreach (var entry in tree)
+            {
+                if (entry.TargetType == TreeEntryTargetType.Blob)
+                {
+                    fileList.Add(entry.Path);
+                }
+                else if (entry.TargetType == TreeEntryTargetType.Tree)
+                {
+                    var subtree = (LibGit2Sharp.Tree)entry.Target;
+                    fileList.AddRange(ListTree(subtree));
+                }
+            }
+
+            return fileList;
+        }
+
         public override GraphProviderKind GetKind()
         {
             return GraphProviderKind.VCS;
@@ -206,11 +247,11 @@ namespace SEE.GraphProviders
         /// Creates a new node for each element of a filepath, that does not
         /// already exists in the graph.
         /// </summary>
-        /// <param name="path">the remaining part of the path</param>
-        /// <param name="parent">the parent node from the current element of the path</param>
-        /// <param name="parentPath">the path of the current parent, which will eventually be part of the ID</param>
-        /// <param name="graph">the graph to which the new node belongs to</param>
-        /// <param name="mainNode">the root node of the main directory</param>
+        /// <param name="path">The remaining part of the path</param>
+        /// <param name="parent">The parent node from the current element of the path</param>
+        /// <param name="parentPath">The path of the current parent, which will eventually be part of the ID</param>
+        /// <param name="graph">The graph to which the new node belongs to</param>
+        /// <param name="mainNode">The root node of the main directory</param>
         static void BuildGraphFromPath(string path, Node parent, string parentPath, Graph graph, Node mainNode)
         {
             string[] pathSegments = path.Split(Path.AltDirectorySeparatorChar);
@@ -260,11 +301,11 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Creates and returns a new node to <paramref name="graph"/>.
         /// </summary>
-        /// <param name="graph">where to add the node</param>
-        /// <param name="id">unique ID of the new node</param>
-        /// <param name="type">type of the new node</param>
-        /// <param name="name">the name of the node</param>
-        /// <param name="length">the length of the graph element, measured in number of lines</param>
+        /// <param name="graph">Where to add the node</param>
+        /// <param name="id">Unique ID of the new node</param>
+        /// <param name="type">Type of the new node</param>
+        /// <param name="name">The name of the node</param>
+        /// <param name="length">The length of the graph element, measured in number of lines</param>
         /// <returns>a new node added to <paramref name="graph"/></returns>
         protected static Node NewNode(Graph graph, string id, string type = "Routine", string name = null, int? length = null)
         {
@@ -283,12 +324,12 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Creates and returns a new node to <paramref name="graph"/> as a child of <paramref name="parent"/>.
         /// </summary>
-        /// <param name="graph">where to add the node</param>
-        /// <param name="parent">the parent of the new node; must not be null</param>
-        /// <param name="id">unique ID of the new node</param>
-        /// <param name="type">type of the new node</param>
-        /// <param name="name">the name of the node</param>
-        /// <param name="length">the length of the graph element, measured in number of lines</param>
+        /// <param name="graph">Where to add the node</param>
+        /// <param name="parent">The parent of the new node; must not be null</param>
+        /// <param name="id">Unique ID of the new node</param>
+        /// <param name="type">Type of the new node</param>
+        /// <param name="name">The name of the node</param>
+        /// <param name="length">The length of the graph element, measured in number of lines</param>
         /// <returns>a new node added to <paramref name="graph"/></returns>
         protected static Node Child(Graph graph, Node parent, string id, string type = "Routine", string name = null, int? length = null)
         {
@@ -431,11 +472,34 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
+        /// Reads the filecontet of a given node.
+        /// </summary>
+        /// <param name="filePath">The filePath from the node.</param>
+        /// <param name="repository">The repository, from which the fileContent comes.</param>
+        /// <param name="commitID">The commitID, where the files exist.</param>
+        /// <returns>a new node added to <paramref name="graph"/></returns>
+        private static string ReadFileText(string filePath, Repository repository, string commitID)
+        {
+            Blob blob = repository.Lookup<Blob>($"{commitID}:{filePath}");
+
+            if (blob != null)
+            {
+                return blob.GetContentText();
+            }
+            else
+            {
+                // File does not exist.
+                return "";
+            }
+        }
+
+        /// <summary>
         /// Calculates the McCabe cyclomatic complexity metric for a given file and adds it as a metric to the corresponding node.
         /// </summary>
         /// <param name="graph">The graph where the metric should be added.</param>
-        /// <param name="filePath">The path to the file for which the metric should be calculated.</param>
-        protected static void AddMcCabeMetric(Graph graph, string filePath)
+        /// <param name="repository">The repository, from which the fileContent comes.</param>
+        /// <param name="commitID">The commitID, where the files exist.</param>
+        protected static void AddMcCabeMetric(Graph graph, Repository repository, string commitID)
         {
             string fileContent;
 
@@ -443,7 +507,7 @@ namespace SEE.GraphProviders
             {
                 if (node.Type == "file")
                 {
-                    fileContent = File.ReadAllText(node.ID.Replace('\\', '/'));
+                    fileContent = ReadFileText(node.ID.Replace('\\', '/'), repository, commitID);
                     node.SetInt("McCabe Complexity", CalculateMcCabeComplexity(fileContent));
                 }
             }
@@ -453,8 +517,9 @@ namespace SEE.GraphProviders
         /// Calculates the Halstead metrics for a given file and adds them as metrics to the corresponding node.
         /// </summary>
         /// <param name="graph">The graph where the metrics should be added.</param>
-        /// <param name="filePath">The path to the file for which the metrics should be calculated.</param>
-        protected static void AddHalsteadMetrics(Graph graph, string filePath)
+        /// <param name="repository">The repository, from which the fileContent comes.</param>
+        /// <param name="commitID">The commitID, where the files exist.</param>
+        protected static void AddHalsteadMetrics(Graph graph, Repository repository, string commitID)
         {
             string fileContent;
 
@@ -462,7 +527,7 @@ namespace SEE.GraphProviders
             {
                 if (node.Type == "file")
                 {
-                    fileContent = File.ReadAllText(node.ID.Replace('\\', '/'));
+                    fileContent = ReadFileText(node.ID.Replace('\\', '/'), repository, commitID);
                     (int distinctOperators, int distinctOperands, int totalOperators, int totalOperands, int programVocabulary, int programLength, float estimatedProgramLength, float volume, float difficulty, float effort, float timeRequiredToProgram, float numberOfDeliveredBugs) = CalculateHalsteadMetrics(fileContent);
                     node.SetInt("Halstead Distinct Operators", distinctOperators);
                     node.SetInt("Halstead Distinct Operands", distinctOperands);
@@ -548,14 +613,15 @@ namespace SEE.GraphProviders
         /// Calculates the number of lines of code for each file and adds it as a metric to the corresponding node. Comments are excluded.
         /// </summary>
         /// <param name="graph">The graph where the metric should be added.</param>
-        /// <param name="filePath">The path to the file for which the metric should be calculated.</param>
-        protected static void AddLinesOfCodeMetric(Graph graph, string filePath)
+        /// <param name="repository">The repository, from which the fileContent comes.</param>
+        /// <param name="commitID">The commitID, where the files exist.</param>
+        protected static void AddLinesOfCodeMetric(Graph graph, Repository repository, string commitID)
         {
             foreach (Node node in graph.Nodes())
             {
                 if (node.Type == "file")
                 {
-                    string fileContent = File.ReadAllText(node.ID.Replace('\\', '/'));
+                    string fileContent = ReadFileText(node.ID.Replace('\\', '/'), repository, commitID);
                     // Split the file content into lines, excluding empty lines and lines containing only whitespace.
                     IEnumerable<string> lines = fileContent.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries).Where(line => !string.IsNullOrWhiteSpace(line));
                     // Exclude lines that start with "//" or are enclosed within "/*" and "*/".
