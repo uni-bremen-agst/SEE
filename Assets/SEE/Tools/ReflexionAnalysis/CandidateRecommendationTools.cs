@@ -31,7 +31,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         {
             bool suppressNotifications = reflexionGraph.SuppressNotifications;
             reflexionGraph.SuppressNotifications = true;
-            reflexionGraph.RemoveFromMapping(candidate, cluster);
+            reflexionGraph.RemoveFromMapping(candidate);
             reflexionGraph.SuppressNotifications = suppressNotifications;
         }
 

@@ -3,6 +3,7 @@ using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
+using SEE.VCS;
 using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
@@ -252,25 +253,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     List<Node> candidatesChangedInMapping = new List<Node>();
                     this.GetImplicitlyMappedCandidates(candidatesChangedInMapping, edgeEvent.Edge.Source, ReflexionGraph);
 
-
-                    if ((ChangeType)edgeEvent.Change == ChangeType.Removal)
+                    foreach (Node node in candidatesChangedInMapping)
                     {
-                        foreach (Node candidate in candidatesChangedInMapping)
-                        {
-                            this.UnmappedCandidates.Add(candidate.ID);
-                        }
-                    }
-                    else if ((ChangeType)edgeEvent.Change == ChangeType.Addition)
-                    {
-                        foreach (Node candidate in candidatesChangedInMapping)
-                        {
-                            this.UnmappedCandidates.Remove(candidate.ID);
-                            recommendedNodes.RemoveCandidate(candidate.ID);
-                        }
-                    }
-                    else
-                    {
-                        throw new Exception("Unkown Changetype in ChangeEvent. Can not process ChangeEvent when calculating recommendations.");
+                        UpdateCandidateSet(node.ID, edgeEvent.Change);
                     }
 
                     if (Statistics.Active)
@@ -286,21 +271,47 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                                 // For the very first mapped node and nodes removed form the mapping
                                 // there is no previously calculated mappingpair available.
                                 // So we create a corresponding mapping pair manually
+                                //Debug.Log($"Could not find mappingPair for candidate={candidateChangedInMapping.ID} and cluster {edgeEvent.Edge.Target.ID}" +
+                                //    $"in Recommendations. Create one MappingPair manually.");
+                                
+                                // TODO: move this into recommendation class.
                                 chosenMappingPair = new MappingPair(candidateChangedInMapping, edgeEvent.Edge.Target, -1.0d);
                             }
 
+                            recommendedNodes.RemoveCandidate(candidateChangedInMapping.ID);
                             AttractFunction.HandleChangedNodes(edgeEvent.Edge.Target, new List<Node> { candidateChangedInMapping }, (ChangeType)edgeEvent.Change);
                             UpdateRecommendations();
                             chosenMappingPair.ChangeType = (ChangeType)edgeEvent.Change;
-                            // Debug.Log($"Record chosen mapping Pair:{chosenMappingPair.CandidateID}  --> {chosenMappingPair.ClusterID}");
+                            // Debug.Log($"Record chosen mapping Pair:{chosenMappingPair.CandidateID} -'{chosenMappingPair.AttractionValue}'-> {chosenMappingPair.ClusterID}");
                             Statistics.RecordChosenMappingPair(chosenMappingPair);
                         }
                     }
                     else
                     {
+                        foreach (Node candidateChangedInMapping in candidatesChangedInMapping)
+                        {
+                            recommendedNodes.RemoveCandidate(candidateChangedInMapping.ID);
+                        }
                         AttractFunction.HandleChangedNodes(edgeEvent.Edge.Target, candidatesChangedInMapping, (ChangeType)edgeEvent.Change);
                     } 
                 }
+            }
+        }
+
+        private void UpdateCandidateSet(string candidateId, ChangeType? change)
+        {
+            if (change == ChangeType.Removal)
+            {
+                this.UnmappedCandidates.Add(candidateId);
+            }
+            else if (change == ChangeType.Addition)
+            {
+                this.UnmappedCandidates.Remove(candidateId);
+
+            }
+            else
+            {
+                throw new Exception("Unkown Changetype in ChangeEvent. Can not process ChangeEvent when calculating recommendations.");
             }
         }
 

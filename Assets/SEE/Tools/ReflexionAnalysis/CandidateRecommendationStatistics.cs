@@ -99,11 +99,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             mappingResult.AddConfigInformation(config);
         }
 
-        public void RecordMappingPairs(IEnumerable<MappingPair> attractionValues)
+        public void RecordMappingPairs(IEnumerable<MappingPair> mappingPairs)
         {
             if (recordAllMappingPairs)
             {
-                mappingProcess[mappingStep].AddRange(attractionValues); 
+                mappingProcess[mappingStep].AddRange(mappingPairs); 
             }
         }
 
