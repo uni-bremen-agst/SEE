@@ -599,9 +599,9 @@ namespace SEE.GraphProviders
 
             int programVocabulary = operators.Count + operands.Count;
             int programLength = totalOperators + totalOperands;
-            float estimatedProgramLength = (float)((operators.Count * Math.Log(operators.Count, 2)) + operands.Count() * Math.Log(operands.Count, 2));
+            float estimatedProgramLength = (float)((operators.Count * Math.Log(operators.Count, 2) + operands.Count * Math.Log(operands.Count, 2)));
             float volume = (float)(programLength * Math.Log(programVocabulary, 2));
-            float difficulty = operators.Count == 0 ? 0 : totalOperators / 2.0f * (totalOperands / (float)operators.Count);
+            float difficulty = operators.Count == 0 ? 0 : operators.Count / 2.0f * (totalOperands / (float)operands.Count);
             float effort = difficulty * volume;
             float timeRequiredToProgram = effort / 18.0f;
             float numberOfDeliveredBugs = volume / 3000.0f;
