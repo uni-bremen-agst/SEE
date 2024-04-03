@@ -8457,7 +8457,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 616cd0a1c5e06384e8441efb4837d445, type: 3}
       propertyPath: m_Name
-      value: DiffCity
+      value: DiffTable
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 616cd0a1c5e06384e8441efb4837d445, type: 3}
       propertyPath: m_StaticEditorFlags
