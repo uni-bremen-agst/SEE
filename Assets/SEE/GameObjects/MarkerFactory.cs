@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using DG.Tweening;
 using SEE.Game;
+using SEE.Game.City;
 using SEE.GO.NodeFactories;
 using SEE.Utils;
 using UnityEngine;
@@ -22,38 +23,36 @@ namespace SEE.GO
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="markerWidth">the width (x and z lengths) of the markers</param>
-        /// <param name="markerHeight">the height (y length) of the markers</param>
-        /// <param name="additionColor">the color for the markers for added nodes</param>
-        /// <param name="changeColor">the color for the markers for changed nodes</param>
-        /// <param name="deletionColor">the color for the markers for deleted nodes</param>
-        public MarkerFactory(float markerWidth, float markerHeight,
-                             Color additionColor, Color changeColor, Color deletionColor)
+        /// <param name="markerAttributes">the attributes to be used</param>
+        public MarkerFactory(MarkerAttributes markerAttributes)
         {
-            additionMarkerFactory = new CylinderFactory(Opaque, new ColorRange(additionColor, additionColor, 1));
-            changeMarkerFactory = new CylinderFactory(Opaque, new ColorRange(changeColor, changeColor, 1));
-            deletionMarkerFactory = new CylinderFactory(Opaque, new ColorRange(deletionColor, deletionColor, 1));
+            additionMarkerFactory = new CylinderFactory(Opaque,
+                new ColorRange(markerAttributes.AdditionBeamColor, markerAttributes.AdditionBeamColor, 1));
+            changeMarkerFactory = new CylinderFactory(Opaque,
+                new ColorRange(markerAttributes.ChangeBeamColor, markerAttributes.ChangeBeamColor, 1));
+            deletionMarkerFactory = new CylinderFactory(Opaque,
+                new ColorRange(markerAttributes.DeletionBeamColor, markerAttributes.DeletionBeamColor, 1));
 
-            if (markerHeight < 0)
+            if (markerAttributes.MarkerHeight < 0)
             {
                 throw new ArgumentException("SEE.Game.Evolution.Marker received a negative marker height.\n");
             }
-            if (markerWidth < 0)
+            if (markerAttributes.MarkerWidth < 0)
             {
                 throw new ArgumentException("SEE.Game.Evolution.Marker received a negative marker width.\n");
             }
-            markerScale = new Vector3(markerWidth, markerHeight, markerWidth);
+            markerScale = new Vector3(markerAttributes.MarkerWidth, markerAttributes.MarkerHeight, markerAttributes.MarkerWidth);
         }
 
         /// <summary>
         /// The strength factor of the emitted light for beam markers. It should be in the range [0,5].
         /// </summary>
-        private const int EmissionStrength = 1;
+        private const int emissionStrength = 1;
 
         /// <summary>
         /// The gap between the decorated game node and its marker in Unity world-space units.
         /// </summary>
-        private const float Gap = 0.001f;
+        private const float gap = 0.001f;
 
         /// <summary>
         /// The world-space scale of the markers used to mark new, changed, and deleted
@@ -84,7 +83,7 @@ namespace SEE.GO
         /// <summary>
         /// Cached shader property for emission strength.
         /// </summary>
-        private static readonly int EmissionStrengthProperty = Shader.PropertyToID("_EmissionStrength");
+        private static readonly int emissionStrengthProperty = Shader.PropertyToID("_EmissionStrength");
 
         /// <summary>
         /// A mapping of the materials used by the three factories onto their original color.
@@ -101,17 +100,17 @@ namespace SEE.GO
         /// <summary>
         /// The name of game objects representing a marker for dead nodes.
         /// </summary>
-        private const string DeadMarkerName = "DEAD_NODE";
+        private const string deadMarkerName = "DEAD_NODE";
 
         /// <summary>
         /// The name of game objects representing a marker for born nodes.
         /// </summary>
-        private const string BornMarkerName = "BORN_NODE";
+        private const string bornMarkerName = "BORN_NODE";
 
         /// <summary>
         /// The name of game objects representing a marker for changed nodes.
         /// </summary>
-        private const string ChangeMarkerName = "CHANGED_NODE";
+        private const string changeMarkerName = "CHANGED_NODE";
 
         /// <summary>
         /// Marks the given <paramref name="gameNode"/> as by putting a beam marker
@@ -136,7 +135,7 @@ namespace SEE.GO
         /// Creates a new beam marker using the given <paramref name="factory"/>.
         /// This new game object will have the given <paramref name="renderQueueOffset"/>.
         /// Emissive light is added to it, where the emission strength is defined by
-        /// <see cref="EmissionStrength"/>.
+        /// <see cref="emissionStrength"/>.
         /// </summary>
         /// <param name="factory">the factory to create the beam marker</param>
         /// <param name="renderQueueOffset">offset in the render queue</param>
@@ -151,14 +150,14 @@ namespace SEE.GO
         /// <summary>
         /// If the sharedMaterial of the <paramref name="gameObject"/> has been adjusted already
         /// (i.e., is contained in <see cref="materials"/>), nothing happens. Otherwise
-        /// <see cref="EmissionStrength"/> and an animation is added to the shared material of
+        /// <see cref="emissionStrength"/> and an animation is added to the shared material of
         /// <paramref name="gameObject"/> and the shared material is added to <see cref="materials"/>.
         ///
         /// Note: The sharedMaterial will be changed. That means all other objects
         /// having the same material will be affected, too.
         ///
         /// Precondition: <paramref name="gameObject"/> must have a renderer whose
-        /// material has a property <see cref="EmissionStrengthProperty"/>.
+        /// material has a property <see cref="emissionStrengthProperty"/>.
         /// </summary>
         /// <param name="gameObject">the object whose shared material is receiving the emission
         /// strength and animation</param>
@@ -167,21 +166,22 @@ namespace SEE.GO
             if (gameObject.TryGetComponent(out Renderer renderer) && !materials.ContainsKey(renderer.sharedMaterial))
             {
                 materials[renderer.sharedMaterial] = renderer.sharedMaterial.color;
-                renderer.sharedMaterial.SetFloat(EmissionStrengthProperty, EmissionStrength);
+                renderer.sharedMaterial.SetFloat(emissionStrengthProperty, emissionStrength);
+                // FIXME: Gradual fade does not work. The marker blinks in and out of existence.
                 renderer.sharedMaterial.DOFade(0.0f, animationDuration).SetEase(Ease.Linear).SetLoops(-1, LoopType.Yoyo);
             }
         }
 
         /// <summary>
         /// Puts <paramref name="beamMarker"/> above <paramref name="gameNode"/> and all
-        /// its active children (with a little <see cref="Gap"/>).
+        /// its active children (with a little <see cref="gap"/>).
         /// </summary>
         /// <param name="gameNode">game node above which <paramref name="beamMarker"/> is to be put</param>
         /// <param name="beamMarker">marker for <paramref name="gameNode"/></param>
         private static void PutAbove(GameObject gameNode, GameObject beamMarker)
         {
             Vector3 position = gameNode.GetRoofCenter();
-            position.y += Gap + beamMarker.transform.lossyScale.y / 2;
+            position.y += gap + beamMarker.transform.lossyScale.y / 2;
             beamMarker.transform.position = position;
         }
 
@@ -195,7 +195,7 @@ namespace SEE.GO
             foreach (Transform child in gameNode.transform)
             {
                 if (child.CompareTag(Tags.Decoration)
-                    && (child.name == ChangeMarkerName || child.name == BornMarkerName || child.name == DeadMarkerName))
+                    && child.name is changeMarkerName or bornMarkerName or deadMarkerName)
                 {
                     GameObject marker = child.gameObject;
                     // The scale of gameNode may have changed, but we want our markers to
@@ -218,7 +218,7 @@ namespace SEE.GO
         public GameObject MarkDead(GameObject gameNode)
         {
             GameObject beamMarker = MarkByBeam(gameNode, deletionMarkerFactory);
-            beamMarker.name = DeadMarkerName;
+            beamMarker.name = deadMarkerName;
             return beamMarker;
         }
 
@@ -233,7 +233,7 @@ namespace SEE.GO
         public GameObject MarkBorn(GameObject gameNode)
         {
             GameObject beamMarker = MarkByBeam(gameNode, additionMarkerFactory);
-            beamMarker.name = BornMarkerName;
+            beamMarker.name = bornMarkerName;
             // We need to add the marker to beamMarkers so that it can be destroyed at the beginning of the
             // next animation cycle.
             beamMarkers.Add(beamMarker);
@@ -251,7 +251,7 @@ namespace SEE.GO
         public GameObject MarkChanged(GameObject gameNode)
         {
             GameObject beamMarker = MarkByBeam(gameNode, changeMarkerFactory);
-            beamMarker.name = ChangeMarkerName;
+            beamMarker.name = changeMarkerName;
             // We need to add beam marker to beamMarkers so that it can be destroyed at the beginning of the
             // next animation cycle.
             beamMarkers.Add(beamMarker);

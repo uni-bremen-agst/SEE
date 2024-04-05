@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using SEE.Tools;
+using SEE.Tools.RandomGraphs;
 using SEE.Utils;
 using UnityEngine;
 
@@ -34,7 +34,7 @@ namespace SEE.DataModel.DG.IO
         [Test]
         public void TestReadingRealBigGraph()
         {
-            string filename = Application.dataPath + "/../Data/GXL/SEE/CodeFacts.gxl.xz";
+            string filename = Application.streamingAssetsPath + "/SEE/CodeFacts.gxl.xz";
             Performance p = Performance.Begin("Loading big GXL file " + filename);
             LoadGraph(filename);
             p.End();
@@ -99,7 +99,6 @@ namespace SEE.DataModel.DG.IO
         [Test, Sequential]
         public void TestRandomGraphWriter([Values(true, false)] bool compress)
         {
-            RandomGraphs random = new();
             Constraint leafConstraint = new("Routine", 10, "calls", 0.01f);
             Constraint innerNodesConstraint = new("File", 3, "imports", 0.01f);
             List<RandomAttributeDescriptor> attributeConstraints = new()
@@ -115,7 +114,7 @@ namespace SEE.DataModel.DG.IO
                 innerNodesConstraint.NodeNumber += i;
 
                 // Create and save the initial graph
-                Graph outGraph = random.Create(leafConstraint, innerNodesConstraint, attributeConstraints);
+                Graph outGraph = RandomGraphs.Create(leafConstraint, innerNodesConstraint, attributeConstraints);
                 // When floating point node metrics are stored, they will be rounded and may then differ
                 // from the more precise values we have in memory. Hence, we round the memory values.
                 RoundMetrics(outGraph);
@@ -161,6 +160,7 @@ namespace SEE.DataModel.DG.IO
         {
             string Extension = compress ? CompressedExtension : NormalExtension;
             string filename = basename + Extension;
+            string backupFilename = basename + backupSuffix + Extension;
 
             // We need to finalize the node hierarchy so that the integer node attribute
             // Metric.Level is calculated for outgraph. Otherwise its node would not have
@@ -168,26 +168,33 @@ namespace SEE.DataModel.DG.IO
             // lead to an artificial discrepancy.
             outGraph.FinalizeNodeHierarchy();
 
-            // Write outGraph
-            GraphWriter.Save(filename, outGraph, hierarchicalEdgeType);
+            try
+            {
+                // Write outGraph
+                GraphWriter.Save(filename, outGraph, hierarchicalEdgeType);
 
-            // Read the saved outGraph again
-            Graph inGraph = LoadGraph(filename);
-            Assert.AreEqual(filename, inGraph.Path);
+                // Read the saved outGraph again
+                Graph inGraph = LoadGraph(filename);
+                Assert.AreEqual(filename, inGraph.Path);
 
-            // Write the loaded saved initial graph again as a backup
-            string backupFilename = basename + backupSuffix + Extension;
-            GraphWriter.Save(backupFilename, inGraph, hierarchicalEdgeType);
+                // Write the loaded saved initial graph again as a backup
+                GraphWriter.Save(backupFilename, inGraph, hierarchicalEdgeType);
 
-            // Read the backup graph again
-            Graph backupGraph = LoadGraph(backupFilename);
-            // The path of backupGraph will be backupFilename.
-            Assert.AreEqual(backupFilename, backupGraph.Path);
-            // For the comparison, we need to reset the path.
-            backupGraph.Path = inGraph.Path = outGraph.Path;
+                // Read the backup graph again
+                Graph backupGraph = LoadGraph(backupFilename);
+                // The path of backupGraph will be backupFilename.
+                Assert.AreEqual(backupFilename, backupGraph.Path);
+                // For the comparison, we need to reset the path.
+                backupGraph.Path = inGraph.Path = outGraph.Path;
 
-            Assert.AreEqual(outGraph, inGraph);
-            Assert.AreEqual(backupGraph, inGraph);
+                Assert.AreEqual(outGraph, inGraph);
+                Assert.AreEqual(backupGraph, inGraph);
+            }
+            finally
+            {
+                FileIO.DeleteIfExists(filename);
+                FileIO.DeleteIfExists(backupFilename);
+            }
         }
 
         private static Graph LoadGraph(string filename)
@@ -238,8 +245,8 @@ namespace SEE.DataModel.DG.IO
             parent.AddChild(node1);
             parent.AddChild(node2);
 
-            Edge edge1 = NewEdge(graph, node1, node2, "call");
-            Edge edge2 = NewEdge(graph, node2, node1, "called");
+            NewEdge(graph, node1, node2, "call");
+            NewEdge(graph, node2, node1, "called");
 
             return graph;
         }

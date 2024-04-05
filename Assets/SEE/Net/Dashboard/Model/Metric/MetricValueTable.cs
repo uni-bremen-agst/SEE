@@ -15,12 +15,12 @@ namespace SEE.Net.Dashboard.Model.Metric
         /// <summary>
         /// The entity data.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly IList<MetricValueTableRow> rows;
+        [JsonProperty(PropertyName = "rows", Required = Required.Always)]
+        public readonly IList<MetricValueTableRow> Rows;
 
         public MetricValueTable(IList<MetricValueTableRow> rows)
         {
-            this.rows = rows;
+            this.Rows = rows;
         }
     }
 }

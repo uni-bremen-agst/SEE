@@ -17,7 +17,7 @@ namespace SEE.Layout.Utils
         /// Determines the strength of the tension for bundling edges. This value may
         /// range from 0.0 (straight lines) to 1.0 (maximal bundling along the spline).
         /// </summary>
-        public const float tensionDefault = 0.85f; // 0.85 is the value recommended by Holten
+        public const float TensionDefault = 0.85f; // 0.85 is the value recommended by Holten
 
         /// <summary>
         /// Returns the points of the line along the B-spline constrained by the given <paramref name="controlPoints"/>.
@@ -26,7 +26,7 @@ namespace SEE.Layout.Utils
         /// <param name="tension">tension of the control points onto the spline points; must be in
         /// the range [0, 1]</param>
         /// <returns>points of the line along the B-spline</returns>
-        public static Vector3[] BSplineLinePoints(Vector3[] controlPoints, float tension = tensionDefault)
+        public static Vector3[] BSplineLinePoints(Vector3[] controlPoints, float tension = TensionDefault)
         {
             Debug.Assert(controlPoints.Length > 3);
             Debug.Assert(0.0f <= tension && tension <= 1.0f);
@@ -51,7 +51,7 @@ namespace SEE.Layout.Utils
         /// the range [0, 1]</param>
         /// <param name="sampleRate">Number of points on the line
         /// <returns>points (depending on the sampleRate) of the line along the B-spline</returns>
-        public static Vector3[] BSplineLinePointsSampleRate(Vector3[] controlPoints, uint sampleRate = 100, float tension = tensionDefault)
+        public static Vector3[] BSplineLinePointsSampleRate(Vector3[] controlPoints, uint sampleRate = 100, float tension = TensionDefault)
         {
             Debug.Assert(controlPoints.Length > 3);
             Debug.Assert(0.0f <= tension && tension <= 1.0f);

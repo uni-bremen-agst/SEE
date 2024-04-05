@@ -20,7 +20,7 @@
 using SEE.DataModel.DG;
 using SEE.Game.Charts;
 using SEE.Game.City;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Utils;
@@ -31,6 +31,8 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
+using SEE.Game.CityRendering;
+using SEE.UI;
 
 namespace SEE.Game.Evolution
 {
@@ -97,7 +99,12 @@ namespace SEE.Game.Evolution
         /// Added nodes will appear there and then be moved to their location in the code
         /// city.
         /// </summary>
-        private const float SkyLevel = 2.0f;
+        private const float skyLevel = 2.0f;
+
+        /// <summary>
+        /// The message to be displayed while rendering the evolution city.
+        /// </summary>
+        private string LoadingMessage => $"Rendering evolution city {gameObject.name}...";
 
         /// <summary>
         /// The manager of the game objects created for the city.
@@ -130,7 +137,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// An event fired upon the end of an animation.
         /// </summary>
-        private readonly UnityEvent AnimationFinishedEvent = new();
+        private readonly UnityEvent animationFinishedEvent = new();
 
         /// <summary>
         /// True if animation is still ongoing.
@@ -140,14 +147,14 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// The default factor for the complete graph transition animation.
         /// </summary>
-        private const float DefaultAnimationFactor = 1.0f;
+        private const float defaultAnimationFactor = 1.0f;
 
         /// <summary>
         /// A factor controlling the speed of an animation (higher = slower). This value can be controlled by the user.
         /// </summary>
         [FormerlySerializedAs("animationDuration")]
         [SerializeField]
-        private float animationFactor = DefaultAnimationFactor;
+        private float animationFactor = defaultAnimationFactor;
 
         /// <summary>
         /// The animation factor for showing a single graph revision during auto-play.
@@ -164,20 +171,6 @@ namespace SEE.Game.Evolution
                 }
             }
         }
-
-        /// <summary>
-        /// The transition from the current graph to the next one is organized in
-        /// the following phases:
-        ///
-        /// (1) Remove deleted nodes and edges from the scene.
-        /// (2) Move existing nodes and edges to their new position in the scene.
-        /// (3) Adjust existing changed nodes and edges in the scene.
-        /// (4) Add newly created nodes to the scene.
-        /// (5) Add newly created edges to the scene.
-        ///
-        /// This constant is the number of phases.
-        /// </summary>
-        private const int NumberOfPhases = 5;  // TODO: Do we still need this constant?
 
         /// <summary>
         /// The city (graph + layout) currently shown.
@@ -210,14 +203,14 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// The title of user notifications used here.
         /// </summary>
-        private const string NotificationTitle = "City Evolution";
+        private const string notificationTitle = "City Evolution";
 
         /// <summary>
         /// Informs the user that graph transition is currently blocked.
         /// </summary>
         private static void UserInfoGraphTransitionIsBlocked()
         {
-            ShowNotification.Info(NotificationTitle, "Graph transition is blocked while animations are running.");
+            ShowNotification.Info(notificationTitle, "Graph transition is blocked while animations are running.");
         }
 
         /// <summary>
@@ -225,7 +218,7 @@ namespace SEE.Game.Evolution
         /// </summary>
         private static void UserInfoStillOccupied()
         {
-            ShowNotification.Info(NotificationTitle, "The renderer is already occupied with animating, wait until animations are finished.");
+            ShowNotification.Info(notificationTitle, "The renderer is already occupied with animating, wait until animations are finished.");
         }
 
         /// <summary>
@@ -233,7 +226,7 @@ namespace SEE.Game.Evolution
         /// </summary>
         private static void UserInfoFirstGraph()
         {
-            ShowNotification.Info(NotificationTitle, "This is already the first graph revision.");
+            ShowNotification.Info(notificationTitle, "This is already the first graph revision.");
         }
 
         /// <summary>
@@ -241,7 +234,7 @@ namespace SEE.Game.Evolution
         /// </summary>
         private static void UserInfoLastGraph()
         {
-            ShowNotification.Info(NotificationTitle, "This is already the last graph revision.");
+            ShowNotification.Info(notificationTitle, "This is already the last graph revision.");
         }
 
         /// <summary>
@@ -249,15 +242,15 @@ namespace SEE.Game.Evolution
         /// </summary>
         private static void UserInfoAutoPlayIsOn()
         {
-            ShowNotification.Info(NotificationTitle, "Auto-play mode is turned on. You cannot move to the next graph manually.");
+            ShowNotification.Info(notificationTitle, "Auto-play mode is turned on. You cannot move to the next graph manually.");
         }
 
         /// <summary>
         /// Informs the user about an error when attempting to load a layout.
         /// </summary>
-        private static Notification UserInfoNoLayout()
+        private static void UserInfoNoLayout()
         {
-            return ShowNotification.Error(NotificationTitle, "Could not retrieve a layout for the graph.");
+            ShowNotification.Error(notificationTitle, "Could not retrieve a layout for the graph.");
         }
 
         #endregion
@@ -284,11 +277,7 @@ namespace SEE.Game.Evolution
                 edgesAreDrawn = Renderer.AreEdgesDrawn();
 
                 objectManager = new ObjectManager(Renderer, gameObject);
-                markerFactory = new MarkerFactory(markerWidth: cityEvolution.MarkerWidth,
-                                    markerHeight: cityEvolution.MarkerHeight,
-                                    additionColor: cityEvolution.AdditionBeamColor,
-                                    changeColor: cityEvolution.ChangeBeamColor,
-                                    deletionColor: cityEvolution.DeletionBeamColor);
+                markerFactory = new MarkerFactory(cityEvolution.MarkerAttributes);
                 animationWatchDog = new CountingJoin();
             }
             else
@@ -362,6 +351,10 @@ namespace SEE.Game.Evolution
             currentCity = null;
             nextCity = null;
 
+            if (graphs.Count > 0)
+            {
+                LoadingSpinner.Show(LoadingMessage);
+            }
             CalculateAllGraphLayouts(graphs);
 
             shownGraphHasChangedEvent.Invoke();
@@ -621,8 +614,9 @@ namespace SEE.Game.Evolution
             UpdateGameNodeHierarchy();
             RenderPlane();
 
+            LoadingSpinner.Hide(LoadingMessage);
             IsStillAnimating = false;
-            AnimationFinishedEvent.Invoke();
+            animationFinishedEvent.Invoke();
 
             // We have made the transition to the next graph.
             currentCity = nextCity;
@@ -819,7 +813,7 @@ namespace SEE.Game.Evolution
             IsAutoPlay = enabled;
             if (IsAutoPlay)
             {
-                AnimationFinishedEvent.AddListener(OnAutoPlayCanContinue);
+                animationFinishedEvent.AddListener(OnAutoPlayCanContinue);
                 if (!ShowNextIfPossible())
                 {
                     UserInfoLastGraph();
@@ -827,7 +821,7 @@ namespace SEE.Game.Evolution
             }
             else
             {
-                AnimationFinishedEvent.RemoveListener(OnAutoPlayCanContinue);
+                animationFinishedEvent.RemoveListener(OnAutoPlayCanContinue);
             }
             shownGraphHasChangedEvent.Invoke();
         }
@@ -845,7 +839,7 @@ namespace SEE.Game.Evolution
             IsAutoPlayReverse = enabled;
             if (IsAutoPlayReverse)
             {
-                AnimationFinishedEvent.AddListener(OnAutoPlayReverseCanContinue);
+                animationFinishedEvent.AddListener(OnAutoPlayReverseCanContinue);
                 if (!ShowPreviousIfPossible())
                 {
                     UserInfoFirstGraph();
@@ -853,7 +847,7 @@ namespace SEE.Game.Evolution
             }
             else
             {
-                AnimationFinishedEvent.RemoveListener(OnAutoPlayReverseCanContinue);
+                animationFinishedEvent.RemoveListener(OnAutoPlayReverseCanContinue);
             }
             shownGraphHasChangedEvent.Invoke();
         }
@@ -930,6 +924,16 @@ namespace SEE.Game.Evolution
         public GameObject DrawNode(Node node, GameObject city = null)
         {
             return Renderer.DrawNode(node, city);
+        }
+
+        /// <summary>
+        /// Placeholder to satisfy the compiler. This method is not
+        /// called anywhere as of yet, but was required in <see
+        /// cref="EdgeRenderer"/>.
+        /// </summary>
+        public GameObject DrawEdge(Edge edge, GameObject source = null, GameObject target = null)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>

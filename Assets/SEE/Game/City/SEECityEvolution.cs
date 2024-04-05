@@ -23,11 +23,13 @@ using System.Linq;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.Evolution;
-using SEE.Game.UI.RuntimeConfigMenu;
+using SEE.UI.RuntimeConfigMenu;
 using SEE.GO;
-using SEE.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using SEE.Game.CityRendering;
+using SEE.Utils.Config;
+using SEE.Utils.Paths;
 
 namespace SEE.Game.City
 {
@@ -47,12 +49,12 @@ namespace SEE.Game.City
         /// <summary>
         /// Name of the Inspector foldout group for the specific evolution setttings.
         /// </summary>
-        private const string EvolutionFoldoutGroup = "Evolution settings";
+        private const string evolutionFoldoutGroup = "Evolution settings";
 
         /// <summary>
         /// Sets the maximum number of revisions to load.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Maximum number of revisions to load."), FoldoutGroup(EvolutionFoldoutGroup), RuntimeTab(EvolutionFoldoutGroup)]
+        [SerializeField, ShowInInspector, Tooltip("Maximum number of revisions to load."), FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
         public int MaxRevisionsToLoad = 500;  // serialized by Unity
 
         /// <summary>
@@ -66,46 +68,7 @@ namespace SEE.Game.City
         /// The directory in which the GXL files of the graph series are located.
         /// </summary>
         [SerializeField, ShowInInspector, Tooltip("The directory in which the GXL files are located."), FoldoutGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
-        public DirectoryPath GXLDirectory = new DirectoryPath();
-
-        //-----------------------------------------------------
-        // Attributes to mark changes
-        //-----------------------------------------------------
-
-        /// <summary>
-        /// The height of posts used as markers for new and deleted elements.
-        /// </summary>
-        [Tooltip("The height of posts used as markers for new, changed, and deleted elements (>=0).")]
-        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup), RuntimeTab(EvolutionFoldoutGroup)]
-        public float MarkerHeight = 0.2f;
-
-        /// <summary>
-        /// The width (x and z lengths) of posts used as markers for new and deleted elements.
-        /// </summary>
-        [Tooltip("The width (x and z lengths) of posts used as markers for new and deleted elements (>=0).")]
-        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup), RuntimeTab(EvolutionFoldoutGroup)]
-        public float MarkerWidth = 0.01f;
-
-        /// <summary>
-        /// Color for power beams of newly added nodes, can be set in inspector
-        /// </summary>
-        [Tooltip("The color of the beam for newly created nodes.")]
-        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup), RuntimeTab(EvolutionFoldoutGroup)]
-        public Color AdditionBeamColor = Color.green;
-
-        /// <summary>
-        /// Changed nodes beam color to be pickable in inspector
-        /// </summary>
-        [Tooltip("The color of the beam for changed nodes.")]
-        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup), RuntimeTab(EvolutionFoldoutGroup)]
-        public Color ChangeBeamColor = Color.yellow;
-
-        /// <summary>
-        /// Deleted nodes beam color to be pickable in inspector
-        /// </summary>
-        [Tooltip("The color of the beam for deleted nodes.")]
-        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup), RuntimeTab(EvolutionFoldoutGroup)]
-        public Color DeletionBeamColor = Color.black;
+        public DirectoryPath GXLDirectory = new();
 
         /// <summary>
         /// Yields the graph renderer that draws this city.
@@ -152,10 +115,10 @@ namespace SEE.Game.City
         /// </summary>
         private List<Graph> LoadDataSeries()
         {
-            GraphsReader graphsReader = new GraphsReader();
+            GraphsReader graphsReader = new();
             // Load all GXL graphs and CSV files in directory PathPrefix but not more than maxRevisionsToLoad many.
             graphsReader.Load(GXLDirectory.Path, HierarchicalEdges, basePath: SourceCodeDirectory.Path, rootName: GXLDirectory.Path, MaxRevisionsToLoad);
-            return graphsReader.graphs;
+            return graphsReader.Graphs;
         }
 
         /// <summary>
@@ -230,7 +193,7 @@ namespace SEE.Game.City
         {
             if (firstGraph)
             {
-                GraphRenderer graphRenderer = new GraphRenderer(this, firstGraph);
+                GraphRenderer graphRenderer = new(this, firstGraph);
                 graphRenderer.DrawGraph(firstGraph, gameObject);
             }
             else
@@ -253,9 +216,9 @@ namespace SEE.Game.City
         /// <returns>the loaded graph or null if none could be found</returns>
         private Graph LoadFirstGraph()
         {
-            GraphsReader reader = new GraphsReader();
+            GraphsReader reader = new();
             reader.Load(GXLDirectory.Path, HierarchicalEdges, basePath: SourceCodeDirectory.Path, rootName: GXLDirectory.Path, 1);
-            List<Graph> graphs = reader.graphs;
+            List<Graph> graphs = reader.Graphs;
             if (graphs.Count == 0)
             {
                 return null;
@@ -286,13 +249,10 @@ namespace SEE.Game.City
         {
             base.Start();
             Reset();
-
             List<Graph> graphs = LoadDataSeries();
             evolutionRenderer = CreateEvolutionRenderer(graphs);
             DrawGraphs(graphs);
-
             gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
-
             evolutionRenderer.ShowGraphEvolution();
         }
 
@@ -311,10 +271,10 @@ namespace SEE.Game.City
                 {
                     // Node types have been filtered out. Because of that
                     // there may now be multiple roots again.
-                    relevantGraph.AddSingleRoot(name: "ROOT", type: Graph.UnknownType);
+                    relevantGraph.AddSingleRoot(out Node _, name: "ROOT", type: Graph.UnknownType);
                 }
                 graphs[i] = relevantGraph;
-                LoadDataForGraphListing(graphs[i]);
+                SetupCompoundSpringEmbedder(graphs[i]);
             }
         }
 
@@ -340,54 +300,24 @@ namespace SEE.Game.City
         /// <summary>
         /// Label of attribute <see cref="GXLDirectory"/> in the configuration file.
         /// </summary>
-        private const string GXLDirectoryLabel = "GXLDirectory";
+        private const string gxlDirectoryLabel = "GXLDirectory";
         /// <summary>
         /// Label of attribute <see cref="MaxRevisionsToLoad"/> in the configuration file.
         /// </summary>
-        private const string MaxRevisionsToLoadLabel = "MaxRevisionsToLoad";
-        /// <summary>
-        /// Label of attribute <see cref="MarkerHeight"/> in the configuration file.
-        /// </summary>
-        private const string MarkerHeightLabel = "MarkerHeight";
-        /// <summary>
-        /// Label of attribute <see cref="MarkerWidth"/> in the configuration file.
-        /// </summary>
-        private const string MarkerWidthLabel = "MarkerWidth";
-        /// <summary>
-        /// Label of attribute <see cref="AdditionBeamColor"/> in the configuration file.
-        /// </summary>
-        private const string AdditionBeamColorLabel = "AdditionBeamColor";
-        /// <summary>
-        /// Label of attribute <see cref="ChangeBeamColor"/> in the configuration file.
-        /// </summary>
-        private const string ChangeBeamColorLabel = "ChangeBeamColor";
-        /// <summary>
-        /// Label of attribute <see cref="DeletionBeamColor"/> in the configuration file.
-        /// </summary>
-        private const string DeletionBeamColorLabel = "DeletionBeamColor";
+        private const string maxRevisionsToLoadLabel = "MaxRevisionsToLoad";
 
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
-            GXLDirectory.Save(writer, GXLDirectoryLabel);
-            writer.Save(MaxRevisionsToLoad, MaxRevisionsToLoadLabel);
-            writer.Save(MarkerHeight, MarkerHeightLabel);
-            writer.Save(MarkerWidth, MarkerWidthLabel);
-            writer.Save(AdditionBeamColor, AdditionBeamColorLabel);
-            writer.Save(ChangeBeamColor, ChangeBeamColorLabel);
-            writer.Save(DeletionBeamColor, DeletionBeamColorLabel);
+            GXLDirectory.Save(writer, gxlDirectoryLabel);
+            writer.Save(MaxRevisionsToLoad, maxRevisionsToLoadLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
-            GXLDirectory.Restore(attributes, GXLDirectoryLabel);
-            ConfigIO.Restore(attributes, MaxRevisionsToLoadLabel, ref MaxRevisionsToLoad);
-            ConfigIO.Restore(attributes, MarkerHeightLabel, ref MarkerHeight);
-            ConfigIO.Restore(attributes, MarkerWidthLabel, ref MarkerWidth);
-            ConfigIO.Restore(attributes, AdditionBeamColorLabel, ref AdditionBeamColor);
-            ConfigIO.Restore(attributes, ChangeBeamColorLabel, ref ChangeBeamColor);
-            ConfigIO.Restore(attributes, DeletionBeamColorLabel, ref DeletionBeamColor);
+            GXLDirectory.Restore(attributes, gxlDirectoryLabel);
+            ConfigIO.Restore(attributes, maxRevisionsToLoadLabel, ref MaxRevisionsToLoad);
         }
     }
 }

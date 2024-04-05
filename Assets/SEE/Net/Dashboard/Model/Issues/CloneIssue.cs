@@ -16,68 +16,68 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// <summary>
         /// The clone type
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly int cloneType;
+        [JsonProperty(PropertyName = "cloneType", Required = Required.Always)]
+        public readonly int CloneType;
 
         /// <summary>
         /// The filename of the left clone fragment
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string leftPath;
+        [JsonProperty(PropertyName = "leftPath", Required = Required.Always)]
+        public readonly string LeftPath;
 
         /// <summary>
         /// The start line number of the left clone fragment
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly int leftLine;
+        [JsonProperty(PropertyName = "leftLine", Required = Required.Always)]
+        public readonly int LeftLine;
 
         /// <summary>
         /// The end line number of the left clone fragment
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly int leftEndLine;
+        [JsonProperty(PropertyName = "leftEndLine", Required = Required.Always)]
+        public readonly int LeftEndLine;
 
         /// <summary>
         /// The number of lines of the left clone fragment
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly int leftLength;
+        [JsonProperty(PropertyName = "leftLength", Required = Required.Always)]
+        public readonly int LeftLength;
 
         /// <summary>
         /// The weight of the left clone fragment
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly int leftWeight;
+        [JsonProperty(PropertyName = "leftWeight", Required = Required.Always)]
+        public readonly int LeftWeight;
 
         /// <summary>
         /// The filename of the right clone fragment
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string rightPath;
+        [JsonProperty(PropertyName = "rightPath", Required = Required.Always)]
+        public readonly string RightPath;
 
         /// <summary>
         /// The start line number of the right clone fragment
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly int rightLine;
+        [JsonProperty(PropertyName = "rightLine", Required = Required.Always)]
+        public readonly int RightLine;
 
         /// <summary>
         /// The end line number of the right clone fragment
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly int rightEndLine;
+        [JsonProperty(PropertyName = "rightEndLine", Required = Required.Always)]
+        public readonly int RightEndLine;
 
         /// <summary>
         /// The number of lines of the right clone fragment
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly int rightLength;
+        [JsonProperty(PropertyName = "rightLength", Required = Required.Always)]
+        public readonly int RightLength;
 
         /// <summary>
         /// The weight of the right clone fragment
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly int rightWeight;
+        [JsonProperty(PropertyName = "rightWeight", Required = Required.Always)]
+        public readonly int RightWeight;
 
         public CloneIssue()
         {
@@ -89,26 +89,26 @@ namespace SEE.Net.Dashboard.Model.Issues
                           int leftWeight, string rightPath, int rightLine, int rightEndLine, int rightLength,
                           int rightWeight)
         {
-            this.cloneType = cloneType;
-            this.leftPath = leftPath;
-            this.leftLine = leftLine;
-            this.leftEndLine = leftEndLine;
-            this.leftLength = leftLength;
-            this.leftWeight = leftWeight;
-            this.rightPath = rightPath;
-            this.rightLine = rightLine;
-            this.rightEndLine = rightEndLine;
-            this.rightLength = rightLength;
-            this.rightWeight = rightWeight;
+            this.CloneType = cloneType;
+            this.LeftPath = leftPath;
+            this.LeftLine = leftLine;
+            this.LeftEndLine = leftEndLine;
+            this.LeftLength = leftLength;
+            this.LeftWeight = leftWeight;
+            this.RightPath = rightPath;
+            this.RightLine = rightLine;
+            this.RightEndLine = rightEndLine;
+            this.RightLength = rightLength;
+            this.RightWeight = rightWeight;
         }
 
-        public override async UniTask<string> ToDisplayString()
+        public override async UniTask<string> ToDisplayStringAsync()
         {
-            string explanation = await DashboardRetriever.Instance.GetIssueDescription($"CL{id}");
-            return $"<style=\"H2\">Clone of type {cloneType}</style>"
-                   + $"\nLeft: {leftPath}, Lines {leftLine}-{leftEndLine}".WrapLines(WRAP_AT)
-                   + $"\nRight: {rightPath}, Lines {rightLine}-{rightEndLine}\n".WrapLines(WRAP_AT)
-                   + $"\n{explanation.WrapLines(WRAP_AT)}";
+            string explanation = await DashboardRetriever.Instance.GetIssueDescriptionAsync($"CL{ID}");
+            return $"<style=\"H2\">Clone of type {CloneType}</style>"
+                   + $"\nLeft: {LeftPath}, Lines {LeftLine}-{LeftEndLine}".WrapLines(WrapAt)
+                   + $"\nRight: {RightPath}, Lines {RightLine}-{RightEndLine}\n".WrapLines(WrapAt)
+                   + $"\n{explanation.WrapLines(WrapAt)}";
         }
 
         public override string IssueKind => "CL";
@@ -117,8 +117,8 @@ namespace SEE.Net.Dashboard.Model.Issues
 
         public override IEnumerable<SourceCodeEntity> Entities => new[]
         {
-            new SourceCodeEntity(leftPath, leftLine, leftEndLine),
-            new SourceCodeEntity(rightPath, rightLine, rightEndLine)
+            new SourceCodeEntity(LeftPath, LeftLine, LeftEndLine),
+            new SourceCodeEntity(RightPath, RightLine, RightEndLine)
         };
     }
 }

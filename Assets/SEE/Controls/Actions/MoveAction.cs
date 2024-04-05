@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using SEE.Audio;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.Game.Operator;
-using SEE.Game.UI.Notification;
+using SEE.Game.SceneManipulation;
+using SEE.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using UnityEngine;
 using Node = SEE.DataModel.DG.Node;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions
 {
@@ -23,17 +24,17 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="MoveAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="MoveAction"/></returns>
-        internal static ReversibleAction CreateReversibleAction() => new MoveAction();
+        internal static IReversibleAction CreateReversibleAction() => new MoveAction();
 
         /// <summary>
         /// Returns a new instance of <see cref="MoveAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance() => new MoveAction();
+        public override IReversibleAction NewInstance() => new MoveAction();
 
         /// <summary>
         /// Returns the set of IDs of all game objects changed by this action.
-        /// <see cref="ReversibleAction.GetChangedObjects"/>
+        /// <see cref="IReversibleAction.GetChangedObjects"/>
         /// </summary>
         /// <returns>returns the ID of the currently grabbed object if any; otherwise
         /// the empty set</returns>
@@ -167,7 +168,7 @@ namespace SEE.Controls.Actions
             /// The position of the grabbed object in world space.
             /// </summary>
             /// <exception cref="InvalidOperationException">in case no object is currently grabbed</exception>
-            internal Vector3 Position
+            internal readonly Vector3 Position
             {
                 get
                 {
@@ -204,7 +205,7 @@ namespace SEE.Controls.Actions
             /// Returns the grabbed object to its original position when it was grabbed.
             /// This method will be called for Undo.
             /// </summary>
-            private void MoveToOrigin()
+            private readonly void MoveToOrigin()
             {
                 if (GrabbedGameObject)
                 {
@@ -217,7 +218,7 @@ namespace SEE.Controls.Actions
             /// to its origin via <see cref="MoveToOrigin"/>.
             /// This method will be called for Redo.
             /// </summary>
-            private void MoveToLastUserRequestedPosition()
+            private readonly void MoveToLastUserRequestedPosition()
             {
                 if (GrabbedGameObject)
                 {
@@ -483,7 +484,7 @@ namespace SEE.Controls.Actions
             {
                 UnmarkAsTarget();
                 MoveToOrigin();
-                GrabbedGameObject.AddOrGetComponent<NodeOperator>().ScaleTo(originalLocalScale);
+                GrabbedGameObject.NodeOperator().ScaleTo(originalLocalScale);
                 new ScaleNodeNetAction(GrabbedGameObject.name, originalLocalScale).Execute();
             }
         }
@@ -510,7 +511,7 @@ namespace SEE.Controls.Actions
         /// of city, re-parenting is always hierarchically interpreted. A hierarchical
         /// re-parenting means that the moved node becomes a child of the target node
         /// both in the game-node hierarchy as well as in the underlying graph.
-        /// <seealso cref="ReversibleAction.Update"/>.
+        /// <seealso cref="IReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
@@ -525,10 +526,10 @@ namespace SEE.Controls.Actions
                     if (hoveredObject && hoveredObject.gameObject.TryGetNode(out Node node) && !node.IsRoot())
                     {
                         grabbedObject.Grab(hoveredObject.gameObject);
-                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, hoveredObject.gameObject);
+                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PickupSound, hoveredObject.gameObject);
                         // Remember the current distance from the pointing device to the grabbed object.
                         distanceToUser = Vector3.Distance(Raycasting.UserPointsTo().origin, grabbedObject.Position);
-                        currentState = ReversibleAction.Progress.InProgress;
+                        CurrentState = IReversibleAction.Progress.InProgress;
                     }
                 }
                 else // continue moving the grabbed object
@@ -550,11 +551,11 @@ namespace SEE.Controls.Actions
                 // Finalize the action with the grabbed object.
                 if (grabbedObject.GrabbedGameObject != null)
                 {
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND, grabbedObject.GrabbedGameObject);
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, grabbedObject.GrabbedGameObject);
                 }
                 grabbedObject.UnGrab();
                 // Action is finished.
-                currentState = ReversibleAction.Progress.Completed;
+                CurrentState = IReversibleAction.Progress.Completed;
                 return true;
             }
             return false;
@@ -567,9 +568,9 @@ namespace SEE.Controls.Actions
         private static bool UserIsGrabbing()
         {
             // Index of the left mouse button.
-            const int LeftMouseButton = 0;
+            const int leftMouseButton = 0;
             // FIXME: We need a VR interaction, too.
-            return Input.GetMouseButton(LeftMouseButton);
+            return Input.GetMouseButton(leftMouseButton);
         }
 
         /// <summary>
@@ -587,23 +588,20 @@ namespace SEE.Controls.Actions
                 if (Raycasting.RaycastLowestNode(out RaycastHit? raycastHit, out Node _, grabbedObject.Node))
                 {
                     // Note: the root node can never be grabbed. See above.
+                    // We need to undo the reparenting of the grabbed node if it is
+                    // currently reparented onto another node.
+                    grabbedObject.UnReparent();
                     if (raycastHit.HasValue)
                     {
                         // The user is currently aiming at a node. The grabbed node is reparented onto this aimed node.
                         grabbedObject.Reparent(raycastHit.Value.transform.gameObject);
-                    }
-                    else
-                    {
-                        // The user is currently not aiming at a node. The reparenting
-                        // of the grabbed must be reverted.
-                        grabbedObject.UnReparent();
                     }
                 }
             }
         }
 
         /// <summary>
-        /// <see cref="ReversibleAction.Undo"/>.
+        /// <see cref="IReversibleAction.Undo"/>.
         /// </summary>
         public override void Undo()
         {
@@ -612,7 +610,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// <see cref="ReversibleAction.Redo"/>.
+        /// <see cref="IReversibleAction.Redo"/>.
         /// </summary>
         public override void Redo()
         {

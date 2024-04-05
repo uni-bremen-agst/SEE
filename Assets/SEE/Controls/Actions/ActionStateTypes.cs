@@ -112,6 +112,11 @@ namespace SEE.Controls.Actions
                   Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                   DrawAction.CreateReversibleAction);
 
+            AcceptDivergence =
+              new("Accept Divergence", "Accept a diverging edge into the architecture",
+                  Color.grey.Darker(), "Materials/ModernUIPack/Arrow Bold",
+                  AcceptDivergenceAction.CreateReversibleAction);
+
             // Metric Board actions
             MetricBoard =
               new("Metric Board", "Manipulate a metric board",
@@ -290,26 +295,28 @@ namespace SEE.Controls.Actions
                     parent: Drawable);
         }
 
-        public readonly static ActionStateType Move;
-        public readonly static ActionStateType Rotate;
-        public readonly static ActionStateType Hide;
-        public readonly static ActionStateType NewEdge;
-        public readonly static ActionStateType NewNode;
-        public readonly static ActionStateType EditNode;
-        public readonly static ActionStateType ScaleNode;
-        public readonly static ActionStateType Delete;
-        public readonly static ActionStateType ShowCode;
-        public readonly static ActionStateType Draw;
 
-        public readonly static ActionStateTypeGroup MetricBoard;
-        public readonly static ActionStateType AddBoard;
-        public readonly static ActionStateType AddWidget;
-        public readonly static ActionStateType MoveBoard;
-        public readonly static ActionStateType MoveWidget;
-        public readonly static ActionStateType DeleteBoard;
-        public readonly static ActionStateType DeleteWidget;
-        public readonly static ActionStateType LoadBoard;
-        public readonly static ActionStateType SaveBoard;
+        public static readonly ActionStateType Move;
+        public static readonly ActionStateType Rotate;
+        public static readonly ActionStateType Hide;
+        public static readonly ActionStateType NewEdge;
+        public static readonly ActionStateType NewNode;
+        public static readonly ActionStateType EditNode;
+        public static readonly ActionStateType ScaleNode;
+        public static readonly ActionStateType Delete;
+        public static readonly ActionStateType ShowCode;
+        public static readonly ActionStateType Draw;
+        public static readonly ActionStateType AcceptDivergence;
+
+        public static readonly ActionStateTypeGroup MetricBoard;
+        public static readonly ActionStateType AddBoard;
+        public static readonly ActionStateType AddWidget;
+        public static readonly ActionStateType MoveBoard;
+        public static readonly ActionStateType MoveWidget;
+        public static readonly ActionStateType DeleteBoard;
+        public static readonly ActionStateType DeleteWidget;
+        public static readonly ActionStateType LoadBoard;
+        public static readonly ActionStateType SaveBoard;
 
         public readonly static ActionStateTypeGroup Drawable;
         public readonly static ActionStateType DrawFreehand;
@@ -351,8 +358,8 @@ namespace SEE.Controls.Actions
 
             string Name(AbstractActionStateType type)
             {
-                const string None = "<NONE>";
-                return type == null ? None : type.Name;
+                const string none = "<NONE>";
+                return type == null ? none : type.Name;
             }
         }
     }

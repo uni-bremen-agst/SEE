@@ -15,8 +15,8 @@ namespace SEE.Layout.EdgeLayouts
         /// <param name="minLevelDistance">the minimal distance between different edge levels</param>
         public IEdgeLayout(bool edgesAboveBlocks, float minLevelDistance)
         {
-            this.edgesAboveBlocks = edgesAboveBlocks;
-            this.minLevelDistance = minLevelDistance;
+            this.EdgesAboveBlocks = edgesAboveBlocks;
+            this.MinLevelDistance = minLevelDistance;
         }
 
         /// <summary>
@@ -24,8 +24,8 @@ namespace SEE.Layout.EdgeLayouts
         /// </summary>
         public string Name
         {
-            get => name;
-        }
+            get; protected set;
+        } = string.Empty;
 
         /// <summary>
         /// Adds way points to the given <paramref name="edges"/> according to the layout.
@@ -41,21 +41,16 @@ namespace SEE.Layout.EdgeLayouts
             where T : ILayoutNode, IHierarchyNode<ILayoutNode>;
 
         /// <summary>
-        /// Name of the layout.
-        /// </summary>
-        protected string name = "";
-
-        /// <summary>
         /// Orientation of the edges;
         /// if false, the edges are drawn below the game nodes;
         /// if true, the edges are drawn above the game nodes;
         /// </summary>
-        protected readonly bool edgesAboveBlocks;
+        protected readonly bool EdgesAboveBlocks;
 
         /// <summary>
         /// The minimal distance between different edge levels.
         /// </summary>
-        protected readonly float minLevelDistance;
+        protected readonly float MinLevelDistance;
 
         /// <summary>
         /// Yields the greatest and smallest y co-ordinate and the maximal height (all in

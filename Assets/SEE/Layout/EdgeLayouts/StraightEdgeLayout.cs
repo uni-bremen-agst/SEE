@@ -18,7 +18,7 @@ namespace SEE.Layout.EdgeLayouts
         public StraightEdgeLayout(bool edgesAboveBlocks, float minLevelDistance)
             : base(edgesAboveBlocks, minLevelDistance)
         {
-            name = "Straight";
+            Name = "Straight";
         }
 
         /// Adds way points to each edge in the given list of <paramref name="edges"/>
@@ -43,9 +43,9 @@ namespace SEE.Layout.EdgeLayouts
             // better read the edges.
             // This offset is used to draw the line somewhat below
             // or above the house (depending on the orientation).
-            float offset = Mathf.Max(minLevelDistance, 0.2f * maxHeight); // must be positive
+            float offset = Mathf.Max(MinLevelDistance, 0.2f * maxHeight); // must be positive
             // The level at which edges are drawn.
-            float edgeLevel = edgesAboveBlocks ? maxBlockY + offset : minBlockY - offset;
+            float edgeLevel = EdgesAboveBlocks ? maxBlockY + offset : minBlockY - offset;
 
             foreach (ILayoutEdge<T> edge in edges)
             {
@@ -53,7 +53,7 @@ namespace SEE.Layout.EdgeLayouts
                 ILayoutNode target = edge.Target;
                 Vector3 start;
                 Vector3 end;
-                if (edgesAboveBlocks)
+                if (EdgesAboveBlocks)
                 {
                     start = source.Roof;
                     end = target.Roof;

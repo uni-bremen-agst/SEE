@@ -226,7 +226,7 @@ namespace SEE.Tools.Architecture
         /// <param name="ignoreVirtual">Whether to ignore <see cref="EdgeChange"/> events
         /// for virtual (e.g., propagated) edges</param>
         /// <typeparam name="T">Type of events that should be counted</typeparam>
-        protected void AssertEventCountEquals<T>(int expected, ChangeType? change = null, ReflexionSubgraph? affectedGraph = null, bool ignoreVirtual = false, bool ignorePropagated = true) where T : ChangeEvent
+        protected void AssertEventCountEquals<T>(int expected, ChangeType? change = null, ReflexionSubgraphs? affectedGraph = null, bool ignoreVirtual = false, bool ignorePropagated = true) where T : ChangeEvent
         {
             Assert.AreEqual(expected, changes.OfType<T>().Count(EventIncluded));
 
@@ -236,7 +236,7 @@ namespace SEE.Tools.Architecture
             {
                 return (change == null || @event.Change == change)
                        && (affectedGraph == null || @event.Affected == affectedGraph)
-                       && !(ignorePropagated && @event is EdgeEvent { Affected: ReflexionSubgraph.Architecture } edgeEvent && !IsSpecified(edgeEvent.Edge))
+                       && !(ignorePropagated && @event is EdgeEvent { Affected: ReflexionSubgraphs.Architecture } edgeEvent && !IsSpecified(edgeEvent.Edge))
                        && !(ignoreVirtual && @event is EdgeChange edgeChange && edgeChange.Edge.HasToggle(Edge.IsVirtualToggle));
             }
         }

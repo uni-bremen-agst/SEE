@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
 
-namespace SEE.Game.UI.PropertyDialog
+namespace SEE.UI.PropertyDialog
 {
     /// <summary>
     /// Test cases for <see cref="PropertyDialog"/>.

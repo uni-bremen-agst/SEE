@@ -17,79 +17,79 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// Whether the explanation shall be shown for these issues.
         /// This is relevant because explanation for metrics are often very long, so disabling it may be of use.
         /// </summary>
-        private const bool SHOW_EXPLANATION = false;
+        private const bool showExplanation = false;
 
         /// <summary>
         /// The severity of the violation
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string severity;
+        [JsonProperty(PropertyName = "severity", Required = Required.Always)]
+        public readonly string Severity;
 
         /// <summary>
         /// The entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string entity;
+        [JsonProperty(PropertyName = "entity", Required = Required.Always)]
+        public readonly string Entity;
 
         /// <summary>
         /// The entity type
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string entityType;
+        [JsonProperty(PropertyName = "entityType", Required = Required.Always)]
+        public readonly string EntityType;
 
         /// <summary>
         /// The filename of the entity
         /// </summary>
-        [JsonProperty(Required = Required.AllowNull)]
-        public readonly string path;
+        [JsonProperty(PropertyName = "path", Required = Required.AllowNull)]
+        public readonly string Path;
 
         /// <summary>
         /// The line number of the entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly int line;
+        [JsonProperty(PropertyName = "line", Required = Required.Always)]
+        public readonly int Line;
 
         /// <summary>
         /// The internal name of the corresponding entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string linkName;
+        [JsonProperty(PropertyName = "linkName", Required = Required.Always)]
+        public readonly string LinkName;
 
         /// <summary>
         /// The internal name of the metric
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string metric;
+        [JsonProperty(PropertyName = "metric", Required = Required.Always)]
+        public readonly string Metric;
 
         /// <summary>
         /// The error number / error code / rule name
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string errorNumber;
+        [JsonProperty(PropertyName = "errorNumber", Required = Required.Always)]
+        public readonly string ErrorNumber;
 
         /// <summary>
         /// The short description of the metric
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string description;
+        [JsonProperty(PropertyName = "description", Required = Required.Always)]
+        public readonly string Description;
 
         /// <summary>
         /// The max value configured for the metric
         /// </summary>
-        [JsonProperty(Required = Required.AllowNull)]
-        public readonly float? max;
+        [JsonProperty(PropertyName = "max", Required = Required.AllowNull)]
+        public readonly float? Max;
 
         /// <summary>
         /// The min value configured for the metric
         /// </summary>
-        [JsonProperty(Required = Required.AllowNull)]
-        public readonly float? min;
+        [JsonProperty(PropertyName = "min", Required = Required.AllowNull)]
+        public readonly float? Min;
 
         /// <summary>
         /// The measured value
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly float value;
+        [JsonProperty(PropertyName = "value", Required = Required.Always)]
+        public readonly float Value;
 
         public MetricViolationIssue()
         {
@@ -101,28 +101,28 @@ namespace SEE.Net.Dashboard.Model.Issues
                                     string linkName, string metric, string errorNumber, string description,
                                     float? max, float? min, float value)
         {
-            this.severity = severity;
-            this.entity = entity;
-            this.entityType = entityType;
-            this.path = path;
-            this.line = line;
-            this.linkName = linkName;
-            this.metric = metric;
-            this.errorNumber = errorNumber;
-            this.description = description;
-            this.max = max;
-            this.min = min;
-            this.value = value;
+            this.Severity = severity;
+            this.Entity = entity;
+            this.EntityType = entityType;
+            this.Path = path;
+            this.Line = line;
+            this.LinkName = linkName;
+            this.Metric = metric;
+            this.ErrorNumber = errorNumber;
+            this.Description = description;
+            this.Max = max;
+            this.Min = min;
+            this.Value = value;
         }
 
-        public override async UniTask<string> ToDisplayString()
+        public override async UniTask<string> ToDisplayStringAsync()
         {
-            string explanation = SHOW_EXPLANATION ? await DashboardRetriever.Instance.GetIssueDescription($"MV{id}") : "";
-            string minimum = min.HasValue ? $"; Minimum: <b>{min:0.##}</b>" : "";
-            string maximum = max.HasValue ? $"; Maximum: <b>{max:0.##}</b>" : "";
-            return $"<style=\"H2\">Metric: {description.WrapLines(WRAP_AT / 2)}</style>"
-                   + $"\nActual: <b>{value}</b>{minimum}{maximum}"
-                   + $"\n{explanation.WrapLines(WRAP_AT)}";
+            string explanation = showExplanation ? await DashboardRetriever.Instance.GetIssueDescriptionAsync($"MV{ID}") : "";
+            string minimum = Min.HasValue ? $"; Minimum: <b>{Min:0.##}</b>" : "";
+            string maximum = Max.HasValue ? $"; Maximum: <b>{Max:0.##}</b>" : "";
+            return $"<style=\"H2\">Metric: {Description.WrapLines(WrapAt / 2)}</style>"
+                   + $"\nActual: <b>{Value}</b>{minimum}{maximum}"
+                   + $"\n{explanation.WrapLines(WrapAt)}";
         }
 
         public override string IssueKind => "MV";
@@ -130,11 +130,11 @@ namespace SEE.Net.Dashboard.Model.Issues
         public override NumericAttributeNames AttributeName => NumericAttributeNames.Metric;
 
         public override IEnumerable<SourceCodeEntity> Entities =>
-            path == null
+            Path == null
                 ? new SourceCodeEntity[] { }
                 : new[]
                 {
-                    new SourceCodeEntity(path, line, null, entity)
+                    new SourceCodeEntity(Path, Line, null, Entity)
                 };
     }
 }

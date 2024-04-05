@@ -18,7 +18,7 @@ namespace SEE.Layout.EdgeLayouts
         public SplineEdgeLayout(bool edgesAboveBlocks, float minLevelDistance)
             : base(edgesAboveBlocks, minLevelDistance)
         {
-            name = "Splines";
+            Name = "Splines";
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace SEE.Layout.EdgeLayouts
             // better read the edges.
             // This offset is used to draw the line somewhat below
             // or above the house (depending on the orientation).
-            float offset = Mathf.Max(minLevelDistance, 0.2f * maxHeight); // must be positive
+            float offset = Mathf.Max(MinLevelDistance, 0.2f * maxHeight); // must be positive
 
             foreach (ILayoutEdge<T> edge in edges)
             {
@@ -54,14 +54,14 @@ namespace SEE.Layout.EdgeLayouts
                 EqualityComparer<T> comparer = EqualityComparer<T>.Default;
                 if (comparer.Equals(source, target))
                 {
-                    edge.Spline = SelfLoop(source, edgesAboveBlocks, offset);
+                    edge.Spline = SelfLoop(source, EdgesAboveBlocks, offset);
                 }
                 else
                 {
                     // define the points along the line
                     Vector3 start;
                     Vector3 end;
-                    if (edgesAboveBlocks)
+                    if (EdgesAboveBlocks)
                     {
                         start = source.Roof;
                         end = target.Roof;
@@ -71,7 +71,7 @@ namespace SEE.Layout.EdgeLayouts
                         start = source.Ground;
                         end = target.Ground;
                     }
-                    edge.Spline = CreateSpline(start, end, edgesAboveBlocks, offset);
+                    edge.Spline = CreateSpline(start, end, EdgesAboveBlocks, offset);
                 }
             }
         }

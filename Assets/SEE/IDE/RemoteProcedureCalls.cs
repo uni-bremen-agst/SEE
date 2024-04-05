@@ -27,7 +27,7 @@ using Cysharp.Threading.Tasks;
 using SEE.Controls;
 using SEE.Game;
 using SEE.GO;
-using SEE.Utils.RPC;
+using SEE.Utils.IdeRPC;
 using UnityEngine;
 
 namespace SEE.IDE
@@ -179,7 +179,7 @@ namespace SEE.IDE
                     }
                     else
                     {
-                        ideIntegration.ideCalls.Decline(connection).Forget();
+                        ideIntegration.ideCalls.DeclineAsync(connection).Forget();
                     }
                 }
             }

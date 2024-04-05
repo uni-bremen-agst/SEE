@@ -4,13 +4,15 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using SEE.Utils;
+using SEE.Utils.Paths;
 using SEE.Net.Dashboard;
 using SEE.Net.Dashboard.Model.Issues;
 using SEE.Net.Dashboard.Model.Metric;
 using SEE.Tools;
-using Sirenix.Utilities;
 using UnityEngine;
+using CsvHelper;
+using CsvHelper.Configuration;
+using Newtonsoft.Json.Linq;
 
 namespace SEE.DataModel.DG.IO
 {
@@ -26,28 +28,31 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="graph">The graph whose nodes' metrics shall be set</param>
         /// <param name="override">Whether any existing metrics present in the graph's nodes shall be updated</param>
-        public static async UniTask LoadDashboard(Graph graph, bool @override = true, string addedFrom = "")
+        /// <param name="addedFrom">If empty, all issues will be retrieved. Otherwise, only those issues which have been added from
+        /// the given version to the most recent one will be loaded.</param>
+        /// <returns>The graph with the updated metrics and issues</returns>
+        public static async UniTask<Graph> LoadDashboardAsync(Graph graph, bool @override = true, string addedFrom = "")
         {
-            IDictionary<(string path, string entity), List<MetricValueTableRow>> metrics = await DashboardRetriever.Instance.GetAllMetricRows();
-            IDictionary<string, List<Issue>> issues = await LoadIssueMetrics(addedFrom.IsNullOrWhitespace() ? null : addedFrom, null);
+            IDictionary<(string path, string entity), List<MetricValueTableRow>> metrics = await DashboardRetriever.Instance.GetAllMetricRowsAsync();
+            IDictionary<string, List<Issue>> issues = await LoadIssueMetrics(string.IsNullOrWhiteSpace(addedFrom) ? null : addedFrom);
             string projectFolder = DataPath.ProjectFolder();
 
             await UniTask.SwitchToThreadPool();
 
-            HashSet<Node> encounteredIssueNodes = new HashSet<Node>();
+            HashSet<Node> encounteredIssueNodes = new();
             int updatedMetrics = 0;
             // Go through all nodes, checking whether any metric in the dashboard matches it.
             foreach (Node node in graph.Nodes())
             {
-                string nodePath = $"{node.RelativePath(projectFolder)}{node.Filename() ?? string.Empty}";
+                string nodePath = $"{node.RelativeDirectory(projectFolder)}{node.Filename ?? string.Empty}";
                 if (metrics.TryGetValue((nodePath, node.SourceName), out List<MetricValueTableRow> metricValues))
                 {
                     foreach (MetricValueTableRow metricValue in metricValues)
                     {
                         // Only set if value doesn't already exist, or if we're supposed to override and the value differs
-                        if (!node.TryGetFloat(metricValue.metric, out float value) || @override && !Mathf.Approximately(metricValue.value, value))
+                        if (!node.TryGetFloat(metricValue.Metric, out float value) || @override && !Mathf.Approximately(metricValue.Value, value))
                         {
-                            node.SetFloat(metricValue.metric, metricValue.value);
+                            node.SetFloat(metricValue.Metric, metricValue.Value);
                             updatedMetrics++;
                         }
                     }
@@ -55,7 +60,7 @@ namespace SEE.DataModel.DG.IO
 
                 if (issues.TryGetValue(nodePath, out List<Issue> issueList))
                 {
-                    int? line = node.SourceLine();
+                    int? line = node.SourceLine;
                     IEnumerable<Issue> relevantIssues;
                     if (!line.HasValue)
                     {
@@ -64,13 +69,10 @@ namespace SEE.DataModel.DG.IO
                     }
                     else
                     {
-                        int? length = node.SourceLength();
-                        // Note: In .NET 7 there is a Enumerable.ToHashSet() which could be used instead of the constructor.
-                        HashSet<int> lineRange = new HashSet<int>(Enumerable.Range(line.Value, length ?? 1), null);
+                        Range lineRange = node.SourceRange ?? new Range(line.Value, line.Value + 1);
                         // Relevant issues are those which are entirely contained by the source region of this node
                         relevantIssues = issueList.Where(
-                            x => x.Entities.Any(e => lineRange.Contains(e.line) &&
-                                                     (!e.endLine.HasValue || lineRange.Contains(e.endLine.Value))));
+                            x => x.Entities.Any(e => lineRange.Contains(e.Line) && (!e.EndLine.HasValue || lineRange.Contains(e.EndLine.Value))));
                     }
 
                     foreach (Issue issue in relevantIssues)
@@ -107,7 +109,7 @@ namespace SEE.DataModel.DG.IO
             {
                 NumericAttributeNames.Clone, NumericAttributeNames.Complexity, NumericAttributeNames.Cycle,
                 NumericAttributeNames.Metric, NumericAttributeNames.Style,
-                NumericAttributeNames.Architecture_Violations, NumericAttributeNames.Dead_Code
+                NumericAttributeNames.ArchitectureViolations, NumericAttributeNames.DeadCode
             };
             //FIXME: Aggregation from lower levels to classes doesn't work due to issues spanning multiple lines
             // Maybe simply ignore aggregated value when a non-aggregated value is present (which it would be)
@@ -116,21 +118,22 @@ namespace SEE.DataModel.DG.IO
             await UniTask.SwitchToMainThread();
             Debug.Log($"Updated {updatedMetrics} metric values and {encounteredIssueNodes.Count} issues "
                       + "using the Axivion dashboard.\n");
+            return graph;
 
 
-            static async UniTask<IDictionary<string, List<Issue>>> LoadIssueMetrics(string start, string end = null)
+            static async UniTask<IDictionary<string, List<Issue>>> LoadIssueMetrics(string start)
             {
                 IDictionary<string, List<Issue>> issues = new Dictionary<string, List<Issue>>();
-                IList<Issue> allIssues = await DashboardRetriever.Instance.GetConfiguredIssues(start, end, Issue.IssueState.added);
+                IList<Issue> allIssues = await DashboardRetriever.Instance.GetConfiguredIssuesAsync(start, end: null, state: Issue.IssueState.added);
                 foreach (Issue issue in allIssues)
                 {
                     foreach (SourceCodeEntity entity in issue.Entities)
                     {
-                        if (!issues.ContainsKey(entity.path))
+                        if (!issues.ContainsKey(entity.Path))
                         {
-                            issues[entity.path] = new List<Issue>();
+                            issues[entity.Path] = new List<Issue>();
                         }
-                        issues[entity.path].Add(issue);
+                        issues[entity.Path].Add(issue);
                     }
                 }
 
@@ -168,105 +171,98 @@ namespace SEE.DataModel.DG.IO
                 Debug.LogWarning($"Metric file {filename} does not exist. CSV Metrics will not be available.\n");
                 return 0;
             }
-            int numberOfErrors = 0;
-            try
+
+            CsvConfiguration config = new(CultureInfo.InvariantCulture)
             {
-                using StreamReader reader = new StreamReader(filename);
-                if (reader.EndOfStream)
+                Delimiter = separator.ToString(),
+            };
+
+            using StreamReader reader = new(filename);
+            using CsvReader csv = new(reader, config);
+
+            int numberOfErrors = 0;
+            int lineCount = 1;
+
+            csv.Read();
+            if (csv.ReadHeader())
+            {
+                string[] header = csv.HeaderRecord;
+                if (header.Length == 0)
                 {
-                    Debug.LogError($"Empty file: {filename}.\n");
+                    throw new IOException($"Header must not be empty. It must include at least column {IDColumnName}.\n");
                 }
-                else
+                if (header[0] != IDColumnName)
                 {
-                    // The line number in the CSV file currently processed.
-                    int lineCount = 1;
-                    // Header row
-                    string headerLine = reader.ReadLine();
-                    // The names of the columns
-                    string[] columnNames = headerLine?.Split(separator);
+                    throw new IOException($"First header column in file {filename} is not {IDColumnName}.");
+                }
+
+                string[] columns = header[1..];
+                if (columns.Length == 0)
+                {
+                    Debug.LogWarning($"There are no data columns in {filename}.\n");
+                    return 0;
+                }
+                while (csv.Read())
+                {
                     lineCount++;
-                    // We expect the ID plus at least one metric
-                    if (columnNames?.Length > 1)
+                    string id = csv.GetField<string>(IDColumnName);
+
+                    if (graph.TryGetNode(id, out Node node))
                     {
-                        // The first column must be the ID
-                        if (columnNames[0] != IDColumnName)
+                        // Process the remaining data columns of this row starting at index 1
+                        foreach (string column in columns)
                         {
-                            string errorMessage = $"First header column in file {filename} is not {IDColumnName}.";
-                            Debug.LogError(errorMessage + "\n");
-                            throw new IOException(errorMessage);
-                        }
-                        // Process each data row
-                        while (!reader.EndOfStream)
-                        {
-                            // Currently processed data row
-                            string line = reader.ReadLine();
-                            // The values of the data row
-                            string[] values = line.Split(separator);
-                            // Number of named columns and data entries must correspond
-                            if (columnNames.Length != values.Length)
+                            string entry = csv.GetField<string>(column);
+
+                            try
                             {
-                                Debug.LogError($"Unexpected number of entries in file {filename} at line {lineCount}.\n");
-                                numberOfErrors++;
-                            }
-                            // ID is expected to be in the first column. Try to
-                            // retrieve the corresponding node from the graph
-                            if (graph.TryGetNode(values[0], out Node node))
-                            {
-                                // Process the remaining data columns of this row starting at index 1
-                                for (int i = 1; i < Mathf.Min(columnNames.Length, values.Length); i++)
+                                if (entry.Contains("."))
                                 {
-                                    try
-                                    {
-                                        if (values[i].Contains("."))
-                                        {
-                                            float value = float.Parse(values[i], CultureInfo.InvariantCulture);
-                                            node.SetFloat(columnNames[i], value);
-                                        }
-                                        else
-                                        {
-                                            int value = int.Parse(values[i]);
-                                            node.SetInt(columnNames[i], value);
-                                        }
-                                    }
-                                    catch (ArgumentNullException)
-                                    {
-                                        Debug.LogError($"Missing value in file {filename} at line {lineCount}.\n");
-                                        numberOfErrors++;
-                                    }
-                                    catch (FormatException)
-                                    {
-                                        Debug.LogError($"Value {values[i]} does not represent a number in a valid format in file {filename} at line {lineCount}.\n");
-                                        numberOfErrors++;
-                                    }
-                                    catch (OverflowException)
-                                    {
-                                        Debug.LogError($"Value {values[i]} represents a number less than minimum or greater than maximum in file {filename} at line {lineCount}.\n");
-                                        numberOfErrors++;
-                                    }
+                                    node.SetFloat(column, (float)float.Parse(entry, CultureInfo.InvariantCulture));
+                                }
+                                else
+                                {
+                                    node.SetInt(column, int.Parse(entry));
                                 }
                             }
-                            else
+                            catch (CsvHelper.MissingFieldException)
                             {
-                                Debug.LogWarning($"Unknown node {values[0]} in file {filename} at line {lineCount}.\n");
+                                Debug.LogError($"{SourceLocation()} Missing value.\n");
                                 numberOfErrors++;
                             }
-                            lineCount++;
+                            catch (FormatException)
+                            {
+                                Debug.LogError($"{SourceLocation()} Value {entry} does not represent a number in a valid format.\n");
+                                numberOfErrors++;
+                            }
+                            catch (OverflowException)
+                            {
+                                Debug.LogError($"{SourceLocation()} Value {entry} represents a number less than minimum or greater than maximum.\n");
+                                numberOfErrors++;
+                            }
                         }
                     }
                     else
                     {
-                        string errorMessage = $"Not enough columns in file {filename}.";
-                        Debug.LogError(errorMessage + "\n");
-                        throw new IOException(errorMessage);
+                        Debug.LogWarning($"{SourceLocation()} Unknown node id '{id}'.\n");
+                        numberOfErrors++;
                     }
                 }
             }
-            catch (Exception e)
+            else
             {
-                Debug.LogError($"Exception {e.Message} while loading data from CSV file {filename}.\n");
-                throw;
+                string errorMessage = "There is no header.";
+                Debug.LogError(errorMessage + "\n");
+                throw new IOException(errorMessage);
+
             }
+
             return numberOfErrors;
+
+            string SourceLocation()
+            {
+                return $"{filename}:{lineCount}: ";
+            }
         }
     }
 }

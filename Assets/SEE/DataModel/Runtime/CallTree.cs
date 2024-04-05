@@ -1,5 +1,5 @@
 ﻿using SEE.DataModel.DG;
-using SEE.Utils;
+using SEE.Utils.Arrays;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -132,13 +132,13 @@ namespace SEE.DataModel.Runtime
         /// The predecessor function call. Can not be serialized due to depth limits of
         /// serialization.
         /// </summary>
-        public CallTreeFunctionCall predecessor;
+        public CallTreeFunctionCall Predecessor;
 
         /// <summary>
         /// The successor function calls. Can not be serialized due to depth limits of
         /// serialization.
         /// </summary>
-        public List<CallTreeFunctionCall> successors;
+        public List<CallTreeFunctionCall> Successors;
 
         /// <summary>
         /// The attributes of the function call.
@@ -150,7 +150,7 @@ namespace SEE.DataModel.Runtime
         /// The <see cref="GameObject"/>, that represents this function call as a
         /// building.
         /// </summary>
-        public GameObject node;
+        public GameObject Node;
 
         /// <summary>
         /// The count of the attributes.
@@ -261,7 +261,7 @@ namespace SEE.DataModel.Runtime
         /// <summary>
         /// Name of the linkage name attribute label.
         /// </summary>
-        public const string LINKAGE_NAME = Node.LinknameAttribute;
+        public const string LinkageName = Node.LinknameAttribute;
 
         /// <summary>
         /// Name of the level attribute label.
@@ -346,15 +346,15 @@ namespace SEE.DataModel.Runtime
                 int key = int.Parse(functionCalls[i].GetAttributeForCategory(LEVEL));
                 CallTreeFunctionCall value = functionCalls[i];
                 KeyValuePair<int, CallTreeFunctionCall> pair = new KeyValuePair<int, CallTreeFunctionCall>(key, value);
-                value.successors = new List<CallTreeFunctionCall>();
+                value.Successors = new List<CallTreeFunctionCall>();
                 while (callStack.Count != 0 && callStack.Peek().Key >= key)
                 {
                     callStack.Pop();
                 }
                 if (callStack.Count != 0)
                 {
-                    callStack.Peek().Value.successors.Add(value);
-                    value.predecessor = callStack.Peek().Value;
+                    callStack.Peek().Value.Successors.Add(value);
+                    value.Predecessor = callStack.Peek().Value;
                 }
                 callStack.Push(pair);
             }
@@ -371,7 +371,7 @@ namespace SEE.DataModel.Runtime
             for (int i = 0; i < functionCalls.Count; i++)
             {
                 CallTreeFunctionCall dynFunctionCall = functionCalls[i];
-                string dynLinkageName = dynFunctionCall.GetAttributeForCategory(LINKAGE_NAME);
+                string dynLinkageName = dynFunctionCall.GetAttributeForCategory(LinkageName);
                 FunctionInformation dynFunctionInformation = FunctionInformation.CreateFromDYNLinkageName(dynLinkageName);
                 if (dynFunctionInformation == null)
                 {
@@ -390,7 +390,7 @@ namespace SEE.DataModel.Runtime
 
                     if (dynFunctionInformation.Equals(gxlFunctionInformation))
                     {
-                        dynFunctionCall.node = go.Value;
+                        dynFunctionCall.Node = go.Value;
                         mapped = true;
                         break;
                     }
@@ -442,14 +442,14 @@ namespace SEE.DataModel.Runtime
             public string ReturnValue { get; private set; }
 
             // string representations of types.
-            private const string CHAR = "char";
-            private const string CONST = "";
-            private const string INT = "int";
-            private const string UNSIGNED_INT = "uint";
-            private const string UNSIGNED = "u";
-            private const string VOID = "";
-            private const string VOID_RETURN = "v";
-            private const char DELIMITER = ':';
+            private const string charType = "char";
+            private const string constType = "";
+            private const string intType = "int";
+            private const string unsignedIntType = "uint";
+            private const string unsignedType = "u";
+            private const string voidType = "";
+            private const string voidReturnType = "v";
+            private const char delimiter = ':';
 
             /// <summary>
             /// Constructs new function information with given name, parameters and
@@ -521,7 +521,7 @@ namespace SEE.DataModel.Runtime
                 name = "";
                 for (int i = 1; i < tokens.Length - 1; i++)
                 {
-                    name += tokens[i] + DELIMITER;
+                    name += tokens[i] + delimiter;
                 }
 
                 // name (function name)
@@ -588,7 +588,7 @@ namespace SEE.DataModel.Runtime
                 returnValue = ConvertFromDYNType(returnValue);
                 if (returnValue.Length == 0)
                 {
-                    returnValue = FunctionInformation.VOID_RETURN;
+                    returnValue = FunctionInformation.voidReturnType;
                 }
 
                 // name (namespaces and class name)
@@ -601,7 +601,7 @@ namespace SEE.DataModel.Runtime
                 name = "";
                 for (int i = 0; i < tokens.Length - 1; i++)
                 {
-                    name += tokens[i] + DELIMITER;
+                    name += tokens[i] + delimiter;
                 }
                 temp = tokens[tokens.Length - 1];
 
@@ -663,19 +663,19 @@ namespace SEE.DataModel.Runtime
                 string convertedType;
                 if (temp.Equals("c"))
                 {
-                    convertedType = CHAR;
+                    convertedType = charType;
                 }
                 else if (temp.Equals("i"))
                 {
-                    convertedType = INT;
+                    convertedType = intType;
                 }
                 else if (temp.Equals("ui"))
                 {
-                    convertedType = UNSIGNED_INT;
+                    convertedType = unsignedIntType;
                 }
                 else if (temp.Equals("v"))
                 {
-                    convertedType = VOID_RETURN;
+                    convertedType = voidReturnType;
                 }
                 else
                 {
@@ -709,23 +709,23 @@ namespace SEE.DataModel.Runtime
 
                     if (token.Equals("char"))
                     {
-                        convertedToken = CHAR;
+                        convertedToken = charType;
                     }
                     else if (token.Equals("const"))
                     {
-                        convertedToken = CONST;
+                        convertedToken = constType;
                     }
                     else if (token.Equals("int"))
                     {
-                        convertedToken = INT;
+                        convertedToken = intType;
                     }
                     else if (token.Equals("unsigned"))
                     {
-                        convertedToken = UNSIGNED;
+                        convertedToken = unsignedType;
                     }
                     else if (token.Equals("void"))
                     {
-                        convertedToken = VOID;
+                        convertedToken = voidType;
                     }
                     else if (token.Contains("*") || token.Contains("&"))
                     {
@@ -762,11 +762,7 @@ namespace SEE.DataModel.Runtime
 
             public override int GetHashCode()
             {
-                int hashCode = -1534923972;
-                hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
-                hashCode = hashCode * -1521134295 + EqualityComparer<string[]>.Default.GetHashCode(Parameters);
-                hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ReturnValue);
-                return hashCode;
+                return HashCode.Combine(Name, Parameters, ReturnValue);
             }
         }
     }

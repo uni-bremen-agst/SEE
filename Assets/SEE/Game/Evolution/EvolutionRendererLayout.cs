@@ -1,4 +1,5 @@
 ﻿using SEE.DataModel.DG;
+using SEE.Game.CityRendering;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using SEE.Utils;
@@ -37,6 +38,11 @@ namespace SEE.Game.Evolution
             = new List<Dictionary<string, ILayoutEdge<ILayoutNode>>>();
 
         /// <summary>
+        /// The last calculated <see cref="NodeLayout"/> used for <see cref="IncrementalTreeMapLayout"/>.
+        /// </summary>
+        private NodeLayout oldLayout = null;
+
+        /// <summary>
         /// Creates and saves the node and edge layouts for all given <paramref name="graphs"/>. This will
         /// also create all necessary game nodes and game edges-- even those game nodes and game edges
         /// that are not present in the first graph in <see cref="graphs"/>.
@@ -44,13 +50,8 @@ namespace SEE.Game.Evolution
         private void CalculateAllGraphLayouts(IList<Graph> graphs)
         {
             // Determines the layouts of all loaded graphs upfront.
-            Performance p = Performance.Begin("Layouting all " + graphs.Count + " graphs");
-            ISet<string> numericNodeAttributes = new HashSet<string>();
-            graphs.ForEach(graph =>
-            {
-                CalculateLayout(graph);
-                numericNodeAttributes.UnionWith(graph.AllNumericNodeAttributes());
-            });
+            Performance p = Performance.Begin($"Layouting all {graphs.Count} graphs");
+            graphs.ForEach(CalculateLayout);
             objectManager.Clear();
             p.End(true);
         }
@@ -105,12 +106,21 @@ namespace SEE.Game.Evolution
                 gameObjects.Add(gameNode);
             }
 
+            // Since incremental layouts must know the layout of the last revision
+            // but are also bound to the function calls of NodeLayout
+            // we must hand over this argument here separately
+            if (nodeLayout is IIncrementalNodeLayout iNodeLayout && oldLayout is IIncrementalNodeLayout iOldLayout)
+            {
+                iNodeLayout.OldLayout = iOldLayout;
+            }
+
             // Calculate and apply the node layout
             ICollection<LayoutGraphNode> layoutNodes = GraphRenderer.ToAbstractLayoutNodes(gameObjects);
             // Note: Apply applies its results only on the layoutNodes but not on the game objects
             // these layoutNodes represent. Here, we leave the game objects untouched. The layout
             // must be later applied when we render a city. Here, we only store the layout for later use.
             nodeLayout.Apply(layoutNodes);
+            oldLayout = nodeLayout;
             GraphRenderer.Fit(gameObject, layoutNodes);
             GraphRenderer.Stack(gameObject, layoutNodes);
 

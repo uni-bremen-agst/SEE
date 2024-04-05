@@ -96,7 +96,7 @@ namespace SEE.Net.Util
         /// <summary>
         /// The minimal logging severity.
         /// </summary>
-        public readonly Severity minSeverity;
+        public readonly Severity MinSeverity;
 
         /// <summary>
         /// Creates a logger with given minimal severity.
@@ -104,7 +104,7 @@ namespace SEE.Net.Util
         /// <param name="minSeverity">The minimal severity of the logger.</param>
         public NetworkCommsLogger(Severity minSeverity)
         {
-            this.minSeverity = minSeverity;
+            this.MinSeverity = minSeverity;
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace SEE.Net.Util
         /// <param name="message">The message.</param>
         public void Debug(string message)
         {
-            if (minSeverity <= Severity.Low)
+            if (MinSeverity <= Severity.Low)
             {
                 UnityEngine.Debug.Log(message);
             }
@@ -125,7 +125,7 @@ namespace SEE.Net.Util
         /// <param name="message">The error message.</param>
         public void Error(string message)
         {
-            if (minSeverity <= Severity.High)
+            if (MinSeverity <= Severity.High)
             {
                 UnityEngine.Debug.LogError(message);
             }
@@ -137,7 +137,7 @@ namespace SEE.Net.Util
         /// <param name="message">The error message.</param>
         public void Fatal(string message)
         {
-            if (minSeverity <= Severity.High)
+            if (MinSeverity <= Severity.High)
             {
                 UnityEngine.Debug.LogError(message);
             }
@@ -150,7 +150,7 @@ namespace SEE.Net.Util
         /// <param name="ex">The exception.</param>
         public void Fatal(string message, Exception ex)
         {
-            if (minSeverity <= Severity.High)
+            if (MinSeverity <= Severity.High)
             {
                 UnityEngine.Debug.LogError(message);
                 UnityEngine.Debug.LogException(ex);
@@ -163,7 +163,7 @@ namespace SEE.Net.Util
         /// <param name="message">The message.</param>
         public void Info(string message)
         {
-            if (minSeverity <= Severity.Low)
+            if (MinSeverity <= Severity.Low)
             {
                 UnityEngine.Debug.Log(message);
             }
@@ -183,7 +183,7 @@ namespace SEE.Net.Util
         /// <param name="message">The message.</param>
         public void Trace(string message)
         {
-            if (minSeverity <= Severity.Low)
+            if (MinSeverity <= Severity.Low)
             {
                 UnityEngine.Debug.Log(message);
             }
@@ -195,7 +195,7 @@ namespace SEE.Net.Util
         /// <param name="message">The message.</param>
         public void Warn(string message)
         {
-            if (minSeverity <= Severity.Medium)
+            if (MinSeverity <= Severity.Medium)
             {
                 UnityEngine.Debug.LogWarning(message);
             }

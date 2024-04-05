@@ -16,68 +16,68 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// <summary>
         /// The type of the relation between source and target
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string dependencyType;
+        [JsonProperty(PropertyName = "dependencyType", Required = Required.Always)]
+        public readonly string DependencyType;
 
         /// <summary>
         /// The source entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string sourceEntity;
+        [JsonProperty(PropertyName = "sourceEntity", Required = Required.Always)]
+        public readonly string SourceEntity;
 
         /// <summary>
         /// The source entity type
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string sourceEntityType;
+        [JsonProperty(PropertyName = "sourceEntityType", Required = Required.Always)]
+        public readonly string SourceEntityType;
 
         /// <summary>
         /// The source filename
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string sourcePath;
+        [JsonProperty(PropertyName = "sourcePath", Required = Required.Always)]
+        public readonly string SourcePath;
 
         /// <summary>
         /// The source line number
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly int sourceLine;
+        [JsonProperty(PropertyName = "sourceLine", Required = Required.Always)]
+        public readonly int SourceLine;
 
         /// <summary>
         /// The internal name of the corresponding entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string sourceLinkName;
+        [JsonProperty(PropertyName = "sourceLinkName", Required = Required.Always)]
+        public readonly string SourceLinkName;
 
         /// <summary>
         /// The target entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string targetEntity;
+        [JsonProperty(PropertyName = "targetEntity", Required = Required.Always)]
+        public readonly string TargetEntity;
 
         /// <summary>
         /// The target entity type
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string targetEntityType;
+        [JsonProperty(PropertyName = "targetEntityType", Required = Required.Always)]
+        public readonly string TargetEntityType;
 
         /// <summary>
         /// The target filename
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string targetPath;
+        [JsonProperty(PropertyName = "targetPath", Required = Required.Always)]
+        public readonly string TargetPath;
 
         /// <summary>
         /// The target line number
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly int targetLine;
+        [JsonProperty(PropertyName = "targetLine", Required = Required.Always)]
+        public readonly int TargetLine;
 
         /// <summary>
         /// The internal name of the corresponding entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string targetLinkName;
+        [JsonProperty(PropertyName = "targetLinkName", Required = Required.Always)]
+        public readonly string TargetLinkName;
 
         public CycleIssue()
         {
@@ -89,26 +89,26 @@ namespace SEE.Net.Dashboard.Model.Issues
                              string sourcePath, int sourceLine, string sourceLinkName, string targetEntity,
                              string targetEntityType, string targetPath, int targetLine, string targetLinkName)
         {
-            this.dependencyType = dependencyType;
-            this.sourceEntity = sourceEntity;
-            this.sourceEntityType = sourceEntityType;
-            this.sourcePath = sourcePath;
-            this.sourceLine = sourceLine;
-            this.sourceLinkName = sourceLinkName;
-            this.targetEntity = targetEntity;
-            this.targetEntityType = targetEntityType;
-            this.targetPath = targetPath;
-            this.targetLine = targetLine;
-            this.targetLinkName = targetLinkName;
+            this.DependencyType = dependencyType;
+            this.SourceEntity = sourceEntity;
+            this.SourceEntityType = sourceEntityType;
+            this.SourcePath = sourcePath;
+            this.SourceLine = sourceLine;
+            this.SourceLinkName = sourceLinkName;
+            this.TargetEntity = targetEntity;
+            this.TargetEntityType = targetEntityType;
+            this.TargetPath = targetPath;
+            this.TargetLine = targetLine;
+            this.TargetLinkName = targetLinkName;
         }
 
-        public override async UniTask<string> ToDisplayString()
+        public override async UniTask<string> ToDisplayStringAsync()
         {
-            string explanation = await DashboardRetriever.Instance.GetIssueDescription($"CY{id}");
+            string explanation = await DashboardRetriever.Instance.GetIssueDescriptionAsync($"CY{ID}");
             return "<style=\"H2\">Cyclic dependency</style>"
-                   + $"\nSource: {sourcePath} ({sourceEntityType}), Line {sourceLine}\n".WrapLines(WRAP_AT)
-                   + $"\nTarget: {targetPath} ({targetEntityType}), Line {targetLine}\n".WrapLines(WRAP_AT)
-                   + $"\n{explanation.WrapLines(WRAP_AT)}";
+                   + $"\nSource: {SourcePath} ({SourceEntityType}), Line {SourceLine}\n".WrapLines(WrapAt)
+                   + $"\nTarget: {TargetPath} ({TargetEntityType}), Line {TargetLine}\n".WrapLines(WrapAt)
+                   + $"\n{explanation.WrapLines(WrapAt)}";
         }
 
         public override string IssueKind => "CY";
@@ -117,8 +117,8 @@ namespace SEE.Net.Dashboard.Model.Issues
 
         public override IEnumerable<SourceCodeEntity> Entities => new[]
         {
-            new SourceCodeEntity(sourcePath, sourceLine, null, sourceEntity),
-            new SourceCodeEntity(targetPath, targetLine, null, targetEntity)
+            new SourceCodeEntity(SourcePath, SourceLine, null, SourceEntity),
+            new SourceCodeEntity(TargetPath, TargetLine, null, TargetEntity)
         };
     }
 }

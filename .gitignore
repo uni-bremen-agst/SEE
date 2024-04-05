@@ -49,6 +49,11 @@ ExportedObj/
 *.mdb
 *.opendb
 *.VC.db
+.vsconfig
+
+# Java class files
+**/*.class
+**/*.class.meta
 
 # Unity3D generated meta files
 *.pidb.meta
@@ -103,7 +108,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-
 # NetworkComms.Net
 CompleteIncomingItemTaskError*.txt
 ConnectionKeepAlivePollError*.txt
@@ -123,8 +127,17 @@ UnityPlayer_s.debug
 # Git LFS
 lfs
 
+# Axivion/Bauhaus
+.bauhaus
+
 # Our own local files to be ignored.
 Data/Vcs2See/target/
 packages/
 Build/
 build/
+Assets/Packages/
+Assets/Packages.meta
+Packages/Microsoft.CodeAnalysis.Analyzers.3.3.4/tools/install.ps1
+Packages/Microsoft.CodeAnalysis.Analyzers.3.3.4/tools/uninstall.ps1
+Packages/Microsoft.VisualStudio.Threading.Analyzers.17.6.40/tools/install.ps1
+Packages/Microsoft.VisualStudio.Threading.Analyzers.17.6.40/tools/uninstall.ps1

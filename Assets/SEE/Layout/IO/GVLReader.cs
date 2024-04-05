@@ -30,21 +30,21 @@ namespace SEE.Layout.IO
         /// <param name="logger">logger used to emit errors, warnings, etc.</param>
         public GVLReader(string filename, ICollection<IGameNode> gameNodes, float groundLevel = 0, SEE.Utils.ILogger logger = null)
         {
-            this.filename = filename;
-            this.logger = logger;
+            this.Filename = filename;
+            this.Logger = logger;
             this.groundLevel = groundLevel;
-            reader = new XmlTextReader(filename)
+            Reader = new XmlTextReader(filename)
             {
                 WhitespaceHandling = WhitespaceHandling.None
             };
-            this.gameNodes = ToMap(gameNodes);
+            this.GameNodes = ToMap(gameNodes);
             // The CS (icon size) values of the nested nodes. The icon size
             // of a node N is the CS value of its immediate parent node.
             // Root nodes do not have a parent, but will try to access the CS
             // value of their parent nevertheless. For these, we will provide
             // a default value here on the stack.
-            nodes = new Stack<ParentNode>();
-            nodes.Push(new ParentNode(14.14f, null));
+            Nodes = new Stack<ParentNode>();
+            Nodes.Push(new ParentNode(14.14f, null));
             Load();
         }
 
@@ -56,7 +56,7 @@ namespace SEE.Layout.IO
         /// <summary>
         /// The minimal height for a loaded game object.
         /// </summary>
-        private const float MinimalHeight = 0.00001f;
+        private const float minimalHeight = 0.00001f;
 
         /// <summary>
         /// Returns a mapping from the IDs of all <paramref name="gameNodes"/> onto
@@ -92,45 +92,45 @@ namespace SEE.Layout.IO
             /// because the position of nested nodes are offsets relative to the
             /// parent.
             /// </summary>
-            public readonly IGameNode gameNode;
+            public readonly IGameNode GameNode;
 
             /// <summary>
             /// Constructor.
             /// </summary>
-            /// <param name="CS">icon size attribute CS of the parent</param>
+            /// <param name="cs">icon size attribute CS of the parent</param>
             /// <param name="gameNode">parent game node</param>
-            public ParentNode(float CS, IGameNode gameNode)
+            public ParentNode(float cs, IGameNode gameNode)
             {
-                this.CS = CS;
-                this.gameNode = gameNode;
+                this.CS = cs;
+                this.GameNode = gameNode;
             }
         }
 
         /// <summary>
         /// The nested XML context.
         /// </summary>
-        protected Stack<State> context = new Stack<State>();
+        protected Stack<State> Context = new();
         /// <summary>
         /// Layout information of all ascendants of the current node.
         /// </summary>
-        protected readonly Stack<ParentNode> nodes;
+        protected readonly Stack<ParentNode> Nodes;
         /// <summary>
         /// The name of the GVL file read.
         /// </summary>
-        protected readonly string filename;
+        protected readonly string Filename;
         /// <summary>
         /// The XML reader used to process the XML content of the GVL file.
         /// </summary>
-        protected readonly XmlTextReader reader;
+        protected readonly XmlTextReader Reader;
         /// <summary>
         /// The logger used to emit errors, warnings, etc.
         /// </summary>
-        protected readonly SEE.Utils.ILogger logger;
+        protected readonly SEE.Utils.ILogger Logger;
         /// <summary>
         /// A mapping of the IDs of all gameNodes onto the gameNodes. This
         /// mapping allows us to quickly identify the nodes by their IDs.
         /// </summary>
-        protected readonly Dictionary<string, IGameNode> gameNodes;
+        protected readonly Dictionary<string, IGameNode> GameNodes;
 
         /// <summary>
         /// Thrown in case of malformed GVL.
@@ -155,29 +155,29 @@ namespace SEE.Layout.IO
 
         protected virtual void LogDebug(string message)
         {
-            if (logger != null)
+            if (Logger != null)
             {
-                logger.LogDebug(message);
+                Logger.LogDebug(message);
             }
         }
 
         protected virtual void LogError(string message)
         {
-            if (logger != null)
+            if (Logger != null)
             {
-                IXmlLineInfo xmlInfo = reader;
+                IXmlLineInfo xmlInfo = Reader;
                 int lineNumber = xmlInfo.LineNumber - 1;
-                logger.LogError(filename + ":" + lineNumber + ": " + message + "\n");
+                Logger.LogError(Filename + ":" + lineNumber + ": " + message + "\n");
             }
         }
 
         protected virtual void LogWarning(string message)
         {
-            if (logger != null)
+            if (Logger != null)
             {
-                IXmlLineInfo xmlInfo = reader;
+                IXmlLineInfo xmlInfo = Reader;
                 int lineNumber = xmlInfo.LineNumber - 1;
-                logger.LogWarning(filename + ":" + lineNumber + ": " + message + "\n");
+                Logger.LogWarning(Filename + ":" + lineNumber + ": " + message + "\n");
             }
         }
 
@@ -187,12 +187,12 @@ namespace SEE.Layout.IO
         /// </summary>
         private void Expected()
         {
-            State actual = ToState(reader.Name);
-            State expected = context.Pop();
+            State actual = ToState(Reader.Name);
+            State expected = Context.Pop();
 
             if (actual != expected)
             {
-                LogError("syntax error: <\\" + ToString(expected) + "> expected. Actual: " + reader.Name);
+                LogError("syntax error: <\\" + ToString(expected) + "> expected. Actual: " + Reader.Name);
                 throw new SyntaxError("mismatched tags");
             }
         }
@@ -202,12 +202,12 @@ namespace SEE.Layout.IO
         /// </summary>
         protected enum State
         {
-            undefined = 0,
-            inLayout = 1,
-            inVisualization = 2,
-            inHiddenNodeTypes = 3,
-            inNode = 4,
-            inOption = 5,
+            Undefined = 0,
+            InLayout = 1,
+            InVisualization = 2,
+            InHiddenNodeTypes = 3,
+            InNode = 4,
+            InOption = 5,
         }
 
         /// <summary>
@@ -220,12 +220,12 @@ namespace SEE.Layout.IO
         {
             switch (state)
             {
-                case State.undefined: return "undefined";
-                case State.inLayout: return "Gravis2_Layout";
-                case State.inVisualization: return "Visualization";
-                case State.inNode: return "Node";
-                case State.inHiddenNodeTypes: return "Hidden_Node_Types";
-                case State.inOption: return "Option";
+                case State.Undefined: return "undefined";
+                case State.InLayout: return "Gravis2_Layout";
+                case State.InVisualization: return "Visualization";
+                case State.InNode: return "Node";
+                case State.InHiddenNodeTypes: return "Hidden_Node_Types";
+                case State.InOption: return "Option";
                 default: throw new NotImplementedException();
             }
         }
@@ -240,27 +240,27 @@ namespace SEE.Layout.IO
         {
             if (name == "Gravis2_Layout")
             {
-                return State.inLayout;
+                return State.InLayout;
             }
             else if (name == "Visualization")
             {
-                return State.inVisualization;
+                return State.InVisualization;
             }
             else if (name == "Node")
             {
-                return State.inNode;
+                return State.InNode;
             }
             else if (name == "Hidden_Node_Types")
             {
-                return State.inHiddenNodeTypes;
+                return State.InHiddenNodeTypes;
             }
             else if (name == "Option")
             {
-                return State.inOption;
+                return State.InOption;
             }
             else
             {
-                return State.undefined;
+                return State.Undefined;
             }
         }
 
@@ -270,38 +270,38 @@ namespace SEE.Layout.IO
         /// the actual handling of the elements is deferred to the called
         /// methods (see below).
         /// </summary>
-        protected virtual void Load()
+        private void Load()
         {
             try
             {
-                while (reader.Read())
+                while (Reader.Read())
                 {
                     // LogDebug("XML processing: name=" + reader.Name + " nodetype=" + reader.NodeType + " value=" + reader.Value + "\n");
 
                     // See https://docs.microsoft.com/de-de/dotnet/api/system.xml.xmlnodetype?view=netframework-4.8
                     // for information on the XML reader.
-                    switch (reader.NodeType)
+                    switch (Reader.NodeType)
                     {
                         case XmlNodeType.Element:
                             // An element(for example, <item> ).
                             {
-                                State state = ToState(reader.Name);
-                                if (!reader.IsEmptyElement)
+                                State state = ToState(Reader.Name);
+                                if (!Reader.IsEmptyElement)
                                 {
                                     // This is not a self-closing (empty) element, e.g., <item/>.
                                     // Note: A corresponding EndElement node is not generated for empty elements.
                                     // That is why we must push an expected EndElement onto the context stack
                                     // only if the element is not self-closing.
-                                    context.Push(state);
+                                    Context.Push(state);
                                 }
                                 switch (state)
                                 {
-                                    case State.undefined: StartUndefined(); break;
-                                    case State.inLayout: StartLayout(); break;
-                                    case State.inHiddenNodeTypes: StartHiddenNodeTypes(); break;
-                                    case State.inNode: StartNode(); break;
-                                    case State.inVisualization: StartVisualization(); break;
-                                    case State.inOption: StartOption(); break;
+                                    case State.Undefined: StartUndefined(); break;
+                                    case State.InLayout: StartLayout(); break;
+                                    case State.InHiddenNodeTypes: StartHiddenNodeTypes(); break;
+                                    case State.InNode: StartNode(); break;
+                                    case State.InVisualization: StartVisualization(); break;
+                                    case State.InOption: StartOption(); break;
                                     default: throw new NotImplementedException();
                                 }
                             }
@@ -312,14 +312,14 @@ namespace SEE.Layout.IO
                         case XmlNodeType.EndElement:
                             // An end element tag (for example, </item> ).
                             Expected();
-                            switch (ToState(reader.Name))
+                            switch (ToState(Reader.Name))
                             {
-                                case State.undefined: EndUndefined(); break;
-                                case State.inLayout: EndLayout(); break;
-                                case State.inHiddenNodeTypes: EndHiddenNodeTypes(); break;
-                                case State.inNode: EndNode(); break;
-                                case State.inVisualization: EndVisualization(); break;
-                                case State.inOption: EndOption(); break;
+                                case State.Undefined: EndUndefined(); break;
+                                case State.InLayout: EndLayout(); break;
+                                case State.InHiddenNodeTypes: EndHiddenNodeTypes(); break;
+                                case State.InNode: EndNode(); break;
+                                case State.InVisualization: EndVisualization(); break;
+                                case State.InOption: EndOption(); break;
                                 default: throw new NotImplementedException();
                             }
                             break;
@@ -376,21 +376,21 @@ namespace SEE.Layout.IO
             }
             finally
             {
-                reader.Close();
+                Reader.Close();
             }
-            if (context.Count > 0)
+            if (Context.Count > 0)
             {
-                LogError($"XML parser is still expecting input in state {context.Peek()}.");
-                throw new SyntaxError($"missing closing {ToString(context.Peek())} tag.");
+                LogError($"XML parser is still expecting input in state {Context.Peek()}.");
+                throw new SyntaxError($"missing closing {ToString(Context.Peek())} tag.");
             }
         }
 
-        private void EndOption()
+        protected virtual void EndOption()
         {
             // will be ignored
         }
 
-        private void StartOption()
+        protected virtual void StartOption()
         {
             // will be ignored
         }
@@ -415,7 +415,7 @@ namespace SEE.Layout.IO
             // will be ignored
         }
 
-        private void StartHiddenNodeTypes()
+        private static void StartHiddenNodeTypes()
         {
             // will be ignored
         }
@@ -494,43 +494,43 @@ namespace SEE.Layout.IO
             // and height 147, whereas the unexpanded leaf node "2" has width
             // and height 14.14 (all values in dots).
 
-            string ID = GetID(reader); // mandatory
+            string id = GetID(Reader); // mandatory
 
-            if (!gameNodes.TryGetValue(ID, out IGameNode gameNode))
+            if (!GameNodes.TryGetValue(id, out IGameNode gameNode))
             {
-                LogWarning($"Unknown id {ID}.");
+                LogWarning($"Unknown id {id}.");
                 // We create a new game node so that we can continue as normal.
-                gameNode = new LayoutVertex(ID);
+                gameNode = new LayoutVertex(id);
             }
-            float X = GetFloat(reader, "X");   // mandatory x co-ordinate
-            float Y = GetFloat(reader, "Y");   // mandatory y co-ordinate; Gravis's Y is Unity's inverted z axis
-            float W = GetFloat(reader, "W");   // mandatory width
-            float H = GetFloat(reader, "H");   // mandatory height
+            float x = GetFloat(Reader, "X");   // mandatory x co-ordinate
+            float y = GetFloat(Reader, "Y");   // mandatory y co-ordinate; Gravis's Y is Unity's inverted z axis
+            float w = GetFloat(Reader, "W");   // mandatory width
+            float h = GetFloat(Reader, "H");   // mandatory height
 
-            ParentNode parent = nodes.Peek();
-            float CS = parent.CS; // icon size for this node
-            if (!reader.IsEmptyElement)
+            ParentNode parent = Nodes.Peek();
+            float cs = parent.CS; // icon size for this node
+            if (!Reader.IsEmptyElement)
             {
                 // push current gameNode along with the mandatory icon size for its children
                 // onto the nodes stack but only if this XML element is not self-closing.
                 // For a self-closing element <Node .... />, no corresponding EndNode()
                 // will be called to pop off this element.
-                nodes.Push(new ParentNode(GetFloat(reader, "CS"), gameNode));
+                Nodes.Push(new ParentNode(GetFloat(Reader, "CS"), gameNode));
             }
-            bool Exp = reader.GetAttribute("Exp") == "True"; // optional expansion
+            bool exp = Reader.GetAttribute("Exp") == "True"; // optional expansion
 
             // The resulting scale of the node; the y co-ordinate remains zero.
             Vector3 scale = Vector3.zero;
             scale.y = gameNode.AbsoluteScale.y; // We maintain the original height of the node.
-            if (Exp && W != 0 && H != 0)
+            if (exp && w != 0 && h != 0)
             {
-                scale.x = W;
-                scale.z = H; // Gravis's height is Unity's z axis
+                scale.x = w;
+                scale.z = h; // Gravis's height is Unity's z axis
             }
             else
             {
-                scale.x = CS;
-                scale.z = CS;
+                scale.x = cs;
+                scale.z = cs;
             }
 
             // The resulting position of the node; the y co-ordinate remains zero.
@@ -539,40 +539,40 @@ namespace SEE.Layout.IO
             // If this node is a root, (X, Y) relates to a common reference point on
             // the canvas. If this node is contained in another node, they are an offset
             // to their parent node.
-            if (parent.gameNode != null)
+            if (parent.GameNode != null)
             {
                 // Node is a nested node, that is, not at top-level.
                 // (X, Y) denote the offset of the nested node to its parent's left upper corner
-                Vector3 parentPosition = parent.gameNode.CenterPosition; // world space in Unity
-                Vector3 parentScale = parent.gameNode.AbsoluteScale;     // world space in Unity
+                Vector3 parentPosition = parent.GameNode.CenterPosition; // world space in Unity
+                Vector3 parentScale = parent.GameNode.AbsoluteScale;     // world space in Unity
 
                 // Transform parent's center position to its left upper corner.
                 parentPosition.x -= parentScale.x / 2.0f;
                 parentPosition.z += parentScale.z / 2.0f;
 
                 // Calculate left upper corner of node.
-                position.x = parentPosition.x + X;
-                position.z = parentPosition.z - Y; // Gravis's Y axis is inverse to Unity's z axis
+                position.x = parentPosition.x + x;
+                position.z = parentPosition.z - y; // Gravis's Y axis is inverse to Unity's z axis
 
                 // position must refer to the center of the node.
                 position.x += scale.x / 2.0f;
                 position.z -= scale.z / 2.0f;
 
                 // Lift y center so that the node stands on its parent's roof.
-                position.y = (parentPosition.y + parentScale.y / 2.0f) + Mathf.Max(MinimalHeight, scale.y) / 2.0f;
+                position.y = (parentPosition.y + parentScale.y / 2.0f) + Mathf.Max(minimalHeight, scale.y) / 2.0f;
             }
             else
             {
                 // Node is a root node.
                 // assert: (X, Y) relates to absolute world space of the left upper corner
                 // Transform to center position for Unity.
-                position.x = X + scale.x / 2.0f;
+                position.x = x + scale.x / 2.0f;
                 // Lift y center so that the node stands on ground zero.
-                position.y = groundLevel + Mathf.Max(MinimalHeight, scale.y) / 2.0f;
+                position.y = groundLevel + Mathf.Max(minimalHeight, scale.y) / 2.0f;
                 // Gravis's Y is Unity's inverted z axis, i.e., we need to mirror Y
                 // as follows: z = -Y. By mirroring Y, the left upper corner of a node
                 // becomes its left lower corner.
-                position.z = -Y - scale.z / 2.0f;
+                position.z = -y - scale.z / 2.0f;
             }
 
             // Although we assign the local scale here, the node is not yet contained in any
@@ -591,7 +591,7 @@ namespace SEE.Layout.IO
         /// <param name="reader">reader processing the XML data</param>
         /// <param name="attribute">name of the float attribute</param>
         /// <returns>float value of the given XML <paramref name="attribute"/></returns>
-        private float GetFloat(XmlTextReader reader, string attribute)
+        private static float GetFloat(XmlTextReader reader, string attribute)
         {
             string value = reader.GetAttribute(attribute);
             if (value.Length == 0)
@@ -608,21 +608,21 @@ namespace SEE.Layout.IO
         /// </summary>
         /// <param name="reader">reader processing the XML data</param>
         /// <returns>value of the Id attribute</returns>
-        private string GetID(XmlTextReader reader)
+        private static string GetID(XmlTextReader reader)
         {
-            string ID = reader.GetAttribute("Id");
-            if (ID.Length == 0)
+            string id = reader.GetAttribute("Id");
+            if (id.Length == 0)
             {
                 throw new SyntaxError("Node does not have an Id.");
             }
             // The first letter is either an 'S' for Source.Name or
             // an 'L' for Linkage.Name. It will be ignored.
-            return ID.Substring(1);
+            return id.Substring(1);
         }
 
         protected virtual void EndNode()
         {
-            nodes.Pop();
+            Nodes.Pop();
         }
 
         protected virtual void StartUndefined()

@@ -40,7 +40,6 @@ namespace SEE.Game
             gameObject.AddComponentIfNecessary<ShowGrabbing>();
             if (gameObject.HasNodeRef())
             {
-                gameObject.AddComponentIfNecessary<GameNodeScaler>();
                 gameObject.AddComponentIfNecessary<ShowLabel>();
                 gameObject.AddComponentIfNecessary<ShowEdges>();
                 gameObject.AddComponentIfNecessary<HighlightErosion>();

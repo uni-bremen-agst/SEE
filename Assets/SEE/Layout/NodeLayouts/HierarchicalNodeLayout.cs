@@ -31,7 +31,7 @@ namespace SEE.Layout.NodeLayouts
         /// A node is considered a root if it has either no parent in the original
         /// graph or its parent is not contained in the set of nodes to be laid out.
         /// </summary>
-        protected IList<ILayoutNode> roots;
+        protected IList<ILayoutNode> Roots;
 
         /// <summary>
         /// Returns the maximal depth of the forest with the given root nodes.

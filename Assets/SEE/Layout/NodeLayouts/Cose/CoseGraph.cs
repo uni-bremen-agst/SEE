@@ -77,7 +77,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <summary>
         /// the margin around this graph
         /// </summary>
-        private readonly float defaultMargin = CoseLayoutSettings.Graph_Margin;
+        private readonly float defaultMargin = CoseLayoutSettings.GraphMargin;
 
         /// <summary>
         /// Indicates if the graph is connected
@@ -210,7 +210,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// updates the bounds of the boundingrectanle 
+        /// updates the bounds of the boundingrectanle
         /// </summary>
         public void UpdateBounding()
         {
@@ -349,7 +349,7 @@ namespace SEE.Layout.NodeLayouts.Cose
 
             if (size == 0)
             {
-                estimatedSize = CoseLayoutSettings.Empty_Compound_Size;
+                estimatedSize = CoseLayoutSettings.EmptyCompoundSize;
             }
             else
             {

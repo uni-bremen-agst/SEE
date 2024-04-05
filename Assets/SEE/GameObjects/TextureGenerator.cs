@@ -33,7 +33,7 @@ namespace SEE.GO
         /// Creates a texture of given dimensions with a single 8-bit color channel. A
         /// line from <paramref name="p0"/> to <paramref name="p1"/> with
         /// <paramref name="thickness"/> thickness is drawn into the texture.
-        /// 
+        ///
         /// The algorithm is based on 'Murphy's Modified Bresenham Line Algorithm' and
         /// the implementation is based on:
         /// <see cref="https://github.com/danbar/murphy_line_draw/blob/master/murphy_line_draw.m"/>
@@ -56,8 +56,8 @@ namespace SEE.GO
             int dx = p1.x - p0.x;
             int dy = p1.y - p0.y;
 
-            int inc_x = (int)Mathf.Sign(Mathf.Sign(dx) + 0.5f);
-            int inc_y = (int)Mathf.Sign(Mathf.Sign(dy) + 0.5f);
+            int incX = (int)Mathf.Sign(Mathf.Sign(dx) + 0.5f);
+            int incY = (int)Mathf.Sign(Mathf.Sign(dy) + 0.5f);
             if (dx < 0)
             {
                 dx = -dx;
@@ -73,11 +73,11 @@ namespace SEE.GO
             {
                 len = dx;
 
-                sd0x = 0; sd0y = inc_y;
-                dd0x = -inc_x; dd0y = inc_y;
+                sd0x = 0; sd0y = incY;
+                dd0x = -incX; dd0y = incY;
 
-                sd1x = inc_x; sd1y = 0;
-                dd1x = inc_x; dd1y = inc_y;
+                sd1x = incX; sd1y = 0;
+                dd1x = incX; dd1y = incY;
 
                 ku = 2 * dx;
                 kv = 2 * dy;
@@ -89,11 +89,11 @@ namespace SEE.GO
             {
                 len = dy;
 
-                sd0x = inc_x; sd0y = 0;
-                dd0x = inc_x; dd0y = -inc_y;
+                sd0x = incX; sd0y = 0;
+                dd0x = incX; dd0y = -incY;
 
-                sd1x = 0; sd1y = inc_y;
-                dd1x = inc_x; dd1y = inc_y;
+                sd1x = 0; sd1y = incY;
+                dd1x = incX; dd1y = incY;
 
                 ku = 2 * dy;
                 kv = 2 * dx;
@@ -114,33 +114,33 @@ namespace SEE.GO
 
                 if (d0 < kt)
                 {
-                    p0.x = p0.x + sd0x;
-                    p0.y = p0.y + sd0y;
+                    p0.x += sd0x;
+                    p0.y += sd0y;
                 }
                 else
                 {
-                    dd = dd + kv;
-                    d0 = d0 - ku;
+                    dd += kv;
+                    d0 -= ku;
 
                     if (d1 < kt)
                     {
-                        p0.x = p0.x + dd0x;
-                        p0.y = p0.y + dd0y;
+                        p0.x += dd0x;
+                        p0.y += dd0y;
 
-                        d1 = d1 - kv;
+                        d1 -= kv;
                     }
                     else
                     {
                         if (dx > dy)
                         {
-                            p0.x = p0.x + dd0x;
+                            p0.x += dd0x;
                         }
                         else
                         {
-                            p0.y = p0.y + dd0y;
+                            p0.y += dd0y;
                         }
 
-                        d1 = d1 - kd;
+                        d1 -= kd;
                         if (dd > tk)
                         {
                             return result;
@@ -150,39 +150,39 @@ namespace SEE.GO
 
                         if (dx > dy)
                         {
-                            p0.y = p0.y + dd0y;
+                            p0.y += dd0y;
                         }
                         else
                         {
-                            p0.x = p0.x + dd0x;
+                            p0.x += dd0x;
                         }
                     }
                 }
 
-                dd = dd + ku;
-                d0 = d0 + kv;
+                dd += ku;
+                d0 += kv;
 
             }
 
-            void BresenhamLineDraw(Vector2Int _p0, int _d1)
+            void BresenhamLineDraw(Vector2Int p0, int d1)
             {
                 for (int p = 0; p < len; p++)
                 {
-                    result.SetPixel(_p0.x, _p0.y, c0);
+                    result.SetPixel(p0.x, p0.y, c0);
 
-                    if (_d1 <= kt)
+                    if (d1 <= kt)
                     {
-                        _p0.x = _p0.x + sd1x;
-                        _p0.y = _p0.y + sd1y;
+                        p0.x += sd1x;
+                        p0.y += sd1y;
 
-                        _d1 = _d1 + kv;
+                        d1 += kv;
                     }
                     else
                     {
-                        _p0.x = _p0.x + dd1x;
-                        _p0.y = _p0.y + dd1y;
+                        p0.x += dd1x;
+                        p0.y += dd1y;
 
-                        _d1 = _d1 + kd;
+                        d1 += kd;
                     }
                 }
             }
@@ -218,19 +218,19 @@ namespace SEE.GO
             int erro = 1 - xo;
             int erri = 1 - xi;
 
-            void XLine(Texture2D _tex, int _x1, int _x2, int _y, Color _color)
+            void XLine(Texture2D tex, int x1, int x2, int y, Color color)
             {
-                while (_x1 <= _x2)
+                while (x1 <= x2)
                 {
-                    _tex.SetPixel(_x1++, _y, _color);
+                    tex.SetPixel(x1++, y, color);
                 }
             }
 
-            void YLine(Texture2D _tex, int _x, int _y1, int _y2, Color _color)
+            void YLine(Texture2D tex, int x, int y1, int y2, Color color)
             {
-                while (_y1 <= _y2)
+                while (y1 <= y2)
                 {
-                    _tex.SetPixel(_x, _y1++, _color);
+                    tex.SetPixel(x, y1++, color);
                 }
             }
 

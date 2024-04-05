@@ -31,19 +31,19 @@ namespace SEE.GO
         /// </summary>
         public Node Value
         {
-            get => (Node)elem;
+            get => (Node)Elem;
             set
             {
-                if (elem != value)
+                if (Elem != value)
                 {
-                    if (elem != null)
+                    if (Elem != null)
                     {
-                        nodeToNodeRefDict.Remove((Node)elem);
+                        nodeToNodeRefDict.Remove((Node)Elem);
                     }
-                    elem = value;
-                    if (elem != null)
+                    Elem = value;
+                    if (Elem != null)
                     {
-                        nodeToNodeRefDict[(Node)elem] = this;
+                        nodeToNodeRefDict[(Node)Elem] = this;
                     }
                 }
             }
@@ -59,7 +59,7 @@ namespace SEE.GO
         /// </summary>
         /// <param name="node">the graph node this <see cref="NodeRef"/> should be
         /// referring to</param>
-        public void SetNode(Node node) => elem = node;
+        public void SetNode(Node node) => Elem = node;
 
         /// <summary>
         /// Returns the <see cref="NodeRef"/> referring to <paramref name="node"/>.

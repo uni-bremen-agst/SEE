@@ -10,12 +10,12 @@
         /// <summary>
         /// The first pair element
         /// </summary>
-        protected A first;
+        protected A First;
 
         /// <summary>
         /// The second pair element.
         /// </summary>
-        protected B second;
+        protected B Second;
 
         /// <summary>
         /// Constructor for a new pair.
@@ -24,26 +24,26 @@
         /// <param name="b">the second element</param>
         public Pair(A a, B b)
         {
-            first = a;
-            second = b;
+            First = a;
+            Second = b;
         }
 
         /// <summary>
         /// Yields the first element of the pair.
         /// </summary>
         /// <returns>the first element of the pair</returns>
-        public A getFirst()
+        public A GetFirst()
         {
-            return first;
+            return First;
         }
 
         /// <summary>
         /// Yields the second element of the pair.
         /// </summary>
         /// <returns>the second element of the pair</returns>
-        public B getSecond()
+        public B GetSecond()
         {
-            return second;
+            return Second;
         }
 
         /// <summary>
@@ -52,7 +52,7 @@
         /// <param name="a">first element</param>
         /// <param name="b">second element</param>
         /// <returns>new pair</returns>
-        public static Pair<A, B> of(A a, B b)
+        public static Pair<A, B> Of(A a, B b)
         {
             return new Pair<A, B>(a, b);
         }

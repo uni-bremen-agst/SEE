@@ -42,12 +42,12 @@ namespace SEE.Net
         /// The ID of the next incoming packet of the server. Is used to ensure the
         /// correct order of execution/handling of packets.
         /// </summary>
-        public static ulong incomingPacketID = 0;
+        public static ulong IncomingPacketID = 0;
 
         /// <summary>
         /// The ID of the next outgoing packet to the server.
         /// </summary>
-        public static ulong outgoingPacketID = 0;
+        public static ulong OutgoingPacketID = 0;
 
         /// <summary>
         /// Whether the client is currently initialized.

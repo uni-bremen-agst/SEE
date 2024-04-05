@@ -71,6 +71,7 @@
             "allow_dependencies_to_parents": true,
             "architecture_file": "$(SEEDIRECTORY)\\Data\\GXL\\SEE\\Architecture.gxl",
             "base_view_name": "Code Facts",
+            "generate_violation_previews": false,
             "hierarchy_view_name": "Code Facts",
             "mapping_file": "$(SEEDIRECTORY)\\Data\\GXL\\SEE\\Mapping.gxl"
         },
@@ -109,6 +110,9 @@
         "C#-FieldNotPrivateNorProtected": {
             "_active": false
         },
+        "C#-ImportCompilerAndAnalyzerDiagnostics": {
+            "_active": true
+        },
         "C#-InvalidDependencyPropertyDeclaration": {
             "_active": true
         },
@@ -122,31 +126,31 @@
             "_active": true
         },
         "CloneDetection": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-AllmanBraces": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-CapitalizeFunctions": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-LineBreaks": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-LinesOfCodeInFile": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-MaxOneStmtPerLine": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-MaximumLineLength": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-NoBlankLinesAtBraces": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-NoSingleCharIdentifier": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-NoTabs": {
             "_active": true
@@ -155,19 +159,19 @@
             "_active": true
         },
         "CodingStyle-NoWhitespaceMemberSelection": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-NoWhitespacePointerReference": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-NoWhitespacePointerReferenceInverse": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-NoWhitespaceUnaryOperator": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-WhitespaceNextToOperator": {
-            "_active": true
+            "_active": false
         },
         "CycleDetection-CallgraphCycles": {
             "_active": true
@@ -175,35 +179,41 @@
         "CycleDetection-IncludeCycles": {
             "_active": true
         },
-        "Generic-MarkupComments": {
+        "FileWide": {
             "_active": true
+        },
+        "Generic-MarkupComments": {
+            "_active": false
         },
         "Generic-MaxComplexity": {
-            "_active": true
+            "_active": false
         },
         "Generic-MaxConditions": {
-            "_active": true
+            "_active": false
         },
         "Generic-MaxNesting": {
-            "_active": true
+            "_active": false
         },
         "Generic-MaxOneStmtPerLine": {
-            "_active": true
+            "_active": false
         },
         "Generic-MaxParams": {
-            "_active": true
+            "_active": false
         },
         "Generic-NoDiscardedReturnCode": {
-            "_active": true
+            "_active": false
         },
         "Generic-NoEmptyLoops": {
-            "_active": true
+            "_active": false
         },
         "Generic-NoMagicNumbers": {
-            "_active": true
+            "_active": false
+        },
+        "ImportExternalAnalysisOutput": {
+            "_active": false
         },
         "Metric-Calling.CPP": {
-            "_active": true,
+            "_active": false,
             "max_value": null
         },
         "Metric-CloneRatio": {
@@ -214,13 +224,14 @@
         },
         "Metric-Comment.Density": {
             "_active": true,
-            "min_value": 0.1
+            "min_value": null
         },
         "Metric-Comment.Internal": {
             "_active": true
         },
         "Metric-Comment.Preceding": {
-            "_active": true
+            "_active": true,
+            "min_value": null
         },
         "Metric-Coupling": {
             "_active": true
@@ -240,53 +251,56 @@
         },
         "Metric-Fan.Out.Call": {
             "_active": true,
-            "max_value": 20
+            "max_value": 50
         },
         "Metric-HIS.APCGCYCLE": {
-            "_active": true
+            "_active": false
         },
         "Metric-HIS.CALLING": {
-            "_active": true,
+            "_active": false,
             "max_value": 100
         },
         "Metric-HIS.CALLS": {
-            "_active": true,
+            "_active": false,
             "max_value": 20
         },
         "Metric-HIS.COMF": {
             "_active": true,
-            "min_value": 0.1
+            "min_value": null
         },
         "Metric-HIS.GOTO": {
             "_active": true
         },
         "Metric-HIS.LEVEL": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-HIS.NOMV": {
-            "_active": true
+            "_active": false
         },
         "Metric-HIS.NOMVPR": {
-            "_active": true
+            "_active": false
         },
         "Metric-HIS.PARAM": {
             "_active": true,
             "max_value": 7
         },
         "Metric-HIS.PATH": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-HIS.RETURN": {
             "_active": true,
-            "max_value": 5
+            "max_value": 20
         },
         "Metric-HIS.STMT": {
             "_active": true,
-            "max_value": 100
+            "max_value": 500,
+            "min_value": null
         },
         "Metric-HIS.VG": {
             "_active": true,
-            "max_value": 20
+            "max_value": null
         },
         "Metric-HIS.VOCF": {
             "_active": true,
@@ -329,25 +343,25 @@
             "_active": false
         },
         "Metric-Includes.DirectIncluders": {
-            "_active": true
+            "_active": false
         },
         "Metric-Includes.DirectIncludes": {
-            "_active": true
+            "_active": false
         },
         "Metric-Includes.IncludeBurden": {
-            "_active": true
+            "_active": false
         },
         "Metric-Includes.MaximumIncludeDepth": {
-            "_active": true
+            "_active": false
         },
         "Metric-Includes.MaximumIncluderDepth": {
-            "_active": true
+            "_active": false
         },
         "Metric-Includes.TransitiveIncluders": {
-            "_active": true
+            "_active": false
         },
         "Metric-Includes.TransitiveIncludes": {
-            "_active": true
+            "_active": false
         },
         "Metric-InverseCoupling": {
             "_active": true
@@ -371,7 +385,8 @@
             "_active": true
         },
         "Metric-LOC": {
-            "_active": true
+            "_active": true,
+            "max_value": 1000
         },
         "Metric-Lines.Class.Code": {
             "_active": true
@@ -384,6 +399,10 @@
         },
         "Metric-Lines.Class.LOC": {
             "_active": true
+        },
+        "Metric-Lines.Class.OnlyComment": {
+            "_active": true,
+            "max_value": null
         },
         "Metric-Lines.Code": {
             "_active": true
@@ -406,11 +425,16 @@
         "Metric-Lines.File.LOC": {
             "_active": true
         },
+        "Metric-Lines.File.OnlyComment": {
+            "_active": true,
+            "max_value": null
+        },
         "Metric-Lines.LOC": {
             "_active": true
         },
         "Metric-Lines.OnlyComment": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-Lines.PP.Define": {
             "_active": true
@@ -467,7 +491,8 @@
             "_active": true
         },
         "Metric-Lines.Routine.Comment": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-Lines.Routine.CommentRatio": {
             "_active": true
@@ -476,7 +501,12 @@
             "_active": true
         },
         "Metric-Lines.Routine.LOC": {
-            "_active": true
+            "_active": true,
+            "max_value": 1000
+        },
+        "Metric-Lines.Routine.OnlyComment": {
+            "_active": true,
+            "max_value": null
         },
         "Metric-LogNPathCeiling": {
             "_active": true
@@ -492,60 +522,72 @@
         },
         "Metric-MaximumNesting": {
             "_active": true,
-            "max_value": 10
+            "max_value": 20
         },
         "Metric-McCabeComplexity": {
-            "_active": true
+            "_active": true,
+            "max_value": 200
         },
         "Metric-NPath": {
             "_active": true
         },
         "Metric-NumberOfCalledRoutines": {
-            "_active": true,
+            "_active": false,
             "max_value": 20
         },
         "Metric-NumberOfCallingRoutines": {
-            "_active": true,
+            "_active": false,
             "max_value": null
         },
         "Metric-NumberOfGotos": {
-            "_active": false
+            "_active": true
         },
         "Metric-NumberOfInvocations": {
             "_active": true
         },
         "Metric-NumberOfParameters": {
-            "_active": false
+            "_active": true
         },
         "Metric-NumberOfReturns": {
-            "_active": false
+            "_active": true,
+            "max_value": 20
         },
         "Metric-NumberOfSCCs": {
-            "_active": true
-        },
-        "Metric-NumberOfStatements": {
             "_active": false
         },
-        "Metric-OO.CBO": {
+        "Metric-NumberOfStatements": {
             "_active": true
+        },
+        "Metric-OO.CBO": {
+            "_active": true,
+            "max_value": null
         },
         "Metric-OO.CBOa": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-OO.CBOs": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-OO.DAC": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-OO.DIT": {
-            "_active": true
+            "_active": true,
+            "max_value": 20
         },
         "Metric-OO.LCOM": {
-            "_active": true
+            "_active": true,
+            "max_value": null
+        },
+        "Metric-OO.LCOM4": {
+            "max_value": null
         },
         "Metric-OO.LCOMs": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-OO.NIVOC": {
             "_active": true
@@ -560,7 +602,8 @@
             "_active": true
         },
         "Metric-OO.NOMA": {
-            "_active": true
+            "_active": true,
+            "max_value": 30
         },
         "Metric-OO.NOMO": {
             "_active": true
@@ -569,13 +612,16 @@
             "_active": true
         },
         "Metric-OO.RFC": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-OO.WMC.McCabeComplexity": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-OO.WMC.One": {
-            "_active": true
+            "_active": true,
+            "max_value": null
         },
         "Metric-SwitchComplexity": {
             "_active": true
@@ -584,7 +630,7 @@
             "_active": false
         },
         "Metric-TokenFileMetric.Check": {
-            "_active": true
+            "_active": false
         },
         "Metric-TokenFileMetric.Debug": {
             "_active": true
@@ -602,7 +648,7 @@
             "_active": true
         },
         "Metric-TokenMetric.Check": {
-            "_active": true
+            "_active": false
         },
         "Metric-TokenMetric.Debug": {
             "_active": true
@@ -619,12 +665,37 @@
         "Metric-TokenMetric.XXX": {
             "_active": true
         },
+        "NextLine": {
+            "_active": true
+        },
+        "NextRoutine": {
+            "_active": true
+        },
+        "SameLine": {
+            "_active": true
+        },
+        "SameRoutine": {
+            "_active": true
+        },
         "SaveRFG": {
             "_active": true,
             "rfg_file": null
+        },
+        "SelectedRoutine": {
+            "_active": true
         }
     },
     "Project": {
+        "AxivionC#Analysis": {
+            "_active": true,
+            "_copy_from": "AxivionC#Frontend",
+            "create_multiple_edges": false,
+            "framework_path": null,
+            "msbuild_path": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
+            "project_is_library": true,
+            "rfg": "SEE.rfg",
+            "solution": "SEE.csproj"
+        },
         "BuildSystemIntegration": {
             "child_order": [
                 "AxivionCompiler",
@@ -632,7 +703,8 @@
                 "Command",
                 "MakeIntegration",
                 "MSBuildIntegration",
-                "PrintAMessage"
+                "PrintAMessage",
+                "AxivionC#Analysis"
             ]
         },
         "Git": {
@@ -644,8 +716,8 @@
             "sourceserver_remote_url": "https://github.com/uni-bremen-agst/SEE.git"
         },
         "MSBuildIntegration": {
-            "_active": true,
-            "binary": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
+            "_active": false,
+            "binary": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
             "project": "SEE.csproj"
         },
         "PrintAMessage": {
@@ -656,17 +728,18 @@
                 "update_workspace": true
             },
             "directory": "$(SEEDIRECTORY)",
-            "ir": "Temp\\bin\\Debug\\SEE.dll.ir",
+            "ir": null,
             "name": "SEE",
-            "rfg": null
+            "rfg": "SEE.rfg"
         }
     },
     "Results": {
-        "Database": {
+        "Dashboard": {
             "ci_mode": {
                 "filename": "SEE.db",
                 "provide_ir": {
-                    "backup_existing": true
+                    "backup_existing": false,
+                    "provide_in_dashboard": false
                 },
                 "provide_rfg": {
                     "backup_existing": true,
@@ -674,16 +747,26 @@
                 }
             },
             "local_mode": {
-                "directory": "($userprofile)\\.bauhaus\\localbuild\\projects"
+                "directory": "$(SEEDIRECTORY)\\.bauhaus\\localbuild\\projects",
+                "provide_ir": {
+                    "provide_in_dashboard": false
+                },
+                "provide_rfg": {
+                    "backup_existing": true
+                }
             }
+        },
+        "JSONReport": {
+            "_active": true,
+            "filename": "$(SEEDIRECTORY)/issues.json"
         }
     },
     "_Format": "1.0",
-    "_Version": "7.1.4",
+    "_Version": "7.7.1",
     "_VersionNum": [
         7,
+        7,
         1,
-        4,
-        6285
+        13682
     ]
 }

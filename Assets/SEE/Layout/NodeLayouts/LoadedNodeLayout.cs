@@ -24,7 +24,7 @@ namespace SEE.Layout.NodeLayouts
         public LoadedNodeLayout(float groundLevel, string filename)
           : base(groundLevel)
         {
-            name = "Loaded Layout";
+            Name = "Loaded Layout";
             this.filename = filename;
         }
 
@@ -48,7 +48,7 @@ namespace SEE.Layout.NodeLayouts
                 IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
                 if (Filenames.HasExtension(filename, Filenames.GVLExtension))
                 {
-                    new GVLReader(filename, layoutNodeList.Cast<IGameNode>().ToList(), groundLevel, new SEELogger());
+                    new GVLReader(filename, layoutNodeList.Cast<IGameNode>().ToList(), GroundLevel, new SEELogger());
                     // The elements in layoutNodeList will be stacked onto each other starting at groundLevel.
                 }
                 else if (Filenames.HasExtension(filename, Filenames.SLDExtension))

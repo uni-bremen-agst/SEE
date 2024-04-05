@@ -17,9 +17,9 @@ namespace SEE.Net
         /// </summary>
         private struct SerializedPendingPacket
         {
-            internal PacketHeader packetHeader;
-            internal Connection connection;
-            internal string serializedPacket;
+            internal PacketHeader PacketHeader;
+            internal Connection Connection;
+            internal string SerializedPacket;
         }
 
         /// <summary>
@@ -28,14 +28,13 @@ namespace SEE.Net
         /// </summary>
         private struct TranslatedPendingPacket : IComparable<TranslatedPendingPacket>
         {
-            internal PacketHeader packetHeader;
-            internal Connection connection;
-            internal PacketSequencePacket packet;
+            internal PacketHeader PacketHeader;
+            internal Connection Connection;
+            internal PacketSequencePacket Packet;
 
-            public int CompareTo(TranslatedPendingPacket other)
+            public readonly int CompareTo(TranslatedPendingPacket other)
             {
-                int result = packet.id.CompareTo(other.packet.id);
-                return result;
+                return Packet.ID.CompareTo(other.Packet.ID);
             }
         }
 
@@ -79,9 +78,9 @@ namespace SEE.Net
                 serializedPendingPackets.Add(
                     new SerializedPendingPacket
                     {
-                        packetHeader = packetHeader,
-                        connection = connection,
-                        serializedPacket = serializedPacket
+                        PacketHeader = packetHeader,
+                        Connection = connection,
+                        SerializedPacket = serializedPacket
                     }
                 );
             }
@@ -102,13 +101,13 @@ namespace SEE.Net
                 Assert.AreEqual(Thread.CurrentThread, Network.MainThread);
                 foreach (SerializedPendingPacket serializedPendingPacket in serializedPendingPackets)
                 {
-                    PacketSequencePacket packet = (PacketSequencePacket)PacketSerializer.Deserialize(serializedPendingPacket.serializedPacket);
+                    PacketSequencePacket packet = (PacketSequencePacket)PacketSerializer.Deserialize(serializedPendingPacket.SerializedPacket);
                     translatedPendingPackets.Add(
                         new TranslatedPendingPacket
                         {
-                            packetHeader = serializedPendingPacket.packetHeader,
-                            connection = serializedPendingPacket.connection,
-                            packet = packet
+                            PacketHeader = serializedPendingPacket.PacketHeader,
+                            Connection = serializedPendingPacket.Connection,
+                            Packet = packet
                         }
                     );
                 }
@@ -119,8 +118,8 @@ namespace SEE.Net
                 {
                     TranslatedPendingPacket translatedPendingPacket = translatedPendingPackets[i];
                     bool result = isServer ?
-                        translatedPendingPacket.packet.ExecuteOnServer(translatedPendingPackets[i].connection) :
-                        translatedPendingPacket.packet.ExecuteOnClient(translatedPendingPackets[i].connection);
+                        translatedPendingPacket.Packet.ExecuteOnServer(translatedPendingPackets[i].Connection) :
+                        translatedPendingPacket.Packet.ExecuteOnClient(translatedPendingPackets[i].Connection);
                     if (result)
                     {
                         translatedPendingPackets.RemoveAt(i--);

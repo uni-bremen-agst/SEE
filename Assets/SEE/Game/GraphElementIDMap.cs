@@ -21,25 +21,25 @@ namespace SEE.Game
         private static readonly IDictionary<string, GameObject> mapping = new Dictionary<string, GameObject>();
 
         /// <summary>
-        /// Returns the game object with the given <paramref name="ID"/> or null if there is
+        /// Returns the game object with the given <paramref name="id"/> or null if there is
         /// no such game object.
         /// </summary>
-        /// <param name="ID">the ID of the game object to be looked up</param>
+        /// <param name="id">the ID of the game object to be looked up</param>
         /// <param name="mustFindElement">If true, an exception will be thrown if the element could not be found.
         /// Otherwise, <c>null</c> will be returned.</param>
-        /// <returns>the game object with the given <paramref name="ID"/> or null if there is
+        /// <returns>the game object with the given <paramref name="id"/> or null if there is
         /// no such game object</returns>
-        internal static GameObject Find(string ID, bool mustFindElement = false)
+        internal static GameObject Find(string id, bool mustFindElement = false)
         {
-            Assert.IsFalse(string.IsNullOrEmpty(ID));
-            if (mapping.TryGetValue(ID, out GameObject result))
+            Assert.IsFalse(string.IsNullOrEmpty(id));
+            if (mapping.TryGetValue(id, out GameObject result))
             {
-                Assert.IsNotNull(result, $"Null value for {ID}");
+                Assert.IsNotNull(result, $"Null value for {id}");
                 return result;
             }
             else if (mustFindElement)
             {
-                throw new KeyNotFoundException($"Element with ID '{ID}' was not found.");
+                throw new KeyNotFoundException($"Element with ID '{id}' was not found.");
             }
             else
             {
@@ -48,13 +48,25 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Emits the <paramref name="ID"/> and all current entries of the map.
+        /// Returns whether there is a game object with the given <paramref name="id"/>
+        /// in this map.
         /// </summary>
-        /// <remarks>Used for debugging when <paramref name="ID"/> cannot be found in the map.</remarks>
-        /// <param name="ID">the ID not found in the map</param>
-        private static void DumpError(string ID)
+        /// <param name="id">the ID of the game object to be looked up</param>
+        /// <returns>whether there is a game object with the given <paramref name="id"/> in this map</returns>
+        internal static bool Has(string id)
         {
-            Debug.LogError($"ID {ID} not found in {nameof(GraphElementIDMap)}.\n");
+            Assert.IsFalse(string.IsNullOrEmpty(id));
+            return mapping.ContainsKey(id);
+        }
+
+        /// <summary>
+        /// Emits the <paramref name="id"/> and all current entries of the map.
+        /// </summary>
+        /// <remarks>Used for debugging when <paramref name="id"/> cannot be found in the map.</remarks>
+        /// <param name="id">the ID not found in the map</param>
+        private static void DumpError(string id)
+        {
+            Debug.LogError($"ID {id} not found in {nameof(GraphElementIDMap)}.\n");
             if (mapping.Count == 0)
             {
                 Debug.LogError($"{nameof(GraphElementIDMap)} is empty.\n");

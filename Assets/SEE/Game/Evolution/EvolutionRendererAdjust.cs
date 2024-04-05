@@ -72,9 +72,9 @@ namespace SEE.Game.Evolution
                                          layoutNode.LocalScale
                                        : gameNode.transform.parent.InverseTransformVector(layoutNode.LocalScale);
 
-                gameNode.AddOrGetComponent<NodeOperator>()
-                    .ScaleTo(localScale, AnimationLagFactor, updateEdges: false)
-                    .SetOnComplete(() => OnScalingFinished(gameNode));
+                gameNode.NodeOperator()
+                        .ScaleTo(localScale, AnimationLagFactor, updateEdges: false)
+                        .OnComplete(() => OnScalingFinished(gameNode));
             }
         }
 

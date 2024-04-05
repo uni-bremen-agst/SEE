@@ -8,6 +8,7 @@ using TinySpline;
 using UnityEngine;
 using Sirenix.OdinInspector;
 using UnityEngine.Rendering;
+using Frame = TinySpline.Frame;
 
 namespace SEE.GO
 {
@@ -51,19 +52,19 @@ namespace SEE.GO
         /// What the name says.
         /// </summary>
         [NonSerialized]
-        private const float PI2 = Mathf.PI * 2f;
+        private const float doublePi = Mathf.PI * 2f;
 
         /// <summary>
         /// Indicates whether the rendering of <see cref="spline"/> must be
         /// updated (as a result of setting one of the public properties).
         /// </summary>
-        private bool needsUpdate = false;
+        private bool needsUpdate;
 
         /// <summary>
         /// Indicates whether the color of <see cref="spline"/> must be updated.
         /// Will not cause an update on its own, use <see cref="needsUpdate"/> for that.
         /// </summary>
-        private bool needsColorUpdate = false;
+        private bool needsColorUpdate;
 
         /// <summary>
         /// The shaping spline.
@@ -75,7 +76,7 @@ namespace SEE.GO
         /// The start position of the subspline for the build-up animation, element of [0,1]
         /// </summary>
         [SerializeField]
-        private float subsplineStartT = 0.0f;
+        private float subsplineStartT;
 
         /// <summary>
         /// The end position of the subspline for the build-up animation, element of [0,1]
@@ -100,7 +101,7 @@ namespace SEE.GO
         /// Used to calculate upper and lower knots from <see cref="subsplineEndT"/> and  <see cref="subsplineStartT"/>.
         /// chordLengths is set in Property <see cref="Spline"/>.
         /// </summary>
-        private ChordLengths chordLengths = null;
+        private ChordLengths chordLengths;
 
         /// <summary>
         /// Property of <see cref="spline"/>. The returned instance is NOT a
@@ -210,7 +211,6 @@ namespace SEE.GO
             set
             {
                 gradientColors = value;
-                needsUpdate = true;
                 needsColorUpdate = true;
             }
         }
@@ -232,7 +232,7 @@ namespace SEE.GO
         /// The material this edge uses, if it uses a mesh renderer.
         /// If it does not, using this property causes a mesh to be created.
         /// </summary>
-        public Material meshMaterial
+        public Material MeshMaterial
         {
             get
             {
@@ -245,7 +245,7 @@ namespace SEE.GO
             }
             set
             {
-                if (meshMaterial != value)
+                if (MeshMaterial != value)
                 {
                     meshRenderer.sharedMaterial = value;
                     UpdateMaterial();
@@ -283,7 +283,12 @@ namespace SEE.GO
             {
                 UpdateLineRenderer();
                 UpdateMesh();
-                needsUpdate = false;
+                needsUpdate = needsColorUpdate = false;
+            }
+            else if (needsColorUpdate)
+            {
+                UpdateColor();
+                needsColorUpdate = false;
             }
         }
 
@@ -336,6 +341,26 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Updates the start and end color of the line renderer attached
+        /// to the gameObject using the values of <see cref="gradientColors"/>
+        /// in case there is a line renderer. Otherwise (if <see cref="meshRenderer"/>
+        /// is different from <c>null</c>, updates the material via
+        /// <see cref="UpdateMaterial"/>.
+        /// </summary>
+        private void UpdateColor()
+        {
+            if (gameObject.TryGetComponent(out LineRenderer lr))
+            {
+                lr.startColor = gradientColors.start;
+                lr.endColor = gradientColors.end;
+            }
+            else if (meshRenderer != null)
+            {
+                UpdateMaterial();
+            }
+        }
+
+        /// <summary>
         /// Create or update the spline mesh (a tube) and replace any
         /// <see cref="LineRenderer"/> with the necessary mesh components
         /// (<see cref="MeshFilter"/>, <see cref="MeshCollider"/> etc.).
@@ -343,11 +368,13 @@ namespace SEE.GO
         /// <returns>The created or updated mesh</returns>
         private Mesh CreateOrUpdateMesh()
         {
-            List<Vector3> vertices = new();
-            List<Vector3> normals = new();
-            List<Vector4> tangents = new();
-            List<Vector2> uvs = new();
-            List<int> indices = new();
+            int totalVertices = (tubularSegments+1) * (radialSegments+1);
+            int totalIndices = tubularSegments * radialSegments * 6;
+            Vector3[] vertices = new Vector3[totalVertices];
+            Vector3[] normals = new Vector3[totalVertices];
+            Vector4[] tangents = new Vector4[totalVertices];
+            Vector2[] uvs = new Vector2[totalVertices];
+            int[] indices = new int[totalIndices];
 
             // It is much more efficient to generate uniform knots than
             // equidistant knots. Besides, you can't see the difference
@@ -357,72 +384,110 @@ namespace SEE.GO
             BSpline subSpline = CreateSubSpline();
             IList<double> rv = subSpline.UniformKnotSeq((uint)tubularSegments + 1);
             FrameSeq frames = subSpline.ComputeRMF(rv);
+            // Precalculated values for the loops later on.
+            float radialSegmentsInv = 1f / radialSegments;
+            float tubularSegmentsInv = 1f / tubularSegments;
+            int segmentPlusOne = radialSegments + 1;
 
-            // Helper function. Creates a radial polygon for frame `i'.
-            void GenerateSegment(int i)
+            // The index of the current index in the index array.
+            // This is less confusing (except, admittedly, for the name)
+            // than calculating this index on-the-fly.
+            uint indexIndex = 0;
+            // Additionally, the index of the current vertex in the vertex-based arrays
+            int index = 0;
+            // Pre-calculate sin and cos values.
+            float[] sinValues = new float[radialSegments + 1];
+            float[] cosValues = new float[radialSegments + 1];
+
+            for (int j = 0; j <= radialSegments; j++)
             {
-                Frame fr = frames.At((uint)i);
+                float v = j * radialSegmentsInv * doublePi;
+                sinValues[j] = Mathf.Sin(v);
+                cosValues[j] = Mathf.Cos(v);
+            }
+            // TODO: This loop is the main culprit for the performance issues when splines are modified.
+            //       I have already tried optimizing it (see PR #622), which resulted in promising improvements, more
+            //       than doubling FPS from 5 to 13, but we should strive for at least 30. Looking at the profiler,
+            //       I see at least two possible avenues for further optimization:
+            //       1. The biggest performance hit comes from the fact that we have to interop with the native C code,
+            //          specifically that we have to convert a lot of objects back-and-forth between C# and C data
+            //          datastructures, and that we have to do so within the unoptimized interop code.
+            //          ==> One solution may be to move this part into C code, as it uses no Unity-specific code.
+            //          We would thus avoid those interop performance problems.
+            //       2. The other big performance hit comes from the many vector operations we have to do,
+            //          such as the normalization in the innermost loop. While this is unavoidable, C# does not provide
+            //          the most efficient way to do so. Additionally, note that the loop is heavily parallelizable –
+            //          the only dependency between iterations is the `index` variable, which can be easily computed
+            //          in each iteration.
+            //          ==> One solution may be to parallelize this loop. We could either use
+            //          Unity's "Parallel jobs" system (https://docs.unity3d.com/Manual/JobSystemParallelForJobs.html)
+            //          or if we want to get especially fancy, we could use the GPU to do the calculations, using
+            //          Unity's "Compute Shaders" (https://docs.unity3d.com/Manual/class-ComputeShader.html).
+            //          While the latter is most likely much more efficient, it is also likely more complicated.
+            //          Another open question is whether we want to parallelize not only across spline segments, i.e.,
+            //          the loop below, but also across splines themselves (since quite often,
+            //          multiple spline operations are carried out at the same time).
+            for (uint i = 0; i <= tubularSegments; i++)
+            {
+                // Create radial polygons for frame 'i'.
+                Frame fr = frames.At(i);
 
-                Vector3 p = TinySplineInterop.VectorToVector(fr.Position);
-                Vector3 N = TinySplineInterop.VectorToVector(fr.Normal);
-                Vector3 B = TinySplineInterop.VectorToVector(fr.Binormal);
+                Vector3 frPosition = TinySplineInterop.VectorToVector(fr.Position);
+                Vector3 frNormal = TinySplineInterop.VectorToVector(fr.Normal);
+                Vector3 frBinormal = TinySplineInterop.VectorToVector(fr.Binormal);
+                Vector4 frTangent = TinySplineInterop.VectorToVector(fr.Tangent);  // w = 0f by default.
+
+                // TODO: This was previously (before the optimization) implicit behavior. Is this intentional?
+                if (float.IsNaN(frNormal.x))
+                {
+                    frNormal = Vector3.zero;
+                }
+                if (float.IsNaN(frBinormal.x))
+                {
+                    frBinormal = Vector3.zero;
+                }
+                Vector3 radiusNormal = frNormal * radius;
+                Vector3 radiusBinormal = frBinormal * radius;
 
                 for (int j = 0; j <= radialSegments; j++)
                 {
-                    float v = 1f * j / radialSegments * PI2;
-                    float sin = Mathf.Sin(v);
-                    float cos = Mathf.Cos(v);
+                    // Generate radial segment of frame `i` for segment `j`.
+                    Vector3 normal = cosValues[j] * radiusNormal + sinValues[j] * radiusBinormal;
+                    vertices[index] = frPosition + normal;
+                    normals[index] = normal; // TODO: Is it fine not to normalize this?
+                    tangents[index] = frTangent;
+                    // U-v-vectors
+                    uvs[index] = new Vector2(j * radialSegmentsInv, i * tubularSegmentsInv);
+                    // Indices (faces)
+                    if (i >= 1 && j >= 1)
+                    {
+                        int a = index - segmentPlusOne - 1;
+                        int b = index - 1;
+                        int c = index;
+                        int d = index - segmentPlusOne;
 
-                    Vector3 normal = (cos * N + sin * B).normalized;
-                    vertices.Add(p + radius * normal);
-                    normals.Add(normal);
+                        // faces
+                        indices[indexIndex++] = a; indices[indexIndex++] = d; indices[indexIndex++] = b;
+                        indices[indexIndex++] = b; indices[indexIndex++] = d; indices[indexIndex++] = c;
+                    }
 
-                    Vector3 tangent = TinySplineInterop.VectorToVector(fr.Tangent);
-                    tangents.Add(new Vector4(tangent.x, tangent.y, tangent.z, 0f));
-                }
-            }
-
-            // Radial polygons
-            for (int i = 0; i < tubularSegments; i++)
-            {
-                GenerateSegment(i);
-            }
-            GenerateSegment(tubularSegments);
-
-            // U-v-vectors
-            for (int i = 0; i <= tubularSegments; i++)
-            {
-                for (int j = 0; j <= radialSegments; j++)
-                {
-                    float u = 1f * j / radialSegments;
-                    float v = 1f * i / tubularSegments;
-                    uvs.Add(new Vector2(u, v));
-                }
-            }
-
-            // Indices (faces)
-            for (int j = 1; j <= tubularSegments; j++)
-            {
-                for (int i = 1; i <= radialSegments; i++)
-                {
-                    int a = (radialSegments + 1) * (j - 1) + (i - 1);
-                    int b = (radialSegments + 1) * j + (i - 1);
-                    int c = (radialSegments + 1) * j + i;
-                    int d = (radialSegments + 1) * (j - 1) + i;
-
-                    // faces
-                    indices.Add(a); indices.Add(d); indices.Add(b);
-                    indices.Add(b); indices.Add(d); indices.Add(c);
+                    index++;
                 }
             }
 
             // Set up the mesh components.
             Mesh mesh; // The mesh to work on.
-            bool updateMaterial = false; // Whether to call `UpdateMaterial'.
+            bool updateMaterial; // Whether to call `UpdateMaterial'.
 
             if (gameObject.TryGetComponent(out MeshFilter filter))
             { // Does this game object already have a mesh which we can reuse?
                 mesh = filter.mesh;
+                updateMaterial = // The geometrics of the mesh have changed.
+                                 mesh.vertices.Length != vertices.Length ||
+                                 mesh.normals.Length != normals.Length ||
+                                 mesh.tangents.Length != tangents.Length ||
+                                 mesh.uv.Length != uvs.Length ||
+                                 needsColorUpdate; // Or the color of the mesh has been changed.
             }
             else
             { // Create a new mesh for this game object.
@@ -434,22 +499,15 @@ namespace SEE.GO
             }
 
             // IMPORTANT: Set mesh vertices, normals, tangents etc. before updating the shared mesh of the collider.
-            updateMaterial = updateMaterial // Implies new mesh.
-                             || // Or the geometrics of the mesh have changed.
-                             mesh.vertices.Length != vertices.Count ||
-                             mesh.normals.Length != normals.Count ||
-                             mesh.tangents.Length != tangents.Count ||
-                             mesh.uv.Length != uvs.Count ||
-                             needsColorUpdate; // Or the color of the mesh has been changed.
             if (updateMaterial)
             {
                 mesh.Clear();
             }
-            mesh.vertices = vertices.ToArray();
-            mesh.normals = normals.ToArray();
-            mesh.tangents = tangents.ToArray();
-            mesh.uv = uvs.ToArray();
-            mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
+            mesh.vertices = vertices;
+            mesh.normals = normals;
+            mesh.tangents = tangents;
+            mesh.uv = uvs;
+            mesh.SetIndices(indices, MeshTopology.Triangles, 0);
 
             // IMPORTANT: Null the shared mesh of the collider before assigning the updated mesh.
             MeshCollider collider = gameObject.AddOrGetComponent<MeshCollider>();
@@ -497,8 +555,6 @@ namespace SEE.GO
                     colors[i] = Color.Lerp(gradientColors.start, gradientColors.end, uv[i].y);
                 }
                 mesh.colors = colors;
-
-                needsColorUpdate = false;
             }
         }
 
@@ -526,7 +582,7 @@ namespace SEE.GO
             if (gameObject.TryGetComponent(out EdgeOperator edgeOperator))
             {
                 // Glow effect depends on materials staying the same. We need to fully refresh it.
-                edgeOperator.RefreshGlow(true).Forget();
+                edgeOperator.RefreshGlowAsync(true).Forget();
             }
             needsUpdate = false; // apparently
             return mesh;
@@ -538,10 +594,7 @@ namespace SEE.GO
         /// <returns>The spline to be rendered.</returns>
         private BSpline CreateSubSpline()
         {
-            if (chordLengths == null)
-            {
-                chordLengths = spline.ChordLengths();
-            }
+            chordLengths ??= spline.ChordLengths();
 
             double lowerKnot = chordLengths.TToKnot(subsplineStartT);
             double upperKnot = chordLengths.TToKnot(subsplineEndT);
@@ -583,7 +636,7 @@ namespace SEE.GO
         /// attached to <see cref="Component.gameObject"/>; see
         /// <see cref="CreateMesh"/> for more details).
         /// </summary>
-        public void UpdateMesh()
+        private void UpdateMesh()
         {
             if (gameObject.TryGetComponent(out MeshFilter _))
             {
@@ -615,7 +668,7 @@ namespace SEE.GO
     /// spline. To evaluate the morphism at a certain point, call
     /// <see cref="Morph(double)"/> with corresponding time parameter.
     ///
-    /// <see cref="CreateTween"/> can be used to create a <see cref="Tween"/>
+    /// <see cref="CreateTween"/> can be used to create a <see cref="DG.Tweening.Tween"/>
     /// object with which the morphism can be played as an animation.
     /// The animation can be controlled using the tween object.
     /// </summary>
@@ -625,10 +678,10 @@ namespace SEE.GO
         /// Origin of the spline morphism.
         /// </summary>
         [NonSerialized]
-        private BSpline Source;
+        private BSpline source;
 
         /// <summary>
-        /// Serializable representation of <see cref="Source"/>.
+        /// Serializable representation of <see cref="source"/>.
         /// </summary>
         [SerializeField]
         private SerializableSpline serializableSource;
@@ -637,10 +690,10 @@ namespace SEE.GO
         /// Target of the spline morphism.
         /// </summary>
         [NonSerialized]
-        private BSpline Target;
+        private BSpline target;
 
         /// <summary>
-        /// Serializable representation of <see cref="Target"/>.
+        /// Serializable representation of <see cref="target"/>.
         /// </summary>
         [SerializeField]
         private SerializableSpline serializableTarget;
@@ -652,13 +705,13 @@ namespace SEE.GO
         private Morphism morphism;
 
         /// <summary>
-        /// The tween which can play the spline morphism from <see cref="Source"/>
-        /// to <see cref="Target"/>, created by <see cref="CreateTween"/>.
+        /// The tween which can play the spline morphism from <see cref="source"/>
+        /// to <see cref="target"/>, created by <see cref="CreateTween"/>.
         /// </summary>
-        public Tween tween;
+        public Tween Tween;
 
         /// <summary>
-        /// Creates a new <see cref="Tween"/> which can play the spline morphism from <paramref name="source"/>
+        /// Creates a new <see cref="DG.Tweening.Tween"/> which can play the spline morphism from <paramref name="source"/>
         /// to <see name="target"/>, taking <paramref name="duration"/> seconds.
         /// </summary>
         /// <param name="source">Origin of the spline morphism</param>
@@ -671,7 +724,7 @@ namespace SEE.GO
         public Tween CreateTween(BSpline source, BSpline target, float duration)
         {
             Init(source, target);
-            return tween = DOTween.To(t => Morph(t), 0f, 1f, Math.Max(duration, 0.01f));
+            return Tween = DOTween.To(t => Morph(t), 0f, 1f, Math.Max(duration, 0.01f));
         }
 
         /// <summary>
@@ -680,15 +733,15 @@ namespace SEE.GO
         /// <param name="newTarget">The new target of this morphism.</param>
         public void ChangeTarget(BSpline newTarget)
         {
-            Target = newTarget;
-            morphism = Source.MorphTo(Target);
+            target = newTarget;
+            morphism = source.MorphTo(target);
         }
 
         /// <summary>
         /// Whether the <paramref name="tween"/> belonging to this morphism is active.
         /// If no tween exists, <c>false</c> will be returned.
         /// </summary>
-        public bool IsActive() => tween?.IsActive() ?? false;
+        public bool IsActive() => Tween?.IsActive() ?? false;
 
         /// <summary>
         /// Initializes the spline morphism.
@@ -700,8 +753,8 @@ namespace SEE.GO
         /// <param name="target">Target of the spline morphism</param>
         public void Init(BSpline source, BSpline target)
         {
-            Source = source;
-            Target = target;
+            this.source = source;
+            this.target = target;
             morphism = source.MorphTo(target);
             Morph(0); // Morph to source.
         }
@@ -735,16 +788,16 @@ namespace SEE.GO
         protected override void OnBeforeSerialize()
         {
             base.OnBeforeSerialize();
-            serializableSource = TinySplineInterop.Serialize(Source);
-            serializableTarget = TinySplineInterop.Serialize(Target);
+            serializableSource = TinySplineInterop.Serialize(source);
+            serializableTarget = TinySplineInterop.Serialize(target);
         }
 
         protected override void OnAfterDeserialize()
         {
             base.OnAfterDeserialize();
-            Source = TinySplineInterop.Deserialize(serializableSource);
-            Target = TinySplineInterop.Deserialize(serializableTarget);
-            morphism = Source.MorphTo(Target);
+            source = TinySplineInterop.Deserialize(serializableSource);
+            target = TinySplineInterop.Deserialize(serializableTarget);
+            morphism = source.MorphTo(target);
         }
     }
 }

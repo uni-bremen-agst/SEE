@@ -67,17 +67,17 @@ namespace SEE.Controls.Actions
                     // request of SEEInput.ZoomInto().
                     if (zoomInto)
                     {
-                        rootTransform.parent.gameObject.MustGetComponent(out CityCursor cursor);
+                        CityCursor cursor = rootTransform.parent.gameObject.MustGetComponent<CityCursor>();
                         if (cursor.E.HasFocus())
                         {
-                            float optimalTargetZoomFactor = clippingPlane.MinLengthXZ / (cursor.E.ComputeDiameterXZ() / zoomState.currentZoomFactor);
+                            float optimalTargetZoomFactor = clippingPlane.MinLengthXZ / (cursor.E.ComputeDiameterXZ() / zoomState.CurrentZoomFactor);
                             float optimalTargetZoomSteps = ConvertZoomFactorToZoomSteps(optimalTargetZoomFactor);
                             int actualTargetZoomSteps = Mathf.FloorToInt(optimalTargetZoomSteps);
 
-                            zoomSteps = actualTargetZoomSteps - (int)zoomState.currentTargetZoomSteps;
+                            zoomSteps = actualTargetZoomSteps - (int)zoomState.CurrentTargetZoomSteps;
                             if (zoomSteps == 0)
                             {
-                                zoomSteps = -(int)zoomState.currentTargetZoomSteps;
+                                zoomSteps = -(int)zoomState.CurrentTargetZoomSteps;
                             }
 
                             if (zoomSteps != 0)
@@ -85,7 +85,7 @@ namespace SEE.Controls.Actions
                                 float zoomFactor = ConvertZoomStepsToZoomFactor(zoomSteps);
                                 // Note: zoomFactor will be different from 1 because ConvertZoomStepsToZoomFactor(zoomSteps) yields 1
                                 // only if zoomSteps equals 0, which is excluded because of the if condition.
-                                Vector2 centerOfTableAfterZoom = zoomSteps == -(int)zoomState.currentTargetZoomSteps ? rootTransform.position.XZ() : cursor.E.ComputeCenter().XZ();
+                                Vector2 centerOfTableAfterZoom = zoomSteps == -(int)zoomState.CurrentTargetZoomSteps ? rootTransform.position.XZ() : cursor.E.ComputeCenter().XZ();
                                 Vector2 toCenterOfTable = clippingPlane.CenterXZ - centerOfTableAfterZoom;
                                 Vector2 zoomCenter = clippingPlane.CenterXZ - (toCenterOfTable * (zoomFactor / (zoomFactor - 1.0f)));
                                 const float duration = 2.0f * ZoomState.DefaultZoomDuration;
@@ -98,7 +98,7 @@ namespace SEE.Controls.Actions
                     // as requested per mouse wheel.
                     if (zoomTowards)
                     {
-                        zoomSteps = Mathf.Clamp(zoomSteps, -(int)zoomState.currentTargetZoomSteps, (int)ZoomState.ZoomMaxSteps - (int)zoomState.currentTargetZoomSteps);
+                        zoomSteps = Mathf.Clamp(zoomSteps, -(int)zoomState.CurrentTargetZoomSteps, (int)ZoomState.ZoomMaxSteps - (int)zoomState.CurrentTargetZoomSteps);
                         zoomState.PushZoomCommand(hitPointOnPlane.XZ(), zoomSteps, ZoomState.DefaultZoomDuration);
                     }
 

@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
+using InControl;
 using SEE.Controls;
 using SEE.Controls.Actions;
-using SEE.Game.UI.Menu;
-using SEE.Game.UI.StateIndicator;
+using SEE.Controls.KeyActions;
+using SEE.Game;
+using SEE.UI.Menu;
+using SEE.UI.StateIndicator;
 using SEE.Utils;
 using UnityEngine;
 
@@ -135,7 +137,7 @@ namespace SEE.GO.Menu
         }
 
         /// <summary>
-        /// This creates and returns the <see cref="StateIndicator.ActionStateIndicator"/>, which displays the current mode.
+        /// This creates and returns the <see cref="ActionStateIndicator"/>, which displays the current mode.
         /// The indicator will either be attached to the given GameObject or to a new GameObject if
         /// <paramref name="attachTo"/> is null.
         /// </summary>
@@ -180,7 +182,12 @@ namespace SEE.GO.Menu
                 }
             }
 
-            if (SEEInput.ToggleMenu())
+            // When the menu is shown, we still want the ToggleMenu key to work,
+            // except if the search field is focussed. Hence, we cannot rely on
+            // SEEInput here, but need to check the key directly.
+            bool shouldReactToToggleMenu = (modeMenu.ShowMenu && !modeMenu.IsSearchFocused)
+                || (!modeMenu.ShowMenu && SEEInput.KeyboardShortcutsEnabled);
+            if (shouldReactToToggleMenu && KeyBindings.IsDown(KeyAction.ToggleMenu))
             {
                 modeMenu.ToggleMenu();
             }
@@ -220,10 +227,10 @@ namespace SEE.GO.Menu
         /// <summary>
         /// Sets the currently selected menu entry in PlayerMenu to the action with given <paramref name="actionName"/>.
         /// </summary>
-        /// <param name="actionName">name of the menu entry to be </param>
-        private void SetPlayerMenu(string actionName)
+        /// <param name="actionName">name of the menu entry to be set</param>
+        private static void SetPlayerMenu(string actionName)
         {
-            if (SceneSettings.LocalPlayer.TryGetComponentOrLog(out PlayerMenu playerMenu))
+            if (LocalPlayer.TryGetPlayerMenu(out PlayerMenu playerMenu))
             {
                 // We cannot use PlayerActionHistory.Current here
                 playerMenu.modeMenu.ActiveEntry = playerMenu.modeMenu.Entries.First(x => x.Title.Equals(actionName));
@@ -236,11 +243,6 @@ namespace SEE.GO.Menu
                     break;
                 }
             }
-        }
-
-        public ActionStateIndicator GetActionStateIndicator()
-        {
-            return indicator;
         }
     }
 }

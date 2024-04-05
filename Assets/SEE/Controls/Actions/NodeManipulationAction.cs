@@ -4,6 +4,7 @@ using SEE.Game;
 using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Utils;
+using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -31,9 +32,9 @@ namespace SEE.Controls.Actions
         /// <returns>all IDs of gameObjects manipulated by this action</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return gameNodeSelected == null ? new HashSet<string>() : new HashSet<string>()
+            return GameNodeSelected == null ? new HashSet<string>() : new HashSet<string>()
             {
-                gameNodeSelected.name
+                GameNodeSelected.name
             };
         }
 
@@ -53,7 +54,7 @@ namespace SEE.Controls.Actions
         {
             base.Stop();
             RTGInitializer.Disable();
-            gizmo.Disable();
+            UsedGizmo.Disable();
         }
 
         #endregion ReversibleAction Overrides
@@ -66,7 +67,7 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
-            memento.Undo();
+            GameNodeMemento.Undo();
         }
 
         /// <summary>
@@ -75,7 +76,7 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            memento.Redo();
+            GameNodeMemento.Redo();
         }
 
         #endregion Undo Redo
@@ -86,31 +87,31 @@ namespace SEE.Controls.Actions
         /// The gameObject that is currently selected and should be transformed.
         /// Will be null if no object has been selected yet.
         /// </summary>
-        protected GameObject gameNodeSelected;
+        protected GameObject GameNodeSelected;
 
         /// <summary>
         /// The user may have selected another node after manipulating
-        /// <see cref="gameNodeSelected"/>. In this case, the current action
+        /// <see cref="GameNodeSelected"/>. In this case, the current action
         /// is considered finished and another instance of this type of action
         /// should be continued with the newly selected game node. For that
         /// reason, that newly selected game node will be saved in this
         /// field and then used when a new instance of this class is to
         /// be created.
         /// </summary>
-        protected GameObject gameNodeToBeContinuedInNextAction;
+        protected GameObject GameNodeToBeContinuedInNextAction;
 
         /// <summary
-        /// See <see cref="ReversibleAction.Update"/>.
+        /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            if (gizmo.IsHovered())
+            if (UsedGizmo.IsHovered())
             {
                 // Transformation via the gizmo is in progress.
-                if (gameNodeSelected && HasChanges())
+                if (GameNodeSelected && HasChanges())
                 {
-                    currentState = ReversibleAction.Progress.InProgress;
+                    CurrentState = IReversibleAction.Progress.InProgress;
                 }
                 return false;
             }
@@ -120,7 +121,7 @@ namespace SEE.Controls.Actions
                 if (Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.Node)
                 {
                     // An object different from a graph node was selected.
-                    if (gameNodeSelected && HasChanges())
+                    if (GameNodeSelected && HasChanges())
                     {
                         // An object to be manipulated was selected already and it was changed.
                         // The action is finished.
@@ -138,11 +139,11 @@ namespace SEE.Controls.Actions
                 {
                     // A game node was selected by the user.
                     // Has the user already selected a game node in a previous iteration?
-                    if (gameNodeSelected)
+                    if (GameNodeSelected)
                     {
                         // The user has already selected a game node in a previous iteration.
                         // Are the two game nodes different?
-                        if (gameNodeSelected != raycastHit.collider.gameObject)
+                        if (GameNodeSelected != raycastHit.collider.gameObject)
                         {
                             // The newly and previously selected nodes are different.
                             // Have we had any changes yet? If not, we assume the user wants
@@ -157,7 +158,7 @@ namespace SEE.Controls.Actions
                                 // This action is considered finished and a different action should
                                 // be started to continue with the newly selected node.
                                 FinalizeAction();
-                                gameNodeToBeContinuedInNextAction = raycastHit.collider.gameObject;
+                                GameNodeToBeContinuedInNextAction = raycastHit.collider.gameObject;
                                 return true;
                             }
                         }
@@ -186,37 +187,37 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Starts the manipulation with the given <paramref name="gameNode"/> considered
-        /// as the <see cref="gameNodeSelected"/>. Saves its initial state for later <see cref="Undo"/>
+        /// as the <see cref="GameNodeSelected"/>. Saves its initial state for later <see cref="Undo"/>
         /// and enables the gizmo. Plays a sound as a feedback to the user.
         /// </summary>
         /// <param name="gameNode">game node to start the manipulation with</param>
         protected void StartAction(GameObject gameNode)
         {
-            gameNodeSelected = gameNode;
-            memento = CreateMemento(gameNodeSelected);
-            gizmo.Enable(gameNodeSelected);
-            AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, gameNodeSelected);
+            GameNodeSelected = gameNode;
+            GameNodeMemento = CreateMemento(GameNodeSelected);
+            UsedGizmo.Enable(GameNodeSelected);
+            AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PickupSound, GameNodeSelected);
         }
 
         /// <summary>
         /// Finalizes the action: set the final state of the memento,
-        /// disables <see cref="gizmo"/>, marks the action as <see cref="ReversibleAction.Progress.Completed"/>,
+        /// disables <see cref="UsedGizmo"/>, marks the action as <see cref="IReversibleAction.Progress.Completed"/>,
         /// and plays a final sound.
         /// This method should be called when the action is completed.
         /// </summary>
         protected virtual void FinalizeAction()
         {
-            UnityEngine.Assertions.Assert.IsNotNull(gameNodeSelected);
-            gizmo.Disable();
-            currentState = ReversibleAction.Progress.Completed;
-            AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND, gameNodeSelected);
+            UnityEngine.Assertions.Assert.IsNotNull(GameNodeSelected);
+            UsedGizmo.Disable();
+            CurrentState = IReversibleAction.Progress.Completed;
+            AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, GameNodeSelected);
         }
 
         /// <summary>
-        /// Yields true if <see cref="gameNodeSelected"/> has had a change.
-        /// Precondition: <see cref="gameNodeSelected"/> is not null.
+        /// Yields true if <see cref="GameNodeSelected"/> has had a change.
+        /// Precondition: <see cref="GameNodeSelected"/> is not null.
         /// </summary>
-        /// <returns>true if <see cref="gameNodeSelected"/> has had a change</returns>
+        /// <returns>true if <see cref="GameNodeSelected"/> has had a change</returns>
         protected abstract bool HasChanges();
 
         #endregion Update
@@ -231,10 +232,10 @@ namespace SEE.Controls.Actions
         protected abstract Memento<T> CreateMemento(GameObject gameNode);
 
         /// <summary>
-        /// The memento for <see cref="gameNodeSelected"/>.
+        /// The memento for <see cref="GameNodeSelected"/>.
         /// This memento is needed for <see cref="Undo"/> and <see cref="Redo"/>.
         /// </summary>
-        protected Memento<T> memento;
+        protected Memento<T> GameNodeMemento;
 
         /// <summary>
         /// A memento of the intial and final state of the game object being transformed.
@@ -244,12 +245,12 @@ namespace SEE.Controls.Actions
         protected abstract class Memento<S>
         {
             /// <summary>
-            /// Constructors setting up the <see cref="nodeOperator"/>.
+            /// Constructors setting up the <see cref="NodeOperator"/>.
             /// </summary>
             /// <param name="gameObject">game object to be transformed</param>
             public Memento(GameObject gameObject)
             {
-                nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
+                NodeOperator = gameObject.NodeOperator();
             }
 
             /// <summary>
@@ -267,7 +268,7 @@ namespace SEE.Controls.Actions
             /// </summary>
             public void Redo()
             {
-                Transform(finalState);
+                Transform(FinalState);
             }
 
             /// <summary>
@@ -278,7 +279,7 @@ namespace SEE.Controls.Actions
             /// <param name="finalState">the final state when the action has completed</param>
             public void Finalize(S finalState)
             {
-                this.finalState = finalState;
+                this.FinalState = finalState;
                 // Even though the gizmo has transformed the object already to the final
                 // state to be reached, we want the NodeOperator attached to the game node
                 // to know the new state of the object. That is why we are here calling
@@ -287,7 +288,7 @@ namespace SEE.Controls.Actions
             }
 
             /// <summary>
-            /// Transforms the object using <see cref="nodeOperator"/> to the given
+            /// Transforms the object using <see cref="NodeOperator"/> to the given
             /// <paramref name="value"/>. Broadcasts this state to all clients.
             /// </summary>
             /// <remarks>This method is expected to be used by <see cref="Undo"/> and
@@ -315,13 +316,13 @@ namespace SEE.Controls.Actions
             /// The local scale at the point in time when the action has completed.
             /// Required for <see cref="Redo"/>.
             /// </summary>
-            protected S finalState;
+            protected S FinalState;
 
             /// <summary>
-            /// The <see cref="NodeOperator"/> of the game object to be transformed.
+            /// The <see cref="Game.Operator.NodeOperator"/> of the game object to be transformed.
             /// It will be used for the transformation.
             /// </summary>
-            protected NodeOperator nodeOperator;
+            protected NodeOperator NodeOperator;
         }
 
         #endregion Memento
@@ -329,9 +330,9 @@ namespace SEE.Controls.Actions
         #region Gizmo
 
         /// <summary>
-        /// The gizmo used to manipulate <see cref="gameNodeSelected"/>.
+        /// The gizmo used to manipulate <see cref="GameNodeSelected"/>.
         /// </summary>
-        protected Gizmo gizmo;
+        protected Gizmo UsedGizmo;
 
         /// <summary>
         /// Common superclass to manage the RTG gizmos for transforming the object.
@@ -341,23 +342,23 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Gizmo used for transforming the object.
             /// </summary>
-            protected ObjectTransformGizmo objectTransformationGizmo;
+            protected ObjectTransformGizmo ObjectTransformationGizmo;
 
             /// <summary>
             /// Disables the transformation gizmo.
             /// </summary>
             public void Disable()
             {
-                objectTransformationGizmo?.Gizmo.SetEnabled(false);
+                ObjectTransformationGizmo?.Gizmo.SetEnabled(false);
             }
 
             /// <summary>
-            /// Enables the transformation gizmo with <see cref="gameNodeSelected"/> as target.
+            /// Enables the transformation gizmo with <see cref="GameNodeSelected"/> as target.
             /// </summary>
             public void Enable(GameObject gameNodeSelected)
             {
-                objectTransformationGizmo.SetTargetObject(gameNodeSelected);
-                objectTransformationGizmo.Gizmo.SetEnabled(true);
+                ObjectTransformationGizmo.SetTargetObject(gameNodeSelected);
+                ObjectTransformationGizmo.Gizmo.SetEnabled(true);
             }
 
             /// <summary>
@@ -366,7 +367,7 @@ namespace SEE.Controls.Actions
             /// <returns></returns>
             public bool IsHovered()
             {
-                return objectTransformationGizmo != null && objectTransformationGizmo.Gizmo.IsHovered;
+                return ObjectTransformationGizmo != null && ObjectTransformationGizmo.Gizmo.IsHovered;
             }
         }
 

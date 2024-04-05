@@ -7,7 +7,7 @@ namespace SEE.Layout.Utils
 {
     /// <summary>
     /// Computes the lowest common ancestors (LCA) in a rooted tree or a forest based on
-    /// the algorithm by Berkman, Omer and Vishkin, Uzi(1993), "Recursive Star-Tree 
+    /// the algorithm by Berkman, Omer and Vishkin, Uzi(1993), "Recursive Star-Tree
     /// Parallel Data Structure", SIAM Journal on Computing, 22 (2): 221–242.
     /// </summary>
     public class LCAFinder<HNode> where HNode : IHierarchyNode<HNode>
@@ -153,7 +153,7 @@ namespace SEE.Layout.Utils
         /// </summary>
         /// <param name="roots">list of root nodes</param>
         /// <returns><paramref name="roots"/> and their transitive descendants</returns>
-        private ICollection<HNode> AllNodes(ICollection<HNode> roots)
+        private static ICollection<HNode> AllNodes(ICollection<HNode> roots)
         {
             List<HNode> result = new List<HNode>(roots);
             Queue<HNode> todos = new Queue<HNode>(roots);
@@ -181,13 +181,13 @@ namespace SEE.Layout.Utils
             HashSet<int> visited = new HashSet<int>();
 
             Stack<Pair<int, int>> stack = new Stack<Pair<int, int>>();
-            stack.Push(Pair<int, int>.of(n, level));
+            stack.Push(Pair<int, int>.Of(n, level));
 
             while (stack.Count > 0)
             {
                 Pair<int, int> pair = stack.Pop();
-                n = pair.getFirst();
-                int lvl = pair.getSecond();
+                n = pair.GetFirst();
+                int lvl = pair.GetSecond();
 
                 if (!visited.Contains(n))
                 {
@@ -206,7 +206,7 @@ namespace SEE.Layout.Utils
                         if (!visited.Contains(child))
                         {
                             stack.Push(pair);
-                            stack.Push(Pair<int, int>.of(child, lvl + 1));
+                            stack.Push(Pair<int, int>.Of(child, lvl + 1));
                         }
                     }
                 }

@@ -1,9 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using NUnit.Framework;
 using SEE.Game;
 using SEE.Game.City;
+using SEE.GraphProviders;
 using SEE.Layout.NodeLayouts.Cose;
-using SEE.Tools;
+using SEE.Tools.RandomGraphs;
+using SEE.Utils.Config;
+using SEE.Utils.Paths;
 using UnityEngine;
 
 namespace SEE.Utils
@@ -11,12 +15,12 @@ namespace SEE.Utils
     /// <summary>
     /// Test cases for ConfigIO.
     /// </summary>
-    internal class TestConfigIO
+    internal class TestConfigIO : AbstractTestConfigIO
     {
         [Test]
         public void TestConfigParseInteger1()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", 0 }
             };
@@ -26,7 +30,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseInteger2()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "l", -1 }
             };
@@ -36,7 +40,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseInteger3()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", 123 }
             };
@@ -46,7 +50,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseFloat1()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", 123.0f }
             };
@@ -56,7 +60,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseFloat2()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", -1234.0f }
             };
@@ -66,7 +70,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseFloat3()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", 1.234567E-06f }
             };
@@ -76,7 +80,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseFloat4()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", -1.234567e-1f }
             };
@@ -87,7 +91,7 @@ namespace SEE.Utils
         public void TestConfigParseInfinity()
         {
             const float value = float.PositiveInfinity;
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", value }
             };
@@ -98,7 +102,7 @@ namespace SEE.Utils
         public void TestConfigParseNegativeInfinity()
         {
             const float value = float.NegativeInfinity;
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", value }
             };
@@ -108,7 +112,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseString1()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", "hello" }
             };
@@ -118,7 +122,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseString3()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", "" }
             };
@@ -128,7 +132,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseString4()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", "\"" }
             };
@@ -138,7 +142,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseString2()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", "\"hello, world\"" }
             };
@@ -148,7 +152,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseTrue()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", true }
             };
@@ -158,7 +162,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseFalse()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", false }
             };
@@ -168,7 +172,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseAttribute1()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "attr", new Dictionary<string, object>() { { "int", 1 } } }
             };
@@ -178,17 +182,18 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseAttribute2()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "attr", new Dictionary<string, object>() }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("attr : { };"));
+            Dictionary<string, object> actual = ConfigReader.Parse("attr : { };");
+            CollectionAssert.AreEquivalent(expected, actual);
         }
 
         [Test]
         public void TestConfigParseAttribute3()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "attr", new Dictionary<string, object>() { { "int", 1 }, { "x", "hello" } } }
             };
@@ -199,7 +204,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseAttribute4()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "attr", new Dictionary<string, object>() { { "x", new Dictionary<string, object>() } } }
             };
@@ -209,7 +214,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseAttribute5()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "attr", new Dictionary<string, object>() { { "a", 1 }, { "b", 2 }, { "x", new Dictionary<string, object>() { { "y", true }, { "z", false } } } } }
             };
@@ -219,7 +224,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseList1()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "list", new List<object>() { } }
             };
@@ -229,7 +234,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseList2()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "list", new List<object>() { 1, 2, 3 } }
             };
@@ -239,7 +244,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseList3()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "list", new List<object>() { true} }
             };
@@ -249,7 +254,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseList4()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "list", new List<object>() { new List<object>(), new List<object>() { 1 }, new List<object>() { 1, 2 } } }
             };
@@ -262,20 +267,27 @@ namespace SEE.Utils
         [Test]
         public void TestMetricColorMapZeroElements()
         {
-            const string filename = "metricmap.cfg";
+            string filename = Path.GetTempFileName();
             const string label = "metricMap";
 
-            ColorMap saved = new ColorMap();
+            try
             {
-                using ConfigWriter writer = new ConfigWriter(filename);
-                saved.Save(writer, label);
+                ColorMap saved = new();
+                {
+                    using ConfigWriter writer = new(filename);
+                    saved.Save(writer, label);
+                }
+                ColorMap loaded = new();
+                {
+                    using ConfigReader stream = new(filename);
+                    loaded.Restore(stream.Read(), label);
+                }
+                AreEqualMetricColorMap(saved, loaded);
             }
-            ColorMap loaded = new ColorMap();
+            finally
             {
-                using ConfigReader stream = new ConfigReader(filename);
-                loaded.Restore(stream.Read(), label);
+                FileIO.DeleteIfExists(filename);
             }
-            AreEqualMetricColorMap(saved, loaded);
         }
 
         /// <summary>
@@ -284,30 +296,39 @@ namespace SEE.Utils
         [Test]
         public void TestMetricColorMapOneElement()
         {
-            const string filename = "metricmap.cfg";
+            string filename = Path.GetTempFileName();
             const string label = "metricMap";
 
-            ColorMap saved = new ColorMap();
-            ColorRange colorRange = NewColorRange(Color.green, Color.cyan, 5);
-            saved["metricX"] = colorRange;
+            try
             {
-                using ConfigWriter writer = new ConfigWriter(filename);
-                saved.Save(writer, label);
+                ColorMap saved = new();
+                ColorRange colorRange = NewColorRange(Color.green, Color.cyan, 5);
+                saved["metricX"] = colorRange;
+                {
+                    using ConfigWriter writer = new(filename);
+                    saved.Save(writer, label);
+                }
+                ColorMap loaded = new();
+                {
+                    using ConfigReader stream = new(filename);
+                    loaded.Restore(stream.Read(), label);
+                }
+                AreEqualMetricColorMap(saved, loaded);
             }
-            ColorMap loaded = new ColorMap();
+            finally
             {
-                using ConfigReader stream = new ConfigReader(filename);
-                loaded.Restore(stream.Read(), label);
+                FileIO.DeleteIfExists(filename);
             }
-            AreEqualMetricColorMap(saved, loaded);
         }
 
         private static ColorRange NewColorRange(Color lower, Color upper, uint numberOfColors)
         {
-            ColorRange colorRange = new ColorRange();
-            colorRange.Lower = lower;
-            colorRange.Upper = upper;
-            colorRange.NumberOfColors = numberOfColors;
+            ColorRange colorRange = new()
+            {
+                Lower = lower,
+                Upper = upper,
+                NumberOfColors = numberOfColors
+            };
             return colorRange;
         }
 
@@ -317,22 +338,29 @@ namespace SEE.Utils
         [Test]
         public void TestMetricColorMapTwoElements()
         {
-            const string filename = "metricmap.cfg";
+            string filename = Path.GetTempFileName();
             const string label = "metricMap";
 
-            ColorMap saved = new ColorMap();
-            saved["metricX"] = NewColorRange(Color.white, Color.grey, 10);
-            saved["metricY"] = NewColorRange(Color.grey, Color.black, 3);
+            try
             {
-                using ConfigWriter writer = new ConfigWriter(filename);
-                saved.Save(writer, label);
+                ColorMap saved = new();
+                saved["metricX"] = NewColorRange(Color.white, Color.grey, 10);
+                saved["metricY"] = NewColorRange(Color.grey, Color.black, 3);
+                {
+                    using ConfigWriter writer = new(filename);
+                    saved.Save(writer, label);
+                }
+                ColorMap loaded = new();
+                {
+                    using ConfigReader stream = new(filename);
+                    loaded.Restore(stream.Read(), label);
+                }
+                AreEqualMetricColorMap(saved, loaded);
             }
-            ColorMap loaded = new ColorMap();
+            finally
             {
-                using ConfigReader stream = new ConfigReader(filename);
-                loaded.Restore(stream.Read(), label);
+                FileIO.DeleteIfExists(filename);
             }
-            AreEqualMetricColorMap(saved, loaded);
         }
 
         private void AreEqualMetricColorMap(ColorMap saved, ColorMap loaded)
@@ -350,58 +378,113 @@ namespace SEE.Utils
         [Test]
         public void TestAntennaAttributes()
         {
-            AntennaAttributes saved = new AntennaAttributes();
+            AntennaAttributes saved = new();
             saved.AntennaSections.Add("metricA");
             saved.AntennaSections.Add("metricB");
 
-            const string filename = "antenna.cfg";
-            const string label = "Antenna";
+            string filename = Path.GetTempFileName();
+            try
             {
-                using ConfigWriter writer = new ConfigWriter(filename);
-                saved.Save(writer, label);
+                const string label = "Antenna";
+                {
+                    using ConfigWriter writer = new(filename);
+                    saved.Save(writer, label);
+                }
+                AntennaAttributes loaded = new();
+                {
+                    using ConfigReader stream = new(filename);
+                    loaded.Restore(stream.Read(), label);
+                }
+                AreEqualAntennaSettings(saved, loaded);
             }
-            AntennaAttributes loaded = new AntennaAttributes();
+            finally
             {
-                using ConfigReader stream = new ConfigReader(filename);
-                loaded.Restore(stream.Read(), label);
+                FileIO.DeleteIfExists(filename);
             }
-            AreEqualAntennaSettings(saved, loaded);
         }
 
         /// <summary>
-        /// Test for SEECity.
+        /// Test for <see cref="SEECity"/>.
         /// </summary>
         [Test]
         public void TestSEECity()
         {
-            string filename = "seecity.cfg";
+            string filename = Path.GetTempFileName();
             // First save a new city with all its default values.
             SEECity savedCity = NewVanillaSEECity<SEECity>();
             // FIXME: We need tests for the antenna settings
             //savedCity.LeafNodeSettings.AntennaSettings.AntennaSections.Add(new AntennaSection("leafmetric", Color.white));
             //savedCity.InnerNodeSettings.AntennaSettings.AntennaSections.Add(new AntennaSection("innermetric", Color.black));
-            VisualNodeAttributes function = new VisualNodeAttributes()
+            VisualNodeAttributes function = new()
             {
                 IsRelevant = true
             };
-            VisualNodeAttributes file = new VisualNodeAttributes()
+            VisualNodeAttributes file = new()
             {
                 IsRelevant = false
             };
-            savedCity.NodeTypes = new NodeTypeVisualsMap();
-            savedCity.NodeTypes["Function"] = function;
-            savedCity.NodeTypes["File"] = file;
-            savedCity.Save(filename);
+            try
+            {
+                savedCity.NodeTypes = new NodeTypeVisualsMap();
+                savedCity.NodeTypes["Function"] = function;
+                savedCity.NodeTypes["File"] = file;
+                CSVGraphProvider csvProvider = new();
+                csvProvider.Path.AbsolutePath = "mydir/myfile.csv";
+                savedCity.DataProvider.Add(csvProvider);
+                savedCity.Save(filename);
 
-            // Create a new city with all its default values and then
-            // wipe out all its attributes to see whether they are correctly
-            // restored from the saved configuration file.
-            SEECity loadedCity = NewVanillaSEECity<SEECity>();
-            WipeOutSEECityAttributes(loadedCity);
-            // Load the saved attributes from the configuration file.
-            loadedCity.Load(filename);
+                // Create a new city with all its default values and then
+                // wipe out all its attributes to see whether they are correctly
+                // restored from the saved configuration file.
+                SEECity loadedCity = NewVanillaSEECity<SEECity>();
+                WipeOutSEECityAttributes(loadedCity);
+                // Load the saved attributes from the configuration file.
+                loadedCity.Load(filename);
 
-            SEECityAttributesAreEqual(savedCity, loadedCity);
+                SEECityAttributesAreEqual(savedCity, loadedCity);
+            }
+            finally
+            {
+                FileIO.DeleteIfExists(filename);
+            }
+        }
+
+        /// <summary>
+        /// Test for <see cref="DiffCity"/>.
+        /// </summary>
+        /// <remarks>We test only the attributes specific to <see cref="DiffCity"/>
+        /// excluding those just inherited. We trust that the inherited attributes
+        /// are tested by <see cref="TestSEECity"/>.</remarks>
+        [Test]
+        public void TestDiffCity()
+        {
+            string filename = Path.GetTempFileName();
+            string vcsPath = "/c/mypath/myvcs";
+
+            try
+            {
+                // First save a new city with all its default values.
+                DiffCity savedCity = NewVanillaSEECity<DiffCity>();
+                savedCity.VersionControlSystem = VCS.VCSKind.Git;
+                savedCity.VCSPath = new(vcsPath);
+                savedCity.OldRevision = "old revision";
+                savedCity.NewRevision = "new revision";
+                savedCity.Save(filename);
+
+                // Create a new city with all its default values and then
+                // wipe out all its attributes to see whether they are correctly
+                // restored from the saved configuration file.
+                DiffCity loadedCity = NewVanillaSEECity<DiffCity>();
+                WipeOutDiffCityAttributes(loadedCity);
+                // Load the saved attributes from the configuration file.
+                loadedCity.Load(filename);
+
+                DiffCityAttributesAreEqual(savedCity, loadedCity);
+            }
+            finally
+            {
+                FileIO.DeleteIfExists(filename);
+            }
         }
 
         /// <summary>
@@ -410,20 +493,27 @@ namespace SEE.Utils
         [Test]
         public void TestSEEEvolutionCity()
         {
-            string filename = "seerandomcity.cfg";
-            // First save a new city with all its default values.
-            SEECityEvolution savedCity = NewVanillaSEECity<SEECityEvolution>();
-            savedCity.Save(filename);
+            string filename = Path.GetTempFileName();
+            try
+            {
+                // First save a new city with all its default values.
+                SEECityEvolution savedCity = NewVanillaSEECity<SEECityEvolution>();
+                savedCity.Save(filename);
 
-            // Create a new city with all its default values and then
-            // wipe out all its attributes to see whether they are correctly
-            // restored from the saved configuration file.
-            SEECityEvolution loadedCity = NewVanillaSEECity<SEECityEvolution>();
-            WipeOutSEEEvolutionCityAttributes(loadedCity);
-            // Load the saved attributes from the configuration file.
-            loadedCity.Load(filename);
+                // Create a new city with all its default values and then
+                // wipe out all its attributes to see whether they are correctly
+                // restored from the saved configuration file.
+                SEECityEvolution loadedCity = NewVanillaSEECity<SEECityEvolution>();
+                WipeOutSEEEvolutionCityAttributes(loadedCity);
+                // Load the saved attributes from the configuration file.
+                loadedCity.Load(filename);
 
-            SEEEvolutionCityAttributesAreEqual(savedCity, loadedCity);
+                SEEEvolutionCityAttributesAreEqual(savedCity, loadedCity);
+            }
+            finally
+            {
+                FileIO.DeleteIfExists(filename);
+            }
         }
 
         /// <summary>
@@ -432,20 +522,27 @@ namespace SEE.Utils
         [Test]
         public void TestSEERandomCity()
         {
-            string filename = "seerandomcity.cfg";
-            // First save a new city with all its default values.
-            SEECityRandom savedCity = NewVanillaSEECity<SEECityRandom>();
-            savedCity.Save(filename);
+            string filename = Path.GetTempFileName();
+            try
+            {
+                // First save a new city with all its default values.
+                SEECityRandom savedCity = NewVanillaSEECity<SEECityRandom>();
+                savedCity.Save(filename);
 
-            // Create a new city with all its default values and then
-            // wipe out all its attributes to see whether they are correctly
-            // restored from the saved configuration file.
-            SEECityRandom loadedCity = NewVanillaSEECity<SEECityRandom>();
-            WipeOutSEERandomCityAttributes(loadedCity);
-            // Load the saved attributes from the configuration file.
-            loadedCity.Load(filename);
+                // Create a new city with all its default values and then
+                // wipe out all its attributes to see whether they are correctly
+                // restored from the saved configuration file.
+                SEECityRandom loadedCity = NewVanillaSEECity<SEECityRandom>();
+                WipeOutSEERandomCityAttributes(loadedCity);
+                // Load the saved attributes from the configuration file.
+                loadedCity.Load(filename);
 
-            SEERandomCityAttributesAreEqual(savedCity, loadedCity);
+                SEERandomCityAttributesAreEqual(savedCity, loadedCity);
+            }
+            finally
+            {
+                FileIO.DeleteIfExists(filename);
+            }
         }
 
         /// <summary>
@@ -454,20 +551,27 @@ namespace SEE.Utils
         [Test]
         public void TestSEEJlgCity()
         {
-            string filename = "seejlgcity.cfg";
-            // First save a new city with all its default values.
-            SEEJlgCity savedCity = NewVanillaSEECity<SEEJlgCity>();
-            savedCity.Save(filename);
+            string filename = Path.GetTempFileName();
+            try
+            {
+                // First save a new city with all its default values.
+                SEEJlgCity savedCity = NewVanillaSEECity<SEEJlgCity>();
+                savedCity.Save(filename);
 
-            // Create a new city with all its default values and then
-            // wipe out all its attributes to see whether they are correctly
-            // restored from the saved configuration file.
-            SEEJlgCity loadedCity = NewVanillaSEECity<SEEJlgCity>();
-            WipeOutSEEJlgCityAttributes(loadedCity);
-            // Load the saved attributes from the configuration file.
-            loadedCity.Load(filename);
+                // Create a new city with all its default values and then
+                // wipe out all its attributes to see whether they are correctly
+                // restored from the saved configuration file.
+                SEEJlgCity loadedCity = NewVanillaSEECity<SEEJlgCity>();
+                WipeOutSEEJlgCityAttributes(loadedCity);
+                // Load the saved attributes from the configuration file.
+                loadedCity.Load(filename);
 
-            SEEJlgCityAttributesAreEqual(savedCity, loadedCity);
+                SEEJlgCityAttributesAreEqual(savedCity, loadedCity);
+            }
+            finally
+            {
+                FileIO.DeleteIfExists(filename);
+            }
         }
 
         //--------------------------------------------------------
@@ -483,8 +587,22 @@ namespace SEE.Utils
         private static void SEECityAttributesAreEqual(SEECity expected, SEECity actual)
         {
             AbstractSEECityAttributesAreEqual(expected, actual);
-            AreEqual(expected.GXLPath, actual.GXLPath);
-            AreEqual(expected.CSVPath, actual.CSVPath);
+            TestGraphProviderIO.AreEqual(expected.DataProvider, actual.DataProvider);
+        }
+
+        /// <summary>
+        /// Checks whether the configuration attributes of <paramref name="expected"/> and
+        /// <paramref name="actual"/> are equal.
+        /// </summary>
+        /// <param name="expected">expected settings</param>
+        /// <param name="actual">actual settings</param>
+        private static void DiffCityAttributesAreEqual(DiffCity expected, DiffCity actual)
+        {
+            SEECityAttributesAreEqual(expected, actual);
+            Assert.AreEqual(expected.VersionControlSystem, actual.VersionControlSystem);
+            Assert.AreEqual(expected.OldRevision, actual.OldRevision);
+            Assert.AreEqual(expected.NewRevision, actual.NewRevision);
+            AreEqual(expected.VCSPath, actual.VCSPath);
         }
 
         /// <summary>
@@ -569,6 +687,15 @@ namespace SEE.Utils
             AbstractSEECityAttributesAreEqual(expected, actual);
             AreEqual(expected.GXLDirectory, actual.GXLDirectory);
             Assert.AreEqual(expected.MaxRevisionsToLoad, actual.MaxRevisionsToLoad);
+        }
+
+        /// <summary>
+        /// Checks whether <paramref name="actual"/> has the same values as <paramref name="expected"/>.
+        /// </summary>
+        /// <param name="expected">expected values</param>
+        /// <param name="actual">actual values</param>
+        private static void AreEqual(MarkerAttributes expected, MarkerAttributes actual)
+        {
             Assert.AreEqual(expected.MarkerHeight, actual.MarkerHeight);
             Assert.AreEqual(expected.MarkerWidth, actual.MarkerWidth);
             AreEqual(expected.AdditionBeamColor, actual.AdditionBeamColor);
@@ -667,22 +794,14 @@ namespace SEE.Utils
             Assert.AreEqual(expected.a, actual.a, 0.001f);
         }
 
-        /// <summary>
-        /// Checks whether the two data paths <paramref name="expected"/> and <paramref name="actual"/>
-        /// are equal (by value).
-        /// </summary>
-        /// <param name="expected">expected data path</param>
-        /// <param name="actual">actual data path</param>
-        private static void AreEqual(DataPath expected, DataPath actual)
-        {
-            Assert.AreEqual(expected.Root, actual.Root);
-            Assert.AreEqual(expected.RelativePath, actual.RelativePath);
-            Assert.AreEqual(expected.AbsolutePath, actual.AbsolutePath);
-        }
-
         //--------------------------------------------------------
         // attribute modifiers
         //--------------------------------------------------------
+
+        // A general note on the following methods wiping out cities:
+        // "Wiping out" means in those cases just that a value different from the
+        // default or from a previously set value is assigned so that we
+        // could notice any difference between the "wiped out" and loaded values.
 
         /// <summary>
         /// Assigns all attributes of given <paramref name="city"/> to arbitrary values
@@ -692,8 +811,34 @@ namespace SEE.Utils
         private static void WipeOutSEECityAttributes(SEECity city)
         {
             WipeOutAbstractSEECityAttributes(city);
-            city.GXLPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gxl");
-            city.CSVPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.csv");
+            city.DataProvider = new PipelineGraphProvider();
+        }
+
+        /// <summary>
+        /// Wipes out all attributes of <paramref name="markerAttributes"/>.
+        /// </summary>
+        /// <param name="markerAttributes">to be wiped out</param>
+        private static void WipeOutMarkerAttributes(MarkerAttributes markerAttributes)
+        {
+            markerAttributes.MarkerHeight++;
+            markerAttributes.MarkerWidth++;
+            markerAttributes.AdditionBeamColor = Color.clear;
+            markerAttributes.ChangeBeamColor = Color.clear;
+            markerAttributes.DeletionBeamColor = Color.clear;
+        }
+
+        /// <summary>
+        /// Assigns all attributes of given <paramref name="city"/> to arbitrary values
+        /// different from their default values.
+        /// </summary>
+        /// <param name="city">the city whose attributes are to be re-assigned</param>
+        private static void WipeOutDiffCityAttributes(DiffCity city)
+        {
+            WipeOutSEECityAttributes(city);
+            city.VersionControlSystem = VCS.VCSKind.None;
+            city.VCSPath.Set("C:/MyAbsoluteDirectory/MyVCSDirectory");
+            city.OldRevision = "XXX";
+            city.NewRevision = "YYY";
         }
 
         /// <summary>
@@ -704,9 +849,9 @@ namespace SEE.Utils
         private void WipeOutSEERandomCityAttributes(SEECityRandom city)
         {
             WipeOutSEECityAttributes(city);
-            city.LeafConstraint = new Tools.Constraint(nodeType: "X", edgeType: "Y", nodeNumber: 5, edgeDensity: 0);
-            city.InnerNodeConstraint = new Tools.Constraint(nodeType: "N", edgeType: "T", nodeNumber: 1, edgeDensity: 1);
-            city.LeafAttributes = new List<Tools.RandomAttributeDescriptor>();
+            city.LeafConstraint = new Constraint(nodeType: "X", edgeType: "Y", nodeNumber: 5, edgeDensity: 0);
+            city.InnerNodeConstraint = new Constraint(nodeType: "N", edgeType: "T", nodeNumber: 1, edgeDensity: 1);
+            city.LeafAttributes = new List<RandomAttributeDescriptor>();
         }
 
         /// <summary>
@@ -730,11 +875,6 @@ namespace SEE.Utils
             WipeOutAbstractSEECityAttributes(city);
             city.GXLDirectory.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gxl");
             city.MaxRevisionsToLoad++;
-            city.MarkerHeight++;
-            city.MarkerWidth++;
-            city.AdditionBeamColor = Color.clear;
-            city.ChangeBeamColor = Color.clear;
-            city.DeletionBeamColor = Color.clear;
         }
 
         /// <summary>
@@ -752,6 +892,7 @@ namespace SEE.Utils
             WipeOutEdgeSelectionSettings(city.EdgeSelectionSettings);
             WipeOutErosionSettings(city);
             WipeOutCoseGraphSettings(city);
+            WipeOutMarkerAttributes(city.MarkerAttributes);
         }
 
         /// <summary>
@@ -820,54 +961,48 @@ namespace SEE.Utils
         {
             city.ErosionSettings.ShowInnerErosions = !city.ErosionSettings.ShowInnerErosions;
             city.ErosionSettings.ShowLeafErosions = !city.ErosionSettings.ShowLeafErosions;
-            city.ErosionSettings.LoadDashboardMetrics = !city.ErosionSettings.LoadDashboardMetrics;
-            city.ErosionSettings.IssuesAddedFromVersion = "XXX";
-            city.ErosionSettings.OverrideMetrics = !city.ErosionSettings.OverrideMetrics;
             city.ErosionSettings.ShowIssuesInCodeWindow = !city.ErosionSettings.ShowIssuesInCodeWindow;
             city.ErosionSettings.ErosionScalingFactor++;
 
             city.ErosionSettings.StyleIssue = "X";
             city.ErosionSettings.UniversalIssue = "X";
             city.ErosionSettings.MetricIssue = "X";
-            city.ErosionSettings.Dead_CodeIssue = "X";
+            city.ErosionSettings.DeadCodeIssue = "X";
             city.ErosionSettings.CycleIssue = "X";
             city.ErosionSettings.CloneIssue = "X";
             city.ErosionSettings.ArchitectureIssue = "X";
 
-            city.ErosionSettings.StyleIssue_SUM = "X";
-            city.ErosionSettings.UniversalIssue_SUM = "X";
-            city.ErosionSettings.MetricIssue_SUM = "X";
-            city.ErosionSettings.Dead_CodeIssue_SUM = "X";
-            city.ErosionSettings.CycleIssue_SUM = "X";
-            city.ErosionSettings.CloneIssue_SUM = "X";
-            city.ErosionSettings.ArchitectureIssue_SUM = "X";
+            city.ErosionSettings.StyleIssueSum = "X";
+            city.ErosionSettings.UniversalIssueSum = "X";
+            city.ErosionSettings.MetricIssueSum = "X";
+            city.ErosionSettings.DeadCodeIssueSum = "X";
+            city.ErosionSettings.CycleIssueSum = "X";
+            city.ErosionSettings.CloneIssueSum = "X";
+            city.ErosionSettings.ArchitectureIssueSum = "X";
         }
 
         private static void AreEqualErosionSettings(ErosionAttributes expected, ErosionAttributes actual)
         {
             Assert.AreEqual(expected.ShowInnerErosions, actual.ShowInnerErosions);
             Assert.AreEqual(expected.ShowLeafErosions, actual.ShowLeafErosions);
-            Assert.AreEqual(expected.LoadDashboardMetrics, actual.LoadDashboardMetrics);
-            Assert.AreEqual(expected.IssuesAddedFromVersion, actual.IssuesAddedFromVersion);
-            Assert.AreEqual(expected.OverrideMetrics, actual.OverrideMetrics);
             Assert.AreEqual(expected.ShowIssuesInCodeWindow, actual.ShowIssuesInCodeWindow);
             Assert.AreEqual(expected.ErosionScalingFactor, actual.ErosionScalingFactor);
 
             Assert.AreEqual(expected.StyleIssue, actual.StyleIssue);
             Assert.AreEqual(expected.UniversalIssue, actual.UniversalIssue);
             Assert.AreEqual(expected.MetricIssue, actual.MetricIssue);
-            Assert.AreEqual(expected.Dead_CodeIssue, actual.Dead_CodeIssue);
+            Assert.AreEqual(expected.DeadCodeIssue, actual.DeadCodeIssue);
             Assert.AreEqual(expected.CycleIssue, actual.CycleIssue);
             Assert.AreEqual(expected.CloneIssue, actual.CloneIssue);
             Assert.AreEqual(expected.ArchitectureIssue, actual.ArchitectureIssue);
 
-            Assert.AreEqual(expected.StyleIssue_SUM, actual.StyleIssue_SUM);
-            Assert.AreEqual(expected.UniversalIssue_SUM, actual.UniversalIssue_SUM);
-            Assert.AreEqual(expected.MetricIssue_SUM, actual.MetricIssue_SUM);
-            Assert.AreEqual(expected.Dead_CodeIssue_SUM, actual.Dead_CodeIssue_SUM);
-            Assert.AreEqual(expected.CycleIssue_SUM, actual.CycleIssue_SUM);
-            Assert.AreEqual(expected.CloneIssue_SUM, actual.CloneIssue_SUM);
-            Assert.AreEqual(expected.ArchitectureIssue_SUM, actual.ArchitectureIssue_SUM);
+            Assert.AreEqual(expected.StyleIssueSum, actual.StyleIssueSum);
+            Assert.AreEqual(expected.UniversalIssueSum, actual.UniversalIssueSum);
+            Assert.AreEqual(expected.MetricIssueSum, actual.MetricIssueSum);
+            Assert.AreEqual(expected.DeadCodeIssueSum, actual.DeadCodeIssueSum);
+            Assert.AreEqual(expected.CycleIssueSum, actual.CycleIssueSum);
+            Assert.AreEqual(expected.CloneIssueSum, actual.CloneIssueSum);
+            Assert.AreEqual(expected.ArchitectureIssueSum, actual.ArchitectureIssueSum);
         }
 
         private static void WipeOutEdgeLayoutSettings(AbstractSEECity city)

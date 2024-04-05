@@ -16,32 +16,32 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// <summary>
         /// The dead entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string entity;
+        [JsonProperty(PropertyName = "entity", Required = Required.Always)]
+        public readonly string Entity;
 
         /// <summary>
         /// The type of the entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string entityType;
+        [JsonProperty(PropertyName = "entityType", Required = Required.Always)]
+        public readonly string EntityType;
 
         /// <summary>
         /// The filename of the entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string path;
+        [JsonProperty(PropertyName = "path", Required = Required.Always)]
+        public readonly string Path;
 
         /// <summary>
         /// The line number of the entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly int line;
+        [JsonProperty(PropertyName = "line", Required = Required.Always)]
+        public readonly int Line;
 
         /// <summary>
         /// The internal name of the corresponding entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string linkName;
+        [JsonProperty(PropertyName = "linkName", Required = Required.Always)]
+        public readonly string LinkName;
 
         public DeadEntityIssue()
         {
@@ -51,28 +51,28 @@ namespace SEE.Net.Dashboard.Model.Issues
         [JsonConstructor]
         protected DeadEntityIssue(string entity, string entityType, string path, int line, string linkName)
         {
-            this.entity = entity;
-            this.entityType = entityType;
-            this.path = path;
-            this.line = line;
-            this.linkName = linkName;
+            this.Entity = entity;
+            this.EntityType = entityType;
+            this.Path = path;
+            this.Line = line;
+            this.LinkName = linkName;
         }
 
-        public override async UniTask<string> ToDisplayString()
+        public override async UniTask<string> ToDisplayStringAsync()
         {
-            string explanation = await DashboardRetriever.Instance.GetIssueDescription($"DE{id}");
+            string explanation = await DashboardRetriever.Instance.GetIssueDescriptionAsync($"DE{ID}");
             return "<style=\"H2\">Dead Entity</style>"
-                   + $"\nThe entity '{entity.WrapLines(WRAP_AT)}' ({entityType.WrapLines(WRAP_AT)}) is dead."
-                   + $"\nMay it rest in peace.\n{explanation.WrapLines(WRAP_AT)}";
+                   + $"\nThe entity '{Entity.WrapLines(WrapAt)}' ({EntityType.WrapLines(WrapAt)}) is dead."
+                   + $"\nMay it rest in peace.\n{explanation.WrapLines(WrapAt)}";
         }
 
         public override string IssueKind => "DE";
 
-        public override NumericAttributeNames AttributeName => NumericAttributeNames.Dead_Code;
+        public override NumericAttributeNames AttributeName => NumericAttributeNames.DeadCode;
 
         public override IEnumerable<SourceCodeEntity> Entities => new[]
         {
-            new SourceCodeEntity(path, line, null, entity)
+            new SourceCodeEntity(Path, Line, null, Entity)
         };
     }
 }

@@ -21,10 +21,10 @@ namespace SEE.Controls
     /// but no two grammar recognizers may use the same grammar file.
     ///
     /// Grammar recognizer is currently functional only on Windows 10.
-    /// 
+    ///
     /// IMPORTANT NOTE.
-    /// Dictation (DictationInput) and phrase recognition (KeywordInput or GrammarInput) cannot be 
-    /// handled at the same time. If a GrammarInput or KeywordInput is active, a DictationInput 
+    /// Dictation (DictationInput) and phrase recognition (KeywordInput or GrammarInput) cannot be
+    /// handled at the same time. If a GrammarInput or KeywordInput is active, a DictationInput
     /// cannot be active and vice versa.
     /// </summary>
     public class GrammarInput : SpeechInput
@@ -44,7 +44,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Registers the given <paramref name="phraseRecognizedDelegate"/> as 
+        /// Registers the given <paramref name="phraseRecognizedDelegate"/> as
         /// callback to be called when a phrase was recognized.
         /// </summary>
         /// <param name="phraseRecognizedDelegate">callback to be registered</param>
@@ -54,7 +54,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Unregisters the given <paramref name="phraseRecognizedDelegate"/> as 
+        /// Unregisters the given <paramref name="phraseRecognizedDelegate"/> as
         /// callback formerly to be called when a phrase was recognized.
         /// </summary>
         /// <param name="phraseRecognizedDelegate">callback to be unregistered</param>
@@ -81,7 +81,7 @@ namespace SEE.Controls
         {
             if (recognizer is { IsRunning: true })
             {
-                recognizer.Stop();                
+                recognizer.Stop();
             }
         }
 

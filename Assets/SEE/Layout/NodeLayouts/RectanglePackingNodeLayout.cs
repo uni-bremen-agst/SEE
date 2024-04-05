@@ -24,7 +24,7 @@ namespace SEE.Layout.NodeLayouts
         public RectanglePackingNodeLayout(float groundLevel, float padding = 1.0f)
             : base(groundLevel)
         {
-            name = "Rectangle Packing";
+            Name = "Rectangle Packing";
             this.padding = padding;
         }
 
@@ -90,7 +90,7 @@ namespace SEE.Layout.NodeLayouts
             {
                 ILayoutNode root = roots.FirstOrDefault();
                 Vector2 area = PlaceNodes(layoutResult, root);
-                Vector3 position = new(0.0f, groundLevel, 0.0f);
+                Vector3 position = new(0.0f, GroundLevel, 0.0f);
                 // Maintain the original height of all inner nodes (and root is an inner node).
                 layoutResult[root] = new NodeTransform(position, new Vector3(area.x, root.LocalScale.y, area.y));
                 RemovePadding(layoutResult, padding);
@@ -114,8 +114,8 @@ namespace SEE.Layout.NodeLayouts
              ILayoutNode parent)
         {
             NodeTransform parentTransform = layout[parent];
-            Vector3 parentCenterPosition = parentTransform.position;
-            Vector3 parentExtent = parentTransform.scale / 2.0f;
+            Vector3 parentCenterPosition = parentTransform.Position;
+            Vector3 parentExtent = parentTransform.Scale / 2.0f;
             // The x co-ordinate of the left lower corner of the parent.
             float xCorner = parentCenterPosition.x - parentExtent.x;
             // The z co-ordinate of the left lower corner of the parent.
@@ -124,7 +124,7 @@ namespace SEE.Layout.NodeLayouts
             foreach (ILayoutNode child in parent.Children())
             {
                 NodeTransform childTransform = layout[child];
-                Vector3 newChildPosition = childTransform.position;
+                Vector3 newChildPosition = childTransform.Position;
                 newChildPosition.x += xCorner;
                 newChildPosition.z += zCorner;
                 if (!child.IsLeaf)
@@ -133,7 +133,7 @@ namespace SEE.Layout.NodeLayouts
                     // tree depth so that they can be stacked visually (level 0 is at the bottom).
                     newChildPosition.y += LevelLift(child);
                 }
-                layout[child] = new NodeTransform(newChildPosition, childTransform.scale, childTransform.rotation);
+                layout[child] = new NodeTransform(newChildPosition, childTransform.Scale, childTransform.Rotation);
                 MakeContained(layout, child);
             }
         }
@@ -143,19 +143,19 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="layout">layout containing the NodeTransform.scale to be adjusted</param>
         /// <param name="padding">padding to be removed</param>
-        private void RemovePadding(Dictionary<ILayoutNode, NodeTransform> layout, float padding)
+        private static void RemovePadding(Dictionary<ILayoutNode, NodeTransform> layout, float padding)
         {
             ICollection<ILayoutNode> keys = new List<ILayoutNode>(layout.Keys);
 
             foreach (ILayoutNode key in keys)
             {
                 NodeTransform value = layout[key];
-                Vector3 scale = value.scale;
+                Vector3 scale = value.Scale;
                 scale.x -= 2.0f * padding;
                 scale.z -= 2.0f * padding;
                 // Since we removed the padding, we need to adjust the position, too,
                 // to center the node within the assigned rectangle.
-                Vector3 position = value.position;
+                Vector3 position = value.Position;
                 position.x += padding;
                 position.z += padding;
                 layout[key] = new NodeTransform(position, scale);
@@ -198,7 +198,7 @@ namespace SEE.Layout.NodeLayouts
                         // inner node. Nevertheless, we do not add padding here, because padding is already
                         // included in the returned childArea.
                         layout[child] = new NodeTransform(Vector3.zero,
-                                                          new Vector3(childArea.x, groundLevel, childArea.y));
+                                                          new Vector3(childArea.x, GroundLevel, childArea.y));
                     }
                 }
                 // The scales of all children of the node have now been set. Now
@@ -225,7 +225,7 @@ namespace SEE.Layout.NodeLayouts
         /// <returns>area size of given layout node</returns>
         private static float AreaSize(NodeTransform node)
         {
-            Vector3 size = node.scale;
+            Vector3 size = node.Scale;
             return size.x * size.z;
         }
 
@@ -237,7 +237,7 @@ namespace SEE.Layout.NodeLayouts
         /// <returns>ground area size of the given <paramref name="node"/></returns>
         private static Vector2 GetRectangleSize(NodeTransform node)
         {
-            Vector3 size = node.scale;
+            Vector3 size = node.Scale;
             return new Vector2(size.x, size.z);
         }
 
@@ -247,16 +247,16 @@ namespace SEE.Layout.NodeLayouts
         /// and its depth is mapped onto the y co-ordinate of the resulting Vector2.
         /// </summary>
         /// <param name="nodes">nodes whose ground area size is requested</param>
-        /// <param name="layout_result">the currently existing layout information for each node
+        /// <param name="layoutResult">the currently existing layout information for each node
         /// (its scale is required only)</param>
         /// <param name="padding">the padding to be added to a node's ground area size</param>
         /// <returns>sum of the required ground area over all given <paramref name="nodes"/></returns>
-        private Vector2 Sum(List<ILayoutNode> nodes, Dictionary<ILayoutNode, NodeTransform> layout_result)
+        private static Vector2 Sum(List<ILayoutNode> nodes, Dictionary<ILayoutNode, NodeTransform> layoutResult)
         {
             Vector2 result = Vector2.zero;
             foreach (ILayoutNode element in nodes)
             {
-                Vector3 size = layout_result[element].scale;
+                Vector3 size = layoutResult[element].Scale;
                 result.x += size.x;
                 result.y += size.z;
             }
@@ -327,7 +327,7 @@ namespace SEE.Layout.NodeLayouts
                 foreach (PNode pnode in tree.GetSufficientlyLargeLeaves(requiredSize))
                 {
                     // Right lower corner of new rectangle
-                    Vector2 corner = pnode.rectangle.position + requiredSize;
+                    Vector2 corner = pnode.Rectangle.Position + requiredSize;
                     // Expanded covrec.
                     Vector2 expandedCoveRec = new Vector2(Mathf.Max(covrec.x, corner.x), Mathf.Max(covrec.y, corner.y));
 
@@ -335,7 +335,7 @@ namespace SEE.Layout.NodeLayouts
                     if (PTree.FitsInto(expandedCoveRec, covrec))
                     {
                         // The remaining area of pnode if el were placed into it.
-                        float waste = pnode.rectangle.size.x * pnode.rectangle.size.y - requiredSize.x * requiredSize.y;
+                        float waste = pnode.Rectangle.Size.x * pnode.Rectangle.Size.y - requiredSize.x * requiredSize.y;
                         preservers[pnode] = waste;
                     }
                     else
@@ -386,17 +386,17 @@ namespace SEE.Layout.NodeLayouts
                 // The size of the node remains unchanged. We set only the position.
                 // The x and y co-ordinates of the rectangle denote the left front corner. The layout
                 // position returned must be the center. The y co-ordinate is the ground level.
-                Vector3 scale = layout[el].scale;
-                layout[el] = new NodeTransform(new Vector3(fitNode.rectangle.position.x + scale.x / 2.0f,
-                                                           groundLevel,
-                                                           fitNode.rectangle.position.y + scale.z / 2.0f),
+                Vector3 scale = layout[el].Scale;
+                layout[el] = new NodeTransform(new Vector3(fitNode.Rectangle.Position.x + scale.x / 2.0f,
+                                                           GroundLevel,
+                                                           fitNode.Rectangle.Position.y + scale.z / 2.0f),
                                                scale);
 
                 // If fitNode is a boundary expander, then we need to expand coverc to the
                 // newly covered area.
                 {
                     // Right lower corner of fitNode
-                    Vector2 corner = fitNode.rectangle.position + requiredSize;
+                    Vector2 corner = fitNode.Rectangle.Position + requiredSize;
                     // Expanded covrec.
                     Vector2 expandedCoveRec = new Vector2(Mathf.Max(covrec.x, corner.x), Mathf.Max(covrec.y, corner.y));
 

@@ -26,7 +26,7 @@ jobs:
     name: Setup Repository
     # The following condition filters out pull requests that are closed, but not merged.
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.state != 'closed' || github.event.pull_request.merged }}
-    runs-on: self-hosted
+    runs-on: [self-hosted, see-ci]
     outputs:
       runner: ${{ steps.remember.outputs.runner }}
     steps:
@@ -37,11 +37,11 @@ jobs:
         run: |
           echo "$CREDENTIALS" > ~/.git-credentials
           git config --global credential.helper store
-          git config --global lfs.url ${CREDENTIALS}project-see/see-lfs.git/info/lfs
+          git config --global lfs.url "${CREDENTIALS}project-see/see-lfs.git/info/lfs"
         env:
           # NOTE: must be of the form https://koschke:token-here@gitlab.informatik.uni-bremen.de/
           CREDENTIALS: ${{secrets.GITLAB_LFS_TOKEN}}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: Checkout Repository
         with:
           lfs: true
@@ -62,7 +62,7 @@ jobs:
         run: ./GitScripts/run_all
   static:
     name: Run static checks
-    runs-on: self-hosted
+    runs-on: [self-hosted, see-ci]
     if: ${{ !github.event.pull_request.draft && github.event_name != 'workflow_dispatch' && !github.event.pull_request.merged }}
     permissions:
       contents: read
@@ -71,15 +71,18 @@ jobs:
     steps:
       - name: Collect bad patterns
         run: |
-          if [ -n $GITHUB_BASE_REF ] && ! PATTERNS=$(curl -H 'Accept: application/vnd.github.v3.diff' -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -f 'https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.number }}' | ./GitScripts/check_for_bad_patterns.py); then
-            DELIMITER=7MApgggGyx6C0
-            echo "PATTERNS<<$DELIMITER" >> $GITHUB_ENV
-            echo "$PATTERNS" >> $GITHUB_ENV
-            echo "$DELIMITER" >> $GITHUB_ENV
-          else
-            echo "PATTERNS=none" >> $GITHUB_ENV
+          if [ -n "$GITHUB_BASE_REF" ]; then
+            PATTERNS=$(curl -H 'Accept: application/vnd.github.v3.diff' -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -f 'https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.number }}' | ./GitScripts/check_for_bad_patterns.py || true)
+            if [ "$PATTERNS" != "[]" ]; then
+              DELIMITER=7MApgggGyx6C0
+              echo "PATTERNS<<$DELIMITER" >> $GITHUB_ENV
+              echo "$PATTERNS" >> $GITHUB_ENV
+              echo "$DELIMITER" >> $GITHUB_ENV
+              exit 0
+            fi
           fi
-      - uses: actions/github-script@v6
+          echo "PATTERNS=none" >> $GITHUB_ENV
+      - uses: actions/github-script@v7
         name: Check for bad patterns
         with:
           retries: 3
@@ -132,7 +135,7 @@ jobs:
     if: ${{ ! github.event.pull_request.draft && github.event_name != 'workflow_dispatch' }}
     permissions: write-all
     steps:
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         name: Cache Library
         env:
           SEGMENT_DOWNLOAD_TIMEOUT_MINS: 11
@@ -142,26 +145,31 @@ jobs:
           restore-keys: |
             Library-SEE-Tests
             Library-SEE
-      - uses: game-ci/unity-test-runner@v2
+      - name: Restore NuGet packages
+        run: /home/see/.dotnet/tools/nugetforunity restore .
+      - uses: game-ci/unity-test-runner@v4.1.1
         timeout-minutes: 45
         name: Run Tests
         id: tests
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           checkName: Test Results
           testMode: EditMode  # PlayMode tests get stuck in batchmode
+          runAsHostUser: true
           customParameters: -testCategory "!NonDeterministic"
           coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;assemblyFilters:+SEE'
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         continue-on-error: true
         name: Upload test results
         if: ${{ !cancelled() }}
         with:
           name: Test results
           path: ${{ steps.tests.outputs.artifactsPath }}
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         continue-on-error: true
         name: Upload coverage results
         # Coverage results can get quite large, so only upload on merge into master.
@@ -173,7 +181,7 @@ jobs:
   setup_build_targets:
     name: Setup build targets
     if: ${{ ! github.event.pull_request.draft }}
-    runs-on: self-hosted
+    runs-on: [self-hosted, see-ci]
     outputs:
       targetPlatforms: ${{ steps.rememberPlatforms.outputs.targetPlatforms }}
     steps:
@@ -186,10 +194,10 @@ jobs:
           else
             # Set targetPlatform based on inputs.
             targetPlatforms=()
-            if ${{ github.event.inputs.windows == true }}; then
+            if ${{ inputs.windows == true }}; then
                 targetPlatforms+=("StandaloneWindows64")
             fi
-            if ${{ github.event.inputs.linux == true }}; then
+            if ${{ inputs.linux == true }}; then
                 targetPlatforms+=("StandaloneLinux64")
             fi
             echo "targetPlatforms=$(jq --compact-output --null-input '$ARGS.positional' --args -- ${targetPlatforms[@]})" >> $GITHUB_OUTPUT
@@ -212,21 +220,27 @@ jobs:
           # Try deleting any previous build, but not other zip files that we may need later.
           git clean -fd -e 'build-*.zip'
           rm -rf build "build-${{ matrix.targetPlatform }}.zip" || true
-      - uses: game-ci/unity-builder@v2
+      - name: Restore NuGet packages
+        run: /home/see/.dotnet/tools/nugetforunity restore .
+      - uses: game-ci/unity-builder@v4
         timeout-minutes: 45
         name: Build project
         id: build
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: ${{ matrix.targetPlatform }}
           buildName: ${{ matrix.targetPlatform }}
+          buildMethod: CITools.BuildScript.Build
+          runAsHostUser: true
           allowDirtyBuild: true
       - name: Compress build
         # Compress only if manually triggered or merged into master, otherwise we won't upload.
         if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.merged }}
         run: zip -r build-${{ matrix.targetPlatform }}.zip build/${{ matrix.targetPlatform }}
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         continue-on-error: true
         name: Upload build
         # Upload only if manually triggered, because for master merges we create a release below anyway.

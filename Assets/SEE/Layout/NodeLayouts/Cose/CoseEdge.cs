@@ -75,8 +75,11 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <summary>
         /// the ideal edge length of the edge
         /// </summary>
-        private float idealEdgeLength = CoseLayoutSettings.Edge_Length;
+        private float idealEdgeLength = CoseLayoutSettings.EdgeLength;
 
+        /// <summary>
+        /// True if edge is between two graphs.
+        /// </summary>
         public bool IsInterGraph { get => isInterGraph; set => isInterGraph = value; }
         public float LengthX { get => lengthX; set => lengthX = value; }
         public float LengthY { get => lengthY; set => lengthY = value; }
@@ -129,7 +132,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// Returns the other end node of the edge 
+        /// Returns the other end node of the edge
         /// </summary>
         /// <param name="node"></param>
         /// <returns>the other end node of this edge</returns>

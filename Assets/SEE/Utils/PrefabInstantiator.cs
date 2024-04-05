@@ -32,7 +32,7 @@ namespace SEE.Utils
         /// <summary>
         /// Loads and returns the <paramref name="prefabName"/> located in the Resources folder.
         /// If it cannot be loaded, an exception is thrown.
-        /// 
+        ///
         /// Note: Unlike <see cref="InstantiatePrefab(string, Transform, bool)"/>, this method only
         /// loads, but does not instantiate the prefab.
         /// </summary>

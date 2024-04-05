@@ -120,7 +120,7 @@ namespace SEE.Game.Avatars
             }
             Speaker.Instance.Speak(text, audioSource, voice: voice);
             Speaker.Instance.OnSpeakCompleted.AddListener(OnSpeakCompleted);
-            
+
             void OnSpeakCompleted(string _)
             {
                 onSpeakCompleted?.Invoke();
@@ -152,7 +152,7 @@ namespace SEE.Game.Avatars
         /// Dumps the available voices on the current platform to the debugging console.
         /// Can be used to retrieve the available voices on the current system.
         /// </summary>
-        private void DumpVoices()
+        private static void DumpVoices()
         {
             foreach (Voice voice in Speaker.Instance.Voices)
             {
@@ -199,6 +199,14 @@ namespace SEE.Game.Avatars
         public void GoodBye()
         {
             Say(goodByeText);
+        }
+
+        /// <summary>
+        /// Says infos about Bachelorproject 23/24.
+        /// </summary>
+        public void Project()
+        {
+            Say(projectText);
         }
 
         /// <summary>
@@ -282,5 +290,15 @@ namespace SEE.Game.Avatars
               "It was a pleasure to meet you. "
             + "I hope to see you soon again. "
             + "<emphasis level=\"strong\">Good bye!</emphasis>";
+
+        /// <summary>
+        /// A brief information about SEE and its developers from bachelorproject 23/24.
+        /// </summary>
+        private const string projectText =
+            "This year participants of the project lead by Rainer Koschke were Azim, Lysander, Omid, Sarah and Tim. "
+            + "They are also presenting SEE today. "
+            + "Maybe we should listen to them now! It was a pleasure to meet you. "
+            + "<emphasis level=\"strong\">Good bye!</emphasis>";
+
     }
 }

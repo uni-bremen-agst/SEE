@@ -13,43 +13,43 @@ namespace SEE.Net.Dashboard.Model.Metric
         /// <summary>
         /// The start version of the metric value range.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly AnalysisVersion startVersion;
+        [JsonProperty(PropertyName = "startVersion", Required = Required.Always)]
+        public readonly AnalysisVersion StartVersion;
 
         /// <summary>
         /// The end version of the metric value range.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly AnalysisVersion endVersion;
+        [JsonProperty(PropertyName = "endVersion", Required = Required.Always)]
+        public readonly AnalysisVersion EndVersion;
 
         /// <summary>
         /// The ID of the entity.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string entity;
+        [JsonProperty(PropertyName = "entity", Required = Required.Always)]
+        public readonly string Entity;
 
         /// <summary>
         /// The ID of the metric.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string metric;
+        [JsonProperty(PropertyName = "metric", Required = Required.Always)]
+        public readonly string Metric;
 
         /// <summary>
         /// An array with the metric values.
         /// The array size is <c>endVersion.index - startVersion.index + 1</c>.
         /// Its values are numbers or <c>null</c> if no value is available.
-        /// They correspond to the range defined by <see cref="startVersion"/> and <see cref="endVersion"/>.
+        /// They correspond to the range defined by <see cref="StartVersion"/> and <see cref="EndVersion"/>.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly IList<float?> values;
+        [JsonProperty(PropertyName = "values", Required = Required.Always)]
+        public readonly IList<float?> Values;
 
         public MetricValueRange(AnalysisVersion startVersion, AnalysisVersion endVersion, string entity, string metric, IList<float?> values)
         {
-            this.startVersion = startVersion;
-            this.endVersion = endVersion;
-            this.entity = entity;
-            this.metric = metric;
-            this.values = values;
+            this.StartVersion = startVersion;
+            this.EndVersion = endVersion;
+            this.Entity = entity;
+            this.Metric = metric;
+            this.Values = values;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SEE.DataModel.DG;
 using SEE.GO;
 using UnityEngine;
@@ -85,14 +86,9 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">game nodes whose roots are to be returned</param>
         /// <returns>all root nodes in the scene</returns>
-        public static List<Node> GetRoots(ICollection<GameObject> gameNodes)
+        public static List<Node> GetRoots(IEnumerable<GameObject> gameNodes)
         {
-            List<Node> result = new();
-            foreach (Graph graph in GetGraphs(gameNodes))
-            {
-                result.AddRange(graph.GetRoots());
-            }
-            return result;
+            return GetGraphs(gameNodes).SelectMany(graph => graph.GetRoots()).ToList();
         }
 
         /// <summary>
@@ -100,7 +96,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="nodeRefs">references to nodes in any graphs whose roots are to be returned</param>
         /// <returns>all root nodes of the graphs containing any node referenced in <paramref name="nodeRefs"/></returns>
-        public static HashSet<Node> GetRoots(ICollection<NodeRef> nodeRefs)
+        public static HashSet<Node> GetRoots(IEnumerable<NodeRef> nodeRefs)
         {
             HashSet<Node> result = new();
             foreach (NodeRef nodeRef in nodeRefs)
@@ -128,14 +124,9 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">game nodes whose graph is to be returned</param>
         /// <returns>all graphs in the scene</returns>
-        public static HashSet<Graph> GetGraphs(ICollection<GameObject> gameNodes)
+        public static HashSet<Graph> GetGraphs(IEnumerable<GameObject> gameNodes)
         {
-            HashSet<Graph> result = new();
-            foreach (GameObject go in gameNodes)
-            {
-                result.Add(go.GetComponent<NodeRef>().Value.ItsGraph);
-            }
-            return result;
+            return gameNodes.Select(go => go.GetComponent<NodeRef>().Value.ItsGraph).ToHashSet();
         }
 
         /// <summary>
@@ -200,40 +191,6 @@ namespace SEE.Game
                 result = result.parent;
             }
             return result;
-        }
-
-        /// <summary>
-        /// Retrieves the game object representing a node with the given <paramref name="nodeID"/>.
-        ///
-        /// Precondition: Such a game object actually exists.
-        /// </summary>
-        /// <param name="nodeID">the unique ID of the node to be retrieved</param>
-        /// <returns>the game object representing the node with the given <paramref name="nodeID"/></returns>
-        /// <exception cref="Exception">thrown if there is no such object</exception>
-        public static GameObject RetrieveGameNode(string nodeID)
-        {
-            GameObject gameObject = GraphElementIDMap.Find(nodeID);
-            if (gameObject == null)
-            {
-                throw new Exception($"Node named {nodeID} not found.");
-            }
-
-            return gameObject;
-        }
-
-        /// <summary>
-        /// Retrieves the game object representing the given <paramref name="node"/>.
-        ///
-        /// Preconditions:
-        ///   (1) <paramref name="node"/> is not null.
-        ///   (2) Such a game object actually exists.
-        /// </summary>
-        /// <param name="node">the node to be retrieved</param>
-        /// <returns>the game object representing the given <paramref name="node"/></returns>
-        /// <exception cref="Exception">thrown if there is no such object</exception>
-        public static GameObject RetrieveGameNode(this Node node)
-        {
-            return RetrieveGameNode(node.ID);
         }
 
         /// <summary>

@@ -32,24 +32,24 @@ namespace SEE.Net.Actions
         /// to all clients has not been received. If no <see cref="NotifyJustReceivedUpdate"/>
         /// has been received, the data is sent again to all clients.
         /// </summary>
-        public int updateTimeout;
+        public int UpdateTimeout;
 
         /// <summary>
         /// Time in between two update cycles for the synchronization in seconds.
         /// </summary>
-        private const float RepeatCycle = 0.1f;
+        private const float repeatCycle = 0.1f;
 
         /// <summary>
         /// Initializes <see cref="sendUpdate"/>, <see cref="interactable"/>, and
-        /// <see cref="updateTimeout"/>. The period call of <see cref="Synchronize"/> is
+        /// <see cref="UpdateTimeout"/>. The period call of <see cref="Synchronize"/> is
         /// triggered.
         /// </summary>
         private void Start()
         {
             sendUpdate = false;
             interactable = GetComponent<InteractableObject>();
-            updateTimeout = 0;
-            InvokeRepeating(nameof(Synchronize), RepeatCycle, RepeatCycle);
+            UpdateTimeout = 0;
+            InvokeRepeating(nameof(Synchronize), repeatCycle, repeatCycle);
         }
 
         /// <summary>
@@ -67,16 +67,16 @@ namespace SEE.Net.Actions
         /// Let's this component know that the <see cref="SynchronizeInteractableNetAction"/>
         /// originally sent by this component has been received by a client.
         ///
-        /// Resets <see cref="updateTimeout"/>.
+        /// Resets <see cref="UpdateTimeout"/>.
         /// </summary>
         public void NotifyJustReceivedUpdate()
         {
-            updateTimeout = 3;
+            UpdateTimeout = 3;
         }
 
         /// <summary>
         /// If an update should be sent (indicated by <see cref="sendUpdate"/>
-        /// and <see cref="updateTimeout"/> is greater than zero), a
+        /// and <see cref="UpdateTimeout"/> is greater than zero), a
         /// <see cref="SynchronizeInteractableNetAction"/> is sent to all clients with
         /// the <see cref="interactable"/> object as parameter.
         ///
@@ -87,9 +87,9 @@ namespace SEE.Net.Actions
         {
             if (sendUpdate)
             {
-                if (updateTimeout > 0)
+                if (UpdateTimeout > 0)
                 {
-                    updateTimeout--;
+                    UpdateTimeout--;
                 }
                 else
                 {

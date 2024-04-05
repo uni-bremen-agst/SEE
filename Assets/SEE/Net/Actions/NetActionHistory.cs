@@ -1,7 +1,7 @@
-﻿using SEE.Utils;
+﻿using SEE.Utils.History;
 using SEE.Controls.Actions;
 using System.Collections.Generic;
-using static SEE.Utils.ActionHistory;
+using static SEE.Utils.History.ActionHistory;
 using System.Linq;
 
 namespace SEE.Net.Actions

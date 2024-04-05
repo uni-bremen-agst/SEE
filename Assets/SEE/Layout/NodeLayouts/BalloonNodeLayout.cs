@@ -22,7 +22,7 @@ namespace SEE.Layout.NodeLayouts
         public BalloonNodeLayout(float groundLevel)
             : base(groundLevel)
         {
-            name = "Balloon";
+            Name = "Balloon";
         }
 
         /// <summary>
@@ -30,15 +30,15 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private struct NodeInfo
         {
-            public readonly float radius;
-            public readonly float outer_radius;
-            public readonly float reference_length_children;
+            public readonly float Radius;
+            public readonly float OuterRadius;
+            public readonly float ReferenceLengthChildren;
 
-            public NodeInfo(float radius, float outer_radius, float reference_length_children)
+            public NodeInfo(float radius, float outerRadius, float referenceLengthChildren)
             {
-                this.radius = radius;
-                this.outer_radius = outer_radius;
-                this.reference_length_children = reference_length_children;
+                this.Radius = radius;
+                this.OuterRadius = outerRadius;
+                this.ReferenceLengthChildren = referenceLengthChildren;
             }
         }
 
@@ -50,7 +50,7 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// The node layout we compute as a result.
         /// </summary>
-        private Dictionary<ILayoutNode, NodeTransform> layout_result;
+        private Dictionary<ILayoutNode, NodeTransform> layoutResult;
 
         public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> gameNodes)
         {
@@ -58,12 +58,12 @@ namespace SEE.Layout.NodeLayouts
             // later we might use a circle-packing algorithm instead,
             // e.g., https://www.codeproject.com/Articles/42067/D-Circle-Packing-Algorithm-Ported-to-Csharp
 
-            layout_result = new Dictionary<ILayoutNode, NodeTransform>();
+            layoutResult = new Dictionary<ILayoutNode, NodeTransform>();
             //to_game_node = NodeMapping(gameNodes);
 
             const float offset = 1.0f;
-            roots = LayoutNodes.GetRoots(gameNodes);
-            if (roots.Count == 0)
+            Roots = LayoutNodes.GetRoots(gameNodes);
+            if (Roots.Count == 0)
             {
                 throw new System.Exception("Graph has no root nodes.");
             }
@@ -73,7 +73,7 @@ namespace SEE.Layout.NodeLayouts
 
             // First calculate all radii including those for the roots as well as max_radius.
             {
-                foreach (ILayoutNode root in roots)
+                foreach (ILayoutNode root in Roots)
                 {
                     CalculateRadius2D(root, out float outRadius);
                     if (outRadius > maxRadius)
@@ -88,18 +88,18 @@ namespace SEE.Layout.NodeLayouts
             {
                 Vector3 position = Vector3.zero;
                 int i = 0;
-                foreach (ILayoutNode root in roots)
+                foreach (ILayoutNode root in Roots)
                 {
                     // for two neighboring circles the distance must be the sum of the their two radii;
                     // in case we draw the very first circle, no distance must be kept
-                    position.x += i == 0 ? 0.0f : nodeInfos[roots[i - 1]].outer_radius + nodeInfos[roots[i]].outer_radius + offset;
+                    position.x += i == 0 ? 0.0f : nodeInfos[Roots[i - 1]].OuterRadius + nodeInfos[Roots[i]].OuterRadius + offset;
                     DrawCircles(root, position);
                     i++;
                 }
             }
 
             // FIXME: define layout_result for roots?
-            return layout_result;
+            return layoutResult;
         }
 
         // Concepts
@@ -158,14 +158,14 @@ namespace SEE.Layout.NodeLayouts
         /// This algorithm is described in the paper.
         /// </summary>
         /// <param name="node">the node for which the ballon layout is to be computed</param>
-        /// <param name="out_rad">radius of the minimal circle around node that includes every circle
+        /// <param name="outRadius">radius of the minimal circle around node that includes every circle
         ///                       of its descendants</param>
-        private void CalculateRadius2D(ILayoutNode node, out float out_rad)
+        private void CalculateRadius2D(ILayoutNode node, out float outRadius)
         {
             // radius of the circle around node at which the center of every circle
             // of its direct children is located
             float rad = 0.0f;
-            float rl_child = 0.0f;
+            float rlChild = 0.0f;
 
             if (node.IsLeaf)
             {
@@ -178,55 +178,55 @@ namespace SEE.Layout.NodeLayouts
                 float diagonal = Mathf.Sqrt(size.x * size.x + size.z * size.z);
 
                 // The outer-radius must be large enough to put in the block.
-                out_rad = diagonal / 2.0f;
+                outRadius = diagonal / 2.0f;
                 rad = 0.0f;
             }
             else
             {
                 // Twice the total sum of out_rad_k over all children k of i, in
                 // other words, the total sum of the diameters of all its children.
-                float inner_sum = 0.0f;
+                float innerSum = 0.0f;
                 // maximal out_rad_k over all children k of i
-                float max_children_rad = 0.0f;
+                float maxChildrenRad = 0.0f;
 
                 foreach (ILayoutNode child in node.Children())
                 {
 
                     // Find the radius rad_k and outer-radius out_rad_k for each child k of node i.
-                    CalculateRadius2D(child, out float child_out_rad);
-                    inner_sum += child_out_rad;
-                    if (max_children_rad < child_out_rad)
+                    CalculateRadius2D(child, out float childOutRad);
+                    innerSum += childOutRad;
+                    if (maxChildrenRad < childOutRad)
                     {
-                        max_children_rad = child_out_rad;
+                        maxChildrenRad = childOutRad;
                     }
                 }
-                inner_sum *= 2;
+                innerSum *= 2;
 
                 // min_rad is the minimal circumference to accommodate all the children
-                float min_rad = 0.0f;
+                float minRad = 0.0f;
 
                 // Let C be the circle with center point cp_i on which
                 // the center points of all children of i are to be placed.
                 // We assume that inner_sum is the approximate sum of the subarcs of
                 // D_i which lie inside the children's outer-discs.
-                if (inner_sum < 2.0f * Math.PI * 2.0f * max_children_rad)
+                if (innerSum < 2.0f * Math.PI * 2.0f * maxChildrenRad)
                 {
                     // case 2:  all the children's outer-discs for node i can
                     // be placed on C without overlap if inner_sum is not greater
                     // than the circumentference of C
-                    rad = max_children_rad > min_rad ? max_children_rad : min_rad;
+                    rad = maxChildrenRad > minRad ? maxChildrenRad : minRad;
                 }
                 else
                 {
                     // case 1: there are so many children that we need to increase C
-                    float value = inner_sum / (2.0f * (float)Math.PI) - max_children_rad;
-                    rad = value > min_rad ? value : min_rad;
+                    float value = innerSum / (2.0f * (float)Math.PI) - maxChildrenRad;
+                    rad = value > minRad ? value : minRad;
                 }
-                out_rad = rad + 2.0f * max_children_rad;
+                outRadius = rad + 2.0f * maxChildrenRad;
 
-                rl_child = max_children_rad;
+                rlChild = maxChildrenRad;
             }
-            nodeInfos.Add(node, new NodeInfo(rad, out_rad, rl_child));
+            nodeInfos.Add(node, new NodeInfo(rad, outRadius, rlChild));
         }
 
         /// <summary>
@@ -243,7 +243,7 @@ namespace SEE.Layout.NodeLayouts
             {
                 // leaf
                 // leaves will only be positioned; we maintain their original scale
-                layout_result[node] = new NodeTransform(position, node.LocalScale);
+                layoutResult[node] = new NodeTransform(position, node.LocalScale);
             }
             else
             {
@@ -252,24 +252,24 @@ namespace SEE.Layout.NodeLayouts
                 // the inner nodes will be slightly lifted along the y axis according to their
                 // tree depth so that they can be stacked visually (level 0 is at the bottom)
                 position.y += LevelLift(node);
-                layout_result[node]
+                layoutResult[node]
                     = new NodeTransform(position,
-                                        new Vector3(2 * nodeInfos[node].outer_radius,
+                                        new Vector3(2 * nodeInfos[node].OuterRadius,
                                                     node.LocalScale.y,
-                                                    2 * nodeInfos[node].outer_radius));
+                                                    2 * nodeInfos[node].OuterRadius));
 
                 // The center points of the children circles are located on the circle
                 // with center point 'position' and radius of the inner circle of the
                 // current node plus the reference length of the children. See the paper
                 // for details.
-                float parent_inner_radius = nodeInfos[node].radius + nodeInfos[node].reference_length_children;
+                float parentInnerRadius = nodeInfos[node].Radius + nodeInfos[node].ReferenceLengthChildren;
 
                 // Placing all children of the inner circle defined by the
                 // center point (the given position) and the radius with some
                 // space in between if that is possible.
 
                 // The space in between neighboring child circles if there is any left.
-                double space_between_child_circles = 0.0;
+                double spaceBetweenChildCircles = 0.0;
 
                 {
                     // Calculate space_between_child_circles.
@@ -278,11 +278,11 @@ namespace SEE.Layout.NodeLayouts
                     // point 'position'.
 
                     // The accumulated angles in radians.
-                    double accummulated_alpha = 0.0;
+                    double accummulatedAlpha = 0.0;
 
                     foreach (ILayoutNode child in children)
                     {
-                        double child_outer_radius = nodeInfos[child].outer_radius;
+                        double childOuterRadius = nodeInfos[child].OuterRadius;
                         // As in polar coordinates, the angle of the child circle w.r.t. to the
                         // circle point of the node's circle. The distance from the node's center point
                         // to the child node's center point together with this angle defines the polar
@@ -298,7 +298,7 @@ namespace SEE.Layout.NodeLayouts
                         // point, P, are isosceles triangles, with |cp_p - P| = |cp_p - cp_c| = r_p
                         // and |cp_c - P| = r_c. The angle alpha of this isosceles triangle is
                         // 2 * arcsin(r_c / (2*r_p)).
-                        double alpha = 2 * System.Math.Asin(child_outer_radius / (2 * parent_inner_radius));
+                        double alpha = 2 * System.Math.Asin(childOuterRadius / (2 * parentInnerRadius));
                         //Debug.Log(node.name + " 1) Alpha:         " + alpha + "\n");
 
                         // There are two identical isosceles triangles, one for each of the two
@@ -307,22 +307,22 @@ namespace SEE.Layout.NodeLayouts
                         // must be placed on the next free points on the parent circles outside
                         // of the child circle with radius r_c. That is why, we need to double
                         // the angle alpha to position the next circle.
-                        accummulated_alpha += 2 * alpha;
+                        accummulatedAlpha += 2 * alpha;
                     }
-                    if (accummulated_alpha > 2 * Math.PI)
+                    if (accummulatedAlpha > 2 * Math.PI)
                     {
                         // No space left.
                     }
                     else
                     {
-                        space_between_child_circles = (2 * Math.PI - accummulated_alpha) / children.Count;
+                        spaceBetweenChildCircles = (2 * Math.PI - accummulatedAlpha) / children.Count;
                     }
                 }
                 // Now that we know the space we can put in between neighboring circles, we can
                 // draw the child circles.
                 {
                     // The accumulated angles in radians.
-                    double accummulated_alpha = 0.0;
+                    double accummulatedAlpha = 0.0;
 
                     foreach (ILayoutNode child in children)
                     {
@@ -330,29 +330,29 @@ namespace SEE.Layout.NodeLayouts
                         // circle point of the node's circle. The distance from the node's center point
                         // to the child node's center point together with this angle defines the polar
                         // coordinates of the child relative to the node.
-                        double child_outer_radius = nodeInfos[child].outer_radius;
+                        double childOuterRadius = nodeInfos[child].OuterRadius;
 
                         // Asin (arcsin) returns an angle, θ, measured in radians, such that
                         // -π/2 ≤ θ ≤ π/2 -or- NaN if d < -1 or d > 1 or d equals NaN.
-                        double alpha = 2 * System.Math.Asin(child_outer_radius / (2 * parent_inner_radius));
+                        double alpha = 2 * System.Math.Asin(childOuterRadius / (2 * parentInnerRadius));
 
-                        if (accummulated_alpha > 0.0)
+                        if (accummulatedAlpha > 0.0)
                         {
                             // We are not drawing the very first child circle. We need to add
                             // the alpha angle of the current child circle to the accumulated alpha.
-                            accummulated_alpha += alpha;
+                            accummulatedAlpha += alpha;
 
                         }
                         // Convert polar coordinate back to cartesian coordinate.
-                        Vector3 child_center;
-                        child_center.x = position.x + (float)(parent_inner_radius * System.Math.Cos(accummulated_alpha));
-                        child_center.y = groundLevel;
-                        child_center.z = position.z + (float)(parent_inner_radius * System.Math.Sin(accummulated_alpha));
+                        Vector3 childCenter;
+                        childCenter.x = position.x + (float)(parentInnerRadius * System.Math.Cos(accummulatedAlpha));
+                        childCenter.y = GroundLevel;
+                        childCenter.z = position.z + (float)(parentInnerRadius * System.Math.Sin(accummulatedAlpha));
 
-                        DrawCircles(child, child_center);
+                        DrawCircles(child, childCenter);
 
                         // The next available circle must be located outside of the child circle
-                        accummulated_alpha += alpha + space_between_child_circles;
+                        accummulatedAlpha += alpha + spaceBetweenChildCircles;
                     }
                 }
             }
