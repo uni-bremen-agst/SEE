@@ -1,7 +1,7 @@
 ﻿using SEE.Utils;
 using SEE.Utils.Paths;
 using Sirenix.Utilities;
-using System.Diagnostics;
+using UnityEngine;
 
 namespace SEE.DataModel.DG
 {
@@ -258,7 +258,7 @@ namespace SEE.DataModel.DG
         /// <returns>platform-specific absolute path</returns>
         public string AbsolutePlatformPath()
         {
-            return System.IO.Path.Combine(ItsGraph.BasePath,
+            return System.IO.Path.Combine(Filenames.OnCurrentPlatform(ItsGraph.BasePath),
                                           Filenames.OnCurrentPlatform(Directory),
                                           Filenames.OnCurrentPlatform(Filename));
         }
