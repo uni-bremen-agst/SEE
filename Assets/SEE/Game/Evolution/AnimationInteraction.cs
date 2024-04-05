@@ -670,7 +670,7 @@ namespace SEE.Game.Evolution
                 + AllOrNothing("Message:\n", CurrentCommitMessage());
             animationDataModel.Slider.value = evolutionRenderer.CurrentGraphIndex;
 
-            string AllOrNothing(string prefix, string postfix)
+            static string AllOrNothing(string prefix, string postfix)
             {
                 if (string.IsNullOrWhiteSpace(postfix))
                 {
