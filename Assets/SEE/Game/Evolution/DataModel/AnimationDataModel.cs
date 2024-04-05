@@ -27,7 +27,8 @@ namespace SEE.Game.Evolution
     /// <summary>
     /// Data model for the animation-related user interactions consisting
     /// of a text field for the animation lag, a text field for the currently
-    /// shown revision, and a toggle for the auto-play mode. These data are
+    /// shown revision, and a toggle for the auto-play mode as well as
+    /// buttons to start, stop, and speed up the animation. These data are
     /// shown to the user as part of the animation canvas.
     /// </summary>
     public class AnimationDataModel : MonoBehaviour
@@ -35,68 +36,68 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// TextField for the shown revision in game.
         /// </summary>
-        public Text RevisionNumberText; // serialized by Unity
+        public Text RevisionNumberText;
 
         /// <summary>
         /// TextField for the shown commit in game.
         /// </summary>
-        public Text CommitInformationText; // serialized by Unity
+        public Text CommitInformationText;
 
         /// <summary>
         /// Slider to show the progress of the animation.
         /// </summary>
-        public Slider Slider; // serialized by Unity
+        public Slider Slider;
 
         /// <summary>
         /// Button to play/pause the animation.
         /// </summary>
-        public Button PlayButton; // serialized by Unity
+        public Button PlayButton;
 
         /// <summary>
         /// Button to fast forward the animation.
         /// </summary>
-        public Button FastForwardButton; // serialized by Unity
+        public Button FastForwardButton;
 
         /// <summary>
         /// Button to reverse/pause the animation.
         /// </summary>
-        public Button ReverseButton; //serialized by Unity
+        public Button ReverseButton;
 
         /// <summary>
         /// Button to fast forward the animation.
         /// </summary>
-        public Button FastBackwardButton; // serialized by Unity
+        public Button FastBackwardButton;
 
         /// <summary>
         /// Prefab for creating markers
         /// </summary>
-        public Button MarkerPrefab; // serialized by Unity
+        public Button MarkerPrefab;
 
         /// <summary>
         /// Prefab for creating comments
         /// </summary>
-        public InputField CommentPrefab; // serialized by Unity
+        public InputField CommentPrefab;
 
         /// <summary>
         /// Text of the play button.
         /// </summary>
-        public Text PlayButtonText; // serialized by Unity
+        public Text PlayButtonText;
 
         /// <summary>
         /// Text of the reverse button.
         /// </summary>
-        public Text ReverseButtonText; // serialized by Unity
+        public Text ReverseButtonText;
 
         /// <summary>
         /// Text of the fast-forward button.
         /// </summary>
         [FormerlySerializedAs("FastFowardButtonText")]
-        public Text FastForwardButtonText; // serialized by Unity
+        public Text FastForwardButtonText;
 
         /// <summary>
         /// Text of the fast-backward button.
         /// </summary>
-        public Text FastBackwardButtonText; // serialized by Unity
+        public Text FastBackwardButtonText;
 
         /// <summary>
         /// Checks if all fields are initialized.
