@@ -430,7 +430,7 @@ namespace SEE.Game.Evolution
                 UserInfoStillOccupied();
                 return false;
             }
-            if (IsAutoPlay || IsAutoPlayReverse)
+            if (IsAutoPlayForward || IsAutoPlayReverse)
             {
                 UserInfoAutoPlayIsOn();
                 return false;
@@ -466,7 +466,7 @@ namespace SEE.Game.Evolution
                 UserInfoStillOccupied();
                 return;
             }
-            if (IsAutoPlay || IsAutoPlayReverse)
+            if (IsAutoPlayForward || IsAutoPlayReverse)
             {
                 UserInfoAutoPlayIsOn();
                 return;
@@ -544,7 +544,7 @@ namespace SEE.Game.Evolution
         /// </summary>
         public void ShowPreviousGraph()
         {
-            if (IsStillAnimating || IsAutoPlay || IsAutoPlayReverse)
+            if (IsStillAnimating || IsAutoPlayForward || IsAutoPlayReverse)
             {
                 UserInfoStillOccupied();
                 return;
@@ -612,7 +612,6 @@ namespace SEE.Game.Evolution
             MarkNodes();
             UpdateNodeChangeBuffer();
             UpdateGameNodeHierarchy();
-            RenderPlane();
 
             LoadingSpinner.Hide(LoadingMessage);
             IsStillAnimating = false;
@@ -725,22 +724,6 @@ namespace SEE.Game.Evolution
                     markerFactory.MarkChanged(GraphElementIDMap.Find(node.ID, true));
                 }
             }
-
-            /// <summary>
-            /// Renders a plane enclosing all game objects of the currently shown graph.
-            /// </summary>
-            void RenderPlane()
-            {
-                bool isPlaneNew = !objectManager.GetPlane(out GameObject plane);
-                if (!isPlaneNew)
-                {
-                    // We are re-using the existing plane, hence, we animate its change
-                    // (new position and new scale).
-                    objectManager.GetPlaneTransform(out Vector3 centerPosition, out Vector3 scale);
-                    Tweens.Scale(plane, scale, AnimationLagFactor);
-                    Tweens.Move(plane, centerPosition, AnimationLagFactor / 2);
-                }
-            }
         }
         #endregion
 
@@ -754,7 +737,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Returns true if automatic animations are active.
         /// </summary>
-        public bool IsAutoPlay
+        public bool IsAutoPlayForward
         {
             get => isAutoplay;
             private set
@@ -788,7 +771,7 @@ namespace SEE.Game.Evolution
         /// </summary>
         internal void ToggleAutoPlay()
         {
-            SetAutoPlay(!IsAutoPlay);
+            SetAutoPlay(!IsAutoPlayForward);
         }
 
         /// <summary>
@@ -810,8 +793,8 @@ namespace SEE.Game.Evolution
         /// <param name="enabled"> Specifies whether reverse auto-play mode should be enabled. </param>
         internal void SetAutoPlay(bool enabled)
         {
-            IsAutoPlay = enabled;
-            if (IsAutoPlay)
+            IsAutoPlayForward = enabled;
+            if (IsAutoPlayForward)
             {
                 animationFinishedEvent.AddListener(OnAutoPlayCanContinue);
                 if (!ShowNextIfPossible())

@@ -310,7 +310,7 @@ namespace SEE.Game.Evolution
                 isFastBackward = false;
                 animationDataModel.FastBackwardButtonText.text = "◄◄";
             }
-            if (!evolutionRenderer.IsAutoPlay)
+            if (!evolutionRenderer.IsAutoPlayForward)
             {
                 animationDataModel.PlayButtonText.text = "ll";
                 evolutionRenderer.ToggleAutoPlay();
@@ -322,44 +322,63 @@ namespace SEE.Game.Evolution
             }
         }
 
+
         /// <summary>
-        /// Handles actions for when the Reverse/Pause button has been clicked.
+        /// Local callback for handling actions for when the Reverse/Pause button has been clicked.
         /// </summary>
         private void OnClickReverseButton()
         {
-            if (!evolutionRenderer.IsAutoPlay)
+            if (!evolutionRenderer.IsAutoPlayForward)
             {
-                if (isFastForward)
-                {
-                    additionalAnimationFactor = 2;
-                    evolutionRenderer.AnimationLagFactor = originalAnimationFactor*additionalAnimationFactor;
-                    isFastForward = false;
-                    animationDataModel.FastForwardButtonText.text = "►►";
-                }
-                if (!evolutionRenderer.IsAutoPlayReverse)
-                {
-                    animationDataModel.ReverseButtonText.text = "ll";
-                    evolutionRenderer.ToggleAutoPlayReverse();
-                }
-                else
-                {
-                    animationDataModel.ReverseButtonText.text = "◄";
-                    evolutionRenderer.ToggleAutoPlayReverse();
-                }
+                PressReverse();
+                new PressReverseNetAction(gameObject.FullName()).Execute();
             }
         }
 
         /// <summary>
-        /// Handles actions for when the fast forward button has been clicked.
+        /// Handles actions for when the Reverse/Pause button has been clicked.
+        /// </summary>
+        public void PressReverse()
+        {
+            if (isFastForward)
+            {
+                additionalAnimationFactor = 2;
+                evolutionRenderer.AnimationLagFactor = originalAnimationFactor * additionalAnimationFactor;
+                isFastForward = false;
+                animationDataModel.FastForwardButtonText.text = "►►";
+            }
+            if (!evolutionRenderer.IsAutoPlayReverse)
+            {
+                animationDataModel.ReverseButtonText.text = "ll";
+                evolutionRenderer.ToggleAutoPlayReverse();
+            }
+            else
+            {
+                animationDataModel.ReverseButtonText.text = "◄";
+                evolutionRenderer.ToggleAutoPlayReverse();
+            }
+        }
+
+        /// <summary>
+        /// Callback to handle actions for when the fast forward button has been clicked.
         /// Also resets the fast backward button.
         /// If the animation is playing backwards it does nothing.
         /// </summary>
         private void OnClickFastForwardButton()
         {
-            if (evolutionRenderer.IsAutoPlayReverse)
+            if (!evolutionRenderer.IsAutoPlayReverse)
             {
-                return;
-            }
+                PressFastForward();
+                new PressFastForwardNetAction(gameObject.FullName()).Execute();
+            }            
+        }
+
+        /// <summary>
+        /// Handles actions for when the fast forward button has been clicked.
+        /// Also resets the fast backward button.
+        /// </summary>
+        public void PressFastForward()
+        {
             if (isFastBackward)
             {
                 additionalAnimationFactor = 2;
@@ -384,23 +403,31 @@ namespace SEE.Game.Evolution
                     animationDataModel.FastForwardButtonText.text = "►►";
                     break;
             }
-            evolutionRenderer.AnimationLagFactor = originalAnimationFactor*additionalAnimationFactor;
+            evolutionRenderer.AnimationLagFactor = originalAnimationFactor * additionalAnimationFactor;
         }
 
         /// <summary>
-        /// Handles actions for when the fast forward button has been clicked.
+        /// Callback to handle actions for when the fast forward button has been clicked.
         /// If the animation is playing forwards it does nothing.
         /// </summary>
         private void OnClickFastBackwardButton()
         {
+            if (!evolutionRenderer.IsAutoPlayForward)
+            {
+                PressFastBackward();
+                new PressFastBackwardNetAction(gameObject.FullName()).Execute();
+            }            
+        }
+
+        /// <summary>
+        /// Handles actions for when the fast forward button has been clicked.
+        /// </summary>
+        public void PressFastBackward()
+        {
             // TODO: There is a lot of opportunity for refactoring here, e.g., when comparing this method
-            //       with TaskOnClickFastForwardButton(). It also seems weird that the additionalAnimationFactor
+            //       with OnClickFastForwardButton(). It also seems weird that the additionalAnimationFactor
             //       is set to 2 by default, with the 2x option setting it to 1, rather than it starting at 1
             //       and then being set to 0.5 by the 2x option.
-            if (evolutionRenderer.IsAutoPlay)
-            {
-                return;
-            }
             if (isFastForward)
             {
                 additionalAnimationFactor = 2;
@@ -425,7 +452,7 @@ namespace SEE.Game.Evolution
                     animationDataModel.FastBackwardButtonText.text = "◄◄";
                     break;
             }
-            evolutionRenderer.AnimationLagFactor = originalAnimationFactor*additionalAnimationFactor;
+            evolutionRenderer.AnimationLagFactor = originalAnimationFactor * additionalAnimationFactor;
         }
 
         /// <summary>
@@ -444,6 +471,8 @@ namespace SEE.Game.Evolution
         }
 
         #endregion
+
+        #region Marker Handling
 
         /// <summary>
         /// Adds an InputField to enter comments to the specified marker.
@@ -469,7 +498,7 @@ namespace SEE.Game.Evolution
 
 
         /// <summary>
-        /// Adds a new marker at the specified position
+        /// Adds a new marker at the specified position.
         /// </summary>
         /// <param name="markerPos"> Position to add the marker at </param>
         /// <param name="comment"> Comment to be added to the marker, optional </param>
@@ -493,7 +522,7 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Removes the specified marker
+        /// Removes the specified marker.
         /// </summary>
         /// <param name="marker"> Marker to remove </param>
         private void RemoveMarker(Button marker)
@@ -505,6 +534,8 @@ namespace SEE.Game.Evolution
             Destroyer.Destroy(comment.gameObject);
             Destroyer.Destroy(marker.gameObject);
         }
+
+        #endregion
 
         /// <summary>
         /// Handles the user input as follows:

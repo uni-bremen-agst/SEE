@@ -1,11 +1,13 @@
 ﻿using SEE.Game.Evolution;
 using SEE.GO;
-using SEE.Net.Actions;
 using System;
 using UnityEngine;
 
-namespace Assets.SEE.Net.Actions.Animation
+namespace SEE.Net.Actions.Animation
 {
+    /// <summary>
+    /// Common superclass for all network actions that trigger an <see cref="AnimationInteraction"/> component.
+    /// </summary>
     public abstract class AnimationNetAction : AbstractNetAction
     {
         /// <summary>
@@ -24,7 +26,19 @@ namespace Assets.SEE.Net.Actions.Animation
             GameObjectID = gameObjectID;
         }
 
-        protected AnimationInteraction FindAnimationInteraction(string gameObjectID)
+        /// <summary>
+        /// Returns the <see cref="AnimationInteraction"/> component attached to the gameObject with the 
+        /// given <paramref name="gameObjectID"/>.
+        /// 
+        /// The result is never null.
+        /// </summary>
+        /// <param name="gameObjectID">the unique full (hierarchical) name of the gameObject holding an
+        /// <see cref="AnimationInteraction"/>component</param>
+        /// <returns>the <see cref="AnimationInteraction"/> component attached to the gameObject with the 
+        /// given <paramref name="gameObjectID"/></returns>
+        /// <exception cref="Exception">thrown if there is no game object with <paramref name="gameObjectID"/>
+        /// or if it does not have an <see cref="AnimationInteraction"/></exception>
+        protected static AnimationInteraction FindAnimationInteraction(string gameObjectID)
         {
             GameObject animationInteractionHolder 
                 = GameObject.Find(gameObjectID) ?? throw new Exception($"Could not find GameObject with ID {gameObjectID}.");
@@ -40,6 +54,10 @@ namespace Assets.SEE.Net.Actions.Animation
             // Intentionally left blank.
         }
 
+        /// <summary>
+        /// Runs <see cref="Trigger"/> on the <see cref="AnimationInteraction"/> component attached to the"
+        /// game object with <see cref="GameObjectID"/> if this is note the requester.
+        /// </summary>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
@@ -48,6 +66,11 @@ namespace Assets.SEE.Net.Actions.Animation
             }
         }
 
+        /// <summary>
+        /// The method to be called on the <see cref="AnimationInteraction"/> component, Must be implemented
+        /// by subclasses.
+        /// </summary>
+        /// <param name="ai">the <see cref="AnimationInteraction"/> the trigger should be applied to</param>
         protected abstract void Trigger(AnimationInteraction ai);
     }
 }
