@@ -203,7 +203,7 @@ namespace SEE.Game.Evolution
 
             foreach (SliderMarker sliderMarker in sliderMarkerContainer.SliderMarkers)
             {
-                Vector3 markerPos = new Vector3(sliderMarker.MarkerX, sliderMarker.MarkerY, sliderMarker.MarkerZ);
+                Vector3 markerPos = new(sliderMarker.MarkerX, sliderMarker.MarkerY, sliderMarker.MarkerZ);
                 string comment = sliderMarker.Comment;
                 AddMarker(markerPos, comment);
             }
@@ -550,6 +550,15 @@ namespace SEE.Game.Evolution
         /// </summary>
         private void Update()
         {
+            /*
+            if (evolutionRenderer.IsStillAnimating)
+            {
+                animationDataModel.EnableButtons(false);
+                return;
+            }
+            animationDataModel.EnableButtons(true);
+            */
+
             bool userIsHoveringCity = AbstractSEECity.UserIsHoveringCity(evolutionRenderer.gameObject);
 
             if (!IsRevisionSelectionOpen)
