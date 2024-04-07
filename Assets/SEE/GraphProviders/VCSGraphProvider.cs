@@ -11,9 +11,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEngine;
 using SEE.VCS;
+using SEE.UI.Window.CodeWindow;
 
 namespace SEE.GraphProviders
 {
@@ -48,7 +48,7 @@ namespace SEE.GraphProviders
             Tooltip("Paths and their inclusion/exclusion status."), RuntimeTab(GraphProviderFoldoutGroup), HideReferenceObjectPicker]
         public Dictionary<string, bool> PathGlobbing = new()
         {
-            {"", false}
+            { "", false }
         };
 
         /// <summary>
@@ -472,63 +472,68 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// Reads the filecontet of a given node.
+        /// Retrieves the token stream for given file content from its repository and commit ID.
         /// </summary>
         /// <param name="filePath">The filePath from the node.</param>
-        /// <param name="repository">The repository, from which the fileContent comes.</param>
-        /// <param name="commitID">The commitID, where the files exist.</param>
-        /// <returns>a new node added to <paramref name="graph"/></returns>
-        private static string ReadFileText(string filePath, Repository repository, string commitID)
+        /// <param name="repository">The repository from which the file content is retrieved.</param>
+        /// <param name="commitID">The commitID where the files exist.</param>
+        /// <returns>The token stream for the specified file and commit.</returns>
+        private static IEnumerable<SEEToken> RetrieveTokens(string filePath, Repository repository, string commitID)
         {
             Blob blob = repository.Lookup<Blob>($"{commitID}:{filePath}");
 
             if (blob != null)
             {
-                return blob.GetContentText();
+                string fileContent = blob.GetContentText();
+
+                return SEEToken.FromString(fileContent, TokenLanguage.FromFileExtension(Path.GetExtension(filePath)?[1..]));
             }
             else
             {
-                // File does not exist.
-                return "";
+                // Token does not exist.
+                return Enumerable.Empty<SEEToken>();
             }
         }
 
         /// <summary>
-        /// Calculates the McCabe cyclomatic complexity metric for a given file and adds it as a metric to the corresponding node.
+        /// Calculates the McCabe cyclomatic complexity metric for a given file and adds it as a metric to the corresponding node in <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">The graph where the metric should be added.</param>
-        /// <param name="repository">The repository, from which the fileContent comes.</param>
-        /// <param name="commitID">The commitID, where the files exist.</param>
+        /// <param name="repository">The repository from which the file content is retrieved.</param>
+        /// <param name="commitID">The commitID where the files exist.</param>
         protected static void AddMcCabeMetric(Graph graph, Repository repository, string commitID)
         {
-            string fileContent;
+            IEnumerable<SEEToken> tokens;
 
             foreach (Node node in graph.Nodes())
             {
                 if (node.Type == "file")
                 {
-                    fileContent = ReadFileText(node.ID.Replace('\\', '/'), repository, commitID);
-                    node.SetInt("McCabe Complexity", CalculateMcCabeComplexity(fileContent));
+                    string filePath = node.ID.Replace('\\', '/');
+                    tokens = RetrieveTokens(filePath, repository, commitID);
+                    int complexity = CalculateMcCabeComplexity(tokens);
+                    node.SetInt("McCabe Complexity", CalculateMcCabeComplexity(tokens));
                 }
             }
         }
 
         /// <summary>
-        /// Calculates the Halstead metrics for a given file and adds them as metrics to the corresponding node.
+        /// Calculates the Halstead metrics for a given file and adds them as metrics to the corresponding node in <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">The graph where the metrics should be added.</param>
-        /// <param name="repository">The repository, from which the fileContent comes.</param>
-        /// <param name="commitID">The commitID, where the files exist.</param>
+        /// <param name="repository">The repository from which the file content is retrieved.</param>
+        /// <param name="commitID">The commitID where the files exist.</param>
         protected static void AddHalsteadMetrics(Graph graph, Repository repository, string commitID)
         {
-            string fileContent;
+            IEnumerable<SEEToken> tokens;
 
             foreach (Node node in graph.Nodes())
             {
                 if (node.Type == "file")
                 {
-                    fileContent = ReadFileText(node.ID.Replace('\\', '/'), repository, commitID);
-                    (int distinctOperators, int distinctOperands, int totalOperators, int totalOperands, int programVocabulary, int programLength, float estimatedProgramLength, float volume, float difficulty, float effort, float timeRequiredToProgram, float numberOfDeliveredBugs) = CalculateHalsteadMetrics(fileContent);
+                    string filePath = node.ID.Replace('\\', '/');
+                    tokens = RetrieveTokens(filePath, repository, commitID);
+                    (int distinctOperators, int distinctOperands, int totalOperators, int totalOperands, int programVocabulary, int programLength, float estimatedProgramLength, float volume, float difficulty, float effort, float timeRequiredToProgram, float numberOfDeliveredBugs) = CalculateHalsteadMetrics(tokens);
                     node.SetInt("Halstead Distinct Operators", distinctOperators);
                     node.SetInt("Halstead Distinct Operands", distinctOperands);
                     node.SetInt("Halstead Total Operators", totalOperators);
@@ -548,17 +553,17 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Calculates the McCabe cyclomatic complexity for provided code.
         /// </summary>
-        /// <param name="code">The code for which the complexity should be calculated.</param>
+        /// <param name="tokens">The tokens used for which the complexity should be calculated.</param>
         /// <returns>Returns the McCabe cyclomatic complexity.</returns>
-        private static int CalculateMcCabeComplexity(string code)
+        private static int CalculateMcCabeComplexity(IEnumerable<SEEToken> tokens)
         {
             int complexity = 1; // Starting complexity for a single method or function.
 
-            // Count decision points (if, for, while, case, &&, ||, ?, ternary operator).
-            complexity += Regex.Matches(code, @"\b(if|else|for|while|case|&&|\|\||\?)\b").Count;
+            // Count decision points (if, for, while, case, &&, ||, ?).
+            complexity += tokens.Count(t => t.TokenType == SEEToken.Type.Keyword && (t.Text == "if" || t.Text == "for" || t.Text == "else" || t.Text == "while" || t.Text == "case" || t.Text == "&&" || t.Text == "||" || t.Text == "?"));
 
             // Count nested cases (i.e. switch statements).
-            complexity += Regex.Matches(code, @"\bcase\b").Count;
+            complexity += tokens.Count(t => t.TokenType == SEEToken.Type.Keyword && t.Text == "case");
 
             return complexity;
         }
@@ -566,37 +571,21 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Calculates the Halstead metrics for provided code.
         /// </summary>
-        /// <param name="code">The code for which the metrics should be calculated.</param>
-        /// <returns>Returns distinct operators and operands and their total amounts.</returns>
-        private static (int, int, int, int, int, int, float, float, float, float, float, float) CalculateHalsteadMetrics(string code)
+        /// <param name="tokens">The tokens for which the metrics should be calculated.</param>
+        /// <returns>Returns the Halstead metrics.</returns>
+        private static (int, int, int, int, int, int, float, float, float, float, float, float) CalculateHalsteadMetrics(IEnumerable<SEEToken> tokens)
         {
-            // Remove comments and string literals.
-            code = Regex.Replace(code, @"/\*.*?\*/|/.*?$|"".*?""", string.Empty, RegexOptions.Multiline);
+            // Identify operands (identifiers, keywords and literals).
+            HashSet<string> operands = new(tokens.Where(t => t.TokenType == SEEToken.Type.Identifier || t.TokenType == SEEToken.Type.Keyword || t.TokenType == SEEToken.Type.NumberLiteral ||  t.TokenType == SEEToken.Type.StringLiteral).Select(t => t.Text));
 
-            // Identify operands (identifiers and literals).
-            HashSet<string> operands = new(Regex.Matches(code, @"\b\w+\b|\d+(\.\d+)?")
-                // Convert into matches.
-                .Cast<Match>()
-                // Projects each match object to a value, containing matched text as string.
-                .Select(m => m.Value));
-
-            // Identify operators (everything else but whitespace).
-            HashSet<string> operators = new(Regex.Matches(code, @"\S+")
-                .Cast<Match>()
-                .Select(m => m.Value)
-                .Except(operands));
+            // Identify operators.
+            HashSet<string> operators = new(tokens.Where(t => t.TokenType == SEEToken.Type.Punctuation).Select(t => t.Text));
 
             // Count the total number of operands and operators.
-            int totalOperands = Regex.Matches(code, @"\b\w+\b|\d+(\.\d+)?")
-                .Cast<Match>()
-                .Select(m => m.Value)
-                .Count();
+            int totalOperands = tokens.Count(t => t.TokenType == SEEToken.Type.Identifier || t.TokenType == SEEToken.Type.Keyword || t.TokenType == SEEToken.Type.NumberLiteral || t.TokenType == SEEToken.Type.StringLiteral);
+            int totalOperators = tokens.Count(t => t.TokenType == SEEToken.Type.Punctuation);
 
-            int totalOperators = Regex.Matches(code, @"\S+")
-                .Cast<Match>()
-                .Select(m => m.Value)
-                .Count();
-
+            // Derivative Halstead metrics.
             int programVocabulary = operators.Count + operands.Count;
             int programLength = totalOperators + totalOperands;
             float estimatedProgramLength = (float)((operators.Count * Math.Log(operators.Count, 2) + operands.Count * Math.Log(operands.Count, 2)));
@@ -610,25 +599,49 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// Calculates the number of lines of code for each file and adds it as a metric to the corresponding node. Comments are excluded.
+        /// Calculates the number of lines of code for the provided token stream, excluding comments and adds it as a metric to the corresponding node in <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">The graph where the metric should be added.</param>
-        /// <param name="repository">The repository, from which the fileContent comes.</param>
-        /// <param name="commitID">The commitID, where the files exist.</param>
+        /// <param name="repository">The repository from which the fileContent is retrieved.</param>
+        /// <param name="commitID">The commitID where the files exist.</param>
         protected static void AddLinesOfCodeMetric(Graph graph, Repository repository, string commitID)
         {
+            IEnumerable<SEEToken> tokens;
+
             foreach (Node node in graph.Nodes())
             {
                 if (node.Type == "file")
                 {
-                    string fileContent = ReadFileText(node.ID.Replace('\\', '/'), repository, commitID);
-                    // Split the file content into lines, excluding empty lines and lines containing only whitespace.
-                    IEnumerable<string> lines = fileContent.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries).Where(line => !string.IsNullOrWhiteSpace(line));
-                    // Exclude lines that start with "//" or are enclosed within "/*" and "*/".
-                    int linesOfCode = lines.Count(line => !line.Trim().StartsWith("//") && !line.Trim().StartsWith("/*") && !line.Trim().EndsWith("*/"));
+                    string filePath = node.ID.Replace('\\', '/');
+                    tokens = RetrieveTokens(filePath, repository, commitID);
+                    int linesOfCode = CalculateLinesOfCode(tokens);
                     node.SetInt("Lines of Code", linesOfCode);
                 }
             }
+        }
+
+        /// <summary>
+        /// Calculates the number of lines of code for the provided token stream, excluding comments.
+        /// </summary>
+        /// <param name="tokens">The tokens for which the lines of code should be counted.</param>
+        /// <returns>Returns the number of lines of code.</returns>
+        private static int CalculateLinesOfCode(IEnumerable<SEEToken> tokens)
+        {
+            int linesOfCode = 0;
+
+            foreach (SEEToken token in tokens)
+            {
+                if (token.TokenType == SEEToken.Type.Newline)
+                {
+                    linesOfCode++;
+                }
+                else if (token.TokenType == SEEToken.Type.Comment)
+                {
+                    linesOfCode--;
+                }
+            }
+
+            return linesOfCode;
         }
     }
 }
