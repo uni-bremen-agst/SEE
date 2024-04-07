@@ -118,5 +118,13 @@ namespace SEE.Game.Evolution
             FastForwardButtonText.AssertNotNull("Text");
             FastBackwardButtonText.AssertNotNull("Text");
         }
+
+        public void EnableButtons(bool enable)
+        {
+            PlayButton.interactable = enable;
+            FastForwardButton.interactable = enable;
+            ReverseButton.interactable = enable;
+            FastBackwardButton.interactable = enable;
+        }
     }
 }
