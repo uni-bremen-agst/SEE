@@ -33209,7 +33209,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1517357890693092, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1643126648504472, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
       propertyPath: m_IsActive
@@ -33391,7 +33391,23 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1702936841}
+    - targetCorrespondingSourceObject: {fileID: 1794417805202770, guid: 7e7e1770b238e724caee49f153d1b3d6,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1702936843}
   m_SourcePrefab: {fileID: 100100000, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+--- !u!114 &1702936839 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114207693767522266, guid: 7e7e1770b238e724caee49f153d1b3d6,
+    type: 3}
+  m_PrefabInstance: {fileID: 1702936838}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1702936842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a066ddbf125f9546bcadc947418566b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1702936840 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1643126648504472, guid: 7e7e1770b238e724caee49f153d1b3d6,
@@ -33439,6 +33455,25 @@ MonoBehaviour:
   m_DeselectOnBackgroundClick: 1
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
+--- !u!1 &1702936842 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1794417805202770, guid: 7e7e1770b238e724caee49f153d1b3d6,
+    type: 3}
+  m_PrefabInstance: {fileID: 1702936838}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1702936843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1702936842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5cd6d3208eb6af4bb40eea65e762a5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Trigger: {fileID: 1702936839}
 --- !u!1 &1704744505
 GameObject:
   m_ObjectHideFlags: 0
