@@ -52,7 +52,7 @@ namespace SEE.GraphProviders
         };
 
         /// <summary>
-        /// Loads the metrics available at the Axivion Dashboard into the <paramref name="graph"/>.
+        /// Loads the metrics and nodes from the given git repository and commitID into the <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">The graph into which the metrics shall be loaded</param>
         public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
@@ -106,7 +106,7 @@ namespace SEE.GraphProviders
             Debug.Log(repositoryPath);
             Graph graph = new(repositoryPath, pathSegments[^1]);
             // The main directory.
-            NewNode(graph, pathSegments[^1], "directory");
+            NewNode(graph, pathSegments[^1], "directory", pathSegments[^1]);
 
             IEnumerable<string> includedFiles = pathGlobbing
                 .Where(path => path.Value == true)
@@ -124,29 +124,18 @@ namespace SEE.GraphProviders
                 IEnumerable<string> files;
                 if (includedFiles.Any() && !string.IsNullOrEmpty(includedFiles.First()))
                 {
-                    files = ListTree(tree).Where(path => includedFiles.Contains(Path.GetExtension(path))).Take(200);
+                    files = ListTree(tree).Where(path => includedFiles.Contains(Path.GetExtension(path))).Take(5);
                 }
                 else if (excludedFiles.Any())
                 {
                     //files = repo.Index.Select(entry => entry.Path).Where(path => !excludedFiles.Contains(Path.GetExtension(path)));
-                    files = ListTree(tree).Where(path => !excludedFiles.Contains(Path.GetExtension(path))).Take(200);
+                    files = ListTree(tree).Where(path => !excludedFiles.Contains(Path.GetExtension(path))).Take(5);
                 }
                 else
                 {
-                    files = ListTree(tree).Take(200);
+                    files = ListTree(tree).Take(5);
                 }
-                Debug.Log(files.Count());
-                string json = Newtonsoft.Json.JsonConvert.SerializeObject(files.ToList());
-                //ToDO: ALLES NUR FÜR DEBUGGING
-                // Teile die Zeichenkette anhand des Kommas auf, um einzelne Elemente zu erhalten
-                string[] elements = json.Split(',');
 
-                // Füge einen Zeilenumbruch nach jedem Element hinzu und erstelle eine neue Zeichenkette
-                string output = string.Join("\n", elements.Select(e => e.Replace("\"", "")));
-
-                // Gib die resultierende Zeichenkette aus
-                Debug.Log(output);
-                Debug.Log(graph.BasePath);
                 // Build the graph structure.
                 foreach (string filePath in files.Where(path => !string.IsNullOrEmpty(path)))
                 {
@@ -267,13 +256,13 @@ namespace SEE.GraphProviders
                 // Directory does not exist.
                 if (graph.GetNode(pathSegments[0]) == null && pathSegments.Length > 1 && parent == null)
                 {
-                    mainNode.AddChild(NewNode(graph, pathSegments[0], "directory"));
+                    mainNode.AddChild(NewNode(graph, pathSegments[0], "directory", pathSegments[0]));
                     BuildGraphFromPath(nodePath, graph.GetNode(pathSegments[0]), pathSegments[0], graph, mainNode);
                 }
                 // I dont know, if this code ever gets used -> I dont know, how to handle empty directorys.
                 if (graph.GetNode(pathSegments[0]) == null && pathSegments.Length == 1 && parent == null)
                 {
-                    mainNode.AddChild(NewNode(graph, pathSegments[0], "directory"));
+                    mainNode.AddChild(NewNode(graph, pathSegments[0], "directory", pathSegments[0]));
                 }
             }
             // Current pathSegment is not in the main directory.
@@ -287,13 +276,13 @@ namespace SEE.GraphProviders
                 // The node for the current pathSegment does not exist, and the node is a directory.
                 if (graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]) == null && pathSegments.Length > 1)
                 {
-                    parent.AddChild(NewNode(graph, parentPath + Path.DirectorySeparatorChar + pathSegments[0], "directory"));
+                    parent.AddChild(NewNode(graph, parentPath + Path.DirectorySeparatorChar + pathSegments[0], "directory", pathSegments[0]));
                     BuildGraphFromPath(nodePath, graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]), parentPath + Path.DirectorySeparatorChar + pathSegments[0], graph, mainNode);
                 }
                 // The node for the current pathSegment does not exist, and the node is file.
                 if (graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]) == null && pathSegments.Length == 1)
                 {
-                    parent.AddChild(NewNode(graph, parentPath + Path.DirectorySeparatorChar + pathSegments[0], "file"));
+                    parent.AddChild(NewNode(graph, parentPath + Path.DirectorySeparatorChar + pathSegments[0], "file", pathSegments[0]));
                 }
             }
         }
@@ -311,7 +300,7 @@ namespace SEE.GraphProviders
         {
             Node result = new()
             {
-                SourceName = id,
+                SourceName = name,
                 ID = id,
                 Type = type,
                 SourceLength = length
