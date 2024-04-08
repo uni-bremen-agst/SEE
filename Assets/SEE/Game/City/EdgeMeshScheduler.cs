@@ -186,7 +186,9 @@ namespace SEE.Game.City
             if (value is EdgeEvent { Change: ChangeType.Addition } edgeEvent)
             {
                 // If this is an added edge, we are going to need to turn it into a mesh.
-                LoadingSpinner.Show(LoadingText);
+                // TODO (#722): The loading spinner loops forever for edges newly added as
+                // part of the reflexion analysis.
+                // LoadingSpinner.Show(LoadingText);
                 edges.Enqueue(edgeEvent.Edge);
             }
 
