@@ -183,6 +183,10 @@
         /// </summary>
         ToggleTextChat,
         /// <summary>
+        /// Toggles the voice chat.
+        /// </summary>
+        ToggleVoiceChat,
+        /// <summary>
         /// Closes all open notifications.
         /// </summary>
         CloseNotifications,

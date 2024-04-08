@@ -581,6 +581,15 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleTextChat);
         }
 
+        /// <summary>
+        /// Toggles the voice chat.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleVoiceChat()
+        {
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleVoiceChat);
+        }
+
         #endregion
 
         //----------------------------------------------------
