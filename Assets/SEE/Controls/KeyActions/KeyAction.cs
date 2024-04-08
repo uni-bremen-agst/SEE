@@ -179,22 +179,6 @@
         /// </summary>
         ShowWindowMenu,
         /// <summary>
-        /// Undoes an edit in the source-code viewer.
-        /// </summary>
-        CodeWindowUndo,
-        /// <summary>
-        /// Redoes an undone edit in the source-code viewer.
-        /// </summary>
-        CodeWindowRedo,
-        /// <summary>
-        /// Saves the content of the source-code viewer.
-        /// </summary>
-        CodeWindowSave,
-        /// <summary>
-        /// Refreshes syntax highlighting in the source-code viewer.
-        /// </summary>
-        RefreshSyntaxHighlighting,
-        /// <summary>
         /// Opens the text chat.
         /// </summary>
         ToggleTextChat,
