@@ -35,13 +35,13 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Toggles voice input (i.e., for voice commands) on/off.
+        /// Toggles voice control (i.e., for voice commands) on/off.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool ToggleVoiceInput()
+        public static bool ToggleVoiceControl()
         {
             return KeyboardShortcutsEnabled
-                && KeyBindings.IsDown(KeyAction.ToggleVoiceInput);
+                && KeyBindings.IsDown(KeyAction.ToggleVoiceControl);
         }
 
         /// <summary>

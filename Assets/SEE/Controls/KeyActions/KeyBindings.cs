@@ -128,7 +128,7 @@ namespace SEE.Controls.KeyActions
             // General
             Register(KeyAction.Help, KeyCode.H, "Help",
                      KeyActionCategory.General, "Provides help");
-            Register(KeyAction.ToggleVoiceInput, KeyCode.Period, "Toggle voice chat",
+            Register(KeyAction.ToggleVoiceControl, KeyCode.Period, "Toggle voice control (commands to SEE)",
                      KeyActionCategory.General, "Toggles voice input on/off.");
             Register(KeyAction.ToggleMenu, KeyCode.Space, "Toggle menu",
                      KeyActionCategory.General, "Toggles the user-action menu.");

@@ -14,9 +14,9 @@
         /// </summary>
         ToggleMenu,
         /// <summary>
-        /// User toggles the voice chat.
+        /// User toggles the voice control (interpreted by the personal assistant).
         /// </summary>
-        ToggleVoiceInput,
+        ToggleVoiceControl,
         /// <summary>
         /// Turns on/off the settings menu.
         /// </summary>
