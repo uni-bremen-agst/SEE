@@ -3,18 +3,18 @@
 namespace SEE.Net.Actions.Animation
 {
     /// <summary>
-    /// Applies <see cref="AnimationInteraction.PressPlay"/> on the 
+    /// Applies <see cref="AnimationInteraction.PressFastForward"/> on the 
     /// <see cref="AnimationInteraction"/> component.
     /// </summary>
-    public class PressPlayNetAction : AnimationNetAction
+    public class PressFastForwardNetAction : AnimationNetAction
     {
-        public PressPlayNetAction(string gameObjectID) : base(gameObjectID)
+        public PressFastForwardNetAction(string gameObjectID) : base(gameObjectID)
         {
         }
 
         protected override void Trigger(AnimationInteraction ai)
         {
-            ai.PressPlay();
+            ai.PressFastForward();
         }
     }
 }
