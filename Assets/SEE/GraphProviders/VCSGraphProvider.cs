@@ -26,7 +26,7 @@ namespace SEE.GraphProviders
         /// The path to the git repository.
         /// </summary>
         [ShowInInspector, Tooltip("Path to the git repository."), HideReferenceObjectPicker]
-        public readonly DirectoryPath RepositoryPath = new();
+        public DirectoryPath RepositoryPath = new();
 
         /// <summary>
         /// The commit id against which to compare.
@@ -124,16 +124,16 @@ namespace SEE.GraphProviders
                 IEnumerable<string> files;
                 if (includedFiles.Any() && !string.IsNullOrEmpty(includedFiles.First()))
                 {
-                    files = ListTree(tree).Where(path => includedFiles.Contains(Path.GetExtension(path))).Take(5);
+                    files = ListTree(tree).Where(path => includedFiles.Contains(Path.GetExtension(path)));
                 }
                 else if (excludedFiles.Any())
                 {
                     //files = repo.Index.Select(entry => entry.Path).Where(path => !excludedFiles.Contains(Path.GetExtension(path)));
-                    files = ListTree(tree).Where(path => !excludedFiles.Contains(Path.GetExtension(path))).Take(5);
+                    files = ListTree(tree).Where(path => !excludedFiles.Contains(Path.GetExtension(path)));
                 }
                 else
                 {
-                    files = ListTree(tree).Take(5);
+                    files = ListTree(tree);
                 }
 
                 // Build the graph structure.

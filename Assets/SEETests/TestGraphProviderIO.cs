@@ -1,7 +1,12 @@
 ﻿using NUnit.Framework;
+using SEE.DataModel.DG;
+using SEE.Game.City;
 using SEE.Utils;
 using SEE.Utils.Config;
+using SEE.Utils.Paths;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -174,6 +179,74 @@ namespace SEE.GraphProviders
             AreEqual(saved.Architecture, reflexionLoaded.Architecture);
             AreEqual(saved.Implementation, reflexionLoaded.Implementation);
             AreEqual(saved.Mapping, reflexionLoaded.Mapping);
+        }
+
+        private static T NewVanillaSEECity<T>() where T : Component
+        {
+            return new GameObject().AddComponent<T>();
+        }
+
+        public async System.Threading.Tasks.Task<Graph> GetVCSGraphAsync()
+        {
+            VCSGraphProvider saved = GetVCSGraphProvider();
+            SEECity testCity = NewVanillaSEECity<SEECity>(); ;
+            Graph testGraph = new("test", "test");
+            Graph graph = await saved.ProvideAsync(testGraph, testCity);
+            return graph;
+        }
+
+        [Test]
+        public void TestVCSGraphProvider()
+        {
+            Graph graph = GetVCSGraphAsync().GetAwaiter().GetResult();
+            List<string> pathsFromGraph = new();
+            foreach (GraphElement elem in graph.Elements())
+            {
+                pathsFromGraph.Add(elem.ID.Replace('\\', '/'));
+            }
+
+            List<string> actualList = new()
+            {
+                "SEE",
+                ".gitignore",
+                "Assets",
+                "Assets/Scenes.meta",
+                "Assets/Scenes",
+                "Assets/Scenes/SampleScene.unity",
+                "Assets/Scenes/SampleScene.unity.meta",
+                "Packages",
+                "Packages/manifest.json",
+                "ProjectSettings",
+                "ProjectSettings/AudioManager.asset",
+                "ProjectSettings/ClusterInputManager.asset",
+                "ProjectSettings/DynamicsManager.asset",
+                "ProjectSettings/EditorBuildSettings.asset",
+                "ProjectSettings/EditorSettings.asset",
+                "ProjectSettings/GraphicsSettings.asset",
+                "ProjectSettings/InputManager.asset",
+                "ProjectSettings/NavMeshAreas.asset",
+                "ProjectSettings/Physics2DSettings.asset",
+                "ProjectSettings/PresetManager.asset",
+                "ProjectSettings/ProjectSettings.asset",
+                "ProjectSettings/ProjectVersion.txt",
+                "ProjectSettings/QualitySettings.asset",
+                "ProjectSettings/TagManager.asset",
+                "ProjectSettings/TimeManager.asset",
+                "ProjectSettings/UnityConnectSettings.asset",
+                "ProjectSettings/VFXManager.asset",
+                "ProjectSettings/XRSettings.asset"
+            };
+            Assert.IsTrue(actualList.SequenceEqual(pathsFromGraph));
+        }
+
+        private VCSGraphProvider GetVCSGraphProvider()
+        {
+            return new VCSGraphProvider()
+            {
+                RepositoryPath = new DirectoryPath(System.IO.Path.GetDirectoryName(Application.dataPath)),
+                OldCommitID = "c015e619360491dd552ef26879a84cbefad024ed",
+                NewCommitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461",
+            };
         }
 
         private GraphProvider Load()
