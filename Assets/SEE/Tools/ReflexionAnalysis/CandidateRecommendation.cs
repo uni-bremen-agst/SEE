@@ -237,15 +237,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 if (edgeEvent.Affected == ReflexionSubgraphs.Mapping)
                 {
                     // Debug.Log($"In Recommendations: Handle Change in Mapping... {edgeEvent.ToString()} sender: {edgeEvent.Sender}");
-
-                    // TODO: is this safe?
-                    if (edgeEvent.Change == null) return;
-
                     bool AnyParentMapped = this.AnyParentMapped(edgeEvent.Edge.Source, ReflexionGraph);
 
                     // If a node is mapped/unmapped and the parent is already mapped this changed node 
                     // was already handled as a child during previous events.
-                    if (AnyParentMapped)
+                    // TODO: is this safe?
+                    if (AnyParentMapped || edgeEvent.Change == null)
                     {
                         return;
                     }

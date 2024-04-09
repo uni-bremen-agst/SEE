@@ -17,7 +17,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         public NBAttract(ReflexionGraph reflexionGraph, NBAttractConfig config) : base(reflexionGraph, config)
         {
             this.config = config;
-            this.naiveBayes = new NaiveBayesAccord();   
+            this.naiveBayes = new NaiveBayesIncremental();   
         }
 
         public override string DumpTrainingData()
@@ -46,7 +46,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         public override bool EmptyTrainingData()
         {
-            throw new NotImplementedException();
+            // TODO: 
+            return true;
         }
 
         public override double GetAttractionValue(Node candidate, Node cluster)
@@ -91,13 +92,24 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         {
             foreach(Node nodeChangedInMapping in nodesChangedInMapping)
             {
-                if (!nodeChangedInMapping.Type.Equals(this.CandidateType)) continue;
+                if (!nodeChangedInMapping.Type.Equals(this.CandidateType))
+                {
+                    continue;
+                }
 
                 Document docStandardTerms = new Document();
-                if(this.config.UseStandardTerms) this.AddStandardTerms(nodeChangedInMapping, docStandardTerms);
+
+                if (this.config.UseStandardTerms)
+                {
+                    this.AddStandardTerms(nodeChangedInMapping, docStandardTerms);
+                }
 
                 Dictionary<string, IDocument> docCdaTerms = new Dictionary<string, IDocument>();
-                if (this.config.UseCDA) this.CreateCdaTerms(cluster, nodeChangedInMapping, docCdaTerms);
+
+                if (this.config.UseCDA)
+                {
+                    this.CreateCdaTerms(cluster, nodeChangedInMapping, docCdaTerms);
+                }
 
                 if(changeType == ChangeType.Addition)
                 {

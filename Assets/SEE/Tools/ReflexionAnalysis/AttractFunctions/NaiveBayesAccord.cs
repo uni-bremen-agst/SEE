@@ -46,11 +46,19 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         public string ClassifyDocument(IDocument document)
         {
-            if (dirty) UpdateModel();
+            if (dirty)
+            {
+                UpdateModel();
+            }
+
             int[] input = CreateInputRepresentation(document);
             int decision = classifier.Decide(input);
+
             // handle artifical extra class
-            if (decision == NumberClasses + 1) return null;
+            if (decision == NumberClasses + 1)
+            {
+                return null;
+            }
             return classIdxToStringMapper[decision];
         }
 
@@ -69,15 +77,22 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         public double ProbabilityForClass(string clazz, IDocument document)
         {
-            if (dirty) UpdateModel();
+            if (dirty)
+            {
+                UpdateModel();
+            }
 
             // class is unknown
-            if (!classStringToIdxMapper.ContainsKey(clazz)) return 0.0;
+            if (!classStringToIdxMapper.ContainsKey(clazz))
+            {
+                return 0.0;
+            }
 
             int[] input = CreateInputRepresentation(document);
             int classIdx = classStringToIdxMapper[clazz];
 
-            return classifier.Probability(input, classIdx);
+            double probability = classifier.Probability(input, classIdx);
+            return probability;
         }
 
         private int[] CreateInputRepresentation(IDocument document)
@@ -85,6 +100,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             int[] input = new int[wordIdxToStringMapper.Length];
             for (int wordIdx = 0; wordIdx < wordIdxToStringMapper.Length; wordIdx++)
             {
+                // input[wordIdx] = document.GetFrequency(wordIdxToStringMapper[wordIdx]) > 0 ? 1 : 0;
                 input[wordIdx] = document.GetFrequency(wordIdxToStringMapper[wordIdx]);
             }
 
@@ -94,7 +110,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         private void UpdateModel()
         {
             IDocument allDocuments = new Document();
-            trainingData.Values.ForEach(d => allDocuments.AddWords(d));
+
+            foreach (Document doc in trainingData.Values)
+            {
+                allDocuments.AddWords(doc);
+            }
 
             int[,] inputs = new int[this.trainingData.Keys.Count, allDocuments.WordCount];
             int[] outputs = new int[this.trainingData.Keys.Count];
@@ -124,7 +144,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 for (wordIdx = 0; wordIdx < allDocuments.WordCount; wordIdx++)
                 {
                     int frequency = trainingData[currentClass].GetFrequency(wordIdxToStringMapper[wordIdx]);
-                    if (frequency > highestFrequency) highestFrequency = frequency;
+                    if (frequency > highestFrequency) 
+                    {
+                        highestFrequency = frequency; 
+                    }
                     inputs[classIdx, wordIdx] = frequency;
                 }
 

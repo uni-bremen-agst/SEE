@@ -87,16 +87,25 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 string key = "Source.Name";
                 if (ascendant.Type.Equals("Class"))
                 {
-                    if (node.StringAttributes.ContainsKey(key)) document.AddWord(node.GetString(key));
+                    if (ascendant.StringAttributes.ContainsKey(key))
+                    {
+                        document.AddWord(ascendant.GetString(key));
+                    }
                 }
                 else if (ascendant.Type.Equals("Package"))
                 {
-                    if (node.StringAttributes.ContainsKey(key)) document.AddWord(node.GetString(key));
+                    if (ascendant.StringAttributes.ContainsKey(key))
+                    {
+                        document.AddWord(ascendant.GetString(key));
+                    }
                 }
                 else if (ascendant.Type.Equals("File"))
                 {
                     key = "Source.File";
-                    if (node.StringAttributes.ContainsKey(key)) document.AddWord(node.GetString(key));
+                    if (ascendant.StringAttributes.ContainsKey(key))
+                    {
+                        document.AddWord(ascendant.GetString(key));
+                    }
                 }
             }
             return;

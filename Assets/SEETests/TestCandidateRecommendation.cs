@@ -5,9 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Assets.SEE.Tools.ReflexionAnalysis;
 using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
-using static Assets.SEE.Tools.ReflexionAnalysis.CandidateRecommendation;
-using System.Security.Cryptography;
-using System.Diagnostics;
 
 namespace SEE.Tools.Architecture
 {
@@ -83,14 +80,28 @@ namespace SEE.Tools.Architecture
             graph.Subscribe(candidateRecommendation);
         }
 
-        private void SetupCountAttract()
+        private void SetupCountAttract(float phi = 1.0f)
         {
             MappingExperimentConfig config = new MappingExperimentConfig();
             CountAttractConfig attractConfig = new CountAttractConfig();
+            attractConfig.Phi = phi;
             attractConfig.CandidateType = "Candidate";
             attractConfig.ClusterType = "Cluster";
             config.AttractFunctionConfig = attractConfig;
             candidateRecommendation.UpdateConfiguration(graph, config);          
+        }
+
+        private void SetupNBAttract(bool useCda = false)
+        {
+            MappingExperimentConfig config = new MappingExperimentConfig();
+            NBAttractConfig attractConfig = new NBAttractConfig();
+            attractConfig.UseCDA = useCda;
+            attractConfig.CandidateType = "Candidate";
+            attractConfig.ClusterType = "Cluster";
+            config.AttractFunctionConfig = attractConfig;
+            candidateRecommendation.UpdateConfiguration(graph, config);
+            nodeReader = new NodeReaderTest();
+            ((NBAttract)candidateRecommendation.AttractFunction).SetNodeReader(nodeReader);
         }
 
         private void SetupADCAttract() 
@@ -156,6 +167,20 @@ namespace SEE.Tools.Architecture
             };
 
             ie = CreateEdgesDictionary(edgesFromTo, i);
+        }
+
+        public void AddImplementatioNBAttract(string type = "Candidate")
+        {
+            i = new Dictionary<int, Node>();
+
+            i[0] = NewNode(false, "implementation", "Package");
+
+            for (int j = 1; j < 7; j++)
+            {
+                string character = alphabet[j - 1];
+                i[j] = NewNode(false, character, type);
+                i[0].AddChild(i[j]);
+            }
         }
 
         /// <summary>
@@ -255,6 +280,26 @@ namespace SEE.Tools.Architecture
             ae = CreateEdgesDictionary(edgesFromTo, a);
         }
 
+        private void AddArchitectureNBAttract()
+        {
+            a = new Dictionary<int, Node>();
+
+            a[0] = NewNode(true, "architecture", "Architecture_Layer");
+
+            for (int j = 1; j < 4; j++)
+            {
+                a[j] = NewNode(true, "A" + j, "Cluster");
+                a[0].AddChild(a[j]);
+            }
+
+            (int, int)[] edgesFromTo =
+{
+                (1, 2), (2, 3)
+            };
+
+            ae = CreateEdgesDictionary(edgesFromTo, a);
+        }
+
         /// <summary>
         /// Creates an architecture as follows:
         ///
@@ -305,6 +350,65 @@ namespace SEE.Tools.Architecture
         {
             graph.ResetMapping();
             candidateRecommendation.UpdateRecommendations();
+        }
+
+        [Test]
+        public void TestNBAtrract()
+        {
+            AddImplementatioNBAttract();
+            AddArchitectureNBAttract();
+            SetupNBAttract();
+
+            this.nodeReader.SetLookUp(i[1].ID, "word1");
+            this.nodeReader.SetLookUp(i[2].ID, "word1");
+            this.nodeReader.SetLookUp(i[3].ID, "word1");
+            this.nodeReader.SetLookUp(i[4].ID, "word1 word2");
+            this.nodeReader.SetLookUp(i[5].ID, "word2");
+
+            this.AddToMapping(i[1], a[1]);
+            this.AddToMapping(i[2], a[2]);
+            this.AddToMapping(i[3], a[3]);
+
+            double attract4To1 = candidateRecommendation.AttractFunction.GetAttractionValue(i[4], a[1]);
+            double attract4To2 = candidateRecommendation.AttractFunction.GetAttractionValue(i[4], a[2]);
+            double attract4To3 = candidateRecommendation.AttractFunction.GetAttractionValue(i[4], a[3]);
+
+            double attract5To2 = candidateRecommendation.AttractFunction.GetAttractionValue(i[5], a[2]);
+            double attract5To3 = candidateRecommendation.AttractFunction.GetAttractionValue(i[5], a[3]);
+            double attract5To1 = candidateRecommendation.AttractFunction.GetAttractionValue(i[5], a[1]);
+
+            Assert.AreEqual(attract4To1, attract4To2, 0.000001);
+            Assert.AreEqual(attract4To1, attract4To3, 0.000001);
+            Assert.AreEqual(attract4To2, attract4To3, 0.000001);
+
+            Assert.IsTrue(attract4To1 > 0);
+            Assert.IsTrue(attract4To2 > 0);
+            Assert.IsTrue(attract4To3 > 0);
+
+            Assert.IsTrue(attract5To1 == 0);
+            Assert.IsTrue(attract5To2 == 0);
+            Assert.IsTrue(attract5To3 == 0);
+
+            this.AddToMapping(i[4], a[1]);
+
+            attract5To2 = candidateRecommendation.AttractFunction.GetAttractionValue(i[5], a[2]);
+            attract5To3 = candidateRecommendation.AttractFunction.GetAttractionValue(i[5], a[3]);
+            attract5To1 = candidateRecommendation.AttractFunction.GetAttractionValue(i[5], a[1]);
+
+            Assert.IsTrue(attract5To1 > attract5To2);
+            Assert.IsTrue(attract5To1 > attract5To3);
+            Assert.AreEqual(attract5To3, attract5To2, 0.0001);
+
+            this.RemoveFromMapping(i[4]);
+            this.AddToMapping(i[4], a[2]);
+
+            attract5To2 = candidateRecommendation.AttractFunction.GetAttractionValue(i[5], a[2]);
+            attract5To3 = candidateRecommendation.AttractFunction.GetAttractionValue(i[5], a[3]);
+            attract5To1 = candidateRecommendation.AttractFunction.GetAttractionValue(i[5], a[1]);
+
+            Assert.IsTrue(attract5To2 > attract5To1);
+            Assert.IsTrue(attract5To2 > attract5To3);
+            Assert.AreEqual(attract5To3, attract5To2, 0.0001);
         }
 
         [Test]
@@ -451,7 +555,7 @@ namespace SEE.Tools.Architecture
             */
 
             // update phi value
-            ((CountAttract)candidateRecommendation.AttractFunction).Phi = 0.4f;
+            SetupCountAttract(0.4f);
 
             // remaps i3(c) to a2(A2)
             this.RemoveFromMapping(i[3]);
@@ -460,7 +564,7 @@ namespace SEE.Tools.Architecture
             // check if i4(d) is in the Recommendations for a1(A1) but not a2(A2)
             Assert.That(DIsRecommendedForA1ButNotA2());
 
-            ((CountAttract)candidateRecommendation.AttractFunction).Phi = 0.5f;
+            SetupCountAttract(0.5f);
 
             // remaps i3(c) to a2(A2)
             this.RemoveFromMapping(i[3]);
@@ -468,7 +572,7 @@ namespace SEE.Tools.Architecture
 
             Assert.That(DIsRecommendedForA1AndA2());
 
-            ((CountAttract)candidateRecommendation.AttractFunction).Phi = 0.6f;
+            SetupCountAttract(0.6f);
 
             // remaps i3(c) to a2(A2)
             this.RemoveFromMapping(i[3]);

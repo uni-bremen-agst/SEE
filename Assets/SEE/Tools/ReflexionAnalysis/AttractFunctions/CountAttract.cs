@@ -4,6 +4,7 @@ using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
@@ -84,7 +85,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 List<Edge> implementationEdges = nodeChangedInMapping.GetImplementationEdges();
                 foreach (Edge edge in implementationEdges)
                 {
-                    Node neighborOfAffectedNode = edge.Source.Equals(nodeChangedInMapping) ? edge.Target : edge.Source;
+                    Node neighborOfAffectedNode = edge.Source.ID.Equals(nodeChangedInMapping.ID) ? edge.Target : edge.Source;
+
                     UpdateOverallTable(neighborOfAffectedNode, edge, changeType);
                     
                     // TODO: Is there a way to also update a datastructure for the ToOthers value efficiently?
@@ -95,9 +97,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         public void UpdateOverallTable(Node NeighborOfMappedNode, Edge edge, ChangeType changeType)
         {
-            if (!overallValues.ContainsKey(NeighborOfMappedNode.ID)) overallValues.Add(NeighborOfMappedNode.ID, 0);
+            if (!overallValues.ContainsKey(NeighborOfMappedNode.ID))
+            {
+                overallValues.Add(NeighborOfMappedNode.ID, 0);
+            }
+
             double edgeWeight = GetEdgeWeight(edge);
-            if (changeType == ChangeType.Removal) edgeWeight *= -1;
+
+            if (changeType == ChangeType.Removal)
+            {
+                edgeWeight *= -1;
+            }
             overallValues[NeighborOfMappedNode.ID] += edgeWeight;
         }
 
@@ -125,7 +135,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         {
             foreach(string key in this.overallValues.Keys)
             {
-                if (this.overallValues[key] > 0) return false;
+                if (this.overallValues[key] != 0)
+                {
+                    return false;
+                }
             }
             return true;
         }

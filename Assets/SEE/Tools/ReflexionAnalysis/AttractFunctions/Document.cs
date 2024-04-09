@@ -12,6 +12,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         //private static Dictionary<string, int> GlobalWordIndices = new Dictionary<string, int>();
 
+        int square = 0;
+
+        private int SquareSum { get => square;}
+
         public enum DocumentMergingType
         {
             Union,
@@ -103,10 +107,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         {
             if (!wordFrequencies.ContainsKey(word)) 
             {
-                // EnsureGlobalWordIndex(word); 
+                //EnsureGlobalWordIndex(word); 
                 wordFrequencies.Add(word, 0); 
             }
+
+            int oldVal = wordFrequencies[word];
             wordFrequencies[word] += count;
+            UpdateSquareSum(oldVal, wordFrequencies[word]);
         }
 
         //private static void EnsureGlobalWordIndex(string word)
@@ -123,11 +130,25 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         public void RemoveWord(string word, int count)
         {
-            if (!wordFrequencies.ContainsKey(word)) return;
+            if (!wordFrequencies.ContainsKey(word))
+            {
+                return;
+            }
+
+            int oldVal = wordFrequencies[word];
             wordFrequencies[word]-= count;
-            if (wordFrequencies[word] < 0) throw new Exception($"Cannot remove word {word} {count} times. " +
+            UpdateSquareSum(oldVal, wordFrequencies[word]);
+
+            if (wordFrequencies[word] < 0)
+            {
+                throw new Exception($"Cannot remove word {word} {count} times. " +
                                                                $"Word count would be negative.");
-            if (wordFrequencies[word] == 0) wordFrequencies.Remove(word);
+            }
+
+            if (wordFrequencies[word] == 0)
+            {
+                wordFrequencies.Remove(word);
+            }
         }
 
         public int GetFrequency(string word)
@@ -236,9 +257,73 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             {
                 int val1 = biggerDoc.GetFrequency(word) > 0 ? 1 : 0;
                 int val2 = smallerDoc.GetFrequency(word) > 0 ? 1 : 0;
+                //int val1 = biggerDoc.GetFrequency(word);
+                //int val2 = smallerDoc.GetFrequency(word);
                 val += val1 * val2;
             }
             return val;
+        }
+
+        public static double CosineSimilarity(Document doc1, Document doc2)
+        {
+            Document smallerDoc = doc1.WordCount <= doc2.WordCount ? doc1 : doc2;
+            Document biggerDoc = doc1.WordCount <= doc2.WordCount ? doc2 : doc1;
+
+            IEnumerable<string> words = smallerDoc.GetContainedWords();
+            double dotProduct = 0.0;
+            foreach (var word in words)
+            {
+                int val1 = biggerDoc.GetFrequency(word);
+                int val2 = smallerDoc.GetFrequency(word);
+                dotProduct += val1 * val2;
+            }
+
+            double result = dotProduct / (Math.Sqrt(doc1.SquareSum) * Math.Sqrt(doc2.SquareSum));
+            return result;        
+        }
+
+        public static double CosineSimilarity2(Document doc1, Document doc2)
+        {
+            Document smallerDoc = doc1.WordCount <= doc2.WordCount ? doc1 : doc2;
+            Document biggerDoc = doc1.WordCount <= doc2.WordCount ? doc2 : doc1;
+
+            IEnumerable<string> words = smallerDoc.GetContainedWords();
+            double dotProduct = 0.0;
+            foreach (var word in words)
+            {
+                int val1 = biggerDoc.GetFrequency(word) > 0 ? 1 : 0;
+                int val2 = smallerDoc.GetFrequency(word) > 0 ? 1 : 0;
+                dotProduct += val1 * val2;
+            }
+
+            double result = dotProduct / (Math.Sqrt(doc1.SquareSum) * Math.Sqrt(doc2.SquareSum));
+            return result;
+        }
+
+        public static double EuclideanDistance(Document doc1, Document doc2)
+        {
+            Document smallerDoc = doc1.WordCount <= doc2.WordCount ? doc1 : doc2;
+            Document biggerDoc = doc1.WordCount <= doc2.WordCount ? doc2 : doc1;
+
+            IEnumerable<string> words = biggerDoc.GetContainedWords();
+            double sum = 0.0;
+            foreach (var word in words)
+            {
+                int val1 = doc1.GetFrequency(word);
+                int val2 = doc2.GetFrequency(word);
+                int diff = (val1 - val2);
+                sum += diff * diff;
+            }
+
+            double result = Math.Sqrt(sum);
+            return result;
+        }
+
+        public static double EuclideanSimilarity(Document doc1, Document doc2)
+        {
+            double euclideanDistance = Document.EuclideanDistance(doc1, doc2);
+            double result = 1 / (1 + euclideanDistance);
+            return result;
         }
 
         //public double[] ToFrequencyArray()
@@ -266,6 +351,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         IDocument IDocument.Clone()
         {
             return this.Clone();
+        }
+
+        private void UpdateSquareSum(int oldVal, int newVal)
+        {
+            square -= oldVal * oldVal;
+            square += newVal * newVal;
         }
     }
 }

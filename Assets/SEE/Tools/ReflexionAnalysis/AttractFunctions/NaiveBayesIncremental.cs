@@ -6,6 +6,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
     public class NaiveBayesIncremental : ITextClassifier, IEnumerable<string>
     {
+        public static int UNDERFLOW_OFFSET = 10000;
+
         private Dictionary<string, ClassInformation> trainingData;
 
         private int alpha;
@@ -45,7 +47,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         public void DeleteDocument(string clazz, IDocument document)
         {
-            if (clazz == null) throw new Exception("Invalid class given.");
+            if (clazz == null)
+            {
+                throw new Exception("Invalid class given.");
+            }
 
             if(!trainingData.ContainsKey(clazz))
             {
@@ -77,12 +82,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         public double ProbabilityForClass(string clazz, IDocument doc)
         {
             this.EnsureClass(clazz);
-            double prob = trainingData[clazz].GetPriorProbability();
+
+            double prob = Math.Log(trainingData[clazz].GetPriorProbability());
+
             foreach (string word in doc)
             {
-                prob *= trainingData[clazz].GetWordProbability(word);
+                prob += Math.Log(trainingData[clazz].GetWordProbability(word));
             }
-            return prob;
+            return prob + UNDERFLOW_OFFSET;
         }
 
         public Dictionary<string, int> GetTrainingsData(string clazz)
@@ -103,7 +110,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         public void Reset()
         {
-            
+            trainingData.Clear();
+            DocumentCountGlobal = 0;
         }
 
         internal class ClassInformation
@@ -154,8 +162,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             {
                 foreach (string word in document)
                 {
-                    if (!wordFrequencies.ContainsKey(word)) wordFrequencies.Add(word, 0);
-                    if (!wordFrequenciesGlobal.ContainsKey(word)) wordFrequenciesGlobal.Add(word,0);
+                    if (!wordFrequencies.ContainsKey(word))
+                    {
+                        wordFrequencies.Add(word, 0);
+                    }
+                    if (!wordFrequenciesGlobal.ContainsKey(word))
+                    {
+                        wordFrequenciesGlobal.Add(word, 0);
+                    }
                     wordFrequencies[word]++;
                     wordFrequenciesGlobal[word]++;
                     wordCount++;
@@ -172,7 +186,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                     {
                         wordFrequencies[word]--;
                         wordFrequenciesGlobal[word]--;
-                        if (wordFrequenciesGlobal[word] == 0) wordFrequenciesGlobal.Remove(word);
+                        if (wordFrequenciesGlobal[word] == 0)
+                        {
+                            wordFrequenciesGlobal.Remove(word);
+                        }
                         wordCount--;
                     }
                 }
