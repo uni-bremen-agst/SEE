@@ -244,8 +244,7 @@ namespace SEE.GraphProviders
             return new VCSGraphProvider()
             {
                 RepositoryPath = new DirectoryPath(System.IO.Path.GetDirectoryName(Application.dataPath)),
-                OldCommitID = "c015e619360491dd552ef26879a84cbefad024ed",
-                NewCommitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461",
+                CommitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461",
             };
         }
 

@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using SEE.VCS;
 using SEE.UI.Window.CodeWindow;
 
 namespace SEE.GraphProviders
@@ -29,16 +28,10 @@ namespace SEE.GraphProviders
         public DirectoryPath RepositoryPath = new();
 
         /// <summary>
-        /// The commit id against which to compare.
-        /// </summary>
-        [ShowInInspector, Tooltip("The commit id against which to compare."), HideReferenceObjectPicker]
-        public string OldCommitID = "";
-
-        /// <summary>
-        /// The new commit id.
+        /// The commit id.
         /// </summary>
         [ShowInInspector, Tooltip("The new commit id."), HideReferenceObjectPicker]
-        public string NewCommitID = "";
+        public string CommitID = "";
 
         /// <summary>
         /// The List of filetypes that get included/excluded.
@@ -58,17 +51,17 @@ namespace SEE.GraphProviders
         public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
         {
             CheckArguments(city);
-            return await UniTask.FromResult<Graph>(GetVCSGraph(PathGlobbing, RepositoryPath.Path, OldCommitID, NewCommitID));
+            return await UniTask.FromResult<Graph>(GetVCSGraph(PathGlobbing, RepositoryPath.Path, CommitID));
         }
 
         /// <summary>
-        /// Checks whether the assumptions on <see cref="RepositoryPath"/>, <see cref="OldCommitID"/>,
-        /// <see cref="NewCommitID"/> and <paramref name="city"/> hold.
+        /// Checks whether the assumptions on <see cref="RepositoryPath"/> and
+        /// <see cref="CommitID"/> and <paramref name="city"/> hold.
         /// If not, exceptions are thrown accordingly.
         /// </summary>
         /// <param name="city">To be checked</param>
         /// <exception cref="ArgumentException">thrown in case <see cref="RepositoryPath"/>,
-        /// <see cref="OldCommitID"/> or <see cref="NewCommitID"/>
+        /// or <see cref="CommitID"/>
         /// is undefined or does not exist or <paramref name="city"/> is null</exception>
         protected void CheckArguments(AbstractSEECity city)
         {
@@ -80,11 +73,7 @@ namespace SEE.GraphProviders
             {
                 throw new ArgumentException($"Directory {RepositoryPath.Path} does not exist.\n");
             }
-            if (string.IsNullOrEmpty(OldCommitID))
-            {
-                throw new ArgumentException("Empty oldCommitID.\n");
-            }
-            if (string.IsNullOrEmpty(NewCommitID))
+            if (string.IsNullOrEmpty(CommitID))
             {
                 throw new ArgumentException("Empty newCommitID.\n");
             }
@@ -99,8 +88,9 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="pathGlobbing">The paths which get included/excluded.</param>
         /// <param name="repositoryPath">The path to the repository.</param>
+        /// <param name="commitID">The commitID where the files exist.</param>
         /// <returns>the graph.</returns>
-        static Graph GetVCSGraph(Dictionary<string, bool> pathGlobbing, string repositoryPath, string oldCommitID, string newCommitID)
+        static Graph GetVCSGraph(Dictionary<string, bool> pathGlobbing, string repositoryPath, string commitID)
         {
             string[] pathSegments = repositoryPath.Split(Path.DirectorySeparatorChar);
             Debug.Log(repositoryPath);
@@ -118,7 +108,7 @@ namespace SEE.GraphProviders
 
             using (Repository repo = new(repositoryPath))
             {
-                LibGit2Sharp.Tree tree = repo.Lookup<Commit>(newCommitID).Tree;
+                LibGit2Sharp.Tree tree = repo.Lookup<Commit>(commitID).Tree;
                 // Get all files using "git ls-files".
                 //TODO: I limited the output to 200 for testing, because SEE is huge.
                 IEnumerable<string> files;
@@ -151,17 +141,13 @@ namespace SEE.GraphProviders
                         BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(pathSegments[^1]));
                     }
 
-                    AddMcCabeMetric(graph, repo, newCommitID);
-                    AddHalsteadMetrics(graph, repo, newCommitID);
-                    AddLinesOfCodeMetric(graph, repo, newCommitID);
+                    AddMcCabeMetric(graph, repo, commitID);
+                    AddHalsteadMetrics(graph, repo, commitID);
+                    AddLinesOfCodeMetric(graph, repo, commitID);
                 }
                 //TODO: Only for testing.
                 Debug.Log(graph.ToString());
             }
-
-            AddLineofCodeChurnMetric(graph, repositoryPath, oldCommitID, newCommitID);
-            AddNumberofDevelopersMetric(graph, repositoryPath, oldCommitID, newCommitID);
-            AddCommitFrequencyMetric(graph, repositoryPath, oldCommitID, newCommitID);
 
             return graph;
         }
@@ -207,11 +193,6 @@ namespace SEE.GraphProviders
         private const string repositoryPathLabel = "RepositoryPath";
 
         /// <summary>
-        /// Label of attribute <see cref="OldCommitID"/> in the configuration file.
-        /// </summary>
-        private const string oldCommitIDLabel = "OldCommitID";
-
-        /// <summary>
         /// Label of attribute <see cref="NewCommitID"/> in the configuration file.
         /// </summary>
         private const string newCommitIDLabel = "NewCommitID";
@@ -220,16 +201,14 @@ namespace SEE.GraphProviders
         {
             Dictionary<string, bool> pathGlobbing = string.IsNullOrEmpty(PathGlobbing.ToString()) ? null : PathGlobbing;
             writer.Save(pathGlobbing, pathGlobbingLabel);
-            writer.Save(OldCommitID, oldCommitIDLabel);
-            writer.Save(NewCommitID, newCommitIDLabel);
+            writer.Save(CommitID, newCommitIDLabel);
             RepositoryPath.Save(writer, repositoryPathLabel);
         }
 
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
             ConfigIO.Restore(attributes, pathGlobbingLabel, ref PathGlobbing);
-            ConfigIO.Restore(attributes, oldCommitIDLabel, ref OldCommitID);
-            ConfigIO.Restore(attributes, newCommitIDLabel, ref NewCommitID);
+            ConfigIO.Restore(attributes, newCommitIDLabel, ref CommitID);
             RepositoryPath.Restore(attributes, repositoryPathLabel);
         }
         /// <summary>
@@ -325,139 +304,6 @@ namespace SEE.GraphProviders
             Node child = NewNode(graph, id, type, name, length);
             parent.AddChild(child);
             return child;
-        }
-
-        /// <summary>
-        /// Calculates the number of lines of code added and deleted for each file changed between two commits and adds them as metrics to <paramref name="graph"/>.
-        /// <param name="graph">Graph where to add the metrics</param>
-        /// <param name="repositoryPath">Path of the repository</param>
-        /// <param name="oldCommit">Commit hash of the older Commit</param>
-        /// <param name="newCommit">Commit hash of the newer Commit</param>
-        protected static void AddLineofCodeChurnMetric(Graph graph, String repositoryPath, String oldCommit, String newCommit)
-        {
-            using (var repo = new Repository(repositoryPath))
-            {
-                var commit1 = repo.Lookup<Commit>(oldCommit);
-                var commit2 = repo.Lookup<Commit>(newCommit);
-
-                var changes = repo.Diff.Compare<Patch>(commit1.Tree, commit2.Tree);
-
-                foreach (var change in changes)
-                {
-                    foreach (var node in graph.Nodes())
-                    {
-                        if (node.ID.Replace('\\', '/') == change.Path)
-                        {
-                            node.SetInt("Lines Added", change.LinesAdded);
-                            node.SetInt("Lines Deleted", change.LinesDeleted);
-                        }
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Calculates the number of unique developers who contributed to each file for each file changed between two commits and adds it as a metric to <paramref name="graph"/>
-        /// </summary>
-        /// <param name="graph">Graph where to add the metrics</param>
-        /// <param name="repositoryPath">Path of the repository</param>
-        /// <param name="oldCommit">Commit hash of the older Commit</param>
-        /// <param name="newCommit">Commit hash of the newer Commit</param>
-        protected static void AddNumberofDevelopersMetric(Graph graph, String repositoryPath, String oldCommit, String newCommit)
-        {
-            using (var repo = new Repository(repositoryPath))
-            {
-                var commit1 = repo.Lookup<Commit>(oldCommit);
-                var commit2 = repo.Lookup<Commit>(newCommit);
-
-                var changes = repo.Diff.Compare<Patch>(commit1.Tree, commit2.Tree);
-
-                Dictionary<string, HashSet<string>> fileAuthors = new Dictionary<string, HashSet<string>>();
-
-                foreach (var change in changes)
-                {
-                    string filePath = change.Path;
-
-                    HashSet<string> authors = new HashSet<string>();
-
-                    foreach (LogEntry commitLogEntry in repo.Commits.QueryBy(filePath))
-                    {
-                        Commit commit = commitLogEntry.Commit;
-                        authors.Add(commit.Author.Name);
-                    }
-
-                    if (fileAuthors.ContainsKey(filePath))
-                    {
-                        fileAuthors[filePath].UnionWith(authors);
-                    }
-                    else
-                    {
-                        fileAuthors[filePath] = authors;
-                    }
-                }
-                foreach (var entry in fileAuthors)
-                {
-                    foreach (var node in graph.Nodes())
-                    {
-
-                        if (node.ID.Replace('\\', '/') == entry.Key)
-                        {
-                            node.SetInt("Number of Developers", entry.Value.Count);
-                        }
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Calculates the number of times each file was changed for each file changed between two commits and adds it as a metric to <paramref name="graph"/>
-        /// </summary>
-        /// <param name="graph">Graph where to add the metrics</param>
-        /// <param name="repositoryPath">Path of the repository</param>
-        /// <param name="oldCommit">Commit hash of the older Commit</param>
-        /// <param name="newCommit">Commit hash of the newer Commit</param>
-        protected static void AddCommitFrequencyMetric(Graph graph, String repositoryPath, String oldCommit, String newCommit)
-        {
-            using (var repo = new Repository(repositoryPath))
-            {
-                var commit1 = repo.Lookup<Commit>(oldCommit);
-                var commit2 = repo.Lookup<Commit>(newCommit);
-
-                var commitsBetween = repo.Commits.QueryBy(new CommitFilter
-                {
-                    IncludeReachableFrom = commit2,
-                    ExcludeReachableFrom = commit1
-                });
-
-                Dictionary<string, int> fileCommitCounts = new Dictionary<string, int>();
-
-                foreach (var commit in commitsBetween)
-                {
-                    foreach (var parent in commit.Parents)
-                    {
-                        var changes = repo.Diff.Compare<TreeChanges>(parent.Tree, commit.Tree);
-                        foreach (var change in changes)
-                        {
-                            var filePath = change.Path;
-                            if (fileCommitCounts.ContainsKey(filePath))
-                                fileCommitCounts[filePath]++;
-                            else
-                                fileCommitCounts.Add(filePath, 1);
-                        }
-                    }
-                }
-
-                foreach (var entry in fileCommitCounts.OrderByDescending(x => x.Value))
-                {
-                    foreach (var node in graph.Nodes())
-                    {
-                        if (node.ID.Replace('\\', '/') == entry.Key)
-                        {
-                            node.SetInt("Commit Frequency", entry.Value);
-                        }
-                    }
-                }
-            }
         }
 
         /// <summary>
