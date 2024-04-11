@@ -40135,6 +40135,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1654884164}
     m_Modifications:
+    - target: {fileID: 1385307744840649191, guid: f2d7a76992d23fc4a87b3421d0b077d4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 1615085233621451865, guid: f2d7a76992d23fc4a87b3421d0b077d4,
         type: 3}
       propertyPath: m_Size.z
@@ -40209,6 +40214,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Double Door
+      objectReference: {fileID: 0}
+    - target: {fileID: 8868810850202492932, guid: f2d7a76992d23fc4a87b3421d0b077d4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
