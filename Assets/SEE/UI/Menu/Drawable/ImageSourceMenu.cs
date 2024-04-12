@@ -3,7 +3,7 @@ using SEE.Game.Drawable;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
     /// This class provides a menu, with which the player can select 

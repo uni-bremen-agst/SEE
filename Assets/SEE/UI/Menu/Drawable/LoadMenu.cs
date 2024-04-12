@@ -5,7 +5,7 @@ using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SEE.Game.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
     /// The load menu for <see cref="DrawableType"/> objects

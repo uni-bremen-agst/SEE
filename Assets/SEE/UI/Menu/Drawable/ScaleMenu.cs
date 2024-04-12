@@ -1,12 +1,12 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
-using SEE.Game.UI.Drawable;
 using SEE.Net.Actions.Drawable;
+using SEE.UI.Drawable;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SEE.Game.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
     /// The class for the scale menu. It delievers a instance.
@@ -114,7 +114,7 @@ namespace SEE.Game.UI.Menu.Drawable
             yScale.AssignValue(objToScale.transform.localScale.y);
             yScale.onValueChanged.AddListener(yScale =>
             {
-                Vector3 newScale = new (xScale.GetValue(), yScale, 1);
+                Vector3 newScale = new(xScale.GetValue(), yScale, 1);
                 GameScaler.SetScale(objToScale, newScale);
                 GameObject drawable = GameFinder.GetDrawable(objToScale);
                 string drawableParent = GameFinder.GetDrawableParentName(drawable);

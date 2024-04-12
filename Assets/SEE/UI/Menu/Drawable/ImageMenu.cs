@@ -1,14 +1,14 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.Game.UI.Drawable;
 using SEE.Net.Actions.Drawable;
+using SEE.UI.Drawable;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace SEE.Game.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
     /// This class provides a menu for editing an image.
@@ -136,7 +136,7 @@ namespace SEE.Game.UI.Menu.Drawable
         /// <param name="imageConf">The configuration which holds the new values.</param>
         /// <param name="drawable">The drawable on which the image is displayed</param>
         /// <param name="drawableParentName">The id of the drawable parent</param>
-        private static void InitMirrorSwitch(GameObject imageObj, ImageConf imageConf, 
+        private static void InitMirrorSwitch(GameObject imageObj, ImageConf imageConf,
             GameObject drawable, string drawableParentName)
         {
             /// Removes the old handler.

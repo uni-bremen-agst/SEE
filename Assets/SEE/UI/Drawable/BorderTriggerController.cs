@@ -1,10 +1,11 @@
-﻿using SEE.Game.Drawable;
+﻿using SEE.Game;
+using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Net.Actions.Drawable;
 using UnityEngine;
 
-namespace SEE.Game.UI.Drawable
+namespace SEE.UI.Drawable
 {
     /// <summary>
     /// The border trigger controller ensures that the 
@@ -20,7 +21,7 @@ namespace SEE.Game.UI.Drawable
         /// <param name="other">The object that causes the collision.</param>
         private void OnTriggerStay(Collider other)
         {
-            if (Tags.DrawableTypes.Contains(other.gameObject.tag) 
+            if (Tags.DrawableTypes.Contains(other.gameObject.tag)
                 && GameFinder.GetHighestParent(gameObject)
                     .Equals(GameFinder.GetHighestParent(other.gameObject)))
             {
@@ -37,8 +38,8 @@ namespace SEE.Game.UI.Drawable
                     /// A Rigidbody is only assigned when the object needs to be moved, rotated, or scaled.
                     foreach (Rigidbody body in bodys)
                     {
-                        if (body.gameObject == other.gameObject 
-                            || valueHolder.GetAllChildren().ContainsKey(body.gameObject) 
+                        if (body.gameObject == other.gameObject
+                            || valueHolder.GetAllChildren().ContainsKey(body.gameObject)
                             || valueHolder.GetAllParentAncestors().Contains(body.gameObject))
                         {
                             MoveBack(body.gameObject, drawable, drawableParentName);

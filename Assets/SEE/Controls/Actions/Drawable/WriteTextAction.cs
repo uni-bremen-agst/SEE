@@ -1,14 +1,15 @@
 ﻿using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.Game.UI.Drawable;
-using SEE.Game.UI.Menu.Drawable;
-using SEE.Game.UI.Notification;
-using SEE.Game.UI.PropertyDialog.Drawable;
+using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
+using SEE.UI.Drawable;
+using SEE.UI.Menu.Drawable;
+using SEE.UI.PropertyDialog.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -187,7 +188,7 @@ namespace SEE.Controls.Actions.Drawable
                         TextConf.GetText(textObj)).Execute();
                     memento = new Memento(drawable, TextConf.GetText(textObj));
                     GameTexter.RefreshMeshCollider(textObj);
-                    currentState = ReversibleAction.Progress.Completed;
+                    CurrentState = IReversibleAction.Progress.Completed;
                     return true;
                 }
                 else
@@ -243,7 +244,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="WriteTextAction"/></returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new WriteTextAction();
         }
@@ -253,7 +254,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
         /// <returns>new instance of <see cref="WriteTextAction"/></returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }

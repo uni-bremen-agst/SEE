@@ -2,13 +2,13 @@
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SEE.Game.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
     /// This class provides the node kind selection menu for the mind map.

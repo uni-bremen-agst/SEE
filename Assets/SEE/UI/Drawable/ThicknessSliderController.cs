@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SEE.Game.UI.Drawable
+namespace SEE.UI.Drawable
 {
     /// <summary>
     /// Provides the controller for the line thickness.

@@ -1,9 +1,9 @@
 ﻿using SEE.Controls.Actions;
 using SEE.Controls.Actions.Drawable;
-using SEE.Game.UI.Menu.Drawable;
+using SEE.UI.Menu.Drawable;
 using UnityEngine;
 
-namespace SEE.Game.UI.Drawable
+namespace SEE.UI.Drawable
 {
     /// <summary>
     /// This class ensures that the color picker menu is hidden when an action state change occurs. 

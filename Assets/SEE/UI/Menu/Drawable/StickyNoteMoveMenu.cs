@@ -1,12 +1,12 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
-using SEE.Game.UI.Drawable;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
+using SEE.UI.Drawable;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
     /// Provides the move menus for the sticky notes.

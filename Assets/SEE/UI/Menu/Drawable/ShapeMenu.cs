@@ -1,6 +1,6 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
-using SEE.Game.UI.Drawable;
+using SEE.UI.Drawable;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
@@ -8,7 +8,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using static SEE.Game.Drawable.ActionHelpers.ShapePointsCalculator;
 
-namespace SEE.Game.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
     /// The class for the shape menu. It delievers a instance.

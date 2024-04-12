@@ -1,11 +1,11 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.Utils;
 using UnityEngine;
 using static SEE.Controls.Actions.Drawable.StickyNoteAction;
 
-namespace SEE.Game.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
     /// This class provides a menu, with which the player can select 

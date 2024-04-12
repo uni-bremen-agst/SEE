@@ -1,14 +1,15 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.Game.UI.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.UI.Drawable;
+using SEE.Game;
 
-namespace SEE.Game.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
     /// This class provides the move menu for drawable type objects.
@@ -68,9 +69,9 @@ namespace SEE.Game.UI.Menu.Drawable
                 {
                     moveByMouseManager.isOn = false;
                     moveByMouseManager.UpdateUI();
-                    newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, KeyCode.LeftArrow, 
+                    newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, KeyCode.LeftArrow,
                         speedUpManager.isOn, includeChildren);
-                    new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition, 
+                    new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition,
                         includeChildren).Execute();
                 }, true);
 
@@ -80,9 +81,9 @@ namespace SEE.Game.UI.Menu.Drawable
                 {
                     moveByMouseManager.isOn = false;
                     moveByMouseManager.UpdateUI();
-                    newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, KeyCode.RightArrow, 
+                    newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, KeyCode.RightArrow,
                         speedUpManager.isOn, includeChildren);
-                    new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition, 
+                    new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition,
                         includeChildren).Execute();
                 }, true);
 
@@ -92,9 +93,9 @@ namespace SEE.Game.UI.Menu.Drawable
                 {
                     moveByMouseManager.isOn = false;
                     moveByMouseManager.UpdateUI();
-                    newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, KeyCode.UpArrow, 
+                    newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, KeyCode.UpArrow,
                         speedUpManager.isOn, includeChildren);
-                    new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition, 
+                    new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition,
                         includeChildren).Execute();
                 }, true);
 
@@ -104,9 +105,9 @@ namespace SEE.Game.UI.Menu.Drawable
                 {
                     moveByMouseManager.isOn = false;
                     moveByMouseManager.UpdateUI();
-                    newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, KeyCode.DownArrow, 
+                    newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, KeyCode.DownArrow,
                         speedUpManager.isOn, includeChildren);
-                    new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition, 
+                    new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition,
                         includeChildren).Execute();
                 }, true);
 

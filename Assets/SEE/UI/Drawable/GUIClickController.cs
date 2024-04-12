@@ -2,7 +2,7 @@
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
-namespace SEE.Game.UI.Drawable
+namespace SEE.UI.Drawable
 {
     /// <summary>
     /// This class provides a controller for buttons, 

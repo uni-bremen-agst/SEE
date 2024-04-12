@@ -4,6 +4,7 @@ using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
+using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -104,7 +105,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// This block completes the action.
                 if (Input.GetMouseButtonUp(0) && isActive)
                 {
-                    currentState = ReversibleAction.Progress.Completed;
+                    CurrentState = IReversibleAction.Progress.Completed;
                     return true;
                 }
                 return false;
@@ -160,7 +161,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="LinePointEraseAction"/></returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new LinePointEraseAction();
         }
@@ -170,7 +171,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
         /// <returns>new instance of <see cref="LinePointEraseAction"/></returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }

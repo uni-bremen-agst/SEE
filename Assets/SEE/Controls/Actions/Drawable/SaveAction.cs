@@ -2,15 +2,17 @@
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.Game.UI.Drawable;
-using SEE.Game.UI.Menu.Drawable;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.GO;
+using SEE.UI.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.Events;
+using SEE.UI.Menu.Drawable;
+using SEE.Utils.Paths;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -259,7 +261,7 @@ namespace SEE.Controls.Actions.Drawable
                     DrawableConfigManager.SaveDrawable(memento.drawables[0].GetDrawable(), memento.filePath);
                     ShowNotification.Info("Saved!",
                             "The selected drawable has been successfully saved to the file " + filePath);
-                    currentState = ReversibleAction.Progress.Completed;
+                    CurrentState = IReversibleAction.Progress.Completed;
                     result = true;
                     break;
                 case SaveState.More:
@@ -281,7 +283,7 @@ namespace SEE.Controls.Actions.Drawable
                     }
                     ShowNotification.Info("Saved!",
                             chosen + " drawables have been successfully saved to the file " + filePath);
-                    currentState = ReversibleAction.Progress.Completed;
+                    CurrentState = IReversibleAction.Progress.Completed;
                     result = true;
                     break;
             }
@@ -323,7 +325,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="SaveAction"/></returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new SaveAction();
         }
@@ -333,7 +335,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
         /// <returns>new instance of <see cref="SaveAction"/></returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }

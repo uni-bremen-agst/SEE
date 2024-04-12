@@ -1,9 +1,9 @@
 ﻿using SEE.Controls;
-using SEE.Game.UI.PropertyDialog.HolisticMetrics;
+using SEE.UI.PropertyDialog.HolisticMetrics;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SEE.Game.UI.PropertyDialog.Drawable
+namespace SEE.UI.PropertyDialog.Drawable
 {
     /// <summary>
     /// This class manages the dialog for adding/editing a text drawable type.
@@ -37,33 +37,33 @@ namespace SEE.Game.UI.PropertyDialog.Drawable
             }
 
             /// Creates the dialog.
-            dialog = new GameObject("Write/Edit Text dialog");
-            PropertyGroup group = dialog.AddComponent<PropertyGroup>();
+            Dialog = new GameObject("Write/Edit Text dialog");
+            PropertyGroup group = Dialog.AddComponent<PropertyGroup>();
             group.Name = "Write/Edit Text dialog";
 
             /// Adds a text property to the dialog.
-            textProperty = dialog.AddComponent<StringProperty>();
+            textProperty = Dialog.AddComponent<StringProperty>();
             textProperty.Name = "Text";
             textProperty.Description = "Write or edit the text that should be transmit";
             if (text != "")
             {
                 textProperty.Value = text;
             }
-            
+
             group.AddProperty(textProperty);
 
             /// Adds the property dialog to the dialog.
-            propertyDialog = dialog.AddComponent<PropertyDialog>();
-            propertyDialog.Title = "Write/Edit Text";
-            propertyDialog.Description = "Write or edit the text; then hit OK button.";
-            propertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Document");
-            propertyDialog.AddGroup(group);
+            PropertyDialog = Dialog.AddComponent<PropertyDialog>();
+            PropertyDialog.Title = "Write/Edit Text";
+            PropertyDialog.Description = "Write or edit the text; then hit OK button.";
+            PropertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Document");
+            PropertyDialog.AddGroup(group);
 
-            propertyDialog.OnConfirm.AddListener(TransmitText);
-            propertyDialog.OnCancel.AddListener(Cancel);
+            PropertyDialog.OnConfirm.AddListener(TransmitText);
+            PropertyDialog.OnCancel.AddListener(Cancel);
 
             SEEInput.KeyboardShortcutsEnabled = false;
-            propertyDialog.DialogShouldBeShown = true;
+            PropertyDialog.DialogShouldBeShown = true;
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace SEE.Game.UI.PropertyDialog.Drawable
         /// </summary>
         private void TransmitText()
         {
-            gotInput = true;
+            GotInput = true;
             text = textProperty.Value;
             text = text.Replace("\\n", "\n");
             text = text.Replace("\\t", "\t");
@@ -91,9 +91,9 @@ namespace SEE.Game.UI.PropertyDialog.Drawable
         /// <returns><see cref="HolisticMetricsDialog.gotInput"/></returns>
         internal bool GetUserInput(out string textOut)
         {
-            if (gotInput)
+            if (GotInput)
             {
-                gotInput = false;
+                GotInput = false;
                 textOut = text;
                 return true;
             }

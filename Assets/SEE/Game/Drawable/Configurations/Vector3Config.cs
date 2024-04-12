@@ -1,4 +1,5 @@
 ﻿using SEE.Utils;
+using SEE.Utils.Config;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ namespace SEE.Game.Drawable.Configurations
     /// <summary>
     /// The configuration class for <see cref="Vector3"/>
     /// </summary>
-    public class Vector3Config : ConfigIO.PersistentConfigItem
+    public class Vector3Config : ConfigIO.IPersistentConfigItem
     {
         /// <summary>
         /// Is the Vector3 of the configuration. 

@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SEE.Game.UI.Drawable
+namespace SEE.UI.Drawable
 {
     /// <summary>
     /// The slider controller for the order in layer.

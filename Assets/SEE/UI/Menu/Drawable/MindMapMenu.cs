@@ -1,10 +1,10 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
     /// This class provides the mind map menu.

@@ -1,13 +1,14 @@
 ﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.Game.UI.Drawable;
-using SEE.Game.UI.Menu.Drawable;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
+using SEE.UI.Drawable;
+using SEE.UI.Menu.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -381,7 +382,7 @@ namespace SEE.Controls.Actions.Drawable
                     Destroyer.Destroy(selectedObj.GetComponent<CollisionController>());
                     memento = new Memento(selectedObj, GameFinder.GetDrawable(selectedObj),
                         selectedObj.name, oldScale, newScale);
-                    currentState = ReversibleAction.Progress.Completed;
+                    CurrentState = IReversibleAction.Progress.Completed;
                     return true;
                 }
             }
@@ -457,7 +458,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="ScaleAction"/></returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new ScaleAction();
         }
@@ -467,7 +468,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
         /// <returns>new instance of <see cref="ScaleAction"/></returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }

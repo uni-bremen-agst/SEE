@@ -2,16 +2,17 @@
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.Game.UI.Drawable;
-using SEE.Game.UI.Menu.Drawable;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
+using SEE.UI.Drawable;
+using SEE.UI.Menu.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
 using MoveNetAction = SEE.Net.Actions.Drawable.MoveNetAction;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -686,7 +687,7 @@ namespace SEE.Controls.Actions.Drawable
                         memento.selectedObject.name).Execute();
                     RotationMenu.Disable();
                     MoveMenu.Disable();
-                    currentState = ReversibleAction.Progress.Completed;
+                    CurrentState = IReversibleAction.Progress.Completed;
                     return true;
                 } else
                 {
@@ -814,7 +815,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="MoveRotatorAction"/></returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new MoveRotatorAction();
         }
@@ -824,7 +825,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
         /// <returns>new instance of <see cref="MoveRotatorAction"/></returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }

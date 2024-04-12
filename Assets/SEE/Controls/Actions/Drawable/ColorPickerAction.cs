@@ -1,9 +1,10 @@
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.Game.UI.Drawable;
-using SEE.Game.UI.Menu.Drawable;
+using SEE.UI.Drawable;
+using SEE.UI.Menu.Drawable;
 using SEE.Utils;
+using SEE.Utils.History;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -92,7 +93,7 @@ namespace SEE.Controls.Actions.Drawable
                         ValueHolder.currentSecondaryColor = pickedColor;
                     }
                     memento = new(oldChosenPrimaryColor, oldChosenSecondColor, pickedColor, pickForSecondColor);
-                    currentState = ReversibleAction.Progress.Completed;
+                    CurrentState = IReversibleAction.Progress.Completed;
                     return true;
                 }
             }
@@ -305,7 +306,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="ColorPickerAction"/></returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new ColorPickerAction();
         }
@@ -315,7 +316,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
         /// <returns>new instance of <see cref="ColorPickerAction"/></returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }

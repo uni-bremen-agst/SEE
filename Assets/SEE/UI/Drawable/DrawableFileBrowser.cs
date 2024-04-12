@@ -7,7 +7,7 @@ using UnityEngine;
 using static SEE.Controls.Actions.Drawable.LoadAction;
 using static SEE.Controls.Actions.Drawable.SaveAction;
 
-namespace SEE.Game.UI.Drawable
+namespace SEE.UI.Drawable
 {
     /// <summary>
     /// The file browser which will used in different drawable actions.

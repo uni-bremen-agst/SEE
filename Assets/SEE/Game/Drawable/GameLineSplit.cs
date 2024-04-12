@@ -1,5 +1,5 @@
 ﻿using SEE.Game.Drawable.Configurations;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,18 +1,17 @@
 ﻿using Michsky.UI.ModernUIPack;
-using RTG;
 using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.Game.UI.Drawable;
 using SEE.Net.Actions.Drawable;
+using SEE.UI.Drawable;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using static SEE.Game.Drawable.GameDrawer;
 
-namespace SEE.Game.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
     /// This class holds the instance for the line menu.
@@ -429,11 +428,12 @@ namespace SEE.Game.UI.Menu.Drawable
             }
 
             /// Creates the new action for changing the color kind on the selector.
-            colorKindAction = index => { 
+            colorKindAction = index =>
+            {
                 ValueHolder.currentColorKind = GetColorKinds(true)[index];
 
                 /// Set the secondary color when it is transparent.
-                if (ValueHolder.currentColorKind != ColorKind.Monochrome 
+                if (ValueHolder.currentColorKind != ColorKind.Monochrome
                     && ValueHolder.currentSecondaryColor == Color.clear)
                 {
                     ValueHolder.currentSecondaryColor = ValueHolder.currentPrimaryColor;
@@ -779,7 +779,7 @@ namespace SEE.Game.UI.Menu.Drawable
         /// <param name="lineHolder">The configuration which holds the changes.</param>
         /// <param name="drawable">The drawable on which the line is displayed.</param>
         /// <param name="drawableParentName">The parent id of the drawable.</param>
-        private static void SetUpOutlineThicknessSliderForEditing(GameObject selectedLine, LineRenderer renderer, 
+        private static void SetUpOutlineThicknessSliderForEditing(GameObject selectedLine, LineRenderer renderer,
             LineConf lineHolder, GameObject drawable, string drawableParentName)
         {
             ThicknessSliderController thicknessSlider = instance.GetComponentInChildren<ThicknessSliderController>();
@@ -857,7 +857,7 @@ namespace SEE.Game.UI.Menu.Drawable
                 lineHolder.loop = false;
                 new EditLineLoopNetAction(drawable.name, drawableParentName, selectedLine.name, false).Execute();
             });
-            
+
             /// Update the switch to the current value.
             loopManager.isOn = lineHolder.loop;
             /// Updates the switch.

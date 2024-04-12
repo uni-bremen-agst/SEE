@@ -2,12 +2,13 @@
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.Game.UI.Menu.Drawable;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
+using SEE.UI.Menu.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -295,7 +296,7 @@ namespace SEE.Controls.Actions.Drawable
                 DrawableConfig config = DrawableConfigManager.GetDrawableConfig(GameFinder.GetDrawable(stickyNote));
                 new StickyNoteSpawnNetAction(config).Execute();
                 memento = new(config, selectedAction);
-                currentState = ReversibleAction.Progress.Completed;
+                CurrentState = IReversibleAction.Progress.Completed;
                 return true;
             }
             return false;
@@ -407,7 +408,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     collider.enabled = true;
                 }
-                currentState = ReversibleAction.Progress.Completed;
+                CurrentState = IReversibleAction.Progress.Completed;
                 return true;
             }
             return false;
@@ -606,7 +607,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 memento.changedConfig.Scale = stickyNote.transform.localScale;
                 memento.changedConfig.Rotation = GameFinder.GetHighestParent(stickyNote).transform.eulerAngles;
-                currentState = ReversibleAction.Progress.Completed;
+                CurrentState = IReversibleAction.Progress.Completed;
                 return true;
             }
             return false;
@@ -676,7 +677,7 @@ namespace SEE.Controls.Actions.Drawable
                 if (!CheckEquals(memento.originalConfig, memento.changedConfig))
                 {
                     finish = true;
-                    currentState = ReversibleAction.Progress.Completed;
+                    CurrentState = IReversibleAction.Progress.Completed;
                     return EditReturnState.True;
                 }
             }
@@ -888,7 +889,7 @@ namespace SEE.Controls.Actions.Drawable
                     memento = new(DrawableConfigManager.GetDrawableConfig(drawable), selectedAction);
                     new StickyNoteDeleterNetAction(GameFinder.GetHighestParent(drawable).name).Execute();
                     Destroyer.Destroy(GameFinder.GetHighestParent(drawable));
-                    currentState = ReversibleAction.Progress.Completed;
+                    CurrentState = IReversibleAction.Progress.Completed;
                     return true;
                 }
                 else
@@ -1009,7 +1010,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="StickyNoteAction"/></returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new StickyNoteAction();
         }
@@ -1019,7 +1020,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
         /// <returns>new instance of <see cref="StickyNoteAction"/></returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }

@@ -2,10 +2,10 @@
 using SEE.Controls;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.Game.UI.Drawable;
-using SEE.Game.UI.Notification;
-using SEE.Game.UI.PropertyDialog.Drawable;
+using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
+using SEE.UI.Drawable;
+using SEE.UI.PropertyDialog.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +15,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using TextConf = SEE.Game.Drawable.Configurations.TextConf;
 
-namespace SEE.Game.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
     /// This class holds the instance for the text menu.
@@ -169,7 +169,7 @@ namespace SEE.Game.UI.Menu.Drawable
         /// <summary>
         /// The color block for the colors if a font style button is selected.
         /// </summary>
-        private static ColorBlock selectedBlock = new ();
+        private static ColorBlock selectedBlock = new();
 
         /// <summary>
         /// The game object of the layer with the edit text button.
@@ -240,7 +240,7 @@ namespace SEE.Game.UI.Menu.Drawable
         /// The input field with their up and down button for the font size.
         /// </summary>
         private static InputFieldWithButtons fontSizeInput;
-#endregion
+        #endregion
 
         /// <summary>
         /// The init constructor that create the instance for the text menu.
@@ -311,7 +311,7 @@ namespace SEE.Game.UI.Menu.Drawable
             /// Initialize button colors for not selected and selected.
             notSelectedBlock = boldBtn.colors;
             selectedBlock = notSelectedBlock;
-            selectedBlock.normalColor = selectedBlock.selectedColor = selectedBlock.disabledColor = 
+            selectedBlock.normalColor = selectedBlock.selectedColor = selectedBlock.disabledColor =
                 selectedBlock.highlightedColor = selectedBlock.pressedColor = Color.gray;
 
             /// Initialize the font color button and adds an exclusion mechanism with the outline color button.
@@ -429,7 +429,7 @@ namespace SEE.Game.UI.Menu.Drawable
         /// <param name="color">The inital color for the hsv color picker.</param>
         /// <param name="reset">Specifies whether the menu should be reset to its initial state.</param>
         /// <param name="showEditMode">Specifies whether the menu should be opened for edit mode. Otherwise it will be opened for the WriteTextAction</param>
-        private static void EnableTextMenu(UnityAction<Color> colorAction, Color color, bool reset = true, 
+        private static void EnableTextMenu(UnityAction<Color> colorAction, Color color, bool reset = true,
             bool showEditMode = false)
         {
             /// Resets the handlers, if desired (depending on <paramref name="reset").
@@ -475,7 +475,7 @@ namespace SEE.Game.UI.Menu.Drawable
         {
             /// Enables the text menu in writing mode.
             EnableTextMenu(color => ValueHolder.currentPrimaryColor = color, ValueHolder.currentPrimaryColor, true);
-            
+
             /// Disables the return button.
             instance.transform.Find("ReturnBtn").gameObject.SetActive(false);
 
@@ -492,7 +492,7 @@ namespace SEE.Game.UI.Menu.Drawable
 
             /// Adds the handler for the outline thickness slider.
             /// It saves the changes in the global value for the outline thickness <see cref="ValueHolder.currentOutlineThickness"/>.
-            AssignOutlineThickness(thickness => ValueHolder.currentOutlineThickness = thickness, 
+            AssignOutlineThickness(thickness => ValueHolder.currentOutlineThickness = thickness,
                 ValueHolder.currentOutlineThickness);
 
             /// Disables the outline color.
@@ -518,7 +518,7 @@ namespace SEE.Game.UI.Menu.Drawable
         /// </summary>
         private static void AssignOutlineThicknessForWriting()
         {
-            
+
             outlineColorBMB.clickEvent.AddListener(() =>
             {
                 /// If the <see cref="GameDrawer.LineKind"/> was <see cref="GameDrawer.LineKind.Solid"/> before, 
@@ -615,7 +615,7 @@ namespace SEE.Game.UI.Menu.Drawable
                         {
                             /// The size of the new text is calculated, and the object is adjusted accordingly.
                             TextMeshPro tmp = selectedText.GetComponent<TextMeshPro>();
-                            tmp.rectTransform.sizeDelta = GameTexter.CalculateWidthAndHeight(textOut, tmp.font, 
+                            tmp.rectTransform.sizeDelta = GameTexter.CalculateWidthAndHeight(textOut, tmp.font,
                                 textHolder.fontSize, textHolder.fontStyles);
                             GameEdit.ChangeText(selectedText, textOut);
                             textHolder.text = textOut;
@@ -673,7 +673,7 @@ namespace SEE.Game.UI.Menu.Drawable
         /// <param name="textHolder">The configuration which holds the changes.</param>
         /// <param name="drawable">The drawable on which the text is displayed</param>
         /// <param name="drawableParentName">The id of the drawable parent</param>
-        private static void AddFontColorButtonForEdit(GameObject selectedText, TextConf textHolder, 
+        private static void AddFontColorButtonForEdit(GameObject selectedText, TextConf textHolder,
             GameObject drawable, string drawableParentName)
         {
             fontColorBMB.clickEvent.AddListener(() =>
@@ -787,7 +787,7 @@ namespace SEE.Game.UI.Menu.Drawable
         public static void AssignOutlineStatus(GameObject selectedText, TextConf textHolder,
             GameObject drawable, string drawableParentName)
         {
-            outlineSwitch.OffEvents.AddListener(()=>
+            outlineSwitch.OffEvents.AddListener(() =>
             {
                 GameTexter.ChangeOutlineStatus(selectedText, false);
                 textHolder.outlineStatus = false;
@@ -800,7 +800,7 @@ namespace SEE.Game.UI.Menu.Drawable
                 textHolder.outlineStatus = true;
                 /// Changes the outline color if the outline was clear.
                 TextMeshPro tmp = selectedText.GetComponent<TextMeshPro>();
-                if (textHolder.outlineColor != tmp.outlineColor 
+                if (textHolder.outlineColor != tmp.outlineColor
                     && tmp.outlineColor == Color.clear)
                 {
                     GameEdit.ChangeOutlineColor(selectedText, textHolder.outlineColor);

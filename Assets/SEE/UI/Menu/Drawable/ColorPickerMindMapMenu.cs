@@ -5,7 +5,7 @@ using SEE.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SEE.Game.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
     /// This class provides a menu for the color picking of mind map nodes.

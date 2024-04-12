@@ -2,7 +2,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace SEE.Game.UI.Drawable
+namespace SEE.UI.Drawable
 {
     /// <summary>
     /// Locks the shortcuts as long as input is entered in an input field. 

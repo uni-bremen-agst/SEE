@@ -1,9 +1,10 @@
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.Game.UI.Menu.Drawable;
 using SEE.Net.Actions.Drawable;
+using SEE.UI.Menu.Drawable;
 using SEE.Utils;
+using SEE.Utils.History;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -236,7 +237,7 @@ namespace SEE.Controls.Actions.Drawable
                     memento = new Memento(drawable, currentLine);
                     new DrawNetAction(memento.drawable.ID, memento.drawable.ParentID, 
                         currentLine).Execute();
-                    currentState = ReversibleAction.Progress.Completed;
+                    CurrentState = IReversibleAction.Progress.Completed;
                     return true;
                 }
                 else
@@ -287,7 +288,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="DrawFreehandAction"/></returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new DrawFreehandAction();
         }
@@ -297,7 +298,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
         /// <returns>new instance of <see cref="DrawFreehandAction"/></returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }

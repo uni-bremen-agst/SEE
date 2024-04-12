@@ -1,8 +1,8 @@
 ﻿using SEE.Controls;
-using SEE.Game.UI.PropertyDialog.HolisticMetrics;
+using SEE.UI.PropertyDialog.HolisticMetrics;
 using UnityEngine;
 
-namespace SEE.Game.UI.PropertyDialog.Drawable
+namespace SEE.UI.PropertyDialog.Drawable
 {
     /// <summary>
     /// This class manages the dialog for adding and downloading an image from web.
@@ -34,35 +34,35 @@ namespace SEE.Game.UI.PropertyDialog.Drawable
         /// </summary>
         internal void Open()
         {
-            dialog = new GameObject("Download image from web dialog");
-            PropertyGroup group = dialog.AddComponent<PropertyGroup>();
+            Dialog = new GameObject("Download image from web dialog");
+            PropertyGroup group = Dialog.AddComponent<PropertyGroup>();
             group.Name = "Web image dialog";
 
-            urlTextProperty = dialog.AddComponent<StringProperty>();
+            urlTextProperty = Dialog.AddComponent<StringProperty>();
             urlTextProperty.Name = "URL";
             urlTextProperty.Description = "Insert the url adress of the image";
 
             group.AddProperty(urlTextProperty);
 
-            fileNameTextProperty = dialog.AddComponent<StringProperty>();
+            fileNameTextProperty = Dialog.AddComponent<StringProperty>();
             fileNameTextProperty.Name = "Filename";
             fileNameTextProperty.Description = "Insert a desired filename for the image to be saved. " +
                 "If the name is already in use, a suffix will be added.";
 
             group.AddProperty(fileNameTextProperty);
 
-            propertyDialog = dialog.AddComponent<PropertyDialog>();
-            propertyDialog.Title = "Download an image from web";
-            propertyDialog.Description = "Insert the url adress of the image and a desired filename; " +
+            PropertyDialog = Dialog.AddComponent<PropertyDialog>();
+            PropertyDialog.Title = "Download an image from web";
+            PropertyDialog.Description = "Insert the url adress of the image and a desired filename; " +
                 "then hit OK button.";
-            propertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Document");
-            propertyDialog.AddGroup(group);
+            PropertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Document");
+            PropertyDialog.AddGroup(group);
 
-            propertyDialog.OnConfirm.AddListener(TransmitText);
-            propertyDialog.OnCancel.AddListener(Cancel);
+            PropertyDialog.OnConfirm.AddListener(TransmitText);
+            PropertyDialog.OnCancel.AddListener(Cancel);
 
             SEEInput.KeyboardShortcutsEnabled = false;
-            propertyDialog.DialogShouldBeShown = true;
+            PropertyDialog.DialogShouldBeShown = true;
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace SEE.Game.UI.PropertyDialog.Drawable
         /// </summary>
         private void TransmitText()
         {
-            gotInput = true;
+            GotInput = true;
             url = urlTextProperty.Value;
             fileName = fileNameTextProperty.Value;
             Close();
@@ -85,9 +85,9 @@ namespace SEE.Game.UI.PropertyDialog.Drawable
         /// <returns><see cref="HolisticMetricsDialog.gotInput"/></returns>
         internal bool GetUserInput(out string httpOut, out string fileNameOut)
         {
-            if (gotInput)
+            if (GotInput)
             {
-                gotInput = false;
+                GotInput = false;
                 httpOut = url;
                 fileNameOut = fileName;
                 return true;

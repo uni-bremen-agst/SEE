@@ -1,6 +1,6 @@
 ﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using System;
 using TMPro;
 using UnityEngine;

@@ -3,7 +3,7 @@ using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable.Configurations;
 using UnityEngine;
 
-namespace SEE.Game.UI.Drawable
+namespace SEE.UI.Drawable
 {
     /// <summary>
     /// This class ensures that the static attributes of an action will be resetted after a actionstate type change.

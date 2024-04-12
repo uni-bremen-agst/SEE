@@ -1,8 +1,9 @@
 ﻿using Michsky.UI.ModernUIPack;
+using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SEE.Game.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
     /// This class provides the parent selection menu for the mind map.
@@ -65,7 +66,7 @@ namespace SEE.Game.UI.Menu.Drawable
             List<GameObject> nodes = new();
             foreach (GameObject node in allNodes)
             {
-                if (node.GetComponent<MMNodeValueHolder>().GetNodeKind() != GameMindMap.NodeKind.Leaf 
+                if (node.GetComponent<MMNodeValueHolder>().GetNodeKind() != GameMindMap.NodeKind.Leaf
                     && node != addedNode)
                 {
                     nodes.Add(node);
@@ -113,7 +114,7 @@ namespace SEE.Game.UI.Menu.Drawable
         /// <param name="returnCall">The call which should be executed, if the return button is pressed.</param>
         /// <param name="cutCopyMode">Indicates that this method was called by CutCopyPaste Action</param>
         /// <returns>The instance of the menu. Can be null if the <see cref="DrawableType"/> isn't a <see cref="MindMapNodeConf"/></returns>
-        public static GameObject EnableForEditing(GameObject attachedObjects, GameObject addedNode, 
+        public static GameObject EnableForEditing(GameObject attachedObjects, GameObject addedNode,
             DrawableType valueHolder, UnityAction returnCall, bool cutCopyMode = false)
         {
             if (valueHolder is MindMapNodeConf newConf)
@@ -233,7 +234,7 @@ namespace SEE.Game.UI.Menu.Drawable
         {
             GameMindMap.ChangeParent(addedNode, chosenObject);
             newConf.parentNode = chosenObject.name;
-            new MindMapChangeParentNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
+            new MindMapChangeParentNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
                 newConf).Execute();
         }
 

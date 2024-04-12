@@ -1,7 +1,9 @@
 ﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.Utils;
+using SEE.Utils.Config;
+using SEE.Utils.Paths;
 using System;
 using System.Collections.Generic;
 using System.IO;

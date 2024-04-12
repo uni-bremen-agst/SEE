@@ -1,10 +1,10 @@
 ﻿using Michsky.UI.ModernUIPack;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SEE.Game.UI.Drawable
+namespace SEE.UI.Drawable
 {
     /// <summary>
     /// This class provides a controller for a combination 
@@ -100,7 +100,7 @@ namespace SEE.Game.UI.Drawable
         private void ValueChanged(string newValue)
         {
             float oldValue = value;
-            newValue = inputField.text.Replace(".",",");
+            newValue = inputField.text.Replace(".", ",");
             /// If the new value can't be parse in a float, then show a notification and
             /// set the default value.
             if (!float.TryParse(newValue, out value))
@@ -190,7 +190,7 @@ namespace SEE.Game.UI.Drawable
             /// Decrease by <see cref="upAndDownValue"/>.
             value -= upAndDownValue;
             value = (float)decimal.Round((decimal)value, 2);
-            
+
             /// If the minimum is undershot, set it to the minimum.
             if (value < minValue) { value = minValue; }
 

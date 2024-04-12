@@ -1,14 +1,15 @@
 ﻿using Michsky.UI.ModernUIPack;
+using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.Game.UI.Drawable;
 using SEE.Net.Actions.Drawable;
+using SEE.UI.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Game.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
     /// This class provides the rotation menu for drawable type objects.
@@ -97,10 +98,10 @@ namespace SEE.Game.UI.Menu.Drawable
                     includeChildren = true;
                     Vector3 newRotation = selectedObject.transform.localEulerAngles;
                     GameMoveRotator.SetRotate(selectedObject, oldRotation.z, false);
-                    new RotatorNetAction(drawable.name, drawableParentName, selectedObject.name, oldRotation.z, 
+                    new RotatorNetAction(drawable.name, drawableParentName, selectedObject.name, oldRotation.z,
                         false).Execute();
                     GameMoveRotator.SetRotate(selectedObject, newRotation.z, true);
-                    new RotatorNetAction(drawable.name, drawableParentName, selectedObject.name, newRotation.z, 
+                    new RotatorNetAction(drawable.name, drawableParentName, selectedObject.name, newRotation.z,
                         true).Execute();
                     changeSwitch = true;
                 });
@@ -115,10 +116,10 @@ namespace SEE.Game.UI.Menu.Drawable
                         {
                             (Vector3 pos, Vector3 rot) = pair.Value;
                             GameMoveRotator.SetPosition(pair.Key, pos, false);
-                            new MoveNetAction(drawable.name, drawableParentName, pair.Key.name, pos, 
+                            new MoveNetAction(drawable.name, drawableParentName, pair.Key.name, pos,
                                 false).Execute();
                             GameMoveRotator.SetRotate(pair.Key, rot.z, false);
-                            new RotatorNetAction(drawable.name, drawableParentName, pair.Key.name, rot.z, 
+                            new RotatorNetAction(drawable.name, drawableParentName, pair.Key.name, rot.z,
                                 false).Execute();
                         }
                     }
@@ -179,7 +180,7 @@ namespace SEE.Game.UI.Menu.Drawable
                 if (unequal)
                 {
                     GameMoveRotator.RotateObject(selectedObject, currentDirection, degreeToMove, includeChildren);
-                    new RotatorNetAction(drawable.name, drawableParentName, selectedObject.name, currentDirection, 
+                    new RotatorNetAction(drawable.name, drawableParentName, selectedObject.name, currentDirection,
                         degreeToMove, includeChildren).Execute();
                 }
             });

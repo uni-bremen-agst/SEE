@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SEE.Game.UI.Drawable
+namespace SEE.UI.Drawable
 {
     /// <summary>
     /// This class provides methods intended to assist menus.
@@ -45,7 +45,7 @@ namespace SEE.Game.UI.Drawable
             float diffHeight = oldHeight - newHeight;
 
             /// Calculates the new whole menu height.
-            menuTransform.sizeDelta = new Vector2(contentTransform.rect.width, 
+            menuTransform.sizeDelta = new Vector2(contentTransform.rect.width,
                 contentTransform.rect.height + draggerTransform.rect.height);
 
             /// It is necessary for the correct representation to update the parent and the position.

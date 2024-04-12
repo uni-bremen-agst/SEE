@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SEE.Game.UI.Drawable
+namespace SEE.UI.Drawable
 {
     /// <summary>
     /// A controller for a slider that used a float value.
@@ -85,7 +85,7 @@ namespace SEE.Game.UI.Drawable
             {
                 /// Does not normalize the value.
                 decimal value = (decimal)manager.mainSlider.value;
-                newValue = (float)Decimal.Round(value, decimalPlaces);
+                newValue = (float)decimal.Round(value, decimalPlaces);
             }
 
             /// If the slider should be centered.

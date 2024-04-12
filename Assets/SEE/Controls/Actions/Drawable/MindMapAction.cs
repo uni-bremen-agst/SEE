@@ -3,14 +3,15 @@ using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.Game.UI.Menu.Drawable;
-using SEE.Game.UI.Notification;
-using SEE.Game.UI.PropertyDialog.Drawable;
+using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
+using SEE.UI.Menu.Drawable;
+using SEE.UI.PropertyDialog.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
-using static SEE.Game.UI.Menu.Drawable.MindMapMenu;
+using static SEE.UI.Menu.Drawable.MindMapMenu;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -404,7 +405,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             memento = new(drawable, MindMapNodeConf.GetNodeConf(node), chosenOperation);
             new MindMapCreateNodeNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.conf).Execute();
-            currentState = ReversibleAction.Progress.Completed;
+            CurrentState = IReversibleAction.Progress.Completed;
             return true;
         }
 
@@ -503,7 +504,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="MindMapAction"/></returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new MindMapAction();
         }
@@ -513,7 +514,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
         /// <returns>new instance of <see cref="MindMapAction"/></returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }

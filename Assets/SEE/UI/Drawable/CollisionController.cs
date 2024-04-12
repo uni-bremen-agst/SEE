@@ -2,7 +2,7 @@
 using SEE.Game.Drawable.Configurations;
 using UnityEngine;
 
-namespace SEE.Game.UI.Drawable
+namespace SEE.UI.Drawable
 {
     /// <summary>
     /// The controller for collisions between 

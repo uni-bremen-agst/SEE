@@ -1,12 +1,12 @@
 ﻿using Michsky.UI.ModernUIPack;
 using RTG;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using System.Globalization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SEE.Game.UI.Drawable
+namespace SEE.UI.Drawable
 {
     /// <summary>
     /// The controller for the rotation slider.
@@ -68,7 +68,7 @@ namespace SEE.Game.UI.Drawable
         private void SliderChanged(float newValue)
         {
             newValue = manager.mainSlider.value;
-            if ((newValue % 1) == 0)
+            if (newValue % 1 == 0)
             {
                 inputField.text = newValue.ToString();
             }
@@ -108,10 +108,11 @@ namespace SEE.Game.UI.Drawable
         /// <param name="value">the value that should be assigned</param>
         public void AssignValue(float value)
         {
-            if ((value % 1) == 0)
+            if (value % 1 == 0)
             {
                 inputField.text = value.ToString();
-            } else
+            }
+            else
             {
                 inputField.text = value.ToString("F1");
             }

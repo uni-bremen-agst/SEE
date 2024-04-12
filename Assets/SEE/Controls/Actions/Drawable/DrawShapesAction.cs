@@ -2,14 +2,15 @@
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
-using SEE.Game.UI.Menu.Drawable;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
+using SEE.UI.Menu.Drawable;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -351,7 +352,7 @@ namespace SEE.Controls.Actions.Drawable
                 LineConf currentShape = LineConf.GetLine(shape);
                 memento = new Memento(drawable, currentShape);
                 new DrawNetAction(memento.drawable.ID, memento.drawable.ParentID, currentShape).Execute();
-                currentState = ReversibleAction.Progress.Completed;
+                CurrentState = IReversibleAction.Progress.Completed;
                 drawing = false;
                 return true;
             }
@@ -426,7 +427,7 @@ namespace SEE.Controls.Actions.Drawable
             LineConf currentShape = LineConf.GetLine(shape);
             memento = new Memento(drawable, currentShape);
             new DrawNetAction(memento.drawable.ID, memento.drawable.ParentID, currentShape).Execute();
-            currentState = ReversibleAction.Progress.Completed;
+            CurrentState = IReversibleAction.Progress.Completed;
             drawing = false;
         }
 
@@ -465,7 +466,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="DrawShapesAction"/></returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new DrawShapesAction();
         }
@@ -475,7 +476,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
         /// <returns>new instance of <see cref="DrawShapesAction"/></returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }

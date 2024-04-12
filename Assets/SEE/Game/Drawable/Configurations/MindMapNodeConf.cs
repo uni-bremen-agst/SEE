@@ -1,5 +1,6 @@
 ﻿using SEE.Game.Drawable.ValueHolders;
 using SEE.Utils;
+using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
 using UnityEngine;

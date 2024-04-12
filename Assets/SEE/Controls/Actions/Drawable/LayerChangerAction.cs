@@ -1,12 +1,13 @@
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.Game.UI.Drawable;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
+using SEE.UI.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -140,7 +141,7 @@ namespace SEE.Controls.Actions.Drawable
                 if ((Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1) ) && isInAction)
                 {
                     isInAction = false;
-                    currentState = ReversibleAction.Progress.Completed;
+                    CurrentState = IReversibleAction.Progress.Completed;
                     return true;
                 }
                 return false;
@@ -165,7 +166,7 @@ namespace SEE.Controls.Actions.Drawable
                             hittedObject, hittedObject.name, oldOrder, newOrder);
             new LayerChangerNetAction(memento.drawable.ID, memento.drawable.ParentID,
                 memento.obj.name, memento.state, memento.newOrder).Execute();
-            currentState = ReversibleAction.Progress.InProgress;
+            CurrentState = IReversibleAction.Progress.InProgress;
         }
 
         /// <summary>
@@ -186,7 +187,7 @@ namespace SEE.Controls.Actions.Drawable
                         hittedObject, hittedObject.name, oldOrder, newOrder);
             new LayerChangerNetAction(memento.drawable.ID, memento.drawable.ParentID,
                 memento.obj.name, memento.state, memento.newOrder).Execute();
-            currentState = ReversibleAction.Progress.InProgress;
+            CurrentState = IReversibleAction.Progress.InProgress;
         }
 
         /// <summary>
@@ -244,7 +245,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="LayerChangerAction"/></returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new LayerChangerAction();
         }
@@ -254,7 +255,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
         /// <returns>new instance of <see cref="LayerChangerAction"/></returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }

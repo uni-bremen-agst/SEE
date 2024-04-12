@@ -1,4 +1,4 @@
-﻿using SEE.Game.UI.Notification;
+﻿using SEE.UI.Notification;
 using SEE.Utils;
 using System.Collections;
 using UnityEngine;

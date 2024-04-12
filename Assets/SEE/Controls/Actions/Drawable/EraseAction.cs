@@ -4,6 +4,7 @@ using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
+using SEE.Utils.History;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -90,7 +91,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// Completes this action run.
                 if (Input.GetMouseButtonUp(0))
                 {
-                    currentState = ReversibleAction.Progress.Completed;
+                    CurrentState = IReversibleAction.Progress.Completed;
                     return true;
                 }
                 return false;
@@ -195,7 +196,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="EraseAction"/></returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new EraseAction();
         }
@@ -205,7 +206,7 @@ namespace SEE.Controls.Actions.Drawable
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
         /// <returns>new instance of <see cref="EraseAction"/></returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }

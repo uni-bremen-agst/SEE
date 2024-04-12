@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SEE.Game.UI.Drawable
+namespace SEE.UI.Drawable
 {
     /// <summary>
     /// This class holds the color preset list with a name.
@@ -14,30 +14,30 @@ namespace SEE.Game.UI.Drawable
     /// as well as loading and saving colors from the previous session.
     /// </summary>
     public static class ColorPresetManager
-{
-    /// <summary>
-    /// The dictionary that currently holds the color preset list.
-    /// </summary>
-    private static Dictionary<string, ColorPresetList> _presets = new();
-
-    /// <summary>
-    /// Adds the created color preset list to the dictionary and returned the list.
-    /// </summary>
-    /// <param name="colors">are the colors that should be load in the list.</param>
-    /// <param name="listId">is the name of the list.</param>
-    /// <returns>The preset list</returns>
-    public static ColorPresetList Get(Color[] colors, string listId = "loaded")
     {
-        ColorPresetList preset;
-        if (!_presets.TryGetValue(listId, out preset))
-        {
-            preset = new ColorPresetList(listId, colors.ToList());
-            _presets.Add(listId, preset);
-        }
+        /// <summary>
+        /// The dictionary that currently holds the color preset list.
+        /// </summary>
+        private static Dictionary<string, ColorPresetList> _presets = new();
 
-        return preset;
+        /// <summary>
+        /// Adds the created color preset list to the dictionary and returned the list.
+        /// </summary>
+        /// <param name="colors">are the colors that should be load in the list.</param>
+        /// <param name="listId">is the name of the list.</param>
+        /// <returns>The preset list</returns>
+        public static ColorPresetList Get(Color[] colors, string listId = "loaded")
+        {
+            ColorPresetList preset;
+            if (!_presets.TryGetValue(listId, out preset))
+            {
+                preset = new ColorPresetList(listId, colors.ToList());
+                _presets.Add(listId, preset);
+            }
+
+            return preset;
+        }
     }
-}
 
     /// <summary>
     /// This class holds the colors for the preset boxes.
