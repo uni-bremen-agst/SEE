@@ -10,6 +10,7 @@ namespace SEE.Utils.Paths
     /// <summary>
     /// Tests <see cref="DataPath"/>.
     /// </summary>
+    [Category("NonDeterministic")]
     internal class TestDataPath
     {
         /// <summary>
@@ -18,6 +19,32 @@ namespace SEE.Utils.Paths
         /// <returns>enumerator to continue</returns>
         [UnityTest]
         public IEnumerator LoadFromServer() =>
+            UniTask.ToCoroutine(async () =>
+            {
+                const string filename = "psnfss2e.pdf";
+                DataPath dataPath = new()
+                {
+                    Root = DataPath.RootKind.Url,
+                    Path = $"https://mirror.physik.tu-berlin.de/pub/CTAN/macros/latex/required/psnfss/{filename}"
+                };
+                Assert.AreEqual(DataPath.RootKind.Url, dataPath.Root);
+                using Stream stream = await dataPath.LoadAsync();
+                Debug.Log($"Content length in bytes: {stream.Length}\n");
+                using (FileStream fileStream = File.Create(filename))
+                {
+                    stream.Seek(0, SeekOrigin.Begin);
+                    Debug.Log($"Saving to {filename}.\n");
+                    await stream.CopyToAsync(fileStream);
+                }
+                FileIO.DeleteIfExists(filename);
+            });
+
+        /// <summary>
+        /// Test for downloading a file from our own backend server based on a URL.
+        /// </summary>
+        /// <returns>enumerator to continue</returns>
+        [UnityTest]
+        public IEnumerator LoadFromBackend() =>
             UniTask.ToCoroutine(async () =>
             {
                 const string filename = "psnfss2e.pdf";
