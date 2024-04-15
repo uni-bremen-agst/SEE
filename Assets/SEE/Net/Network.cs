@@ -693,7 +693,7 @@ namespace SEE.Net
         /// <param name="owner">ID of the owner</param>
         private void OnClientConnectedCallback(ulong owner)
         {
-            callbackToMenu(true, "You are connected to " + ServerAddress);
+            callbackToMenu?.Invoke(true, "You are connected to " + ServerAddress);
             callbackToMenu = null;
         }
 
