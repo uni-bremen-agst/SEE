@@ -168,7 +168,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Returns a <see cref="MetricWindow"/> showing the attributes of the given graph element.
+        /// Returns a <see cref="MetricWindow"/> showing the attributes of <paramref name="graphElementRef"/>.
         /// </summary>
         /// <param name="graphElementRef">The graph element to activate the metric window for</param>
         /// <returns>The <see cref="MetricWindow"/> object showing the attributes of the specified graph element.</returns>
