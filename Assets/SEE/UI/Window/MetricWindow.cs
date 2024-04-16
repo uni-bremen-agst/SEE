@@ -7,6 +7,7 @@ using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 
@@ -49,13 +50,18 @@ namespace SEE.UI.Window
         }
 
         /// <summary>
-        /// Searches for a specified string within an array of GameObject elements and activates or deactivates them based on the search results.
+        /// Searches for a specified string within <paramref name="elements"/>.
+        /// Activates or deactivates them based on the search results.
+        /// GameObjects are considered "active" when the search string has been found within their names.
         /// </summary>
         /// <param name="searchQuery"> string to search for </param>
         /// <param name="elements"> array of GameObjects to search in </param>
         private void InputSearchField(string searchQuery, GameObject[] elements)
         {
-            if (searchQuery.Length == 0)
+            //Remove Whitespaces
+            searchQuery = searchQuery.Replace(" ", "");
+            Debug.Log("searchQuery: " + searchQuery.Length);
+            if (String.IsNullOrEmpty(searchQuery))
             {
                 foreach (GameObject ele in elements)
                 {
