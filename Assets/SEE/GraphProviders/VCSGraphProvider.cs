@@ -114,16 +114,16 @@ namespace SEE.GraphProviders
                 IEnumerable<string> files;
                 if (includedFiles.Any() && !string.IsNullOrEmpty(includedFiles.First()))
                 {
-                    files = ListTree(tree).Where(path => includedFiles.Contains(Path.GetExtension(path)));
+                    files = ListTree(tree).Where(path => includedFiles.Contains(Path.GetExtension(path))).Take(200);
                 }
                 else if (excludedFiles.Any())
                 {
                     //files = repo.Index.Select(entry => entry.Path).Where(path => !excludedFiles.Contains(Path.GetExtension(path)));
-                    files = ListTree(tree).Where(path => !excludedFiles.Contains(Path.GetExtension(path)));
+                    files = ListTree(tree).Where(path => !excludedFiles.Contains(Path.GetExtension(path))).Take(200);
                 }
                 else
                 {
-                    files = ListTree(tree);
+                    files = ListTree(tree).Take(200);
                 }
 
                 // Build the graph structure.
@@ -140,11 +140,10 @@ namespace SEE.GraphProviders
                     {
                         BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(pathSegments[^1]));
                     }
-
-                    AddMcCabeMetric(graph, repo, commitID);
-                    AddHalsteadMetrics(graph, repo, commitID);
-                    AddLinesOfCodeMetric(graph, repo, commitID);
                 }
+                AddMcCabeMetric(graph, repo, commitID);
+                AddHalsteadMetrics(graph, repo, commitID);
+                AddLinesOfCodeMetric(graph, repo, commitID);
                 //TODO: Only for testing.
                 Debug.Log(graph.ToString());
             }
