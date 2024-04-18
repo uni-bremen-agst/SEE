@@ -362,7 +362,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Postcondition: MapsTo() should return null for every node contained
         /// within the implementation graph
         /// </summary>
-        public void ResetMapping()
+        public void ResetMapping(bool useCaching = false)
         {
             List<Node> nodes = this.explicitMapsToTable.Values.ToList();
             Node node;
@@ -372,7 +372,17 @@ namespace SEE.Tools.ReflexionAnalysis
                 node = this.GetNode(nodeId);
                 if(node != null)
                 {
+                    if(useCaching)
+                    {
+                        this.StartCaching();
+                    }
+
                     this.RemoveFromMapping(node);
+
+                    if(useCaching)
+                    {
+                        this.ReleaseCaching();
+                    }
                 }
             }
         }
@@ -922,7 +932,9 @@ namespace SEE.Tools.ReflexionAnalysis
                 foreach (Node node in subtree)
                 {
                     AssertOrThrow(node.IsInImplementation(), () => new NotInSubgraphException(Implementation, node));
+                    Node prevTarget = implicitMapsToTable[node.ID];
                     implicitMapsToTable.Remove(node.ID);
+                    Notify(new MapsToChange(Version, source: node, target: prevTarget, null, ChangeType.Removal));
                 }
             }
             else
@@ -930,7 +942,12 @@ namespace SEE.Tools.ReflexionAnalysis
                 foreach (Node node in subtree)
                 {
                     AssertOrThrow(node.IsInImplementation(), () => new NotInSubgraphException(Implementation, node));
+                    if (implicitMapsToTable.TryGetValue(node.ID, out Node prevTarget) && prevTarget != target)
+                    {
+                        Notify(new MapsToChange(Version, node, prevTarget, null, ChangeType.Removal));
+                    };
                     implicitMapsToTable[node.ID] = target;
+                    Notify(new MapsToChange(Version, source: node, target: target, null, ChangeType.Addition));
                 }
             }
         }

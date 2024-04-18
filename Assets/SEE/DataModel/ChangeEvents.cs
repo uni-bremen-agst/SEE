@@ -85,6 +85,47 @@ namespace SEE.DataModel
     }
 
     /// <summary>
+    /// A change event fired when a node is is implicitly mapped or unmapped.
+    /// </summary>
+    public class MapsToChange : ChangeEvent
+    {
+        /// <summary>
+        /// The source node which is mapped or unmapped.
+        /// </summary>
+        public Node Source { get; }
+
+        /// <summary>
+        /// The target node from which the origin node is removed or mapped to.
+        /// </summary>
+        public Node Target { get; }
+
+        /// <summary>
+        /// Constructor for a maps to change event.
+        /// </summary>
+        /// <param name="versionId">the graph version this event is associated to</param>
+        /// <param name="source">The source node which is mapped or unmapped</param>
+        /// <param name="target">The target node from which the origin node is removed or mapped to</param>
+        /// <param name="affectedGraph">the graph version this event is associated to</param>
+        /// <param name="change">If the source node was mapped or unmapped.</param>
+        public MapsToChange(Guid versionId,
+                            Node source,
+                            Node target, 
+                            ReflexionSubgraphs? affectedGraph = null, 
+                            ChangeType? change = null) : base(versionId, affectedGraph, change)
+        { 
+            this.Source = source;
+            this.Target = target;
+        }
+
+        protected override string Description()
+        {
+            string operation = Change == ChangeType.Addition ? "mapped to" : "removed from";
+            string description = $"Node '{Source}' was {operation} {Target}.";
+            return description;
+        }
+    }
+
+    /// <summary>
     /// A change event fired when the state of an edge changed.
     /// </summary>
     public class EdgeChange : ChangeEvent

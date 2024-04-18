@@ -771,7 +771,14 @@ namespace SEE.Tools.ReflexionAnalysis
                     AddSubtreeToImplicitMap(child, target);
                 }
             }
+            
+            if (implicitMapsToTable.TryGetValue(root.ID, out Node prevTarget) && prevTarget != target)
+            {
+                Notify(new MapsToChange(Version, root, prevTarget, null, ChangeType.Removal));
+            };
+
             implicitMapsToTable[root.ID] = target;
+            Notify(new MapsToChange(Version, root, target, null, ChangeType.Addition));
         }
 
         #endregion

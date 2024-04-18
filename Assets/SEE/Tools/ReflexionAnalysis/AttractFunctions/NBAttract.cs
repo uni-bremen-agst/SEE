@@ -14,7 +14,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         private new NBAttractConfig config;
 
-        public NBAttract(ReflexionGraph reflexionGraph, NBAttractConfig config) : base(reflexionGraph, config)
+        public NBAttract(ReflexionGraph reflexionGraph, 
+               CandidateRecommendation candidateRecommendation, 
+               NBAttractConfig config) : base(reflexionGraph, candidateRecommendation, config)
         {
             this.config = config;
             this.naiveBayes = new NaiveBayesIncremental();   
@@ -25,7 +27,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             if (naiveBayes == null) return string.Empty;
             StringBuilder sb = new StringBuilder();
             string indent = "\t";
-            foreach (string clazz in naiveBayes)
+            foreach (string clazz in naiveBayes.Classes)
             {
                 sb.Append(clazz);
                 sb.Append(" {");
@@ -46,8 +48,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         public override bool EmptyTrainingData()
         {
-            // TODO: 
-            return true;
+            return naiveBayes.IsEmpty();
         }
 
         public override double GetAttractionValue(Node candidate, Node cluster)
@@ -88,54 +89,62 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return attraction;
         }
 
-        public override void HandleChangedNodes(Node cluster, List<Node> nodesChangedInMapping, ChangeType changeType)
+        public override void HandleChangedCandidate(Node cluster, Node nodeChangedInMapping, ChangeType changeType)
         {
-            foreach(Node nodeChangedInMapping in nodesChangedInMapping)
+            if (!this.HandlingRequired(nodeChangedInMapping.ID, changeType, updateHandling: true))
             {
-                if (!nodeChangedInMapping.Type.Equals(this.CandidateType))
+                return;
+            }
+
+            ResetClustersToUpdate();
+
+            Document docStandardTerms = new Document();
+
+            if (this.config.UseStandardTerms)
+            {
+                this.AddStandardTerms(nodeChangedInMapping, docStandardTerms);
+            }
+
+            Dictionary<string, IDocument> docCdaTerms = new Dictionary<string, IDocument>();
+
+            if (this.config.UseCDA)
+            {
+                this.CreateCdaTerms(cluster, nodeChangedInMapping, docCdaTerms);
+            }
+
+            if(changeType == ChangeType.Addition)
+            {
+                naiveBayes.AddDocument(cluster.ID, docStandardTerms);
+
+                foreach (string clusterID in docCdaTerms.Keys)
                 {
-                    continue;
+                    naiveBayes.AddDocument(clusterID, docCdaTerms[clusterID]);
                 }
+            }
+            else if(changeType == ChangeType.Removal) 
+            {
+                naiveBayes.DeleteDocument(cluster.ID, docStandardTerms);
 
-                Document docStandardTerms = new Document();
-
-                if (this.config.UseStandardTerms)
+                foreach (string clusterID in docCdaTerms.Keys)
                 {
-                    this.AddStandardTerms(nodeChangedInMapping, docStandardTerms);
+                    naiveBayes.DeleteDocument(clusterID, docCdaTerms[clusterID]);
                 }
+            }
+        }
 
-                Dictionary<string, IDocument> docCdaTerms = new Dictionary<string, IDocument>();
-
-                if (this.config.UseCDA)
-                {
-                    this.CreateCdaTerms(cluster, nodeChangedInMapping, docCdaTerms);
-                }
-
-                if(changeType == ChangeType.Addition)
-                {
-                    naiveBayes.AddDocument(cluster.ID, docStandardTerms);
-
-                    foreach (string clusterID in docCdaTerms.Keys)
-                    {
-                        naiveBayes.AddDocument(clusterID, docCdaTerms[clusterID]);
-                    }
-                }
-                else if(changeType == ChangeType.Removal) 
-                {
-                    naiveBayes.DeleteDocument(cluster.ID, docStandardTerms);
-
-                    foreach (string clusterID in docCdaTerms.Keys)
-                    {
-                        naiveBayes.DeleteDocument(clusterID, docCdaTerms[clusterID]);
-                    }
-                }
+        private void ResetClustersToUpdate()
+        {
+            foreach (Node cluster in this.CandidateRecommendation.GetCluster())
+            {
+                this.AddClusterToUpdate(cluster.ID);
             }
         }
 
         public override void Reset()
         {
+            base.Reset();
             this.naiveBayes.Reset();
-            this.edgeStatesCache.ClearCache();
+            this.edgeStateCache.ClearCache();
             this.ClearDocumentCache();
         }
     }

@@ -121,6 +121,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 // TODO: Version concept isn't really integrated as neatly as it could be.
                 //       E.g., when merging two events, we discard the older version ID and just use the newer one.
+                MapsToChange mapsToChange => events.Incorporate(mapsToChange),
                 EdgeChange edgeChange => events.Incorporate(edgeChange),
                 GraphElementTypeEvent typeEvent => events.Incorporate(typeEvent),
                 EdgeEvent edgeEvent => events.Incorporate(edgeEvent, e => e.Edge == edgeEvent.Edge),
@@ -170,6 +171,18 @@ namespace SEE.Tools.ReflexionAnalysis
             EdgeChange newEvent = new EdgeChange(edgeChange.VersionId, edgeChange.Edge, oldState ?? edgeChange.OldState, edgeChange.NewState);
             // Now we just have to filter out previous EdgeChange events and add the new one.
             return events.Where(x => !(x is EdgeChange e && e.Edge == edgeChange.Edge)).Append(newEvent).ToList();
+        }
+
+        /// <summary>
+        /// Currently just ignores MapsToChange events.
+        /// </summary>
+        /// <param name="events">The events into which <paramref name="mapsToChange"/> shall be incorporated</param>
+        /// <param name="edgeChange">The ignored event.</param>
+        /// <returns>The same list of <paramref name="events"/>. The MapsToChange event is currently ignored.</returns>
+        private static IList<ChangeEvent> Incorporate(this IList<ChangeEvent> events, MapsToChange mapsToChange)
+        {
+            // TODO: handle MapsToChange event properly
+            return events; 
         }
 
         /// <summary>

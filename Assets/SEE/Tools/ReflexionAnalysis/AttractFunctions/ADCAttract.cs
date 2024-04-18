@@ -1,7 +1,6 @@
 ﻿using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
-using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,9 +14,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         private new ADCAttractConfig config;
 
-        private Dictionary<string, string> assignedToDependency = new Dictionary<string, string>();
+        private Dictionary<string, Edge> specifiedByDependency = new Dictionary<string, Edge>();
 
-        public ADCAttract(ReflexionGraph reflexionGraph, ADCAttractConfig config) : base(reflexionGraph, config)
+        public ADCAttract(ReflexionGraph reflexionGraph, 
+                          CandidateRecommendation candidateRecommendation, 
+                          ADCAttractConfig config) : base(reflexionGraph, candidateRecommendation, config)
         {   
             // TODO: Copy values from config?
             this.config = config;
@@ -49,44 +50,28 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             double attraction = 0;
 
-            bool isCandidateSource;
-
             foreach (Edge edge in implementationEdges)
             {
-                isCandidateSource = edge.Source.Equals(candidate);
+                bool isCandidateSource = edge.Source.Equals(candidate);
                 Node candidateNeighbor = isCandidateSource ? edge.Target : edge.Source;
-                Node neighborCluster = reflexionGraph.MapsTo(candidateNeighbor);
 
-                if(neighborCluster == null)
-                {
-                    continue;
-                }
-
-                State edgeState = this.edgeStatesCache.GetFromCache(clusterId: cluster.ID,
+                // Get the state of the current implementation edge if the candidate would be mapped to the cluster 
+                State edgeState = this.edgeStateCache.GetFromCache(clusterId: cluster.ID,
                                                                     candidateId: candidate.ID,
                                                                     candidateNeighborId: candidateNeighbor.ID,
                                                                     edgeId: edge.ID);
 
                 if (edgeState == State.Allowed || edgeState == State.ImplicitlyAllowed)
                 {
+                    Node neighborCluster = reflexionGraph.MapsTo(candidateNeighbor);
                     Node clusterSource = isCandidateSource ? cluster : neighborCluster;
                     Node clusterTarget = isCandidateSource ? neighborCluster : cluster;
 
-                    string id = this.GetMatchingArchitectureDepedency(clusterSource, clusterTarget, edge.Type);
+                    Edge architectureEdge = this.GetSpecifyingArchitectureDepedency(clusterSource, clusterTarget, edge.Type);
 
-                    if (id != null)
+                    if (architectureEdge != null && this.wordsPerDependency.ContainsKey(architectureEdge.ID))
                     {
-                        if (!this.wordsPerDependency.ContainsKey(id))
-                        {
-                            //UnityEngine.Debug.Log($"No Document found for propagated Dependency: " + Environment.NewLine +
-                            //    $"id:{id} propagated by " + Environment.NewLine +
-                            //    $"{edge.Source.ID} -{edge.Type}-> {edge.Target.ID} " + Environment.NewLine +
-                            //    $"implementation edge is in State {edge.State()}");
-
-                            continue;
-                        }
-
-                        Document architectureEdgeDoc = this.wordsPerDependency[id];
+                        Document architectureEdgeDoc = this.wordsPerDependency[architectureEdge.ID];
                         Document mergedDocument = this.GetMergedTerms(edge.Source, edge.Target, config.MergingType);
                         double similarity = Document.DotProduct(mergedDocument, architectureEdgeDoc);
                         attraction += similarity;
@@ -96,25 +81,29 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return attraction;
         }
 
-        public override void HandleChangedNodes(Node cluster, List<Node> nodesChangedInMapping, ChangeType changeType)
-        {   
-            foreach (Node nodeChangedInMapping in nodesChangedInMapping)
+        public override void HandleChangedCandidate(Node cluster, Node nodeChangedInMapping, ChangeType changeType)
+        {
+            if(!HandlingRequired(nodeChangedInMapping.ID, changeType, updateHandling: true))
             {
-                IEnumerable<Edge> edges = nodeChangedInMapping.GetImplementationEdges();
+                return;
+            } 
 
-                if (changeType == ChangeType.Addition)
+            this.AddClusterToUpdate(cluster.ID);
+
+            IEnumerable<Edge> edges = nodeChangedInMapping.GetImplementationEdges();
+
+            if (changeType == ChangeType.Addition)
+            {
+                foreach (Edge edge in edges)
                 {
-                    foreach (Edge edge in edges)
-                    {
-                        AddDocumentsOfPropagatedEdge(edge);
-                    }
-                } 
-                else
+                    AddDocumentsOfPropagatedEdge(edge);
+                }
+            } 
+            else if(changeType == ChangeType.Removal)
+            {
+                foreach(Edge edge in edges)
                 {
-                    foreach(Edge edge in edges)
-                    {
-                        DeleteDocumentsOfPropagatedEdge(edge);
-                    }
+                    DeleteDocumentsOfPropagatedEdge(edge);
                 }
             }
         }
@@ -137,53 +126,65 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             // UnityEngine.Debug.Log($"Try to add Documents of edge {implEdge.Source.ID} --> {implEdge.Target.ID} (State: {implEdge.State()}, Graph: {implEdge.ItsGraph.Name})");
             State state = implEdge.State();
             if ((state == State.Allowed || state == State.ImplicitlyAllowed) 
-                 && !this.assignedToDependency.ContainsKey(implEdge.ID))
+                 && !this.specifiedByDependency.ContainsKey(implEdge.ID))
             {
                 Node mapsToSource = this.reflexionGraph.MapsTo(implEdge.Source);
                 Node mapsToTarget = this.reflexionGraph.MapsTo(implEdge.Target);
 
-                string id = GetMatchingArchitectureDepedency(mapsToSource, mapsToTarget, implEdge.Type);
+                this.AddClusterToUpdate(mapsToSource.ID);
+                this.AddClusterToUpdate(mapsToTarget.ID);
 
-                this.assignedToDependency[implEdge.ID] = id;
+                Edge architectureEdge = GetSpecifyingArchitectureDepedency(mapsToSource, mapsToTarget, implEdge.Type);
+
+                if(architectureEdge == null)
+                {
+                    throw new Exception($"No matching architecture edge was found for {mapsToSource.ID} -{implEdge.Type}-> {mapsToTarget.ID}." +
+                                          $" Expected by implementation Edge {implEdge.ToShortString()} in state {state}");
+                }
+
+                this.specifiedByDependency[implEdge.ID] = architectureEdge;
 
                 Document mergedDocument = this.GetMergedTerms(implEdge.Source, implEdge.Target, config.MergingType);
 
-                if (!wordsPerDependency.ContainsKey(id))
+                if (!wordsPerDependency.ContainsKey(architectureEdge.ID))
                 {
-                    wordsPerDependency.Add(id, mergedDocument.Clone());
+                    wordsPerDependency.Add(architectureEdge.ID, mergedDocument.Clone());
                 }
                 else
                 {
-                    wordsPerDependency[id].AddWords(mergedDocument);
+                    wordsPerDependency[architectureEdge.ID].AddWords(mergedDocument);
                 }
             } 
         }
 
-        private string GetMatchingArchitectureDepedency(Node source, Node target, string type) 
+        private Edge GetSpecifyingArchitectureDepedency(Node source, Node target, string type) 
         {
-            string architectureId;
+            // TODO: Is this correct?
+            List<Edge> edges = source.FromTo(target, null);
+            // Edge architectureEdge = source.FromTo(target, null).SingleOrDefault(edge => ReflexionGraph.IsSpecified(edge));
+            
+            // TODO: Use type hierarchy in the future
+            List<Edge> architectureEdges = source.FromTo(target, "Source_Dependency");
 
-            if (!source.ID.Equals(target.ID))
+            //if (architectureEdges.Count > 1)
+            //{
+            //    UnityEngine.Debug.Log("Multiple matching architecture edges found.");
+            //    foreach (Edge edge in architectureEdges)
+            //    {
+            //        UnityEngine.Debug.Log($"Retrieved architecture dependency {edge.ToShortString()} for {source.ID} -{type}-> {target.ID}");
+            //    } 
+            //}
+
+            Edge architectureEdge = architectureEdges.FirstOrDefault();
+
+            if (architectureEdge == null)
             {
-                // TODO: Is this correct?
-                // TODO: Use type hierarchy in the future
-                List<Edge> edges = source.FromTo(target, null);
-                Edge architectureEdge = source.FromTo(target, null).SingleOrDefault(edge => ReflexionGraph.IsSpecified(edge));
-
-                if(architectureEdge == null)
-                {
-                    return null;
-                    throw new Exception($"No matching Architecture edge could be found. {source.ID} -{type}-> {target.ID}");
-                }
-
-                architectureId = architectureEdge.ID;
+                return null;
+                // TODO: Throw Exception here
+                throw new Exception($"No matching Architecture edge could be found. {source.ID} -{type}-> {target.ID}");
             }
-            else
-            {
-                // TODO: describe self loops in architecture of implicitly allowed depedencies
-                architectureId = source.ID;
-            }
-            return architectureId;
+
+            return architectureEdge;
         }
 
         /// <summary>
@@ -204,17 +205,27 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <param name="implEdge">incoming or outgoing implementation edge associated with the changed node</param>
         public void DeleteDocumentsOfPropagatedEdge(Edge implEdge)
         {
-            if(this.assignedToDependency.ContainsKey(implEdge.ID))
+            if(this.specifiedByDependency.ContainsKey(implEdge.ID))
             {
-                string id = this.assignedToDependency[implEdge.ID];
+                Edge architectureEdge = this.specifiedByDependency[implEdge.ID];
 
-                this.assignedToDependency.Remove(implEdge.ID);
+                this.specifiedByDependency.Remove(implEdge.ID);
 
                 Document mergedDocument = this.GetMergedTerms(implEdge.Source, implEdge.Target, config.MergingType);
 
-                if (wordsPerDependency.ContainsKey(id))
+                if (wordsPerDependency.ContainsKey(architectureEdge.ID))
                 {
-                    wordsPerDependency[id].RemoveWords(mergedDocument);
+                    wordsPerDependency[architectureEdge.ID].RemoveWords(mergedDocument);
+                }
+
+                if (architectureEdge != null)
+                {
+                    this.AddClusterToUpdate(architectureEdge.Source.ID);
+                    this.AddClusterToUpdate(architectureEdge.Target.ID);
+                }
+                else
+                {
+                    UnityEngine.Debug.LogWarning($"Architecture edge {architectureEdge.ID} is no longer contained within the graph. Attraction values may not be updated completely.");
                 }
             }
         }
@@ -233,10 +244,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         public override void Reset()
         {
-            this.edgeStatesCache.ClearCache();
+            this.edgeStateCache.ClearCache();
             this.ClearDocumentCache();
             this.wordsPerDependency.Clear();
-            this.assignedToDependency.Clear();
+            this.specifiedByDependency.Clear();
         }
     }
 }

@@ -6,11 +6,15 @@ using System.Threading.Tasks;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
-    public interface ITextClassifier : IEnumerable<string>
+    public interface ITextClassifier
     {
+        public IEnumerable<string> Classes { get; }
+
         void AddDocument(string clazz, IDocument document);
 
         void DeleteDocument(string clazz, IDocument document);
+
+        bool IsEmpty();
 
         void Reset();
 

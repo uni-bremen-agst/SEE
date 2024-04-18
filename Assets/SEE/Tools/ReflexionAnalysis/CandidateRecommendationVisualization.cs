@@ -543,7 +543,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 // 1. Create initial mapping based on current seed
                 Dictionary<Node, HashSet<Node>> initialMapping = recommendations.CreateInitialMapping(initialMappingPercentage,                                                                                                     currentSeed);
                                                                                                      
-                UnityEngine.Debug.Log($"initialMapping keys={initialMapping.Keys.Count} values={initialMapping.Values.Count}");
+                UnityEngine.Debug.Log($"Experiment run={i} initialMapping keys={initialMapping.Keys.Count} values={initialMapping.Values.Count}");
+                
                 // TODO:
                 // case 1.1 create initial mapping for calc graph
                 if (true)
@@ -565,7 +566,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 }
 
                 string trainingData = recommendations.AttractFunction.DumpTrainingData();
-                Debug.Log(recommendations.AttractFunction.DumpTrainingData());
+                UnityEngine.Debug.Log(trainingData);
                 string trainingDataFile = Path.Combine(config.OutputPath.Path, $"trainingData_{currentSeed}.txt");
                 File.WriteAllText(trainingDataFile, trainingData);
 
@@ -584,11 +585,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 // case 4.1 sync with viz
                 // case 4.2 sync not with viz
                 StartAutomatedMapping(recommendations, graph);
-
-                trainingData = recommendations.AttractFunction.DumpTrainingData();
-                Debug.Log(recommendations.AttractFunction.DumpTrainingData());
-                trainingDataFile = Path.Combine(config.OutputPath.Path, $"trainingData2_{currentSeed}.txt");
-                File.WriteAllText(trainingDataFile, trainingData);
 
                 // 5. Stop Recording
                 recommendations.Statistics.StopRecording();
@@ -613,10 +609,25 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 // 7. ResetMapping
                 // case 7.1 sync with viz
                 // case 7.2 sync not with viz
-                graph.StartCaching();
-                graph.ResetMapping();
-                graph.ReleaseCaching();
+                // graph.StartCaching();
+                graph.ResetMapping(true);
+                // graph.ReleaseCaching();
 
+                UnityEngine.Debug.Log(recommendations.AttractFunction.DumpTrainingData());
+
+                if (!recommendations.AttractFunction.EmptyTrainingData())
+                {
+                    foreach(string handledCandidate in recommendations.AttractFunction.HandledCandidates)
+                    {
+                        UnityEngine.Debug.Log($"Handled candidate: {handledCandidate}");
+                    }
+                    throw new Exception("Training Data was not resetted correctly after resetting mapping during experiment.");
+                }
+
+                if(recommendations.AttractFunction.HandledCandidates.Count != 0)
+                {
+                    throw new Exception("Handled candidates left despite mapping was resetted.");
+                }
 
                 // 8. Create next seed
                 currentSeed = rand.Next(int.MaxValue);
@@ -692,7 +703,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
                 //await MapRecommendation(chosenMappingPair.Candidate, chosenMappingPair.Cluster);
                 // Debug.Log($"Automatically map candidate {chosenMappingPair.Candidate.ID} to the cluster {chosenMappingPair.Cluster.ID}. candidates left: {recommendation.UnmappedCandidates.Count}");
+                graph.StartCaching();
                 graph.AddToMapping(chosenMappingPair.Candidate, chosenMappingPair.Cluster);
+                graph.ReleaseCaching();
 
                 recommendations = recommendation.Recommendations;
             }

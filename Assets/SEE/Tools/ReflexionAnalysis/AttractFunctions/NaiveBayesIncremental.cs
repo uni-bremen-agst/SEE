@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
-    public class NaiveBayesIncremental : ITextClassifier, IEnumerable<string>
+    public class NaiveBayesIncremental : ITextClassifier
     {
         public static int UNDERFLOW_OFFSET = 10000;
 
@@ -17,6 +17,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         public int NumberClasses
         {
             get { return this.trainingData.Keys.Count; }
+        }
+
+        public IEnumerable<string> Classes
+        {
+            get { return this.trainingData.Keys; }
         }
 
         public int Alpha { get { return alpha; } }
@@ -40,7 +45,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         public void AddDocument(string clazz, IDocument document) 
         {
             this.EnsureClass(clazz);
-
             trainingData[clazz].Add(document);
             DocumentCountGlobal++;
         }
@@ -94,18 +98,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         public Dictionary<string, int> GetTrainingsData(string clazz)
         {
-            if (!this.trainingData.ContainsKey(clazz)) return new Dictionary<string, int>();
+            if (!this.trainingData.ContainsKey(clazz))
+            {
+                return new Dictionary<string, int>();
+            }
             return this.trainingData[clazz].WordFrequencies;
-        }
-
-        public IEnumerator<string> GetEnumerator()
-        {
-            return trainingData.Keys.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
         }
 
         public void Reset()
@@ -113,6 +110,29 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             trainingData.Clear();
             DocumentCountGlobal = 0;
         }
+
+        public bool IsEmpty()
+        {
+            foreach (string clazz in trainingData.Keys)
+            {
+                if (trainingData[clazz].DocumentCount != 0)
+                {
+                    return false;
+                }
+
+                Dictionary<string, int> wordFrequencies = trainingData[clazz].WordFrequencies;
+                
+                foreach (string word in wordFrequencies.Keys)
+                {
+                    if (wordFrequencies[word] != 0)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return DocumentCountGlobal == 0;
+        } 
 
         internal class ClassInformation
         {
@@ -160,7 +180,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             public void Add(IDocument document)
             {
-                foreach (string word in document)
+                foreach (string word in document.GetContainedWords())
                 {
                     if (!wordFrequencies.ContainsKey(word))
                     {
@@ -170,9 +190,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                     {
                         wordFrequenciesGlobal.Add(word, 0);
                     }
-                    wordFrequencies[word]++;
-                    wordFrequenciesGlobal[word]++;
-                    wordCount++;
+                    wordFrequencies[word]+= document.GetFrequency(word);
+                    wordFrequenciesGlobal[word]+= document.GetFrequency(word);
+                    wordCount+= document.GetFrequency(word);
                 }
                 DocumentCount++;
             }
@@ -180,17 +200,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             public void Remove(IDocument document)
             {
-                foreach (string word in document)
+                foreach (string word in document.GetContainedWords())
                 {
                     if (wordFrequencies.ContainsKey(word))
                     {
-                        wordFrequencies[word]--;
-                        wordFrequenciesGlobal[word]--;
+                        wordFrequencies[word]-= document.GetFrequency(word);
+                        wordFrequenciesGlobal[word]-= document.GetFrequency(word);
                         if (wordFrequenciesGlobal[word] == 0)
                         {
                             wordFrequenciesGlobal.Remove(word);
                         }
-                        wordCount--;
+                        wordCount-= document.GetFrequency(word);
                     }
                 }
                 DocumentCount--;

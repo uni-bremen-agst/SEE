@@ -1,9 +1,6 @@
-﻿
-using Accord.MachineLearning.Bayes;
+﻿using Accord.MachineLearning.Bayes;
 using Accord.Math;
-using Sirenix.Utilities;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using NaiveBayesModel = Accord.MachineLearning.Bayes.NaiveBayes;
 
@@ -24,6 +21,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             get
             {
                 return classIdxToStringMapper?.Length ?? 0;
+            }
+        }
+
+        public IEnumerable<string> Classes
+        {
+            get
+            {
+                return classIdxToStringMapper;
             }
         }
 
@@ -175,15 +180,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return trainingData[clazz].GetWordFrequencies();
         }
 
-        public IEnumerator<string> GetEnumerator()
-        {
-            return trainingData.Keys.GetEnumerator();
-        }
+        //public IEnumerator<string> GetEnumerator()
+        //{
+        //    return trainingData.Keys.GetEnumerator();
+        //}
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
+        //IEnumerator IEnumerable.GetEnumerator()
+        //{
+        //    return this.GetEnumerator();
+        //}
 
         public void Reset()
         {
@@ -191,6 +196,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             this.wordIdxToStringMapper.Clear();
             this.wordStringToIdxMapper.Clear();
             this.trainingData.Clear();
+        }
+
+        public bool IsEmpty()
+        {
+            throw new NotImplementedException();
         }
     }
 }

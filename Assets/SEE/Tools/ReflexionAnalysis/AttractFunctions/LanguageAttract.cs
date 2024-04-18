@@ -31,8 +31,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             "volatile", "while"
         };
 
-        protected LanguageAttract(ReflexionGraph reflexionGraph, 
-                                                    LanguageAttractConfig config) : base(reflexionGraph, config)
+        protected LanguageAttract(ReflexionGraph reflexionGraph,
+                                  CandidateRecommendation candidateRecommendation,
+                                  LanguageAttractConfig config) : base(reflexionGraph, candidateRecommendation, config)
         {
             this.config = config;
             nodeReader = new NodeReader();

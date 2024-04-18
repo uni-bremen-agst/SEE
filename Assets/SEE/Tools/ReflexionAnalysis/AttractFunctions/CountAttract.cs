@@ -1,35 +1,66 @@
-﻿using Crosstales.RTVoice.Util;
-using SEE.DataModel;
+﻿using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class CountAttract : AttractFunction
     {
         // TODO: Implementation of delta
+        
+        /// <summary>
+        /// 
+        /// </summary>
         private CountAttractConfig config;
 
+        /// <summary>
+        /// 
+        /// </summary>
         private Dictionary<string, double> overallValues;
 
+        /// <summary>
+        /// 
+        /// </summary>
         private Dictionary<string, int> mappingCount;
 
         /// <summary>
         /// 
         /// </summary>
-        public float Phi { get => config.Phi; set => config.Phi = value; }
+        public float Phi { get;  private set; }
 
-        public CountAttract(ReflexionGraph graph, CountAttractConfig config) : base(graph, config)
+        /// <summary>
+        /// 
+        /// </summary>
+        public float Delta { get;  private set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="graph"></param>
+        /// <param name="config"></param>
+        public CountAttract(ReflexionGraph graph, 
+                            CandidateRecommendation candidateRecommendation, 
+                            CountAttractConfig config) : base(graph, candidateRecommendation, config)
         {
             this.config = config;
             overallValues = new Dictionary<string, double>();
             mappingCount = new Dictionary<string, int>();
+            this.Phi = config.Phi;
+            this.Delta = config.Delta;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="candidateNode"></param>
+        /// <param name="cluster"></param>
+        /// <returns></returns>
         public override double GetAttractionValue(Node candidateNode, Node cluster)
         {
             if (!candidateNode.Type.Equals(this.CandidateType)) return 0;
@@ -37,18 +68,21 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             {
                 double toOthers = GetToOthersValue(candidateNode, cluster);
 
-                // UnityEngine.Debug.Log($"CountAttract({candidateNode.ID},{cluster.ID}) = {overall}(overall) - {toOthers}(toOthers) = {overall - toOthers}");
                 return overall - toOthers;
             } 
             else
             {
-                // TODO: dirty? does no overall value imply always 0?
-                // UnityEngine.Debug.LogWarning($"Couldn't find overall value for the candidate {candidateNode.ID}");
                 return 0;
             };
         }
 
-        public double GetToOthersValue(Node candidate, Node cluster)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="candidate"></param>
+        /// <param name="cluster"></param>
+        /// <returns></returns>
+        private double GetToOthersValue(Node candidate, Node cluster)
         {
             List<Edge> implementationEdges = candidate.GetImplementationEdges();
             double toOthers = 0;
@@ -57,45 +91,56 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             {
                 Node candidateNeighbor = edge.Source.Equals(candidate) ? edge.Target : edge.Source;
                 Node neighborCluster = reflexionGraph.MapsTo(candidateNeighbor);
-  
-                if (neighborCluster == null || neighborCluster.ID.Equals(cluster.ID)) continue;
+
+                if (neighborCluster == null || neighborCluster.ID.Equals(cluster.ID))
+                {
+                    continue;
+                }
 
                 double weight = GetEdgeWeight(edge);
 
-                State edgeState = this.edgeStatesCache.GetFromCache(cluster.ID, candidate.ID, candidateNeighbor.ID, edge.ID);
+                State edgeState = this.edgeStateCache.GetFromCache(cluster.ID, candidate.ID, candidateNeighbor.ID, edge.ID);
                 
-                // UnityEngine.Debug.Log($"stateCache: candidate id = {candidate.ID} cluster id = {cluster.ID} edge id = {edge.ID} State={edgeState}");
                 if (edgeState == State.Allowed || edgeState == State.ImplicitlyAllowed)
                 {
-                    // UnityEngine.Debug.Log($"State is allowed. Phi value will be applied.");
                     weight *= Phi;
                 }
 
                 toOthers += weight;
             }
 
-            // UnityEngine.Debug.Log($"ToOthers({candidateNode.ID},{cluster.ID}) = {toOthers}");
             return toOthers;
         }
 
-        public override void HandleChangedNodes(Node cluster, List<Node> nodesChangedInMapping, ChangeType changeType)
+        public override void HandleChangedCandidate(Node cluster, Node nodeChangedInMapping, ChangeType changeType)
         {
-            foreach (Node nodeChangedInMapping in nodesChangedInMapping)
+            if (!this.HandlingRequired(nodeChangedInMapping.ID, changeType, updateHandling: true))
             {
-                List<Edge> implementationEdges = nodeChangedInMapping.GetImplementationEdges();
-                foreach (Edge edge in implementationEdges)
-                {
-                    Node neighborOfAffectedNode = edge.Source.ID.Equals(nodeChangedInMapping.ID) ? edge.Target : edge.Source;
+                return;
+            }
 
-                    UpdateOverallTable(neighborOfAffectedNode, edge, changeType);
+            this.AddClusterToUpdate(cluster.ID);
+
+            List<Edge> implementationEdges = nodeChangedInMapping.GetImplementationEdges();
+            foreach (Edge edge in implementationEdges)
+            {
+                Node neighborOfAffectedNode = edge.Source.ID.Equals(nodeChangedInMapping.ID) ? edge.Target : edge.Source;
+
+                UpdateOverallTable(neighborOfAffectedNode, edge, changeType);
                     
-                    // TODO: Is there a way to also update a datastructure for the ToOthers value efficiently?
-                    UpdateMappingCountTable(neighborOfAffectedNode, changeType);
-                }
+                // TODO: Is there a way to also update a datastructure for the ToOthers value efficiently?
+                
+                UpdateMappingCountTable(neighborOfAffectedNode, changeType);
             }
         }
 
-        public void UpdateOverallTable(Node NeighborOfMappedNode, Edge edge, ChangeType changeType)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="NeighborOfMappedNode"></param>
+        /// <param name="edge"></param>
+        /// <param name="changeType"></param>
+        private void UpdateOverallTable(Node NeighborOfMappedNode, Edge edge, ChangeType changeType)
         {
             if (!overallValues.ContainsKey(NeighborOfMappedNode.ID))
             {
@@ -108,17 +153,40 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             {
                 edgeWeight *= -1;
             }
+
             overallValues[NeighborOfMappedNode.ID] += edgeWeight;
+
+            Node neighborCluster = reflexionGraph.MapsTo(NeighborOfMappedNode);
+
+            if (neighborCluster != null)
+            {
+                this.AddClusterToUpdate(neighborCluster.ID);
+            }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="NeighborOfMappedNode"></param>
+        /// <param name="changeType"></param>
         public void UpdateMappingCountTable(Node NeighborOfMappedNode, ChangeType changeType)
         {
-            if (!mappingCount.ContainsKey(NeighborOfMappedNode.ID)) mappingCount.Add(NeighborOfMappedNode.ID, 0);
+            if (!mappingCount.ContainsKey(NeighborOfMappedNode.ID))
+            {
+                mappingCount.Add(NeighborOfMappedNode.ID, 0);
+            }
             int count = 1;
-            if (changeType == ChangeType.Removal) count *= -1;
+            if (changeType == ChangeType.Removal)
+            {
+                count *= -1;
+            }
             mappingCount[NeighborOfMappedNode.ID] += count;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public override string DumpTrainingData()
         {
             StringBuilder sb = new StringBuilder();
@@ -131,6 +199,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return sb.ToString();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public override bool EmptyTrainingData()
         {
             foreach(string key in this.overallValues.Keys)
@@ -143,10 +215,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return true;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public override void Reset()
         {
             this.overallValues.Clear();
-            this.edgeStatesCache.ClearCache();
+            this.edgeStateCache.ClearCache();
         }
     }
 }

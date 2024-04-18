@@ -21,9 +21,16 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             bool mappingChangeRequired = mapsTo != cluster && mapsTo != null;
 
+            Node explicitlyMappedNode = candidate;
+
             if (mappingChangeRequired)
             {
-                reflexionGraph.RemoveFromMappingSilent(mapsTo, candidate);
+                while(explicitlyMappedNode != null && !reflexionGraph.IsExplicitlyMapped(explicitlyMappedNode))
+                {
+                    explicitlyMappedNode = explicitlyMappedNode.Parent;
+                }                
+
+                reflexionGraph.RemoveFromMappingSilent(mapsTo, explicitlyMappedNode);
             }
 
             reflexionGraph.AddToMappingSilent(cluster, candidate);
@@ -35,7 +42,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 Node candidateNeighbor = edge.Source.Equals(candidate) ? edge.Target : edge.Source;
                 Node neighborCluster = reflexionGraph.MapsTo(candidateNeighbor);
 
-                if(neighborCluster != null)
+                if (neighborCluster != null)
                 {
                     string key = $"{cluster.ID}#{neighborCluster.ID}#{edge.ID}";
                     this.cache[key] = edge.State();
@@ -46,7 +53,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             if (mappingChangeRequired)
             {
-                reflexionGraph.AddToMappingSilent(mapsTo, candidate);
+                reflexionGraph.AddToMappingSilent(mapsTo, explicitlyMappedNode);
             }
         }
 
@@ -62,6 +69,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             if(neighborCluster == null)
             {
                 return State.Unmapped; // TODO: Undefined or Unmapped?
+            }
+
+            if (candidateId.Equals(candidateNeighborId) && !clusterId.Equals(neighborCluster.ID))
+            {
+                // TODO: When can this case happen?
+                return State.Undefined;
             }
 
             string neighborClusterID = neighborCluster.ID;
