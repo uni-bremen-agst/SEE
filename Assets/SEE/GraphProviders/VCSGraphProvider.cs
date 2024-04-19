@@ -141,9 +141,7 @@ namespace SEE.GraphProviders
                         BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(pathSegments[^1]));
                     }
                 }
-                AddMcCabeMetric(graph, repo, commitID);
-                AddHalsteadMetrics(graph, repo, commitID);
-                AddLinesOfCodeMetric(graph, repo, commitID);
+                AddMetricsToNode(graph, repo, commitID);
                 //TODO: Only for testing.
                 Debug.Log(graph.ToString());
             }
@@ -330,56 +328,73 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// Calculates the McCabe cyclomatic complexity metric for a given file and adds it as a metric to the corresponding node in <paramref name="graph"/>.
+        /// Adds Halstead, McCabe and lines of code metrics to the corresponding node for the supported TokenLanguages in <paramref name="graph"/>.
+        /// Otherwise, metrics are not available.
         /// </summary>
         /// <param name="graph">The graph where the metric should be added.</param>
         /// <param name="repository">The repository from which the file content is retrieved.</param>
         /// <param name="commitID">The commitID where the files exist.</param>
-        protected static void AddMcCabeMetric(Graph graph, Repository repository, string commitID)
+        protected static void AddMetricsToNode(Graph graph, Repository repository, string commitID)
         {
-            IEnumerable<SEEToken> tokens;
-
+            HalsteadMetrics halsteadMetrics;
             foreach (Node node in graph.Nodes())
             {
                 if (node.Type == "file")
                 {
                     string filePath = node.ID.Replace('\\', '/');
-                    tokens = RetrieveTokens(filePath, repository, commitID);
-                    int complexity = CalculateMcCabeComplexity(tokens);
-                    node.SetInt("McCabe Complexity", CalculateMcCabeComplexity(tokens));
-                }
-            }
-        }
+                    IEnumerable<SEEToken> tokens;
+                    TokenLanguage language;
 
-        /// <summary>
-        /// Calculates the Halstead metrics for a given file and adds them as metrics to the corresponding node in <paramref name="graph"/>.
-        /// </summary>
-        /// <param name="graph">The graph where the metrics should be added.</param>
-        /// <param name="repository">The repository from which the file content is retrieved.</param>
-        /// <param name="commitID">The commitID where the files exist.</param>
-        protected static void AddHalsteadMetrics(Graph graph, Repository repository, string commitID)
-        {
-            IEnumerable<SEEToken> tokens;
-
-            foreach (Node node in graph.Nodes())
-            {
-                if (node.Type == "file")
-                {
-                    string filePath = node.ID.Replace('\\', '/');
-                    tokens = RetrieveTokens(filePath, repository, commitID);
-                    (int distinctOperators, int distinctOperands, int totalOperators, int totalOperands, int programVocabulary, int programLength, float estimatedProgramLength, float volume, float difficulty, float effort, float timeRequiredToProgram, float numberOfDeliveredBugs) = CalculateHalsteadMetrics(tokens);
-                    node.SetInt("Halstead Distinct Operators", distinctOperators);
-                    node.SetInt("Halstead Distinct Operands", distinctOperands);
-                    node.SetInt("Halstead Total Operators", totalOperators);
-                    node.SetInt("Halstead Total Operands", totalOperands);
-                    node.SetInt("Halstead Program Vocabulary", programVocabulary);
-                    node.SetInt("Halstead Program Length", programLength);
-                    node.SetFloat("Halstead Calculated Estimated Program Length", estimatedProgramLength);
-                    node.SetFloat("Halstead Volume", volume);
-                    node.SetFloat("Halstead Difficulty", difficulty);
-                    node.SetFloat("Halstead Effort", effort);
-                    node.SetFloat("Halstead Time Required to Program", timeRequiredToProgram);
-                    node.SetFloat("Halstead Number of Delivered Bugs", numberOfDeliveredBugs);
+                    try
+                    {
+                        tokens = RetrieveTokens(filePath, repository, commitID);
+                        language = TokenLanguage.FromFileExtension(Path.GetExtension(filePath).TrimStart('.'));
+                    }
+                    catch (Exception)
+                    {
+                        UnityEngine.Debug.LogError($"Unknown token type");
+                        continue;
+                    }
+                    //if(language == TokenLanguage.AllTokenLanguages)
+                    if (TokenLanguage.AllTokenLanguages.Contains(language))
+                    {
+                        int complexity = CalculateMcCabeComplexity(tokens);
+                        int linesOfCode = CalculateLinesOfCode(tokens);
+                        halsteadMetrics = CalculateHalsteadMetrics(tokens);
+                        node.SetInt("Lines of Code", linesOfCode);
+                        node.SetInt("McCabe Complexity", complexity);
+                        node.SetInt("Halstead Distinct Operators", halsteadMetrics.DistinctOperators);
+                        node.SetInt("Halstead Distinct Operands", halsteadMetrics.DistinctOperands);
+                        node.SetInt("Halstead Total Operators", halsteadMetrics.TotalOperators);
+                        node.SetInt("Halstead Total Operands", halsteadMetrics.TotalOperands);
+                        node.SetInt("Halstead Program Vocabulary", halsteadMetrics.ProgramVocabulary);
+                        node.SetInt("Halstead Program Length", halsteadMetrics.ProgramLength);
+                        node.SetFloat("Halstead Calculated Estimated Program Length", halsteadMetrics.EstimatedProgramLength);
+                        node.SetFloat("Halstead Volume", halsteadMetrics.Volume);
+                        node.SetFloat("Halstead Difficulty", halsteadMetrics.Difficulty);
+                        node.SetFloat("Halstead Effort", halsteadMetrics.Effort);
+                        node.SetFloat("Halstead Time Required to Program", halsteadMetrics.TimeRequiredToProgram);
+                        node.SetFloat("Halstead Number of Delivered Bugs", halsteadMetrics.NumberOfDeliveredBugs);
+                    }
+                    else
+                    {
+                        UnityEngine.Debug.LogError($"Unknown token type for file {filePath}");
+                        // UnknownTokens, no metrics available
+                        node.SetInt("Lines of Code", -1);
+                        node.SetInt("McCabe Complexity", -1);
+                        node.SetInt("Halstead Distinct Operators", -1);
+                        node.SetInt("Halstead Distinct Operands", -1);
+                        node.SetInt("Halstead Total Operators", -1);
+                        node.SetInt("Halstead Total Operands", -1);
+                        node.SetInt("Halstead Program Vocabulary", -1);
+                        node.SetInt("Halstead Program Length", -1);
+                        node.SetFloat("Halstead Calculated Estimated Program Length", -1);
+                        node.SetFloat("Halstead Volume", -1);
+                        node.SetFloat("Halstead Difficulty", -1);
+                        node.SetFloat("Halstead Effort", -1);
+                        node.SetFloat("Halstead Time Required to Program", -1);
+                        node.SetFloat("Halstead Number of Delivered Bugs", -1);
+                    }
                 }
             }
         }
@@ -394,7 +409,7 @@ namespace SEE.GraphProviders
             int complexity = 1; // Starting complexity for a single method or function.
 
             // Count decision points (if, for, while, case, &&, ||, ?).
-            complexity += tokens.Count(t => t.TokenType == SEEToken.Type.Keyword && (t.Text == "if" || t.Text == "for" || t.Text == "else" || t.Text == "while" || t.Text == "case" || t.Text == "&&" || t.Text == "||" || t.Text == "?"));
+            complexity += tokens.Count(t => t.TokenType == SEEToken.Type.Keyword);
 
             // Count nested cases (i.e. switch statements).
             complexity += tokens.Count(t => t.TokenType == SEEToken.Type.Keyword && t.Text == "case");
@@ -403,14 +418,33 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
+        /// Helper struct to store Halstead metrics.
+        /// </summary>
+        private struct HalsteadMetrics
+        {
+            public int DistinctOperators;
+            public int DistinctOperands;
+            public int TotalOperators;
+            public int TotalOperands;
+            public int ProgramVocabulary;
+            public int ProgramLength;
+            public float EstimatedProgramLength;
+            public float Volume;
+            public float Difficulty;
+            public float Effort;
+            public float TimeRequiredToProgram;
+            public float NumberOfDeliveredBugs;
+        }
+
+        /// <summary>
         /// Calculates the Halstead metrics for provided code.
         /// </summary>
         /// <param name="tokens">The tokens for which the metrics should be calculated.</param>
         /// <returns>Returns the Halstead metrics.</returns>
-        private static (int, int, int, int, int, int, float, float, float, float, float, float) CalculateHalsteadMetrics(IEnumerable<SEEToken> tokens)
+        private static HalsteadMetrics CalculateHalsteadMetrics(IEnumerable<SEEToken> tokens)
         {
             // Identify operands (identifiers, keywords and literals).
-            HashSet<string> operands = new(tokens.Where(t => t.TokenType == SEEToken.Type.Identifier || t.TokenType == SEEToken.Type.Keyword || t.TokenType == SEEToken.Type.NumberLiteral ||  t.TokenType == SEEToken.Type.StringLiteral).Select(t => t.Text));
+            HashSet<string> operands = new(tokens.Where(t => t.TokenType == SEEToken.Type.Identifier || t.TokenType == SEEToken.Type.Keyword || t.TokenType == SEEToken.Type.NumberLiteral || t.TokenType == SEEToken.Type.StringLiteral).Select(t => t.Text));
 
             // Identify operators.
             HashSet<string> operators = new(tokens.Where(t => t.TokenType == SEEToken.Type.Punctuation).Select(t => t.Text));
@@ -429,29 +463,21 @@ namespace SEE.GraphProviders
             float timeRequiredToProgram = effort / 18.0f;
             float numberOfDeliveredBugs = volume / 3000.0f;
 
-            return (operators.Count, operands.Count, totalOperators, totalOperands, programVocabulary, programLength, estimatedProgramLength, volume, difficulty, effort, timeRequiredToProgram, numberOfDeliveredBugs);
-        }
-
-        /// <summary>
-        /// Calculates the number of lines of code for the provided token stream, excluding comments and adds it as a metric to the corresponding node in <paramref name="graph"/>.
-        /// </summary>
-        /// <param name="graph">The graph where the metric should be added.</param>
-        /// <param name="repository">The repository from which the fileContent is retrieved.</param>
-        /// <param name="commitID">The commitID where the files exist.</param>
-        protected static void AddLinesOfCodeMetric(Graph graph, Repository repository, string commitID)
-        {
-            IEnumerable<SEEToken> tokens;
-
-            foreach (Node node in graph.Nodes())
+            return new HalsteadMetrics
             {
-                if (node.Type == "file")
-                {
-                    string filePath = node.ID.Replace('\\', '/');
-                    tokens = RetrieveTokens(filePath, repository, commitID);
-                    int linesOfCode = CalculateLinesOfCode(tokens);
-                    node.SetInt("Lines of Code", linesOfCode);
-                }
-            }
+                DistinctOperators = operators.Count,
+                DistinctOperands = operands.Count,
+                TotalOperators = totalOperators,
+                TotalOperands = totalOperands,
+                ProgramVocabulary = programVocabulary,
+                ProgramLength = programLength,
+                EstimatedProgramLength = estimatedProgramLength,
+                Volume = volume,
+                Difficulty = difficulty,
+                Effort = effort,
+                TimeRequiredToProgram = timeRequiredToProgram,
+                NumberOfDeliveredBugs = numberOfDeliveredBugs
+            };
         }
 
         /// <summary>
@@ -462,16 +488,24 @@ namespace SEE.GraphProviders
         private static int CalculateLinesOfCode(IEnumerable<SEEToken> tokens)
         {
             int linesOfCode = 0;
+            bool comment = false;
 
             foreach (SEEToken token in tokens)
             {
                 if (token.TokenType == SEEToken.Type.Newline)
                 {
-                    linesOfCode++;
+                    if (!comment)
+                    {
+                        linesOfCode++;
+                    }
                 }
                 else if (token.TokenType == SEEToken.Type.Comment)
                 {
-                    linesOfCode--;
+                    comment = true;
+                }
+                else if (token.TokenType != SEEToken.Type.Whitespace)
+                {
+                    comment = false;
                 }
             }
 
