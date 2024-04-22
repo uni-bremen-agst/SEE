@@ -136,6 +136,11 @@ namespace SEE.UI.Window
             inputField.onValueChanged.AddListener(str => InputSearchField(str, Element));
         }
 
+        /// <summary>
+        /// Displays the attributes and their corresponding values.
+        /// </summary>
+        /// <typeparam name="T">The type of the attribute values.</typeparam>
+        /// <param name="attributes">A dictionary containing attribute names (keys) and their corresponding values (values).</param>
         private void DisplayAttributes<T>(Dictionary<string, T> attributes)
         {
             Transform scrollViewContent = metricWindowObject.transform.Find("Content/Items").transform;
@@ -159,6 +164,7 @@ namespace SEE.UI.Window
 
         protected override void InitializeFromValueObject(WindowValues valueObject)
         {
+            // TODO: Should metric windows be sent over the network?
             throw new NotImplementedException();
         }
 
