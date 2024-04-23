@@ -1,6 +1,5 @@
 using LibGit2Sharp;
 using System.Linq;
-using System.IO;
 using System;
 using System.Collections.Generic;
 using UnityEngine.Assertions;
@@ -42,11 +41,18 @@ namespace SEE.VCS
         /// <summary>
         /// See <see cref="IVersionControl.Show(string, string)"/>.
         /// </summary>
-        /// <exception cref="ArgumentException">thrown in case <paramref name="fileName"/>
+        /// <param name="pathInRepository">the path of the file to be shown relative to the root 
+        /// of the repository; must be in the syntax of the underlying type of repository (here: git,
+        /// where forward slashes are used to separate path elements)</param>
+        /// <param name="commitID">the commit ID to show the file from</param>
+        /// <returns>the content of the file at the given path in the given commit or
+        /// the empty string if the file does not exist (in which case a warning
+        /// is emitted)</returns>
+        /// <exception cref="ArgumentException">thrown in case <paramref name="pathInRepository"/>
         /// or <paramref name="commitID"/> are null or just whitespace</exception>
-        public string Show(string fileName, string commitID)
+        public string Show(string pathInRepository, string commitID)
         {
-            if (string.IsNullOrWhiteSpace(fileName))
+            if (string.IsNullOrWhiteSpace(pathInRepository))
             {
                 throw new ArgumentException("Path must not be null or empty.");
             }
@@ -54,7 +60,8 @@ namespace SEE.VCS
             {
                 throw new ArgumentException("Commit ID must not be null or empty.");
             }
-            Blob blob = repo.Lookup<Blob>($"{commitID}:{Path.GetRelativePath(repositoryPath, fileName).Replace("\\", "/")}");
+            
+            Blob blob = repo.Lookup<Blob>($"{commitID}:{pathInRepository}");
 
             if (blob != null)
             {
@@ -63,6 +70,7 @@ namespace SEE.VCS
             else
             {
                 // File does not exist.
+                Debug.LogWarning($"Looking up file {pathInRepository} in revision {commitID} of git repository at {repositoryPath} failed.\n");
                 return "";
             }
         }
@@ -70,7 +78,7 @@ namespace SEE.VCS
         /// <summary>
         /// See <see cref="IVersionControl.GetFileChange(string, string, string, out string)"/>.
         /// </summary>
-        public Change GetFileChange(string fileName, string oldCommitID, string newCommitID, out string oldFilename)
+        public Change GetFileChange(string pathInRepository, string oldCommitID, string newCommitID, out string oldFilename)
         {
             Commit newCommit = repo.Lookup<Commit>(newCommitID);
             if (newCommit == null)
@@ -95,7 +103,7 @@ namespace SEE.VCS
 
             // Compare the commits
             IEnumerable<TreeEntryChanges> changes = repo.Diff.Compare<TreeChanges>(oldCommit.Tree, newCommit.Tree, compareOptions)
-                .Where(change => change.Path == fileName || change.OldPath == fileName);
+                .Where(change => change.Path == pathInRepository || change.OldPath == pathInRepository);
 
             Change result = Change.Unknown;
             oldFilename = null;
@@ -108,7 +116,7 @@ namespace SEE.VCS
             {
                 numberOfIterations++;
                 // Dump(change);
-                Assert.IsTrue(change.Path == fileName || change.OldPath == fileName);
+                Assert.IsTrue(change.Path == pathInRepository || change.OldPath == pathInRepository);
                 switch (change.Status)
                 {
                     case ChangeKind.Unmodified:
@@ -130,7 +138,7 @@ namespace SEE.VCS
                     case ChangeKind.Modified:
                         // File was modified in the newer commit.
                         oldFilename = change.Path;
-                        Assert.AreEqual(fileName, change.OldPath);
+                        Assert.AreEqual(pathInRepository, change.OldPath);
                         result = Change.Modified;
                         break;
 

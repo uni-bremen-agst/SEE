@@ -201,6 +201,9 @@ namespace SEE.Game.Avatars
                             case "goodBye":
                                 brain.GoodBye();
                                 break;
+                            case "project":
+                                brain.Project();
+                                break;
                         }
                     }
                 }
