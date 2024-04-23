@@ -344,20 +344,10 @@ namespace SEE.GraphProviders
                     string filePath = node.ID.Replace('\\', '/');
                     IEnumerable<SEEToken> tokens;
                     TokenLanguage language;
-
                     try
                     {
+                        language = TokenLanguage.FromFileExtension(Path.GetExtension(filePath).TrimStart('.'), true);
                         tokens = RetrieveTokens(filePath, repository, commitID);
-                        language = TokenLanguage.FromFileExtension(Path.GetExtension(filePath).TrimStart('.'));
-                    }
-                    catch (Exception)
-                    {
-                        UnityEngine.Debug.LogError($"Unknown token type");
-                        continue;
-                    }
-                    //if(language == TokenLanguage.AllTokenLanguages)
-                    if (TokenLanguage.AllTokenLanguages.Contains(language))
-                    {
                         int complexity = CalculateMcCabeComplexity(tokens);
                         int linesOfCode = CalculateLinesOfCode(tokens);
                         halsteadMetrics = CalculateHalsteadMetrics(tokens);
@@ -376,7 +366,7 @@ namespace SEE.GraphProviders
                         node.SetFloat("Halstead Time Required to Program", halsteadMetrics.TimeRequiredToProgram);
                         node.SetFloat("Halstead Number of Delivered Bugs", halsteadMetrics.NumberOfDeliveredBugs);
                     }
-                    else
+                    catch
                     {
                         UnityEngine.Debug.LogError($"Unknown token type for file {filePath}");
                         // UnknownTokens, no metrics available
