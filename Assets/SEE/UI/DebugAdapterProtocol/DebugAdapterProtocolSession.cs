@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using SEE.Controls;
 using SEE.DataModel.DG;
-using SEE.DataModel.DG.SourceRange;
+using SEE.DataModel.DG.GraphIndex;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.GO;
@@ -237,7 +237,7 @@ namespace SEE.UI.DebugAdapterProtocol
             CodeWindow.OnWordHoverEnd += OnWordHoverEnd;
             if (City && City.LoadedGraph != null)
             {
-                sourceRangeIndex = new SourceRangeIndex(City.LoadedGraph);
+                sourceRangeIndex = new SourceRangeIndex(City.LoadedGraph, node => node.Path());
             }
 
             if (Adapter == null)
