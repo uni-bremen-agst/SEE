@@ -318,7 +318,7 @@ MonoBehaviour:
   internalLoggingEnabled: 1
   minimalSeverity: 2
   networkCommsLoggingEnabled: 0
-  VoiceChat: 0
+  VoiceChat: 1
   ConfigPath:
     Root: 3
     relativePath: /network.cfg
