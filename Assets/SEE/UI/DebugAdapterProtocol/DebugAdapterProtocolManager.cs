@@ -41,6 +41,8 @@ namespace SEE.UI.DebugAdapterProtocol
         private static readonly DebugAdapter.DebugAdapter[] adapters =
         {
             new NetCoreDebugAdapter(),
+            new JavaScriptDebugAdapter(),
+            new GDBDebugAdapter(),
             new MockDebugAdapter(),
         };
         /// <summary>
