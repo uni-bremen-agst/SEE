@@ -3,6 +3,7 @@ using System.IO;
 using NUnit.Framework;
 using SEE.Game;
 using SEE.Game.City;
+using SEE.GraphProviders;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Tools.RandomGraphs;
 using SEE.Utils.Config;
@@ -14,7 +15,7 @@ namespace SEE.Utils
     /// <summary>
     /// Test cases for ConfigIO.
     /// </summary>
-    internal class TestConfigIO
+    internal class TestConfigIO : AbstractTestConfigIO
     {
         [Test]
         public void TestConfigParseInteger1()
@@ -427,6 +428,9 @@ namespace SEE.Utils
                 savedCity.NodeTypes = new NodeTypeVisualsMap();
                 savedCity.NodeTypes["Function"] = function;
                 savedCity.NodeTypes["File"] = file;
+                CSVGraphProvider csvProvider = new();
+                csvProvider.Path.AbsolutePath = "mydir/myfile.csv";
+                savedCity.DataProvider.Add(csvProvider);
                 savedCity.Save(filename);
 
                 // Create a new city with all its default values and then
@@ -461,6 +465,7 @@ namespace SEE.Utils
             {
                 // First save a new city with all its default values.
                 DiffCity savedCity = NewVanillaSEECity<DiffCity>();
+                savedCity.VersionControlSystem = VCS.VCSKind.Git;
                 savedCity.VCSPath = new(vcsPath);
                 savedCity.OldRevision = "old revision";
                 savedCity.NewRevision = "new revision";
@@ -582,9 +587,7 @@ namespace SEE.Utils
         private static void SEECityAttributesAreEqual(SEECity expected, SEECity actual)
         {
             AbstractSEECityAttributesAreEqual(expected, actual);
-            AreEqual(expected.GXLPath, actual.GXLPath);
-            AreEqual(expected.CSVPath, actual.CSVPath);
-            AreEqual(expected.XMLPath, actual.XMLPath);
+            TestGraphProviderIO.AreEqual(expected.DataProvider, actual.DataProvider);
         }
 
         /// <summary>
@@ -596,6 +599,7 @@ namespace SEE.Utils
         private static void DiffCityAttributesAreEqual(DiffCity expected, DiffCity actual)
         {
             SEECityAttributesAreEqual(expected, actual);
+            Assert.AreEqual(expected.VersionControlSystem, actual.VersionControlSystem);
             Assert.AreEqual(expected.OldRevision, actual.OldRevision);
             Assert.AreEqual(expected.NewRevision, actual.NewRevision);
             AreEqual(expected.VCSPath, actual.VCSPath);
@@ -683,6 +687,15 @@ namespace SEE.Utils
             AbstractSEECityAttributesAreEqual(expected, actual);
             AreEqual(expected.GXLDirectory, actual.GXLDirectory);
             Assert.AreEqual(expected.MaxRevisionsToLoad, actual.MaxRevisionsToLoad);
+        }
+
+        /// <summary>
+        /// Checks whether <paramref name="actual"/> has the same values as <paramref name="expected"/>.
+        /// </summary>
+        /// <param name="expected">expected values</param>
+        /// <param name="actual">actual values</param>
+        private static void AreEqual(MarkerAttributes expected, MarkerAttributes actual)
+        {
             Assert.AreEqual(expected.MarkerHeight, actual.MarkerHeight);
             Assert.AreEqual(expected.MarkerWidth, actual.MarkerWidth);
             AreEqual(expected.AdditionBeamColor, actual.AdditionBeamColor);
@@ -781,22 +794,14 @@ namespace SEE.Utils
             Assert.AreEqual(expected.a, actual.a, 0.001f);
         }
 
-        /// <summary>
-        /// Checks whether the two data paths <paramref name="expected"/> and <paramref name="actual"/>
-        /// are equal (by value).
-        /// </summary>
-        /// <param name="expected">expected data path</param>
-        /// <param name="actual">actual data path</param>
-        private static void AreEqual(DataPath expected, DataPath actual)
-        {
-            Assert.AreEqual(expected.Root, actual.Root);
-            Assert.AreEqual(expected.RelativePath, actual.RelativePath);
-            Assert.AreEqual(expected.AbsolutePath, actual.AbsolutePath);
-        }
-
         //--------------------------------------------------------
         // attribute modifiers
         //--------------------------------------------------------
+
+        // A general note on the following methods wiping out cities:
+        // "Wiping out" means in those cases just that a value different from the
+        // default or from a previously set value is assigned so that we
+        // could notice any difference between the "wiped out" and loaded values.
 
         /// <summary>
         /// Assigns all attributes of given <paramref name="city"/> to arbitrary values
@@ -806,9 +811,20 @@ namespace SEE.Utils
         private static void WipeOutSEECityAttributes(SEECity city)
         {
             WipeOutAbstractSEECityAttributes(city);
-            city.GXLPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gxl");
-            city.CSVPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.csv");
-            city.XMLPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.xml");
+            city.DataProvider = new PipelineGraphProvider();
+        }
+
+        /// <summary>
+        /// Wipes out all attributes of <paramref name="markerAttributes"/>.
+        /// </summary>
+        /// <param name="markerAttributes">to be wiped out</param>
+        private static void WipeOutMarkerAttributes(MarkerAttributes markerAttributes)
+        {
+            markerAttributes.MarkerHeight++;
+            markerAttributes.MarkerWidth++;
+            markerAttributes.AdditionBeamColor = Color.clear;
+            markerAttributes.ChangeBeamColor = Color.clear;
+            markerAttributes.DeletionBeamColor = Color.clear;
         }
 
         /// <summary>
@@ -819,6 +835,7 @@ namespace SEE.Utils
         private static void WipeOutDiffCityAttributes(DiffCity city)
         {
             WipeOutSEECityAttributes(city);
+            city.VersionControlSystem = VCS.VCSKind.None;
             city.VCSPath.Set("C:/MyAbsoluteDirectory/MyVCSDirectory");
             city.OldRevision = "XXX";
             city.NewRevision = "YYY";
@@ -858,11 +875,6 @@ namespace SEE.Utils
             WipeOutAbstractSEECityAttributes(city);
             city.GXLDirectory.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gxl");
             city.MaxRevisionsToLoad++;
-            city.MarkerHeight++;
-            city.MarkerWidth++;
-            city.AdditionBeamColor = Color.clear;
-            city.ChangeBeamColor = Color.clear;
-            city.DeletionBeamColor = Color.clear;
         }
 
         /// <summary>
@@ -880,6 +892,7 @@ namespace SEE.Utils
             WipeOutEdgeSelectionSettings(city.EdgeSelectionSettings);
             WipeOutErosionSettings(city);
             WipeOutCoseGraphSettings(city);
+            WipeOutMarkerAttributes(city.MarkerAttributes);
         }
 
         /// <summary>
@@ -948,9 +961,6 @@ namespace SEE.Utils
         {
             city.ErosionSettings.ShowInnerErosions = !city.ErosionSettings.ShowInnerErosions;
             city.ErosionSettings.ShowLeafErosions = !city.ErosionSettings.ShowLeafErosions;
-            city.ErosionSettings.LoadDashboardMetrics = !city.ErosionSettings.LoadDashboardMetrics;
-            city.ErosionSettings.IssuesAddedFromVersion = "XXX";
-            city.ErosionSettings.OverrideMetrics = !city.ErosionSettings.OverrideMetrics;
             city.ErosionSettings.ShowIssuesInCodeWindow = !city.ErosionSettings.ShowIssuesInCodeWindow;
             city.ErosionSettings.ErosionScalingFactor++;
 
@@ -975,9 +985,6 @@ namespace SEE.Utils
         {
             Assert.AreEqual(expected.ShowInnerErosions, actual.ShowInnerErosions);
             Assert.AreEqual(expected.ShowLeafErosions, actual.ShowLeafErosions);
-            Assert.AreEqual(expected.LoadDashboardMetrics, actual.LoadDashboardMetrics);
-            Assert.AreEqual(expected.IssuesAddedFromVersion, actual.IssuesAddedFromVersion);
-            Assert.AreEqual(expected.OverrideMetrics, actual.OverrideMetrics);
             Assert.AreEqual(expected.ShowIssuesInCodeWindow, actual.ShowIssuesInCodeWindow);
             Assert.AreEqual(expected.ErosionScalingFactor, actual.ErosionScalingFactor);
 

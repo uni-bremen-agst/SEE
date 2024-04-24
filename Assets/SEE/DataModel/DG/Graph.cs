@@ -106,6 +106,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         public string BasePath { get; set; }
 
+        /// <summary>
         /// Adds a node to the graph.
         /// Preconditions:
         ///   (1) node must not be null
@@ -125,9 +126,9 @@ namespace SEE.DataModel.DG
                 throw new ArgumentException("ID of a node must neither be null nor empty.");
             }
 
-            if (nodes.ContainsKey(node.ID))
+            if (nodes.TryGetValue(node.ID, out Node other))
             {
-                throw new InvalidOperationException($"ID '{node.ID}' is not unique\n: {node}. \nDuplicate already in graph: {nodes[node.ID]}.");
+                throw new InvalidOperationException($"ID '{node.ID}' is not unique\n: {node}. \nDuplicate already in graph: {other}.");
             }
 
             if (node.ItsGraph != null)
@@ -330,9 +331,10 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="id">unique ID</param>
         /// <returns>node with the given unique ID if it exists; otherwise null</returns>
+        /// <exception cref="ArgumentException">thrown in case <paramref name="id"/> is null or whitespace</exception>
         public Node GetNode(string id)
         {
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrWhiteSpace(id))
             {
                 throw new ArgumentException("ID must neither be null nor empty");
             }
@@ -350,9 +352,10 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="id">unique ID</param>
         /// <returns>edge with the given unique ID if it exists; otherwise null</returns>
+        /// <exception cref="ArgumentException">thrown in case <paramref name="id"/> is null or whitespace</exception>
         public Edge GetEdge(string id)
         {
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrWhiteSpace(id))
             {
                 throw new ArgumentException("ID must neither be null nor empty");
             }
@@ -363,6 +366,25 @@ namespace SEE.DataModel.DG
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Returns the edge with the given unique <paramref name="id"/> in <paramref name="edge"/>.
+        /// If there is no such edge, <paramref name="edge"/> will be null and false will be returned;
+        /// otherwise true will be returned.
+        /// </summary>
+        /// <param name="id">unique ID of the searched edge</param>
+        /// <param name="edge">the found edge, otherwise null</param>
+        /// <returns>true if an edge could be found</returns>
+        /// <exception cref="ArgumentException">thrown in case <paramref name="id"/> is null or whitespace</exception>
+        public bool TryGetEdge(string id, out Edge edge)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                throw new ArgumentException("ID must neither be null nor empty");
+            }
+
+            return edges.TryGetValue(id, out edge);
         }
 
         /// <summary>
@@ -560,15 +582,20 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Returns the node with the given unique ID. If there is no
-        /// such node, node will be null and false will be returned; otherwise
-        /// true will be returned.
+        /// Returns the node with the given unique <paramref name="id"/> in <paramref name="node"/>.
+        /// If there is no such node, <paramref name="node"/> will be null and false will be returned;
+        /// otherwise true will be returned.
         /// </summary>
         /// <param name="id">unique ID of the searched node</param>
         /// <param name="node">the found node, otherwise null</param>
         /// <returns>true if a node could be found</returns>
+        /// <exception cref="ArgumentException">thrown in case <paramref name="id"/> is null or whitespace</exception>
         public bool TryGetNode(string id, out Node node)
         {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                throw new ArgumentException("ID must neither be null nor empty");
+            }
             return nodes.TryGetValue(id, out node);
         }
 
@@ -576,7 +603,7 @@ namespace SEE.DataModel.DG
         /// The list of root nodes of this graph. Must be re-computed
         /// whenever nodeHierarchyHasChanged becomes true.
         /// </summary>
-        private readonly List<Node> roots = new List<Node>();
+        private readonly List<Node> roots = new();
 
         /// <summary>
         /// Returns the list of nodes without parent.

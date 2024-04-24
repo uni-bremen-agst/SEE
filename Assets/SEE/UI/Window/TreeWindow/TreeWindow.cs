@@ -4,7 +4,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel;
 using SEE.DataModel.DG;
-using SEE.DataModel.GraphSearch;
+using SEE.DataModel.DG.GraphSearch;
 using SEE.UI.Notification;
 using SEE.Utils;
 using UnityEngine;

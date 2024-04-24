@@ -27,6 +27,10 @@ namespace SEE.DataModel.DG.IO
         /// <paramref name="rootID"/> is null or the empty string or has a single root, the graph
         /// will be loaded as stored in the GXL file.
         ///
+        /// The loaded graph will have the <paramref name="basePath"/> that will be used
+        /// to turn relative file-system paths into absolute ones. It should be chosen as
+        /// the root directory in which the source code can be found.
+        ///
         /// When the graph is loaded, the node levels are calculated.
         ///
         /// Precondition: <paramref name="rootID"/> must be unique.
@@ -80,9 +84,9 @@ namespace SEE.DataModel.DG.IO
             // the hardware architecture (e.g., x86_64; see also
             // https://docs.unity3d.com/Manual/PluginInspector.html).
 
-            string libDir = Application.isEditor ?
-                                Path.Combine(Path.GetFullPath(Application.dataPath), "Plugins", "Native", "LZMA")
-                              : Path.Combine(Path.GetFullPath(Application.dataPath), "Plugins");
+            string libDir = Application.isEditor
+                ? Path.Combine(Path.GetFullPath(Application.dataPath), "Plugins", "Native", "LZMA")
+                : Path.Combine(Path.GetFullPath(Application.dataPath), "Plugins");
 
             if (Application.isEditor)
             {
@@ -194,8 +198,7 @@ namespace SEE.DataModel.DG.IO
                 }
                 else
                 {
-                    throw new PlatformNotSupportedException
-                        ("Only Windows, Linux, and OSX are supported operating systems.");
+                    throw new PlatformNotSupportedException("Only Windows, Linux, and OSX are supported operating systems.");
                 }
             }
         }
@@ -740,7 +743,24 @@ namespace SEE.DataModel.DG.IO
             }
             else
             {
-                current.SetInt(currentAttributeName, value);
+                // In the Axivion Suite, the Source.Region_Length and Source.Region_Start attributes are used to
+                // denote ranges. In SEE, we use the SourceRange attribute to denote ranges, which works with an
+                // explicit end line rather than a length. We hence need to convert the Source.Region_Length and
+                // Source.Region_Start attributes to SourceRange attributes.
+                switch (currentAttributeName)
+                {
+                    case RegionLengthAttribute:
+                        // NOTE: This assumes the Region_Length is always declared *after* the Region_Start.
+                        int endLine = current.GetInt(GraphElement.SourceRangeStartLineAttribute) + value;
+                        current.SetInt(GraphElement.SourceRangeEndLineAttribute, endLine);
+                        break;
+                    case RegionStartAttribute:
+                        current.SetInt(GraphElement.SourceRangeStartLineAttribute, value);
+                        break;
+                    default:
+                        current.SetInt(currentAttributeName, value);
+                        break;
+                }
             }
         }
     }

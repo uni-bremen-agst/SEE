@@ -20,7 +20,8 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "nunit.framework.dll",
-        "Sirenix.Serialization.dll"
+        "Sirenix.Serialization.dll",
+        "LibGit2Sharp.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [

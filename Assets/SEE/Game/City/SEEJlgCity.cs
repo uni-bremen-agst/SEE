@@ -22,6 +22,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using Cysharp.Threading.Tasks;
 using SEE.Utils.Paths;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
@@ -46,19 +47,19 @@ namespace SEE.Game.City
         /// Path to the JLG file containing the runtime trace data.
         /// </summary>
         /// <returns>path of JLG file</returns>
-        [SerializeField, ShowInInspector, Tooltip("Path of JLG file"), FoldoutGroup(DataFoldoutGroup)]
+        [ShowInInspector, Tooltip("Path of JLG file"), FoldoutGroup(DataFoldoutGroup)]
         public FilePath JLGPath = new();
 
         /// <summary>
-        /// Loads all city data as in <see cref="SEECity.LoadData()"/> plus the
+        /// Loads all city data as in <see cref="SEECity.LoadDataAsync"/> plus the
         /// JLG tracing data.
         /// </summary>
-        [Button(ButtonSizes.Small)]
+        [Button(ButtonSizes.Small, Name = "Load Data")]
         [ButtonGroup(DataButtonsGroup)]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
-        public override void LoadData()
+        public override async UniTask LoadDataAsync()
         {
-            base.LoadData();
+            await base.LoadDataAsync();
             LoadJLG();
         }
 
@@ -77,10 +78,12 @@ namespace SEE.Game.City
             }
             else if (!File.Exists(path))
             {
-                Debug.LogErrorFormat("Source file does not exist at that path {0}.\n", path);
+                Debug.LogError($"Source file does not exist at that path {path}.\n");
                 enabled = false;
             }
         }
+
+        #region Config I/O
 
         //----------------------------------------------------------------------------
         // Input/output of configuration attributes
@@ -152,5 +155,6 @@ namespace SEE.Game.City
             ConfigIO.Restore(attributes, lineWidthLabel, ref LineWidth);
             ConfigIO.Restore(attributes, showOnlyCallsLabel, ref ShowOnlyCalls);
         }
+        #endregion
     }
 }

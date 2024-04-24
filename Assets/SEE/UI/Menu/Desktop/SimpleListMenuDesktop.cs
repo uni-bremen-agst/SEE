@@ -52,7 +52,7 @@ namespace SEE.UI.Menu
         /// </summary>
         /// <param name="entry">The menu entry.</param>
         /// <returns>The game object of the entry.</returns>
-        public GameObject EntryGameObject(T entry) => EntryList.transform.Find(entry.Title).gameObject;
+        public GameObject EntryGameObject(T entry) => EntryList.transform.Find(entry.Title)?.gameObject;
 
         /// <summary>
         /// Initializes the menu.
@@ -144,6 +144,10 @@ namespace SEE.UI.Menu
         /// <param name="entry">The menu entry.</param>
         protected virtual void DestroyButton(T entry)
         {
+            if (entry == null)
+            {
+                return;
+            }
             Destroyer.Destroy(EntryGameObject(entry));
         }
 

@@ -10,23 +10,6 @@ namespace SEE.DataModel.DG
     class TestGraphDiff : TestGraphBase
     {
         /// <summary>
-        /// Name of the toggle attribute.
-        /// </summary>
-        private const string ToggleAttribute = "Toggle";
-        /// <summary>
-        /// Name of the float attribute.
-        /// </summary>
-        private const string FloatAttribute = "Float";
-        /// <summary>
-        /// Name of the int attribute.
-        /// </summary>
-        private const string IntAttribute = "Int";
-        /// <summary>
-        /// Name of the string attribute.
-        /// </summary>
-        private const string StringAttribute = "String";
-
-        /// <summary>
         /// Both graphs are null.
         /// </summary>
         [Test]
@@ -273,8 +256,8 @@ namespace SEE.DataModel.DG
              out Edge e_in_g2,
              bool addAttributes)
         {
-            g1 = NewGraph();
-            g2 = NewGraph();
+            g1 = NewEmptyGraph();
+            g2 = NewEmptyGraph();
 
             only_g1 = NewNode(g1, nameof(only_g1));
             only_g2 = NewNode(g2, nameof(only_g2));
@@ -411,9 +394,9 @@ namespace SEE.DataModel.DG
         [Test]
         public void EmptyAndNullGraphs()
         {
-            CompareEmptyGraphs(NewGraph(), NewGraph());
-            CompareEmptyGraphs(null, NewGraph());
-            CompareEmptyGraphs(NewGraph(), null);
+            CompareEmptyGraphs(NewEmptyGraph(), NewEmptyGraph());
+            CompareEmptyGraphs(null, NewEmptyGraph());
+            CompareEmptyGraphs(NewEmptyGraph(), null);
             CompareEmptyGraphs(null, null);
         }
 

@@ -388,7 +388,6 @@ namespace SEE.UI.Window.CodeWindow
         /// <param name="path">The path to the file whose issues shall be marked.</param>
         private async UniTaskVoid MarkIssuesAsync(string path)
         {
-            // First notification should stay as long as issues are still loading.
             using (LoadingSpinner.Show($"Loading issues for {Title}..."))
             {
                 string queryPath = Path.GetFileName(path);
