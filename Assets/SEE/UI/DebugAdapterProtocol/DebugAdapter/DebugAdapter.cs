@@ -17,6 +17,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
     /// </summary>
     public abstract class DebugAdapter
     {
+        #region Adapter Configuration
         /// <summary>
         /// The name.
         /// </summary>
@@ -41,7 +42,9 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// The arguments.
         /// </summary>
         public abstract string AdapterArguments { get; set; }
+        #endregion
 
+        #region Adapter Methods
         /// <summary>
         /// Creates input fields for the launch properties.
         /// </summary>
@@ -60,5 +63,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// </summary>
         /// <returns>The launch request.</returns>
         public abstract LaunchRequest GetLaunchRequest();
+        #endregion
     }
 }

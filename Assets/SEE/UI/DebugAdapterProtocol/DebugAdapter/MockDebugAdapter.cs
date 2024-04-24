@@ -16,6 +16,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
     /// </summary>
     public class MockDebugAdapter : DebugAdapter
     {
+        #region Adapter Configuration
         /// <summary>
         /// The name.
         /// </summary>
@@ -24,7 +25,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// <summary>
         /// The working directory of the debug adapter.
         /// </summary>
-        public override string AdapterWorkingDirectory { get; set; } = Path.Combine(AdapterDirectory, "mock", "out");
+        public override string AdapterWorkingDirectory { get; set; } = Path.Combine(AdapterDirectory, "vscode-mock-debug", "out");
         
         /// <summary>
         /// The executable (file name) of the debug adapter.
@@ -35,7 +36,9 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// The arguments of the debug adapter.
         /// </summary>
         public override string AdapterArguments { get; set; } = "debugAdapter.js";
+        #endregion
 
+        #region Launch Configuration
         /// <summary>
         /// The <c>noDebug</c> property.
         /// </summary>
@@ -44,7 +47,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// <summary>
         /// The <c>program</c> property.
         /// </summary>
-        private string launchProgram = Path.Combine(AdapterDirectory, "mock", "sampleWorkspace", "readme.md");
+        private string launchProgram = Path.Combine(AdapterDirectory, "vscode-mock-debug", "sampleWorkspace", "readme.md");
         
         /// <summary>
         /// The <c>stopOnEntry</c> property.
@@ -85,7 +88,9 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         ///     The input field for the <c>compileError</c> property.
         /// </summary>
         private BooleanProperty launchCompileErrorProperty;
+        #endregion
 
+        #region Adapter Methods
         /// <inheritdoc/>
         public override void SetupLaunchConfig(GameObject go, PropertyGroup group)
         {
@@ -146,5 +151,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
                 }
             };
         }
+        #endregion
     }
 }

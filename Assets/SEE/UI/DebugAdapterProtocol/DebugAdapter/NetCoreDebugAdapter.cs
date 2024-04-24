@@ -20,6 +20,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
     /// </summary>
     public class NetCoreDebugAdapter : DebugAdapter
     {
+        #region Adapter Configuration
         /// <summary>
         /// The name.
         /// </summary>
@@ -40,6 +41,9 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// </summary>
         public override string AdapterArguments { get; set; } = "--interpreter=vscode";
 
+        #endregion
+
+        #region Launch Configuration
         /// <summary>
         /// The <c>noDebug</c> property.
         /// </summary>
@@ -130,6 +134,10 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// </summary>
         private BooleanProperty launchStopAtEntryProperty;
 
+        #endregion
+
+        #region Adapter Methods
+
         /// <inheritdoc/>
         public override void SetupLaunchConfig(GameObject go, PropertyGroup group)
         {
@@ -196,6 +204,10 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             };
         }
 
+        #endregion
+
+        #region Utilities
+
         /// <summary>
         /// Escapes a list as a string.
         /// <seealso cref="parseList(string)"/>
@@ -252,5 +264,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             }
             return arguments;
         }
+        #endregion
     }
 }
