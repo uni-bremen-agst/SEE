@@ -36,7 +36,7 @@
       "hash": "17c6330d51a140eac037b9ea6f5d157a846535af"
     },
     "com.openai.unity": {
-      "version": "7.7.6",
+      "version": "7.7.7",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -70,7 +70,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.burst": {
-      "version": "1.8.13",
+      "version": "1.8.14",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -188,7 +188,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.render-pipelines.core": {
-      "version": "14.0.10",
+      "version": "14.0.11",
       "depth": 1,
       "source": "builtin",
       "dependencies": {
@@ -213,11 +213,11 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.shadergraph": {
-      "version": "14.0.10",
+      "version": "14.0.11",
       "depth": 0,
       "source": "builtin",
       "dependencies": {
-        "com.unity.render-pipelines.core": "14.0.10",
+        "com.unity.render-pipelines.core": "14.0.11",
         "com.unity.searcher": "4.9.2"
       }
     },
