@@ -27,7 +27,7 @@ namespace SEE.UI.DebugAdapterProtocol
 {
     /// <summary>
     /// Manages a debug session.
-    /// 
+    ///
     /// <para>
     /// Takes care of the following things:
     /// <list type="bullet">
@@ -140,7 +140,7 @@ namespace SEE.UI.DebugAdapterProtocol
 
         /// <summary>
         /// Queued actions that are executed on the main thread.
-        /// 
+        ///
         /// <para>
         ///     Ensures that the actions are executed after the debug adapter is initialized.
         /// </para>
@@ -654,7 +654,7 @@ namespace SEE.UI.DebugAdapterProtocol
                     OnContinuedEvent(continuedEvent);
                     break;
                 case CapabilitiesEvent capabilitiesEvent:
-                    OnCapabilitiesEvent(capabilitiesEvent); 
+                    OnCapabilitiesEvent(capabilitiesEvent);
                     break;
             }
         }
@@ -1000,8 +1000,8 @@ namespace SEE.UI.DebugAdapterProtocol
             // Tries to stop the debuggee gracefully.
             void Terminate()
             {
-                adapterHost.SendRequest(new TerminateRequest(), 
-                    _ => QueueDestroy(), 
+                adapterHost.SendRequest(new TerminateRequest(),
+                    _ => QueueDestroy(),
                     (_, _) => actions.Enqueue(Disconnect));
             }
             // Forcefully shuts down the debuggee.
@@ -1094,7 +1094,6 @@ namespace SEE.UI.DebugAdapterProtocol
                 manager.AddWindow(codeWindow);
                 codeWindow.OnComponentInitialized += Mark;
                 codeWindow.OnComponentInitialized += MakeActive;
-                
             } else
             {
                 Mark();
@@ -1129,7 +1128,7 @@ namespace SEE.UI.DebugAdapterProtocol
 
 
         /// <summary>
-        /// Clears the last code position. 
+        /// Clears the last code position.
         /// </summary>
         private void ClearLastCodePosition()
         {
@@ -1181,7 +1180,6 @@ namespace SEE.UI.DebugAdapterProtocol
                     Dictionary<Scope, List<Variable>> stackVariables = new();
                     threadVariables.Add(stackFrame, stackVariables);
                     List<Scope> stackScopes = adapterHost.SendRequestSync(new ScopesRequest() { FrameId = stackFrame.Id }).Scopes;
-                    
                     foreach (Scope scope in stackScopes)
                     {
                         stackVariables.Add(scope, RetrieveNestedVariables(scope.VariablesReference));
