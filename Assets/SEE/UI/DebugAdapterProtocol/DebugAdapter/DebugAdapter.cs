@@ -27,17 +27,14 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// The directory that contains debug adapters.
         /// </summary>
         protected static readonly string AdapterDirectory = Path.Combine("D:\\" + "ferdi", "Adapters");
-        
         /// <summary>
         /// The working directory.
         /// </summary>
         public abstract string AdapterWorkingDirectory { get; set; }
-        
         /// <summary>
         /// The file name.
         /// </summary>
         public abstract string AdapterFileName { get; set; }
-        
         /// <summary>
         /// The arguments.
         /// </summary>

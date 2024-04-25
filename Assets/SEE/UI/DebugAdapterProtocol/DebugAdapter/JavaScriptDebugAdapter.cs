@@ -31,7 +31,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// <inheritdoc/>
         /// </summary>
         public override string AdapterWorkingDirectory { get; set; } = Path.Combine(AdapterDirectory, "js-debug", "src");
-        
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
@@ -59,12 +58,10 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// The <c>name</c> property.
         /// </summary>
         private String launchName = "Launch file";
-        
         /// <summary>
         /// The <c>cwd</c> property.
         /// </summary>
         private String launchCwd = Path.Combine("C:\\", "path", "containing", "program");
-        
         /// <summary>
         /// The <c>program</c> property.
         /// </summary>
@@ -150,7 +147,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         #region Utilities
         /// <summary>
         /// Returns the first available port.
-        /// 
+        ///
         /// <para>
         /// <see href="https://gist.github.com/jrusbatch/4211535"/>
         /// </para>
@@ -159,7 +156,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// <returns>The port number.</returns>
         private static int GetAvailablePort(int startingPort = 1000)
         {
-            
             IPEndPoint[] endPoints;
             List<int> portArray = new List<int>();
 

@@ -14,7 +14,7 @@ namespace SEE.UI.DebugAdapterProtocol
 {
     /// <summary>
     /// Manages the buttons of the BaseWindow that are used for debugging.
-    /// 
+    ///
     /// <para>
     /// Listens to these buttons of the *BaseWindow*:
     /// </para>

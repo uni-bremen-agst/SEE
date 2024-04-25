@@ -26,7 +26,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// The working directory of the debug adapter.
         /// </summary>
         public override string AdapterWorkingDirectory { get; set; } = Path.Combine(AdapterDirectory, "vscode-mock-debug", "out");
-        
         /// <summary>
         /// The executable (file name) of the debug adapter.
         /// </summary>
@@ -43,12 +42,10 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// The <c>noDebug</c> property.
         /// </summary>
         private bool launchNoDebug;
-        
         /// <summary>
         /// The <c>program</c> property.
         /// </summary>
         private string launchProgram = Path.Combine(AdapterDirectory, "vscode-mock-debug", "sampleWorkspace", "readme.md");
-        
         /// <summary>
         /// The <c>stopOnEntry</c> property.
         /// </summary>

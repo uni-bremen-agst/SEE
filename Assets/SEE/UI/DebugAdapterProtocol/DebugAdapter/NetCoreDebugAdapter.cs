@@ -30,12 +30,10 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// The working directory of the debug adapter.
         /// </summary>
         public override string AdapterWorkingDirectory { get; set; } = Path.Combine(AdapterDirectory, "netcoredbg");
-        
         /// <summary>
         /// The executable (file name) of the debug adapter.
         /// </summary>
         public override string AdapterFileName { get; set; } = "netcoredbg.exe";
-        
         /// <summary>
         /// The arguments of the debug adapter.
         /// </summary>
@@ -78,12 +76,10 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// The <c>cwd</c> property.
         /// </summary>
         private string launchCwd = Path.Combine("C:\\", "path", "containing", "dll");
-        
         /// <summary>
         /// The <c>env</c> property.
         /// </summary>
         private Dictionary<string, string> launchEnv = new();
-        
         /// <summary>
         /// The <c>console</c> property.
         /// </summary>
@@ -217,7 +213,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         private static string espaceList(List<string> args)
         {
             if (args.Count == 0) return "";
-            return "\"" + String.Join("\", \"", 
+            return "\"" + String.Join("\", \"",
                 args.Select(arg => arg.Replace("\\", "\\\\").Replace("\"", "\\\""))) + "\"";
         }
 
@@ -256,7 +252,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
                         i += 1;
                         c = text[i];
                     }
-                    currentArgument.Append(c); 
+                    currentArgument.Append(c);
                 } else
                 {
                     // characters outside of quotations marks are ignored

@@ -167,13 +167,13 @@ namespace SEE.UI.PropertyDialog
                         {
                             Value = paths[0];
                             FileBrowser.SetFilters(true, new string[] {});
-                        }, 
+                        },
                         () => {
                             FileBrowser.SetFilters(true, new string[] {});
-                        }, 
-                        PickMode, 
+                        },
+                        PickMode,
                         AllowMultiSelection,
-                        FileBrowserHelpers.GetDirectoryName(Value) != "" ? FileBrowserHelpers.GetDirectoryName(Value) : FallbackDirectory, 
+                        FileBrowserHelpers.GetDirectoryName(Value) != "" ? FileBrowserHelpers.GetDirectoryName(Value) : FallbackDirectory,
                         FileBrowserHelpers.GetFilename(Value),
                         title: $"{Name} - {Description}"
                     );
