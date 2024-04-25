@@ -1,6 +1,7 @@
 ﻿using SEE.Utils;
 using UnityEngine;
 using SEE.Controls.Actions.HolisticMetrics;
+using SEE.Controls.Actions.Drawable;
 
 namespace SEE.Controls.Actions
 {
@@ -168,6 +169,130 @@ namespace SEE.Controls.Actions
                   Color.blue.Darker(), "Materials/ModernUIPack/Document",
                   SaveBoardAction.CreateReversibleAction,
                   parent: MetricBoard);
+
+            // Whiteboard actions
+            Drawable =
+              new("Drawable", "Please select the drawable mode you want to activate.",
+                  Color.blue, "Materials/Drawable/Drawable");
+
+            DrawFreehand =
+                new("Draw Freehand", "Draw a line on a drawable",
+                    Color.magenta.Darker(), "Materials/Drawable/Brush",
+                    DrawFreehandAction.CreateReversibleAction,
+                    parent: Drawable);
+
+            DrawShapes =
+                new("Draw Shape", "Draw different shapes on a drawable",
+                    Color.magenta.Darker(), "Materials/ModernUIPack/Crop",
+                    DrawShapesAction.CreateReversibleAction,
+                    parent: Drawable);
+
+            WriteText =
+                new("Write Text", "Writes a text on a drawable",
+                    Color.magenta.Darker(), "Materials/Drawable/Text",
+                    WriteTextAction.CreateReversibleAction,
+                    parent: Drawable);
+
+            AddImage =
+                new("Add an Image", "Adds an image to a drawable",
+                    Color.magenta.Darker(), "Materials/Drawable/Image",
+                    AddImageAction.CreateReversibleAction,
+                    parent: Drawable);
+
+            MindMap =
+                new("Mind Map", "Adds and controll mind map components",
+                    Color.magenta.Darker(), "Materials/Charts/TreeIcon",
+                    MindMapAction.CreateReversibleAction,
+                    parent: Drawable);
+
+            ColorPicker =
+                new("Color Picker", "Picks a color",
+                    Color.yellow.Darker(), "Materials/Drawable/Eyedropper",
+                    ColorPickerAction.CreateReversibleAction,
+                    parent: Drawable);
+
+            Edit =
+                new("Edit", "Edits a drawable type.",
+                    Color.green.Darker(), "Materials/Drawable/Edit",
+                    EditAction.CreateReversibleAction,
+                    parent: Drawable);
+
+            MoveRotator =
+                new("Move or Rotate", "Move or rotates a Object on the Drawable.",
+                    Color.green.Darker(), "Materials/Drawable/MoveRotator",
+                    MoveRotatorAction.CreateReversibleAction,
+                    parent: Drawable);
+
+            Scale =
+                new("Scale", "Scales a drawable type. Mouse wheel up to scale up, mouse wheel down to scale down.",
+                    Color.green.Darker(), "Materials/Drawable/Scale",
+                    ScaleAction.CreateReversibleAction,
+                    parent: Drawable);
+
+            LayerChanger =
+                new("Change The Sorting Layer", "Left mouse click to increase, right mouse click to decrease",
+                    Color.green.Darker(), "Materials/Drawable/Layer",
+                    LayerChangerAction.CreateReversibleAction,
+                    parent: Drawable);
+
+            CutCopyPaste = new("Cut, Copy, Paste", "Cut or Copy a drawable type and paste it on the selected position.",
+                    Color.green.Darker(), "Materials/Drawable/CutCopyPaste",
+                    CutCopyPasteAction.CreateReversibleAction,
+                    parent: Drawable);
+
+            MovePoint =
+                new("Move a Point", "Moves a point of a line.",
+                    Color.green.Darker().Darker(), "Materials/Charts/MoveIcon",
+                    MovePointAction.CreateReversibleAction,
+                    parent: Drawable);
+
+            LineSplit =
+                new("Line Split", "Splittes a line on a given point.",
+                    Color.green.Darker().Darker(), "Materials/Drawable/LineSplit",
+                    LineSplitAction.CreateReversibleAction,
+                    parent: Drawable);
+
+            Save =
+                new("Save", "Save one or more drawables.",
+                    Color.yellow, "Materials/Drawable/Save",
+                    SaveAction.CreateReversibleAction,
+                    parent: Drawable);
+
+            Load =
+                new("Load", "Load one or more drawables.",
+                    Color.yellow.Darker(), "Materials/ModernUIPack/Document",
+                    LoadAction.CreateReversibleAction,
+                    parent: Drawable);
+
+            LinePointErase =
+                new("Line Point Erase", "Erase a point from a line on a drawable",
+                    Color.red, "Materials/Drawable/LineErase",
+                    LinePointEraseAction.CreateReversibleAction,
+                    parent: Drawable);
+
+            LineConnectionErase =
+                new("Line Connection Erase", "Erase a line connection from a line of the chosen point.",
+                    Color.red, "Materials/Drawable/LineConnectionErase",
+                    LineConnectionEraseAction.CreateReversibleAction,
+                    parent: Drawable);
+
+            Erase =
+                new("Erase", "Erase a complete object on a drawable",
+                    Color.red.Darker(), "Materials/Drawable/Erase",
+                    EraseAction.CreateReversibleAction,
+                    parent: Drawable);
+
+            Cleaner =
+                new("Cleaner", "Cleans a complete drawable",
+                    Color.red.Darker(), "Materials/ModernUIPack/Trash",
+                    CleanerAction.CreateReversibleAction,
+                    parent: Drawable);
+
+            StickyNote =
+                new("Sticky Note", "Manage sticky notes (spawn/move/edit/delete)",
+                 Color.blue.Darker(), "Materials/Drawable/StickyNote",
+                    StickyNoteAction.CreateReversibleAction,
+                    parent: Drawable);
         }
 
 
@@ -192,6 +317,28 @@ namespace SEE.Controls.Actions
         public static readonly ActionStateType DeleteWidget;
         public static readonly ActionStateType LoadBoard;
         public static readonly ActionStateType SaveBoard;
+
+        public readonly static ActionStateTypeGroup Drawable;
+        public readonly static ActionStateType DrawFreehand;
+        public readonly static ActionStateType DrawShapes;
+        public readonly static ActionStateType WriteText;
+        public readonly static ActionStateType AddImage;
+        public readonly static ActionStateType MindMap;
+        public readonly static ActionStateType ColorPicker;
+        public readonly static ActionStateType Edit;
+        public readonly static ActionStateType MoveRotator;
+        public readonly static ActionStateType MovePoint;
+        public readonly static ActionStateType LayerChanger;
+        public readonly static ActionStateType CutCopyPaste;
+        public readonly static ActionStateType Scale;
+        public readonly static ActionStateType LineSplit;
+        public readonly static ActionStateType Load;
+        public readonly static ActionStateType Save;
+        public readonly static ActionStateType Erase;
+        public readonly static ActionStateType LinePointErase;
+        public readonly static ActionStateType LineConnectionErase;
+        public readonly static ActionStateType Cleaner;
+        public readonly static ActionStateType StickyNote;
 
         #endregion
 

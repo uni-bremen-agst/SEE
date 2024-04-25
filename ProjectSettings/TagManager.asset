@@ -23,6 +23,22 @@ TagManager:
   - Erosion
   - ChartContainer
   - Chart
+  - CCAnimation
+  - TabButton
+  - Tooltip
+  - UMAIgnore
+  - videoCollider
+  - VideoPlayer
+  - Drawable
+  - Line
+  - Top
+  - Bottom
+  - Left
+  - Right
+  - AttachedObjects
+  - DText
+  - Image
+  - MindMapNode
   layers:
   - Default
   - TransparentFX
