@@ -44,12 +44,10 @@ namespace SEE.UI.Window.ConsoleWindow
         /// The window prefab.
         /// </summary>
         private const string windowPrefab = "Prefabs/UI/ConsoleWindow/ConsoleWindow";
-        
         /// <summary>
         /// The prefab for each message.
         /// </summary>
         private const string itemPrefab = "Prefabs/UI/ConsoleWindow/ConsoleWindowItem";
-        
         /// <summary>
         /// The number of spaces to use for tabs.
         /// <seealso cref="tabReplacement"/>.
@@ -69,12 +67,10 @@ namespace SEE.UI.Window.ConsoleWindow
         /// All console messages.
         /// </summary>
         private static List<Message> messages = new List<Message>();
-        
         /// <summary>
         /// The messages got cleared.
         /// </summary>
         private static event Action MessagesCleared;
-        
         /// <summary>
         /// A message was added.
         /// </summary>
