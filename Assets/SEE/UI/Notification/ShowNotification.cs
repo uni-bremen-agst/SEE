@@ -33,17 +33,17 @@ namespace SEE.UI.Notification
         /// <summary>
         /// Sprite for the error icon.
         /// </summary>
-        private static readonly Sprite errorIcon = Resources.Load<Sprite>("Materials/Notification/Error");
+        private static readonly Lazy<Sprite> errorIcon = new(() => Resources.Load<Sprite>("Materials/Notification/Error"));
 
         /// <summary>
         /// Sprite for the warning icon.
         /// </summary>
-        private static readonly Sprite warningIcon = Resources.Load<Sprite>("Materials/Notification/Warning");
+        private static readonly Lazy<Sprite> warningIcon = new(() => Resources.Load<Sprite>("Materials/Notification/Warning"));
 
         /// <summary>
         /// Sprite for the info icon.
         /// </summary>
-        private static readonly Sprite infoIcon = Resources.Load<Sprite>("Materials/Notification/Info");
+        private static readonly Lazy<Sprite> infoIcon = new(() => Resources.Load<Sprite>("Materials/Notification/Info"));
 
         /// <summary>
         /// Lazily initialized notification manager instance. Behaves like a singleton.
@@ -78,7 +78,7 @@ namespace SEE.UI.Notification
             {
                 Debug.Log($"{title}: {description}\n");
             }
-            Show(title, description, infoIcon, infoColor, duration);
+            Show(title, description, infoIcon.Value, infoColor, duration);
         }
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace SEE.UI.Notification
             {
                 Debug.LogWarning($"{title}: {description}\n");
             }
-            Show(title, description, warningIcon, warningColor, duration);
+            Show(title, description, warningIcon.Value, warningColor, duration);
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace SEE.UI.Notification
             {
                 Debug.LogError($"{title}: {description}\n");
             }
-            Show(title, description, errorIcon, errorColor, duration);
+            Show(title, description, errorIcon.Value, errorColor, duration);
         }
 
         /// <summary>
