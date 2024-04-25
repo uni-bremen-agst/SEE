@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using NUnit.Framework;
+using static SEETests.RangeExamples;
 
 namespace SEE.DataModel.DG
 {
@@ -9,28 +9,6 @@ namespace SEE.DataModel.DG
     [TestFixture]
     public class TestRanges
     {
-        private static readonly Range OneFullLine = new(1, 2);
-        private static readonly Range TwoFullLines = new(1, 3);
-
-        private static readonly Range OneCharacter = new(1, 1, 2, 3);
-        private static readonly Range HalfALineStart = new(1, 1, 0, 4);
-        private static readonly Range HalfALineEnd = new(1, 2, 5, 0);
-
-        private static readonly Range OneAndAHalfEndLine = new(1, 2, 0, 6);
-        private static readonly Range OneAndAHalfStartLine = new(1, 3, 7, 0);
-        private static readonly Range OneAndTwoHalfLines = new(1, 3, 5, 5);
-
-        private static readonly Range LargeRange = new(1, 100, 3, 100);
-        private static readonly Range LargeLineRange = new(0, 301);
-
-        private static readonly IList<Range> AllRanges = new List<Range>
-        {
-            OneFullLine, TwoFullLines,
-            OneCharacter, HalfALineStart, HalfALineEnd,
-            OneAndAHalfEndLine, OneAndAHalfStartLine, OneAndTwoHalfLines,
-            LargeRange, LargeLineRange
-        };
-
         [Test]
         public void TestLines()
         {
@@ -45,6 +23,61 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(100, LargeRange.Lines);
             Assert.AreEqual(301, LargeLineRange.Lines);
         }
+
+        /// <summary>
+        /// A matrix describing the expected CompareTo results between all example ranges, i.e.,
+        /// <c>range[row].CompareTo(range[column])</c>.
+        ///
+        /// Note that the matrix is skew-symmetric, i.e., <c>M = -M^T</c>.
+        /// </summary>
+        private static readonly int[,] ComparisonMatrix =
+        {
+            // ReSharper disable once CommentTypo
+            //1L  2L  1C  HLS HLE OHE OHS O2H LR  LLR
+            { +0, -1, +1, +1, +1, -1, -1, -1, -1, -1 }, // OneFullLine
+            { +1, +0, +1, +1, +1, +1, +1, -1, -1, -1 }, // TwoFullLine
+            { -1, -1, +0, -1, +0, -1, -1, -1, -1, -1 }, // OneCharacter
+            { -1, -1, +1, +0, +0, -1, -1, -1, -1, -1 }, // HalfALineStart
+            { -1, -1, +0, +0, +0, -1, -1, -1, -1, -1 }, // HalfALineEnd
+            { +1, -1, +1, +1, +1, +0, +0, -1, -1, -1 }, // OneAndAHalfEndLine
+            { +1, -1, +1, +1, +1, +0, +0, -1, -1, -1 }, // OneAndAHalfStartLine
+            { +1, +1, +1, +1, +1, +1, +1, +0, -1, -1 }, // OneAndTwoHalfLines
+            { +1, +1, +1, +1, +1, +1, +1, +1, +0, -1 }, // LargeRange
+            { +1, +1, +1, +1, +1, +1, +1, +1, +1, +0 }, // LargeLineRange
+        };
+
+        [Test]
+        public void TestCompare()
+        {
+            Assert.IsTrue(ComparisonMatrix.GetLength(0) == AllRanges.Count);
+            Assert.IsTrue(ComparisonMatrix.Rank == 2);
+
+            for (int i = 0; i < ComparisonMatrix.GetLength(0); i++)
+            {
+                Assert.IsTrue(ComparisonMatrix.GetLength(1) == AllRanges.Count);
+                for (int j = 0; j < ComparisonMatrix.GetLength(1); j++)
+                {
+                    Range firstRange = AllRanges[i];
+                    Range secondRange = AllRanges[j];
+                    int comparison = ComparisonMatrix[i, j];
+                    int actual = firstRange.CompareTo(secondRange);
+                    Assert.AreEqual(comparison, actual, $"Expected {firstRange} {ComparisonToSymbol(comparison)} "
+                                    + $"{secondRange}, but got {ComparisonToSymbol(actual)} instead.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="comparison"></param>
+        /// <returns></returns>
+        private static char ComparisonToSymbol(int comparison) =>
+            comparison switch
+            {
+                0 => '=',
+                < 0 => '<',
+                _ => '>'
+            };
 
         [Test]
         public void TestContainsPoint()
