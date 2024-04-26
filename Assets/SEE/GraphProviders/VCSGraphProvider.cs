@@ -110,20 +110,19 @@ namespace SEE.GraphProviders
             {
                 LibGit2Sharp.Tree tree = repo.Lookup<Commit>(commitID).Tree;
                 // Get all files using "git ls-files".
-                //TODO: I limited the output to 200 for testing, because SEE is huge.
+                //TODO: I limited the output to 1000 for testing, because there are performance issues with huge graphs.
                 IEnumerable<string> files;
                 if (includedFiles.Any() && !string.IsNullOrEmpty(includedFiles.First()))
                 {
-                    files = ListTree(tree).Where(path => includedFiles.Contains(Path.GetExtension(path))).Take(200);
+                    files = ListTree(tree).Where(path => includedFiles.Contains(Path.GetExtension(path))).Take(1000);
                 }
                 else if (excludedFiles.Any())
                 {
-                    //files = repo.Index.Select(entry => entry.Path).Where(path => !excludedFiles.Contains(Path.GetExtension(path)));
-                    files = ListTree(tree).Where(path => !excludedFiles.Contains(Path.GetExtension(path))).Take(200);
+                    files = ListTree(tree).Where(path => !excludedFiles.Contains(Path.GetExtension(path))).Take(1000);
                 }
                 else
                 {
-                    files = ListTree(tree).Take(200);
+                    files = ListTree(tree).Take(1000);
                 }
 
                 // Build the graph structure.
@@ -155,11 +154,11 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="tree">The tree of the given commit.</param>
         /// <returns>a list of paths.</returns>
-        static List<string> ListTree(LibGit2Sharp.Tree tree)
+        static IEnumerable<string> ListTree(LibGit2Sharp.Tree tree)
         {
-            var fileList = new List<string>();
+            List<string> fileList = new();
 
-            foreach (var entry in tree)
+            foreach (TreeEntry entry in tree)
             {
                 if (entry.TargetType == TreeEntryTargetType.Blob)
                 {
@@ -167,12 +166,13 @@ namespace SEE.GraphProviders
                 }
                 else if (entry.TargetType == TreeEntryTargetType.Tree)
                 {
-                    var subtree = (LibGit2Sharp.Tree)entry.Target;
+                    LibGit2Sharp.Tree subtree = (LibGit2Sharp.Tree)entry.Target;
                     fileList.AddRange(ListTree(subtree));
                 }
             }
 
-            return fileList;
+            return fileList.Where(path => TokenLanguage.AllTokenLanguages.Any
+                    (x => x.FileExtensions.Contains(Path.GetExtension(path).TrimStart('.'))));
         }
 
         public override GraphProviderKind GetKind()
@@ -342,49 +342,24 @@ namespace SEE.GraphProviders
                 if (node.Type == "file")
                 {
                     string filePath = node.ID.Replace('\\', '/');
-                    IEnumerable<SEEToken> tokens;
-                    TokenLanguage language;
-                    try
-                    {
-                        language = TokenLanguage.FromFileExtension(Path.GetExtension(filePath).TrimStart('.'), true);
-                        tokens = RetrieveTokens(filePath, repository, commitID);
-                        int complexity = CalculateMcCabeComplexity(tokens);
-                        int linesOfCode = CalculateLinesOfCode(tokens);
-                        halsteadMetrics = CalculateHalsteadMetrics(tokens);
-                        node.SetInt("Lines of Code", linesOfCode);
-                        node.SetInt("McCabe Complexity", complexity);
-                        node.SetInt("Halstead Distinct Operators", halsteadMetrics.DistinctOperators);
-                        node.SetInt("Halstead Distinct Operands", halsteadMetrics.DistinctOperands);
-                        node.SetInt("Halstead Total Operators", halsteadMetrics.TotalOperators);
-                        node.SetInt("Halstead Total Operands", halsteadMetrics.TotalOperands);
-                        node.SetInt("Halstead Program Vocabulary", halsteadMetrics.ProgramVocabulary);
-                        node.SetInt("Halstead Program Length", halsteadMetrics.ProgramLength);
-                        node.SetFloat("Halstead Calculated Estimated Program Length", halsteadMetrics.EstimatedProgramLength);
-                        node.SetFloat("Halstead Volume", halsteadMetrics.Volume);
-                        node.SetFloat("Halstead Difficulty", halsteadMetrics.Difficulty);
-                        node.SetFloat("Halstead Effort", halsteadMetrics.Effort);
-                        node.SetFloat("Halstead Time Required to Program", halsteadMetrics.TimeRequiredToProgram);
-                        node.SetFloat("Halstead Number of Delivered Bugs", halsteadMetrics.NumberOfDeliveredBugs);
-                    }
-                    catch
-                    {
-                        UnityEngine.Debug.LogError($"Unknown token type for file {filePath}");
-                        // UnknownTokens, no metrics available
-                        node.SetInt("Lines of Code", -1);
-                        node.SetInt("McCabe Complexity", -1);
-                        node.SetInt("Halstead Distinct Operators", -1);
-                        node.SetInt("Halstead Distinct Operands", -1);
-                        node.SetInt("Halstead Total Operators", -1);
-                        node.SetInt("Halstead Total Operands", -1);
-                        node.SetInt("Halstead Program Vocabulary", -1);
-                        node.SetInt("Halstead Program Length", -1);
-                        node.SetFloat("Halstead Calculated Estimated Program Length", -1);
-                        node.SetFloat("Halstead Volume", -1);
-                        node.SetFloat("Halstead Difficulty", -1);
-                        node.SetFloat("Halstead Effort", -1);
-                        node.SetFloat("Halstead Time Required to Program", -1);
-                        node.SetFloat("Halstead Number of Delivered Bugs", -1);
-                    }
+                    IEnumerable<SEEToken> tokens = RetrieveTokens(filePath, repository, commitID);
+                    int complexity = CalculateMcCabeComplexity(tokens);
+                    int linesOfCode = CalculateLinesOfCode(tokens);
+                    halsteadMetrics = CalculateHalsteadMetrics(tokens);
+                    node.SetInt("Lines of Code", linesOfCode);
+                    node.SetInt("McCabe Complexity", complexity);
+                    node.SetInt("Halstead Distinct Operators", halsteadMetrics.DistinctOperators);
+                    node.SetInt("Halstead Distinct Operands", halsteadMetrics.DistinctOperands);
+                    node.SetInt("Halstead Total Operators", halsteadMetrics.TotalOperators);
+                    node.SetInt("Halstead Total Operands", halsteadMetrics.TotalOperands);
+                    node.SetInt("Halstead Program Vocabulary", halsteadMetrics.ProgramVocabulary);
+                    node.SetInt("Halstead Program Length", halsteadMetrics.ProgramLength);
+                    node.SetFloat("Halstead Calculated Estimated Program Length", halsteadMetrics.EstimatedProgramLength);
+                    node.SetFloat("Halstead Volume", halsteadMetrics.Volume);
+                    node.SetFloat("Halstead Difficulty", halsteadMetrics.Difficulty);
+                    node.SetFloat("Halstead Effort", halsteadMetrics.Effort);
+                    node.SetFloat("Halstead Time Required to Program", halsteadMetrics.TimeRequiredToProgram);
+                    node.SetFloat("Halstead Number of Delivered Bugs", halsteadMetrics.NumberOfDeliveredBugs);
                 }
             }
         }
