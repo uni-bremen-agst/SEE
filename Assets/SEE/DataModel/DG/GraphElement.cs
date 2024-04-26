@@ -282,7 +282,7 @@ namespace SEE.DataModel.DG
 
             set
             {
-                Debug.Assert(value == null || value > 0);
+                Debug.Assert(value is null or > 0, $"expected positive line number, but got {value}");
                 SetInt(sourceLineAttribute, value);
             }
         }

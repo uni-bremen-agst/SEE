@@ -62,7 +62,8 @@
         "OmniSharp.Extensions.LanguageServer.Shared.dll",
         "OmniSharp.Extensions.JsonRpc.dll",
         "System.IO.Pipelines.dll",
-        "Supercluster.KDTree.Standard.dll"
+        "Supercluster.KDTree.Standard.dll",
+        "Markdig.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

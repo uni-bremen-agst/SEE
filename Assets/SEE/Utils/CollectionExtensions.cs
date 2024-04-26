@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
@@ -73,6 +74,22 @@ namespace SEE.Utils
             {
                 return dict[key] = defaultValue;
             }
+        }
+
+        /// <summary>
+        /// Gets the value for the given <paramref name="key"/> from the given <paramref name="dict"/>.
+        /// If the key is not present in the dictionary, the given <paramref name="defaultValue"/>
+        /// will be returned instead.
+        /// </summary>
+        /// <param name="dict">The dictionary from which the value shall be retrieved.</param>
+        /// <param name="key">The key for which the value shall be retrieved.</param>
+        /// <param name="defaultValue">The default value which shall be returned if the key is not present.</param>
+        /// <typeparam name="K">The type of the keys in the dictionary.</typeparam>
+        /// <typeparam name="V">The type of the values in the dictionary.</typeparam>
+        /// <returns>The value for the given <paramref name="key"/> from the given <paramref name="dict"/>.</returns>
+        public static V GetValueOrDefault<K, V>(this IDictionary<K, V> dict, K key, V defaultValue = default)
+        {
+            return dict.TryGetValue(key, out V value) ? value : defaultValue;
         }
 
         /// <summary>

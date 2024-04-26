@@ -57,6 +57,30 @@ namespace SEE.Utils
         }
 
         /// <summary>
+        /// Runs the given <paramref name="task"/> with a <paramref name="timeout"/>.
+        /// Note that a timeout of <see cref="TimeSpan.Zero"/> will cause no timeout to be applied.
+        ///
+        /// If the task does not complete within the given timeout and <paramref name="throwOnTimeout"/> is set to true,
+        /// a <see cref="TimeoutException"/> is thrown.
+        /// </summary>
+        /// <param name="task">The task to run. It should accept a <see cref="CancellationToken"/> as an argument,
+        /// which will be used to cancel the task if it exceeds the timeout.</param>
+        /// <param name="timeout">The maximum time to wait for the task to complete.</param>
+        /// <param name="throwOnTimeout">Whether to throw a <see cref="TimeoutException"/> if the task times out.</param>
+        /// <exception cref="TimeoutException">Thrown if the task does not complete within the given timeout and
+        /// <paramref name="throwOnTimeout"/> is set to <c>true</c>.</exception>
+        /// <returns><c>true</c> if the task completed within the timeout, <c>false</c> otherwise.</returns>
+        public static async UniTask<bool> RunWithTimeoutAsync(Func<CancellationToken, UniTask> task, TimeSpan timeout,
+                                                        bool throwOnTimeout = true)
+        {
+            return await RunWithTimeoutAsync(async token =>
+            {
+                await task(token);
+                return true;
+            }, timeout, throwOnTimeout: throwOnTimeout, defaultValue: false);
+        }
+
+        /// <summary>
         /// Observes the given <paramref name="task"/>'s observable until it completes or <paramref name="timeout"/>
         /// elapses. The results are returned as an asynchronous enumerable that can, for example, be iterated
         /// over using `await foreach`.
@@ -106,16 +130,34 @@ namespace SEE.Utils
             {
                 await UniTask.SwitchToMainThread();
             }
-            else
-            {
-                Debug.LogWarning("RunOnMainThreadAsync called from main thread. This is not necessary.\n");
-            }
             T result = action();
             if (notOnMainThread)
             {
                 await UniTask.SwitchToThreadPool();
             }
             return result;
+        }
+
+        /// <summary>
+        /// Runs the given action on the main thread.
+        /// <p>
+        /// <b>Important:</b> This method should only be used if the caller is running on the thread pool.
+        /// Additionally, be aware that switching between threads can be very expensive.
+        /// </p>
+        /// </summary>
+        /// <param name="action">The action to run on the main thread.</param>
+        /// <remarks>
+        /// When running on the thread pool, resources such as <see cref="UnityEngine.Object"/> or MonoBehaviors
+        /// cannot be accessed. This method allows you to side-step this limitation by switching to the main thread
+        /// to execute the given action.
+        /// </remarks>
+        public static async UniTask RunOnMainThreadAsync(Action action)
+        {
+            await RunOnMainThreadAsync<byte>(() =>
+            {
+                action();
+                return default;
+            });
         }
 
         /// <summary>
