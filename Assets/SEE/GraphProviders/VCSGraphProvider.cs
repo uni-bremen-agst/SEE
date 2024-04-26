@@ -217,7 +217,7 @@ namespace SEE.GraphProviders
         /// <param name="parentPath">The path of the current parent, which will eventually be part of the ID</param>
         /// <param name="graph">The graph to which the new node belongs to</param>
         /// <param name="mainNode">The root node of the main directory</param>
-        static void BuildGraphFromPath(string path, Node parent, string parentPath, Graph graph, Node mainNode)
+        public static void BuildGraphFromPath(string path, Node parent, string parentPath, Graph graph, Node mainNode)
         {
             string[] pathSegments = path.Split(Path.AltDirectorySeparatorChar);
             string nodePath = string.Join(Path.AltDirectorySeparatorChar.ToString(), pathSegments, 1, pathSegments.Length - 1);
@@ -272,7 +272,7 @@ namespace SEE.GraphProviders
         /// <param name="name">The name of the node</param>
         /// <param name="length">The length of the graph element, measured in number of lines</param>
         /// <returns>a new node added to <paramref name="graph"/></returns>
-        protected static Node NewNode(Graph graph, string id, string type = "Routine", string name = null, int? length = null)
+        public static Node NewNode(Graph graph, string id, string type = "Routine", string name = null, int? length = null)
         {
             Node result = new()
             {
