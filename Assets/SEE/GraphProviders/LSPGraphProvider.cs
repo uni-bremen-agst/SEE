@@ -59,7 +59,7 @@ namespace SEE.GraphProviders
             return GraphProviderKind.LSP;
         }
 
-        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
+        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city, Action<float> changePercentage = null)
         {
             if (string.IsNullOrEmpty(ProjectPath.Path))
             {

@@ -50,7 +50,7 @@ namespace SEE.GraphProviders
             return GraphProviderKind.Reflexion;
         }
 
-        public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
+        public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city, Action<float> changePercentage = null)
         {
             if (city == null)
             {

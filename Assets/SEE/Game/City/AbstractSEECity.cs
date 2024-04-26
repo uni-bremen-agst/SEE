@@ -169,6 +169,38 @@ namespace SEE.Game.City
         public ColorMap MetricToColor = new();
 
         /// <summary>
+        /// A progress bar, shown in the editor.
+        /// Can be used to indicate loading progress during city creation.
+        /// </summary>
+        [ProgressBar(0, 1, Height = 20, ColorGetter = nameof(GetProgressBarColor),
+                     CustomValueStringGetter = "$" + nameof(ProgressBarValueString))]
+        [PropertyOrder(999)]
+        [ShowIf(nameof(ShowProgressBar))]
+        [HideLabel]
+        [ReadOnly]
+        public float ProgressBar;
+
+        /// <summary>
+        /// Whether the progress bar should be shown.
+        /// </summary>
+        private bool ShowProgressBar => ProgressBar > 0;
+
+        /// <summary>
+        /// The string representation of the progress bar value.
+        /// </summary>
+        private string ProgressBarValueString => $"{ProgressBar * 100:F0}%";
+
+        /// <summary>
+        /// Returns the color for the progress bar, based on the current <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">The value (from 0–1) for which to determine the color.</param>
+        /// <returns>The color for the progress bar.</returns>
+        private static Color GetProgressBarColor(float value)
+        {
+            return Color.Lerp(Color.red, Color.green, Mathf.Pow(value, 2));
+        }
+
+        /// <summary>
         /// Yields a graph renderer that can draw this city.
         /// </summary>
         public abstract IGraphRenderer Renderer
@@ -329,6 +361,7 @@ namespace SEE.Game.City
         public virtual void Reset()
         {
             DeleteGraphGameObjects();
+            ProgressBar = 0;
         }
 
         /// <summary>

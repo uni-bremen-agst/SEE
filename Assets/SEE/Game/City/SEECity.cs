@@ -303,10 +303,11 @@ namespace SEE.Game.City
             {
                 try
                 {
-                    LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this);
+                    LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, x => ProgressBar = x);
                 }
                 catch (Exception ex)
                 {
+                    await UniTask.SwitchToMainThread();
                     ShowNotification.Error("Data failure", $"Graph provider failed with: {ex}\n");
                     Debug.LogException(ex);
                 }

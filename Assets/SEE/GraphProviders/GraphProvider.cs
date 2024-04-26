@@ -24,8 +24,11 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="graph">input graph</param>
         /// <param name="city">settings possibly necessary to provide a graph</param>
+        /// <param name="changePercentage">callback to report progress from 0 to 1</param>
         /// <returns>provided graph based on <paramref name="graph"/></returns>
-        public abstract UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city);
+        public abstract UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
+                                                    Action<float> changePercentage = null);
+        // TODO: Implement changePercentage for providers other than LSP and Pipeline.
 
         /// <summary>
         /// Saves the settings in the configuration file.

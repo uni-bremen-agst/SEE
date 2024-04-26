@@ -37,13 +37,24 @@ namespace SEE.GraphProviders
         /// graph provider in <see cref="Pipeline"/></param>
         /// <param name="city">this value will be passed to each graph provider
         /// in <see cref="Pipeline"/></param>
+        /// <param name="changePercentage">this callback will be called with
+        /// the percentage (0–1) of completion of the pipeline</param>
         /// <returns></returns>
         /// <remarks>Exceptions may be thrown by each nested graph provider.</remarks>
-        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
+        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city, Action<float> changePercentage = null)
         {
             UniTask<Graph> initial = UniTask.FromResult(graph);
-            return await Pipeline.Aggregate(initial,
-                                            (current, provider) => current.ContinueWith(g => provider.ProvideAsync(g, city)));
+            int count = -1;  // -1 because the first provider will increment it to 0.
+            return await Pipeline.Aggregate(initial, (current, provider) =>
+                                                current.ContinueWith(g => provider.ProvideAsync(g, city, AggregatePercentage())));
+
+            Action<float> AggregatePercentage()
+            {
+                // Counts the number of providers that have been executed so far.
+                count++;
+                // Each stage of the pipeline gets an equal share of the total percentage.
+                return percentage => changePercentage?.Invoke((count + percentage) / Pipeline.Count);
+            }
         }
 
         public override GraphProviderKind GetKind()

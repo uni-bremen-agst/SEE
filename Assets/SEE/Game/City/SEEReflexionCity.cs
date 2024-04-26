@@ -43,7 +43,7 @@ namespace SEE.Game.City
             {
                 Reset();
             }
-            LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this);
+            LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, x => ProgressBar = x);
             visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
             visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
         }
