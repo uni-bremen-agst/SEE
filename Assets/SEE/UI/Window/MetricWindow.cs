@@ -55,29 +55,29 @@ namespace SEE.UI.Window
         /// GameObjects are considered "active" when the search string has been found within their names.
         /// </summary>
         /// <param name="searchQuery"> string to search for </param>
-        /// <param name="elements"> array of GameObjects to search in </param>
-        private void InputSearchField(string searchQuery, GameObject[] elements)
+        /// <param name="searchableObjects"> Dictionary of GameObjects to search in </param>
+        private void InputSearchField(string searchQuery, Dictionary<string, GameObject> searchableObjects)
         {
             //Remove Whitespaces
-            searchQuery = searchQuery.Replace(" ", "");
-            Debug.Log("searchQuery: " + searchQuery.Length);
-            if (String.IsNullOrEmpty(searchQuery))
+            searchQuery = searchQuery.Trim();
+            if (searchQuery == null || searchQuery.Trim().Length == 0)
             {
-                foreach (GameObject ele in elements)
+                foreach (var ele in searchableObjects)
                 {
-                    ele.SetActive(true);
+                    ele.Value.SetActive(true);
                 }
             }
             else
             {
-                var searchList = Search(searchQuery, elements);
-                foreach (GameObject ele in elements)
+                IEnumerable<string> searchList = Search(searchQuery, searchableObjects.Values.ToArray());
+                foreach(var ele in searchableObjects)
                 {
-                    if (ele != null)
-                    {
-                        string eleText = ele.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text;
-                        ele.SetActive(searchList.Contains(eleText));
-                    }
+                    ele.Value.SetActive(false);
+                }
+                foreach (string ele in searchList)
+                {
+                    searchableObjects.TryGetValue(ele, out GameObject activeObject);
+                    activeObject.SetActive(true);
                 }
             }
         }
@@ -89,15 +89,14 @@ namespace SEE.UI.Window
         /// <param name="objectList"> array of GameObjects containing the objects to search through</param>
         /// <param name="cutoff"> representing the cutoff score for relevance </param>
         /// <returns> An iterable collection of strings representing the attributes of the GameObject instances, ordered by relevance to the search query </returns>
-        public IEnumerable<string> Search(string query, GameObject[] objectList, int cutoff = 62)
+        public IEnumerable<string> Search(string query, GameObject[] objectList, int limit = 15, int cutoff = 40)
         {
             List<string> attributesList = new List<string>();
             foreach (GameObject obj in objectList)
             {
                 attributesList.Add(obj.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text);
             }
-
-            IEnumerable<(int score, string attribute)> searchResults = Process.ExtractAll(query, attributesList, cutoff: cutoff).Select(x => (x.Score, x.Value));
+            IEnumerable<(int score, string attribute)> searchResults = Process.ExtractTop(query, attributesList, limit: limit, cutoff: cutoff).Select(x => (x.Score, x.Value));
             searchResults = searchResults.OrderByDescending(x => x.score);
 
             return searchResults.Select(x => x.attribute);
@@ -126,14 +125,15 @@ namespace SEE.UI.Window
 
             // Save GameObjects in Array for SearchField
             int totalElements = scrollViewContent.transform.childCount;
-            GameObject[] Element = new GameObject[totalElements];
+            Dictionary<string, GameObject> activeElements = new Dictionary<string, GameObject>();
 
-            for (int i = 0; i < totalElements; i++)
+            for (int i = 1; i < totalElements; i++)
             {
-                Element[i] = scrollViewContent.transform.GetChild(i).gameObject;
+                activeElements.Add(scrollViewContent.transform.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>().text,
+                    scrollViewContent.transform.GetChild(i).gameObject);
             }
 
-            inputField.onValueChanged.AddListener(str => InputSearchField(str, Element));
+            inputField.onValueChanged.AddListener(str => InputSearchField(str, activeElements));
         }
 
         /// <summary>
