@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using SEE.GO;
 using SEE.Utils;
 using TMPro;
@@ -10,7 +11,7 @@ namespace SEE.UI
     /// <summary>
     /// A loading spinner that can be shown and hidden.
     ///
-    /// A message can also be specified that will be shown to the user when they hover over the spinner.
+    /// A message can also be specified that will be shown below the spinner.
     /// Note that the message must be unique to your loading process, otherwise another loading process
     /// with the same message may interfere with your spinner.
     /// The spinner will be shown as long as there is at least one active loading process.
@@ -46,10 +47,9 @@ namespace SEE.UI
         private static TextMeshProUGUI processCountText;
 
         /// <summary>
-        /// The tooltip containing the <see cref="TooltipText"/> of this <see cref="LoadingSpinner"/>, which will
-        /// be displayed when hovering above it.
+        /// The TextMeshPro containing the information about the active loading processes.
         /// </summary>
-        private static Tooltip.Tooltip tooltip;
+        private static TextMeshProUGUI processInfoText;
 
         /// <summary>
         /// The set of active loading processes.
@@ -66,20 +66,17 @@ namespace SEE.UI
 
             // We initialize the loading spinner so that it can be quickly shown when needed.
             loadingSpinner = PrefabInstantiator.InstantiatePrefab(loadingSpinnerPrefab, Canvas.transform, false);
-            PointerHelper pointerHelper = loadingSpinner.MustGetComponent<PointerHelper>();
-            processCountText = loadingSpinner.GetComponentInChildren<TextMeshProUGUI>();
-            tooltip = loadingSpinner.AddOrGetComponent<Tooltip.Tooltip>();
-            pointerHelper.EnterEvent.AddListener(_ => tooltip.Show(TooltipText));
-            pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
+            processCountText = loadingSpinner.transform.Find("Counter").gameObject.MustGetComponent<TextMeshProUGUI>();
+            processInfoText = loadingSpinner.transform.Find("Info").gameObject.MustGetComponent<TextMeshProUGUI>();
 
             loadingSpinner.SetActive(loadingProcesses.Count > 0);
             UpdateLoadingText();
         }
 
         /// <summary>
-        /// The text that shall be shown in the loading spinner's tooltip.
+        /// The text that shall be shown below the spinner.
         /// </summary>
-        private static string TooltipText => string.Join("\n", loadingProcesses);
+        private static string InfoText => string.Join("\n", loadingProcesses);
 
         /// <summary>
         /// Displays the loading spinner with the given <paramref name="processMessage"/>,
@@ -147,6 +144,7 @@ namespace SEE.UI
                 return;
             }
             processCountText.text = loadingProcesses.Count <= 1 ? "" : $"{loadingProcesses.Count}";
+            processInfoText.text = InfoText;
         }
 
         /// <summary>
