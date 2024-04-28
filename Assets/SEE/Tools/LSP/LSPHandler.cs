@@ -537,7 +537,7 @@ namespace SEE.Tools.LSP
                 return;
             }
 
-            IDisposable spinner = LoadingSpinner.Show("Shutting down language server...");
+            IDisposable spinner = LoadingSpinner.ShowIndeterminate("Shutting down language server...");
             try
             {
                 if (Client != null)

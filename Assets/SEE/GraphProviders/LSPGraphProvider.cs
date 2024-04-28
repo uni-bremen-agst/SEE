@@ -177,14 +177,19 @@ namespace SEE.GraphProviders
                 SourcePaths = new[] { ProjectPath.Path };
             }
 
-            IDisposable spinner = LoadingSpinner.Show("Creating graph from language server...");
             try
             {
-                await UniTask.SwitchToThreadPool();
                 // TODO: Use cancellation token to cancel the task if requested.
                 LSPImporter importer = new(handler, SourcePaths, ExcludedSourcePaths, IncludedNodeTypes,
                                            IncludedEdgeTypes, AvoidSelfReferences, AvoidParentReferences);
-                await importer.LoadAsync(graph, changePercentage);
+                using (LoadingSpinner.ShowDeterminate("Creating graph using LSP...", out Action<float> updateProgress))
+                {
+                    await importer.LoadAsync(graph, x =>
+                    {
+                        changePercentage?.Invoke(x);
+                        updateProgress(x);
+                    });
+                }
             }
             catch (TimeoutException)
             {
@@ -202,7 +207,6 @@ namespace SEE.GraphProviders
             finally
             {
                 await UniTask.SwitchToMainThread();
-                spinner.Dispose();
             }
 
             // We shut down the LSP server for now. If it is needed again, it can still be restarted.

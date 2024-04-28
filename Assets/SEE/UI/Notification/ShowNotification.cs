@@ -1,4 +1,5 @@
 ﻿using System;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.UI.Notification
@@ -78,7 +79,7 @@ namespace SEE.UI.Notification
             {
                 Debug.Log($"{title}: {description}\n");
             }
-            Show(title, description, infoIcon.Value, infoColor, duration);
+            Show(title, description, infoIcon, infoColor, duration);
         }
 
         /// <summary>
@@ -95,7 +96,7 @@ namespace SEE.UI.Notification
             {
                 Debug.LogWarning($"{title}: {description}\n");
             }
-            Show(title, description, warningIcon.Value, warningColor, duration);
+            Show(title, description, warningIcon, warningColor, duration);
         }
 
         /// <summary>
@@ -112,7 +113,7 @@ namespace SEE.UI.Notification
             {
                 Debug.LogError($"{title}: {description}\n");
             }
-            Show(title, description, errorIcon.Value, errorColor, duration);
+            Show(title, description, errorIcon, errorColor, duration);
         }
 
         /// <summary>
@@ -123,12 +124,13 @@ namespace SEE.UI.Notification
         /// <param name="icon">The icon of the notification.</param>
         /// <param name="color">The color of the notification.</param>
         /// <param name="duration">The duration of the notification.</param>
-        private static void Show(string title, string description, Sprite icon, Color color,
+        private static void Show(string title, string description, Lazy<Sprite> icon, Color color,
                                  float duration = defaultDuration)
         {
-            if (Application.isPlaying)
+            // Only show the notification if we are on the main thread.
+            if (AsyncUtils.IsRunningOnMainThread)
             {
-                manager.Value.Show(title, description, icon, color, duration);
+                manager.Value.Show(title, description, icon.Value, color, duration);
             }
         }
     }

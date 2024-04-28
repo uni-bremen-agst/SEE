@@ -149,15 +149,12 @@ namespace SEE.Game.City
             loadedGraph = null;
             visualizedSubGraph = null;
 
-            using (LoadingSpinner.Show($"Loading city \"{gameObject.name}\""))
+            if (!gameObject.IsCodeCityDrawn())
             {
-                if (!gameObject.IsCodeCityDrawn())
-                {
-                    Debug.LogWarning($"There is no drawn code city for {gameObject.name}.");
-                    return;
-                }
-                LoadAsync().Forget();
+                Debug.LogWarning($"There is no drawn code city for {gameObject.name}.");
+                return;
             }
+            LoadAsync().Forget();
             return;
 
             async UniTaskVoid LoadAsync()
@@ -303,13 +300,15 @@ namespace SEE.Game.City
             {
                 try
                 {
-                    LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, x => ProgressBar = x);
+                    using (LoadingSpinner.ShowIndeterminate($"Loading city \"{gameObject.name}\""))
+                    {
+                        LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, x => ProgressBar = x);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    await UniTask.SwitchToMainThread();
-                    ShowNotification.Error("Data failure", $"Graph provider failed with: {ex}\n");
                     Debug.LogException(ex);
+                    ShowNotification.Error("Data failure", $"Graph provider failed with: {ex.Message}\n", log: false);
                 }
             }
             else
@@ -381,7 +380,7 @@ namespace SEE.Game.City
                 }
                 else
                 {
-                    using (LoadingSpinner.Show($"Drawing city \"{gameObject.name}\""))
+                    using (LoadingSpinner.ShowIndeterminate($"Drawing city \"{gameObject.name}\""))
                     {
                         graphRenderer = new GraphRenderer(this, theVisualizedSubGraph);
                         // We assume here that this SEECity instance was added to a game object as

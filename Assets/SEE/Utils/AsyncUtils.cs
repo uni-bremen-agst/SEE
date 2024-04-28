@@ -14,6 +14,12 @@ namespace SEE.Utils
     public static class AsyncUtils
     {
         /// <summary>
+        /// The main thread ID.
+        /// Needs to be set by the main thread at the start of the application.
+        /// </summary>
+        public static int MainThreadId = 0;
+
+        /// <summary>
         /// Runs the given <paramref name="task"/> with a <paramref name="timeout"/> and returns the result.
         /// Note that a timeout of <see cref="TimeSpan.Zero"/> will cause no timeout to be applied.
         ///
@@ -163,6 +169,11 @@ namespace SEE.Utils
         /// <summary>
         /// Whether the current thread is the main thread.
         /// </summary>
-        public static bool IsMainThread => Thread.CurrentThread.ManagedThreadId == 1;
+        public static bool IsMainThread => Thread.CurrentThread.ManagedThreadId == MainThreadId;
+
+        /// <summary>
+        /// Whether the current thread is the main thread and the application is running.
+        /// </summary>
+        public static bool IsRunningOnMainThread => IsMainThread && (!Application.isEditor || Application.isPlaying);
     }
 }
