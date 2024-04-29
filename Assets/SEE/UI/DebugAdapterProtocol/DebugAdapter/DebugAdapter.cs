@@ -19,7 +19,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
     {
         #region Adapter Configuration
         /// <summary>
-        /// The name.
+        /// The name of the debug adapter.
         /// </summary>
         public abstract string Name { get; }
 
@@ -29,15 +29,17 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         protected static readonly string AdapterDirectory = Path.Combine(Directory.GetParent(Application.dataPath).Parent.FullName, "Adapters");
 
         /// <summary>
-        /// The working directory.
+        /// The working directory of the adapter executable.
         /// </summary>
         public abstract string AdapterWorkingDirectory { get; set; }
+
         /// <summary>
-        /// The file name.
+        /// The file name of the adapter executable.
         /// </summary>
         public abstract string AdapterFileName { get; set; }
+
         /// <summary>
-        /// The arguments.
+        /// The arguments passed to the adapter executable.
         /// </summary>
         public abstract string AdapterArguments { get; set; }
         #endregion
