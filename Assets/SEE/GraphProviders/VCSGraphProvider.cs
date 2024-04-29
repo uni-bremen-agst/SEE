@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Dissonance;
 using UnityEngine;
 using SEE.UI.Window.CodeWindow;
 
@@ -38,7 +39,8 @@ namespace SEE.GraphProviders
         /// </summary>
         [OdinSerialize]
         [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
-            Tooltip("Paths and their inclusion/exclusion status."), RuntimeTab(GraphProviderFoldoutGroup), HideReferenceObjectPicker]
+         Tooltip("Paths and their inclusion/exclusion status."), RuntimeTab(GraphProviderFoldoutGroup),
+         HideReferenceObjectPicker]
         public Dictionary<string, bool> PathGlobbing = new()
         {
             { "", false }
@@ -48,10 +50,12 @@ namespace SEE.GraphProviders
         /// Loads the metrics and nodes from the given git repository and commitID into the <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">The graph into which the metrics shall be loaded</param>
-        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
+        public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
         {
             CheckArguments(city);
-            return await UniTask.FromResult<Graph>(GetVCSGraph(PathGlobbing, RepositoryPath.Path, CommitID));
+            UniTask<Graph> graphTask = UniTask.FromResult<Graph>(GetVCSGraph(PathGlobbing, RepositoryPath.Path, CommitID));
+    
+            return graphTask;
         }
 
         /// <summary>
@@ -69,14 +73,17 @@ namespace SEE.GraphProviders
             {
                 throw new ArgumentException("Empty repository path.\n");
             }
+
             if (!Directory.Exists(RepositoryPath.Path))
             {
                 throw new ArgumentException($"Directory {RepositoryPath.Path} does not exist.\n");
             }
+
             if (string.IsNullOrEmpty(CommitID))
             {
                 throw new ArgumentException("Empty newCommitID.\n");
             }
+
             if (city == null)
             {
                 throw new ArgumentException("The given city is null.\n");
@@ -141,6 +148,7 @@ namespace SEE.GraphProviders
                         BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(pathSegments[^1]));
                     }
                 }
+
                 AddMetricsToNode(graph, repo, commitID);
                 //TODO: Only for testing.
                 Debug.Log(graph.ToString());
@@ -179,6 +187,7 @@ namespace SEE.GraphProviders
         {
             return GraphProviderKind.VCS;
         }
+
         /// <summary>
         /// Label of attribute <see cref="PathGlobbing"/> in the configuration file.
         /// </summary>
@@ -208,6 +217,7 @@ namespace SEE.GraphProviders
             ConfigIO.Restore(attributes, newCommitIDLabel, ref CommitID);
             RepositoryPath.Restore(attributes, repositoryPathLabel);
         }
+
         /// <summary>
         /// Creates a new node for each element of a filepath, that does not
         /// already exists in the graph.
@@ -217,50 +227,71 @@ namespace SEE.GraphProviders
         /// <param name="parentPath">The path of the current parent, which will eventually be part of the ID</param>
         /// <param name="graph">The graph to which the new node belongs to</param>
         /// <param name="mainNode">The root node of the main directory</param>
-        public static void BuildGraphFromPath(string path, Node parent, string parentPath, Graph graph, Node mainNode)
+        public static Node BuildGraphFromPath(string path, Node parent, string parentPath, Graph graph, Node mainNode)
         {
             string[] pathSegments = path.Split(Path.AltDirectorySeparatorChar);
-            string nodePath = string.Join(Path.AltDirectorySeparatorChar.ToString(), pathSegments, 1, pathSegments.Length - 1);
+            string nodePath = string.Join(Path.AltDirectorySeparatorChar.ToString(), pathSegments, 1,
+                pathSegments.Length - 1);
             // Current pathSegment is in the main directory.
             if (parentPath == null)
             {
                 // Directory already exists.
                 if (graph.GetNode(pathSegments[0]) != null)
                 {
-                    BuildGraphFromPath(nodePath, graph.GetNode(pathSegments[0]), pathSegments[0], graph, mainNode);
+                    return BuildGraphFromPath(nodePath, graph.GetNode(pathSegments[0]), pathSegments[0], graph,
+                        mainNode);
                 }
+
                 // Directory does not exist.
                 if (graph.GetNode(pathSegments[0]) == null && pathSegments.Length > 1 && parent == null)
                 {
                     mainNode.AddChild(NewNode(graph, pathSegments[0], "directory", pathSegments[0]));
-                    BuildGraphFromPath(nodePath, graph.GetNode(pathSegments[0]), pathSegments[0], graph, mainNode);
+                    return BuildGraphFromPath(nodePath, graph.GetNode(pathSegments[0]), pathSegments[0], graph,
+                        mainNode);
                 }
+
                 // I dont know, if this code ever gets used -> I dont know, how to handle empty directorys.
                 if (graph.GetNode(pathSegments[0]) == null && pathSegments.Length == 1 && parent == null)
                 {
                     mainNode.AddChild(NewNode(graph, pathSegments[0], "directory", pathSegments[0]));
+                    return null;
                 }
             }
+
             // Current pathSegment is not in the main directory.
             if (parentPath != null)
             {
                 // The node for the current pathSegment exists.
                 if (graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]) != null)
                 {
-                    BuildGraphFromPath(nodePath, graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]), parentPath + Path.DirectorySeparatorChar + pathSegments[0], graph, mainNode);
+                    return BuildGraphFromPath(nodePath,
+                        graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]),
+                        parentPath + Path.DirectorySeparatorChar + pathSegments[0], graph, mainNode);
                 }
+
                 // The node for the current pathSegment does not exist, and the node is a directory.
-                if (graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]) == null && pathSegments.Length > 1)
+                if (graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]) == null &&
+                    pathSegments.Length > 1)
                 {
-                    parent.AddChild(NewNode(graph, parentPath + Path.DirectorySeparatorChar + pathSegments[0], "directory", pathSegments[0]));
-                    BuildGraphFromPath(nodePath, graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]), parentPath + Path.DirectorySeparatorChar + pathSegments[0], graph, mainNode);
+                    parent.AddChild(NewNode(graph, parentPath + Path.DirectorySeparatorChar + pathSegments[0],
+                        "directory", pathSegments[0]));
+                    return BuildGraphFromPath(nodePath,
+                        graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]),
+                        parentPath + Path.DirectorySeparatorChar + pathSegments[0], graph, mainNode);
                 }
+
                 // The node for the current pathSegment does not exist, and the node is file.
-                if (graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]) == null && pathSegments.Length == 1)
+                if (graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]) == null &&
+                    pathSegments.Length == 1)
                 {
-                    parent.AddChild(NewNode(graph, parentPath + Path.DirectorySeparatorChar + pathSegments[0], "file", pathSegments[0]));
+                    Node addedFileNode = NewNode(graph, parentPath + Path.DirectorySeparatorChar + pathSegments[0],
+                        "file", pathSegments[0]);
+                    parent.AddChild(addedFileNode);
+                    return addedFileNode;
                 }
             }
+
+            return null;
         }
 
         /// <summary>
@@ -272,7 +303,8 @@ namespace SEE.GraphProviders
         /// <param name="name">The name of the node</param>
         /// <param name="length">The length of the graph element, measured in number of lines</param>
         /// <returns>a new node added to <paramref name="graph"/></returns>
-        public static Node NewNode(Graph graph, string id, string type = "Routine", string name = null, int? length = null)
+        public static Node NewNode(Graph graph, string id, string type = "Routine", string name = null,
+            int? length = null)
         {
             Node result = new()
             {
@@ -296,7 +328,8 @@ namespace SEE.GraphProviders
         /// <param name="name">The name of the node</param>
         /// <param name="length">The length of the graph element, measured in number of lines</param>
         /// <returns>a new node added to <paramref name="graph"/></returns>
-        protected static Node Child(Graph graph, Node parent, string id, string type = "Routine", string name = null, int? length = null)
+        protected static Node Child(Graph graph, Node parent, string id, string type = "Routine", string name = null,
+            int? length = null)
         {
             Node child = NewNode(graph, id, type, name, length);
             parent.AddChild(child);
@@ -318,7 +351,8 @@ namespace SEE.GraphProviders
             {
                 string fileContent = blob.GetContentText();
 
-                return SEEToken.FromString(fileContent, TokenLanguage.FromFileExtension(Path.GetExtension(filePath)?[1..]));
+                return SEEToken.FromString(fileContent,
+                    TokenLanguage.FromFileExtension(Path.GetExtension(filePath)?[1..]));
             }
             else
             {
@@ -355,6 +389,7 @@ namespace SEE.GraphProviders
                         UnityEngine.Debug.LogError($"Unknown token type");
                         continue;
                     }
+
                     //if(language == TokenLanguage.AllTokenLanguages)
                     if (TokenLanguage.AllTokenLanguages.Contains(language))
                     {
@@ -369,7 +404,8 @@ namespace SEE.GraphProviders
                         node.SetInt("Halstead Total Operands", halsteadMetrics.TotalOperands);
                         node.SetInt("Halstead Program Vocabulary", halsteadMetrics.ProgramVocabulary);
                         node.SetInt("Halstead Program Length", halsteadMetrics.ProgramLength);
-                        node.SetFloat("Halstead Calculated Estimated Program Length", halsteadMetrics.EstimatedProgramLength);
+                        node.SetFloat("Halstead Calculated Estimated Program Length",
+                            halsteadMetrics.EstimatedProgramLength);
                         node.SetFloat("Halstead Volume", halsteadMetrics.Volume);
                         node.SetFloat("Halstead Difficulty", halsteadMetrics.Difficulty);
                         node.SetFloat("Halstead Effort", halsteadMetrics.Effort);
@@ -444,21 +480,30 @@ namespace SEE.GraphProviders
         private static HalsteadMetrics CalculateHalsteadMetrics(IEnumerable<SEEToken> tokens)
         {
             // Identify operands (identifiers, keywords and literals).
-            HashSet<string> operands = new(tokens.Where(t => t.TokenType == SEEToken.Type.Identifier || t.TokenType == SEEToken.Type.Keyword || t.TokenType == SEEToken.Type.NumberLiteral || t.TokenType == SEEToken.Type.StringLiteral).Select(t => t.Text));
+            HashSet<string> operands = new(tokens.Where(t =>
+                    t.TokenType == SEEToken.Type.Identifier || t.TokenType == SEEToken.Type.Keyword ||
+                    t.TokenType == SEEToken.Type.NumberLiteral || t.TokenType == SEEToken.Type.StringLiteral)
+                .Select(t => t.Text));
 
             // Identify operators.
-            HashSet<string> operators = new(tokens.Where(t => t.TokenType == SEEToken.Type.Punctuation).Select(t => t.Text));
+            HashSet<string> operators =
+                new(tokens.Where(t => t.TokenType == SEEToken.Type.Punctuation).Select(t => t.Text));
 
             // Count the total number of operands and operators.
-            int totalOperands = tokens.Count(t => t.TokenType == SEEToken.Type.Identifier || t.TokenType == SEEToken.Type.Keyword || t.TokenType == SEEToken.Type.NumberLiteral || t.TokenType == SEEToken.Type.StringLiteral);
+            int totalOperands = tokens.Count(t =>
+                t.TokenType == SEEToken.Type.Identifier || t.TokenType == SEEToken.Type.Keyword ||
+                t.TokenType == SEEToken.Type.NumberLiteral || t.TokenType == SEEToken.Type.StringLiteral);
             int totalOperators = tokens.Count(t => t.TokenType == SEEToken.Type.Punctuation);
 
             // Derivative Halstead metrics.
             int programVocabulary = operators.Count + operands.Count;
             int programLength = totalOperators + totalOperands;
-            float estimatedProgramLength = (float)((operators.Count * Math.Log(operators.Count, 2) + operands.Count * Math.Log(operands.Count, 2)));
+            float estimatedProgramLength = (float)((operators.Count * Math.Log(operators.Count, 2) +
+                                                    operands.Count * Math.Log(operands.Count, 2)));
             float volume = (float)(programLength * Math.Log(programVocabulary, 2));
-            float difficulty = operators.Count == 0 ? 0 : operators.Count / 2.0f * (totalOperands / (float)operands.Count);
+            float difficulty = operators.Count == 0
+                ? 0
+                : operators.Count / 2.0f * (totalOperands / (float)operands.Count);
             float effort = difficulty * volume;
             float timeRequiredToProgram = effort / 18.0f;
             float numberOfDeliveredBugs = volume / 3000.0f;

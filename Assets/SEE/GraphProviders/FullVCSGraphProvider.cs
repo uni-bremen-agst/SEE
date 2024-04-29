@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using LibGit2Sharp;
+using LibGit2Sharp.Handlers;
 using SEE.DataModel.DG;
-using SEE.DataModel.GraphSearch;
 using SEE.Game.City;
+using SEE.GO;
 using SEE.UI.RuntimeConfigMenu;
-using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
@@ -55,7 +54,9 @@ namespace SEE.GraphProviders
 
         public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
         {
-            return UniTask.FromResult(GetGraph(graph));
+            UniTask<Graph> graphTask = UniTask.FromResult(GetGraph(graph));
+
+            return graphTask;
         }
 
         private Graph GetGraph(Graph graph)
@@ -80,7 +81,6 @@ namespace SEE.GraphProviders
             {
                 //string[] pathSegments = RepositoryPath.Path.Split(Path.DirectorySeparatorChar);
 
-
                 List<Commit> commitList = new();
 
                 // Iterate over each commit in each branch until time limit is reached
@@ -104,6 +104,7 @@ namespace SEE.GraphProviders
                 commitList = commitList
                     .GroupBy(x => x.Sha)
                     .Select(x => x.First())
+                    //.Where(x => x.Parents.Count() <= 1)
                     .ToList();
 
 
@@ -147,22 +148,24 @@ namespace SEE.GraphProviders
                     }
                     else
                     {
-                        VCSGraphProvider.BuildGraphFromPath(file.Key, null, null, graph,
+                        Node n = VCSGraphProvider.BuildGraphFromPath(file.Key, null, null, graph,
                             graph.GetNode(pathSegments[^1]));
+                        n.SetInt("Metric.Authors.Number", file.Value.Authors.Count);
+                        n.SetInt("Metric.File.Commits", file.Value.NumberOfCommits);
                     }
                 }
 
-                foreach (var file in fileMetrics)
-                {
-                    string[] pathSplit = file.Key.Split(Path.AltDirectorySeparatorChar);
-                    string nodePath = string.Join(Path.DirectorySeparatorChar.ToString(), pathSplit, 0,
-                        pathSplit.Length);
-
-                    GraphSearch search = new GraphSearch(graph);
-                    var n = graph.GetNode(nodePath);
-                    n.SetInt("Metric.Authors.Number", file.Value.Authors.Count);
-                    n.SetInt("Metric.File.Commits", file.Value.NumberOfCommits);
-                }
+                // foreach (var file in fileMetrics)
+                // {
+                //     string[] pathSplit = file.Key.Split(Path.AltDirectorySeparatorChar);
+                //     string nodePath = string.Join(Path.DirectorySeparatorChar.ToString(), pathSplit, 0,
+                //         pathSplit.Length);
+                //
+                //     GraphSearch search = new GraphSearch(graph);
+                //     var n = graph.GetNode(nodePath);
+                //     n.SetInt("Metric.Authors.Number", file.Value.Authors.Count);
+                //     n.SetInt("Metric.File.Commits", file.Value.NumberOfCommits);
+                // }
 
                 if (SimplifyGraph)
                 {
