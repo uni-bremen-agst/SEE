@@ -64,7 +64,7 @@ namespace SEE.UI.Window.CodeWindow
             DebugBreakpointManager.OnBreakpointAdded += OnBreakpointAdded;
             DebugBreakpointManager.OnBreakpointRemoved += OnBreakpointRemoved;
 
-            var temp = SceneQueries.GetCodeCity(transform);
+            Transform temp = SceneQueries.GetCodeCity(transform);
             if (temp && temp.gameObject.TryGetComponentOrLog(out AbstractSEECity city)) {
                 // Get button for IDE interaction and register events.
                 Window.transform.Find("Dragger/IDEButton").gameObject.GetComponent<Button>()
