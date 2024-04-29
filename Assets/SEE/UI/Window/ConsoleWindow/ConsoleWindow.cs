@@ -207,7 +207,7 @@ namespace SEE.UI.Window.ConsoleWindow
             }
             else
             {
-                messages[appendTo.Value].text += text;
+                messages[appendTo.Value].Text += text;
                 MessageChanged?.Invoke();
             }
         }
@@ -263,7 +263,7 @@ namespace SEE.UI.Window.ConsoleWindow
             {
                 if (c.Levels.TryGetValue(level, out ChannelLevel l))
                 {
-                    l.enabled = enabled;
+                    l.Enabled = enabled;
                     ChannelChanged?.Invoke();
                 }
                 else
@@ -290,9 +290,9 @@ namespace SEE.UI.Window.ConsoleWindow
             for (int i = messages.Count - 1; i >= 0; i--)
             {
                 Message message = messages[i];
-                if (message.channel == channel && message.level == level)
+                if (message.Channel == channel && message.Level == level)
                 {
-                    if (!message.text.EndsWith('\n'))
+                    if (!message.Text.EndsWith('\n'))
                     {
                         return i;
                     }
@@ -447,12 +447,12 @@ namespace SEE.UI.Window.ConsoleWindow
         {
             GameObject item = PrefabInstantiator.InstantiatePrefab(itemPrefab, items, false);
 
-            Channel channel = channels.GetValueOrDefault(message.channel);
-            Color color = channel?.Levels.GetValueOrDefault(message.level)?.Color ?? Color.white;
+            Channel channel = channels.GetValueOrDefault(message.Channel);
+            Color color = channel?.Levels.GetValueOrDefault(message.Level)?.Color ?? Color.white;
             char icon = channel?.Icon ?? '\u003f';
 
             TextMeshProUGUI textMesh = item.transform.Find("Foreground/Text").gameObject.MustGetComponent<TextMeshProUGUI>();
-            textMesh.text = message.text;
+            textMesh.text = message.Text;
             textMesh.color = color.IdealTextColor();
 
             TextMeshProUGUI iconMesh = item.transform.Find("Foreground/Type Icon").gameObject.MustGetComponent<TextMeshProUGUI>();
@@ -475,7 +475,7 @@ namespace SEE.UI.Window.ConsoleWindow
             GameObject item = items.GetChild(i).gameObject;
             Message message = messages[i];
             TextMeshProUGUI textMesh = item.transform.Find("Foreground/Text").gameObject.MustGetComponent<TextMeshProUGUI>();
-            textMesh.SetText(message.text);
+            textMesh.SetText(message.Text);
             UpdateFilter(message, item);
         }
 
@@ -502,7 +502,7 @@ namespace SEE.UI.Window.ConsoleWindow
             string text = item.transform.Find("Foreground/Text").gameObject.MustGetComponent<TextMeshProUGUI>().text;
             if (!text.Contains(searchField.text, matchCase ? 0 : StringComparison.OrdinalIgnoreCase) ||
                 fullMatch && text.Length != searchField.text.Length ||
-                !channels[message.channel].Levels[message.level].Enabled)
+                !channels[message.Channel].Levels[message.Level].Enabled)
             {
                 item.SetActive(false);
             }
@@ -549,12 +549,12 @@ namespace SEE.UI.Window.ConsoleWindow
                 popupMenu.AddEntry(new PopupMenuHeading(channel.Name));
                 foreach (ChannelLevel level in channel.Levels.Values)
                 {
-                    popupMenu.AddEntry(new PopupMenuAction(level.name, () =>
+                    popupMenu.AddEntry(new PopupMenuAction(level.Name, () =>
                     {
-                        level.enabled = !level.enabled;
+                        level.Enabled = !level.Enabled;
                         UpdateFilters();
                         ShowFilterPopup(true);
-                    }, level.enabled ? Icons.CheckedCheckbox : Icons.EmptyCheckbox, false));
+                    }, level.Enabled ? Icons.CheckedCheckbox : Icons.EmptyCheckbox, false));
                 }
             }
             if (!refresh)
@@ -595,27 +595,27 @@ namespace SEE.UI.Window.ConsoleWindow
             /// <summary>
             /// The message channel.
             /// </summary>
-            public string channel { get; } = channel;
+            public string Channel { get; } = channel;
 
             /// <summary>
             /// The message level.
             /// </summary>
-            public string level { get; } = level;
+            public string Level { get; } = level;
 
 
             /// <summary>
             /// The message text.
             /// </summary>
-            public string text { get; set; } = text;
+            public string Text { get; set; } = text;
         };
 
         /// <summary>
         /// Container for a channel.
         /// </summary>
-        /// <param name="name">The channel name.</param>
-        /// <param name="icon">The channel icon.</param>
-        /// <param name="levels">The channel levels.</param>
-        private record Channel(string name, char icon, Dictionary<string, ChannelLevel> levels = null);
+        /// <param name="Name">The channel name.</param>
+        /// <param name="Icon">The channel icon.</param>
+        /// <param name="Levels">The channel levels.</param>
+        private record Channel(string Name, char Icon, Dictionary<string, ChannelLevel> Levels = null);
 
         /// <summary>
         /// Container for a channel level.
@@ -628,18 +628,18 @@ namespace SEE.UI.Window.ConsoleWindow
             /// <summary>
             /// The level name.
             /// </summary>
-            public string name { get; } = name;
+            public string Name { get; } = name;
 
             /// <summary>
             /// The level color. (background color in console window)
             /// </summary>
-            public Color color { get; } = color;
+            public Color Color { get; } = color;
 
             /// <summary>
             /// Whether the level is enabled.
             /// </summary>
 
-            public bool enabled { get; set; } = enabled;
+            public bool Enabled { get; set; } = enabled;
         };
     }
 }
