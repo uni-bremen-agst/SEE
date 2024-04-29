@@ -280,8 +280,17 @@ namespace SEE.UI.Window.ConsoleWindow
         /// <returns></returns>
         private static int AppendTo(string channel, string level)
         {
-            return messages.Reverse()
-                           .FirstOrDefault(m => m.Channel == channel && m.Level == level && !message.Text.EndsWith('\n'), -1);
+            for (int i = messages.Count - 1; i >= 0; i--)
+            {
+                Message message = messages[i];
+                if (message.Channel == channel && message.Level == level)
+                {
+                    if (!message.Text.EndsWith('\n'))
+                    {
+                        return i;
+                    }
+                }
+            }
         }
 
         /// <summary>
