@@ -143,7 +143,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// Queued actions that are executed on the main thread.
         ///
         /// <para>
-        /// Ensures that the actions are executed after the debug adapter is initialized.
+        /// Ensures that the actions are executed on the main thread and after the debug adapter is initialized.
         /// </para>
         /// <seealso cref="Update"/>
         /// </summary>
@@ -311,7 +311,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// Executes the queued actions on the main thread.
         /// Waits until the capabilities are known.
         /// </summary>
-        private void Update()
+        protected override void Update()
         {
             if (capabilities != null)
             {
