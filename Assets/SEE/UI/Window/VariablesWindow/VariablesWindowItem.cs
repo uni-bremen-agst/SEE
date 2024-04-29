@@ -181,7 +181,7 @@ namespace SEE.UI.Window.VariablesWindow
         /// <summary>
         /// Adds an item.
         /// </summary>
-        /// <param name="child"></param>
+        /// <param name="child">The child item.</param>
         public void AddChild(VariablesWindowItem child)
         {
             children.Add(child);
@@ -196,7 +196,7 @@ namespace SEE.UI.Window.VariablesWindow
         /// <summary>
         /// Adds a variable.
         /// </summary>
-        /// <param name="variable"></param>
+        /// <param name="variable">The child variable.</param>
         public void AddVariable(Variable variable)
         {
             VariablesWindowItem variableItem = gameObject.AddComponent<VariablesWindowItem>();
@@ -321,7 +321,7 @@ namespace SEE.UI.Window.VariablesWindow
         /// <summary>
         /// Updates the indentation level of all children.
         /// </summary>
-        /// <param name="child"></param>
+        /// <param name="child">The child that needs to be updated.</param>
         private void UpdateChildIndent(VariablesWindowItem child)
         {
             child.Indent = Indent + 1;
@@ -330,7 +330,7 @@ namespace SEE.UI.Window.VariablesWindow
         /// <summary>
         /// Updates the visibility of all children.
         /// </summary>
-        /// <param name="child"></param>
+        /// <param name="child">The child that needs to be updated.</param>
         private void UpdateChildVisibility(VariablesWindowItem child)
         {
             child.IsVisible = IsVisible && isExpanded;
