@@ -357,7 +357,8 @@ namespace SEE.UI.Window.CodeWindow
                             && city.ErosionSettings.ShowIssuesInCodeWindow)
                         {
                             MarkIssuesAsync(filename).Forget(); // initiate issue search
-                        } else if (HasStarted)
+                        }
+                        else if (HasStarted)
                         {
                             textMesh.SetText(text);
                             SetupBreakpoints();

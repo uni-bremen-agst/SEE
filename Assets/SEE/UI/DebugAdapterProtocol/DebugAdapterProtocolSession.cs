@@ -180,7 +180,8 @@ namespace SEE.UI.DebugAdapterProtocol
                 if (value)
                 {
                     actions.Enqueue(ClearLastCodePosition);
-                } else
+                }
+                else
                 {
                     actions.Enqueue(UpdateThreads);
                     actions.Enqueue(UpdateStackFrames);
@@ -808,7 +809,8 @@ namespace SEE.UI.DebugAdapterProtocol
             if (capabilities == null)
             {
                 actions.Enqueue(UpdateCapabilities);
-            } else
+            }
+            else
             {
                 UpdateCapabilities();
             }
@@ -994,7 +996,8 @@ namespace SEE.UI.DebugAdapterProtocol
                 if (capabilities.SupportsTerminateRequest == true)
                 {
                     Terminate();
-                } else
+                }
+                else
                 {
                     Disconnect();
                 }
@@ -1070,11 +1073,13 @@ namespace SEE.UI.DebugAdapterProtocol
                     float duration = lastHighlighted == null || lastHighlighted.ID != node.ID ? highlightDurationInitial : highlightDurationRepeated;
                     lastHighlighted = node;
                     ShowCodePosition(true, true, highlightDurationInitial);
-                } else
+                }
+                else
                 {
                     ShowCodePosition(true, true, -1);
                 }
-            } else
+            }
+            else
             {
                 ShowCodePosition(true, true, -1);
             }
@@ -1098,7 +1103,8 @@ namespace SEE.UI.DebugAdapterProtocol
                 manager.AddWindow(codeWindow);
                 codeWindow.OnComponentInitialized += Mark;
                 codeWindow.OnComponentInitialized += MakeActive;
-            } else
+            }
+            else
             {
                 Mark();
                 MakeActive();
@@ -1123,7 +1129,8 @@ namespace SEE.UI.DebugAdapterProtocol
                 if (scroll)
                 {
                     codeWindow.ScrolledVisibleLine = lastCodeLine;
-                } else
+                }
+                else
                 {
                     codeWindow.MarkLine(lastCodeLine);
                 }

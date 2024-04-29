@@ -329,7 +329,8 @@ namespace SEE.Tools.Architecture
                 {
                     return graph.AddToMapping(from, to);
                 }
-            } else if (from.IsInImplementation())
+            }
+            else if (from.IsInImplementation())
             {
                 Assert.IsTrue(to.IsInImplementation());
                 result.SetInImplementation();

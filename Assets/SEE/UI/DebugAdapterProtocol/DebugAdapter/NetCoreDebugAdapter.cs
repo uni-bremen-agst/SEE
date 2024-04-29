@@ -150,7 +150,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             launchArgsProperty = go.AddComponent<StringProperty>();
             launchArgsProperty.Name = "Args";
             launchArgsProperty.Description = "The program arguments.";
-            launchArgsProperty.Value = espaceList(launchArgs);
+            launchArgsProperty.Value = escapeList(launchArgs);
             group.AddProperty(launchArgsProperty);
 
             launchStopAtEntryProperty = go.AddComponent<BooleanProperty>();
@@ -202,8 +202,8 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// <seealso cref="parseList(string)"/>
         /// </summary>
         /// <param name="args">The list.</param>
-        /// <returns></returns>
-        private static string espaceList(List<string> args)
+        /// <returns>The escaped list.</returns>
+        private static string escapeList(List<string> args)
         {
             if (args.Count == 0)
             {
@@ -215,10 +215,10 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
 
         /// <summary>
         /// Parses a string to a list.
-        /// <seealso cref="espaceList(List{string})"/>
+        /// <seealso cref="escapeList(List{string})"/>
         /// </summary>
         /// <param name="text">The string.</param>
-        /// <returns></returns>
+        /// <returns>The parsed list.</returns>
         private static List<string> parseList(string text)
         {
             if (text.Length == 0)
@@ -229,7 +229,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             List<string> arguments = new();
             StringBuilder currentArgument = new();
             bool inString = false;
-            for (int i=0; i<text.Length; i++)
+            for (int i=0; i < text.Length; i++)
             {
                 char c = text[i];
                 // quotations marks mark the start and end of each argument
@@ -238,12 +238,14 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
                     if (!inString)
                     {
                         currentArgument = new();
-                    } else
+                    } 
+                    else
                     {
                         arguments.Add(currentArgument.ToString());
                     }
                     inString = !inString;
-                } else if (inString)
+                } 
+                else if (inString)
                 {
                     // backslash escapes the next character (allows quotation marks)
                     if (c == '\\')
@@ -252,7 +254,8 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
                         c = text[i];
                     }
                     currentArgument.Append(c);
-                } else
+                }
+                else
                 {
                     // characters outside of quotations marks are ignored
                 }
