@@ -574,8 +574,8 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Handles the begin of hovering a word.
         /// </summary>
-        /// <param name="codeWindow"></param>
-        /// <param name="wordInfo"></param>
+        /// <param name="codeWindow">The code window containing the hovered word.</param>
+        /// <param name="wordInfo">The info of the hovered word.</param>
         private void OnWordHoverBegin(CodeWindow codeWindow, TMP_WordInfo wordInfo)
         {
             hoveredWord = wordInfo;
@@ -585,8 +585,8 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Handles the end of hovering a word.
         /// </summary>
-        /// <param name="codeWindow"></param>
-        /// <param name="wordInfo"></param>
+        /// <param name="codeWindow">The code window of the hovered word.</param>
+        /// <param name="wordInfo">The info of the hovered word.</param>
         private void OnWordHoverEnd(CodeWindow codeWindow, TMP_WordInfo wordInfo)
         {
             hoveredWord = null;
