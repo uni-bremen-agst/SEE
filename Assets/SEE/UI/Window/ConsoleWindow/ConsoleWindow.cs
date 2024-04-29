@@ -199,15 +199,15 @@ namespace SEE.UI.Window.ConsoleWindow
             }
 
             text = text.Replace("\t", tabReplacement);
-            int appendTo = AppendTo(channel, level);
-            if (appendTo == -1)
+            int? appendTo = AppendTo(channel, level);
+            if (appendTo is null)
             {
                 messages.Add(new(channel, level, text));
                 MessageAdded?.Invoke();
             }
             else
             {
-                messages[appendTo].Text += text;
+                messages[appendTo.Value].Text += text;
                 MessageChanged?.Invoke();
             }
         }
@@ -285,7 +285,7 @@ namespace SEE.UI.Window.ConsoleWindow
         /// <param name="channel">The channel.</param>
         /// <param name="level">The level.</param>
         /// <returns></returns>
-        private static int AppendTo(string channel, string level)
+        private static int? AppendTo(string channel, string level)
         {
             for (int i = messages.Count - 1; i >= 0; i--)
             {
@@ -298,7 +298,7 @@ namespace SEE.UI.Window.ConsoleWindow
                     }
                 }
             }
-            return -1;
+            return null;
         }
 
         /// <summary>
