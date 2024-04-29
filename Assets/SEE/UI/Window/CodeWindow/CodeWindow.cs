@@ -318,22 +318,11 @@ namespace SEE.UI.Window.CodeWindow
         /// <summary>
         /// Data container for a word hover event
         /// </summary>
-        public struct WordHoverEvent
-        {
-            public readonly string Word;
-            public readonly CodeWindow CodeWindow;
-            public readonly string FilePath;
-            public readonly int Line;
-            public readonly int Column;
-
-            public WordHoverEvent(string word, CodeWindow codeWindow, string filePath, int line, int column)
-            {
-                CodeWindow = codeWindow;
-                FilePath = filePath;
-                Line = line;
-                Column = column;
-                Word = word;
-            }
-        }
+        /// <param name="Word">The hovered word.</param>
+        /// <param name="CodeWindow">The code window containing the hovered word.</param>
+        /// <param name="FilePath">The file path of the code window.</param>
+        /// <param name="Line">The line of the hovered word.</param>
+        /// <param name="Column">The column of the hovered word.</param>
+        public record WordHoverEvent(string Word, CodeWindow CodeWindow, string FilePath, int Line, int Column);
     }
 }
