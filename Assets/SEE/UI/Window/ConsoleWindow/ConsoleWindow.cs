@@ -500,15 +500,9 @@ namespace SEE.UI.Window.ConsoleWindow
             item.SetActive(true);
 
             string text = item.transform.Find("Foreground/Text").gameObject.MustGetComponent<TextMeshProUGUI>().text;
-            if (!text.Contains(searchField.text, matchCase ? 0 : StringComparison.OrdinalIgnoreCase))
-            {
-                item.SetActive(false);
-            }
-            if (fullMatch && text.Length != searchField.text.Length)
-            {
-                item.SetActive(false);
-            }
-            if (!channels[message.Channel].Levels[message.Level].enabled)
+            if (!text.Contains(searchField.text, matchCase ? 0 : StringComparison.OrdinalIgnoreCase) ||
+                fullMatch && text.Length != searchField.text.Length ||
+                !channels[message.Channel].Levels[message.Level].enabled)
             {
                 item.SetActive(false);
             }
