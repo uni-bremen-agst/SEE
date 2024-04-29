@@ -61,10 +61,12 @@ namespace SEE.UI.Window.CodeWindow
         /// Path to the breakpoint prefab.
         /// </summary>
         private const string breakpointPrefab = "Prefabs/UI/BreakpointButton";
+
         /// <summary>
         /// The color for active breakpoints.
         /// </summary>
         private static readonly Color breakpointColorActive = Color.red.WithAlpha(0.5f);
+
         /// <summary>
         /// The color for inactive breakpoints.
         /// </summary>

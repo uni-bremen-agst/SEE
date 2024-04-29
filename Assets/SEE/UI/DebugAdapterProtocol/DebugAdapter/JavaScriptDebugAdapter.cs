@@ -57,10 +57,12 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// The <c>name</c> property.
         /// </summary>
         private string launchName = "Launch file";
+
         /// <summary>
         /// The <c>cwd</c> property.
         /// </summary>
         private string launchCwd = Path.Combine("C:\\", "path", "containing", "program");
+
         /// <summary>
         /// The <c>program</c> property.
         /// </summary>

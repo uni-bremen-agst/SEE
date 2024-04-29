@@ -19,7 +19,7 @@ namespace SEE.UI.Window.VariablesWindow
     /// Represents an item in the <see cref="VariablesWindow"/>.
     /// 
     /// <para>
-    ///     Can be used to group items and/or represent an actual variable.
+    /// Can be used to group items and/or represent an actual variable.
     /// </para>
     /// </summary>
     public class VariablesWindowItem : PlatformDependentComponent
@@ -256,7 +256,7 @@ namespace SEE.UI.Window.VariablesWindow
         /// Updates the item.
         /// 
         /// <para>
-        ///     Retrieves child items if necessary.
+        /// Retrieves child items if necessary.
         /// </para>
         /// </summary>
         protected override void Update()
@@ -311,7 +311,7 @@ namespace SEE.UI.Window.VariablesWindow
         }
 
         /// <summary>
-        ///     Updates the indentation level of all children.
+        /// Updates the indentation level of all children.
         /// </summary>
         /// <param name="child"></param>
         private void UpdateChildIndent(VariablesWindowItem child)
@@ -320,7 +320,7 @@ namespace SEE.UI.Window.VariablesWindow
         }
 
         /// <summary>
-        ///     Updates the visibility of all children.
+        /// Updates the visibility of all children.
         /// </summary>
         /// <param name="child"></param>
         private void UpdateChildVisibility(VariablesWindowItem child)
@@ -329,7 +329,7 @@ namespace SEE.UI.Window.VariablesWindow
         }
 
         /// <summary>
-        ///     Updates (sorts) all children.
+        /// Updates (sorts) all children.
         /// </summary>
         private void UpdateChildrenIndices()
         {
@@ -343,7 +343,7 @@ namespace SEE.UI.Window.VariablesWindow
         }
 
         /// <summary>
-        ///     Updates the sibling index.
+        /// Updates the sibling index.
         /// </summary>
         /// <param name="index">The index.</param>
         private void SetSiblingIndex(int index)
@@ -352,7 +352,7 @@ namespace SEE.UI.Window.VariablesWindow
         }
 
         /// <summary>
-        ///     Retrieves all children.
+        /// Retrieves all children.
         /// </summary>
         private void RetrieveChildren()
         {
@@ -371,7 +371,7 @@ namespace SEE.UI.Window.VariablesWindow
         }
 
         /// <summary>
-        ///     Toggles all children.
+        /// Toggles all children.
         /// </summary>
         /// <param name="e">The click event.</param>
         private void ToggleChildren(PointerEventData e)

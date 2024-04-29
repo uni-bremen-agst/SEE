@@ -20,16 +20,16 @@ namespace SEE.UI.DebugAdapterProtocol
     /// </para>
     /// <list type="table">
     /// <item>
-    ///     <term>Run</term>
-    ///     <description>Starts the debug session.</description>
+    /// <term>Run</term>
+    /// <description>Starts the debug session.</description>
     /// </item>
     /// <item>
-    ///     <term>Adapter Configuration</term>
-    ///     <description>Opens the debug adapter configration dialog.</description>
+    /// <term>Adapter Configuration</term>
+    /// <description>Opens the debug adapter configration dialog.</description>
     /// </item>
     /// <item>
-    ///     <term>Launch Configuration</term>
-    ///     <description>Opens the launch configuration dialog.</description>
+    /// <term>Launch Configuration</term>
+    /// <description>Opens the launch configuration dialog.</description>
     /// </item>
     /// </list>
     /// </summary>
@@ -45,6 +45,7 @@ namespace SEE.UI.DebugAdapterProtocol
             new GDBDebugAdapter(),
             new MockDebugAdapter(),
         };
+
         /// <summary>
         /// Selected debug adapter.
         /// </summary>

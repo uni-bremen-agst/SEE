@@ -17,13 +17,13 @@ namespace SEE.UI.Window.ConsoleWindow
     /// Represents a movable, scrollable console window.
     /// Displays text outputs, provides search and filter options and has an input field.
     /// <para>
-    ///     The console messages can be categorized by channels and levels:
-    ///     <list type="bullet">
-    ///         <item><description>Each channel has a fontawesome icon, which is displayed in front of each console message.</description></item>
-    ///         <item><description>Each level (in every channel) specifies the color which is used for the message backgrounds.</description></item>
-    ///         <item><description>The channels and levels be used to filter specific messages.</description></item>
-    ///         <item><description>By default only the channel `User Input` with one level `Log` exists.</description></item>
-    ///     </list>
+    /// The console messages can be categorized by channels and levels:
+    /// <list type="bullet">
+    /// <item><description>Each channel has a fontawesome icon, which is displayed in front of each console message.</description></item>
+    /// <item><description>Each level (in every channel) specifies the color which is used for the message backgrounds.</description></item>
+    /// <item><description>The channels and levels be used to filter specific messages.</description></item>
+    /// <item><description>By default only the channel `User Input` with one level `Log` exists.</description></item>
+    /// </list>
     /// </para>
     /// <seealso cref="Channel"/>
     /// <seealso cref="ChannelLevel"/>
@@ -44,10 +44,12 @@ namespace SEE.UI.Window.ConsoleWindow
         /// The window prefab.
         /// </summary>
         private const string windowPrefab = "Prefabs/UI/ConsoleWindow/ConsoleWindow";
+
         /// <summary>
         /// The prefab for each message.
         /// </summary>
         private const string itemPrefab = "Prefabs/UI/ConsoleWindow/ConsoleWindowItem";
+
         /// <summary>
         /// The number of spaces to use for tabs.
         /// <seealso cref="tabReplacement"/>.
@@ -67,10 +69,12 @@ namespace SEE.UI.Window.ConsoleWindow
         /// All console messages.
         /// </summary>
         private static List<Message> messages = new();
+
         /// <summary>
         /// The messages got cleared.
         /// </summary>
         private static event Action MessagesCleared;
+
         /// <summary>
         /// A message was added.
         /// </summary>
@@ -174,7 +178,7 @@ namespace SEE.UI.Window.ConsoleWindow
         /// Adds a console message.
         /// 
         /// <para>
-        ///     Uses <see cref="DefaultChannel"/> and <see cref="DefaultChannelLevel"/> as default if these parameters are omitted.
+        /// Uses <see cref="DefaultChannel"/> and <see cref="DefaultChannelLevel"/> as default if these parameters are omitted.
         /// </para>
         /// </summary>
         /// <param name="text">The text.</param>

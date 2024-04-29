@@ -30,10 +30,12 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// The working directory of the debug adapter.
         /// </summary>
         public override string AdapterWorkingDirectory { get; set; } = Path.Combine(AdapterDirectory, "netcoredbg");
+
         /// <summary>
         /// The executable (file name) of the debug adapter.
         /// </summary>
         public override string AdapterFileName { get; set; } = "netcoredbg.exe";
+
         /// <summary>
         /// The arguments of the debug adapter.
         /// </summary>
@@ -47,20 +49,24 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// </summary>
         private bool launchNoDebug = false;
 
+
         /// <summary>
         /// The <c>name</c> property.
         /// </summary>
         private string launchName = ".NET Core Launch";
+
 
         /// <summary>
         /// The <c>type</c> property.
         /// </summary>
         private string launchType = "coreclr";
 
+
         /// <summary>
         /// The <c>preLaunchTask</c> property.
         /// </summary>
         private string launchPreLaunchTask = "build";
+
 
         /// <summary>
         /// The <c>program</c> property.
@@ -76,10 +82,12 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// The <c>cwd</c> property.
         /// </summary>
         private string launchCwd = Path.Combine("C:\\", "path", "containing", "dll");
+
         /// <summary>
         /// The <c>env</c> property.
         /// </summary>
         private Dictionary<string, string> launchEnv = new();
+
         /// <summary>
         /// The <c>console</c> property.
         /// </summary>

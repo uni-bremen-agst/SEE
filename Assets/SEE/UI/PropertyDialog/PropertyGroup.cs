@@ -22,6 +22,7 @@ namespace SEE.UI.PropertyDialog
         /// TODO: This is unused.
         /// </summary>
         public Sprite Icon;
+
         /// <summary>
         /// Whether to display the properties more compactly.
         /// </summary>

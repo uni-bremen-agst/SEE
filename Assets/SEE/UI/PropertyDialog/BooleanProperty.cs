@@ -15,6 +15,7 @@ namespace SEE.UI.PropertyDialog
         /// The prefab.
         /// </summary>
         private const string inputFieldPrefab = "Prefabs/UI/InputFields/BooleanInputField";
+
         /// <summary>
         /// The switch manager.
         /// </summary>

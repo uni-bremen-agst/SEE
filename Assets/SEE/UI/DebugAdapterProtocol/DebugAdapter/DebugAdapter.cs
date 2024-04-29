@@ -6,14 +6,14 @@ using UnityEngine;
 namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
 {
     /// <summary>
-    ///     Represents an abstract debug adapter.
-    ///     <para>
-    ///         To start the debug adapter <see cref="AdapterDirectory"/>, <see cref="AdapterWorkingDirectory"/> and <see cref="AdapterFileName"/> must be defined.
-    ///     </para>
-    ///     <para>
-    ///         Properties used for the launch configuration should be created in the <see cref="SetupLaunchConfig"/> method.<br/>
-    ///         These properties are not predefined, as these are heavily dependent on the specific debug adapter.<br/>
-    ///     </para>
+    /// Represents an abstract debug adapter.
+    /// <para>
+    /// To start the debug adapter <see cref="AdapterDirectory"/>, <see cref="AdapterWorkingDirectory"/> and <see cref="AdapterFileName"/> must be defined.
+    /// </para>
+    /// <para>
+    /// Properties used for the launch configuration should be created in the <see cref="SetupLaunchConfig"/> method.<br/>
+    /// These properties are not predefined, as these are heavily dependent on the specific debug adapter.<br/>
+    /// </para>
     /// </summary>
     public abstract class DebugAdapter
     {

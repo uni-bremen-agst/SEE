@@ -207,6 +207,7 @@ namespace SEE.UI.PropertyDialog
         /// has not been called and, hence, <see cref="textField"/> does not exist yet.
         /// </summary>
         private string savedValue;
+
         /// <summary>
         /// Value of the input field.
         /// </summary>

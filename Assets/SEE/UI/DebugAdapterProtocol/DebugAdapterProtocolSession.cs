@@ -31,26 +31,26 @@ namespace SEE.UI.DebugAdapterProtocol
     /// <para>
     /// Takes care of the following things:
     /// <list type="bullet">
-    ///     <item>
-    ///         <term>Actions</term>
-    ///         <description>Creates the button bar for start-, stop- and step-actions.</description>
-    ///     </item>
-    ///     <item>
-    ///         <term>Variables</term>
-    ///         <description>Shows variable values in the variable window and on hover.</description>
-    ///     </item>
-    ///     <item>
-    ///         <term>Sending/Receiving Events</term>
-    ///         <description>Handles sending and receiving information to and from the debug adapter.</description>
-    ///     </item>
-    ///     <item>
-    ///         <term>Console</term>
-    ///         <description>Displays program outputs in the console and evaluates user inputs.</description>
-    ///     </item>
-    ///     <item>
-    ///         <term>Code Position</term>
-    ///         <description>Shows the code position in the code window and the city.</description>
-    ///     </item>
+    /// <item>
+    /// <term>Actions</term>
+    /// <description>Creates the button bar for start-, stop- and step-actions.</description>
+    /// </item>
+    /// <item>
+    /// <term>Variables</term>
+    /// <description>Shows variable values in the variable window and on hover.</description>
+    /// </item>
+    /// <item>
+    /// <term>Sending/Receiving Events</term>
+    /// <description>Handles sending and receiving information to and from the debug adapter.</description>
+    /// </item>
+    /// <item>
+    /// <term>Console</term>
+    /// <description>Displays program outputs in the console and evaluates user inputs.</description>
+    /// </item>
+    /// <item>
+    /// <term>Code Position</term>
+    /// <description>Shows the code position in the code window and the city.</description>
+    /// </item>
     /// </list>
     /// </para>
     /// </summary>
@@ -142,7 +142,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// Queued actions that are executed on the main thread.
         ///
         /// <para>
-        ///     Ensures that the actions are executed after the debug adapter is initialized.
+        /// Ensures that the actions are executed after the debug adapter is initialized.
         /// </para>
         /// <seealso cref="Update"/>
         /// </summary>
