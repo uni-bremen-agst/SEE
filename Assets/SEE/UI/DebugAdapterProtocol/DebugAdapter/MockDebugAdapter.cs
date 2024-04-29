@@ -64,27 +64,27 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         private bool launchCompileError = false;
 
         /// <summary>
-        ///     The input field for the <c>noDebug</c> property.
+        /// The input field for the <c>noDebug</c> property.
         /// </summary>
         private BooleanProperty launchNoDebugProperty;
 
         /// <summary>
-        ///     The input field for the <c>program</c> property.
+        /// The input field for the <c>program</c> property.
         /// </summary>
         private FilePathProperty launchProgramProperty;
 
         /// <summary>
-        ///     The input field for the <c>stopOnEntry</c> property.
+        /// The input field for the <c>stopOnEntry</c> property.
         /// </summary>
         private BooleanProperty launchStopOnEntryProperty;
 
         /// <summary>
-        ///     The input field for the <c>trace</c> property.
+        /// The input field for the <c>trace</c> property.
         /// </summary>
         private BooleanProperty launchTraceProperty;
 
         /// <summary>
-        ///     The input field for the <c>compileError</c> property.
+        /// The input field for the <c>compileError</c> property.
         /// </summary>
         private BooleanProperty launchCompileErrorProperty;
         #endregion

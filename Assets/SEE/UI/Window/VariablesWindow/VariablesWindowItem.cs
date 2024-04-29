@@ -37,12 +37,12 @@ namespace SEE.UI.Window.VariablesWindow
         private const int indentShift = 22;
 
         /// <summary>
-        /// The name.
+        /// The name of the variable.
         /// </summary>
         public string Name;
 
         /// <summary>
-        /// The text.
+        /// The string representation of the variable value.
         /// </summary>
         public string Text;
 
@@ -64,7 +64,7 @@ namespace SEE.UI.Window.VariablesWindow
         /// <summary>
         /// Function to retrieve string representing the variable value.
         /// <para>
-        ///     Is executed on the main thread.
+        /// Is executed on the main thread.
         /// </para>
         /// </summary>
         public Func<Variable, string> RetrieveVariableValue;
