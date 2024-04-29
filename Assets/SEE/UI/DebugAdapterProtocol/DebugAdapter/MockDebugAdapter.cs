@@ -8,7 +8,7 @@ using UnityEngine;
 namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
 {
     /// <summary>
-    /// Configration for the mock debug adapter.
+    /// Configuration for the mock debug adapter.
     /// <para>
     /// Repository: <seealso href="https://github.com/microsoft/vscode-mock-debug"/><br/>
     /// Properties: <seealso href="https://github.com/microsoft/vscode-mock-debug/blob/main/package.json#L146"/>
@@ -121,7 +121,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             launchCompileErrorProperty.Description = "Simulates a compile error in 'launch' request.";
             launchCompileErrorProperty.Value = launchCompileError;
             group.AddProperty(launchCompileErrorProperty);
-
         }
 
         /// <inheritdoc/>

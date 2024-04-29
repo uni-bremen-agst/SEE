@@ -123,7 +123,7 @@ namespace SEE.UI.DebugAdapterProtocol
         private string lastCodePath;
 
         /// <summary>
-        /// THe line of the last code position.
+        /// The line of the last code position.
         /// </summary>
         private int lastCodeLine;
 
@@ -428,7 +428,7 @@ namespace SEE.UI.DebugAdapterProtocol
 
         /// <summary>
         /// Opens up the console.
-        /// Can be recalled to reopen or focus the console.
+        /// Can be called again to reopen or focus the console.
         /// </summary>
         private void OpenConsole(bool start = false)
         {
@@ -1019,8 +1019,6 @@ namespace SEE.UI.DebugAdapterProtocol
         }
         #endregion
 
-
-
         #region Utilities
         /// <summary>
         /// Updates the code position.
@@ -1126,7 +1124,6 @@ namespace SEE.UI.DebugAdapterProtocol
             }
         }
 
-
         /// <summary>
         /// Clears the last code position.
         /// </summary>
@@ -1228,6 +1225,4 @@ namespace SEE.UI.DebugAdapterProtocol
         }
         #endregion
     }
-
-
 }

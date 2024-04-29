@@ -213,7 +213,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         private static string espaceList(List<string> args)
         {
             if (args.Count == 0) return "";
-            return "\"" + String.Join("\", \"",
+            return "\"" + string.Join("\", \"",
                 args.Select(arg => arg.Replace("\\", "\\\\").Replace("\"", "\\\""))) + "\"";
         }
 

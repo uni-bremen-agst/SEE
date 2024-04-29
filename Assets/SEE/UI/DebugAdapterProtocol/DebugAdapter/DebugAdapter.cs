@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
 {
     /// <summary>
-    ///     Represents the mock debug adapter.
+    ///     Represents an abstract debug adapter.
     ///     <para>
     ///         To start the debug adapter <see cref="AdapterDirectory"/>, <see cref="AdapterWorkingDirectory"/> and <see cref="AdapterFileName"/> must be defined.
     ///     </para>
@@ -56,7 +56,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// Saves properties of the launch request configuration.
         /// </summary>
         public abstract void SaveLaunchConfig();
-
 
         /// <summary>
         /// Returns the launch request.

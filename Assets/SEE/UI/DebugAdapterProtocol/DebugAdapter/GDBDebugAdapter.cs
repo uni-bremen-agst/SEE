@@ -45,7 +45,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// </summary>
         private bool launchNoDebug = false;
 
-
         /// <summary>
         /// The <c>type</c> property.
         /// </summary>

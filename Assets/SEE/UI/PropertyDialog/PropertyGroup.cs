@@ -23,7 +23,7 @@ namespace SEE.UI.PropertyDialog
         /// </summary>
         public Sprite Icon;
         /// <summary>
-        /// Whether to display the properties more compact.
+        /// Whether to display the properties more compactly.
         /// </summary>
         public bool Compact;
 
@@ -46,7 +46,7 @@ namespace SEE.UI.PropertyDialog
         private const string configurationGroupPrefabPath = "Prefabs/UI/PropertyGroup";
 
         /// <summary>
-        /// The path of the prefab for a PropertyGroup.
+        /// The path of the prefab for a compact PropertyGroup.
         /// </summary>
         private const string configurationCompactGroupPrefabPath = "Prefabs/UI/PropertyGroupCompact";
 

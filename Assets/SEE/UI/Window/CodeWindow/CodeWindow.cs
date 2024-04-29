@@ -98,7 +98,7 @@ namespace SEE.UI.Window.CodeWindow
             string[] allLines = textMesh.text.Split('\n').Select(x => x.EndsWith("</mark>") ? x.Substring(16, x.Length - 16 - 7) : x).ToArray();
             if (lineNumber < 1)
             {
-                textMesh.text = String.Join("\n", allLines);
+                textMesh.text = string.Join("\n", allLines);
             } else
             {
                 string markLine = $"<mark=#ff000044>{allLines[lineNumber - 1]}</mark>";

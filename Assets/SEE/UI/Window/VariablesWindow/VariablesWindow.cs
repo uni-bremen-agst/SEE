@@ -60,7 +60,6 @@ namespace SEE.UI.Window.VariablesWindow
         /// </summary>
         public Func<int, List<Variable>> RetrieveNestedVariables;
 
-
         /// <summary>
         /// Function to retrieve the string representing the variable value.
         /// </summary>

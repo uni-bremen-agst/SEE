@@ -29,7 +29,7 @@ namespace SEE.UI.Window
                 if (HasStarted)
                 {
                     Window.name = Title;
-                    Window.transform.Find("Dragger/Title").gameObject.GetComponent<TextMeshProUGUI>().text = Title;
+                    Window.transform.Find("Dragger/Title").gameObject.MustGetComponent<TextMeshProUGUI>().text = Title;
                 }
             }
         }

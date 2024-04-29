@@ -66,7 +66,7 @@ namespace SEE.UI.Window.ConsoleWindow
         /// <summary>
         /// All console messages.
         /// </summary>
-        private static List<Message> messages = new List<Message>();
+        private static List<Message> messages = new();
         /// <summary>
         /// The messages got cleared.
         /// </summary>
@@ -262,7 +262,7 @@ namespace SEE.UI.Window.ConsoleWindow
                     ChannelChanged?.Invoke();
                 } else
                 {
-                    Debug.LogWarning($"Level {channel} doesn't exist for channel {channel}.");
+                    Debug.LogWarning($"Level {level} doesn't exist for channel {channel}.");
                 }
             } else
             {
@@ -273,25 +273,15 @@ namespace SEE.UI.Window.ConsoleWindow
 
         /// <summary>
         /// Returns the message index to which a new message should be appended.
-        /// -1 if the a new message should be created.
+        /// -1 if a new message should be created.
         /// </summary>
         /// <param name="channel">The channel.</param>
         /// <param name="level">The level.</param>
         /// <returns></returns>
         private static int AppendTo(string channel, string level)
         {
-            for (int i=messages.Count-1; i>=0; i--)
-            {
-                Message message = messages[i];
-                if (message.Channel == channel && message.Level == level)
-                {
-                    if (!message.Text.EndsWith('\n'))
-                    {
-                        return i;
-                    }
-                }
-            }
-            return -1;
+            return messages.Reverse()
+                           .FirstOrDefault(m => m.Channel == channel && m.Level == level && !message.Text.EndsWith('\n'), -1);
         }
 
         /// <summary>

@@ -32,7 +32,6 @@ namespace SEE.UI.Window.CodeWindow
         /// <summary>
         /// The container for breakpoints.
         /// </summary>
-
         private GameObject breakpoints;
 
         /// <summary>
@@ -162,7 +161,6 @@ namespace SEE.UI.Window.CodeWindow
 
         protected override void UpdateDesktop()
         {
-
             // Show issue info on click (on hover would be too expensive)
             if (issueDictionary.Count != 0 && Input.GetMouseButtonDown(0))
             {

@@ -16,7 +16,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
     /// <summary>
     /// Represents the JavaScript debug adapter.
     /// <para>
-    /// Repository: <seealso href="https://github.com/microsoft/vscode-js-debug"/><br/>
+    /// Repository: <seealso href="https://github.com/microsoft/vscode-js-debug"/>
     /// </para>
     /// </summary>
     public class JavaScriptDebugAdapter : DebugAdapter
@@ -47,7 +47,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// The <c>noDebug</c> property.
         /// </summary>
         private bool launchNoDebug = false;
-
 
         /// <summary>
         /// The <c>type</c> property.

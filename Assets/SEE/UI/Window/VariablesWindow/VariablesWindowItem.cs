@@ -19,7 +19,7 @@ namespace SEE.UI.Window.VariablesWindow
     /// Represents an item in the <see cref="VariablesWindow"/>.
     /// 
     /// <para>
-    ///     Can be used to group items and/or the represent an actual variable.
+    ///     Can be used to group items and/or represent an actual variable.
     /// </para>
     /// </summary>
     public class VariablesWindowItem : PlatformDependentComponent

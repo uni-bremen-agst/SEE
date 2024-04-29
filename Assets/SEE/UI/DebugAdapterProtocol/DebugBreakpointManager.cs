@@ -27,7 +27,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// All breakpoints.
         /// </summary>
-        private static readonly Dictionary<string, Dictionary<int, SourceBreakpoint>> breakpoints = new Dictionary<string, Dictionary<int, SourceBreakpoint>>();
+        private static readonly Dictionary<string, Dictionary<int, SourceBreakpoint>> breakpoints = new();
 
         /// <summary>
         /// Adds a breakpoint.

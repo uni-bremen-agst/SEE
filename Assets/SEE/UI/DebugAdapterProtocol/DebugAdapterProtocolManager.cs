@@ -85,7 +85,6 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </summary>
         public GameObject LaunchConfigButton;
 
-
         /// <summary>
         /// Retrieves all cities.
         /// </summary>
