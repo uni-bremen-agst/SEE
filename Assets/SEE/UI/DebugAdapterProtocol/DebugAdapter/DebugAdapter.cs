@@ -26,7 +26,8 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// <summary>
         /// The directory that contains debug adapters.
         /// </summary>
-        protected static readonly string AdapterDirectory = Path.Combine("D:\\" + "ferdi", "Adapters");
+        protected static readonly string AdapterDirectory = Path.Combine(Directory.GetParent(Application.dataPath).Parent.FullName, "Adapters");
+
         /// <summary>
         /// The working directory.
         /// </summary>
