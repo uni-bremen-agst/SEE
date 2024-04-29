@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 
@@ -39,14 +40,17 @@ namespace SEE.GraphProviders
         /// in <see cref="Pipeline"/></param>
         /// <param name="changePercentage">this callback will be called with
         /// the percentage (0–1) of completion of the pipeline</param>
+        /// <param name="token">can be used to cancel the operation</param>
         /// <returns></returns>
         /// <remarks>Exceptions may be thrown by each nested graph provider.</remarks>
-        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city, Action<float> changePercentage = null)
+        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
+                                                          Action<float> changePercentage = null,
+                                                          CancellationToken token = default)
         {
             UniTask<Graph> initial = UniTask.FromResult(graph);
             int count = -1;  // -1 because the first provider will increment it to 0.
             return await Pipeline.Aggregate(initial, (current, provider) =>
-                                                current.ContinueWith(g => provider.ProvideAsync(g, city, AggregatePercentage())));
+                                                current.ContinueWith(g => provider.ProvideAsync(g, city, AggregatePercentage(), token)));
 
             Action<float> AggregatePercentage()
             {

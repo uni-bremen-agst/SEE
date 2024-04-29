@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Markdig;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
@@ -176,7 +177,10 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="graph">The graph to which the nodes and edges should be added.</param>
         /// <param name="changePercentage">A callback that is called with the progress percentage (0 to 1).</param>
-        public async UniTask LoadAsync(Graph graph, Action<float> changePercentage = null)
+        /// <param name="token">A cancellation token that can be used to cancel the import.</param>
+        /// <exception cref="OperationCanceledException">Thrown if the operation is canceled.</exception>
+        public async UniTask LoadAsync(Graph graph, Action<float> changePercentage = null,
+                                       CancellationToken token = default)
         {
             // Query all documents whose file extension is supported by the language server.
             List<string> relevantExtensions = Handler.Server.Languages.SelectMany(x => x.Extensions).ToList();
@@ -316,11 +320,16 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="node">The node for which to retrieve the call hierarchy.</param>
         /// <param name="graph">The graph to which the edges should be added.</param>
-        private async UniTask HandleCallHierarchyAsync(Node node, Graph graph)
+        /// <param name="token">A cancellation token that can be used to cancel the operation.</param>
+        private async UniTask HandleCallHierarchyAsync(Node node, Graph graph, CancellationToken token)
         {
             IUniTaskAsyncEnumerable<CallHierarchyItem> results = Handler.OutgoingCalls(SelectItem, node.Path(), node.SourceLine ?? 0, node.SourceColumn ?? 0);
             await foreach (CallHierarchyItem item in results)
             {
+                if (token.IsCancellationRequested)
+                {
+                    throw new OperationCanceledException();
+                }
                 Node targetNode = FindNodesByLocation(item.Uri.Path, Range.FromLspRange(item.Range)).First();
                 Edge edge = AddEdge(node, targetNode, "Call", false, graph);
                 edge.SetRange(SelectionRangeAttribute, Range.FromLspRange(item.SelectionRange));
@@ -339,11 +348,16 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="node">The node for which to retrieve the type hierarchy.</param>
         /// <param name="graph">The graph to which the edges should be added.</param>
-        private async UniTask HandleTypeHierarchyAsync(Node node, Graph graph)
+        /// <param name="token">A cancellation token that can be used to cancel the operation.</param>
+        private async UniTask HandleTypeHierarchyAsync(Node node, Graph graph, CancellationToken token)
         {
             IUniTaskAsyncEnumerable<TypeHierarchyItem> results = Handler.Supertypes(SelectItem, node.Path(), node.SourceLine ?? 0, node.SourceColumn ?? 0);
             await foreach (TypeHierarchyItem item in results)
             {
+                if (token.IsCancellationRequested)
+                {
+                    throw new OperationCanceledException();
+                }
                 Node targetNode = FindNodesByLocation(item.Uri.Path, Range.FromLspRange(item.Range)).First();
                 Edge edge = AddEdge(node, targetNode, "Extend", false, graph);
                 edge.SetRange(SelectionRangeAttribute, Range.FromLspRange(item.SelectionRange));
@@ -372,9 +386,16 @@ namespace SEE.DataModel.DG.IO
         /// <param name="path">The path of the file in which the symbol is located.</param>
         /// <param name="graph">The graph to which the node should be added.</param>
         /// <param name="parent">The parent node of the symbol node.</param>
+        /// <param name="token">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>The added node, or null if the node was skipped.</returns>
-        private async UniTask AddSymbolNodeAsync(DocumentSymbol symbol, string path, Graph graph, Node parent)
+        private async UniTask AddSymbolNodeAsync(DocumentSymbol symbol, string path, Graph graph, Node parent,
+                                                 CancellationToken token)
         {
+            if (token.IsCancellationRequested)
+            {
+                throw new OperationCanceledException();
+            }
+
             Node childParent;
             if (IncludeNodeTypes.HasFlag(ToImporterSymbolKind(symbol.Kind)))
             {
@@ -435,7 +456,7 @@ namespace SEE.DataModel.DG.IO
 
             foreach (DocumentSymbol child in symbol.Children ?? Array.Empty<DocumentSymbol>())
             {
-                await AddSymbolNodeAsync(child, path, graph, childParent);
+                await AddSymbolNodeAsync(child, path, graph, childParent, token);
             }
         }
 
@@ -547,13 +568,20 @@ namespace SEE.DataModel.DG.IO
         /// <param name="node">The node to use as a source for the edges.</param>
         /// <param name="graph">The graph to which the edges should be added.</param>
         /// <param name="reverseDirection">If true, the direction of the edges is reversed, i.e.,
+        /// <param name="token">A cancellation token that can be used to cancel the operation.</param>
         /// the source and target nodes are swapped.</param>
         private async UniTask ConnectNodeViaAsync(Func<string, int, int, IUniTaskAsyncEnumerable<LocationOrLocationLink>> lspFunction,
-                                                  string type, Node node, Graph graph, bool reverseDirection = false)
+                                                  string type, Node node, Graph graph, bool reverseDirection = false,
+                                                  CancellationToken token = default)
         {
             IUniTaskAsyncEnumerable<LocationOrLocationLink> locations = lspFunction(node.Path(), node.SourceLine - 1 ?? 0, node.SourceColumn - 1 ?? 0);
             await foreach (LocationOrLocationLink location in locations)
             {
+                if (token.IsCancellationRequested)
+                {
+                    throw new OperationCanceledException();
+                }
+
                 if (location.IsLocation)
                 {
                     // NOTE: We assume only local files are used.

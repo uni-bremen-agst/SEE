@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
@@ -129,7 +130,9 @@ namespace SEE.GraphProviders
             return GraphProviderKind.LSP;
         }
 
-        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city, Action<float> changePercentage = null)
+        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
+                                                          Action<float> changePercentage = null,
+                                                          CancellationToken token = default)
         {
             if (string.IsNullOrEmpty(ProjectPath.Path))
             {
@@ -170,6 +173,10 @@ namespace SEE.GraphProviders
             {
                 throw new OperationCanceledException();
             }
+            if (token.IsCancellationRequested)
+            {
+                throw new OperationCanceledException();
+            }
             changePercentage?.Invoke(0.0001f);
 
             if (SourcePaths.Length == 0)
@@ -179,7 +186,6 @@ namespace SEE.GraphProviders
 
             try
             {
-                // TODO: Use cancellation token to cancel the task if requested.
                 LSPImporter importer = new(handler, SourcePaths, ExcludedSourcePaths, IncludedNodeTypes,
                                            IncludedEdgeTypes, AvoidSelfReferences, AvoidParentReferences);
                 using (LoadingSpinner.ShowDeterminate("Creating graph using LSP...", out Action<float> updateProgress))
@@ -188,7 +194,7 @@ namespace SEE.GraphProviders
                     {
                         changePercentage?.Invoke(x);
                         updateProgress(x);
-                    });
+                    }, token);
                 }
             }
             catch (TimeoutException)

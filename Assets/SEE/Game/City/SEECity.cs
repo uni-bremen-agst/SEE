@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.UI.RuntimeConfigMenu;
@@ -100,6 +101,11 @@ namespace SEE.Game.City
                 LoadedGraph.BasePath = SourceCodeDirectory.Path;
             }
         }
+
+        /// <summary>
+        /// A token that can be used to cancel the loading of the graph.
+        /// </summary>
+        protected CancellationTokenSource cancellationTokenSource = new();
 
         /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
@@ -302,13 +308,20 @@ namespace SEE.Game.City
                 {
                     using (LoadingSpinner.ShowIndeterminate($"Loading city \"{gameObject.name}\""))
                     {
-                        LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, x => ProgressBar = x);
+                        LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, x => ProgressBar = x,
+                                                                      cancellationTokenSource.Token);
                     }
+                }
+                catch (OperationCanceledException)
+                {
+                    ShowNotification.Warn("Data loading cancelled", "Data loading was cancelled.\n", log: true);
+                    throw;
                 }
                 catch (Exception ex)
                 {
                     Debug.LogException(ex);
                     ShowNotification.Error("Data failure", $"Graph provider failed with: {ex.Message}\n", log: false);
+                    throw;
                 }
             }
             else
@@ -460,6 +473,9 @@ namespace SEE.Game.City
         public override void Reset()
         {
             base.Reset();
+            // Cancel any ongoing loading operation and reset the token.
+            cancellationTokenSource.Cancel();
+            cancellationTokenSource = new CancellationTokenSource();
             // Delete the underlying graph.
             loadedGraph?.Destroy();
             loadedGraph = null;
