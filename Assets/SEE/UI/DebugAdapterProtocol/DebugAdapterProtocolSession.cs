@@ -57,12 +57,12 @@ namespace SEE.UI.DebugAdapterProtocol
     public class DebugAdapterProtocolSession : PlatformDependentComponent
     {
         /// <summary>
-        /// Duration of highlighting the code position in the city.
+        /// Duration (seconds) of highlighting the code position in the city.
         /// </summary>
         private const float highlightDurationInitial = 3f;
 
         /// <summary>
-        /// Duration of repeated highlighting the code position in the city.
+        /// Duration (seconds) of repeated highlighting the code position in the city.
         /// Occurs when code stays in the same method.
         /// </summary>
         private const float highlightDurationRepeated = 2f;
@@ -1079,7 +1079,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </summary>
         /// <param name="makeActive">Whether to make the code window active.</param>
         /// <param name="scroll">Whether to scroll the code window.</param>
-        /// <param name="highlightDuration">The highlight duration in the city.</param>
+        /// <param name="highlightDuration">The highlight duration (seconds) in the city.</param>
         private void ShowCodePosition(bool makeActive = false, bool scroll = false, float highlightDuration = highlightDurationInitial)
         {
             WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
