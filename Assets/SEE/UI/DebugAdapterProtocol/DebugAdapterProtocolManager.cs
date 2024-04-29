@@ -109,22 +109,17 @@ namespace SEE.UI.DebugAdapterProtocol
             DebugAdapterConfigButton.MustGetComponent<ButtonManagerBasic>().clickEvent.AddListener(OpenDebugAdapterConfig);
             LaunchConfigButton.MustGetComponent<ButtonManagerBasic>().clickEvent.AddListener(OpenLaunchConfig);
 
-            PointerHelper pointerHelper;
-            if (RunButton.TryGetComponent<PointerHelper>(out pointerHelper))
-            {
-                pointerHelper.EnterEvent.AddListener(_ => tooltip.Show("Run"));
-                pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
-            }
-            if (DebugAdapterConfigButton.TryGetComponent<PointerHelper>(out pointerHelper))
-            {
-                pointerHelper.EnterEvent.AddListener(_ => tooltip.Show("Debug Adapter"));
-                pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
-            }
-            if (LaunchConfigButton.TryGetComponent<PointerHelper>(out pointerHelper))
-            {
-                pointerHelper.EnterEvent.AddListener(_ => tooltip.Show("Launch Configuration"));
-                pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
-            }
+            PointerHelper pointerHelper = RunButton.MustGetComponent<PointerHelper>();
+            pointerHelper.EnterEvent.AddListener(_ => tooltip.Show("Run"));
+            pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
+            
+            pointerHelper = DebugAdapterConfigButton.MustGetComponent<PointerHelper>();
+            pointerHelper.EnterEvent.AddListener(_ => tooltip.Show("Debug Adapter"));
+            pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
+
+            pointerHelper = LaunchConfigButton.MustGetComponent<PointerHelper>();
+            pointerHelper.EnterEvent.AddListener(_ => tooltip.Show("Launch Configuration"));
+            pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
         }
 
         /// <summary>
