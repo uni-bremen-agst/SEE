@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -20,6 +21,7 @@ using SEE.UI;
 using SEE.UI.Notification;
 using SEE.Utils;
 using UnityEngine;
+using Container = OmniSharp.Extensions.LanguageServer.Protocol.Models.Container;
 using Debug = UnityEngine.Debug;
 
 namespace SEE.Tools.LSP
@@ -155,7 +157,7 @@ namespace SEE.Tools.LSP
             Window = new WindowClientCapabilities
             {
                 WorkDoneProgress = true
-            },
+            }
         };
 
         private void OnEnable()
@@ -188,22 +190,30 @@ namespace SEE.Tools.LSP
             }
 
             HashSet<ProgressToken> initialWork = new();
-            IDisposable spinner = LoadingSpinner.ShowIndeterminate("Initializing language server...");
+            IDisposable spinner = LoadingSpinner.ShowIndeterminate("Starting language server...");
             try
             {
-                // TODO: Check for executable (at relevant locations?) first, and if not there, direct users
-                //       for info on how to install it.
-                ProcessStartInfo startInfo = new(fileName: Server.ServerExecutable, arguments: Server.Parameters)
+                ProcessStartInfo startInfo = new(fileName: executablePath ?? Server.ServerExecutable,
+                                                 arguments: Server.Parameters)
                 {
                     RedirectStandardInput = true,
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     WorkingDirectory = ProjectPath
                 };
-                lspProcess = Process.Start(startInfo);
+                try
+                {
+                    lspProcess = Process.Start(startInfo);
+                }
+                catch (Win32Exception)
+                {
+                    Debug.LogError($"Failed to start the language server. See {Server.WebsiteURL} for setup instructions.\n");
+                    throw;
+                }
                 if (lspProcess == null)
                 {
-                    throw new InvalidOperationException("Failed to start the language server.\n");
+                    throw new InvalidOperationException("Failed to start the language server. "
+                                                        + $"See {Server.WebsiteURL} for setup instructions.\n");
                 }
 
                 Stream outputLog = Stream.Null;

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Security;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
@@ -14,6 +15,7 @@ using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
+using Sirenix.Utilities.Editor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -35,9 +37,20 @@ namespace SEE.GraphProviders
         /// </summary>
         [Tooltip("The language server to be used for the analysis."),
          LabelText("Language Server"),
+         OnValueChanged(nameof(SetLSPServerPath)),
          RuntimeTab(GraphProviderFoldoutGroup),
          ValueDropdown(nameof(ServerDropdown), ExpandAllMenuItems = false)]
         public string ServerName = $"{LSPLanguage.Python}/{LSPServer.Pyright}";
+
+        /// <summary>
+        /// The path to the language server executable.
+        /// </summary>
+        [Tooltip("The path to the language server executable."),
+         ValidateInput(nameof(ValidServerExecutableMessage)),
+         InlineButton(nameof(SetLSPServerPath), "\u21ba"),
+         GUIColor(nameof(ExecutablePathColor)),
+         FolderPath(AbsolutePath = true)]
+        public string ServerPath;
 
         /// <summary>
         /// The paths within the project (recursively) containing the source code to be analyzed.
@@ -122,8 +135,71 @@ namespace SEE.GraphProviders
         private IEnumerable<string> ServerDropdown()
         {
             return LSPLanguage.All.Select(language => (language, LSPServer.All.Where(server => server.Languages.Contains(language))))
-                              .SelectMany(pair => pair.Item2.Select(server => $"{pair.language}/{server}"));
+                              .SelectMany(pair => pair.Item2.Select(server => $"{pair.language}/{server}"))
+                              .OrderBy(server => server);
         }
+
+        /// <summary>
+        /// Returns the color for the <see cref="ServerPath"/> field.
+        /// </summary>
+        /// <returns>The color for the <see cref="ServerPath"/> field.</returns>
+        private Color ExecutablePathColor()
+        {
+            string message = "";
+            if (ValidServerExecutableMessage(ServerPath, ref message))
+            {
+                return Color.green.Lighter();
+            }
+            else
+            {
+                return Color.red.Lighter().Lighter();
+            }
+        }
+
+        /// <summary>
+        /// Returns whether the server executable at the given <paramref name="executablePath"/> is valid,
+        /// and sets the <paramref name="errorMessage"/> if it is not.
+        /// </summary>
+        /// <param name="executablePath">The path to the server executable.</param>
+        /// <param name="errorMessage">The error message to be set if the server executable is invalid.</param>
+        /// <returns>Whether the server executable is valid.</returns>
+        private bool ValidServerExecutableMessage(string executablePath, ref string errorMessage)
+        {
+            if (string.IsNullOrEmpty(executablePath))
+            {
+                errorMessage = $"Executable {Server.ServerExecutable} not found. "
+                    + $"See {Server.WebsiteURL} for installation instructions.";
+                return false;
+            }
+            if (!File.Exists(executablePath))
+            {
+                errorMessage = $"Executable {Server.ServerExecutable} not accessible at this location. "
+                    + $"See {Server.WebsiteURL} for installation instructions.";
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Returns the path to the executable of the language server.
+        /// </summary>
+        /// <returns>The path to the executable of the language server.</returns>
+        private string GetExecutablePath()
+        {
+            string executableName = Server.ServerExecutable;
+            if (File.Exists(executableName))
+            {
+                return Path.GetFullPath(executableName);
+            }
+
+            string[] paths = Environment.GetEnvironmentVariable("PATH")?.Split(Path.PathSeparator) ?? Array.Empty<string>();
+            return paths.Select(path => Path.Combine(path, executableName)).FirstOrDefault(File.Exists);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="ServerPath"/> to the default path of the language server executable.
+        /// </summary>
+        private void SetLSPServerPath() => ServerPath = GetExecutablePath();
 
         public override GraphProviderKind GetKind()
         {
@@ -169,10 +245,6 @@ namespace SEE.GraphProviders
             handler.LogLSP = LogLSP;
             handler.TimeoutSpan = TimeSpan.FromSeconds(Timeout);
             await handler.InitializeAsync(executablePath: ServerPath ?? Server.ServerExecutable, token);
-            if (token.IsCancellationRequested)
-            {
-                throw new OperationCanceledException();
-            }
             if (token.IsCancellationRequested)
             {
                 throw new OperationCanceledException();

@@ -31,6 +31,13 @@ namespace SEE.Tools.LSP
         public string ServerExecutable { get; }
 
         /// <summary>
+        /// A URL to the website of the language server.
+        ///
+        /// The website should contain instructions on how to install the language server.
+        /// </summary>
+        public string WebsiteURL { get; }
+
+        /// <summary>
         /// The parameters with which the <see cref="ServerExecutable"/> should be invoked.
         /// </summary>
         public string Parameters { get; }
@@ -44,14 +51,16 @@ namespace SEE.Tools.LSP
         /// Constructor.
         /// </summary>
         /// <param name="name">The name of the language server.</param>
+        /// <param name="websiteURL">A URL to the website of the language server.</param>
         /// <param name="languages">The languages supported by this language server.</param>
         /// <param name="serverExecutable">The name of the executable of the language server.</param>
         /// <param name="parameters">The parameters with which the <paramref name="serverExecutable"/> should be invoked.</param>
         /// <param name="initOptions">The options to be passed to the language server during initialization.</param>
-        private LSPServer(string name, IList<LSPLanguage> languages, string serverExecutable,
+        private LSPServer(string name, string websiteURL, IList<LSPLanguage> languages, string serverExecutable,
                           string parameters = "", IDictionary<string, object> initOptions = null)
         {
             Name = name;
+            WebsiteURL = websiteURL;
             Languages = languages;
             ServerExecutable = serverExecutable;
             Parameters = parameters;
@@ -83,6 +92,7 @@ namespace SEE.Tools.LSP
                                                       "clangd", "--background-index");
 
         public static readonly LSPServer Omnisharp = new("Omnisharp",
+                                                         "https://github.com/OmniSharp/omnisharp-roslyn",
                                                          new List<LSPLanguage> { LSPLanguage.CSharp },
                                                          "omnisharp", "-z DotNet:enablePackageRestore=false -e utf-8 -lsp",
                                                          initOptions: new Dictionary<string, object>
