@@ -54,7 +54,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// All cities.
         /// </summary>
-        private static IEnumerable<AbstractSEECity> cities;
+        private static IList<AbstractSEECity> cities;
 
         /// <summary>
         /// Selected city in which the code position should be highlighted.
@@ -94,7 +94,7 @@ namespace SEE.UI.DebugAdapterProtocol
             base.Start();
             if (cities == null)
             {
-                cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity).Select(go => go.MustGetComponent<AbstractSEECity>()).OrderBy(c => c.name);
+                cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity).Select(go => go.MustGetComponent<AbstractSEECity>()).OrderBy(c => c.name).ToList();
                 city = cities.First();
             }
         }
