@@ -90,7 +90,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         #endregion
 
         #region Adapter Methods
-        /// <inheritdoc/>
         public override void SetupLaunchConfig(GameObject go, PropertyGroup group)
         {
             launchProgramProperty = go.AddComponent<FilePathProperty>();
@@ -125,7 +124,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             group.AddProperty(launchCompileErrorProperty);
         }
 
-        /// <inheritdoc/>
         public override void SaveLaunchConfig()
         {
             launchProgram = launchProgramProperty.Value;
@@ -134,7 +132,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             launchCompileError = launchCompileErrorProperty.Value;
         }
 
-        /// <inheritdoc/>
         public override LaunchRequest GetLaunchRequest()
         {
             return new()

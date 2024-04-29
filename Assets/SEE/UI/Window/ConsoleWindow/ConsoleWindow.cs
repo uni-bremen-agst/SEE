@@ -566,25 +566,21 @@ namespace SEE.UI.Window.ConsoleWindow
             }
         }
 
-        /// <inheritdoc/>
         public override void RebuildLayout()
         {
             // Nothing needs to be done
         }
 
-        /// <inheritdoc/>
         protected override void InitializeFromValueObject(WindowValues valueObject)
         {
             throw new System.NotImplementedException();
         }
 
-        /// <inheritdoc/>
         public override void UpdateFromNetworkValueObject(WindowValues valueObject)
         {
             throw new System.NotImplementedException();
         }
 
-        /// <inheritdoc/>
         public override WindowValues ToValueObject()
         {
             throw new System.NotImplementedException();

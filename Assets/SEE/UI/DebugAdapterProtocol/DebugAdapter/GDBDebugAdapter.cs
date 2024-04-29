@@ -18,24 +18,12 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
     public class GDBDebugAdapter : DebugAdapter
     {
         #region Adapter Configuration
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
         public override string Name => "GDB";
 
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
         public override string AdapterWorkingDirectory { get; set; } = Path.Combine(AdapterDirectory, "gdb");
 
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
         public override string AdapterFileName { get; set; } = "gdb";
 
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
         public override string AdapterArguments { get; set; } = "-i dap";
         #endregion
 
@@ -92,10 +80,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         #endregion
 
         #region Adapter Methods
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <returns><inheritdoc/></returns>
         public override LaunchRequest GetLaunchRequest()
         {
             return new LaunchRequest()
@@ -112,9 +96,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             };
         }
 
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
         public override void SaveLaunchConfig()
         {
             launchNoDebug = launchNoDebugProperty.Value;
@@ -123,11 +104,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             launchStopAtBeginningOfMainSubprogram = launchStopAtBeginningOfMainSubprogramProperty.Value;
         }
 
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <param name="go"><inheritdoc/></param>
-        /// <param name="group"><inheritdoc/></param>
         public override void SetupLaunchConfig(GameObject go, PropertyGroup group)
         {
             launchCwdProperty = go.AddComponent<FilePathProperty>();

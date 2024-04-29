@@ -21,24 +21,12 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
     public class NetCoreDebugAdapter : DebugAdapter
     {
         #region Adapter Configuration
-        /// <summary>
-        /// The name.
-        /// </summary>
         public override string Name => "Netcore";
 
-        /// <summary>
-        /// The working directory of the debug adapter.
-        /// </summary>
         public override string AdapterWorkingDirectory { get; set; } = Path.Combine(AdapterDirectory, "netcoredbg");
 
-        /// <summary>
-        /// The executable (file name) of the debug adapter.
-        /// </summary>
         public override string AdapterFileName { get; set; } = "netcoredbg.exe";
 
-        /// <summary>
-        /// The arguments of the debug adapter.
-        /// </summary>
         public override string AdapterArguments { get; set; } = "--interpreter=vscode";
 
         #endregion
@@ -142,7 +130,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
 
         #region Adapter Methods
 
-        /// <inheritdoc/>
         public override void SetupLaunchConfig(GameObject go, PropertyGroup group)
         {
             launchCwdProperty = go.AddComponent<FilePathProperty>();
@@ -174,7 +161,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         }
 
 
-        /// <inheritdoc/>
         public override void SaveLaunchConfig()
         {
             launchProgram = launchProgramProperty.Value;
@@ -183,7 +169,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             launchStopAtEntry = launchStopAtEntryProperty.Value;
         }
 
-        /// <inheritdoc/>
         public override LaunchRequest GetLaunchRequest()
         {
             return new()

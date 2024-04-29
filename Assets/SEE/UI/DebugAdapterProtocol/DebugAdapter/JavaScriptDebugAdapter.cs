@@ -22,23 +22,11 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
     public class JavaScriptDebugAdapter : DebugAdapter
     {
         #region Adapter Configuration
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
         public override string Name => "JavaScript";
 
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
         public override string AdapterWorkingDirectory { get; set; } = Path.Combine(AdapterDirectory, "js-debug", "src");
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
         public override string AdapterFileName { get; set; } = "node";
 
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
         public override string AdapterArguments { get; set; } = $"dapDebugServer.js {GetAvailablePort()}";
         #endregion
 
@@ -85,10 +73,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         #endregion
 
         #region Adapter Methods
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <returns><inheritdoc/></returns>
         public override LaunchRequest GetLaunchRequest()
         {
             return new LaunchRequest()
@@ -104,9 +88,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             };
         }
 
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
         public override void SaveLaunchConfig()
         {
             launchNoDebug = launchNoDebugProperty.Value;
@@ -114,11 +95,6 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
             launchProgram = launchProgramProperty.Value;
         }
 
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <param name="go"><inheritdoc/></param>
-        /// <param name="group"><inheritdoc/></param>
         public override void SetupLaunchConfig(GameObject go, PropertyGroup group)
         {
             launchCwdProperty = go.AddComponent<FilePathProperty>();
