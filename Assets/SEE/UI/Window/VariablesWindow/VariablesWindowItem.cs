@@ -87,7 +87,10 @@ namespace SEE.UI.Window.VariablesWindow
             get => isExpanded;
             set
             {
-                if (value == isExpanded) return;
+                if (value == isExpanded)
+                {
+                    return;
+                }
                 isExpanded = value;
                 UpdateExpand();
             }
@@ -126,7 +129,10 @@ namespace SEE.UI.Window.VariablesWindow
             get => isVisible;
             set
             {
-                if (value == isVisible) return;
+                if (value == isVisible)
+                {
+                    return;
+                }
                 isVisible = value;
                 if (HasStarted)
                 {
@@ -150,7 +156,10 @@ namespace SEE.UI.Window.VariablesWindow
             get => indent;
             set
             {
-                if (value == indent) return;
+                if (value == indent)
+                {
+                    return;
+                }
                 indent = value;
                 if (HasStarted)
                 {

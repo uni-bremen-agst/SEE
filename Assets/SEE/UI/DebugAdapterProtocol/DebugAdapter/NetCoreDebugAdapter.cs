@@ -205,7 +205,10 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// <returns></returns>
         private static string espaceList(List<string> args)
         {
-            if (args.Count == 0) return "";
+            if (args.Count == 0)
+            {
+                return "";
+            }
             return "\"" + string.Join("\", \"",
                 args.Select(arg => arg.Replace("\\", "\\\\").Replace("\"", "\\\""))) + "\"";
         }
@@ -218,7 +221,10 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// <returns></returns>
         private static List<string> parseList(string text)
         {
-            if (text.Length == 0) return new();
+            if (text.Length == 0)
+            {
+                return new();
+            }
 
             List<string> arguments = new();
             StringBuilder currentArgument = new();

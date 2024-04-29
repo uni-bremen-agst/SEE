@@ -172,7 +172,10 @@ namespace SEE.UI.DebugAdapterProtocol
             get => isRunning;
             set
             {
-                if (value == isRunning) return;
+                if (value == isRunning)
+                {
+                    return;
+                }
                 isRunning = value;
                 if (value)
                 {
@@ -596,7 +599,10 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </summary>
         private void UpdateHoverTooltip()
         {
-            if (hoveredWord is null || IsRunning) return;
+            if (hoveredWord is null || IsRunning)
+            {
+                return;
+            }
 
             string expression = ((TMP_WordInfo)hoveredWord).GetWord();
 
@@ -752,7 +758,10 @@ namespace SEE.UI.DebugAdapterProtocol
             {
                 actions.Enqueue(() =>
                 {
-                    if (capabilities.SupportsExceptionInfoRequest != true) return;
+                    if (capabilities.SupportsExceptionInfoRequest != true)
+                    {
+                        return;
+                    }
 
                     ExceptionInfoResponse exceptionInfo = adapterHost.SendRequestSync(new ExceptionInfoRequest()
                     {
@@ -1021,7 +1030,10 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </summary>
         private void UpdateCodePosition()
         {
-            if (IsRunning) return;
+            if (IsRunning)
+            {
+                return;
+            }
 
             StackFrame stackFrameWithSource = stackFrames.FirstOrDefault(frame => frame.Source != null);
             if (stackFrameWithSource == null)
@@ -1135,7 +1147,10 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </summary>
         private void UpdateThreads()
         {
-            if (IsRunning) return;
+            if (IsRunning)
+            {
+                return;
+            }
 
             threads = adapterHost.SendRequestSync(new ThreadsRequest()).Threads;
         }
@@ -1146,7 +1161,10 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </summary>
         private void UpdateStackFrames()
         {
-            if (IsRunning) return;
+            if (IsRunning)
+            {
+                return;
+            }
 
             stackFrames = adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = mainThread.Id }).StackFrames;
         }
@@ -1158,7 +1176,10 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </summary>
         private void UpdateVariables()
         {
-            if (IsRunning) return;
+            if (IsRunning)
+            {
+                return;
+            }
             variables = new();
 
             foreach (Thread thread in threads)
@@ -1193,7 +1214,10 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <returns>The nested variables.</returns>
         private List<Variable> RetrieveNestedVariables(int variablesReference)
         {
-            if (variablesReference <= 0 || IsRunning) return new();
+            if (variablesReference <= 0 || IsRunning)
+            {
+                return new();
+            }
             return adapterHost.SendRequestSync(new VariablesRequest() { VariablesReference = variablesReference }).Variables;
         }
 
