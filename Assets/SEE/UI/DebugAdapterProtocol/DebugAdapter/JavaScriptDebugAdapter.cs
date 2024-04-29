@@ -52,20 +52,20 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
         /// <summary>
         /// The <c>type</c> property.
         /// </summary>
-        private String launchType = "pwa-node";
+        private string launchType = "pwa-node";
 
         /// <summary>
         /// The <c>name</c> property.
         /// </summary>
-        private String launchName = "Launch file";
+        private string launchName = "Launch file";
         /// <summary>
         /// The <c>cwd</c> property.
         /// </summary>
-        private String launchCwd = Path.Combine("C:\\", "path", "containing", "program");
+        private string launchCwd = Path.Combine("C:\\", "path", "containing", "program");
         /// <summary>
         /// The <c>program</c> property.
         /// </summary>
-        private String launchProgram = "file.js";
+        private string launchProgram = "file.js";
 
         /// <summary>
         /// The input field for the <c>noDebug</c> property.
