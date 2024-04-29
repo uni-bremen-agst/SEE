@@ -4,7 +4,6 @@ using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.GraphIndex;
-using SEE.Game;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.UI.Window;
@@ -246,10 +245,7 @@ namespace SEE.UI.DebugAdapterProtocol
 
             if (Adapter == null)
             {
-                string message = "Debug adapter not set.";
-                ConsoleWindow.AddMessage(message, "Adapter", "Error");
-                Debug.LogWarning(message);
-                Destroyer.Destroy(this);
+                OnInitializationFailed("Debug adapter not set.");
                 return;
             }
             ConsoleWindow.AddMessage($"Start debugging session: {Adapter.Name} - {Adapter.AdapterFileName} - {Adapter.AdapterArguments} - {Adapter.AdapterWorkingDirectory}\n");
@@ -257,10 +253,7 @@ namespace SEE.UI.DebugAdapterProtocol
             // starts the debug adapter process
             if (!CreateAdapterProcess())
             {
-                string message = "Couldn't create the debug adapter process.";
-                ConsoleWindow.AddMessage(message, "Adapter", "Error");
-                Debug.LogWarning(message);
-                Destroyer.Destroy(this);
+                OnInitializationFailed("Couldn't create the debug adapter process.");
                 return;
             }
             else
@@ -270,10 +263,7 @@ namespace SEE.UI.DebugAdapterProtocol
             // starts the debug adapter host
             if (!CreateAdapterHost())
             {
-                string message = "Couldn't create the debug adapter host.";
-                ConsoleWindow.AddMessage(message, "Adapter", "Error");
-                Debug.LogWarning(message);
-                Destroyer.Destroy(this);
+                OnInitializationFailed("Couldn't create the debug adapter host.");
                 return;
             }
             else
@@ -305,10 +295,19 @@ namespace SEE.UI.DebugAdapterProtocol
             }
             catch (Exception e)
             {
-                ConsoleWindow.AddMessage(e.Message + "\n", "Adapter", "Error");
-                Debug.LogWarning(e);
-                Destroyer.Destroy(this);
+                OnInitializationFailed(e.Message + "");
             }
+        }
+
+        /// <summary>
+        /// Helper method for when something went wrong during the initialization.
+        /// </summary>
+        /// <param name="message">The error message.</param>
+        private void OnInitializationFailed(string message)
+        {
+            ConsoleWindow.AddMessage(message, "Adapter", "Error");
+            Debug.LogError(message);
+            Destroyer.Destroy(this);
         }
 
         /// <summary>
