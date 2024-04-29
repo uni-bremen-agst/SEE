@@ -378,7 +378,7 @@ namespace SEE.UI.Window.ConsoleWindow
                 messageAdded = false;
                 for (int i = items.childCount; i < messages.Count; i++)
                 {
-                    CreatemessageItem(messages[i]);
+                    CreateMessageItem(messages[i]);
                 }
             }
             else if (messageChanged)
@@ -443,7 +443,7 @@ namespace SEE.UI.Window.ConsoleWindow
         /// Creates a message item.
         /// </summary>
         /// <param name="message">The message.</param>
-        private void CreatemessageItem(Message message)
+        private void CreateMessageItem(Message message)
         {
             GameObject item = PrefabInstantiator.InstantiatePrefab(itemPrefab, items, false);
 
@@ -475,7 +475,6 @@ namespace SEE.UI.Window.ConsoleWindow
             GameObject item = items.GetChild(i).gameObject;
             Message message = messages[i];
             TextMeshProUGUI textMesh = item.transform.Find("Foreground/Text").gameObject.MustGetComponent<TextMeshProUGUI>();
-            Debug.Log($"Update Text - {i} - {message.Text}");
             textMesh.SetText(message.Text);
             UpdateFilter(message, item);
         }
