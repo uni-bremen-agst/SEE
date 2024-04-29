@@ -252,11 +252,11 @@ namespace SEE.UI.Window.ConsoleWindow
         }
 
         /// <summary>
-        /// Sets whether 
+        /// Sets whether a level inside a channel is enabled.
         /// </summary>
-        /// <param name="channel"></param>
-        /// <param name="level"></param>
-        /// <param name="enabled"></param>
+        /// <param name="channel">The channel name.</param>
+        /// <param name="level">The level inside the channel.</param>
+        /// <param name="enabled">Whether the level is enabled.</param>
         public static void SetChannelLevelEnabled(string channel, string level, bool enabled)
         {
             if (channels.TryGetValue(channel, out Channel c))
@@ -284,7 +284,7 @@ namespace SEE.UI.Window.ConsoleWindow
         /// </summary>
         /// <param name="channel">The channel.</param>
         /// <param name="level">The level.</param>
-        /// <returns></returns>
+        /// <returns>The message index where the message should be appended. (null if new message should be created)</returns>
         private static int? AppendTo(string channel, string level)
         {
             for (int i = messages.Count - 1; i >= 0; i--)
