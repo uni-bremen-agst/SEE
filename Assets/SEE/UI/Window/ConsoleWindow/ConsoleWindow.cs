@@ -291,6 +291,7 @@ namespace SEE.UI.Window.ConsoleWindow
                     }
                 }
             }
+            return -1;
         }
 
         /// <summary>
