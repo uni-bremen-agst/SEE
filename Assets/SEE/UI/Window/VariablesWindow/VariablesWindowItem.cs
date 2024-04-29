@@ -2,16 +2,13 @@ using UnityEngine;
 using SEE.Utils;
 using DG.Tweening;
 using System.Collections.Generic;
-using static RootMotion.FinalIK.RagdollUtility;
 using TMPro;
 using SEE.GO;
-using Crosstales;
 using Michsky.UI.ModernUIPack;
 using System.Linq;
 using System;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using UnityEngine.EventSystems;
-using System.Collections;
 
 namespace SEE.UI.Window.VariablesWindow
 {
@@ -201,7 +198,7 @@ namespace SEE.UI.Window.VariablesWindow
             variableItem.RetrieveVariableValue = RetrieveVariableValue;
             variableItem.BackgroundColor = variableColor;
             AddChild(variableItem);
-            
+
         }
 
         /// <summary>
@@ -230,7 +227,8 @@ namespace SEE.UI.Window.VariablesWindow
                 if (children.Count > 0)
                 {
                     pointerHelper.ClickEvent.AddListener(ToggleChildren);
-                } else if (VariableReference > 0)
+                }
+                else if (VariableReference > 0)
                 {
                     IsExpanded = false;
                     pointerHelper.ClickEvent.AddListener(e =>
@@ -240,7 +238,8 @@ namespace SEE.UI.Window.VariablesWindow
                             queueRetrieveChildren = true;
                         }
                     });
-                } else
+                }
+                else
                 {
                     expandIcon.gameObject.SetActive(false);
                 }
@@ -333,7 +332,7 @@ namespace SEE.UI.Window.VariablesWindow
         /// </summary>
         private void UpdateChildrenIndices()
         {
-            for (int i = children.Count-1; i >= 0; i--)
+            for (int i = children.Count - 1; i >= 0; i--)
             {
                 if (children[i].HasStarted)
                 {

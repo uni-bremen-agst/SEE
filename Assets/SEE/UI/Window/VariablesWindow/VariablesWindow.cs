@@ -1,10 +1,7 @@
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
-using SEE.UI.Window;
 using SEE.Utils;
-using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.UI.Window.VariablesWindow
@@ -85,7 +82,7 @@ namespace SEE.UI.Window.VariablesWindow
 
             Rebuild();
         }
-        
+
         private void Rebuild()
         {
             foreach (VariablesWindowItem child in items.GetComponents<VariablesWindowItem>())

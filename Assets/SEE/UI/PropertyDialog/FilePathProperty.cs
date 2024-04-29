@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using SEE.GO;
 using SEE.Utils;
@@ -31,7 +28,7 @@ namespace SEE.UI.PropertyDialog
         /// The filters.
         /// The first entry is used as the default filter.
         /// </summary>
-        public FileBrowser.Filter[] Filters = {};
+        public FileBrowser.Filter[] Filters = { };
 
         /// <summary>
         /// Used if <see cref="Value"/> is a relative path.
@@ -166,10 +163,11 @@ namespace SEE.UI.PropertyDialog
                         paths =>
                         {
                             Value = paths[0];
-                            FileBrowser.SetFilters(true, new string[] {});
+                            FileBrowser.SetFilters(true, new string[] { });
                         },
-                        () => {
-                            FileBrowser.SetFilters(true, new string[] {});
+                        () =>
+                        {
+                            FileBrowser.SetFilters(true, new string[] { });
                         },
                         PickMode,
                         AllowMultiSelection,

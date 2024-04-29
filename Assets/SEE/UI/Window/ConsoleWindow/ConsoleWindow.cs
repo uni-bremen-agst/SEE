@@ -79,7 +79,7 @@ namespace SEE.UI.Window.ConsoleWindow
         /// A message was added.
         /// </summary>
         private static event Action MessageAdded;
-        
+
         /// <summary>
         /// A message was changed.
         /// </summary>
@@ -259,16 +259,19 @@ namespace SEE.UI.Window.ConsoleWindow
         /// <param name="enabled"></param>
         public static void SetChannelLevelEnabled(string channel, string level, bool enabled)
         {
-            if (channels.TryGetValue(channel, out Channel c)) {
+            if (channels.TryGetValue(channel, out Channel c))
+            {
                 if (c.Levels.TryGetValue(level, out ChannelLevel l))
                 {
                     l.enabled = enabled;
                     ChannelChanged?.Invoke();
-                } else
+                }
+                else
                 {
                     Debug.LogWarning($"Level {level} doesn't exist for channel {channel}.");
                 }
-            } else
+            }
+            else
             {
                 Debug.LogWarning($"Channel {channel} doesn't exist.");
             }
@@ -384,7 +387,8 @@ namespace SEE.UI.Window.ConsoleWindow
                 {
                     UpdateItem(i);
                 }
-            } else if (channelChanged)
+            }
+            else if (channelChanged)
             {
                 channelChanged = false;
                 UpdateFilters();
@@ -455,7 +459,7 @@ namespace SEE.UI.Window.ConsoleWindow
             iconMesh.color = color.IdealTextColor();
 
             item.transform.Find("Background").GetComponent<UIGradient>().EffectGradient.SetKeys(
-                new Color[] { color, color.Darker(0.3f) }.ToGradientColorKeys().ToArray(), 
+                new Color[] { color, color.Darker(0.3f) }.ToGradientColorKeys().ToArray(),
                 new GradientAlphaKey[] { new(1, 0), new(1, 1) });
 
             UpdateFilter(message, item);
@@ -595,12 +599,12 @@ namespace SEE.UI.Window.ConsoleWindow
             /// The message channel.
             /// </summary>
             public readonly string Channel;
-            
+
             /// <summary>
             /// The message level.
             /// </summary>
             public readonly string Level;
-            
+
             /// <summary>
             /// The text.
             /// </summary>
@@ -663,7 +667,7 @@ namespace SEE.UI.Window.ConsoleWindow
             /// The level name.
             /// </summary>
             public readonly string Name;
-            
+
             /// <summary>
             /// The level color.
             /// </summary>
