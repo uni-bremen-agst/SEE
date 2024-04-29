@@ -207,7 +207,7 @@ namespace SEE.UI.Window.ConsoleWindow
             }
             else
             {
-                messages[appendTo.Value].Text += text;
+                messages[appendTo.Value].text += text;
                 MessageChanged?.Invoke();
             }
         }
@@ -290,9 +290,9 @@ namespace SEE.UI.Window.ConsoleWindow
             for (int i = messages.Count - 1; i >= 0; i--)
             {
                 Message message = messages[i];
-                if (message.Channel == channel && message.Level == level)
+                if (message.channel == channel && message.level == level)
                 {
-                    if (!message.Text.EndsWith('\n'))
+                    if (!message.text.EndsWith('\n'))
                     {
                         return i;
                     }
@@ -447,12 +447,12 @@ namespace SEE.UI.Window.ConsoleWindow
         {
             GameObject item = PrefabInstantiator.InstantiatePrefab(itemPrefab, items, false);
 
-            Channel channel = channels.GetValueOrDefault(message.Channel);
-            Color color = channel?.Levels.GetValueOrDefault(message.Level)?.Color ?? Color.white;
+            Channel channel = channels.GetValueOrDefault(message.channel);
+            Color color = channel?.Levels.GetValueOrDefault(message.level)?.Color ?? Color.white;
             char icon = channel?.Icon ?? '\u003f';
 
             TextMeshProUGUI textMesh = item.transform.Find("Foreground/Text").gameObject.MustGetComponent<TextMeshProUGUI>();
-            textMesh.text = message.Text;
+            textMesh.text = message.text;
             textMesh.color = color.IdealTextColor();
 
             TextMeshProUGUI iconMesh = item.transform.Find("Foreground/Type Icon").gameObject.MustGetComponent<TextMeshProUGUI>();
@@ -475,7 +475,7 @@ namespace SEE.UI.Window.ConsoleWindow
             GameObject item = items.GetChild(i).gameObject;
             Message message = messages[i];
             TextMeshProUGUI textMesh = item.transform.Find("Foreground/Text").gameObject.MustGetComponent<TextMeshProUGUI>();
-            textMesh.SetText(message.Text);
+            textMesh.SetText(message.text);
             UpdateFilter(message, item);
         }
 
@@ -502,7 +502,7 @@ namespace SEE.UI.Window.ConsoleWindow
             string text = item.transform.Find("Foreground/Text").gameObject.MustGetComponent<TextMeshProUGUI>().text;
             if (!text.Contains(searchField.text, matchCase ? 0 : StringComparison.OrdinalIgnoreCase) ||
                 fullMatch && text.Length != searchField.text.Length ||
-                !channels[message.Channel].Levels[message.Level].enabled)
+                !channels[message.channel].Levels[message.level].Enabled)
             {
                 item.SetActive(false);
             }
@@ -511,7 +511,7 @@ namespace SEE.UI.Window.ConsoleWindow
         /// <summary>
         /// Shows the search options.
         /// </summary>
-        /// <param name="refresh"></param>
+        /// <param name="refresh">Whether the popup is already open and should be refreshed.</param>
         private void ShowSearchOptionsPopup(bool refresh = false)
         {
             popupMenu.ClearEntries();
@@ -539,7 +539,7 @@ namespace SEE.UI.Window.ConsoleWindow
         /// <summary>
         /// Shows the filter options.
         /// </summary>
-        /// <param name="refresh"></param>
+        /// <param name="refresh">Whether the popup is already open and should be refreshed.</param>
         private void ShowFilterPopup(bool refresh = false)
         {
             popupMenu.ClearEntries();
@@ -549,7 +549,7 @@ namespace SEE.UI.Window.ConsoleWindow
                 popupMenu.AddEntry(new PopupMenuHeading(channel.Name));
                 foreach (ChannelLevel level in channel.Levels.Values)
                 {
-                    popupMenu.AddEntry(new PopupMenuAction(level.Name, () =>
+                    popupMenu.AddEntry(new PopupMenuAction(level.name, () =>
                     {
                         level.enabled = !level.enabled;
                         UpdateFilters();
@@ -587,103 +587,59 @@ namespace SEE.UI.Window.ConsoleWindow
         /// <summary>
         /// Container for a console message.
         /// </summary>
-        private class Message
+        /// <param name="channel">The message channel.</param>
+        /// <param name="level">The message level.</param>
+        /// <param name="text">The message text.</param>
+        private record Message(string channel, string level, string text)
         {
             /// <summary>
             /// The message channel.
             /// </summary>
-            public readonly string Channel;
+            public string channel { get; } = channel;
 
             /// <summary>
             /// The message level.
             /// </summary>
-            public readonly string Level;
+            public string level { get; } = level;
+
 
             /// <summary>
-            /// The text.
+            /// The message text.
             /// </summary>
-            public string Text;
-
-            /// <summary>
-            /// The constructor.
-            /// </summary>
-            /// <param name="channel">The channel.</param>
-            /// <param name="level">The level.</param>
-            /// <param name="text">The text.</param>
-            public Message(string channel, string level, string text)
-            {
-                Channel = channel;
-                Level = level;
-                Text = text;
-            }
-        }
+            public string text { get; set; } = text;
+        };
 
         /// <summary>
         /// Container for a channel.
         /// </summary>
-        private class Channel
-        {
-            /// <summary>
-            /// The name.
-            /// </summary>
-            public readonly string Name;
-
-            /// <summary>
-            /// The channel icon.
-            /// </summary>
-            public readonly char Icon;
-
-            /// <summary>
-            /// The channel levels.
-            /// </summary>
-            public readonly Dictionary<string, ChannelLevel> Levels;
-
-            /// <summary>
-            /// The constructor.
-            /// </summary>
-            /// <param name="name">The name.</param>
-            /// <param name="icon">The icon.</param>
-            /// <param name="levels">The levels.</param>
-            public Channel(string name, char icon, Dictionary<string, ChannelLevel> levels = null)
-            {
-                this.Name = name;
-                this.Icon = icon;
-                this.Levels = levels ?? new();
-            }
-        }
+        /// <param name="name">The channel name.</param>
+        /// <param name="icon">The channel icon.</param>
+        /// <param name="levels">The channel levels.</param>
+        private record Channel(string name, char icon, Dictionary<string, ChannelLevel> levels = null);
 
         /// <summary>
         /// Container for a channel level.
         /// </summary>
-        private class ChannelLevel
+        /// <param name="name">The level name.</param>
+        /// <param name="color">The level color. (background color in console window)</param>
+        /// <param name="enabled">Whether the level is enabled.</param>
+        private record ChannelLevel(string name, Color color, bool enabled = true)
         {
             /// <summary>
             /// The level name.
             /// </summary>
-            public readonly string Name;
+            public string name { get; } = name;
 
             /// <summary>
-            /// The level color.
+            /// The level color. (background color in console window)
             /// </summary>
-            public readonly Color Color;
+            public Color color { get; } = color;
 
             /// <summary>
-            /// Whether the channel is enabled.
+            /// Whether the level is enabled.
             /// </summary>
-            public bool enabled;
 
-            /// <summary>
-            /// The constructor.
-            /// </summary>
-            /// <param name="name">The name.</param>
-            /// <param name="color">The color.</param>
-            /// <param name="enabled">Whether is it enabled.</param>
-            public ChannelLevel(string name, Color color, bool enabled)
-            {
-                this.Name = name;
-                this.Color = color;
-                this.enabled = enabled;
-            }
-        }
+            public bool enabled { get; set; } = enabled;
+        };
     }
 }
