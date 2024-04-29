@@ -81,7 +81,8 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// The prefab for the debug controls.
         /// </summary>
-        private const string DebugControlsPrefab = "Prefabs/UI/DebugAdapterProtocolControls";
+        private const string DebugControlsPrefab = UIPrefabFolder + "DebugAdapterProtocolControls";
+
         /// <summary>
         /// The stepping granularity.
         /// </summary>
