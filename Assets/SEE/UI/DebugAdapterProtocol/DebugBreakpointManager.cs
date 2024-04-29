@@ -78,11 +78,11 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </summary>
         /// <param name="path">The file path.</param>
         /// <param name="line">The source code line.</param>
-        /// <param name="value">Whether to add or remove.</param>
+        /// <param name="add">Whether to add or remove.</param>
         /// <returns>Whether the breakpoints changed as a result of this call.</returns>
-        public static bool SetBreakpoint(string path, int line, bool value)
+        public static bool SetBreakpoint(string path, int line, bool add)
         {
-            if (value)
+            if (add)
             {
                 return AddBreakpoint(path, line);
             }
