@@ -226,9 +226,8 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Sets up the debug session.
         /// </summary>
-        protected void Start()
+        protected override void StartDesktop()
         {
-            base.Start();
             // creates ui elements
             tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
             OpenConsole(true);
@@ -306,13 +305,6 @@ namespace SEE.UI.DebugAdapterProtocol
                 Debug.LogWarning(e);
                 Destroyer.Destroy(this);
             }
-        }
-
-        /// <summary>
-        /// This component supports the desktop platform.
-        /// </summary>
-        protected override void StartDesktop()
-        {
         }
 
         /// <summary>
