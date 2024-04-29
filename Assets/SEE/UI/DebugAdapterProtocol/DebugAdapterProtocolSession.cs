@@ -609,9 +609,10 @@ namespace SEE.UI.DebugAdapterProtocol
                     FrameId = stackFrame.Id
                 });
                 tooltip.Show(result.Result, 0.25f);
-            } catch (ProtocolException)
+            } catch (ProtocolException e)
             {
                 // Ignore exceptions on hover
+                // Thrown when the hovered word isn't known
             }
 
         }
