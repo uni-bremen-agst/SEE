@@ -154,25 +154,6 @@ namespace SEE.DataModel.DG.IO
         private const string SelectionRangeAttribute = "SelectionRange";
 
         /// <summary>
-        /// Converts a <see cref="SymbolKind"/> to a <see cref="NodeKind"/>.
-        /// </summary>
-        /// <param name="kind">The symbol kind to convert.</param>
-        /// <returns>The corresponding node kind.</returns>
-        private static NodeKind ToImporterSymbolKind(SymbolKind kind)
-        {
-            // By taking the power of 2, we can use the original enum values as flags.
-            int shiftedValue = 1 << (int)(kind - 1);
-            if (Enum.IsDefined(typeof(NodeKind), shiftedValue))
-            {
-                return (NodeKind)shiftedValue;
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException(nameof(kind), kind, "The given SymbolKind is not supported by the importer.");
-            }
-        }
-
-        /// <summary>
         /// Loads nodes and edges from the language server and adds them to the given <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">The graph to which the nodes and edges should be added.</param>
@@ -397,7 +378,7 @@ namespace SEE.DataModel.DG.IO
             }
 
             Node childParent;
-            if (IncludeNodeTypes.HasFlag(ToImporterSymbolKind(symbol.Kind)))
+            if (IncludeNodeTypes.HasFlag(symbol.Kind.ToNodeKind()))
             {
                 Node node = childParent = new Node();
                 string name = symbol.Name;
@@ -410,7 +391,7 @@ namespace SEE.DataModel.DG.IO
                 node.Filename = Path.GetFileName(path);
                 node.Directory = Path.GetDirectoryName(path);
                 Assert.AreEqual(path, node.Path());
-                node.Type = ToImporterSymbolKind(symbol.Kind).ToString();
+                node.Type = symbol.Kind.ToNodeKind().ToString();
                 node.SourceRange = Range.FromLspRange(symbol.Range);
                 node.SourceLine = symbol.SelectionRange.Start.Line + 1;
                 node.SourceColumn = symbol.SelectionRange.Start.Character + 1;
@@ -683,6 +664,53 @@ namespace SEE.DataModel.DG.IO
         {
             Assert.IsTrue(node.Type == NodeKind.File.ToString());
             node.SetInt(NumericAttributeNames.LOC.Name(), File.ReadAllLines(node.Path()).Length);
+        }
+    }
+
+    /// <summary>
+    /// Provides helper extensions methods to convert between <see cref="NodeKind"/>
+    /// and <see cref="SymbolKind"/>.
+    /// </summary>
+    public static class NodeKindExtensions
+    {
+        /// <summary>
+        /// Converts a <see cref="SymbolKind"/> to a <see cref="NodeKind"/>.
+        /// </summary>
+        /// <param name="kind">The symbol kind to convert.</param>
+        /// <returns>The corresponding node kind.</returns>
+        public static NodeKind ToNodeKind(this SymbolKind kind)
+        {
+            // By taking the power of 2, we can use the original enum values as flags.
+            int shiftedValue = 1 << (int)(kind - 1);
+            if (Enum.IsDefined(typeof(NodeKind), shiftedValue))
+            {
+                return (NodeKind)shiftedValue;
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(kind), kind, "The given SymbolKind is not supported by the importer.");
+            }
+        }
+
+        /// <summary>
+        /// Converts a <see cref="NodeKind"/> to an enumeration of <see cref="SymbolKind"/>.
+        /// </summary>
+        /// <param name="kind">The node kind to convert.</param>
+        /// <returns>The corresponding symbol kinds.</returns>
+        public static IEnumerable<SymbolKind> ToSymbolKind(this NodeKind kind)
+        {
+            foreach (NodeKind nodeKind in Enum.GetValues(typeof(NodeKind)).Cast<NodeKind>().Where(x => x.HasFlag(kind)))
+            {
+                // This has to do the inverse to the above, i.e., log2, to get the original enum value.
+                int nodeKindValue = (int)nodeKind;
+                int symbolKindValue = (int)Math.Log(nodeKindValue, 2) + 1;
+                // If the enum is not defined, we don't throw an exception, because we have a flag enum
+                // with certain values (like None) that are not defined in the original enum.
+                if (Enum.IsDefined(typeof(SymbolKind), symbolKindValue))
+                {
+                    yield return (SymbolKind)symbolKindValue;
+                }
+            }
         }
     }
 }

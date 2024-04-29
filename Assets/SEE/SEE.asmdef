@@ -63,7 +63,8 @@
         "OmniSharp.Extensions.JsonRpc.dll",
         "System.IO.Pipelines.dll",
         "Supercluster.KDTree.Standard.dll",
-        "Markdig.dll"
+        "Markdig.dll",
+        "System.Collections.Immutable.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

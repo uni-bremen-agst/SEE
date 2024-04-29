@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
@@ -14,7 +15,9 @@ using OmniSharp.Extensions.LanguageServer.Protocol.General;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Window;
+using SEE.DataModel.DG.IO;
 using SEE.UI;
+using SEE.UI.Notification;
 using SEE.Utils;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -102,6 +105,59 @@ namespace SEE.Tools.LSP
         /// </summary>
         public IServerCapabilities ServerCapabilities => Client?.ServerSettings.Capabilities;
 
+        /// <summary>
+        /// The capabilities of the language client.
+        /// </summary>
+        private static readonly ClientCapabilities ClientCapabilities = new()
+        {
+            TextDocument = new TextDocumentClientCapabilities
+            {
+                Declaration = new DeclarationCapability
+                {
+                    LinkSupport = false
+                },
+                Definition = new DefinitionCapability
+                {
+                    LinkSupport = false
+                },
+                TypeDefinition = new TypeDefinitionCapability
+                {
+                    LinkSupport = false
+                },
+                Implementation = new ImplementationCapability
+                {
+                    LinkSupport = false
+                },
+                References = new ReferenceCapability(),
+                CallHierarchy = new CallHierarchyCapability(),
+                TypeHierarchy = new TypeHierarchyCapability(),
+                Hover = new HoverCapability
+                {
+                    // TODO: Switch this once we have proper markdown support.
+                    ContentFormat = new Container<MarkupKind>(MarkupKind.PlainText, MarkupKind.Markdown)
+                },
+                DocumentSymbol = new DocumentSymbolCapability
+                {
+                    SymbolKind = new SymbolKindCapabilityOptions
+                    {
+                        // We use all values of the SymbolKind enum.
+                        // This way, if new values are added to SymbolKind, we don't have to update this list.
+                        ValueSet = Container.From(Enum.GetValues(typeof(NodeKind)).Cast<NodeKind>().SelectMany(x => x.ToSymbolKind()))
+                    },
+                    HierarchicalDocumentSymbolSupport = true,
+                    TagSupport = new TagSupportCapabilityOptions
+                    {
+                        ValueSet = Container.From(SymbolTag.Deprecated)
+                    },
+                    LabelSupport = false
+                }
+            },
+            Window = new WindowClientCapabilities
+            {
+                WorkDoneProgress = true
+            },
+        };
+
         private void OnEnable()
         {
             if (Server != null)
@@ -172,16 +228,11 @@ namespace SEE.Tools.LSP
                 TeeStream teedInputStream = new(lspProcess.StandardOutput.BaseStream, outputLog);
                 TeeStream teedOutputStream = new(lspProcess.StandardInput.BaseStream, inputLog);
 
-                // TODO: Add other capabilities here
-                DocumentSymbolCapability symbolCapabilities = new()
-                {
-                    HierarchicalDocumentSymbolSupport = true
-                };
                 Client = LanguageClient.Create(options =>
                                                    options.WithInput(teedInputStream)
                                                           .WithOutput(teedOutputStream)
                                                           .WithRootPath(ProjectPath)
-                                                          .WithCapability(symbolCapabilities)
+                                                          .WithClientCapabilities(ClientCapabilities)
                                                           .DisableDynamicRegistration()
                                                           .DisableWorkspaceFolders()
                                                           .WithUnhandledExceptionHandler(Debug.LogException)
@@ -195,6 +246,8 @@ namespace SEE.Tools.LSP
                                                           .WithInitializationOptions(Server.InitOptions)
                                                           .DisableProgressTokens()
                                                           .WithWorkspaceFolder(ProjectPath, "Main")
+                                                          .OnLogMessage(LogMessage)
+                                                          .OnShowMessage(ShowMessage)
                                                           .OnWorkDoneProgressCreate(HandleInitialWorkDoneProgress));
                 // Starting the server might take a little while.
                 await AsyncUtils.RunWithTimeoutAsync(t => Client.Initialize(t).AsUniTask(), TimeoutSpan * 4,
