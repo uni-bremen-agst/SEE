@@ -322,6 +322,7 @@ namespace SEE.UI.Window.ConsoleWindow
             base.StartDesktop();
             Transform root = PrefabInstantiator.InstantiatePrefab(windowPrefab, Window.transform.Find("Content"), false).transform;
             items = (RectTransform)root.Find("Content/Items");
+            // destroys dummy messages
             foreach (Transform child in items)
             {
                 Destroyer.Destroy(child.gameObject);
