@@ -123,14 +123,11 @@ namespace SEE.UI.Window
             // Float Attributes
             DisplayAttributes(GraphElement.FloatAttributes);
 
-            // Save GameObjects in Array for SearchField
-            int totalElements = scrollViewContent.transform.childCount;
-            Dictionary<string, GameObject> activeElements = new Dictionary<string, GameObject>();
-
-            for (int i = 1; i < totalElements; i++)
+            // Save GameObjects in Array for SearchField            
+            Dictionary<string, GameObject> activeElements = new();
+            foreach (Transform child in scrollViewContent)
             {
-                activeElements.Add(scrollViewContent.transform.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>().text,
-                    scrollViewContent.transform.GetChild(i).gameObject);
+                activeElements.Add(child.GetChild(0).GetComponent<TextMeshProUGUI>().text, child.gameObject);
             }
 
             inputField.onValueChanged.AddListener(str => InputSearchField(str, activeElements));
