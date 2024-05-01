@@ -91,7 +91,7 @@ namespace SEE.UI.Window
         /// <returns> An iterable collection of strings representing the attributes of the GameObject instances, ordered by relevance to the search query </returns>
         public IEnumerable<string> Search(string query, GameObject[] objectList, int limit = 15, int cutoff = 40)
         {
-            List<string> attributesList = new List<string>();
+            List<string> attributesList = new();
             foreach (GameObject obj in objectList)
             {
                 attributesList.Add(obj.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text);
