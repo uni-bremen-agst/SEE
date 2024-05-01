@@ -2,12 +2,10 @@ using FuzzySharp;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.GO;
-using SEE.UI.Window;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 
@@ -19,16 +17,6 @@ namespace SEE.UI.Window
     public class MetricWindow : BaseWindow
     {
         /// <summary>
-        /// Gameobject of the Metric Window.
-        /// </summary>
-        private GameObject metricWindowObject;
-
-        /// <summary>
-        /// GameObject for a row.
-        /// </summary>
-        private GameObject itemRow;
-
-        /// <summary>
         /// GraphElement to read its attributes.
         /// </summary>
         public GraphElement GraphElement;
@@ -36,12 +24,12 @@ namespace SEE.UI.Window
         /// <summary>
         /// Prefab for the <see cref="MetricWindow"/>.
         /// </summary>
-        private string windowPrefab => UIPrefabFolder + "MetricWindow";
+        private static string WindowPrefab => UIPrefabFolder + "MetricWindow";
 
         /// <summary>
         /// Prefab for the <see cref="MetricRowLine"/>.
         /// </summary>
-        private string itemPrefab => UIPrefabFolder + "MetricRowLine";
+        private static string ItemPrefab => UIPrefabFolder + "MetricRowLine";
 
         protected override void StartDesktop()
         {
@@ -58,7 +46,7 @@ namespace SEE.UI.Window
         /// <param name="searchableObjects"> Dictionary of GameObjects to search in </param>
         private void InputSearchField(string searchQuery, Dictionary<string, GameObject> searchableObjects)
         {
-            //Remove Whitespaces
+            // Remove Whitespaces
             searchQuery = searchQuery.Trim();
             if (searchQuery == null || searchQuery.Trim().Length == 0)
             {
@@ -86,15 +74,15 @@ namespace SEE.UI.Window
         /// Performs a fuzzy search operation on a collection of GameObject instances based on a provided query.
         /// </summary>
         /// <param name="query"> the search query </param>
-        /// <param name="objectList"> array of GameObjects containing the objects to search through</param>
+        /// <param name="gameObjects"> the game objects to search through</param>
         /// <param name="cutoff"> representing the cutoff score for relevance </param>
         /// <returns> An iterable collection of strings representing the attributes of the GameObject instances, ordered by relevance to the search query </returns>
-        public IEnumerable<string> Search(string query, GameObject[] objectList, int limit = 15, int cutoff = 40)
+        public IEnumerable<string> Search(string query, GameObject[] gameObjects, int limit = 15, int cutoff = 40)
         {
             List<string> attributesList = new();
-            foreach (GameObject obj in objectList)
+            foreach (GameObject obj in gameObjects)
             {
-                attributesList.Add(obj.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text);
+                attributesList.Add(AttributeName(obj));
             }
             IEnumerable<(int score, string attribute)> searchResults = Process.ExtractTop(query, attributesList, limit: limit, cutoff: cutoff).Select(x => (x.Score, x.Value));
             searchResults = searchResults.OrderByDescending(x => x.score);
@@ -103,12 +91,50 @@ namespace SEE.UI.Window
         }
 
         /// <summary>
+        /// Returns the name of a node attribute stored in the first child of the <paramref name="metricRow"/>.
+        /// <paramref name="metricRow"/> is assumed to represent a row in the metric window providing
+        /// the name and value of a node attribute (metric).
+        /// </summary>
+        /// <param name="metricRow">a game object representing a pair of an attribute name and an attribute value</param>
+        /// <returns>name of the node attribute</returns>
+        private static string AttributeName(GameObject metricRow)
+        {
+            return Attribute(metricRow).text;
+        }
+
+        /// <summary>
+        /// Returns the attribute name TMP container of <paramref name="metricRow"/>
+        /// <paramref name="metricRow"/> is assumed to represent a row in the metric window providing
+        /// the name and value of a node attribute (metric).
+        /// </summary>
+        /// <param name="metricRow">a game object representing a pair of an attribute name and an attribute value</param>
+        /// <returns>the TMP holding the attribute name</returns>
+        /// <remarks>Assumes that the attribute name is stored in the first child of the metric row.</remarks>
+        private static TextMeshProUGUI Attribute(GameObject metricRow)
+        {
+            return metricRow.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+        }
+
+        /// <summary>
+        /// Returns the attribute value TMP container of <paramref name="metricRow"/>
+        /// <paramref name="metricRow"/> is assumed to represent a row in the metric window providing
+        /// the name and value of a node attribute (metric).
+        /// </summary>
+        /// <param name="metricRow">a game object representing a pair of an attribute name and an attribute value</param>
+        /// <returns>the TMP holding the attribute value</returns>
+        /// <remarks>Assumes that the attribute name is stored in the second child of the metric row.</remarks>
+        private static TextMeshProUGUI Value(GameObject metricRow)
+        {
+            return metricRow.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+        }
+
+        /// <summary>
         /// Creates the Metric Window
         /// </summary>
         public void CreateUIInstance()
         {
             // Instantiate MetricWindow
-            metricWindowObject = PrefabInstantiator.InstantiatePrefab(windowPrefab, Window.transform.Find("Content"), false);
+            GameObject metricWindowObject = PrefabInstantiator.InstantiatePrefab(WindowPrefab, Window.transform.Find("Content"), false);
             metricWindowObject.name = "Scrollable";
 
             Transform scrollViewContent = metricWindowObject.transform.Find("Content/Items").transform;
@@ -118,16 +144,16 @@ namespace SEE.UI.Window
             inputField.onDeselect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = true);
 
             // Int Attributes
-            DisplayAttributes(GraphElement.IntAttributes);
+            DisplayAttributes(GraphElement.IntAttributes, metricWindowObject);
 
             // Float Attributes
-            DisplayAttributes(GraphElement.FloatAttributes);
+            DisplayAttributes(GraphElement.FloatAttributes, metricWindowObject);
 
             // Save GameObjects in Array for SearchField            
             Dictionary<string, GameObject> activeElements = new();
             foreach (Transform child in scrollViewContent)
             {
-                activeElements.Add(child.GetChild(0).GetComponent<TextMeshProUGUI>().text, child.gameObject);
+                activeElements.Add(AttributeName(child.gameObject), child.gameObject);
             }
 
             inputField.onValueChanged.AddListener(str => InputSearchField(str, activeElements));
@@ -138,19 +164,18 @@ namespace SEE.UI.Window
         /// </summary>
         /// <typeparam name="T">The type of the attribute values.</typeparam>
         /// <param name="attributes">A dictionary containing attribute names (keys) and their corresponding values (values).</param>
-        private void DisplayAttributes<T>(Dictionary<string, T> attributes)
+        /// <param name="metricWindowObject">The GameObject representing the metric window.</param>
+        private static void DisplayAttributes<T>(Dictionary<string, T> attributes, GameObject metricWindowObject)
         {
             Transform scrollViewContent = metricWindowObject.transform.Find("Content/Items").transform;
             foreach (KeyValuePair<string, T> kvp in attributes)
             {
                 // Create GameObject
-                itemRow = PrefabInstantiator.InstantiatePrefab(itemPrefab, scrollViewContent, false);
+                GameObject metricRow = PrefabInstantiator.InstantiatePrefab(ItemPrefab, scrollViewContent, false);
                 // Attribute Name
-                TextMeshProUGUI attributeTextClone = itemRow.transform.Find("AttributeLine").gameObject.MustGetComponent<TextMeshProUGUI>();
-                attributeTextClone.text = kvp.Key;
+                Attribute(metricRow).text = kvp.Key;
                 // Value Name
-                TextMeshProUGUI valueTextClone = itemRow.transform.Find("ValueLine").gameObject.MustGetComponent<TextMeshProUGUI>();
-                valueTextClone.text = kvp.Value.ToString();
+                Value(metricRow).text = kvp.Value.ToString();
             }
         }
 
