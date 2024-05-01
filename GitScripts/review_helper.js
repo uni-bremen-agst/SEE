@@ -26,8 +26,13 @@ module.exports = {
         // Uniqueness is now determined by path, line number, and comment text.
         // To make sure the Set's `has` method works by comparing array values
         // rather than identity, it seems we need to use this JSON.stringify approach.
-        const reviews = await get_reviews(github, context);
-        const existing = new Set(reviews.map(x => [x['path'], x['line'] !== null ? x['line'] : x['original_line'], x['body']]).map(JSON.stringify));
+        let existing = new Set();
+        try {
+          const reviews = await get_reviews(github, context);
+          existing = new Set(reviews.map(x => [x['path'], x['line'] !== null ? x['line'] : x['original_line'], x['body']]).map(JSON.stringify));
+        } catch (e) {
+            console.warn("Error while fetching reviews, we may double-post comments: " + e);
+        }
         for (let i = comments.length - 1; i >= 0; i--) {
             const comment = comments[i];
             if (existing.has(JSON.stringify([comment['path'], comment['line'], comment['body']]))) {

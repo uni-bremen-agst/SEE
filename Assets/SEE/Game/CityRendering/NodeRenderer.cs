@@ -529,8 +529,8 @@ namespace SEE.Game.CityRendering
                 AddGeneralDecorations(node);
             }
 
-            ICollection<GameObject> leafNodes = FindLeafNodes(gameNodes);
-            ICollection<GameObject> innerNodes = FindInnerNodes(gameNodes);
+            IEnumerable<GameObject> leafNodes = FindLeafNodes(gameNodes);
+            IEnumerable<GameObject> innerNodes = FindInnerNodes(gameNodes);
 
             AddMarkers(gameNodes);
 

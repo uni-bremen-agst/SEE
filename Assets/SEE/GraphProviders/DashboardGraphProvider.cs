@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
@@ -35,7 +36,12 @@ namespace SEE.GraphProviders
         /// Loads the metrics available at the Axivion Dashboard into the <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">The graph into which the metrics shall be loaded</param>
-        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
+        /// <param name="city">This parameter is currently ignored.</param>
+        /// <param name="changePercentage">This parameter is currently ignored.</param>
+        /// <param name="token">This parameter is currently ignored.</param>
+        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
+                                                          Action<float> changePercentage = null,
+                                                          CancellationToken token = default)
         {
             string startVersion = string.IsNullOrEmpty(IssuesAddedFromVersion) ? null : IssuesAddedFromVersion;
             Debug.Log($"Loading metrics and added issues from the Axivion Dashboard for start version {startVersion}.\n");

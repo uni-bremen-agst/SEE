@@ -383,7 +383,7 @@ namespace SEE.UI.Window.CodeWindow
         /// <param name="path">The path to the file whose issues shall be marked.</param>
         private async UniTaskVoid MarkIssuesAsync(string path)
         {
-            using (LoadingSpinner.Show($"Loading issues for {Title}..."))
+            using (LoadingSpinner.ShowIndeterminate($"Loading issues for {Title}..."))
             {
                 string queryPath = Path.GetFileName(path);
                 List<Issue> allIssues;
