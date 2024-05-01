@@ -1,8 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using static SEETests.RangeExamples;
+using static SEE.DataModel.DG.RangeExamples;
 using Range = SEE.DataModel.DG.Range;
 
 namespace SEE.Utils

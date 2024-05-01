@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using SEE.DataModel.DG;
 
-namespace SEETests
+namespace SEE.DataModel.DG
 {
     /// <summary>
     /// Examples of ranges for testing purposes.

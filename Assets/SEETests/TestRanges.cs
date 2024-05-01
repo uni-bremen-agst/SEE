@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using static SEETests.RangeExamples;
+using static SEE.DataModel.DG.RangeExamples;
 
 namespace SEE.DataModel.DG
 {
