@@ -5,6 +5,7 @@ using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace SEE.GraphProviders
 {
@@ -30,11 +31,15 @@ namespace SEE.GraphProviders
         /// Merges the graph provided by <see cref="OldGraph"/> into <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">graph in which to merge</param>
-        /// <param name="city"></param>
+        /// <param name="city">parameter is currently ignored</param>
+        /// <param name="changePercentage">parameter is currently ignored</param>
+        /// <param name="token">can be used to cancel the operation</param>
         /// <returns>the resulting graph where changes between <paramref name="graph"/>
         /// and <see cref="OldGraph"/> have been merged into</returns>
         /// <exception cref="NotImplementedException"></exception>
-        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
+        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
+                                                          Action<float> changePercentage = null,
+                                                          CancellationToken token = default)
         {
             graph ??= new Graph("");
             if (OldGraph == null)
@@ -42,7 +47,7 @@ namespace SEE.GraphProviders
                 return graph;
             }
 
-            Graph oldGraph = await OldGraph.ProvideAsync(new Graph(graph.BasePath), city);
+            Graph oldGraph = await OldGraph.ProvideAsync(new Graph(graph.BasePath), city, token: token);
             graph.MergeDiff(oldGraph);
             return graph;
         }

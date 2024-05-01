@@ -1,3 +1,6 @@
+using System;
+using UnityEngine.Assertions;
+
 namespace SEE.DataModel.DG
 {
     /// <summary>
@@ -11,14 +14,26 @@ namespace SEE.DataModel.DG
     /// <param name="EndLine">Line number of the end of the range (exclusive).</param>
     /// <param name="StartCharacter">Character offset of the start of the range (inclusive).</param>
     /// <param name="EndCharacter">Character offset of the end of the range (exclusive).</param>
-    public record Range(int StartLine, int EndLine, int? StartCharacter = null, int? EndCharacter = null)
+    public record Range(int StartLine, int EndLine, int? StartCharacter = null, int? EndCharacter = null) : IComparable<Range>
     {
         /// <summary>
         /// Returns the number of lines in the range.
         /// Note that this also includes partial lines
         /// (i.e. if <see cref="StartCharacter"/> and <see cref="EndCharacter"/> are set).
         /// </summary>
-        public int Lines => EndLine - StartLine;
+        public int Lines =>
+            // The last line may be a partial line and hence needs to be counted.
+            EndLine - StartLine + (EndCharacter is > 0 ? 1 : 0);
+
+        /// <summary>
+        /// Returns the start line and character as a tuple.
+        /// </summary>
+        public (int Line, int Character) Start => (StartLine, StartCharacter ?? 0);
+
+        /// <summary>
+        /// Returns the end line and character as a tuple.
+        /// </summary>
+        public (int Line, int Character) End => (EndLine, EndCharacter ?? 0);
 
         /// <summary>
         /// Returns true if the given line and character are contained in this range.
@@ -26,10 +41,22 @@ namespace SEE.DataModel.DG
         /// <param name="line">The line to check.</param>
         /// <param name="character">The character to check. If not set, only the line is checked.</param>
         /// <returns>True if the given line and character are contained in this range.</returns>
-        public bool Contains(int line, int? character = null)
+        public bool Contains(int line, int character)
         {
-            return line >= StartLine && line < EndLine
-                && (!character.HasValue || (character >= StartCharacter && character < EndCharacter));
+            if (line == StartLine)
+            {
+                return character >= (StartCharacter ?? 0) && (line < EndLine || character < (EndCharacter ?? int.MaxValue));
+            }
+            else if (line == EndLine)
+            {
+                // 0 here because if no EndCharacter is set, the range ends at the end of the previous line,
+                // as end indices are exclusive.
+                return character < (EndCharacter ?? 0);
+            }
+            else
+            {
+                return line > StartLine && line < EndLine;
+            }
         }
 
         /// <summary>
@@ -39,8 +66,29 @@ namespace SEE.DataModel.DG
         /// <returns>True if the given range is completely contained in this range.</returns>
         public bool Contains(Range other)
         {
-            return Contains(other.StartLine, other.StartCharacter)
-                && Contains(other.EndLine-1, other.EndCharacter-1);  // -1 because EndLine and EndCharacter are exclusive
+            bool contains;
+            if (other.StartCharacter.HasValue && other.EndCharacter.HasValue)
+            {
+                contains = Contains(other.StartLine, other.StartCharacter.Value);
+                if (other.EndCharacter.Value > 0)
+                {
+                    // Must contain last line up to EndCharacter.
+                    contains = contains && Contains(other.EndLine, other.EndCharacter.Value - 1);
+                }
+                else
+                {
+                    // Must contain up to last line.
+                    contains = contains && Contains(other.EndLine - 1, int.MaxValue);
+                }
+            }
+            else
+            {
+                Assert.IsTrue(!other.StartCharacter.HasValue && !other.EndCharacter.HasValue);
+                // Has to contain all lines in full.
+                contains = Contains(other.StartLine, 0) && Contains(other.StartLine, int.MaxValue);
+                contains = contains && Contains(other.EndLine - 1, 0) && Contains(other.EndLine - 1, int.MaxValue);
+            }
+            return contains;
         }
 
         public override string ToString()
@@ -48,6 +96,95 @@ namespace SEE.DataModel.DG
             return StartCharacter.HasValue && EndCharacter.HasValue
                 ? $"{StartLine}:{StartCharacter} – {EndLine}:{EndCharacter}"
                 : $"{StartLine} – {EndLine}";
+        }
+
+        /// <summary>
+        /// Converts the given <paramref name="lspRange"/> (i.e., from OmniSharp) to a <see cref="Range"/>.
+        /// </summary>
+        /// <param name="lspRange">The LSP range to convert.</param>
+        /// <returns>The converted range.</returns>
+        public static Range FromLspRange(OmniSharp.Extensions.LanguageServer.Protocol.Models.Range lspRange)
+        {
+            if (lspRange == null)
+            {
+                return null;
+            }
+            return new Range(lspRange.Start.Line+1, lspRange.End.Line+1,
+                             lspRange.Start.Character+1, lspRange.End.Character+1);
+        }
+
+        /// <summary>
+        /// Compares this range to the given <paramref name="other"/> range.
+        ///
+        /// Note that this comparison is not transitive, since we do not know the length of each line!
+        /// For the same reason, a result of 0 does not necessarily mean that the ranges are equal, it
+        /// can also mean that we cannot tell which of the two ranges is larger.
+        /// </summary>
+        /// <param name="other">The range to compare to.</param>
+        /// <returns>The result of the comparison.</returns>
+        /// <seealso cref="IComparable{T}.CompareTo"/>
+        public int CompareTo(Range other)
+        {
+            if (ReferenceEquals(this, other) || Equals(this, other))
+            {
+                return 0;
+            }
+            if (ReferenceEquals(null, other))
+            {
+                return 1;
+            }
+
+            int lineComparison = Lines.CompareTo(other.Lines);
+            if (lineComparison != 0)
+            {
+                return lineComparison;
+            }
+
+            // Ranges are only comparable at the character-level if they start on the same line,
+            // since we do not know the length of each line.
+            if (StartLine == other.StartLine)
+            {
+                if (StartCharacter.HasValue && other.StartCharacter.HasValue)
+                {
+                    Assert.IsTrue(EndCharacter.HasValue && other.EndCharacter.HasValue);
+                    if (EndLine == other.EndLine)
+                    {
+                        // We can just count and compare the characters.
+                        int characters = EndCharacter.Value - StartCharacter.Value;
+                        int otherCharacters = other.EndCharacter.Value - other.StartCharacter.Value;
+                        return characters.CompareTo(otherCharacters);
+                    }
+                    // Only other two possibilities (since lineComparison == 0):
+                    // A) This line has EndCharacter 0 and this.EndLine == other.EndLine+1.
+                    else if (EndLine == other.EndLine + 1 && StartCharacter < other.StartCharacter)
+                    {
+                        return 1;
+                    }
+                    // B) The other line has EndCharacter 0 and other.EndLine == this.EndLine+1.
+                    else if (other.EndLine == EndLine + 1 && StartCharacter > other.StartCharacter)
+                    {
+                        return -1;
+                    }
+                    // Otherwise, we cannot tell.
+                }
+                else if (StartCharacter is > 0)
+                {
+                    // The other range is a full line, this one is not.
+                    return -1;
+                }
+                else if (other.StartCharacter is > 0 || (!EndCharacter.HasValue && other.EndLine < EndLine))
+                {
+                     // This range is a full line, the other one either is not or is shorter.
+                    return 1;
+                }
+                else if (!other.EndCharacter.HasValue && EndLine < other.EndLine)
+                {
+                    // This range is a full line, the other one is not.
+                    return -1;
+                }
+            }
+
+            return 0;
         }
     }
 }

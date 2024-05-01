@@ -134,7 +134,7 @@ namespace SEE.DataModel.DG
             {
                 if (string.IsNullOrEmpty(id))
                 {
-                    id = Type + "#" + Source.ID + "#" + Target.ID;
+                    id = GetGeneratedID(Source, Target, Type);
                 }
                 return id;
             }
@@ -147,6 +147,18 @@ namespace SEE.DataModel.DG
 
                 id = value;
             }
+        }
+
+        /// <summary>
+        /// Returns the auto-generated ID of an edge with the given source, target, and type.
+        /// </summary>
+        /// <param name="source">The source node of the edge.</param>
+        /// <param name="target">The target node of the edge.</param>
+        /// <param name="type">The type of the edge.</param>
+        /// <returns>The auto-generated ID of an edge with the given source, target, and type.</returns>
+        public static string GetGeneratedID(Node source, Node target, string type)
+        {
+            return type + "#" + source.ID + "#" + target.ID;
         }
 
         /// <summary>
