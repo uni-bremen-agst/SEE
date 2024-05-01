@@ -135,7 +135,7 @@ namespace SEE.Tools.LSP
                 TypeHierarchy = new TypeHierarchyCapability(),
                 Hover = new HoverCapability
                 {
-                    // TODO: Switch this once we have proper markdown support.
+                    // TODO (#728): Switch this once we have proper markdown support.
                     ContentFormat = new Container<MarkupKind>(MarkupKind.PlainText, MarkupKind.Markdown)
                 },
                 DocumentSymbol = new DocumentSymbolCapability

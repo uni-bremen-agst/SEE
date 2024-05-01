@@ -270,7 +270,7 @@ namespace SEE.DataModel.DG.IO
                     }
                     if (IncludeEdgeTypes.HasFlag(EdgeKind.Call) && Handler.ServerCapabilities.CallHierarchyProvider.TrueOrValue())
                     {
-                        // FIXME (UniTask-internal problem, sends wrong method name):
+                        // FIXME (external: OmniSharp bug, sends wrong method name)
                         // await HandleCallHierarchyAsync(node, graph, token);
                     }
                     if (IncludeEdgeTypes.HasFlag(EdgeKind.Extend) && Handler.ServerCapabilities.TypeHierarchyProvider.TrueOrValue())
@@ -481,7 +481,7 @@ namespace SEE.DataModel.DG.IO
                 }));
             }
 
-            // TODO: Parse markdown to TextMeshPro rich text (custom MarkDig parser).
+            // TODO (#728): Parse markdown to TextMeshPro rich text (custom MarkDig parser).
             return Markdown.ToPlainText(markdown);
         }
 
