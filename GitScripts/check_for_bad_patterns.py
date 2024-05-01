@@ -145,7 +145,7 @@ We should just leave it as a backslash.""",
         see_only=False,
     ),
     BadPattern(
-        re.compile(r"^.*/(?:/|\*) (?:TODO|FIXME)(?!\s*\(#?\d{2,}\))"),
+        re.compile(r"^.*/(?:/|\*) (?:TODO|FIXME)(?!\s*\((?:#?\d{2,}|external.*)\))"),
         "Always associate a TODO/FIXME comment with an issue on GitHub, so that we can keep track of open tasks.\n"
         "Reference either [a new issue](https://github.com/uni-bremen-agst/SEE/issues/new) or an existing (open) issue "
         "by putting its number in parentheses after the TODO, e.g., `// TODO (#614): Fix linux builds`",
