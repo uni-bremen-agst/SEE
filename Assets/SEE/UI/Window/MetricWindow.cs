@@ -129,12 +129,18 @@ namespace SEE.UI.Window
         }
 
         /// <summary>
+        /// The GameObject representing the metric window. It must be stored in this field;
+        /// otherwise, it will be garbage collected.
+        /// </summary>
+        private GameObject metricWindowObject;
+
+        /// <summary>
         /// Creates the Metric Window
         /// </summary>
         public void CreateUIInstance()
         {
             // Instantiate MetricWindow
-            GameObject metricWindowObject = PrefabInstantiator.InstantiatePrefab(WindowPrefab, Window.transform.Find("Content"), false);
+            metricWindowObject = PrefabInstantiator.InstantiatePrefab(WindowPrefab, Window.transform.Find("Content"), false);
             metricWindowObject.name = "Scrollable";
 
             Transform scrollViewContent = metricWindowObject.transform.Find("Content/Items").transform;
