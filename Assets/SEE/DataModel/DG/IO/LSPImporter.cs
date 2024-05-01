@@ -135,13 +135,13 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// A mapping from directory paths to their corresponding nodes.
         /// </summary>
-        private readonly IDictionary<string, Node> NodeAtDirectory = new Dictionary<string, Node>();
+        private readonly IDictionary<string, Node> nodeAtDirectory = new Dictionary<string, Node>();
 
         /// <summary>
         /// A mapping from file paths to their corresponding range trees.
         /// </summary>
         /// <seealso cref="KDIntervalTree{T}"/>
-        private IDictionary<string, KDIntervalTree<Node>> RangeTrees = new Dictionary<string, KDIntervalTree<Node>>();
+        private IDictionary<string, KDIntervalTree<Node>> rangeTrees = new Dictionary<string, KDIntervalTree<Node>>();
 
         /// <summary>
         /// Number of newly added edges.
@@ -169,7 +169,7 @@ namespace SEE.DataModel.DG.IO
                                                         .Where(x => ExcludedPaths.All(y => !x.StartsWith(y)))
                                                         .Distinct().ToList();
             List<Node> originalNodes = graph.Nodes();
-            NodeAtDirectory.Clear();
+            nodeAtDirectory.Clear();
             newEdges = 0;
 
             // For changePercentage: Edge creation will very roughly take up a fraction of (1 - 1 / (n+1)) * 90%,
@@ -235,7 +235,7 @@ namespace SEE.DataModel.DG.IO
             // We build a range tree for each file, so that we can quickly find the nodes with the smallest size
             // that contain the given range.
             Dictionary<string, List<Node>> relevantNodesByPath = relevantNodes.GroupBy(x => x.Path()).ToDictionary(x => x.Key, x => x.ToList());
-            RangeTrees = relevantNodesByPath.ToDictionary(x => x.Key, x => new KDIntervalTree<Node>(x.Value, node => node.SourceRange));
+            rangeTrees = relevantNodesByPath.ToDictionary(x => x.Key, x => new KDIntervalTree<Node>(x.Value, node => node.SourceRange));
 
             int i = 0;
             foreach ((string path, List<Node> nodes) in relevantNodesByPath)
@@ -496,7 +496,7 @@ namespace SEE.DataModel.DG.IO
         /// <returns>The added or existing node for the directory.</returns>
         private Node AddOrGetDirectoryNode(string directoryPath, Graph graph)
         {
-            if (NodeAtDirectory.TryGetValue(directoryPath, out Node node))
+            if (nodeAtDirectory.TryGetValue(directoryPath, out Node node))
             {
                 return node;
             }
@@ -525,7 +525,7 @@ namespace SEE.DataModel.DG.IO
                 // In case the project path is the root directory, we make the ID a bit more descriptive.
                 node.ID = Path.GetFileName(Handler.ProjectPath);
             }
-            NodeAtDirectory[directoryPath] = node;
+            nodeAtDirectory[directoryPath] = node;
             graph.AddNode(node);
 
             // We recursively add the parent directory.
@@ -646,7 +646,7 @@ namespace SEE.DataModel.DG.IO
         private IEnumerable<Node> FindNodesByLocation(string path, Range range)
 
         {
-            if (RangeTrees.TryGetValue(path, out KDIntervalTree<Node> tree))
+            if (rangeTrees.TryGetValue(path, out KDIntervalTree<Node> tree))
             {
                 // We need to do a stabbing query here, with the caveat that we want the tightest fitting range.
                 // We use our custom-made KDIntervalTree for this purpose.
