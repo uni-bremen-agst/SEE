@@ -347,8 +347,7 @@ namespace SEE.Tools.LSP
                 case MessageType.Warning:
                     Debug.LogWarning(messageParams.Message);
                     break;
-                case MessageType.Info:
-                case MessageType.Log:
+                case MessageType.Info or MessageType.Log:
                 default:
                     Debug.Log(messageParams.Message);
                     break;
