@@ -16,9 +16,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         public TokenLanguage TargetLanguage { get => config.TargetLanguage; set => config.TargetLanguage = value; }
 
-        public LanguageAttractConfig config;
+        private LanguageAttractConfig config;
 
-        public INodeReader nodeReader;
+        private INodeReader nodeReader;
 
         // TODO: What to do about keywords???
         HashSet<string> Keywords = new HashSet<string>
@@ -55,7 +55,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
                 Node neighborCluster = this.reflexionGraph.MapsTo(neighbor);
 
-                if (neighborCluster == null) continue;
+                if (neighborCluster == null)
+                {
+                    continue;
+                }
 
                 if (neighborCluster != null)
                 {

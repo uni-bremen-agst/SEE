@@ -210,6 +210,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
                 attractFunction = AttractFunction.Create(config.AttractFunctionConfig, this, reflexionGraph);
 
+                // TODO: Handle node reader initialization differently?
+                //(This set operation is only necessary for the test cases)
+                if(attractFunction is LanguageAttract && config.NodeReader != null)
+                {
+                    ((LanguageAttract)attractFunction).SetNodeReader(config.NodeReader);
+                }
+
                 subscription?.Dispose();
                 subscription = reflexionGraph.Subscribe(this);
 
@@ -254,58 +261,103 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         public void OnNext(ChangeEvent value)
         {
+            // UnityEngine.Debug.Log($"Received event {value.ToString()}");
+
+            if(!this.ReflexionGraph.AnalysisInitialized)
+            {
+                return;
+            }
+
+            // TODO: Use switch cast
             if(value is MapsToChange mapsToEvent)
             {
-                // Debug.Log($"mapsToEvent.Source={mapsToEvent.Source.ID} mapsToEvent.Target={mapsToEvent.Target.ID} change={mapsToEvent.Change} isSourceCandidate={IsCandidate(mapsToEvent.Source, this.AttractFunction.CandidateType)}");
-                if (!IsCandidate(mapsToEvent.Source, this.AttractFunction.CandidateType))
-                {
-                    return;
-                }
+                OnNextMapsToChange(mapsToEvent);
+                return;
+            }
 
-                UpdateCandidateSet(mapsToEvent.Source.ID, mapsToEvent.Change);
-
-                if (Statistics.Active)
-                {
-                    // Update and calculate attraction values for each mapped node
-                    // to make sure the statistic is consistent
-                    MappingPair chosenMappingPair = recommendedNodes.GetMappingPair(mapsToEvent.Source.ID, mapsToEvent.Target.ID);
-
-                    if (chosenMappingPair == null)
-                    {
-                        // For the very first mapped node, nodes removed from the mapping, and already mapped childs
-                        // there is no previously calculated mappingpair available.
-                        // So we create a corresponding mapping pair manually
-
-                        //Debug.Log($"Could not find mappingPair for candidate={candidateChangedInMapping.ID} and cluster {edgeEvent.Edge.Target.ID}" +
-                        //    $"in Recommendations. Create one MappingPair manually.");
-
-                        // TODO: move this into recommendation class.
-                        chosenMappingPair = new MappingPair(mapsToEvent.Source, mapsToEvent.Target, -1.0d);
-                    }
-
-                    recommendedNodes.RemoveCandidate(mapsToEvent.Source.ID);
-                    AttractFunction.HandleChangedCandidate(mapsToEvent.Target, mapsToEvent.Source, (ChangeType)mapsToEvent.Change);
-                    UpdateRecommendations();
-                    chosenMappingPair.ChangeType = (ChangeType)mapsToEvent.Change;
-                    Debug.Log($"Record chosen mapping Pair:{chosenMappingPair.CandidateID} -'{chosenMappingPair.AttractionValue}'-> {chosenMappingPair.ClusterID}");
-                    Statistics.RecordChosenMappingPair(chosenMappingPair);
-                }
-                else
-                {
-                    recommendedNodes.RemoveCandidate(mapsToEvent.Source.ID);
-                    AttractFunction.HandleChangedCandidate(mapsToEvent.Target, mapsToEvent.Source, (ChangeType)mapsToEvent.Change);
-                }
+            if (value is EdgeChange edgeChangeEvent)
+            {
+                AttractFunction.HandleChangedState(edgeChangeEvent);
+                return;
             }
 
             if (value is EdgeEvent edgeEvent)
             {
-                if(edgeEvent.Affected == ReflexionSubgraphs.Architecture)
+                if (edgeEvent.Affected == ReflexionSubgraphs.Architecture)
                 {
-                    // TODO: Reset edgeStateCache here with correct criteria
-                    // AttractFunction.ClearStateCache();
                     // UnityEngine.Debug.Log("TODO: Architecture might have changed. Edge State cache in attract function needs to be invalidated.");
-                    return;
+                    if (ReflexionGraph.IsSpecified(edgeEvent.Edge))
+                    {
+                        if (edgeEvent.Change == ChangeType.Addition)
+                        {
+                            this.AttractFunction.HandleAddArchEdge(edgeEvent.Edge);
+                        }
+                        else if (edgeEvent.Change == ChangeType.Removal)
+                        {
+                            this.AttractFunction.HandleRemovedArchEdge(edgeEvent.Edge);
+                        }
+                    }
                 }
+                return;
+            }
+
+            if (value is NodeEvent nodeEvent)
+            {
+                if (nodeEvent.Node.IsInArchitecture())
+                {
+                    if (nodeEvent.Change == ChangeType.Addition)
+                    {
+                        this.AttractFunction.HandleAddCluster(nodeEvent.Node);
+                    }
+                    else if (nodeEvent.Change == ChangeType.Removal)
+                    {
+                        this.AttractFunction.HandleRemovedCluster(nodeEvent.Node);
+                        this.recommendedNodes.RemoveCluster(nodeEvent.Node.ID);
+                    }
+                }
+            }
+        }
+
+        private void OnNextMapsToChange(MapsToChange mapsToChange)
+        {
+            // Debug.Log($"mapsToEvent.Source={mapsToEvent.Source.ID} mapsToEvent.Target={mapsToEvent.Target.ID} change={mapsToEvent.Change} isSourceCandidate={IsCandidate(mapsToEvent.Source, this.AttractFunction.CandidateType)}");
+            if (!IsCandidate(mapsToChange.Source, this.AttractFunction.CandidateType))
+            {
+                return;
+            }
+
+            UpdateCandidateSet(mapsToChange.Source.ID, mapsToChange.Change);
+
+            if (Statistics.Active)
+            {
+                // Update and calculate attraction values for each mapped node
+                // to make sure the statistic is consistent
+                MappingPair chosenMappingPair = recommendedNodes.GetMappingPair(mapsToChange.Source.ID, mapsToChange.Target.ID);
+
+                if (chosenMappingPair == null)
+                {
+                    // For the very first mapped node, nodes removed from the mapping, and already mapped childs
+                    // there is no previously calculated mappingpair available.
+                    // So we create a corresponding mapping pair manually
+
+                    //Debug.Log($"Could not find mappingPair for candidate={candidateChangedInMapping.ID} and cluster {edgeEvent.Edge.Target.ID}" +
+                    //    $"in Recommendations. Create one MappingPair manually.");
+
+                    // TODO: move this into recommendation class.
+                    chosenMappingPair = new MappingPair(mapsToChange.Source, mapsToChange.Target, -1.0d);
+                }
+
+                recommendedNodes.RemoveCandidate(mapsToChange.Source.ID);
+                AttractFunction.HandleChangedCandidate(mapsToChange.Target, mapsToChange.Source, (ChangeType)mapsToChange.Change);
+                UpdateRecommendations();
+                chosenMappingPair.ChangeType = (ChangeType)mapsToChange.Change;
+                // Debug.Log($"Record chosen mapping Pair:{chosenMappingPair.CandidateID} -'{chosenMappingPair.AttractionValue}'-> {chosenMappingPair.ClusterID}");
+                Statistics.RecordChosenMappingPair(chosenMappingPair);
+            }
+            else
+            {
+                recommendedNodes.RemoveCandidate(mapsToChange.Source.ID);
+                AttractFunction.HandleChangedCandidate(mapsToChange.Target, mapsToChange.Source, (ChangeType)mapsToChange.Change);
             }
         }
 

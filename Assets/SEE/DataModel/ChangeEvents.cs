@@ -120,7 +120,7 @@ namespace SEE.DataModel
         protected override string Description()
         {
             string operation = Change == ChangeType.Addition ? "mapped to" : "removed from";
-            string description = $"Node '{Source}' was {operation} {Target}.";
+            string description = $"Node '{Source.ID}' was {operation} {Target.ID}.";
             return description;
         }
     }

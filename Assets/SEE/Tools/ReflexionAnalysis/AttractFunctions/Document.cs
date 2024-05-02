@@ -1,5 +1,4 @@
-﻿using Accord.Math.Distances;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -167,6 +166,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return totalNumber;
         }
 
+        // TODO: May delete the enumerator later completely
         public IEnumerator<string> GetEnumerator()
         {
             // TODO: iterate all words once or as often as they are contained in the document
@@ -224,29 +224,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return this.GetEnumerator();
         }
 
-        public static double CosineSimilarityByFrequency(Document doc1, Document doc2)
-        {
-            HashSet<string> doc1Set = doc1.GetContainedWordsAsHashSet();
-            HashSet<string> doc2Set = doc2.GetContainedWordsAsHashSet();
-            doc1Set.UnionWith(doc2Set);
-
-            double[] doc1Array = new double[doc1Set.Count];
-            double[] doc2Array = new double[doc1Set.Count];
-
-            int i = 0;
-            foreach(string word in doc1Set)
-            {
-                doc1Array[i] = doc1.GetFrequency(word);
-                doc2Array[i] = doc2.GetFrequency(word);
-                i++;
-            }
-
-            Cosine cos = new Cosine();
-            double result = cos.Similarity(doc1Array, doc2Array);
-            return result;
-        }
-
-        public static double DotProduct(Document doc1, Document doc2)
+        public static double CommonWords(Document doc1, Document doc2)
         {
             Document smallerDoc = doc1.WordCount <= doc2.WordCount ? doc1 : doc2;
             Document biggerDoc = doc1.WordCount <= doc2.WordCount ? doc2 : doc1;
@@ -254,14 +232,49 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             IEnumerable<string> words = smallerDoc.GetContainedWords();
             double val = 0.0;
             foreach (var word in words)
-            {
-                int val1 = biggerDoc.GetFrequency(word) > 0 ? 1 : 0;
-                int val2 = smallerDoc.GetFrequency(word) > 0 ? 1 : 0;
-                //int val1 = biggerDoc.GetFrequency(word);
-                //int val2 = smallerDoc.GetFrequency(word);
-                val += val1 * val2;
+            {          
+                val += biggerDoc.GetFrequency(word) > 0 ? 1 : 0;
             }
             return val;
+        }
+
+        public static double OverlapCoefficient(Document doc1, Document doc2)
+        {
+            if (doc1.WordCount == 0 || doc2.WordCount == 0)
+            {
+                return 0;
+            }
+            return CommonWords(doc1, doc2) / Math.Min(doc1.WordCount, doc2.WordCount);
+        }
+
+        public static double SorensenDiceSimilarity(Document doc1, Document doc2)
+        {
+            return 2 * CommonWords(doc1, doc2) / doc1.WordCount + doc2.WordCount;
+        }
+
+        public static double JaccardSimilarity(Document doc1, Document doc2)
+        {
+            Document smallerDoc = doc1.WordCount <= doc2.WordCount ? doc1 : doc2;
+            Document biggerDoc = doc1.WordCount <= doc2.WordCount ? doc2 : doc1;
+            
+            IEnumerable<string> words = smallerDoc.GetContainedWords();
+            
+            int intersectionCount = 0;
+
+            // HashSet<string> remainingWords = biggerDoc.GetContainedWordsAsHashSet();
+
+            foreach (var word in words)
+            {
+                // remainingWords.Remove(word);
+                int val1 = biggerDoc.GetFrequency(word) > 0 ? 1 : 0;
+                // int val2 = smallerDoc.GetFrequency(word) > 0 ? 1 : 0;
+                intersectionCount += val1 /** val2*/;
+            }
+
+            //int unionCount = words.Count() + remainingWords.Count(); 
+            int unionCount = smallerDoc.GetContainedWords().Count() + biggerDoc.GetContainedWords().Count() - intersectionCount;
+
+            return (double)intersectionCount / (double)unionCount;
         }
 
         public static double CosineSimilarity(Document doc1, Document doc2)
@@ -282,7 +295,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return result;        
         }
 
-        public static double CosineSimilarity2(Document doc1, Document doc2)
+        public static double CosineSimilarityByOccurence(Document doc1, Document doc2)
         {
             Document smallerDoc = doc1.WordCount <= doc2.WordCount ? doc1 : doc2;
             Document biggerDoc = doc1.WordCount <= doc2.WordCount ? doc2 : doc1;

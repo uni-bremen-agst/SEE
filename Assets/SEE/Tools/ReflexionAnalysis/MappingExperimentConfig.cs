@@ -37,6 +37,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         public DirectoryPath OutputPath { get => outputPath; set => outputPath = value; }
 
+        public INodeReader NodeReader { get; set; }
+
         [SerializeField]
         public bool measurePercentileRanks;
 

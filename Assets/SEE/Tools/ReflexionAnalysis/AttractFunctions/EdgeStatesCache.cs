@@ -30,7 +30,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                     explicitlyMappedNode = explicitlyMappedNode.Parent;
                 }                
 
-                reflexionGraph.RemoveFromMappingSilent(mapsTo, explicitlyMappedNode);
+                reflexionGraph.RemoveFromMappingSilent(explicitlyMappedNode);
             }
 
             reflexionGraph.AddToMappingSilent(cluster, candidate);
@@ -44,19 +44,19 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
                 if (neighborCluster != null)
                 {
-                    string key = $"{cluster.ID}#{neighborCluster.ID}#{edge.ID}";
+                    string key = $"{candidate.ID}#{cluster.ID}#{candidateNeighbor.ID}#{neighborCluster.ID}#{edge.ID}";
                     this.cache[key] = edge.State();
                 }
             }
 
-            reflexionGraph.RemoveFromMappingSilent(cluster, candidate);
+            reflexionGraph.RemoveFromMappingSilent(candidate);
 
             if (mappingChangeRequired)
             {
                 reflexionGraph.AddToMappingSilent(mapsTo, explicitlyMappedNode);
             }
         }
-
+        
         public State GetFromCache(string clusterId, string candidateId, string candidateNeighborId, string edgeId)
         {
             Node candidate = reflexionGraph.GetNode(candidateId);
@@ -79,7 +79,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             string neighborClusterID = neighborCluster.ID;
 
-            string key = $"{clusterId}#{neighborClusterID}#{edgeId}";
+            string key = $"{candidateId}#{clusterId}#{candidateNeighbor.ID}#{neighborClusterID}#{edgeId}";
             if(!this.cache.ContainsKey(key))
             {
                 UpdateCache(candidate, cluster);

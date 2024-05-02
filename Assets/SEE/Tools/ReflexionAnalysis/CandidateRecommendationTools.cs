@@ -27,14 +27,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             reflexionGraph.SuppressNotifications = suppressNotifications;
         }
 
-        public static void RemoveFromMappingSilent(this ReflexionGraph reflexionGraph, Node cluster, Node candidate)
-        {
-            bool suppressNotifications = reflexionGraph.SuppressNotifications;
-            reflexionGraph.SuppressNotifications = true;
-            reflexionGraph.RemoveFromMapping(candidate);
-            reflexionGraph.SuppressNotifications = suppressNotifications;
-        }
-
         public static void RemoveFromMappingSilent(this ReflexionGraph reflexionGraph, Node candidate)
         {
             bool suppressNotifications = reflexionGraph.SuppressNotifications;

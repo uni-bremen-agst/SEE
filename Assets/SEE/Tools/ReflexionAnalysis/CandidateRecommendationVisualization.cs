@@ -80,6 +80,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         public void OnNext(ChangeEvent value)
         {
+            UnityEngine.Debug.Log($"Received event in Visualization: {value.ToString()}");
+
             if (value is NodeEvent || value is EdgeEvent || value is HierarchyEvent)
             {
                 changeEventQueue.Enqueue(value);
@@ -447,34 +449,60 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         [ButtonGroup(debugButtonGroup)]
         public void StartDebugScenario()
         {
-            string nameNode1 = "minilax.c";
-            string nameNode2 = "scanner.h";
-            string clusterName1 = "Main";
-            string clusterName2 = "FrontEnd";
-            Node node1 = reflexionGraphViz.Nodes().Where(n => n.ID.Contains(nameNode1)).FirstOrDefault();
-            Node node2 = reflexionGraphViz.Nodes().Where(n => n.ID.Contains(nameNode2)).FirstOrDefault();
+            //string nameNode1 = "minilax.c";
+            //string nameNode2 = "scanner.h";
+            //string clusterName1 = "Main";
+            //string clusterName2 = "FrontEnd";
+            //Node node1 = reflexionGraphViz.Nodes().Where(n => n.ID.Contains(nameNode1)).FirstOrDefault();
+            //Node node2 = reflexionGraphViz.Nodes().Where(n => n.ID.Contains(nameNode2)).FirstOrDefault();
 
-            Node cluster1 = reflexionGraphViz.Nodes().Where(n => n.ID.Contains(clusterName1)).FirstOrDefault();
-            Node cluster2 = reflexionGraphViz.Nodes().Where(n => n.ID.Contains(clusterName2)).FirstOrDefault();
+            //Node cluster1 = reflexionGraphViz.Nodes().Where(n => n.ID.Contains(clusterName1)).FirstOrDefault();
+            //Node cluster2 = reflexionGraphViz.Nodes().Where(n => n.ID.Contains(clusterName2)).FirstOrDefault();
 
-            lock (calculationReflexionGraphLock)
+            //lock (calculationReflexionGraphLock)
+            //{
+            //    reflexionGraphViz.AddToMapping(node1, cluster1);
+            //}
+
+            //lock (calculationReflexionGraphLock)
+            //{
+            //    reflexionGraphViz.AddToMapping(node2, cluster2); 
+            //}
+
+            //foreach(Edge edge in reflexionGraphViz.Edges().Where(  e =>
+            //                                                       (e.Source.ID.Contains(nameNode2) || e.Target.ID.Contains(nameNode2))
+            //                                                    && (e.Source.ID.Contains(nameNode1)  || e.Target.ID.Contains(nameNode1))  
+            //                                                    && (e.State() == State.Allowed || e.State() == State.ImplicitlyAllowed)
+            //                                                    && e.IsInImplementation()))
+            //{
+            //    // UnityEngine.Debug.Log($"After Analysis: Edge {edge.Source.ID} --> {edge.Target.ID} is in State.(State: {edge.State()}, Graph: {edge.ItsGraph.Name})");
+            //}
+
+            foreach (Node archNode in reflexionGraphViz.Nodes().Where(n => n.IsInArchitecture()))
             {
-                reflexionGraphViz.AddToMapping(node1, cluster1);
+                UnityEngine.Debug.Log($"Architecture Node {archNode.ID}");
             }
 
-            lock (calculationReflexionGraphLock)
-            {
-                reflexionGraphViz.AddToMapping(node2, cluster2); 
-            }
+            Node nodeToRemove = reflexionGraphViz.GetNode("common");
+            Node nodeToAdd = reflexionGraphViz.GetNode("org.apache.commons.imaging.common.ZlibDeflate");
+            Node nodeToAdd2 = reflexionGraphViz.GetNode("org.apache.commons.imaging.common.bytesource.ByteSourceArray");
 
-            foreach(Edge edge in reflexionGraphViz.Edges().Where(  e =>
-                                                                   (e.Source.ID.Contains(nameNode2) || e.Target.ID.Contains(nameNode2))
-                                                                && (e.Source.ID.Contains(nameNode1)  || e.Target.ID.Contains(nameNode1))  
-                                                                && (e.State() == State.Allowed || e.State() == State.ImplicitlyAllowed)
-                                                                && e.IsInImplementation()))
-            {
-                // UnityEngine.Debug.Log($"After Analysis: Edge {edge.Source.ID} --> {edge.Target.ID} is in State.(State: {edge.State()}, Graph: {edge.ItsGraph.Name})");
-            }
+            UnityEngine.Debug.Log($"Retrieved Node={nodeToRemove?.ID}");
+            UnityEngine.Debug.Log($"Retrieved Node={nodeToAdd?.ID}");
+            UnityEngine.Debug.Log($"Retrieved Node={nodeToAdd2?.ID}");
+
+            reflexionGraphViz.AddToMapping(nodeToAdd, nodeToRemove);
+            reflexionGraphViz.AddToMapping(nodeToAdd2, nodeToRemove);
+
+            Edge archEdge = reflexionGraphViz.GetEdge("Source_Dependency#tiff#common");
+
+            UnityEngine.Debug.Log($"Remove architecture edge.");
+
+            reflexionGraphViz.RemoveEdge(archEdge);
+
+            UnityEngine.Debug.Log($"Remove architecture node.");
+
+            reflexionGraphViz.RemoveNode(nodeToRemove);
         }
 
         [Button(testOracleLabel, ButtonSizes.Small)]
@@ -541,7 +569,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             {
                 // STEPS
                 // 1. Create initial mapping based on current seed
-                Dictionary<Node, HashSet<Node>> initialMapping = recommendations.CreateInitialMapping(initialMappingPercentage,                                                                                                     currentSeed);
+                Dictionary<Node, HashSet<Node>> initialMapping = recommendations.CreateInitialMapping(initialMappingPercentage, currentSeed);
                                                                                                      
                 UnityEngine.Debug.Log($"Experiment run={i} initialMapping keys={initialMapping.Keys.Count} values={initialMapping.Values.Count}");
                 
@@ -702,7 +730,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 // Debug.Log($"Chosen Mapping Pair {chosenMappingPair.CandidateID} --> {chosenMappingPair.CandidateID}");
 
                 //await MapRecommendation(chosenMappingPair.Candidate, chosenMappingPair.Cluster);
-                // Debug.Log($"Automatically map candidate {chosenMappingPair.Candidate.ID} to the cluster {chosenMappingPair.Cluster.ID}. candidates left: {recommendation.UnmappedCandidates.Count}");
+                Debug.Log($"Automatically map candidate {chosenMappingPair.Candidate.ID} to the cluster {chosenMappingPair.Cluster.ID}. candidates left: {recommendation.UnmappedCandidates.Count}");
                 graph.StartCaching();
                 graph.AddToMapping(chosenMappingPair.Candidate, chosenMappingPair.Cluster);
                 graph.ReleaseCaching();

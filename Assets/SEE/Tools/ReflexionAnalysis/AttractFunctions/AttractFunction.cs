@@ -135,6 +135,41 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         public abstract void HandleChangedCandidate(Node cluster, Node nodeChangedInMapping, ChangeType changeType);
 
+        private void EnsureSubgraph(ReflexionSubgraphs subgraph, GraphElement element)
+        {
+            if(!element.IsIn(subgraph))
+            {
+                throw new NotInSubgraphException(subgraph, element);
+            }
+        }
+
+        public virtual void HandleAddCluster(Node cluster)
+        {
+            EnsureSubgraph(ReflexionSubgraphs.Architecture, cluster);
+            this.AddClusterToUpdate(cluster.ID);
+        }
+
+        public virtual void HandleRemovedCluster(Node cluster)
+        {
+            EnsureSubgraph(ReflexionSubgraphs.Architecture, cluster);
+            this.RemoveClusterToUpdate(cluster.ID);
+        }
+
+        public virtual void HandleAddArchEdge(Edge archEdge)
+        {
+            EnsureSubgraph(ReflexionSubgraphs.Architecture, archEdge);
+            this.edgeStateCache.ClearCache();
+        }
+
+        public virtual void HandleRemovedArchEdge(Edge archEdge)
+        {
+            EnsureSubgraph(ReflexionSubgraphs.Architecture, archEdge);
+            this.edgeStateCache.ClearCache();
+        }
+
+        public abstract void HandleChangedState(EdgeChange edgeChange);
+
+        // TODO: Check if the call HandlingRequired() is still required.
         public bool HandlingRequired(string candidateId, 
                                      ChangeType changeType,
                                      bool updateHandling)
@@ -178,7 +213,5 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         {
             this.handledCandidates.Clear();
         }
-
-
     }
 }

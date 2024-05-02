@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using XInputDotNetPure;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
@@ -10,7 +11,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         private Dictionary<string, ClassInformation> trainingData;
 
-        private int alpha;
+        private double alpha;
 
         private int DocumentCountGlobal { get; set; }
 
@@ -24,9 +25,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             get { return this.trainingData.Keys; }
         }
 
-        public int Alpha { get { return alpha; } }
+        public double Alpha { get { return alpha; } }
 
-        public NaiveBayesIncremental(int alpha = 1)
+        public NaiveBayesIncremental(double alpha = 1)
         {
             trainingData = new Dictionary<string, ClassInformation>();
             this.alpha = alpha;
@@ -89,11 +90,29 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             double prob = Math.Log(trainingData[clazz].GetPriorProbability());
 
-            foreach (string word in doc)
+            int unknownWords = 0;
+
+            foreach(string word in doc.GetContainedWords())
             {
-                prob += Math.Log(trainingData[clazz].GetWordProbability(word));
+                if(!ClassInformation.wordFrequenciesGlobal.ContainsKey(word))
+                {
+                    unknownWords++;
+                }
+            }
+
+            foreach (string word in doc.GetContainedWords())
+            {
+                int wordFrequency = doc.GetFrequency(word);
+                double wordProbability = trainingData[clazz].GetWordProbability(word, unknownWords);
+                prob += Math.Log(wordProbability) * wordFrequency;
             }
             return prob + UNDERFLOW_OFFSET;
+        }
+        public static double ConvertFromLogarithmicScale(double value)
+        {
+            value -= UNDERFLOW_OFFSET;
+            value = Math.Pow(Math.E, value);
+            return value;
         }
 
         public Dictionary<string, int> GetTrainingsData(string clazz)
@@ -132,7 +151,37 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             }
 
             return DocumentCountGlobal == 0;
-        } 
+        }
+
+        public void DeleteClass(string clazz)
+        {
+            if (!this.trainingData.ContainsKey(clazz))
+            {
+                throw new Exception($"Given class {clazz} is unknown.");
+            }
+
+            ClassInformation classToRemove = this.trainingData[clazz];
+
+            DocumentCountGlobal -= classToRemove.DocumentCount;
+
+            Dictionary<string, int> wordFrequencies = classToRemove.WordFrequencies;
+            foreach (string word in wordFrequencies.Keys)
+            {
+                ClassInformation.wordFrequenciesGlobal[word] -= wordFrequencies[word];
+
+                if (ClassInformation.wordFrequenciesGlobal[word] == 0)
+                {
+                    ClassInformation.wordFrequenciesGlobal.Remove(word);
+                }
+
+                if (ClassInformation.wordFrequenciesGlobal[word] < 0)
+                {
+                    throw new Exception($"Global Frequency for word {word} in naive bayes classifier cannot be negative.");
+                }
+            }
+
+            trainingData.Remove(clazz);
+        }
 
         internal class ClassInformation
         {
@@ -143,9 +192,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 get { return new Dictionary<string, int>(wordFrequencies); }
             }
 
-            private int wordCount;
+            private int totalWordsInClass;
 
-            private static Dictionary<string, int> wordFrequenciesGlobal = new Dictionary<string, int>();
+            public static Dictionary<string, int> wordFrequenciesGlobal = new Dictionary<string, int>();
 
             private int documentCount;
 
@@ -159,22 +208,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             public int DocumentCount { get => documentCount; set => documentCount = value; }
 
-            public double GetWordProbability(string word)
+            public double GetWordProbability(string word, int unknownWordsCount)
             {
-                int wordFrequency = classifier.Alpha;
-                int wordCountWithAlpha = wordCount + wordFrequenciesGlobal.Keys.Count * classifier.Alpha;
-                
+                double wordFrequency = classifier.Alpha;
+      
                 if (wordFrequencies.ContainsKey(word))
                 {
                     wordFrequency += wordFrequencies[word];
-                } 
-                
-                if(!wordFrequenciesGlobal.ContainsKey(word))
-                {
-                    wordCountWithAlpha++;
                 }
 
-                double wordProbability = (double)wordFrequency / (double)wordCountWithAlpha;
+                double totalWordsAlphaSmoothed = totalWordsInClass + (wordFrequenciesGlobal.Keys.Count + unknownWordsCount) * classifier.Alpha;
+                double wordProbability = wordFrequency / totalWordsAlphaSmoothed;
                 return wordProbability;
             }
 
@@ -192,11 +236,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                     }
                     wordFrequencies[word]+= document.GetFrequency(word);
                     wordFrequenciesGlobal[word]+= document.GetFrequency(word);
-                    wordCount+= document.GetFrequency(word);
+                    totalWordsInClass+= document.GetFrequency(word);
                 }
                 DocumentCount++;
             }
-
 
             public void Remove(IDocument document)
             {
@@ -210,7 +253,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                         {
                             wordFrequenciesGlobal.Remove(word);
                         }
-                        wordCount-= document.GetFrequency(word);
+                        totalWordsInClass-= document.GetFrequency(word);
                     }
                 }
                 DocumentCount--;

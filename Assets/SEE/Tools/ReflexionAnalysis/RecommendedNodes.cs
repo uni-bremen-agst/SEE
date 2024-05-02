@@ -58,8 +58,23 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         public void RemoveCluster(string clusterId)
         {
-            // TODO:
-            throw new NotImplementedException("Currently not implemented.");
+            foreach(string candidateId in knownCandidates)
+            {
+                string key = CreateKey(candidateId, clusterId);
+                mappingPairs.Remove(key);
+            }
+
+            foreach(string candidateId in candidatesInRecommendations.Keys)
+            {
+                string key = CreateKey(candidateId, clusterId);
+                if(recommendations.ContainsKey(key)) 
+                {
+                    recommendations.Remove(key);
+                }
+            }
+
+            clusterInRecommendations.Remove(clusterId);
+            knownClusters.Remove(clusterId);
         }
 
         public MappingPair GetMappingPair(string candidateId, string clusterId)

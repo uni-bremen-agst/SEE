@@ -19,7 +19,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                NBAttractConfig config) : base(reflexionGraph, candidateRecommendation, config)
         {
             this.config = config;
-            this.naiveBayes = new NaiveBayesIncremental();   
+            this.naiveBayes = new NaiveBayesIncremental(config.AlphaSmoothing);   
         }
 
         public override string DumpTrainingData()
@@ -67,7 +67,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             {
                 this.reflexionGraph.AddToMappingSilent(cluster, candidate);
                 this.CreateCdaTerms(cluster, candidate, docCdaTerms);    
-                this.reflexionGraph.RemoveFromMappingSilent(cluster, candidate);
+                this.reflexionGraph.RemoveFromMappingSilent(candidate);
                 doc.AddWords(docCdaTerms[cluster.ID]);
             }
 
@@ -146,6 +146,32 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             this.naiveBayes.Reset();
             this.edgeStateCache.ClearCache();
             this.ClearDocumentCache();
+        }
+
+        public override void HandleAddCluster(Node cluster)
+        {
+            base.HandleAddCluster(cluster);
+        }
+
+        public override void HandleRemovedCluster(Node cluster)
+        {
+            base.HandleRemovedCluster(cluster); 
+            naiveBayes.DeleteClass(cluster.ID);
+        }
+
+        public override void HandleAddArchEdge(Edge archEdge)
+        {
+            base.HandleAddArchEdge(archEdge);
+        }
+
+        public override void HandleRemovedArchEdge(Edge archEdge)
+        {
+            base.HandleRemovedArchEdge(archEdge);
+        }
+
+        public override void HandleChangedState(EdgeChange edgeChange)
+        {
+            // No handling necessary
         }
     }
 }

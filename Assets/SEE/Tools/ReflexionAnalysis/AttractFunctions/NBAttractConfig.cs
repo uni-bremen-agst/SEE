@@ -15,12 +15,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         [SerializeField]
         private bool useCDA;
 
-        public bool UseCDA {get => useCDA; set => useCDA = value;}
+        public bool UseCDA { get => useCDA; set => useCDA = value; }
 
         [SerializeField]
         private bool useStandardTerms;
 
         public bool UseStandardTerms { get => useStandardTerms; set => useStandardTerms = value; }
+
+        [SerializeField]
+        private double alphaSmoothing = 1.0;
+
+        public double AlphaSmoothing { get => alphaSmoothing; set => alphaSmoothing = value; }
 
         public NBAttractConfig(bool useCda = true) : this(TokenLanguage.Plain, useCda)
         {

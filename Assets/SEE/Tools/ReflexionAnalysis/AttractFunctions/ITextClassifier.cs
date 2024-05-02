@@ -14,6 +14,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         void DeleteDocument(string clazz, IDocument document);
 
+        void DeleteClass(string clazz);
+
         bool IsEmpty();
 
         void Reset();

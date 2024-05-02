@@ -13,11 +13,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
     public class CountAttract : AttractFunction
     {
         // TODO: Implementation of delta
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        private CountAttractConfig config;
 
         /// <summary>
         /// 
@@ -48,7 +43,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                             CandidateRecommendation candidateRecommendation, 
                             CountAttractConfig config) : base(graph, candidateRecommendation, config)
         {
-            this.config = config;
             overallValues = new Dictionary<string, double>();
             mappingCount = new Dictionary<string, int>();
             this.Phi = config.Phi;
@@ -63,11 +57,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <returns></returns>
         public override double GetAttractionValue(Node candidateNode, Node cluster)
         {
-            if (!candidateNode.Type.Equals(this.CandidateType)) return 0;
+            if (!candidateNode.Type.Equals(this.CandidateType))
+            {
+                return 0;
+            }
+
             if (overallValues.TryGetValue(candidateNode.ID, out double overall))
             {
                 double toOthers = GetToOthersValue(candidateNode, cluster);
-
                 return overall - toOthers;
             } 
             else
@@ -119,6 +116,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 return;
             }
 
+            // TODO: is the cluster still there? regarding removal of architecture node
             this.AddClusterToUpdate(cluster.ID);
 
             List<Edge> implementationEdges = nodeChangedInMapping.GetImplementationEdges();
@@ -222,6 +220,43 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         {
             this.overallValues.Clear();
             this.edgeStateCache.ClearCache();
+        }
+
+        public override void HandleAddCluster(Node cluster)
+        {
+            base.HandleAddCluster(cluster); 
+        }
+
+        public override void HandleRemovedCluster(Node cluster)
+        {
+            base.HandleRemovedCluster(cluster);
+        }
+
+        public override void HandleAddArchEdge(Edge archEdge)
+        {
+            base.HandleAddArchEdge(archEdge);
+            this.AddClusterToUpdate(archEdge.Source.ID);
+            this.AddClusterToUpdate(archEdge.Target.ID);
+        }
+
+        public override void HandleRemovedArchEdge(Edge archEdge)
+        {
+            base.HandleRemovedArchEdge(archEdge);
+            
+            if(reflexionGraph.ContainsNode(archEdge.Source))
+            {
+                this.AddClusterToUpdate(archEdge.Source.ID);
+            }
+
+            if (reflexionGraph.ContainsNode(archEdge.Target))
+            {
+                this.AddClusterToUpdate(archEdge.Target.ID);
+            }
+        }
+
+        public override void HandleChangedState(EdgeChange edgeChange)
+        {
+            //No handling necessary
         }
     }
 }
