@@ -112,19 +112,19 @@ namespace SEE.GraphProviders
             {
                 LibGit2Sharp.Tree tree = repo.Lookup<Commit>(commitID).Tree;
                 // Get all files using "git ls-files".
-                //TODO: I limited the output to 1000 for testing, because there are performance issues with huge graphs.
+                //TODO: I limited the output to 300 for testing, because there are performance issues with huge graphs.
                 IEnumerable<string> files;
                 if (includedFiles.Any() && !string.IsNullOrEmpty(includedFiles.First()))
                 {
-                    files = ListTree(tree).Where(path => includedFiles.Contains(Path.GetExtension(path))).Take(1000);
+                    files = ListTree(tree).Where(path => includedFiles.Contains(Path.GetExtension(path))).Take(300);
                 }
                 else if (excludedFiles.Any())
                 {
-                    files = ListTree(tree).Where(path => !excludedFiles.Contains(Path.GetExtension(path))).Take(1000);
+                    files = ListTree(tree).Where(path => !excludedFiles.Contains(Path.GetExtension(path))).Take(300);
                 }
                 else
                 {
-                    files = ListTree(tree).Take(1000);
+                    files = ListTree(tree).Take(300);
                 }
 
                 // Build the graph structure.
