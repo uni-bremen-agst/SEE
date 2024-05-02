@@ -10,6 +10,7 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.UI.RuntimeConfigMenu;
+using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
@@ -47,11 +48,12 @@ namespace SEE.GraphProviders
         [OdinSerialize] [ShowInInspector] public int AuthorThreshhold { get; set; } = 1;
 
         [OdinSerialize] [ShowInInspector] public int CommitThreshhold { get; set; } = 1;
-
         [OdinSerialize] [ShowInInspector] public bool SimplifyGraph { get; set; }
 
         [OdinSerialize] [ShowInInspector] public bool AutoFetch { get; set; }
 
+
+        private const string NumberOfAuthorsMetricName = "Metric.Authors.Number";
         public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
         {
             UniTask<Graph> graphTask = UniTask.FromResult(GetGraph(graph));
@@ -64,7 +66,7 @@ namespace SEE.GraphProviders
             graph.BasePath = RepositoryPath.Path;
             string[] pathSegments = RepositoryPath.Path.Split(Path.DirectorySeparatorChar);
 
-            VCSGraphProvider.NewNode(graph, pathSegments[^1], "Repository", pathSegments[^1]);
+            GraphUtils.NewNode(graph, pathSegments[^1], "Repository", pathSegments[^1]);
 
             //var mainNode = graph.GetNode(pathSegments[^1]);
             DateTime timeLimit = DateTime.ParseExact(Date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
@@ -112,26 +114,29 @@ namespace SEE.GraphProviders
 
                 foreach (var commit in commitList)
                 {
-                    var changedFilesPath = repo.Diff.Compare<TreeChanges>(commit.Tree, commit.Parents.First().Tree)
-                        .Select(y => y.Path);
+                    var changedFilesPath = repo.Diff.Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
+                    //.Select(y => y.Path);
 
                     foreach (var changedFile in changedFilesPath)
                     {
-                        if (!includedFiles.Contains(Path.GetExtension(changedFile)) ||
-                            excludedFiles.Contains(Path.GetExtension(changedFile)))
+                        string filePath = changedFile.Path;
+                        if (!includedFiles.Contains(Path.GetExtension(filePath)) ||
+                            excludedFiles.Contains(Path.GetExtension(filePath)))
                         {
                             continue;
                         }
 
-                        if (!fileMetrics.ContainsKey(changedFile))
+                        if (!fileMetrics.ContainsKey(filePath))
                         {
-                            fileMetrics.Add(changedFile,
-                                new GitFileMetricsCollector(1, new HashSet<string> { commit.Author.Email }));
+                            fileMetrics.Add(filePath,
+                                new GitFileMetricsCollector(1, new HashSet<string> { commit.Author.Email },
+                                    changedFile.LinesAdded + changedFile.LinesDeleted));
                         }
                         else
                         {
-                            fileMetrics[changedFile].NumberOfCommits += 1;
-                            fileMetrics[changedFile].Authors.Add(commit.Author.Email);
+                            fileMetrics[filePath].NumberOfCommits += 1;
+                            fileMetrics[filePath].Authors.Add(commit.Author.Email);
+                            fileMetrics[filePath].Churn += changedFile.LinesAdded + changedFile.LinesDeleted;
                         }
                     }
                 }
@@ -143,15 +148,20 @@ namespace SEE.GraphProviders
                     // Files in the main directory.
                     if (filePathSegments.Length == 1)
                     {
+                        Node n = GraphUtils.NewNode(graph, file.Key, "file", file.Key);
                         graph.GetNode(pathSegments[^1])
-                            .AddChild(VCSGraphProvider.NewNode(graph, file.Key, "file", file.Key));
+                            .AddChild(n);
+                        n.SetInt(NumberOfAuthorsMetricName, file.Value.Authors.Count);
+                        n.SetInt("Metric.File.Commits", file.Value.NumberOfCommits);
+                        n.SetInt("Metric.File.Churn", file.Value.Churn);
                     }
                     else
                     {
-                        Node n = VCSGraphProvider.BuildGraphFromPath(file.Key, null, null, graph,
+                        Node n = GraphUtils.BuildGraphFromPath(file.Key, null, null, graph,
                             graph.GetNode(pathSegments[^1]));
-                        n.SetInt("Metric.Authors.Number", file.Value.Authors.Count);
+                        n.SetInt(NumberOfAuthorsMetricName, file.Value.Authors.Count);
                         n.SetInt("Metric.File.Commits", file.Value.NumberOfCommits);
+                        n.SetInt("Metric.File.Churn", file.Value.Churn);
                     }
                 }
 
@@ -243,10 +253,16 @@ namespace SEE.GraphProviders
 
         public HashSet<string> Authors { get; set; }
 
-        public GitFileMetricsCollector(int numberOfCommits, HashSet<string> authors)
+        /// <summary>
+        /// Total sum of changed lines (added and removed)
+        /// </summary>
+        public int Churn { get; set; }
+
+        public GitFileMetricsCollector(int numberOfCommits, HashSet<string> authors, int churn)
         {
             NumberOfCommits = numberOfCommits;
             Authors = authors;
+            Churn = churn;
         }
     }
 }
