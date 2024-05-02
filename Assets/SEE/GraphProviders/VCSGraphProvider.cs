@@ -11,7 +11,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Dissonance;
 using UnityEngine;
+using SEE.Utils;
 using SEE.UI.Window.CodeWindow;
 
 namespace SEE.GraphProviders
@@ -96,7 +98,7 @@ namespace SEE.GraphProviders
             Debug.Log(repositoryPath);
             Graph graph = new(repositoryPath, pathSegments[^1]);
             // The main directory.
-            NewNode(graph, pathSegments[^1], "directory", pathSegments[^1]);
+            GraphUtils.NewNode(graph, pathSegments[^1], "directory", pathSegments[^1]);
 
             IEnumerable<string> includedFiles = pathGlobbing
                 .Where(path => path.Value == true)
@@ -132,12 +134,12 @@ namespace SEE.GraphProviders
                     // Files in the main directory.
                     if (filePathSegments.Length == 1)
                     {
-                        graph.GetNode(pathSegments[^1]).AddChild(NewNode(graph, filePath, "file", filePath));
+                        graph.GetNode(pathSegments[^1]).AddChild(GraphUtils.NewNode(graph, filePath, "file", filePath));
                     }
                     // Other directorys/files.
                     else
                     {
-                        BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(pathSegments[^1]));
+                        GraphUtils.BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(pathSegments[^1]));
                     }
                 }
                 AddMetricsToNode(graph, repo, commitID);
@@ -208,83 +210,10 @@ namespace SEE.GraphProviders
             ConfigIO.Restore(attributes, newCommitIDLabel, ref CommitID);
             RepositoryPath.Restore(attributes, repositoryPathLabel);
         }
-        /// <summary>
-        /// Creates a new node for each element of a filepath, that does not
-        /// already exists in the graph.
-        /// </summary>
-        /// <param name="path">The remaining part of the path</param>
-        /// <param name="parent">The parent node from the current element of the path</param>
-        /// <param name="parentPath">The path of the current parent, which will eventually be part of the ID</param>
-        /// <param name="graph">The graph to which the new node belongs to</param>
-        /// <param name="mainNode">The root node of the main directory</param>
-        static void BuildGraphFromPath(string path, Node parent, string parentPath, Graph graph, Node mainNode)
-        {
-            string[] pathSegments = path.Split(Path.AltDirectorySeparatorChar);
-            string nodePath = string.Join(Path.AltDirectorySeparatorChar.ToString(), pathSegments, 1, pathSegments.Length - 1);
-            // Current pathSegment is in the main directory.
-            if (parentPath == null)
-            {
-                // Directory already exists.
-                if (graph.GetNode(pathSegments[0]) != null)
-                {
-                    BuildGraphFromPath(nodePath, graph.GetNode(pathSegments[0]), pathSegments[0], graph, mainNode);
-                }
-                // Directory does not exist.
-                if (graph.GetNode(pathSegments[0]) == null && pathSegments.Length > 1 && parent == null)
-                {
-                    mainNode.AddChild(NewNode(graph, pathSegments[0], "directory", pathSegments[0]));
-                    BuildGraphFromPath(nodePath, graph.GetNode(pathSegments[0]), pathSegments[0], graph, mainNode);
-                }
-                // I dont know, if this code ever gets used -> I dont know, how to handle empty directorys.
-                if (graph.GetNode(pathSegments[0]) == null && pathSegments.Length == 1 && parent == null)
-                {
-                    mainNode.AddChild(NewNode(graph, pathSegments[0], "directory", pathSegments[0]));
-                }
-            }
-            // Current pathSegment is not in the main directory.
-            if (parentPath != null)
-            {
-                // The node for the current pathSegment exists.
-                if (graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]) != null)
-                {
-                    BuildGraphFromPath(nodePath, graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]), parentPath + Path.DirectorySeparatorChar + pathSegments[0], graph, mainNode);
-                }
-                // The node for the current pathSegment does not exist, and the node is a directory.
-                if (graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]) == null && pathSegments.Length > 1)
-                {
-                    parent.AddChild(NewNode(graph, parentPath + Path.DirectorySeparatorChar + pathSegments[0], "directory", pathSegments[0]));
-                    BuildGraphFromPath(nodePath, graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]), parentPath + Path.DirectorySeparatorChar + pathSegments[0], graph, mainNode);
-                }
-                // The node for the current pathSegment does not exist, and the node is file.
-                if (graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]) == null && pathSegments.Length == 1)
-                {
-                    parent.AddChild(NewNode(graph, parentPath + Path.DirectorySeparatorChar + pathSegments[0], "file", pathSegments[0]));
-                }
-            }
-        }
 
-        /// <summary>
-        /// Creates and returns a new node to <paramref name="graph"/>.
-        /// </summary>
-        /// <param name="graph">Where to add the node</param>
-        /// <param name="id">Unique ID of the new node</param>
-        /// <param name="type">Type of the new node</param>
-        /// <param name="name">The name of the node</param>
-        /// <param name="length">The length of the graph element, measured in number of lines</param>
-        /// <returns>a new node added to <paramref name="graph"/></returns>
-        protected static Node NewNode(Graph graph, string id, string type = "Routine", string name = null, int? length = null)
-        {
-            Node result = new()
-            {
-                SourceName = name,
-                ID = id,
-                Type = type,
-                SourceLength = length
-            };
+ 
 
-            graph.AddNode(result);
-            return result;
-        }
+       
 
         /// <summary>
         /// Creates and returns a new node to <paramref name="graph"/> as a child of <paramref name="parent"/>.
@@ -298,7 +227,7 @@ namespace SEE.GraphProviders
         /// <returns>a new node added to <paramref name="graph"/></returns>
         protected static Node Child(Graph graph, Node parent, string id, string type = "Routine", string name = null, int? length = null)
         {
-            Node child = NewNode(graph, id, type, name, length);
+            Node child = GraphUtils.NewNode(graph, id, type, name, length);
             parent.AddChild(child);
             return child;
         }
