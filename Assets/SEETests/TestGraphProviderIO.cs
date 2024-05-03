@@ -42,6 +42,14 @@ namespace SEE.GraphProviders
             {
                 AreEqualReflexionGraphProviders(reflexionGraphProvider, actual);
             }
+            else if (expected is JaCoCoGraphProvider jacocoGraphProvider)
+            {
+                AreEqualJaCoCoGraphProviders(jacocoGraphProvider, actual);
+            }
+            else if (expected is MergeDiffGraphProvider diffMergeGraphProvider)
+            {
+                AreEqualDiffMergeGraphProviders(diffMergeGraphProvider, actual);
+            }
             else
             {
                 throw new System.NotImplementedException();
@@ -64,6 +72,7 @@ namespace SEE.GraphProviders
             FileIO.DeleteIfExists(filename);
         }
 
+        #region GXL provider
         [Test]
         public void TestGXLGraphProvider()
         {
@@ -87,6 +96,9 @@ namespace SEE.GraphProviders
             AreEqual(saved.Path, gxlLoaded.Path);
         }
 
+        #endregion
+
+        #region CSV provider
         [Test]
         public void TestCSVGraphProvider()
         {
@@ -109,6 +121,36 @@ namespace SEE.GraphProviders
             CSVGraphProvider gxlLoaded = loaded as CSVGraphProvider;
             AreEqual(saved.Path, gxlLoaded.Path);
         }
+
+        #endregion
+
+        #region JaCoCo provider
+        [Test]
+        public void TestJaCoCoGraphProvider()
+        {
+            JaCoCoGraphProvider saved = GetJaCoCoProvider();
+            Save(saved);
+            AreEqualJaCoCoGraphProviders(saved, Load());
+        }
+
+        private JaCoCoGraphProvider GetJaCoCoProvider()
+        {
+            return new JaCoCoGraphProvider()
+            {
+                Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
+            };
+        }
+
+        private static void AreEqualJaCoCoGraphProviders(JaCoCoGraphProvider saved, GraphProvider loaded)
+        {
+            Assert.IsTrue(saved.GetType() == loaded.GetType());
+            JaCoCoGraphProvider loadedProvider = loaded as JaCoCoGraphProvider;
+            AreEqual(saved.Path, loadedProvider.Path);
+        }
+
+        #endregion
+
+        #region Pipeline provider
 
         [Test]
         public void TestPipelineProvider()
@@ -154,6 +196,10 @@ namespace SEE.GraphProviders
             }
         }
 
+        #endregion
+
+        #region Reflexion provider
+
         [Test]
         public void TestReflexionGraphProvider()
         {
@@ -180,6 +226,38 @@ namespace SEE.GraphProviders
             AreEqual(saved.Implementation, reflexionLoaded.Implementation);
             AreEqual(saved.Mapping, reflexionLoaded.Mapping);
         }
+
+        #endregion
+
+        #region DiffMerge provider
+
+        [Test]
+        public void TestDiffMergeGraphProvider()
+        {
+            MergeDiffGraphProvider saved = GetDiffMergeProvider();
+            Save(saved);
+            AreEqualDiffMergeGraphProviders(saved, Load());
+        }
+
+        private MergeDiffGraphProvider GetDiffMergeProvider()
+        {
+            return new MergeDiffGraphProvider()
+            {
+                OldGraph = new JaCoCoGraphProvider()
+                {
+                    Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
+                }
+            };
+        }
+
+        private static void AreEqualDiffMergeGraphProviders(MergeDiffGraphProvider saved, GraphProvider loaded)
+        {
+            Assert.IsTrue(saved.GetType() == loaded.GetType());
+            MergeDiffGraphProvider loadedProvider = loaded as MergeDiffGraphProvider;
+            AreEqual(saved.OldGraph, loadedProvider.OldGraph);
+        }
+
+        #endregion
 
         private static T NewVanillaSEECity<T>() where T : Component
         {

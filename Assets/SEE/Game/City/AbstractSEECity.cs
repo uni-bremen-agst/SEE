@@ -82,7 +82,7 @@ namespace SEE.Game.City
         /// The path to project where the source code can be found. This attribute
         /// is needed to show the source code of nodes and edges.
         /// </summary>
-        [TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        [TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup), ShowInInspector]
         [PropertyTooltip("Directory where the source code is located")]
         [HideReferenceObjectPicker]
         public DirectoryPath SourceCodeDirectory
@@ -109,7 +109,7 @@ namespace SEE.Game.City
         /// of an IDE for a particular project. Concretely, if the IDE is Visual Studio,
         /// this is the VS solution file.
         /// </summary>
-        [SerializeField, Tooltip("Path of Visual Studio solution file."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        [Tooltip("Path of Visual Studio solution file."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         public FilePath SolutionPath = new();
 
         /// <summary>
@@ -123,8 +123,17 @@ namespace SEE.Game.City
         /// they should be visualized or not and if so, how.
         /// </summary>
         [NonSerialized, OdinSerialize, Tooltip("Visual attributes of nodes."), HideReferenceObjectPicker]
-        [DictionaryDrawerSettings(KeyLabel = "Node type", ValueLabel = "Visual attributes", DisplayMode = DictionaryDisplayOptions.CollapsedFoldout), TabGroup(NodeFoldoutGroup), RuntimeTab(NodeFoldoutGroup)]
+        [DictionaryDrawerSettings(KeyLabel = "Node type", ValueLabel = "Visual attributes",
+            DisplayMode = DictionaryDisplayOptions.CollapsedFoldout), TabGroup(NodeFoldoutGroup), RuntimeTab(NodeFoldoutGroup)]
         public NodeTypeVisualsMap NodeTypes = new();
+
+        /// <summary>
+        /// Attributes to mark changes of nodes.
+        /// </summary>
+        [Tooltip("How changes of nodes should be marked."),
+            TabGroup(NodeFoldoutGroup), RuntimeTab(NodeFoldoutGroup), HideReferenceObjectPicker]
+        [NonSerialized, OdinSerialize]
+        public MarkerAttributes MarkerAttributes = new();
 
         /// <summary>
         /// If true, lifted edges whose source and target nodes are the same are ignored.
@@ -158,6 +167,38 @@ namespace SEE.Game.City
         [Tooltip("Maps metric names onto colors."), TabGroup(MetricFoldoutGroup), RuntimeTab(MetricFoldoutGroup), HideReferenceObjectPicker]
         [NonSerialized, OdinSerialize]
         public ColorMap MetricToColor = new();
+
+        /// <summary>
+        /// A progress bar, shown in the editor.
+        /// Can be used to indicate loading progress during city creation.
+        /// </summary>
+        [ProgressBar(0, 1, Height = 20, ColorGetter = nameof(GetProgressBarColor),
+                     CustomValueStringGetter = "$" + nameof(ProgressBarValueString))]
+        [PropertyOrder(999)]
+        [ShowIf(nameof(ShowProgressBar))]
+        [HideLabel]
+        [ReadOnly]
+        public float ProgressBar;
+
+        /// <summary>
+        /// Whether the progress bar should be shown.
+        /// </summary>
+        private bool ShowProgressBar => ProgressBar > 0;
+
+        /// <summary>
+        /// The string representation of the progress bar value.
+        /// </summary>
+        private string ProgressBarValueString => $"{ProgressBar * 100:F0}%";
+
+        /// <summary>
+        /// Returns the color for the progress bar, based on the current <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">The value (from 0–1) for which to determine the color.</param>
+        /// <returns>The color for the progress bar.</returns>
+        private static Color GetProgressBarColor(float value)
+        {
+            return Color.Lerp(Color.red, Color.green, Mathf.Pow(value, 2));
+        }
 
         /// <summary>
         /// Yields a graph renderer that can draw this city.
@@ -320,6 +361,7 @@ namespace SEE.Game.City
         public virtual void Reset()
         {
             DeleteGraphGameObjects();
+            ProgressBar = 0;
         }
 
         /// <summary>

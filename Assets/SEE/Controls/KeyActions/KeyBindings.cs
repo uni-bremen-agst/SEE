@@ -136,6 +136,8 @@ namespace SEE.Controls.KeyActions
                      KeyActionCategory.General, "Turns on/off the settings menu.");
             Register(KeyAction.ToggleBrowser, KeyCode.F4, "Toggle browser",
                      KeyActionCategory.General, "Turns on/off the browser.");
+            Register(KeyAction.ToggleMirror, KeyCode.F8, "Toggle mirror",
+                     KeyActionCategory.General, "Turns on/off the mirror.");
             Register(KeyAction.SearchMenu, KeyCode.F, "Search",
                      KeyActionCategory.General, "Opens the search menu.");
             Register(KeyAction.Undo, KeyCode.Z, "Undo",
@@ -232,7 +234,7 @@ namespace SEE.Controls.KeyActions
                      KeyActionCategory.CodeViewer, "Redoes an undone edit in the source-code viewer.");
             Register(KeyAction.CodeWindowSave, KeyCode.F7, "Code-window save",
                      KeyActionCategory.CodeViewer, "Saves the content of the source-code viewer.");
-            Register(KeyAction.RefreshSyntaxHighlighting, KeyCode.F8, "Refresh",
+            Register(KeyAction.RefreshSyntaxHighlighting, KeyCode.F10, "Refresh",
                      KeyActionCategory.CodeViewer, "Refreshes syntax highlighting in the source-code viewer.");
             // Chat
             Register(KeyAction.ToggleTextChat, KeyCode.F2, "Toggle text chat",
