@@ -14,6 +14,7 @@ using System.Linq;
 using UnityEngine;
 using SEE.Utils;
 using SEE.UI.Window.CodeWindow;
+using System.Threading;
 
 namespace SEE.GraphProviders
 {
@@ -49,7 +50,11 @@ namespace SEE.GraphProviders
         /// Loads the metrics and nodes from the given git repository and commitID into the <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">The graph into which the metrics shall be loaded</param>
-        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
+        /// <param name="city">This parameter is currently ignored.</param>
+        /// <param name="changePercentage">This parameter is currently ignored.</param>
+        /// <param name="token">This parameter is currently ignored.</param>
+        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city, Action<float> changePercentage = null,
+                                                          CancellationToken token = default)
         {
             CheckArguments(city);
             return await UniTask.FromResult<Graph>(GetVCSGraph(PathGlobbing, RepositoryPath.Path, CommitID));
@@ -115,15 +120,15 @@ namespace SEE.GraphProviders
                 IEnumerable<string> files;
                 if (includedFiles.Any() && !string.IsNullOrEmpty(includedFiles.First()))
                 {
-                    files = ListTree(tree).Where(path => includedFiles.Contains(Path.GetExtension(path)));
+                    files = ListTree(tree).Where(path => includedFiles.Contains(Path.GetExtension(path))).Take(200);
                 }
                 else if (excludedFiles.Any())
                 {
-                    files = ListTree(tree).Where(path => !excludedFiles.Contains(Path.GetExtension(path)));
+                    files = ListTree(tree).Where(path => !excludedFiles.Contains(Path.GetExtension(path))).Take(200);
                 }
                 else
                 {
-                    files = ListTree(tree);
+                    files = ListTree(tree).Take(200);
                 }
 
                 // Build the graph structure.
@@ -221,9 +226,9 @@ namespace SEE.GraphProviders
         /// <param name="name">The name of the node</param>
         /// <param name="length">The length of the graph element, measured in number of lines</param>
         /// <returns>a new node added to <paramref name="graph"/></returns>
-        protected static Node Child(Graph graph, Node parent, string id, string type = "Routine", string name = null, int? length = null)
+        protected static Node Child(Graph graph, Node parent, string id, string type = "Routine", string name = null)
         {
-            Node child = GraphUtils.NewNode(graph, id, type, name, length);
+            Node child = GraphUtils.NewNode(graph, id, type, name);
             parent.AddChild(child);
             return child;
         }

@@ -12,17 +12,14 @@ namespace SEE.Utils
         /// <param name="id">Unique ID of the new node</param>
         /// <param name="type">Type of the new node</param>
         /// <param name="name">The source name of the node</param>
-        /// <param name="length">The length of the graph element, measured in number of lines</param>
         /// <returns>a new node added to <paramref name="graph"/></returns>
-        public static Node NewNode(Graph graph, string id, string type = "Routine", string name = null,
-            int? length = null)
+        public static Node NewNode(Graph graph, string id, string type = "Routine", string name = null)
         {
             Node result = new()
             {
                 SourceName = name,
                 ID = id,
-                Type = type,
-                SourceLength = length
+                Type = type
             };
 
             graph.AddNode(result);
