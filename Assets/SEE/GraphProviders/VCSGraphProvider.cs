@@ -11,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Dissonance;
 using UnityEngine;
 using SEE.Utils;
 using SEE.UI.Window.CodeWindow;
@@ -95,8 +94,9 @@ namespace SEE.GraphProviders
         static Graph GetVCSGraph(Dictionary<string, bool> pathGlobbing, string repositoryPath, string commitID)
         {
             string[] pathSegments = repositoryPath.Split(Path.DirectorySeparatorChar);
-            Debug.Log(repositoryPath);
+
             Graph graph = new(repositoryPath, pathSegments[^1]);
+
             // The main directory.
             GraphUtils.NewNode(graph, pathSegments[^1], "directory", pathSegments[^1]);
 
@@ -111,20 +111,19 @@ namespace SEE.GraphProviders
             using (Repository repo = new(repositoryPath))
             {
                 LibGit2Sharp.Tree tree = repo.Lookup<Commit>(commitID).Tree;
-                // Get all files using "git ls-files".
-                //TODO: I limited the output to 300 for testing, because there are performance issues with huge graphs.
+                // Get all files using "git ls-tree -r <CommitID> --rame-only".
                 IEnumerable<string> files;
                 if (includedFiles.Any() && !string.IsNullOrEmpty(includedFiles.First()))
                 {
-                    files = ListTree(tree).Where(path => includedFiles.Contains(Path.GetExtension(path))).Take(300);
+                    files = ListTree(tree).Where(path => includedFiles.Contains(Path.GetExtension(path)));
                 }
                 else if (excludedFiles.Any())
                 {
-                    files = ListTree(tree).Where(path => !excludedFiles.Contains(Path.GetExtension(path))).Take(300);
+                    files = ListTree(tree).Where(path => !excludedFiles.Contains(Path.GetExtension(path)));
                 }
                 else
                 {
-                    files = ListTree(tree).Take(300);
+                    files = ListTree(tree);
                 }
 
                 // Build the graph structure.
@@ -143,8 +142,6 @@ namespace SEE.GraphProviders
                     }
                 }
                 AddMetricsToNode(graph, repo, commitID);
-                //TODO: Only for testing.
-                Debug.Log(graph.ToString());
             }
 
             return graph;
@@ -173,8 +170,7 @@ namespace SEE.GraphProviders
                 }
             }
 
-            return fileList.Where(path => TokenLanguage.AllTokenLanguages.Any
-                    (x => x.FileExtensions.Contains(Path.GetExtension(path).TrimStart('.'))));
+            return fileList;
         }
 
         public override GraphProviderKind GetKind()
@@ -271,24 +267,34 @@ namespace SEE.GraphProviders
                 if (node.Type == "file")
                 {
                     string filePath = node.ID.Replace('\\', '/');
-                    IEnumerable<SEEToken> tokens = RetrieveTokens(filePath, repository, commitID);
-                    int complexity = CalculateMcCabeComplexity(tokens);
-                    int linesOfCode = CalculateLinesOfCode(tokens);
-                    halsteadMetrics = CalculateHalsteadMetrics(tokens);
-                    node.SetInt("Lines of Code", linesOfCode);
-                    node.SetInt("McCabe Complexity", complexity);
-                    node.SetInt("Halstead Distinct Operators", halsteadMetrics.DistinctOperators);
-                    node.SetInt("Halstead Distinct Operands", halsteadMetrics.DistinctOperands);
-                    node.SetInt("Halstead Total Operators", halsteadMetrics.TotalOperators);
-                    node.SetInt("Halstead Total Operands", halsteadMetrics.TotalOperands);
-                    node.SetInt("Halstead Program Vocabulary", halsteadMetrics.ProgramVocabulary);
-                    node.SetInt("Halstead Program Length", halsteadMetrics.ProgramLength);
-                    node.SetFloat("Halstead Calculated Estimated Program Length", halsteadMetrics.EstimatedProgramLength);
-                    node.SetFloat("Halstead Volume", halsteadMetrics.Volume);
-                    node.SetFloat("Halstead Difficulty", halsteadMetrics.Difficulty);
-                    node.SetFloat("Halstead Effort", halsteadMetrics.Effort);
-                    node.SetFloat("Halstead Time Required to Program", halsteadMetrics.TimeRequiredToProgram);
-                    node.SetFloat("Halstead Number of Delivered Bugs", halsteadMetrics.NumberOfDeliveredBugs);
+                    IEnumerable<SEEToken> tokens;
+                    TokenLanguage language;
+                    try
+                    {
+                        language = TokenLanguage.FromFileExtension(Path.GetExtension(filePath).TrimStart('.'), true);
+                        tokens = RetrieveTokens(filePath, repository, commitID);
+                        int complexity = CalculateMcCabeComplexity(tokens);
+                        int linesOfCode = CalculateLinesOfCode(tokens);
+                        halsteadMetrics = CalculateHalsteadMetrics(tokens);
+                        node.SetInt("Lines of Code", linesOfCode);
+                        node.SetInt("McCabe Complexity", complexity);
+                        node.SetInt("Halstead Distinct Operators", halsteadMetrics.DistinctOperators);
+                        node.SetInt("Halstead Distinct Operands", halsteadMetrics.DistinctOperands);
+                        node.SetInt("Halstead Total Operators", halsteadMetrics.TotalOperators);
+                        node.SetInt("Halstead Total Operands", halsteadMetrics.TotalOperands);
+                        node.SetInt("Halstead Program Vocabulary", halsteadMetrics.ProgramVocabulary);
+                        node.SetInt("Halstead Program Length", halsteadMetrics.ProgramLength);
+                        node.SetFloat("Halstead Calculated Estimated Program Length", halsteadMetrics.EstimatedProgramLength);
+                        node.SetFloat("Halstead Volume", halsteadMetrics.Volume);
+                        node.SetFloat("Halstead Difficulty", halsteadMetrics.Difficulty);
+                        node.SetFloat("Halstead Effort", halsteadMetrics.Effort);
+                        node.SetFloat("Halstead Time Required to Program", halsteadMetrics.TimeRequiredToProgram);
+                        node.SetFloat("Halstead Number of Delivered Bugs", halsteadMetrics.NumberOfDeliveredBugs);
+                    }
+                    catch
+                    {
+
+                    }
                 }
             }
         }
