@@ -116,19 +116,19 @@ namespace SEE.GraphProviders
             using (Repository repo = new(repositoryPath))
             {
                 LibGit2Sharp.Tree tree = repo.Lookup<Commit>(commitID).Tree;
-                // Get all files using "git ls-tree -r <CommitID> --rame-only".
+                // Get all files using "git ls-tree -r <CommitID> --name-only".
                 IEnumerable<string> files;
                 if (includedFiles.Any() && !string.IsNullOrEmpty(includedFiles.First()))
                 {
-                    files = ListTree(tree).Where(path => includedFiles.Contains(Path.GetExtension(path))).Take(200);
+                    files = ListTree(tree).Where(path => includedFiles.Contains(Path.GetExtension(path)));
                 }
                 else if (excludedFiles.Any())
                 {
-                    files = ListTree(tree).Where(path => !excludedFiles.Contains(Path.GetExtension(path))).Take(200);
+                    files = ListTree(tree).Where(path => !excludedFiles.Contains(Path.GetExtension(path)));
                 }
                 else
                 {
-                    files = ListTree(tree).Take(200);
+                    files = ListTree(tree);
                 }
 
                 // Build the graph structure.
@@ -239,8 +239,9 @@ namespace SEE.GraphProviders
         /// <param name="filePath">The filePath from the node.</param>
         /// <param name="repository">The repository from which the file content is retrieved.</param>
         /// <param name="commitID">The commitID where the files exist.</param>
+        /// <param name="language">The language the given text is written in.</param>
         /// <returns>The token stream for the specified file and commit.</returns>
-        private static IEnumerable<SEEToken> RetrieveTokens(string filePath, Repository repository, string commitID)
+        private static IEnumerable<SEEToken> RetrieveTokens(string filePath, Repository repository, string commitID, TokenLanguage language)
         {
             Blob blob = repository.Lookup<Blob>($"{commitID}:{filePath}");
 
@@ -248,7 +249,7 @@ namespace SEE.GraphProviders
             {
                 string fileContent = blob.GetContentText();
 
-                return SEEToken.FromString(fileContent, TokenLanguage.FromFileExtension(Path.GetExtension(filePath)?[1..]));
+                return SEEToken.FromString(fileContent, language);
             }
             else
             {
@@ -277,7 +278,7 @@ namespace SEE.GraphProviders
                     try
                     {
                         language = TokenLanguage.FromFileExtension(Path.GetExtension(filePath).TrimStart('.'), true);
-                        tokens = RetrieveTokens(filePath, repository, commitID);
+                        tokens = RetrieveTokens(filePath, repository, commitID, language);
                         int complexity = CalculateMcCabeComplexity(tokens);
                         int linesOfCode = CalculateLinesOfCode(tokens);
                         halsteadMetrics = CalculateHalsteadMetrics(tokens);
