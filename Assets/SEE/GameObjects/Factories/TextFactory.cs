@@ -7,6 +7,7 @@ namespace SEE.GO
 {
     /// <summary>
     /// A factory for text objects that rotate towards the camera.
+    /// The created texts respect a portal (culling area).
     /// </summary>
     internal static class TextFactory
     {
@@ -52,7 +53,7 @@ namespace SEE.GO
         /// <summary>
         /// Returns a game object showing the given <paramref name="text"/> at given <paramref name="position"/>
         /// with given <paramref name="fontSize"/>.
-        /// The text rotates towards the main camera.
+        /// The text rotates towards the main camera and respects a portal (culling area).
         /// </summary>
         /// <param name="text">the text to be drawn</param>
         /// <param name="position">the center position at which to draw the text</param>
