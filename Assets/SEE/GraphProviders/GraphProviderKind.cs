@@ -40,6 +40,10 @@
         /// <summary>
         /// For <see cref="LSPGraphProvider"/>.
         /// </summary>
-        LSP
+        LSP,
+        /// <summary>
+        /// For <see cref="GitGraphProvider"/>.
+        /// </summary>
+        Git
     }
 }
