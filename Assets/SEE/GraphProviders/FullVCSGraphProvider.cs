@@ -52,8 +52,14 @@ namespace SEE.GraphProviders
 
         [OdinSerialize] [ShowInInspector] public bool AutoFetch { get; set; }
 
+        #region Constants
 
         private const string NumberOfAuthorsMetricName = "Metric.Authors.Number";
+
+        private const string NumberOfCommitsMetricName = "Metric.File.Commits";
+
+        #endregion
+
         public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
         {
             UniTask<Graph> graphTask = UniTask.FromResult(GetGraph(graph));
@@ -83,32 +89,38 @@ namespace SEE.GraphProviders
             {
                 //string[] pathSegments = RepositoryPath.Path.Split(Path.DirectorySeparatorChar);
 
-                List<Commit> commitList = new();
+                // List<Commit> commitList = new();
 
-                // Iterate over each commit in each branch until time limit is reached
-                // Assuming, that commits are sorted chronological.
-                foreach (var branch in repo.Branches)
-                {
-                    foreach (var commit in branch.Commits)
-                    {
-                        // Assuming that git log is in a 
-                        if (DateTime.Compare(commit.Author.When.Date, timeLimit) < 0)
-                        {
-                            break;
-                        }
-
-                        commitList.Add(commit);
-                    }
-                }
-
-
-                // remove duplicates
+                IEnumerable<Commit> commitList = repo.Commits
+                    .QueryBy(new CommitFilter { IncludeReachableFrom = repo.Branches })
+                    .Where(commit => DateTime.Compare(commit.Author.When.Date, timeLimit) > 0)
+                    .Where(commit => commit.Parents.Count() == 1);
+                // // Iterate over each commit in each branch until time limit is reached
+                // // Assuming, that commits are sorted chronological.
+                // foreach (var branch in repo.Branches)
+                // {
+                //     foreach (var commit in branch.Commits)
+                //     {
+                //         // Assuming that git log is in a 
+                //         if (DateTime.Compare(commit.Author.When.Date, timeLimit) < 0)
+                //         {
+                //             continue;
+                //         }
+                //
+                //         commitList.Add(commit);
+                //     }
+                // }
+                //
+                //
+                // // remove duplicates
+                
+                // Filter out merge commits
                 commitList = commitList
-                    .GroupBy(x => x.Sha)
-                    .Select(x => x.First())
-                    //.Where(x => x.Parents.Count() <= 1)
+                    //.GroupBy(x => x.Sha)
+                    //.Select(x => x.First())
+                    .Where(x => x.Parents.Count() <= 1)
+                    //.Distinct()
                     .ToList();
-
 
                 Dictionary<string, GitFileMetricsCollector> fileMetrics = new();
 
@@ -152,7 +164,7 @@ namespace SEE.GraphProviders
                         graph.GetNode(pathSegments[^1])
                             .AddChild(n);
                         n.SetInt(NumberOfAuthorsMetricName, file.Value.Authors.Count);
-                        n.SetInt("Metric.File.Commits", file.Value.NumberOfCommits);
+                        n.SetInt(NumberOfCommitsMetricName, file.Value.NumberOfCommits);
                         n.SetInt("Metric.File.Churn", file.Value.Churn);
                     }
                     else
@@ -160,7 +172,7 @@ namespace SEE.GraphProviders
                         Node n = GraphUtils.BuildGraphFromPath(file.Key, null, null, graph,
                             graph.GetNode(pathSegments[^1]));
                         n.SetInt(NumberOfAuthorsMetricName, file.Value.Authors.Count);
-                        n.SetInt("Metric.File.Commits", file.Value.NumberOfCommits);
+                        n.SetInt(NumberOfCommitsMetricName, file.Value.NumberOfCommits);
                         n.SetInt("Metric.File.Churn", file.Value.Churn);
                     }
                 }
