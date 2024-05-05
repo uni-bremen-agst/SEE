@@ -278,17 +278,20 @@ namespace SEE.Game.City
         public BoardAttributes BoardSettings = new();
 
         /// <summary>
-        /// Adds all game objects tagged by <see cref="Tags.Node"/> or <see cref="Tags.Edge"/>
-        /// of <paramref name="parent"/> including its descendants to <see cref="GraphElementIDMap"/>.
+        /// Recurses into the game-object hierarchy rooted by <paramref name="root"/> and adds
+        /// all visited game objects (including <paramref name="root"/>) tagged by <see cref="Tags.Node"/>
+        /// or <see cref="Tags.Edge"/> to <see cref="GraphElementIDMap"/>.
         /// </summary>
-        /// <param name="parent">root node of the game-object tree to be added to <see cref="GraphElementIDMap"/></param>
-        protected static void UpdateGraphElementIDMap(GameObject parent)
+        /// <param name="root">root node of the game-object tree to be added to <see cref="GraphElementIDMap"/></param>
+        /// <remarks>Generally, <paramref name="root"/> will be a game object representing a code city;
+        /// that is, a game object where a <see cref="AbstractSEECity"/> component is attached to.</remarks>
+        protected static void UpdateGraphElementIDMap(GameObject root)
         {
-            if (parent.CompareTag(Tags.Node) || parent.CompareTag(Tags.Edge))
+            if (root.CompareTag(Tags.Node) || root.CompareTag(Tags.Edge))
             {
-                GraphElementIDMap.Add(parent, true);
+                GraphElementIDMap.Add(root);
             }
-            foreach (Transform child in parent.transform)
+            foreach (Transform child in root.transform)
             {
                 UpdateGraphElementIDMap(child.gameObject);
             }
