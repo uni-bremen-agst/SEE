@@ -7,7 +7,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-
 namespace SEE.Game.Operator
 {
     /// <summary>
@@ -57,8 +56,7 @@ namespace SEE.Game.Operator
         /// </summary>
         private void PrepareLabel()
         {
-            Color textColor = UnityEngine.Color.white;
-            Color lineColor = UnityEngine.Color.white;
+            Color textColor = UnityEngine.Color.white;            
 
             string shownText = Node?.SourceName ?? gameObject.name;
 
@@ -86,8 +84,7 @@ namespace SEE.Game.Operator
                 {
                     name = $"{labelPrefix}{shownText} (Connecting Line)"
                 };
-                LineFactory.Draw(line, new[] { startLinePosition, startLinePosition }, 0.01f,
-                                 LineMaterial(lineColor));
+                LineFactory.Draw(line, new[] { startLinePosition, startLinePosition }, 0.01f, City.LabelLineMaterial);                                 
                 line.transform.SetParent(nodeLabel.transform);
 
                 // The nodeLabel and its child edge must inherit the portal of gameObject.
@@ -106,24 +103,6 @@ namespace SEE.Game.Operator
             {
                 nodeLabel.SetActive(true);
             }
-        }
-
-        /// <summary>
-        /// Material for the line connecting a node and its label. We use
-        /// exactly the same material for all.
-        /// </summary>
-        private static Material lineMaterial;
-
-        /// <summary>
-        /// Returns the material for the line connecting a node and its label.
-        /// </summary>
-        /// <param name="lineColor"></param>
-        /// <returns>a new material for the line connecting a node and its label</returns>
-        private static Material LineMaterial(Color lineColor)
-        {
-            lineMaterial ??= Materials.New(Materials.ShaderType.TransparentLine, lineColor, texture: null,
-                                           renderQueueOffset: (int)(RenderQueue.Transparent + 1));
-            return lineMaterial;
         }
 
         /// <summary>

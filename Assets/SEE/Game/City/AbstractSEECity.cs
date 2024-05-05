@@ -14,6 +14,7 @@ using SEE.UI.RuntimeConfigMenu;
 using SEE.Game.CityRendering;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
+using UnityEngine.Rendering;
 
 namespace SEE.Game.City
 {
@@ -29,7 +30,7 @@ namespace SEE.Game.City
     {
         protected virtual void Awake()
         {
-            // Intentionally left blank
+            LabelLineMaterial = new Material(LineMaterial(Color.white));
         }
 
         protected virtual void Start()
@@ -276,6 +277,25 @@ namespace SEE.Game.City
         /// </summary>
         [Tooltip("Settings for holistic metric boards.")]
         public BoardAttributes BoardSettings = new();
+
+        /// <summary>
+        /// The material for the line connecting a node and its label. We use exactly one material 
+        /// for all connecting lines within this city.
+        /// </summary>
+        [HideInInspector]
+        public Material LabelLineMaterial
+        { get; private set; }
+
+        /// <summary>
+        /// Returns the material for the line connecting a node and its label.
+        /// </summary>
+        /// <param name="lineColor"></param>
+        /// <returns>a new material for the line connecting a node and its label</returns>
+        private static Material LineMaterial(Color lineColor)
+        {
+            return Materials.New(Materials.ShaderType.TransparentLine, lineColor, texture: null,
+                                 renderQueueOffset: (int)(RenderQueue.Transparent + 1));
+        }
 
         /// <summary>
         /// Recurses into the game-object hierarchy rooted by <paramref name="root"/> and adds
