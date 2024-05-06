@@ -47,29 +47,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// 
         /// </summary>
-        public Dictionary<Node, HashSet<MappingPair>> Recommendations { get
-            {
-                // TODO: ADJUST INTERFACE!
-                Dictionary<Node, HashSet<MappingPair>> recommendations = new();
-                foreach (MappingPair mappingPair in recommendedNodes.Recommendations.Values)
-                {
-                    Node cluster = ReflexionGraph.GetNode(mappingPair.ClusterID);
-                    HashSet<MappingPair> mappingPairs;
-                    if (!recommendations.TryGetValue(cluster, out mappingPairs))
-                    {
-                        recommendations[cluster] = new HashSet<MappingPair>();
-                        mappingPairs = recommendations[cluster];
-                    }
-                    mappingPairs.Add(mappingPair);
-                }
-                
-                return recommendations; 
-            } 
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         public IEnumerable<MappingPair> MappingPairs { get { return recommendedNodes.MappingPairs; } }
 
         /// <summary>
@@ -92,6 +69,25 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         public CandidateRecommendation()
         {
             Statistics = new CandidateRecommendationStatistics();
+        }
+
+        public IEnumerable<MappingPair> GetRecommendations()
+        {
+            return this.recommendedNodes.Recommendations;
+        }
+
+        public IEnumerable<MappingPair> GetRecommendations(Node node)
+        {
+            if(IsCandidate(node))
+            {
+                return this.recommendedNodes.GetRecommendationsForCandidate(node.ID);
+            } 
+            else if(IsCluster(node))
+            {
+                return this.recommendedNodes.GetRecommendationsForCluster(node.ID);
+            }
+
+            return new List<MappingPair>();
         }
 
         // TODO: this interface needs work(Make it async)
@@ -144,32 +140,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 graph.AddEdge(edge);
             }
 
-            return graph;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public Graph GetRecommendationTree()
-        {
-            Graph graph = new Graph("", "Recommendations");
-
-            foreach (Node cluster in Recommendations.Keys)
-            {
-                Node clusterClone = (Node)cluster.Clone();
-                graph.AddNode(clusterClone);
-                foreach (MappingPair mappingPair in Recommendations[cluster])
-                {
-                    Node candidate = mappingPair.Candidate;
-                    Node candidateClone = (Node) candidate.Clone();
-                    Edge edge = new Edge(candidateClone, clusterClone, recommendationEdgeType);
-                    clusterClone.AddChild(candidateClone);
-                    graph.AddNode(candidateClone);
-                    graph.AddEdge(edge);
-                }
-            }
- 
             return graph;
         }
 
@@ -320,7 +290,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         private void OnNextMapsToChange(MapsToChange mapsToChange)
         {
-            // Debug.Log($"mapsToEvent.Source={mapsToEvent.Source.ID} mapsToEvent.Target={mapsToEvent.Target.ID} change={mapsToEvent.Change} isSourceCandidate={IsCandidate(mapsToEvent.Source, this.AttractFunction.CandidateType)}");
+            // Debug.Log($"mapsToEvent.Source={mapsToChange.Source.ID} mapsToEvent.Target={mapsToChange.Target.ID} change={mapsToChange.Change} isSourceCandidate={IsCandidate(mapsToChange.Source, this.AttractFunction.CandidateType)}");
             if (!IsCandidate(mapsToChange.Source, this.AttractFunction.CandidateType))
             {
                 return;
@@ -330,20 +300,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             if (Statistics.Active)
             {
-                // Update and calculate attraction values for each mapped node
-                // to make sure the statistic is consistent
                 MappingPair chosenMappingPair = recommendedNodes.GetMappingPair(mapsToChange.Source.ID, mapsToChange.Target.ID);
 
+                // TODO: move this into recommendation class?
                 if (chosenMappingPair == null)
                 {
                     // For the very first mapped node, nodes removed from the mapping, and already mapped childs
                     // there is no previously calculated mappingpair available.
                     // So we create a corresponding mapping pair manually
 
-                    //Debug.Log($"Could not find mappingPair for candidate={candidateChangedInMapping.ID} and cluster {edgeEvent.Edge.Target.ID}" +
-                    //    $"in Recommendations. Create one MappingPair manually.");
-
-                    // TODO: move this into recommendation class.
                     chosenMappingPair = new MappingPair(mapsToChange.Source, mapsToChange.Target, -1.0d);
                 }
 
@@ -724,26 +689,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             return percentileRank;
         }
 
-        public static bool IsRecommendationDefinite(Dictionary<Node, HashSet<MappingPair>> recommendations)
-        {
-            Node cluster = recommendations.Keys.First<Node>();
-            HashSet<MappingPair> candidates = recommendations[cluster];
-            return recommendations.Keys.Count == 1 && candidates.Count == 1;
-        }
-
-        public static MappingPair GetDefiniteRecommendation(Dictionary<Node, HashSet<MappingPair>> recommendations)
-        {
-            if(IsRecommendationDefinite(recommendations))
-            {
-                Node cluster = recommendations.Keys.First<Node>();
-                return recommendations[cluster].FirstOrDefault<MappingPair>();
-            } 
-            else
-            {
-                return null;
-            }
-        }
-
         public /*static*/ List<Node> GetCandidates(ReflexionGraph graph, string candidateType)
         {
             return graph.Nodes().Where(n => this.IsCandidate(n)).ToList();
@@ -784,6 +729,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             return GetMappedCandidates(ReflexionGraph, attractFunction.CandidateType);
         }
 
+        private static bool IsCluster(Node node, string clusterType)
+        {
+            return node.Type.Equals(clusterType);
+        }
+
         public static bool IsCandidate(Node node, string candidateType)
         {
             return node.Type.Equals(candidateType)
@@ -800,6 +750,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         public bool IsCandidate(Node node)
         {
             return IsCandidate(node, this.AttractFunction.CandidateType);
+        }
+
+        public bool IsCluster(Node node)
+        {
+            return IsCluster(node, this.AttractFunction.ClusterType);
         }
 
         public bool IsUnmappedCandidate(Node node)

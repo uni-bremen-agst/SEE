@@ -10,13 +10,13 @@ using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using Sirenix.OdinInspector;
-using Sirenix.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis
@@ -169,30 +169,47 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         public async UniTaskVoid TriggerBlinkAnimation()
         {
-            Dictionary<Node, HashSet<MappingPair>> recommendations = await this.SyncRecommendations(CandidateRecommendation);
+            IEnumerable<MappingPair> recommendations = await this.GetRecommendations(CandidateRecommendation);
             await UniTask.SwitchToMainThread();
+
             List<NodeOperator> nodeOperators = new List<NodeOperator>();
-            foreach (Node cluster in recommendations.Keys)
+
+            // TODO: Distinction between different clusters is required(different color intensity)
+            foreach (MappingPair mappingPair in recommendations)
             {
-                NodeOperator nodeOperator;
+                // sync node objects
+                Node cluster = this.reflexionGraphViz.GetNode(mappingPair.ClusterID);
+                Node candidate = this.reflexionGraphViz.GetNode(mappingPair.CandidateID);
 
-                nodeOperator = cluster.GameObject().AddOrGetComponent<NodeOperator>();
-                nodeOperators.Add(nodeOperator);
-
-                foreach (MappingPair mappingPair in recommendations[cluster])
+                if(cluster != null && candidate != null)
                 {
-                    nodeOperators.Add(mappingPair.Candidate.GameObject().AddOrGetComponent<NodeOperator>());
+                    nodeOperators.Add(cluster.GameObject().AddOrGetComponent<NodeOperator>());
+                    nodeOperators.Add(candidate.GameObject().AddOrGetComponent<NodeOperator>());
                 }
             }
 
-            if (!ProcessingEvents)
+            if (!ProcessingEvents && nodeOperators.Count > 0)
             {
                 // blink effect
-                // TODO: Distinction between different hypothesized entities is required
-                if (blinkEffectCoroutine != null) StopCoroutine(blinkEffectCoroutine);
+                if (blinkEffectCoroutine != null)
+                {
+                    StopCoroutine(blinkEffectCoroutine);
+                }
                 blinkEffectCoroutine = StartCoroutine(StartBlinkEffect(nodeOperators));
             }
-        } 
+        }
+
+        private async Task<IEnumerable<MappingPair>> GetRecommendations(CandidateRecommendation candidateRecommendation)
+        {
+            await UniTask.WaitWhile(() => ProcessingEvents);
+            return await UniTask.RunOnThreadPool(() =>
+            {
+                lock (calculationReflexionGraphLock)
+                {
+                    return candidateRecommendation.GetRecommendations();
+                }
+            });
+        }
 
         public async UniTask ProcessEvents()
         {
@@ -247,7 +264,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         public void StartRecording()
         {
             string csvFile = Path.Combine(this.mappingConfig.OutputPath.Path, csvFileName);
-            // CandidateRecommendation.Statistics.AddConfigInformation(this.mappingConfig);
             CandidateRecommendation.Statistics.StartRecording(csvFile);
         }
 
@@ -375,43 +391,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             Debug.Log(CandidateRecommendation.AttractFunction.DumpTrainingData());
         }
 
-        /// <summary>
-        /// Copies the recommendation of the given candidateRecommendation object and 
-        /// creates clone corresponding to the visualizedGraph
-        /// </summary>
-        /// <param name="candidateRecommendation"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        public async UniTask<Dictionary<Node, HashSet<MappingPair>>> SyncRecommendations(CandidateRecommendation candidateRecommendation) 
-        {
-            await UniTask.WaitWhile(() => ProcessingEvents);
-            Dictionary<Node, HashSet<MappingPair>> RecommendationsVisualized = new Dictionary<Node, HashSet<MappingPair>>();
-            lock (visualizedReflexionGraphLock)
-            {
-                foreach (Node key in candidateRecommendation.Recommendations.Keys)
-                {
-                    HashSet<MappingPair> visualizedMappingPairs = new HashSet<MappingPair>();
-                    Node keyInViz = reflexionGraphViz.GetNode(key.ID);
-                    RecommendationsVisualized.Add(keyInViz, visualizedMappingPairs);
-                    foreach (MappingPair mappingPair in candidateRecommendation.Recommendations[key])
-                    {
-                        Node visualizedCandidate = reflexionGraphViz.GetNode(mappingPair.CandidateID);
-                        Node visualizedCluster = reflexionGraphViz.GetNode(mappingPair.ClusterID);
-                        if (visualizedCandidate == null || visualizedCluster == null)
-                        {
-                            throw new Exception($"Couldn't map recommendations to visualized reflexion graph." +
-                                $" {mappingPair.CandidateID} --> {visualizedCandidate?.ID} | {mappingPair.ClusterID} --> {visualizedCluster?.ID}");
-                        }
-                        MappingPair mappingPairVisualized = new MappingPair(visualizedCandidate,
-                                                                            visualizedCluster,
-                                                                            mappingPair.AttractionValue);
-                        visualizedMappingPairs.Add(mappingPairVisualized);
-                    }
-                } 
-            }
-            return RecommendationsVisualized;
-        }
-
         [Button(startAutomatedMappingLabel,ButtonSizes.Small)]
         [ButtonGroup(mappingButtonGroup)]
         public void StartAutomatedMappingCommand()
@@ -449,60 +428,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         [ButtonGroup(debugButtonGroup)]
         public void StartDebugScenario()
         {
-            //string nameNode1 = "minilax.c";
-            //string nameNode2 = "scanner.h";
-            //string clusterName1 = "Main";
-            //string clusterName2 = "FrontEnd";
-            //Node node1 = reflexionGraphViz.Nodes().Where(n => n.ID.Contains(nameNode1)).FirstOrDefault();
-            //Node node2 = reflexionGraphViz.Nodes().Where(n => n.ID.Contains(nameNode2)).FirstOrDefault();
-
-            //Node cluster1 = reflexionGraphViz.Nodes().Where(n => n.ID.Contains(clusterName1)).FirstOrDefault();
-            //Node cluster2 = reflexionGraphViz.Nodes().Where(n => n.ID.Contains(clusterName2)).FirstOrDefault();
-
-            //lock (calculationReflexionGraphLock)
-            //{
-            //    reflexionGraphViz.AddToMapping(node1, cluster1);
-            //}
-
-            //lock (calculationReflexionGraphLock)
-            //{
-            //    reflexionGraphViz.AddToMapping(node2, cluster2); 
-            //}
-
-            //foreach(Edge edge in reflexionGraphViz.Edges().Where(  e =>
-            //                                                       (e.Source.ID.Contains(nameNode2) || e.Target.ID.Contains(nameNode2))
-            //                                                    && (e.Source.ID.Contains(nameNode1)  || e.Target.ID.Contains(nameNode1))  
-            //                                                    && (e.State() == State.Allowed || e.State() == State.ImplicitlyAllowed)
-            //                                                    && e.IsInImplementation()))
-            //{
-            //    // UnityEngine.Debug.Log($"After Analysis: Edge {edge.Source.ID} --> {edge.Target.ID} is in State.(State: {edge.State()}, Graph: {edge.ItsGraph.Name})");
-            //}
-
-            foreach (Node archNode in reflexionGraphViz.Nodes().Where(n => n.IsInArchitecture()))
-            {
-                UnityEngine.Debug.Log($"Architecture Node {archNode.ID}");
-            }
-
-            Node nodeToRemove = reflexionGraphViz.GetNode("common");
-            Node nodeToAdd = reflexionGraphViz.GetNode("org.apache.commons.imaging.common.ZlibDeflate");
-            Node nodeToAdd2 = reflexionGraphViz.GetNode("org.apache.commons.imaging.common.bytesource.ByteSourceArray");
-
-            UnityEngine.Debug.Log($"Retrieved Node={nodeToRemove?.ID}");
-            UnityEngine.Debug.Log($"Retrieved Node={nodeToAdd?.ID}");
-            UnityEngine.Debug.Log($"Retrieved Node={nodeToAdd2?.ID}");
-
-            reflexionGraphViz.AddToMapping(nodeToAdd, nodeToRemove);
-            reflexionGraphViz.AddToMapping(nodeToAdd2, nodeToRemove);
-
-            Edge archEdge = reflexionGraphViz.GetEdge("Source_Dependency#tiff#common");
-
-            UnityEngine.Debug.Log($"Remove architecture edge.");
-
-            reflexionGraphViz.RemoveEdge(archEdge);
-
-            UnityEngine.Debug.Log($"Remove architecture node.");
-
-            reflexionGraphViz.RemoveNode(nodeToRemove);
+            // Empty method for debugging
         }
 
         [Button(testOracleLabel, ButtonSizes.Small)]
@@ -632,7 +558,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 // case 6.1 keep csv File
                 // case 6.3 keep csv File
 
-
                 // TODO:
                 // 7. ResetMapping
                 // case 7.1 sync with viz
@@ -675,56 +600,53 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// </summary>
         public async UniTaskVoid StartAutomatedMappingViz()
         {
-            Dictionary<Node, HashSet<MappingPair>> recommendations = await this.SyncRecommendations(CandidateRecommendation);
+            IEnumerable<MappingPair> recommendations = await this.GetRecommendations(CandidateRecommendation);
             
             // While next recommendation still exists      
-            while (recommendations.Count != 0)
+            while (recommendations.Count() != 0)
             {
                 MappingPair chosenMappingPair;
 
                 // TODO: Wrap recommendations within own class?
-                if(CandidateRecommendation.IsRecommendationDefinite(recommendations))
+                if(recommendations.Count() == 1)
                 {
-                    chosenMappingPair = CandidateRecommendation.GetDefiniteRecommendation(recommendations);
+                    chosenMappingPair = recommendations.FirstOrDefault();
                     // Debug.Log($"Automatically map candidate {chosenMappingPair.Candidate.ID} to the cluster {chosenMappingPair.Cluster.ID}");
                 } 
                 else
                 {
-                    chosenMappingPair = recommendations[recommendations.Keys.First()].FirstOrDefault();
-
                     // TODO: Handle ambigous mapping steps
                     Debug.Log("Warning: Ambigous recommendations.");
+                    chosenMappingPair = recommendations.FirstOrDefault();
                 }
                 
                 Debug.Log($"Chosen Mapping Pair {chosenMappingPair.CandidateID} --> {chosenMappingPair.CandidateID}");
 
                 await MapRecommendation(chosenMappingPair.Candidate, chosenMappingPair.Cluster);
-                recommendations = await this.SyncRecommendations(CandidateRecommendation);
+                recommendations = await this.GetRecommendations(CandidateRecommendation);
             }
             Debug.Log("Automatic Mapping stopped.");
         }
 
         public static void StartAutomatedMapping(CandidateRecommendation recommendation, ReflexionGraph graph)
         {
-            Dictionary<Node, HashSet<MappingPair>> recommendations = recommendation.Recommendations;
+            IEnumerable<MappingPair> recommendations = recommendation.GetRecommendations();
 
             // While next recommendation still exists      
-            while (recommendations.Count != 0)
+            while (recommendations.Count() != 0)
             {
                 MappingPair chosenMappingPair;
 
-                // TODO: Wrap recommendations within own class?
-                if (CandidateRecommendation.IsRecommendationDefinite(recommendations))
+                if (recommendations.Count() == 1)
                 {
-                    chosenMappingPair = CandidateRecommendation.GetDefiniteRecommendation(recommendations);
                     // Debug.Log($"Automatically map candidate {chosenMappingPair.Candidate.ID} to the cluster {chosenMappingPair.Cluster.ID}");
+                    chosenMappingPair = recommendations.FirstOrDefault();
                 }
                 else
                 {
-                    chosenMappingPair = recommendations[recommendations.Keys.First()].FirstOrDefault();
-
                     // TODO: Handle ambigous mapping steps
                     // Debug.Log("Warning: Ambigous recommendation.");
+                    chosenMappingPair = recommendations.FirstOrDefault();
                 }
 
                 // Debug.Log($"Chosen Mapping Pair {chosenMappingPair.CandidateID} --> {chosenMappingPair.CandidateID}");
@@ -735,7 +657,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 graph.AddToMapping(chosenMappingPair.Candidate, chosenMappingPair.Cluster);
                 graph.ReleaseCaching();
 
-                recommendations = recommendation.Recommendations;
+                recommendations = recommendation.GetRecommendations();
             }
         }
 

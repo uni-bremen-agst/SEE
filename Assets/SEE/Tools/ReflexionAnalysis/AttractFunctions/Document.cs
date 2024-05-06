@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
-    public class Document : IDocument, IEnumerable<string>
+    public class Document : IDocument
     {
         //private static int GlobalWords = 0;
 
@@ -55,7 +55,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return new Dictionary<string, int>(this.wordFrequencies);
         }
 
-        public void AddWords(Document document)
+        public void AddWords(IDocument document)
         {
             IEnumerable<string> containedWords = document != this ?
                                                    document.GetContainedWords()
@@ -68,7 +68,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             }
         }
 
-        public void RemoveWords(Document document)
+        public void RemoveWords(IDocument document)
         {
             IEnumerable<string> containedWords = document != this ? 
                                                  document.GetContainedWords() 
@@ -166,19 +166,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return totalNumber;
         }
 
-        // TODO: May delete the enumerator later completely
-        public IEnumerator<string> GetEnumerator()
-        {
-            // TODO: iterate all words once or as often as they are contained in the document
-            foreach (string word in wordFrequencies.Keys)
-            {
-                for (int i = 0; i < wordFrequencies[word]; i++)
-                {
-                    yield return word;
-                }
-            }
-        }
-
         public override string ToString()
         {
             string doc = "Document {" + Environment.NewLine;
@@ -217,11 +204,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             }
 
             return mergedDocument;
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
         }
 
         public static double CommonWords(Document doc1, Document doc2)

@@ -2,7 +2,7 @@
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
-    public interface IDocument : IEnumerable<string>
+    public interface IDocument
     {
         public IEnumerable<string> GetContainedWords();
 
@@ -12,9 +12,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         public Dictionary<string, int> GetWordFrequencies();
 
-        public void AddWords(Document document);
+        public void AddWords(IDocument document);
 
-        public void RemoveWords(Document document);
+        public void RemoveWords(IDocument document);
 
         public void AddWords(IEnumerable<string> words);
 
@@ -33,15 +33,5 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         public int GetTotalWordFrequencies();
 
         public string ToString();
-
-        //public Document MergeDocuments(Document doc1, Document doc2, DocumentMergingType type = DocumentMergingType.Union);
-
-        //public double CosineSimilarityByFrequency(Document doc1, Document doc2);
-
-        //public double DotProduct(Document doc1, Document doc2);
-
-        //public double[] ToFrequencyArray();
-
-        //public int[] ToOccurenceArray();
     }
 }

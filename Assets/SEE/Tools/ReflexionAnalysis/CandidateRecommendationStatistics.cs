@@ -271,7 +271,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 mappingResult.AddCandidateStatisticResult(node, CandidateRecommendation);
             }
 
-            UnityEngine.Debug.Log($"Active Results: {this.mappingResult.ActiveResultsCount} Finished Results: {this.mappingResult.FinishedResultsCount}");
+            // UnityEngine.Debug.Log($"Active Results: {this.mappingResult.ActiveResultsCount} Finished Results: {this.mappingResult.FinishedResultsCount}");
 
             Active = true;
         }

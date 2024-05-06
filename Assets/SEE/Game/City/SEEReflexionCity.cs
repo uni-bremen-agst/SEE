@@ -8,6 +8,7 @@ using Sirenix.OdinInspector;
 using Assets.SEE.Tools.ReflexionAnalysis;
 using SEE.GraphProviders;
 using System.Collections.Generic;
+using Sirenix.Serialization;
 
 namespace SEE.Game.City
 {
@@ -32,6 +33,13 @@ namespace SEE.Game.City
 
         private string oracleProviderPathLabel = "OracleGraph";
 
+        /// <summary>
+        /// A provider of the data shown as code city.
+        /// </summary>
+        [OdinSerialize, ShowInInspector,
+            Tooltip("A graph provider yielding the oracle mapping for a corresponding reflexion graph"),
+            TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup),
+            HideReferenceObjectPicker]
         private PipelineGraphProvider OracleMappingProvider { get; set; }
 
         /// <summary>
@@ -51,7 +59,11 @@ namespace SEE.Game.City
                 Reset();
             }
             LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this);
-            Graph oracleMapping = await OracleMappingProvider.ProvideAsync(new Graph(""), this);
+            Graph oracleMapping = null;
+            if(OracleMappingProvider != null)
+            {
+                oracleMapping = await OracleMappingProvider.ProvideAsync(new Graph(""), this);
+            }
             AddCandidateRecommendation(LoadedGraph as ReflexionGraph, oracleMapping);
             visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
             visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
@@ -82,7 +94,10 @@ namespace SEE.Game.City
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
-            OracleMappingProvider = GraphProvider.Restore(attributes, oracleProviderPathLabel) as PipelineGraphProvider;
+            if (attributes.ContainsKey(oracleProviderPathLabel))
+            {
+                OracleMappingProvider = GraphProvider.Restore(attributes, oracleProviderPathLabel) as PipelineGraphProvider; 
+            }
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using Accord.MachineLearning;
-using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
+﻿using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,9 +30,39 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         Dictionary<string, int> candidatesInRecommendations = new Dictionary<string, int>();
         Dictionary<string, MappingPair> recommendations = new Dictionary< string, MappingPair>();
 
-        public Dictionary<string, MappingPair> Recommendations { get => new Dictionary<string, MappingPair>(recommendations); }
+        public IEnumerable<MappingPair> Recommendations { get => new List<MappingPair>(recommendations.Values); }
 
         public IEnumerable<MappingPair> MappingPairs { get => mappingPairs.Values.ToList(); }
+
+        public IEnumerable<MappingPair> GetRecommendationsForCluster(string clusterId)
+        {
+            IList<MappingPair> recommendationsForCluster = new List<MappingPair>();
+            foreach (string candidateId in candidatesInRecommendations.Keys)
+            {
+                string key = this.CreateKey(candidateId, clusterId);
+                
+                if(recommendations.TryGetValue(key, out MappingPair recommendation))
+                {
+                    recommendationsForCluster.Add(recommendation);
+                }
+            }
+            return recommendationsForCluster;
+        }
+
+        public IEnumerable<MappingPair> GetRecommendationsForCandidate(string candidateId)
+        {
+            IList<MappingPair> recommendationsForCandidate = new List<MappingPair>();
+            foreach (string clusterId in clusterInRecommendations.Keys)
+            {
+                string key = this.CreateKey(candidateId, clusterId);
+
+                if (recommendations.TryGetValue(key, out MappingPair recommendation))
+                {
+                    recommendationsForCandidate.Add(recommendation);
+                }
+            }
+            return recommendationsForCandidate;
+        }
 
         public void RemoveCandidate(string candidateId)
         {

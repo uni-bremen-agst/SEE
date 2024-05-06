@@ -48,13 +48,6 @@ namespace SEE.Tools.Architecture
         /// </summary>
         NodeReaderTest nodeReader;
 
-        private readonly string[] alphabet = new string[]
-        {
-            "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", 
-            "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", 
-            "w", "x", "y", "z"
-        };
-
         /// <summary>
         /// Sets up all three graphs (implementation, architecture,
         /// mapping) and registers itself at the reflexion analysis
@@ -782,94 +775,76 @@ namespace SEE.Tools.Architecture
 
             this.ResetMapping();
 
-            Assert.That(candidateRecommendation.Recommendations.Keys.Count == 0 &&
-                        candidateRecommendation.Recommendations.Values.Count == 0);
+            Assert.That(candidateRecommendation.GetRecommendations().Count() == 0);
 
             Assert.That(candidateRecommendation.AttractFunction.EmptyTrainingData());
 
             #region local functions
             bool DIsRecommendedForA1AndA2()
             {
-                return CheckRecommendations(candidateRecommendation.Recommendations,
-                                    new Dictionary<Node, HashSet<MappingPair>>()
-                                    {
-                                        {a[1], new HashSet<MappingPair>() { new MappingPair(i[4], a[1], -1.0) } },
-                                        {a[2], new HashSet<MappingPair>() { new MappingPair(i[4], a[2], -1.0) } }
-                                    },
-                                    null);
+                IList<MappingPair> recommendationsOfD = candidateRecommendation.GetRecommendations(i[4]).ToList();
+                IEnumerable<MappingPair> recommendationsOfA1 = candidateRecommendation.GetRecommendations(a[1]);
+                IEnumerable<MappingPair> recommendationsOfA2 = candidateRecommendation.GetRecommendations(a[2]);
+                
+                MappingPair recommendation0 = recommendationsOfD[0];
+                MappingPair recommendation1 = recommendationsOfD[1];
+
+                bool validForD = recommendation0.CandidateID.Equals(i[4].ID)
+                          && recommendation0.CandidateID.Equals(i[4].ID)
+                          && (recommendation0.ClusterID.Equals(a[1].ID) && recommendation1.ClusterID.Equals(a[2].ID)
+                             || recommendation0.ClusterID.Equals(a[2].ID) && recommendation1.ClusterID.Equals(a[1].ID));
+
+                bool validForA1 = recommendationsOfA1.FirstOrDefault().CandidateID.Equals(i[4].ID) 
+                               && recommendationsOfA1.FirstOrDefault().ClusterID.Equals(a[1].ID);
+
+                bool validForA2 = recommendationsOfA2.FirstOrDefault().CandidateID.Equals(i[4].ID)
+                               && recommendationsOfA2.FirstOrDefault().ClusterID.Equals(a[2].ID);
+
+                return validForD && validForA1 && validForA2;
             }
 
             bool DIsRecommendedForA1ButNotA2()
             {
-                return CheckRecommendations(candidateRecommendation.Recommendations,
-                                    new Dictionary<Node, HashSet<MappingPair>>()
-                                    {
-                                        {a[1], new HashSet<MappingPair>() { new MappingPair(i[4], a[1], -1.0) } },
-                                    },
-                                    new Dictionary<Node, HashSet<MappingPair>>()
-                                    {
-                                        {a[2], new HashSet<MappingPair>() { new MappingPair(i[4], a[2], -1.0) } },
-                                    });
+                IList<MappingPair> recommendationsOfD = candidateRecommendation.GetRecommendations(i[4]).ToList();
+                IEnumerable<MappingPair> recommendationsOfA1 = candidateRecommendation.GetRecommendations(a[1]);
+                IEnumerable<MappingPair> recommendationsOfA2 = candidateRecommendation.GetRecommendations(a[2]);
+
+                MappingPair recommendation = recommendationsOfD[0];
+                bool validForD = recommendationsOfD.Count() == 1 
+                              && recommendation.CandidateID.Equals(i[4].ID) 
+                              && recommendation.ClusterID.Equals(a[1].ID);
+
+                recommendation = recommendationsOfA1.FirstOrDefault();
+
+                bool validForA1 = recommendation.CandidateID.Equals(i[4].ID) 
+                               && recommendation.ClusterID.Equals(a[1].ID);
+
+                bool validForA2 = recommendationsOfA2.Count() == 0;
+
+                return validForD && validForA1 && validForA2;
             }
 
             bool DIsRecommendedForA2ButNotA1()
             {
-                return CheckRecommendations(candidateRecommendation.Recommendations,
-                    new Dictionary<Node, HashSet<MappingPair>>()
-                    {
-                                        {a[2], new HashSet<MappingPair>() { new MappingPair(i[4], a[2], -1.0) } },
-                    },
-                    new Dictionary<Node, HashSet<MappingPair>>()
-                    {
-                                        {a[1], new HashSet<MappingPair>() { new MappingPair(i[4], a[1], -1.0) } },
-                    });
+                IList<MappingPair> recommendationsOfD = candidateRecommendation.GetRecommendations(i[4]).ToList();
+                IEnumerable<MappingPair> recommendationsOfA1 = candidateRecommendation.GetRecommendations(a[1]);
+                IEnumerable<MappingPair> recommendationsOfA2 = candidateRecommendation.GetRecommendations(a[2]);
+
+                MappingPair recommendation = recommendationsOfD[0];
+                bool validForD = recommendationsOfD.Count() == 1
+                              && recommendation.CandidateID.Equals(i[4].ID)
+                              && recommendation.ClusterID.Equals(a[2].ID);
+
+                recommendation = recommendationsOfA2.FirstOrDefault();
+
+                bool validForA2 = recommendation.CandidateID.Equals(i[4].ID)
+                               && recommendation.ClusterID.Equals(a[2].ID);
+
+                bool validForA1 = recommendationsOfA1.Count() == 0;
+
+                return validForD && validForA1 && validForA1;
             } 
             #endregion
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="recommendations">Actual recommendations which are compared to the expected recommendations.</param>
-        /// <param name="mustBeRecommended">Required recommendations. If null this parameter is ignored.</param>
-        /// <param name="mustNotBeRecommended">Forbidden recommendation. If null this parameter is ignored.
-        /// If this parameter is not null it must not contain null values.</param>
-        /// <returns></returns>
-        public bool CheckRecommendations(Dictionary<Node, HashSet<MappingPair>> recommendations, 
-                                         Dictionary<Node, HashSet<MappingPair>> mustBeRecommended,
-                                         Dictionary<Node, HashSet<MappingPair>> mustNotBeRecommended)
-        {
-            // Check mustRecommended
-            if (mustBeRecommended != null)
-            {
-                foreach (Node cluster in mustBeRecommended.Keys)
-                {
-                    HashSet<MappingPair> recommendationsForCluster;
-                    if (!recommendations.TryGetValue(cluster, out recommendationsForCluster)) return false;
-
-                    if (recommendationsForCluster == null && mustBeRecommended[cluster] == null) continue;
-                    if (recommendationsForCluster == null || mustBeRecommended == null) return false;
-                    // Cannot compare MappingPairs directly, because the attraction values might differ
-                    if (!mustBeRecommended[cluster].Select(p => p.CandidateID).ToHashSet()
-                        .IsSubsetOf(recommendationsForCluster.Select(p => p.CandidateID).ToHashSet())) return false;
-                } 
-            }
-
-            // Check mustNotRecommended 
-            if (mustNotBeRecommended != null)
-            {
-                foreach (Node cluster in mustNotBeRecommended.Keys)
-                {
-                    HashSet<MappingPair> recommendationsForCluster;
-                    if (!recommendations.TryGetValue(cluster, out recommendationsForCluster)) continue;
-                    if (mustNotBeRecommended[cluster] == null) throw new Exception("Error in while comparing Recommendations. Forbidden recommendations cannot be null.");
-                    // Cannot compare MappingPairs directly, because the attraction values might differ
-                    if (recommendationsForCluster.Select(p => p.CandidateID).ToHashSet()
-                        .Intersect(mustNotBeRecommended[cluster].Select(p => p.CandidateID).ToHashSet()).Count() > 0) return false;
-                }
-            }
-
-            return true;
         }
     }
 }
