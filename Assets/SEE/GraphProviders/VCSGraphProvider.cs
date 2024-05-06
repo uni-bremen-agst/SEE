@@ -11,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Dissonance;
 using UnityEngine;
 using SEE.Utils;
 using SEE.UI.Window.CodeWindow;
@@ -21,31 +20,14 @@ namespace SEE.GraphProviders
     /// <summary>
     /// Provides a version control system graph based on a git repository.
     /// </summary>
-    public class VCSGraphProvider : GraphProvider
+    public class VCSGraphProvider : GitRepositoryProvider<Graph>
     {
-        /// <summary>
-        /// The path to the git repository.
-        /// </summary>
-        [ShowInInspector, Tooltip("Path to the git repository."), HideReferenceObjectPicker]
-        public DirectoryPath RepositoryPath = new();
-
         /// <summary>
         /// The commit id.
         /// </summary>
         [ShowInInspector, Tooltip("The new commit id."), HideReferenceObjectPicker]
         public string CommitID = "";
 
-        /// <summary>
-        /// The List of filetypes that get included/excluded.
-        /// </summary>
-        [OdinSerialize]
-        [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
-         Tooltip("Paths and their inclusion/exclusion status."), RuntimeTab(GraphProviderFoldoutGroup),
-         HideReferenceObjectPicker]
-        public Dictionary<string, bool> PathGlobbing = new()
-        {
-            { "", false }
-        };
 
         /// <summary>
         /// Loads the metrics and nodes from the given git repository and commitID into the <paramref name="graph"/>.
@@ -54,8 +36,9 @@ namespace SEE.GraphProviders
         public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
         {
             CheckArguments(city);
-            UniTask<Graph> graphTask = UniTask.FromResult<Graph>(GetVCSGraph(PathGlobbing, RepositoryPath.Path, CommitID));
-    
+            UniTask<Graph> graphTask =
+                UniTask.FromResult<Graph>(GetVCSGraph(PathGlobbing, RepositoryPath.Path, CommitID));
+
             return graphTask;
         }
 
@@ -164,7 +147,7 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="tree">The tree of the given commit.</param>
         /// <returns>a list of paths.</returns>
-        static List<string> ListTree(LibGit2Sharp.Tree tree)
+        public static List<string> ListTree(LibGit2Sharp.Tree tree)
         {
             var fileList = new List<string>();
 
@@ -219,9 +202,6 @@ namespace SEE.GraphProviders
             RepositoryPath.Restore(attributes, repositoryPathLabel);
         }
 
- 
-
-       
 
         /// <summary>
         /// Creates and returns a new node to <paramref name="graph"/> as a child of <paramref name="parent"/>.

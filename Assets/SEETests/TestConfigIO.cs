@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
+using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.GraphProviders;
@@ -685,7 +686,7 @@ namespace SEE.Utils
         private static void SEEEvolutionCityAttributesAreEqual(SEECityEvolution expected, SEECityEvolution actual)
         {
             AbstractSEECityAttributesAreEqual(expected, actual);
-            AreEqual(expected.GXLDirectory, actual.GXLDirectory);
+            TestGraphProviderIO.AreEqual(expected.DataProvider, actual.DataProvider);
             Assert.AreEqual(expected.MaxRevisionsToLoad, actual.MaxRevisionsToLoad);
             Assert.AreEqual(expected.MarkerHeight, actual.MarkerHeight);
             Assert.AreEqual(expected.MarkerWidth, actual.MarkerWidth);
@@ -797,7 +798,7 @@ namespace SEE.Utils
         private static void WipeOutSEECityAttributes(SEECity city)
         {
             WipeOutAbstractSEECityAttributes(city);
-            city.DataProvider = new PipelineGraphProvider();
+            city.DataProvider = new PipelineGraphProvider<Graph>();
         }
 
         /// <summary>
@@ -846,7 +847,7 @@ namespace SEE.Utils
         private static void WipeOutSEEEvolutionCityAttributes(SEECityEvolution city)
         {
             WipeOutAbstractSEECityAttributes(city);
-            city.GXLDirectory.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gxl");
+            //city.GXLDirectory.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gxl");
             city.MaxRevisionsToLoad++;
             city.MarkerHeight++;
             city.MarkerWidth++;

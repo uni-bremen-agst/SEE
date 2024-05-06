@@ -20,16 +20,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
 using SEE.Game.Evolution;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.GO;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using SEE.Game.CityRendering;
+using SEE.GraphProviders;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
+using Sirenix.Serialization;
 
 namespace SEE.Game.City
 {
@@ -45,6 +47,12 @@ namespace SEE.Game.City
         /// <see cref="SEECityEvolution.Save(ConfigWriter)"/> and
         /// <see cref="SEECityEvolution.Restore(Dictionary{string,object})"/>,
         /// respectively. You should also extend the test cases in TestConfigIO.
+        [OdinSerialize, ShowInInspector,
+         Tooltip("A graph provider yielding the data to be visualized as a code city."),
+         TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup),
+         HideReferenceObjectPicker]
+        public PipelineGraphProvider<List<Graph>> DataProvider = new();
+
 
         /// <summary>
         /// Name of the Inspector foldout group for the specific evolution setttings.
@@ -54,21 +62,23 @@ namespace SEE.Game.City
         /// <summary>
         /// Sets the maximum number of revisions to load.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Maximum number of revisions to load."), FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
-        public int MaxRevisionsToLoad = 500;  // serialized by Unity
+        [SerializeField, ShowInInspector, Tooltip("Maximum number of revisions to load."),
+         FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
+        public int MaxRevisionsToLoad = 500; // serialized by Unity
 
         /// <summary>
         /// The renderer for rendering the evolution of the graph series.
         ///
         /// Neither serialized nor saved in the configuration file.
         /// </summary>
-        private EvolutionRenderer evolutionRenderer;  // not serialized by Unity; will be set in Start()
+        private EvolutionRenderer evolutionRenderer; // not serialized by Unity; will be set in Start()
 
-        /// <summary>
-        /// The directory in which the GXL files of the graph series are located.
-        /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("The directory in which the GXL files are located."), FoldoutGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
-        public DirectoryPath GXLDirectory = new();
+        // /// <summary>
+        // /// The directory in which the GXL files of the graph series are located.
+        // /// </summary>
+        // [SerializeField, ShowInInspector, Tooltip("The directory in which the GXL files are located."),
+        //  FoldoutGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        // public DirectoryPath GXLDirectory = new();
 
         //-----------------------------------------------------
         // Attributes to mark changes
@@ -135,6 +145,7 @@ namespace SEE.Game.City
                 result = gameObject.AddComponent<EvolutionRenderer>();
                 result.SetGraphEvolution(graphs);
             }
+
             return result;
         }
 
@@ -152,20 +163,20 @@ namespace SEE.Game.City
         /// Loads the graph data from the GXL files and the metrics from the CSV files contained
         /// in the directory with path PathPrefix and the metrics.
         /// </summary>
-        private List<Graph> LoadDataSeries()
+        private async UniTask<IEnumerable<Graph>> LoadDataSeries()
         {
-            GraphsReader graphsReader = new();
-            // Load all GXL graphs and CSV files in directory PathPrefix but not more than maxRevisionsToLoad many.
-            graphsReader.Load(GXLDirectory.Path, HierarchicalEdges, basePath: SourceCodeDirectory.Path, rootName: GXLDirectory.Path, MaxRevisionsToLoad);
-            return graphsReader.Graphs;
+            // GraphsReader graphsReader = new();
+            // // Load all GXL graphs and CSV files in directory PathPrefix but not more than maxRevisionsToLoad many.
+            // graphsReader.Load(GXLDirectory.Path, HierarchicalEdges, basePath: SourceCodeDirectory.Path, rootName: GXLDirectory.Path, MaxRevisionsToLoad);
+            return await DataProvider.ProvideAsync(new List<Graph>(), this);
+            //return graphsReader.Graphs;
         }
 
         /// <summary>
         /// The first graph of the graph series. It is used only to let the user see
         /// his/her settings in action. It will be destroyed when the game starts.
         /// </summary>
-        [NonSerialized]
-        private Graph firstGraph;
+        [NonSerialized] private Graph firstGraph;
 
         /// <summary>
         /// Dumps the metric names of all node types of the currently loaded graph.
@@ -189,13 +200,14 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
-        public void LoadData()
+        public async void LoadData()
         {
             if (firstGraph != null)
             {
                 Reset();
             }
-            firstGraph = LoadFirstGraph();
+
+            firstGraph = await LoadFirstGraph();
             if (firstGraph != null)
             {
                 Debug.Log($"Loaded graph with {firstGraph.NodeCount} nodes and {firstGraph.EdgeCount} edges.\n");
@@ -253,22 +265,22 @@ namespace SEE.Game.City
         /// file system containing at least one GXL file.
         /// </summary>
         /// <returns>the loaded graph or null if none could be found</returns>
-        private Graph LoadFirstGraph()
+        private async UniTask<Graph> LoadFirstGraph()
         {
-            GraphsReader reader = new();
-            reader.Load(GXLDirectory.Path, HierarchicalEdges, basePath: SourceCodeDirectory.Path, rootName: GXLDirectory.Path, 1);
-            List<Graph> graphs = reader.Graphs;
+            List<Graph> graphs = new List<Graph>(await DataProvider.ProvideAsync(new List<Graph>(), this));
+            // GraphsReader reader = new();
+            // reader.Load(GXLDirectory.Path, HierarchicalEdges, basePath: SourceCodeDirectory.Path,
+            //     rootName: GXLDirectory.Path, 1);
+            //List<Graph> graphs = reader.Graphs;
             if (graphs.Count == 0)
             {
                 return null;
             }
-            else
-            {
-                Graph graph = graphs.First();
-                InspectSchema(graph);
-                graph = RelevantGraph(graph);
-                return graph;
-            }
+
+            Graph graph = graphs.First();
+            InspectSchema(graph);
+            graph = RelevantGraph(graph);
+            return graph;
         }
 
         /// <summary>
@@ -284,12 +296,12 @@ namespace SEE.Game.City
         /// Loads all graphs, calculates their layouts, and displays the first graph in the
         /// graph series.
         /// </summary>
-        protected override void Start()
+        protected override async void Start()
         {
             base.Start();
             Reset();
 
-            List<Graph> graphs = LoadDataSeries();
+            List<Graph> graphs = new List<Graph>(await DataProvider.ProvideAsync(new List<Graph>(), this));
             evolutionRenderer = CreateEvolutionRenderer(graphs);
             DrawGraphs(graphs);
 
@@ -315,6 +327,7 @@ namespace SEE.Game.City
                     // there may now be multiple roots again.
                     relevantGraph.AddSingleRoot(out Node _, name: "ROOT", type: Graph.UnknownType);
                 }
+
                 graphs[i] = relevantGraph;
                 SetupCompoundSpringEmbedder(graphs[i]);
             }
@@ -343,35 +356,47 @@ namespace SEE.Game.City
         /// Label of attribute <see cref="GXLDirectory"/> in the configuration file.
         /// </summary>
         private const string gxlDirectoryLabel = "GXLDirectory";
+
         /// <summary>
         /// Label of attribute <see cref="MaxRevisionsToLoad"/> in the configuration file.
         /// </summary>
         private const string maxRevisionsToLoadLabel = "MaxRevisionsToLoad";
+
         /// <summary>
         /// Label of attribute <see cref="MarkerHeight"/> in the configuration file.
         /// </summary>
         private const string markerHeightLabel = "MarkerHeight";
+
         /// <summary>
         /// Label of attribute <see cref="MarkerWidth"/> in the configuration file.
         /// </summary>
         private const string markerWidthLabel = "MarkerWidth";
+
         /// <summary>
         /// Label of attribute <see cref="AdditionBeamColor"/> in the configuration file.
         /// </summary>
         private const string additionBeamColorLabel = "AdditionBeamColor";
+
         /// <summary>
         /// Label of attribute <see cref="ChangeBeamColor"/> in the configuration file.
         /// </summary>
         private const string changeBeamColorLabel = "ChangeBeamColor";
+
         /// <summary>
         /// Label of attribute <see cref="DeletionBeamColor"/> in the configuration file.
         /// </summary>
         private const string deletionBeamColorLabel = "DeletionBeamColor";
 
+        /// <summary>
+        /// The same as in <see cref="SEECity"/>
+        /// </summary>
+        private const string dataProviderPathLabel = "data";
+
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
-            GXLDirectory.Save(writer, gxlDirectoryLabel);
+            DataProvider?.Save(writer, dataProviderPathLabel);
+            //GXLDirectory.Save(writer, gxlDirectoryLabel);
             writer.Save(MaxRevisionsToLoad, maxRevisionsToLoadLabel);
             writer.Save(MarkerHeight, markerHeightLabel);
             writer.Save(MarkerWidth, markerWidthLabel);
@@ -383,7 +408,10 @@ namespace SEE.Game.City
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
-            GXLDirectory.Restore(attributes, gxlDirectoryLabel);
+            DataProvider =
+                GraphProvider<List<Graph>>.Restore(attributes, dataProviderPathLabel) as
+                    PipelineGraphProvider<List<Graph>>;
+            //GXLDirectory.Restore(attributes, gxlDirectoryLabel);
             ConfigIO.Restore(attributes, maxRevisionsToLoadLabel, ref MaxRevisionsToLoad);
             ConfigIO.Restore(attributes, markerHeightLabel, ref MarkerHeight);
             ConfigIO.Restore(attributes, markerWidthLabel, ref MarkerWidth);

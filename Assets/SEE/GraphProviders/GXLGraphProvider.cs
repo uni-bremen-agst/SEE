@@ -12,7 +12,7 @@ namespace SEE.GraphProviders
     /// A graph provider reading a graph from a GXL file.
     /// </summary>
     [Serializable]
-    public class GXLGraphProvider : FileBasedGraphProvider
+    public class GXLGraphProvider : FileBasedGraphProvider<Graph>
     {
         /// <summary>
         /// Reads and returns a graph from a GXL file with <see cref="Path"/> where

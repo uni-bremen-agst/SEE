@@ -13,7 +13,8 @@ namespace SEE.GraphProviders
     /// are responsible for providing a graph based on the input graph by
     /// implementing the method <see cref="ProvideAsync(Graph, AbstractSEECity)"/>.
     /// </summary>
-    public abstract class GraphProvider
+    /// <typeparam name="T">The type of data which should be provided (e.g <see cref="Graph"/> for simple CodeCities or <see cref="Graph}"/> for evolution cities)</typeparam>
+    public abstract class GraphProvider<T>
     {
         protected const string GraphProviderFoldoutGroup = "Data";
 
@@ -25,7 +26,7 @@ namespace SEE.GraphProviders
         /// <param name="graph">input graph</param>
         /// <param name="city">settings possibly necessary to provide a graph</param>
         /// <returns>provided graph based on <paramref name="graph"/></returns>
-        public abstract UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city);
+        public abstract UniTask<T> ProvideAsync(T graph, AbstractSEECity city);
 
         /// <summary>
         /// Saves the settings in the configuration file.
@@ -78,7 +79,7 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="attributes">dictionary of attributes from which to retrieve the settings</param>
         /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>
-        public static GraphProvider Restore(Dictionary<string, object> attributes, string label)
+        public static GraphProvider<T> Restore(Dictionary<string, object> attributes, string label)
         {
             if (attributes.TryGetValue(label, out object dictionary))
             {
@@ -104,14 +105,14 @@ namespace SEE.GraphProviders
         /// via the <see cref="GraphProviderFactory"/>. The actual restoration of that
         /// new instance's attributes ist deferred to the subclasses, which need to
         /// implement <see cref="RestoreAttributes(Dictionary{string, object})"/>.</remarks>
-        protected static GraphProvider RestoreProvider(Dictionary<string, object> values)
+        protected static GraphProvider<T> RestoreProvider(Dictionary<string, object> values)
         {
             GraphProviderKind kind = GraphProviderKind.Pipeline;
             if (ConfigIO.RestoreEnum(values, kindLabel, ref kind))
             {
-                GraphProvider provider = GraphProviderFactory.NewInstance(kind);
+                GraphProvider<T> provider = GraphProviderFactory<T>.NewInstance(kind);
                 provider.RestoreAttributes(values);
-                return provider;
+                return provider as GraphProvider<T>;
             }
             else
             {

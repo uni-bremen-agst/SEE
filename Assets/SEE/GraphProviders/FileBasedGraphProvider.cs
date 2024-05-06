@@ -6,6 +6,7 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using SEE.DataModel.DG;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -15,7 +16,7 @@ namespace SEE.GraphProviders
     /// a single file.
     /// </summary>
     [Serializable]
-    public abstract class FileBasedGraphProvider : GraphProvider
+    public abstract class FileBasedGraphProvider<T> : GraphProvider<T>
     {
         /// <summary>
         /// The path to the file containing the additional data to be added to a graph.

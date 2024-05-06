@@ -31,15 +31,14 @@ namespace SEE.Game.City
         /// <see cref="SEECity.Save(ConfigWriter)"/> and
         /// <see cref="SEECity.Restore(Dictionary{string,object})"/>,
         /// respectively. You should also extend the test cases in TestConfigIO.
-
         /// <summary>
         /// A provider of the data shown as code city.
         /// </summary>
         [OdinSerialize, ShowInInspector,
-            Tooltip("A graph provider yielding the data to be visualized as a code city."),
-            TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup),
-            HideReferenceObjectPicker]
-        public PipelineGraphProvider DataProvider = new();
+         Tooltip("A graph provider yielding the data to be visualized as a code city."),
+         TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup),
+         HideReferenceObjectPicker]
+        public PipelineGraphProvider<Graph> DataProvider = new();
 
         /// <summary>
         /// The graph that is visualized in the scene and whose visualization settings are
@@ -63,8 +62,7 @@ namespace SEE.Game.City
         /// Neither serialized nor saved to the config file.
         /// </summary>
         /// <remarks>Do not use this field directly. Use <see cref="LoadedGraph"/> instead.</remarks>
-        [NonSerialized]
-        private Graph loadedGraph = null;
+        [NonSerialized] private Graph loadedGraph = null;
 
         /// <summary>
         /// The graph underlying this SEE city that was loaded from disk. May be null.
@@ -78,10 +76,11 @@ namespace SEE.Game.City
             get => loadedGraph;
             protected set
             {
-                if (loadedGraph  != null)
+                if (loadedGraph != null)
                 {
                     Reset();
                 }
+
                 Assert.IsNull(visualizedSubGraph);
                 loadedGraph = value;
                 InspectSchema(loadedGraph);
@@ -107,8 +106,7 @@ namespace SEE.Game.City
         /// if all node types are relevant. It is null if no graph has been loaded yet
         /// (i.e. <see cref="LoadedGraph"/> is null).
         /// </summary>
-        [NonSerialized]
-        private Graph visualizedSubGraph = null;
+        [NonSerialized] private Graph visualizedSubGraph = null;
 
         /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
@@ -135,6 +133,7 @@ namespace SEE.Game.City
                     visualizedSubGraph = RelevantGraph(LoadedGraph);
                     SetupCompoundSpringEmbedder(visualizedSubGraph);
                 }
+
                 return visualizedSubGraph;
             }
         }
@@ -156,8 +155,10 @@ namespace SEE.Game.City
                     Debug.LogWarning($"There is no drawn code city for {gameObject.name}.");
                     return;
                 }
+
                 LoadAsync().Forget();
             }
+
             return;
 
             async UniTaskVoid LoadAsync()
@@ -190,7 +191,8 @@ namespace SEE.Game.City
                 // are toggled as GraphElement.IsVirtualToggle. These are not intended to be drawn.
                 // Because the graph elements stem from two different graphs (LoadedGraph versus subGraph),
                 // we need to provide a suitable comparer taking into account only the ID.
-                foreach (GraphElement graphElement in LoadedGraph.Elements().Except(subGraph.Elements(), new GraphElementIDComparer()))
+                foreach (GraphElement graphElement in LoadedGraph.Elements()
+                             .Except(subGraph.Elements(), new GraphElementIDComparer()))
                 {
                     // All other elements are virtual, i.e., should not be drawn.
                     graphElement.SetToggle(GraphElement.IsVirtualToggle);
@@ -205,7 +207,7 @@ namespace SEE.Game.City
 
             // Add EdgeMeshScheduler to convert edge lines to meshes over time.
             gameObject.AddOrGetComponent<EdgeMeshScheduler>().Init(EdgeLayoutSettings, EdgeSelectionSettings,
-                                                                   subGraph);
+                subGraph);
             // This must be loadedGraph. It must not be LoadedGraph. The latter would reset the graph.
             loadedGraph = subGraph;
 
@@ -313,7 +315,8 @@ namespace SEE.Game.City
             }
             else
             {
-                ShowNotification.Error("No data provider", "You must set a data provider before you can load the data.");
+                ShowNotification.Error("No data provider",
+                    "You must set a data provider before you can load the data.");
             }
         }
 
@@ -502,6 +505,7 @@ namespace SEE.Game.City
         }
 
         #region Config I/O
+
         //--------------------------------
         // Configuration file input/output
         //--------------------------------
@@ -520,8 +524,10 @@ namespace SEE.Game.City
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
-            DataProvider = GraphProvider.Restore(attributes, dataProviderPathLabel) as PipelineGraphProvider;
+            DataProvider =
+                GraphProvider<Graph>.Restore(attributes, dataProviderPathLabel) as PipelineGraphProvider<Graph>;
         }
+
         #endregion
     }
 }

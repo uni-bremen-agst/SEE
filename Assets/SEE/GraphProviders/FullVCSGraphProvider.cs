@@ -20,13 +20,8 @@ using UnityEngine;
 namespace SEE.GraphProviders
 {
     [Serializable]
-    public class FullVCSGraphProvider : GraphProvider
+    public class FullVCSGraphProvider : GitRepositoryProvider<Graph>
     {
-        [OdinSerialize]
-        [ShowInInspector, Tooltip("Path to the git repository."), HideReferenceObjectPicker,
-         RuntimeTab(GraphProviderFoldoutGroup)]
-        public DirectoryPath RepositoryPath = new();
-
         /// <summary>
         /// The date limit until commits should be analysed
         /// </summary>
@@ -34,15 +29,6 @@ namespace SEE.GraphProviders
         [ShowInInspector, InspectorName("Date Limit"),
          Tooltip("The date until commits should be analysed (DD-MM-YYYY)"), RuntimeTab(GraphProviderFoldoutGroup)]
         public string Date = "";
-
-        [OdinSerialize]
-        [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
-         Tooltip("Paths and their inclusion/exclusion status."), RuntimeTab(GraphProviderFoldoutGroup),
-         HideReferenceObjectPicker]
-        public Dictionary<string, bool> PathGlobbing = new()
-        {
-            { "", false }
-        };
 
 
         [OdinSerialize] [ShowInInspector] public int AuthorThreshhold { get; set; } = 1;
@@ -113,7 +99,7 @@ namespace SEE.GraphProviders
                 //
                 //
                 // // remove duplicates
-                
+
                 // Filter out merge commits
                 commitList = commitList
                     //.GroupBy(x => x.Sha)

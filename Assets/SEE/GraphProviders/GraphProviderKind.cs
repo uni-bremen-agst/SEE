@@ -36,6 +36,8 @@
         /// <summary>
         /// For <see cref="ReflexionGraphProvider"/>.
         /// </summary>
-        Reflexion
+        Reflexion,
+        
+        GitHistory
     }
 }

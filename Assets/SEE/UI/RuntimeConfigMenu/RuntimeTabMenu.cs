@@ -571,8 +571,8 @@ namespace SEE.UI.RuntimeConfigMenu
                                   attributeArray);
                     break;
 
-                case PipelineGraphProvider:
-                    FieldInfo pipeline = value.GetType().GetField(nameof(PipelineGraphProvider.Pipeline))!;
+                case PipelineGraphProvider<Graph>:
+                    FieldInfo pipeline = value.GetType().GetField(nameof(PipelineGraphProvider<Graph>.Pipeline))!;
                     CreateSetting(() => pipeline.GetValue(value),
                                   settingName,
                                   parent,
@@ -596,9 +596,9 @@ namespace SEE.UI.RuntimeConfigMenu
                     parent = CreateNestedSetting(settingName, parent);
                     CreateList(list, parent, () => string.Empty);
                     break;
-                case List<GraphProvider> providerList:
+                case List<GraphProvider<Graph>> providerList:
                     parent = CreateNestedSetting(settingName, parent);
-                    CreateList(providerList, parent, () => new PipelineGraphProvider());
+                    CreateList(providerList, parent, () => new PipelineGraphProvider<Graph>());
                     break;
 
                 // confirmed types where the nested fields should be edited
@@ -624,7 +624,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 case JaCoCoGraphProvider:
                 case ReflexionGraphProvider:
                     parent = CreateNestedSetting(settingName, parent);
-                    CreateTypeField(parent, value as GraphProvider);
+                    CreateTypeField(parent, value as GraphProvider<Graph>);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
 
@@ -926,7 +926,7 @@ namespace SEE.UI.RuntimeConfigMenu
             }
         }
 
-        private void CreateTypeField(GameObject parent, GraphProvider provider)
+        private void CreateTypeField(GameObject parent, GraphProvider<Graph> provider)
         {
             string[] graphProviderKinds = GetGraphProviderKinds();
 

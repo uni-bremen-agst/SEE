@@ -17,14 +17,14 @@ namespace SEE.GraphProviders
     /// added from a CSV file.
     /// </summary>
     [Serializable]
-    public class PipelineGraphProvider : GraphProvider
+    public class PipelineGraphProvider<T> : GraphProvider<T>
     {
         /// <summary>
         /// The list of nested providers in this pipeline. These will be executed
         /// from first to last.
         /// </summary>
         [HideReferenceObjectPicker]
-        public List<GraphProvider> Pipeline = new();
+        public List<GraphProvider<T>> Pipeline = new();
 
         /// <summary>
         /// Provides a graph based as a result of the serial execution of all
@@ -39,9 +39,9 @@ namespace SEE.GraphProviders
         /// in <see cref="Pipeline"/></param>
         /// <returns></returns>
         /// <remarks>Exceptions may be thrown by each nested graph provider.</remarks>
-        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
+        public override async UniTask<T> ProvideAsync(T graph, AbstractSEECity city)
         {
-            UniTask<Graph> initial = UniTask.FromResult(graph);
+            UniTask<T> initial = UniTask.FromResult(graph);
             return await Pipeline.Aggregate(initial,
                                             (current, provider) => current.ContinueWith(g => provider.ProvideAsync(g, city)));
         }
@@ -55,7 +55,7 @@ namespace SEE.GraphProviders
         /// Adds <paramref name="provider"/> at the end of the <see cref="Pipeline"/>.
         /// </summary>
         /// <param name="provider">graph provider to be added</param>
-        internal void Add(GraphProvider provider) => Pipeline.Add(provider);
+        internal void Add(GraphProvider<T> provider) => Pipeline.Add(provider);
 
         #region Config I/O
 
@@ -67,7 +67,7 @@ namespace SEE.GraphProviders
         protected override void SaveAttributes(ConfigWriter writer)
         {
             writer.BeginList(pipelineLabel);
-            foreach (GraphProvider provider in Pipeline)
+            foreach (GraphProvider<T> provider in Pipeline)
             {
                 provider.Save(writer, "");
             }
@@ -85,14 +85,14 @@ namespace SEE.GraphProviders
                     foreach (object item in items)
                     {
                         Dictionary<string, object> dict = (Dictionary<string, object>)item;
-                        GraphProvider provider = RestoreProvider(dict);
+                        GraphProvider<T> provider = RestoreProvider(dict);
                         Pipeline.Add(provider);
                     }
                 }
                 catch (InvalidCastException e)
                 {
                     throw new InvalidCastException("Types are not assignment compatible."
-                        + $" Expected type: IList<{typeof(GraphProvider)}>. Actual type: {v.GetType()}."
+                        + $" Expected type: IList<{typeof(GraphProvider<T>)}>. Actual type: {v.GetType()}."
                         + $" Original exception: {e.Message} {e.StackTrace}");
                 }
             }
