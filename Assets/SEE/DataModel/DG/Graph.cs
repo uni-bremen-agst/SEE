@@ -582,6 +582,16 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// Returns true if an edge with the given <paramref name="id"/> is part of the graph.
+        /// </summary>
+        /// <param name="id">unique ID of the edge searched</param>
+        /// <returns>true if an edge with the given <paramref name="id"/> is part of the graph</returns>
+        public bool ContainsEdgeID(string id)
+        {
+            return edges.ContainsKey(id);
+        }
+
+        /// <summary>
         /// Returns the node with the given unique <paramref name="id"/> in <paramref name="node"/>.
         /// If there is no such node, <paramref name="node"/> will be null and false will be returned;
         /// otherwise true will be returned.

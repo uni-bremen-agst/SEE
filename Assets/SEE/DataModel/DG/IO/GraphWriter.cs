@@ -302,14 +302,13 @@ namespace SEE.DataModel.DG.IO
             // In the Axivion Suite, the Source.Region_Length and Source.Region_Start attributes are used instead.
             // We hence need to convert the attributes to be Axivion-compatible here.
             // We will not consider character ranges, as they are not used in the Axivion Suite.
-            if (intAttributes.Remove(GraphElement.SourceRangeStartLineAttribute, out int startLine))
+            if (attributable.TryGetRange(GraphElement.SourceRangeAttribute, out Range range))
             {
-                intAttributes.Add(RegionStartAttribute, startLine);
-
-                Assert.IsTrue(intAttributes.ContainsKey(GraphElement.SourceRangeEndLineAttribute),
-                              "Ranges must consist of both start and end line.");
-                intAttributes.Remove(GraphElement.SourceRangeEndLineAttribute, out int endLine);
-                intAttributes.Add(RegionLengthAttribute, endLine - startLine);
+                intAttributes.Add(RegionStartAttribute, range.StartLine);
+                intAttributes.Add(RegionLengthAttribute, range.Lines);
+                // We remove these two attributes from the intAttributes dictionary to avoid duplication.
+                attributable.IntAttributes.Remove(GraphElement.SourceRangeAttribute + Attributable.RangeStartLineSuffix);
+                attributable.IntAttributes.Remove(GraphElement.SourceRangeAttribute + Attributable.RangeEndLineSuffix);
             }
 
             AppendAttributes(doc, xmlNode, "string", attributable.StringAttributes, StringToString);

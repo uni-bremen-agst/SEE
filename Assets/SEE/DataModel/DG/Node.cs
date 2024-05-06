@@ -416,10 +416,10 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// The descendants of the node.
+        /// The immediate descendants of the node.
         /// Note: This is not a copy. The result can't be modified.
         /// </summary>
-        /// <returns>descendants of the node</returns>
+        /// <returns>immediate descendants of the node</returns>
         public IList<Node> Children()
         {
             return children.AsReadOnly();
