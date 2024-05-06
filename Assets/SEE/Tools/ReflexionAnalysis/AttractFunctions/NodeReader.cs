@@ -6,6 +6,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
     public class NodeReader : INodeReader
     {
+        private static readonly string SourceStartLine = "SourceRange_StartLine";
+        
+        private static readonly string SourceStartLength = "SourceRange_EndLine";
+
         public string ReadRegion(Node node)
         {
             string fileName;
@@ -14,22 +18,20 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             int sourceRegionEnd;
             string region = string.Empty;
 
-            if (!(node.IntAttributes.ContainsKey("Source.Region_Start")
-               && node.IntAttributes.ContainsKey("Source.Region_Length")))
+            if (!(node.IntAttributes.ContainsKey(SourceStartLine)
+               && node.IntAttributes.ContainsKey(SourceStartLength)))
             {
                 return region;
             }
 
             try
             {
-                // TODO: Distinguish between Source.Line and Source.Region_Start?
-                //int sourceLine = node.GetInt("Source.Line");
                 sourceColumn = node.StringAttributes.ContainsKey("Source.Column") ? node.GetInt("Source.Column") : 1;
 
-                sourceRegionStart = node.GetInt("Source.Region_Start");
+                sourceRegionStart = node.GetInt(SourceStartLine);
 
                 // TODO: Is this length to be interpreted in lines?
-                int sourceRegionLength = node.GetInt("Source.Region_Length");
+                int sourceRegionLength = node.GetInt(SourceStartLength);
                 sourceRegionEnd = sourceRegionStart + sourceRegionLength;
 
                 fileName = node.AbsolutePlatformPath();

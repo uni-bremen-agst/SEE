@@ -676,9 +676,9 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="gameNodes"></param>
         /// <returns>the inner nodes in gameNodes as a list</returns>
-        private static ICollection<GameObject> FindInnerNodes(IEnumerable<GameObject> gameNodes)
+        private static IEnumerable<GameObject> FindInnerNodes(IEnumerable<GameObject> gameNodes)
         {
-            return gameNodes.Where(o => !o.IsLeaf()).ToList();
+            return gameNodes.Where(o => !o.IsLeaf());
         }
 
         /// <summary>
@@ -686,9 +686,9 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="gameNodes"></param>
         /// <returns>the leaf nodes in gameNodes as a list</returns>
-        private static ICollection<GameObject> FindLeafNodes(IEnumerable<GameObject> gameNodes)
+        private static IEnumerable<GameObject> FindLeafNodes(IEnumerable<GameObject> gameNodes)
         {
-            return gameNodes.Where(o => o.IsLeaf()).ToList();
+            return gameNodes.Where(o => o.IsLeaf());
         }
 
         /// <summary>
@@ -696,19 +696,9 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="nodes">list of nodes for which to create blocks</param>
         /// <returns>blocks for all leaf nodes in given list of nodes</returns>
-        protected Dictionary<Node, GameObject> DrawLeafNodes(IList<Node> nodes)
+        protected Dictionary<Node, GameObject> DrawLeafNodes(IEnumerable<Node> nodes)
         {
-            Dictionary<Node, GameObject> result = new Dictionary<Node, GameObject>(nodes.Count);
-
-            foreach (Node node in nodes)
-            {
-                // We add only leaves.
-                if (node.IsLeaf())
-                {
-                    result[node] = DrawNode(node);
-                }
-            }
-            return result;
+            return nodes.Where(n => n.IsLeaf()).ToDictionary(n => n, n => DrawNode(n));
         }
 
         /// <summary>
@@ -717,7 +707,7 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="nodeMap">nodeMap to which the game objects are to be added</param>
         /// <param name="nodes">list of nodes for which to create blocks</param>
-        protected void DrawInnerNodes(Dictionary<Node, GameObject> nodeMap, IList<Node> nodes)
+        protected void DrawInnerNodes(Dictionary<Node, GameObject> nodeMap, IEnumerable<Node> nodes)
         {
             foreach (Node node in nodes)
             {

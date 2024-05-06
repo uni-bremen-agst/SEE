@@ -9,6 +9,7 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -50,7 +51,9 @@ namespace SEE.GraphProviders
             return GraphProviderKind.Reflexion;
         }
 
-        public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
+        public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
+                                                    Action<float> changePercentage = null,
+                                                    CancellationToken token = default)
         {
             if (city == null)
             {

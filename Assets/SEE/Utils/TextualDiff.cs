@@ -81,12 +81,12 @@ namespace SEE.Utils
                 switch (aDiff.operation)
                 {
                     case Operation.INSERT:
-                        // red and struck through
-                        result.Append("<color=\"red\"><s><noparse>").Append(ReplaceNewlines(aDiff.text)).Append("</noparse></s></color>");
-                        break;
-                    case Operation.DELETE:
                         // green and underlined
                         result.Append("<color=\"green\"><u><noparse>").Append(ReplaceNewlines(aDiff.text)).Append("</noparse></u></color>");
+                        break;
+                    case Operation.DELETE:
+                        // red and struck through
+                        result.Append("<color=\"red\"><s><noparse>").Append(ReplaceNewlines(aDiff.text)).Append("</noparse></s></color>");
                         break;
                     case Operation.EQUAL:
                         result.Append("<noparse>").Append(ReplaceNewlines(aDiff.text)).Append("</noparse>");

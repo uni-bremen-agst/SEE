@@ -26,6 +26,10 @@
         /// </summary>
         ToggleBrowser,
         /// <summary>
+        /// Turns on/off the mirror.
+        /// </summary>
+        ToggleMirror,
+        /// <summary>
         /// Opens the search menu.
         /// </summary>
         SearchMenu,

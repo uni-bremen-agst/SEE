@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using SEE.DataModel.DG.SourceRange;
 
 namespace SEE.DataModel.DG
 {
@@ -13,14 +14,17 @@ namespace SEE.DataModel.DG
         /// Name of the toggle attribute.
         /// </summary>
         protected const string ToggleAttribute = "Toggle";
+
         /// <summary>
         /// Name of the float attribute.
         /// </summary>
         protected const string FloatAttribute = "Float";
+
         /// <summary>
         /// Name of the int attribute.
         /// </summary>
         protected const string IntAttribute = "Int";
+
         /// <summary>
         /// Name of the string attribute.
         /// </summary>
@@ -34,7 +38,7 @@ namespace SEE.DataModel.DG
         /// <param name="type">type of the new node</param>
         /// <returns>a new node added to <paramref name="graph"/></returns>
         protected static Node NewNode(Graph graph, string id, string type = "Routine",
-            string directory = null, string filename = null, int? line = null, int? length = null)
+                                      string directory = null, string filename = null, int? line = null, int? length = null)
         {
             Node result = new()
             {
@@ -44,7 +48,7 @@ namespace SEE.DataModel.DG
                 Directory = directory,
                 Filename = filename,
                 SourceLine = line,
-                SourceLength = length
+                SourceRange = line != null && length != null ? new Range(line.Value, line.Value + length.Value) : null
             };
 
             graph.AddNode(result);
@@ -60,7 +64,7 @@ namespace SEE.DataModel.DG
         /// <param name="type">type of the new node</param>
         /// <returns>a new node added to <paramref name="graph"/></returns>
         protected static Node Child(Graph graph, Node parent, string id, string type = "Routine",
-            string directory = null, string filename = null, int? line = null, int? length = null)
+                                    string directory = null, string filename = null, int? line = null, int? length = null)
         {
             Node child = NewNode(graph, id, type, directory, filename, line, length);
             parent.AddChild(child);

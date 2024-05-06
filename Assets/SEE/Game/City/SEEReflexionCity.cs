@@ -58,11 +58,11 @@ namespace SEE.Game.City
             {
                 Reset();
             }
-            LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this);
+            LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, x => ProgressBar = x, cancellationTokenSource.Token);
             Graph oracleMapping = null;
             if(OracleMappingProvider != null)
             {
-                oracleMapping = await OracleMappingProvider.ProvideAsync(new Graph(""), this);
+                oracleMapping = await OracleMappingProvider.ProvideAsync(new Graph(""), this, x => ProgressBar = x, cancellationTokenSource.Token);
             }
             AddCandidateRecommendation(LoadedGraph as ReflexionGraph, oracleMapping);
             visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();

@@ -106,6 +106,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         public string BasePath { get; set; }
 
+        /// <summary>
         /// Adds a node to the graph.
         /// Preconditions:
         ///   (1) node must not be null
@@ -125,9 +126,9 @@ namespace SEE.DataModel.DG
                 throw new ArgumentException("ID of a node must neither be null nor empty.");
             }
 
-            if (nodes.ContainsKey(node.ID))
+            if (nodes.TryGetValue(node.ID, out Node other))
             {
-                throw new InvalidOperationException($"ID '{node.ID}' is not unique\n: {node}. \nDuplicate already in graph: {nodes[node.ID]}.");
+                throw new InvalidOperationException($"ID '{node.ID}' is not unique\n: {node}. \nDuplicate already in graph: {other}.");
             }
 
             if (node.ItsGraph != null)
@@ -577,6 +578,16 @@ namespace SEE.DataModel.DG
         public bool ContainsNodeID(string id)
         {
             return nodes.ContainsKey(id);
+        }
+
+        /// <summary>
+        /// Returns true if an edge with the given <paramref name="id"/> is part of the graph.
+        /// </summary>
+        /// <param name="id">unique ID of the edge searched</param>
+        /// <returns>true if an edge with the given <paramref name="id"/> is part of the graph</returns>
+        public bool ContainsEdgeID(string id)
+        {
+            return edges.ContainsKey(id);
         }
 
         /// <summary>

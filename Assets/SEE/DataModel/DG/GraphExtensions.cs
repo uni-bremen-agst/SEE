@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.DataModel.GraphSearch;
+using SEE.DataModel.DG.GraphSearch;
 
 namespace SEE.DataModel.DG
 {
