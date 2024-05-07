@@ -245,6 +245,10 @@ namespace SEE.Game.City
             if (firstGraph)
             {
                 GraphRenderer graphRenderer = new GraphRenderer(this, firstGraph);
+                // For some reason SetScaler needs to be called here a second time, the attribute Metic.Level
+                // can't be found otherwise.
+                // EvolutionRenderer.SetGraph doese this too.
+                graphRenderer.SetScaler(new List<Graph>() { firstGraph });
                 graphRenderer.DrawGraph(firstGraph, gameObject);
             }
             else
@@ -268,6 +272,7 @@ namespace SEE.Game.City
         private async UniTask<Graph> LoadFirstGraph()
         {
             List<Graph> graphs = new List<Graph>(await DataProvider.ProvideAsync(new List<Graph>(), this));
+
             // GraphsReader reader = new();
             // reader.Load(GXLDirectory.Path, HierarchicalEdges, basePath: SourceCodeDirectory.Path,
             //     rootName: GXLDirectory.Path, 1);
