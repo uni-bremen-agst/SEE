@@ -14,6 +14,8 @@ using SEE.UI.RuntimeConfigMenu;
 using SEE.Game.CityRendering;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
+using UnityEngine.Rendering;
+using TMPro;
 
 namespace SEE.Game.City
 {
@@ -29,7 +31,8 @@ namespace SEE.Game.City
     {
         protected virtual void Awake()
         {
-            // Intentionally left blank
+            LabelLineMaterial = new Material(LineMaterial(Color.white));
+            LabelFont = NewFont();
         }
 
         protected virtual void Start()
@@ -277,18 +280,73 @@ namespace SEE.Game.City
         [Tooltip("Settings for holistic metric boards.")]
         public BoardAttributes BoardSettings = new();
 
+        #region LabelLineMaterial
         /// <summary>
-        /// Adds all game objects tagged by <see cref="Tags.Node"/> or <see cref="Tags.Edge"/>
-        /// of <paramref name="parent"/> including its descendants to <see cref="GraphElementIDMap"/>.
+        /// The material for the line connecting a node and its label. We use exactly one material 
+        /// for all connecting lines within this city, different from the lines used for labels in 
+        /// other cities. This allows us to set the portal independently from other other cities.
         /// </summary>
-        /// <param name="parent">root node of the game-object tree to be added to <see cref="GraphElementIDMap"/></param>
-        protected static void UpdateGraphElementIDMap(GameObject parent)
+        [HideInInspector]
+        public Material LabelLineMaterial
+        { get; private set; }
+
+        /// <summary>
+        /// Returns the material for the line connecting a node and its label.
+        /// </summary>
+        /// <param name="lineColor"></param>
+        /// <returns>a new material for the line connecting a node and its label</returns>
+        private static Material LineMaterial(Color lineColor)
         {
-            if (parent.CompareTag(Tags.Node) || parent.CompareTag(Tags.Edge))
+            return Materials.New(Materials.ShaderType.TransparentLine, lineColor, texture: null,
+                                 renderQueueOffset: (int)(RenderQueue.Transparent + 1));
+        }
+        #endregion
+
+        #region LabelFont
+        /// <summary>
+        /// The font of the label triggered when the user hovers a node. 
+        /// We use exactly one material for all labels within this city, different
+        /// from the font used for labels in other cities. This allows us to set
+        /// the portal independently from other other cities.
+        /// </summary>
+        [HideInInspector]
+        public TMP_FontAsset LabelFont
+        { get; private set; }
+
+        /// <summary>
+        /// Name of the font used for the text. This must be a font with portal information.
+        /// </summary>
+        private const string portalFontName = "Fonts & Materials/LiberationSans SDF - Portal";
+
+        private static TMP_FontAsset NewFont()
+        {
+            TMP_FontAsset fontAsset = Resources.Load<TMP_FontAsset>(portalFontName);
+            if (fontAsset == null)
             {
-                GraphElementIDMap.Add(parent, true);
+                Debug.LogError($"Font {portalFontName} not found. Using default font.\n");
+                fontAsset = TMPro.TMP_Settings.defaultFontAsset;
             }
-            foreach (Transform child in parent.transform)
+            // FIXME: The portal information is part of the font asset, not its material.
+            fontAsset.material = new Material(fontAsset.material);
+            return fontAsset;
+        }
+        #endregion
+
+        /// <summary>
+        /// Recurses into the game-object hierarchy rooted by <paramref name="root"/> and adds
+        /// all visited game objects (including <paramref name="root"/>) tagged by <see cref="Tags.Node"/>
+        /// or <see cref="Tags.Edge"/> to <see cref="GraphElementIDMap"/>.
+        /// </summary>
+        /// <param name="root">root node of the game-object tree to be added to <see cref="GraphElementIDMap"/></param>
+        /// <remarks>Generally, <paramref name="root"/> will be a game object representing a code city;
+        /// that is, a game object where a <see cref="AbstractSEECity"/> component is attached to.</remarks>
+        protected static void UpdateGraphElementIDMap(GameObject root)
+        {
+            if (root.CompareTag(Tags.Node) || root.CompareTag(Tags.Edge))
+            {
+                GraphElementIDMap.Add(root);
+            }
+            foreach (Transform child in root.transform)
             {
                 UpdateGraphElementIDMap(child.gameObject);
             }
