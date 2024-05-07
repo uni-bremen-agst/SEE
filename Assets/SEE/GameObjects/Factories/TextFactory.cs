@@ -17,11 +17,6 @@ namespace SEE.GO
         private static readonly Color textColorDefault = Color.white;
 
         /// <summary>
-        /// Name of the font used for the text.
-        /// </summary>
-        private const string portalFontName = "Fonts & Materials/LiberationSans SDF - Portal";
-
-        /// <summary>
         /// This will apply an outline effect across <em>all</em> TextMeshPro instances with the same
         /// shared material as the given one.
         /// </summary>
@@ -56,16 +51,17 @@ namespace SEE.GO
         /// The text rotates towards the main camera and respects a portal (culling area).
         /// </summary>
         /// <param name="text">the text to be drawn</param>
+        /// <param name="fontAsset">the font asset to be used</param>
         /// <param name="position">the center position at which to draw the text</param>
         /// <param name="fontSize">the size of the font with which the text is drawn</param>
         /// <param name="lift">if true, the text will be lifted up by its extent; that is, its y position is actually
         /// the bottom line (position.y + extents.y)</param>
         /// <param name="textColor">the color of the text (default: black)</param>
         /// <returns>the game object representing the text</returns>
-        public static GameObject GetTextWithSize(string text, Vector3 position, float fontSize, bool lift = true,
+        public static GameObject GetTextWithSize(string text, TMP_FontAsset fontAsset, Vector3 position, float fontSize, bool lift = true,
                                                  Color? textColor = null)
         {
-            CreateText(text, position, textColor, out TextMeshPro tm, out GameObject result);
+            CreateText(text, fontAsset, position, textColor, out TextMeshPro tm, out GameObject result);
 
             tm.fontSize = fontSize;
 
@@ -85,6 +81,7 @@ namespace SEE.GO
         /// The text rotates towards the main camera.
         /// </summary>
         /// <param name="text">the text to be drawn</param>
+        /// <param name="fontAsset">the font asset to be used</param>
         /// <param name="position">the center position at which to draw the text</param>
         /// <param name="width">the width of the rectangle enclosing the text (essentially,
         /// the text width); the font size will be chosen appropriately</param>
@@ -92,10 +89,10 @@ namespace SEE.GO
         /// the bottom line (position.y + extents.y)</param>
         /// <param name="textColor">the color of the text (default: <see cref="textColorDefault"/>)</param>
         /// <returns>the game object representing the text</returns>
-        public static GameObject GetTextWithWidth(string text, Vector3 position, float width, bool lift = true,
+        public static GameObject GetTextWithWidth(string text, TMP_FontAsset fontAsset, Vector3 position, float width, bool lift = true,
             Color? textColor = null)
         {
-            CreateText(text, position, textColor, out TextMeshPro tm, out GameObject result);
+            CreateText(text, fontAsset, position, textColor, out TextMeshPro tm, out GameObject result);
 
             RectTransform rect = tm.GetComponent<RectTransform>();
             // We set width and height of the rectangle and leave the actual size to Unity,
@@ -123,12 +120,13 @@ namespace SEE.GO
         /// center aligned.
         /// </summary>
         /// <param name="text">The text to be used</param>
+        /// <param name="fontAsset">the font asset to be used</param>
         /// <param name="position">the center position at which to create the GameObject</param>
         /// <param name="textColor">the color of the text</param>
         /// <param name="tm">the TextMeshPro component which will be attached to <paramref name="result"/></param>
         /// <param name="result">the GameObject containing the TextMeshPro component <paramref name="tm"/></param>
         /// <returns></returns>
-        private static void CreateText(string text, Vector3 position, Color? textColor, out TextMeshPro tm,
+        private static void CreateText(string text, TMP_FontAsset fontAsset, Vector3 position, Color? textColor, out TextMeshPro tm,
             out GameObject result)
         {
             result = new GameObject("Text " + text)
@@ -138,7 +136,7 @@ namespace SEE.GO
             result.transform.position = position;
 
             tm = result.AddComponent<TextMeshPro>();
-            tm.font = Resources.Load<TMP_FontAsset>(portalFontName);
+            tm.font = fontAsset;
             tm.text = text;
             tm.color = textColor ?? textColorDefault;
             tm.alignment = TextAlignmentOptions.Center;

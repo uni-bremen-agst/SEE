@@ -5,7 +5,6 @@ using SEE.GO;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace SEE.Game.Operator
 {
@@ -71,6 +70,7 @@ namespace SEE.Game.Operator
                 Vector3 startLabelPosition = gameObject.GetTop();
                 float fontSize = Node != null ? City.NodeTypes[Node.Type].LabelSettings.FontSize : LabelAttributes.DefaultFontSize;
                 nodeLabel = TextFactory.GetTextWithSize(shownText,
+                                                        City.LabelFont,
                                                         startLabelPosition,
                                                         fontSize,
                                                         lift: true,

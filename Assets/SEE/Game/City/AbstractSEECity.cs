@@ -15,6 +15,7 @@ using SEE.Game.CityRendering;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using UnityEngine.Rendering;
+using TMPro;
 
 namespace SEE.Game.City
 {
@@ -31,6 +32,7 @@ namespace SEE.Game.City
         protected virtual void Awake()
         {
             LabelLineMaterial = new Material(LineMaterial(Color.white));
+            LabelFont = NewFont();
         }
 
         protected virtual void Start()
@@ -278,9 +280,11 @@ namespace SEE.Game.City
         [Tooltip("Settings for holistic metric boards.")]
         public BoardAttributes BoardSettings = new();
 
+        #region LabelLineMaterial
         /// <summary>
         /// The material for the line connecting a node and its label. We use exactly one material 
-        /// for all connecting lines within this city.
+        /// for all connecting lines within this city, different from the lines used for labels in 
+        /// other cities. This allows us to set the portal independently from other other cities.
         /// </summary>
         [HideInInspector]
         public Material LabelLineMaterial
@@ -296,6 +300,37 @@ namespace SEE.Game.City
             return Materials.New(Materials.ShaderType.TransparentLine, lineColor, texture: null,
                                  renderQueueOffset: (int)(RenderQueue.Transparent + 1));
         }
+        #endregion
+
+        #region LabelFont
+        /// <summary>
+        /// The font of the label triggered when the user hovers a node. 
+        /// We use exactly one material for all labels within this city, different
+        /// from the font used for labels in other cities. This allows us to set
+        /// the portal independently from other other cities.
+        /// </summary>
+        [HideInInspector]
+        public TMP_FontAsset LabelFont
+        { get; private set; }
+
+        /// <summary>
+        /// Name of the font used for the text. This must be a font with portal information.
+        /// </summary>
+        private const string portalFontName = "Fonts & Materials/LiberationSans SDF - Portal";
+
+        private static TMP_FontAsset NewFont()
+        {
+            TMP_FontAsset fontAsset = Resources.Load<TMP_FontAsset>(portalFontName);
+            if (fontAsset == null)
+            {
+                Debug.LogError($"Font {portalFontName} not found. Using default font.\n");
+                fontAsset = TMPro.TMP_Settings.defaultFontAsset;
+            }
+            // FIXME: The portal information is part of the font asset, not its material.
+            fontAsset.material = new Material(fontAsset.material);
+            return fontAsset;
+        }
+        #endregion
 
         /// <summary>
         /// Recurses into the game-object hierarchy rooted by <paramref name="root"/> and adds

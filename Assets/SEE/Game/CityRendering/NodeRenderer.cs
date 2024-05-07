@@ -605,6 +605,7 @@ namespace SEE.Game.CityRendering
         {
             const float relativeLabelSize = 0.8f;
             GameObject codeCity = null;
+            AbstractSEECity city = null;
             foreach (GameObject node in gameNodes)
             {
                 Node theNode = node.GetNode();
@@ -614,14 +615,16 @@ namespace SEE.Game.CityRendering
                     float length = Mathf.Min(size.x, size.z);
                     // The text may occupy up to RelativeLabelSize of the length.
                     Vector3 position = node.GetRoofCenter();
+                    codeCity ??= SceneQueries.GetCodeCity(node.transform).gameObject;
+                    city ??= codeCity.GetComponent<AbstractSEECity>();
                     GameObject text = TextFactory.GetTextWithWidth(text: theNode.SourceName,
+                                                                   fontAsset: city.LabelFont,
                                                                    position: position,
                                                                    width: length * relativeLabelSize,
                                                                    lift: true,
                                                                    textColor: node.GetColor().Invert());
                     text.transform.SetParent(node.transform);
-                    AddLOD(text);
-                    codeCity ??= SceneQueries.GetCodeCity(node.transform).gameObject;
+                    AddLOD(text);                    
                     Portal.SetPortal(codeCity, text);
                 }
             }
