@@ -158,16 +158,8 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
 
             portArray.Sort();
 
-            for (int i = startingPort; i < UInt16.MaxValue; i++)
-            {
-                if (!portArray.Contains(i))
-                {
-                    return i;
-                }
-            }
-
-
-            return 0;
+            return Enumerable.Range(startingPort, UInt16.MaxValue)
+                .FirstOrDefault(x => !portArray.Contains(x));
         }
         #endregion
     }
