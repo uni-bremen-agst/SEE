@@ -228,7 +228,7 @@ namespace SEE.UI.Window.ConsoleWindow
         /// <param name="icon">The channel icon.</param>
         public static void AddChannel(string channel, char icon)
         {
-            channels[channel] = new Channel(channel, icon);
+            channels[channel] = new Channel(channel, icon, new());
             ChannelChanged?.Invoke();
         }
 
@@ -615,7 +615,7 @@ namespace SEE.UI.Window.ConsoleWindow
         /// <param name="Name">The channel name.</param>
         /// <param name="Icon">The channel icon.</param>
         /// <param name="Levels">The channel levels.</param>
-        private record Channel(string Name, char Icon, Dictionary<string, ChannelLevel> Levels = null);
+        private record Channel(string Name, char Icon, Dictionary<string, ChannelLevel> Levels);
 
         /// <summary>
         /// Container for a channel level.
