@@ -57,11 +57,13 @@ namespace SEE.UI.Window
             }
             else
             {
+                // Deactivate every GameObject
                 IEnumerable<string> searchList = Search(searchQuery, searchableObjects.Values.ToArray());
                 foreach(var ele in searchableObjects)
                 {
                     ele.Value.SetActive(false);
                 }
+                // Activate GameObjects that match the search results from the fuzzy search.
                 foreach (string ele in searchList)
                 {
                     searchableObjects.TryGetValue(ele, out GameObject activeObject);
@@ -192,17 +194,19 @@ namespace SEE.UI.Window
 
         protected override void InitializeFromValueObject(WindowValues valueObject)
         {
-            // TODO: Should metric windows be sent over the network?
+            // TODO (#732): Should metric windows be sent over the network?
             throw new NotImplementedException();
         }
 
         public override void UpdateFromNetworkValueObject(WindowValues valueObject)
         {
+            // TODO (#732): Should metric windows be sent over the network?
             throw new NotImplementedException();
         }
 
         public override WindowValues ToValueObject()
         {
+            // TODO (#732): Should metric windows be sent over the network?
             throw new NotImplementedException();
         }
     }
