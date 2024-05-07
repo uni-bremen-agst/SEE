@@ -353,7 +353,7 @@ namespace SEE.Game.Evolution
 
             if (graphs.Count > 0)
             {
-                LoadingSpinner.Show(LoadingMessage);
+                LoadingSpinner.ShowIndeterminate(LoadingMessage);
             }
             CalculateAllGraphLayouts(graphs);
 

@@ -36,6 +36,10 @@
         /// <summary>
         /// For <see cref="MergeDiffGraphProvider"/>.
         /// </summary>
-        MergeDiff
+        MergeDiff,
+        /// <summary>
+        /// For <see cref="LSPGraphProvider"/>.
+        /// </summary>
+        LSP
     }
 }

@@ -365,6 +365,8 @@ namespace SEE.Net
         /// </summary>
         private void InitializeGame()
         {
+            AsyncUtils.MainThreadId = Thread.CurrentThread.ManagedThreadId;
+
             if (HostServer && loadCityOnStart)
             {
                 foreach (AbstractSEECity city in FindObjectsOfType<AbstractSEECity>())
