@@ -522,7 +522,7 @@ namespace SEE.Game.CityRendering
         /// <param name="gameNodes">game nodes to be decorated</param>
         protected void AddDecorations(ICollection<GameObject> gameNodes)
         {
-            AddLabels(gameNodes);
+            AddNames(gameNodes);
 
             foreach (GameObject node in gameNodes)
             {
@@ -596,12 +596,14 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Adds the source name as a label to the center of the given game nodes as a child
-        /// for all given <paramref name="gameNodes"/> except for the root (its label would
+        /// Adds the source name to the center of the given game nodes as a child
+        /// for all given <paramref name="gameNodes"/> except for the root (its name would
         /// be too large and is not really neeed anyway).
         /// </summary>
         /// <param name="gameNodes">game nodes whose source name is to be added</param>
-        private void AddLabels(IEnumerable<GameObject> gameNodes)
+        /// <remarks>This name addition is not be confused with ShowLabel. The latter is
+        /// popping up while a node is hovered. This name here is shown all the time.</remarks>
+        private void AddNames(IEnumerable<GameObject> gameNodes)
         {
             const float relativeLabelSize = 0.8f;
             GameObject codeCity = null;
