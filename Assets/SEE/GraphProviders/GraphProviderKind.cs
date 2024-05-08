@@ -13,31 +13,45 @@
         /// For <see cref="GXLGraphProvider"/>.
         /// </summary>
         GXL,
+
         /// <summary>
         /// For <see cref="CSVGraphProvider"/>.
         /// </summary>
         CSV,
+
         /// <summary>
         /// For <see cref="JaCoCoGraphProvider"/>.
         /// </summary>
         JaCoCo,
+
         /// <summary>
         /// For <see cref="PipelineGraphProvider"/>.
         /// </summary>
         Pipeline,
+
         /// <summary>
         /// For <see cref="DashboardGraphProvider"/>.
         /// </summary>
         Dashboard,
+
         /// <summary>
         /// For <see cref="VCSGraphProvider"/>.
         /// </summary>
         VCS,
+
         /// <summary>
         /// For <see cref="ReflexionGraphProvider"/>.
         /// </summary>
         Reflexion,
-        
-        GitHistory
+
+        /// <summary>
+        /// For <see cref="GitEvolutionGraphProvider"/>
+        /// </summary>
+        GitHistory,
+
+        /// <summary>
+        /// For <see cref="GXLEvolutionGraphProvider"/>
+        /// </summary>
+        GXLEvolution
     }
 }
