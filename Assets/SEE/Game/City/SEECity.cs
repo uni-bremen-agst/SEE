@@ -305,7 +305,10 @@ namespace SEE.Game.City
             {
                 try
                 {
-                    LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this);
+                    LoadedGraph = await UniTask.RunOnThreadPool(() => DataProvider.ProvideAsync(new Graph(""), this));
+                    //LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this);
+                    Debug.Log("Graph Provider finished");
+                    ShowNotification.Info($"{DataProvider.Pipeline.Count()} Graph provider finished:","Graph Loaded");
                 }
                 catch (Exception ex)
                 {
