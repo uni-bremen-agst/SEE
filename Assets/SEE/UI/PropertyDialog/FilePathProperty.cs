@@ -97,12 +97,6 @@ namespace SEE.UI.PropertyDialog
                     // Register listeners on entry and exit events, respectively
                     pointerHelper.EnterEvent.AddListener(_ => tooltip.Show(Description));
                     pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
-                    // FIXME scrolling doesn't work while hovering above the field, because
-                    // the Modern UI Pack uses an Event Trigger (see Utils/PointerHelper for an explanation.)
-                    // It is unclear how to resolve this without either abstaining from using the Modern UI Pack
-                    // in this instance or without modifying the Modern UI Pack, which would complicate
-                    // updates greatly. Perhaps the author of the Modern UI Pack (or Unity developers?) should
-                    // be contacted about this.
                 }
             }
 
@@ -144,7 +138,6 @@ namespace SEE.UI.PropertyDialog
                 });
                 textField.onEndEdit.AddListener(_ =>
                 {
-                    // FIXME: box where text can be selected doesn't cover the whole text
                     ((RectTransform)textField.textComponent.transform).localPosition = Vector2.zero;
                     textField.textComponent.overflowMode = TextOverflowModes.Ellipsis;
                 });
