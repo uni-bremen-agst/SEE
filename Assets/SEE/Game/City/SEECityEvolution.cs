@@ -29,6 +29,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using SEE.Game.CityRendering;
 using SEE.GraphProviders;
+using SEE.UI.Notification;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.Serialization;
@@ -58,6 +59,11 @@ namespace SEE.Game.City
         /// Name of the Inspector foldout group for the specific evolution setttings.
         /// </summary>
         private const string evolutionFoldoutGroup = "Evolution settings";
+
+
+        private const string NoGraphsProvidedErrorMessage = "Graph providers didn't yield any graphs";
+
+        private const string CantShowEvolutionMessage = "Can't show evolution";
 
         /// <summary>
         /// Sets the maximum number of revisions to load.
@@ -307,6 +313,12 @@ namespace SEE.Game.City
             Reset();
 
             List<Graph> graphs = new List<Graph>(await DataProvider.ProvideAsync(new List<Graph>(), this));
+            if (!graphs.Any())
+            {
+                ShowNotification.Error(CantShowEvolutionMessage, NoGraphsProvidedErrorMessage);
+                return;
+            }
+
             evolutionRenderer = CreateEvolutionRenderer(graphs);
             DrawGraphs(graphs);
 
@@ -314,6 +326,36 @@ namespace SEE.Game.City
 
             evolutionRenderer.ShowGraphEvolution();
         }
+
+        /// <summary>
+        /// Starts the evolution on runtime.
+        /// <see cref="LoadData"/> doesn't need to be called first
+        /// </summary>
+        //[Button(ButtonSizes.Small, Name = "Start Evolution")]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Start Evo")]
+        [PropertyOrder(DataButtonsGroupOrderDraw)]
+        public async void StatEvolution()
+        {
+            List<Graph> graphs = new List<Graph>(await DataProvider.ProvideAsync(new List<Graph>(), this));
+
+            if (!graphs.Any())
+            {
+                ShowNotification.Error(CantShowEvolutionMessage, NoGraphsProvidedErrorMessage);
+                return;
+            }
+
+            DrawGraphs(graphs);
+
+            DestroyImmediate(CreateEvolutionRenderer(graphs));
+            DestroyImmediate(gameObject.AddOrGetComponent<AnimationInteraction>());
+
+            evolutionRenderer = CreateEvolutionRenderer(graphs);
+
+            gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
+
+            evolutionRenderer.ShowGraphEvolution();
+        }
+
 
         /// <summary>
         /// Creates <see cref="evolutionRenderer"/> and shows the nodes having one of the selected

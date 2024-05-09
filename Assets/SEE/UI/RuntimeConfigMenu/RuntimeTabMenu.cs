@@ -225,13 +225,14 @@ namespace SEE.UI.RuntimeConfigMenu
             // For all *public* fields of city annotated by RuntimeTab.
             // Note that Type.GetMember yields only public members.
             // A member can be a field, property, method, event, or other things.
-            IOrderedEnumerable<MemberInfo> members = city.GetType().GetMembers().Where(IsCityAttribute).OrderBy(HasTabAttribute).ThenBy(GetTabName).ThenBy(SortIsNotNested);
+            IOrderedEnumerable<MemberInfo> members = city.GetType().GetMembers().Where(IsCityAttribute)
+                .OrderBy(HasTabAttribute).ThenBy(GetTabName).ThenBy(SortIsNotNested);
             members.ForEach(memberInfo => CreateSetting(memberInfo, null, city));
             SelectEntry(Entries.First());
 
             // creates the buttons for methods
             IOrderedEnumerable<MethodInfo> methods = city.GetType().GetMethods().Where(IsCityAttribute)
-                                                         .OrderBy(GetButtonGroup).ThenBy(GetOrderOfMemberInfo).ThenBy(GetButtonName);
+                .OrderBy(GetButtonGroup).ThenBy(GetOrderOfMemberInfo).ThenBy(GetButtonName);
             methods.ForEach(CreateButton);
             return;
 
@@ -255,11 +256,11 @@ namespace SEE.UI.RuntimeConfigMenu
 
             float GetOrderOfMemberInfo(MemberInfo memberInfo) =>
                 (memberInfo.GetCustomAttributes().OfType<PropertyOrderAttribute>()
-                           .FirstOrDefault() ?? new PropertyOrderAttribute()).Order;
+                    .FirstOrDefault() ?? new PropertyOrderAttribute()).Order;
 
             string GetButtonGroup(MemberInfo memberInfo) =>
                 (memberInfo.GetCustomAttributes().OfType<RuntimeButtonAttribute>().FirstOrDefault()
-                    ?? new RuntimeButtonAttribute(null, null)).Name;
+                 ?? new RuntimeButtonAttribute(null, null)).Name;
 
             // ordered depending if a setting is primitive or has nested settings
             bool SortIsNotNested(MemberInfo memberInfo)
@@ -274,12 +275,13 @@ namespace SEE.UI.RuntimeConfigMenu
                                                           || propertyInfo.SetMethod == null
                                                           || !propertyInfo.CanRead
                                                           || !propertyInfo.CanWrite
-                                                          ):
+                        ):
                         value = propertyInfo.GetValue(city);
                         break;
                     default:
                         return false;
                 }
+
                 return value switch
                 {
                     bool => true,
@@ -394,6 +396,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 );
                 AddEntry(entry);
             }
+
             return ViewGameObject(entry);
         }
 
@@ -437,6 +440,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     {
                         return;
                     }
+
                     if (propertyInfo.GetMethod.IsAbstract)
                     {
                         return;
@@ -465,7 +469,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="setter">setter of the setting value</param>
         /// <param name="attributes">attributes</param>
         private void CreateSetting(Func<object> getter, string settingName, GameObject parent,
-                                   UnityAction<object> setter = null, IEnumerable<Attribute> attributes = null)
+            UnityAction<object> setter = null, IEnumerable<Attribute> attributes = null)
         {
             // stores the attributes in an array so it can be accessed multiple times
             Attribute[] attributeArray = attributes as Attribute[] ?? attributes?.ToArray() ?? Array.Empty<Attribute>();
@@ -492,46 +496,46 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 case bool:
                     CreateSwitch(settingName,
-                                 changedValue => setter!(changedValue),
-                                 () => (bool)getter(),
-                                 parent);
+                        changedValue => setter!(changedValue),
+                        () => (bool)getter(),
+                        parent);
                     break;
                 case int:
                     CreateSlider(settingName,
-                                 attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
-                                 changedValue => setter!((int)changedValue),
-                                 () => (int)getter(),
-                                 true,
-                                 parent);
+                        attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
+                        changedValue => setter!((int)changedValue),
+                        () => (int)getter(),
+                        true,
+                        parent);
                     break;
                 case uint:
                     CreateSlider(settingName,
-                                 attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
-                                 changedValue => setter!((uint)changedValue),
-                                 () => (uint)getter(),
-                                 true,
-                                 parent);
+                        attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
+                        changedValue => setter!((uint)changedValue),
+                        () => (uint)getter(),
+                        true,
+                        parent);
                     break;
                 case float:
                     CreateSlider(settingName,
-                                 attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
-                                 changedValue => setter!(changedValue),
-                                 () => (float)getter(),
-                                 false,
-                                 parent);
+                        attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
+                        changedValue => setter!(changedValue),
+                        () => (float)getter(),
+                        false,
+                        parent);
                     break;
                 case string:
                     CreateStringField(settingName,
-                                      changedValue => setter!(changedValue),
-                                      () => (string)getter(),
-                                      parent);
+                        changedValue => setter!(changedValue),
+                        () => (string)getter(),
+                        parent);
                     break;
                 case Color:
                     parent = CreateNestedSetting(settingName, parent);
                     CreateColorPicker(settingName,
-                                      parent,
-                                      changedValue => setter!(changedValue),
-                                      () => (Color)getter());
+                        parent,
+                        changedValue => setter!(changedValue),
+                        () => (Color)getter());
                     break;
                 case DataPath dataPath:
                     parent = CreateNestedSetting(settingName, parent);
@@ -539,15 +543,15 @@ namespace SEE.UI.RuntimeConfigMenu
                     break;
                 case Enum:
                     CreateDropDown(settingName,
-                                   // changedValue is the enum value as an integer; here we will
-                                   // convert it back to the enum. We pass on the value to the
-                                   // setter of the caller because only the caller has the context to
-                                   // change the value. Here we have only the knowledge what value was
-                                   // selected from the drop-down menu.
-                                   changedValue => setter!(Enum.ToObject(value.GetType(), changedValue)),
-                                   value.GetType().GetEnumNames(),
-                                   () => getter().ToString(),
-                                   parent);
+                        // changedValue is the enum value as an integer; here we will
+                        // convert it back to the enum. We pass on the value to the
+                        // setter of the caller because only the caller has the context to
+                        // change the value. Here we have only the knowledge what value was
+                        // selected from the drop-down menu.
+                        changedValue => setter!(Enum.ToObject(value.GetType(), changedValue)),
+                        value.GetType().GetEnumNames(),
+                        () => getter().ToString(),
+                        parent);
                     break;
                 // from here on come nested settings
                 case NodeTypeVisualsMap:
@@ -557,27 +561,36 @@ namespace SEE.UI.RuntimeConfigMenu
                     FieldInfo mapInfo =
                         value.GetType().GetField("map", BindingFlags.Instance | BindingFlags.NonPublic)!;
                     CreateSetting(() => mapInfo.GetValue(value),
-                                  settingName,
-                                  parent,
-                                  null,
-                                  attributeArray);
+                        settingName,
+                        parent,
+                        null,
+                        attributeArray);
                     break;
                 case AntennaAttributes:
                     FieldInfo antennaInfo = value.GetType().GetField(nameof(AntennaAttributes.AntennaSections))!;
                     CreateSetting(() => antennaInfo.GetValue(value),
-                                  settingName,
-                                  parent,
-                                  null,
-                                  attributeArray);
+                        settingName,
+                        parent,
+                        null,
+                        attributeArray);
                     break;
 
                 case PipelineGraphProvider<Graph>:
                     FieldInfo pipeline = value.GetType().GetField(nameof(PipelineGraphProvider<Graph>.Pipeline))!;
                     CreateSetting(() => pipeline.GetValue(value),
-                                  settingName,
-                                  parent,
-                                  null,
-                                  attributeArray);
+                        settingName,
+                        parent,
+                        null,
+                        attributeArray);
+                    break;
+
+                case PipelineGraphProvider<List<Graph>>:
+                    FieldInfo pipeline2 = value.GetType().GetField(nameof(PipelineGraphProvider<List<Graph>>.Pipeline))!;
+                    CreateSetting(() => pipeline2.GetValue(value),
+                        settingName,
+                        parent,
+                        null,
+                        attributeArray);
                     break;
                 // types that shouldn't be in the configuration menu
                 case Graph:
@@ -599,6 +612,10 @@ namespace SEE.UI.RuntimeConfigMenu
                 case List<GraphProvider<Graph>> providerList:
                     parent = CreateNestedSetting(settingName, parent);
                     CreateList(providerList, parent, () => new PipelineGraphProvider<Graph>());
+                    break;
+                case List<GraphProvider<List<Graph>>> providerList:
+                    parent = CreateNestedSetting(settingName, parent);
+                    CreateList(providerList, parent, () => new PipelineGraphProvider<List<Graph>>());
                     break;
 
                 // confirmed types where the nested fields should be edited
@@ -627,7 +644,16 @@ namespace SEE.UI.RuntimeConfigMenu
                     CreateTypeField(parent, value as GraphProvider<Graph>);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
-
+                case FullVCSGraphProvider:
+                    parent = CreateNestedSetting(settingName, parent);
+                    CreateTypeField(parent, value as GraphProvider<Graph>);
+                    value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
+                    break;
+                case GitEvolutionGraphProvider:
+                    parent = CreateNestedSetting(settingName, parent);
+                    CreateTypeField(parent, value as GraphProvider<List<Graph>>);
+                    value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
+                    break;
                 default:
                     Debug.LogWarning("Missing: " + settingName + ", " + value.GetType().GetNiceName() + "\n");
                     break;
@@ -664,8 +690,8 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="recursive">whether it is called recursively (small editor menu)</param>
         /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
         private void CreateSlider(string settingName, RangeAttribute range, UnityAction<float> setter,
-                                  Func<float> getter, bool useRoundValue, GameObject parent,
-                                  bool recursive = false, Func<string> getWidgetName = null)
+            Func<float> getter, bool useRoundValue, GameObject parent,
+            bool recursive = false, Func<string> getWidgetName = null)
         {
             // use range 0-2 if non provided
             range ??= new RangeAttribute(0, 2);
@@ -757,7 +783,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="recursive">whether it is called recursively (small editor menu)</param>
         /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
         private void CreateSwitch(string settingName, UnityAction<bool> setter, Func<bool> getter, GameObject parent,
-                                  bool recursive = false, Func<string> getWidgetName = null)
+            bool recursive = false, Func<string> getWidgetName = null)
         {
             // init the widget
             GameObject switchGameObject =
@@ -855,7 +881,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="recursive">whether it is called recursively (small editor menu)</param>
         /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
         private void CreateStringField(string settingName, UnityAction<string> setter, Func<string> getter,
-                                       GameObject parent, bool recursive = false, Func<string> getWidgetName = null)
+            GameObject parent, bool recursive = false, Func<string> getWidgetName = null)
         {
             // init the widget
             GameObject stringGameObject =
@@ -926,20 +952,59 @@ namespace SEE.UI.RuntimeConfigMenu
             }
         }
 
+        private void CreateTypeField(GameObject parent, GraphProvider<List<Graph>> provider)
+        {
+                   string[] graphProviderKinds = GetGraphProviderKinds();
+            
+                        CreateDropDown(settingName: "Type",
+                            setter: Setter,
+                            values: graphProviderKinds,
+                            getter: Getter,
+                            parent: parent);
+            
+                        // all values of enum GraphProviderKind as strings
+                        string[] GetGraphProviderKinds()
+                        {
+                            return Enum.GetValues(typeof(GraphProviderKind)).Cast<GraphProviderKind>().Select(e => e.ToString())
+                                .ToArray();
+                        }
+            
+                        string Getter()
+                        {
+                            return provider.GetKind().ToString();
+                        }
+            
+                        // index is the index of the changed enum
+                        void Setter(int index)
+                        {
+                            if (Enum.TryParse(graphProviderKinds[index], true, out GraphProviderKind newKind))
+                            {
+                                if (provider.GetKind() != newKind)
+                                {
+                                    // TODO (#698):
+                                    // We need to replace provider in the list it is contained in
+                                    // by a new instance of newKind.
+                                    Debug.LogError("Changing the type of a data provider is currently not supported.\n");
+                                }
+                            }
+                        }
+        }
+        
         private void CreateTypeField(GameObject parent, GraphProvider<Graph> provider)
         {
             string[] graphProviderKinds = GetGraphProviderKinds();
 
             CreateDropDown(settingName: "Type",
-                           setter: Setter,
-                           values: graphProviderKinds,
-                           getter: Getter,
-                           parent: parent);
+                setter: Setter,
+                values: graphProviderKinds,
+                getter: Getter,
+                parent: parent);
 
             // all values of enum GraphProviderKind as strings
             string[] GetGraphProviderKinds()
             {
-                return Enum.GetValues(typeof(GraphProviderKind)).Cast<GraphProviderKind>().Select(e => e.ToString()).ToArray();
+                return Enum.GetValues(typeof(GraphProviderKind)).Cast<GraphProviderKind>().Select(e => e.ToString())
+                    .ToArray();
             }
 
             string Getter()
@@ -974,7 +1039,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="recursive">whether it is called recursively (small editor menu)</param>
         /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
         private void CreateDropDown(string settingName, UnityAction<int> setter, IEnumerable<string> values,
-                                    Func<string> getter, GameObject parent, bool recursive = false, Func<string> getWidgetName = null)
+            Func<string> getter, GameObject parent, bool recursive = false, Func<string> getWidgetName = null)
         {
             // convert the value names to an array
             string[] valueArray = values as string[] ?? values.ToArray();
@@ -1060,7 +1125,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="recursive">whether it is called recursively (small editor menu)</param>
         /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
         private void CreateColorPicker(string settingName, GameObject parent, UnityAction<Color> setter,
-                                       Func<Color> getter, bool recursive = false, Func<string> getWidgetName = null)
+            Func<Color> getter, bool recursive = false, Func<string> getWidgetName = null)
         {
             // init the widget
             GameObject colorPickerGameObject =
@@ -1081,7 +1146,7 @@ namespace SEE.UI.RuntimeConfigMenu
             if (!recursive)
             {
                 colorPickerGameObject.transform.parent.parent.GetComponent<RuntimeConfigMenuCollapse>()
-                                     .OnClickCollapse();
+                    .OnClickCollapse();
             }
 
             // getter of widget name (if not provided)
@@ -1299,6 +1364,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     return;
                 }
+
                 list.RemoveAt(list.Count - 1);
                 UpdateListChildren(list, parent);
                 buttonContainer.transform.SetAsLastSibling();
