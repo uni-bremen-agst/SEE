@@ -17,7 +17,7 @@ using UnityEngine;
 namespace SEE.GraphProviders
 {
     [Serializable]
-    public class FullVCSGraphProvider : GitRepositoryProvider<Graph>
+    public class AllBranchGitProvider : GitRepositoryProvider<Graph>
     {
         /// <summary>
         /// The date limit until commits should be analysed
