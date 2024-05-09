@@ -612,7 +612,6 @@ namespace SEE.Game.Evolution
             MarkNodes();
             UpdateNodeChangeBuffer();
             UpdateGameNodeHierarchy();
-            RenderPlane();
 
             LoadingSpinner.Hide(LoadingMessage);
             IsStillAnimating = false;
@@ -723,22 +722,6 @@ namespace SEE.Game.Evolution
                 foreach (Node node in changedNodes)
                 {
                     markerFactory.MarkChanged(GraphElementIDMap.Find(node.ID, true));
-                }
-            }
-
-            /// <summary>
-            /// Renders a plane enclosing all game objects of the currently shown graph.
-            /// </summary>
-            void RenderPlane()
-            {
-                bool isPlaneNew = !objectManager.GetPlane(out GameObject plane);
-                if (!isPlaneNew)
-                {
-                    // We are re-using the existing plane, hence, we animate its change
-                    // (new position and new scale).
-                    objectManager.GetPlaneTransform(out Vector3 centerPosition, out Vector3 scale);
-                    Tweens.Scale(plane, scale, AnimationLagFactor);
-                    Tweens.Move(plane, centerPosition, AnimationLagFactor / 2);
                 }
             }
         }
