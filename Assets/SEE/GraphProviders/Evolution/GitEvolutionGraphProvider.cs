@@ -16,6 +16,7 @@ using UnityEngine;
 
 namespace SEE.GraphProviders
 {
+    [Serializable]
     public class GitEvolutionGraphProvider : GitRepositoryProvider<List<Graph>>
     {
         private const string NumberOfAuthorsMetricName = "Metric.Authors.Number";
@@ -58,13 +59,19 @@ namespace SEE.GraphProviders
                     .Reverse()
                     .ToList();
                 int counter = 1;
+
+                Dictionary<Commit, List<PatchEntryChanges>> commitChanges = new();
+                foreach (var commit in commitList)
+                {
+                    commitChanges.Add(commit, GetFileChanges(commit, repo));
+                }
+
                 foreach (var currentCommit in commitList)
                 {
                     Graph g = new Graph(RepositoryPath.Path);
                     g.BasePath = RepositoryPath.Path;
                     GraphUtils.NewNode(g, pathSegments[^1], "Repository", pathSegments[^1]);
 
-                    //g.AddNode(new Node(){SourceName = "AAAAAA", ID = "AAA"});
                     g.StringAttributes.Add("CommitTimestamp", currentCommit.Author.When.Date.ToString("dd/MM/yyyy"));
                     g.StringAttributes.Add("CommitId", currentCommit.Sha);
                     // All commits between the first commit in commitList and the current commit
@@ -73,9 +80,9 @@ namespace SEE.GraphProviders
                     Dictionary<string, GitFileMetricsCollector> fileMetrics = new();
                     foreach (var commit in commitsInBetween)
                     {
-                        var changedFilesPath = repo.Diff.Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
+                        //var changedFilesPath = repo.Diff.Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
 
-                        foreach (var changedFile in changedFilesPath)
+                        foreach (var changedFile in commitChanges[commit])
                         {
                             string filePath = changedFile.Path;
                             if (!includedFiles.Contains(Path.GetExtension(filePath)) ||
@@ -130,9 +137,17 @@ namespace SEE.GraphProviders
             return graph;
         }
 
+        
+        
+        
+        private List<PatchEntryChanges> GetFileChanges(Commit commit, Repository repo)
+        {
+            return repo.Diff.Compare<Patch>(commit.Tree, commit.Parents.First().Tree).Select(x => x).ToList();
+        }
+
         public override GraphProviderKind GetKind()
         {
-            throw new System.NotImplementedException();
+            return GraphProviderKind.GitHistory;
         }
 
         protected override void SaveAttributes(ConfigWriter writer)
