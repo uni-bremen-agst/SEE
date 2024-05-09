@@ -55,7 +55,7 @@ namespace SEE.Game.Operator
         /// </summary>
         private void PrepareLabel()
         {
-            Color textColor = UnityEngine.Color.white;            
+            Color textColor = UnityEngine.Color.white;
 
             string shownText = Node?.SourceName ?? gameObject.name;
 
@@ -69,8 +69,8 @@ namespace SEE.Game.Operator
                 // We define starting and ending positions for the animation.
                 Vector3 startLabelPosition = gameObject.GetTop();
                 float fontSize = Node != null ? City.NodeTypes[Node.Type].LabelSettings.FontSize : LabelAttributes.DefaultFontSize;
-                nodeLabel = TextFactory.GetTextWithSize(shownText,
-                                                        City.LabelFont,
+                nodeLabel = TextFactory.GetTextWithSize(City,
+                                                        shownText,
                                                         startLabelPosition,
                                                         fontSize,
                                                         lift: true,
@@ -84,7 +84,7 @@ namespace SEE.Game.Operator
                 {
                     name = $"{labelPrefix}{shownText} (Connecting Line)"
                 };
-                LineFactory.Draw(line, new[] { startLinePosition, startLinePosition }, 0.01f, City.LabelLineMaterial);                                 
+                LineFactory.Draw(line, new[] { startLinePosition, startLinePosition }, 0.01f, City.LabelLineMaterial);
                 line.transform.SetParent(nodeLabel.transform);
 
                 // The nodeLabel and its child edge must inherit the portal of gameObject.

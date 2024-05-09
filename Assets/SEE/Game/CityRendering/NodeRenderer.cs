@@ -619,14 +619,14 @@ namespace SEE.Game.CityRendering
                     Vector3 position = node.GetRoofCenter();
                     codeCity ??= SceneQueries.GetCodeCity(node.transform).gameObject;
                     city ??= codeCity.GetComponent<AbstractSEECity>();
-                    GameObject text = TextFactory.GetTextWithWidth(text: theNode.SourceName,
-                                                                   fontAsset: city.LabelFont,
+                    GameObject text = TextFactory.GetTextWithWidth(city: city,
+                                                                   text: theNode.SourceName,
                                                                    position: position,
                                                                    width: length * relativeLabelSize,
                                                                    lift: true,
                                                                    textColor: node.GetColor().Invert());
                     text.transform.SetParent(node.transform);
-                    AddLOD(text);                    
+                    AddLOD(text);
                     Portal.SetPortal(codeCity, text);
                 }
             }
