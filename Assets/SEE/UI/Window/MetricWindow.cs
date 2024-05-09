@@ -17,7 +17,7 @@ namespace SEE.UI.Window
     public class MetricWindow : BaseWindow
     {
         /// <summary>
-        /// GraphElement to read its attributes.
+        /// GraphElement whose metrics are to be shown.
         /// </summary>
         public GraphElement GraphElement;
 
@@ -73,12 +73,13 @@ namespace SEE.UI.Window
         }
 
         /// <summary>
-        /// Performs a fuzzy search operation on a collection of GameObject instances based on a provided query.
+        /// Returns the attributes of all <paramref name="gameObjects"/> whose name match the
+        /// <paramref name="query"/> using a fuzzy search.
         /// </summary>
-        /// <param name="query"> the search query </param>
+        /// <param name="query"> the search query (part of an attribute name)</param>
         /// <param name="gameObjects"> the game objects to search through</param>
         /// <param name="cutoff"> representing the cutoff score for relevance </param>
-        /// <returns> An iterable collection of strings representing the attributes of the GameObject instances, ordered by relevance to the search query </returns>
+        /// <returns> the attributes whose names match the <paramref name="query"/> </returns>
         public IEnumerable<string> Search(string query, GameObject[] gameObjects, int limit = 15, int cutoff = 40)
         {
             List<string> attributesList = new();
@@ -86,7 +87,8 @@ namespace SEE.UI.Window
             {
                 attributesList.Add(AttributeName(obj));
             }
-            IEnumerable<(int score, string attribute)> searchResults = Process.ExtractTop(query, attributesList, limit: limit, cutoff: cutoff).Select(x => (x.Score, x.Value));
+            IEnumerable<(int score, string attribute)> searchResults
+                = Process.ExtractTop(query, attributesList, limit: limit, cutoff: cutoff).Select(x => (x.Score, x.Value));
             searchResults = searchResults.OrderByDescending(x => x.score);
 
             return searchResults.Select(x => x.attribute);
@@ -94,7 +96,7 @@ namespace SEE.UI.Window
 
         /// <summary>
         /// Returns the name of a node attribute stored in the first child of the <paramref name="metricRow"/>.
-        /// <paramref name="metricRow"/> is assumed to represent a row in the metric window providing
+        /// Parameter <paramref name="metricRow"/> is assumed to represent a row in the metric window providing
         /// the name and value of a node attribute (metric).
         /// </summary>
         /// <param name="metricRow">a game object representing a pair of an attribute name and an attribute value</param>
@@ -105,8 +107,8 @@ namespace SEE.UI.Window
         }
 
         /// <summary>
-        /// Returns the attribute name TMP container of <paramref name="metricRow"/>
-        /// <paramref name="metricRow"/> is assumed to represent a row in the metric window providing
+        /// Returns the TMP container of <paramref name="metricRow"/> holding the attribute name.
+        /// Parameter <paramref name="metricRow"/> is assumed to represent a row in the metric window providing
         /// the name and value of a node attribute (metric).
         /// </summary>
         /// <param name="metricRow">a game object representing a pair of an attribute name and an attribute value</param>
@@ -118,8 +120,8 @@ namespace SEE.UI.Window
         }
 
         /// <summary>
-        /// Returns the attribute value TMP container of <paramref name="metricRow"/>
-        /// <paramref name="metricRow"/> is assumed to represent a row in the metric window providing
+        /// Returns the TMP container of <paramref name="metricRow"/> holding the attribute value.
+        /// Parameter <paramref name="metricRow"/> is assumed to represent a row in the metric window providing
         /// the name and value of a node attribute (metric).
         /// </summary>
         /// <param name="metricRow">a game object representing a pair of an attribute name and an attribute value</param>
@@ -157,7 +159,7 @@ namespace SEE.UI.Window
             // Float Attributes
             DisplayAttributes(GraphElement.FloatAttributes, metricWindowObject);
 
-            // Save GameObjects in Array for SearchField            
+            // Save GameObjects in Array for SearchField
             Dictionary<string, GameObject> activeElements = new();
             foreach (Transform child in scrollViewContent)
             {
