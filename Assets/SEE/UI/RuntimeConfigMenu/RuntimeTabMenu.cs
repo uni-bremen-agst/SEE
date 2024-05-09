@@ -585,7 +585,8 @@ namespace SEE.UI.RuntimeConfigMenu
                     break;
 
                 case PipelineGraphProvider<List<Graph>>:
-                    FieldInfo pipeline2 = value.GetType().GetField(nameof(PipelineGraphProvider<List<Graph>>.Pipeline))!;
+                    FieldInfo pipeline2 =
+                        value.GetType().GetField(nameof(PipelineGraphProvider<List<Graph>>.Pipeline))!;
                     CreateSetting(() => pipeline2.GetValue(value),
                         settingName,
                         parent,
@@ -644,7 +645,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     CreateTypeField(parent, value as GraphProvider<Graph>);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
-                case AllBranchGitProvider:
+                case AllBranchesGitProvider:
                     parent = CreateNestedSetting(settingName, parent);
                     CreateTypeField(parent, value as GraphProvider<Graph>);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
@@ -954,42 +955,42 @@ namespace SEE.UI.RuntimeConfigMenu
 
         private void CreateTypeField(GameObject parent, GraphProvider<List<Graph>> provider)
         {
-                   string[] graphProviderKinds = GetGraphProviderKinds();
-            
-                        CreateDropDown(settingName: "Type",
-                            setter: Setter,
-                            values: graphProviderKinds,
-                            getter: Getter,
-                            parent: parent);
-            
-                        // all values of enum GraphProviderKind as strings
-                        string[] GetGraphProviderKinds()
-                        {
-                            return Enum.GetValues(typeof(GraphProviderKind)).Cast<GraphProviderKind>().Select(e => e.ToString())
-                                .ToArray();
-                        }
-            
-                        string Getter()
-                        {
-                            return provider.GetKind().ToString();
-                        }
-            
-                        // index is the index of the changed enum
-                        void Setter(int index)
-                        {
-                            if (Enum.TryParse(graphProviderKinds[index], true, out GraphProviderKind newKind))
-                            {
-                                if (provider.GetKind() != newKind)
-                                {
-                                    // TODO (#698):
-                                    // We need to replace provider in the list it is contained in
-                                    // by a new instance of newKind.
-                                    Debug.LogError("Changing the type of a data provider is currently not supported.\n");
-                                }
-                            }
-                        }
+            string[] graphProviderKinds = GetGraphProviderKinds();
+
+            CreateDropDown(settingName: "Type",
+                setter: Setter,
+                values: graphProviderKinds,
+                getter: Getter,
+                parent: parent);
+
+            // all values of enum GraphProviderKind as strings
+            string[] GetGraphProviderKinds()
+            {
+                return Enum.GetValues(typeof(GraphProviderKind)).Cast<GraphProviderKind>().Select(e => e.ToString())
+                    .ToArray();
+            }
+
+            string Getter()
+            {
+                return provider.GetKind().ToString();
+            }
+
+            // index is the index of the changed enum
+            void Setter(int index)
+            {
+                if (Enum.TryParse(graphProviderKinds[index], true, out GraphProviderKind newKind))
+                {
+                    if (provider.GetKind() != newKind)
+                    {
+                        // TODO (#698):
+                        // We need to replace provider in the list it is contained in
+                        // by a new instance of newKind.
+                        Debug.LogError("Changing the type of a data provider is currently not supported.\n");
+                    }
+                }
+            }
         }
-        
+
         private void CreateTypeField(GameObject parent, GraphProvider<Graph> provider)
         {
             string[] graphProviderKinds = GetGraphProviderKinds();
@@ -1253,7 +1254,12 @@ namespace SEE.UI.RuntimeConfigMenu
             FilePicker.FilePicker filePicker = parent.AddComponent<FilePicker.FilePicker>();
             filePicker.DataPathInstance = dataPath;
             filePicker.Label = settingName;
-            filePicker.PickingMode = FileBrowser.PickMode.Files;
+            if (dataPath is FilePath)
+                filePicker.PickingMode = FileBrowser.PickMode.Files;
+            else if (dataPath is DirectoryPath)
+                filePicker.PickingMode = FileBrowser.PickMode.Folders;
+            else
+                filePicker.PickingMode = FileBrowser.PickMode.FilesAndFolders;
 
             // getter of widget name (if not provided)
             string GetWidgetName() => filePicker.gameObject.FullName() + "/" + settingName;

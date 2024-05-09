@@ -133,10 +133,10 @@ namespace SEE.UI.FilePicker
                 FileBrowser.ShowLoadDialog(HandleFileBrowserSuccess,
                                            () => { },
                                            allowMultiSelection: false,
-                                           pickMode: FileBrowser.PickMode.Files,
+                                           pickMode: pickingMode,
                                            title: "Pick a file/folder",
                                            initialPath: DataPathInstance.RootPath);
-
+                
                 // Find the newly opened file browser and optimize it for VR.
                 GameObject fileBrowser = GameObject.FindWithTag("FileBrowser");
                 fileBrowser.transform.Find("EventSystem").gameObject.SetActive(false);
