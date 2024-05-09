@@ -283,7 +283,7 @@ namespace SEE.Game
         /// <param name="leftFrontCorner">left front corner of the portal</param>
         /// <param name="rightBackCorner">right back corner of the portal</param>
         private static void SetPortal(Material material, Vector2 leftFrontCorner, Vector2 rightBackCorner)
-        {            
+        {
             material.SetVector(portalMin, new Vector4(leftFrontCorner.x, leftFrontCorner.y));
             material.SetVector(portalMax, new Vector4(rightBackCorner.x, rightBackCorner.y));
         }
