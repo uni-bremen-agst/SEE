@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils.Paths;
@@ -11,13 +12,14 @@ namespace SEE.GraphProviders
     /// 
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    [Serializable]
     public abstract class GitRepositoryProvider<T> : GraphProvider<T>
     {
    
         /// <summary>
         /// The path to the git repository.
         /// </summary>
-        [ShowInInspector, Tooltip("Path to the git repository."), HideReferenceObjectPicker]
+        [ShowInInspector, Tooltip("Path to the git repository."), HideReferenceObjectPicker,RuntimeTab(GraphProviderFoldoutGroup)]
         public DirectoryPath RepositoryPath = new();
         
         /// <summary>
