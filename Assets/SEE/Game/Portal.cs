@@ -1,5 +1,4 @@
-﻿using SEE.GO;
-using System;
+﻿using System;
 using UnityEngine;
 
 namespace SEE.Game
@@ -154,8 +153,6 @@ namespace SEE.Game
         {
             if (transform.TryGetComponent(out Renderer renderer))
             {
-                UnityEngine.Assertions.Assert.IsNotNull(renderer.sharedMaterial,
-                    $"Shared material of {transform.gameObject.FullName()} must not be null.");
                 SetPortal(renderer.sharedMaterial, leftFront, rightBack);
             }
             foreach (Transform child in transform)
