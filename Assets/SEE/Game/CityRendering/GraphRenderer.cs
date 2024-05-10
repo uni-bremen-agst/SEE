@@ -570,57 +570,6 @@ namespace SEE.Game.CityRendering
             };
 
         /// <summary>
-        /// Creates and returns a new plane enclosing all given <paramref name="gameNodes"/>.
-        /// </summary>
-        /// <param name="gameNodes">the game objects to be enclosed by the new plane</param>
-        /// <returns>new plane enclosing all given <paramref name="gameNodes"/></returns>
-        public static GameObject DrawPlane(ICollection<GameObject> gameNodes, float yLevel)
-        {
-            ComputeBoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
-            return DrawPlane(leftFrontCorner, rightBackCorner, yLevel);
-        }
-
-        /// <summary>
-        /// Returns a new plane for a vector describing the left front corner position and a vector describing the right bar position
-        /// </summary>
-        /// <param name="leftFrontCorner">the left front corner</param>
-        /// <param name="rightBackCorner">the right back corner</param>
-        /// <returns>a new plane</returns>
-        public static GameObject DrawPlane(Vector2 leftFrontCorner, Vector2 rightBackCorner, float yLevel)
-        {
-            return PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, yLevel, levelDistance);
-        }
-
-        /// <summary>
-        /// Adjusts the x and z co-ordinates of the given <paramref name="plane"/> so that all
-        /// <paramref name="gameNodes"/> fit onto it.
-        /// </summary>
-        /// <param name="plane">the plane to be adjusted</param>
-        /// <param name="gameNodes">the game nodes that should be fitted onto <paramref name="plane"/></param>
-        public static void AdjustPlane(GameObject plane, ICollection<GameObject> gameNodes)
-        {
-            ComputeBoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
-            PlaneFactory.AdjustXZ(plane, leftFrontCorner, rightBackCorner);
-        }
-
-        /// <summary>
-        /// Determines the new <paramref name="centerPosition"/> and <paramref name="scale"/> for the given
-        /// <paramref name="plane"/> so that it would enclose all given <paramref name="gameNodes"/>
-        /// and the y co-ordinate and the height of <paramref name="plane"/> would remain the same.
-        ///
-        /// Precondition: <paramref name="plane"/> is a plane game object.
-        /// </summary>
-        /// <param name="plane">a plane game object to be adjusted</param>
-        /// <param name="gameNodes">the game nodes that should be fitted onto <paramref name="plane"/></param>
-        /// <param name="centerPosition">the new center of the plane</param>
-        /// <param name="scale">the new scale of the plane</param>
-        public static void GetPlaneTransform(GameObject plane, ICollection<GameObject> gameNodes, out Vector3 centerPosition, out Vector3 scale)
-        {
-            ComputeBoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
-            PlaneFactory.GetTransform(plane, leftFrontCorner, rightBackCorner, out centerPosition, out scale);
-        }
-
-        /// <summary>
         /// Adds <paramref name="child"/> as a child to <paramref name="parent"/>,
         /// maintaining the world position of <paramref name="child"/>.
         /// </summary>

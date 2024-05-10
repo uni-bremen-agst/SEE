@@ -176,7 +176,6 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Hides the text label above the object if it exists.
-        ///
         /// </summary>
         /// <seealso cref="SelectionOn"/>
         public void Off()
