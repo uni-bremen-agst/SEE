@@ -73,7 +73,7 @@ namespace SEE.UI.Window
         }
 
         /// <summary>
-        /// Returns the attributes of all <paramref name="gameObjects"/> whose name match the
+        /// Returns the attributes of all <paramref name="gameObjects"/> whose name matches the
         /// <paramref name="query"/> using a fuzzy search.
         /// </summary>
         /// <param name="query"> the search query (part of an attribute name)</param>
