@@ -35,9 +35,12 @@ namespace SEE.Tools
         /// </summary>
         /// <param name="graph">graph whose metric nodes are to be aggregated bottom up</param>
         /// <param name="metrics">the metrics to be aggregated</param>
-        public static void AggregateSum(Graph graph, IEnumerable<string> metrics)
+        /// <param name="withSuffix">if true, the new metric will have the SumExtension suffix</param>
+        /// <param name="asInt">if true, the new metric will be set as an integer, otherwise as a float</param>
+        public static void AggregateSum(Graph graph, IEnumerable<string> metrics,
+                                        bool withSuffix = true, bool asInt = false)
         {
-            Aggregate(graph, metrics, Sum, SumExtension);
+            Aggregate(graph, metrics, Sum, withSuffix ? SumExtension : string.Empty, asInt);
         }
 
         /// <summary>
@@ -53,7 +56,7 @@ namespace SEE.Tools
         /// <param name="leafMetrics">the metrics to be aggregated</param>
         /// <param name="func">function to be used for the aggregation</param>
         /// <param name="extension">extension to be added to each metric name in leafMetrics for the new inner metric</param>
-        private static void Aggregate(Graph graph, IEnumerable<string> leafMetrics, Func<float, float, float> func, string extension)
+        private static void Aggregate(Graph graph, IEnumerable<string> leafMetrics, Func<float, float, float> func, string extension, bool asInt)
         {
             IList<Node> list = graph.GetRoots();
 
@@ -63,19 +66,19 @@ namespace SEE.Tools
 
                 foreach (Node root in list)
                 {
-                    Aggregate(root, metric, innerMetric, func);
+                    Aggregate(root, metric, innerMetric, func, asInt);
                 }
             }
         }
 
-        private static void Aggregate(Node node, string leafMetric, string innerMetric, Func<float, float, float> func)
+        private static void Aggregate(Node node, string leafMetric, string innerMetric, Func<float, float, float> func, bool asInt)
         {
             if (!node.IsLeaf())
             {
                 // depth-first post-order traversal to calculate all metrics for all descendants first
                 foreach (Node child in node.Children())
                 {
-                    Aggregate(child, leafMetric, innerMetric, func);
+                    Aggregate(child, leafMetric, innerMetric, func, asInt);
                 }
 
                 // Now every immediate child should have this attribute leafMetric or the derived
@@ -84,26 +87,33 @@ namespace SEE.Tools
                 // We set the attribute only if node does not have this attribute already.
                 if (!node.TryGetNumeric(innerMetric, out float unused))
                 {
-                    float nodeValue = float.NaN;
+                    float? nodeValue = null;
                     foreach (Node child in node.Children())
                     {
                         if (TryGetNumeric(child, leafMetric, innerMetric, out float childValue))
                         {
                             // Note: Comparisons to NaN as nodeValue == float.NaN always return false,
                             // no matter what the value of the float is. We must use float.IsNaN(nodeValue).
-                            if (float.IsNaN(nodeValue))
+                            if (nodeValue.HasValue)
                             {
-                                nodeValue = childValue;
+                                nodeValue = func(nodeValue.Value, childValue);
                             }
                             else
                             {
-                                nodeValue = func(nodeValue, childValue);
+                                nodeValue = childValue;
                             }
                         }
                     }
-                    if (!float.IsNaN(nodeValue))
+                    if (nodeValue.HasValue)
                     {
-                        node.SetFloat(innerMetric, nodeValue);
+                        if (asInt)
+                        {
+                            node.SetInt(innerMetric, Convert.ToInt32(nodeValue.Value));
+                        }
+                        else
+                        {
+                            node.SetFloat(innerMetric, nodeValue);
+                        }
                     }
                 }
             }
