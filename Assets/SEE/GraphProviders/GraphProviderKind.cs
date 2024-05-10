@@ -52,6 +52,15 @@
         /// <summary>
         /// For <see cref="GXLEvolutionGraphProvider"/>
         /// </summary>
-        GXLEvolution
+        GXLEvolution,
+        /// <summary>
+        /// For <see cref="MergeDiffGraphProvider"/>.
+        /// </summary>
+        MergeDiff,
+        /// <summary>
+        /// For <see cref="LSPGraphProvider"/>.
+        /// </summary>
+        LSP
+
     }
 }

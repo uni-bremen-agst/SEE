@@ -86,45 +86,6 @@ namespace SEE.Game.City
         //  FoldoutGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         // public DirectoryPath GXLDirectory = new();
 
-        //-----------------------------------------------------
-        // Attributes to mark changes
-        //-----------------------------------------------------
-
-        /// <summary>
-        /// The height of posts used as markers for new and deleted elements.
-        /// </summary>
-        [Tooltip("The height of posts used as markers for new, changed, and deleted elements (>=0).")]
-        [SerializeField, ShowInInspector, FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
-        public float MarkerHeight = 0.2f;
-
-        /// <summary>
-        /// The width (x and z lengths) of posts used as markers for new and deleted elements.
-        /// </summary>
-        [Tooltip("The width (x and z lengths) of posts used as markers for new and deleted elements (>=0).")]
-        [SerializeField, ShowInInspector, FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
-        public float MarkerWidth = 0.01f;
-
-        /// <summary>
-        /// Color for power beams of newly added nodes, can be set in inspector
-        /// </summary>
-        [Tooltip("The color of the beam for newly created nodes.")]
-        [SerializeField, ShowInInspector, FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
-        public Color AdditionBeamColor = Color.green;
-
-        /// <summary>
-        /// Changed nodes beam color to be pickable in inspector
-        /// </summary>
-        [Tooltip("The color of the beam for changed nodes.")]
-        [SerializeField, ShowInInspector, FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
-        public Color ChangeBeamColor = Color.yellow;
-
-        /// <summary>
-        /// Deleted nodes beam color to be pickable in inspector
-        /// </summary>
-        [Tooltip("The color of the beam for deleted nodes.")]
-        [SerializeField, ShowInInspector, FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
-        public Color DeletionBeamColor = Color.black;
-
         /// <summary>
         /// Yields the graph renderer that draws this city.
         /// </summary>
@@ -321,9 +282,7 @@ namespace SEE.Game.City
 
             evolutionRenderer = CreateEvolutionRenderer(graphs);
             DrawGraphs(graphs);
-
             gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
-
             evolutionRenderer.ShowGraphEvolution();
         }
 
@@ -445,11 +404,6 @@ namespace SEE.Game.City
             DataProvider?.Save(writer, dataProviderPathLabel);
             //GXLDirectory.Save(writer, gxlDirectoryLabel);
             writer.Save(MaxRevisionsToLoad, maxRevisionsToLoadLabel);
-            writer.Save(MarkerHeight, markerHeightLabel);
-            writer.Save(MarkerWidth, markerWidthLabel);
-            writer.Save(AdditionBeamColor, additionBeamColorLabel);
-            writer.Save(ChangeBeamColor, changeBeamColorLabel);
-            writer.Save(DeletionBeamColor, deletionBeamColorLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
@@ -460,11 +414,6 @@ namespace SEE.Game.City
                     PipelineGraphProvider<List<Graph>>;
             //GXLDirectory.Restore(attributes, gxlDirectoryLabel);
             ConfigIO.Restore(attributes, maxRevisionsToLoadLabel, ref MaxRevisionsToLoad);
-            ConfigIO.Restore(attributes, markerHeightLabel, ref MarkerHeight);
-            ConfigIO.Restore(attributes, markerWidthLabel, ref MarkerWidth);
-            ConfigIO.Restore(attributes, additionBeamColorLabel, ref AdditionBeamColor);
-            ConfigIO.Restore(attributes, changeBeamColorLabel, ref ChangeBeamColor);
-            ConfigIO.Restore(attributes, deletionBeamColorLabel, ref DeletionBeamColor);
         }
     }
 }

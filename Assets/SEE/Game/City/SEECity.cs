@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.UI.RuntimeConfigMenu;
@@ -101,6 +102,11 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// A token that can be used to cancel the loading of the graph.
+        /// </summary>
+        protected CancellationTokenSource cancellationTokenSource = new();
+
+        /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
         /// containing only nodes with relevant node types or the original <see cref="LoadedGraph"/>
         /// if all node types are relevant. It is null if no graph has been loaded yet
@@ -148,17 +154,12 @@ namespace SEE.Game.City
             loadedGraph = null;
             visualizedSubGraph = null;
 
-            using (LoadingSpinner.Show($"Loading city \"{gameObject.name}\""))
+            if (!gameObject.IsCodeCityDrawn())
             {
-                if (!gameObject.IsCodeCityDrawn())
-                {
-                    Debug.LogWarning($"There is no drawn code city for {gameObject.name}.");
-                    return;
-                }
-
-                LoadAsync().Forget();
+                Debug.LogWarning($"There is no drawn code city for {gameObject.name}.");
+                return;
             }
-
+            LoadAsync().Forget();
             return;
 
             async UniTaskVoid LoadAsync()
@@ -312,8 +313,9 @@ namespace SEE.Game.City
                 }
                 catch (Exception ex)
                 {
-                    ShowNotification.Error("Data failure", $"Graph provider failed with: {ex}\n");
                     Debug.LogException(ex);
+                    ShowNotification.Error("Data failure", $"Graph provider failed with: {ex.Message}\n", log: false);
+                    throw;
                 }
             }
             else
@@ -386,7 +388,7 @@ namespace SEE.Game.City
                 }
                 else
                 {
-                    using (LoadingSpinner.Show($"Drawing city \"{gameObject.name}\""))
+                    using (LoadingSpinner.ShowIndeterminate($"Drawing city \"{gameObject.name}\""))
                     {
                         graphRenderer = new GraphRenderer(this, theVisualizedSubGraph);
                         // We assume here that this SEECity instance was added to a game object as
@@ -466,6 +468,9 @@ namespace SEE.Game.City
         public override void Reset()
         {
             base.Reset();
+            // Cancel any ongoing loading operation and reset the token.
+            cancellationTokenSource.Cancel();
+            cancellationTokenSource = new CancellationTokenSource();
             // Delete the underlying graph.
             loadedGraph?.Destroy();
             loadedGraph = null;

@@ -688,6 +688,15 @@ namespace SEE.Utils
             AbstractSEECityAttributesAreEqual(expected, actual);
             TestGraphProviderIO.AreEqual(expected.DataProvider, actual.DataProvider);
             Assert.AreEqual(expected.MaxRevisionsToLoad, actual.MaxRevisionsToLoad);
+        }
+
+        /// <summary>
+        /// Checks whether <paramref name="actual"/> has the same values as <paramref name="expected"/>.
+        /// </summary>
+        /// <param name="expected">expected values</param>
+        /// <param name="actual">actual values</param>
+        private static void AreEqual(MarkerAttributes expected, MarkerAttributes actual)
+        {
             Assert.AreEqual(expected.MarkerHeight, actual.MarkerHeight);
             Assert.AreEqual(expected.MarkerWidth, actual.MarkerWidth);
             AreEqual(expected.AdditionBeamColor, actual.AdditionBeamColor);
@@ -790,6 +799,11 @@ namespace SEE.Utils
         // attribute modifiers
         //--------------------------------------------------------
 
+        // A general note on the following methods wiping out cities:
+        // "Wiping out" means in those cases just that a value different from the
+        // default or from a previously set value is assigned so that we
+        // could notice any difference between the "wiped out" and loaded values.
+
         /// <summary>
         /// Assigns all attributes of given <paramref name="city"/> to arbitrary values
         /// different from their default values.
@@ -799,6 +813,19 @@ namespace SEE.Utils
         {
             WipeOutAbstractSEECityAttributes(city);
             city.DataProvider = new PipelineGraphProvider<Graph>();
+        }
+
+        /// <summary>
+        /// Wipes out all attributes of <paramref name="markerAttributes"/>.
+        /// </summary>
+        /// <param name="markerAttributes">to be wiped out</param>
+        private static void WipeOutMarkerAttributes(MarkerAttributes markerAttributes)
+        {
+            markerAttributes.MarkerHeight++;
+            markerAttributes.MarkerWidth++;
+            markerAttributes.AdditionBeamColor = Color.clear;
+            markerAttributes.ChangeBeamColor = Color.clear;
+            markerAttributes.DeletionBeamColor = Color.clear;
         }
 
         /// <summary>
@@ -849,11 +876,6 @@ namespace SEE.Utils
             WipeOutAbstractSEECityAttributes(city);
             //city.GXLDirectory.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gxl");
             city.MaxRevisionsToLoad++;
-            city.MarkerHeight++;
-            city.MarkerWidth++;
-            city.AdditionBeamColor = Color.clear;
-            city.ChangeBeamColor = Color.clear;
-            city.DeletionBeamColor = Color.clear;
         }
 
         /// <summary>
@@ -871,6 +893,7 @@ namespace SEE.Utils
             WipeOutEdgeSelectionSettings(city.EdgeSelectionSettings);
             WipeOutErosionSettings(city);
             WipeOutCoseGraphSettings(city);
+            WipeOutMarkerAttributes(city.MarkerAttributes);
         }
 
         /// <summary>

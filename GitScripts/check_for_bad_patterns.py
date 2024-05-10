@@ -11,8 +11,7 @@ import json
 import re
 import sys
 from enum import Enum
-
-from typing import Optional, List, Dict, Union
+from typing import Dict, List, Optional, Union
 
 
 class Level(str, Enum):
@@ -146,12 +145,12 @@ We should just leave it as a backslash.""",
         see_only=False,
     ),
     BadPattern(
-        re.compile(r"^.*/(?:/|\*) (?:TODO|FIXME)(?!\s*\(#?\d{2,}\))"),
+        re.compile(r"^.*/(?:/|\*) (?:TODO|FIXME)(?!\s*\((?:#?\d{2,}|external.*)\))"),
         "Always associate a TODO/FIXME comment with an issue on GitHub, so that we can keep track of open tasks.\n"
         "Reference either [a new issue](https://github.com/uni-bremen-agst/SEE/issues/new) or an existing (open) issue "
         "by putting its number in parentheses after the TODO, e.g., `// TODO (#614): Fix linux builds`",
-        level=Level.WARNING
-    )
+        level=Level.WARNING,
+    ),
 ]
 
 
@@ -184,7 +183,9 @@ def warn(message):
     print(f"::warning::{message}", file=sys.stderr)
 
 
-def handle_missing_newline(filename: Optional[str], linenumber: int, last_line: Optional[str]):
+def handle_missing_newline(
+    filename: Optional[str], linenumber: int, last_line: Optional[str]
+):
     """
     Handles a missing newline at the end of a file.
     :param filename: The name of the file.
@@ -210,7 +211,7 @@ def main():
     skip_file = False
     hunk_indicator = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@.*$")
     missing_newline_at_eof = False
-    sys.stdin.reconfigure(errors='ignore')
+    sys.stdin.reconfigure(errors="ignore")
     for line in sys.stdin:
         line = line.rstrip("\r\n")
         if line.startswith("+++"):
@@ -218,7 +219,12 @@ def main():
             if missing_newline_at_eof:
                 handle_missing_newline(filename, diff_line - 1, last_line)
                 missing_newline_at_eof = False
-            filename = line.split("/", 1)[1]
+            split = line.split(" ", 1)
+            if len(split) != 2:
+                warn(f"Invalid unified diff file indicator: {line}")
+                # Nonetheless, this is not a fatal error, so we can continue.
+                continue
+            filename = split[1]
             skip_file = filename == "dev/null"
         elif skip_file:
             continue

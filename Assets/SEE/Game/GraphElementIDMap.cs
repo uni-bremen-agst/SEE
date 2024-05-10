@@ -7,8 +7,7 @@ using UnityEngine.Assertions;
 namespace SEE.Game
 {
     /// <summary>
-    /// A mapping of IDs (name) of GameObjects representing nodes or edges
-    /// onto those GameObjects.
+    /// A mapping of IDs (name) of GameObjects representing nodes or edges onto those GameObjects.
     /// </summary>
     internal static class GraphElementIDMap
     {
@@ -19,6 +18,27 @@ namespace SEE.Game
         /// Invariant: mapping[gameObject.name] = gameObject
         /// </summary>
         private static readonly IDictionary<string, GameObject> mapping = new Dictionary<string, GameObject>();
+
+#if UNITY_EDITOR
+        [UnityEditor.InitializeOnEnterPlayMode]
+        /// <summary>
+        /// Resets the mapping. As a consequence, all game objects  representing nodes or edges 
+        /// must re-added to the mapping when the game is being started.
+        /// 
+        /// We always want to start with a clean mapping when entering play mode in 
+        /// the Unity editor. Otherwise, the mapping could contain game objects from the last
+        /// game session which are no longer valid.
+        /// 
+        /// This method is called when entering play mode in the Unity editor. When the game
+        /// is run from a build, this method does not need to be called, because the mapping
+        /// would be initialized from scratch anyway due to the static initialization of
+        /// <see cref="mapping"/>.
+        /// </summary>
+        private static void ResetMapping()
+        {
+            mapping.Clear();
+        }
+#endif
 
         /// <summary>
         /// Returns the game object with the given <paramref name="id"/> or null if there is
@@ -102,19 +122,13 @@ namespace SEE.Game
         /// Assumption: <paramref name="gameObject"/> represents a graph node or edge.
         /// </summary>
         /// <param name="gameObject">game object to be added</param>
-        /// <param name="ignoreDuplicate">If a game object with the same name has already been added, nothing will
-        /// happen. Otherwise, an exception will be thrown.</param>
         /// <exception cref="ArgumentException">thrown if there is already a game object with
         /// this ID (name attribute)</exception>
-        internal static void Add(GameObject gameObject, bool ignoreDuplicate = false)
+        internal static void Add(GameObject gameObject)
         {
             Assert.IsNotNull(gameObject);
             Assert.IsFalse(string.IsNullOrEmpty(gameObject.name));
             Assert.IsTrue(gameObject.IsNode() || gameObject.IsEdge());
-            if (ignoreDuplicate && mapping.ContainsKey(gameObject.name))
-            {
-                return;
-            }
             mapping.Add(gameObject.name, gameObject);
         }
 

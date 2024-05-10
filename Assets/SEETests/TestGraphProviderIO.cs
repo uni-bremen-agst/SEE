@@ -48,6 +48,14 @@ namespace SEE.GraphProviders
             {
                 AreEqualReflexionGraphProviders(reflexionGraphProvider, actual);
             }
+            else if (expected is JaCoCoGraphProvider jacocoGraphProvider)
+            {
+                AreEqualJaCoCoGraphProviders(jacocoGraphProvider, actual);
+            }
+            else if (expected is MergeDiffGraphProvider diffMergeGraphProvider)
+            {
+                AreEqualDiffMergeGraphProviders(diffMergeGraphProvider, actual);
+            }
             else
             {
                 throw new System.NotImplementedException();
@@ -70,6 +78,7 @@ namespace SEE.GraphProviders
             FileIO.DeleteIfExists(filename);
         }
 
+        #region GXL provider
         [Test]
         public void TestGXLGraphProvider()
         {
@@ -93,6 +102,9 @@ namespace SEE.GraphProviders
             AreEqual(saved.Path, gxlLoaded.Path);
         }
 
+        #endregion
+
+        #region CSV provider
         [Test]
         public void TestCSVGraphProvider()
         {
@@ -115,6 +127,36 @@ namespace SEE.GraphProviders
             CSVGraphProvider gxlLoaded = loaded as CSVGraphProvider;
             AreEqual(saved.Path, gxlLoaded.Path);
         }
+
+        #endregion
+
+        #region JaCoCo provider
+        [Test]
+        public void TestJaCoCoGraphProvider()
+        {
+            JaCoCoGraphProvider saved = GetJaCoCoProvider();
+            Save(saved);
+            AreEqualJaCoCoGraphProviders(saved, Load());
+        }
+
+        private JaCoCoGraphProvider GetJaCoCoProvider()
+        {
+            return new JaCoCoGraphProvider()
+            {
+                Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
+            };
+        }
+
+        private static void AreEqualJaCoCoGraphProviders(JaCoCoGraphProvider saved, GraphProvider loaded)
+        {
+            Assert.IsTrue(saved.GetType() == loaded.GetType());
+            JaCoCoGraphProvider loadedProvider = loaded as JaCoCoGraphProvider;
+            AreEqual(saved.Path, loadedProvider.Path);
+        }
+
+        #endregion
+
+        #region Pipeline provider
 
         [Test]
         public void TestPipelineProvider()
@@ -160,6 +202,10 @@ namespace SEE.GraphProviders
             }
         }
 
+        #endregion
+
+        #region Reflexion provider
+
         [Test]
         public void TestReflexionGraphProvider()
         {
@@ -187,19 +233,37 @@ namespace SEE.GraphProviders
             AreEqual(saved.Mapping, reflexionLoaded.Mapping);
         }
 
-        private static T NewVanillaSEECity<T>() where T : Component
+        #endregion
+
+        #region DiffMerge provider
+
+        [Test]
+        public void TestDiffMergeGraphProvider()
         {
-            return new GameObject().AddComponent<T>();
+            MergeDiffGraphProvider saved = GetDiffMergeProvider();
+            Save(saved);
+            AreEqualDiffMergeGraphProviders(saved, Load());
         }
 
-        public async System.Threading.Tasks.Task<Graph> GetVCSGraphAsync()
+        private MergeDiffGraphProvider GetDiffMergeProvider()
         {
-            VCSGraphProvider saved = GetVCSGraphProvider();
-            SEECity testCity = NewVanillaSEECity<SEECity>(); ;
-            Graph testGraph = new("test", "test");
-            Graph graph = await saved.ProvideAsync(testGraph, testCity);
-            return graph;
+            return new MergeDiffGraphProvider()
+            {
+                OldGraph = new JaCoCoGraphProvider()
+                {
+                    Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
+                }
+            };
         }
+
+        private static void AreEqualDiffMergeGraphProviders(MergeDiffGraphProvider saved, GraphProvider loaded)
+        {
+            Assert.IsTrue(saved.GetType() == loaded.GetType());
+            MergeDiffGraphProvider loadedProvider = loaded as MergeDiffGraphProvider;
+            AreEqual(saved.OldGraph, loadedProvider.OldGraph);
+        }
+
+        #endregion
 
         [Test]
         public void TestVCSGraphProvider()
@@ -245,16 +309,7 @@ namespace SEE.GraphProviders
             Assert.IsTrue(actualList.SequenceEqual(pathsFromGraph));
         }
 
-        private VCSGraphProvider GetVCSGraphProvider()
-        {
-            return new VCSGraphProvider()
-            {
-                RepositoryPath = new DirectoryPath(System.IO.Path.GetDirectoryName(Application.dataPath)),
-                CommitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461",
-            };
-        }
-
-        private GraphProvider<Graph> Load()
+        private GraphProvider Load()
         {
             using ConfigReader stream = new(filename);
             GraphProvider<Graph> loaded = GraphProvider<Graph>.Restore(stream.Read(), providerLabel);

@@ -73,6 +73,15 @@ namespace SEE.Controls
         }
 
         /// <summary>
+        /// Turns on/off the mirror.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleMirror()
+        {
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleMirror);
+        }
+
+        /// <summary>
         /// Opens/closes the search menu.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
@@ -689,7 +698,6 @@ namespace SEE.Controls
         {
             return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleFaceCamPosition);
         }
-
         #endregion
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Michsky.UI.ModernUIPack;
 using SEE.DataModel.DG;
-using SEE.DataModel.GraphSearch;
+using SEE.DataModel.DG.GraphSearch;
 using SEE.Game.City;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.PopupMenu;

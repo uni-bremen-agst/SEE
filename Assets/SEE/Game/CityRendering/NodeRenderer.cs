@@ -522,15 +522,17 @@ namespace SEE.Game.CityRendering
         /// <param name="gameNodes">game nodes to be decorated</param>
         protected void AddDecorations(ICollection<GameObject> gameNodes)
         {
-            AddLabels(gameNodes);
+            AddNames(gameNodes);
 
             foreach (GameObject node in gameNodes)
             {
                 AddGeneralDecorations(node);
             }
 
-            ICollection<GameObject> leafNodes = FindLeafNodes(gameNodes);
-            ICollection<GameObject> innerNodes = FindInnerNodes(gameNodes);
+            IEnumerable<GameObject> leafNodes = FindLeafNodes(gameNodes);
+            IEnumerable<GameObject> innerNodes = FindInnerNodes(gameNodes);
+
+            AddMarkers(gameNodes);
 
             // Add software erosion decorators for all nodes if requested.
             if (Settings.ErosionSettings.ShowInnerErosions)
@@ -546,6 +548,32 @@ namespace SEE.Game.CityRendering
                 ErosionIssues issueDecorator = new(Settings.LeafIssueMap(),
                                                    scaler, Settings.ErosionSettings.ErosionScalingFactor * 5);
                 issueDecorator.Add(leafNodes);
+            }
+        }
+
+        /// <summary>
+        /// Adds markers to all <paramref name="gameNodes"/>.
+        /// </summary>
+        /// <param name="gameNodes">List of gamenodes to be marked</param>
+        private void AddMarkers(ICollection<GameObject> gameNodes)
+        {
+            MarkerFactory markerFactory = new(Settings.MarkerAttributes);
+
+            foreach (GameObject gameNode in gameNodes)
+            {
+                Node node = gameNode.GetNode();
+                if (node.HasToggle(ChangeMarkers.IsNew))
+                {
+                    markerFactory.MarkBorn(gameNode);
+                }
+                else if (node.HasToggle(ChangeMarkers.IsDeleted))
+                {
+                    markerFactory.MarkDead(gameNode);
+                }
+                else if (node.HasToggle(ChangeMarkers.IsChanged))
+                {
+                    markerFactory.MarkChanged(gameNode);
+                }
             }
         }
 
@@ -568,15 +596,18 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Adds the source name as a label to the center of the given game nodes as a child
-        /// for all given <paramref name="gameNodes"/> except for the root (its label would
+        /// Adds the source name to the center of the given game nodes as a child
+        /// for all given <paramref name="gameNodes"/> except for the root (its name would
         /// be too large and is not really neeed anyway).
         /// </summary>
         /// <param name="gameNodes">game nodes whose source name is to be added</param>
-        private void AddLabels(IEnumerable<GameObject> gameNodes)
+        /// <remarks>This name addition is not be confused with ShowLabel. The latter is
+        /// popping up while a node is hovered. This name here is shown all the time.</remarks>
+        private void AddNames(IEnumerable<GameObject> gameNodes)
         {
             const float relativeLabelSize = 0.8f;
             GameObject codeCity = null;
+            AbstractSEECity city = null;
             foreach (GameObject node in gameNodes)
             {
                 Node theNode = node.GetNode();
@@ -586,14 +617,16 @@ namespace SEE.Game.CityRendering
                     float length = Mathf.Min(size.x, size.z);
                     // The text may occupy up to RelativeLabelSize of the length.
                     Vector3 position = node.GetRoofCenter();
-                    GameObject text = TextFactory.GetTextWithWidth(text: theNode.SourceName,
+                    codeCity ??= SceneQueries.GetCodeCity(node.transform).gameObject;
+                    city ??= codeCity.GetComponent<AbstractSEECity>();
+                    GameObject text = TextFactory.GetTextWithWidth(city: city,
+                                                                   text: theNode.SourceName,
                                                                    position: position,
                                                                    width: length * relativeLabelSize,
                                                                    lift: true,
                                                                    textColor: node.GetColor().Invert());
                     text.transform.SetParent(node.transform);
                     AddLOD(text);
-                    codeCity ??= SceneQueries.GetCodeCity(node.transform).gameObject;
                     Portal.SetPortal(codeCity, text);
                 }
             }

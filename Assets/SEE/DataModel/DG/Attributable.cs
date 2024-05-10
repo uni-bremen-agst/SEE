@@ -41,7 +41,7 @@ namespace SEE.DataModel.DG
         /// list, otherwise it is unset. Conceptually, toggleAttributes is a HashSet,
         /// but HashSets are not serialized by Unity. That is why we use List instead.
         /// </summary>
-        private HashSet<string> toggleAttributes = new HashSet<string>();
+        private HashSet<string> toggleAttributes = new();
         public ISet<string> ToggleAttributes => toggleAttributes;
 
         /// <summary>
@@ -66,15 +66,47 @@ namespace SEE.DataModel.DG
             return Version = newVersion;
         }
 
+        /// <summary>
+        /// If <paramref name="value"/> is true, the toggle with <paramref name="attributeName"/>
+        /// will be set, otherwise it will be removed.
+        /// </summary>
+        /// <param name="attributeName">name of toggle attribute</param>
+        /// <param name="value">value to be set</param>
+        /// <remarks>All listeners will be notified in case of a change.</remarks>
+        public void SetToggle(string attributeName, bool value)
+        {
+            if (value)
+            {
+                SetToggle(attributeName);
+            }
+            else
+            {
+                UnsetToggle(attributeName);
+            }
+        }
+
+        /// <summary>
+        /// Removes the toggle attribute with <paramref name="attributeName"/> if not
+        /// already set. All listeners will be notified of this change.
+        /// If the attribute is set already, nothing happens.
+        /// </summary>
+        /// <param name="attributeName">name of toggle attribute</param>
+        /// <remarks>All listeners will be notified in case of a change.</remarks>
         public void SetToggle(string attributeName)
         {
-            if (!toggleAttributes.Contains(attributeName))
+            if (toggleAttributes.Add(attributeName))
             {
-                toggleAttributes.Add(attributeName);
                 Notify(new AttributeEvent<UnitType>(Version, this, attributeName, UnitType.Unit, Addition));
             }
         }
 
+        /// <summary>
+        /// Removes the toggle attribute with <paramref name="attributeName"/> if set.
+        /// All listeners will be notified of this change.
+        /// If no such attribute exists, nothing happens.
+        /// </summary>
+        /// <param name="attributeName">name of toggle attribute</param>
+        /// <remarks>All listeners will be notified in case of a change.</remarks>
         public void UnsetToggle(string attributeName)
         {
             if (toggleAttributes.Contains(attributeName))
@@ -84,6 +116,11 @@ namespace SEE.DataModel.DG
             }
         }
 
+        /// <summary>
+        /// True if the toggle attribute with <paramref name="attributeName"/> is set.
+        /// </summary>
+        /// <param name="attributeName">name of toggle attribute</param>
+        /// <returns>true if set</returns>
         public bool HasToggle(string attributeName)
         {
             return toggleAttributes.Contains(attributeName);
@@ -93,7 +130,7 @@ namespace SEE.DataModel.DG
         // String attributes
         //----------------------------------
 
-        public Dictionary<string, string> StringAttributes { get; private set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> StringAttributes { get; private set; } = new();
 
         /// <summary>
         /// Sets the string attribute with given <paramref name="attributeName"/> to <paramref name="value"/>
@@ -137,7 +174,7 @@ namespace SEE.DataModel.DG
         // Float attributes
         //----------------------------------
 
-        public Dictionary<string, float> FloatAttributes { get; private set; } = new Dictionary<string, float>();
+        public Dictionary<string, float> FloatAttributes { get; private set; } = new();
 
         /// <summary>
         /// Sets the float attribute with given <paramref name="attributeName"/> to <paramref name="value"/>
@@ -182,7 +219,7 @@ namespace SEE.DataModel.DG
         // Integer attributes
         //----------------------------------
 
-        public Dictionary<string, int> IntAttributes { get; private set; } = new Dictionary<string, int>();
+        public Dictionary<string, int> IntAttributes { get; private set; } = new();
 
         /// <summary>
         /// Sets the integer attribute with given <paramref name="attributeName"/> to <paramref name="value"/>
@@ -264,6 +301,100 @@ namespace SEE.DataModel.DG
                 return intValue;
             }
             throw new UnknownAttribute(attributeName);
+        }
+
+        // ------------------------------
+        // Range attributes
+        // ------------------------------
+
+        public const string RangeStartLineSuffix = "_StartLine";
+        public const string RangeStartCharacterSuffix = "_StartCharacter";
+        public const string RangeEndLineSuffix = "_EndLine";
+        public const string RangeEndCharacterSuffix = "_EndCharacter";
+
+        /// <summary>
+        /// Sets the range attribute with given <paramref name="attributeName"/> to <paramref name="value"/>
+        /// if <paramref name="value"/> is different from <c>null</c>. If <paramref name="value"/> is <c>null</c>,
+        /// the attribute will be removed.
+        /// </summary>
+        /// <param name="attributeName">name of the attribute</param>
+        /// <param name="value">new value of the attribute</param>
+        /// <remarks>This method will notify all listeners of this attributable</remarks>
+        public void SetRange(string attributeName, Range value)
+        {
+            if (value == null)
+            {
+                IntAttributes.Remove(attributeName + RangeStartLineSuffix);
+                IntAttributes.Remove(attributeName + RangeStartCharacterSuffix);
+                IntAttributes.Remove(attributeName + RangeEndLineSuffix);
+                IntAttributes.Remove(attributeName + RangeEndCharacterSuffix);
+            }
+            else
+            {
+                IntAttributes[attributeName + RangeStartLineSuffix] = value.StartLine;
+                IntAttributes[attributeName + RangeEndLineSuffix] = value.EndLine;
+                if (value.StartCharacter.HasValue)
+                {
+                    IntAttributes[attributeName + RangeStartCharacterSuffix] = value.StartCharacter.Value;
+                }
+                else
+                {
+                    IntAttributes.Remove(attributeName + RangeStartCharacterSuffix);
+                }
+                if (value.EndCharacter.HasValue)
+                {
+                    IntAttributes[attributeName + RangeEndCharacterSuffix] = value.EndCharacter.Value;
+                }
+                else
+                {
+                    IntAttributes.Remove(attributeName + RangeEndCharacterSuffix);
+                }
+            }
+            Notify(new AttributeEvent<Range>(Version, this, attributeName, value, Addition));
+        }
+
+        public bool TryGetRange(string attributeName, out Range value)
+        {
+            if (IntAttributes.TryGetValue(attributeName + RangeStartLineSuffix, out int startLine) &&
+                IntAttributes.TryGetValue(attributeName + RangeEndLineSuffix, out int endLine))
+            {
+                int? startCharacter, endCharacter;
+                if (IntAttributes.TryGetValue(attributeName + RangeStartCharacterSuffix, out int startCharacterValue))
+                {
+                    startCharacter = startCharacterValue;
+                }
+                else
+                {
+                    startCharacter = null;
+                }
+                if (IntAttributes.TryGetValue(attributeName + RangeEndCharacterSuffix, out int endCharacterValue))
+                {
+                    endCharacter = endCharacterValue;
+                }
+                else
+                {
+                    endCharacter = null;
+                }
+                value = new Range(startLine, endLine, startCharacter, endCharacter);
+                return true;
+            }
+            else
+            {
+                value = null;
+                return false;
+            }
+        }
+
+        public Range GetRange(string attributeName)
+        {
+            if (TryGetRange(attributeName, out Range value))
+            {
+                return value;
+            }
+            else
+            {
+                throw new UnknownAttribute(attributeName);
+            }
         }
 
         /// <summary>
@@ -422,36 +553,6 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Returns true if <paramref name="other"/> meets all of the following conditions:
-        /// (1) is not null
-        /// (2) has exactly the same C# type
-        /// (3) has exactly the same attributes with exactly the same values as this attributable.
-        /// </summary>
-        /// <param name="other">to be compared to</param>
-        /// <returns>true if equal</returns>
-        public override bool Equals(object other)
-        {
-            if (other == null)
-            {
-                Report("other is null");
-                return false;
-            }
-            else if (ReferenceEquals(this, other))
-            {
-                return true;
-            }
-            else if (GetType() != other.GetType())
-            {
-                Report("other has different C# type");
-                return false;
-            }
-            else
-            {
-                return HasSameAttributes(other as Attributable);
-            }
-        }
-
-        /// <summary>
         /// Yields true if this <see cref="Attributable"/> has exactly the same attributes
         /// as <paramref name="other"/>.
         /// </summary>
@@ -501,18 +602,6 @@ namespace SEE.DataModel.DG
         protected static bool AreEqual<V>(IDictionary<string, V> left, IDictionary<string, V> right)
         {
             return left.Count == right.Count && !left.Except(right).Any();
-        }
-
-        /// <summary>
-        /// Returns a hash code.
-        /// </summary>
-        /// <returns>hash code</returns>
-        public override int GetHashCode()
-        {
-            // we are using only those two attribute kinds to avoid unnecessary
-            // computation in the hope that they suffice; nodes and edges should
-            // have some attributes of this kind sufficiently different to others
-            return IntAttributes.GetHashCode() ^ StringAttributes.GetHashCode();
         }
 
         /// <summary>

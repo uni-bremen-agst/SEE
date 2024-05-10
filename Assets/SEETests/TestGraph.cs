@@ -23,7 +23,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void AddingRemovingGraphElements()
         {
-            Graph g = NewGraph();
+            Graph g = NewEmptyGraph();
 
             Node n1 = NewNode(g, "n1");
             Node n2 = NewNode(g, "n2");
@@ -88,7 +88,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void RemoveNode()
         {
-            Graph g = NewGraph();
+            Graph g = NewEmptyGraph();
 
             Node n1 = NewNode(g, "n1");
             Node n2 = NewNode(g, "n2");
@@ -208,7 +208,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void RemoveOrphansBecomeChildren()
         {
-            Graph g = NewGraph();
+            Graph g = NewEmptyGraph();
 
             Node r = NewNode(g, "root");
             Node d = Child(g, r, "toBeDeleted");
@@ -227,7 +227,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void RemoveOrphansBecomeRoots()
         {
-            Graph g = NewGraph();
+            Graph g = NewEmptyGraph();
 
             Node r = NewNode(g, "root");
             Node d = Child(g, r, "toBeDeleted");
@@ -249,7 +249,7 @@ namespace SEE.DataModel.DG
         {
             string t = "Routine";
 
-            Graph g = NewGraph();
+            Graph g = NewEmptyGraph();
             Assert.AreEqual(0, g.MaxDepth);
 
             Node a = NewNode(g, "a", t);
@@ -363,7 +363,7 @@ namespace SEE.DataModel.DG
                                    Func<GraphElement, bool> isRelevant, Func<Graph, Graph> makeSubgraph)
         {
             // Note: This test is rather imperfect and may be improved in the future.
-            Graph g = NewGraph();
+            Graph g = NewEmptyGraph();
 
             Node a = NewNode(g, "a");
             makeIrrelevant(a);
@@ -493,22 +493,22 @@ namespace SEE.DataModel.DG
             Assert.IsNull(Pendant(subgraph, a));
             Assert.IsNull(Pendant(subgraph, b));
             Assert.IsNull(Pendant(subgraph, ba));
-            Node BAA = Pendant(subgraph, baa);
-            Node BB = Pendant(subgraph, bb);
+            Node BAA = Pendant(subgraph, baa) as Node;
+            Node BB = Pendant(subgraph, bb) as Node;
             Assert.IsNull(Pendant(subgraph, bc));
-            Node BCA = Pendant(subgraph, bca);
+            Node BCA = Pendant(subgraph, bca) as Node;
             Assert.IsNull(Pendant(subgraph, bcb));
-            Node BCBA = Pendant(subgraph, bcba);
-            Node BD = Pendant(subgraph, bd);
-            Node C = Pendant(subgraph, c);
+            Node BCBA = Pendant(subgraph, bcba) as Node;
+            Node BD = Pendant(subgraph, bd) as Node;
+            Node C = Pendant(subgraph, c) as Node;
             Assert.IsNull(Pendant(subgraph, d));
-            Node DA = Pendant(subgraph, da);
-            Node E = Pendant(subgraph, e);
-            Node BAAAA = Pendant(subgraph, baaaa);
-            Node BBA = Pendant(subgraph, bba);
-            Node BCAA = Pendant(subgraph, bcaa);
-            Node BCAB = Pendant(subgraph, bcab);
-            Node BDAA = Pendant(subgraph, bdaa);
+            Node DA = Pendant(subgraph, da) as Node;
+            Node E = Pendant(subgraph, e) as Node;
+            Node BAAAA = Pendant(subgraph, baaaa) as Node;
+            Node BBA = Pendant(subgraph, bba) as Node;
+            Node BCAA = Pendant(subgraph, bcaa) as Node;
+            Node BCAB = Pendant(subgraph, bcab) as Node;
+            Node BDAA = Pendant(subgraph, bdaa) as Node;
 
             Assert.That(BAA.IsRoot);
             Assert.That(BB.IsRoot);
@@ -568,7 +568,7 @@ namespace SEE.DataModel.DG
             const string RootType = "Root";
             const string ChildType = "Child";
 
-            Graph g = NewGraph();
+            Graph g = NewEmptyGraph();
 
             Node a = NewNode(g, "a", RootType);
             Node a1 = Child(g, a, "a1", ChildType);
@@ -600,11 +600,11 @@ namespace SEE.DataModel.DG
                 Graph subgraph = g.SubgraphByNodeType(new List<string> { RootType }, false);
                 Assert.AreEqual(g.Nodes().Where(n => n.Type == RootType).Count(), subgraph.NodeCount);
 
-                Node A = Pendant(subgraph, a);
-                Node B = Pendant(subgraph, b);
-                Node C = Pendant(subgraph, c);
-                Node D = Pendant(subgraph, d);
-                Node E = Pendant(subgraph, e);
+                Node A = Pendant(subgraph, a) as Node;
+                Node B = Pendant(subgraph, b) as Node;
+                Node C = Pendant(subgraph, c) as Node;
+                Node D = Pendant(subgraph, d) as Node;
+                Node E = Pendant(subgraph, e) as Node;
 
                 Assert.That(HasEdge(A, A));
                 Assert.That(HasEdge(B, B));
@@ -620,11 +620,11 @@ namespace SEE.DataModel.DG
                 Graph subgraph = g.SubgraphByNodeType(new List<string> { RootType }, true);
                 Assert.AreEqual(g.Nodes().Where(n => n.Type == RootType).Count(), subgraph.NodeCount);
 
-                Node A = Pendant(subgraph, a);
-                Node B = Pendant(subgraph, b);
-                Node C = Pendant(subgraph, c);
-                Node D = Pendant(subgraph, d);
-                Node E = Pendant(subgraph, e);
+                Node A = Pendant(subgraph, a) as Node;
+                Node B = Pendant(subgraph, b) as Node;
+                Node C = Pendant(subgraph, c) as Node;
+                Node D = Pendant(subgraph, d) as Node;
+                Node E = Pendant(subgraph, e) as Node;
 
                 Assert.That(HasEdge(A, A));
                 Assert.That(HasEdge(A, C));
@@ -668,7 +668,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void TestDeleteTreeSingleNode()
         {
-            Graph g = NewGraph();
+            Graph g = NewEmptyGraph();
             Node a = NewNode(g, "a");
             SubgraphMemento subgraph = a.DeleteTree();
             Assert.IsNull(a.ItsGraph);
@@ -688,7 +688,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void TestDeleteTreeSingleNodeAndEdge()
         {
-            Graph g = NewGraph();
+            Graph g = NewEmptyGraph();
             Node a = NewNode(g, "a");
             Edge e = NewEdge(g, a, a);
             SubgraphMemento subgraph = a.DeleteTree();
@@ -712,7 +712,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void TestDeleteTree()
         {
-            Graph g = NewGraph();
+            Graph g = NewEmptyGraph();
             Node a = NewNode(g, "a"); // root
             Node b = Child(g, a, "b"); // child of a, but not descendant of c
             Node c = Child(g, a, "c"); // root of subtree to be deleted
