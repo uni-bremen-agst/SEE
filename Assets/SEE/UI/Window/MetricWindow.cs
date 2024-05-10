@@ -48,7 +48,7 @@ namespace SEE.UI.Window
         {
             // Remove Whitespaces
             searchQuery = searchQuery.Trim();
-            if (searchQuery == null || searchQuery.Trim().Length == 0)
+            if (string.IsNullOrEmpty(searchQuery))
             {
                 foreach (var ele in searchableObjects)
                 {
