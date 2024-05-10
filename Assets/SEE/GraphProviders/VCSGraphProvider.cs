@@ -271,32 +271,29 @@ namespace SEE.GraphProviders
                     string filePath = node.ID.Replace('\\', '/');
                     IEnumerable<SEEToken> tokens;
                     TokenLanguage language;
-                    try
+                    language = TokenLanguage.FromFileExtension(Path.GetExtension(filePath).TrimStart('.'));
+                    if (language == TokenLanguage.Plain)
                     {
-                        language = TokenLanguage.FromFileExtension(Path.GetExtension(filePath).TrimStart('.'), true);
-                        tokens = RetrieveTokens(filePath, repository, commitID, language);
-                        int complexity = CalculateMcCabeComplexity(tokens);
-                        int linesOfCode = CalculateLinesOfCode(tokens);
-                        halsteadMetrics = CalculateHalsteadMetrics(tokens);
-                        node.SetInt("Lines of Code", linesOfCode);
-                        node.SetInt("McCabe Complexity", complexity);
-                        node.SetInt("Halstead Distinct Operators", halsteadMetrics.DistinctOperators);
-                        node.SetInt("Halstead Distinct Operands", halsteadMetrics.DistinctOperands);
-                        node.SetInt("Halstead Total Operators", halsteadMetrics.TotalOperators);
-                        node.SetInt("Halstead Total Operands", halsteadMetrics.TotalOperands);
-                        node.SetInt("Halstead Program Vocabulary", halsteadMetrics.ProgramVocabulary);
-                        node.SetInt("Halstead Program Length", halsteadMetrics.ProgramLength);
-                        node.SetFloat("Halstead Calculated Estimated Program Length", halsteadMetrics.EstimatedProgramLength);
-                        node.SetFloat("Halstead Volume", halsteadMetrics.Volume);
-                        node.SetFloat("Halstead Difficulty", halsteadMetrics.Difficulty);
-                        node.SetFloat("Halstead Effort", halsteadMetrics.Effort);
-                        node.SetFloat("Halstead Time Required to Program", halsteadMetrics.TimeRequiredToProgram);
-                        node.SetFloat("Halstead Number of Delivered Bugs", halsteadMetrics.NumberOfDeliveredBugs);
+                            continue;
                     }
-                    catch
-                    {
-
-                    }
+                    tokens = RetrieveTokens(filePath, repository, commitID, language);
+                    int complexity = CalculateMcCabeComplexity(tokens);
+                    int linesOfCode = CalculateLinesOfCode(tokens);
+                    halsteadMetrics = CalculateHalsteadMetrics(tokens);
+                    node.SetInt("Lines of Code", linesOfCode);
+                    node.SetInt("McCabe Complexity", complexity);
+                    node.SetInt("Halstead Distinct Operators", halsteadMetrics.DistinctOperators);
+                    node.SetInt("Halstead Distinct Operands", halsteadMetrics.DistinctOperands);
+                    node.SetInt("Halstead Total Operators", halsteadMetrics.TotalOperators);
+                    node.SetInt("Halstead Total Operands", halsteadMetrics.TotalOperands);
+                    node.SetInt("Halstead Program Vocabulary", halsteadMetrics.ProgramVocabulary);
+                    node.SetInt("Halstead Program Length", halsteadMetrics.ProgramLength);
+                    node.SetFloat("Halstead Calculated Estimated Program Length", halsteadMetrics.EstimatedProgramLength);
+                    node.SetFloat("Halstead Volume", halsteadMetrics.Volume);
+                    node.SetFloat("Halstead Difficulty", halsteadMetrics.Difficulty);
+                    node.SetFloat("Halstead Effort", halsteadMetrics.Effort);
+                    node.SetFloat("Halstead Time Required to Program", halsteadMetrics.TimeRequiredToProgram);
+                    node.SetFloat("Halstead Number of Delivered Bugs", halsteadMetrics.NumberOfDeliveredBugs);
                 }
             }
         }
@@ -374,7 +371,7 @@ namespace SEE.GraphProviders
             HashSet<string> operators = new(tokens.Where(t => t.TokenType == SEEToken.Type.Punctuation).Select(t => t.Text));
 
             // Count the total number of operands and operators.
-            int totalOperands = tokens.Count(t => t.TokenType == SEEToken.Type.Identifier || t.TokenType == SEEToken.Type.Keyword || t.TokenType == SEEToken.Type.NumberLiteral || t.TokenType == SEEToken.Type.StringLiteral);
+            int totalOperands = tokens.Count(t => operandTypes.Contains(t.TokenType));
             int totalOperators = tokens.Count(t => t.TokenType == SEEToken.Type.Punctuation);
 
             // Derivative Halstead metrics.
@@ -388,6 +385,7 @@ namespace SEE.GraphProviders
             float numberOfDeliveredBugs = volume / 3000.0f; // Formula: Bugs B = effort E^(2/3) / 3000 or bugs B = volume V / 3000 are both used. 3000 is an empirical estimate.
 
             return new HalsteadMetrics(
+
                 operators.Count,
                 operands.Count,
                 totalOperators,
