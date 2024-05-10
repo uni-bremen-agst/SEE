@@ -174,14 +174,14 @@ namespace SEE.UI.Window
         private static void DisplayAttributes<T>(Dictionary<string, T> attributes, GameObject metricWindowObject)
         {
             Transform scrollViewContent = metricWindowObject.transform.Find("Content/Items").transform;
-            foreach (KeyValuePair<string, T> kvp in attributes)
+            foreach ((string name, T value) in attributes)
             {
                 // Create GameObject
                 GameObject metricRow = PrefabInstantiator.InstantiatePrefab(ItemPrefab, scrollViewContent, false);
                 // Attribute Name
-                Attribute(metricRow).text = kvp.Key;
+                Attribute(metricRow).text = name;
                 // Value Name
-                Value(metricRow).text = kvp.Value.ToString();
+                Value(metricRow).text = value.ToString();
             }
         }
 
