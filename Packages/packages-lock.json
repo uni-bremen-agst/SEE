@@ -155,7 +155,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.netcode.gameobjects": {
-      "version": "1.8.1",
+      "version": "1.9.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {
