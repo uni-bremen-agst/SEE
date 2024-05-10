@@ -125,7 +125,7 @@ namespace SEE.UI.Window
         /// <remarks>Assumes that the attribute name is stored in the second child of the metric row.</remarks>
         private static TextMeshProUGUI Value(GameObject metricRow)
         {
-            return metricRow.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+            return metricRow.transform.GetChild(1).MustGetComponent<TextMeshProUGUI>();
         }
 
         /// <summary>
