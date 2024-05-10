@@ -3,7 +3,7 @@ using SEE.DataModel.DG;
 
 namespace SEE.Utils
 {
-    public class GraphUtils
+    public static class GraphUtils
     {
         /// <summary>
         /// Creates and returns a new node to <paramref name="graph"/>.
@@ -13,7 +13,7 @@ namespace SEE.Utils
         /// <param name="type">Type of the new node</param>
         /// <param name="name">The source name of the node</param>
         /// <returns>a new node added to <paramref name="graph"/></returns>
-        public static Node NewNode(Graph graph, string id, string type = "Routine", string name = null)
+        public static Node NewNode(this Graph graph, string id, string type = "Routine", string name = null)
         {
             Node result = new()
             {
@@ -40,60 +40,52 @@ namespace SEE.Utils
             string[] pathSegments = path.Split(Path.AltDirectorySeparatorChar);
             string nodePath = string.Join(Path.AltDirectorySeparatorChar.ToString(), pathSegments, 1,
                 pathSegments.Length - 1);
+
             // Current pathSegment is in the main directory.
             if (parentPath == null)
             {
+                Node currentSegmentNode = graph.GetNode(pathSegments[0]);
+
                 // Directory already exists.
-                if (graph.GetNode(pathSegments[0]) != null)
+                if (currentSegmentNode != null)
                 {
-                    return BuildGraphFromPath(nodePath, graph.GetNode(pathSegments[0]), pathSegments[0], graph,
+                    return BuildGraphFromPath(nodePath, currentSegmentNode, pathSegments[0], graph,
                         mainNode);
                 }
 
                 // Directory does not exist.
-                if (graph.GetNode(pathSegments[0]) == null && pathSegments.Length > 1 && parent == null)
+                if (currentSegmentNode == null && pathSegments.Length > 1 && parent == null)
                 {
-                    mainNode.AddChild(NewNode(graph, pathSegments[0], "directory", pathSegments[0]));
-                    return BuildGraphFromPath(nodePath, graph.GetNode(pathSegments[0]), pathSegments[0], graph,
-                        mainNode);
-                }
-
-                // I dont know, if this code ever gets used -> I dont know, how to handle empty directorys.
-                if (graph.GetNode(pathSegments[0]) == null && pathSegments.Length == 1 && parent == null)
-                {
-                    mainNode.AddChild(NewNode(graph, pathSegments[0], "directory", pathSegments[0]));
-                    return null;
+                    mainNode.AddChild(graph.NewNode(pathSegments[0], "directory", pathSegments[0]));
+                    return BuildGraphFromPath(nodePath, graph.GetNode(pathSegments[0]), pathSegments[0], graph, mainNode);
                 }
             }
 
             // Current pathSegment is not in the main directory.
             if (parentPath != null)
             {
+                string currentPathSegment = parentPath + Path.DirectorySeparatorChar + pathSegments[0];
+                Node currentPathSegmentNode = graph.GetNode(currentPathSegment);
+
                 // The node for the current pathSegment exists.
-                if (graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]) != null)
+                if (currentPathSegmentNode != null)
                 {
-                    return BuildGraphFromPath(nodePath,
-                        graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]),
-                        parentPath + Path.DirectorySeparatorChar + pathSegments[0], graph, mainNode);
+                    return BuildGraphFromPath(nodePath, currentPathSegmentNode, currentPathSegment, graph, mainNode);
                 }
 
                 // The node for the current pathSegment does not exist, and the node is a directory.
-                if (graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]) == null &&
+                if (currentPathSegmentNode == null &&
                     pathSegments.Length > 1)
                 {
-                    parent.AddChild(NewNode(graph, parentPath + Path.DirectorySeparatorChar + pathSegments[0],
-                        "directory", pathSegments[0]));
-                    return BuildGraphFromPath(nodePath,
-                        graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]),
-                        parentPath + Path.DirectorySeparatorChar + pathSegments[0], graph, mainNode);
+                    parent.AddChild(graph.NewNode(currentPathSegment, "directory", pathSegments[0]));
+                    return BuildGraphFromPath(nodePath, graph.GetNode(currentPathSegment), currentPathSegment, graph, mainNode);
                 }
 
-                // The node for the current pathSegment does not exist, and the node is file.
-                if (graph.GetNode(parentPath + Path.DirectorySeparatorChar + pathSegments[0]) == null &&
+                // The node for the current pathSegment does not exist, and the node is a file.
+                if (currentPathSegmentNode == null &&
                     pathSegments.Length == 1)
                 {
-                    Node addedFileNode = NewNode(graph, parentPath + Path.DirectorySeparatorChar + pathSegments[0],
-                        "file", pathSegments[0]);
+                    Node addedFileNode = graph.NewNode(currentPathSegment, "file", pathSegments[0]);
                     parent.AddChild(addedFileNode);
                     return addedFileNode;
                 }

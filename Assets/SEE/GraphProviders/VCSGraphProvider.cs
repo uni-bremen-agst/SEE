@@ -81,7 +81,7 @@ namespace SEE.GraphProviders
             }
             if (string.IsNullOrEmpty(CommitID))
             {
-                throw new ArgumentException("Empty newCommitID.\n");
+                throw new ArgumentException("Empty CommitID.\n");
             }
             if (city == null)
             {
@@ -96,21 +96,21 @@ namespace SEE.GraphProviders
         /// <param name="repositoryPath">The path to the repository.</param>
         /// <param name="commitID">The commitID where the files exist.</param>
         /// <returns>the graph.</returns>
-        static Graph GetVCSGraph(Dictionary<string, bool> pathGlobbing, string repositoryPath, string commitID)
+        private static Graph GetVCSGraph(Dictionary<string, bool> pathGlobbing, string repositoryPath, string commitID)
         {
             string[] pathSegments = repositoryPath.Split(Path.DirectorySeparatorChar);
 
             Graph graph = new(repositoryPath, pathSegments[^1]);
 
             // The main directory.
-            GraphUtils.NewNode(graph, pathSegments[^1], "directory", pathSegments[^1]);
+            graph.NewNode(pathSegments[^1], "directory", pathSegments[^1]);
 
-            IEnumerable<string> includedFiles = pathGlobbing
-                .Where(path => path.Value == true)
+            IEnumerable<string> includedPathGlobs = pathGlobbing
+                .Where(path => path.Value)
                 .Select(path => path.Key);
 
-            IEnumerable<string> excludedFiles = pathGlobbing
-                .Where(path => path.Value == false)
+            IEnumerable<string> excludedPathGlobs = pathGlobbing
+                .Where(path => !path.Value)
                 .Select(path => path.Key);
 
             using (Repository repo = new(repositoryPath))
@@ -118,19 +118,18 @@ namespace SEE.GraphProviders
                 LibGit2Sharp.Tree tree = repo.Lookup<Commit>(commitID).Tree;
                 // Get all files using "git ls-tree -r <CommitID> --name-only".
                 IEnumerable<string> files;
-                if (includedFiles.Any() && !string.IsNullOrEmpty(includedFiles.First()))
+                if (includedPathGlobs.Any() && !string.IsNullOrEmpty(includedPathGlobs.First()))
                 {
-                    files = ListTree(tree).Where(path => includedFiles.Contains(Path.GetExtension(path)));
+                    files = ListTree(tree).Where(path => includedPathGlobs.Contains(Path.GetExtension(path)));
                 }
-                else if (excludedFiles.Any())
+                else if (excludedPathGlobs.Any())
                 {
-                    files = ListTree(tree).Where(path => !excludedFiles.Contains(Path.GetExtension(path)));
+                    files = ListTree(tree).Where(path => !excludedPathGlobs.Contains(Path.GetExtension(path)));
                 }
                 else
                 {
                     files = ListTree(tree);
                 }
-
                 // Build the graph structure.
                 foreach (string filePath in files.Where(path => !string.IsNullOrEmpty(path)))
                 {
@@ -138,9 +137,9 @@ namespace SEE.GraphProviders
                     // Files in the main directory.
                     if (filePathSegments.Length == 1)
                     {
-                        graph.GetNode(pathSegments[^1]).AddChild(GraphUtils.NewNode(graph, filePath, "file", filePath));
+                        graph.GetNode(pathSegments[^1]).AddChild(graph.NewNode(filePath, "file", filePath));
                     }
-                    // Other directorys/files.
+                    // Other directories/files.
                     else
                     {
                         GraphUtils.BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(pathSegments[^1]));
@@ -158,7 +157,7 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="tree">The tree of the given commit.</param>
         /// <returns>a list of paths.</returns>
-        static IEnumerable<string> ListTree(LibGit2Sharp.Tree tree)
+        private static IEnumerable<string> ListTree(LibGit2Sharp.Tree tree)
         {
             List<string> fileList = new();
 
@@ -182,6 +181,7 @@ namespace SEE.GraphProviders
         {
             return GraphProviderKind.VCS;
         }
+
         /// <summary>
         /// Label of attribute <see cref="PathGlobbing"/> in the configuration file.
         /// </summary>
@@ -195,26 +195,22 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Label of attribute <see cref="NewCommitID"/> in the configuration file.
         /// </summary>
-        private const string newCommitIDLabel = "NewCommitID";
+        private const string commitIDLabel = "CommitID";
 
         protected override void SaveAttributes(ConfigWriter writer)
         {
             Dictionary<string, bool> pathGlobbing = string.IsNullOrEmpty(PathGlobbing.ToString()) ? null : PathGlobbing;
             writer.Save(pathGlobbing, pathGlobbingLabel);
-            writer.Save(CommitID, newCommitIDLabel);
+            writer.Save(CommitID, commitIDLabel);
             RepositoryPath.Save(writer, repositoryPathLabel);
         }
 
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
             ConfigIO.Restore(attributes, pathGlobbingLabel, ref PathGlobbing);
-            ConfigIO.Restore(attributes, newCommitIDLabel, ref CommitID);
+            ConfigIO.Restore(attributes, commitIDLabel, ref CommitID);
             RepositoryPath.Restore(attributes, repositoryPathLabel);
         }
-
- 
-
-       
 
         /// <summary>
         /// Creates and returns a new node to <paramref name="graph"/> as a child of <paramref name="parent"/>.
@@ -253,7 +249,7 @@ namespace SEE.GraphProviders
             }
             else
             {
-                // Token does not exist.
+                // Blob does not exist.
                 return Enumerable.Empty<SEEToken>();
             }
         }
