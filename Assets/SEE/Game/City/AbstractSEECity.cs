@@ -291,7 +291,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Returns the material for the line connecting a node and its label.
         /// </summary>
-        /// <param name="lineColor"></param>
+        /// <param name="lineColor">the color for the requested line material</param>
         /// <returns>a new material for the line connecting a node and its label</returns>
         private static Material LineMaterial(Color lineColor)
         {
