@@ -1,6 +1,4 @@
 ﻿using System;
-using JetBrains.Annotations;
-using SEE.DataModel.DG;
 
 namespace SEE.GraphProviders
 {
@@ -26,10 +24,10 @@ namespace SEE.GraphProviders
                 GraphProviderKind.GXL => new GXLGraphProvider() as GraphProvider<T>,
                 GraphProviderKind.CSV => new CSVGraphProvider() as GraphProvider<T>,
                 GraphProviderKind.Reflexion => new ReflexionGraphProvider() as GraphProvider<T>,
-                GraphProviderKind.Pipeline => new PipelineGraphProvider() as GraphProvider<T>,
+                GraphProviderKind.Pipeline => new PipelineGraphProvider<T>(),
                 GraphProviderKind.JaCoCo => new JaCoCoGraphProvider() as GraphProvider<T>,
                 GraphProviderKind.VCS => new VCSGraphProvider() as GraphProvider<T>,
-                GraphProviderKind.GitHistory => new GitEvolutionGraphProvider() as GraphProvider<T>
+                GraphProviderKind.GitHistory => new GitEvolutionGraphProvider() as GraphProvider<T>,
                 _ => throw new NotImplementedException($"Not implemented for {kind}")
             };
         }

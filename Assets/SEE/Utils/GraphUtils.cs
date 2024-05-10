@@ -22,7 +22,7 @@ namespace SEE.Utils
                 SourceName = name,
                 ID = id,
                 Type = type,
-                SourceLength = length
+                //SourceLength = length
             };
 
             graph.AddNode(result);

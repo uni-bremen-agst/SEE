@@ -7,6 +7,7 @@ using SEE.Utils.Paths;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -147,7 +148,7 @@ namespace SEE.GraphProviders
             };
         }
 
-        private static void AreEqualJaCoCoGraphProviders(JaCoCoGraphProvider saved, GraphProvider loaded)
+        private static void AreEqualJaCoCoGraphProviders(JaCoCoGraphProvider saved, GraphProvider<Graph> loaded)
         {
             Assert.IsTrue(saved.GetType() == loaded.GetType());
             JaCoCoGraphProvider loadedProvider = loaded as JaCoCoGraphProvider;
@@ -256,7 +257,7 @@ namespace SEE.GraphProviders
             };
         }
 
-        private static void AreEqualDiffMergeGraphProviders(MergeDiffGraphProvider saved, GraphProvider loaded)
+        private static void AreEqualDiffMergeGraphProviders(MergeDiffGraphProvider saved, GraphProvider<Graph> loaded)
         {
             Assert.IsTrue(saved.GetType() == loaded.GetType());
             MergeDiffGraphProvider loadedProvider = loaded as MergeDiffGraphProvider;
@@ -265,6 +266,28 @@ namespace SEE.GraphProviders
 
         #endregion
 
+        private VCSGraphProvider GetVCSGraphProvider()
+        {
+            return new VCSGraphProvider()
+            {
+                RepositoryPath = new DirectoryPath(System.IO.Path.GetDirectoryName(Application.dataPath)),
+                CommitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461",
+            };
+        }
+        private static T NewVanillaSEECity<T>() where T : Component
+        {
+            return new GameObject().AddComponent<T>();
+        }
+        
+        public async System.Threading.Tasks.Task<Graph> GetVCSGraphAsync()
+        {
+            VCSGraphProvider saved = GetVCSGraphProvider();
+            SEECity testCity = NewVanillaSEECity<SEECity>(); ;
+            Graph testGraph = new("test", "test");
+            Graph graph = await saved.ProvideAsync(testGraph, testCity);
+            return graph;
+        }
+        
         [Test]
         public void TestVCSGraphProvider()
         {
@@ -309,7 +332,7 @@ namespace SEE.GraphProviders
             Assert.IsTrue(actualList.SequenceEqual(pathsFromGraph));
         }
 
-        private GraphProvider Load()
+        private GraphProvider<Graph> Load()
         {
             using ConfigReader stream = new(filename);
             GraphProvider<Graph> loaded = GraphProvider<Graph>.Restore(stream.Read(), providerLabel);

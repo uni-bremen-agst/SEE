@@ -645,7 +645,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     CreateTypeField(parent, value as GraphProvider<Graph>);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
-                case AllBranchesGitProvider:
+                case AllBranchGitProvider:
                     parent = CreateNestedSetting(settingName, parent);
                     CreateTypeField(parent, value as GraphProvider<Graph>);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));

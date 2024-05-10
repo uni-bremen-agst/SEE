@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using LibGit2Sharp;
 using SEE.DataModel.DG;
@@ -32,7 +33,9 @@ namespace SEE.GraphProviders
          Tooltip("The date until commits should be analysed (DD-MM-YYYY)"), RuntimeTab(GraphProviderFoldoutGroup)]
         public string Date = "";
 
-        public override UniTask<List<Graph>> ProvideAsync(List<Graph> graph, AbstractSEECity city) =>
+        public override UniTask<List<Graph>> ProvideAsync(List<Graph> graph, AbstractSEECity city,
+            Action<float> changePercentage = null,
+            CancellationToken token = default) =>
             UniTask.FromResult(GetGraph(graph));
 
 
@@ -137,13 +140,12 @@ namespace SEE.GraphProviders
             return graph;
         }
 
-        
-        
-        
+
         private List<PatchEntryChanges> GetFileChanges(Commit commit, Repository repo)
         {
             return repo.Diff.Compare<Patch>(commit.Tree, commit.Parents.First().Tree).Select(x => x).ToList();
         }
+
 
         public override GraphProviderKind GetKind()
         {

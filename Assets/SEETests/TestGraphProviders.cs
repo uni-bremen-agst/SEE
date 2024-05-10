@@ -17,7 +17,7 @@ namespace SEE.GraphProviders
         public IEnumerator TestGXLGraphProvider() =>
             UniTask.ToCoroutine(async () =>
             {
-                GraphProvider provider = new GXLGraphProvider()
+                GraphProvider<Graph> provider = new GXLGraphProvider()
                 { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
 
                 GameObject go = new();
@@ -36,21 +36,21 @@ namespace SEE.GraphProviders
                 GameObject go = new();
                 SEECity city = go.AddComponent<SEECity>();
 
-                PipelineGraphProvider pipeline = new();
+                PipelineGraphProvider<Graph> pipeline = new();
 
                 {
-                    GraphProvider provider = new GXLGraphProvider()
+                    GraphProvider<Graph> provider = new GXLGraphProvider()
                     { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
                     pipeline.Add(provider);
                 }
                 {
-                    GraphProvider provider = new JaCoCoGraphProvider()
+                    GraphProvider<Graph> provider = new JaCoCoGraphProvider()
                     { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/jacoco.xml") };
                     pipeline.Add(provider);
                 }
 
                 {
-                    GraphProvider provider = new CSVGraphProvider()
+                    GraphProvider<Graph> provider = new CSVGraphProvider()
                     { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.csv") };
                     pipeline.Add(provider);
                 }
@@ -84,14 +84,14 @@ namespace SEE.GraphProviders
                     // Newer graph
                     Graph graph;
                     {
-                        GraphProvider provider = new GXLGraphProvider()
+                        GraphProvider<Graph> provider = new GXLGraphProvider()
                         { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mini-evolution/CodeFacts-5.gxl") };
                         graph = await provider.ProvideAsync(new Graph(""), city);
                     }
 
                     {
                         // Older graph
-                        GraphProvider provider = new GXLGraphProvider()
+                        GraphProvider<Graph> provider = new GXLGraphProvider()
                         { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mini-evolution/CodeFacts-1.gxl") };
 
                         MergeDiffGraphProvider mergeDiffProvider = new()

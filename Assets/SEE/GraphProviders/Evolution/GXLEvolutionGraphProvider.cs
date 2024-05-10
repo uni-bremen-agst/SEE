@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
@@ -36,7 +38,9 @@ namespace SEE.GraphProviders
          FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
         public int MaxRevisionsToLoad = 500; // serialized by Unity
 
-        public override UniTask<List<Graph>> ProvideAsync(List<Graph> graph, AbstractSEECity city) =>
+        public override UniTask<List<Graph>> ProvideAsync(List<Graph> graph, AbstractSEECity city,
+            Action<float> changePercentage = null,
+            CancellationToken token = default) =>
             UniTask.FromResult(LoadGraph(city));
 
         private List<Graph> LoadGraph(AbstractSEECity city)
@@ -46,6 +50,7 @@ namespace SEE.GraphProviders
                 rootName: GXLDirectory.Path, MaxRevisionsToLoad);
             return reader.Graphs;
         }
+
 
         public override GraphProviderKind GetKind() => GraphProviderKind.GXLEvolution;
 

@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 using SEE.Utils;
 using SEE.UI.Window.CodeWindow;
@@ -33,7 +34,8 @@ namespace SEE.GraphProviders
         /// Loads the metrics and nodes from the given git repository and commitID into the <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">The graph into which the metrics shall be loaded</param>
-        public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
+        public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city, Action<float> changePercentage = null,
+            CancellationToken token = default)
         {
             CheckArguments(city);
             UniTask<Graph> graphTask =
@@ -166,6 +168,8 @@ namespace SEE.GraphProviders
 
             return fileList;
         }
+
+
 
         public override GraphProviderKind GetKind()
         {

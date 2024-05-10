@@ -22,7 +22,7 @@ namespace SEE.GraphProviders
     /// <summary>
     /// A graph provider that uses a language server to create a graph.
     /// </summary>
-    public class LSPGraphProvider : GraphProvider
+    public class LSPGraphProvider : GraphProvider<Graph>
     {
         /// <summary>
         /// The path to the software project for which the graph shall be generated.

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using LibGit2Sharp;
 using SEE.DataModel.DG;
@@ -43,7 +44,9 @@ namespace SEE.GraphProviders
 
         #endregion
 
-        public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
+        public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
+            Action<float> changePercentage = null,
+            CancellationToken token = default)
         {
             UniTask<Graph> graphTask = UniTask.FromResult(GetGraph(graph));
 
@@ -222,6 +225,7 @@ namespace SEE.GraphProviders
         //         return current.Children().First(x => x.ID == pathSplit.First());
         //     }
         // }
+
 
         public override GraphProviderKind GetKind()
         {
