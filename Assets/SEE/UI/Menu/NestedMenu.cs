@@ -227,7 +227,10 @@ namespace SEE.UI.Menu
                 // and the level must be reset to the top.
                 if (!ShowMenu)
                 {
-                    searchInput.text = string.Empty;
+                    if (searchInput)
+                    {
+                        searchInput.text = string.Empty;
+                    }
                     ResetToBase();
                 }
             };
