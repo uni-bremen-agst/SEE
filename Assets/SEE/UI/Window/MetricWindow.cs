@@ -150,8 +150,8 @@ namespace SEE.UI.Window
             Transform scrollViewContent = metricWindowObject.transform.Find("Content/Items").transform;
             TMP_InputField inputField = metricWindowObject.transform.Find("Search/SearchField").gameObject.MustGetComponent<TMP_InputField>();
 
-            inputField.onSelect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = false);
-            inputField.onDeselect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = true);
+            inputField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
+            inputField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
 
             // Int Attributes
             DisplayAttributes(GraphElement.IntAttributes, metricWindowObject);
