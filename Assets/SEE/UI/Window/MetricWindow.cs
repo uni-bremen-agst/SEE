@@ -82,11 +82,7 @@ namespace SEE.UI.Window
         /// <returns> the attributes whose names match the <paramref name="query"/> </returns>
         public IEnumerable<string> Search(string query, GameObject[] gameObjects, int limit = 15, int cutoff = 40)
         {
-            List<string> attributesList = new();
-            foreach (GameObject obj in gameObjects)
-            {
-                attributesList.Add(AttributeName(obj));
-            }
+            List<string> attributesList = gameObjects.Select(AttributeName).ToList();
             IEnumerable<(int score, string attribute)> searchResults
                 = Process.ExtractTop(query, attributesList, limit: limit, cutoff: cutoff).Select(x => (x.Score, x.Value));
             searchResults = searchResults.OrderByDescending(x => x.score);
