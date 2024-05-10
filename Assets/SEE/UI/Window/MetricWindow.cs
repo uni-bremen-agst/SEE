@@ -159,7 +159,7 @@ namespace SEE.UI.Window
             // Float Attributes
             DisplayAttributes(GraphElement.FloatAttributes, metricWindowObject);
 
-            // Save GameObjects in Array for SearchField
+            // Save GameObjects in dictionary for SearchField
             Dictionary<string, GameObject> activeElements = new();
             foreach (Transform child in scrollViewContent)
             {
