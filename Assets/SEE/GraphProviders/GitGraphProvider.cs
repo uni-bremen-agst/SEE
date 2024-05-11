@@ -12,7 +12,7 @@ using System.Threading;
 namespace SEE.GraphProviders
 {
     /// <summary>
-    /// Calculates metrics between 2 revisions from a git repository and adds these to a graph.
+    /// Calculates metrics between two revisions from a git repository and adds these to a graph.
     /// </summary>
     [Serializable]
     public class GitGraphProvider : GraphProvider
@@ -33,7 +33,7 @@ namespace SEE.GraphProviders
         private string NewRevision = string.Empty;
 
         /// <summary>
-        /// Calculates metrics between 2 revisions from a git repository and adds these to <paramref name="graph"/>.
+        /// Calculates metrics between two revisions from a git repository and adds these to <paramref name="graph"/>.
         /// The resulting graph is returned.
         /// </summary>
         /// <param name="graph">an existing graph where to add the metrics</param>
@@ -56,10 +56,15 @@ namespace SEE.GraphProviders
             }
             else
             {
-                AddLineofCodeChurnMetric(graph, VCSPath, OldRevision, NewRevision);
-                AddNumberofDevelopersMetric(graph, VCSPath, OldRevision, NewRevision);
-                AddCommitFrequencyMetric(graph, VCSPath, OldRevision, NewRevision);
+                using (Repository repo = new(VCSPath))
+                {
+                    Commit OldCommit = repo.Lookup<Commit>(OldRevision);
+                    Commit NewCommit = repo.Lookup<Commit>(NewRevision);
 
+                    AddLineofCodeChurnMetric(graph, VCSPath, OldCommit, NewCommit);
+                    AddNumberofDevelopersMetric(graph, VCSPath, OldCommit, NewCommit);
+                    AddCommitFrequencyMetric(graph, VCSPath, OldCommit, NewCommit);
+                }
                 return UniTask.FromResult(graph);
             }
         }
@@ -149,25 +154,22 @@ namespace SEE.GraphProviders
         /// Calculates the number of lines of code added and deleted for each file changed between two commits and adds them as metrics to <paramref name="graph"/>.
         /// <param name="graph">an existing graph where to add the metrics</param>
         /// <param name="vcsPath">the path to the VCS containing the two revisions to be compared</param>
-        /// <param name="oldRevision">the older revision that constitutes the baseline of the comparison</param>
-        /// <param name="newRevision">the newer revision against which the <see cref="oldRevision"/> is to be compared</param>
-        protected void AddLineofCodeChurnMetric(Graph graph, string vcsPath, string oldRevision, string newRevision)
+        /// <param name="oldCommit">the older commit that constitutes the baseline of the comparison</param>
+        /// <param name="newCommit">the newer commit against which the <see cref="oldCommit"/> is to be compared</param>
+        protected void AddLineofCodeChurnMetric(Graph graph, string vcsPath, Commit oldCommit, Commit newCommit)
         {
-            using (var repo = new Repository(vcsPath))
+            using (Repository repo = new(vcsPath))
             {
-                var oldCommit = repo.Lookup<Commit>(oldRevision);
-                var newCommit = repo.Lookup<Commit>(newRevision);
+                Patch changes = repo.Diff.Compare<Patch>(oldCommit.Tree, newCommit.Tree);
 
-                var changes = repo.Diff.Compare<Patch>(oldCommit.Tree, newCommit.Tree);
-
-                foreach (var change in changes)
+                foreach (PatchEntryChanges change in changes)
                 {
-                    foreach (var node in graph.Nodes())
+                    foreach (Node node in graph.Nodes())
                     {
                         if (node.ID.Replace('\\', '/') == change.Path)
                         {
-                            node.SetInt("Lines Added", change.LinesAdded);
-                            node.SetInt("Lines Deleted", change.LinesDeleted);
+                            node.SetInt(Git.LinesAdded, change.LinesAdded);
+                            node.SetInt(Git.LinesDeleted, change.LinesDeleted);
                         }
                     }
                 }
@@ -179,49 +181,46 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="graph">an existing graph where to add the metrics</param>
         /// <param name="vcsPath">the path to the VCS containing the two revisions to be compared</param>
-        /// <param name="oldRevision">the older revision that constitutes the baseline of the comparison</param>
-        /// <param name="newRevision">the newer revision against which the <see cref="oldRevision"/> is to be compared</param>
-        protected void AddNumberofDevelopersMetric(Graph graph, string vcsPath, string oldRevision, string newRevision)
+        /// <param name="oldCommit">the older commit that constitutes the baseline of the comparison</param>
+        /// <param name="newCommit">the newer commit against which the <see cref="oldCommit"/> is to be compared</param>
+        protected void AddNumberofDevelopersMetric(Graph graph, string vcsPath, Commit oldCommit, Commit newCommit)
         {
-            using (var repo = new Repository(vcsPath))
+            using (Repository repo = new(vcsPath))
             {
-                var oldCommit = repo.Lookup<Commit>(oldRevision);
-                var newCommit = repo.Lookup<Commit>(newRevision);
+                ICommitLog commits = repo.Commits.QueryBy(new CommitFilter { SortBy = CommitSortStrategies.Topological });
 
-                var commits = repo.Commits.QueryBy(new CommitFilter { SortBy = CommitSortStrategies.Topological });
+                Dictionary<string, HashSet<string>> uniqueContributorsPerFile = new();
 
-                var uniqueContributorsPerFile = new Dictionary<string, HashSet<string>>();
-
-                foreach (var commit in commits)
+                foreach (Commit commit in commits)
                 {
                     if (commit.Author.When >= oldCommit.Author.When && commit.Author.When <= newCommit.Author.When)
                     {
-                        foreach (var parent in commit.Parents)
+                        foreach (Commit parent in commit.Parents)
                         {
-                            var changes = repo.Diff.Compare<Patch>(parent.Tree, commit.Tree);
+                            Patch changes = repo.Diff.Compare<Patch>(parent.Tree, commit.Tree);
 
-                            foreach (var change in changes)
+                            foreach (PatchEntryChanges change in changes)
                             {
-                                var filePath = change.Path;
-                                var id = commit.Author.Email;
+                                string filePath = change.Path;
+                                string id = commit.Author.Email;
 
                                 if (!uniqueContributorsPerFile.ContainsKey(filePath))
                                 {
                                     uniqueContributorsPerFile[filePath] = new HashSet<string>();
                                 }
-
                                 uniqueContributorsPerFile[filePath].Add(id);
                             }
                         }
                     }
                 }
-                foreach (var entry in uniqueContributorsPerFile)
+
+                foreach (KeyValuePair<string, HashSet<string>> entry in uniqueContributorsPerFile)
                 {
-                    foreach (var node in graph.Nodes())
+                    foreach (Node node in graph.Nodes())
                     {
                         if (node.ID.Replace('\\', '/') == entry.Key)
                         {
-                            node.SetInt("Number of Developers", entry.Value.Count);
+                            node.SetInt(Git.NumberOfDevelopers, entry.Value.Count);
                         }
                     }
                 }
@@ -233,46 +232,49 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="graph">an existing graph where to add the metrics</param>
         /// <param name="vcsPath">the path to the VCS containing the two revisions to be compared</param>
-        /// <param name="oldRevision">the older revision that constitutes the baseline of the comparison</param>
-        /// <param name="newRevision">the newer revision against which the <see cref="oldRevision"/> is to be compared</param>
-        protected void AddCommitFrequencyMetric(Graph graph, string vcsPath, string oldRevision, string newRevision)
+        /// <param name="oldCommit">the older commit that constitutes the baseline of the comparison</param>
+        /// <param name="newCommit">the newer commit against which the <see cref="oldCommit"/> is to be compared</param>
+        protected void AddCommitFrequencyMetric(Graph graph, string vcsPath, Commit oldCommit, Commit newCommit)
         {
-            using (var repo = new Repository(vcsPath))
+            using (Repository repo = new(vcsPath))
             {
-                var oldCommit = repo.Lookup<Commit>(oldRevision);
-                var newCommit = repo.Lookup<Commit>(newRevision);
-
-                var commitsBetween = repo.Commits.QueryBy(new CommitFilter
+                ICommitLog commitsBetween = repo.Commits.QueryBy(new CommitFilter
                 {
                     IncludeReachableFrom = newCommit,
                     ExcludeReachableFrom = oldCommit
                 });
 
-                Dictionary<string, int> fileCommitCounts = new Dictionary<string, int>();
+                Dictionary<string, int> fileCommitCounts = new();
 
-                foreach (var commit in commitsBetween)
+                foreach (Commit commit in commitsBetween)
                 {
-                    foreach (var parent in commit.Parents)
+                    foreach (Commit parent in commit.Parents)
                     {
-                        var changes = repo.Diff.Compare<TreeChanges>(parent.Tree, commit.Tree);
-                        foreach (var change in changes)
+                        TreeChanges changes = repo.Diff.Compare<TreeChanges>(parent.Tree, commit.Tree);
+
+                        foreach (TreeEntryChanges change in changes)
                         {
-                            var filePath = change.Path;
+                            string filePath = change.Path;
+
                             if (fileCommitCounts.ContainsKey(filePath))
+                            {
                                 fileCommitCounts[filePath]++;
+                            }
                             else
+                            {
                                 fileCommitCounts.Add(filePath, 1);
+                            }
                         }
                     }
                 }
 
-                foreach (var entry in fileCommitCounts.OrderByDescending(x => x.Value))
+                foreach (KeyValuePair<string, int> entry in fileCommitCounts.OrderByDescending(x => x.Value))
                 {
-                    foreach (var node in graph.Nodes())
+                    foreach (Node node in graph.Nodes())
                     {
                         if (node.ID.Replace('\\', '/') == entry.Key)
                         {
-                            node.SetInt("Commit Frequency", entry.Value);
+                            node.SetInt(Git.CommitFrequency, entry.Value);
                         }
                     }
                 }

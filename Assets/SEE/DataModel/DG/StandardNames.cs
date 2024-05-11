@@ -190,4 +190,27 @@
         /// </summary>
         public const string IsChanged = "Change.IsChanged";
     }
+
+    /// <summary>
+    /// Defines names of node attributes for Git metrics.
+    /// </summary>
+    public static class Git
+    {
+        /// <summary>
+        /// The number of lines of code added for a file that was changed between two commits.
+        /// </summary>
+        public const string LinesAdded = "Metric.Git.Lines_Added";
+        /// <summary>
+        /// The number of lines of code deleted for a file that was changed between two commits.
+        /// </summary>
+        public const string LinesDeleted = "Metric.Git.Lines_Deleted";
+        /// <summary>
+        /// The number of unique developers who contributed to a file that was changed between two commits.
+        /// </summary>
+        public const string NumberOfDevelopers = "Metric.Git.Number_of_Developers";
+        /// <summary>
+        /// The number of times a file was changed between two commits.
+        /// </summary>
+        public const string CommitFrequency = "Metric.Git.Commit_Frequency";
+    }
 }
