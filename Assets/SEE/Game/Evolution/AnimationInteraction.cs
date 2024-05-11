@@ -370,7 +370,7 @@ namespace SEE.Game.Evolution
             {
                 PressFastForward();
                 new PressFastForwardNetAction(gameObject.FullName()).Execute();
-            }            
+            }
         }
 
         /// <summary>
@@ -416,7 +416,7 @@ namespace SEE.Game.Evolution
             {
                 PressFastBackward();
                 new PressFastBackwardNetAction(gameObject.FullName()).Execute();
-            }            
+            }
         }
 
         /// <summary>
@@ -550,15 +550,6 @@ namespace SEE.Game.Evolution
         /// </summary>
         private void Update()
         {
-            /*
-            if (evolutionRenderer.IsStillAnimating)
-            {
-                animationDataModel.EnableButtons(false);
-                return;
-            }
-            animationDataModel.EnableButtons(true);
-            */
-
             bool userIsHoveringCity = AbstractSEECity.UserIsHoveringCity(evolutionRenderer.gameObject);
 
             if (!IsRevisionSelectionOpen)
