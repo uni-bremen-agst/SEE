@@ -37,7 +37,7 @@
             {
                 NumericAttributeNames.NumberOfTokens => "Metric.Number_of_Tokens",
                 NumericAttributeNames.CloneRate => "Metric.Clone_Rate",
-                NumericAttributeNames.LOC => "Metric.LOC",
+                NumericAttributeNames.LOC => "Metric.Lines.LOC",
                 NumericAttributeNames.Complexity => "Metric.Complexity",
                 NumericAttributeNames.ArchitectureViolations => "Metric.Architecture_Violations",
                 NumericAttributeNames.Clone => "Metric.Clone",

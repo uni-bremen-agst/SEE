@@ -33,17 +33,27 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "17c6330d51a140eac037b9ea6f5d157a846535af"
+      "hash": "12574c32f658fa23c194357141abc3fc157ea362"
     },
     "com.openai.unity": {
-      "version": "7.7.6",
+      "version": "7.7.9",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.utilities.rest": "2.5.5",
+        "com.utilities.rest": "2.5.6",
         "com.utilities.encoder.wav": "1.1.5"
       },
       "url": "https://package.openupm.com"
+    },
+    "com.singularitygroup.hotreload": {
+      "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.12.9",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.ugui": "1.0.0",
+        "com.unity.modules.unitywebrequest": "1.0.0"
+      },
+      "hash": "15115347b80179b483f7f4022c18fe48604dee8d"
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
@@ -70,7 +80,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.burst": {
-      "version": "1.8.13",
+      "version": "1.8.14",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -222,18 +232,18 @@
       }
     },
     "com.unity.sysroot": {
-      "version": "2.0.7",
+      "version": "2.0.10",
       "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
     "com.unity.sysroot.linux-x86_64": {
-      "version": "2.0.6",
+      "version": "2.0.9",
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.unity.sysroot": "2.0.7"
+        "com.unity.sysroot": "2.0.10"
       },
       "url": "https://packages.unity.com"
     },
@@ -280,12 +290,12 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.toolchain.linux-x86_64": {
-      "version": "2.0.6",
+      "version": "2.0.9",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.sysroot": "2.0.7",
-        "com.unity.sysroot.linux-x86_64": "2.0.6"
+        "com.unity.sysroot": "2.0.10",
+        "com.unity.sysroot.linux-x86_64": "2.0.9"
       },
       "url": "https://packages.unity.com"
     },
@@ -410,7 +420,7 @@
       "url": "https://package.openupm.com"
     },
     "com.utilities.rest": {
-      "version": "2.5.5",
+      "version": "2.5.6",
       "depth": 1,
       "source": "registry",
       "dependencies": {

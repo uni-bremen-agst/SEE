@@ -230,7 +230,7 @@ namespace SEE.Game.Avatars
             async UniTaskVoid SendChatMessage(ChatRequest request)
             {
                 string message;
-                using (LoadingSpinner.Show("ChatGPT is thinking about what you said..."))
+                using (LoadingSpinner.ShowIndeterminate("ChatGPT is thinking about what you said..."))
                 {
                     ChatResponse result = await openAiClient.ChatEndpoint.GetCompletionAsync(request);
                     message = result.FirstChoice.Message.Content.ToString();

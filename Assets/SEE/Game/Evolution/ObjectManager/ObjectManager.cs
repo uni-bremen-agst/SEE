@@ -18,7 +18,6 @@
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
 using SEE.GO;
@@ -83,11 +82,6 @@ namespace SEE.Game.Evolution
             graphRenderer = renderer;
             this.city = city;
         }
-
-        /// <summary>
-        /// List of all created game nodes that are in use.
-        /// </summary>
-        private IList<GameObject> GameNodes => nodes.Values.ToList();
 
         /// <summary>
         /// Sets <paramref name="gameNode"/> to a cached GameObject or creates a new one
