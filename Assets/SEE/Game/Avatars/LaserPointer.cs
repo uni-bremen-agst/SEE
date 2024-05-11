@@ -126,8 +126,8 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// The laser beam is to be directed towards given <paramref name="direction"/>.
         /// </summary>
-        /// <param name="direction">requested direction of the laser beam</param>
-        /// <returns>the position of the tip of the laser beam</returns>
+        /// <param name="direction">requested direction of the laser beam in world space</param>
+        /// <returns>the position of the tip of the laser beam in world space</returns>
         internal Vector3 PointTowards(Vector3 direction)
         {
             Vector3 target = Source.position + direction * LaserLength;
