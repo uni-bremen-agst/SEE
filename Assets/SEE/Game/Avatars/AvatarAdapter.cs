@@ -15,6 +15,7 @@ using SEE.XR;
 using ViveSR.anipal;
 using ViveSR.anipal.Lip;
 using RootMotion.FinalIK;
+using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation;
 #endif
 
 namespace SEE.Game.Avatars
@@ -254,7 +255,7 @@ namespace SEE.Game.Avatars
         /// is set up for VR. This controller will be assigned to the UMA avatar
         /// as the default race animation controller.
         /// </summary>
-        private const string animatorForVRIK = "Prefabs/Players/VRIKAnimatedLocomotion";
+        private const string animatorForVRIKPrefab = "Prefabs/Players/VRIKAnimatedLocomotion";
 
         /// <summary>
         /// The path of the prefab for the VR camera rig.
@@ -290,7 +291,6 @@ namespace SEE.Game.Avatars
                 yield return null;
             }
 
-
             Debug.Log($"[{nameof(AvatarAdapter)}] XR is initialized. Adding the necessary VR components.\n");
 
             // Now we can instantiate the prefabs for VR that requires that XR is up and running.
@@ -303,18 +303,19 @@ namespace SEE.Game.Avatars
 
             //gameObject.transform.SetParent(rig.transform);
             //gameObject.transform.position = Vector3.zero;
-
-            PrepareScene();
+            
             // Note: AddComponents() must be run before TurnOffAvatarAimingSystem() because the latter
             // will remove components, the former must query.
             VRIKActions.AddComponents(gameObject, IsLocalPlayer);
             VRIKActions.TurnOffAvatarAimingSystem(gameObject);
-            VRIKActions.ReplaceAnimator(gameObject, animatorForVRIK);
+            VRIKActions.ReplaceAnimator(gameObject, animatorForVRIKPrefab);
 
             SetupVRIK();
 
             PrepareLipTracker();
             InitializeVrikRemote();
+
+            PrepareScene();
 
             /// <summary>
             /// Sets up the scene for playing in an VR environment. This means to instantiate the
@@ -326,7 +327,7 @@ namespace SEE.Game.Avatars
             /// </summary>
             void PrepareScene()
             {
-                const string groundName = "Ground";
+                const string groundName = "Floor";
 
                 GameObject ground = GameObject.Find(groundName);
                 if (ground == null)
@@ -335,6 +336,7 @@ namespace SEE.Game.Avatars
                 }
                 else
                 {
+                    AddTeleportArea(ground);
                     // FIXME: This needs to work again for our metric charts.
                     //{
                     //    // Assign the VR camera to the chart manager so that charts can move along with the camera.
@@ -359,6 +361,37 @@ namespace SEE.Game.Avatars
                     //    }
                     //}
                 }
+            }
+
+            /// <summary>
+            /// Adds a teleport area to the ground plane.
+            /// </summary>
+            void AddTeleportArea(GameObject ground)
+            {
+                GameObject teleportArea = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/TeleportArea");
+                teleportArea.name = "TeleportArea";
+                if (teleportArea.TryGetComponentOrLog(out TeleportationArea teleportationArea) 
+                    && ground.TryGetComponentOrLog(out Collider collider))
+                {
+                    if (teleportationArea.colliders.Count == 0)
+                    {
+                        teleportationArea.colliders.Add(collider);
+                    }
+                    else                     
+                    {
+                        if (teleportationArea.colliders[0] != null)
+                        {
+                            Debug.LogWarning($"The teleport area {teleportArea.name} already has a collider assigned.\n");
+                        }
+                        teleportationArea.colliders[0] = collider;
+                    }
+
+                    // The teleport area is initially disabled in the prefab.
+                    // If it were enabled, the assigned collider would be ignored.
+                    // We need to first assign the collider and then enable the teleport area.
+                    teleportArea.SetActive(true);
+                    teleportationArea.enabled = true;
+                }               
             }
 
             // Adds component to VR-Player to sent data from VRIK to all remote clients.

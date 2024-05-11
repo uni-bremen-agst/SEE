@@ -310,7 +310,7 @@ namespace SEE.Game.Avatars
 
         private void Update()
         {
-            if (SEEInput.ToggleVoiceInput() && input != null)
+            if (SEEInput.ToggleVoiceControl() && input != null)
             {
                 if (currentlyListening)
                 {
