@@ -22,12 +22,21 @@ namespace SEE.Dissonance
         private const string targetChannel = "Global";
 
         /// <summary>
-        /// The dissonance network to broadcast the messages.
+        /// The dissonance network to broadcast the messages. Can
+        /// be set in the Unity inspector or otherwise will be set
+        /// automatically by <see cref="Start"/>.
         /// </summary>
+        [Tooltip("The dissonance network to broadcast the messages.")]
         public DissonanceComms Comms;
 
         /// <summary>
-        /// The input field of the text chat.
+        /// The name of the game object representing the input field for the chat.
+        /// </summary>
+        private const string chatInputName = "ChatInput";
+
+        /// <summary>
+        /// The input field of the text chat. This is the game object named <see cref="chatInputName"/>.
+        /// It will be retrieved in <see cref="Start"/>.
         /// </summary>
         private InputField inputField;
 
@@ -47,7 +56,7 @@ namespace SEE.Dissonance
         {
             Comms = Comms ?? FindObjectOfType<DissonanceComms>();
 
-            inputField = GetComponentsInChildren<InputField>().Single(a => a.name == "ChatInput");
+            inputField = GetComponentsInChildren<InputField>().Single(a => a.name == chatInputName);
             inputField.gameObject.SetActive(false);
 
             inputField.onEndEdit.AddListener(OnInputEndEdit);
