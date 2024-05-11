@@ -3923,6 +3923,7 @@ MonoBehaviour:
   MaximalAntennaSegmentHeight: 0.5
   AntennaWidth: 0.1
   BaseAnimationDuration: 1
+  ProgressBar: 0
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
@@ -4008,7 +4009,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ScaleFactor: 1
   HeightOffset: 0.0010153651
 --- !u!65 &264006616
 BoxCollider:
@@ -7574,6 +7574,7 @@ MonoBehaviour:
   MaximalAntennaSegmentHeight: 0.1
   AntennaWidth: 0.01
   BaseAnimationDuration: 1
+  ProgressBar: 0
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
@@ -7649,7 +7650,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ScaleFactor: 1
   HeightOffset: 0.0015009642
 --- !u!65 &326121979
 BoxCollider:
@@ -13099,6 +13099,7 @@ MonoBehaviour:
   MaximalAntennaSegmentHeight: 0.1
   AntennaWidth: 0.01
   BaseAnimationDuration: 1
+  ProgressBar: 0
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
@@ -13179,7 +13180,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ScaleFactor: 1
   HeightOffset: 0.0015009642
 --- !u!65 &551406259
 BoxCollider:
@@ -23993,7 +23993,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ScaleFactor: 1
   HeightOffset: 0.0015009642
 --- !u!65 &1222147445
 BoxCollider:
@@ -25634,6 +25633,7 @@ MonoBehaviour:
   MaximalAntennaSegmentHeight: 0.5
   AntennaWidth: 0.1
   BaseAnimationDuration: 1
+  ProgressBar: 0
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
@@ -33386,6 +33386,12 @@ PrefabInstance:
     - {fileID: 114125503372306616, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
     m_RemovedGameObjects:
     - {fileID: 1517357890693092, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+    - {fileID: 1706114631358294, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+    - {fileID: 1219238646228308, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+    - {fileID: 1071528346688116, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+    - {fileID: 1047069224676776, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+    - {fileID: 1240725178886710, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+    - {fileID: 1764493501854154, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1643126648504472, guid: 7e7e1770b238e724caee49f153d1b3d6,
@@ -39523,6 +39529,7 @@ MonoBehaviour:
   MaximalAntennaSegmentHeight: 0.1
   AntennaWidth: 0.01
   BaseAnimationDuration: 1
+  ProgressBar: 0
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
@@ -39610,7 +39617,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ScaleFactor: 1
   HeightOffset: 0.0015009642
 --- !u!65 &2147363518
 BoxCollider:
