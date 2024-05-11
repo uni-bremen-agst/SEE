@@ -12,15 +12,14 @@ namespace SEE.Dissonance
     /// </summary>
     /// <remarks>This code stems from a Dissonance demo and was then
     /// adapted to our needs.</remarks>
-    public class ChatInputController
-        : MonoBehaviour
+    public class ChatInputController : MonoBehaviour
     {
         #region fields and properties
 
         /// <summary>
         /// The name of the text channel where to send messages.
         /// </summary>
-        private string targetChannel;
+        private const string targetChannel = "Global";
 
         /// <summary>
         /// The dissonance network to broadcast the messages.
@@ -100,7 +99,7 @@ namespace SEE.Dissonance
         {
             if (SEEInput.OpenTextChat())
             {
-                ShowTextInput("Global");
+                ShowTextInput();
             }
         }
 
@@ -109,11 +108,9 @@ namespace SEE.Dissonance
         /// the <see cref="inputField"/> and <see cref="chatLog"/> so that the user
         /// can add a message.
         /// </summary>
-        /// <param name="channel">the name of the Dissonance channel where to send messages</param>
-        private void ShowTextInput(string channel)
+        private void ShowTextInput()
         {
             SEEInput.KeyboardShortcutsEnabled = false;
-            targetChannel = channel;
             inputField.gameObject.SetActive(true);
             inputField.ActivateInputField();
 
