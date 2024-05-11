@@ -10,7 +10,7 @@ namespace SEE.XR
     /// This component is assumed to be attached to an object that comes
     /// into existence only if XR is to be started locally (i.e, within
     /// this instance of the game on the computer running the VR),
-    /// for instance, a SteamVR camera rig.
+    /// for instance, an XR camera rig.
     /// </summary>
 #if ENABLE_VR
     internal class ManualXRControl : MonoBehaviour
