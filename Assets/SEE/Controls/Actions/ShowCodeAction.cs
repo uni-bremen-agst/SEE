@@ -260,7 +260,7 @@ namespace SEE.Controls.Actions
             {
                 codeWindow = GetOrCreateCodeWindow(graphElementRef, graphElement.Filename);
                 IVersionControl vcs = VersionControlFactory.GetVersionControl(VCSKind.Git, graphElement.RepositoryPath);
-                string[] fileContent = vcs.Show(graphElement.ID.Replace('\\', '/'), commitID).
+                string[] fileContent = vcs.Show(graphElement.ID, commitID).
                     Split("\\n", StringSplitOptions.RemoveEmptyEntries);
                 codeWindow.EnterFromText(fileContent);
             }

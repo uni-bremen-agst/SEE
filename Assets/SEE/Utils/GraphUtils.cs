@@ -46,8 +46,8 @@ namespace SEE.Utils
         public static Node BuildGraphFromPath(string path, Node parent, string parentPath,
             Graph graph, Node mainNode, string commitID, string repositoryPath)
         {
-            string[] pathSegments = path.Split(Path.AltDirectorySeparatorChar);
-            string nodePath = string.Join(Path.AltDirectorySeparatorChar.ToString(), pathSegments, 1,
+            string[] pathSegments = path.Split('/');
+            string nodePath = string.Join('/', pathSegments, 1,
                 pathSegments.Length - 1);
 
             // Current pathSegment is in the main directory.
@@ -74,7 +74,7 @@ namespace SEE.Utils
             // Current pathSegment is not in the main directory.
             if (parentPath != null)
             {
-                string currentPathSegment = parentPath + Path.DirectorySeparatorChar + pathSegments[0];
+                string currentPathSegment = parentPath + '/' + pathSegments[0];
                 Node currentPathSegmentNode = graph.GetNode(currentPathSegment);
 
                 // The node for the current pathSegment exists.

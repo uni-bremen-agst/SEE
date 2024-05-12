@@ -107,11 +107,11 @@ namespace SEE.GraphProviders
 
             IEnumerable<string> includedPathGlobs = pathGlobbing
                 .Where(path => path.Value)
-                .Select(path => path.Key);
+                .Select(path => path.Key).ToHashSet();
 
             IEnumerable<string> excludedPathGlobs = pathGlobbing
                 .Where(path => !path.Value)
-                .Select(path => path.Key);
+                .Select(path => path.Key).ToHashSet();
 
             using (Repository repo = new(repositoryPath))
             {
@@ -124,7 +124,7 @@ namespace SEE.GraphProviders
                 }
                 else if (excludedPathGlobs.Any())
                 {
-                    files = ListTree(tree).Where(path => !excludedPathGlobs.Contains(Path.GetExtension(path))).Take(200);
+                    files = ListTree(tree).Where(path => !excludedPathGlobs.Contains(Path.GetExtension(path)));
                 }
                 else
                 {
@@ -133,7 +133,7 @@ namespace SEE.GraphProviders
                 // Build the graph structure.
                 foreach (string filePath in files.Where(path => !string.IsNullOrEmpty(path)))
                 {
-                    string[] filePathSegments = filePath.Split(Path.AltDirectorySeparatorChar);
+                    string[] filePathSegments = filePath.Split('/');
                     // Files in the main directory.
                     if (filePathSegments.Length == 1)
                     {
@@ -147,7 +147,6 @@ namespace SEE.GraphProviders
                 }
                 AddMetricsToNode(graph, repo, commitID);
             }
-            Debug.Log(graph.ToString());
             return graph;
         }
 
