@@ -307,8 +307,12 @@ namespace SEE.Game.City
                 {
                     using (LoadingSpinner.ShowIndeterminate($"Loading city \"{gameObject.name}\""))
                     {
+                    	ShowNotification.Info("SEECity", "Loading graph");
+                    	Debug.Log("Loading graph from provider");
                         LoadedGraph = await UniTask.RunOnThreadPool(() => DataProvider.ProvideAsync(new Graph(""), this, x => ProgressBar = x,
                                                                       cancellationTokenSource.Token));
+                     	Debug.Log("Graph Provider finished");
+                    	ShowNotification.Info("SEECity", $"{DataProvider.Pipeline.Count()} Graph provider finished:");                                               
                     }
                 }
                 catch (OperationCanceledException)
