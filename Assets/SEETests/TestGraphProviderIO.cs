@@ -280,7 +280,8 @@ namespace SEE.GraphProviders
             List<string> pathsFromGraph = new();
             foreach (GraphElement elem in graph.Elements())
             {
-                pathsFromGraph.Add(elem.ID.Replace('\\', '/'));
+                Debug.Log(elem.ID);
+                pathsFromGraph.Add(elem.ID);
             }
 
             List<string> actualList = new()
@@ -315,7 +316,7 @@ namespace SEE.GraphProviders
                 "ProjectSettings/XRSettings.asset"
             };
             Assert.AreEqual(28, pathsFromGraph.Count());
-            //Assert.IsTrue(actualList.OrderByDescending(x => x).ToList().SequenceEqual(pathsFromGraph.OrderByDescending(x => x).ToList()));
+            Assert.IsTrue(actualList.OrderByDescending(x => x).ToList().SequenceEqual(pathsFromGraph.OrderByDescending(x => x).ToList()));
         }
 
         private VCSGraphProvider GetVCSGraphProvider()
