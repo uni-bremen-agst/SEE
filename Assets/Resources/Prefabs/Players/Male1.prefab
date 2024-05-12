@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3286500012218721111}
   - component: {fileID: 6501686124662936318}
   - component: {fileID: 1986803398891020467}
+  - component: {fileID: 3165194812237359857}
   m_Layer: 0
   m_Name: PlayernameText
   m_TagString: Untagged
@@ -26,16 +27,16 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 347568875701933544}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 3205672565585931483}
+  m_Father: {fileID: 5742082173774747445}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 8.93, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &3286500012218721111
@@ -127,14 +128,14 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 4
-  m_fontSizeBase: 4
+  m_fontSize: 1.6
+  m_fontSizeBase: 1.6
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -185,7 +186,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   displayNameText: {fileID: 6501686124662936318}
---- !u!1 &2261007234997853737
+--- !u!114 &3165194812237359857
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 347568875701933544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78fd978b02b236e4f901a03238b69744, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lockX: 0
+  lockY: 0
+  lockZ: 0
+--- !u!1 &3133454302570595070
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -193,8 +209,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3969300772831401622}
-  - component: {fileID: 5874419700956773975}
+  - component: {fileID: 8870858460498484543}
+  - component: {fileID: 6292221397160225315}
   m_Layer: 0
   m_Name: UMARenderer
   m_TagString: Untagged
@@ -202,13 +218,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3969300772831401622
+--- !u!4 &8870858460498484543
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2261007234997853737}
+  m_GameObject: {fileID: 3133454302570595070}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -217,13 +233,13 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5742082173774747445}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!137 &5874419700956773975
+--- !u!137 &6292221397160225315
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2261007234997853737}
+  m_GameObject: {fileID: 3133454302570595070}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -374,38 +390,6 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.020856157, y: 0.8481372, z: 0.15248327}
     m_Extent: {x: 0.37678468, y: 0.9712463, z: 0.5293872}
   m_DirtyAABB: 0
---- !u!1 &3318146478236078789
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3205672565585931483}
-  m_Layer: 0
-  m_Name: Playername
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &3205672565585931483
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3318146478236078789}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 4698872749653426967}
-  m_Father: {fileID: 5742082173774747445}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3443734408606541875
 GameObject:
   m_ObjectHideFlags: 0
@@ -682,7 +666,7 @@ GameObject:
   - component: {fileID: 3788740111477233866}
   - component: {fileID: 3531842660520793191}
   - component: {fileID: 3766411869251678112}
-  - component: {fileID: 3484649399423778866}
+  - component: {fileID: 2539779041373885804}
   m_Layer: 0
   m_Name: Male1
   m_TagString: Untagged
@@ -703,11 +687,11 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 3205672565585931483}
+  - {fileID: 4698872749653426967}
   - {fileID: 8404349698636673230}
   - {fileID: 6027063460069805855}
   - {fileID: 3717910476915078163}
-  - {fileID: 3969300772831401622}
+  - {fileID: 8870858460498484543}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5742082173764887403
@@ -723,7 +707,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   context: {fileID: 0}
-  umaData: {fileID: 3484649399423778866}
+  umaData: {fileID: 2539779041373885804}
   defaultRendererAsset: {fileID: 0}
   umaRecipe: {fileID: 11400000, guid: 812bdfd823b789145a41e3e5a7997d33, type: 2}
   umaAdditionalRecipes: []
@@ -6167,7 +6151,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Animator: {fileID: 5742082173775082021}
---- !u!114 &3484649399423778866
+--- !u!114 &2539779041373885804
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -6180,7 +6164,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   renderers:
-  - {fileID: 5874419700956773975}
+  - {fileID: 6292221397160225315}
   umaGenerator: {fileID: 0}
   atlasResolutionScale: 1
   isMeshDirty: 0

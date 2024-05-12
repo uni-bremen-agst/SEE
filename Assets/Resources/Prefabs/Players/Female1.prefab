@@ -32,7 +32,7 @@ GameObject:
   - component: {fileID: 7863935095142469213}
   - component: {fileID: 7545113140716339952}
   - component: {fileID: 7922671637628041527}
-  - component: {fileID: 7018710821711352155}
+  - component: {fileID: 2294912691502485757}
   m_Layer: 0
   m_Name: Female1
   m_TagString: Untagged
@@ -53,10 +53,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8890257416810143098}
+  - {fileID: 7402534002555023124}
   - {fileID: 3248291354149152345}
   - {fileID: 725763486979496328}
-  - {fileID: 5212410998618386707}
+  - {fileID: 758021182343310570}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1592577805369341436
@@ -72,7 +72,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   context: {fileID: 0}
-  umaData: {fileID: 7018710821711352155}
+  umaData: {fileID: 2294912691502485757}
   defaultRendererAsset: {fileID: 0}
   umaRecipe: {fileID: 11400000, guid: 30e5e8eaf5d2b434cbe238cda80a8fac, type: 2}
   umaAdditionalRecipes: []
@@ -5521,7 +5521,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Animator: {fileID: 1592577805375857842}
---- !u!114 &7018710821711352155
+--- !u!114 &2294912691502485757
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5534,7 +5534,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   renderers:
-  - {fileID: 7138443404070695001}
+  - {fileID: 5276741339553065827}
   umaGenerator: {fileID: 0}
   atlasResolutionScale: 1
   isMeshDirty: 0
@@ -10860,7 +10860,7 @@ Transform:
   - {fileID: 3248291354335724667}
   m_Father: {fileID: 3248291354557260072}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &3775024658201290465
+--- !u!1 &4438206024542707481
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -10868,8 +10868,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5212410998618386707}
-  - component: {fileID: 7138443404070695001}
+  - component: {fileID: 758021182343310570}
+  - component: {fileID: 5276741339553065827}
   m_Layer: 0
   m_Name: UMARenderer
   m_TagString: Untagged
@@ -10877,13 +10877,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5212410998618386707
+--- !u!4 &758021182343310570
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3775024658201290465}
+  m_GameObject: {fileID: 4438206024542707481}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -10892,13 +10892,13 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1592577805376045474}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!137 &7138443404070695001
+--- !u!137 &5276741339553065827
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3775024658201290465}
+  m_GameObject: {fileID: 4438206024542707481}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -11088,6 +11088,7 @@ GameObject:
   - component: {fileID: 9005778057601270570}
   - component: {fileID: 9185793760928423029}
   - component: {fileID: 2015786705323173149}
+  - component: {fileID: 2948688971428076917}
   m_Layer: 0
   m_Name: PlayernameText
   m_TagString: Untagged
@@ -11102,16 +11103,16 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4695067599110966516}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8890257416810143098}
+  m_Father: {fileID: 1592577805376045474}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 8.93, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &9005778057601270570
@@ -11203,14 +11204,14 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 4
-  m_fontSizeBase: 4
+  m_fontSize: 1.6
+  m_fontSizeBase: 1.6
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -11261,38 +11262,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   displayNameText: {fileID: 9185793760928423029}
---- !u!1 &5531262841612350321
-GameObject:
+--- !u!114 &2948688971428076917
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8890257416810143098}
-  m_Layer: 0
-  m_Name: Playername
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &8890257416810143098
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5531262841612350321}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 7402534002555023124}
-  m_Father: {fileID: 1592577805376045474}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_GameObject: {fileID: 4695067599110966516}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78fd978b02b236e4f901a03238b69744, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lockX: 0
+  lockY: 0
+  lockZ: 0
 --- !u!1 &7868800906394081354
 GameObject:
   m_ObjectHideFlags: 0
