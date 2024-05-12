@@ -114,6 +114,8 @@ namespace SEE.Game.City
         /// </summary>
         [NonSerialized] private Graph visualizedSubGraph = null;
 
+        private bool IsRunningPipeline;
+
         /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
         /// containing only nodes with relevant node types or the original <see cref="LoadedGraph"/>
@@ -159,6 +161,7 @@ namespace SEE.Game.City
                 Debug.LogWarning($"There is no drawn code city for {gameObject.name}.");
                 return;
             }
+
             LoadAsync().Forget();
             return;
 
@@ -308,8 +311,9 @@ namespace SEE.Game.City
                 {
                     ShowNotification.Info("SEECity", "Loading graph");
                     Debug.Log("Loading graph from provider");
+                    IsRunningPipeline = true;
                     LoadedGraph = await UniTask.RunOnThreadPool(() => DataProvider.ProvideAsync(new Graph(""), this));
-                    //LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this);
+                    IsRunningPipeline = false;
                     Debug.Log("Graph Provider finished");
                     ShowNotification.Info("SEECity", $"{DataProvider.Pipeline.Count()} Graph provider finished:");
                 }
@@ -377,6 +381,13 @@ namespace SEE.Game.City
         [EnableIf(nameof(IsGraphLoaded))]
         public virtual void DrawGraph()
         {
+            if (IsRunningPipeline)
+            {
+                Debug.LogError("Pipeline is still running");
+                ShowNotification.Error("SEECity", "Graph provider pipeline is still running");
+                return;
+            }
+
             if (LoadedGraph == null)
             {
                 Debug.LogError("No graph loaded.\n");
@@ -472,6 +483,7 @@ namespace SEE.Game.City
             base.Reset();
             // Cancel any ongoing loading operation and reset the token.
             cancellationTokenSource.Cancel();
+            IsRunningPipeline = false;
             cancellationTokenSource = new CancellationTokenSource();
             // Delete the underlying graph.
             loadedGraph?.Destroy();
