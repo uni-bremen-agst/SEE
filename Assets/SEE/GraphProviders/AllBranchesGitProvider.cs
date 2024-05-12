@@ -59,9 +59,7 @@ namespace SEE.GraphProviders
             Action<float> changePercentage = null,
             CancellationToken token = default)
         {
-            UniTask<Graph> graphTask = UniTask.FromResult(GetGraph(graph));
-
-            return graphTask;
+            return UniTask.RunOnThreadPool(() => GetGraph(graph));
         }
 
         private Graph GetGraph(Graph graph)
@@ -140,7 +138,6 @@ namespace SEE.GraphProviders
                     n.SetInt(NumberOfCommitsMetricName, file.Value.NumberOfCommits);
                     n.SetInt(NumberOfFileChurnMetricName, file.Value.Churn);
                     n.SetInt(TruckFactorMetricName, file.Value.TruckFactor);
-                
                 }
 
                 if (SimplifyGraph)
@@ -258,6 +255,12 @@ namespace SEE.GraphProviders
         /// Total sum of changed lines (added and removed)
         /// </summary>
         public int Churn { get; set; }
+
+        public GitFileMetricsCollector()
+        {
+            Authors = new();
+            AuthorsChurn = new();
+        }   
 
         public GitFileMetricsCollector(int numberOfCommits, HashSet<string> authors, int churn)
         {

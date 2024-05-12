@@ -114,7 +114,10 @@ namespace SEE.Game.City
         /// </summary>
         [NonSerialized] private Graph visualizedSubGraph = null;
 
-        private bool IsRunningPipeline;
+        /// <summary>
+        /// Specifies if the pipeline of <see cref="PipelineGraphProvider"/> is still running.
+        /// </summary>
+        private bool IsPipelineRunning;
 
         /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
@@ -309,13 +312,22 @@ namespace SEE.Game.City
             {
                 try
                 {
-                    ShowNotification.Info("SEECity", "Loading graph");
-                    Debug.Log("Loading graph from provider");
-                    IsRunningPipeline = true;
-                    LoadedGraph = await UniTask.RunOnThreadPool(() => DataProvider.ProvideAsync(new Graph(""), this));
-                    IsRunningPipeline = false;
-                    Debug.Log("Graph Provider finished");
-                    ShowNotification.Info("SEECity", $"{DataProvider.Pipeline.Count()} Graph provider finished:");
+                    using (LoadingSpinner.ShowIndeterminate($"Loading city \"{gameObject.name}\""))
+                    {
+                        ShowNotification.Info("SEECity", "Loading graph");
+                        Debug.Log("Loading graph from provider");
+                        IsPipelineRunning = true;
+                        LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, x => ProgressBar = x,
+                            cancellationTokenSource.Token);
+                        IsPipelineRunning = false;
+                        Debug.Log("Graph Provider finished");
+                        ShowNotification.Info("SEECity", $"{DataProvider.Pipeline.Count()} Graph provider finished:");
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    ShowNotification.Warn("Data loading cancelled", "Data loading was cancelled.\n", log: true);
+                    throw;
                 }
                 catch (Exception ex)
                 {
@@ -381,7 +393,7 @@ namespace SEE.Game.City
         [EnableIf(nameof(IsGraphLoaded))]
         public virtual void DrawGraph()
         {
-            if (IsRunningPipeline)
+            if (IsPipelineRunning)
             {
                 Debug.LogError("Pipeline is still running");
                 ShowNotification.Error("SEECity", "Graph provider pipeline is still running");
@@ -483,7 +495,7 @@ namespace SEE.Game.City
             base.Reset();
             // Cancel any ongoing loading operation and reset the token.
             cancellationTokenSource.Cancel();
-            IsRunningPipeline = false;
+            IsPipelineRunning = false;
             cancellationTokenSource = new CancellationTokenSource();
             // Delete the underlying graph.
             loadedGraph?.Destroy();
