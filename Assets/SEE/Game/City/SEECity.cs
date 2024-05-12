@@ -306,10 +306,12 @@ namespace SEE.Game.City
             {
                 try
                 {
+                    ShowNotification.Info("SEECity", "Loading graph");
+                    Debug.Log("Loading graph from provider");
                     LoadedGraph = await UniTask.RunOnThreadPool(() => DataProvider.ProvideAsync(new Graph(""), this));
                     //LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this);
                     Debug.Log("Graph Provider finished");
-                    ShowNotification.Info($"{DataProvider.Pipeline.Count()} Graph provider finished:","Graph Loaded");
+                    ShowNotification.Info("SEECity", $"{DataProvider.Pipeline.Count()} Graph provider finished:");
                 }
                 catch (Exception ex)
                 {
