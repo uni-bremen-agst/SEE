@@ -215,7 +215,7 @@ namespace SEE.Game.City
                 // For some reason SetScaler needs to be called here a second time, the attribute Metic.Level
                 // can't be found otherwise.
                 // EvolutionRenderer.SetGraph doese this too.
-                graphRenderer.SetScaler(new List<Graph>() { firstGraph });
+                //graphRenderer.SetScaler(new List<Graph>() { firstGraph });
                 graphRenderer.DrawGraph(firstGraph, gameObject);
             }
             else
@@ -295,6 +295,7 @@ namespace SEE.Game.City
         [PropertyOrder(DataButtonsGroupOrderDraw)]
         public async void StatEvolution()
         {
+            Reset();
             List<Graph> graphs = new List<Graph>(await DataProvider.ProvideAsync(new List<Graph>(), this));
 
             if (!graphs.Any())
