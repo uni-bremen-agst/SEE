@@ -25,7 +25,7 @@ namespace SEE.GraphProviders
         /// </summary>
         [OdinSerialize]
         [ShowInInspector, InspectorName("Date Limit"),
-         Tooltip("The date until commits should be analysed (DD-MM-YYYY)"), RuntimeTab(GraphProviderFoldoutGroup)]
+         Tooltip("The date until commits should be analysed (DD/MM/YYYY)"), RuntimeTab(GraphProviderFoldoutGroup)]
         public string Date = "";
 
 
@@ -38,9 +38,20 @@ namespace SEE.GraphProviders
 
         #region Constants
 
-        private const string NumberOfAuthorsMetricName = "Metric.Authors.Number";
+        private const string NumberOfAuthorsMetricName = "Metric.File.AuthorsNumber";
 
         private const string NumberOfCommitsMetricName = "Metric.File.Commits";
+
+        private const string NumberOfFileChurnMetricName = "Metric.File.Churn";
+
+        private const string TruckFactorMetricName = "Metric.File.TruckFactor";
+
+        /// <summary>
+        /// Used in the calculation of the truck factor.
+        ///
+        /// Specifies the minimum ratio of the file churn the core devs should be responsible for 
+        /// </summary>
+        private const float TruckFactorCoreDevRatio = 0.8f;
 
         #endregion
 
@@ -58,62 +69,34 @@ namespace SEE.GraphProviders
             graph.BasePath = RepositoryPath.Path;
             string[] pathSegments = RepositoryPath.Path.Split(Path.DirectorySeparatorChar);
 
-            GraphUtils.NewNode(graph, pathSegments[^1], "Repository", pathSegments[^1]);
+            string repositoryName = pathSegments[^1];
 
-            //var mainNode = graph.GetNode(pathSegments[^1]);
+            GraphUtils.NewNode(graph, repositoryName, "Repository", pathSegments[^1]);
+
             DateTime timeLimit = DateTime.ParseExact(Date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
 
             IEnumerable<string> includedFiles = PathGlobbing
-                .Where(path => path.Value == true)
+                .Where(path => path.Value)
                 .Select(path => path.Key);
 
             IEnumerable<string> excludedFiles = PathGlobbing
-                .Where(path => path.Value == false)
+                .Where(path => !path.Value)
                 .Select(path => path.Key);
 
             using (var repo = new Repository(RepositoryPath.Path))
             {
-                //string[] pathSegments = RepositoryPath.Path.Split(Path.DirectorySeparatorChar);
-
-                // List<Commit> commitList = new();
-
                 IEnumerable<Commit> commitList = repo.Commits
                     .QueryBy(new CommitFilter { IncludeReachableFrom = repo.Branches })
                     .Where(commit => DateTime.Compare(commit.Author.When.Date, timeLimit) > 0)
+                    // Filter out merge commits
                     .Where(commit => commit.Parents.Count() == 1);
-                // // Iterate over each commit in each branch until time limit is reached
-                // // Assuming, that commits are sorted chronological.
-                // foreach (var branch in repo.Branches)
-                // {
-                //     foreach (var commit in branch.Commits)
-                //     {
-                //         // Assuming that git log is in a 
-                //         if (DateTime.Compare(commit.Author.When.Date, timeLimit) < 0)
-                //         {
-                //             continue;
-                //         }
-                //
-                //         commitList.Add(commit);
-                //     }
-                // }
-                //
-                //
-                // // remove duplicates
-
-                // Filter out merge commits
-                commitList = commitList
-                    //.GroupBy(x => x.Sha)
-                    //.Select(x => x.First())
-                    .Where(x => x.Parents.Count() <= 1)
-                    //.Distinct()
-                    .ToList();
 
                 Dictionary<string, GitFileMetricsCollector> fileMetrics = new();
 
                 foreach (var commit in commitList)
                 {
                     var changedFilesPath = repo.Diff.Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
-                    //.Select(y => y.Path);
+
 
                     foreach (var changedFile in changedFilesPath)
                     {
@@ -129,51 +112,36 @@ namespace SEE.GraphProviders
                             fileMetrics.Add(filePath,
                                 new GitFileMetricsCollector(1, new HashSet<string> { commit.Author.Email },
                                     changedFile.LinesAdded + changedFile.LinesDeleted));
+
+                            fileMetrics[filePath].AuthorsChurn.Add(commit.Author.Email,
+                                changedFile.LinesAdded + changedFile.LinesDeleted);
                         }
                         else
                         {
                             fileMetrics[filePath].NumberOfCommits += 1;
                             fileMetrics[filePath].Authors.Add(commit.Author.Email);
                             fileMetrics[filePath].Churn += changedFile.LinesAdded + changedFile.LinesDeleted;
+                            fileMetrics[filePath].AuthorsChurn.GetOrAdd(commit.Author.Email, 0);
+                            fileMetrics[filePath].AuthorsChurn[commit.Author.Email] +=
+                                (changedFile.LinesAdded + changedFile.LinesDeleted);
                         }
                     }
                 }
 
                 foreach (var file in fileMetrics)
                 {
-                    //analoge tp VCSGraphÜProvider
-                    string[] filePathSegments = file.Key.Split(Path.AltDirectorySeparatorChar);
-                    // Files in the main directory.
-                    if (filePathSegments.Length == 1)
-                    {
-                        Node n = GraphUtils.NewNode(graph, file.Key, "file", file.Key);
-                        graph.GetNode(pathSegments[^1])
-                            .AddChild(n);
-                        n.SetInt(NumberOfAuthorsMetricName, file.Value.Authors.Count);
-                        n.SetInt(NumberOfCommitsMetricName, file.Value.NumberOfCommits);
-                        n.SetInt("Metric.File.Churn", file.Value.Churn);
-                    }
-                    else
-                    {
-                        Node n = GraphUtils.BuildGraphFromPath(file.Key, null, null, graph,
-                            graph.GetNode(pathSegments[^1]));
-                        n.SetInt(NumberOfAuthorsMetricName, file.Value.Authors.Count);
-                        n.SetInt(NumberOfCommitsMetricName, file.Value.NumberOfCommits);
-                        n.SetInt("Metric.File.Churn", file.Value.Churn);
-                    }
+                    file.Value.TruckFactor = CalculateTruckFactor(file.Value.AuthorsChurn);
                 }
 
-                // foreach (var file in fileMetrics)
-                // {
-                //     string[] pathSplit = file.Key.Split(Path.AltDirectorySeparatorChar);
-                //     string nodePath = string.Join(Path.DirectorySeparatorChar.ToString(), pathSplit, 0,
-                //         pathSplit.Length);
-                //
-                //     GraphSearch search = new GraphSearch(graph);
-                //     var n = graph.GetNode(nodePath);
-                //     n.SetInt("Metric.Authors.Number", file.Value.Authors.Count);
-                //     n.SetInt("Metric.File.Commits", file.Value.NumberOfCommits);
-                // }
+                foreach (var file in fileMetrics)
+                {
+                    Node n = GraphUtils.GetOrAddNode(file.Key, graph.GetNode(repositoryName), graph);
+                    n.SetInt(NumberOfAuthorsMetricName, file.Value.Authors.Count);
+                    n.SetInt(NumberOfCommitsMetricName, file.Value.NumberOfCommits);
+                    n.SetInt(NumberOfFileChurnMetricName, file.Value.Churn);
+                    n.SetInt(TruckFactorMetricName, file.Value.TruckFactor);
+                
+                }
 
                 if (SimplifyGraph)
                 {
@@ -182,12 +150,42 @@ namespace SEE.GraphProviders
                         DoSimplyfiGraph(child, graph);
                     }
                 }
-
-                //  SimplyfiGraph(graph.GetRoots().First());
-                Debug.Log($"{fileMetrics.Count}");
             }
 
             return graph;
+        }
+
+
+        /// <summary>
+        /// Calculates the truck factor with a LOC-based heuristic algorithm by Yamashita et al. cited by. Ferreira et. al
+        ///
+        /// Soruce/Math: https://doi.org/10.1145/2804360.2804366, https://doi.org/10.1007/s11219-019-09457-2
+        /// </summary>
+        /// <returns></returns>
+        private static int CalculateTruckFactor(Dictionary<string, int> developersChurn)
+        {
+            int totalChurn = developersChurn.Select(x => x.Value).Sum();
+
+            HashSet<string> coreDevs = new();
+
+            float cumulativeRatio = 0;
+            // Sorting devs by their number of changed files 
+            List<string> sortedDevs =
+                developersChurn
+                    .OrderByDescending(x => x.Value)
+                    .Select(x => x.Key)
+                    .ToList();
+            // Selecting the coreDevs which are responsible for at least 80% of the total churn of a file
+            while (cumulativeRatio <= TruckFactorCoreDevRatio)
+            {
+                string dev = sortedDevs.First();
+                float devRatio = (float)developersChurn[dev] / totalChurn;
+                cumulativeRatio += devRatio;
+                coreDevs.Add(dev);
+                sortedDevs.Remove(dev);
+            }
+
+            return coreDevs.Count;
         }
 
         private void DoSimplyfiGraph(Node root, Graph g)
@@ -252,6 +250,10 @@ namespace SEE.GraphProviders
 
         public HashSet<string> Authors { get; set; }
 
+        public Dictionary<string, int> AuthorsChurn { get; set; }
+
+        public int TruckFactor { get; set; }
+
         /// <summary>
         /// Total sum of changed lines (added and removed)
         /// </summary>
@@ -262,6 +264,8 @@ namespace SEE.GraphProviders
             NumberOfCommits = numberOfCommits;
             Authors = authors;
             Churn = churn;
+            AuthorsChurn = new();
+            TruckFactor = 0;
         }
     }
 }
