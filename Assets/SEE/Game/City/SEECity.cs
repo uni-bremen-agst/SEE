@@ -32,7 +32,6 @@ namespace SEE.Game.City
         /// <see cref="SEECity.Save(ConfigWriter)"/> and
         /// <see cref="SEECity.Restore(Dictionary{string,object})"/>,
         /// respectively. You should also extend the test cases in TestConfigIO.
-
         /// <summary>
         /// A provider of the data shown as code city.
         /// </summary>
@@ -308,8 +307,8 @@ namespace SEE.Game.City
                 {
                     using (LoadingSpinner.ShowIndeterminate($"Loading city \"{gameObject.name}\""))
                     {
-                        LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, x => ProgressBar = x,
-                                                                      cancellationTokenSource.Token);
+                        LoadedGraph = await UniTask.RunOnThreadPool(() => DataProvider.ProvideAsync(new Graph(""), this, x => ProgressBar = x,
+                                                                      cancellationTokenSource.Token));
                     }
                 }
                 catch (OperationCanceledException)
