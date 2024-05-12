@@ -48,6 +48,11 @@
         /// For <see cref="GitEvolutionGraphProvider"/>
         /// </summary>
         GitHistory,
+        
+        /// <summary>
+        /// For <see cref="AllBranchGitProvider"/>
+        /// </summary>
+        GitAllBranches,
 
         /// <summary>
         /// For <see cref="GXLEvolutionGraphProvider"/>

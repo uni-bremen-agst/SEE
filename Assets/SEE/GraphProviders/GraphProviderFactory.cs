@@ -27,6 +27,7 @@ namespace SEE.GraphProviders
                 GraphProviderKind.Pipeline => new PipelineGraphProvider<T>(),
                 GraphProviderKind.JaCoCo => new JaCoCoGraphProvider() as GraphProvider<T>,
                 GraphProviderKind.VCS => new VCSGraphProvider() as GraphProvider<T>,
+                GraphProviderKind.GitAllBranches => new AllBranchGitProvider() as GraphProvider<T>,
                 GraphProviderKind.GitHistory => new GitEvolutionGraphProvider() as GraphProvider<T>,
                 _ => throw new NotImplementedException($"Not implemented for {kind}")
             };
