@@ -170,6 +170,34 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// The attribute name for the commitID of nodes.
+        /// </summary>
+        public const string CommitIDAttribute = "CommitID";
+
+        /// <summary>
+        /// The commitID of the node.
+        /// </summary>
+        public string CommitID
+        {
+            get => TryGetString(CommitIDAttribute, out string commitID) ? commitID : null;
+            set => SetString(CommitIDAttribute, value);
+        }
+
+        /// <summary>
+        /// The attribute name for the repositoryPath of nodes.
+        /// </summary>
+        public const string RepositoryPathAttribute = "RepositoryPath";
+
+        /// <summary>
+        /// The repositoryPath of the node.
+        /// </summary>
+        public string RepositoryPath
+        {
+            get => TryGetString(RepositoryPathAttribute, out string repositoryPath) ? repositoryPath : null;
+            set => SetString(RepositoryPathAttribute, value);
+        }
+
+        /// <summary>
         /// The name of the source file for this graph element.
         /// Note that not all graph elements may have a source file.
         /// If the graph element does not have this attribute, null is returned.

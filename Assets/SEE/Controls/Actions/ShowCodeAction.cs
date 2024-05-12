@@ -254,10 +254,23 @@ namespace SEE.Controls.Actions
         public static CodeWindow ShowCode(GraphElementRef graphElementRef)
         {
             GraphElement graphElement = graphElementRef.Elem;
-            // File name of source code file to read from it
-            (string filename, string absolutePlatformPath) = GetPath(graphElement);
-            CodeWindow codeWindow = GetOrCreateCodeWindow(graphElementRef, filename);
-            codeWindow.EnterFromFile(absolutePlatformPath);
+            string commitID = graphElement.CommitID;
+            CodeWindow codeWindow;
+            if (!string.IsNullOrEmpty(commitID))
+            {
+                codeWindow = GetOrCreateCodeWindow(graphElementRef, graphElement.Filename);
+                IVersionControl vcs = VersionControlFactory.GetVersionControl(VCSKind.Git, graphElement.RepositoryPath);
+                string[] fileContent = vcs.Show(graphElement.ID.Replace('\\', '/'), commitID).
+                    Split("\\n", StringSplitOptions.RemoveEmptyEntries);
+                codeWindow.EnterFromText(fileContent);
+            }
+            else
+            {
+                (string filename, string absolutePlatformPath) = GetPath(graphElement);
+                codeWindow = GetOrCreateCodeWindow(graphElementRef, filename);
+                // File name of source code file to read from it
+                codeWindow.EnterFromFile(absolutePlatformPath);
+            }
 
             // Pass line number to automatically scroll to it, if it exists
             if (graphElement.SourceLine is { } line)

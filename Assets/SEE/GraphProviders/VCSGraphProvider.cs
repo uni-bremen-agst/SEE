@@ -103,7 +103,7 @@ namespace SEE.GraphProviders
             Graph graph = new(repositoryPath, pathSegments[^1]);
 
             // The main directory.
-            graph.NewNode(pathSegments[^1], "directory", pathSegments[^1]);
+            graph.NewNode(pathSegments[^1], "directory", pathSegments[^1], commitID, repositoryPath);
 
             IEnumerable<string> includedPathGlobs = pathGlobbing
                 .Where(path => path.Value)
@@ -124,7 +124,7 @@ namespace SEE.GraphProviders
                 }
                 else if (excludedPathGlobs.Any())
                 {
-                    files = ListTree(tree).Where(path => !excludedPathGlobs.Contains(Path.GetExtension(path)));
+                    files = ListTree(tree).Where(path => !excludedPathGlobs.Contains(Path.GetExtension(path))).Take(200);
                 }
                 else
                 {
@@ -137,17 +137,17 @@ namespace SEE.GraphProviders
                     // Files in the main directory.
                     if (filePathSegments.Length == 1)
                     {
-                        graph.GetNode(pathSegments[^1]).AddChild(graph.NewNode(filePath, "file", filePath));
+                        graph.GetNode(pathSegments[^1]).AddChild(graph.NewNode(filePath, "file", filePath, commitID, repositoryPath));
                     }
                     // Other directories/files.
                     else
                     {
-                        GraphUtils.BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(pathSegments[^1]));
+                        GraphUtils.BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(pathSegments[^1]), commitID, repositoryPath);
                     }
                 }
                 AddMetricsToNode(graph, repo, commitID);
             }
-
+            Debug.Log(graph.ToString());
             return graph;
         }
 
