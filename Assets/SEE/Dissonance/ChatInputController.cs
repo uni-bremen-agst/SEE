@@ -1,6 +1,5 @@
-﻿using Dissonance;
-using Dissonance.Demo;
-using SEE.Controls;
+﻿using SEE.Controls;
+using SEE.GO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,11 +7,16 @@ using UnityEngine.UI;
 namespace SEE.Dissonance
 {
     /// <summary>
-    /// Controls the text chat provided by Dissonance.
+    /// Controls the input (field) for the Dissonance text chat.
+    ///
+    /// It must be attached to a game object that has a direct child
+    /// named <see cref="canvasName"/> holding the canvas where the chat
+    /// is shown. That game object should also have a <see cref="ChatLogController"/>
+    /// component attached to it.
     /// </summary>
     /// <remarks>This code stems from a Dissonance demo and was then
     /// adapted to our needs.</remarks>
-    public class ChatInputController : MonoBehaviour
+    public class ChatInputController : ChatController
     {
         #region fields and properties
 
@@ -22,27 +26,23 @@ namespace SEE.Dissonance
         private const string targetChannel = "Global";
 
         /// <summary>
-        /// The dissonance network to broadcast the messages. Can
-        /// be set in the Unity inspector or otherwise will be set
-        /// automatically by <see cref="Start"/>.
-        /// </summary>
-        [Tooltip("The dissonance network to broadcast the messages.")]
-        public DissonanceComms Comms;
-
-        /// <summary>
         /// The name of the game object representing the input field for the chat.
+        /// The respective game object must be a descendant of the game object holding
+        /// the canvas.
         /// </summary>
         private const string chatInputName = "ChatInput";
 
         /// <summary>
-        /// The input field of the text chat. This is the game object named <see cref="chatInputName"/>.
-        /// It will be retrieved in <see cref="Start"/>.
+        /// The input field of the text chat. This is the game object named
+        /// <see cref="chatInputName"/>. It will be retrieved in <see cref="Start"/>.
         /// </summary>
         private InputField inputField;
 
         /// <summary>
-        /// The controller for the chat log. The log contains the messages
-        /// being entered so far.
+        /// The controller for the chat log. The log contains the messages being entered so far.
+        ///
+        /// The <see cref="ChatLogController"/> component must be attached to the same game
+        /// object as this component.
         /// </summary>
         private ChatLogController chatLog;
         #endregion
@@ -52,16 +52,28 @@ namespace SEE.Dissonance
         /// Registers <see cref="OnInputEndEdit(string)"/> to be called when the user
         /// has ended his/her input.
         /// </summary>
-        private void Start ()
+        protected override void Start ()
         {
-            Comms = Comms ?? FindObjectOfType<DissonanceComms>();
+            base.Start();
 
-            inputField = GetComponentsInChildren<InputField>().Single(a => a.name == chatInputName);
+            // Find the input field.
+            // Note: GetComponentsInChildren recurses into all transitive descendants.
+            inputField = GetComponentsInChildren<InputField>(true).Single(a => a.name == chatInputName);
+            if (inputField == null)
+            {
+                Debug.LogError($"Could not find input field named {chatInputName}.\n");
+                enabled = false;
+                return;
+            }
             inputField.gameObject.SetActive(false);
-
             inputField.onEndEdit.AddListener(OnInputEndEdit);
 
-            chatLog = GetComponent<ChatLogController>();
+            // Find the chat log.
+            if (!gameObject.TryGetComponentOrLog(out chatLog))
+            {
+                enabled = false;
+                return;
+            }
         }
 
         /// <summary>
@@ -76,28 +88,19 @@ namespace SEE.Dissonance
         {
             if (!string.IsNullOrEmpty(message))
             {
-                // Send the text to dissonance network
-                if (Comms != null)
-                {
-                    Comms.Text.Send(targetChannel, message);
-                }
+                // Send the text to the Dissonance network.
+                Comms.Text.Send(targetChannel, message);
 
-                // Display in the local log
-                if (chatLog != null)
-                {
-                    chatLog.AddMessage(string.Format("Me ({0}): {1}", targetChannel, message), Color.blue);
-                }
+                // Display in the local log.
+                chatLog.AddMessage($"Me ({targetChannel}): {message}", Color.blue);
             }
 
-            // Clear the UI
+            // Clear the UI.
             inputField.text = "";
             inputField.gameObject.SetActive(false);
 
-            // Stop forcing the chat visible
-            if (chatLog != null)
-            {
-                chatLog.ForceShow = false;
-            }
+            // Stop forcing the chat visible.
+            chatLog.ForceShow = false;
             SEEInput.KeyboardShortcutsEnabled = true;
         }
 
@@ -122,12 +125,10 @@ namespace SEE.Dissonance
             SEEInput.KeyboardShortcutsEnabled = false;
             inputField.gameObject.SetActive(true);
             inputField.ActivateInputField();
+            EnableCanvas(true);
 
             // Force the chat log to show
-            if (chatLog != null)
-            {
-                chatLog.ForceShow = true;
-            }
+            chatLog.ForceShow = true;
         }
     }
 }
