@@ -39,7 +39,7 @@ namespace SEE.Game.City
          Tooltip("A graph provider yielding the data to be visualized as a code city."),
          TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup),
          HideReferenceObjectPicker]
-        public PipelineGraphProvider<Graph> DataProvider = new();
+        public SingleGraphPipelineProvider DataProvider = new();
 
         /// <summary>
         /// The graph that is visualized in the scene and whose visualization settings are
@@ -559,7 +559,7 @@ namespace SEE.Game.City
         {
             base.Restore(attributes);
             DataProvider =
-                GraphProvider<Graph>.Restore(attributes, dataProviderPathLabel) as PipelineGraphProvider<Graph>;
+                SingleGraphPipelineProvider.Restore(attributes, dataProviderPathLabel) as SingleGraphPipelineProvider;
         }
 
         #endregion

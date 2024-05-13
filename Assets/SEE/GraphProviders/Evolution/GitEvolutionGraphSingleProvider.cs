@@ -18,7 +18,7 @@ using UnityEngine;
 namespace SEE.GraphProviders
 {
     [Serializable]
-    public class GitEvolutionGraphProvider : GitRepositoryProvider<List<Graph>>
+    public class GitEvolutionGraphProvider : MultiGraphProvider
     {
         #region Constants
 
@@ -30,6 +30,9 @@ namespace SEE.GraphProviders
 
         #endregion
 
+        [OdinSerialize, ShowInInspector, SerializeReference, HideReferenceObjectPicker,
+         ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository")]
+        public GitRepository Repository = new();
 
         /// <summary>
         /// The date limit until commits should be analysed
@@ -49,18 +52,18 @@ namespace SEE.GraphProviders
         {
             DateTime timeLimit = DateTime.ParseExact(Date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
 
-            IEnumerable<string> includedFiles = PathGlobbing
+            IEnumerable<string> includedFiles = Repository.PathGlobbing
                 .Where(path => path.Value == true)
                 .Select(path => path.Key);
 
-            IEnumerable<string> excludedFiles = PathGlobbing
+            IEnumerable<string> excludedFiles = Repository.PathGlobbing
                 .Where(path => path.Value == false)
                 .Select(path => path.Key);
 
-            string[] pathSegments = RepositoryPath.Path.Split(Path.DirectorySeparatorChar);
+            string[] pathSegments = Repository.RepositoryPath.Path.Split(Path.DirectorySeparatorChar);
             string repositoryName = pathSegments[^1];
 
-            using (var repo = new Repository(RepositoryPath.Path))
+            using (var repo = new Repository(Repository.RepositoryPath.Path))
             {
                 List<Commit> commitList = repo.Commits
                     .QueryBy(new CommitFilter { IncludeReachableFrom = repo.Branches })
@@ -106,9 +109,9 @@ namespace SEE.GraphProviders
             Dictionary<Commit, List<PatchEntryChanges>> commitChanges, IEnumerable<string> includedFiles,
             IEnumerable<string> excludedFiles)
         {
-            Graph g = new Graph(RepositoryPath.Path);
-            g.BasePath = RepositoryPath.Path;
-            GraphUtils.NewNode(g, repoName, "Repository", repoName);
+            Graph g = new Graph(Repository.RepositoryPath.Path);
+            g.BasePath = Repository.RepositoryPath.Path;
+            Node rootNode = GraphUtils.NewNode(g, repoName + "-Evo", "Repository", repoName + "-Evo");
 
             g.StringAttributes.Add("CommitTimestamp", currentCommit.Author.When.Date.ToString("dd/MM/yyy"));
             g.StringAttributes.Add("CommitId", currentCommit.Sha);
@@ -145,7 +148,7 @@ namespace SEE.GraphProviders
 
             foreach (var file in fileMetrics)
             {
-                Node n = GraphUtils.GetOrAddNode(file.Key, g.GetNode(repoName), g);
+                Node n = GraphUtils.GetOrAddNode(file.Key, rootNode, g, idSuffix: "-evo");
                 n.SetInt(NumberOfAuthorsMetricName, file.Value.Authors.Count);
                 n.SetInt(NumberOfCommitsMetricName, file.Value.NumberOfCommits);
                 n.SetInt("Metric.File.Churn", file.Value.Churn);
@@ -199,22 +202,26 @@ namespace SEE.GraphProviders
             .Compare<Patch>(commit.Tree, commit.Parents.First().Tree).Select(x => x).ToList();
 
 
-        public override GraphProviderKind GetKind()
+        public override MultiGraphProviderKind GetKind()
         {
-            return GraphProviderKind.GitHistory;
+            return MultiGraphProviderKind.GitEvolution;
         }
 
         protected override void SaveAttributes(ConfigWriter writer)
         {
-            RepositoryPath.Save(writer, "RepositoryPath");
-            Dictionary<string, bool> pathGlobbing = string.IsNullOrEmpty(PathGlobbing.ToString()) ? null : PathGlobbing;
+            Repository.RepositoryPath.Save(writer, "RepositoryPath");
+            Dictionary<string, bool> pathGlobbing = string.IsNullOrEmpty(Repository.PathGlobbing.ToString())
+                ? null
+                : Repository.PathGlobbing;
             writer.Save(pathGlobbing, "PathGlobing");
             writer.Save(Date, "Date");
         }
 
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
-            throw new System.NotImplementedException();
+            Repository.RepositoryPath.Restore(attributes, "RepositoryPath");
+            ConfigIO.Restore(attributes, "PathGlobing", ref Repository.PathGlobbing);
+            ConfigIO.Restore(attributes, "Date", ref Date);
         }
     }
 }

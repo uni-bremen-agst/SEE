@@ -15,7 +15,7 @@ namespace SEE.GraphProviders
     /// Reads metrics from the Axivion Dashboard and adds these to a graph.
     /// </summary>
     [Serializable]
-    public class DashboardGraphProvider: GraphProvider<Graph>
+    public class DashboardGraphProvider: SingleGraphProvider
     {
         /// <summary>
         /// Whether metrics retrieved from the dashboard shall override existing metrics.

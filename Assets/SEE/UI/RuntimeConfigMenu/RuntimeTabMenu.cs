@@ -575,8 +575,8 @@ namespace SEE.UI.RuntimeConfigMenu
                         attributeArray);
                     break;
 
-                case PipelineGraphProvider<Graph>:
-                    FieldInfo pipeline = value.GetType().GetField(nameof(PipelineGraphProvider<Graph>.Pipeline))!;
+                case SingleGraphPipelineProvider:
+                    FieldInfo pipeline = value.GetType().GetField(nameof(SingleGraphPipelineProvider.Pipeline))!;
                     CreateSetting(() => pipeline.GetValue(value),
                         settingName,
                         parent,
@@ -584,9 +584,9 @@ namespace SEE.UI.RuntimeConfigMenu
                         attributeArray);
                     break;
 
-                case PipelineGraphProvider<List<Graph>>:
+                case MultiGraphPipelineProvider:
                     FieldInfo pipeline2 =
-                        value.GetType().GetField(nameof(PipelineGraphProvider<List<Graph>>.Pipeline))!;
+                        value.GetType().GetField(nameof(MultiGraphPipelineProvider.Pipeline))!;
                     CreateSetting(() => pipeline2.GetValue(value),
                         settingName,
                         parent,
@@ -610,13 +610,13 @@ namespace SEE.UI.RuntimeConfigMenu
                     parent = CreateNestedSetting(settingName, parent);
                     CreateList(list, parent, () => string.Empty);
                     break;
-                case List<GraphProvider<Graph>> providerList:
+                case List<SingleGraphProvider> providerList:
                     parent = CreateNestedSetting(settingName, parent);
-                    CreateList(providerList, parent, () => new PipelineGraphProvider<Graph>());
+                    CreateList(providerList, parent, () => new SingleGraphPipelineProvider());
                     break;
-                case List<GraphProvider<List<Graph>>> providerList:
+                case List<MultiGraphProvider> providerList:
                     parent = CreateNestedSetting(settingName, parent);
-                    CreateList(providerList, parent, () => new PipelineGraphProvider<List<Graph>>());
+                    CreateList(providerList, parent, () => new MultiGraphPipelineProvider());
                     break;
 
                 // confirmed types where the nested fields should be edited
@@ -638,21 +638,21 @@ namespace SEE.UI.RuntimeConfigMenu
                     break;
                 case CSVGraphProvider:
                 case DashboardGraphProvider:
-                case GXLGraphProvider:
-                case JaCoCoGraphProvider:
+                case GXLSingleGraphProvider:
+                case JaCoCoSingleGraphProvider:
                 case ReflexionGraphProvider:
                     parent = CreateNestedSetting(settingName, parent);
-                    CreateTypeField(parent, value as GraphProvider<Graph>);
+                    CreateTypeField(parent, value as SingleGraphProvider);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
-                case AllBranchGitProvider:
+                case AllBranchGitSingleProvider:
                     parent = CreateNestedSetting(settingName, parent);
-                    CreateTypeField(parent, value as GraphProvider<Graph>);
+                    CreateTypeField(parent, value as SingleGraphProvider);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
                 case GitEvolutionGraphProvider:
                     parent = CreateNestedSetting(settingName, parent);
-                    CreateTypeField(parent, value as GraphProvider<List<Graph>>);
+                    CreateTypeField(parent, value as MultiGraphProvider);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
                 default:
@@ -953,7 +953,7 @@ namespace SEE.UI.RuntimeConfigMenu
             }
         }
 
-        private void CreateTypeField(GameObject parent, GraphProvider<List<Graph>> provider)
+        private void CreateTypeField(GameObject parent, MultiGraphProvider provider)
         {
             string[] graphProviderKinds = GetGraphProviderKinds();
 
@@ -966,7 +966,8 @@ namespace SEE.UI.RuntimeConfigMenu
             // all values of enum GraphProviderKind as strings
             string[] GetGraphProviderKinds()
             {
-                return Enum.GetValues(typeof(GraphProviderKind)).Cast<GraphProviderKind>().Select(e => e.ToString())
+                return Enum.GetValues(typeof(MultiGraphProviderKind)).Cast<MultiGraphProviderKind>()
+                    .Select(e => e.ToString())
                     .ToArray();
             }
 
@@ -978,7 +979,7 @@ namespace SEE.UI.RuntimeConfigMenu
             // index is the index of the changed enum
             void Setter(int index)
             {
-                if (Enum.TryParse(graphProviderKinds[index], true, out GraphProviderKind newKind))
+                if (Enum.TryParse(graphProviderKinds[index], true, out MultiGraphProviderKind newKind))
                 {
                     if (provider.GetKind() != newKind)
                     {
@@ -991,7 +992,7 @@ namespace SEE.UI.RuntimeConfigMenu
             }
         }
 
-        private void CreateTypeField(GameObject parent, GraphProvider<Graph> provider)
+        private void CreateTypeField(GameObject parent, SingleGraphProvider provider)
         {
             string[] graphProviderKinds = GetGraphProviderKinds();
 
@@ -1254,8 +1255,8 @@ namespace SEE.UI.RuntimeConfigMenu
             FilePicker.FilePicker filePicker = parent.AddComponent<FilePicker.FilePicker>();
             filePicker.DataPathInstance = dataPath;
             filePicker.Label = settingName;
-            filePicker.PickingMode = dataPath is DirectoryPath ?
-                                       FileBrowser.PickMode.Folders : FileBrowser.PickMode.Files;
+            filePicker.PickingMode =
+                dataPath is DirectoryPath ? FileBrowser.PickMode.Folders : FileBrowser.PickMode.Files;
 
             // getter of widget name (if not provided)
             string GetWidgetName() => filePicker.gameObject.FullName() + "/" + settingName;

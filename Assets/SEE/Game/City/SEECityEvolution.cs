@@ -52,7 +52,7 @@ namespace SEE.Game.City
          Tooltip("A graph provider yielding the data to be visualized as a code city."),
          TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup),
          HideReferenceObjectPicker]
-        public PipelineGraphProvider<List<Graph>> DataProvider = new();
+        public MultiGraphPipelineProvider DataProvider = new();
 
 
         /// <summary>
@@ -411,8 +411,7 @@ namespace SEE.Game.City
         {
             base.Restore(attributes);
             DataProvider =
-                GraphProvider<List<Graph>>.Restore(attributes, dataProviderPathLabel) as
-                    PipelineGraphProvider<List<Graph>>;
+                MultiGraphProvider.Restore(attributes, dataProviderPathLabel) as MultiGraphPipelineProvider;
             //GXLDirectory.Restore(attributes, gxlDirectoryLabel);
             ConfigIO.Restore(attributes, maxRevisionsToLoadLabel, ref MaxRevisionsToLoad);
         }

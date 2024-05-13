@@ -1,31 +1,33 @@
-﻿using SEE.DataModel.DG;
-using SEE.Game.City;
-using SEE.Utils.Config;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using SEE.DataModel.DG;
+using SEE.Game.City;
+using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 
 namespace SEE.GraphProviders
 {
     /// <summary>
-    /// A pipeline of <see cref="GraphProvider"/>s which are executed one by one to
-    /// create a graph. This class allows us to generate a graph step by step. For
-    /// instance, first a graph is loaded from a GXL file and then metrics are
-    /// added from a CSV file.
+    /// A graph provider pipeline of multiple <see cref="SingleGraphProvider"/>
     /// </summary>
-    [Serializable]
-    public class PipelineGraphProvider<T> : GraphProvider<T>
+    public class SingleGraphPipelineProvider : SingleGraphProvider
     {
+        /// <summary>
+        /// The label for <see cref="Pipeline"/> in the configuration file.
+        /// </summary>
+        protected const string pipelineLabel = "pipeline";
+
         /// <summary>
         /// The list of nested providers in this pipeline. These will be executed
         /// from first to last.
         /// </summary>
-        [HideReferenceObjectPicker, ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = nameof(GetKind))]
-        public List<GraphProvider<T>> Pipeline = new();
+        [HideReferenceObjectPicker,
+         ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = nameof(GetKind))]
+        public List<SingleGraphProvider> Pipeline = new();
 
         /// <summary>
         /// Provides a graph based as a result of the serial execution of all
@@ -43,14 +45,14 @@ namespace SEE.GraphProviders
         /// <param name="token">can be used to cancel the operation</param>
         /// <returns></returns>
         /// <remarks>Exceptions may be thrown by each nested graph provider.</remarks>
-        public override async UniTask<T> ProvideAsync(T graph, AbstractSEECity city,
-                                                          Action<float> changePercentage = null,
-                                                          CancellationToken token = default)
+        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
+            Action<float> changePercentage = null,
+            CancellationToken token = default)
         {
-            UniTask<T> initial = UniTask.FromResult(graph);
-            int count = -1;  // -1 because the first provider will increment it to 0.
+            UniTask<Graph> initial = UniTask.FromResult(graph);
+            int count = -1; // -1 because the first provider will increment it to 0.
             return await Pipeline.Aggregate(initial, (current, provider) =>
-                                                current.ContinueWith(g => provider.ProvideAsync(g, city, AggregatePercentage(), token)));
+                current.ContinueWith(g => provider.ProvideAsync(g, city, AggregatePercentage(), token)));
 
             Action<float> AggregatePercentage()
             {
@@ -63,31 +65,25 @@ namespace SEE.GraphProviders
 
         public override GraphProviderKind GetKind()
         {
-            return GraphProviderKind.Pipeline;
+            return GraphProviderKind.SinglePipeline;
+        }
+
+        protected override void SaveAttributes(ConfigWriter writer)
+        {
+            writer.BeginList(pipelineLabel);
+            foreach (SingleGraphProvider provider in Pipeline)
+            {
+                provider.Save(writer, "");
+            }
+
+            writer.EndList();
         }
 
         /// <summary>
         /// Adds <paramref name="provider"/> at the end of the <see cref="Pipeline"/>.
         /// </summary>
         /// <param name="provider">graph provider to be added</param>
-        internal void Add(GraphProvider<T> provider) => Pipeline.Add(provider);
-
-        #region Config I/O
-
-        /// <summary>
-        /// The label for <see cref="Pipeline"/> in the configuration file.
-        /// </summary>
-        private const string pipelineLabel = "pipeline";
-
-        protected override void SaveAttributes(ConfigWriter writer)
-        {
-            writer.BeginList(pipelineLabel);
-            foreach (GraphProvider<T> provider in Pipeline)
-            {
-                provider.Save(writer, "");
-            }
-            writer.EndList();
-        }
+        internal void Add(SingleGraphProvider provider) => Pipeline.Add(provider);
 
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
@@ -100,19 +96,17 @@ namespace SEE.GraphProviders
                     foreach (object item in items)
                     {
                         Dictionary<string, object> dict = (Dictionary<string, object>)item;
-                        GraphProvider<T> provider = RestoreProvider(dict);
+                        SingleGraphProvider provider = SingleGraphProvider.RestoreProvider(dict);
                         Pipeline.Add(provider);
                     }
                 }
                 catch (InvalidCastException e)
                 {
                     throw new InvalidCastException("Types are not assignment compatible."
-                        + $" Expected type: IList<{typeof(GraphProvider<T>)}>. Actual type: {v.GetType()}."
-                        + $" Original exception: {e.Message} {e.StackTrace}");
+                                                   + $" Expected type: IList<{typeof(MultiGraphProvider)}>. Actual type: {v.GetType()}."
+                                                   + $" Original exception: {e.Message} {e.StackTrace}");
                 }
             }
         }
-
-        #endregion
     }
 }

@@ -16,7 +16,7 @@ namespace SEE.GraphProviders
     /// a single file.
     /// </summary>
     [Serializable]
-    public abstract class FileBasedGraphProvider<T> : GraphProvider<T>
+    public abstract class FileBasedSingleGraphProvider : SingleGraphProvider
     {
         /// <summary>
         /// The path to the file containing the additional data to be added to a graph.

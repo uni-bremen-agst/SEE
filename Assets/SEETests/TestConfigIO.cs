@@ -812,7 +812,7 @@ namespace SEE.Utils
         private static void WipeOutSEECityAttributes(SEECity city)
         {
             WipeOutAbstractSEECityAttributes(city);
-            city.DataProvider = new PipelineGraphProvider<Graph>();
+            city.DataProvider = new SingleGraphPipelineProvider();
         }
 
         /// <summary>

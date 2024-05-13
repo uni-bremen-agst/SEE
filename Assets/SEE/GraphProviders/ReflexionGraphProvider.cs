@@ -20,7 +20,7 @@ namespace SEE.GraphProviders
     /// implementation, mapping).
     /// </summary>
     [Serializable]
-    public class ReflexionGraphProvider : GraphProvider<Graph>
+    public class ReflexionGraphProvider : SingleGraphProvider
     {
         /// <summary>
         /// The path to the GXL file containing the architecture.

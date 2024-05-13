@@ -4,21 +4,25 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Antlr4.Runtime.Misc;
 using Cysharp.Threading.Tasks;
+using Dissonance;
 using LibGit2Sharp;
 using SEE.DataModel.DG;
 using SEE.Game.City;
+using SEE.GO;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SEE.GraphProviders
 {
     [Serializable]
-    public class AllBranchGitProvider : GitRepositoryProvider<Graph>
+    public class AllBranchGitSingleProvider : SingleGraphProvider
     {
         /// <summary>
         /// The date limit until commits should be analysed
@@ -28,13 +32,26 @@ namespace SEE.GraphProviders
          Tooltip("The date until commits should be analysed (DD/MM/YYYY)"), RuntimeTab(GraphProviderFoldoutGroup)]
         public string Date = "";
 
+        [OdinSerialize, ShowInInspector, SerializeReference, HideReferenceObjectPicker,
+         ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository")]
+        public GitRepository RepositoryData = new();
 
         [OdinSerialize] [ShowInInspector] public int AuthorThreshhold { get; set; } = 1;
 
         [OdinSerialize] [ShowInInspector] public int CommitThreshhold { get; set; } = 1;
         [OdinSerialize] [ShowInInspector] public bool SimplifyGraph { get; set; }
 
-        [OdinSerialize] [ShowInInspector] public bool AutoFetch { get; set; }
+        /// <summary>
+        /// Specifies if SEE should automatically fetch for new commits in the repository <see cref="GitRepositorySingleProvider{T}.RepositoryPath"/>.
+        ///
+        /// This will append the path of this repo to <see cref="GitPoller"/>.
+        ///
+        /// Note: the repository must be fetch-able without any credentials since we cant store them securely yet.
+        /// TODO: Maybe change this in the future 
+        /// </summary>
+        [OdinSerialize]
+        [ShowInInspector]
+        public bool AutoFetch { get; set; }
 
         #region Constants
 
@@ -55,17 +72,41 @@ namespace SEE.GraphProviders
 
         #endregion
 
-        public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="city"></param>
+        /// <returns></returns>
+        private GitPoller GetOrAddGitPollerComponent(AbstractSEECity city)
+        {
+            if (city.TryGetComponent(out GitPoller poller))
+            {
+                return poller;
+            }
+
+            GitPoller newPoller = city.gameObject.AddComponent<GitPoller>();
+            newPoller.CodeCity = (SEECity)city;
+            return newPoller;
+        }
+
+        public async override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
             Action<float> changePercentage = null,
             CancellationToken token = default)
         {
-            return UniTask.RunOnThreadPool(() => GetGraph(graph));
+            var task = await UniTask.RunOnThreadPool(() => GetGraph(graph));
+            if (AutoFetch)
+            {
+                GitPoller poller = GetOrAddGitPollerComponent(city);
+                poller.WatchedRepositories.Add(RepositoryData.RepositoryPath.Path);
+            }
+
+            return task;
         }
 
         private Graph GetGraph(Graph graph)
         {
-            graph.BasePath = RepositoryPath.Path;
-            string[] pathSegments = RepositoryPath.Path.Split(Path.DirectorySeparatorChar);
+            graph.BasePath = RepositoryData.RepositoryPath.Path;
+            string[] pathSegments = RepositoryData.RepositoryPath.Path.Split(Path.DirectorySeparatorChar);
 
             string repositoryName = pathSegments[^1];
 
@@ -73,15 +114,15 @@ namespace SEE.GraphProviders
 
             DateTime timeLimit = DateTime.ParseExact(Date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
 
-            IEnumerable<string> includedFiles = PathGlobbing
+            IEnumerable<string> includedFiles = RepositoryData.PathGlobbing
                 .Where(path => path.Value)
                 .Select(path => path.Key);
 
-            IEnumerable<string> excludedFiles = PathGlobbing
+            IEnumerable<string> excludedFiles = RepositoryData.PathGlobbing
                 .Where(path => !path.Value)
                 .Select(path => path.Key);
 
-            using (var repo = new Repository(RepositoryPath.Path))
+            using (var repo = new Repository(RepositoryData.RepositoryPath.Path))
             {
                 IEnumerable<Commit> commitList = repo.Commits
                     .QueryBy(new CommitFilter { IncludeReachableFrom = repo.Branches })
@@ -224,20 +265,34 @@ namespace SEE.GraphProviders
 
         public override GraphProviderKind GetKind()
         {
-            return GraphProviderKind.VCS;
+            return GraphProviderKind.GitAllBranches;
         }
 
         protected override void SaveAttributes(ConfigWriter writer)
         {
-            Dictionary<string, bool> pathGlobbing = string.IsNullOrEmpty(PathGlobbing.ToString()) ? null : PathGlobbing;
+            Dictionary<string, bool> pathGlobbing = string.IsNullOrEmpty(RepositoryData.PathGlobbing.ToString())
+                ? null
+                : RepositoryData.PathGlobbing;
+            RepositoryData.RepositoryPath.Save(writer, "Path");
             writer.Save(pathGlobbing, pathGlobbingLabel);
+            writer.Save(Date, "Date");
+            writer.Save(SimplifyGraph, "SimplifyGraph");
+            writer.Save(AutoFetch, "AutoFetch");
         }
 
         private const string pathGlobbingLabel = "PathGlobbing";
 
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
-            throw new System.NotImplementedException();
+            ConfigIO.Restore(attributes, pathGlobbingLabel, ref RepositoryData.PathGlobbing);
+            RepositoryData.RepositoryPath.Restore(attributes, "Path");
+            ConfigIO.Restore(attributes, "Date", ref Date);
+            var simplifyGraph = SimplifyGraph;
+            ConfigIO.Restore(attributes, "SimplifyGraph", ref simplifyGraph);
+            SimplifyGraph = simplifyGraph;
+            var autoFetch = AutoFetch;
+            ConfigIO.Restore(attributes, "AutoFetch", ref autoFetch);
+            AutoFetch = autoFetch;
         }
     }
 
@@ -260,7 +315,7 @@ namespace SEE.GraphProviders
         {
             Authors = new();
             AuthorsChurn = new();
-        }   
+        }
 
         public GitFileMetricsCollector(int numberOfCommits, HashSet<string> authors, int churn)
         {

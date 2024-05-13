@@ -5,7 +5,7 @@ namespace SEE.GraphProviders
     /// <summary>
     /// A factory for instances of <see cref="GraphProvider"/> and its subclasses.
     /// </summary>
-    static class GraphProviderFactory<T>
+    static class GraphProviderFactory
     {
         /// <summary>
         /// Returns a new instance of a suitable <see cref="GraphProvider"/> for the
@@ -17,18 +17,29 @@ namespace SEE.GraphProviders
         /// <returns>a new instance</returns>
         /// <exception cref="NotImplementedException">thrown in case the given <paramref name="kind"/>
         /// is not yet handled</exception>
-        internal static GraphProvider<T> NewInstance(GraphProviderKind kind)
+        internal static SingleGraphProvider NewSingleGraphProviderInstance(GraphProviderKind kind)
         {
             return kind switch
             {
-                GraphProviderKind.GXL => new GXLGraphProvider() as GraphProvider<T>,
-                GraphProviderKind.CSV => new CSVGraphProvider() as GraphProvider<T>,
-                GraphProviderKind.Reflexion => new ReflexionGraphProvider() as GraphProvider<T>,
-                GraphProviderKind.Pipeline => new PipelineGraphProvider<T>(),
-                GraphProviderKind.JaCoCo => new JaCoCoGraphProvider() as GraphProvider<T>,
-                GraphProviderKind.VCS => new VCSGraphProvider() as GraphProvider<T>,
-                GraphProviderKind.GitAllBranches => new AllBranchGitProvider() as GraphProvider<T>,
-                GraphProviderKind.GitHistory => new GitEvolutionGraphProvider() as GraphProvider<T>,
+                GraphProviderKind.GXL => new GXLSingleGraphProvider(),
+                GraphProviderKind.CSV => new CSVGraphProvider(),
+                GraphProviderKind.Reflexion => new ReflexionGraphProvider(),
+                GraphProviderKind.SinglePipeline => new SingleGraphPipelineProvider(),
+                GraphProviderKind.JaCoCo => new JaCoCoSingleGraphProvider(),
+                GraphProviderKind.MergeDiff => new MergeDiffGraphProvider(),
+                GraphProviderKind.VCS => new VCSGraphProvider(),
+                GraphProviderKind.GitAllBranches => new AllBranchGitSingleProvider(),
+                _ => throw new NotImplementedException($"Not implemented for {kind}")
+            };
+        }
+
+        internal static MultiGraphProvider NewMultiGraphProviderInstance(MultiGraphProviderKind kind)
+        {
+            return kind switch
+            {
+                MultiGraphProviderKind.MultiPipeline => new MultiGraphPipelineProvider(),
+                MultiGraphProviderKind.GitEvolution => new GitEvolutionGraphProvider(),
+                MultiGraphProviderKind.GXLEvolution => new GXLEvolutionGraphProvider(),
                 _ => throw new NotImplementedException($"Not implemented for {kind}")
             };
         }

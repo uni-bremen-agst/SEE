@@ -11,10 +11,11 @@ namespace SEE.GraphProviders
     /// <summary>
     /// 
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     [Serializable]
-    public abstract class GitRepositoryProvider<T> : GraphProvider<T>
+    public class GitRepository
     {
+        
+        protected const string GraphProviderFoldoutGroup = "Data";
    
         /// <summary>
         /// The path to the git repository.

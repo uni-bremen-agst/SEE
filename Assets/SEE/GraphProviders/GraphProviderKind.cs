@@ -1,5 +1,16 @@
 ﻿namespace SEE.GraphProviders
 {
+    public enum MultiGraphProviderKind
+    {
+        MultiPipeline,
+        GitEvolution,
+
+        /// <summary>
+        /// For <see cref="GXLEvolutionGraphProvider"/>
+        /// </summary>
+        GXLEvolution,
+    }
+
     /// <summary>
     /// The kind of graph providers. These values are shown to a user, e.g., in a configuration
     /// file or in the configuration of code cities at run-time. They should be short and
@@ -10,7 +21,7 @@
     public enum GraphProviderKind
     {
         /// <summary>
-        /// For <see cref="GXLGraphProvider"/>.
+        /// For <see cref="GXLSingleGraphProvider"/>.
         /// </summary>
         GXL,
 
@@ -20,14 +31,16 @@
         CSV,
 
         /// <summary>
-        /// For <see cref="JaCoCoGraphProvider"/>.
+        /// For <see cref="JaCoCoSingleGraphProvider"/>.
         /// </summary>
         JaCoCo,
 
         /// <summary>
         /// For <see cref="PipelineGraphProvider"/>.
         /// </summary>
-        Pipeline,
+        SinglePipeline,
+
+        MultiPipeline,
 
         /// <summary>
         /// For <see cref="DashboardGraphProvider"/>.
@@ -45,27 +58,23 @@
         Reflexion,
 
         /// <summary>
-        /// For <see cref="GitEvolutionGraphProvider"/>
+        /// For <see cref="GitEvolutionGraphSingleProvider"/>
         /// </summary>
         GitHistory,
-        
+
         /// <summary>
-        /// For <see cref="AllBranchGitProvider"/>
+        /// For <see cref="AllBranchGitSingleProvider"/>
         /// </summary>
         GitAllBranches,
 
         /// <summary>
-        /// For <see cref="GXLEvolutionGraphProvider"/>
-        /// </summary>
-        GXLEvolution,
-        /// <summary>
         /// For <see cref="MergeDiffGraphProvider"/>.
         /// </summary>
         MergeDiff,
+
         /// <summary>
         /// For <see cref="LSPGraphProvider"/>.
         /// </summary>
         LSP
-
     }
 }

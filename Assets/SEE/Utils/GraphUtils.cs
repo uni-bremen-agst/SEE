@@ -48,8 +48,8 @@ namespace SEE.Utils
         /// <param name="rootNode">The root node of the repository</param>
         /// <param name="g">The graph to add the nodes to</param>
         /// <returns>The found file node</returns>
-        public static Node GetOrAddNode(string fullRelativePath, Node rootNode, Graph g) =>
-            GetOrAddNode(fullRelativePath, fullRelativePath, rootNode, g);
+        public static Node GetOrAddNode(string fullRelativePath, Node rootNode, Graph g, string idSuffix = "") =>
+            GetOrAddNode(fullRelativePath, fullRelativePath, rootNode, g, idSuffix: idSuffix);
 
 
         /// <summary>
@@ -60,34 +60,35 @@ namespace SEE.Utils
         /// <param name="parent">The parent of the current node</param>
         /// <param name="g">The graph to add the nodes to</param>
         /// <returns></returns>
-        private static Node GetOrAddNode(string fullRelativePath, string path, Node parent, Graph g)
+        private static Node GetOrAddNode(string fullRelativePath, string path, Node parent, Graph g,
+            string idSuffix = "")
         {
             string[] pathSegments = path.Split(Path.AltDirectorySeparatorChar);
             // If we are in the directory of the file
             if (pathSegments.Length == 1)
             {
                 // If the file node exists
-                if (parent.Children().Any(x => x.ID == fullRelativePath))
+                if (parent.Children().Any(x => x.ID + idSuffix == fullRelativePath))
                 {
-                    return parent.Children().First(x => x.ID == fullRelativePath);
+                    return parent.Children().First(x => x.ID + idSuffix == fullRelativePath);
                 }
 
                 // Create a new file node and return it
-                Node addedFileNode = NewNode(g, fullRelativePath,
+                Node addedFileNode = NewNode(g, fullRelativePath + idSuffix,
                     FileType, path);
                 parent.AddChild(addedFileNode);
                 return addedFileNode;
             }
 
-            string directoryName = parent.ID + Path.AltDirectorySeparatorChar + pathSegments.First();
+            string directoryName = parent.ID + Path.AltDirectorySeparatorChar + pathSegments.First() + idSuffix;
 
             // If the current Node parent already has the next directory with the name directoryName
             if (parent.Children().Any(x => x.ID == directoryName))
             {
                 Node dirNode = parent.Children().First(x =>
-                    x.ID == parent.ID + Path.AltDirectorySeparatorChar + pathSegments.First());
+                    x.ID == parent.ID + Path.AltDirectorySeparatorChar + pathSegments.First() + idSuffix);
                 return GetOrAddNode(fullRelativePath, String.Join(Path.AltDirectorySeparatorChar, pathSegments.Skip(1)),
-                    dirNode, g);
+                    dirNode, g,idSuffix: idSuffix);
             }
 
             // Create a new directory node
@@ -95,7 +96,7 @@ namespace SEE.Utils
                 DirectoryType, directoryName);
             parent.AddChild(addedDirectoryNode);
             return GetOrAddNode(fullRelativePath, String.Join(Path.AltDirectorySeparatorChar, pathSegments.Skip(1)),
-                addedDirectoryNode, g);
+                addedDirectoryNode, g, idSuffix:idSuffix);
         }
 
         /// <summary>

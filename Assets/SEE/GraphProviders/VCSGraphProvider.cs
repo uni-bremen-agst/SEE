@@ -2,11 +2,8 @@ using Cysharp.Threading.Tasks;
 using LibGit2Sharp;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils.Config;
-using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
-using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,13 +12,14 @@ using System.Threading;
 using UnityEngine;
 using SEE.Utils;
 using SEE.UI.Window.CodeWindow;
+using SEE.Utils.Paths;
 
 namespace SEE.GraphProviders
 {
     /// <summary>
     /// Provides a version control system graph based on a git repository.
     /// </summary>
-    public class VCSGraphProvider : GitRepositoryProvider<Graph>
+    public class VCSGraphProvider : SingleGraphProvider
     {
         /// <summary>
         /// The commit id.
@@ -29,12 +27,18 @@ namespace SEE.GraphProviders
         [ShowInInspector, Tooltip("The new commit id."), HideReferenceObjectPicker]
         public string CommitID = "";
 
+        public GitRepository Repository;
+
+        private Dictionary<string, bool> PathGlobbing => Repository.PathGlobbing;
+
+        private DirectoryPath RepositoryPath => Repository.RepositoryPath;
 
         /// <summary>
         /// Loads the metrics and nodes from the given git repository and commitID into the <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">The graph into which the metrics shall be loaded</param>
-        public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city, Action<float> changePercentage = null,
+        public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
+            Action<float> changePercentage = null,
             CancellationToken token = default)
         {
             CheckArguments(city);
@@ -170,7 +174,6 @@ namespace SEE.GraphProviders
         }
 
 
-
         public override GraphProviderKind GetKind()
         {
             return GraphProviderKind.VCS;
@@ -201,7 +204,7 @@ namespace SEE.GraphProviders
 
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
-            ConfigIO.Restore(attributes, pathGlobbingLabel, ref PathGlobbing);
+            ConfigIO.Restore(attributes, pathGlobbingLabel, ref Repository.PathGlobbing);
             ConfigIO.Restore(attributes, newCommitIDLabel, ref CommitID);
             RepositoryPath.Restore(attributes, repositoryPathLabel);
         }

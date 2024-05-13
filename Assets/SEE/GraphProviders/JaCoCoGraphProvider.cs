@@ -12,7 +12,7 @@ namespace SEE.GraphProviders
     /// Reads metrics from a JaCoCo XML report file and adds these to a graph.
     /// </summary>
     [Serializable]
-    public class JaCoCoGraphProvider : FileBasedGraphProvider<Graph>
+    public class JaCoCoSingleGraphProvider : FileBasedSingleGraphProvider
     {
         /// <summary>
         /// Reads metrics from a JaCoCo XML report file and adds these to <paramref name="graph"/>.
