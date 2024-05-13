@@ -1,0 +1,4 @@
+PROGRAM test;
+BEGIN
+ RETURN 
+END.
