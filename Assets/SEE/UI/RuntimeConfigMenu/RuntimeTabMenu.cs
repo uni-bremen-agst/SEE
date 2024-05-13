@@ -1254,12 +1254,8 @@ namespace SEE.UI.RuntimeConfigMenu
             FilePicker.FilePicker filePicker = parent.AddComponent<FilePicker.FilePicker>();
             filePicker.DataPathInstance = dataPath;
             filePicker.Label = settingName;
-            if (dataPath is FilePath)
-                filePicker.PickingMode = FileBrowser.PickMode.Files;
-            else if (dataPath is DirectoryPath)
-                filePicker.PickingMode = FileBrowser.PickMode.Folders;
-            else
-                filePicker.PickingMode = FileBrowser.PickMode.FilesAndFolders;
+            filePicker.PickingMode = dataPath is DirectoryPath ?
+                                       FileBrowser.PickMode.Folders : FileBrowser.PickMode.Files;
 
             // getter of widget name (if not provided)
             string GetWidgetName() => filePicker.gameObject.FullName() + "/" + settingName;

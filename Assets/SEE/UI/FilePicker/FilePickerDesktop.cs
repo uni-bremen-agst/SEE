@@ -11,7 +11,7 @@ using UnityEngine;
 namespace SEE.UI.FilePicker
 {
     /// <summary>
-    /// Allows a user to pick a file.
+    /// Allows a user to pick a file or folder.
     /// Implementation for the desktop environment.
     /// </summary>
     public partial class FilePicker
@@ -130,11 +130,14 @@ namespace SEE.UI.FilePicker
             // opens a file picker with the picker button
             PickerButton.clickEvent.AddListener(() =>
             {
+                FileBrowser.PickMode pickingMode = DataPathInstance is DirectoryPath
+                                                    ? FileBrowser.PickMode.Folders : FileBrowser.PickMode.Files;
+                string whatToPick = pickingMode == FileBrowser.PickMode.Folders ? "folder" : "file";
                 FileBrowser.ShowLoadDialog(HandleFileBrowserSuccess,
                                            () => { },
                                            allowMultiSelection: false,
                                            pickMode: pickingMode,
-                                           title: "Pick a file/folder",
+                                           title: "Pick a " + whatToPick,
                                            initialPath: DataPathInstance.RootPath);
                 
                 // Find the newly opened file browser and optimize it for VR.

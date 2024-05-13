@@ -20,6 +20,20 @@ namespace SEE.Controls
         /// </summary>
         public static bool KeyboardShortcutsEnabled { set; get; } = true;
 
+#if UNITY_EDITOR
+        /// <summary>
+        /// Sometimes if the game is not stopped correctly, the keyboard shortcuts
+        /// might still be disabled. This method ensures that the keyboard shortcuts
+        /// are always enabled when the game is started. This is needed only in the
+        /// editor, because the executable will start always with a fresh state.
+        /// </summary>
+        [UnityEditor.InitializeOnEnterPlayMode]
+        private static void ResetKeyboardShortcutsEnabled()
+        {
+            KeyboardShortcutsEnabled = true;
+        }
+#endif
+
         //-----------------------------------------------------
         #region General key bindings
         //-----------------------------------------------------
