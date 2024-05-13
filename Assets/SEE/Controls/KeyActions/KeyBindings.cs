@@ -171,8 +171,8 @@ namespace SEE.Controls.KeyActions
                      KeyActionCategory.Movement, "Move down.");
 
             // Chat
-            Register(KeyAction.ToggleTextChat, KeyCode.F2, "Toggle text chat",
-                     KeyActionCategory.Chat, "Toggles the text chat.");
+            Register(KeyAction.ToggleTextChat, KeyCode.F2, "Open text chat",
+                     KeyActionCategory.Chat, "Opens the text chat.");
             Register(KeyAction.ToggleVoiceChat, KeyCode.F5, "Toggle voice chat",
                      KeyActionCategory.Chat, "Toggles the voice chat.");
 
