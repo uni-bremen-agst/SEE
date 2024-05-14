@@ -3,6 +3,11 @@ using UnityEngine;
 
 namespace SEE.Dissonance
 {
+    /// <summary>
+    /// Base class for chat controllers. It provides the features needed
+    /// by all subclasses, such as enabling/disabling the chat canvas
+    /// and setting up the Dissonance network (<see cref="Comms"/>).
+    /// </summary>
     public abstract class ChatController : MonoBehaviour
     {
         /// <summary>
