@@ -71,44 +71,16 @@ namespace SEE.UI.Window.ConsoleWindow
         private static List<Message> messages = new();
 
         /// <summary>
-        /// The messages got cleared.
+        /// Triggered when something happens in the console.
         /// </summary>
-        private static event Action MessagesCleared;
+        public static event Action<ConsoleEvent> OnConsoleEvent;
 
         /// <summary>
-        /// A message was added.
+        /// Keeps track of console events.
+        /// 
+        /// So that <see cref="Update"/> can respond to them.
         /// </summary>
-        private static event Action MessageAdded;
-
-        /// <summary>
-        /// A message was changed.
-        /// </summary>
-        private static event Action MessageChanged;
-
-        /// <summary>
-        /// A channel or level was changed.
-        /// </summary>
-        private static event Action ChannelChanged;
-
-        /// <summary>
-        /// The messages were cleared.
-        /// </summary>
-        private bool messagesCleared;
-
-        /// <summary>
-        /// A message was added.
-        /// </summary>
-        private bool messageAdded;
-
-        /// <summary>
-        /// A message was changed.
-        /// </summary>
-        private bool messageChanged;
-
-        /// <summary>
-        /// A channel or level was changed.
-        /// </summary>
-        private bool channelChanged;
+        private ConsoleEvent consoleEvent = ConsoleEvent.None;
 
         /// <summary>
         /// Container for all messages.
@@ -203,12 +175,12 @@ namespace SEE.UI.Window.ConsoleWindow
             if (appendTo is null)
             {
                 messages.Add(new(channel, level, text));
-                MessageAdded?.Invoke();
+                OnConsoleEvent?.Invoke(ConsoleEvent.MessageAdded);
             }
             else
             {
                 messages[appendTo.Value].Text += text;
-                MessageChanged?.Invoke();
+                OnConsoleEvent?.Invoke(ConsoleEvent.MessageChanged);
             }
         }
 
@@ -218,7 +190,7 @@ namespace SEE.UI.Window.ConsoleWindow
         public static void ClearMessages()
         {
             messages.Clear();
-            MessagesCleared?.Invoke();
+            OnConsoleEvent?.Invoke(ConsoleEvent.Cleared);
         }
 
         /// <summary>
@@ -229,7 +201,7 @@ namespace SEE.UI.Window.ConsoleWindow
         public static void AddChannel(string channel, char icon)
         {
             channels[channel] = new Channel(channel, icon, new());
-            ChannelChanged?.Invoke();
+            OnConsoleEvent?.Invoke(ConsoleEvent.ChannelChanged);
         }
 
         /// <summary>
@@ -243,7 +215,7 @@ namespace SEE.UI.Window.ConsoleWindow
             if (channels.TryGetValue(channel, out Channel c))
             {
                 c.Levels[level] = new(level, color, true);
-                ChannelChanged?.Invoke();
+                OnConsoleEvent?.Invoke(ConsoleEvent.ChannelChanged);
             }
             else
             {
@@ -264,7 +236,7 @@ namespace SEE.UI.Window.ConsoleWindow
                 if (c.Levels.TryGetValue(level, out ChannelLevel l))
                 {
                     l.Enabled = enabled;
-                    ChannelChanged?.Invoke();
+                    OnConsoleEvent?.Invoke(ConsoleEvent.ChannelChanged);
                 }
                 else
                 {
@@ -308,10 +280,7 @@ namespace SEE.UI.Window.ConsoleWindow
         {
             Title ??= "Console";
             base.Start();
-            MessageAdded += OnMessageAdded;
-            MessageChanged += OnMessageChanged;
-            MessagesCleared += OnMessagesCleared;
-            ChannelChanged += OnChannelChanged;
+            OnConsoleEvent += HandleConsoleEvent;
         }
 
         /// <summary>
@@ -364,35 +333,36 @@ namespace SEE.UI.Window.ConsoleWindow
         protected override void Update()
         {
             base.Update();
-            // destroys message items after a clear
-            if (messagesCleared)
+            switch (consoleEvent)
             {
-                messagesCleared = false;
-                foreach (Transform child in items)
-                {
-                    Destroyer.Destroy(child.gameObject);
-                }
-            }
-            else if (messageAdded)
-            {
-                messageAdded = false;
-                for (int i = items.childCount; i < messages.Count; i++)
-                {
-                    CreateMessageItem(messages[i]);
-                }
-            }
-            else if (messageChanged)
-            {
-                messageChanged = false;
-                for (int i = items.childCount; i < messages.Count; i++)
-                {
-                    UpdateItem(i);
-                }
-            }
-            else if (channelChanged)
-            {
-                channelChanged = false;
-                UpdateFilters();
+                case ConsoleEvent.Cleared:
+                    consoleEvent &= ~ConsoleEvent.Cleared;
+                    foreach (Transform child in items)
+                    {
+                        Destroyer.Destroy(child.gameObject);
+                    }
+                    break;
+                case ConsoleEvent.MessageAdded:
+                    consoleEvent &= ~ConsoleEvent.MessageAdded;
+                    for (int i = items.childCount; i < messages.Count; i++)
+                    {
+                        CreateMessageItem(messages[i]);
+                    }
+                    break;
+                case ConsoleEvent.MessageChanged:
+                    consoleEvent &= ~ConsoleEvent.MessageChanged;
+                    for (int i = items.childCount; i < messages.Count; i++)
+                    {
+                        UpdateItem(i);
+                    }
+                    break;
+                case ConsoleEvent.ChannelChanged:
+                    consoleEvent &= ~ConsoleEvent.ChannelChanged;
+                    UpdateFilters();
+                    break;
+                default:
+                    // do nothing
+                    break;
             }
         }
 
@@ -401,42 +371,13 @@ namespace SEE.UI.Window.ConsoleWindow
         /// </summary>
         private void OnDestroy()
         {
-            MessageAdded -= OnMessageAdded;
-            MessageChanged -= OnMessageChanged;
-            MessagesCleared -= OnMessagesCleared;
-            ChannelChanged -= OnChannelChanged;
+            OnConsoleEvent -= HandleConsoleEvent;
         }
 
-        /// <summary>
-        /// Listens to <see cref="MessageAdded"/>.
-        /// </summary>
-        private void OnMessageAdded()
+        private void HandleConsoleEvent(ConsoleEvent consoleEvent)
         {
-            messageAdded = true;
-        }
-
-        /// <summary>
-        /// Listens to <see cref="MessagesCleared"/>
-        /// </summary>
-        private void OnMessagesCleared()
-        {
-            messagesCleared = true;
-        }
-
-        /// <summary>
-        /// Listens to <see cref="MessageChanged"/>.
-        /// </summary>
-        private void OnMessageChanged()
-        {
-            messageChanged = true;
-        }
-
-        /// <summary>
-        /// Listens to <see cref="ChannelChanged"/>.
-        /// </summary>
-        private void OnChannelChanged()
-        {
-            channelChanged = true;
+            Debug.Log(consoleEvent);
+            this.consoleEvent |= consoleEvent;
         }
 
         /// <summary>
@@ -641,5 +582,33 @@ namespace SEE.UI.Window.ConsoleWindow
 
             public bool Enabled { get; set; } = enabled;
         };
+
+        /// <summary>
+        /// The console events.
+        /// </summary>
+        [Flags]
+        public enum ConsoleEvent
+        {
+            /// <summary>
+            /// Nothing happened.
+            /// </summary>
+            None = 0,
+            /// <summary>
+            /// The console was cleared.
+            /// </summary>
+            Cleared = 1 << 1,
+            /// <summary>
+            /// A message was added.
+            /// </summary>
+            MessageAdded = 1 << 2,
+            /// <summary>
+            /// A message was changed.
+            /// </summary>
+            MessageChanged = 1 << 3,
+            /// <summary>
+            /// A channel was changed.
+            /// </summary>
+            ChannelChanged = 1 << 4,
+        }
     }
 }
