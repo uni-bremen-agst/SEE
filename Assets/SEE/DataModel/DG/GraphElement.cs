@@ -107,24 +107,10 @@ namespace SEE.DataModel.DG
         private const string sourceColumnAttribute = "Source.Column";
 
         /// <summary>
-        /// The attribute name for the source range start line. The source range start line may not exist.
+        /// The attribute name for the source range. The source range may not exist.
+        /// Note that the source range is represented by four attributes (see <see cref="SetRange"/> for details).
         /// </summary>
-        public const string SourceRangeStartLineAttribute = "SourceRange.Start.Line";
-
-        /// <summary>
-        /// The attribute name for the source range start character. The source range start character may not exist.
-        /// </summary>
-        private const string sourceRangeStartCharacterAttribute = "SourceRange.Start.Character";
-
-        /// <summary>
-        /// The attribute name for the source range end line. The source range end line may not exist.
-        /// </summary>
-        public const string SourceRangeEndLineAttribute = "SourceRange.End.Line";
-
-        /// <summary>
-        /// The attribute name for the source range end character. The source range end character may not exist.
-        /// </summary>
-        private const string sourceRangeEndCharacterAttribute = "SourceRange.End.Character";
+        public const string SourceRangeAttribute = "SourceRange";
 
         /// <summary>
         /// The source range of this graph element.
@@ -134,42 +120,19 @@ namespace SEE.DataModel.DG
         {
             get
             {
-                if (!TryGetInt(SourceRangeStartLineAttribute, out int startLine) ||
-                    !TryGetInt(SourceRangeEndLineAttribute, out int endLine))
+                if (TryGetRange(SourceRangeAttribute, out Range result))
                 {
-                    if (SourceLine.HasValue)
-                    {
-                        // If either the start or end line cannot be found, an explicit range is not defined.
-                        // In this case, we will construct a one character (or one line) long range
-                        // based on the source line and column.
-                        return new Range(SourceLine.Value, SourceLine.Value+1, SourceColumn, SourceColumn+1);
-                    }
-                    return null;
+                    return result;
                 }
-                if (!TryGetInt(sourceRangeStartCharacterAttribute, out int startCharacter) ||
-                    !TryGetInt(sourceRangeEndCharacterAttribute, out int endCharacter))
+                else if (SourceLine.HasValue)
                 {
-                    return new Range(startLine, endLine);
+                    // If an explicit range is not defined, we will construct a one character (or one line) long
+                    // range based on the source line and column.
+                    return new Range(SourceLine.Value, SourceLine.Value+1, SourceColumn, SourceColumn+1);
                 }
-                return new Range(startLine, endLine, startCharacter, endCharacter);
+                return null;
             }
-            set
-            {
-                if (value == null)
-                {
-                    SetInt(SourceRangeStartLineAttribute, null);
-                    SetInt(SourceRangeEndLineAttribute, null);
-                    SetInt(sourceRangeStartCharacterAttribute, null);
-                    SetInt(sourceRangeEndCharacterAttribute, null);
-                }
-                else
-                {
-                    SetInt(SourceRangeStartLineAttribute, value.StartLine);
-                    SetInt(SourceRangeEndLineAttribute, value.EndLine);
-                    SetInt(sourceRangeStartCharacterAttribute, value.StartCharacter);
-                    SetInt(sourceRangeEndCharacterAttribute, value.EndCharacter);
-                }
-            }
+            set => SetRange(SourceRangeAttribute, value);
         }
 
         /// <summary>
@@ -282,7 +245,7 @@ namespace SEE.DataModel.DG
 
             set
             {
-                Debug.Assert(value == null || value > 0);
+                Debug.Assert(value is null or > 0, $"expected positive line number, but got {value}");
                 SetInt(sourceLineAttribute, value);
             }
         }

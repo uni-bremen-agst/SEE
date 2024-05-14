@@ -32,7 +32,9 @@
         "GUID:a8cce43e97e592144b989ad4056cbc17",
         "GUID:1491147abca9d7d4bb7105af628b223e",
         "GUID:3b8ed52f1b5c64994af4c4e0aa4b6c4b",
-        "GUID:4d1e63f328d08c14b8f0029b5bb1aa40"
+        "GUID:4d1e63f328d08c14b8f0029b5bb1aa40",
+        "GUID:fe685ec1767f73d42b749ea8045bfe43",
+        "GUID:5c01796d064528144a599661eaab93a6"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -55,7 +57,15 @@
         "Newtonsoft.Json.dll",
         "NetworkCommsDotNet.dll",
         "LibGit2Sharp.dll",
-        "CsvHelper.dll"
+        "CsvHelper.dll",
+        "OmniSharp.Extensions.LanguageClient.dll",
+        "OmniSharp.Extensions.LanguageProtocol.dll",
+        "OmniSharp.Extensions.LanguageServer.Shared.dll",
+        "OmniSharp.Extensions.JsonRpc.dll",
+        "System.IO.Pipelines.dll",
+        "Supercluster.KDTree.Standard.dll",
+        "Markdig.dll",
+        "System.Collections.Immutable.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

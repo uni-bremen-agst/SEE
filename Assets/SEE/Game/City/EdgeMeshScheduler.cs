@@ -69,6 +69,11 @@ namespace SEE.Game.City
         public event Action OnInitialEdgesDone;
 
         /// <summary>
+        /// Takes the number of remaining initial edges to be processed and updates the loading spinner accordingly.
+        /// </summary>
+        private Action<int> UpdateInitialEdgesProgress;
+
+        /// <summary>
         /// Initialize this component with given settings.
         ///
         /// Precondition: The given parameters are not null.
@@ -87,8 +92,10 @@ namespace SEE.Game.City
             graph.Subscribe(this);
 
             // When we're initialized, we also convert all existing edges into meshes first.
-            LoadingSpinner.Show(LoadingText);
             graph.Edges().ForEach(edges.Enqueue);
+            LoadingSpinner.ShowDeterminate(LoadingText, out Action<float> updateProgress);
+            int totalEdges = edges.Count;
+            UpdateInitialEdgesProgress = remaining => updateProgress(1 - remaining / (float)totalEdges);
         }
 
         /// <summary>
@@ -120,12 +127,14 @@ namespace SEE.Game.City
                 initialEdgesDone = true;
                 OnInitialEdgesDone?.Invoke();
                 LoadingSpinner.Hide(LoadingText);
+                UpdateInitialEdgesProgress = null;
             }
             // We will loop until either we converted `EdgesPerFrame` many edges,
             // or until there are no further edges to convert to meshes.
             int remaining = Mathf.Min(edges.Count, EdgesPerFrame);
             for (int i = 0; i < remaining; i++)
             {
+                UpdateInitialEdgesProgress?.Invoke(edges.Count);
                 Edge edge = edges.Dequeue();
                 if (edge == null)
                 {
@@ -186,7 +195,9 @@ namespace SEE.Game.City
             if (value is EdgeEvent { Change: ChangeType.Addition } edgeEvent)
             {
                 // If this is an added edge, we are going to need to turn it into a mesh.
-                LoadingSpinner.Show(LoadingText);
+                // TODO (#722): The loading spinner loops forever for edges newly added as
+                // part of the reflexion analysis.
+                // LoadingSpinner.ShowIndeterminate(LoadingText);
                 edges.Enqueue(edgeEvent.Edge);
             }
 

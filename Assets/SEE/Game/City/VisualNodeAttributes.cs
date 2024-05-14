@@ -142,13 +142,13 @@ namespace SEE.Game.City
         /// </summary>
         [OdinSerialize]
         [Tooltip("The antenna settings.")]
-        public AntennaAttributes AntennaSettings = new AntennaAttributes();
+        public AntennaAttributes AntennaSettings = new();
         /// <summary>
         /// The settings for the labels appearing when a node is hovered over.
         /// </summary>
         [OdinSerialize]
         [Tooltip("The settings for labels drawn during hovering.")]
-        public LabelAttributes LabelSettings = new LabelAttributes();
+        public LabelAttributes LabelSettings = new();
         /// <summary>
         /// Width of the outline for leaf and inner nodes.
         /// </summary>
@@ -157,7 +157,7 @@ namespace SEE.Game.City
         /// <summary>
         /// If true, persistent text labels will be added to the node representation.
         /// </summary>
-        [Tooltip("Whether text labels will be added to the node representation")]
+        [Tooltip("Whether the source name will be added to a node.")]
         public bool ShowNames = false;
 
         /// <summary>

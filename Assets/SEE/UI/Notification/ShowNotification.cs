@@ -1,4 +1,5 @@
 ﻿using System;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.UI.Notification
@@ -33,17 +34,17 @@ namespace SEE.UI.Notification
         /// <summary>
         /// Sprite for the error icon.
         /// </summary>
-        private static readonly Sprite errorIcon = Resources.Load<Sprite>("Materials/Notification/Error");
+        private static readonly Lazy<Sprite> errorIcon = new(() => Resources.Load<Sprite>("Materials/Notification/Error"));
 
         /// <summary>
         /// Sprite for the warning icon.
         /// </summary>
-        private static readonly Sprite warningIcon = Resources.Load<Sprite>("Materials/Notification/Warning");
+        private static readonly Lazy<Sprite> warningIcon = new(() => Resources.Load<Sprite>("Materials/Notification/Warning"));
 
         /// <summary>
         /// Sprite for the info icon.
         /// </summary>
-        private static readonly Sprite infoIcon = Resources.Load<Sprite>("Materials/Notification/Info");
+        private static readonly Lazy<Sprite> infoIcon = new(() => Resources.Load<Sprite>("Materials/Notification/Info"));
 
         /// <summary>
         /// Lazily initialized notification manager instance. Behaves like a singleton.
@@ -123,12 +124,13 @@ namespace SEE.UI.Notification
         /// <param name="icon">The icon of the notification.</param>
         /// <param name="color">The color of the notification.</param>
         /// <param name="duration">The duration of the notification.</param>
-        private static void Show(string title, string description, Sprite icon, Color color,
+        private static void Show(string title, string description, Lazy<Sprite> icon, Color color,
                                  float duration = defaultDuration)
         {
-            if (Application.isPlaying)
+            // Only show the notification if we are on the main thread.
+            if (AsyncUtils.IsRunningOnMainThread)
             {
-                manager.Value.Show(title, description, icon, color, duration);
+                manager.Value.Show(title, description, icon.Value, color, duration);
             }
         }
     }

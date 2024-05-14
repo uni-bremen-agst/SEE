@@ -751,11 +751,11 @@ namespace SEE.DataModel.DG.IO
                 {
                     case RegionLengthAttribute:
                         // NOTE: This assumes the Region_Length is always declared *after* the Region_Start.
-                        int endLine = current.GetInt(GraphElement.SourceRangeStartLineAttribute) + value;
-                        current.SetInt(GraphElement.SourceRangeEndLineAttribute, endLine);
+                        int endLine = current.GetInt(GraphElement.SourceRangeAttribute + Attributable.RangeStartLineSuffix) + value;
+                        current.SetInt(GraphElement.SourceRangeAttribute + Attributable.RangeEndLineSuffix, endLine);
                         break;
                     case RegionStartAttribute:
-                        current.SetInt(GraphElement.SourceRangeStartLineAttribute, value);
+                        current.SetInt(GraphElement.SourceRangeAttribute + Attributable.RangeStartLineSuffix, value);
                         break;
                     default:
                         current.SetInt(currentAttributeName, value);

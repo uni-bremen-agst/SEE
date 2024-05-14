@@ -8,7 +8,7 @@ namespace SEE.XR
     /// <summary>
     /// Enables the two controllers of an XR camera rig when XR is enabled.
     ///
-    /// This component is expected to be added to a SteamVR camera rig which
+    /// This component is expected to be added to an XR camera rig which
     /// has two immediate inactive children named <see cref="LeftControllerName"/>
     /// and <see cref="RightControllerName"/>, respectively.
     /// </summary>
@@ -18,12 +18,12 @@ namespace SEE.XR
         /// Name of the child of the <see cref="gameObject"/> representing the left
         /// controller to be enabled.
         /// </summary>
-        internal const string LeftControllerName = "Camera Offset/LeftHand Controller";
+        internal const string LeftControllerName = "Camera Offset/Left Controller";
         /// <summary>
         /// Name of the child of the <see cref="gameObject"/> representing the right
         /// controller to be enabled.
         /// </summary>
-        internal const string RightControllerName = "Camera Offset/RightHand Controller";
+        internal const string RightControllerName = "Camera Offset/Right Controller";
 
         /// <summary>
         /// Enables the two controllers when XR is initialized.
