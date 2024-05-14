@@ -31,7 +31,7 @@ namespace SEE.GraphProviders
         #endregion
 
         [OdinSerialize, ShowInInspector, SerializeReference, HideReferenceObjectPicker,
-         ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository")]
+         ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository"), RuntimeTab("Data")]
         public GitRepository Repository = new();
 
         /// <summary>
@@ -159,11 +159,14 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// Calculates the truck factor with a LOC-based heuristic algorithm by Yamashita et al. cited by. Ferreira et. al
+        /// Calculates the truck factor with a LOC-based heuristic by Yamashita et al.
+        /// The truck factor are the amount of core-developers which are responsible for 80% of the code (changes). 
+        ///
+        /// The algorithm was described by. Ferreira et. al
         ///
         /// Soruce/Math: https://doi.org/10.1145/2804360.2804366, https://doi.org/10.1007/s11219-019-09457-2
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The calculated truck-factor</returns>
         private static int CalculateTruckFactor(Dictionary<string, int> developersChurn)
         {
             if (!developersChurn.Any())

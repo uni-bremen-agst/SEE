@@ -33,7 +33,7 @@ namespace SEE.GraphProviders
         public string Date = "";
 
         [OdinSerialize, ShowInInspector, SerializeReference, HideReferenceObjectPicker,
-         ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository")]
+         ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository"), RuntimeTab("Data")]
         public GitRepository RepositoryData = new();
 
         [OdinSerialize] [ShowInInspector] public int AuthorThreshhold { get; set; } = 1;
