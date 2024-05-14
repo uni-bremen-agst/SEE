@@ -41,7 +41,7 @@ namespace SEE.Utils
         ///
         /// This method will also add all directories in between.
         ///
-        /// Files will have the node type <see cref="FileType"/>
+        /// Files will have the node type <see cref="FileType"/> and also a Filename and Directory, so that the files can be opened in the CodeEditor.
         /// Diecotries will have the node type <see cref="DirectoryType"/> 
         /// </summary>
         /// <param name="fullRelativePath">The full relative path of the file</param>
@@ -73,9 +73,16 @@ namespace SEE.Utils
                     return parent.Children().First(x => x.ID + idSuffix == fullRelativePath);
                 }
 
+                string[] fileDirectorySplit = fullRelativePath.Split(Path.AltDirectorySeparatorChar);
+
+                string fileDir = String.Join(Path.AltDirectorySeparatorChar,
+                    fileDirectorySplit.Take(fileDirectorySplit.Length - 1));
+
                 // Create a new file node and return it
                 Node addedFileNode = NewNode(g, fullRelativePath + idSuffix,
                     FileType, path);
+                addedFileNode.Filename = path;
+                addedFileNode.Directory = fileDir;
                 parent.AddChild(addedFileNode);
                 return addedFileNode;
             }
@@ -88,15 +95,16 @@ namespace SEE.Utils
                 Node dirNode = parent.Children().First(x =>
                     x.ID == parent.ID + Path.AltDirectorySeparatorChar + pathSegments.First() + idSuffix);
                 return GetOrAddNode(fullRelativePath, String.Join(Path.AltDirectorySeparatorChar, pathSegments.Skip(1)),
-                    dirNode, g,idSuffix: idSuffix);
+                    dirNode, g, idSuffix: idSuffix);
             }
 
             // Create a new directory node
             Node addedDirectoryNode = NewNode(g, directoryName,
                 DirectoryType, directoryName);
+            addedDirectoryNode.Directory = directoryName;
             parent.AddChild(addedDirectoryNode);
             return GetOrAddNode(fullRelativePath, String.Join(Path.AltDirectorySeparatorChar, pathSegments.Skip(1)),
-                addedDirectoryNode, g, idSuffix:idSuffix);
+                addedDirectoryNode, g, idSuffix: idSuffix);
         }
 
         /// <summary>
