@@ -4,12 +4,10 @@ using SEE.Game.Drawable.Configurations;
 using SEE.Game.UI.Menu.Drawable;
 using SEE.UI.Notification;
 using SEE.GO;
-using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
 using TextConf = SEE.Game.Drawable.Configurations.TextConf;
 using SEE.Utils.History;
@@ -19,7 +17,7 @@ namespace SEE.Controls.Actions.Drawable
     /// <summary>
     /// This class provides the option to edit a <see cref="DrawableType"/> object.
     /// </summary>
-    public class EditAction : AbstractPlayerAction
+    public class EditAction : DrawableAction
     {
         /// <summary>
         /// Holds the current progress state.
@@ -48,46 +46,46 @@ namespace SEE.Controls.Actions.Drawable
         private struct Memento
         {
             /// <summary>
-            /// Is the selected drawable type object that should be edit.
+            /// Is the selected drawable type object that should be edited.
             /// </summary>
-            public GameObject selectedObj;
+            public GameObject SelectedObj;
             /// <summary>
             /// The old values of the drawable type object.
             /// </summary>
-            public readonly DrawableType oldValueHolder;
+            public readonly DrawableType OldValueHolder;
             /// <summary>
             /// The new edited values of the drawable type object.
             /// </summary>
-            public readonly DrawableType newValueHolder;
+            public readonly DrawableType NewValueHolder;
             /// <summary>
             /// The drawable on that the drawable type object is displayed.
             /// </summary>
-            public readonly DrawableConfig drawable;
+            public readonly DrawableConfig Drawable;
             /// <summary>
             /// The id of the drawable type object.
             /// </summary>
-            public readonly string id;
+            public readonly string Id;
 
             /// <summary>
-            /// The constructor, which simply assigns its only parameter to a field in this class.
+            /// The constructor.
             /// </summary>
-            /// <param name="obj">Is the selected drawable type object that should be edit</param>
+            /// <param name="obj">The selected drawable type object that should be edit</param>
             /// <param name="oldValueHolder">The old values of the drawable type object.</param>
-            /// <param name="newValueHolder">The new edited values of the drawable type object.</param>
-            /// <param name="drawable">The drawable on that the drawable type object is displayed.</param>
+            /// <param name="newValueHolder">The newly edited values of the drawable type object.</param>
+            /// <param name="drawable">The drawable on which the drawable type object is displayed.</param>
             /// <param name="id">The id of the drawable type object.</param>
             public Memento(GameObject obj, DrawableType oldValueHolder,
                 DrawableType newValueHolder, GameObject drawable, string id)
             {
-                this.selectedObj = obj;
-                this.oldValueHolder = oldValueHolder;
-                this.newValueHolder = newValueHolder;
-                this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
-                this.id = id;
+                SelectedObj = obj;
+                OldValueHolder = oldValueHolder;
+                NewValueHolder = newValueHolder;
+                Drawable = DrawableConfigManager.GetDrawableConfig(drawable);
+                Id = id;
             }
         }
         /// <summary>
-        /// The selected drawable type object that should be edit.
+        /// The selected drawable type object that should be edited.
         /// </summary>
         private GameObject selectedObj;
 
@@ -97,9 +95,9 @@ namespace SEE.Controls.Actions.Drawable
         private static GameObject oldSelectedObj;
 
         /// <summary>
-        /// Bool that represents that the left mouse button was released after finish.
-        /// It is necessary to prevent the previously selected object from being accidentally selected again. 
-        /// After the action has successfully completed, it starts again, allowing for the selection of a new object. 
+        /// True if the left mouse button was released after finish.
+        /// It is necessary to prevent the previously selected object from being accidentally selected again.
+        /// After the action has successfully completed, it starts again, allowing for the selection of a new object.
         /// This option enables the immediate selection of another object while holding down the mouse button.
         /// </summary>
         private static bool mouseWasReleased = true;
@@ -110,12 +108,12 @@ namespace SEE.Controls.Actions.Drawable
         private DrawableType oldValueHolder;
 
         /// <summary>
-        /// The new edited values of the selected drawable type.
+        /// The newly edited values of the selected drawable type.
         /// </summary>
         private DrawableType newValueHolder;
 
         /// <summary>
-        /// Resets the old selected object, if the action state will leave.
+        /// Resets the old selected object, if the action state will be left.
         /// </summary>
         public static void Reset()
         {
@@ -128,7 +126,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         /// <param name="oldHolder">The holder for the old values.</param>
         /// <param name="newHolder">The holder for the new values.</param>
-        /// <returns>whatever the comparison results in</returns>
+        /// <returns>true if all is equal</returns>
         private bool CheckEquals(DrawableType oldHolder, DrawableType newHolder)
         {
             if (oldHolder is LineConf oldLineHolder && newHolder is LineConf newLineHolder)
@@ -171,7 +169,7 @@ namespace SEE.Controls.Actions.Drawable
                     && CheckEquals(oldConf.branchLineConf, newConf.branchLineConf);
             }
 
-            /// This case will be needed for mind map change node kind case.
+            /// This case will be needed for mind-map nodes.
             if (oldHolder == null && newHolder == null)
             {
                 return true;
@@ -180,7 +178,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Deactivates the blink effect if, it is still active and hides the text and line menu.
+        /// Deactivates the blink effect if it is still active and hides the text and line menu.
         /// If the action was not completed in full, the changes are reset.
         /// </summary>
         public override void Stop()
@@ -205,7 +203,7 @@ namespace SEE.Controls.Actions.Drawable
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.Edit"/>.
         /// It allows editing of the drawable type objects.
         /// </summary>
-        /// <returns>Whether this Action is finished</returns>
+        /// <returns>Whether this action is finished</returns>
         public override bool Update()
         {
             /// Block for canceling the action.
@@ -234,12 +232,11 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Provides the option to cancel the action. 
-        /// Simply press the "Esc" key if an object is selected for edit.
+        /// Provides the option to cancel the action.
         /// </summary>
         private void Cancel()
         {
-            if (selectedObj != null && Input.GetKeyDown(KeyCode.Escape))
+            if (selectedObj != null && SEEInput.Cancel())
             {
                 ShowNotification.Info("Canceled", "The action was canceled by the user.");
                 if (selectedObj != null && selectedObj.GetComponent<BlinkEffect>() != null)
@@ -261,13 +258,13 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Allows the selection of a drawable type object for editing, 
-        /// taking into account the object edited in the last run. 
-        /// It prevents the same object from being accidentally selected again 
-        /// when the left mouse button is not released. 
-        /// Therefore, after the last action has been successfully completed, 
-        /// the left mouse button must be released to select the same object again. 
-        /// Additionally, a ValueResetter component is added to the UI Canvas to reset 
+        /// Allows the selection of a drawable type object for editing,
+        /// taking into account the object edited in the last run.
+        /// It prevents the same object from being accidentally selected again
+        /// when the left mouse button is not released.
+        /// Therefore, after the last action has been successfully completed,
+        /// the left mouse button must be released to select the same object again.
+        /// Additionally, a ValueResetter component is added to the UI Canvas to reset
         /// the two static variables after exiting this action type.
         /// </summary>
         private void Selection()
@@ -285,11 +282,7 @@ namespace SEE.Controls.Actions.Drawable
 
                 selectedObj.AddOrGetComponent<BlinkEffect>();
 
-                if (GameObject.Find("UI Canvas").GetComponent<ValueResetter>() == null)
-                {
-                    GameObject.Find("UI Canvas").AddComponent<ValueResetter>().
-                        SetAllowedState(GetActionStateType());
-                }
+                Canvas.AddOrGetComponent<ValueResetter>().SetAllowedState(GetActionStateType());
                 progressState = ProgressState.OpenEditMenu;
             }
 
@@ -300,7 +293,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Opens the appropriate menu for editing the selected Drawable Type Object. 
+        /// Opens the appropriate menu for editing the selected Drawable Type Object.
         /// Once a left mouse button up is registered, the progress state is switched to Edit.
         /// </summary>
         private void OpenMenu()
@@ -309,21 +302,28 @@ namespace SEE.Controls.Actions.Drawable
             {
                 case Tags.Line:
                     if (!LineMenu.IsOpen())
+                    {
                         LineMenu.EnableForEditing(selectedObj, newValueHolder);
+                    }
                     break;
                 case Tags.DText:
                     if (!TextMenu.IsOpen())
+                    {
                         TextMenu.EnableForEditing(selectedObj, newValueHolder);
+                    }
                     break;
                 case Tags.Image:
                     if (!ImageMenu.IsOpen())
+                    {
                         ImageMenu.Enable(selectedObj, newValueHolder);
+                    }
                     break;
                 case Tags.MindMapNode:
                     if (!MindMapEditMenu.IsOpen())
+                    {
                         MindMapEditMenu.Enable(selectedObj, newValueHolder);
+                    }
                     break;
-
             }
             if (Input.GetMouseButtonUp(0))
             {
@@ -332,7 +332,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Provides the completion of the edit action. 
+        /// Provides the completion of the edit action.
         /// As soon as the left mouse button is pressed, the completion is initiated.
         /// It deactivates the <see cref="BlinkEffect"/> and sets the progress state to finish.
         /// </summary>
@@ -380,15 +380,15 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo();
-            if (memento.selectedObj == null && memento.id != null)
+            if (memento.SelectedObj == null && memento.Id != null)
             {
-                memento.selectedObj = GameFinder.FindChild(memento.drawable.GetDrawable(), memento.id);
+                memento.SelectedObj = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Id);
             }
 
-            if (memento.selectedObj != null)
+            if (memento.SelectedObj != null)
             {
-                GameObject drawable = GameFinder.GetDrawable(memento.selectedObj);
-                DrawableType.Edit(memento.selectedObj, memento.oldValueHolder, drawable);
+                GameObject drawable = GameFinder.GetDrawable(memento.SelectedObj);
+                DrawableType.Edit(memento.SelectedObj, memento.OldValueHolder, drawable);
             }
         }
 
@@ -398,15 +398,15 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            if (memento.selectedObj == null && memento.id != null)
+            if (memento.SelectedObj == null && memento.Id != null)
             {
-                memento.selectedObj = GameFinder.FindChild(memento.drawable.GetDrawable(), memento.id);
+                memento.SelectedObj = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Id);
             }
 
-            if (memento.selectedObj != null)
+            if (memento.SelectedObj != null)
             {
-                GameObject drawable = GameFinder.GetDrawable(memento.selectedObj);
-                DrawableType.Edit(memento.selectedObj, memento.newValueHolder, drawable);
+                GameObject drawable = GameFinder.GetDrawable(memento.SelectedObj);
+                DrawableType.Edit(memento.SelectedObj, memento.NewValueHolder, drawable);
             }
         }
 
@@ -442,13 +442,11 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
-        /// Because this action does not actually change any game object, 
-        /// an empty set is always returned.
         /// </summary>
         /// <returns>The object id of the changed object.</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            if (memento.selectedObj == null && memento.selectedObj == null)
+            if (memento.SelectedObj == null && memento.SelectedObj == null)
             {
                 return new HashSet<string>();
             }
@@ -456,7 +454,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 return new HashSet<string>
                 {
-                    memento.selectedObj.name
+                    memento.SelectedObj.name
                 };
             }
         }

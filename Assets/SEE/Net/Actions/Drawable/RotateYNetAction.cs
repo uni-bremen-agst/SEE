@@ -29,7 +29,7 @@ namespace SEE.Net.Actions.Drawable
 
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
-        /// Used for undo / redo of <see cref="MoveRotatorAction"/> 
+        /// Used for undo / redo of <see cref="MoveRotateAction"/> 
         /// </summary>
         /// <param name="drawableID">The id of the drawable on which the object is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>

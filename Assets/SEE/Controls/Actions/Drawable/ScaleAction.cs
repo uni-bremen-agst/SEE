@@ -257,7 +257,7 @@ namespace SEE.Controls.Actions.Drawable
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                 (oldSelectedObj == null || oldSelectedObj != raycastHit.collider.gameObject
                     || (oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased))
-                && GameFinder.hasDrawable(raycastHit.collider.gameObject))
+                && GameFinder.HasDrawable(raycastHit.collider.gameObject))
             {
                 /// If an object was already selected, the Rigidbody and Collision Controller are removed if they are still present.
                 if (oldSelectedObj != null)

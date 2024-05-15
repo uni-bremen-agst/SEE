@@ -319,7 +319,7 @@ namespace SEE.Controls.Actions.Drawable
 
                 /// Block for take the rotation of the suitable object.
                 if (raycastHit.collider.gameObject.CompareTag(Tags.Drawable)
-                    || GameFinder.hasDrawable(raycastHit.collider.gameObject)
+                    || GameFinder.HasDrawable(raycastHit.collider.gameObject)
                     || GameFinder.IsPartOfADrawable(raycastHit.collider.gameObject)
                     || ValueHolder.IsASuitableObjectForStickyNote(raycastHit.collider.gameObject))
                 {
@@ -427,7 +427,7 @@ namespace SEE.Controls.Actions.Drawable
             if (Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit) && !inProgress
                 && (raycastHit.collider.gameObject.CompareTag(Tags.Drawable)
-                    || GameFinder.hasDrawable(raycastHit.collider.gameObject)
+                    || GameFinder.HasDrawable(raycastHit.collider.gameObject)
                     || CheckIsPartOfStickyNote(raycastHit.collider.gameObject)))
             {
                 GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
@@ -473,7 +473,7 @@ namespace SEE.Controls.Actions.Drawable
                 Vector3 eulerAngles = eulerAnglesBackup;
                 /// If the new target object is a suitable object, the rotation is adopted.
                 if (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                    GameFinder.hasDrawable(hit.collider.gameObject) ||
+                    GameFinder.HasDrawable(hit.collider.gameObject) ||
                     GameFinder.IsPartOfADrawable(hit.collider.gameObject) ||
                     ValueHolder.IsASuitableObjectForStickyNote(hit.collider.gameObject))
                 {
@@ -495,7 +495,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// If the new target object has a drawable or is part of a sticky note, 
                 /// the Z-axis of the drawable is used for the hit point. 
                 /// This is done to address overlap display errors.
-                if (GameFinder.hasDrawable(hit.collider.gameObject) ||
+                if (GameFinder.HasDrawable(hit.collider.gameObject) ||
                     CheckIsPartOfStickyNote(hit.collider.gameObject))
                 {
                     GameObject drawable = GameFinder.GetDrawable(hit.collider.gameObject);
@@ -525,7 +525,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Enables moving via the arrow keys, as well as in the <see cref="MoveRotatorAction"/>.
+        /// Enables moving via the arrow keys, as well as in the <see cref="MoveRotateAction"/>.
         /// In addition there are the keys page up for forward and page down for back moving.
         /// </summary>
         /// <param name="stickyNote">The object that should be moved.</param>
@@ -635,7 +635,7 @@ namespace SEE.Controls.Actions.Drawable
             if (Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit) 
                 && (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) 
-                    || GameFinder.hasDrawable(raycastHit.collider.gameObject) 
+                    || GameFinder.HasDrawable(raycastHit.collider.gameObject) 
                     || CheckIsPartOfStickyNote(raycastHit.collider.gameObject)))
             {
                 GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
@@ -782,7 +782,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Enables scaling via the mouse wheel, as well as in the <see cref="MoveRotatorAction"/>.
+        /// Enables scaling via the mouse wheel, as well as in the <see cref="MoveRotateAction"/>.
         /// </summary>
         private void RotateByWheel(GameObject stickyNote, bool spawnMode)
         {
@@ -878,7 +878,7 @@ namespace SEE.Controls.Actions.Drawable
             if (Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                 (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                GameFinder.hasDrawable(raycastHit.collider.gameObject) ||
+                GameFinder.HasDrawable(raycastHit.collider.gameObject) ||
                 CheckIsPartOfStickyNote(raycastHit.collider.gameObject)))
             {
                 GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?

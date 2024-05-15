@@ -9,7 +9,6 @@ using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
 using MoveNetAction = SEE.Net.Actions.Drawable.MoveNetAction;
 using SEE.Utils.History;
@@ -19,7 +18,7 @@ namespace SEE.Controls.Actions.Drawable
     /// <summary>
     /// Moves or rotate a drawable type object.
     /// </summary>
-    public class MoveRotatorAction : AbstractPlayerAction
+    public class MoveRotateAction : DrawableAction
     {
         /// <summary>
         /// Saves all the information needed to revert or repeat this action.
@@ -27,49 +26,49 @@ namespace SEE.Controls.Actions.Drawable
         private Memento memento;
 
         /// <summary>
-        /// This struct can store all the information needed to revert or repeat a <see cref="MoveRotatorAction"/>
+        /// This struct can store all the information needed to revert or repeat a <see cref="MoveRotateAction"/>
         /// </summary>
         private struct Memento
         {
             /// <summary>
-            /// Is the selected drawable type object.
+            /// The selected drawable type object.
             /// </summary>
-            public GameObject selectedObject;
+            public GameObject SelectedObject;
             /// <summary>
-            /// Is the drawable where the selected object is displayed.
+            /// The drawable where the selected object is displayed.
             /// </summary>
-            public readonly DrawableConfig drawable;
+            public readonly DrawableConfig Drawable;
             /// <summary>
-            /// Is the id of the selected object.
+            /// The id of the selected object.
             /// </summary>
-            public readonly string id;
+            public readonly string Id;
             /// <summary>
             /// The old position of the selected object.
             /// </summary>
-            public readonly Vector3 oldObjectPosition;
+            public readonly Vector3 OldObjectPosition;
             /// <summary>
             /// The new position of the selected object.
             /// </summary>
-            public readonly Vector3 newObjectPosition;
+            public readonly Vector3 NewObjectPosition;
             /// <summary>
             /// The old local euler angles of the selected object.
             /// </summary>
-            public readonly Vector3 oldObjectLocalEulerAngles;
+            public readonly Vector3 OldObjectLocalEulerAngles;
             /// <summary>
-            /// The degree on that the object was rotated. (Is the z value of the local euler angeles)
+            /// The degree by which the object was rotated (the z value of the local euler angles).
             /// </summary>
-            public readonly float degree;
+            public readonly float Degree;
             /// <summary>
-            /// The state if was moved or rotated.
+            /// Whether it was moved or rotated.
             /// </summary>
-            public readonly ProgressState moveOrRotate;
+            public readonly ProgressState MoveOrRotate;
             /// <summary>
-            /// The state if children was included if the selected object was a mind map node.
+            /// Whether children were included in case the selected object was a mind map node.
             /// </summary>
-            public readonly bool includeChildren;
+            public readonly bool IncludeChildren;
 
             /// <summary>
-            /// The constructor, which simply assigns its only parameter to a field in this class.
+            /// The constructor.
             /// </summary>
             /// <param name="selectedObject">Is the selected drawable type object.</param>
             /// <param name="drawable">Is the drawable where the selected object is displayed.</param>
@@ -83,15 +82,15 @@ namespace SEE.Controls.Actions.Drawable
                 Vector3 oldObjectPosition, Vector3 newObjectPosition, Vector3 oldObjectLocalEulerAngles,
                 float degree, ProgressState moveOrRotate, bool includeChildren)
             {
-                this.selectedObject = selectedObject;
-                this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
-                this.id = id;
-                this.oldObjectPosition = oldObjectPosition;
-                this.newObjectPosition = newObjectPosition;
-                this.oldObjectLocalEulerAngles = oldObjectLocalEulerAngles;
-                this.degree = degree;
-                this.moveOrRotate = moveOrRotate;
-                this.includeChildren = includeChildren;
+                SelectedObject = selectedObject;
+                Drawable = DrawableConfigManager.GetDrawableConfig(drawable);
+                Id = id;
+                OldObjectPosition = oldObjectPosition;
+                NewObjectPosition = newObjectPosition;
+                OldObjectLocalEulerAngles = oldObjectLocalEulerAngles;
+                Degree = degree;
+                MoveOrRotate = moveOrRotate;
+                IncludeChildren = includeChildren;
             }
         }
 
@@ -101,7 +100,7 @@ namespace SEE.Controls.Actions.Drawable
         private ProgressState progressState = ProgressState.SelectObject;
 
         /// <summary>
-        /// The progress states of the <see cref="MoveRotatorAction"/>
+        /// The progress states of the <see cref="MoveRotateAction"/>
         /// </summary>
         private enum ProgressState
         {
@@ -117,12 +116,12 @@ namespace SEE.Controls.Actions.Drawable
         private ProgressState executedOperation;
 
         /// <summary>
-        /// The selected drawable type object for moveing or rotating.
+        /// The selected drawable type object for moving or rotating.
         /// </summary>
         private GameObject selectedObject;
 
         /// <summary>
-        /// The old selected drawable type object, if the user select a new one
+        /// The old selected drawable type object, if the user selected a new one
         /// in the same action run.
         /// </summary>
         private GameObject oldSelectedObj;
@@ -148,7 +147,7 @@ namespace SEE.Controls.Actions.Drawable
         private GameObject switchMenu;
 
         /// <summary>
-        /// Represents that the left mouse button was released after selecting a object.
+        /// True if the left mouse button was released after selecting a object.
         /// </summary>
         private bool mouseWasReleased = true;
 
@@ -163,10 +162,10 @@ namespace SEE.Controls.Actions.Drawable
         private Vector3 newObjectLocalEulerAngles;
 
         /// <summary>
-        /// Deactivates the blink effect if, it is still active.
-        /// And destroys the rigidbody and collision controller if it is still active.
+        /// Deactivates the blink effect if it is still active
+        /// and destroys the rigidbody and collision controller if there are still active.
         /// If the action was not completed in full (finish), the changes are reset.
-        /// Destoryes the rotation and move menu if is still active.
+        /// Destroys the rotation and move menu if it is still active.
         /// </summary>
         public override void Stop()
         {
@@ -216,7 +215,7 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.MoveRotator"/>.
-        /// It moves or rotate a chosen drawable type object.
+        /// It moves or rotates a chosen drawable type object.
         /// </summary>
         /// <returns>Whether this Action is finished</returns>
         public override bool Update()
@@ -228,12 +227,12 @@ namespace SEE.Controls.Actions.Drawable
             {
                 switch (progressState)
                 {
-                    /// With this block, the user can select a Drawable Type object. 
+                    /// With this block, the user can select a Drawable Type object.
                     case ProgressState.SelectObject:
                         Selection();
                         break;
 
-                    /// With this block, the user can move the object. 
+                    /// With this block, the user can move the object.
                     case ProgressState.Move:
                         Move();
                         break;
@@ -243,24 +242,22 @@ namespace SEE.Controls.Actions.Drawable
                         Rotate();
                         break;
 
-                    /// With this block, it is checked whether changes have been made. 
+                    /// With this block, it is checked whether changes have been made.
                     /// If so, the action is completed; otherwise, it is reset.
                     case ProgressState.Finish:
                         return Finish();
                 }
-                return false;
             }
-            
+
             return false;
         }
 
         /// <summary>
-        /// Provides the option to cancel the action. 
-        /// Simply press the "Esc" key if an object is selected for move/rotate.
+        /// Provides the option to cancel the action.
         /// </summary>
         private void Cancel()
         {
-            if (selectedObject != null && Input.GetKeyDown(KeyCode.Escape))
+            if (selectedObject != null && SEEInput.Cancel())
             {
                 ShowNotification.Info("Canceled", "The action was canceled by the user.");
                 if (selectedObject != null)
@@ -311,10 +308,11 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Enables the user to select a <see cref="DrawableType"/> object. 
-        /// After the selection, a menu is opened, providing the user with options to move and rotate. 
-        /// The respective choices are initiated by using the corresponding buttons. 
-        /// Furthermore, the user is allowed to switch the <see cref="DrawableType"/> object before making the move or rotate selection.
+        /// Enables the user to select a <see cref="DrawableType"/> object.
+        /// After the selection, a menu is opened, providing the user with options to move and rotate.
+        /// The respective choices are initiated by using the corresponding buttons.
+        /// Furthermore, the user is allowed to switch the <see cref="DrawableType"/> object before
+        /// making the move or rotate selection.
         /// </summary>
         private void Selection()
         {
@@ -322,7 +320,7 @@ namespace SEE.Controls.Actions.Drawable
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit) && selectedObject == null
                 && (oldSelectedObj == null || oldSelectedObj != raycastHit.collider.gameObject
                     || (oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased))
-                && GameFinder.hasDrawable(raycastHit.collider.gameObject))
+                && GameFinder.HasDrawable(raycastHit.collider.gameObject))
             {
                 selectedObject = raycastHit.collider.gameObject;
                 oldObjectPosition = selectedObject.transform.localPosition;
@@ -337,8 +335,8 @@ namespace SEE.Controls.Actions.Drawable
                 mouseWasReleased = false;
 
                 switchMenu = PrefabInstantiator.InstantiatePrefab(switchMenuPrefab,
-                            GameObject.Find("UI Canvas").transform, false);
-                /// Adds the functionality to the move button 
+                                                                  Canvas.transform, false);
+                /// Adds the functionality to the move button
                 GameFinder.FindChild(switchMenu, "Move").GetComponent<ButtonManagerBasic>().clickEvent
                     .AddListener(() =>
                 {
@@ -363,15 +361,16 @@ namespace SEE.Controls.Actions.Drawable
                 mouseWasReleased = true;
             }
 
-            /// This block ensures that a change of the <see cref="DrawableType"/> object is possible before the operation selection.
+            /// This block ensures that a change of the <see cref="DrawableType"/> object is possible
+            /// before the operation selection.
             EnableObjectChange();
         }
 
         /// <summary>
         /// Ensures that a change of the <see cref="DrawableType"/> object is possible.
-        /// Deselects the current object. 
-        /// The menu is closed. 
-        /// The blink effect, rigidbody, and collision controller are removed. 
+        /// Deselects the current object.
+        /// The menu is closed.
+        /// The blink effect, rigidbody, and collision controller are removed.
         /// Ensures that the visibility of the Renderer/Canvas is activated.
         /// </summary>
         private void EnableObjectChange()
@@ -408,16 +407,16 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// Provides the functionality for moving the object.
-        /// The object either follows the mouse movement, or the arrow keys can be used.
+        /// The object either follows the mouse movement or the arrow keys can be used.
         /// The mouse movement is stopped and blocked if a collision with any of the borders of the Drawable is detected.
-        /// (When moving mind map nodes with the setting that includes children, 
+        /// (When moving mind map nodes with the setting that includes children,
         /// the collision controllers of the children are also taken into account.)
         /// Using the arrow keys locks moving with the mouse, which can be unlocked by a middle mouse click.
         /// A middle mouse click toggles the move by mouse state.
         /// There is a faster option for moving by key. It can be toggled by clicking the left Ctrl key down.
         /// To end the move, the left mouse button must be pressed and released.
-        /// 
-        /// Alternatively, through the menu, the object can be moved, and settings for speed, 'move by mouse' 
+        ///
+        /// Alternatively, through the menu, the object can be moved, and settings for speed, 'move by mouse'
         /// and include children can be chosen as well.
         /// </summary>
         private void Move()
@@ -469,7 +468,7 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// To detect a move by key.
-        /// It locks the moving by mouse and 
+        /// It locks the moving by mouse and
         /// moves the object in the respective direction based on the chosen speed
         /// </summary>
         /// <param name="moveByMouse">The switch manager for the move by mouse option from the menu</param>
@@ -495,7 +494,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Checks if any of the child nodes are involved in a collision.
         /// </summary>
-        /// <returns>true, if a child node are involved in a collision. Otherwise false.</returns>
+        /// <returns>true if a child node is involved in a collision; otherwise false</returns>
         private bool CheckChildrenCollision()
         {
             bool childInCollision = false;
@@ -512,16 +511,16 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Moves the selected object based on the mouse position. 
+        /// Moves the selected object based on the mouse position.
         /// This means it follows the mouse position.
-        /// Will be executed when move by mouse is active 
+        /// Will be executed when move by mouse is active
         /// and if the object and none of the children are in collision.
         /// The children are only necessary for a mind map node with the
         /// include children option.
         /// </summary>
-        /// <param name="moveByMouse">The switch manager for the move by mouse option from the menu</param>
+        /// <param name="moveByMouse">The switch manager for the move-by-mouse option from the menu</param>
         /// <param name="childInCollision">Identifies whether any of the children are in collision</param>
-        /// <param name="drawable">The drawable on that the object is displayed.</param>
+        /// <param name="drawable">The drawable on which the object is displayed.</param>
         /// <param name="drawableParentName">The parent name of the drawable</param>
         private void MoveByMouse(SwitchManager moveByMouse, bool childInCollision,
             GameObject drawable, string drawableParentName)
@@ -532,7 +531,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 if ((hit.collider.gameObject.CompareTag(Tags.Drawable)
                         && hit.collider.gameObject.Equals(drawable))
-                    || (GameFinder.hasDrawable(hit.collider.gameObject)
+                    || (GameFinder.HasDrawable(hit.collider.gameObject)
                         && GameFinder.GetDrawable(hit.collider.gameObject).Equals(drawable)))
                 {
                     newObjectPosition = GameMoveRotator.MoveObjectByMouse(selectedObject,
@@ -575,8 +574,8 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Checks if a mouse wheel movement is registered. 
-        /// If yes, it performs the desired rotation. 
+        /// Checks whether a mouse wheel movement is registered.
+        /// If yes, it performs the desired rotation.
         /// The rotation can be accelerated using Left Control.
         /// </summary>
         private void RotateByWheel()
@@ -645,10 +644,10 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Completes the action, if there are any changes in the position or in the euler angles.
         /// Otherwise it will reset the action.
-        /// The action is only completed properly if the object is no longer involved in any collision. 
+        /// The action is only completed properly if the object is no longer involved in any collision.
         /// The same applies to children when using mind map nodes with the option to include children.
         /// </summary>
-        /// <returns>whatever the state of success is.</returns>
+        /// <returns>state of success</returns>
         private bool Finish()
         {
             if (oldObjectPosition != newObjectPosition
@@ -666,10 +665,11 @@ namespace SEE.Controls.Actions.Drawable
                     }
                 }
 
-                /// If there is no collision, the action is completed. 
-                /// To do this, necessary data is queried, and then a Memento is created. 
-                /// Subsequently, the rigidbodies and collision controllers are destroyed, 
-                /// the menus are closed, and the progress state of the action is set to completed.
+                /// If there is no collision, the action is completed.
+                /// To do this, necessary data is queried, and then a Memento is created.
+                /// Subsequently, the rigidbodies and collision controllers are destroyed,
+                /// the menus are closed, and the progress state of the action is set to
+                /// be completed.
                 if (selectedObject.GetComponent<CollisionController>() != null
                     && !selectedObject.GetComponent<CollisionController>().IsInCollision() && !childInCollision)
                 {
@@ -683,8 +683,8 @@ namespace SEE.Controls.Actions.Drawable
                     Destroyer.Destroy(selectedObject.GetComponent<Rigidbody>());
                     Destroyer.Destroy(selectedObject.GetComponent<CollisionController>());
                     GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(selectedObject);
-                    new RbAndCCDestroyerNetAction(memento.drawable.ID, memento.drawable.ParentID,
-                        memento.selectedObject.name).Execute();
+                    new RbAndCCDestroyerNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                        memento.SelectedObject.name).Execute();
                     RotationMenu.Disable();
                     MoveMenu.Disable();
                     CurrentState = IReversibleAction.Progress.Completed;
@@ -693,8 +693,8 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     if (executedOperation == ProgressState.Rotate)
                     {
-                        /// A block is needed because occasionally a trigger exit is not registered during rotation. 
-                        /// This block attempts to set the isInCollision value of the Collision Controller to false. 
+                        /// A block is needed because occasionally a trigger exit is not registered during rotation.
+                        /// This block attempts to set the isInCollision value of the Collision Controller to false.
                         /// However, if the object is still in a collision, it will be set back to true by its OnStayCollision method.
                         selectedObject.GetComponent<CollisionController>().TrySetCollisionToFalse();
                     }
@@ -718,7 +718,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Get the pressed KeyCode of the arrow keys.
+        /// Returns the pressed KeyCode of the arrow keys.
         /// </summary>
         /// <returns>The pressed arrow key.</returns>
         private KeyCode GetArrowKey()
@@ -747,33 +747,33 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo();
-            if (memento.selectedObject == null && memento.id != null)
+            if (memento.SelectedObject == null && memento.Id != null)
             {
-                memento.selectedObject = GameFinder.FindChild(memento.drawable.GetDrawable(),
-                    memento.id);
+                memento.SelectedObject = GameFinder.FindChild(memento.Drawable.GetDrawable(),
+                    memento.Id);
             }
 
-            if (memento.selectedObject != null)
+            if (memento.SelectedObject != null)
             {
-                if (memento.moveOrRotate == ProgressState.Move)
+                if (memento.MoveOrRotate == ProgressState.Move)
                 {
-                    GameMoveRotator.SetPosition(memento.selectedObject, memento.oldObjectPosition,
-                                            memento.includeChildren);
-                    new MoveNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.id,
-                        memento.oldObjectPosition, memento.includeChildren).Execute();
+                    GameMoveRotator.SetPosition(memento.SelectedObject, memento.OldObjectPosition,
+                                            memento.IncludeChildren);
+                    new MoveNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Id,
+                        memento.OldObjectPosition, memento.IncludeChildren).Execute();
                 }
-                else if (memento.moveOrRotate == ProgressState.Rotate)
+                else if (memento.MoveOrRotate == ProgressState.Rotate)
                 {
-                    GameMoveRotator.SetRotate(memento.selectedObject, memento.oldObjectLocalEulerAngles.z,
-                        memento.includeChildren);
-                    new RotatorNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.id,
-                        memento.oldObjectLocalEulerAngles.z, memento.includeChildren).Execute();
+                    GameMoveRotator.SetRotate(memento.SelectedObject, memento.OldObjectLocalEulerAngles.z,
+                        memento.IncludeChildren);
+                    new RotatorNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Id,
+                        memento.OldObjectLocalEulerAngles.z, memento.IncludeChildren).Execute();
                 }
 
                 GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(
-                    GameFinder.GetAttachedObjectsObject(memento.selectedObject));
-                new RbAndCCDestroyerNetAction(memento.drawable.ID, memento.drawable.ParentID,
-                    memento.selectedObject.name).Execute();
+                    GameFinder.GetAttachedObjectsObject(memento.SelectedObject));
+                new RbAndCCDestroyerNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                    memento.SelectedObject.name).Execute();
             }
         }
 
@@ -783,48 +783,48 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            if (memento.selectedObject == null && memento.id != null)
+            if (memento.SelectedObject == null && memento.Id != null)
             {
-                memento.selectedObject = GameFinder.FindChild(memento.drawable.GetDrawable(),
-                    memento.id);
+                memento.SelectedObject = GameFinder.FindChild(memento.Drawable.GetDrawable(),
+                    memento.Id);
             }
-            if (memento.selectedObject != null)
+            if (memento.SelectedObject != null)
             {
-                if (memento.moveOrRotate == ProgressState.Move)
+                if (memento.MoveOrRotate == ProgressState.Move)
                 {
-                    GameMoveRotator.SetPosition(memento.selectedObject, memento.newObjectPosition,
-                        memento.includeChildren);
-                    new MoveNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.id,
-                        memento.newObjectPosition, memento.includeChildren).Execute();
+                    GameMoveRotator.SetPosition(memento.SelectedObject, memento.NewObjectPosition,
+                        memento.IncludeChildren);
+                    new MoveNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Id,
+                        memento.NewObjectPosition, memento.IncludeChildren).Execute();
                 }
-                else if (memento.moveOrRotate == ProgressState.Rotate)
+                else if (memento.MoveOrRotate == ProgressState.Rotate)
                 {
-                    GameMoveRotator.SetRotate(memento.selectedObject, memento.degree, memento.includeChildren);
-                    new RotatorNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.id,
-                        memento.degree, memento.includeChildren).Execute();
+                    GameMoveRotator.SetRotate(memento.SelectedObject, memento.Degree, memento.IncludeChildren);
+                    new RotatorNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Id,
+                        memento.Degree, memento.IncludeChildren).Execute();
                 }
                 GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(
-                    GameFinder.GetAttachedObjectsObject(memento.selectedObject));
-                new RbAndCCDestroyerNetAction(memento.drawable.ID, memento.drawable.ParentID,
-                    memento.selectedObject.name).Execute();
+                    GameFinder.GetAttachedObjectsObject(memento.SelectedObject));
+                new RbAndCCDestroyerNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                    memento.SelectedObject.name).Execute();
             }
         }
 
         /// <summary>
-        /// A new instance of <see cref="MoveRotatorAction"/>.
+        /// A new instance of <see cref="MoveRotateAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="MoveRotatorAction"/></returns>
+        /// <returns>new instance of <see cref="MoveRotateAction"/></returns>
         public static IReversibleAction CreateReversibleAction()
         {
-            return new MoveRotatorAction();
+            return new MoveRotateAction();
         }
 
         /// <summary>
-        /// A new instance of <see cref="MoveRotatorAction"/>.
+        /// A new instance of <see cref="MoveRotateAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="MoveRotatorAction"/></returns>
+        /// <returns>new instance of <see cref="MoveRotateAction"/></returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -842,21 +842,19 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
-        /// Because this action does not actually change any game object, 
-        /// an empty set is always returned.
         /// </summary>
         /// <returns>The id of the moved or rotated object</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            if (memento.selectedObject == null)
+            if (memento.SelectedObject == null)
             {
-                return new HashSet<string>();
+                return new();
             }
             else
             {
-                return new HashSet<string>
+                return new()
                 {
-                    memento.selectedObject.name
+                    memento.SelectedObject.name
                 };
             }
         }

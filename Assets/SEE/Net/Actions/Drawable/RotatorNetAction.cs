@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is responsible for changing the rotation (<see cref="MoveRotatorAction"/>) of an object on all clients.
+    /// This class is responsible for changing the rotation (<see cref="MoveRotateAction"/>) of an object on all clients.
     /// </summary>
     public class RotatorNetAction : AbstractNetAction
     {
@@ -59,7 +59,7 @@ namespace SEE.Net.Actions.Drawable
 
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
-        /// Used for undo / redo of <see cref="MoveRotatorAction"/> 
+        /// Used for undo / redo of <see cref="MoveRotateAction"/> 
         /// </summary>
         /// <param name="drawableID">The id of the drawable on which the object is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>

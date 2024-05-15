@@ -24,7 +24,7 @@ namespace SEE.Game.Drawable
             foreach (GameObject drawable in drawables)
             {
                 /// Block for searching includes the parend id.
-                if (parentDrawableID != null && !parentDrawableID.Equals("") 
+                if (parentDrawableID != null && !parentDrawableID.Equals("")
                     && drawable.transform.parent != null)
                 {
                     string parentName = drawable.transform.parent.gameObject.name;
@@ -37,7 +37,7 @@ namespace SEE.Game.Drawable
                 else
                 {
                     /// Block for searching without parent id.
-                    /// Currently not used, as the drawables from 
+                    /// Currently not used, as the drawables from
                     /// the Whiteboard and Sticky Notes each have a parent.
                     if (string.Equals(drawableID, drawable.name))
                     {
@@ -98,7 +98,7 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="child">The child to be examined.</param>
         /// <returns>true, if the child has a drawable. Otherwise false</returns>
-        public static bool hasDrawable(GameObject child)
+        public static bool HasDrawable(GameObject child)
         {
             if (hasParentWithTag(child, Tags.AttachedObjects))
             {
@@ -112,7 +112,7 @@ namespace SEE.Game.Drawable
 
         /// <summary>
         /// Query whether the given game object is part of a drawable.
-        /// It is checked whether the highest game object in the hierarchy of 
+        /// It is checked whether the highest game object in the hierarchy of
         /// the given game object contains a drawable child object.
         /// </summary>
         /// <param name="component">The game object to be checked.</param>
@@ -162,7 +162,7 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Searches for all children with the given tag (<paramref name="childTag"/>) except the parent 
+        /// Searches for all children with the given tag (<paramref name="childTag"/>) except the parent
         /// has a specific tag (<paramref name="parentTag"/>).
         /// Will be used for mind map nodes.
         /// </summary>
@@ -170,14 +170,14 @@ namespace SEE.Game.Drawable
         /// <param name="childTag">The tag to be searched</param>
         /// <param name="parentTag">The execpt tag</param>
         /// <returns>All children with the searched tag, except those whose parents have the specific tag.</returns>
-        public static List<GameObject> FindAllChildrenWithTagExceptParentHasTag(GameObject parent, 
+        public static List<GameObject> FindAllChildrenWithTagExceptParentHasTag(GameObject parent,
             string childTag, string parentTag)
         {
             List<GameObject> gameObjects = new();
             Transform[] allChildren = parent.GetComponentsInChildren<Transform>();
             foreach (Transform childTransform in allChildren)
             {
-                if (childTransform.gameObject.CompareTag(childTag) 
+                if (childTransform.gameObject.CompareTag(childTag)
                     && !childTransform.parent.gameObject.CompareTag(parentTag))
                 {
                     gameObjects.Add(childTransform.gameObject);

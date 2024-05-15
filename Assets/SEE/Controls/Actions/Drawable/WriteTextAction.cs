@@ -152,7 +152,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit)
-                && (GameFinder.hasDrawable(raycastHit.collider.gameObject)
+                && (GameFinder.HasDrawable(raycastHit.collider.gameObject)
                     || raycastHit.collider.gameObject.CompareTag(Tags.Drawable)))
             {
                 drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?

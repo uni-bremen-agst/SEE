@@ -220,7 +220,7 @@ namespace SEE.Controls.Actions
             MoveRotator =
                 new("Move or Rotate", "Move or rotates a Object on the Drawable.",
                     Color.green.Darker(), "Materials/Drawable/MoveRotator",
-                    MoveRotatorAction.CreateReversibleAction,
+                    MoveRotateAction.CreateReversibleAction,
                     parent: Drawable);
 
             Scale =

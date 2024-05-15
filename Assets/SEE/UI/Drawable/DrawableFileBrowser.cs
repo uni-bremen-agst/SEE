@@ -119,7 +119,7 @@ namespace SEE.UI.Drawable
                     break;
 
                 /// Block for save more drawables.
-                case SaveState.More:
+                case SaveState.Multiple:
                     DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.multipleConfPath);
                     initPath = DrawableConfigManager.multipleConfPath;
                     title = "Save specific Drawables";

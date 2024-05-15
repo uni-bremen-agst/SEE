@@ -1,6 +1,7 @@
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.GO;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.Utils;
@@ -14,7 +15,7 @@ namespace SEE.Controls.Actions.Drawable
     /// <summary>
     /// This class provides a color picker action for <see cref="DrawableType"/> objects.
     /// </summary>
-    class ColorPickerAction : AbstractPlayerAction
+    class ColorPickerAction : DrawableAction
     {
         /// <summary>
         /// The old chosen primary color of the <see cref="ValueHolder"/>
@@ -27,7 +28,7 @@ namespace SEE.Controls.Actions.Drawable
         private Color oldChosenSecondColor;
 
         /// <summary>
-        /// The new picked color.
+        /// The newly picked color.
         /// </summary>
         private Color pickedColor;
 
@@ -37,31 +38,31 @@ namespace SEE.Controls.Actions.Drawable
         private Memento memento;
 
         /// <summary>
-        /// Bool to identifiy if the action is running.
+        /// Trie if the action is running.
         /// </summary>
         private bool isInAction = false;
 
         /// <summary>
-        /// Bool to identifiy if the action waits for user input of the
+        /// True if the action waits for user input of the
         /// mind map color picker menu.
         /// </summary>
         private bool waitForHelperMenu = false;
 
         /// <summary>
-        /// Bool to identify that the color picking from mind map node is finish.
+        /// True if the color picking from a mind map node is finished.
         /// </summary>
         private bool finishChosingMMColor = false;
 
         /// <summary>
-        /// Bool to identifiy if the picker picks a color for the second color.
+        /// True if the picker picks a color for the second color.
         /// </summary>
         private bool pickForSecondColor = false;
 
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.ColorPicker"/>.
-        /// It pickes the chosen color of a drawable type object.
+        /// It picks the chosen color of a drawable type object.
         /// </summary>
-        /// <returns>Whether this Action is finished</returns>
+        /// <returns>Whether this action is finished</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -74,10 +75,11 @@ namespace SEE.Controls.Actions.Drawable
                 /// Will be executed via right mouse click.
                 PickingSecondaryColor();
 
-                /// Ends the action. 
-                /// Loads the selected color, depending on the option chosen in the ColorPickerMenu, 
-                /// either into <see cref="ValueHolder.currentPrimaryColor"/> or <see cref="ValueHolder.currentSecondaryColor"/>. 
-                /// Subsequently, a memento is created, and the action process is completed. 
+                /// Ends the action.
+                /// Loads the selected color, depending on the option chosen in the ColorPickerMenu,
+                /// either into <see cref="ValueHolder.currentPrimaryColor"/> or
+                /// <see cref="ValueHolder.currentSecondaryColor"/>.
+                /// Subsequently, a memento is created, and the action process is completed.
                 if (((Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1)) && isInAction && !waitForHelperMenu) ||
                     finishChosingMMColor)
                 {
@@ -98,9 +100,9 @@ namespace SEE.Controls.Actions.Drawable
                 }
             }
 
-            /// This block is waiting for user input to select a Mind Map element 
+            /// This block is waiting for user input to select a Mind Map element
             /// of <see cref="ColorPickerMindMapMenu"/>.
-            /// It is placed outside the <see cref="Raycasting.IsMouseOverGUI"/> block so 
+            /// It is placed outside the <see cref="Raycasting.IsMouseOverGUI"/> block so
             /// that the input can be immediately detected.
             if (waitForHelperMenu && ColorPickerMindMapMenu.TryGetColor(out Color color))
             {
@@ -117,9 +119,9 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void PickingPrimaryColor()
         {
-            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !isInAction 
-                && Raycasting.RaycastAnything(out RaycastHit raycastHit) 
-                && (GameFinder.hasDrawable(raycastHit.collider.gameObject) ||
+            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !isInAction
+                && Raycasting.RaycastAnything(out RaycastHit raycastHit)
+                && (GameFinder.HasDrawable(raycastHit.collider.gameObject) ||
                     raycastHit.collider.gameObject.CompareTag(Tags.Drawable) &&
                     GameFinder.GetHighestParent(raycastHit.collider.gameObject).name.
                         StartsWith(ValueHolder.StickyNotePrefix)))
@@ -158,9 +160,9 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void PickingSecondaryColor()
         {
-            if ((Input.GetMouseButtonDown(1) || Input.GetMouseButton(1)) && !isInAction 
-                && Raycasting.RaycastAnything(out RaycastHit hit) 
-                && (GameFinder.hasDrawable(hit.collider.gameObject) ||
+            if ((Input.GetMouseButtonDown(1) || Input.GetMouseButton(1)) && !isInAction
+                && Raycasting.RaycastAnything(out RaycastHit hit)
+                && (GameFinder.HasDrawable(hit.collider.gameObject) ||
                     hit.collider.gameObject.CompareTag(Tags.Drawable) &&
                     GameFinder.GetHighestParent(hit.collider.gameObject).name.
                         StartsWith(ValueHolder.StickyNotePrefix)))
@@ -198,24 +200,23 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// At beginning of this action, it saves the current color values 
-        /// (<see cref="ValueHolder.currentPrimaryColor>"/> and <see cref="ValueHolder.currentSecondaryColor"/> 
+        /// At the beginning of this action, it saves the current color values
+        /// (<see cref="ValueHolder.currentPrimaryColor>"/> and <see cref="ValueHolder.currentSecondaryColor"/>)
         /// of the <see cref="ValueHolder"/>.
         /// It also adds to the UICanvas a <see cref="ColorPickerMenuDisabler"/> component.
-        /// This is required to prevent a display error when displaying the color picker menu. 
-        /// (When it is displayed, the switch status is initialized once. 
+        /// This is required to prevent a display error when displaying the color picker menu.
+        /// (When it is displayed, the switch status is initialized once.
         ///     It is activated once and then returns to its original position.)
         /// Then it enables the color picker menu.
         /// </summary>
         public override void Awake()
         {
+            base.Awake();
+
             oldChosenPrimaryColor = ValueHolder.currentPrimaryColor;
             oldChosenSecondColor = ValueHolder.currentSecondaryColor;
-            if (GameObject.Find("UI Canvas").GetComponent<ColorPickerMenuDisabler>() == null)
-            {
-                GameObject.Find("UI Canvas").AddComponent<ColorPickerMenuDisabler>();
-                ColorPickerMenu.Enable();
-            }
+            Canvas.AddOrGetComponent<ColorPickerMenuDisabler>();
+            ColorPickerMenu.Enable();
         }
 
         /// <summary>
@@ -223,51 +224,52 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Stop()
         {
+            base.Stop();
             ColorPickerMindMapMenu.Disable();
         }
 
         /// <summary>
-        /// This struct can store all the information needed to 
+        /// This struct can store all the information needed to
         /// revert or repeat a <see cref="ColorPickerAction"/>.
         /// </summary>
-        struct Memento
+        readonly struct Memento
         {
             /// <summary>
             /// The old chosen <see cref="ValueHolder.currentPrimaryColor"/>
             /// </summary>
-            public readonly Color oldChosenPrimaryColor;
+            public readonly Color OldChosenPrimaryColor;
             /// <summary>
             /// The old chosen <see cref="ValueHolder.currentSecondaryColor"/>
             /// </summary>
-            public readonly Color oldChosenSecondColor;
+            public readonly Color OldChosenSecondColor;
             /// <summary>
             /// The picked color
             /// </summary>
-            public readonly Color pickedColor;
+            public readonly Color PickedColor;
             /// <summary>
-            /// A boolean representing that the selected color has been picked 
+            /// A boolean representing that the selected color has been picked
             /// for the <see cref="ValueHolder.currentSecondaryColor"/>
             /// </summary>
-            public readonly bool pickForSecondColor;
+            public readonly bool PickForSecondColor;
 
             /// <summary>
             /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
-            /// <param name="oldChosenPrimaryColor">The old chosen 
+            /// <param name="oldChosenPrimaryColor">The old chosen
             ///     <see cref="ValueHolder.currentPrimaryColor"/></param>
-            /// <param name="oldChosenSecondColor">The old chosen 
+            /// <param name="oldChosenSecondColor">The old chosen
             ///     <see cref="ValueHolder.currentSecondaryColor"/></param>
             /// <param name="pickedColor">The picked color</param>
-            /// <param name="pickForSecondColor">Color was picked for 
+            /// <param name="pickForSecondColor">Color was picked for
             ///     <see cref="ValueHolder.currentSecondaryColor"/></param>
-            /// 
-            public Memento(Color oldChosenPrimaryColor, Color oldChosenSecondColor, Color pickedColor, 
+            ///
+            public Memento(Color oldChosenPrimaryColor, Color oldChosenSecondColor, Color pickedColor,
                 bool pickForSecondColor)
             {
-                this.oldChosenPrimaryColor = oldChosenPrimaryColor;
-                this.oldChosenSecondColor = oldChosenSecondColor;
-                this.pickedColor = pickedColor;
-                this.pickForSecondColor = pickForSecondColor;
+                OldChosenPrimaryColor = oldChosenPrimaryColor;
+                OldChosenSecondColor = oldChosenSecondColor;
+                PickedColor = pickedColor;
+                PickForSecondColor = pickForSecondColor;
             }
         }
 
@@ -277,9 +279,9 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo();
-            ValueHolder.currentPrimaryColor = memento.oldChosenPrimaryColor;
+            ValueHolder.currentPrimaryColor = memento.OldChosenPrimaryColor;
             ColorPickerMenu.AssignPrimaryColor(ValueHolder.currentPrimaryColor);
-            ValueHolder.currentSecondaryColor = memento.oldChosenSecondColor;
+            ValueHolder.currentSecondaryColor = memento.OldChosenSecondColor;
             ColorPickerMenu.AssignSecondaryColor(ValueHolder.currentSecondaryColor);
         }
 
@@ -289,14 +291,14 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            if (!memento.pickForSecondColor)
+            if (!memento.PickForSecondColor)
             {
-                ValueHolder.currentPrimaryColor = memento.pickedColor;
+                ValueHolder.currentPrimaryColor = memento.PickedColor;
                 ColorPickerMenu.AssignPrimaryColor(ValueHolder.currentPrimaryColor);
             }
             else
             {
-                ValueHolder.currentSecondaryColor = memento.pickedColor;
+                ValueHolder.currentSecondaryColor = memento.PickedColor;
                 ColorPickerMenu.AssignSecondaryColor(ValueHolder.currentSecondaryColor);
             }
         }
@@ -333,7 +335,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
-        /// Because this action does not actually change any game object, 
+        /// Because this action does not actually change any game object,
         /// an empty set is always returned.
         /// </summary>
         /// <returns>a empty set</returns>
