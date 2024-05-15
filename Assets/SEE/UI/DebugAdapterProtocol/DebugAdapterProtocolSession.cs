@@ -483,10 +483,9 @@ namespace SEE.UI.DebugAdapterProtocol
 
                 foreach (StackFrame stackFrame in stackFrames)
                 {
-                    Dictionary<Scope, List<Variable>> stackVariables = new();
-                    threadVariables.Add(stackFrame, stackVariables);
                     List<Scope> stackScopes = adapterHost.SendRequestSync(new ScopesRequest() { FrameId = stackFrame.Id }).Scopes;
-                    stackVariables = stackScopes.ToDictionary(scope => scope, scope => RetrieveNestedVariables(scope.VariablesReference));
+                    Dictionary<Scope, List<Variable>> stackVariables = stackScopes.ToDictionary(scope => scope, scope => RetrieveNestedVariables(scope.VariablesReference));
+                    threadVariables.Add(stackFrame, stackVariables);
                 }
             }
             variablesWindow ??= WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer].Windows.OfType<VariablesWindow>().FirstOrDefault();
