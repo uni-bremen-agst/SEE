@@ -330,9 +330,8 @@ namespace SEE.UI.Window.ConsoleWindow
         /// <summary>
         /// Updates the displayed messages.
         /// </summary>
-        protected override void Update()
+        protected override void UpdateDesktop()
         {
-            base.Update();
             switch (consoleEvent)
             {
                 case ConsoleEvent.Cleared:
@@ -376,7 +375,6 @@ namespace SEE.UI.Window.ConsoleWindow
 
         private void HandleConsoleEvent(ConsoleEvent consoleEvent)
         {
-            Debug.Log(consoleEvent);
             this.consoleEvent |= consoleEvent;
         }
 
@@ -596,19 +594,19 @@ namespace SEE.UI.Window.ConsoleWindow
             /// <summary>
             /// The console was cleared.
             /// </summary>
-            Cleared = 1 << 1,
+            Cleared = 1 << 0,
             /// <summary>
             /// A message was added.
             /// </summary>
-            MessageAdded = 1 << 2,
+            MessageAdded = 1 << 1,
             /// <summary>
             /// A message was changed.
             /// </summary>
-            MessageChanged = 1 << 3,
+            MessageChanged = 1 << 2,
             /// <summary>
             /// A channel was changed.
             /// </summary>
-            ChannelChanged = 1 << 4,
+            ChannelChanged = 1 << 3,
         }
     }
 }
