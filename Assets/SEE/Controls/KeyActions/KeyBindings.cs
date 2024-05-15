@@ -128,7 +128,7 @@ namespace SEE.Controls.KeyActions
             // General
             Register(KeyAction.Help, KeyCode.H, "Help",
                      KeyActionCategory.General, "Provides help");
-            Register(KeyAction.ToggleVoiceInput, KeyCode.Period, "Toggle voice chat",
+            Register(KeyAction.ToggleVoiceControl, KeyCode.Period, "Toggle voice control (commands to SEE)",
                      KeyActionCategory.General, "Toggles voice input on/off.");
             Register(KeyAction.ToggleMenu, KeyCode.Space, "Toggle menu",
                      KeyActionCategory.General, "Toggles the user-action menu.");
@@ -227,18 +227,12 @@ namespace SEE.Controls.KeyActions
                      KeyActionCategory.Debugging, "Execution is back to very first statement.");
             // Code Viewer
             Register(KeyAction.ShowWindowMenu, KeyCode.F1, "Show window menu",
-                     KeyActionCategory.CodeViewer, "Toggles the menu of the open windows.");
-            Register(KeyAction.CodeWindowUndo, KeyCode.F5, "Code-window undo",
-                     KeyActionCategory.CodeViewer, "Undoes an edit in the source-code viewer.");
-            Register(KeyAction.CodeWindowRedo, KeyCode.F6, "Code-window redo",
-                     KeyActionCategory.CodeViewer, "Redoes an undone edit in the source-code viewer.");
-            Register(KeyAction.CodeWindowSave, KeyCode.F7, "Code-window save",
-                     KeyActionCategory.CodeViewer, "Saves the content of the source-code viewer.");
-            Register(KeyAction.RefreshSyntaxHighlighting, KeyCode.F10, "Refresh",
-                     KeyActionCategory.CodeViewer, "Refreshes syntax highlighting in the source-code viewer.");
+                     KeyActionCategory.CodeViewer, "Toggles the menu of the open windows.");         
             // Chat
             Register(KeyAction.ToggleTextChat, KeyCode.F2, "Toggle text chat",
                      KeyActionCategory.Chat, "Toggles the text chat.");
+            Register(KeyAction.ToggleVoiceChat, KeyCode.F5, "Toggle voice chat",
+                     KeyActionCategory.Chat, "Toggles the voice chat.");
         }
 
         /// <summary>
