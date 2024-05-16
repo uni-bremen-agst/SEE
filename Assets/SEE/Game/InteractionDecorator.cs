@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.GO;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game
@@ -79,11 +83,18 @@ namespace SEE.Game
         /// or edge.
         /// </summary>
         /// <param name="gameObjects">game objects where the components are to be added to</param>
-        public static void PrepareForInteraction(IEnumerable<GameObject> gameObjects)
+        /// <param name="updateProgress">action that updates the progress of the preparation</param>
+        /// <param name="token">token with which to cancel the preparation</param>
+        public static async UniTask PrepareForInteractionAsync(ICollection<GameObject> gameObjects,
+                                                               Action<float> updateProgress,
+                                                               CancellationToken token = default)
         {
-            foreach (GameObject go in gameObjects)
+            int totalGameObjects = gameObjects.Count;
+            float i = 0;
+            await foreach (GameObject go in gameObjects.BatchPerFrame(cancellationToken: token))
             {
                 PrepareForInteraction(go);
+                updateProgress(++i / totalGameObjects);
             }
         }
     }

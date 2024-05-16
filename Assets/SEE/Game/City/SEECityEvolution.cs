@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.Evolution;
@@ -194,7 +195,7 @@ namespace SEE.Game.City
             if (firstGraph)
             {
                 GraphRenderer graphRenderer = new(this, firstGraph);
-                graphRenderer.DrawGraph(firstGraph, gameObject);
+                graphRenderer.DrawGraphAsync(firstGraph, gameObject).Forget();
             }
             else
             {
