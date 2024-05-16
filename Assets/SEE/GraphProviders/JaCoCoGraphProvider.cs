@@ -43,9 +43,9 @@ namespace SEE.GraphProviders
             }
         }
 
-        public override GraphProviderKind GetKind()
+        public override SingleGraphProviderKind GetKind()
         {
-            return GraphProviderKind.JaCoCo;
+            return SingleGraphProviderKind.JaCoCo;
         }
     }
 }

@@ -174,9 +174,9 @@ namespace SEE.GraphProviders
         }
 
 
-        public override GraphProviderKind GetKind()
+        public override SingleGraphProviderKind GetKind()
         {
-            return GraphProviderKind.VCS;
+            return SingleGraphProviderKind.VCS;
         }
 
         /// <summary>

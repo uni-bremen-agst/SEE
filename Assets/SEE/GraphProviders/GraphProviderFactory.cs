@@ -17,18 +17,18 @@ namespace SEE.GraphProviders
         /// <returns>a new instance</returns>
         /// <exception cref="NotImplementedException">thrown in case the given <paramref name="kind"/>
         /// is not yet handled</exception>
-        internal static SingleGraphProvider NewSingleGraphProviderInstance(GraphProviderKind kind)
+        internal static SingleGraphProvider NewSingleGraphProviderInstance(SingleGraphProviderKind kind)
         {
             return kind switch
             {
-                GraphProviderKind.GXL => new GXLSingleGraphProvider(),
-                GraphProviderKind.CSV => new CSVGraphProvider(),
-                GraphProviderKind.Reflexion => new ReflexionGraphProvider(),
-                GraphProviderKind.SinglePipeline => new SingleGraphPipelineProvider(),
-                GraphProviderKind.JaCoCo => new JaCoCoSingleGraphProvider(),
-                GraphProviderKind.MergeDiff => new MergeDiffGraphProvider(),
-                GraphProviderKind.VCS => new VCSGraphProvider(),
-                GraphProviderKind.GitAllBranches => new AllBranchGitSingleProvider(),
+                SingleGraphProviderKind.GXL => new GXLSingleGraphProvider(),
+                SingleGraphProviderKind.CSV => new CSVGraphProvider(),
+                SingleGraphProviderKind.Reflexion => new ReflexionGraphProvider(),
+                SingleGraphProviderKind.SinglePipeline => new SingleGraphPipelineProvider(),
+                SingleGraphProviderKind.JaCoCo => new JaCoCoSingleGraphProvider(),
+                SingleGraphProviderKind.MergeDiff => new MergeDiffGraphProvider(),
+                SingleGraphProviderKind.VCS => new VCSGraphProvider(),
+                SingleGraphProviderKind.GitAllBranches => new AllGitBranchesSingleGraphProvider(),
                 _ => throw new NotImplementedException($"Not implemented for {kind}")
             };
         }

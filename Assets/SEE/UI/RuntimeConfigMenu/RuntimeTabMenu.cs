@@ -649,7 +649,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     CreateTypeField(parent, value as SingleGraphProvider);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
-                case AllBranchGitSingleProvider:
+                case AllGitBranchesSingleGraphProvider:
                     parent = CreateNestedSetting(settingName, parent);
                     CreateTypeField(parent, value as SingleGraphProvider);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
@@ -1009,7 +1009,7 @@ namespace SEE.UI.RuntimeConfigMenu
             // all values of enum GraphProviderKind as strings
             string[] GetGraphProviderKinds()
             {
-                return Enum.GetValues(typeof(GraphProviderKind)).Cast<GraphProviderKind>().Select(e => e.ToString())
+                return Enum.GetValues(typeof(SingleGraphProviderKind)).Cast<SingleGraphProviderKind>().Select(e => e.ToString())
                     .ToArray();
             }
 
@@ -1021,7 +1021,7 @@ namespace SEE.UI.RuntimeConfigMenu
             // index is the index of the changed enum
             void Setter(int index)
             {
-                if (Enum.TryParse(graphProviderKinds[index], true, out GraphProviderKind newKind))
+                if (Enum.TryParse(graphProviderKinds[index], true, out SingleGraphProviderKind newKind))
                 {
                     if (provider.GetKind() != newKind)
                     {

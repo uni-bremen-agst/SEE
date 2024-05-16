@@ -4,9 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Antlr4.Runtime.Misc;
 using Cysharp.Threading.Tasks;
-using Dissonance;
 using LibGit2Sharp;
 using SEE.DataModel.DG;
 using SEE.Game.City;
@@ -17,12 +15,24 @@ using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace SEE.GraphProviders
 {
+    /// <summary>
+    /// This provider analyses all branches of the given git repository specified in <see cref="RepositoryData"/> within the given time range (<see cref="Date"/>).
+    ///
+    /// This provider will collect all commits from the latest to the last one before <see cref="Date"/>.
+    ///
+    /// The collected metrics are:
+    /// <list type="bullet">
+    /// <item>Metric.File.Commits</item>
+    /// <item>Metric.File.AuthorsNumber</item>
+    /// <item>Metric.File.Churn</item>
+    /// <item>Metric.File.CoreDevs</item>
+    /// </list>
+    /// </summary>
     [Serializable]
-    public class AllBranchGitSingleProvider : SingleGraphProvider
+    public class AllGitBranchesSingleGraphProvider : SingleGraphProvider
     {
         /// <summary>
         /// The date limit until commits should be analysed
@@ -42,7 +52,7 @@ namespace SEE.GraphProviders
         [OdinSerialize] [ShowInInspector] public bool SimplifyGraph { get; set; }
 
         /// <summary>
-        /// Specifies if SEE should automatically fetch for new commits in the repository <see cref="GitRepositorySingleProvider{T}.RepositoryPath"/>.
+        /// Specifies if SEE should automatically fetch for new commits in the repository <see cref="AllGitBranchesSingleGraphProvider{T}.RepositoryPath"/>.
         ///
         /// This will append the path of this repo to <see cref="GitPoller"/>.
         ///
@@ -61,7 +71,7 @@ namespace SEE.GraphProviders
 
         private const string NumberOfFileChurnMetricName = "Metric.File.Churn";
 
-        private const string TruckFactorMetricName = "Metric.File.TruckFactor";
+        private const string TruckFactorMetricName = "Metric.File.CoreDevs";
 
         /// <summary>
         /// Used in the calculation of the truck factor.
@@ -77,7 +87,7 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="city"></param>
         /// <returns></returns>
-        private GitPoller GetOrAddGitPollerComponent(AbstractSEECity city)
+        private static GitPoller GetOrAddGitPollerComponent(AbstractSEECity city)
         {
             if (city.TryGetComponent(out GitPoller poller))
             {
@@ -195,7 +205,9 @@ namespace SEE.GraphProviders
 
 
         /// <summary>
-        /// Calculates the truck factor with a LOC-based heuristic algorithm by Yamashita et al. cited by. Ferreira et. al
+        /// Calculates the truck factor based a LOC-based heuristic by Yamashita et al. for estimating the coreDev set.
+        ///
+        /// cited by. Ferreira et. al
         ///
         /// Soruce/Math: https://doi.org/10.1145/2804360.2804366, https://doi.org/10.1007/s11219-019-09457-2
         /// </summary>
@@ -233,10 +245,7 @@ namespace SEE.GraphProviders
                 foreach (var child in root.Children().ToList())
                 {
                     child.Reparent(root.Parent);
-                    // child.ID = root.ID + Path.AltDirectorySeparatorChar + child.ID;
                     DoSimplyfiGraph(child, g);
-
-                    //root.Children().Remove(root);
                 }
 
                 if (g.ContainsNode(root))
@@ -252,20 +261,10 @@ namespace SEE.GraphProviders
                 }
             }
         }
-
-        // private Node GetNode(string path, Graph graph, Node current = null)
-        // {
-        //     string[] pathSplit = path.Split(Path.AltDirectorySeparatorChar);
-        //     if (pathSplit.Length == 1)
-        //     {
-        //         return current.Children().First(x => x.ID == pathSplit.First());
-        //     }
-        // }
-
-
-        public override GraphProviderKind GetKind()
+        
+        public override SingleGraphProviderKind GetKind()
         {
-            return GraphProviderKind.GitAllBranches;
+            return SingleGraphProviderKind.GitAllBranches;
         }
 
         protected override void SaveAttributes(ConfigWriter writer)

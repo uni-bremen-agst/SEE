@@ -48,9 +48,9 @@ namespace SEE.GraphProviders
             return await MetricImporter.LoadDashboardAsync(graph, OverrideMetrics, startVersion);
         }
 
-        public override GraphProviderKind GetKind()
+        public override SingleGraphProviderKind GetKind()
         {
-            return GraphProviderKind.Dashboard;
+            return SingleGraphProviderKind.Dashboard;
         }
 
         #region Configuration file input/output

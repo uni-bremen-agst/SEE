@@ -311,25 +311,25 @@ namespace SEE.GraphProviders
         [Test]
         public void TestAllBranchGitSingleProvider()
         {
-            AllBranchGitSingleProvider saved = GetAllBranchGitSingleProvider();
+            AllGitBranchesSingleGraphProvider saved = GetAllBranchGitSingleProvider();
             Save(saved);
             AreEqualAllBranchGitSingleProvider(saved, LoadSingleGraph());
         }
 
-        private void AreEqualAllBranchGitSingleProvider(AllBranchGitSingleProvider saved, SingleGraphProvider loaded)
+        private void AreEqualAllBranchGitSingleProvider(AllGitBranchesSingleGraphProvider saved, SingleGraphProvider loaded)
         {
             Assert.IsTrue(saved.GetType() == loaded.GetType());
-            AllBranchGitSingleProvider gitLoaded = loaded as AllBranchGitSingleProvider;
-            Assert.AreEqual(gitLoaded.Date, saved.Date);
-            AreEqual(gitLoaded.RepositoryData.RepositoryPath, saved.RepositoryData.RepositoryPath);
-            Assert.AreEqual(gitLoaded.RepositoryData.PathGlobbing, saved.RepositoryData.PathGlobbing);
-            Assert.AreEqual(gitLoaded.SimplifyGraph, saved.SimplifyGraph);
-            Assert.AreEqual(gitLoaded.AutoFetch, saved.AutoFetch);
+            AllGitBranchesSingleGraphProvider gitBranchesLoaded = loaded as AllGitBranchesSingleGraphProvider;
+            Assert.AreEqual(gitBranchesLoaded.Date, saved.Date);
+            AreEqual(gitBranchesLoaded.RepositoryData.RepositoryPath, saved.RepositoryData.RepositoryPath);
+            Assert.AreEqual(gitBranchesLoaded.RepositoryData.PathGlobbing, saved.RepositoryData.PathGlobbing);
+            Assert.AreEqual(gitBranchesLoaded.SimplifyGraph, saved.SimplifyGraph);
+            Assert.AreEqual(gitBranchesLoaded.AutoFetch, saved.AutoFetch);
         }
 
-        private AllBranchGitSingleProvider GetAllBranchGitSingleProvider()
+        private AllGitBranchesSingleGraphProvider GetAllBranchGitSingleProvider()
         {
-            return new AllBranchGitSingleProvider()
+            return new AllGitBranchesSingleGraphProvider()
             {
                 Date = "01/05/2024",
                 RepositoryData = GetGitRepository()

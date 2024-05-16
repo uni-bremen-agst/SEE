@@ -63,9 +63,9 @@ namespace SEE.GraphProviders
             }
         }
 
-        public override GraphProviderKind GetKind()
+        public override SingleGraphProviderKind GetKind()
         {
-            return GraphProviderKind.SinglePipeline;
+            return SingleGraphProviderKind.SinglePipeline;
         }
 
         protected override void SaveAttributes(ConfigWriter writer)

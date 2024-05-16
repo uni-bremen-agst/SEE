@@ -9,123 +9,21 @@ using Cysharp.Threading.Tasks;
 namespace SEE.GraphProviders
 {
     /// <summary>
-    /// SingleGraphProvider is a graph provider for returning a single graph.
-    ///
-    /// This kind of graph provider is used in <see cref="SEECity"/>.
-    /// It can also be used with a <see cref="SingleGraphPipelineProvider"/> to create a pipeline
-    /// </summary>
-    public abstract class SingleGraphProvider : GraphProvider<Graph, GraphProviderKind>
-    {
-        /// <summary>
-        /// Restores the settings from <paramref name="attributes"/> under the key <paramref name="label"/>.
-        /// The latter must be the label under which the settings were grouped, i.e., the same
-        /// value originally passed in <see cref="Save(ConfigWriter, string)"/>.
-        /// </summary>
-        /// <param name="attributes">dictionary of attributes from which to retrieve the settings</param>
-        /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>
-        public static SingleGraphProvider Restore(Dictionary<string, object> attributes, string label)
-        {
-            if (attributes.TryGetValue(label, out object dictionary))
-            {
-                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-                return RestoreProvider(values);
-            }
-            else
-            {
-                throw new Exception($"A graph provider could not be found under the label {label}.");
-            }
-        }
-
-
-        /// <summary>
-        /// Restores the graph provider's attributes from <paramref name="values"/>.
-        /// The parameter <paramref name="values"/> is assumed to already be the list
-        /// of values. No further label look-up will be needed.
-        /// </summary>
-        /// <param name="values">list of values to be used to restore a graph provider</param>
-        /// <returns>the resulting graph provider that was restored; it will have the
-        /// <paramref name="values"/></returns>
-        /// <exception cref="Exception">thrown in case the values are malformed</exception>
-        /// <remarks>This method just creates a new instance using the 'kind' attribute
-        /// via the <see cref="GraphProviderFactory"/>. The actual restoration of that
-        /// new instance's attributes ist deferred to the subclasses, which need to
-        /// implement <see cref="RestoreAttributes(Dictionary{string, object})"/>.</remarks>
-        protected internal static SingleGraphProvider RestoreProvider(Dictionary<string, object> values)
-        {
-            GraphProviderKind kind = GraphProviderKind.SinglePipeline;
-            if (ConfigIO.RestoreEnum(values, kindLabel, ref kind))
-            {
-                SingleGraphProvider provider = GraphProviderFactory.NewSingleGraphProviderInstance(kind);
-                provider.RestoreAttributes(values);
-                return provider;
-            }
-            else
-            {
-                throw new Exception($"Specification of graph provider is malformed: label {kindLabel} is missing.");
-            }
-        }
-    }
-
-    public abstract class MultiGraphProvider : GraphProvider<List<Graph>, MultiGraphProviderKind>
-    {
-        /// <summary>
-        /// Restores the settings from <paramref name="attributes"/> under the key <paramref name="label"/>.
-        /// The latter must be the label under which the settings were grouped, i.e., the same
-        /// value originally passed in <see cref="Save(ConfigWriter, string)"/>.
-        /// </summary>
-        /// <param name="attributes">dictionary of attributes from which to retrieve the settings</param>
-        /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>
-        public static MultiGraphProvider Restore(Dictionary<string, object> attributes, string label)
-        {
-            if (attributes.TryGetValue(label, out object dictionary))
-            {
-                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-                return RestoreProvider(values);
-            }
-            else
-            {
-                throw new Exception($"A graph provider could not be found under the label {label}.");
-            }
-        }
-
-
-        /// <summary>
-        /// Restores the graph provider's attributes from <paramref name="values"/>.
-        /// The parameter <paramref name="values"/> is assumed to already be the list
-        /// of values. No further label look-up will be needed.
-        /// </summary>
-        /// <param name="values">list of values to be used to restore a graph provider</param>
-        /// <returns>the resulting graph provider that was restored; it will have the
-        /// <paramref name="values"/></returns>
-        /// <exception cref="Exception">thrown in case the values are malformed</exception>
-        /// <remarks>This method just creates a new instance using the 'kind' attribute
-        /// via the <see cref="GraphProviderFactory"/>. The actual restoration of that
-        /// new instance's attributes ist deferred to the subclasses, which need to
-        /// implement <see cref="RestoreAttributes(Dictionary{string, object})"/>.</remarks>
-        protected internal static MultiGraphProvider RestoreProvider(Dictionary<string, object> values)
-        {
-            MultiGraphProviderKind kind = MultiGraphProviderKind.MultiPipeline;
-            if (ConfigIO.RestoreEnum(values, kindLabel, ref kind))
-            {
-                MultiGraphProvider provider = GraphProviderFactory.NewMultiGraphProviderInstance(kind);
-                provider.RestoreAttributes(values);
-                return provider;
-            }
-            else
-            {
-                throw new Exception($"Specification of graph provider is malformed: label {kindLabel} is missing.");
-            }
-        }
-    }
-
-    /// <summary>
     /// The GraphProvider class is an abstract base class that provides a framework
     /// for creating and managing graph data. Concrete subclasses of GraphProvider
     /// are responsible for providing a graph based on the input graph by
-    /// implementing the method <see cref="ProvideAsync(Graph, AbstractSEECity)"/>.
+    /// implementing the method <see cref="ProvideAsync(x,AbstractSEECity,Action{float},CancellationToken)"/>.
+    ///
+    /// It is not recomended to inhert this class directly from a graph provider.
+    /// Instead you should use <see cref="SingleGraphProvider"/> and <see cref="MultiGraphProvider"/>.
     /// </summary>
     /// <typeparam name="T">The type of data which should be provided (e.g <see cref="Graph"/> for simple CodeCities or <see cref="Graph}"/> for evolution cities)</typeparam>
-    public abstract class GraphProvider<T, Kind> where Kind : Enum
+    /// <typeparam name="K">
+    /// The type of an enum specifying the concrete kind of graph provider.
+    /// Can either be a <see cref="SingleGraphProviderKind"/> or <see cref="MultiGraphProviderKind"/>.
+    /// This type will be returned by <see cref="GetKind"/>
+    /// </typeparam>
+    public abstract class GraphProvider<T, K> where K : Enum
     {
         protected const string GraphProviderFoldoutGroup = "Data";
 
@@ -177,7 +75,7 @@ namespace SEE.GraphProviders
         /// Returns the kind of graph provider.
         /// </summary>
         /// <returns>kind of graph provider</returns>
-        public abstract Kind GetKind();
+        public abstract K GetKind();
 
         /// <summary>
         /// Subclasses must implement this so save their attributes. This class takes

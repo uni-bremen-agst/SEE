@@ -1,24 +1,14 @@
 ﻿namespace SEE.GraphProviders
 {
-    public enum MultiGraphProviderKind
-    {
-        MultiPipeline,
-        GitEvolution,
-
-        /// <summary>
-        /// For <see cref="GXLEvolutionGraphProvider"/>
-        /// </summary>
-        GXLEvolution,
-    }
 
     /// <summary>
-    /// The kind of graph providers. These values are shown to a user, e.g., in a configuration
+    /// The kind of single graph providers. These values are shown to a user, e.g., in a configuration
     /// file or in the configuration of code cities at run-time. They should be short and
     /// self-explanatory.
     /// </summary>
     /// <remarks>If a concrete subclass is derived from <see cref="GraphProvider"/>, a new
     /// value should be added here.</remarks>
-    public enum GraphProviderKind
+    public enum SingleGraphProviderKind
     {
         /// <summary>
         /// For <see cref="GXLSingleGraphProvider"/>.
@@ -58,12 +48,7 @@
         Reflexion,
 
         /// <summary>
-        /// For <see cref="GitEvolutionGraphSingleProvider"/>
-        /// </summary>
-        GitHistory,
-
-        /// <summary>
-        /// For <see cref="AllBranchGitSingleProvider"/>
+        /// For <see cref="AllGitBranchesSingleGraphProvider"/>
         /// </summary>
         GitAllBranches,
 

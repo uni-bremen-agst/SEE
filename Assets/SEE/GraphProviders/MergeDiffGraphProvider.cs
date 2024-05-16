@@ -22,9 +22,9 @@ namespace SEE.GraphProviders
         [HideReferenceObjectPicker]
         public SingleGraphProvider OldGraph = new SingleGraphPipelineProvider();
 
-        public override GraphProviderKind GetKind()
+        public override SingleGraphProviderKind GetKind()
         {
-            return GraphProviderKind.MergeDiff;
+            return SingleGraphProviderKind.MergeDiff;
         }
 
         /// <summary>

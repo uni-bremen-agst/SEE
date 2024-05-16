@@ -199,9 +199,9 @@ namespace SEE.GraphProviders
         /// </summary>
         private void SetLSPServerPath() => ServerPath = GetExecutablePath();
 
-        public override GraphProviderKind GetKind()
+        public override SingleGraphProviderKind GetKind()
         {
-            return GraphProviderKind.LSP;
+            return SingleGraphProviderKind.LSP;
         }
 
         public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
