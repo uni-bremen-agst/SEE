@@ -12,17 +12,17 @@ namespace SEE.Game.Drawable
     public class BlinkEffect : MonoBehaviour
     {
         /// <summary>
-        /// Represents the status of whether the loop is active.
+        /// Whether the loop is active.
         /// </summary>
         private bool loopOn;
 
         /// <summary>
-        /// The render of the attached game object.
+        /// The renderer of the attached game object.
         /// </summary>
         private new Renderer renderer;
 
         /// <summary>
-        /// The renders of the attached game object (for mind map nodes)
+        /// The renderers of the attached game object (for mind map nodes)
         /// </summary>
         private Renderer[] renderers;
 
@@ -91,7 +91,7 @@ namespace SEE.Game.Drawable
         /// Deactivates the blink effect.
         /// It enables the renderer, the canvas, or the child renderers
         /// (depending on what is present).
-        /// If a highlight effect was used, it will destroyed.
+        /// If a highlight effect was used, it will be destroyed.
         /// Subsequently, the Blink Effect Component is destroyed.
         /// </summary>
         public void Deactivate()

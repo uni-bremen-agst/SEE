@@ -23,7 +23,7 @@ namespace SEE.Game.Drawable
 
         /// <summary>
         /// This method checks whether the directory for the saved drawable exists.
-        /// If not, then it creates that directory.
+        /// If not, it creates that directory.
         /// </summary>
         private static void EnsureDrawableDirectoryExists()
         {
