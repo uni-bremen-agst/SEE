@@ -1,70 +1,10 @@
-﻿using SEE.Utils;
-using SEE.Utils.Config;
+﻿using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game.Drawable.Configurations
 {
-    /// <summary>
-    /// This class can persist the configurations for a list of drawables.
-    /// </summary>
-    [Serializable]
-    public class DrawablesConfigs
-    {
-        /// <summary>
-        /// A list of drawables that should be saved or loaded.
-        /// </summary>
-        public List<DrawableConfig> Drawables = new();
-
-        /// <summary>
-        /// Label in configuration file for the drawables configurations.
-        /// </summary>
-        private const string DrawablesLabel = "DrawablesConfigs";
-
-        /// <summary>
-        /// Writes this instances' attributes into the given <see cref="ConfigWriter"/>.
-        /// </summary>
-        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes into.</param>
-        internal void Save(ConfigWriter writer)
-        {
-            writer.BeginList(DrawablesLabel);
-            foreach (DrawableConfig drawableConfig in Drawables)
-            {
-                writer.BeginGroup();
-                drawableConfig.Save(writer);
-                writer.EndGroup();
-            }
-            writer.EndList();
-        }
-
-        /// <summary>
-        /// Loads the given attributes into this instance of the class <see cref="DrawablesConfigs"/>.
-        /// </summary>
-        /// <param name="attributes">The attributes to load in the format created by
-        /// <see cref="ConfigWriter"/>.</param>
-        /// <returns>Whether or not the attributes were loaded without any errors.</returns>
-        internal bool Restore(Dictionary<string, object> attributes)
-        {
-            bool errorFree = true;
-            if (attributes.TryGetValue(DrawablesLabel, out object drawableList))
-            {
-                foreach (object item in (List<object>)drawableList)
-                {
-                    Dictionary<string, object> dict = (Dictionary<string, object>)item;
-                    DrawableConfig config = new DrawableConfig();
-                    errorFree = config.Restore(dict);
-                    Drawables.Add(config);
-                }
-            } else
-            {
-                errorFree = false;
-            }
-
-            return errorFree;
-        }
-    }
-
     /// <summary>
     /// This class can hold all the information that is needed to configure a drawable.
     /// </summary>
@@ -126,6 +66,30 @@ namespace SEE.Game.Drawable.Configurations
         /// All the mind map nodes that should be displayed on this drawable.
         /// </summary>
         public List<MindMapNodeConf> MindMapNodeConfigs = new();
+
+        /// <summary>
+        /// Gets the current game object of this drawable.
+        /// </summary>
+        /// <returns>the drawable game object.</returns>
+        public GameObject GetDrawable()
+        {
+            return GameFinder.FindDrawable(ID, ParentID);
+        }
+
+        /// <summary>
+        /// Gets all drawable type configs of this drawable config.
+        /// </summary>
+        /// <returns>A list that contains all drawable type configs of this drawable.</returns>
+        public List<DrawableType> GetAllDrawableTypes()
+        {
+            List<DrawableType> list = new(LineConfigs);
+            list.AddRange(TextConfigs);
+            list.AddRange(ImageConfigs);
+            list.AddRange(MindMapNodeConfigs);
+            return list;
+        }
+
+        #region Config I/O
 
         /// <summary>
         /// The label for the drawable name in the configuration file.
@@ -377,27 +341,6 @@ namespace SEE.Game.Drawable.Configurations
             return errorFree;
         }
 
-        /// <summary>
-        /// Gets the current game object of this drawable.
-        /// </summary>
-        /// <returns>the drawable game object.</returns>
-        public GameObject GetDrawable()
-        {
-            return GameFinder.FindDrawable(ID, ParentID);
-        }
-
-        /// <summary>
-        /// Gets all drawable type configs of this drawable config.
-        /// </summary>
-        /// <returns>A list that contains all drawable type configs of this drawable.</returns>
-        public List<DrawableType> GetAllDrawableTypes()
-        {
-            List<DrawableType> list = new (LineConfigs);
-            list.AddRange(TextConfigs);
-            list.AddRange(ImageConfigs);
-            list.AddRange(MindMapNodeConfigs);
-
-            return list;
-        }
+        #endregion
     }
 }
