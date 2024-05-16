@@ -21,9 +21,9 @@ namespace SEE.Game.Drawable.Configurations
         private const string DrawablesLabel = "DrawablesConfigs";
 
         /// <summary>
-        /// Writes this instances' attributes into the given <see cref="ConfigWriter"/>.
+        /// Saves this instance's attributes using the given <see cref="ConfigWriter"/>.
         /// </summary>
-        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes into.</param>
+        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
         internal void Save(ConfigWriter writer)
         {
             writer.BeginList(DrawablesLabel);

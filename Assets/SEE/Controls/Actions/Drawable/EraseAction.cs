@@ -176,7 +176,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             foreach (Memento mem in mementoList)
             {
-                GameObject toDelete = GameFinder.FindChild(mem.Drawable.GetDrawable(), mem.DrawableType.id);
+                GameObject toDelete = GameFinder.FindChild(mem.Drawable.GetDrawable(), mem.DrawableType.Id);
                 if (mem.DrawableType is MindMapNodeConf conf)
                 {
                     MMNodeValueHolder valueHolder = toDelete.GetComponent<MMNodeValueHolder>();
@@ -187,7 +187,7 @@ namespace SEE.Controls.Actions.Drawable
                             MindMapNodeConf.GetNodeConf(toDelete)).Execute();
                     }
                 }
-                new EraseNetAction(mem.Drawable.ID, mem.Drawable.ParentID, mem.DrawableType.id).Execute();
+                new EraseNetAction(mem.Drawable.ID, mem.Drawable.ParentID, mem.DrawableType.Id).Execute();
                 Destroyer.Destroy(toDelete);
             }
         }
@@ -240,7 +240,7 @@ namespace SEE.Controls.Actions.Drawable
                 };
                 foreach (Memento mem in mementoList)
                 {
-                    changedObjects.Add(mem.DrawableType.id);
+                    changedObjects.Add(mem.DrawableType.Id);
                 }
                 return changedObjects;
             }

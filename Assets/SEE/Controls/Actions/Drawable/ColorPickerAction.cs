@@ -133,14 +133,14 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     case Tags.Line:
                         LineConf line = LineConf.GetLine(hittedObject);
-                        pickedColor = line.primaryColor;
+                        pickedColor = line.PrimaryColor;
                         break;
                     case Tags.DText:
                         pickedColor = hittedObject.GetComponent<TextMeshPro>().color;
                         break;
                     case Tags.Image:
                         ImageConf image = ImageConf.GetImageConf(hittedObject);
-                        pickedColor = image.imageColor;
+                        pickedColor = image.ImageColor;
                         break;
                     case Tags.MindMapNode:
                         ColorPickerMindMapMenu.Enable(hittedObject, true);
@@ -174,10 +174,10 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     case Tags.Line:
                         LineConf line = LineConf.GetLine(hittedObject);
-                        pickedColor = line.secondaryColor;
-                        if (line.colorKind == GameDrawer.ColorKind.Monochrome)
+                        pickedColor = line.SecondaryColor;
+                        if (line.ColorKind == GameDrawer.ColorKind.Monochrome)
                         {
-                            pickedColor = line.primaryColor;
+                            pickedColor = line.PrimaryColor;
                         }
                         break;
                     case Tags.DText:
@@ -185,7 +185,7 @@ namespace SEE.Controls.Actions.Drawable
                         break;
                     case Tags.Image:
                         ImageConf image = ImageConf.GetImageConf(hittedObject);
-                        pickedColor = image.imageColor;
+                        pickedColor = image.ImageColor;
                         break;
                     case Tags.MindMapNode:
                         ColorPickerMindMapMenu.Enable(hittedObject, false);

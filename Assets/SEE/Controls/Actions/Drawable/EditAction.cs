@@ -131,42 +131,42 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (oldHolder is LineConf oldLineHolder && newHolder is LineConf newLineHolder)
             {
-                return oldLineHolder.primaryColor.Equals(newLineHolder.primaryColor)
-                    && oldLineHolder.secondaryColor.Equals(newLineHolder.secondaryColor)
-                    && oldLineHolder.orderInLayer.Equals(newLineHolder.orderInLayer)
-                    && oldLineHolder.thickness.Equals(newLineHolder.thickness)
-                    && oldLineHolder.loop.Equals(newLineHolder.loop)
-                    && oldLineHolder.lineKind.Equals(newLineHolder.lineKind)
-                    && oldLineHolder.colorKind.Equals(newLineHolder.colorKind)
-                    && oldLineHolder.tiling.Equals(newLineHolder.tiling);
+                return oldLineHolder.PrimaryColor.Equals(newLineHolder.PrimaryColor)
+                    && oldLineHolder.SecondaryColor.Equals(newLineHolder.SecondaryColor)
+                    && oldLineHolder.OrderInLayer.Equals(newLineHolder.OrderInLayer)
+                    && oldLineHolder.Thickness.Equals(newLineHolder.Thickness)
+                    && oldLineHolder.Loop.Equals(newLineHolder.Loop)
+                    && oldLineHolder.LineKind.Equals(newLineHolder.LineKind)
+                    && oldLineHolder.ColorKind.Equals(newLineHolder.ColorKind)
+                    && oldLineHolder.Tiling.Equals(newLineHolder.Tiling);
             }
 
             if (oldHolder is TextConf oldTextHolder && newHolder is TextConf newTextHolder)
             {
-                return oldTextHolder.text.Equals(newTextHolder.text)
-                    && oldTextHolder.fontSize.Equals(newTextHolder.fontSize)
-                    && oldTextHolder.orderInLayer.Equals(newTextHolder.orderInLayer)
-                    && oldTextHolder.fontStyles.Equals(newTextHolder.fontStyles)
-                    && oldTextHolder.fontColor.Equals(newTextHolder.fontColor)
-                    && oldTextHolder.outlineColor.Equals(newTextHolder.outlineColor)
-                    && oldTextHolder.outlineThickness.Equals(newTextHolder.outlineThickness)
-                    && oldTextHolder.outlineStatus.Equals(newTextHolder.outlineStatus);
+                return oldTextHolder.Text.Equals(newTextHolder.Text)
+                    && oldTextHolder.FontSize.Equals(newTextHolder.FontSize)
+                    && oldTextHolder.OrderInLayer.Equals(newTextHolder.OrderInLayer)
+                    && oldTextHolder.FontStyles.Equals(newTextHolder.FontStyles)
+                    && oldTextHolder.FontColor.Equals(newTextHolder.FontColor)
+                    && oldTextHolder.OutlineColor.Equals(newTextHolder.OutlineColor)
+                    && oldTextHolder.OutlineThickness.Equals(newTextHolder.OutlineThickness)
+                    && oldTextHolder.IsOutlined.Equals(newTextHolder.IsOutlined);
             }
 
             if (oldHolder is ImageConf oldImageHolder && newHolder is ImageConf newImageHolder)
             {
-                return oldImageHolder.orderInLayer.Equals(newImageHolder.orderInLayer)
-                    && oldImageHolder.imageColor.Equals(newImageHolder.imageColor)
-                    && oldImageHolder.eulerAngles.Equals(newImageHolder.eulerAngles);
+                return oldImageHolder.OrderInLayer.Equals(newImageHolder.OrderInLayer)
+                    && oldImageHolder.ImageColor.Equals(newImageHolder.ImageColor)
+                    && oldImageHolder.EulerAngles.Equals(newImageHolder.EulerAngles);
             }
 
             if (oldHolder is MindMapNodeConf oldConf && newHolder is MindMapNodeConf newConf)
             {
-                return oldConf.parentNode.Equals(newConf.parentNode)
-                    && oldConf.nodeKind.Equals(newConf.nodeKind)
-                    && CheckEquals(oldConf.borderConf, newConf.borderConf)
-                    && CheckEquals(oldConf.textConf, newConf.textConf)
-                    && CheckEquals(oldConf.branchLineConf, newConf.branchLineConf);
+                return oldConf.ParentNode.Equals(newConf.ParentNode)
+                    && oldConf.NodeKind.Equals(newConf.NodeKind)
+                    && CheckEquals(oldConf.BorderConf, newConf.BorderConf)
+                    && CheckEquals(oldConf.TextConf, newConf.TextConf)
+                    && CheckEquals(oldConf.BranchLineConf, newConf.BranchLineConf);
             }
 
             /// This case will be needed for mind-map nodes.

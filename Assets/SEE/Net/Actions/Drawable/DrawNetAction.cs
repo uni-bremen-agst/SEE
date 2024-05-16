@@ -52,7 +52,7 @@ namespace SEE.Net.Actions.Drawable
                     throw new System.Exception($"There is no drawable with the ID {DrawableID}.");
                 }
 
-                if (Line != null && Line.id != "")
+                if (Line != null && Line.Id != "")
                 {
                     GameDrawer.ReDrawLine(drawable, Line);
                 } else

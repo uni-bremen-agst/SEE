@@ -306,15 +306,15 @@ namespace SEE.Controls.Actions.Drawable
         /// <param name="prefix">The prefix for the drawable type object.</param>
         private void CheckAndChangeID (DrawableType conf, GameObject attachedObjects, string prefix)
         {
-            if (GameFinder.FindChild(attachedObjects, conf.id) != null
-                && !conf.id.Contains(ValueHolder.MindMapBranchLine))
+            if (GameFinder.FindChild(attachedObjects, conf.Id) != null
+                && !conf.Id.Contains(ValueHolder.MindMapBranchLine))
             {
                 string newName = prefix + "-" + DrawableHolder.GetRandomString(8);
                 while (GameFinder.FindChild(attachedObjects, newName) != null)
                 {
                     newName = prefix + "-" + DrawableHolder.GetRandomString(8);
                 }
-                conf.id = newName;
+                conf.Id = newName;
             }
         }
 
@@ -332,7 +332,7 @@ namespace SEE.Controls.Actions.Drawable
 
                 foreach (DrawableType type in config.GetAllDrawableTypes())
                 {
-                    GameObject typeObj = GameFinder.FindChild(attachedObjects, type.id);
+                    GameObject typeObj = GameFinder.FindChild(attachedObjects, type.Id);
                     if (typeObj != null)
                     {
                         new EraseNetAction(drawable.name, drawableParentName, typeObj.name).Execute();

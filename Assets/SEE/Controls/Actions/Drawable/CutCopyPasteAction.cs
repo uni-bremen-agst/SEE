@@ -471,10 +471,10 @@ namespace SEE.Controls.Actions.Drawable
         private void ProcessLine(Vector3 newPosition)
         {
             LineConf lineConf = LineConf.GetLine(selectedObj);
-            lineConf.id = "";
+            lineConf.Id = "";
             newObject = GameDrawer.ReDrawLine(newDrawable, lineConf);
             newObject.transform.position = newPosition
-                - lineConf.orderInLayer * ValueHolder.distanceToDrawable.z * newObject.transform.forward;
+                - lineConf.OrderInLayer * ValueHolder.distanceToDrawable.z * newObject.transform.forward;
             new DrawNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable),
                 LineConf.GetLine(newObject)).Execute();
         }
@@ -486,10 +486,10 @@ namespace SEE.Controls.Actions.Drawable
         private void ProcessText(Vector3 newPosition)
         {
             TextConf textConf = TextConf.GetText(selectedObj);
-            textConf.id = "";
+            textConf.Id = "";
             newObject = GameTexter.ReWriteText(newDrawable, textConf);
             newObject.transform.position = newPosition
-                - newObject.transform.forward * ValueHolder.distanceToDrawable.z * textConf.orderInLayer;
+                - newObject.transform.forward * ValueHolder.distanceToDrawable.z * textConf.OrderInLayer;
             new WriteTextNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable),
                 TextConf.GetText(newObject)).Execute();
         }
@@ -501,20 +501,20 @@ namespace SEE.Controls.Actions.Drawable
         private void ProcessImage(Vector3 newPosition)
         {
             ImageConf imageConf = ImageConf.GetImageConf(selectedObj);
-            imageConf.id = "";
-            bool mirrored = imageConf.eulerAngles.y == 180;
+            imageConf.Id = "";
+            bool mirrored = imageConf.EulerAngles.y == 180;
             newObject = GameImage.RePlaceImage(newDrawable, imageConf);
             newObject.transform.position = newPosition
-                - imageConf.orderInLayer * ValueHolder.distanceToDrawable.z * newObject.transform.forward;
+                - imageConf.OrderInLayer * ValueHolder.distanceToDrawable.z * newObject.transform.forward;
 
             if (mirrored)
             {
                 newObject.transform.position = newPosition
-                    + imageConf.orderInLayer * ValueHolder.distanceToDrawable.z * newObject.transform.forward;
+                    + imageConf.OrderInLayer * ValueHolder.distanceToDrawable.z * newObject.transform.forward;
             } else
             {
                 newObject.transform.position = newPosition
-                    - imageConf.orderInLayer * ValueHolder.distanceToDrawable.z * newObject.transform.forward;
+                    - imageConf.OrderInLayer * ValueHolder.distanceToDrawable.z * newObject.transform.forward;
             }
             new AddImageNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable),
                 ImageConf.GetImageConf(newObject)).Execute();
@@ -531,8 +531,8 @@ namespace SEE.Controls.Actions.Drawable
                 oldBranchLineConf = LineConf.GetLine(selectedObj.GetComponent<MMNodeValueHolder>()
                     .GetParentBranchLine());
             }
-            newNodesBranchLineHolder.MindMapNodeConfigs[0].branchLineToParent = "";
-            newNodesBranchLineHolder.MindMapNodeConfigs[0].parentNode = "";
+            newNodesBranchLineHolder.MindMapNodeConfigs[0].BranchLineToParent = "";
+            newNodesBranchLineHolder.MindMapNodeConfigs[0].ParentNode = "";
             GameMindMap.RenameMindMap(newNodesBranchLineHolder,
                 GameFinder.GetAttachedObjectsObject(newDrawable));
 
@@ -546,7 +546,7 @@ namespace SEE.Controls.Actions.Drawable
                 InverseTransformPoint(newPosition);
             newLocalPosition = new Vector3(newLocalPosition.x, newLocalPosition.y,
                 selectedObj.transform.localPosition.z);
-            newObject = GameFinder.FindChild(newDrawable, newNodesBranchLineHolder.MindMapNodeConfigs[0].id);
+            newObject = GameFinder.FindChild(newDrawable, newNodesBranchLineHolder.MindMapNodeConfigs[0].Id);
             GameMoveRotator.SetPosition(newObject, newLocalPosition, true);
             new MoveNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable),
                 newObject.name, newLocalPosition, true).Execute();
@@ -580,9 +580,9 @@ namespace SEE.Controls.Actions.Drawable
                 /// Block for the case when the node can be added.
                 if (newValueHolder is MindMapNodeConf conf)
                 {
-                    conf.parentNode = parent.name;
+                    conf.ParentNode = parent.name;
                     GameObject branchLineToParent = parent.GetComponent<MMNodeValueHolder>().GetChildren()[newObject];
-                    conf.branchLineToParent = branchLineToParent.name;
+                    conf.BranchLineToParent = branchLineToParent.name;
                     if (oldBranchLineConf != null)
                     {
                         GameEdit.ChangeLine(branchLineToParent, oldBranchLineConf);
@@ -599,7 +599,7 @@ namespace SEE.Controls.Actions.Drawable
               /// This means the clone nodes are deleted, and the original nodes are restored if they were deleted (cut).
                 foreach (DrawableType type in newNodesBranchLineHolder.GetAllDrawableTypes())
                 {
-                    GameObject typeObject = GameFinder.FindChild(newDrawable, type.id);
+                    GameObject typeObject = GameFinder.FindChild(newDrawable, type.Id);
                     new EraseNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable),
                         typeObject.name).Execute();
                     Destroyer.Destroy(typeObject);
@@ -613,7 +613,7 @@ namespace SEE.Controls.Actions.Drawable
                     }
                     if (oldBranchLineConf != null)
                     {
-                        GameObject branchLineToParent = GameFinder.FindChild(oldDrawable, oldValueHolder.id).
+                        GameObject branchLineToParent = GameFinder.FindChild(oldDrawable, oldValueHolder.Id).
                             GetComponent<MMNodeValueHolder>().GetParentBranchLine();
                         GameEdit.ChangeLine(branchLineToParent, oldBranchLineConf);
                         new EditLineNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable),
@@ -655,7 +655,7 @@ namespace SEE.Controls.Actions.Drawable
                     }
                     if (memento.OldBranchLineConfig != null)
                     {
-                        GameObject oldObject = GameFinder.FindChild(oldDrawable, memento.OldValueHolder.id);
+                        GameObject oldObject = GameFinder.FindChild(oldDrawable, memento.OldValueHolder.Id);
                         if (oldObject.GetComponent<MMNodeValueHolder>().GetParentBranchLine() != null)
                         {
                             GameObject branchLineToParent = oldObject.GetComponent<MMNodeValueHolder>().
@@ -673,7 +673,7 @@ namespace SEE.Controls.Actions.Drawable
 
             /// Block to destroy the clone object.
             GameObject newObject = GameFinder.FindChild(memento.NewDrawable.GetDrawable(),
-                memento.NewValueHolder.id);
+                memento.NewValueHolder.Id);
             if (newObject.CompareTag(Tags.MindMapNode))
             {
                 MMNodeValueHolder valueHolder = newObject.GetComponent<MMNodeValueHolder>();
@@ -689,8 +689,8 @@ namespace SEE.Controls.Actions.Drawable
                 }
                 foreach (DrawableType type in memento.NewNodesHolder.GetAllDrawableTypes())
                 {
-                    new EraseNetAction(memento.NewDrawable.ID, memento.NewDrawable.ParentID, type.id).Execute();
-                    Destroyer.Destroy(GameFinder.FindChild(memento.NewDrawable.GetDrawable(), type.id));
+                    new EraseNetAction(memento.NewDrawable.ID, memento.NewDrawable.ParentID, type.Id).Execute();
+                    Destroyer.Destroy(GameFinder.FindChild(memento.NewDrawable.GetDrawable(), type.Id));
                 }
             }
             new EraseNetAction(memento.NewDrawable.ID, memento.NewDrawable.ParentID, newObject.name).Execute();
@@ -715,7 +715,7 @@ namespace SEE.Controls.Actions.Drawable
                 DrawableType.Restore(memento.NewValueHolder, newDrawable);
                 if (memento.OldBranchLineConfig != null)
                 {
-                    GameObject newObject = GameFinder.FindChild(newDrawable, memento.NewValueHolder.id);
+                    GameObject newObject = GameFinder.FindChild(newDrawable, memento.NewValueHolder.Id);
                     if (newObject.GetComponent<MMNodeValueHolder>().GetParentBranchLine() != null)
                     {
                         GameObject branchLineToParent = newObject.GetComponent<MMNodeValueHolder>().
@@ -734,7 +734,7 @@ namespace SEE.Controls.Actions.Drawable
             if (memento.State == CutCopy.Cut)
             {
                 GameObject oldObject = GameFinder.FindChild(memento.OldDrawable.GetDrawable(),
-                    memento.OldValueHolder.id);
+                    memento.OldValueHolder.Id);
                 if (oldObject.CompareTag(Tags.MindMapNode))
                 {
                     MMNodeValueHolder valueHolder = oldObject.GetComponent<MMNodeValueHolder>();
@@ -750,8 +750,8 @@ namespace SEE.Controls.Actions.Drawable
                     }
                     foreach (DrawableType type in memento.OldNodesHolder.GetAllDrawableTypes())
                     {
-                        new EraseNetAction(memento.OldDrawable.ID, memento.OldDrawable.ParentID, type.id).Execute();
-                        Destroyer.Destroy(GameFinder.FindChild(memento.OldDrawable.GetDrawable(), type.id));
+                        new EraseNetAction(memento.OldDrawable.ID, memento.OldDrawable.ParentID, type.Id).Execute();
+                        Destroyer.Destroy(GameFinder.FindChild(memento.OldDrawable.GetDrawable(), type.Id));
                     }
                 }
                 new EraseNetAction(memento.OldDrawable.ID, memento.OldDrawable.ParentID, oldObject.name).Execute();
@@ -800,8 +800,8 @@ namespace SEE.Controls.Actions.Drawable
         {
             return new HashSet<string>
                 {
-                    memento.OldValueHolder.id,
-                    memento.NewValueHolder.id
+                    memento.OldValueHolder.Id,
+                    memento.NewValueHolder.Id
                 };
         }
     }

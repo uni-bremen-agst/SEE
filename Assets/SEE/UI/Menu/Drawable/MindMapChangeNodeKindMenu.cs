@@ -59,7 +59,7 @@ namespace SEE.UI.Menu.Drawable
                 }
 
                 /// Gets the index of the current chosen <see cref="GameMindMap.NodeKind"/>.
-                int index = GameMindMap.GetNodeKinds().IndexOf(newConf.nodeKind);
+                int index = GameMindMap.GetNodeKinds().IndexOf(newConf.NodeKind);
 
                 /// Adds the handler for the node kind change.
                 AddNodeKindSelectorHandler(addedNode, newConf);
@@ -80,14 +80,14 @@ namespace SEE.UI.Menu.Drawable
             string drawableParent = GameFinder.GetDrawableParentName(drawable);
 
             /// Gets the configurations for the mind map border and the branch line to the parent.
-            LineConf boarderConf = newConf.borderConf;
-            LineConf parentBranchLineConf = newConf.branchLineConf;
+            LineConf boarderConf = newConf.BorderConf;
+            LineConf parentBranchLineConf = newConf.BranchLineConf;
 
             nodeKindSelector.selectorEvent.AddListener(index =>
             {
                 /// Gets the new and the old node kind.
                 GameMindMap.NodeKind newNodeKind = GameMindMap.GetNodeKinds()[index];
-                GameMindMap.NodeKind oldKind = newConf.nodeKind;
+                GameMindMap.NodeKind oldKind = newConf.NodeKind;
 
                 /// If the change was possible or the new kind corresponds to the old one.
                 if (GameMindMap.CheckValidNodeKindChange(addedNode, newNodeKind, oldKind) || newNodeKind == oldKind)
@@ -95,12 +95,12 @@ namespace SEE.UI.Menu.Drawable
                     /// Executes the Node Kind change if it is possible.
                     GameMindMap.ChangeNodeKind(addedNode, newNodeKind, boarderConf);
                     new MindMapChangeNodeKindNetAction(drawable.name, drawableParent, newConf, newNodeKind).Execute();
-                    newConf.nodeKind = newNodeKind;
-                    newConf.textConf = ((MindMapNodeConf)DrawableType.Get(addedNode)).textConf;
+                    newConf.NodeKind = newNodeKind;
+                    newConf.TextConf = ((MindMapNodeConf)DrawableType.Get(addedNode)).TextConf;
                     if (newNodeKind == GameMindMap.NodeKind.Theme)
                     {
-                        newConf.parentNode = "";
-                        newConf.branchLineToParent = "";
+                        newConf.ParentNode = "";
+                        newConf.BranchLineToParent = "";
                     }
 
                     /// If the new one is not a <see cref="GameMindMap.NodeKind.Theme"/> 

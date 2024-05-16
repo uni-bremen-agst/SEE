@@ -54,14 +54,14 @@ namespace SEE.Net.Actions.Drawable
             if (!IsRequester())
             {
                 GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
-                if (drawable != null && GameFinder.FindChild(drawable, Text.id) != null)
+                if (drawable != null && GameFinder.FindChild(drawable, Text.Id) != null)
                 {
-                    GameObject textObj = GameFinder.FindChild(drawable, Text.id);
+                    GameObject textObj = GameFinder.FindChild(drawable, Text.Id);
                     GameEdit.ChangeText(textObj, Text);
                 }
                 else
                 {
-                    throw new System.Exception($"There is no drawable with the ID {DrawableID} or text with the ID {Text.id}.");
+                    throw new System.Exception($"There is no drawable with the ID {DrawableID} or text with the ID {Text.Id}.");
                 }
             }
         }

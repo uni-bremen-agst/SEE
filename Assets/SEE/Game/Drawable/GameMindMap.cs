@@ -635,7 +635,7 @@ namespace SEE.Game.Drawable
 
                 /// Restores the old border appearance, if the new node kind is not a Leaf.
                 if (newNodeKind != NodeKind.Leaf && borderConf != null
-                    && borderConf.primaryColor != Color.clear)
+                    && borderConf.PrimaryColor != Color.clear)
                 {
                     GameEdit.ChangeLine(nodeBorder, borderConf);
                 }
@@ -774,7 +774,7 @@ namespace SEE.Game.Drawable
             else
             {
                 /// Creates the node.
-                Setup(drawable, name, GetPrefix(nodeKind), textConf.text, 
+                Setup(drawable, name, GetPrefix(nodeKind), textConf.Text, 
                     drawable.transform.TransformPoint(position), out GameObject node);
                 /// Destroyes the text and border, because the originals will be restored below.
                 Destroyer.Destroy(GameFinder.FindChildWithTag(node, Tags.Line));
@@ -786,7 +786,7 @@ namespace SEE.Game.Drawable
             GameObject border = ReDrawLine(drawable, borderConf);
 
             /// Restores the text and sets the order.
-            textConf.orderInLayer = order;
+            textConf.OrderInLayer = order;
             GameObject text = GameTexter.ReWriteText(drawable, textConf);
             text.GetComponent<OrderInLayerValueHolder>().SetOrderInLayer(0);
 
@@ -834,20 +834,20 @@ namespace SEE.Game.Drawable
             if (GameFinder.GetAttachedObjectsObject(drawable) != null)
             {
                 parent = GameFinder.FindChild(GameFinder.GetAttachedObjectsObject(drawable), 
-                    conf.parentNode);
+                    conf.ParentNode);
             }
 
             return ReCreate(drawable,
                 parent,
-                conf.id,
-                conf.textConf,
-                conf.borderConf,
-                conf.position,
-                conf.scale,
-                conf.eulerAngles,
-                conf.orderInLayer,
-                conf.nodeKind,
-                conf.branchLineToParent);
+                conf.Id,
+                conf.TextConf,
+                conf.BorderConf,
+                conf.Position,
+                conf.Scale,
+                conf.EulerAngles,
+                conf.OrderInLayer,
+                conf.NodeKind,
+                conf.BranchLineToParent);
         }
 
         /// <summary>
@@ -869,7 +869,7 @@ namespace SEE.Game.Drawable
                 /// Block for renames the branch lines.
                 foreach (LineConf branchLine in config.LineConfigs)
                 {
-                    if (branchLine.id.StartsWith(ValueHolder.MindMapBranchLine))
+                    if (branchLine.Id.StartsWith(ValueHolder.MindMapBranchLine))
                     {
                         RenameBranchLine(branchLine, idDictionary);
                     }
@@ -887,9 +887,9 @@ namespace SEE.Game.Drawable
         private static void RenameNode(MindMapNodeConf conf, GameObject attachedObjects, 
             Dictionary<string, string> nameDictionary, Dictionary<string, string> idDictionary)
         {
-            string prefix = GetPrefix(conf.nodeKind); ;
+            string prefix = GetPrefix(conf.NodeKind); ;
 
-            if (GameFinder.FindChild(attachedObjects, conf.id) != null)
+            if (GameFinder.FindChild(attachedObjects, conf.Id) != null)
             {
                 /// Gets a new id for the object based on a random string.
                 string id = DrawableHolder.GetRandomString(8);
@@ -903,26 +903,26 @@ namespace SEE.Game.Drawable
                 }
 
                 /// Adds the old and the new name to a dictionary.
-                nameDictionary.Add(conf.id, newName);
+                nameDictionary.Add(conf.Id, newName);
 
                 /// Adds a pair of the old id and the new name in a other dictionary.
-                idDictionary.Add(GetIDofName(conf.id), newName);
+                idDictionary.Add(GetIDofName(conf.Id), newName);
 
                 /// Change the names to the new name.
-                conf.id = newName;
-                conf.borderConf.id = ValueHolder.LinePrefix + id;
-                conf.textConf.id = ValueHolder.TextPrefix + id;
+                conf.Id = newName;
+                conf.BorderConf.Id = ValueHolder.LinePrefix + id;
+                conf.TextConf.Id = ValueHolder.TextPrefix + id;
 
                 /// If the node has a parent, replace the old parent name with the new one.
-                if (conf.parentNode != "")
+                if (conf.ParentNode != "")
                 {
-                    conf.parentNode = nameDictionary[conf.parentNode];
+                    conf.ParentNode = nameDictionary[conf.ParentNode];
                     /// Rename the branch line with the new id's of the parent and the node.
-                    conf.branchLineToParent = ValueHolder.MindMapBranchLine + "-" 
-                        + GetIDofName(conf.parentNode) + "-" + GetIDofName(conf.id);
-                    if (conf.branchLineConf != null)
+                    conf.BranchLineToParent = ValueHolder.MindMapBranchLine + "-" 
+                        + GetIDofName(conf.ParentNode) + "-" + GetIDofName(conf.Id);
+                    if (conf.BranchLineConf != null)
                     {
-                        conf.branchLineConf.id = conf.branchLineToParent;
+                        conf.BranchLineConf.Id = conf.BranchLineToParent;
                     }
                 }
             }
@@ -938,7 +938,7 @@ namespace SEE.Game.Drawable
             string prefix = ValueHolder.MindMapBranchLine;
 
             /// Splits the old name into three parts.
-            string[] splitted = conf.id.Split("-");
+            string[] splitted = conf.Id.Split("-");
 
             /// Get the new parent id.
             string newParentID = splitted[1];
@@ -957,7 +957,7 @@ namespace SEE.Game.Drawable
             }
 
             /// Rename the branch line.
-            conf.id = prefix + "-" + newParentID + "-" + newChildID;
+            conf.Id = prefix + "-" + newParentID + "-" + newChildID;
         }
 
         /// <summary>

@@ -59,7 +59,7 @@ namespace SEE.Net.Actions.Drawable
                     throw new System.Exception($"There is no drawable with the ID {DrawableID}.");
                 }
 
-                if (Text != null && Text.id != "")
+                if (Text != null && Text.Id != "")
                 {
                     GameTexter.ReWriteText(drawable, Text);
                 }

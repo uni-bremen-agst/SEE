@@ -59,16 +59,16 @@ namespace SEE.Net.Actions.Drawable
                     throw new System.Exception($"There is no drawable with the ID {DrawableID}.");
                 }
 
-                if (Node != null && Node.id != "")
+                if (Node != null && Node.Id != "")
                 {
                     GameObject attached = GameFinder.GetAttachedObjectsObject(drawable);
-                    GameObject node = GameFinder.FindChild(attached, Node.borderConf.id).transform.parent.gameObject;
-                    GameObject parent = GameFinder.FindChild(attached, Node.parentNode);
+                    GameObject node = GameFinder.FindChild(attached, Node.BorderConf.Id).transform.parent.gameObject;
+                    GameObject parent = GameFinder.FindChild(attached, Node.ParentNode);
                     GameMindMap.ChangeParent(node, parent);
                 }
                 else
                 {
-                    throw new System.Exception($"The node with the ID {Node.id} or the parent node with the ID {Node.parentNode} dont exists.");
+                    throw new System.Exception($"The node with the ID {Node.Id} or the parent node with the ID {Node.ParentNode} dont exists.");
                 }
             }
         }

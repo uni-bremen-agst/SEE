@@ -98,7 +98,7 @@ namespace SEE.Controls.Actions.Drawable
                         memento = new Memento(hittedObject, GameFinder.GetDrawable(hittedObject), lines);
                         mementoList.Add(memento);
                         new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
-                            memento.OriginalLine.id).Execute();
+                            memento.OriginalLine.Id).Execute();
                         Destroyer.Destroy(hittedObject);
                     }
                 }
@@ -128,8 +128,8 @@ namespace SEE.Controls.Actions.Drawable
 
                 foreach (LineConf line in mem.Lines)
                 {
-                    GameObject lineObj = GameFinder.FindChild(drawable, line.id);
-                    new EraseNetAction(mem.Drawable.ID, mem.Drawable.ParentID, line.id).Execute();
+                    GameObject lineObj = GameFinder.FindChild(drawable, line.Id);
+                    new EraseNetAction(mem.Drawable.ID, mem.Drawable.ParentID, line.Id).Execute();
                     Destroyer.Destroy(lineObj);
                 }
             }
@@ -143,8 +143,8 @@ namespace SEE.Controls.Actions.Drawable
             foreach (Memento mem in mementoList)
             {
                 GameObject drawable = mem.Drawable.GetDrawable();
-                GameObject originObj = GameFinder.FindChild(drawable, mem.OriginalLine.id);
-                new EraseNetAction(mem.Drawable.ID, mem.Drawable.ParentID, mem.OriginalLine.id).Execute();
+                GameObject originObj = GameFinder.FindChild(drawable, mem.OriginalLine.Id);
+                new EraseNetAction(mem.Drawable.ID, mem.Drawable.ParentID, mem.OriginalLine.Id).Execute();
                 Destroyer.Destroy(originObj);
 
                 foreach (LineConf line in mem.Lines)
@@ -200,7 +200,7 @@ namespace SEE.Controls.Actions.Drawable
                 HashSet<string> changedObjects = new();
                 foreach (Memento mem in mementoList)
                 {
-                    changedObjects.Add(mem.OriginalLine.id);
+                    changedObjects.Add(mem.OriginalLine.Id);
                 }
                 return changedObjects;
             }

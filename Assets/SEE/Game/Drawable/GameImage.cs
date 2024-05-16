@@ -193,16 +193,16 @@ namespace SEE.Game.Drawable
         /// <returns>The created image game object.</returns>
         public static GameObject RePlaceImage(GameObject drawable, ImageConf conf)
         {
-            string fileName = Path.GetFileName(conf.path);
+            string fileName = Path.GetFileName(conf.Path);
             return RePlaceImage(
                 drawable,
-                conf.id,
-                conf.fileData,
-                conf.position,
-                conf.scale,
-                conf.eulerAngles,
-                conf.orderInLayer,
-                conf.imageColor,
+                conf.Id,
+                conf.FileData,
+                conf.Position,
+                conf.Scale,
+                conf.EulerAngles,
+                conf.OrderInLayer,
+                conf.ImageColor,
                 fileName
                 );
         }

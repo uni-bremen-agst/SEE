@@ -147,9 +147,9 @@ namespace SEE.Game.Drawable.Configurations
         private const string MindMapNodeConfigsLabel = "MindMapNodeConfigs";
 
         /// <summary>
-        /// Writes this instances' attributes into the given <see cref="ConfigWriter"/>.
+        /// Saves this instance's attributes using the given <see cref="ConfigWriter"/>.
         /// </summary>
-        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes into.</param>
+        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
         internal void Save(ConfigWriter writer)
         {
             writer.Save(ID, DrawableNameLabel);
@@ -210,7 +210,7 @@ namespace SEE.Game.Drawable.Configurations
         internal bool Restore(Dictionary<string, object> attributes)
         {
             bool errorFree = true;
-            /// Try to restores the drawable name.
+            /// Try to restore the drawable name.
             if (attributes.TryGetValue(DrawableNameLabel, out object name))
             {
                 ID = (string)name;
@@ -220,7 +220,7 @@ namespace SEE.Game.Drawable.Configurations
                 errorFree = false;
             }
 
-            /// Try to restores the drawable parent name.
+            /// Try to restore the drawable parent name.
             if (attributes.TryGetValue(DrawableParentNameLabel, out object pName))
             {
                 ParentID = (string)pName;
@@ -230,7 +230,7 @@ namespace SEE.Game.Drawable.Configurations
                 errorFree = false;
             }
 
-            /// Try to restores the position.
+            /// Try to restore the position.
             Vector3 position = Vector3.zero;
             if (ConfigIO.Restore(attributes, PositionLabel, ref position))
             {
@@ -242,7 +242,7 @@ namespace SEE.Game.Drawable.Configurations
                 errorFree = false;
             }
 
-            /// Try to restores the rotation.
+            /// Try to restore the rotation.
             Vector3 rotation = Vector3.zero;
             if (ConfigIO.Restore(attributes, RotationLabel, ref rotation))
             {
@@ -254,7 +254,7 @@ namespace SEE.Game.Drawable.Configurations
                 errorFree = false;
             }
 
-            /// Try to restores the scale.
+            /// Try to restore the scale.
             Vector3 scale = Vector3.zero;
             if (ConfigIO.Restore(attributes, ScaleLabel, ref scale))
             {
@@ -266,7 +266,7 @@ namespace SEE.Game.Drawable.Configurations
                 errorFree = false;
             }
 
-            /// Try to restores the color.
+            /// Try to restore the color.
             Color color = Color.black;
             if (ConfigIO.Restore(attributes, ColorLabel, ref color))
             {
@@ -278,13 +278,13 @@ namespace SEE.Game.Drawable.Configurations
                 errorFree = false;
             }
 
-            /// Try to restores the order.
+            /// Try to restore the order.
             if (!ConfigIO.Restore(attributes, OrderLabel, ref Order))
             {
                 errorFree = false;
             }
 
-            /// Try to restores the lines that are displayed on this drawable.
+            /// Try to restore the lines that are displayed on this drawable.
             if (attributes.TryGetValue(LineConfigsLabel, out object lineList))
             {
                 foreach (object item in (List<object>)lineList)
@@ -296,7 +296,7 @@ namespace SEE.Game.Drawable.Configurations
                 }
             }
 
-            /// Try to restores the texts that are displayed on this drawable.
+            /// Try to restore the texts that are displayed on this drawable.
             if (attributes.TryGetValue(TextConfigsLabel, out object textList))
             {
                 int i = 0;
@@ -310,7 +310,7 @@ namespace SEE.Game.Drawable.Configurations
                 }
             }
 
-            /// Try to restores the images that are displayed on this drawable.
+            /// Try to restore the images that are displayed on this drawable.
             if (attributes.TryGetValue(ImageConfigsLabel, out object imageList))
             {
                 int i = 0;
@@ -324,7 +324,7 @@ namespace SEE.Game.Drawable.Configurations
                 }
             }
 
-            /// Try to restores the mind map nodes that are displayed on this drawable.
+            /// Try to restore the mind map nodes that are displayed on this drawable.
             if (attributes.TryGetValue(MindMapNodeConfigsLabel, out object nodeList))
             {
                 int i = 0;

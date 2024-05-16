@@ -144,7 +144,7 @@ namespace SEE.Game.Drawable
                 
                 /// Block for the case where an attempt was made to split at the start or end point.
                 if (lines.Count == 1 
-                    && lines[0].rendererPositions.Length == positions.Count)
+                    && lines[0].RendererPositions.Length == positions.Count)
                 {
                     ShowNotification.Warn("Line Connector Erase Problem:", "You can't erase a line connector on the endpoint. " +
                         "Because the endpoint has none." +
@@ -200,8 +200,8 @@ namespace SEE.Game.Drawable
         private static LineConf ReDraw(GameObject drawable, LineConf originLine, Vector3[] positions)
         {
             LineConf lineToCreate = (LineConf)originLine.Clone();
-            lineToCreate.id = "";
-            lineToCreate.rendererPositions = positions;
+            lineToCreate.Id = "";
+            lineToCreate.RendererPositions = positions;
 
             GameObject newLine = GameDrawer.ReDrawLine(drawable, lineToCreate);
             GameDrawer.ChangePivot(newLine);

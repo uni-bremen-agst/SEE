@@ -320,18 +320,18 @@ namespace SEE.Game.Drawable
         public static GameObject ReWriteText(GameObject drawable, TextConf text)
         {
             return ReWriteText(drawable,
-                text.id,
-                text.text,
-                text.position,
-                text.scale,
-                text.eulerAngles,
-                text.fontColor,
-                text.outlineColor,
-                text.outlineStatus,
-                text.outlineThickness,
-                text.fontSize,
-                text.orderInLayer,
-                text.fontStyles);
+                text.Id,
+                text.Text,
+                text.Position,
+                text.Scale,
+                text.EulerAngles,
+                text.FontColor,
+                text.OutlineColor,
+                text.IsOutlined,
+                text.OutlineThickness,
+                text.FontSize,
+                text.OrderInLayer,
+                text.FontStyles);
         }
 
         /// <summary>

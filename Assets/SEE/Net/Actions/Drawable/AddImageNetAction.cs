@@ -59,7 +59,7 @@ namespace SEE.Net.Actions.Drawable
                     throw new System.Exception($"There is no drawable with the ID {DrawableID}.");
                 }
 
-                if (Conf != null && Conf.id != "")
+                if (Conf != null && Conf.Id != "")
                 {
                     GameImage.RePlaceImage(drawable, Conf);
                 }

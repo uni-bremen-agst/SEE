@@ -87,7 +87,7 @@ namespace SEE.Controls.Actions.Drawable
 
                 foreach (DrawableType type in allDrawableTypes)
                 {
-                    GameObject child = GameFinder.FindChild(drawable, type.id);
+                    GameObject child = GameFinder.FindChild(drawable, type.Id);
                     new EraseNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
                         child.name).Execute();
                     Destroyer.Destroy(child);
@@ -125,8 +125,8 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             foreach (DrawableType type in memento.Drawable.GetAllDrawableTypes())
             {
-                GameObject toDelete = GameFinder.FindChild(memento.Drawable.GetDrawable(), type.id); ;
-                new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID, type.id).Execute();
+                GameObject toDelete = GameFinder.FindChild(memento.Drawable.GetDrawable(), type.Id); ;
+                new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID, type.Id).Execute();
                 Destroyer.Destroy(toDelete);
             }
         }
@@ -179,7 +179,7 @@ namespace SEE.Controls.Actions.Drawable
                 };
                 foreach(DrawableType type in memento.Drawable.GetAllDrawableTypes())
                 {
-                    changedObjects.Add(type.id);
+                    changedObjects.Add(type.Id);
                 }
                 return changedObjects;
             }

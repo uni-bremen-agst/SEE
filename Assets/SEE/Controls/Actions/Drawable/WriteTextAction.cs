@@ -223,8 +223,8 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo();
-            GameObject obj = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Text.id);
-            new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Text.id).Execute();
+            GameObject obj = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Text.Id);
+            new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Text.Id).Execute();
             Destroyer.Destroy(obj);
         }
 
@@ -275,7 +275,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>the id of the created drawable text</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new() { memento.Text.id };
+            return new() { memento.Text.Id };
         }
     }
 }

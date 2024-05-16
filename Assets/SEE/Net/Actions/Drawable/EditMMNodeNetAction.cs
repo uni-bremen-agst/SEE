@@ -55,14 +55,14 @@ namespace SEE.Net.Actions.Drawable
             {
                 GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
                 GameObject attached = GameFinder.GetAttachedObjectsObject(drawable);
-                if (drawable != null && GameFinder.FindChild(attached, Conf.borderConf.id).transform.parent.gameObject != null)
+                if (drawable != null && GameFinder.FindChild(attached, Conf.BorderConf.Id).transform.parent.gameObject != null)
                 {
-                    GameObject nodeObj = GameFinder.FindChild(attached, Conf.borderConf.id).transform.parent.gameObject;
+                    GameObject nodeObj = GameFinder.FindChild(attached, Conf.BorderConf.Id).transform.parent.gameObject;
                     GameEdit.ChangeMindMapNode(nodeObj, Conf);
                 }
                 else
                 {
-                    throw new System.Exception($"There is no drawable with the ID {DrawableID} or node with the ID {Conf.id}.");
+                    throw new System.Exception($"There is no drawable with the ID {DrawableID} or node with the ID {Conf.Id}.");
                 }
             }
         }

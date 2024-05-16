@@ -61,7 +61,7 @@ namespace SEE.Net.Actions.Drawable
                     throw new System.Exception($"There is no drawable with the ID {DrawableID}.");
                 }
 
-                if (Node != null && Node.id != "")
+                if (Node != null && Node.Id != "")
                 {
                     GameMindMap.ReCreate(drawable, Node);
                 }

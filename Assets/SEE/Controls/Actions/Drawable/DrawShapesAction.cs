@@ -441,11 +441,11 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (shape == null)
             {
-                shape = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Shape.id);
+                shape = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Shape.Id);
             }
             if (shape != null)
             {
-                new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Shape.id).Execute();
+                new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Shape.Id).Execute();
                 Destroyer.Destroy(shape);
             }
         }
@@ -507,7 +507,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 return new HashSet<string>
                 {
-                    memento.Shape.id
+                    memento.Shape.Id
                 };
             }
         }

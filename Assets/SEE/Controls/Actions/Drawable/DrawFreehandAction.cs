@@ -264,12 +264,12 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (line == null)
             {
-                line = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Line.id);
+                line = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Line.Id);
             }
             if (line != null)
             {
                 new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
-                    memento.Line.id).Execute();
+                    memento.Line.Id).Execute();
                 Destroyer.Destroy(line);
                 line = null;
             }
@@ -334,7 +334,7 @@ namespace SEE.Controls.Actions.Drawable
                 return new HashSet<string>
                 {
                     memento.Drawable.ID,
-                    memento.Line.id
+                    memento.Line.Id
                 };
             }
         }

@@ -182,7 +182,7 @@ namespace SEE.UI.Menu.Drawable
                 }
 
                 /// Get the index of the current parent.
-                int index = nodes.IndexOf(GameFinder.FindChild(attachedObjects, newConf.parentNode));
+                int index = nodes.IndexOf(GameFinder.FindChild(attachedObjects, newConf.ParentNode));
 
                 /// If the index can't be found, take the default index 0.
                 index = index < 0 ? 0 : index;
@@ -233,7 +233,7 @@ namespace SEE.UI.Menu.Drawable
         private static void ChangeParent(GameObject addedNode, MindMapNodeConf newConf, GameObject drawable)
         {
             GameMindMap.ChangeParent(addedNode, chosenObject);
-            newConf.parentNode = chosenObject.name;
+            newConf.ParentNode = chosenObject.name;
             new MindMapChangeParentNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
                 newConf).Execute();
         }

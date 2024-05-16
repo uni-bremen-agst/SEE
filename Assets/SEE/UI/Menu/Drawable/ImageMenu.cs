@@ -88,22 +88,22 @@ namespace SEE.UI.Menu.Drawable
                 AssignOrderInLayer(order =>
                 {
                     GameEdit.ChangeLayer(imageObj, order);
-                    imageConf.orderInLayer = order;
+                    imageConf.OrderInLayer = order;
                     ImageConf conf = ImageConf.GetImageConf(imageObj);
-                    conf.fileData = null;
+                    conf.FileData = null;
                     new EditImageNetAction(drawable.name, drawableParentName, conf).Execute();
-                }, imageConf.orderInLayer);
+                }, imageConf.OrderInLayer);
 
                 /// Assigns an action to the color picker that should be executed 
                 /// along with the current color.
                 AssignColorArea(color =>
                 {
                     GameEdit.ChangeImageColor(imageObj, color);
-                    imageConf.imageColor = color;
+                    imageConf.ImageColor = color;
                     ImageConf conf = ImageConf.GetImageConf(imageObj);
-                    conf.fileData = null;
+                    conf.FileData = null;
                     new EditImageNetAction(drawable.name, drawableParentName, conf).Execute();
-                }, imageConf.imageColor);
+                }, imageConf.ImageColor);
 
                 /// Initialize the switch for mirror the image.
                 InitMirrorSwitch(imageObj, imageConf, drawable, drawableParentName);
@@ -147,7 +147,7 @@ namespace SEE.UI.Menu.Drawable
             mirrorSwitch.OnEvents.AddListener(() =>
             {
                 GameMoveRotator.SetRotateY(imageObj, 180f);
-                imageConf.eulerAngles = new Vector3(0, 180, imageConf.eulerAngles.z);
+                imageConf.EulerAngles = new Vector3(0, 180, imageConf.EulerAngles.z);
                 new RotatorYNetAction(drawable.name, drawableParentName, imageObj.name, 180f).Execute();
             });
 
@@ -155,12 +155,12 @@ namespace SEE.UI.Menu.Drawable
             mirrorSwitch.OffEvents.AddListener(() =>
             {
                 GameMoveRotator.SetRotateY(imageObj, 0);
-                imageConf.eulerAngles = new Vector3(0, 0, imageConf.eulerAngles.z);
+                imageConf.EulerAngles = new Vector3(0, 0, imageConf.EulerAngles.z);
                 new RotatorYNetAction(drawable.name, drawableParentName, imageObj.name, 0).Execute();
             });
 
             /// Sets the state of the switch.
-            mirrorSwitch.isOn = imageConf.eulerAngles.y == 180;
+            mirrorSwitch.isOn = imageConf.EulerAngles.y == 180;
         }
 
         /// <summary>

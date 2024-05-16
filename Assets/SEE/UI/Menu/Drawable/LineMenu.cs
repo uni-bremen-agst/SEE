@@ -541,8 +541,8 @@ namespace SEE.UI.Menu.Drawable
                 tilingSlider.onValueChanged.AddListener(tilingAction = tiling =>
                 {
                     ChangeLineKind(selectedLine, LineKind.Dashed, tiling);
-                    lineHolder.lineKind = LineKind.Dashed;
-                    lineHolder.tiling = tiling;
+                    lineHolder.LineKind = LineKind.Dashed;
+                    lineHolder.Tiling = tiling;
                     new ChangeLineKindNetAction(drawable.name, drawableParentName, selectedLine.name,
                             LineKind.Dashed, tiling).Execute();
                 });
@@ -623,24 +623,24 @@ namespace SEE.UI.Menu.Drawable
                 /// This is because it does not work without an additionally set tiling.
                 if (GetLineKinds()[index] != LineKind.Dashed)
                 {
-                    lineHolder.lineKind = GetLineKinds()[index];
+                    lineHolder.LineKind = GetLineKinds()[index];
 
                     /// If you want to switch to <see cref="LineKind.Solid"/> but 
                     /// previously a Dashed LineKind with <see cref="ColorKind.TwoDashed"/> was active, 
                     /// you need also to switch the <see cref="ColorKind"/> to <see cref="ColorKind.Monochrome"/>.
-                    if (lineHolder.lineKind == LineKind.Solid &&
-                        lineHolder.colorKind == ColorKind.TwoDashed)
+                    if (lineHolder.LineKind == LineKind.Solid &&
+                        lineHolder.ColorKind == ColorKind.TwoDashed)
                     {
-                        lineHolder.colorKind = ColorKind.Monochrome;
-                        ChangeColorKind(selectedLine, lineHolder.colorKind, lineHolder);
+                        lineHolder.ColorKind = ColorKind.Monochrome;
+                        ChangeColorKind(selectedLine, lineHolder.ColorKind, lineHolder);
                         new ChangeColorKindNetAction(drawable.name, drawableParentName,
-                            LineConf.GetLine(selectedLine), lineHolder.colorKind).Execute();
+                            LineConf.GetLine(selectedLine), lineHolder.ColorKind).Execute();
                     }
 
                     /// Apply the line kind change.
-                    ChangeLineKind(selectedLine, lineHolder.lineKind, lineHolder.tiling);
+                    ChangeLineKind(selectedLine, lineHolder.LineKind, lineHolder.Tiling);
                     new ChangeLineKindNetAction(drawable.name, drawableParentName, selectedLine.name,
-                            lineHolder.lineKind, lineHolder.tiling).Execute();
+                            lineHolder.LineKind, lineHolder.Tiling).Execute();
                 }
             };
 
@@ -660,7 +660,7 @@ namespace SEE.UI.Menu.Drawable
             LineConf lineHolder, GameObject drawable, string drawableParentName)
         {
             /// Assigns the current <see cref="ColorKind"/> of the selected line to the menu variable.
-            AssignColorKind(lineHolder.colorKind);
+            AssignColorKind(lineHolder.ColorKind);
             /// Gets and sets the current selected color kind index.
             colorKindSelector.index = GetIndexOfSelectedColorKind();
             /// Updates the selector.
@@ -675,13 +675,13 @@ namespace SEE.UI.Menu.Drawable
             /// Creates a new color kind selector action
             colorKindAction = index =>
             {
-                lineHolder.colorKind = GetColorKinds(true)[index];
-                ChangeColorKind(selectedLine, lineHolder.colorKind, lineHolder);
+                lineHolder.ColorKind = GetColorKinds(true)[index];
+                ChangeColorKind(selectedLine, lineHolder.ColorKind, lineHolder);
                 new ChangeColorKindNetAction(drawable.name, drawableParentName, LineConf.GetLine(selectedLine),
-                    lineHolder.colorKind).Execute();
+                    lineHolder.ColorKind).Execute();
 
                 /// Activates the primary color button, if it changes to <see cref="ColorKind.Monochrome"/>
-                if (lineHolder.colorKind == ColorKind.Monochrome
+                if (lineHolder.ColorKind == ColorKind.Monochrome
                     && !secondaryColorBMB.buttonVar.IsInteractable())
                 {
                     picker.onValueChanged.RemoveListener(colorAction);
@@ -716,9 +716,9 @@ namespace SEE.UI.Menu.Drawable
                 AssignColorArea(color =>
                 {
                     GameEdit.ChangePrimaryColor(selectedLine, color);
-                    lineHolder.primaryColor = color;
+                    lineHolder.PrimaryColor = color;
                     new EditLinePrimaryColorNetAction(drawable.name, drawableParentName, selectedLine.name, color).Execute();
-                }, lineHolder.primaryColor);
+                }, lineHolder.PrimaryColor);
             });
             /// Makes the button unclickable.
             primaryColorBMB.buttonVar.interactable = false;
@@ -748,22 +748,22 @@ namespace SEE.UI.Menu.Drawable
                 /// the secondary color is clear. 
                 /// Therefore, a random color is added first, 
                 /// and if the color's alpha is 0, it is set to 255 to ensure the color is not transparent.
-                if (lineHolder.secondaryColor == Color.clear)
+                if (lineHolder.SecondaryColor == Color.clear)
                 {
-                    lineHolder.secondaryColor = Random.ColorHSV();
+                    lineHolder.SecondaryColor = Random.ColorHSV();
                 }
-                if (lineHolder.secondaryColor.a == 0)
+                if (lineHolder.SecondaryColor.a == 0)
                 {
-                    lineHolder.secondaryColor = new Color(lineHolder.secondaryColor.r,
-                        lineHolder.secondaryColor.g, lineHolder.secondaryColor.b, 255);
+                    lineHolder.SecondaryColor = new Color(lineHolder.SecondaryColor.r,
+                        lineHolder.SecondaryColor.g, lineHolder.SecondaryColor.b, 255);
                 }
                 AssignColorArea(color =>
                 {
                     GameEdit.ChangeSecondaryColor(selectedLine, color);
-                    lineHolder.secondaryColor = color;
+                    lineHolder.SecondaryColor = color;
                     new EditLineSecondaryColorNetAction(drawable.name, drawableParentName,
                         selectedLine.name, color).Execute();
-                }, lineHolder.secondaryColor);
+                }, lineHolder.SecondaryColor);
             });
             /// Makes the button unclickable.
             secondaryColorBMB.buttonVar.interactable = true;
@@ -792,7 +792,7 @@ namespace SEE.UI.Menu.Drawable
                 if (thickness > 0.0f)
                 {
                     GameEdit.ChangeThickness(selectedLine, thickness);
-                    lineHolder.thickness = thickness;
+                    lineHolder.Thickness = thickness;
                     new EditLineThicknessNetAction(drawable.name, drawableParentName,
                         selectedLine.name, thickness).Execute();
                 }
@@ -814,12 +814,12 @@ namespace SEE.UI.Menu.Drawable
         {
             LayerSliderController layerSlider = instance.GetComponentInChildren<LayerSliderController>();
             /// Assigns the current value to the slider.
-            layerSlider.AssignValue(lineHolder.orderInLayer);
+            layerSlider.AssignValue(lineHolder.OrderInLayer);
             /// Adds the handler for changing.
             layerSlider.onValueChanged.AddListener(layerOrder =>
             {
                 GameEdit.ChangeLayer(selectedLine, layerOrder);
-                lineHolder.orderInLayer = layerOrder;
+                lineHolder.OrderInLayer = layerOrder;
                 new EditLayerNetAction(drawable.name, drawableParentName,
                     selectedLine.name, layerOrder).Execute();
             });
@@ -845,7 +845,7 @@ namespace SEE.UI.Menu.Drawable
             loopManager.OnEvents.AddListener(() =>
             {
                 GameEdit.ChangeLoop(selectedLine, true);
-                lineHolder.loop = true;
+                lineHolder.Loop = true;
                 new EditLineLoopNetAction(drawable.name, drawableParentName, selectedLine.name, true).Execute();
             });
             /// Removes the old off handler.
@@ -854,12 +854,12 @@ namespace SEE.UI.Menu.Drawable
             loopManager.OffEvents.AddListener(() =>
             {
                 GameEdit.ChangeLoop(selectedLine, false);
-                lineHolder.loop = false;
+                lineHolder.Loop = false;
                 new EditLineLoopNetAction(drawable.name, drawableParentName, selectedLine.name, false).Execute();
             });
 
             /// Update the switch to the current value.
-            loopManager.isOn = lineHolder.loop;
+            loopManager.isOn = lineHolder.Loop;
             /// Updates the switch.
             RefreshLoop();
         }
@@ -878,7 +878,7 @@ namespace SEE.UI.Menu.Drawable
         {
             /// Assign the color to the <see cref="HSVPicker.ColorPicker"/> depending on 
             /// the current <see cref="ColorKind"/> of the selected line.
-            switch (lineHolder.colorKind)
+            switch (lineHolder.ColorKind)
             {
                 case ColorKind.Monochrome:
                     picker.AssignColor(renderer.material.color);
@@ -896,7 +896,7 @@ namespace SEE.UI.Menu.Drawable
             picker.onValueChanged.AddListener(colorAction = color =>
             {
                 GameEdit.ChangePrimaryColor(selectedLine, color);
-                lineHolder.primaryColor = color;
+                lineHolder.PrimaryColor = color;
                 new EditLinePrimaryColorNetAction(drawable.name, drawableParentName,
                     selectedLine.name, color).Execute();
             });

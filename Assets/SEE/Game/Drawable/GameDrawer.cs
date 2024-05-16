@@ -394,19 +394,19 @@ namespace SEE.Game.Drawable
         public static GameObject ReDrawLine(GameObject drawable, LineConf lineToRedraw)
         {
             GameObject line = ReDrawLine(drawable,
-                 lineToRedraw.id,
-                 lineToRedraw.rendererPositions,
-                 lineToRedraw.colorKind,
-                 lineToRedraw.primaryColor,
-                 lineToRedraw.secondaryColor,
-                 lineToRedraw.thickness,
-                 lineToRedraw.orderInLayer,
-                 lineToRedraw.position,
-                 lineToRedraw.eulerAngles,
-                 lineToRedraw.scale,
-                 lineToRedraw.loop,
-                 lineToRedraw.lineKind,
-                 lineToRedraw.tiling);
+                 lineToRedraw.Id,
+                 lineToRedraw.RendererPositions,
+                 lineToRedraw.ColorKind,
+                 lineToRedraw.PrimaryColor,
+                 lineToRedraw.SecondaryColor,
+                 lineToRedraw.Thickness,
+                 lineToRedraw.OrderInLayer,
+                 lineToRedraw.Position,
+                 lineToRedraw.EulerAngles,
+                 lineToRedraw.Scale,
+                 lineToRedraw.Loop,
+                 lineToRedraw.LineKind,
+                 lineToRedraw.Tiling);
             return line;
         }
 
@@ -634,14 +634,14 @@ namespace SEE.Game.Drawable
                 holder.SetColorKind(colorKind);
 
                 /// Restores the primary and secondary color of the line.
-                GameEdit.ChangePrimaryColor(line, conf.primaryColor);
-                GameEdit.ChangeSecondaryColor(line, conf.secondaryColor);
+                GameEdit.ChangePrimaryColor(line, conf.PrimaryColor);
+                GameEdit.ChangeSecondaryColor(line, conf.SecondaryColor);
 
                 /// When the secondary color is clear use the primary.
                 /// It prevents it from looking like a part of the line has disappeared.
-                if (conf.secondaryColor == Color.clear)
+                if (conf.SecondaryColor == Color.clear)
                 {
-                    GameEdit.ChangeSecondaryColor(line, conf.primaryColor);
+                    GameEdit.ChangeSecondaryColor(line, conf.PrimaryColor);
                 }
             }
         }

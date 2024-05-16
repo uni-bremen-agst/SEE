@@ -105,13 +105,13 @@ namespace SEE.Game.Drawable
         {
             if (lineObj.CompareTag(Tags.Line))
             {
-                ChangeThickness(lineObj, line.thickness);
-                ChangeLayer(lineObj, line.orderInLayer);
-                GameDrawer.ChangeColorKind(lineObj, line.colorKind, line);
-                ChangePrimaryColor(lineObj, line.primaryColor);
-                ChangeSecondaryColor(lineObj, line.secondaryColor);
-                ChangeLoop(lineObj, line.loop);
-                GameDrawer.ChangeLineKind(lineObj, line.lineKind, line.tiling);
+                ChangeThickness(lineObj, line.Thickness);
+                ChangeLayer(lineObj, line.OrderInLayer);
+                GameDrawer.ChangeColorKind(lineObj, line.ColorKind, line);
+                ChangePrimaryColor(lineObj, line.PrimaryColor);
+                ChangeSecondaryColor(lineObj, line.SecondaryColor);
+                ChangeLoop(lineObj, line.Loop);
+                GameDrawer.ChangeLineKind(lineObj, line.LineKind, line.Tiling);
             }
         }
 
@@ -145,14 +145,14 @@ namespace SEE.Game.Drawable
         {
             if (textObj.CompareTag(Tags.DText))
             {
-                ChangeText(textObj, text.text);
-                ChangeFontSize(textObj, text.fontSize);
-                ChangeLayer(textObj, text.orderInLayer);
-                ChangeFontStyles(textObj, text.fontStyles);
-                ChangeFontColor(textObj, text.fontColor);
-                GameTexter.ChangeOutlineStatus(textObj, text.outlineStatus);
-                ChangeOutlineColor(textObj, text.outlineColor);
-                ChangeOutlineThickness(textObj, text.outlineThickness);
+                ChangeText(textObj, text.Text);
+                ChangeFontSize(textObj, text.FontSize);
+                ChangeLayer(textObj, text.OrderInLayer);
+                ChangeFontStyles(textObj, text.FontStyles);
+                ChangeFontColor(textObj, text.FontColor);
+                GameTexter.ChangeOutlineStatus(textObj, text.IsOutlined);
+                ChangeOutlineColor(textObj, text.OutlineColor);
+                ChangeOutlineThickness(textObj, text.OutlineThickness);
                 textObj.GetComponent<TextMeshPro>().ForceMeshUpdate(true);
                 GameTexter.RefreshMeshCollider(textObj);
             }
@@ -297,9 +297,9 @@ namespace SEE.Game.Drawable
         {
             if (imageObj.CompareTag(Tags.Image))
             {
-                ChangeLayer(imageObj, conf.orderInLayer);
-                ChangeImageColor(imageObj, conf.imageColor);
-                GameMoveRotator.SetRotateY(imageObj, conf.eulerAngles.y);
+                ChangeLayer(imageObj, conf.OrderInLayer);
+                ChangeImageColor(imageObj, conf.ImageColor);
+                GameMoveRotator.SetRotateY(imageObj, conf.EulerAngles.y);
             }
         }
 
@@ -312,22 +312,22 @@ namespace SEE.Game.Drawable
         {
             if (node.CompareTag(Tags.MindMapNode))
             {
-                GameMindMap.ChangeNodeKind(node, conf.nodeKind, conf.borderConf);
-                ChangeLine(GameFinder.FindChildWithTag(node, Tags.Line), conf.borderConf);
-                ChangeText(GameFinder.FindChildWithTag(node, Tags.DText), conf.textConf);
+                GameMindMap.ChangeNodeKind(node, conf.NodeKind, conf.BorderConf);
+                ChangeLine(GameFinder.FindChildWithTag(node, Tags.Line), conf.BorderConf);
+                ChangeText(GameFinder.FindChildWithTag(node, Tags.DText), conf.TextConf);
                 GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(
                         GameFinder.GetDrawable(node));
-                GameObject parent = GameFinder.FindChild(attachedObjects, conf.parentNode);
+                GameObject parent = GameFinder.FindChild(attachedObjects, conf.ParentNode);
                 GameMindMap.ChangeParent(node, parent);
 
                 GameMindMap.ChangeBoxSize(node);
 
                 GameFinder.FindChildWithTag(node, Tags.Line).GetComponent<MeshCollider>().enabled = false;
                 GameFinder.FindChildWithTag(node, Tags.DText).GetComponent<MeshCollider>().enabled = false;
-                if (conf.branchLineToParent != "")
+                if (conf.BranchLineToParent != "")
                 {
-                    GameObject branch = GameFinder.FindChild(attachedObjects, conf.branchLineToParent);
-                    ChangeLine(branch, conf.branchLineConf);
+                    GameObject branch = GameFinder.FindChild(attachedObjects, conf.BranchLineToParent);
+                    ChangeLine(branch, conf.BranchLineConf);
                     branch.GetComponent<MeshCollider>().enabled = false;
                 }
 
