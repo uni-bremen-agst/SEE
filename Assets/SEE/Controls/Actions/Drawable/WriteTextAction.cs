@@ -16,10 +16,10 @@ namespace SEE.Controls.Actions.Drawable
     /// <summary>
     /// Adds a text to a drawable.
     /// </summary>
-    public class WriteTextAction : AbstractPlayerAction
+    public class WriteTextAction : DrawableAction
     {
         /// <summary>
-        /// Value that represents the first start of this action.
+        /// True if we are currently at the first start of this action.
         /// </summary>
         public static bool firstStart = true;
 
@@ -29,7 +29,7 @@ namespace SEE.Controls.Actions.Drawable
         private GameObject textObj;
 
         /// <summary>
-        /// The drawable on that the text should be displayed.
+        /// The drawable on which the text should be displayed.
         /// </summary>
         private GameObject drawable;
 
@@ -44,12 +44,13 @@ namespace SEE.Controls.Actions.Drawable
         private Memento memento;
 
         /// <summary>
-        /// This field can hold a reference to the dialog that the player will see in the process of executing this.
+        /// This field can hold a reference to the dialog that the player will see in the
+        /// process of executing this.
         /// </summary>
         private WriteEditTextDialog writeTextDialog;
 
         /// <summary>
-        /// Indicates how far this instance has progressed in write a text on a drawable.
+        /// Indicates how far this instance has progressed in writing a text on a drawable.
         /// </summary>
         private ProgressState progress = ProgressState.GettingPosition;
 
@@ -63,29 +64,30 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// This struct can store all the information needed to revert or repeat a <see cref="WriteTextAction"/>
+        /// This struct can store all the information needed to revert or repeat a
+        /// <see cref="WriteTextAction"/>
         /// </summary>
         private struct Memento
         {
             /// <summary>
-            /// The drawable on that the text should be displayed
+            /// The drawable on which the text should be displayed.
             /// </summary>
-            public DrawableConfig drawable;
+            public DrawableConfig Drawable;
 
             /// <summary>
             /// The written text.
             /// </summary>
-            public TextConf text;
+            public TextConf Text;
 
             /// <summary>
-            /// The constructor, which simply assigns its only parameter to a field in this class.
+            /// The constructor.
             /// </summary>
-            /// <param name="drawable">The drawable on that the text should be displayed.</param>
+            /// <param name="drawable">The drawable on which the text should be displayed.</param>
             /// <param name="text">The written text</param>
             public Memento(GameObject drawable, TextConf text)
             {
-                this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
-                this.text = text;
+                Drawable = DrawableConfigManager.GetDrawableConfig(drawable);
+                Text = text;
             }
         }
 
@@ -103,10 +105,10 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Awake()
         {
+            base.Awake();
             if (firstStart)
             {
-                GameObject.Find("UI Canvas").AddComponent<ValueResetter>()
-                    .SetAllowedState(GetActionStateType());
+                Canvas.AddComponent<ValueResetter>().SetAllowedState(GetActionStateType());
                 TextMenu.EnableForWriting();
                 firstStart = false;
             }
@@ -119,7 +121,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.WriteText"/>.
         /// </summary>
-        /// <returns>Whether this Action is finished</returns>
+        /// <returns>Whether this action is finished</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -136,14 +138,13 @@ namespace SEE.Controls.Actions.Drawable
                         return GettingText();
                     default:
                         return false;
-
                 }
             }
             return false;
         }
 
         /// <summary>
-        /// Identifying where the text should be placed. 
+        /// Identifying where the text should be placed.
         /// The <see cref="WriteEditTextDialog"/> is then opened.
         /// The user can enter the text in it.
         /// Changes the progress state to <see cref="ProgressState.GettingText"/>
@@ -165,12 +166,12 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Gets the user input for the drawable text and create the drawable text if the text is not empty.
-        /// Because the mesh renderer of TextMeshPro takes some time to generate the mesh, 
+        /// Gets the user input for the drawable text and creates the drawable text if the text is not empty.
+        /// Because the mesh renderer of TextMeshPro takes some time to generate the mesh,
         /// the mesh collider of the text must be refreshed.
-        /// When the text for the drawable text is not empty the action will be finished.
-        /// 
-        /// If the dialog was canceled or the user input is empty, then the action is resets.
+        /// If the text for the drawable text is not empty, the action will be finished.
+        ///
+        /// If the dialog was canceled or the user input is empty, then the action is reset.
         /// </summary>
         /// <returns>Whatever the success of creating is.</returns>
         private bool GettingText()
@@ -179,12 +180,12 @@ namespace SEE.Controls.Actions.Drawable
             {
                 if (textOut != null && textOut != "")
                 {
-                    textObj = GameTexter.WriteText(drawable, textOut, position, 
+                    textObj = GameTexter.WriteText(drawable, textOut, position,
                         ValueHolder.currentPrimaryColor, ValueHolder.currentSecondaryColor,
                         TextMenu.GetOutlineStatus(),
-                        ValueHolder.currentOutlineThickness, ValueHolder.currentFontSize, 
+                        ValueHolder.currentOutlineThickness, ValueHolder.currentFontSize,
                         ValueHolder.currentOrderInLayer, TextMenu.GetFontStyle());
-                    new WriteTextNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
+                    new WriteTextNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
                         TextConf.GetText(textObj)).Execute();
                     memento = new Memento(drawable, TextConf.GetText(textObj));
                     GameTexter.RefreshMeshCollider(textObj);
@@ -216,15 +217,14 @@ namespace SEE.Controls.Actions.Drawable
             TextMenu.Disable();
         }
 
-
         /// <summary>
-        /// Reverts this action, i.e., deletes the text was was written on the drawable.
+        /// Reverts this action, i.e., deletes the text that was written on the drawable.
         /// </summary>
         public override void Undo()
         {
             base.Undo();
-            GameObject obj = GameFinder.FindChild(memento.drawable.GetDrawable(), memento.text.id);
-            new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.text.id).Execute();
+            GameObject obj = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Text.id);
+            new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Text.id).Execute();
             Destroyer.Destroy(obj);
         }
 
@@ -234,8 +234,8 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            GameTexter.ReWriteText(memento.drawable.GetDrawable(), memento.text);
-            new WriteTextNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.text).Execute();
+            GameTexter.ReWriteText(memento.Drawable.GetDrawable(), memento.Text);
+            new WriteTextNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Text).Execute();
 
         }
 
@@ -270,14 +270,12 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// The set of IDs of all gameObjects changed by this action.
-        /// <see cref="ReversibleAction.GetActionStateType"/>
-        /// Because this action does not actually change any game object, 
-        /// an empty set is always returned.
+        /// <see cref="ReversibleAction.GetActionStateType"/>.
         /// </summary>
         /// <returns>the id of the created drawable text</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new HashSet<string> { memento.text.id };
+            return new() { memento.Text.id };
         }
     }
 }

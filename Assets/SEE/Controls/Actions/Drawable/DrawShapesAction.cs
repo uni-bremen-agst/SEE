@@ -115,7 +115,7 @@ namespace SEE.Controls.Actions.Drawable
         /// Simply enter the desired values in the Shape Menu.
         /// For the Line shape type, multiple clicks (one for each point) are required.
         /// </summary>
-        /// <returns>Whether this Action is finished</returns>
+        /// <returns>Whether this action is finished</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())

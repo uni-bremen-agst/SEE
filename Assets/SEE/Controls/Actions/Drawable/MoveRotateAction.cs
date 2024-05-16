@@ -217,7 +217,7 @@ namespace SEE.Controls.Actions.Drawable
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.MoveRotator"/>.
         /// It moves or rotates a chosen drawable type object.
         /// </summary>
-        /// <returns>Whether this Action is finished</returns>
+        /// <returns>Whether this action is finished</returns>
         public override bool Update()
         {
             /// Block for canceling the action.

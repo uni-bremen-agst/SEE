@@ -130,7 +130,7 @@ namespace SEE.Controls.Actions.Drawable
         /// For this, the left mouse button must be held down as long as you want to draw.
         /// To finish, release the left mouse button.
         /// </summary>
-        /// <returns>Whether this Action is finished</returns>
+        /// <returns>Whether this action is finished</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())

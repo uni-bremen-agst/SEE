@@ -15,7 +15,7 @@ namespace SEE.Controls.Actions.Drawable
     /// <summary>
     /// Scales a drawable type object.
     /// </summary>
-    public class ScaleAction : AbstractPlayerAction
+    public class ScaleAction : DrawableAction
     {
         /// <summary>
         /// Saves all the information needed to revert or repeat this action.
@@ -28,7 +28,7 @@ namespace SEE.Controls.Actions.Drawable
         private ProgressState progressState = ProgressState.SelectObject;
 
         /// <summary>
-        /// The progress states of the <see cref="ScaleAction"/>
+        /// The progress states of the <see cref="ScaleAction"/>.
         /// </summary>
         private enum ProgressState
         {
@@ -48,7 +48,7 @@ namespace SEE.Controls.Actions.Drawable
         private Vector3 oldScale;
 
         /// <summary>
-        /// The new scale value
+        /// The new scale value.
         /// </summary>
         private Vector3 newScale;
 
@@ -63,41 +63,41 @@ namespace SEE.Controls.Actions.Drawable
         private static GameObject oldSelectedObj;
 
         /// <summary>
-        /// Bool that represents that the left mouse button was released after finish.
-        /// It is necessary to prevent the previously selected object from being accidentally selected again. 
-        /// After the action has successfully completed, it starts again, allowing for the selection of a new object. 
+        /// True if the left mouse button was released after finish.
+        /// It is necessary to prevent the previously selected object from being accidentally selected again.
+        /// After the action has successfully completed, it starts again, allowing for the selection of a new object.
         /// This option enables the immediate selection of another object while holding down the mouse button.
         /// </summary>
         private static bool mouseWasReleased = true;
 
         /// <summary>
-        /// This struct can store all the information needed to revert or repeat a <see cref="ScaleAction"/>
+        /// This struct can store all the information needed to revert or repeat a <see cref="ScaleAction"/>.
         /// </summary>
         private struct Memento
         {
             /// <summary>
-            /// The selected drawable object to scale
+            /// The selected drawable object to scale.
             /// </summary>
-            public GameObject selectedObject;
+            public GameObject SelectedObject;
             /// <summary>
-            /// The drawable on that the selected object is displayed.
+            /// The drawable on which the selected object is displayed.
             /// </summary>
-            public readonly DrawableConfig drawable;
+            public readonly DrawableConfig Drawable;
             /// <summary>
-            /// The id of the selected object
+            /// The id of the selected object.
             /// </summary>
-            public readonly string id;
+            public readonly string Id;
             /// <summary>
             /// The old scale of the selected object.
             /// </summary>
-            public readonly Vector3 oldScale;
+            public readonly Vector3 OldScale;
             /// <summary>
             /// The new scale of the selected object.
             /// </summary>
-            public readonly Vector3 newScale;
+            public readonly Vector3 NewScale;
 
             /// <summary>
-            /// The constructor, which simply assigns its only parameter to a field in this class.
+            /// The constructor.
             /// </summary>
             /// <param name="selectedObject">The selected drawable object</param>
             /// <param name="drawable">The drawable on that the selected object is displayed</param>
@@ -107,11 +107,11 @@ namespace SEE.Controls.Actions.Drawable
             public Memento(GameObject selectedObject, GameObject drawable, string id,
                 Vector3 oldScale, Vector3 newScale)
             {
-                this.selectedObject = selectedObject;
-                this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
-                this.id = id;
-                this.oldScale = oldScale;
-                this.newScale = newScale;
+                SelectedObject = selectedObject;
+                Drawable = DrawableConfigManager.GetDrawableConfig(drawable);
+                Id = id;
+                OldScale = oldScale;
+                NewScale = newScale;
             }
         }
 
@@ -125,7 +125,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Deactivates the blink effect if, it is still active.
+        /// Deactivates the blink effect if it is still active.
         /// If the action was not completed in full, the changes are reset.
         /// </summary>
         public override void Stop()
@@ -158,9 +158,9 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.Scale"/>.
-        /// It scales the selected objec.
+        /// It scales the selected object.
         /// </summary>
-        /// <returns>Whether this Action is finished</returns>
+        /// <returns>Whether this action is finished</returns>
         public override bool Update()
         {
             /// Block for canceling the action.
@@ -183,8 +183,8 @@ namespace SEE.Controls.Actions.Drawable
                             Scale();
 
                             /// Initializes the end of scaling.
-                            /// When the left mouse button is pressed and released, 
-                            /// scaling is finish and it switches to the last progress state.
+                            /// When the left mouse button is pressed and released,
+                            /// scaling is finished and it switches to the last progress state.
                             if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
                                 && selectedObj.GetComponent<BlinkEffect>() != null)
                             {
@@ -206,12 +206,11 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Provides the option to cancel the action. 
-        /// Simply press the "Esc" key if an object is selected for scaling.
+        /// Provides the option to cancel the action.
         /// </summary>
         private void Cancel()
         {
-            if (selectedObj != null && Input.GetKeyDown(KeyCode.Escape))
+            if (selectedObj != null && SEEInput.Cancel())
             {
                 ShowNotification.Info("Canceled", "The action was canceled by the user.");
                 if (selectedObj != null)
@@ -244,9 +243,9 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Allows the selection of a drawable type object for scaling, taking into account the object scales in the last run. 
-        /// It prevents the same object from being accidentally selected again when the left mouse button is not released. 
-        /// Therefore, after the last action has been successfully completed, the left mouse button must be released to select the same object again. 
+        /// Allows the selection of a drawable type object for scaling, taking into account the object scale in the last run.
+        /// It prevents the same object from being accidentally selected again when the left mouse button is not released.
+        /// Therefore, after the last action has been successfully completed, the left mouse button must be released to select the same object again.
         /// Additionally, a ValueResetter component is added to the UI Canvas to reset the two static variables after exiting this action type.
         /// The blinking effect is activated to indicate which object has been chosen for scaling.
         /// </summary>
@@ -276,18 +275,14 @@ namespace SEE.Controls.Actions.Drawable
                 drawable = GameFinder.GetDrawable(selectedObj);
                 oldSelectedObj = selectedObj;
 
-                /// Adds and activates the necessary components to detect a collision. 
+                /// Adds and activates the necessary components to detect a collision.
                 /// Additionally, the selection is highlighted by the blink effect.
                 selectedObj.AddOrGetComponent<Rigidbody>().isKinematic = true;
                 selectedObj.AddOrGetComponent<CollisionController>();
                 selectedObj.AddOrGetComponent<BlinkEffect>();
 
                 oldScale = selectedObj.transform.localScale;
-                if (GameObject.Find("UI Canvas").GetComponent<ValueResetter>() == null)
-                {
-                    GameObject.Find("UI Canvas").AddComponent<ValueResetter>()
-                        .SetAllowedState(GetActionStateType());
-                }
+                Canvas.AddOrGetComponent<ValueResetter>().SetAllowedState(GetActionStateType());
             }
             /// Tracked a released mouse button.
             if (Input.GetMouseButtonUp(0))
@@ -303,9 +298,9 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// In this block, the necessary data for scaling is gathered, and then scaling is performed. 
+        /// In this block, the necessary data for scaling is gathered, and then scaling is performed.
         /// The data is collected when the mouse wheel is moved.
-        /// Optionally, the speed of scaling can be increased by pressing the left Ctrl key. 
+        /// Optionally, the speed of scaling can be increased by pressing the left Ctrl key.
         /// </summary>
         private void Scale()
         {
@@ -366,7 +361,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// This block completes or resets this action.
         /// If no changes were made, it resets.
-        /// If there are changes the action will be successfull completed.
+        /// If there are changes, the action will be successfully completed.
         /// </summary>
         /// <returns>Wheter the action is completed or not.</returns>
         private bool Finish()
@@ -397,29 +392,29 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Reverts this action, i.e., it scales the object back to it's old scale value.
+        /// Reverts this action, i.e., it scales the object back to its old scale value.
         /// </summary>
         public override void Undo()
         {
             base.Undo();
-            if (memento.selectedObject == null && memento.id != null)
+            if (memento.SelectedObject == null && memento.Id != null)
             {
-                memento.selectedObject = GameFinder.FindChild(memento.drawable.GetDrawable(), memento.id);
+                memento.SelectedObject = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Id);
             }
 
-            if (memento.selectedObject != null)
+            if (memento.SelectedObject != null)
             {
-                GameScaler.SetScale(memento.selectedObject, memento.oldScale);
-                bool refresh = GameMindMap.ReDrawBranchLines(memento.selectedObject);
-                new ScaleNetAction(memento.drawable.ID, memento.drawable.ParentID,
-                    memento.selectedObject.name, memento.oldScale).Execute();
+                GameScaler.SetScale(memento.SelectedObject, memento.OldScale);
+                bool refresh = GameMindMap.ReDrawBranchLines(memento.SelectedObject);
+                new ScaleNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                    memento.SelectedObject.name, memento.OldScale).Execute();
                 if (refresh)
                 {
-                    new MindMapRefreshBranchLinesNetAction(memento.drawable.ID, memento.drawable.ParentID,
-                        MindMapNodeConf.GetNodeConf(memento.selectedObject)).Execute();
+                    new MindMapRefreshBranchLinesNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                        MindMapNodeConf.GetNodeConf(memento.SelectedObject)).Execute();
                 }
             }
-            if (memento.selectedObject != null && memento.selectedObject.TryGetComponent(out BlinkEffect currentEffect))
+            if (memento.SelectedObject != null && memento.SelectedObject.TryGetComponent(out BlinkEffect currentEffect))
             {
                 currentEffect.Deactivate();
             }
@@ -431,23 +426,23 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            if (memento.selectedObject == null && memento.id != null)
+            if (memento.SelectedObject == null && memento.Id != null)
             {
-                memento.selectedObject = GameFinder.FindChild(memento.drawable.GetDrawable(), memento.id);
+                memento.SelectedObject = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Id);
             }
-            if (memento.selectedObject != null)
+            if (memento.SelectedObject != null)
             {
-                GameScaler.SetScale(memento.selectedObject, memento.newScale);
-                bool refresh = GameMindMap.ReDrawBranchLines(memento.selectedObject);
-                new ScaleNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.selectedObject.name, memento.newScale).Execute();
+                GameScaler.SetScale(memento.SelectedObject, memento.NewScale);
+                bool refresh = GameMindMap.ReDrawBranchLines(memento.SelectedObject);
+                new ScaleNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.SelectedObject.name, memento.NewScale).Execute();
                 if (refresh)
                 {
-                    new MindMapRefreshBranchLinesNetAction(memento.drawable.ID, memento.drawable.ParentID,
-                        MindMapNodeConf.GetNodeConf(memento.selectedObject)).Execute();
+                    new MindMapRefreshBranchLinesNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                        MindMapNodeConf.GetNodeConf(memento.SelectedObject)).Execute();
                 }
             }
 
-            if (memento.selectedObject != null && memento.selectedObject.TryGetComponent<BlinkEffect>(out BlinkEffect currentEffect))
+            if (memento.SelectedObject != null && memento.SelectedObject.TryGetComponent<BlinkEffect>(out BlinkEffect currentEffect))
             {
                 currentEffect.Deactivate();
             }
@@ -485,24 +480,21 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
-        /// Because this action does not actually change any game object, 
-        /// an empty set is always returned.
         /// </summary>
         /// <returns>an empty set or the object name that was changed.</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            if (memento.selectedObject == null)
+            if (memento.SelectedObject == null)
             {
-                return new HashSet<string>();
+                return new();
             }
             else
             {
-                return new HashSet<string>
+                return new()
                 {
-                    memento.selectedObject.name
+                    memento.SelectedObject.name
                 };
             }
         }
-
     }
 }

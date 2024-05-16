@@ -64,7 +64,7 @@ namespace SEE.Controls.Actions.Drawable
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.LineSplit"/>.
         /// Specifically: Allows the user to split a line. One action run allows to split the line one time.
         /// </summary>
-        /// <returns>Whether this Action is finished</returns>
+        /// <returns>Whether this action is finished</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
