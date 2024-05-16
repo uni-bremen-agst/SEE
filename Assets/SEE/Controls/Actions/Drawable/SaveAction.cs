@@ -91,10 +91,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Stop();
             foreach (GameObject drawable in selectedDrawables)
             {
-                if (drawable.GetComponent<HighlightEffect>() != null)
-                {
-                    Destroyer.Destroy(drawable.GetComponent<HighlightEffect>());
-                }
+                drawable.Destroy<HighlightEffect>();
             }
             SaveMenu.Disable();
         }
@@ -202,10 +199,7 @@ namespace SEE.Controls.Actions.Drawable
                 ShowNotification.Info("Unselect drawables", "The marked drawables was unselected.");
                 foreach (GameObject drawable in selectedDrawables)
                 {
-                    if (drawable.GetComponent<HighlightEffect>() != null)
-                    {
-                        Destroyer.Destroy(drawable.GetComponent<HighlightEffect>());
-                    }
+                    drawable.Destroy<HighlightEffect>();
                 }
                 selectedDrawables.Clear();
             }

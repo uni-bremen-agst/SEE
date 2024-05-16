@@ -134,12 +134,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             base.Stop();
             LoadMenu.Disable();
-
-            if (selectedDrawable != null
-                && selectedDrawable.GetComponent<HighlightEffect>() != null)
-            {
-                Destroyer.Destroy(selectedDrawable.GetComponent<HighlightEffect>());
-            }
+            selectedDrawable?.Destroy<HighlightEffect>();
         }
 
         /// <summary>
@@ -198,7 +193,7 @@ namespace SEE.Controls.Actions.Drawable
                 && (browser == null || (browser != null && !browser.IsOpen())))
             {
                 ShowNotification.Info("Unselect drawable", "The marked drawable was unselected.");
-                Destroyer.Destroy(selectedDrawable.GetComponent<HighlightEffect>());
+                selectedDrawable.Destroy<HighlightEffect>();
                 selectedDrawable = null;
             }
         }
@@ -214,10 +209,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (drawable.GetComponent<HighlightEffect>() == null)
             {
-                if (selectedDrawable != null && selectedDrawable.GetComponent<HighlightEffect>() != null)
-                {
-                    Destroyer.Destroy(selectedDrawable.GetComponent<HighlightEffect>());
-                }
+                selectedDrawable?.Destroy<HighlightEffect>();
                 selectedDrawable = drawable;
                 HighlightEffect effect = selectedDrawable.AddComponent<HighlightEffect>();
                 effect.highlighted = true;

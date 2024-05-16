@@ -127,10 +127,7 @@ namespace SEE.Controls.Actions.Drawable
             StickyNoteEditMenu.Disable();
             StickyNoteMoveMenu.Disable();
             ScaleMenu.Disable();
-            if (stickyNote != null && stickyNote.GetComponent<HighlightEffect>() != null)
-            {
-                Destroyer.Destroy(stickyNote.GetComponent<HighlightEffect>());
-            }
+            stickyNote?.Destroy<HighlightEffect>();
 
             if (selectedAction == Operation.Move && stickyNote != null)
             {
@@ -220,10 +217,7 @@ namespace SEE.Controls.Actions.Drawable
                 StickyNoteEditMenu.Disable();
                 StickyNoteMoveMenu.Disable();
                 ScaleMenu.Disable();
-                if (stickyNote != null && stickyNote.GetComponent<HighlightEffect>() != null)
-                {
-                    Destroyer.Destroy(stickyNote.GetComponent<HighlightEffect>());
-                }
+                stickyNote?.Destroy<HighlightEffect>();
 
                 if (selectedAction == Operation.Move
                     && stickyNote != null)
