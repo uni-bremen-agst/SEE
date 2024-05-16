@@ -109,7 +109,7 @@ namespace SEE.Game
         /// Will needed because a drawable could be scaled.
         /// </summary>
         public const string AttachedObjects = "AttachedObjects";
-        
+
         /// <summary>
         /// For the drawable top border.
         /// </summary>
@@ -134,7 +134,7 @@ namespace SEE.Game
         /// All existing tags in one.
         /// </summary>
         public static readonly string[] All = { Graph, Node, Edge, Text, Erosion, Decoration,
-            Path, Runtime, FunctionCall, CullingPlane, ChartManager, MainCamera, 
+            Path, Runtime, FunctionCall, CullingPlane, ChartManager, MainCamera,
             Drawable, Line, DText, Image, AttachedObjects, MindMapNode, Top, Bottom, Left, Right};
 
         /// <summary>
