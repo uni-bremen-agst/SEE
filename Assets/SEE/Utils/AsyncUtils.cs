@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
+using MoreLinq;
 using UnityEngine;
 using CancellationTokenSource = System.Threading.CancellationTokenSource;
 
@@ -112,6 +113,37 @@ namespace SEE.Utils
                                   .Where(x => x != null)  // May be necessary for some observables.
                                   .SelectMany(x => x.ToUniTaskAsyncEnumerable())
                                   .Concat(cleanUp);
+        }
+
+        /// <summary>
+        /// Iterates over the given <paramref name="items"/> in batches of size <paramref name="batchSize"/>.
+        /// Between each batch, the method yields control back to the main thread so that another frame
+        /// can be rendered and the game can remain responsive. This is useful for processing large
+        /// amounts of data without causing frame drops, as only <paramref name="batchSize"/> items are
+        /// handled per frame.
+        ///
+        /// To iterate over the batches, use `await foreach`.
+        /// </summary>
+        /// <param name="items">The items to iterate over.</param>
+        /// <param name="batchSize">The size of each batch.</param>
+        /// <param name="cancellationToken">The cancellation token to use.</param>
+        /// <typeparam name="T">The type of the items.</typeparam>
+        /// <returns>An asynchronous enumerable that emits the items in batches.</returns>
+        public static IUniTaskAsyncEnumerable<T> BatchPerFrame<T>(this IEnumerable<T> items, int batchSize = 1000,
+                                                                  CancellationToken cancellationToken = default)
+        {
+            return UniTaskAsyncEnumerable.Create<IEnumerable<T>>(async (writer, _) =>
+            {
+                foreach (T[] batch in items.Batch(batchSize))
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        throw new OperationCanceledException(cancellationToken);
+                    }
+                    await writer.YieldAsync(batch);
+                    await UniTask.Yield();
+                }
+            }).SelectMany(x => x.ToUniTaskAsyncEnumerable());
         }
 
         /// <summary>
