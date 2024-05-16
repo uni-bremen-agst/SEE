@@ -7,6 +7,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using LibGit2Sharp;
 using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO.Git;
 using SEE.Game.City;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
@@ -42,6 +43,11 @@ namespace SEE.GraphProviders
          Tooltip("The date until commits should be analysed (DD-MM-YYYY)"), RuntimeTab(GraphProviderFoldoutGroup)]
         public string Date = "";
 
+        [OdinSerialize]
+        [ShowInInspector, InspectorName("Date Limit"),
+         Tooltip("The date until commits should be analysed (DD-MM-YYYY)"), RuntimeTab(GraphProviderFoldoutGroup)]
+        public bool SimplifyGraph;
+
         public override UniTask<List<Graph>> ProvideAsync(List<Graph> graph, AbstractSEECity city,
             Action<float> changePercentage = null,
             CancellationToken token = default) =>
@@ -72,21 +78,25 @@ namespace SEE.GraphProviders
                     .Reverse()
                     .ToList();
 
-                Dictionary<Commit, List<PatchEntryChanges>> commitChanges = new();
+                Dictionary<Commit, Patch> commitChanges = new();
                 foreach (var commit in commitList)
                 {
                     commitChanges.Add(commit, GetFileChanges(commit, repo));
                 }
 
-                foreach (var currentCommit in commitList)
+                foreach (var currentCommit in
+                         commitChanges.Where(x =>
+                             x.Value.All(y =>
+                                 includedFiles.Contains(Path.GetExtension(y.Path)) &&
+                                 !excludedFiles.Contains(Path.GetExtension(y.Path)))))
                 {
                     // All commits between the first commit in commitList and the current commit
                     List<Commit> commitsInBetween =
-                        commitList.GetRange(0, commitList.FindIndex(x => x.Sha == currentCommit.Sha) + 1);
+                        commitList.GetRange(0, commitList.FindIndex(x => x.Sha == currentCommit.Key.Sha) + 1);
 
-                    graph.Add(GetGraphOfCommit(repositoryName, currentCommit, commitsInBetween,
+                    graph.Add(GetGraphOfCommit(repositoryName, currentCommit.Key, commitsInBetween,
                         commitChanges,
-                        includedFiles, excludedFiles));
+                        includedFiles, excludedFiles, repo));
                 }
             }
 
@@ -106,93 +116,38 @@ namespace SEE.GraphProviders
         /// <param name="excludedFiles">All excluded file extensions</param>
         /// <returns>The graoh of the evolution step</returns>
         private Graph GetGraphOfCommit(string repoName, Commit currentCommit, List<Commit> commitsInBetween,
-            Dictionary<Commit, List<PatchEntryChanges>> commitChanges, IEnumerable<string> includedFiles,
-            IEnumerable<string> excludedFiles)
+            IDictionary<Commit, Patch> commitChanges, IEnumerable<string> includedFiles,
+            IEnumerable<string> excludedFiles, Repository repo)
         {
             Graph g = new Graph(Repository.RepositoryPath.Path);
             g.BasePath = Repository.RepositoryPath.Path;
-            Node rootNode = GraphUtils.NewNode(g, repoName + "-Evo", "Repository", repoName + "-Evo");
+            GraphUtils.NewNode(g, repoName + "-Evo", "Repository", repoName + "-Evo");
 
             g.StringAttributes.Add("CommitTimestamp", currentCommit.Author.When.Date.ToString("dd/MM/yyy"));
             g.StringAttributes.Add("CommitId", currentCommit.Sha);
 
-            Dictionary<string, GitFileMetricsCollector> fileMetrics = new();
+
+            GitFileMetricRepository metricRepository = new(repo, includedFiles, excludedFiles);
 
             foreach (var commitInBetween in commitsInBetween)
             {
-                foreach (var changedFile in commitChanges[commitInBetween])
-                {
-                    string filePath = changedFile.Path;
-                    if (!includedFiles.Contains(Path.GetExtension(filePath)) ||
-                        excludedFiles.Contains(Path.GetExtension(filePath)))
-                    {
-                        continue;
-                    }
-
-
-                    GitFileMetricsCollector metricsCollector =
-                        fileMetrics.GetOrAdd(filePath, new GitFileMetricsCollector());
-                    metricsCollector.NumberOfCommits += 1;
-                    metricsCollector.Authors.Add(currentCommit.Author.Email);
-                    metricsCollector.Churn += changedFile.LinesAdded + changedFile.LinesDeleted;
-                    metricsCollector.AuthorsChurn.GetOrAdd(currentCommit.Author.Email, 0);
-                    metricsCollector.AuthorsChurn[currentCommit.Author.Email] +=
-                        (changedFile.LinesAdded + changedFile.LinesDeleted);
-                }
+                metricRepository.ProcessCommit(commitInBetween, commitChanges[commitInBetween]);
             }
 
-            foreach (var file in fileMetrics)
-            {
-                file.Value.TruckFactor = CalculateTruckFactor(file.Value.AuthorsChurn);
-            }
+            metricRepository.CalculateTruckFactor();
 
-            foreach (var file in fileMetrics)
-            {
-                Node n = GraphUtils.GetOrAddNode(file.Key, rootNode, g, idSuffix: "-evo");
-                n.SetInt(NumberOfAuthorsMetricName, file.Value.Authors.Count);
-                n.SetInt(NumberOfCommitsMetricName, file.Value.NumberOfCommits);
-                n.SetInt("Metric.File.Churn", file.Value.Churn);
-                n.SetInt(TruckFactorMetricName, file.Value.TruckFactor);
-            }
+            GitFileMetricsGraphGenerator.FillGraphWithGitMetrics(metricRepository, g, repoName, SimplifyGraph,
+                idSuffix: "-Evo");
+            // foreach (var file in fileMetrics)
+            // {
+            //     Node n = GraphUtils.GetOrAddNode(file.Key, rootNode, g, idSuffix: "-evo");
+            //     n.SetInt(NumberOfAuthorsMetricName, file.Value.Authors.Count);
+            //     n.SetInt(NumberOfCommitsMetricName, file.Value.NumberOfCommits);
+            //     n.SetInt("Metric.File.Churn", file.Value.Churn);
+            //     n.SetInt(TruckFactorMetricName, file.Value.TruckFactor);
+            // }
 
             return g;
-        }
-
-        /// <summary>
-        /// Calculates the truck factor with a LOC-based heuristic by Yamashita et al.
-        /// The truck factor are the amount of core-developers which are responsible for 80% of the code (changes). 
-        ///
-        /// The algorithm was described by. Ferreira et. al
-        ///
-        /// Soruce/Math: https://doi.org/10.1145/2804360.2804366, https://doi.org/10.1007/s11219-019-09457-2
-        /// </summary>
-        /// <returns>The calculated truck-factor</returns>
-        private static int CalculateTruckFactor(Dictionary<string, int> developersChurn)
-        {
-            if (!developersChurn.Any())
-                return 0;
-            int totalChurn = developersChurn.Select(x => x.Value).Sum();
-
-            HashSet<string> coreDevs = new();
-
-            float cumulativeRatio = 0;
-            // Sorting devs by their number of changed files 
-            List<string> sortedDevs =
-                developersChurn
-                    .OrderByDescending(x => x.Value)
-                    .Select(x => x.Key)
-                    .ToList();
-            // Selecting the coreDevs which are responsible for at least 80% of the total churn of a file
-            while (cumulativeRatio <= 0.8f)
-            {
-                string dev = sortedDevs.First();
-                float devRatio = (float)developersChurn[dev] / totalChurn;
-                cumulativeRatio += devRatio;
-                coreDevs.Add(dev);
-                sortedDevs.Remove(dev);
-            }
-
-            return coreDevs.Count;
         }
 
         /// <summary>
@@ -201,8 +156,8 @@ namespace SEE.GraphProviders
         /// <param name="commit">The commit which files should be returned</param>
         /// <param name="repo">The repo</param>
         /// <returns>A list of all changed files (<see cref="PatchEntryChanges"/>)</returns>
-        private static List<PatchEntryChanges> GetFileChanges(Commit commit, Repository repo) => repo.Diff
-            .Compare<Patch>(commit.Tree, commit.Parents.First().Tree).Select(x => x).ToList();
+        private static Patch GetFileChanges(Commit commit, Repository repo) => repo.Diff
+            .Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
 
 
         public override MultiGraphProviderKind GetKind()
