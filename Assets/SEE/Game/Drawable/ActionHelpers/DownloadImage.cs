@@ -49,7 +49,7 @@ namespace SEE.Game.Drawable.ActionHelpers
             if (request.result == UnityWebRequest.Result.ProtocolError
                 ||  request.result == UnityWebRequest.Result.ConnectionError)
             {
-                Warn();
+                Warn(imageUrl);
                 Destroyer.Destroy(this);
             }
             else
@@ -57,7 +57,7 @@ namespace SEE.Game.Drawable.ActionHelpers
                 texture = DownloadHandlerTexture.GetContent(request);
                 if (texture == null)
                 {
-                    Warn();
+                    Warn(imageUrl);
                     Destroyer.Destroy(this);
                 }
             }
