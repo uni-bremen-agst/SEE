@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SEE.Game.Drawable
 {
     /// <summary>
-    /// Component that is required to show which object has been selected. 
+    /// Component that is required to show which object has been selected.
     /// It makes the respective object blink.
     /// </summary>
     public class BlinkEffect : MonoBehaviour
@@ -19,30 +19,30 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// The render of the attached game object.
         /// </summary>
-        new Renderer renderer;
+        private new Renderer renderer;
 
         /// <summary>
         /// The renders of the attached game object (for mind map nodes)
         /// </summary>
-        Renderer[] renderers;
+        private Renderer[] renderers;
 
         /// <summary>
         /// The canvas of the attached game object.
         /// </summary>
-        Canvas canvas;
+        private Canvas canvas;
 
         /// <summary>
         /// The highlight effect of the attached game object.
         /// </summary>
-        HighlightEffect highlight;
+        private HighlightEffect highlight;
 
         /// <summary>
         /// Executed as long as the Blink Effect Component is active.
-        /// It ensures that the corresponding renderer/canvas/highlight effect 
+        /// It ensures that the corresponding renderer/canvas/highlight effect
         /// is toggled on and off, thus creating a blinking effect.
         /// </summary>
         /// <returns>Nothing, only the seconds to wait.</returns>
-        IEnumerator Blink()
+        public IEnumerator Blink()
         {
             while (loopOn)
             {
@@ -89,9 +89,9 @@ namespace SEE.Game.Drawable
 
         /// <summary>
         /// Deactivates the blink effect.
-        /// It enables the renderer, the canvas, or the child renderers 
+        /// It enables the renderer, the canvas, or the child renderers
         /// (depending on what is present).
-        /// If a highlight effect was used it will destroyed.
+        /// If a highlight effect was used, it will destroyed.
         /// Subsequently, the Blink Effect Component is destroyed.
         /// </summary>
         public void Deactivate()
@@ -120,9 +120,9 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Executed upon assigning the component. 
-        /// It searches for a renderer, child renderers, or a highlight effect. 
-        /// If none of these components are present, a highlight effect is created, 
+        /// Executed upon assigning the component.
+        /// It searches for a renderer, child renderers, or a highlight effect.
+        /// If none of these components are present, a highlight effect is created,
         /// and then the blink loop is initiated.
         /// </summary>
         private void Start()
@@ -136,7 +136,7 @@ namespace SEE.Game.Drawable
             }
             else if (obj.GetComponentsInChildren<Renderer>().Length > 0)
             {
-                /// Sets the renderers if available. 
+                /// Sets the renderers if available.
                 /// Only for mind map nodes, it takes the border (line render)
                 /// and the text (mesh renderer)
                 renderers = obj.GetComponentsInChildren<Renderer>();
