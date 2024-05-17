@@ -10,6 +10,7 @@ using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO.Git;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using SEE.Utils.Config;
@@ -63,35 +64,24 @@ namespace SEE.GraphProviders
         /// This will append the path of this repo to <see cref="GitPoller"/>.
         ///
         /// Note: the repository must be fetch-able without any credentials since we cant store them securely yet.
-        /// TODO: Maybe change this in the future 
         /// </summary>
         [OdinSerialize]
         [ShowInInspector]
         public bool AutoFetch { get; set; }
 
-        #region Constants
+        private void CheckAttributes()
+        {
+            if (Date == "" || !DateTime.TryParseExact(Date, "dd/MM/yyyy", CultureInfo.InvariantCulture,
+                    DateTimeStyles.None, out _))
+            {
+                throw new ArgumentException("Date is not set or cant be parsed");
+            }
 
-        /// <summary>
-        /// The name of the number of authors metric
-        /// </summary>
-        private const string NumberOfAuthorsMetricName = "Metric.File.AuthorsNumber";
-
-        /// <summary>
-        /// The name of the number of commits metric
-        /// </summary>
-        private const string NumberOfCommitsMetricName = "Metric.File.Commits";
-
-        /// <summary>
-        /// The name of the churn metric
-        /// </summary>
-        private const string NumberOfFileChurnMetricName = "Metric.File.Churn";
-
-        /// <summary>
-        /// The Name of the number of coredevs metric
-        /// </summary>
-        private const string TruckFactorMetricName = "Metric.File.CoreDevs";
-
-        #endregion
+            if (RepositoryData.RepositoryPath.Path == "" || !Directory.Exists(RepositoryData.RepositoryPath.Path))
+            {
+                throw new ArgumentException("Repository path is not set or does not exists");
+            }
+        }
 
         /// <summary>
         /// Returns or adds the <see cref="GitPoller"/> component to the current gameobject/code city <paramref name="city"/>. 
@@ -110,10 +100,12 @@ namespace SEE.GraphProviders
             return newPoller;
         }
 
-        public async override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
+        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
             Action<float> changePercentage = null,
             CancellationToken token = default)
         {
+            CheckAttributes();
+
             var task = await UniTask.RunOnThreadPool(() => GetGraph(graph));
             if (AutoFetch)
             {
@@ -165,14 +157,14 @@ namespace SEE.GraphProviders
 
                 metricRepository.CalculateTruckFactor();
 
-                GitFileMetricsGraphGenerator.FillGraphWithGitMetrics(metricRepository, graph, repositoryName,SimplifyGraph);
-                
+                GitFileMetricsGraphGenerator.FillGraphWithGitMetrics(metricRepository, graph, repositoryName,
+                    SimplifyGraph);
             }
 
             return graph;
         }
 
-        
+
         public override SingleGraphProviderKind GetKind()
         {
             return SingleGraphProviderKind.GitAllBranches;

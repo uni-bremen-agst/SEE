@@ -48,11 +48,27 @@ namespace SEE.GraphProviders
          Tooltip("The date until commits should be analysed (DD-MM-YYYY)"), RuntimeTab(GraphProviderFoldoutGroup)]
         public bool SimplifyGraph;
 
-        public override UniTask<List<Graph>> ProvideAsync(List<Graph> graph, AbstractSEECity city,
+        public async override UniTask<List<Graph>> ProvideAsync(List<Graph> graph, AbstractSEECity city,
             Action<float> changePercentage = null,
-            CancellationToken token = default) =>
-            UniTask.RunOnThreadPool(() => GetGraph(graph), cancellationToken: token);
+            CancellationToken token = default)
+        {
+            CheckAttributes();
+            return await UniTask.RunOnThreadPool(() => GetGraph(graph), cancellationToken: token);
+        }
 
+        private void CheckAttributes()
+        {
+            if (Date == "" || !DateTime.TryParseExact(Date, "dd/MM/yyyy", CultureInfo.InvariantCulture,
+                    DateTimeStyles.None, out _))
+            {
+                throw new ArgumentException("Date is not set or cant be parsed");
+            }
+
+            if (Repository.RepositoryPath.Path == "" || !Directory.Exists(Repository.RepositoryPath.Path))
+            {
+                throw new ArgumentException("Repository path is not set or does not exists");
+            }
+        }
 
         private List<Graph> GetGraph(List<Graph> graph)
         {
