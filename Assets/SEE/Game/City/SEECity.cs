@@ -314,6 +314,8 @@ namespace SEE.Game.City
                             reportProgress(x);
                         }
 
+                        ReportProgress(0.01f);
+
                         LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, ReportProgress,
                                                                       cancellationTokenSource.Token);
                     }

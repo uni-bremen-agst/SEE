@@ -267,6 +267,9 @@ namespace SEE.Game.CityRendering
         /// Applies the edge layout according to the user's choice (settings) for
         /// all edges in between nodes in <paramref name="gameNodes"/>. The resulting
         /// edges are added to <paramref name="parent"/> as children.
+        ///
+        /// This method should be chosen if a synchronous context is required. Otherwise,
+        /// prefer <see cref="EdgeLayoutAsync"/> for performance reasons.
         /// </summary>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
         /// <param name="parent">the object the new edges are to become children of</param>
@@ -292,6 +295,8 @@ namespace SEE.Game.CityRendering
         /// <param name="parent">the object the new edges are to become children of</param>
         /// <param name="addToGraphElementIDMap">if true, all newly created edges will be
         /// added to <see cref="GraphElementIDMap"/></param>
+        /// <param name="updateProgress">callback to update the progress of the operation</param>
+        /// <param name="token">token to cancel the operation</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
         private async UniTask<ICollection<GameObject>> EdgeLayoutAsync(ICollection<LayoutGameNode> gameNodes,
                                                                        GameObject parent,
@@ -341,6 +346,8 @@ namespace SEE.Game.CityRendering
         /// <param name="layoutEdges">the edges to be laid out</param>
         /// <param name="addToGraphElementIDMap">if true, all newly created edges will be added
         /// to <see cref="GraphElementIDMap"/></param>
+        /// <param name="updateProgress">callback to update the progress of the operation</param>
+        /// <param name="token">token to cancel the operation</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
         private async UniTask<ICollection<GameObject>> EdgeLayoutAsync<T>(ICollection<T> gameNodes,
                                                                           ICollection<LayoutGraphEdge<T>> layoutEdges,
@@ -375,6 +382,17 @@ namespace SEE.Game.CityRendering
             return result;
         }
 
+        /// <summary>
+        /// Applies the edge layout according to the the user's choice (settings) synchronously.
+        ///
+        /// This method should be chosen if a synchronous context is required. Otherwise,
+        /// prefer <see cref="EdgeLayoutAsync"/> for performance reasons.
+        /// </summary>
+        /// <param name="gameNodes">the set of layout nodes for which to create game edges</param>
+        /// <param name="layoutEdges">the edges to be laid out</param>
+        /// <param name="addToGraphElementIDMap">if true, all newly created edges will be added
+        /// to <see cref="GraphElementIDMap"/></param>
+        /// <returns>all game objects created to represent the edges; may be empty</returns>
         private ICollection<GameObject> EdgeLayout<T>(ICollection<T> gameNodes,
                                                       ICollection<LayoutGraphEdge<T>> layoutEdges,
                                                       bool addToGraphElementIDMap)
