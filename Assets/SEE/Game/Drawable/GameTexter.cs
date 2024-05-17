@@ -180,7 +180,7 @@ namespace SEE.Game.Drawable
                 textObj.name = name;
             }
             /// Setups the drawable holder <see cref="DrawableHolder"/>.
-            DrawableHolder.Setup(drawable, out GameObject highestParent, out GameObject attachedObjects);
+            DrawableHolder.Setup(drawable, out _, out GameObject attachedObjects);
 
             /// Assign the dtext tag to the text object.
             textObj.tag = Tags.DText;
