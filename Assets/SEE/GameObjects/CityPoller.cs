@@ -80,7 +80,7 @@ namespace SEE.GO
             async UniTaskVoid InitialPoll()
             {
                 RepositoriesTipHashes = await UniTask.RunOnThreadPool(GetTipHashes);
-                InvokeRepeating(nameof(PollRepos), PollingInterval, PollingInterval);
+                InvokeRepeating(nameof(PollReposAsync), PollingInterval, PollingInterval);
             }
         }
 
@@ -95,7 +95,7 @@ namespace SEE.GO
         /// </summary>
         private static readonly NodeEqualityComparer nodeEqualityComparer = new();
 
-        async void PollRepos()
+        async UniTaskVoid PollReposAsync()
         {
             Debug.Log("Poll");
             Dictionary<string, List<string>> newHashes = await UniTask.RunOnThreadPool(() =>
