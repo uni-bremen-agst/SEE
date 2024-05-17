@@ -14,6 +14,7 @@ using UnityEngine;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Newtonsoft.Json.Linq;
+using SEE.Utils;
 
 namespace SEE.DataModel.DG.IO
 {
@@ -31,8 +32,13 @@ namespace SEE.DataModel.DG.IO
         /// <param name="override">Whether any existing metrics present in the graph's nodes shall be updated</param>
         /// <param name="addedFrom">If empty, all issues will be retrieved. Otherwise, only those issues which have been added from
         /// the given version to the most recent one will be loaded.</param>
+        /// <param name="changePercentage">Used to report progress of the operation as a percentage</param>
+        /// <param name="token">Token to cancel the operation</param>
         /// <returns>The graph with the updated metrics and issues</returns>
-        public static async UniTask<Graph> LoadDashboardAsync(Graph graph, bool @override = true, string addedFrom = "")
+        public static async UniTask<Graph> LoadDashboardAsync(Graph graph, bool @override = true,
+                                                              string addedFrom = "",
+                                                              Action<float> changePercentage = null,
+                                                              CancellationToken token = default)
         {
             IDictionary<(string path, string entity), List<MetricValueTableRow>> metrics = await DashboardRetriever.Instance.GetAllMetricRowsAsync();
             IDictionary<string, List<Issue>> issues = await LoadIssueMetrics(string.IsNullOrWhiteSpace(addedFrom) ? null : addedFrom);
@@ -42,9 +48,16 @@ namespace SEE.DataModel.DG.IO
 
             HashSet<Node> encounteredIssueNodes = new();
             int updatedMetrics = 0;
+            IList<Node> nodes = graph.Nodes();
+            float i = 0;
             // Go through all nodes, checking whether any metric in the dashboard matches it.
-            foreach (Node node in graph.Nodes())
+            await foreach (Node node in nodes.BatchPerFrame())
             {
+                if (token.IsCancellationRequested)
+                {
+                    throw new OperationCanceledException(token);
+                }
+                changePercentage?.Invoke(++i / nodes.Count);
                 string nodePath = $"{node.RelativeDirectory(projectFolder)}{node.Filename ?? string.Empty}";
                 if (metrics.TryGetValue((nodePath, node.SourceName), out List<MetricValueTableRow> metricValues))
                 {
