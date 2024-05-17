@@ -497,7 +497,7 @@ namespace SEE.Game.CityRendering
             foreach (SublayoutNode sublayoutNode in sublayoutNodes)
             {
                 List<Node> children = WithAllChildren(sublayoutNode.Node);
-                List<Node> childrenToRemove = new List<Node>();
+                List<Node> childrenToRemove = new();
 
                 foreach (Node child in children)
                 {
@@ -517,7 +517,7 @@ namespace SEE.Game.CityRendering
 
         private List<SublayoutLayoutNode> ConvertSublayoutToLayoutNodes(List<SublayoutNode> sublayouts)
         {
-            List<SublayoutLayoutNode> sublayoutLayoutNodes = new List<SublayoutLayoutNode>();
+            List<SublayoutLayoutNode> sublayoutLayoutNodes = new();
             sublayouts.ForEach(sublayoutNode =>
             {
                 SublayoutLayoutNode sublayout = new SublayoutLayoutNode(toLayoutNode[sublayoutNode.Node], sublayoutNode.InnerNodeKind, sublayoutNode.NodeLayout);
@@ -535,7 +535,7 @@ namespace SEE.Game.CityRendering
         /// <returns></returns>
         private static List<Node> WithAllChildren(Node root)
         {
-            List<Node> allNodes = new List<Node> { root };
+            List<Node> allNodes = new() { root };
             foreach (Node node in root.Children())
             {
                 allNodes.AddRange(WithAllChildren(node));
