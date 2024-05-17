@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace SEE.GraphProviders
 {
-    public class GXLEvolutionGraphProvider : MultiGraphPipelineProvider
+    public class GXLEvolutionGraphProvider : MultiGraphProvider
     {
         private const string evolutionFoldoutGroup = "Evolution settings";
 
