@@ -202,7 +202,7 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="child">The child.</param>
         /// <returns>true, if the child has a parent.</returns>
-        public static bool hasAParent(GameObject child)
+        public static bool HasParent(GameObject child)
         {
             return child.transform.parent != null;
         }
@@ -236,7 +236,7 @@ namespace SEE.Game.Drawable
         {
             if (drawable.CompareTag(Tags.Drawable))
             {
-                return hasAParent(drawable) ? drawable.transform.parent.name : "";
+                return HasParent(drawable) ? drawable.transform.parent.name : "";
             }
             else
             {
