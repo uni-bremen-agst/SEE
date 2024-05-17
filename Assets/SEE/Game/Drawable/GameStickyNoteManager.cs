@@ -248,7 +248,7 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Combine all edit method together
+        /// Combines all edit method together.
         /// </summary>
         /// <param name="stickyNote">The sticky note on that the changes should be executed.</param>
         /// <param name="config">The configuration which holds the values for the changing.</param>

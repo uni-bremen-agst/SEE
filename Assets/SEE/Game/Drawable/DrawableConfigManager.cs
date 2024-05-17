@@ -258,7 +258,7 @@ namespace SEE.Game.Drawable
                 }
 
                 /// Creates configurations for all Mind Map nodes of the drawable.
-                List<GameObject> nodes = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.MindMapNode);
+                IList<GameObject> nodes = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.MindMapNode);
                 nodes = nodes.OrderBy(o => o.GetComponent<MMNodeValueHolder>().GetLayer()).ToList();
                 foreach (GameObject node in nodes)
                 {

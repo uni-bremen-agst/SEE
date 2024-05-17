@@ -58,7 +58,7 @@ namespace SEE.UI.Menu.Drawable
                 .GetComponent<HorizontalSelector>();
 
             /// Gets all Mind Map Nodes of the given attached object - object.
-            List<GameObject> allNodes = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.MindMapNode);
+            IList<GameObject> allNodes = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.MindMapNode);
 
             /// Gather all Mind Map Nodes with the <see cref="GameMindMap.NodeKind"/>:
             /// <see cref="GameMindMap.NodeKind.Theme"/> or <see cref="GameMindMap.NodeKind.Subtheme"/>.
@@ -140,10 +140,10 @@ namespace SEE.UI.Menu.Drawable
                     .GetComponent<HorizontalSelector>();
 
                 /// Gets all Mind Map Nodes of the given attached object - object.
-                List<GameObject> allNodes = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.MindMapNode);
+                IList<GameObject> allNodes = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.MindMapNode);
 
-                /// Collect all Mind Map Nodes with the <see cref="GameMindMap.NodeKind"/>: 
-                /// <see cref="GameMindMap.NodeKind.Theme"/> or <see cref="GameMindMap.NodeKind.Subtheme"/> 
+                /// Collect all Mind Map Nodes with the <see cref="GameMindMap.NodeKind"/>:
+                /// <see cref="GameMindMap.NodeKind.Theme"/> or <see cref="GameMindMap.NodeKind.Subtheme"/>
                 /// that qualify as a new (valid) parent.
                 /// Note: A <see cref="GameMindMap.NodeKind.Leaf"/> can not be a parent
                 ///     and nodes are prohibited as a parent if selecting them would create a cycle.
@@ -205,7 +205,7 @@ namespace SEE.UI.Menu.Drawable
                 });
                 parentSelector.defaultIndex = index;
 
-                /// For the <paramref name="cutCopyMode", provide a Finish Button. 
+                /// For the <paramref name="cutCopyMode", provide a Finish Button.
                 /// Disable it for all others.
                 if (!cutCopyMode)
                 {
