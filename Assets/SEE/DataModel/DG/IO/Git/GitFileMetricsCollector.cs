@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using LibGit2Sharp;
 
 namespace SEE.DataModel.DG.IO.Git
 {
@@ -7,9 +6,9 @@ namespace SEE.DataModel.DG.IO.Git
     {
         public int NumberOfCommits { get; set; }
 
-        public HashSet<string> Authors { get; set; }
+        public HashSet<string> Authors { get; }
 
-        public Dictionary<string, int> AuthorsChurn { get; set; }
+        public Dictionary<string, int> AuthorsChurn { get; }
 
         public int TruckFactor { get; set; }
 
@@ -17,19 +16,14 @@ namespace SEE.DataModel.DG.IO.Git
         /// Total sum of changed lines (added and removed)
         /// </summary>
         public int Churn { get; set; }
-
-        public GitFileMetricsCollector()
-        {
-            Authors = new();
-            AuthorsChurn = new();
-        }
+        
 
         public GitFileMetricsCollector(int numberOfCommits, HashSet<string> authors, int churn)
         {
             NumberOfCommits = numberOfCommits;
             Authors = authors;
             Churn = churn;
-            AuthorsChurn = new();
+            AuthorsChurn = new Dictionary<string, int>();
             TruckFactor = 0;
         }
     }

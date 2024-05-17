@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using LibGit2Sharp;
 using SEE.Utils;
 
@@ -8,15 +9,13 @@ namespace SEE.DataModel.DG.IO.Git
 {
     public class GitFileMetricRepository
     {
-        private Dictionary<string, GitFileMetricsCollector> fileToMetrics = new();
+        public Dictionary<string, GitFileMetricsCollector> FileToMetrics { get; } = new();
 
-        public Dictionary<string, GitFileMetricsCollector> FileToMetrics => fileToMetrics;
+        private readonly Repository repo;
 
-        private Repository repo;
+        private readonly IEnumerable<string> includedFiles;
 
-        private IEnumerable<string> includedFiles;
-
-        private IEnumerable<string> excludedFiles;
+        private readonly IEnumerable<string> excludedFiles;
 
 
         /// <summary>
@@ -37,7 +36,8 @@ namespace SEE.DataModel.DG.IO.Git
 
         public void CalculateTruckFactor()
         {
-            foreach (var file in fileToMetrics)
+            
+            foreach (var file in FileToMetrics)
             {
                 file.Value.TruckFactor = CalculateTruckFactor(file.Value.AuthorsChurn);
             }
@@ -52,7 +52,7 @@ namespace SEE.DataModel.DG.IO.Git
         /// Soruce/Math: https://doi.org/10.1145/2804360.2804366, https://doi.org/10.1007/s11219-019-09457-2
         /// </summary>
         /// <returns>The calculated truck factor</returns>
-        private static int CalculateTruckFactor(Dictionary<string, int> developersChurn)
+        private static int CalculateTruckFactor(IReadOnlyDictionary<string, int> developersChurn)
         {
             int totalChurn = developersChurn.Select(x => x.Value).Sum();
 
@@ -78,8 +78,13 @@ namespace SEE.DataModel.DG.IO.Git
             return coreDevs.Count;
         }
 
-        public void ProcessCommit(Commit commit, Patch commitChanges)
+        public void ProcessCommit(Commit commit, [CanBeNull] Patch commitChanges)
         {
+            if (commitChanges == null || commit == null)
+            {
+                return;
+            }
+
             foreach (var changedFile in commitChanges)
             {
                 string filePath = changedFile.Path;
@@ -89,22 +94,22 @@ namespace SEE.DataModel.DG.IO.Git
                     continue;
                 }
 
-                if (!fileToMetrics.ContainsKey(filePath))
+                if (!FileToMetrics.ContainsKey(filePath))
                 {
-                    fileToMetrics.Add(filePath,
+                    FileToMetrics.Add(filePath,
                         new GitFileMetricsCollector(1, new HashSet<string> { commit.Author.Email },
                             changedFile.LinesAdded + changedFile.LinesDeleted));
 
-                    fileToMetrics[filePath].AuthorsChurn.Add(commit.Author.Email,
+                    FileToMetrics[filePath].AuthorsChurn.Add(commit.Author.Email,
                         changedFile.LinesAdded + changedFile.LinesDeleted);
                 }
                 else
                 {
-                    fileToMetrics[filePath].NumberOfCommits += 1;
-                    fileToMetrics[filePath].Authors.Add(commit.Author.Email);
-                    fileToMetrics[filePath].Churn += changedFile.LinesAdded + changedFile.LinesDeleted;
-                    fileToMetrics[filePath].AuthorsChurn.GetOrAdd(commit.Author.Email, 0);
-                    fileToMetrics[filePath].AuthorsChurn[commit.Author.Email] +=
+                    FileToMetrics[filePath].NumberOfCommits += 1;
+                    FileToMetrics[filePath].Authors.Add(commit.Author.Email);
+                    FileToMetrics[filePath].Churn += changedFile.LinesAdded + changedFile.LinesDeleted;
+                    FileToMetrics[filePath].AuthorsChurn.GetOrAdd(commit.Author.Email, 0);
+                    FileToMetrics[filePath].AuthorsChurn[commit.Author.Email] +=
                         (changedFile.LinesAdded + changedFile.LinesDeleted);
                 }
             }
@@ -112,6 +117,10 @@ namespace SEE.DataModel.DG.IO.Git
 
         public void ProcessCommit(Commit commit)
         {
+            if (commit == null)
+            {
+                return;
+            }
             var changedFilesPath = repo.Diff.Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
             ProcessCommit(commit, changedFilesPath);
         }

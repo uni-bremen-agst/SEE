@@ -16,21 +16,11 @@ using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using UnityEngine;
 
-namespace SEE.GraphProviders
+namespace SEE.GraphProviders.Evolution
 {
     [Serializable]
     public class GitEvolutionGraphProvider : MultiGraphProvider
     {
-        #region Constants
-
-        private const string NumberOfAuthorsMetricName = "Metric.Authors.Number";
-
-        private const string NumberOfCommitsMetricName = "Metric.File.Commits";
-
-        private const string TruckFactorMetricName = "Metric.File.TruckFactor";
-
-        #endregion
-
         [OdinSerialize, ShowInInspector, SerializeReference, HideReferenceObjectPicker,
          ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository"), RuntimeTab("Data")]
         public GitRepository Repository = new();
@@ -48,7 +38,7 @@ namespace SEE.GraphProviders
          Tooltip("The date until commits should be analysed (DD-MM-YYYY)"), RuntimeTab(GraphProviderFoldoutGroup)]
         public bool SimplifyGraph;
 
-        public async override UniTask<List<Graph>> ProvideAsync(List<Graph> graph, AbstractSEECity city,
+        public override async UniTask<List<Graph>> ProvideAsync(List<Graph> graph, AbstractSEECity city,
             Action<float> changePercentage = null,
             CancellationToken token = default)
         {
@@ -75,7 +65,7 @@ namespace SEE.GraphProviders
             DateTime timeLimit = DateTime.ParseExact(Date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
 
             IEnumerable<string> includedFiles = Repository.PathGlobbing
-                .Where(path => path.Value == true)
+                .Where(path => path.Value)
                 .Select(path => path.Key);
 
             IEnumerable<string> excludedFiles = Repository.PathGlobbing
@@ -94,11 +84,8 @@ namespace SEE.GraphProviders
                     .Reverse()
                     .ToList();
 
-                Dictionary<Commit, Patch> commitChanges = new();
-                foreach (var commit in commitList)
-                {
-                    commitChanges.Add(commit, GetFileChanges(commit, repo));
-                }
+                Dictionary<Commit, Patch> commitChanges =
+                    commitList.ToDictionary(commit => commit, commit => GetFileChanges(commit, repo));
 
                 foreach (var currentCommit in
                          commitChanges.Where(x =>

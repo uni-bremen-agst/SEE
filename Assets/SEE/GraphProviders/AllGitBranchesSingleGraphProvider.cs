@@ -10,7 +10,6 @@ using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO.Git;
 using SEE.Game.City;
 using SEE.GO;
-using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using SEE.Utils.Config;
@@ -52,7 +51,7 @@ namespace SEE.GraphProviders
         public GitRepository RepositoryData = new();
 
         /// <summary>
-        /// This option fill simplify the graph with <see cref="DoSimplyfiGraph"/> and combine directories.
+        /// This option fill simplify the graph with <see cref="GitFileMetricsGraphGenerator.DoSimplyfiGraph"/> and combine directories.
         /// </summary>
         [OdinSerialize]
         [ShowInInspector]
@@ -106,7 +105,7 @@ namespace SEE.GraphProviders
         {
             CheckAttributes();
 
-            var task = await UniTask.RunOnThreadPool(() => GetGraph(graph));
+            var task = await UniTask.RunOnThreadPool(() => GetGraph(graph), cancellationToken: token);
             if (AutoFetch)
             {
                 GitPoller poller = GetOrAddGitPollerComponent(city);
