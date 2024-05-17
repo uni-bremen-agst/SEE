@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.Utils.Paths;
 using SEE.Net.Dashboard;
@@ -163,8 +164,10 @@ namespace SEE.DataModel.DG.IO
         /// <param name="graph">graph for which node metrics are to be imported</param>
         /// <param name="filename">CSV file from which to import node metrics</param>
         /// <param name="separator">used to separate column entries</param>
+        /// <param name="token">token to cancel the operation</param>
         /// <returns>the number of errors</returns>
-        public static int LoadCsv(Graph graph, string filename, char separator = ';')
+        public static async UniTask<int> LoadCsvAsync(Graph graph, string filename, char separator = ';',
+                                                      CancellationToken token = default)
         {
             if (!File.Exists(filename))
             {
@@ -183,7 +186,11 @@ namespace SEE.DataModel.DG.IO
             int numberOfErrors = 0;
             int lineCount = 1;
 
-            csv.Read();
+            await csv.ReadAsync();
+            if (token.IsCancellationRequested)
+            {
+                throw new OperationCanceledException(token);
+            }
             if (csv.ReadHeader())
             {
                 string[] header = csv.HeaderRecord;
@@ -202,8 +209,12 @@ namespace SEE.DataModel.DG.IO
                     Debug.LogWarning($"There are no data columns in {filename}.\n");
                     return 0;
                 }
-                while (csv.Read())
+                while (await csv.ReadAsync())
                 {
+                    if (token.IsCancellationRequested)
+                    {
+                        throw new OperationCanceledException(token);
+                    }
                     lineCount++;
                     string id = csv.GetField<string>(IDColumnName);
 
@@ -218,7 +229,7 @@ namespace SEE.DataModel.DG.IO
                             {
                                 if (entry.Contains("."))
                                 {
-                                    node.SetFloat(column, (float)float.Parse(entry, CultureInfo.InvariantCulture));
+                                    node.SetFloat(column, float.Parse(entry, CultureInfo.InvariantCulture));
                                 }
                                 else
                                 {
@@ -251,7 +262,7 @@ namespace SEE.DataModel.DG.IO
             }
             else
             {
-                string errorMessage = "There is no header.";
+                const string errorMessage = "There is no header.";
                 Debug.LogError(errorMessage + "\n");
                 throw new IOException(errorMessage);
 
@@ -259,10 +270,7 @@ namespace SEE.DataModel.DG.IO
 
             return numberOfErrors;
 
-            string SourceLocation()
-            {
-                return $"{filename}:{lineCount}: ";
-            }
+            string SourceLocation() => $"{filename}:{lineCount}: ";
         }
     }
 }

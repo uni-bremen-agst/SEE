@@ -86,7 +86,7 @@ namespace SEE.DataModel.DG.IO
                     if (File.Exists(csvFilename))
                     {
                         Debug.Log($"Loading CSV file {csvFilename}.\n");
-                        int numberOfErrors = MetricImporter.LoadCsv(graph, csvFilename, ';');
+                        int numberOfErrors = await MetricImporter.LoadCsvAsync(graph, csvFilename);
                         if (numberOfErrors > 0)
                         {
                             Debug.LogError($"CSV file {csvFilename} has {numberOfErrors} many errors.\n");
