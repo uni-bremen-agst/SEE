@@ -12,35 +12,6 @@ namespace SEE.Game.Drawable
     /// </summary>
     public static class DrawableHolder
     {
-/* Unmerged change from project 'SEE.Player'
-Before:
-        private static readonly string characters = letters + letters.ToUpper() + numbers + specialCharacters;
-After:
-        private static readonly string characters = Drawable.RandomStrings.letters + Drawable.RandomStrings.letters.ToUpper() + Drawable.RandomStrings.numbers + Drawable.RandomStrings.specialCharacters;
-*/
-
-/* Unmerged change from project 'SEE.Player'
-Before:
-        private static readonly string charactersWithoutSpecial = letters + letters.ToUpper() + numbers;
-After:
-        private static readonly string charactersWithoutSpecial = Drawable.RandomStrings.letters + Drawable.RandomStrings.letters.ToUpper() + Drawable.RandomStrings.numbers;
-*/
-
-/* Unmerged change from project 'SEE.Player'
-Before:
-                randomString += characters[Random.Range(0, characters.Length)];
-After:
-                randomString += Drawable.RandomStrings.characters[Random.Range(0, Drawable.RandomStrings.characters.Length)];
-*/
-
-/* Unmerged change from project 'SEE.Player'
-Before:
-                randomString += charactersWithoutSpecial[Random.Range(0, charactersWithoutSpecial.Length)];
-After:
-                randomString += Drawable.RandomStrings.charactersWithoutSpecial[Random.Range(0, Drawable.RandomStrings.charactersWithoutSpecial.Length)];
-*/
-
-
         /// <summary>
         /// Provides the drawable holder for a given drawable.
         /// </summary>
