@@ -10,7 +10,7 @@ using UnityEngine.UI;
 namespace SEE.Game.Drawable
 {
     /// <summary>
-    /// This class add's an image to a drawable.
+    /// This class adds an image to a drawable.
     /// </summary>
     public static class GameImage
     {
@@ -26,16 +26,16 @@ namespace SEE.Game.Drawable
                 new Vector2(0.5f, 0.5f), 50f, 0, SpriteMeshType.FullRect);
 
         /// <summary>
-        /// Setup the image game object with all the needed components.
+        /// Setsup the image game object with all the needed components.
         /// Either the file path is empty or the file data.
         /// </summary>
         /// <param name="drawable">The drawable where the image should be displayed.</param>
         /// <param name="name">the name of the image game object</param>
         /// <param name="imageFilePath">the path where the image is located</param>
         /// <param name="data">the file data of the image.</param>
-        /// <param name="position">The position where the image should be</param>
-        /// <param name="order">The order in layer for the image</param>
-        /// <param name="image">The output image game object.</param>
+        /// <param name="position">the position where the image should be</param>
+        /// <param name="order">the order in layer for the image</param>
+        /// <param name="image">the output image game object.</param>
         private static void Setup(GameObject drawable, string name, string imageFilePath,
             byte[] data, Vector3 position, int order,
             out GameObject image)
@@ -62,8 +62,8 @@ namespace SEE.Game.Drawable
                 image.name = name;
             }
 
-            /// Setups the drawable holder <see cref="DrawableHolder"/>.
-            DrawableHolder.Setup(drawable, out GameObject highestParent, out GameObject attachedObjects);
+            /// Sets up the drawable holder <see cref="DrawableHolder"/>.
+            DrawableHolder.Setup(drawable, out GameObject _, out GameObject attachedObjects);
 
             /// Assign the image tag to the image object.
             image.tag = Tags.Image;
@@ -86,7 +86,7 @@ namespace SEE.Game.Drawable
                 ImageValueHolder holder = image.AddComponent<ImageValueHolder>();
                 holder.SetFileData(fileData);
                 /// Saves the loaded file to the app data folder.
-                CreateImageFile(image, fileData, Path.GetFileName(imageFilePath), out string filePath);
+                CreateImageFile(image, fileData, Path.GetFileName(imageFilePath), out string _);
 
                 Texture2D texture = new(2, 2)
                 {
@@ -114,9 +114,7 @@ namespace SEE.Game.Drawable
 
             /// Set the position of the line and ensure the correct order in the layer.
             /// Additionally, adopt the rotation of the attached object.
-            image.transform.rotation = attachedObjects.transform.rotation;
-            image.transform.position = position - image.transform.forward * ValueHolder.distanceToDrawable.z * order;
-
+            image.transform.SetPositionAndRotation(position - order * ValueHolder.distanceToDrawable.z * image.transform.forward, attachedObjects.transform.rotation);
             /// Adds the order in layer value holder component to the line object and sets the order.
             image.AddComponent<OrderInLayerValueHolder>().SetOrderInLayer(order);
         }
@@ -161,7 +159,7 @@ namespace SEE.Game.Drawable
             }
             GameObject imageObj;
 
-            /// Block for update an existing image with the given name.
+            /// Block to update an existing image with the given name.
             if (GameFinder.FindChild(drawable, name) != null)
             {
                 imageObj = GameFinder.FindChild(drawable, name);
@@ -169,12 +167,12 @@ namespace SEE.Game.Drawable
             }
             else
             {
-                /// Block for create a new image.
+                /// Block to create a new image.
                 Setup(drawable, name, "", fileData, position, order, out GameObject image);
                 imageObj = image;
             }
             /// Saves the loaded image to the app data folder.
-            CreateImageFile(imageObj, fileData, fileName, out string filePath);
+            CreateImageFile(imageObj, fileData, fileName, out string _);
             /// Sets the old values:
             imageObj.transform.localScale = scale;
             imageObj.transform.localEulerAngles = eulerAngles;
@@ -235,7 +233,7 @@ namespace SEE.Game.Drawable
                     }
                 } else
                 {
-                    /// For the case if the file in the path dont exists and the file data is empty.
+                    /// For the case if the file in the path does not exists and the file data is empty.
                     ShowNotification.Warn("Cannot be restored.", "The image cannot be restored.");
                     Destroyer.Destroy(imageObj);
                 }
@@ -264,11 +262,12 @@ namespace SEE.Game.Drawable
 
                 if (fileInfo.Length != existsInfo.Length)
                 {
+                    int numberOfFiles = Directory.GetFiles(ValueHolder.imagePath).ToList().Count;
                     /// If the byte counts are not equal, indicating different images,
                     /// it checks whether another file with a similar name already exists and
                     /// whether there is a file among them that matches the image to be saved.
                     /// If this is not the case, a new file with the highest index + 1 is created.
-                    for (int i = 1; i <= Directory.GetFiles(ValueHolder.imagePath).ToList().Count; i++)
+                    for (int i = 1; i <= numberOfFiles; i++)
                     {
                         string newPath = ValueHolder.imagePath + fileNameWithoutExtension
                             + "(" + i + ")" + fileExtension;
@@ -280,7 +279,7 @@ namespace SEE.Game.Drawable
                         }
                         else
                         {
-                            FileInfo info = new FileInfo(newPath);
+                            FileInfo info = new(newPath);
                             if (fileInfo.Length == info.Length)
                             {
                                 Directory.Delete(tmpPath, true);

@@ -8,7 +8,7 @@ using UnityEngine;
 namespace SEE.Game.Drawable
 {
     /// <summary>
-    /// This class provides methods for moving and rotating objects
+    /// This class provides methods for moving and rotating objects.
     /// </summary>
     public static class GameMoveRotator
     {
@@ -16,7 +16,7 @@ namespace SEE.Game.Drawable
         /// Move an object (using its pivot point) by mouse.
         /// For moving it is necessary that the rotation of the object is zero.
         /// Because if they are not zero, the axes are rotated.
-        /// And that would lead to incorrect movement.
+        /// And that would lead to an incorrect movement.
         /// </summary>
         /// <param name="obj">The object that should be moved.</param>
         /// <param name="hitPoint">The mouse hit point.</param>
@@ -37,12 +37,12 @@ namespace SEE.Game.Drawable
             Vector3 convertedHitPoint = GameFinder.GetHighestParent(obj).transform.InverseTransformPoint(hitPoint);
 
             /// Ensure that the converted hit point preserves the distance to the drawable.
-            convertedHitPoint -= obj.transform.forward * ValueHolder.distanceToDrawable.z 
-                * obj.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
+            convertedHitPoint -= obj.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer()
+                * ValueHolder.distanceToDrawable.z * obj.transform.forward;
 
             /// Build the new object position.
             Vector3 position = new(convertedHitPoint.x, convertedHitPoint.y, oldPos.z);
-            
+
             /// Sets the new object position.
             obj.transform.localPosition = position;
 
@@ -51,7 +51,7 @@ namespace SEE.Game.Drawable
 
             /// For mind map nodes.
             /// If child nodes were to be included, they are now encapsulated by the parent object.
-            CheckPostProcessNode(obj, includeChildren);
+            IsPostProcessNodeNeeded(obj, includeChildren);
             return position;
         }
 
@@ -108,13 +108,13 @@ namespace SEE.Game.Drawable
 
             /// For mind map nodes.
             /// If child nodes were to be included, they are now encapsulated by the parent object.
-            CheckPostProcessNode(obj, includeChildren);
+            IsPostProcessNodeNeeded(obj, includeChildren);
             return newPosition;
         }
 
         /// <summary>
         /// Sets the given position to the object.
-        /// It will needed for undo/redo.
+        /// It will be needed for undo/redo.
         /// </summary>
         /// <param name="obj">The object that should be moved</param>
         /// <param name="position">The new position for the object.</param>
@@ -124,29 +124,28 @@ namespace SEE.Game.Drawable
             /// If child nodes are to be included, the child objects in the hierarchy are added to the parent object.
             CheckPrepareNodeChilds(obj, includeChildren, false, true);
 
-            /// Sets the position
+            /// Sets the position.
             obj.transform.localPosition = position;
 
             /// For mind map nodes.
             /// If child nodes were to be included, they are now encapsulated by the parent object.
-            CheckPostProcessNode(obj, includeChildren);
+            IsPostProcessNodeNeeded(obj, includeChildren);
         }
 
         /// <summary>
-        /// Moves an point of a line.
+        /// Moves a point of a line.
         /// It only works for the drawable type line.
         /// </summary>
         /// <param name="line">The line which holds the to moved point</param>
-        /// <param name="Indices">The indices of the points which should be moved. (all indices have the same position)</param>
+        /// <param name="Indices">The indices of the points which should be moved (all indices have the same position).</param>
         /// <param name="point">The new point position</param>
         public static void MovePoint(GameObject line, List<int> Indices, Vector3 point)
         {
             LineRenderer renderer = line.GetComponent<LineRenderer>();
             foreach (int i in Indices)
             {
-                float z = renderer.GetPosition(i).z;
                 /// Calculates the new position for the point.
-                Vector3 newPoint = new Vector3(point.x, point.y, z);
+                Vector3 newPoint = new(point.x, point.y, renderer.GetPosition(i).z);
                 renderer.SetPosition(i, newPoint);
             }
             GameDrawer.RefreshCollider(line);
@@ -154,7 +153,7 @@ namespace SEE.Game.Drawable
 
         /// <summary>
         /// Rotates an object at its pivot point.
-        /// It is necessary to refresh the object's collider, as it does not update itself. 
+        /// It is necessary to refresh the object's collider, as it does not update itself.
         /// </summary>
         /// <param name="obj">The object which should be rotated.</param>
         /// <param name="rotateDirection">The direction in which should be rotated.</param>
@@ -176,14 +175,14 @@ namespace SEE.Game.Drawable
 
             /// For mind map nodes.
             /// If child nodes were to be included, they are now encapsulated by the parent object.
-            CheckPostProcessNode(obj, includeChildren);
+            IsPostProcessNodeNeeded(obj, includeChildren);
             return obj.transform.localEulerAngles;
         }
 
         /// <summary>
         /// Sets the given z euler angle to the object.
-        /// It rotates the z axis.
-        /// Will needed for undo/redo.
+        /// It rotates around the z axis.
+        /// Will be needed for undo/redo.
         /// </summary>
         /// <param name="obj">The object which should be rotated.</param>
         /// <param name="localEulerAngleZ">The new z degree</param>
@@ -200,7 +199,7 @@ namespace SEE.Game.Drawable
 
             /// For mind map nodes.
             /// If child nodes were to be included, they are now encapsulated by the parent object.
-            CheckPostProcessNode(obj, includeChildren);
+            IsPostProcessNodeNeeded(obj, includeChildren);
         }
 
         /// <summary>
@@ -213,13 +212,13 @@ namespace SEE.Game.Drawable
         public static void SetRotateY(GameObject obj, float localEulerAngleY)
         {
             Transform transform = obj.transform;
-            transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, 
+            transform.localEulerAngles = new Vector3(transform.localEulerAngles.x,
                 localEulerAngleY, transform.localEulerAngles.z);
         }
 
         /// <summary>
-        /// This method prepares a mind map node so that 
-        /// an action including the children can be performed. 
+        /// This method prepares a mind map node so that
+        /// an action including the children can be performed.
         /// For this purpose, the child nodes are added to the parent node.
         /// </summary>
         /// <param name="node">The parent node</param>
@@ -255,18 +254,18 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Checks if preparing child nodes is necessary, and if not, 
+        /// Checks if preparing child nodes is necessary, and if not,
         /// deletes all rigid bodies and collision controllers except those of the selected nodes.
         /// </summary>
         /// <param name="node">the parent node</param>
-        /// <param name="includeChildren">if the children should be included for the movement or the rotation.</param>
+        /// <param name="includeChildren">whether the children should be included for the movement or the rotation.</param>
         /// <param name="rotationSetMode">true, if the method will be called from <see cref="SetRotate"/></param>
-        /// <param name="setMode">true, if the method will be called from a Set-Method 
+        /// <param name="setMode">true, if the method will be called from a Set-Method
         /// (<see cref="SetRotate"/> or <see cref="SetPosition"/>)</param>
-        private static void CheckPrepareNodeChilds(GameObject node, bool includeChildren, 
+        private static void CheckPrepareNodeChilds(GameObject node, bool includeChildren,
             bool rotationSetMode = false, bool setMode = false)
         {
-            /// If the children should be included prepare the child nodes.
+            /// If the children should be included, prepare the child nodes.
             if (includeChildren)
             {
                 PrepareNodeChilds(node, setMode, rotationSetMode);
@@ -278,7 +277,7 @@ namespace SEE.Game.Drawable
                     MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
                     GameObject drawable = GameFinder.GetDrawable(node);
                     string drawableParentName = GameFinder.GetDrawableParentName(drawable);
-                    /// If this method was not called by a set method (<see cref="SetRotate"/> or <see cref="SetPosition"/>), 
+                    /// If this method was not called by a set method (<see cref="SetRotate"/> or <see cref="SetPosition"/>),
                     /// then disable collision detection for the children.
                     if (!setMode)
                     {
@@ -297,9 +296,9 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// This method separates the child nodes from the parent node 
-        /// after <see cref="PrepareNodeChilds"/> has been called. 
-        /// The children are assigned to the original "AttachedObjects" 
+        /// This method separates the child nodes from the parent node
+        /// after <see cref="PrepareNodeChilds"/> has been called.
+        /// The children are assigned to the original "AttachedObjects"
         /// object of the respective drawable.
         /// </summary>
         /// <param name="obj">The parent node</param>
@@ -323,12 +322,12 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Checks if <see cref="PostProcessNode"/> needs to be executed. 
+        /// Checks if <see cref="PostProcessNode"/> needs to be executed.
         /// If not, only the branch lines are refreshed.
         /// </summary>
         /// <param name="node">The parent node</param>
         /// <param name="includeChildren">Option if children should be included for the action.</param>
-        private static void CheckPostProcessNode(GameObject node, bool includeChildren)
+        private static void IsPostProcessNodeNeeded(GameObject node, bool includeChildren)
         {
             if (includeChildren)
             {

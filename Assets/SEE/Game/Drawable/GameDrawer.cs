@@ -4,14 +4,13 @@ using SEE.GO;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game.Drawable
 {
     /// <summary>
-    /// This class provides the creation of the <see cref="DrawableType"/> <see cref="LineConf"/>.
+    /// This class provides the creation of <see cref="LineConf"/>.
     /// </summary>
     public static class GameDrawer
     {
@@ -33,7 +32,7 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="isDashedLineKind">Whether the line has a dashed line child.</param>
         /// <returns>The color kind list depending on <paramref name="isDashedLineKind"/>.</returns>
-        public static List<ColorKind> GetColorKinds(bool isDashedLineKind)
+        public static IList<ColorKind> GetColorKinds(bool isDashedLineKind)
         {
             if (isDashedLineKind)
             {
@@ -63,13 +62,13 @@ namespace SEE.Game.Drawable
         /// Gets a list with all the different line kinds.
         /// </summary>
         /// <returns>a list with all the line kinds.</returns>
-        public static List<LineKind> GetLineKinds()
+        public static IList<LineKind> GetLineKinds()
         {
             return Enum.GetValues(typeof(LineKind)).Cast<LineKind>().ToList();
         }
 
         /// <summary>
-        /// Setups a line object based on the parameters.
+        /// Sets up a line object based on the parameters.
         /// It creates the initial line.
         /// </summary>
         /// <param name="drawable">The drawable on which the line should displayed.</param>
@@ -111,8 +110,8 @@ namespace SEE.Game.Drawable
                 }
                 line.name = name;
             }
-            /// Setups the drawable holder <see cref="DrawableHolder"/>.
-            DrawableHolder.Setup(drawable, out GameObject highestParent, out GameObject attachedObjects);
+            /// Sets up the drawable holder <see cref="DrawableHolder"/>.
+            DrawableHolder.Setup(drawable, out GameObject _, out GameObject attachedObjects);
 
             /// Assign the line tag to the line object.
             line.tag = Tags.Line;
@@ -129,8 +128,7 @@ namespace SEE.Game.Drawable
             /// Sets the correct material for the chosen line kind.
             renderer.sharedMaterial = GetMaterial(primaryColor, lineKind);
             /// Adds the line value holder to the object and assign the color kind to it.
-            line.AddComponent<LineValueHolder>()
-                .SetColorKind(colorKind);
+            line.AddComponent<LineValueHolder>().SetColorKind(colorKind);
             /// Set the color(s) of the line depending on the chosen color kind.
             switch (colorKind)
             {
@@ -163,9 +161,8 @@ namespace SEE.Game.Drawable
 
             /// Set the position of the line and ensure the correct order in the layer.
             /// Additionally, adopt the rotation of the attached object.
-            line.transform.position = attachedObjects.transform.position;
-            line.transform.rotation = attachedObjects.transform.rotation;
-            line.transform.position -= line.transform.forward * ValueHolder.distanceToDrawable.z * order;
+            line.transform.SetPositionAndRotation(attachedObjects.transform.position, attachedObjects.transform.rotation);
+            line.transform.position -= order * ValueHolder.distanceToDrawable.z * line.transform.forward;
 
             /// Adds the order in layer value holder component to the line object and sets the order.
             line.AddComponent<OrderInLayerValueHolder>().SetOrderInLayer(order);
@@ -217,14 +214,14 @@ namespace SEE.Game.Drawable
         {
             Setup(drawable, "", positions, colorKind, primaryColor, secondaryColor, thickness,
                 ValueHolder.currentOrderInLayer, lineKind, tiling,
-                out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
+                out GameObject line, out LineRenderer _, out MeshCollider _);
             ValueHolder.currentOrderInLayer++;
 
             return line;
         }
 
         /// <summary>
-        /// Update the positions of an existing line.
+        /// Updates the positions of an existing line.
         /// </summary>
         /// <param name="line">The line to be updated.</param>
         /// <param name="positions">The new positions for the line.</param>
@@ -238,8 +235,8 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Finish drawing a line.
-        /// Ensure that the mesh collider aligns with the renderer line points.
+        /// Finishes drawing a line.
+        /// Ensures that the mesh collider aligns with the renderer line points.
         /// However, the generated mesh must have at least three different points for this to work
         /// (otherwise, the mesh won't function).
         ///
@@ -259,12 +256,12 @@ namespace SEE.Game.Drawable
             {
                 meshCollider.sharedMesh = mesh;
             }
-
         }
 
         /// <summary>
         /// Draws or updates an entire line.
-        /// It combines the functionality of the methods <see cref="StartDrawing"/>, <see cref="Drawing"/>, and <see cref="FinishDrawing"/>.
+        /// It combines the functionality of the methods <see cref="StartDrawing"/>, <see cref="Drawing"/>,
+        /// and <see cref="FinishDrawing"/>.
         ///
         /// First, it ensures that the z-axis of the positions is set to 0.
         /// Then, it checks if the line is already present on the drawable.
@@ -386,8 +383,9 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Redraws or update the line of the given <see cref="LineConf"/> to the <paramref name="drawable"/>.
-        /// It calls <see cref="ReDrawLine(GameObject, string, Vector3[], ColorKind, Color, Color, float, int, Vector3, Vector3, Vector3, bool, LineKind, float)"/>
+        /// Redraws or updates the line of the given <see cref="LineConf"/> to the <paramref name="drawable"/>.
+        /// It calls <see cref="ReDrawLine(GameObject, string, Vector3[], ColorKind, Color, Color,
+        /// float, int, Vector3, Vector3, Vector3, bool, LineKind, float)"/>.
         /// </summary>
         /// <param name="drawable">The drawable on which the line should be displayed.</param>
         /// <param name="lineToRedraw">The configuration of the line to be restore.</param>
@@ -417,11 +415,11 @@ namespace SEE.Game.Drawable
         /// For an even number, the midpoint is calculated by adding the two middle points and
         /// dividing by two, obtaining the center of the two middle points.
         ///
-        /// After determining the midpoint,
-        /// the line positions are converted to world space,
+        /// After determining the midpoint, the line positions are converted to world space,
         /// and the line is shifted to the midpoint.
         /// Subsequently, the world space coordinates are converted back to local,
-        /// ensuring that the visual representation of the line remains unchanged while the pivot is shifted.
+        /// ensuring that the visual representation of the line remains unchanged while
+        /// the pivot is shifted.
         /// </summary>
         /// <param name="line">The line in which the pivot should be set</param>
         /// <returns>The line with the pivot in the middle</returns>
@@ -469,7 +467,7 @@ namespace SEE.Game.Drawable
         /// Changes the pivot point of a line.
         /// Will be needed for <see cref="GameLineSplit"/>
         /// </summary>
-        /// <param name="line">The line which pivot point should be changes.</param>
+        /// <param name="line">The line whose pivot point should be changed.</param>
         /// <returns><paramref name="line"/> with the new pivot point.</returns>
         public static GameObject ChangePivot(GameObject line)
         {
@@ -546,7 +544,7 @@ namespace SEE.Game.Drawable
         /// Refreshes the mesh collider of the line.
         /// The mesh for the Mesh Collider is recalculated.
         /// </summary>
-        /// <param name="line">The line which mesh collider should be refreshed.</param>
+        /// <param name="line">The line whose mesh collider should be refreshed.</param>
         public static void RefreshCollider(GameObject line)
         {
             if (line.CompareTag(Tags.Line))
@@ -565,7 +563,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Changes the line kind of the given line.
         /// </summary>
-        /// <param name="line">The line which line kind should be changed.</param>
+        /// <param name="line">The line whose line kind should be changed.</param>
         /// <param name="lineKind">The new line kind</param>
         /// <param name="tiling">The tiling, if the new line kind is a dashed line kind</param>
         public static void ChangeLineKind(GameObject line, LineKind lineKind, float tiling)
@@ -586,9 +584,9 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Changes the color kind of the given line.
         /// </summary>
-        /// <param name="line">The line which cholor kind should be changed.</param>
+        /// <param name="line">The line whose color kind should be changed.</param>
         /// <param name="colorKind">The new color kind for the line.</param>
-        /// <param name="conf">The old line configuration, will be needed for restore the colors.</param>
+        /// <param name="conf">The old line configuration; will be needed for restore the colors.</param>
         public static void ChangeColorKind(GameObject line, ColorKind colorKind, LineConf conf)
         {
             if (line.CompareTag(Tags.Line))
@@ -631,14 +629,14 @@ namespace SEE.Game.Drawable
                         GetRenderer(line).endColor = Color.white;
                     }
                 }
-                /// Update the <see cref="LineValueHolder"/>
+                /// Updates the <see cref="LineValueHolder"/>.
                 holder.SetColorKind(colorKind);
 
                 /// Restores the primary and secondary color of the line.
                 GameEdit.ChangePrimaryColor(line, conf.PrimaryColor);
                 GameEdit.ChangeSecondaryColor(line, conf.SecondaryColor);
 
-                /// When the secondary color is clear use the primary.
+                /// If the secondary color is clear, use the primary.
                 /// It prevents it from looking like a part of the line has disappeared.
                 if (conf.SecondaryColor == Color.clear)
                 {
@@ -655,7 +653,7 @@ namespace SEE.Game.Drawable
         /// correct tiling for the dashed line.
         /// Tiling describes the spacing between the dashed lines.
         /// </summary>
-        /// <param name="renderer">The line renderer that should be update his texture scale.</param>
+        /// <param name="renderer">The line renderer that should be updated by his texture scale.</param>
         /// <param name="kind">The chosen color kind.</param>
         /// <param name="tiling">The tiling for a <see cref="LineKind.Dashed"/></param>
         private static void SetRendererTextrueScale(LineRenderer renderer, LineKind kind, float tiling)
@@ -706,8 +704,7 @@ namespace SEE.Game.Drawable
         /// <returns>The count of different positions.</returns>
         public static int DifferentPositionCounter(Vector3[] positions)
         {
-            List<Vector3> positionsList = new List<Vector3>(positions);
-            return positionsList.Distinct().ToList().Count;
+            return new List<Vector3>(positions).Distinct().ToList().Count;
         }
 
         /// <summary>

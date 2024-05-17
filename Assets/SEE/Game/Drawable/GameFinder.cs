@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SEE.Game.Drawable
 {
     /// <summary>
-    /// This class provides methods to search.
+    /// This class provides methods to search for <see cref="DrawableType"/>s.
     /// </summary>
     public static class GameFinder
     {
@@ -15,6 +15,8 @@ namespace SEE.Game.Drawable
         /// <param name="drawableID">the drawable id.</param>
         /// <param name="parentDrawableID">the parent id of the drawable.</param>
         /// <returns>The sought-after drawable, if found. Otherwise, null.</returns>
+        /// <remarks>This method will iterate over all game objects in the
+        /// scene and, hence, is expensive.</remarks>
         public static GameObject FindDrawable(string drawableID, string parentDrawableID)
         {
             GameObject searchedDrawable = null;
@@ -24,12 +26,11 @@ namespace SEE.Game.Drawable
             foreach (GameObject drawable in drawables)
             {
                 /// Block for searching includes the parend id.
-                if (parentDrawableID != null && !parentDrawableID.Equals("")
+                if (!string.IsNullOrWhiteSpace(parentDrawableID)
                     && drawable.transform.parent != null)
                 {
                     string parentName = drawable.transform.parent.gameObject.name;
-                    if (string.Equals(parentDrawableID, parentName) &&
-                          string.Equals(drawableID, drawable.name))
+                    if (parentDrawableID == parentName && drawableID == drawable.name)
                     {
                         searchedDrawable = drawable;
                     }
@@ -100,7 +101,7 @@ namespace SEE.Game.Drawable
         /// <returns>true, if the child has a drawable. Otherwise false</returns>
         public static bool HasDrawable(GameObject child)
         {
-            if (hasParentWithTag(child, Tags.AttachedObjects))
+            if (HasParentWithTag(child, Tags.AttachedObjects))
             {
                 return GetDrawable(child) != null;
             }
@@ -127,7 +128,7 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="parent">The parent of the children.</param>
         /// <param name="tag">The tag to be searched.</param>
-        /// <returns>the first founded child with the searched tag.</returns>
+        /// <returns>the first found child with the searched tag.</returns>
         public static GameObject FindChildWithTag(GameObject parent, string tag)
         {
             Transform[] allChildren = parent.GetComponentsInChildren<Transform>();
@@ -147,7 +148,7 @@ namespace SEE.Game.Drawable
         /// <param name="parent">The parent of the children</param>
         /// <param name="tag">The tag to be searched</param>
         /// <returns>All children with the searched tag.</returns>
-        public static List<GameObject> FindAllChildrenWithTag(GameObject parent, string tag)
+        public static IList<GameObject> FindAllChildrenWithTag(GameObject parent, string tag)
         {
             List<GameObject> gameObjects = new();
             Transform[] allChildren = parent.GetComponentsInChildren<Transform>();
@@ -169,7 +170,7 @@ namespace SEE.Game.Drawable
         /// <param name="parent">The parent of the children</param>
         /// <param name="childTag">The tag to be searched</param>
         /// <param name="parentTag">The execpt tag</param>
-        /// <returns>All children with the searched tag, except those whose parents have the specific tag.</returns>
+        /// <returns>All children with the searched tag, except those whose parent has the specific tag.</returns>
         public static List<GameObject> FindAllChildrenWithTagExceptParentHasTag(GameObject parent,
             string childTag, string parentTag)
         {
@@ -192,13 +193,13 @@ namespace SEE.Game.Drawable
         /// <param name="parent">The parent</param>
         /// <param name="tag">The tag to be searched.</param>
         /// <returns>true, if a child with the searched tag exists.</returns>
-        public static bool hasChildWithTag(GameObject parent, string tag)
+        public static bool HasChildWithTag(GameObject parent, string tag)
         {
             return FindChildWithTag(parent, tag) != null;
         }
 
         /// <summary>
-        /// Query wheter the child has a parent.
+        /// Query whether the child has a parent.
         /// </summary>
         /// <param name="child">The child.</param>
         /// <returns>true, if the child has a parent.</returns>
@@ -213,7 +214,7 @@ namespace SEE.Game.Drawable
         /// <param name="child">The child.</param>
         /// <param name="tag">The tag to be searched.</param>
         /// <returns>true, if a parent with the given tag exists.</returns>
-        public static bool hasParentWithTag(GameObject child, string tag)
+        public static bool HasParentWithTag(GameObject child, string tag)
         {
             Transform transform = child.transform;
             while (transform.parent != null)
@@ -263,10 +264,10 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Gets the attached objects object.
+        /// Gets the attached objects of <paramref name="obj"/>.
         /// Below this game object, the <see cref="DrawableType"/> objects are placed.
         /// </summary>
-        /// <param name="obj">An object within the drawable holder.</param>
+        /// <param name="obj">An object within a drawable holder.</param>
         /// <returns>the object which holds the <see cref="DrawableType"/> objects of a drawable.</returns>
         public static GameObject GetAttachedObjectsObject(GameObject obj)
         {

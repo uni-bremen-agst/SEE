@@ -152,7 +152,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     if (node.GetComponent<MMNodeValueHolder>().GetNodeKind() != GameMindMap.NodeKind.Leaf
                         && node != addedNode
-                        && GameMindMap.CheckValidParentChange(addedNode, node))
+                        && GameMindMap.ParentChangeIsValid(addedNode, node))
                     {
                         nodes.Add(node);
                     }

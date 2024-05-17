@@ -8,20 +8,24 @@ using UnityEngine;
 namespace SEE.Game.Drawable
 {
     /// <summary>
-    /// This class allows to change the order in layer of a <see cref="DrawableType"/>
+    /// This class allows to change the order in layer of a <see cref="DrawableType"/>.
     /// The <see cref="DrawableType"/> needs a <see cref="OrderInLayerValueHolder"/> component.
     /// </summary>
     public static class GameLayerChanger
     {
         /// <summary>
         /// The state of the layer changer.
-        /// Increase when the order in layer was increased.
-        /// Decrease when the order in layer was decreased.
         /// </summary>
         [Serializable]
         public enum LayerChangerStates
         {
+            /// <summary>
+            /// The order in layer is increased.
+            /// </summary>
             Increase,
+            /// <summary>
+            /// The order in layer is decreased.
+            /// </summary>
             Decrease
         }
 
@@ -34,7 +38,7 @@ namespace SEE.Game.Drawable
         /// <param name="useWorldPos">use world position for moving, only needed for sticky note</param>
         public static void Increase(GameObject obj, int order, bool showInformation = true, bool useWorldPos = false)
         {
-            if (obj.GetComponent<OrderInLayerValueHolder>() != null 
+            if (obj.GetComponent<OrderInLayerValueHolder>() != null
                 || obj.GetComponentInChildren<OrderInLayerValueHolder>() != null)
             {
                 OrderInLayerValueHolder holder = obj.GetComponent<OrderInLayerValueHolder>() != null ?
@@ -44,7 +48,7 @@ namespace SEE.Game.Drawable
                 {
                     if (showInformation)
                     {
-                        ShowNotification.Warn("Maximum layer order", obj.name + 
+                        ShowNotification.Warn("Maximum layer order", obj.name +
                             " has reached the maximum layer order: " + holder.GetOrderInLayer());
                     }
                 }
@@ -89,7 +93,7 @@ namespace SEE.Game.Drawable
         /// <param name="useWorldPos">use world position for moving, only needed for sticky note</param>
         public static void Decrease(GameObject obj, int order, bool showInformation = true, bool useWorldPos = false)
         {
-            if (obj.GetComponent<OrderInLayerValueHolder>() != null 
+            if (obj.GetComponent<OrderInLayerValueHolder>() != null
                 || obj.GetComponentInChildren<OrderInLayerValueHolder>() != null)
             {
                 OrderInLayerValueHolder holder = obj.GetComponent<OrderInLayerValueHolder>() != null ?
@@ -99,7 +103,7 @@ namespace SEE.Game.Drawable
                 {
                     if (showInformation)
                     {
-                        ShowNotification.Warn("Minimum layer order", obj.name + 
+                        ShowNotification.Warn("Minimum layer order", obj.name +
                             " has reached the minimum layer order: " + holder.GetOrderInLayer());
                     }
                 }
@@ -143,7 +147,7 @@ namespace SEE.Game.Drawable
         {
             Vector3 oldPos = obj.transform.localPosition;
 
-            /// For sticky notes, it's important to use the world space position 
+            /// For sticky notes, it's important to use the world space position
             /// since it is an independent object not dependent on a drawable.
             if (useWorldPos)
             {
@@ -163,13 +167,12 @@ namespace SEE.Game.Drawable
             /// For sticky notes, it's important to use the original position for the calculation.
             if (useWorldPos)
             {
-                obj.transform.position = oldPos - obj.transform.forward * ValueHolder.distanceToDrawable.z 
-                    * multiplyValue;
+                obj.transform.position = oldPos - multiplyValue * ValueHolder.distanceToDrawable.z * obj.transform.forward;
             }
             else
             {
                 /// For a <see cref="DrawableType"/> object only change the z-axis.
-                obj.transform.localPosition = new Vector3(oldPos.x, oldPos.y, 
+                obj.transform.localPosition = new Vector3(oldPos.x, oldPos.y,
                     multiplyValue * -ValueHolder.distanceToDrawable.z);
             }
         }

@@ -162,7 +162,7 @@ namespace SEE.Game.Drawable
         /// This method changes the text of a drawable text.
         /// If the text object is a part of a mind map node, the border will refreshed.
         /// </summary>
-        /// <param name="textObj">The textObj whose text should be changed.</param>
+        /// <param name="textObj">The object whose text should be changed.</param>
         /// <param name="text">The new text.</param>
         public static void ChangeText(GameObject textObj, string text)
         {
@@ -183,9 +183,9 @@ namespace SEE.Game.Drawable
 
         /// <summary>
         /// This method changes the font size of a text.
-        /// If the text object is a part of a mind map node, the border will refreshed.
+        /// If the text object is a part of a mind map node, the border will be refreshed.
         /// </summary>
-        /// <param name="textObj">The textObj whose text should be changed.</param>
+        /// <param name="textObj">The object whose text should be changed.</param>
         /// <param name="fontSize">The new font size.</param>
         public static void ChangeFontSize(GameObject textObj, float fontSize)
         {
@@ -211,7 +211,7 @@ namespace SEE.Game.Drawable
         /// This method changes the font style of a text.
         /// If the text object is a part of a mind map node, the border will refreshed.
         /// </summary>
-        /// <param name="textObj">The textObj whose text should be changed.</param>
+        /// <param name="textObj">The object whose text should be changed.</param>
         /// <param name="styles">The new font style.</param>
         public static void ChangeFontStyles(GameObject textObj, FontStyles styles)
         {
@@ -236,7 +236,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// This method changes the font color of a text.
         /// </summary>
-        /// <param name="textObj">The textObj whose text should be changed.</param>
+        /// <param name="textObj">The object whose text should be changed.</param>
         /// <param name="color">The new font color.</param>
         public static void ChangeFontColor(GameObject textObj, Color color)
         {
@@ -250,7 +250,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// This method changes the outline color of a text.
         /// </summary>
-        /// <param name="textObj">The textObj whose text should be changed.</param>
+        /// <param name="textObj">The object whose text should be changed.</param>
         /// <param name="color">The new outline color.</param>
         public static void ChangeOutlineColor(GameObject textObj, Color color)
         {
@@ -263,7 +263,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// This method changes the outline thickness of a text.
         /// </summary>
-        /// <param name="textObj">The textObj whose text should be changed.</param>
+        /// <param name="textObj">The object whose text should be changed.</param>
         /// <param name="thickness">The new outline thickness.</param>
         public static void ChangeOutlineThickness(GameObject textObj, float thickness)
         {
