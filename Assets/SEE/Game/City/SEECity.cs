@@ -156,6 +156,11 @@ namespace SEE.Game.City
         {
             base.Start();
 
+            if (TryGetComponent(out GitPoller poller))
+            {
+               Destroy(poller);
+            }
+
             loadedGraph = null;
             visualizedSubGraph = null;
 
@@ -497,6 +502,12 @@ namespace SEE.Game.City
             cancellationTokenSource.Cancel();
             IsPipelineRunning = false;
             cancellationTokenSource = new CancellationTokenSource();
+            // Remove the poller
+            if (TryGetComponent(out GitPoller poller))
+            {
+                Destroy(poller);
+            }
+
             // Delete the underlying graph.
             loadedGraph?.Destroy();
             loadedGraph = null;
@@ -559,7 +570,7 @@ namespace SEE.Game.City
         {
             base.Restore(attributes);
             DataProvider =
-                SingleGraphPipelineProvider.Restore(attributes, dataProviderPathLabel) as SingleGraphPipelineProvider;
+                SingleGraphProvider.Restore(attributes, dataProviderPathLabel) as SingleGraphPipelineProvider;
         }
 
         #endregion
