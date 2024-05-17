@@ -77,22 +77,22 @@ namespace SEE.Controls.Actions.Drawable
 
                 /// Ends the action.
                 /// Loads the selected color, depending on the option chosen in the ColorPickerMenu,
-                /// either into <see cref="ValueHolder.currentPrimaryColor"/> or
-                /// <see cref="ValueHolder.currentSecondaryColor"/>.
+                /// either into <see cref="ValueHolder.CurrentPrimaryColor"/> or
+                /// <see cref="ValueHolder.CurrentSecondaryColor"/>.
                 /// Subsequently, a memento is created, and the action process is completed.
                 if (((Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1)) && isInAction && !waitForHelperMenu) ||
                     finishChosingMMColor)
                 {
                     if (!ColorPickerMenu.GetSwitchStatus())
                     {
-                        ValueHolder.currentPrimaryColor = pickedColor;
+                        ValueHolder.CurrentPrimaryColor = pickedColor;
                         ColorPickerMenu.AssignPrimaryColor(pickedColor);
                     }
                     else
                     {
                         pickForSecondColor = true;
                         ColorPickerMenu.AssignSecondaryColor(pickedColor);
-                        ValueHolder.currentSecondaryColor = pickedColor;
+                        ValueHolder.CurrentSecondaryColor = pickedColor;
                     }
                     memento = new(oldChosenPrimaryColor, oldChosenSecondColor, pickedColor, pickForSecondColor);
                     CurrentState = IReversibleAction.Progress.Completed;
@@ -201,7 +201,7 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// At the beginning of this action, it saves the current color values
-        /// (<see cref="ValueHolder.currentPrimaryColor>"/> and <see cref="ValueHolder.currentSecondaryColor"/>)
+        /// (<see cref="ValueHolder.CurrentPrimaryColor>"/> and <see cref="ValueHolder.CurrentSecondaryColor"/>)
         /// of the <see cref="ValueHolder"/>.
         /// It also adds to the UICanvas a <see cref="ColorPickerMenuDisabler"/> component.
         /// This is required to prevent a display error when displaying the color picker menu.
@@ -213,8 +213,8 @@ namespace SEE.Controls.Actions.Drawable
         {
             base.Awake();
 
-            oldChosenPrimaryColor = ValueHolder.currentPrimaryColor;
-            oldChosenSecondColor = ValueHolder.currentSecondaryColor;
+            oldChosenPrimaryColor = ValueHolder.CurrentPrimaryColor;
+            oldChosenSecondColor = ValueHolder.CurrentSecondaryColor;
             Canvas.AddOrGetComponent<ColorPickerMenuDisabler>();
             ColorPickerMenu.Enable();
         }
@@ -235,11 +235,11 @@ namespace SEE.Controls.Actions.Drawable
         readonly struct Memento
         {
             /// <summary>
-            /// The old chosen <see cref="ValueHolder.currentPrimaryColor"/>
+            /// The old chosen <see cref="ValueHolder.CurrentPrimaryColor"/>
             /// </summary>
             public readonly Color OldChosenPrimaryColor;
             /// <summary>
-            /// The old chosen <see cref="ValueHolder.currentSecondaryColor"/>
+            /// The old chosen <see cref="ValueHolder.CurrentSecondaryColor"/>
             /// </summary>
             public readonly Color OldChosenSecondColor;
             /// <summary>
@@ -248,7 +248,7 @@ namespace SEE.Controls.Actions.Drawable
             public readonly Color PickedColor;
             /// <summary>
             /// A boolean representing that the selected color has been picked
-            /// for the <see cref="ValueHolder.currentSecondaryColor"/>
+            /// for the <see cref="ValueHolder.CurrentSecondaryColor"/>
             /// </summary>
             public readonly bool PickForSecondColor;
 
@@ -256,12 +256,12 @@ namespace SEE.Controls.Actions.Drawable
             /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
             /// <param name="oldChosenPrimaryColor">The old chosen
-            ///     <see cref="ValueHolder.currentPrimaryColor"/></param>
+            ///     <see cref="ValueHolder.CurrentPrimaryColor"/></param>
             /// <param name="oldChosenSecondColor">The old chosen
-            ///     <see cref="ValueHolder.currentSecondaryColor"/></param>
+            ///     <see cref="ValueHolder.CurrentSecondaryColor"/></param>
             /// <param name="pickedColor">The picked color</param>
             /// <param name="pickForSecondColor">Color was picked for
-            ///     <see cref="ValueHolder.currentSecondaryColor"/></param>
+            ///     <see cref="ValueHolder.CurrentSecondaryColor"/></param>
             ///
             public Memento(Color oldChosenPrimaryColor, Color oldChosenSecondColor, Color pickedColor,
                 bool pickForSecondColor)
@@ -279,10 +279,10 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo();
-            ValueHolder.currentPrimaryColor = memento.OldChosenPrimaryColor;
-            ColorPickerMenu.AssignPrimaryColor(ValueHolder.currentPrimaryColor);
-            ValueHolder.currentSecondaryColor = memento.OldChosenSecondColor;
-            ColorPickerMenu.AssignSecondaryColor(ValueHolder.currentSecondaryColor);
+            ValueHolder.CurrentPrimaryColor = memento.OldChosenPrimaryColor;
+            ColorPickerMenu.AssignPrimaryColor(ValueHolder.CurrentPrimaryColor);
+            ValueHolder.CurrentSecondaryColor = memento.OldChosenSecondColor;
+            ColorPickerMenu.AssignSecondaryColor(ValueHolder.CurrentSecondaryColor);
         }
 
         /// <summary>
@@ -293,13 +293,13 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             if (!memento.PickForSecondColor)
             {
-                ValueHolder.currentPrimaryColor = memento.PickedColor;
-                ColorPickerMenu.AssignPrimaryColor(ValueHolder.currentPrimaryColor);
+                ValueHolder.CurrentPrimaryColor = memento.PickedColor;
+                ColorPickerMenu.AssignPrimaryColor(ValueHolder.CurrentPrimaryColor);
             }
             else
             {
-                ValueHolder.currentSecondaryColor = memento.PickedColor;
-                ColorPickerMenu.AssignSecondaryColor(ValueHolder.currentSecondaryColor);
+                ValueHolder.CurrentSecondaryColor = memento.PickedColor;
+                ColorPickerMenu.AssignSecondaryColor(ValueHolder.CurrentSecondaryColor);
             }
         }
 

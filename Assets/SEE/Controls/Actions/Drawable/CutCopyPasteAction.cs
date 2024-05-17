@@ -474,7 +474,7 @@ namespace SEE.Controls.Actions.Drawable
             lineConf.Id = "";
             newObject = GameDrawer.ReDrawLine(newDrawable, lineConf);
             newObject.transform.position = newPosition
-                - lineConf.OrderInLayer * ValueHolder.distanceToDrawable.z * newObject.transform.forward;
+                - lineConf.OrderInLayer * ValueHolder.DistanceToDrawable.z * newObject.transform.forward;
             new DrawNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable),
                 LineConf.GetLine(newObject)).Execute();
         }
@@ -489,7 +489,7 @@ namespace SEE.Controls.Actions.Drawable
             textConf.Id = "";
             newObject = GameTexter.ReWriteText(newDrawable, textConf);
             newObject.transform.position = newPosition
-                - newObject.transform.forward * ValueHolder.distanceToDrawable.z * textConf.OrderInLayer;
+                - newObject.transform.forward * ValueHolder.DistanceToDrawable.z * textConf.OrderInLayer;
             new WriteTextNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable),
                 TextConf.GetText(newObject)).Execute();
         }
@@ -505,16 +505,16 @@ namespace SEE.Controls.Actions.Drawable
             bool mirrored = imageConf.EulerAngles.y == 180;
             newObject = GameImage.RePlaceImage(newDrawable, imageConf);
             newObject.transform.position = newPosition
-                - imageConf.OrderInLayer * ValueHolder.distanceToDrawable.z * newObject.transform.forward;
+                - imageConf.OrderInLayer * ValueHolder.DistanceToDrawable.z * newObject.transform.forward;
 
             if (mirrored)
             {
                 newObject.transform.position = newPosition
-                    + imageConf.OrderInLayer * ValueHolder.distanceToDrawable.z * newObject.transform.forward;
+                    + imageConf.OrderInLayer * ValueHolder.DistanceToDrawable.z * newObject.transform.forward;
             } else
             {
                 newObject.transform.position = newPosition
-                    - imageConf.OrderInLayer * ValueHolder.distanceToDrawable.z * newObject.transform.forward;
+                    - imageConf.OrderInLayer * ValueHolder.DistanceToDrawable.z * newObject.transform.forward;
             }
             new AddImageNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable),
                 ImageConf.GetImageConf(newObject)).Execute();

@@ -783,24 +783,24 @@ namespace SEE.Controls.Actions.Drawable
 
             if (Input.mouseScrollDelta.y > 0 && !Input.GetKey(KeyCode.LeftControl))
             {
-                degree = ValueHolder.rotate;
+                degree = ValueHolder.Rotate;
                 rotate = true;
             }
             if (Input.mouseScrollDelta.y > 0 && Input.GetKey(KeyCode.LeftControl))
             {
-                degree = ValueHolder.rotateFast;
+                degree = ValueHolder.FotateFast;
                 rotate = true;
             }
 
             if (Input.mouseScrollDelta.y < 0 && !Input.GetKey(KeyCode.LeftControl))
             {
-                degree = -ValueHolder.rotate;
+                degree = -ValueHolder.Rotate;
                 rotate = true;
 
             }
             if (Input.mouseScrollDelta.y < 0 && Input.GetKey(KeyCode.LeftControl))
             {
-                degree = -ValueHolder.rotateFast;
+                degree = -ValueHolder.FotateFast;
                 rotate = true;
             }
 
@@ -828,24 +828,24 @@ namespace SEE.Controls.Actions.Drawable
 
             if (Input.mouseScrollDelta.y > 0 && !Input.GetKey(KeyCode.LeftControl))
             {
-                scaleFactor = ValueHolder.scaleUp;
+                scaleFactor = ValueHolder.ScaleUp;
                 isScaled = true;
             }
             if (Input.mouseScrollDelta.y > 0 && Input.GetKey(KeyCode.LeftControl))
             {
-                scaleFactor = ValueHolder.scaleUpFast;
+                scaleFactor = ValueHolder.ScaleUpFast;
                 isScaled = true;
             }
 
             if (Input.mouseScrollDelta.y < 0 && !Input.GetKey(KeyCode.LeftControl))
             {
-                scaleFactor = ValueHolder.scaleDown;
+                scaleFactor = ValueHolder.ScaleDown;
                 isScaled = true;
 
             }
             if (Input.mouseScrollDelta.y < 0 && Input.GetKey(KeyCode.LeftControl))
             {
-                scaleFactor = ValueHolder.scaleDownFast;
+                scaleFactor = ValueHolder.ScaleDownFast;
                 isScaled = true;
             }
             if (isScaled)

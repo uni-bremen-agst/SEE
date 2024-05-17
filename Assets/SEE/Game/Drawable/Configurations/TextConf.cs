@@ -69,7 +69,7 @@ namespace SEE.Game.Drawable.Configurations
                     Text = tmp.text,
                     FontColor = tmp.color,
                     OutlineColor = tmp.outlineColor,
-                    IsOutlined = tmp.fontMaterial.IsKeywordEnabled(GameTexter.OutlineKeyWord),
+                    IsOutlined = tmp.fontMaterial.IsKeywordEnabled(GameTexter.outlineKeyWord),
                     OutlineThickness = tmp.outlineWidth,
                     FontStyles = tmp.fontStyle,
                     FontSize = tmp.fontSize,

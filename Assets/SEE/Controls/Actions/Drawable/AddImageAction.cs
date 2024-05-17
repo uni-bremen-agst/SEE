@@ -244,7 +244,7 @@ namespace SEE.Controls.Actions.Drawable
             if (!string.IsNullOrWhiteSpace(filePath))
             {
                 imageObj = GameImage.PlaceImage(drawable, filePath, position,
-                    ValueHolder.currentOrderInLayer);
+                    ValueHolder.CurrentOrderInLayer);
                 new AddImageNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
                     ImageConf.GetImageConf(imageObj)).Execute();
                 memento = new Memento(drawable, ImageConf.GetImageConf(imageObj));

@@ -23,7 +23,7 @@ namespace SEE.Game.Drawable
         /// </summary>
         public static void Synchronize()
         {
-            new SynchronizeCurrentOrderInLayer(ValueHolder.currentOrderInLayer).Execute();
+            new SynchronizeCurrentOrderInLayer(ValueHolder.CurrentOrderInLayer).Execute();
 
             ArrayList drawables = new(GameObject.FindGameObjectsWithTag(Tags.Drawable));
             foreach (GameObject drawable in drawables)

@@ -97,7 +97,7 @@ namespace SEE.Game.Drawable
             border.transform.SetParent(node.transform);
 
             /// Ensures adherence to the order in layer distance.
-            node.transform.position = position - node.transform.forward * ValueHolder.distanceToDrawable.z *
+            node.transform.position = position - node.transform.forward * ValueHolder.DistanceToDrawable.z *
                             border.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
             /// Sets the order in layer to a new created order in layer value holder for the node.
             node.AddComponent<OrderInLayerValueHolder>()
@@ -153,7 +153,7 @@ namespace SEE.Game.Drawable
 
             /// Create the text. The initial color is black. It can be changed with the <see cref="EditAction"/>.
             GameObject text = GameTexter.WriteText(drawable, writtenText, position, Color.black, Color.clear, false,
-                ValueHolder.standardTextOutlineThickness, fontSize, 0, fontStyles);
+                ValueHolder.StandardTextOutlineThickness, fontSize, 0, fontStyles);
 
             return text;
         }
@@ -194,8 +194,8 @@ namespace SEE.Game.Drawable
             Vector3[] positions = GetBorderPositions(ellipse, convertedHitPoint, text);
             /// Draws the border.
             shape = DrawLine(drawable, "", positions, ColorKind.Monochrome,
-                        lineColor, ValueHolder.currentSecondaryColor, ValueHolder.standardLineThickness, true,
-                        lineKind, ValueHolder.standardLineTiling, false);
+                        lineColor, ValueHolder.CurrentSecondaryColor, ValueHolder.StandardLineThickness, true,
+                        lineKind, ValueHolder.StandardLineTiling, false);
             /// Sets the pivot to the middle.
             shape = SetPivotShape(shape, convertedHitPoint);
             return shape;
@@ -379,8 +379,8 @@ namespace SEE.Game.Drawable
             }
             /// Creates the branch line.
             GameObject branchLine = DrawLine(drawable, name, positions, ColorKind.Monochrome,
-                        Color.black, ValueHolder.currentSecondaryColor, ValueHolder.standardLineThickness, true,
-                        LineKind.Solid, ValueHolder.standardLineTiling, false);
+                        Color.black, ValueHolder.CurrentSecondaryColor, ValueHolder.StandardLineThickness, true,
+                        LineKind.Solid, ValueHolder.StandardLineTiling, false);
 
             /// Calculates the order.
             /// An order lower than the lower order (parent or node).
@@ -597,7 +597,7 @@ namespace SEE.Game.Drawable
                         ellipse = true;
                         GameEdit.ChangeFontStyles(nodeText, FontStyles.Bold | FontStyles.Underline);
                         GameEdit.ChangeFontSize(nodeText, 1.0f);
-                        ChangeLineKind(nodeBorder, LineKind.Solid, ValueHolder.standardLineTiling);
+                        ChangeLineKind(nodeBorder, LineKind.Solid, ValueHolder.StandardLineTiling);
                         GameEdit.ChangePrimaryColor(nodeBorder, Color.black);
                         break;
 
@@ -606,7 +606,7 @@ namespace SEE.Game.Drawable
                         /// Change the node appearance to the appearance of a Subtheme.
                         GameEdit.ChangeFontStyles(nodeText, FontStyles.Normal);
                         GameEdit.ChangeFontSize(nodeText, 0.7f);
-                        ChangeLineKind(nodeBorder, LineKind.Solid, ValueHolder.standardLineTiling);
+                        ChangeLineKind(nodeBorder, LineKind.Solid, ValueHolder.StandardLineTiling);
                         GameEdit.ChangePrimaryColor(nodeBorder, Color.black);
                         break;
 
@@ -616,7 +616,7 @@ namespace SEE.Game.Drawable
                         ellipse = true;
                         GameEdit.ChangeFontStyles(nodeText, FontStyles.Normal);
                         GameEdit.ChangeFontSize(nodeText, 0.5f);
-                        ChangeLineKind(nodeBorder, LineKind.Dashed25, ValueHolder.standardLineTiling);
+                        ChangeLineKind(nodeBorder, LineKind.Dashed25, ValueHolder.StandardLineTiling);
                         GameEdit.ChangePrimaryColor(nodeBorder, Color.clear);
                         break;
                 }
@@ -757,9 +757,9 @@ namespace SEE.Game.Drawable
         {
             /// Adjusts the current order in the layer if the
             /// order in layer for the line is greater than or equal to it.
-            if (order >= ValueHolder.currentOrderInLayer)
+            if (order >= ValueHolder.CurrentOrderInLayer)
             {
-                ValueHolder.currentOrderInLayer = order + 1;
+                ValueHolder.CurrentOrderInLayer = order + 1;
             }
             GameObject createdNode;
 

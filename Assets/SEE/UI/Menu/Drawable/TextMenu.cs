@@ -474,16 +474,16 @@ namespace SEE.UI.Menu.Drawable
         public static void EnableForWriting()
         {
             /// Enables the text menu in writing mode.
-            EnableTextMenu(color => ValueHolder.currentPrimaryColor = color, ValueHolder.currentPrimaryColor, true);
+            EnableTextMenu(color => ValueHolder.CurrentPrimaryColor = color, ValueHolder.CurrentPrimaryColor, true);
 
             /// Disables the return button.
             instance.transform.Find("ReturnBtn").gameObject.SetActive(false);
 
             /// Adds the handler for the font color button.
-            /// It saves the changes in the global value for the primary color <see cref="ValueHolder.currentPrimaryColor"/>.
+            /// It saves the changes in the global value for the primary color <see cref="ValueHolder.CurrentPrimaryColor"/>.
             fontColorBMB.clickEvent.AddListener(() =>
             {
-                AssignColorArea(color => ValueHolder.currentPrimaryColor = color, ValueHolder.currentPrimaryColor);
+                AssignColorArea(color => ValueHolder.CurrentPrimaryColor = color, ValueHolder.CurrentPrimaryColor);
                 MenuHelper.CalculateHeight(instance);
             });
 
@@ -491,16 +491,16 @@ namespace SEE.UI.Menu.Drawable
             AssignOutlineThicknessForWriting();
 
             /// Adds the handler for the outline thickness slider.
-            /// It saves the changes in the global value for the outline thickness <see cref="ValueHolder.currentOutlineThickness"/>.
-            AssignOutlineThickness(thickness => ValueHolder.currentOutlineThickness = thickness,
-                ValueHolder.currentOutlineThickness);
+            /// It saves the changes in the global value for the outline thickness <see cref="ValueHolder.CurrentOutlineThickness"/>.
+            AssignOutlineThickness(thickness => ValueHolder.CurrentOutlineThickness = thickness,
+                ValueHolder.CurrentOutlineThickness);
 
             /// Disables the outline color.
             outlineSwitch.isOn = false;
             outlineSwitch.UpdateUI();
 
             /// Adds the handler for the font size component.
-            AssignFontSize(size => ValueHolder.currentFontSize = size, ValueHolder.currentFontSize);
+            AssignFontSize(size => ValueHolder.CurrentFontSize = size, ValueHolder.CurrentFontSize);
 
             /// Re-calculate the menu height.
             MenuHelper.CalculateHeight(instance);
@@ -508,7 +508,7 @@ namespace SEE.UI.Menu.Drawable
 
         /// <summary>
         /// Adds the handler for the outline color button.
-        /// It saves the changes in the global value for the secondary color <see cref="ValueHolder.currentSecondaryColor"/>.
+        /// It saves the changes in the global value for the secondary color <see cref="ValueHolder.CurrentSecondaryColor"/>.
         /// 
         /// Checks the current secondary color before assigning it.
         /// If it is clear (completely transparent), a new random color is chosen. 
@@ -525,17 +525,17 @@ namespace SEE.UI.Menu.Drawable
                 /// the secondary color is clear. 
                 /// Therefore, a random color is added first, 
                 /// and if the color's alpha is 0, it is set to 255 to ensure the color is not transparent.
-                if (ValueHolder.currentSecondaryColor == Color.clear)
+                if (ValueHolder.CurrentSecondaryColor == Color.clear)
                 {
-                    ValueHolder.currentSecondaryColor = Random.ColorHSV();
+                    ValueHolder.CurrentSecondaryColor = Random.ColorHSV();
                 }
 
-                if (ValueHolder.currentSecondaryColor.a == 0)
+                if (ValueHolder.CurrentSecondaryColor.a == 0)
                 {
-                    ValueHolder.currentSecondaryColor = new Color(ValueHolder.currentSecondaryColor.r,
-                        ValueHolder.currentSecondaryColor.g, ValueHolder.currentSecondaryColor.b, 255);
+                    ValueHolder.CurrentSecondaryColor = new Color(ValueHolder.CurrentSecondaryColor.r,
+                        ValueHolder.CurrentSecondaryColor.g, ValueHolder.CurrentSecondaryColor.b, 255);
                 }
-                AssignColorArea(color => ValueHolder.currentSecondaryColor = color, ValueHolder.currentSecondaryColor);
+                AssignColorArea(color => ValueHolder.CurrentSecondaryColor = color, ValueHolder.CurrentSecondaryColor);
                 MenuHelper.CalculateHeight(instance);
             });
         }

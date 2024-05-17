@@ -181,10 +181,10 @@ namespace SEE.Controls.Actions.Drawable
                 if (textOut != null && textOut != "")
                 {
                     textObj = GameTexter.WriteText(drawable, textOut, position,
-                        ValueHolder.currentPrimaryColor, ValueHolder.currentSecondaryColor,
+                        ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor,
                         TextMenu.GetOutlineStatus(),
-                        ValueHolder.currentOutlineThickness, ValueHolder.currentFontSize,
-                        ValueHolder.currentOrderInLayer, TextMenu.GetFontStyle());
+                        ValueHolder.CurrentOutlineThickness, ValueHolder.CurrentFontSize,
+                        ValueHolder.CurrentOrderInLayer, TextMenu.GetFontStyle());
                     new WriteTextNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
                         TextConf.GetText(textObj)).Execute();
                     memento = new Memento(drawable, TextConf.GetText(textObj));

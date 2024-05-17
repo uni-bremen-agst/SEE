@@ -248,7 +248,7 @@ namespace SEE.Game.Drawable.Configurations
             }
             else
             {
-                Thickness = ValueHolder.currentThickness;
+                Thickness = ValueHolder.CurrentThickness;
                 errors = true;
             }
 

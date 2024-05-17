@@ -162,7 +162,7 @@ namespace SEE.Game.Drawable
             /// Set the position of the line and ensure the correct order in the layer.
             /// Additionally, adopt the rotation of the attached object.
             line.transform.SetPositionAndRotation(attachedObjects.transform.position, attachedObjects.transform.rotation);
-            line.transform.position -= order * ValueHolder.distanceToDrawable.z * line.transform.forward;
+            line.transform.position -= order * ValueHolder.DistanceToDrawable.z * line.transform.forward;
 
             /// Adds the order in layer value holder component to the line object and sets the order.
             line.AddComponent<OrderInLayerValueHolder>().SetOrderInLayer(order);
@@ -213,9 +213,9 @@ namespace SEE.Game.Drawable
             Color primaryColor, Color secondaryColor, float thickness, LineKind lineKind, float tiling)
         {
             Setup(drawable, "", positions, colorKind, primaryColor, secondaryColor, thickness,
-                ValueHolder.currentOrderInLayer, lineKind, tiling,
+                ValueHolder.CurrentOrderInLayer, lineKind, tiling,
                 out GameObject line, out LineRenderer _, out MeshCollider _);
-            ValueHolder.currentOrderInLayer++;
+            ValueHolder.CurrentOrderInLayer++;
 
             return line;
         }
@@ -299,13 +299,13 @@ namespace SEE.Game.Drawable
             {
                 /// Block for creating a new line.
                 Setup(drawable, name, positions, colorKind, primaryColor, secondaryColor, thickness,
-                    ValueHolder.currentOrderInLayer, lineKind, tiling,
+                    ValueHolder.CurrentOrderInLayer, lineKind, tiling,
                     out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
                 lineObject = line;
                 renderer.SetPositions(positions);
                 if (increaseCurrentOrder)
                 {
-                    ValueHolder.currentOrderInLayer++;
+                    ValueHolder.CurrentOrderInLayer++;
                 }
                 FinishDrawing(line, loop);
             }
@@ -347,9 +347,9 @@ namespace SEE.Game.Drawable
 
             /// Adjusts the current order in the layer if the
             /// order in layer for the line is greater than or equal to it.
-            if (orderInLayer >= ValueHolder.currentOrderInLayer)
+            if (orderInLayer >= ValueHolder.CurrentOrderInLayer)
             {
-                ValueHolder.currentOrderInLayer = orderInLayer + 1;
+                ValueHolder.CurrentOrderInLayer = orderInLayer + 1;
             }
 
             /// Block for update an existing line with the given name.
@@ -766,10 +766,10 @@ namespace SEE.Game.Drawable
         public static Vector3 GetConvertedPosition(GameObject drawable, Vector3 position)
         {
             Vector3 convertedPosition;
-            Setup(drawable, "", new Vector3[] { position }, ColorKind.Monochrome, ValueHolder.currentPrimaryColor,
-                Color.clear, ValueHolder.currentThickness, 0, ValueHolder.currentLineKind, 1,
+            Setup(drawable, "", new Vector3[] { position }, ColorKind.Monochrome, ValueHolder.CurrentPrimaryColor,
+                Color.clear, ValueHolder.CurrentThickness, 0, ValueHolder.CurrentLineKind, 1,
                 out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
-            convertedPosition = line.transform.InverseTransformPoint(position) - ValueHolder.distanceToDrawable;
+            convertedPosition = line.transform.InverseTransformPoint(position) - ValueHolder.DistanceToDrawable;
             Destroyer.Destroy(line);
             return convertedPosition;
         }

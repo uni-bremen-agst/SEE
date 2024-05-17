@@ -1,10 +1,9 @@
-﻿using SEE.Game.Drawable.Configurations;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SEE.Game.Drawable.ValueHolders
 {
     /// <summary>
-    /// This class represents a value holder component for the 
+    /// This class represents a value holder component for the
     /// order in layer value.
     /// </summary>
     public class OrderInLayerValueHolder : MonoBehaviour

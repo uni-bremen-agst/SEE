@@ -48,7 +48,7 @@ namespace SEE.UI.Drawable
         /// </summary>
         private void Start()
         {
-            manager.mainSlider.maxValue = ValueHolder.currentOrderInLayer;
+            manager.mainSlider.maxValue = ValueHolder.CurrentOrderInLayer;
         }
 
         /// <summary>

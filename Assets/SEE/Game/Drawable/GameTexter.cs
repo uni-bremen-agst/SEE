@@ -12,14 +12,14 @@ namespace SEE.Game.Drawable
     public static class GameTexter
     {
         /// <summary>
-        /// Name of the font for the text
+        /// Name of the font for the text.
         /// </summary>
-        private const string DrawableTextFontName = "Fonts/DrawableTextFont";
+        private const string drawableTextFontName = "Fonts/DrawableTextFont";
 
         /// <summary>
         /// The shader keyword for the outline color.
         /// </summary>
-        public static readonly string OutlineKeyWord = "OUTLINE_ON";
+        public static readonly string outlineKeyWord = "OUTLINE_ON";
 
         /// <summary>
         /// Removes HTML tags from string using char array.
@@ -98,10 +98,8 @@ namespace SEE.Game.Drawable
             /// It takes into account whether the text is bold, uppercase, or in small caps.
             for (int i = 0; i < result.Length; i++)
             {
-                char unicode = result[i];
-                TMP_Character character;
                 /// Makes sure the given unicode exists in the font asset.
-                if (fontAsset.characterLookupTable.TryGetValue(unicode, out character))
+                if (fontAsset.characterLookupTable.TryGetValue(result[i], out TMP_Character character))
                 {
                     width += character.glyph.metrics.horizontalAdvance * pointSizeScale +
                         (styleSpacingAdjustment + normalSpacingAdjustment) * emScale;
@@ -115,7 +113,7 @@ namespace SEE.Game.Drawable
         /// This method calculates the width and height of the text.
         /// The width depends on the first line of the text.
         /// The height is approximated by dividing the number of characters in the text by
-        /// the number of characters in the first line multiplies with 0.1f and the fontSize.
+        /// the number of characters in the first line multiplied by 0.1f and the fontSize.
         /// </summary>
         /// <param name="text">The written text.</param>
         /// <param name="fontAsset">The font asset of the text</param>
@@ -133,26 +131,27 @@ namespace SEE.Game.Drawable
             /// Approximates the height of the text
             /// by dividing the length of the text by the length of the first line,
             /// multiplied by the font size and a buffer of 0.1.
-            /// Since the width was calculated by the first line, the subsequent lines break when reaching the width.
+            /// Since the width was calculated by the first line, the subsequent lines break
+            /// when reaching the width.
             float height = text.Length / lengthToFirstLineBreak;
             float y = height * 0.1f * fontSize;
             return new Vector2(x, y);
         }
 
         /// <summary>
-        /// This method creates the inital drawable text object
+        /// This method creates the inital drawable text object.
         /// </summary>
-        /// <param name="drawable">Is the drawable on which the text should be displayed</param>
-        /// <param name="name">The name of the text object</param>
-        /// <param name="text">The text that should be displayed</param>
-        /// <param name="position">The inital position of the text object</param>
+        /// <param name="drawable">The drawable on which the text should be displayed</param>
+        /// <param name="name">The name of the text object.</param>
+        /// <param name="text">The text that should be displayed.</param>
+        /// <param name="position">The inital position of the text object.</param>
         /// <param name="fontColor">The chosen font color of the text.</param>
         /// <param name="outlineColor">The chosen outline color of the text.</param>
         /// <param name="outlineThickness">The chosen outline thickness of the text.</param>
-        /// <param name="fontSize">The chosen font size of the text</param>
-        /// <param name="order">The current order in layer</param>
-        /// <param name="styles">The chosen font styles for the text</param>
-        /// <param name="textObj">The created drawable text object</param>
+        /// <param name="fontSize">The chosen font size of the text.</param>
+        /// <param name="order">The current order in layer.</param>
+        /// <param name="styles">The chosen font styles for the text.</param>
+        /// <param name="textObj">The created drawable text object.</param>
         private static void Setup(GameObject drawable, string name, string text, Vector3 position,
             Color fontColor, Color outlineColor, bool outlineStatus, float outlineThickness,
             float fontSize, int order, FontStyles styles,
@@ -182,7 +181,6 @@ namespace SEE.Game.Drawable
             /// Sets up the drawable holder <see cref="DrawableHolder"/>.
             DrawableHolder.Setup(drawable, out _, out GameObject attachedObjects);
 
-            /// Assign the dtext tag to the text object.
             textObj.tag = Tags.DText;
 
             /// Add the text object to the hierarchy below the attached objects - object of the drawable.
@@ -194,7 +192,7 @@ namespace SEE.Game.Drawable
             /// Sets the values for the text and calculates the rect tranform size.
             tmp.text = text;
             tmp.fontStyle = styles;
-            tmp.font = Resources.Load<TMP_FontAsset>(DrawableTextFontName);
+            tmp.font = Resources.Load<TMP_FontAsset>(drawableTextFontName);
             tmp.rectTransform.sizeDelta = CalculateWidthAndHeight(text, tmp.font, fontSize, styles);
             tmp.color = fontColor;
             tmp.faceColor = fontColor;
@@ -204,11 +202,8 @@ namespace SEE.Game.Drawable
             tmp.alignment = TextAlignmentOptions.Center;
 
             /// Adopt the rotation of the attached object.
-            textObj.transform.rotation = attachedObjects.transform.rotation;
-
             /// Calculates the position and preserve the distance.
-            textObj.transform.position = position - textObj.transform.forward * ValueHolder.distanceToDrawable.z * order;
-
+            textObj.transform.SetPositionAndRotation(position - order * ValueHolder.DistanceToDrawable.z * textObj.transform.forward, attachedObjects.transform.rotation);
             /// Forces the updated of the <see cref="TextMeshPro"/>'s mesh.
             tmp.ForceMeshUpdate(true);
 
@@ -222,7 +217,7 @@ namespace SEE.Game.Drawable
             tmp.sortingOrder = order;
 
             /// Is needed to fix an issue in the <see cref="TextMeshPro"/> component.
-            /// If the outline color is set to black during creation, it is strangely always set to white.
+            /// If the outline color is set to black during creation; it is strangely always set to white.
             tmp.outlineColor = tmp.outlineColor;
 
             /// Enables or disables the outline color.
@@ -233,7 +228,7 @@ namespace SEE.Game.Drawable
         /// Writes a drawbale text on a drawable.
         /// The name for it is currently empty, because the setup method will create a unique one.
         /// </summary>
-        /// <param name="drawable">Is the drawable on which the text should be displayed</param>
+        /// <param name="drawable">The drawable on which the text should be displayed</param>
         /// <param name="text">The text that should be displayed</param>
         /// <param name="position">The inital position of the text object</param>
         /// <param name="fontColor">The chosen font color of the text.</param>
@@ -248,7 +243,7 @@ namespace SEE.Game.Drawable
         {
             Setup(drawable, "", text, position, fontColor, outlineColor, outlineStatus, outlineThickness, fontSize,
                 order, styles, out GameObject textObj);
-            ValueHolder.currentOrderInLayer++;
+            ValueHolder.CurrentOrderInLayer++;
 
             /// Is needed to fix an issue in the <see cref="TextMeshPro"/> component.
             /// If the outline color is set to black during creation, it is strangely always set to white.
@@ -259,7 +254,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Rewrites a drawbale text on a drawable.
         /// </summary>
-        /// <param name="drawable">Is the drawable on which the text should be displayed</param>
+        /// <param name="drawable">The drawable on which the text should be displayed</param>
         /// <param name="id">The name of the drawable text</param>
         /// <param name="text">The text that should be displayed</param>
         /// <param name="position">The inital position of the text object</param>
@@ -278,21 +273,22 @@ namespace SEE.Game.Drawable
         {
             /// Adjusts the current order in the layer if the
             /// order in layer for the line is greater than or equal to it.
-            if (order >= ValueHolder.currentOrderInLayer)
+            if (order >= ValueHolder.CurrentOrderInLayer)
             {
-                ValueHolder.currentOrderInLayer = order + 1;
+                ValueHolder.CurrentOrderInLayer = order + 1;
             }
 
             GameObject textObject;
 
-            /// Trys to find the text on the drawable.
+            /// Tries to find the text on the drawable.
             if (GameFinder.FindChild(drawable, id) != null)
             {
                 textObject = GameFinder.FindChild(drawable, id);
                 textObject.GetComponent<TextMeshPro>().sortingOrder = order;
             }
             else
-            { /// Creates the text object.
+            {
+                /// Creates the text object.
                 Setup(drawable, id, text, position, fontColor, outlineColor, outlineStatus, outlineThickness, fontSize, order,
                     styles, out GameObject textObj);
                 textObject = textObj;
@@ -306,7 +302,7 @@ namespace SEE.Game.Drawable
             textObject.GetComponent<OrderInLayerValueHolder>().SetOrderInLayer(order);
 
             /// Is needed to fix an issue in the <see cref="TextMeshPro"/> component.
-            /// If the outline color is set to black during creation, it is strangely always set to white.
+            /// If the outline color is set to black during creation; it is strangely always set to white.
             GameEdit.ChangeOutlineColor(textObject, outlineColor);
 
             return textObject;
@@ -360,7 +356,7 @@ namespace SEE.Game.Drawable
             if (textObj.CompareTag(Tags.DText))
             {
                 TextMeshPro tmp = textObj.GetComponent<TextMeshPro>();
-                LocalKeyword outlineKeyword = new(tmp.fontMaterial.shader, OutlineKeyWord);
+                LocalKeyword outlineKeyword = new(tmp.fontMaterial.shader, outlineKeyWord);
                 tmp.fontMaterial.SetKeyword(outlineKeyword, status);
             }
         }

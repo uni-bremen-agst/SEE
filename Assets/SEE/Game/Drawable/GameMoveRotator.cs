@@ -38,7 +38,7 @@ namespace SEE.Game.Drawable
 
             /// Ensure that the converted hit point preserves the distance to the drawable.
             convertedHitPoint -= obj.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer()
-                * ValueHolder.distanceToDrawable.z * obj.transform.forward;
+                * ValueHolder.DistanceToDrawable.z * obj.transform.forward;
 
             /// Build the new object position.
             Vector3 position = new(convertedHitPoint.x, convertedHitPoint.y, oldPos.z);
@@ -78,10 +78,10 @@ namespace SEE.Game.Drawable
             obj.transform.localEulerAngles = Vector3.zero;
 
             /// The moving speed.
-            float multiplyValue = ValueHolder.move;
+            float multiplyValue = ValueHolder.Move;
             if (speedUp)
             {
-                multiplyValue = ValueHolder.moveFast;
+                multiplyValue = ValueHolder.MoveFast;
             }
 
             /// Moves the object in the desired direction with the chosen speed.

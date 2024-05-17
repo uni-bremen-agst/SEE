@@ -21,7 +21,7 @@ namespace SEE.Game.Drawable
         /// The path to the configuration folder of the saved drawables.
         /// This is saved in a field because multiple methods of this class and other classes use it.
         /// </summary>
-        public static readonly string configurationPath = ValueHolder.drawablePath + "Configuration/";
+        public static readonly string configurationPath = ValueHolder.DrawablePath + "Configuration/";
 
         /// <summary>
         /// The path to the folder of saved drawable (single).

@@ -309,25 +309,25 @@ namespace SEE.Controls.Actions.Drawable
             /// Scale up with normal speed.
             if (Input.mouseScrollDelta.y > 0 && !Input.GetKey(KeyCode.LeftControl))
             {
-                scaleFactor = ValueHolder.scaleUp;
+                scaleFactor = ValueHolder.ScaleUp;
                 isScaled = true;
             }
             /// Scale up with faster speed.
             if (Input.mouseScrollDelta.y > 0 && Input.GetKey(KeyCode.LeftControl))
             {
-                scaleFactor = ValueHolder.scaleUpFast;
+                scaleFactor = ValueHolder.ScaleUpFast;
                 isScaled = true;
             }
             /// Scale down with normal speed.
             if (Input.mouseScrollDelta.y < 0 && !Input.GetKey(KeyCode.LeftControl))
             {
-                scaleFactor = ValueHolder.scaleDown;
+                scaleFactor = ValueHolder.ScaleDown;
                 isScaled = true;
             }
             /// Scale down with faster speed.
             if (Input.mouseScrollDelta.y < 0 && Input.GetKey(KeyCode.LeftControl))
             {
-                scaleFactor = ValueHolder.scaleDownFast;
+                scaleFactor = ValueHolder.ScaleDownFast;
                 isScaled = true;
             }
 

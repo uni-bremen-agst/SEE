@@ -44,7 +44,7 @@ namespace SEE.Game.Drawable
                 OrderInLayerValueHolder holder = obj.GetComponent<OrderInLayerValueHolder>() != null ?
                     obj.GetComponent<OrderInLayerValueHolder>() : obj.GetComponentInChildren<OrderInLayerValueHolder>();
                 /// Block that is executed when the desired order in layer exceeds the maximum or is equal.
-                if (holder.GetOrderInLayer() >= ValueHolder.currentOrderInLayer)
+                if (holder.GetOrderInLayer() >= ValueHolder.CurrentOrderInLayer)
                 {
                     if (showInformation)
                     {
@@ -167,13 +167,13 @@ namespace SEE.Game.Drawable
             /// For sticky notes, it's important to use the original position for the calculation.
             if (useWorldPos)
             {
-                obj.transform.position = oldPos - multiplyValue * ValueHolder.distanceToDrawable.z * obj.transform.forward;
+                obj.transform.position = oldPos - multiplyValue * ValueHolder.DistanceToDrawable.z * obj.transform.forward;
             }
             else
             {
                 /// For a <see cref="DrawableType"/> object only change the z-axis.
                 obj.transform.localPosition = new Vector3(oldPos.x, oldPos.y,
-                    multiplyValue * -ValueHolder.distanceToDrawable.z);
+                    multiplyValue * -ValueHolder.DistanceToDrawable.z);
             }
         }
     }

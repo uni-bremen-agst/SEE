@@ -116,8 +116,8 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// Marks the split point with a polygon with a radius of
-        /// <see cref="ValueHolder.lineSplitMarkerRadius"/> and vertices count of <see cref="ValueHolder.lineSplitMarkerVertices"/>
-        /// for <see cref="ValueHolder.lineSplitTimer"/> seconds.
+        /// <see cref="ValueHolder.LineSplitMarkerRadius"/> and vertices count of <see cref="ValueHolder.LineSplitMarkerVertices"/>
+        /// for <see cref="ValueHolder.LineSplitTimer"/> seconds.
         /// </summary>
         /// <param name="hitObject">The object that has been split.</param>
         /// <param name="splitPos">The first split position.</param>
@@ -139,12 +139,12 @@ namespace SEE.Controls.Actions.Drawable
             /// If the color does not have a complementary color, take the default.
             if (color == negativColor)
             {
-                negativColor = ValueHolder.lineSplitDefaultMarkerColor;
+                negativColor = ValueHolder.LineSplitDefaultMarkerColor;
             }
 
             /// Calculates the positions of the marker polygon.
             Vector3[] positions = ShapePointsCalculator.Polygon(position,
-                ValueHolder.lineSplitMarkerRadius, ValueHolder.lineSplitMarkerVertices);
+                ValueHolder.LineSplitMarkerRadius, ValueHolder.LineSplitMarkerVertices);
             /// Creates the marker polygon.
             GameObject point = GameDrawer.DrawLine(drawable, RandomStrings.GetRandomString(10), positions,
                 GameDrawer.ColorKind.Monochrome,
@@ -159,8 +159,8 @@ namespace SEE.Controls.Actions.Drawable
             /// Adds the blink effect to the point on all clients.
             new AddBlinkEffectNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), point.name).Execute();
             /// Destroys the marker after the chosen time.
-            Object.Destroy(point, ValueHolder.lineSplitTimer);
-            new EraseAfterTimeNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), point.name, ValueHolder.lineSplitTimer).Execute();
+            Object.Destroy(point, ValueHolder.LineSplitTimer);
+            new EraseAfterTimeNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), point.name, ValueHolder.LineSplitTimer).Execute();
         }
 
         /// <summary>

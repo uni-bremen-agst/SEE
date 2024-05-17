@@ -182,12 +182,12 @@ namespace SEE.Controls.Actions.Drawable
             progressState = ProgressState.Drawing;
             positions[0] = raycastHit.point;
             /// Create the line object.
-            line = GameDrawer.StartDrawing(drawable, positions, ValueHolder.currentColorKind,
-                ValueHolder.currentPrimaryColor, ValueHolder.currentSecondaryColor, ValueHolder.currentThickness,
-                ValueHolder.currentLineKind, ValueHolder.currentTiling);
+            line = GameDrawer.StartDrawing(drawable, positions, ValueHolder.CurrentColorKind,
+                ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor, ValueHolder.CurrentThickness,
+                ValueHolder.CurrentLineKind, ValueHolder.CurrentTiling);
             /// Transform the first position in local space.
             /// Beforehand, it's not possible because there is no line object on which 'InverseTransformPoint' can be applied.
-            positions[0] = line.transform.InverseTransformPoint(positions[0]) - ValueHolder.distanceToDrawable;
+            positions[0] = line.transform.InverseTransformPoint(positions[0]) - ValueHolder.DistanceToDrawable;
         }
 
         /// <summary>
@@ -201,7 +201,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             /// The position at which to continue the line in local space.
             /// To maintain the distance from the drawable, the minimum distance on the Z-axis is subtracted.
-            Vector3 newPosition = line.transform.InverseTransformPoint(raycastHit.point) - ValueHolder.distanceToDrawable;
+            Vector3 newPosition = line.transform.InverseTransformPoint(raycastHit.point) - ValueHolder.DistanceToDrawable;
             Vector3 nPos = new(newPosition.x, newPosition.y, 0);
             if (newPosition != positions.Last() /// This query is required in case <see cref="StartDrawing"/> was used previously.
                 && nPos != positions.Last()) // This query is required if <see cref="GameDrawer.Drawing"/> has already been

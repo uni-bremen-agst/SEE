@@ -27,7 +27,7 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                ValueHolder.currentOrderInLayer = OrderInLayer;
+                ValueHolder.CurrentOrderInLayer = OrderInLayer;
             }
         }
 

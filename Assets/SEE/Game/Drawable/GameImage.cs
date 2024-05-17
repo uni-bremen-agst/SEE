@@ -114,7 +114,7 @@ namespace SEE.Game.Drawable
 
             /// Set the position of the line and ensure the correct order in the layer.
             /// Additionally, adopt the rotation of the attached object.
-            image.transform.SetPositionAndRotation(position - order * ValueHolder.distanceToDrawable.z * image.transform.forward, attachedObjects.transform.rotation);
+            image.transform.SetPositionAndRotation(position - order * ValueHolder.DistanceToDrawable.z * image.transform.forward, attachedObjects.transform.rotation);
             /// Adds the order in layer value holder component to the line object and sets the order.
             image.AddComponent<OrderInLayerValueHolder>().SetOrderInLayer(order);
         }
@@ -131,7 +131,7 @@ namespace SEE.Game.Drawable
         public static GameObject PlaceImage(GameObject drawable, string imageFilePath, Vector3 position, int order)
         {
             Setup(drawable, "", imageFilePath, null, position, order, out GameObject image);
-            ValueHolder.currentOrderInLayer++;
+            ValueHolder.CurrentOrderInLayer++;
             return image;
         }
 
@@ -153,9 +153,9 @@ namespace SEE.Game.Drawable
         {
             /// Adjusts the current order in the layer if the
             /// order in layer for the line is greater than or equal to it.
-            if (order >= ValueHolder.currentOrderInLayer)
+            if (order >= ValueHolder.CurrentOrderInLayer)
             {
-                ValueHolder.currentOrderInLayer = order + 1;
+                ValueHolder.CurrentOrderInLayer = order + 1;
             }
             GameObject imageObj;
 
@@ -215,8 +215,8 @@ namespace SEE.Game.Drawable
         public static void CreateImageFile(GameObject imageObj, byte[] fileData, string fileName,
             out string filePath)
         {
-            DrawableConfigManager.EnsureDrawableDirectoryExists(ValueHolder.imagePath);
-            string path = ValueHolder.imagePath + fileName;
+            DrawableConfigManager.EnsureDrawableDirectoryExists(ValueHolder.ImagePath);
+            string path = ValueHolder.ImagePath + fileName;
             string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
             string fileExtension = Path.GetExtension(fileName);
             filePath = path;
@@ -245,7 +245,7 @@ namespace SEE.Game.Drawable
                 /// To do this, it is necessary to create a temporary image file.
                 /// This is done in a separate subfolder 'temp.'
                 /// After the examinations, this file and the folder are deleted.
-                string tmpPath = ValueHolder.imagePath + "/temp/";
+                string tmpPath = ValueHolder.ImagePath + "/temp/";
                 DrawableConfigManager.EnsureDrawableDirectoryExists(tmpPath);
                 string tmpFileName = fileNameWithoutExtension + "-"
                                      + RandomStrings.GetRandomStringForFile(10) + fileExtension;
@@ -262,14 +262,14 @@ namespace SEE.Game.Drawable
 
                 if (fileInfo.Length != existsInfo.Length)
                 {
-                    int numberOfFiles = Directory.GetFiles(ValueHolder.imagePath).ToList().Count;
+                    int numberOfFiles = Directory.GetFiles(ValueHolder.ImagePath).ToList().Count;
                     /// If the byte counts are not equal, indicating different images,
                     /// it checks whether another file with a similar name already exists and
                     /// whether there is a file among them that matches the image to be saved.
                     /// If this is not the case, a new file with the highest index + 1 is created.
                     for (int i = 1; i <= numberOfFiles; i++)
                     {
-                        string newPath = ValueHolder.imagePath + fileNameWithoutExtension
+                        string newPath = ValueHolder.ImagePath + fileNameWithoutExtension
                             + "(" + i + ")" + fileExtension;
                         if (!File.Exists(newPath))
                         {

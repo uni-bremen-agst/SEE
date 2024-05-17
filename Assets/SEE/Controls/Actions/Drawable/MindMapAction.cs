@@ -316,8 +316,8 @@ namespace SEE.Controls.Actions.Drawable
                 /// The following block is for a branch line preview.
                 branchLine = GameDrawer.StartDrawing(drawable, new Vector3[] { position },
                     GameDrawer.ColorKind.Monochrome, Color.black, Color.clear,
-                    ValueHolder.standardLineThickness, GameDrawer.LineKind.Solid,
-                    ValueHolder.standardLineTiling);
+                    ValueHolder.StandardLineThickness, GameDrawer.LineKind.Solid,
+                    ValueHolder.StandardLineTiling);
                 branchLine.transform.SetParent(node.transform);
                 branchLineRenderer = branchLine.GetComponent<LineRenderer>();
                 MindMapParentSelectionMenu.Enable(GameFinder.GetAttachedObjectsObject(drawable), node);

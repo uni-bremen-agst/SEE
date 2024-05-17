@@ -154,7 +154,7 @@ namespace SEE.Controls.Actions.Drawable
                     && (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
                         GameFinder.HasDrawable(hit.collider.gameObject)))
                 {
-                    Vector3 newPosition = shape.transform.InverseTransformPoint(hit.point) - ValueHolder.distanceToDrawable;
+                    Vector3 newPosition = shape.transform.InverseTransformPoint(hit.point) - ValueHolder.DistanceToDrawable;
                     if (newPosition != positions.Last())
                     {
                         Vector3[] newPositions = new Vector3[positions.Length + 1];
@@ -286,11 +286,11 @@ namespace SEE.Controls.Actions.Drawable
                 case ShapePointsCalculator.Shape.Line:
 
                     positions[0] = hitpoint;
-                    shape = GameDrawer.StartDrawing(drawable, positions, ValueHolder.currentColorKind,
-                        ValueHolder.currentPrimaryColor, ValueHolder.currentSecondaryColor,
-                        ValueHolder.currentThickness, ValueHolder.currentLineKind,
-                        ValueHolder.currentTiling);
-                    positions[0] = shape.transform.InverseTransformPoint(positions[0]) - ValueHolder.distanceToDrawable;
+                    shape = GameDrawer.StartDrawing(drawable, positions, ValueHolder.CurrentColorKind,
+                        ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor,
+                        ValueHolder.CurrentThickness, ValueHolder.CurrentLineKind,
+                        ValueHolder.CurrentTiling);
+                    positions[0] = shape.transform.InverseTransformPoint(positions[0]) - ValueHolder.DistanceToDrawable;
                     break;
                 case ShapePointsCalculator.Shape.Square:
                     positions = ShapePointsCalculator.Square(convertedHitPoint, ShapeMenu.GetValue1());
@@ -346,9 +346,9 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (GameDrawer.DifferentPositionCounter(positions) > 1)
             {
-                shape = GameDrawer.DrawLine(drawable, "", positions, ValueHolder.currentColorKind,
-                    ValueHolder.currentPrimaryColor, ValueHolder.currentSecondaryColor, ValueHolder.currentThickness, false,
-                    ValueHolder.currentLineKind, ValueHolder.currentTiling);
+                shape = GameDrawer.DrawLine(drawable, "", positions, ValueHolder.CurrentColorKind,
+                    ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor, ValueHolder.CurrentThickness, false,
+                    ValueHolder.CurrentLineKind, ValueHolder.CurrentTiling);
                 shape.GetComponent<LineRenderer>().loop = false;
                 shape = GameDrawer.SetPivotShape(shape, convertedHitPoint);
                 LineConf currentShape = LineConf.GetLine(shape);
@@ -380,7 +380,7 @@ namespace SEE.Controls.Actions.Drawable
                     ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
                     && (drawable == null || drawable != null && GameFinder.GetDrawable(rh.collider.gameObject).Equals(drawable)))
             {
-                Vector3 newPosition = shape.transform.InverseTransformPoint(rh.point) - ValueHolder.distanceToDrawable;
+                Vector3 newPosition = shape.transform.InverseTransformPoint(rh.point) - ValueHolder.DistanceToDrawable;
                 Vector3[] newPositions = new Vector3[positions.Length + 1];
                 Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
                 newPositions[^1] = newPosition;
@@ -403,7 +403,7 @@ namespace SEE.Controls.Actions.Drawable
                 && drawing && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
                 && (drawable == null || drawable != null && GameFinder.GetDrawable(hit.collider.gameObject).Equals(drawable)))
             {
-                Vector3 newPosition = shape.transform.InverseTransformPoint(hit.point) - ValueHolder.distanceToDrawable;
+                Vector3 newPosition = shape.transform.InverseTransformPoint(hit.point) - ValueHolder.DistanceToDrawable;
                 if (newPosition != positions.Last())
                 {
                     Vector3[] newPositions = new Vector3[positions.Length + 1];

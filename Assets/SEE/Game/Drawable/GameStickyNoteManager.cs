@@ -43,7 +43,7 @@ namespace SEE.Game.Drawable
             }
 
             /// Adopt the position of the hit object, but preserve the distance.
-            stickyNote.transform.position = raycastHit.point - ValueHolder.currentOrderInLayer * ValueHolder.distanceToDrawable.z * stickyNote.transform.forward;
+            stickyNote.transform.position = raycastHit.point - ValueHolder.CurrentOrderInLayer * ValueHolder.DistanceToDrawable.z * stickyNote.transform.forward;
 
             /// Sets the initial scale for sticky notes
             stickyNote.transform.localScale = ValueHolder.StickyNoteScale;
@@ -54,9 +54,9 @@ namespace SEE.Game.Drawable
             /// Adds an order in layer value holder to the sticky note and sets the necessary values.
             OrderInLayerValueHolder holder = stickyNote.AddComponent<OrderInLayerValueHolder>();
             holder.SetOriginPosition(raycastHit.point);
-            holder.SetOrderInLayer(ValueHolder.currentOrderInLayer);
+            holder.SetOrderInLayer(ValueHolder.CurrentOrderInLayer);
 
-            ValueHolder.currentOrderInLayer++;
+            ValueHolder.CurrentOrderInLayer++;
             return stickyNote;
         }
 
@@ -69,9 +69,9 @@ namespace SEE.Game.Drawable
         {
             /// Adjusts the current order in the layer if the
             /// order in layer for the line is greater than or equal to it.
-            if (config.Order >= ValueHolder.currentOrderInLayer)
+            if (config.Order >= ValueHolder.CurrentOrderInLayer)
             {
-                ValueHolder.currentOrderInLayer = config.Order + 1;
+                ValueHolder.CurrentOrderInLayer = config.Order + 1;
             }
 
             /// Instantiates the sticky note.
@@ -86,7 +86,7 @@ namespace SEE.Game.Drawable
 
             /// Adds an order in layer value holder to the sticky note and sets the necessary values.
             OrderInLayerValueHolder holder = stickyNote.AddComponent<OrderInLayerValueHolder>();
-            holder.SetOriginPosition(config.Position + config.Order * ValueHolder.distanceToDrawable.z * stickyNote.transform.forward);
+            holder.SetOriginPosition(config.Position + config.Order * ValueHolder.DistanceToDrawable.z * stickyNote.transform.forward);
             holder.SetOrderInLayer(config.Order);
             return stickyNote;
         }
@@ -112,7 +112,7 @@ namespace SEE.Game.Drawable
         public static Vector3 FinishMoving(GameObject stickyNoteHolder)
         {
             stickyNoteHolder.transform.position -= stickyNoteHolder.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer()
-                * ValueHolder.distanceToDrawable.z * stickyNoteHolder.transform.forward;
+                * ValueHolder.DistanceToDrawable.z * stickyNoteHolder.transform.forward;
             stickyNoteHolder.GetComponent<OrderInLayerValueHolder>()
                 .SetOriginPosition(stickyNoteHolder.transform.position);
             return stickyNoteHolder.transform.position;
@@ -188,7 +188,7 @@ namespace SEE.Game.Drawable
             {
                 /// Preserve the distance.
                 obj.transform.position = oldPos - obj.transform.forward
-                    * ValueHolder.distanceToDrawable.z * ValueHolder.currentOrderInLayer;
+                    * ValueHolder.DistanceToDrawable.z * ValueHolder.CurrentOrderInLayer;
             }
         }
 
