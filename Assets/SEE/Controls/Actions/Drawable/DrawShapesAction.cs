@@ -148,7 +148,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// It adds a final point to the line.
                 /// It requires a left-click with the left Ctrl key held down.
                 if (Input.GetMouseButtonUp(0) && Input.GetKey(KeyCode.LeftControl)
-                    && drawing && positions.Length > 1
+                    && drawing && positions.Length > 0
                     && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
                     && Raycasting.RaycastAnything(out RaycastHit hit)
                     && (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
