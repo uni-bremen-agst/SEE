@@ -174,18 +174,18 @@ namespace SEE.Controls.Actions.Drawable
         /// Decreases the order in layer by one.
         /// Additionally, a memento of this action is created and the progress state is set to InProgress.
         /// </summary>
-        /// <param name="hittedObject">The object to decrease the order for</param>
-        private void Decrease(GameObject hittedObject)
+        /// <param name="hitObject">The object to decrease the order for</param>
+        private void Decrease(GameObject hitObject)
         {
             isInAction = true;
-            GameObject drawable = GameFinder.GetDrawable(hittedObject);
+            GameObject drawable = GameFinder.GetDrawable(hitObject);
 
-            int oldOrder = hittedObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
+            int oldOrder = hitObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
             int newOrder = oldOrder - 1;
             newOrder = newOrder < 0 ? 0 : newOrder;
-            GameLayerChanger.Decrease(hittedObject, newOrder);
+            GameLayerChanger.Decrease(hitObject, newOrder);
             memento = new Memento(drawable, GameLayerChanger.LayerChangerStates.Decrease,
-                        hittedObject, hittedObject.name, oldOrder, newOrder);
+                        hitObject, hitObject.name, oldOrder, newOrder);
             new LayerChangerNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
                 memento.Obj.name, memento.State, memento.NewOrder).Execute();
             CurrentState = IReversibleAction.Progress.InProgress;

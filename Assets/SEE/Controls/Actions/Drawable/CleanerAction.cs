@@ -54,14 +54,14 @@ namespace SEE.Controls.Actions.Drawable
                 if (Input.GetMouseButtonDown(0) &&
                     Raycasting.RaycastAnything(out RaycastHit raycastHit))
                 {
-                    GameObject hittedObject = raycastHit.collider.gameObject;
+                    GameObject hitObject = raycastHit.collider.gameObject;
 
-                    if (hittedObject.CompareTag(Tags.Drawable))
+                    if (hitObject.CompareTag(Tags.Drawable))
                     {
-                        return DeleteDrawableChilds(hittedObject);
-                    } else if (GameFinder.HasDrawable(hittedObject))
+                        return DeleteDrawableChilds(hitObject);
+                    } else if (GameFinder.HasDrawable(hitObject))
                     {
-                        return DeleteDrawableChilds(GameFinder.GetDrawable(hittedObject));
+                        return DeleteDrawableChilds(GameFinder.GetDrawable(hitObject));
                     }
                 }
                 return false;

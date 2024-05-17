@@ -82,24 +82,24 @@ namespace SEE.Controls.Actions.Drawable
                     Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     GameFinder.HasDrawable(raycastHit.collider.gameObject))
                 {
-                    GameObject hittedObject = raycastHit.collider.gameObject;
+                    GameObject hitObject = raycastHit.collider.gameObject;
                     isActive = true;
 
-                    if (hittedObject.CompareTag(Tags.Line))
+                    if (hitObject.CompareTag(Tags.Line))
                     {
-                        LineConf originLine = LineConf.GetLine(hittedObject);
+                        LineConf originLine = LineConf.GetLine(hitObject);
                         List<LineConf> lines = new();
-                        NearestPoints.GetNearestPoints(hittedObject, raycastHit.point,
+                        NearestPoints.GetNearestPoints(hitObject, raycastHit.point,
                             out List<Vector3> positionsList, out List<int> matchedIndices);
 
-                        GameLineSplit.Split(GameFinder.GetDrawable(hittedObject), originLine,
+                        GameLineSplit.Split(GameFinder.GetDrawable(hitObject), originLine,
                             matchedIndices, positionsList, lines, true);
 
-                        memento = new Memento(hittedObject, GameFinder.GetDrawable(hittedObject), lines);
+                        memento = new Memento(hitObject, GameFinder.GetDrawable(hitObject), lines);
                         mementoList.Add(memento);
                         new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
                             memento.OriginalLine.Id).Execute();
-                        Destroyer.Destroy(hittedObject);
+                        Destroyer.Destroy(hitObject);
                     }
                 }
                 /// This block completes the action.

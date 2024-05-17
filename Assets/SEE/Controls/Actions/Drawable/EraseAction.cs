@@ -71,22 +71,22 @@ namespace SEE.Controls.Actions.Drawable
                     Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     GameFinder.HasDrawable(raycastHit.collider.gameObject))
                 {
-                    GameObject hittedObject = raycastHit.collider.gameObject;
+                    GameObject hitObject = raycastHit.collider.gameObject;
 
-                    if (Tags.DrawableTypes.Contains(hittedObject.tag))
+                    if (Tags.DrawableTypes.Contains(hitObject.tag))
                     {
-                        memento = new Memento(GameFinder.GetDrawable(hittedObject),
-                            DrawableType.Get(hittedObject));
+                        memento = new Memento(GameFinder.GetDrawable(hitObject),
+                            DrawableType.Get(hitObject));
                         mementoList.Add(memento);
 
                         if (memento.DrawableType is MindMapNodeConf conf)
                         {
-                            DeleteChildren(hittedObject);
+                            DeleteChildren(hitObject);
                         }
 
                         new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
-                            hittedObject.name).Execute();
-                        Destroyer.Destroy(hittedObject);
+                            hitObject.name).Execute();
+                        Destroyer.Destroy(hitObject);
                     }
                 }
                 /// Completes this action run.

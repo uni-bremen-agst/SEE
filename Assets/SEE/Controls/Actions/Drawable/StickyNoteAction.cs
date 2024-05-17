@@ -467,7 +467,7 @@ namespace SEE.Controls.Actions.Drawable
                     GameFinder.IsPartOfADrawable(hit.collider.gameObject) ||
                     ValueHolder.IsASuitableObjectForStickyNote(hit.collider.gameObject))
                 {
-                    /// Adopts the euler angles of the hitted object,
+                    /// Adopts the euler angles of the hit object,
                     /// unless it is a <see cref="DrawableType"/> object.
                     /// In that case, take the euler angles of the drawable.
                     if (DrawableType.Get(hit.collider.gameObject) == null)

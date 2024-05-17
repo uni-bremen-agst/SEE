@@ -127,27 +127,27 @@ namespace SEE.Controls.Actions.Drawable
                         StartsWith(ValueHolder.StickyNotePrefix)))
             {
                 isInAction = true;
-                GameObject hittedObject = raycastHit.collider.gameObject;
+                GameObject hitObject = raycastHit.collider.gameObject;
 
-                switch (hittedObject.tag)
+                switch (hitObject.tag)
                 {
                     case Tags.Line:
-                        LineConf line = LineConf.GetLine(hittedObject);
+                        LineConf line = LineConf.GetLine(hitObject);
                         pickedColor = line.PrimaryColor;
                         break;
                     case Tags.DText:
-                        pickedColor = hittedObject.GetComponent<TextMeshPro>().color;
+                        pickedColor = hitObject.GetComponent<TextMeshPro>().color;
                         break;
                     case Tags.Image:
-                        ImageConf image = ImageConf.GetImageConf(hittedObject);
+                        ImageConf image = ImageConf.GetImageConf(hitObject);
                         pickedColor = image.ImageColor;
                         break;
                     case Tags.MindMapNode:
-                        ColorPickerMindMapMenu.Enable(hittedObject, true);
+                        ColorPickerMindMapMenu.Enable(hitObject, true);
                         waitForHelperMenu = true;
                         break;
                     case Tags.Drawable:
-                        DrawableConfig config = DrawableConfigManager.GetDrawableConfig(hittedObject);
+                        DrawableConfig config = DrawableConfigManager.GetDrawableConfig(hitObject);
                         pickedColor = config.Color;
                         break;
                 }
@@ -168,12 +168,12 @@ namespace SEE.Controls.Actions.Drawable
                         StartsWith(ValueHolder.StickyNotePrefix)))
             {
                 isInAction = true;
-                GameObject hittedObject = hit.collider.gameObject;
+                GameObject hitObject = hit.collider.gameObject;
 
-                switch (hittedObject.tag)
+                switch (hitObject.tag)
                 {
                     case Tags.Line:
-                        LineConf line = LineConf.GetLine(hittedObject);
+                        LineConf line = LineConf.GetLine(hitObject);
                         pickedColor = line.SecondaryColor;
                         if (line.ColorKind == GameDrawer.ColorKind.Monochrome)
                         {
@@ -181,18 +181,18 @@ namespace SEE.Controls.Actions.Drawable
                         }
                         break;
                     case Tags.DText:
-                        pickedColor = hittedObject.GetComponent<TextMeshPro>().outlineColor;
+                        pickedColor = hitObject.GetComponent<TextMeshPro>().outlineColor;
                         break;
                     case Tags.Image:
-                        ImageConf image = ImageConf.GetImageConf(hittedObject);
+                        ImageConf image = ImageConf.GetImageConf(hitObject);
                         pickedColor = image.ImageColor;
                         break;
                     case Tags.MindMapNode:
-                        ColorPickerMindMapMenu.Enable(hittedObject, false);
+                        ColorPickerMindMapMenu.Enable(hitObject, false);
                         waitForHelperMenu = true;
                         break;
                     case Tags.Drawable:
-                        DrawableConfig config = DrawableConfigManager.GetDrawableConfig(hittedObject);
+                        DrawableConfig config = DrawableConfigManager.GetDrawableConfig(hitObject);
                         pickedColor = config.Color;
                         break;
                 }

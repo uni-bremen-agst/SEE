@@ -57,8 +57,8 @@ namespace SEE.UI.Menu.Drawable
         /// Enables the rotation menu. It beginns with the x - rotation menu.
         /// </summary>
         /// <param name="stickyNoteHolder">the sticky note that should be rotated.</param>
-        /// <param name="hittedObject">The object where the sticky note was placed. only necessary for spawning.</param>
-        public static void Enable(GameObject stickyNoteHolder, GameObject hittedObject = null,
+        /// <param name="hitObject">The object where the sticky note was placed. only necessary for spawning.</param>
+        public static void Enable(GameObject stickyNoteHolder, GameObject hitObject = null,
             UnityAction returnCall = null)
         {
             xRotationMenu = PrefabInstantiator.InstantiatePrefab(xRotationMenuPrefab,
@@ -67,16 +67,16 @@ namespace SEE.UI.Menu.Drawable
             string drawableParentID = GameFinder.GetDrawableParentName(drawable);
 
             /// Initialize the button for laying.
-            LayingButton(stickyNoteHolder, hittedObject, drawable, drawableParentID);
+            LayingButton(stickyNoteHolder, hitObject, drawable, drawableParentID);
 
             /// Initialize the button for haning.
-            HangingButton(stickyNoteHolder, hittedObject, drawable, drawableParentID);
+            HangingButton(stickyNoteHolder, hitObject, drawable, drawableParentID);
 
             /// Initialize the next button, it opens the menu for the Y-rotation.
             GameFinder.FindChild(xRotationMenu, "Next").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 xRotationMenu.SetActive(false);
-                EnableYRotation(stickyNoteHolder, hittedObject != null, returnCall);
+                EnableYRotation(stickyNoteHolder, hitObject != null, returnCall);
             });
 
             /// Initialize or disables the return button.
@@ -88,19 +88,19 @@ namespace SEE.UI.Menu.Drawable
         /// It set's the x euler angle to 90°.
         /// </summary>
         /// <param name="stickyNoteHolder">The sticky note holder to be rotated.</param>
-        /// <param name="hittedObject">The hitted object, is only in the spawn mode != null.</param>
+        /// <param name="hitObject">The hit object, is only in the spawn mode != null.</param>
         /// <param name="drawable">The drawable of the sticky note holder</param>
         /// <param name="drawableParentID">The id of the sticky note</param>
-        private static void LayingButton(GameObject stickyNoteHolder, GameObject hittedObject,
+        private static void LayingButton(GameObject stickyNoteHolder, GameObject hitObject,
             GameObject drawable, string drawableParentID)
         {
             GameFinder.FindChild(xRotationMenu, "Laying").GetComponent<ButtonManagerBasic>()
                 .clickEvent.AddListener(() =>
                 {
-                    if (hittedObject != null)
+                    if (hitObject != null)
                     {
                         GameStickyNoteManager.SetRotateX(stickyNoteHolder, 90, stickyNoteHolder.transform.position,
-                            hittedObject.name.Equals("Floor"));
+                            hitObject.name.Equals("Floor"));
                     }
                     else
                     {
@@ -115,16 +115,16 @@ namespace SEE.UI.Menu.Drawable
         /// It set's the x euler angle to 0°.
         /// </summary>
         /// <param name="stickyNoteHolder">The sticky note holder to be rotated.</param>
-        /// <param name="hittedObject">The hitted object, is only in the spawn mode != null.</param>
+        /// <param name="hitObject">The hit object, is only in the spawn mode != null.</param>
         /// <param name="drawable">The drawable of the sticky note holder</param>
         /// <param name="drawableParentID">The id of the sticky note</param>
-        private static void HangingButton(GameObject stickyNoteHolder, GameObject hittedObject,
+        private static void HangingButton(GameObject stickyNoteHolder, GameObject hitObject,
             GameObject drawable, string drawableParentID)
         {
             GameFinder.FindChild(xRotationMenu, "Hanging").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GameStickyNoteManager.SetRotateX(stickyNoteHolder, 0);
-                if (hittedObject == null)
+                if (hitObject == null)
                 {
                     new StickyNoteRotateXNetAction(drawable.name, drawableParentID, 0).Execute();
                 }
