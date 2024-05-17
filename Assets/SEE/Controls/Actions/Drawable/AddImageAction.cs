@@ -27,7 +27,7 @@ namespace SEE.Controls.Actions.Drawable
         private GameObject imageObj;
 
         /// <summary>
-        /// The drawable on that the image should be displayed.
+        /// The drawable on which the image should be displayed.
         /// </summary>
         private GameObject drawable;
 

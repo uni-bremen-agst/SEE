@@ -35,7 +35,7 @@ namespace SEE.Controls.Actions.Drawable
         private class Memento
         {
             /// <summary>
-            /// The drawable on that the drawable type is displayed.
+            /// The drawable on which the drawable type is displayed.
             /// </summary>
             public readonly DrawableConfig Drawable;
             /// <summary>
@@ -46,7 +46,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
-            /// <param name="drawable">The drawable on that the drawable type is displayed</param>
+            /// <param name="drawable">The drawable on which the drawable type is displayed</param>
             /// <param name="drawableType">The drawable type of the deleted object</param>
             public Memento(GameObject drawable, DrawableType drawableType)
             {

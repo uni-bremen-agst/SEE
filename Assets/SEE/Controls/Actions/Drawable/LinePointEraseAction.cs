@@ -41,7 +41,7 @@ namespace SEE.Controls.Actions.Drawable
             /// </summary>
             public LineConf OriginalLine;
             /// <summary>
-            /// Is the drawable on that the lines are displayed.
+            /// Is the drawable on which the lines are displayed.
             /// </summary>
             public readonly DrawableConfig Drawable;
             /// <summary>

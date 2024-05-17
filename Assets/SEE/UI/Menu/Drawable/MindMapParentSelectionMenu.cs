@@ -229,7 +229,7 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="addedNode">The selected node.</param>
         /// <param name="newConf">The configuration that holds the changes.</param>
-        /// <param name="drawable">The drawable on that the node is placed.</param>
+        /// <param name="drawable">The drawable on which the node is placed.</param>
         private static void ChangeParent(GameObject addedNode, MindMapNodeConf newConf, GameObject drawable)
         {
             GameMindMap.ChangeParent(addedNode, chosenObject);

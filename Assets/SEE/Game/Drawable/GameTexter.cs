@@ -142,7 +142,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// This method creates the inital drawable text object
         /// </summary>
-        /// <param name="drawable">Is the drawable on that the text should be displayed</param>
+        /// <param name="drawable">Is the drawable on which the text should be displayed</param>
         /// <param name="name">The name of the text object</param>
         /// <param name="text">The text that should be displayed</param>
         /// <param name="position">The inital position of the text object</param>
@@ -233,7 +233,7 @@ namespace SEE.Game.Drawable
         /// Writes a drawbale text on a drawable.
         /// The name for it is currently empty, because the setup method will create a unique one.
         /// </summary>
-        /// <param name="drawable">Is the drawable on that the text should be displayed</param>
+        /// <param name="drawable">Is the drawable on which the text should be displayed</param>
         /// <param name="text">The text that should be displayed</param>
         /// <param name="position">The inital position of the text object</param>
         /// <param name="fontColor">The chosen font color of the text.</param>
@@ -259,7 +259,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Rewrites a drawbale text on a drawable.
         /// </summary>
-        /// <param name="drawable">Is the drawable on that the text should be displayed</param>
+        /// <param name="drawable">Is the drawable on which the text should be displayed</param>
         /// <param name="id">The name of the drawable text</param>
         /// <param name="text">The text that should be displayed</param>
         /// <param name="position">The inital position of the text object</param>
@@ -315,7 +315,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Rewrites a given <see cref="TextConf"/> configuration.
         /// </summary>
-        /// <param name="drawable">The drawable on that the text should be displayed.</param>
+        /// <param name="drawable">The drawable on which the text should be displayed.</param>
         /// <param name="text">The text configuration which contains the necessary values.</param>
         /// <returns>The created drawable text object</returns>
         public static GameObject ReWriteText(GameObject drawable, TextConf text)

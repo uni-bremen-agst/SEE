@@ -473,7 +473,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         /// <param name="moveByMouse">The switch manager for the move by mouse option from the menu</param>
         /// <param name="speedUp">The switch manager for the speed up option from the menu</param>
-        /// <param name="drawable">The drawable on that the object is displayed.</param>
+        /// <param name="drawable">The drawable on which the object is displayed.</param>
         /// <param name="drawableParentName">The parent name of the drawable</param>
         private void MoveByKey(SwitchManager moveByMouse, SwitchManager speedUp,
             GameObject drawable, string drawableParentName)

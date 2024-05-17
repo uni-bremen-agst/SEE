@@ -45,7 +45,7 @@ namespace SEE.Game.Drawable
         /// The box collider of the node will be calculated on the border size.
         /// Additionally, the node receives an <see cref="MMNodeValueHolder"/> component.
         /// </summary>
-        /// <param name="drawable">The drawable on that the node should be displayed.</param>
+        /// <param name="drawable">The drawable on which the node should be displayed.</param>
         /// <param name="name">The id of the node</param>
         /// <param name="prefix">The id prefix.</param>
         /// <param name="writtenText">The displayed text of the node</param>
@@ -128,7 +128,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Creates the text for the mind map node (description)
         /// </summary>
-        /// <param name="drawable">The drawable on that the node should be displayed.</param>
+        /// <param name="drawable">The drawable on which the node should be displayed.</param>
         /// <param name="position">The position for the text.</param>
         /// <param name="writtenText">The text (description) for the node</param>
         /// <param name="prefix">The id prefix, necessary for the font size.</param>
@@ -163,7 +163,7 @@ namespace SEE.Game.Drawable
         /// Creates the border of the mind map node.
         /// Themes receive an ellipse shape, sub-themes a rectangle, and leaves receive an invisible ellipse shape.
         /// </summary>
-        /// <param name="drawable">The drawable on that the node should be displayed.</param>
+        /// <param name="drawable">The drawable on which the node should be displayed.</param>
         /// <param name="position">The position for the border.</param>
         /// <param name="text">The text object, necessary for the width/height calculation</param>
         /// <param name="prefix">The id prefix</param>
@@ -319,7 +319,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Creates a mind map node.
         /// </summary>
-        /// <param name="drawable">The drawable on that the node should be displayed.</param>
+        /// <param name="drawable">The drawable on which the node should be displayed.</param>
         /// <param name="prefix">The id prefix for the node.</param>
         /// <param name="writtenText">The text (description) of the node.</param>
         /// <param name="position">The position for the node.</param>
@@ -743,7 +743,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Re-creates a mind map node
         /// </summary>
-        /// <param name="drawable">The drawable on that the node should be displayed.</param>
+        /// <param name="drawable">The drawable on which the node should be displayed.</param>
         /// <param name="parent">The parent mind map node</param>
         /// <param name="name">The id of the node</param>
         /// <param name="textConf">The text configuration for the text (description) of the node</param>
@@ -824,7 +824,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Recreates a mind map node based on <paramref name="conf"/>.
         /// </summary>
-        /// <param name="drawable">The drawable on that the node should be displayed.</param>
+        /// <param name="drawable">The drawable on which the node should be displayed.</param>
         /// <param name="conf">The node configuration for restore.</param>
         /// <returns>The mind map node.</returns>
         public static GameObject ReCreate(GameObject drawable, MindMapNodeConf conf)

@@ -58,7 +58,7 @@ namespace SEE.Controls.Actions.Drawable
             /// </summary>
             public readonly DrawableType NewValueHolder;
             /// <summary>
-            /// The drawable on that the drawable type object is displayed.
+            /// The drawable on which the drawable type object is displayed.
             /// </summary>
             public readonly DrawableConfig Drawable;
             /// <summary>

@@ -58,7 +58,7 @@ namespace SEE.Controls.Actions.Drawable
             /// The constructor.
             /// </summary>
             /// <param name="line">the selected line</param>
-            /// <param name="drawable">The drawable on that the line is placed.</param>
+            /// <param name="drawable">The drawable on which the line is placed.</param>
             /// <param name="id">the id of the selected line</param>
             /// <param name="indices">The Indices of the founded nearest position.
             /// It can be more then one, because points can overlap.</param>

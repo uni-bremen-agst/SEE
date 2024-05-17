@@ -53,7 +53,7 @@ namespace SEE.Controls.Actions.Drawable
         private Vector3 newScale;
 
         /// <summary>
-        /// The drawable on that the selected object is displayed.
+        /// The drawable on which the selected object is displayed.
         /// </summary>
         private GameObject drawable;
 
@@ -100,7 +100,7 @@ namespace SEE.Controls.Actions.Drawable
             /// The constructor.
             /// </summary>
             /// <param name="selectedObject">The selected drawable object</param>
-            /// <param name="drawable">The drawable on that the selected object is displayed</param>
+            /// <param name="drawable">The drawable on which the selected object is displayed</param>
             /// <param name="id">The id of the selected object</param>
             /// <param name="oldScale">The old scale of the selected object</param>
             /// <param name="newScale">The new scale of the selected object</param>

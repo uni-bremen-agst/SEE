@@ -92,7 +92,7 @@ namespace SEE.Controls.Actions.Drawable
             /// </summary>
             public readonly Operation Operation;
             /// <summary>
-            /// The drawable on that the node should be displayed.
+            /// The drawable on which the node should be displayed.
             /// </summary>
             public readonly DrawableConfig Drawable;
 
@@ -104,7 +104,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The constructor.
             /// </summary>
-            /// <param name="drawable">The drawable on that the node should be displayed.</param>
+            /// <param name="drawable">The drawable on which the node should be displayed.</param>
             /// <param name="conf">The node configuration</param>
             /// <param name="operation">The executed operation.</param>
             public Memento(GameObject drawable, MindMapNodeConf conf, Operation operation)

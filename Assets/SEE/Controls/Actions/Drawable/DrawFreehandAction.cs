@@ -38,7 +38,7 @@ namespace SEE.Controls.Actions.Drawable
         private GameObject line;
 
         /// <summary>
-        /// The drawable on that the line should be displayed.
+        /// The drawable on which the line should be displayed.
         /// </summary>
         private GameObject drawable;
 
