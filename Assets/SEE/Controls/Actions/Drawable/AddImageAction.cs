@@ -207,7 +207,7 @@ namespace SEE.Controls.Actions.Drawable
                 Texture2D tex = download.GetTexture();
                 if (string.IsNullOrEmpty(fileName))
                 {
-                    fileName = DrawableHolder.GetRandomStringForFile(10) + Filenames.PNGExtension;
+                    fileName = RandomStrings.GetRandomStringForFile(10) + Filenames.PNGExtension;
                 }
                 if (string.IsNullOrEmpty(Path.GetExtension(fileName)) ||
                     (Path.GetExtension(fileName) != Filenames.PNGExtension

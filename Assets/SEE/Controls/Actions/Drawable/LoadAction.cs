@@ -309,10 +309,10 @@ namespace SEE.Controls.Actions.Drawable
             if (GameFinder.FindChild(attachedObjects, conf.Id) != null
                 && !conf.Id.Contains(ValueHolder.MindMapBranchLine))
             {
-                string newName = prefix + "-" + DrawableHolder.GetRandomString(8);
+                string newName = prefix + "-" + RandomStrings.GetRandomString(8);
                 while (GameFinder.FindChild(attachedObjects, newName) != null)
                 {
-                    newName = prefix + "-" + DrawableHolder.GetRandomString(8);
+                    newName = prefix + "-" + RandomStrings.GetRandomString(8);
                 }
                 conf.Id = newName;
             }

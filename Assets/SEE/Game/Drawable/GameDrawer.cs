@@ -85,12 +85,12 @@ namespace SEE.Game.Drawable
         /// <param name="line">The created line object</param>
         /// <param name="renderer">The line renderer of the line.</param>
         /// <param name="meshCollider">The mesh collider of the line.</param>
-        private static void Setup(GameObject drawable, string name, Vector3[] positions, 
-            ColorKind colorKind, Color primaryColor, Color secondaryColor, float thickness, 
+        private static void Setup(GameObject drawable, string name, Vector3[] positions,
+            ColorKind colorKind, Color primaryColor, Color secondaryColor, float thickness,
             int order, LineKind lineKind, float tiling,
             out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider)
         {
-            /// If the object has been created earlier, it already has a name, 
+            /// If the object has been created earlier, it already has a name,
             /// and this name is taken from the parameters <paramref name="name"/>.
             if (name.Length > 4)
             {
@@ -99,14 +99,15 @@ namespace SEE.Game.Drawable
             else
             {
                 /// Otherwise, a name for the line will be generated.
-                /// For this, the <see cref="ValueHolder.LinePrefix"/> is concatenated with 
+                /// For this, the <see cref="ValueHolder.LinePrefix"/> is concatenated with
                 /// the object ID along with a random string consisting of four characters.
                 line = new("");
-                name = ValueHolder.LinePrefix + line.GetInstanceID() + DrawableHolder.GetRandomString(4);
+
+                name = ValueHolder.LinePrefix + line.GetInstanceID() + RandomStrings.GetRandomString(4);
                 /// Check if the name is already in use. If so, generate a new name.
                 while (GameFinder.FindChild(drawable, name) != null)
                 {
-                    name = ValueHolder.LinePrefix + line.GetInstanceID() + DrawableHolder.GetRandomString(4);
+                    name = ValueHolder.LinePrefix + line.GetInstanceID() + RandomStrings.GetRandomString(4);
                 }
                 line.name = name;
             }
@@ -160,7 +161,7 @@ namespace SEE.Game.Drawable
             /// Make the line ends round.
             renderer.numCapVertices = 90;
 
-            /// Set the position of the line and ensure the correct order in the layer. 
+            /// Set the position of the line and ensure the correct order in the layer.
             /// Additionally, adopt the rotation of the attached object.
             line.transform.position = attachedObjects.transform.position;
             line.transform.rotation = attachedObjects.transform.rotation;
@@ -193,13 +194,13 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Initiate the drawing of a line. 
-        /// This call creates the line and adds the initial position. 
-        /// Additionally, it increases the current order in the layer. 
-        /// 
-        /// To add further points to the created line, the <see cref="Drawing"/> method must be 
-        /// subsequently called with the new points. 
-        /// To complete the drawing, <see cref="FinishDrawing"/> should be executed at the end. 
+        /// Initiate the drawing of a line.
+        /// This call creates the line and adds the initial position.
+        /// Additionally, it increases the current order in the layer.
+        ///
+        /// To add further points to the created line, the <see cref="Drawing"/> method must be
+        /// subsequently called with the new points.
+        /// To complete the drawing, <see cref="FinishDrawing"/> should be executed at the end.
         /// If desired, <see cref="SetPivot"/> can then be called to set the correct pivot.
         /// </summary>
         /// <param name="drawable">The drawable on which the line should be displayed.</param>
@@ -215,7 +216,7 @@ namespace SEE.Game.Drawable
             Color primaryColor, Color secondaryColor, float thickness, LineKind lineKind, float tiling)
         {
             Setup(drawable, "", positions, colorKind, primaryColor, secondaryColor, thickness,
-                ValueHolder.currentOrderInLayer, lineKind, tiling, 
+                ValueHolder.currentOrderInLayer, lineKind, tiling,
                 out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
             ValueHolder.currentOrderInLayer++;
 
@@ -237,12 +238,12 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Finish drawing a line. 
-        /// Ensure that the mesh collider aligns with the renderer line points. 
-        /// However, the generated mesh must have at least three different points for this to work 
+        /// Finish drawing a line.
+        /// Ensure that the mesh collider aligns with the renderer line points.
+        /// However, the generated mesh must have at least three different points for this to work
         /// (otherwise, the mesh won't function).
-        /// 
-        /// Additionally, it can be specified whether the line should form a loop, 
+        ///
+        /// Additionally, it can be specified whether the line should form a loop,
         /// meaning that the endpoint is connected to the starting point.
         /// </summary>
         /// <param name="line">The line for which drawing is to be finished.</param>
@@ -262,12 +263,12 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Draws or updates an entire line. 
-        /// It combines the functionality of the methods <see cref="StartDrawing"/>, <see cref="Drawing"/>, and <see cref="FinishDrawing"/>. 
-        /// 
-        /// First, it ensures that the z-axis of the positions is set to 0. 
-        /// Then, it checks if the line is already present on the drawable. 
-        /// If so, the line is only refreshed. 
+        /// Draws or updates an entire line.
+        /// It combines the functionality of the methods <see cref="StartDrawing"/>, <see cref="Drawing"/>, and <see cref="FinishDrawing"/>.
+        ///
+        /// First, it ensures that the z-axis of the positions is set to 0.
+        /// Then, it checks if the line is already present on the drawable.
+        /// If so, the line is only refreshed.
         /// Otherwise, it is newly created.
         /// </summary>
         /// <param name="drawable">The drawable on which the line should be displayed.</param>
@@ -280,11 +281,11 @@ namespace SEE.Game.Drawable
         /// <param name="loop">Option to connect the line endpoint with the starting point.</param>
         /// <param name="lineKind">The line kind for the line.</param>
         /// <param name="tiling">The tiling for a dashed line kind</param>
-        /// <param name="increaseCurrentOrder">Option to increase the current order in the layer value. 
+        /// <param name="increaseCurrentOrder">Option to increase the current order in the layer value.
         /// By default, it is set to true.</param>
         /// <returns>The created or updated line.</returns>
         public static GameObject DrawLine(GameObject drawable, string name, Vector3[] positions, ColorKind colorKind,
-            Color primaryColor, Color secondaryColor, float thickness, bool loop, LineKind lineKind, 
+            Color primaryColor, Color secondaryColor, float thickness, bool loop, LineKind lineKind,
             float tiling, bool increaseCurrentOrder = true)
         {
             GameObject lineObject;
@@ -301,7 +302,7 @@ namespace SEE.Game.Drawable
             {
                 /// Block for creating a new line.
                 Setup(drawable, name, positions, colorKind, primaryColor, secondaryColor, thickness,
-                    ValueHolder.currentOrderInLayer, lineKind, tiling, 
+                    ValueHolder.currentOrderInLayer, lineKind, tiling,
                     out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
                 lineObject = line;
                 renderer.SetPositions(positions);
@@ -315,13 +316,13 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Redraws a line that has been drawn before. 
+        /// Redraws a line that has been drawn before.
         /// The difference from <see cref="DrawLine"/> is that the object's position,
-        /// rotation, scale and order in layer is also restored in this case. 
-        /// Otherwise, it works almost the same. 
-        /// The difference is that in the <see cref="ReDrawLine"/>, you cannot specify 
-        /// that the order in the layer should not be increased. 
-        /// This only happens if the order in layer of the line to be created is greater 
+        /// rotation, scale and order in layer is also restored in this case.
+        /// Otherwise, it works almost the same.
+        /// The difference is that in the <see cref="ReDrawLine"/>, you cannot specify
+        /// that the order in the layer should not be increased.
+        /// This only happens if the order in layer of the line to be created is greater
         /// than or equal to the current maximum order.
         /// </summary>
         /// <param name="drawable">The drawable on which the line should be displayed.</param>
@@ -340,14 +341,14 @@ namespace SEE.Game.Drawable
         /// <param name="tiling">The tiling for a dashed line kind</param>
         /// <returns>The recreated or updated line.</returns>
         public static GameObject ReDrawLine(GameObject drawable, string name, Vector3[] positions,
-            ColorKind colorKind, Color primaryColor, Color secondaryColor, float thickness, 
-            int orderInLayer, Vector3 position, Vector3 eulerAngles, Vector3 scale, bool loop, 
+            ColorKind colorKind, Color primaryColor, Color secondaryColor, float thickness,
+            int orderInLayer, Vector3 position, Vector3 eulerAngles, Vector3 scale, bool loop,
             LineKind lineKind, float tiling)
         {
             /// Updates the z axis values of the positions to 0.
             UpdateZPositions(ref positions);
 
-            /// Adjusts the current order in the layer if the 
+            /// Adjusts the current order in the layer if the
             /// order in layer for the line is greater than or equal to it.
             if (orderInLayer >= ValueHolder.currentOrderInLayer)
             {
@@ -371,7 +372,7 @@ namespace SEE.Game.Drawable
             {
                 /// Block for creating of a new line.
                 Setup(drawable, name, positions, colorKind, primaryColor, secondaryColor, thickness,
-                    orderInLayer, lineKind, tiling, 
+                    orderInLayer, lineKind, tiling,
                     out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
                 line.transform.localScale = scale;
                 line.transform.localEulerAngles = eulerAngles;
@@ -411,15 +412,15 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Sets the pivot of the line to the center of the line. 
-        /// For an odd number of positions, the pivot is placed precisely at the midpoint. 
-        /// For an even number, the midpoint is calculated by adding the two middle points and 
+        /// Sets the pivot of the line to the center of the line.
+        /// For an odd number of positions, the pivot is placed precisely at the midpoint.
+        /// For an even number, the midpoint is calculated by adding the two middle points and
         /// dividing by two, obtaining the center of the two middle points.
-        /// 
-        /// After determining the midpoint, 
-        /// the line positions are converted to world space, 
-        /// and the line is shifted to the midpoint. 
-        /// Subsequently, the world space coordinates are converted back to local, 
+        ///
+        /// After determining the midpoint,
+        /// the line positions are converted to world space,
+        /// and the line is shifted to the midpoint.
+        /// Subsequently, the world space coordinates are converted back to local,
         /// ensuring that the visual representation of the line remains unchanged while the pivot is shifted.
         /// </summary>
         /// <param name="line">The line in which the pivot should be set</param>
@@ -508,8 +509,8 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Sets the pivot point for shapes. 
-        /// In this case, the pivot point is placed at the original hit point of creation, 
+        /// Sets the pivot point for shapes.
+        /// In this case, the pivot point is placed at the original hit point of creation,
         /// corresponding to the center of the shape.
         /// </summary>
         /// <param name="line">The shape for which the pivot point should be set.</param>
@@ -594,7 +595,7 @@ namespace SEE.Game.Drawable
             {
                 LineValueHolder holder = line.GetComponent<LineValueHolder>();
                 /// The initial color for deactivated color kinds is white.
-                /// If the new ColorKind is TwoDashed, another material must be 
+                /// If the new ColorKind is TwoDashed, another material must be
                 /// added to the line renderer for the second color.
                 if (colorKind == ColorKind.TwoDashed)
                 {
@@ -610,7 +611,7 @@ namespace SEE.Game.Drawable
                 }
                 else
                 {
-                    /// Block for the case that the previous color kind was <see cref="ColorKind.TwoDashed"/>, 
+                    /// Block for the case that the previous color kind was <see cref="ColorKind.TwoDashed"/>,
                     /// then the additional material must be removed.
                     if (GetRenderer(line).materials.Length > 1)
                     {
@@ -648,10 +649,10 @@ namespace SEE.Game.Drawable
 
         /// <summary>
         /// Sets the texture scale for the line renderer depending on the chosen <paramref name="kind"/>.
-        /// Required only for dashed line kinds. 
-        /// The X-Scale value varies for different LineKinds. 
-        /// It is multiplied by the material's tiling (15) to achieve the 
-        /// correct tiling for the dashed line. 
+        /// Required only for dashed line kinds.
+        /// The X-Scale value varies for different LineKinds.
+        /// It is multiplied by the material's tiling (15) to achieve the
+        /// correct tiling for the dashed line.
         /// Tiling describes the spacing between the dashed lines.
         /// </summary>
         /// <param name="renderer">The line renderer that should be update his texture scale.</param>
@@ -685,8 +686,8 @@ namespace SEE.Game.Drawable
 
         /// <summary>
         /// Sets the z positions of the given <paramref name="positions"/> to zero.
-        /// It is needed because a Line Renderer by itself 
-        /// changes the z values in case of an overlap. 
+        /// It is needed because a Line Renderer by itself
+        /// changes the z values in case of an overlap.
         /// However, this is problematic for the change order in layer variant.
         /// </summary>
         /// <param name="positions">The positions of the line from the line renderer</param>
@@ -710,7 +711,7 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Calculates the various vertices of a mesh that has been computed 
+        /// Calculates the various vertices of a mesh that has been computed
         /// from the line points of the line renderer.
         /// </summary>
         /// <param name="line">The line which holds the line renderer.</param>
@@ -758,7 +759,7 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Converts a world space coordinate to a local space coordinate 
+        /// Converts a world space coordinate to a local space coordinate
         /// as if it were a line originating from that point.
         /// A line is created for the calculation and then deleted afterward.
         /// </summary>

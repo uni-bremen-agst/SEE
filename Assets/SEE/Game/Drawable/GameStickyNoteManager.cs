@@ -2,7 +2,6 @@
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Utils;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace SEE.Game.Drawable
 {
@@ -28,10 +27,10 @@ namespace SEE.Game.Drawable
             GameObject stickyNote = PrefabInstantiator.InstantiatePrefab(stickyNotePrefabName);
 
             /// Sets the name of the sticky note.
-            stickyNote.name = ValueHolder.StickyNotePrefix + "-" + DrawableHolder.GetRandomString(8);
+            stickyNote.name = ValueHolder.StickyNotePrefix + "-" + RandomStrings.GetRandomString(8);
 
             /// Adopts the rotation of the hitted object,
-            /// unless it is a <see cref="DrawableType"/> object. 
+            /// unless it is a <see cref="DrawableType"/> object.
             /// In that case, take the rotation of the drawable.
             if (DrawableType.Get(raycastHit.collider.gameObject) == null)
             {
@@ -68,7 +67,7 @@ namespace SEE.Game.Drawable
         /// <returns>The created sticky note.</returns>
         public static GameObject Spawn(DrawableConfig config)
         {
-            /// Adjusts the current order in the layer if the 
+            /// Adjusts the current order in the layer if the
             /// order in layer for the line is greater than or equal to it.
             if (config.Order >= ValueHolder.currentOrderInLayer)
             {

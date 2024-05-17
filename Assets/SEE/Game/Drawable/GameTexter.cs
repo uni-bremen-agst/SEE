@@ -58,7 +58,7 @@ namespace SEE.Game.Drawable
         /// Calculates the text width based on the first line.
         /// For the calculation it removes the HTML Tags and checks if there are active font styles for bold, upper case or small caps.
         /// This font styles affects the width.
-        /// 
+        ///
         /// Method based on the method from Stephan_B's comment in
         /// https://forum.unity.com/threads/calculate-width-of-a-text-before-without-assigning-it-to-a-tmp-object.758867/#post-5057900
         /// </summary>
@@ -67,7 +67,7 @@ namespace SEE.Game.Drawable
         /// <param name="fontSize">the used font size.</param>
         /// <param name="style">the used font styles.</param>
         /// <returns>The calculated width for the first line of the text.</returns>
-        private static float TextWidthApproximation(string text, TMP_FontAsset fontAsset, 
+        private static float TextWidthApproximation(string text, TMP_FontAsset fontAsset,
             float fontSize, FontStyles style)
         {
             string result = StripTagsCharArray(text);
@@ -82,13 +82,13 @@ namespace SEE.Game.Drawable
             float pointSizeScale = fontSize / (fontAsset.faceInfo.pointSize * fontAsset.faceInfo.scale * 10);
             float emScale = fontSize * 0.001f;
 
-            float styleSpacingAdjustment = (style & FontStyles.Bold) == FontStyles.Bold 
+            float styleSpacingAdjustment = (style & FontStyles.Bold) == FontStyles.Bold
                 || htmlBold ? fontAsset.boldSpacing : 0;
             float normalSpacingAdjustment = fontAsset.normalSpacingOffset;
             float width = 0;
 
             /// If the text would originally be in uppercase, write it back in uppercase.
-            if ((style & FontStyles.UpperCase) != 0 || (style & FontStyles.SmallCaps) != 0 
+            if ((style & FontStyles.UpperCase) != 0 || (style & FontStyles.SmallCaps) != 0
                 || htmlUpperCase || htmlSmallCaps)
             {
                 result = result.ToUpper();
@@ -103,7 +103,7 @@ namespace SEE.Game.Drawable
                 /// Makes sure the given unicode exists in the font asset.
                 if (fontAsset.characterLookupTable.TryGetValue(unicode, out character))
                 {
-                    width += character.glyph.metrics.horizontalAdvance * pointSizeScale + 
+                    width += character.glyph.metrics.horizontalAdvance * pointSizeScale +
                         (styleSpacingAdjustment + normalSpacingAdjustment) * emScale;
                 }
             }
@@ -114,7 +114,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// This method calculates the width and height of the text.
         /// The width depends on the first line of the text.
-        /// The height is approximated by dividing the number of characters in the text by 
+        /// The height is approximated by dividing the number of characters in the text by
         /// the number of characters in the first line multiplies with 0.1f and the fontSize.
         /// </summary>
         /// <param name="text">The written text.</param>
@@ -122,7 +122,7 @@ namespace SEE.Game.Drawable
         /// <param name="fontSize">The font size of the text</param>
         /// <param name="styles">The font styles of the text</param>
         /// <returns>calculated width and height</returns>
-        public static Vector2 CalculateWidthAndHeight(string text, TMP_FontAsset fontAsset, 
+        public static Vector2 CalculateWidthAndHeight(string text, TMP_FontAsset fontAsset,
             float fontSize, FontStyles styles)
         {
             /// Calculates the text width based on the first line.
@@ -130,9 +130,9 @@ namespace SEE.Game.Drawable
             int lengthToFirstLineBreak = firstLine.Length;
             float x = TextWidthApproximation(firstLine, fontAsset, fontSize, styles);
 
-            /// Approximates the height of the text 
-            /// by dividing the length of the text by the length of the first line, 
-            /// multiplied by the font size and a buffer of 0.1. 
+            /// Approximates the height of the text
+            /// by dividing the length of the text by the length of the first line,
+            /// multiplied by the font size and a buffer of 0.1.
             /// Since the width was calculated by the first line, the subsequent lines break when reaching the width.
             float height = text.Length / lengthToFirstLineBreak;
             float y = height * 0.1f * fontSize;
@@ -153,12 +153,12 @@ namespace SEE.Game.Drawable
         /// <param name="order">The current order in layer</param>
         /// <param name="styles">The chosen font styles for the text</param>
         /// <param name="textObj">The created drawable text object</param>
-        private static void Setup(GameObject drawable, string name, string text, Vector3 position, 
-            Color fontColor, Color outlineColor, bool outlineStatus, float outlineThickness, 
+        private static void Setup(GameObject drawable, string name, string text, Vector3 position,
+            Color fontColor, Color outlineColor, bool outlineStatus, float outlineThickness,
             float fontSize, int order, FontStyles styles,
             out GameObject textObj)
         {
-            /// If the object has been created earlier, it already has a name, 
+            /// If the object has been created earlier, it already has a name,
             /// and this name is taken from the parameters <paramref name="name"/>.
             if (name.Length > 4)
             {
@@ -167,14 +167,15 @@ namespace SEE.Game.Drawable
             else
             {
                 /// Otherwise, a name for the text will be generated.
-                /// For this, the <see cref="ValueHolder.TextPrefix"/> is concatenated with 
+                /// For this, the <see cref="ValueHolder.TextPrefix"/> is concatenated with
                 /// the object ID along with a random string consisting of four characters.
                 textObj = new("");
-                name = ValueHolder.TextPrefix + textObj.GetInstanceID() + DrawableHolder.GetRandomString(4);
+
+                name = ValueHolder.TextPrefix + textObj.GetInstanceID() + RandomStrings.GetRandomString(4);
                 /// Check if the name is already in use. If so, generate a new name.
                 while (GameFinder.FindChild(drawable, name) != null)
                 {
-                    name = ValueHolder.TextPrefix + textObj.GetInstanceID() + DrawableHolder.GetRandomString(4);
+                    name = ValueHolder.TextPrefix + textObj.GetInstanceID() + RandomStrings.GetRandomString(4);
                 }
                 textObj.name = name;
             }
@@ -220,7 +221,7 @@ namespace SEE.Game.Drawable
             /// The Text Mesh Pro needs also the order.
             tmp.sortingOrder = order;
 
-            /// Is needed to fix an issue in the <see cref="TextMeshPro"/> component. 
+            /// Is needed to fix an issue in the <see cref="TextMeshPro"/> component.
             /// If the outline color is set to black during creation, it is strangely always set to white.
             tmp.outlineColor = tmp.outlineColor;
 
@@ -242,14 +243,14 @@ namespace SEE.Game.Drawable
         /// <param name="order">The current order in layer</param>
         /// <param name="styles">The chosen font styles for the text</param>
         /// <returns>The created drawable text object</returns>
-        public static GameObject WriteText(GameObject drawable, string text, Vector3 position, 
+        public static GameObject WriteText(GameObject drawable, string text, Vector3 position,
             Color fontColor, Color outlineColor, bool outlineStatus, float outlineThickness, float fontSize, int order, FontStyles styles)
         {
-            Setup(drawable, "", text, position, fontColor, outlineColor, outlineStatus, outlineThickness, fontSize, 
+            Setup(drawable, "", text, position, fontColor, outlineColor, outlineStatus, outlineThickness, fontSize,
                 order, styles, out GameObject textObj);
             ValueHolder.currentOrderInLayer++;
 
-            /// Is needed to fix an issue in the <see cref="TextMeshPro"/> component. 
+            /// Is needed to fix an issue in the <see cref="TextMeshPro"/> component.
             /// If the outline color is set to black during creation, it is strangely always set to white.
             GameEdit.ChangeOutlineColor(textObj, outlineColor);
             return textObj;
@@ -271,11 +272,11 @@ namespace SEE.Game.Drawable
         /// <param name="order">The current order in layer</param>
         /// <param name="styles">The chosen font styles for the text</param>
         /// <returns>The created drawable text object</returns>
-        private static GameObject ReWriteText(GameObject drawable, string id, string text, Vector3 position, 
+        private static GameObject ReWriteText(GameObject drawable, string id, string text, Vector3 position,
             Vector3 scale, Vector3 eulerAngles, Color fontColor, Color outlineColor, bool outlineStatus,
             float outlineThickness, float fontSize, int order, FontStyles styles)
         {
-            /// Adjusts the current order in the layer if the 
+            /// Adjusts the current order in the layer if the
             /// order in layer for the line is greater than or equal to it.
             if (order >= ValueHolder.currentOrderInLayer)
             {
@@ -292,7 +293,7 @@ namespace SEE.Game.Drawable
             }
             else
             { /// Creates the text object.
-                Setup(drawable, id, text, position, fontColor, outlineColor, outlineStatus, outlineThickness, fontSize, order, 
+                Setup(drawable, id, text, position, fontColor, outlineColor, outlineStatus, outlineThickness, fontSize, order,
                     styles, out GameObject textObj);
                 textObject = textObj;
 
@@ -304,7 +305,7 @@ namespace SEE.Game.Drawable
             textObject.transform.localPosition = position;
             textObject.GetComponent<OrderInLayerValueHolder>().SetOrderInLayer(order);
 
-            /// Is needed to fix an issue in the <see cref="TextMeshPro"/> component. 
+            /// Is needed to fix an issue in the <see cref="TextMeshPro"/> component.
             /// If the outline color is set to black during creation, it is strangely always set to white.
             GameEdit.ChangeOutlineColor(textObject, outlineColor);
 

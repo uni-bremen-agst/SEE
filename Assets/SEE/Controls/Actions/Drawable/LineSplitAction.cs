@@ -146,7 +146,7 @@ namespace SEE.Controls.Actions.Drawable
             Vector3[] positions = ShapePointsCalculator.Polygon(position,
                 ValueHolder.lineSplitMarkerRadius, ValueHolder.lineSplitMarkerVertices);
             /// Creates the marker polygon.
-            GameObject point = GameDrawer.DrawLine(drawable, DrawableHolder.GetRandomString(10), positions,
+            GameObject point = GameDrawer.DrawLine(drawable, RandomStrings.GetRandomString(10), positions,
                 GameDrawer.ColorKind.Monochrome,
                 negativColor, negativColor, 0.01f,
                 false, GameDrawer.LineKind.Solid, 1f, false);

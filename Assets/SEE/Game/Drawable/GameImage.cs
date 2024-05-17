@@ -36,11 +36,11 @@ namespace SEE.Game.Drawable
         /// <param name="position">The position where the image should be</param>
         /// <param name="order">The order in layer for the image</param>
         /// <param name="image">The output image game object.</param>
-        private static void Setup(GameObject drawable, string name, string imageFilePath, 
+        private static void Setup(GameObject drawable, string name, string imageFilePath,
             byte[] data, Vector3 position, int order,
             out GameObject image)
         {
-            /// If the object has been created earlier, it already has a name, 
+            /// If the object has been created earlier, it already has a name,
             /// and this name is taken from the parameters <paramref name="name"/>.
             if (name.Length > 4)
             {
@@ -49,14 +49,15 @@ namespace SEE.Game.Drawable
             else
             {
                 /// Otherwise, a name for the image will be generated.
-                /// For this, the <see cref="ValueHolder.ImagePrefix"/> is concatenated with 
+                /// For this, the <see cref="ValueHolder.ImagePrefix"/> is concatenated with
                 /// the object ID along with a random string consisting of four characters.
                 image = new("");
-                name = ValueHolder.ImagePrefix + image.GetInstanceID() + DrawableHolder.GetRandomString(4);
+
+                name = ValueHolder.ImagePrefix + image.GetInstanceID() + RandomStrings.GetRandomString(4);
                 /// Check if the name is already in use. If so, generate a new name.
                 while (GameFinder.FindChild(drawable, name) != null)
                 {
-                    name = ValueHolder.ImagePrefix + image.GetInstanceID() + DrawableHolder.GetRandomString(4);
+                    name = ValueHolder.ImagePrefix + image.GetInstanceID() + RandomStrings.GetRandomString(4);
                 }
                 image.name = name;
             }
@@ -111,7 +112,7 @@ namespace SEE.Game.Drawable
             /// Adjust the size of the collider to match the size of the canvas.
             collider.size = new Vector3(1, 1, 0.01f);
 
-            /// Set the position of the line and ensure the correct order in the layer. 
+            /// Set the position of the line and ensure the correct order in the layer.
             /// Additionally, adopt the rotation of the attached object.
             image.transform.rotation = attachedObjects.transform.rotation;
             image.transform.position = position - image.transform.forward * ValueHolder.distanceToDrawable.z * order;
@@ -149,10 +150,10 @@ namespace SEE.Game.Drawable
         /// <param name="imageColor">The image color</param>
         /// <param name="fileName">The file name of the image</param>
         /// <returns>The created image game object.</returns>
-        public static GameObject RePlaceImage(GameObject drawable, string name, byte[] fileData, Vector3 position, 
+        public static GameObject RePlaceImage(GameObject drawable, string name, byte[] fileData, Vector3 position,
             Vector3 scale, Vector3 eulerAngles, int order, Color imageColor, string fileName)
         {
-            /// Adjusts the current order in the layer if the 
+            /// Adjusts the current order in the layer if the
             /// order in layer for the line is greater than or equal to it.
             if (order >= ValueHolder.currentOrderInLayer)
             {
@@ -213,7 +214,7 @@ namespace SEE.Game.Drawable
         /// <param name="imageObj">The image game object, can be null when the method is used to save a downloaded file.</param>
         /// <param name="fileData">The fila data of the image.</param>
         /// <param name="fileName">The file name of the image.</param>
-        public static void CreateImageFile(GameObject imageObj, byte[] fileData, string fileName, 
+        public static void CreateImageFile(GameObject imageObj, byte[] fileData, string fileName,
             out string filePath)
         {
             DrawableConfigManager.EnsureDrawableDirectoryExists(ValueHolder.imagePath);
@@ -241,21 +242,21 @@ namespace SEE.Game.Drawable
             }
             else
             {
-                /// If a file with the same name exists, it checks whether they are the same images. 
-                /// This is done by comparing the byte count. 
-                /// To do this, it is necessary to create a temporary image file. 
-                /// This is done in a separate subfolder 'temp.' 
+                /// If a file with the same name exists, it checks whether they are the same images.
+                /// This is done by comparing the byte count.
+                /// To do this, it is necessary to create a temporary image file.
+                /// This is done in a separate subfolder 'temp.'
                 /// After the examinations, this file and the folder are deleted.
                 string tmpPath = ValueHolder.imagePath + "/temp/";
                 DrawableConfigManager.EnsureDrawableDirectoryExists(tmpPath);
-                string tmpFileName = fileNameWithoutExtension + "-" + 
-                    DrawableHolder.GetRandomStringForFile(10) + fileExtension;
+                string tmpFileName = fileNameWithoutExtension + "-"
+                                     + RandomStrings.GetRandomStringForFile(10) + fileExtension;
 
                 /// If the file already exists, find a new name.
                 while (File.Exists(tmpPath + tmpFileName))
                 {
-                    tmpFileName = fileNameWithoutExtension + "-" + 
-                        DrawableHolder.GetRandomStringForFile(10) + fileExtension;
+                    tmpFileName = fileNameWithoutExtension + "-"
+                                  + RandomStrings.GetRandomStringForFile(10) + fileExtension;
                 }
                 File.WriteAllBytes(tmpPath + tmpFileName, fileData);
                 FileInfo fileInfo = new (tmpPath + tmpFileName);
@@ -263,13 +264,13 @@ namespace SEE.Game.Drawable
 
                 if (fileInfo.Length != existsInfo.Length)
                 {
-                    /// If the byte counts are not equal, indicating different images, 
-                    /// it checks whether another file with a similar name already exists and 
-                    /// whether there is a file among them that matches the image to be saved. 
+                    /// If the byte counts are not equal, indicating different images,
+                    /// it checks whether another file with a similar name already exists and
+                    /// whether there is a file among them that matches the image to be saved.
                     /// If this is not the case, a new file with the highest index + 1 is created.
                     for (int i = 1; i <= Directory.GetFiles(ValueHolder.imagePath).ToList().Count; i++)
                     {
-                        string newPath = ValueHolder.imagePath + fileNameWithoutExtension 
+                        string newPath = ValueHolder.imagePath + fileNameWithoutExtension
                             + "(" + i + ")" + fileExtension;
                         if (!File.Exists(newPath))
                         {
