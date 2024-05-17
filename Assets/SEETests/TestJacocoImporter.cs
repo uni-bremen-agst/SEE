@@ -42,7 +42,7 @@ namespace SEE.DataModel.DG
             string xmlPath = Application.streamingAssetsPath + "/JLGExample/jacoco.xml";
 
             graph = await LoadGraphAsync(gxlPath);
-            JaCoCoImporter.Load(graph, xmlPath);
+            await JaCoCoImporter.LoadAsync(graph, xmlPath);
         }
 
         [TearDown]
