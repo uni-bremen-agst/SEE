@@ -1,6 +1,8 @@
 ﻿using NUnit.Framework;
 using SEE.DataModel.DG.IO;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace SEE.DataModel.DG
@@ -21,10 +23,10 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="filename">GXL file</param>
         /// <returns>loaded graph</returns>
-        private static Graph LoadGraph(string filename)
+        private static async UniTask<Graph> LoadGraphAsync(string filename)
         {
             GraphReader graphReader = new(filename, new HashSet<string> { hierarchicalEdgeType }, basePath: "");
-            graphReader.Load();
+            await graphReader.LoadAsync();
             return graphReader.GetGraph();
         }
 
@@ -34,12 +36,12 @@ namespace SEE.DataModel.DG
         private Graph graph;
 
         [SetUp]
-        public void SetUp()
+        public async Task SetUpAsync()
         {
             string gxlPath = Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz";
             string xmlPath = Application.streamingAssetsPath + "/JLGExample/jacoco.xml";
 
-            graph = LoadGraph(gxlPath);
+            graph = await LoadGraphAsync(gxlPath);
             JaCoCoImporter.Load(graph, xmlPath);
         }
 
