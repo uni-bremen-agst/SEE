@@ -90,8 +90,11 @@ namespace SEE.Game
                                                                CancellationToken token = default)
         {
             int totalGameObjects = gameObjects.Count;
+            // The batch size controls the compromise between FPS and processing speed.
+            // In the editor, requirements for FPS are significantly lower than in-game.
+            int batchSize = Application.isPlaying ? 200 : 1000;
             float i = 0;
-            await foreach (GameObject go in gameObjects.BatchPerFrame(cancellationToken: token))
+            await foreach (GameObject go in gameObjects.BatchPerFrame(batchSize, cancellationToken: token))
             {
                 PrepareForInteraction(go);
                 updateProgress(++i / totalGameObjects);

@@ -15,8 +15,6 @@ namespace SEE.Utils
     /// </summary>
     public class Performance
     {
-        private Performance() { }
-
         private Performance(string action, Stopwatch sw)
         {
             this.action = action;
@@ -27,7 +25,7 @@ namespace SEE.Utils
 
         private readonly string action;
 
-        private double totalTimeInMilliSeconds = 0.0;
+        private double totalTimeInMilliSeconds;
 
         /// <summary>
         /// Returns a new performance time stamp and emits given action.
@@ -36,8 +34,8 @@ namespace SEE.Utils
         /// <returns></returns>
         public static Performance Begin(string action)
         {
-            Stopwatch sw = new Stopwatch();
-            Performance result = new Performance(action, sw);
+            Stopwatch sw = new();
+            Performance result = new(action, sw);
             sw.Start();
             return result;
         }
@@ -54,7 +52,7 @@ namespace SEE.Utils
             totalTimeInMilliSeconds = ts.TotalMilliseconds;
             if (print)
             {
-                Debug.LogFormat("Action {0} finished in {1} [h:m:s:ms] elapsed time).\n", action, GetElapsedTime());
+                Debug.Log($"Action {action} finished in {GetElapsedTime()} [h:m:s:ms] elapsed time).\n");
             }
         }
 
@@ -66,7 +64,7 @@ namespace SEE.Utils
         public string GetElapsedTime()
         {
             TimeSpan ts = TimeSpan.FromMilliseconds(totalTimeInMilliSeconds);
-            return string.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+            return $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds / 10:00}";
         }
 
         /// <summary>

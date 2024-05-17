@@ -305,9 +305,16 @@ namespace SEE.Game.City
             {
                 try
                 {
-                    using (LoadingSpinner.ShowIndeterminate($"Loading city \"{gameObject.name}\""))
+                    using (LoadingSpinner.ShowDeterminate($"Loading city \"{gameObject.name}\"...",
+                                                          out Action<float> reportProgress))
                     {
-                        LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, x => ProgressBar = x,
+                        void ReportProgress(float x)
+                        {
+                            ProgressBar = x;
+                            reportProgress(x);
+                        }
+
+                        LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, ReportProgress,
                                                                       cancellationTokenSource.Token);
                     }
                 }
