@@ -84,6 +84,21 @@ namespace SEE.Utils.Config
         protected const string AlphaLabel = "Alpha";
 
         /// <summary>
+        /// Label for the X coordinate of a Vector3.
+        /// </summary>
+        protected const string XLabel = "X";
+
+        /// <summary>
+        /// Label for the Y coordinate of a Vector3.
+        /// </summary>
+        protected const string YLabel = "Y";
+
+        /// <summary>
+        /// Label for the Z coordinate of a Vector3.
+        /// </summary>
+        protected const string ZLabel = "Z";
+
+        /// <summary>
         /// Looks up the <paramref name="value"/> in <paramref name="attributes"/> using the
         /// key <paramref name="label"/>. If no such <paramref name="label"/> exists, false
         /// is returned and <paramref name="value"/> remains unchanged. Otherwise <paramref name="value"/>
@@ -228,6 +243,51 @@ namespace SEE.Utils.Config
                 if (values.TryGetValue(AlphaLabel, out object alpha))
                 {
                     value.a = (float)alpha;
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Looks up the <paramref name="value"/> in <paramref name="attributes"/> using the
+        /// key <paramref name="label"/>. If no such <paramref name="label"/> exists, false
+        /// is returned and <paramref name="value"/> remains unchanged. Otherwise <paramref name="value"/>
+        /// receives the looked up value. Note that only those parts of the Vector3 (x, y, z)
+        /// will be updated in <paramref name="value"/> that are actually found in <paramref name="attributes"/>;
+        /// all others remain unchanged.
+        ///
+        /// Note: This method is intended specifically for Vector3. For enums use <see cref="RestoreEnum()"/>
+        /// and for all other types, use <see cref="Restore{T}()"/> instead.
+        /// </summary>
+        /// <param name="attributes">where to look up the <paramref name="label"/></param>
+        /// <param name="label">the label to look up</param>
+        /// <param name="value">the value of the looked up <paramref name="label"/> if the <paramref name="label"/>
+        /// exists</param>
+        /// <returns>true if the <paramref name="label"/> was found</returns>
+        internal static bool Restore(Dictionary<string, object> attributes, string label, ref Vector3 value)
+        {
+            if (attributes.TryGetValue(label, out object dictionary))
+            {
+                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
+                if (values == null)
+                {
+                    throw new InvalidCastException($"Types are not assignment compatible for attribute {label}. Expected type: Dictionary<string, float>. Actual type: {dictionary.GetType()}");
+                }
+                if (values.TryGetValue(XLabel, out object x))
+                {
+                    value.x = (float)x;
+                }
+                if (values.TryGetValue(YLabel, out object y))
+                {
+                    value.y = (float)y;
+                }
+                if (values.TryGetValue(ZLabel, out object z))
+                {
+                    value.z = (float)z;
                 }
                 return true;
             }

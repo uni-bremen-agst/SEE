@@ -1,0 +1,147 @@
+﻿using SEE.Game.Drawable.ValueHolders;
+using SEE.Utils.Config;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace SEE.Game.Drawable.Configurations
+{
+    /// <summary>
+    /// The configuration class for a drawable image.
+    /// </summary>
+    [Serializable]
+    public class ImageConf : DrawableType, ICloneable
+    {
+        /// <summary>
+        /// The color of the image.
+        /// </summary>
+        public Color ImageColor;
+
+        /// <summary>
+        /// The file data of the image.
+        /// </summary>
+        public byte[] FileData;
+
+        /// <summary>
+        /// The file path where the image is located.
+        /// </summary>
+        public string Path;
+
+        /// <summary>
+        /// Returns an image configuration for the given game object.
+        /// Only works if the game object is a drawable image.
+        /// If not, <c>null</c> is returned.
+        /// </summary>
+        /// <param name="imageObject">The game object which contains the image, the canvas and an image tag.</param>
+        /// <returns>A newly created image configuration</returns>
+        public static ImageConf GetImageConf(GameObject imageObject)
+        {
+            ImageConf conf = null;
+            if (imageObject != null && imageObject.CompareTag(Tags.Image))
+            {
+                conf = new()
+                {
+                    Id = imageObject.name,
+                    Position = imageObject.transform.localPosition,
+                    EulerAngles = imageObject.transform.localEulerAngles,
+                    Scale = imageObject.transform.localScale,
+                    OrderInLayer = imageObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer(),
+                    ImageColor = imageObject.GetComponent<Image>().color,
+                    Path = imageObject.GetComponent<ImageValueHolder>().GetPath(),
+                    FileData = imageObject.GetComponent<ImageValueHolder>().GetFileData()
+                };
+            }
+            return conf;
+        }
+
+        /// <summary>
+        /// Returns a clone of this <see cref="ImageConf"/> object.
+        /// </summary>
+        /// <returns>A new <see cref="ImageConf"/> with the values of this object.</returns>
+        public object Clone()
+        {
+            return new ImageConf
+            {
+                Id = this.Id,
+                Position = this.Position,
+                EulerAngles = this.EulerAngles,
+                Scale = this.Scale,
+                OrderInLayer = this.OrderInLayer,
+                ImageColor = this.ImageColor,
+                Path = this.Path,
+                FileData = this.FileData
+            };
+        }
+
+        #region Config I/O
+
+        /// <summary>
+        /// Label in the configuration file for the color of the image.
+        /// </summary>
+        private const string colorLabel = "ColorLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the path of the image.
+        /// </summary>
+        private const string pathLabel = "PathLabel";
+
+        /// <summary>
+        /// Saves this instance's attributes using <see cref="ConfigWriter"/>.
+        /// </summary>
+        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
+        override internal void Save(ConfigWriter writer)
+        {
+            writer.BeginGroup();
+            base.Save(writer);
+            writer.Save(ImageColor, colorLabel);
+            writer.Save(Path, pathLabel);
+            writer.EndGroup();
+        }
+
+        /// <summary>
+        /// Given the representation of a <see cref="ImageConf"/> as created by the <see cref="ConfigWriter"/>,
+        /// this method parses the attributes from that representation and
+        /// puts them into this <see cref="ImageConf"/> instance.
+        /// </summary>
+        /// <param name="attributes">A list of labels (strings) of attributes and their values (objects). This
+        /// has to be the representation of a <see cref="ImageConf"/> as created by
+        /// <see cref="ConfigWriter"/>.</param>
+        /// <returns>Whether or not the <see cref="ImageConf"/> was loaded without errors.</returns>
+        override internal bool Restore(Dictionary<string, object> attributes)
+        {
+            bool errors = base.Restore(attributes);
+
+            /// Try to restore the image color.
+            Color loadedimageColor = Color.black;
+            if (ConfigIO.Restore(attributes, colorLabel, ref loadedimageColor))
+            {
+                ImageColor = loadedimageColor;
+            }
+            else
+            {
+                ImageColor = Color.black;
+                errors = true;
+            }
+
+            /// Try to restore the image file.
+            if (attributes.TryGetValue(pathLabel, out object p))
+            {
+                Path = (string)p;
+                if (File.Exists(Path))
+                {
+                    FileData = File.ReadAllBytes(Path);
+                }
+            }
+            else
+            {
+                errors = true;
+            }
+
+            return !errors;
+        }
+
+        #endregion
+    }
+}

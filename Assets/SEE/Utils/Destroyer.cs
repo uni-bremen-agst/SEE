@@ -84,5 +84,19 @@ namespace SEE.Utils
                 }
             }
         }
+
+        /// <summary>
+        /// If <paramref name="gameObject"/> has a component of type <typeparamref name="T"/>,
+        /// this component will be destroyed. If there is no such component, nothing happens.
+        /// </summary>
+        /// <typeparam name="T">type of component to be destroyed</typeparam>
+        /// <param name="gameObject">game object whose component is to be destroyed</param>
+        public static void Destroy<T>(this GameObject gameObject) where T : Component
+        {
+            if (gameObject.TryGetComponent(out T component))
+            {
+                Destroy(component);
+            }
+        }
     }
 }
