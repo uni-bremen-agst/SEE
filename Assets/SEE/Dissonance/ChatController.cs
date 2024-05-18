@@ -21,7 +21,6 @@ namespace SEE.Dissonance
         /// <summary>
         /// The name of the direct child holding the canvas where the chat
         /// is displayed. The canvas will be disabled when the chat is toggled off.
-        ///
         /// </summary>
         private const string canvasName = "Canvas";
 
