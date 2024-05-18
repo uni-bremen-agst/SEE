@@ -203,14 +203,13 @@ namespace SEE.Controls.Actions.Drawable
             /// To maintain the distance from the drawable, the minimum distance on the Z-axis is subtracted.
             Vector3 newPosition = line.transform.InverseTransformPoint(raycastHit.point) - ValueHolder.DistanceToDrawable;
             Vector3 nPos = new(newPosition.x, newPosition.y, 0);
-            if (newPosition != positions.Last() /// This query is required in case <see cref="StartDrawing"/> was used previously.
-                && nPos != positions.Last()) // This query is required if <see cref="GameDrawer.Drawing"/> has already been
-                                             // executed (because of GameDrawer.UpdateZPositions()).
+            if (nPos != positions.Last()) // This query is required if <see cref="GameDrawer.Drawing"/> has already been
+                                          // executed (because of GameDrawer.UpdateZPositions()).
             {
                 /// Add newPosition to the line renderer and and start drawing over the network.
                 Vector3[] newPositions = new Vector3[positions.Length + 1];
                 Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
-                newPositions[newPositions.Length - 1] = newPosition;
+                newPositions[^1] = newPosition;
                 positions = newPositions;
 
                 GameDrawer.Drawing(line, positions);
