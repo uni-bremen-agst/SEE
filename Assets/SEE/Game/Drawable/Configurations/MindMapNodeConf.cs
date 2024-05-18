@@ -50,7 +50,7 @@ namespace SEE.Game.Drawable.Configurations
         /// <summary>
         /// The dictionary with the childs and the branch lines to them.
         /// </summary>
-        public Dictionary<GameObject, GameObject> Children;
+        public IDictionary<GameObject, GameObject> Children;
         /// <summary>
         /// The dictionary with the children names and the branch line names.
         /// </summary>
