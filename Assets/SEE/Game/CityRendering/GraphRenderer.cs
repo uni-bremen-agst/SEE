@@ -315,7 +315,7 @@ namespace SEE.Game.CityRendering
             GameObject rootGameNode = RootGameNode(parent);
             try
             {
-                await EdgeLayoutAsync(gameNodes, rootGameNode, true, x => updateProgress?.Invoke(0.5f + x*0.5f), token);
+                await EdgeLayoutAsync(gameNodes, rootGameNode, true, x => updateProgress?.Invoke(0.5f + x * 0.5f), token);
             }
             catch (OperationCanceledException)
             {
