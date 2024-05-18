@@ -58,7 +58,7 @@ namespace SEE.Dissonance
 
             // Find the input field.
             // Note: GetComponentsInChildren recurses into all transitive descendants.
-            inputField = GetComponentsInChildren<InputField>(true).Single(a => a.name == chatInputName);
+            inputField = GetComponentsInChildren<InputField>(true).SingleOrDefault(a => a.name == chatInputName);
             if (inputField == null)
             {
                 Debug.LogError($"Could not find input field named {chatInputName}.\n");

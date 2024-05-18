@@ -151,14 +151,15 @@ namespace SEE.Dissonance
 
             // Preferred height will be the height it wants to be (e.g. including extra height because of wraparound).
             // Directly set the height to that height to ensure all text is seen.
-            txt.GetComponent<RectTransform>().sizeDelta = new Vector2(0, txt.preferredHeight);
-            txt.GetComponent<RectTransform>().anchoredPosition += new Vector2(0, 3);
+            RectTransform rectTransform = txt.GetComponent<RectTransform>();
+            rectTransform.sizeDelta = new Vector2(0, txt.preferredHeight);
+            rectTransform.anchoredPosition += new Vector2(0, 3);
 
             // Save the item in the queue of log entries.
             logEntries.Enqueue(new ChatLogEntry(txt));
 
             // Bump all items up by the appropriate amount.
-            foreach (var chatLogEntry in logEntries)
+            foreach (ChatLogEntry chatLogEntry in logEntries)
             {
                 chatLogEntry.Transform.anchoredPosition += new Vector2(0, txt.preferredHeight);
 
