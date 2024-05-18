@@ -31,7 +31,7 @@ namespace SEE.Dissonance
 
         /// <summary>
         /// The name of the game object representing the chat box. It must be a direct
-        /// child of the <see cref="canvas"/> game object"/>.
+        /// child of the <see cref="canvas"/> game object.
         /// </summary>
         private const string chatBoxName = "ChatBox";
 
