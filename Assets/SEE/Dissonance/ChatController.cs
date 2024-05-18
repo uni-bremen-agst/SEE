@@ -32,7 +32,7 @@ namespace SEE.Dissonance
         protected GameObject canvas;
 
         /// <summary>
-        /// Initiliazes the <see cref="canvas"/> and <see cref="Comms"/>.
+        /// Initializes the <see cref="canvas"/> and <see cref="Comms"/>.
         /// </summary>
         protected virtual void Start()
         {
