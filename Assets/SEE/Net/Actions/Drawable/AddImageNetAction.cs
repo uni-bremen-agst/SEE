@@ -8,20 +8,10 @@ namespace SEE.Net.Actions.Drawable
     /// <summary>
     /// This class is reponsible for add <see cref="AddImageAction"/> an image to the given drawable on all clients.
     /// </summary>
-    public class AddImageNetAction : AbstractNetAction
+    public class AddImageNetAction : DrawableNetAction
     {
         /// <summary>
-        /// The id of the drawable on which the object should be placed
-        /// </summary>
-        public string DrawableID;
-
-        /// <summary>
-        /// The id of the drawable parent
-        /// </summary>
-        public string ParentDrawableID;
-
-        /// <summary>
-        /// The image that should be add as <see cref="ImageConf"/> object.
+        /// The image that should be added as <see cref="ImageConf"/> object.
         /// </summary>
         public ImageConf Conf;
 
@@ -32,19 +22,11 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="imageConf">The image configuration of the image that should be added.</param>
         public AddImageNetAction(string drawableID, string parentDrawableID, ImageConf imageConf)
+            : base(drawableID, parentDrawableID)
         {
-            this.DrawableID = drawableID;
-            this.ParentDrawableID = parentDrawableID;
-            this.Conf = imageConf;
+            Conf = imageConf;
         }
 
-        /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
-        }
         /// <summary>
         /// Adds the image on each client.
         /// </summary>
@@ -53,15 +35,9 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
-                if (drawable == null)
-                {
-                    throw new System.Exception($"There is no drawable with the ID {DrawableID}.");
-                }
-
                 if (Conf != null && Conf.Id != "")
                 {
-                    GameImage.RePlaceImage(drawable, Conf);
+                    GameImage.RePlaceImage(Drawable, Conf);
                 }
                 else
                 {
