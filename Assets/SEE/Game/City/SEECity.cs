@@ -547,10 +547,6 @@ namespace SEE.Game.City
 
         #region Config I/O
 
-        //--------------------------------
-        // Configuration file input/output
-        //--------------------------------
-
         /// <summary>
         /// Label of attribute <see cref="DataProvider"/> in the configuration file.
         /// </summary>
