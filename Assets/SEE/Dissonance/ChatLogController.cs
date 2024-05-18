@@ -212,16 +212,9 @@ namespace SEE.Dissonance
             }
 
             // Update animations on fading chat lines.
-            foreach (ChatLogEntry chatLogEntry in logEntries)
+            foreach (ChatLogEntry chatLogEntry in logEntries.TakeWhile(x => x.IsTransitioningOut))
             {
-                if (chatLogEntry.IsTransitioningOut)
-                {
-                    chatLogEntry.Update();
-                }
-                else
-                {
-                    break;
-                }
+                chatLogEntry.Update();
             }
         }
 
