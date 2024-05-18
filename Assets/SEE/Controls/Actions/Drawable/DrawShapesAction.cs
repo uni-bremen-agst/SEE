@@ -155,17 +155,14 @@ namespace SEE.Controls.Actions.Drawable
                         GameFinder.HasDrawable(hit.collider.gameObject)))
                 {
                     Vector3 newPosition = shape.transform.InverseTransformPoint(hit.point) - ValueHolder.DistanceToDrawable;
-                    if (newPosition != positions.Last())
-                    {
-                        Vector3[] newPositions = new Vector3[positions.Length + 1];
-                        Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
-                        newPositions[newPositions.Length - 1] = newPosition;
-                        positions = newPositions;
+                    Vector3[] newPositions = new Vector3[positions.Length + 1];
+                    Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
+                    newPositions[newPositions.Length - 1] = newPosition;
+                    positions = newPositions;
 
-                        GameDrawer.Drawing(shape, positions);
-                        new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
-                            LineConf.GetLine(shape)).Execute();
-                    }
+                    GameDrawer.Drawing(shape, positions);
+                    new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
+                        LineConf.GetLine(shape)).Execute();
                     FinishDrawing();
                     return true;
                 }
@@ -222,7 +219,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void RemoveLastPoint()
         {
-            if (drawing && Input.GetKeyDown(KeyCode.Tab))
+            if (drawing && Input.GetKeyDown(KeyCode.LeftAlt))
             {
                 if (shape.GetComponent<LineRenderer>().positionCount >= 3)
                 {
