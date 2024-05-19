@@ -1,0 +1,134 @@
+PROGRAM einezuendendeidee;
+ DECLARE zgr       : INTEGER;
+         zkl       : INTEGER;
+         wert      : INTEGER;
+         um        : INTEGER;
+         stgr      : INTEGER;
+         stkl      : INTEGER;
+         modus     : INTEGER;
+
+ PROCEDURE dummy;
+ DECLARE d : INTEGER
+ BEGIN
+   d:=1
+ END;
+
+ PROCEDURE naechstestellung;
+  DECLARE dum : INTEGER
+  BEGIN
+    stgr:=(stgr+zgr-1) % zgr;
+    stkl:=(stkl+1) % zkl;
+    IF stgr==0
+      THEN um:=um+1
+      ELSE dummy() 
+    END
+  END;
+
+ PROCEDURE drehbewegungsimulieren;
+  DECLARE dum : INTEGER
+  BEGIN
+    WRITELN("Simulation der Drehbewegung");
+    WRITELN("");
+    WRITELN("Folgende Zaehne treffen sich (gross,klein): ");
+    WRITE("("++FORMAT(stgr)++","++FORMAT(stkl)++"),");
+    naechstestellung();
+    IF NOT (um==wert)
+    THEN
+      WRITE("("++FORMAT(stgr)++","++FORMAT(stkl)++"),");
+      naechstestellung()
+    ELSE
+      dummy()
+    END
+  END;
+
+ FUNCTION bedingung : BOOLEAN;
+ DECLARE x : INTEGER
+ BEGIN
+   IF stgr>0 
+     THEN RETURN(TRUE)
+     ELSE IF stkl>0 
+            THEN IF NOT (stkl==wert)
+                   THEN RETURN(TRUE)
+                   ELSE RETURN(FALSE)
+                 END
+            ELSE RETURN(FALSE)
+          END
+   END;
+   RETURN(FALSE)
+ END;
+
+ PROCEDURE zuendzeitpunktberechnen;
+  DECLARE dum:INTEGER
+  BEGIN
+    WRITELN("Berechnung des Zuendzeitpunkts...");
+    WRITELN("");
+    IF wert>0
+      THEN naechstestellung()
+      ELSE dummy()
+    END;
+    IF bedingung() THEN
+      naechstestellung()
+    ELSE
+      dummy()
+    END;
+    IF stkl>0
+      THEN WRITELN("Die Zuendung erfolgt nach "++FORMAT(um)++" Minuten.")
+      ELSE IF wert==0
+             THEN WRITELN("Zuendung nach "++FORMAT(um)++"Minuten.")
+             ELSE WRITELN("Es erfolgt keine Zuendung.")
+           END
+    END
+  END;
+
+ PROCEDURE steinmarkeberechnen;
+  DECLARE dum : INTEGER
+  BEGIN
+    WRITELN("Berechnung der Feuersteinmarke...");
+    WRITELN("");
+    IF NOT (um==wert) THEN
+      naechstestellung()
+    ELSE
+      dummy()
+    END;
+    WRITELN("Marke am kleinen Rad an Zahn Nr. "++FORMAT(stkl));
+    WRITELN("");
+    wert:=stkl;
+    stgr:=0;
+    stkl:=0;
+    um:=0;
+    zuendzeitpunktberechnen()
+  END
+
+ BEGIN
+   WRITELN("Eine zuendende Idee");
+   WRITELN("-------------------");
+   WRITELN("");
+   WRITE("Anzahl der Zaehne des grossen Zahnrads: ");
+   READ(zgr);
+   WRITE("Anzahl der Zaehne des kleinen Zahnrads: ");
+   READ(zkl);
+   WRITELN("");
+   WRITELN("Was wird noch eingegeben:");
+   WRITELN("");
+   WRITELN("    1) Umdrehungszahl des grossen Rads");
+   WRITELN("    2) Steinmarke am kleinen Rad");
+   WRITELN("    3) Zuendzeitpunkt");
+   READ(modus);
+   WRITELN("");
+   WRITE(FORMAT(modus)++" > Wert: ");
+   READ(wert);
+   WRITELN("");
+   stgr:=0;
+   stkl:=0;
+   um:=0;
+   IF modus == 1
+     THEN drehbewegungsimulieren()
+     ELSE IF modus == 2
+       THEN zuendzeitpunktberechnen()
+       ELSE IF modus == 3
+         THEN steinmarkeberechnen()
+         ELSE WRITELN("falsche Eingabe")
+       END
+     END
+   END
+ END.
