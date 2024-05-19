@@ -241,7 +241,7 @@ namespace SEE.Scanner
                 Type type = AllTokens.SingleOrDefault(x => x.Name.Equals(typeName));
                 if (type == null)
                 {
-                    Debug.LogError($"Unknown token type: {typeName}");
+                    Debug.LogError($"Unknown token type: {typeName}/{symbolicName}");
                 }
                 return type ?? Unknown;
             }
