@@ -145,7 +145,7 @@ namespace SEE.GraphProviders
                 }
                 else
                 {
-                    throw new ArgumentException("To generate Git metrics, the given city should be a DiffCity.\n");
+                    throw new ArgumentException($"To generate Git metrics, the given city should be a {nameof(DiffCity)}.\n");
                 }
             }
         }
