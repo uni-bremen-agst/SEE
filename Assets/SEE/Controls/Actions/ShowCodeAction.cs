@@ -254,12 +254,17 @@ namespace SEE.Controls.Actions
         public static CodeWindow ShowCode(GraphElementRef graphElementRef)
         {
             GraphElement graphElement = graphElementRef.Elem;
-            string commitID = graphElement.CommitID;
             CodeWindow codeWindow;
-            if (!string.IsNullOrEmpty(commitID))
+            if (graphElement.TryGetCommitID(out string commitID))
             {
                 codeWindow = GetOrCreateCodeWindow(graphElementRef, graphElement.Filename);
-                IVersionControl vcs = VersionControlFactory.GetVersionControl(VCSKind.Git, graphElement.RepositoryPath);
+                if (!graphElement.TryGetRepositoryPath(out string repositoryPath))
+                {
+                    string message = $"Selected {GetName(graphElement)} has no repository path.";
+                    ShowNotification.Error("No repository path", message, log: false);
+                    throw new InvalidOperationException(message);
+                }
+                IVersionControl vcs = VersionControlFactory.GetVersionControl(VCSKind.Git, repositoryPath);
                 string[] fileContent = vcs.Show(graphElement.ID, commitID).
                     Split("\\n", StringSplitOptions.RemoveEmptyEntries);
                 codeWindow.EnterFromText(fileContent);
