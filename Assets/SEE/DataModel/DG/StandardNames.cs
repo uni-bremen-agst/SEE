@@ -207,7 +207,7 @@
         /// <summary>
         /// The number of unique developers who contributed to a file that was changed between two commits.
         /// </summary>
-        public const string NumberOfDevelopers = "Metric.Git.Number_of_Developers";
+        public const string NumberOfDevelopers = "Metric.Git.Number_Of_Developers";
         /// <summary>
         /// The number of times a file was changed between two commits.
         /// </summary>
