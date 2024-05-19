@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE Gravis2_Layout>
+<Gravis2_Layout W="Hierarchy" V="Architecture">
+<Node Id="SMain" X="40" Y="-156" W="40" H="40" CS="14.14">
+</Node>
+<Node Id="SCompiler" X="-161" Y="99" W="701" H="346" CS="14.14" Exp="True">
+<Node Id="SMiddleend" X="380.42" Y="56.42" W="28.28" H="28.28" CS="10">
+</Node>
+<Node Id="SBackend" X="562.98" Y="60.49" W="28.28" H="28.28" CS="10">
+</Node>
+<Node Id="SFrontend" X="23.54" Y="36.42" W="227.46" H="135.58" CS="10" Exp="True">
+<Node Id="SScanner" X="30" Y="30" W="20" H="20" CS="10">
+</Node>
+<Node Id="SSemantic Analysis" X="92" Y="87" W="20" H="20" CS="10">
+</Node>
+<Node Id="SParser" X="167" Y="21" W="20" H="20" CS="10">
+</Node>
+</Node>
+<Node Id="SConstants Table" X="416.42" Y="287.98" W="28.28" H="28.28" CS="10">
+</Node>
+<Node Id="SAST2IL" X="308.98" Y="122.05" W="28.28" H="28.28" CS="10">
+</Node>
+<Node Id="SIL" X="564.54" Y="229.98" W="28.28" H="28.28" CS="10">
+</Node>
+<Node Id="SSymbol Table" X="81.42" Y="198.54" W="28.28" H="28.28" CS="10">
+</Node>
+<Node Id="SAST" X="258.98" Y="278.61" W="28.28" H="28.28" CS="10">
+</Node>
+</Node>
+<Node Id="SInfrastructure" X="184" Y="-202" W="357" H="276" CS="14.14" Exp="True">
+<Node Id="SMacros" X="109.42" Y="35.42" W="28.28" H="28.28" CS="10">
+</Node>
+<Node Id="SError Handler" X="83.98" Y="147.49" W="28.28" H="28.28" CS="10">
+</Node>
+<Node Id="SMemory Manager" X="256.42" Y="219.98" W="28.28" H="28.28" CS="10">
+</Node>
+</Node>
+<Node Id="SGlobal Controls" X="-157" Y="-182" W="40" H="40" CS="14.14">
+</Node>
+</Gravis2_Layout>

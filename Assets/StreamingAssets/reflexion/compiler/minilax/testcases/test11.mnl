@@ -1,0 +1,18 @@
+PROGRAM test10;
+DECLARE
+  a : ARRAY [1..2] OF INTEGER;
+
+  PROCEDURE print( VAR a : ARRAY [1..2] OF INTEGER );
+  DECLARE
+    i : INTEGER
+  BEGIN
+    WRITELN( FORMAT( a[1] ) ++ " " ++ FORMAT( a[2] ) );
+    a[2] := 10
+  END
+
+BEGIN
+  a[1] := 99;
+  a[2] := 100;
+  print(a);
+  print(a)
+END.
