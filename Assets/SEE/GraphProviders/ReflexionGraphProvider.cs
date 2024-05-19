@@ -51,7 +51,7 @@ namespace SEE.GraphProviders
             return GraphProviderKind.Reflexion;
         }
 
-        public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
+        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
                                                     Action<float> changePercentage = null,
                                                     CancellationToken token = default)
         {
@@ -59,8 +59,10 @@ namespace SEE.GraphProviders
             {
                 throw new ArgumentException("The given city is null.\n");
             }
-            Graph architectureGraph = LoadGraph(Architecture.Path, city);
-            Graph implementationGraph = LoadGraph(Implementation.Path, city);
+            Graph architectureGraph = await LoadGraphAsync(Architecture.Path, city, token);
+            changePercentage?.Invoke(0.33f);
+            Graph implementationGraph = await LoadGraphAsync(Implementation.Path, city, token);
+            changePercentage?.Invoke(0.66f);
             Graph mappingGraph;
             if (string.IsNullOrEmpty(Mapping.Path))
             {
@@ -72,10 +74,11 @@ namespace SEE.GraphProviders
             }
             else
             {
-                mappingGraph = LoadGraph(Mapping.Path, city);
+                mappingGraph = await LoadGraphAsync(Mapping.Path, city, token);
+                changePercentage?.Invoke(1.0f);
             }
 
-            return UniTask.FromResult<Graph>(new ReflexionGraph(implementationGraph, architectureGraph, mappingGraph, CityName));
+            return new ReflexionGraph(implementationGraph, architectureGraph, mappingGraph, CityName);
         }
 
         /// <summary>
@@ -84,10 +87,11 @@ namespace SEE.GraphProviders
         /// <param name="path">the path of the GXL data from which to load</param>
         /// <param name="city">where the <see cref="AbstractSEECity.HierarchicalEdges"/>
         /// and <see cref="AbstractSEECity.SourceCodeDirectory"/> will be retrieved</param>
+        /// <param name="token">token with which the loading can be cancelled</param>
         /// <returns>loaded graph</returns>
         /// <exception cref="ArgumentException">thrown if <paramref name="path"/> is null or empty
         /// or does not exist</exception>
-        private Graph LoadGraph(string path, AbstractSEECity city)
+        private async UniTask<Graph> LoadGraphAsync(string path, AbstractSEECity city, CancellationToken token = default)
         {
             if (string.IsNullOrEmpty(path))
             {
@@ -100,7 +104,7 @@ namespace SEE.GraphProviders
             GraphReader graphCreator = new(path, city.HierarchicalEdges,
                                            basePath: city.SourceCodeDirectory.Path,
                                            logger: new SEELogger());
-            graphCreator.Load();
+            await graphCreator.LoadAsync(token);
             return graphCreator.GetGraph();
         }
 

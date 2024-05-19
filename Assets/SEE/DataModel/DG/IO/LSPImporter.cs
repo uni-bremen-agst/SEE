@@ -168,7 +168,7 @@ namespace SEE.DataModel.DG.IO
             List<string> relevantDocuments = SourcePaths.SelectMany(RelevantDocumentsForPath)
                                                         .Where(x => ExcludedPaths.All(y => !x.StartsWith(y)))
                                                         .Distinct().ToList();
-            List<Node> originalNodes = graph.Nodes();
+            IList<Node> originalNodes = graph.Nodes();
             nodeAtDirectory.Clear();
             newEdges = 0;
 

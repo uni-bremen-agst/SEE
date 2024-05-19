@@ -548,7 +548,7 @@ namespace SEE.DataModel.DG
         /// Returns all nodes of the graph.
         /// </summary>
         /// <returns>all nodes</returns>
-        public List<Node> Nodes()
+        public IList<Node> Nodes()
         {
             return nodes.Values.ToList();
         }
@@ -557,7 +557,7 @@ namespace SEE.DataModel.DG
         /// Returns all non-hierarchical edges of the graph.
         /// </summary>
         /// <returns>all non-hierarchical edges</returns>
-        public List<Edge> Edges()
+        public IList<Edge> Edges()
         {
             return edges.Values.ToList();
         }
