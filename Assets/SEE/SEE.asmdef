@@ -65,7 +65,8 @@
         "System.IO.Pipelines.dll",
         "Supercluster.KDTree.Standard.dll",
         "Markdig.dll",
-        "System.Collections.Immutable.dll"
+        "System.Collections.Immutable.dll",
+        "MoreLinq.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

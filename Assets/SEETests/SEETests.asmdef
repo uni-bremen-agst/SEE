@@ -21,7 +21,8 @@
     "precompiledReferences": [
         "nunit.framework.dll",
         "Sirenix.Serialization.dll",
-        "LibGit2Sharp.dll"
+        "LibGit2Sharp.dll",
+        "MoreLinq.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [

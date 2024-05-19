@@ -171,14 +171,13 @@ namespace SEE.Game.Evolution
                 foreach (GameObject newGameEdge in graphRenderer.EdgeLayout(gameNodes, city, false))
                 {
                     string edgeID = newGameEdge.GetComponent<EdgeRef>().Value.ID;
-                    if (edges.ContainsKey(edgeID))
+                    if (!edges.TryAdd(edgeID, newGameEdge))
                     {
                         // Edge object has already been created in previous call.
                         Destroyer.Destroy(newGameEdge);
                     }
                     else
                     {
-                        edges.Add(edgeID, newGameEdge);
                         // FIXME (@koschke): This should be rewritten so that the GraphElementIDMap isn't called here.
                         //                   That part should be handled by GraphRenderer.CreateGameNode.
                         GraphElementIDMap.Add(newGameEdge);
