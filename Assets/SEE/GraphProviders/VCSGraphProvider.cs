@@ -118,7 +118,7 @@ namespace SEE.GraphProviders
             graph.RepositoryPath(repositoryPath);
 
             // The main directory.
-            NewNode(graph, pathSegments[^1], directoryNodeType, pathSegments[^1], commitID, repositoryPath);
+            NewNode(graph, pathSegments[^1], directoryNodeType, pathSegments[^1]);
 
             IEnumerable<string> includedPathGlobs = pathGlobbing
                 .Where(path => path.Value)
@@ -152,12 +152,12 @@ namespace SEE.GraphProviders
                     // Files in the main directory.
                     if (filePathSegments.Length == 1)
                     {
-                        graph.GetNode(pathSegments[^1]).AddChild(NewNode(graph, filePath, fileNodeType, filePath, commitID, repositoryPath));
+                        graph.GetNode(pathSegments[^1]).AddChild(NewNode(graph, filePath, fileNodeType, filePath));
                     }
                     // Other directories/files.
                     else
                     {
-                        BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(pathSegments[^1]), commitID, repositoryPath);
+                        BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(pathSegments[^1]));
                     }
                 }
                 AddMetricsToNode(graph, repo, commitID);
@@ -166,17 +166,14 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// Creates and returns a new node to <paramref name="graph"/>.
+        /// Creates and adds a new node to <paramref name="graph"/> and returns it.
         /// </summary>
         /// <param name="graph">Where to add the node</param>
         /// <param name="id">Unique ID of the new node</param>
         /// <param name="type">Type of the new node</param>
         /// <param name="name">The source name of the node</param>
-        /// <param name="commitID">The commitID of the node</param>
-        /// <param name="repositoryPath">The repository path of the node</param>
         /// <returns>a new node added to <paramref name="graph"/></returns>
-        public static Node NewNode(Graph graph, string id, string type,
-            string name, string commitID, string repositoryPath)
+        public static Node NewNode(Graph graph, string id, string type, string name)
         {
             Node result = new()
             {
@@ -199,10 +196,8 @@ namespace SEE.GraphProviders
         /// <param name="parentPath">The path of the current parent, which will eventually be part of the ID</param>
         /// <param name="graph">The graph to which the new node belongs to</param>
         /// <param name="mainNode">The root node of the main directory</param>
-        /// <param name="commitID">The commitID of the graph</param>
-        /// <param name="repositoryPath">The repositoryPath of the graph</param>
         public static Node BuildGraphFromPath(string path, Node parent, string parentPath,
-            Graph graph, Node mainNode, string commitID, string repositoryPath)
+            Graph graph, Node mainNode)
         {
             string[] pathSegments = path.Split('/');
             string nodePath = string.Join('/', pathSegments, 1,
@@ -216,16 +211,15 @@ namespace SEE.GraphProviders
                 // Directory already exists.
                 if (currentSegmentNode != null)
                 {
-                    return BuildGraphFromPath(nodePath, currentSegmentNode, pathSegments[0], graph,
-                        mainNode, commitID, repositoryPath);
+                    return BuildGraphFromPath(nodePath, currentSegmentNode, pathSegments[0], graph, mainNode);
                 }
 
                 // Directory does not exist.
                 if (currentSegmentNode == null && pathSegments.Length > 1 && parent == null)
                 {
-                    mainNode.AddChild(NewNode(graph, pathSegments[0], directoryNodeType, pathSegments[0], commitID, repositoryPath));
+                    mainNode.AddChild(NewNode(graph, pathSegments[0], directoryNodeType, pathSegments[0]));
                     return BuildGraphFromPath(nodePath, graph.GetNode(pathSegments[0]),
-                        pathSegments[0], graph, mainNode, commitID, repositoryPath);
+                        pathSegments[0], graph, mainNode);
                 }
             }
 
@@ -239,23 +233,23 @@ namespace SEE.GraphProviders
                 if (currentPathSegmentNode != null)
                 {
                     return BuildGraphFromPath(nodePath, currentPathSegmentNode,
-                        currentPathSegment, graph, mainNode, commitID, repositoryPath);
+                        currentPathSegment, graph, mainNode);
                 }
 
                 // The node for the current pathSegment does not exist, and the node is a directory.
                 if (currentPathSegmentNode == null &&
                     pathSegments.Length > 1)
                 {
-                    parent.AddChild(NewNode(graph, currentPathSegment, directoryNodeType, pathSegments[0], commitID, repositoryPath));
+                    parent.AddChild(NewNode(graph, currentPathSegment, directoryNodeType, pathSegments[0]));
                     return BuildGraphFromPath(nodePath, graph.GetNode(currentPathSegment),
-                        currentPathSegment, graph, mainNode, commitID, repositoryPath);
+                        currentPathSegment, graph, mainNode);
                 }
 
                 // The node for the current pathSegment does not exist, and the node is a file.
                 if (currentPathSegmentNode == null &&
                     pathSegments.Length == 1)
                 {
-                    Node addedFileNode = NewNode(graph, currentPathSegment, fileNodeType, pathSegments[0], commitID, repositoryPath);
+                    Node addedFileNode = NewNode(graph, currentPathSegment, fileNodeType, pathSegments[0]);
                     parent.AddChild(addedFileNode);
                     return addedFileNode;
                 }
