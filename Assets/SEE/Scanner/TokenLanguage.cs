@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Antlr4.Runtime;
 
-namespace SEE.UI.Window.CodeWindow
+namespace SEE.Scanner
 {
     /// <summary>
     /// Represents a language a <see cref="SEEToken.Type"/> is in.

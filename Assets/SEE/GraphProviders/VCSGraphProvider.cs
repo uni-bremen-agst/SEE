@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using SEE.UI.Window.CodeWindow;
+using SEE.Scanner;
 using System.Threading;
 
 namespace SEE.GraphProviders

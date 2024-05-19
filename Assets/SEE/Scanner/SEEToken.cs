@@ -5,7 +5,7 @@ using System.Linq;
 using Antlr4.Runtime;
 using UnityEngine;
 
-namespace SEE.UI.Window.CodeWindow
+namespace SEE.Scanner
 {
     /// <summary>
     /// Represents a token from a source code file, including <see cref="Text"/> and a <see cref="Type"/>.
