@@ -35,14 +35,14 @@ namespace SEE.GraphProviders
         public string CommitID = "";
 
         /// <summary>
-        /// The List of filetypes that get included/excluded.
+        /// The list of path globbings to include or exclude files.
         /// </summary>
         [OdinSerialize]
         [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
-            Tooltip("Paths and their inclusion/exclusion status."), RuntimeTab(GraphProviderFoldoutGroup), HideReferenceObjectPicker]
+            Tooltip("Path globbings to include (true) or exclude files (false)"), RuntimeTab(GraphProviderFoldoutGroup), HideReferenceObjectPicker]
         public Dictionary<string, bool> PathGlobbing = new()
         {
-            { "", false }
+            { "", true }
         };
 
         public override GraphProviderKind GetKind()
@@ -162,6 +162,7 @@ namespace SEE.GraphProviders
                 }
                 AddMetricsToNode(graph, repo, commitID);
             }
+            graph.FinalizeNodeHierarchy();
             return graph;
         }
 
@@ -284,40 +285,6 @@ namespace SEE.GraphProviders
             return fileList;
         }
 
-        #region Config I/O
-
-        /// <summary>
-        /// Label of attribute <see cref="PathGlobbing"/> in the configuration file.
-        /// </summary>
-        private const string pathGlobbingLabel = "PathGlobbing";
-
-        /// <summary>
-        /// Label of attribute <see cref="RepositoryPath"/> in the configuration file.
-        /// </summary>
-        private const string repositoryPathLabel = "RepositoryPath";
-
-        /// <summary>
-        /// Label of attribute <see cref="NewCommitID"/> in the configuration file.
-        /// </summary>
-        private const string commitIDLabel = "CommitID";
-
-        protected override void SaveAttributes(ConfigWriter writer)
-        {
-            Dictionary<string, bool> pathGlobbing = string.IsNullOrEmpty(PathGlobbing.ToString()) ? null : PathGlobbing;
-            writer.Save(pathGlobbing, pathGlobbingLabel);
-            writer.Save(CommitID, commitIDLabel);
-            RepositoryPath.Save(writer, repositoryPathLabel);
-        }
-
-        protected override void RestoreAttributes(Dictionary<string, object> attributes)
-        {
-            ConfigIO.Restore(attributes, pathGlobbingLabel, ref PathGlobbing);
-            ConfigIO.Restore(attributes, commitIDLabel, ref CommitID);
-            RepositoryPath.Restore(attributes, repositoryPathLabel);
-        }
-
-        #endregion
-
         /// <summary>
         /// Retrieves the token stream for given file content from its repository and commit ID.
         /// </summary>
@@ -343,7 +310,8 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// Adds Halstead, McCabe and lines of code metrics to the corresponding node for the supported TokenLanguages in <paramref name="graph"/>.
+        /// Adds Halstead, McCabe and lines of code metrics to the corresponding node for the supported TokenLanguages
+        /// in <paramref name="graph"/>.
         /// Otherwise, metrics are not available.
         /// </summary>
         /// <param name="graph">The graph where the metric should be added.</param>
@@ -381,5 +349,39 @@ namespace SEE.GraphProviders
                 }
             }
         }
+
+        #region Config I/O
+
+        /// <summary>
+        /// Label of attribute <see cref="PathGlobbing"/> in the configuration file.
+        /// </summary>
+        private const string pathGlobbingLabel = "PathGlobbing";
+
+        /// <summary>
+        /// Label of attribute <see cref="RepositoryPath"/> in the configuration file.
+        /// </summary>
+        private const string repositoryPathLabel = "RepositoryPath";
+
+        /// <summary>
+        /// Label of attribute <see cref="NewCommitID"/> in the configuration file.
+        /// </summary>
+        private const string commitIDLabel = "CommitID";
+
+        protected override void SaveAttributes(ConfigWriter writer)
+        {
+            Dictionary<string, bool> pathGlobbing = string.IsNullOrEmpty(PathGlobbing.ToString()) ? null : PathGlobbing;
+            writer.Save(pathGlobbing, pathGlobbingLabel);
+            writer.Save(CommitID, commitIDLabel);
+            RepositoryPath.Save(writer, repositoryPathLabel);
+        }
+
+        protected override void RestoreAttributes(Dictionary<string, object> attributes)
+        {
+            ConfigIO.Restore(attributes, pathGlobbingLabel, ref PathGlobbing);
+            ConfigIO.Restore(attributes, commitIDLabel, ref CommitID);
+            RepositoryPath.Restore(attributes, repositoryPathLabel);
+        }
+
+        #endregion
     }
 }
