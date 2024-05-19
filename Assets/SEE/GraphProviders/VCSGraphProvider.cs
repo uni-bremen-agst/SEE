@@ -368,20 +368,20 @@ namespace SEE.GraphProviders
                     int complexity = CalculateMcCabeComplexity(tokens);
                     int linesOfCode = CalculateLinesOfCode(tokens);
                     halsteadMetrics = CalculateHalsteadMetrics(tokens);
-                    node.SetInt("Lines of Code", linesOfCode);
-                    node.SetInt("McCabe Complexity", complexity);
-                    node.SetInt("Halstead Distinct Operators", halsteadMetrics.DistinctOperators);
-                    node.SetInt("Halstead Distinct Operands", halsteadMetrics.DistinctOperands);
-                    node.SetInt("Halstead Total Operators", halsteadMetrics.TotalOperators);
-                    node.SetInt("Halstead Total Operands", halsteadMetrics.TotalOperands);
-                    node.SetInt("Halstead Program Vocabulary", halsteadMetrics.ProgramVocabulary);
-                    node.SetInt("Halstead Program Length", halsteadMetrics.ProgramLength);
-                    node.SetFloat("Halstead Calculated Estimated Program Length", halsteadMetrics.EstimatedProgramLength);
-                    node.SetFloat("Halstead Volume", halsteadMetrics.Volume);
-                    node.SetFloat("Halstead Difficulty", halsteadMetrics.Difficulty);
-                    node.SetFloat("Halstead Effort", halsteadMetrics.Effort);
-                    node.SetFloat("Halstead Time Required to Program", halsteadMetrics.TimeRequiredToProgram);
-                    node.SetFloat("Halstead Number of Delivered Bugs", halsteadMetrics.NumberOfDeliveredBugs);
+                    node.SetInt("Metrics.LOC", linesOfCode);
+                    node.SetInt("Metrics.McCabe_Complexity", complexity);
+                    node.SetInt("Metrics.Halstead.Distinct_Operators", halsteadMetrics.DistinctOperators);
+                    node.SetInt("Metrics.Halstead.Distinct_Operands", halsteadMetrics.DistinctOperands);
+                    node.SetInt("Metrics.Halstead.Total_Operators", halsteadMetrics.TotalOperators);
+                    node.SetInt("Metrics.Halstead.Total_Operands", halsteadMetrics.TotalOperands);
+                    node.SetInt("Metrics.Halstead.Program_Vocabulary", halsteadMetrics.ProgramVocabulary);
+                    node.SetInt("Metrics.Halstead.Program_Length", halsteadMetrics.ProgramLength);
+                    node.SetFloat("Metrics.Halstead.Estimated_Program_Length", halsteadMetrics.EstimatedProgramLength);
+                    node.SetFloat("Metrics.Halstead.Volume", halsteadMetrics.Volume);
+                    node.SetFloat("Metrics.Halstead.Difficulty", halsteadMetrics.Difficulty);
+                    node.SetFloat("Metrics.Halstead.Effort", halsteadMetrics.Effort);
+                    node.SetFloat("Metrics.Halstead.Time_Required_To_Program", halsteadMetrics.TimeRequiredToProgram);
+                    node.SetFloat("Metrics.Halstead.Number_Of_Delivered_Bugs", halsteadMetrics.NumberOfDeliveredBugs);
                 }
             }
         }
@@ -442,9 +442,8 @@ namespace SEE.GraphProviders
         /// <returns>Returns the Halstead metrics.</returns>
         private static HalsteadMetrics CalculateHalsteadMetrics(IEnumerable<SEEToken> tokens)
         {
-
             // Set of token types which are operands.
-            HashSet<SEEToken.Type> operandTypes = new HashSet<SEEToken.Type>
+            HashSet<SEEToken.Type> operandTypes = new()
             {
                 SEEToken.Type.Identifier,
                 SEEToken.Type.Keyword,
