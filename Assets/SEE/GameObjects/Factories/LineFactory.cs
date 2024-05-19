@@ -148,8 +148,8 @@ namespace SEE.GO
         /// two points. We do not want to change a true polyline by a single line.
         /// </summary>
         /// <param name="line">line to be redrawn</param>
-        /// <param name="from">the start of the line</param>
-        /// <param name="to">the end of the line</param>
+        /// <param name="from">the start of the line in world space</param>
+        /// <param name="to">the end of the line in world space</param>
         /// <exception cref="System.Exception">thrown if the number of points in <paramref name="line"/> is
         /// different from two</exception>
         internal static void ReDraw(LineRenderer line, Vector3 from, Vector3 to)
