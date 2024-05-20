@@ -2,6 +2,7 @@
 using SEE.GO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace SEE.Dissonance
@@ -126,6 +127,7 @@ namespace SEE.Dissonance
             inputField.gameObject.SetActive(true);
             inputField.ActivateInputField();
             EnableCanvas(true);
+            EventSystem.current.SetSelectedGameObject(inputField.gameObject);
 
             // Force the chat log to show
             chatLog.ForceShow = true;
