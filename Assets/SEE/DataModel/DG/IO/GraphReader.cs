@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using Joveler.Compression.XZ;
 using SEE.Utils;
 #if UNITY_EDITOR
@@ -245,9 +247,10 @@ namespace SEE.DataModel.DG.IO
         /// Loads the graph from the GXL file and adds an artificial root node if requested
         /// (see constructor). The node levels will be calculated, too.
         /// </summary>
-        public override void Load()
+        /// <param name="token">token with which the loading can be cancelled</param>
+        public override async UniTask LoadAsync(CancellationToken token = default)
         {
-            base.Load();
+            await base.LoadAsync(token);
             graph.BasePath = basePath;
             if (!string.IsNullOrWhiteSpace(rootName))
             {

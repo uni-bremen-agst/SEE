@@ -1,0 +1,15 @@
+PROGRAM a;
+
+DECLARE
+  b : INTEGER;
+
+PROCEDURE c(x:INTEGER);
+  DECLARE d : INTEGER
+BEGIN
+  d := b;
+  WRITELN( FORMAT( x ) )
+END
+
+BEGIN
+  c(1)
+END.

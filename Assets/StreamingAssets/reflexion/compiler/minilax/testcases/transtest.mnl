@@ -1,0 +1,113 @@
+PROGRAM transtest;
+DECLARE
+  a : ARRAY [1..100] OF INTEGER;
+  i : INTEGER;
+  f : BOOLEAN;
+  mode : INTEGER;
+  count : INTEGER;
+
+  FUNCTION GetTheAnswer : REAL;
+  DECLARE
+    y : REAL
+  BEGIN
+    y := 42;
+    WRITELN( "GetTheAnswer was called" );
+    RETURN (y)
+  END;
+
+  PROCEDURE dummy;
+  DECLARE
+    x : REAL
+  BEGIN
+    x := GetTheAnswer()
+  END;
+
+  PROCEDURE qsort( low : INTEGER; high : INTEGER );
+  DECLARE
+    tmp : INTEGER;
+    u : INTEGER;
+    o : INTEGER;
+    v : INTEGER
+  BEGIN
+    IF low >= high
+    THEN
+      RETURN()
+    ELSE
+      u := low;
+      o := high;
+      v := a[(low+high)/2];
+      WHILE u <= o DO
+        WHILE a[u] < v DO
+          u := u + 1
+	END;
+        WHILE a[o] > v DO
+          o := o - 1
+	END;
+        IF u <= o
+        THEN
+          tmp := a[u];
+          a[u] := a[o];
+          a[o] := tmp;
+  	  u := u + 1;
+	  o := o - 1
+        ELSE
+          dummy()
+	END
+      END;
+      qsort( low, o );
+      qsort( u, high )
+    END
+  END;
+
+  PROCEDURE output( von : INTEGER; bis : INTEGER );
+  DECLARE
+    i : INTEGER
+  BEGIN
+    i := von;
+    WRITE( "from " );
+    WRITE( FORMAT( von ) );
+    WRITE( " to " );
+    WRITE( FORMAT( bis ) );
+    WRITE( ":  " );
+    WHILE i <= bis DO
+      WRITE( FORMAT( a[i] ) );
+      WRITE( "  " );
+      i := i + 1
+    END;
+    WRITELN( " " )
+  END;
+
+  PROCEDURE input( max : INTEGER );
+  DECLARE
+    i : INTEGER
+  BEGIN
+    i := 1;
+    WHILE i <= max DO
+      WRITE( FORMAT(i) );
+      WRITE( ". number: " );
+      READ( a[i] );
+      i := i + 1
+    END
+  END
+
+BEGIN
+  WRITE( "how many numbers? (max. 100) " );
+  READ( count );
+  WRITE( "input numbers (0) or generate numbers (1)? " );
+  READ( mode );
+  IF mode % 2 == 1
+    THEN
+      i := 1;
+      f := FALSE;
+      WHILE NOT f DO
+        a[i] := IF i <= count/2 THEN count/i+i ELSE count/(i-count/2)+i/2 END;
+        i := i + 1;
+        f := i > count
+      END
+    ELSE
+      input( count )
+    END;
+  output( 1, count );
+  qsort( 1, count );
+  output( 1, count )
+END.

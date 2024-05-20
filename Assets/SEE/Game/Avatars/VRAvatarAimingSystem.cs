@@ -1,7 +1,6 @@
 ﻿using SEE.GO;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.XR;
 
 namespace SEE.Game.Avatars
 {
@@ -18,6 +17,11 @@ namespace SEE.Game.Avatars
 
         [Tooltip("If true, local interactions control where the avatar is pointing to.")]
         public bool IsLocallyControlled = true;
+
+        ///<summary>
+        /// The bone of the hand that is used to point.
+        /// </summary>        
+        private Transform HandBone;
 
         /// <summary>
         /// The source from which to start the laser beam. Assigning
@@ -51,11 +55,20 @@ namespace SEE.Game.Avatars
 
         /// <summary>
         /// Adds a <see cref="LaserPointer"/> if necessary and turns it on.
+        /// Sets <see cref="HandBone"/> if it is not set."/>
         /// </summary>
         private void Awake()
         {
             Laser = gameObject.AddOrGetComponent<LaserPointer>();
             Laser.On = true;
+            if (HandBone == null)
+            {
+                HandBone = gameObject.transform.Find("Root/Global/Position/Hips/LowerBack/Spine/Spine1/RightShoulder/RightArm/RightForeArm/RightHand")?.transform;
+            }
+            if (HandBone == null)
+            {
+                Debug.LogError($"Hand bone not assigned in component {nameof(VRAvatarAimingSystem)} in game object {gameObject.FullName()}.\n");
+            }
         }
 
         /// <summary>
@@ -70,11 +83,13 @@ namespace SEE.Game.Avatars
             if (IsLocallyControlled)
             {
                 // Draw a line from the AimTransform of the avatar into the direction
-                // where the pointing device is pointing to.
-                InputDevice handR = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
-                if (handR.TryGetFeatureValue(CommonUsages.deviceRotation, out Quaternion rotR))
+                // where the Handbone is pointing to.
+                if (HandBone != null)
                 {
-                    Vector3 direction = rotR * Vector3.forward;
+                    // The direction of the HandBone needs to be adjusted.
+                    // The direction is not just in forward direction
+                    // of the axis from palm to fingers.
+                    Vector3 direction = HandBone.rotation * Vector3.left;
                     // Move the aim target to the tip of the laser beam.
                     Target.position = Laser.PointTowards(direction);
                 }

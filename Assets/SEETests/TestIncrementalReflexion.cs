@@ -3,9 +3,9 @@ using NUnit.Framework;
 using SEE.DataModel.DG;
 using System.Collections.Generic;
 using System.Linq;
+using MoreLinq;
 using SEE.DataModel;
 using SEE.Tools.ReflexionAnalysis;
-using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Tools.Architecture

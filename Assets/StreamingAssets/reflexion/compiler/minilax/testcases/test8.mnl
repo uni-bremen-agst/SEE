@@ -1,0 +1,8 @@
+PROGRAM test8;
+DECLARE
+  i : REAL
+
+BEGIN
+  READ( i );
+  WRITELN( FORMAT( i ) )
+END.

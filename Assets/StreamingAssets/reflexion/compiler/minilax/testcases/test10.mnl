@@ -1,0 +1,40 @@
+PROGRAM test10;
+DECLARE
+  a : ARRAY [1..10] OF ARRAY [1..10] OF INTEGER;
+  b : ARRAY [1..10] OF ARRAY [1..10] OF INTEGER;
+  i : INTEGER;
+  j : INTEGER;
+
+  PROCEDURE print;
+  DECLARE
+    i : INTEGER;
+    j : INTEGER
+  BEGIN
+    i := 1;
+    WHILE i <= 10 DO
+      j := 1;
+      WHILE j <= 10 DO
+        WRITE( FORMAT( a[i][j] ) ++ " " );
+        j := j + 1
+      END;
+      WRITELN("");
+      i := i + 1
+    END;
+    WRITELN( "[fini]" )
+  END
+
+BEGIN
+  i := 1;
+  WHILE i <= 10 DO
+    j := 1;
+    WHILE j <= 10 DO
+      a[i][j] := i*j;
+      b[i][j] := 0-a[i][j];
+      j := j + 1
+    END;
+    i := i + 1
+  END;
+  print();
+  a[10] := b[5];
+  print()
+END.

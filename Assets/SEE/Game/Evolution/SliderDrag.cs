@@ -96,7 +96,7 @@ namespace SEE.Game.Evolution
         public void OnPointerDown(PointerEventData eventData)
         {
             HoverText.enabled = true;
-            if (evolutionRenderer.IsAutoPlay)
+            if (evolutionRenderer.IsAutoPlayForward)
             {
                 wasAutoPlay = true;
                 evolutionRenderer.ToggleAutoPlay();

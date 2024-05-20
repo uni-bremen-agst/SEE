@@ -1,0 +1,12 @@
+PROGRAM test;
+DECLARE x : BOOLEAN
+
+BEGIN
+  IF TRUE THEN
+    WHILE TRUE DO
+      x := TRUE
+    END
+  ELSE
+    x := FALSE
+  END
+END.

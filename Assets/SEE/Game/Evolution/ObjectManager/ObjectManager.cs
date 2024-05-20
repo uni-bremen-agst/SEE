@@ -18,7 +18,6 @@
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
 using SEE.GO;
@@ -82,56 +81,6 @@ namespace SEE.Game.Evolution
             renderer.AssertNotNull("renderer");
             graphRenderer = renderer;
             this.city = city;
-        }
-
-        /// <summary>
-        /// List of all created game nodes that are in use.
-        /// </summary>
-        private IList<GameObject> GameNodes => nodes.Values.ToList();
-
-        /// <summary>
-        /// Returns a saved plane or generates a new one if it does not already exist. The resulting
-        /// plane encloses all currently cached game objects of the city only if it was newly
-        /// generated. It may need to be adjusted if it was not newly generated. The resulting
-        /// plane is an immediate child of <see cref="city"/>.
-        /// </summary>
-        /// <param name="plane">the plane intended to enclose all game objects of the city; the
-        /// y co-ordinate of the plane will be 0</param>
-        /// <returns>true if the plane already existed (thus, can be re-used) and false if it
-        /// was newly created</returns>
-        public bool GetPlane(out GameObject plane)
-        {
-            bool hasPlane = currentPlane != null;
-            if (!hasPlane)
-            {
-                currentPlane = GraphRenderer.DrawPlane(GameNodes, city.transform.position.y);
-                currentPlane.transform.SetParent(city.transform);
-            }
-            plane = currentPlane;
-            return hasPlane;
-        }
-
-        /// <summary>
-        /// Adjusts the current plane so that all current <see cref="GameNodes"/> managed here
-        /// fit onto it. Height and y co-ordinate will be maintained. Only its
-        /// x and z co-ordinates will be adjusted.
-        /// </summary>
-        public void AdjustPlane()
-        {
-            GraphRenderer.AdjustPlane(currentPlane, GameNodes);
-        }
-
-        /// <summary>
-        /// Determines the new <paramref name="centerPosition"/> and <paramref name="scale"/> for the
-        /// <see cref="currentPlane"/> so that it would enclose all cached <see cref="GameNodes"/> of the city where
-        /// the y co-ordinate and the height of the plane would remain the same. The plane itself
-        /// is not actually changed.
-        /// </summary>
-        /// <param name="centerPosition">the new center of the plane</param>
-        /// <param name="scale">the new scale of the plane</param>
-        public void GetPlaneTransform(out Vector3 centerPosition, out Vector3 scale)
-        {
-            GraphRenderer.GetPlaneTransform(currentPlane, GameNodes, out centerPosition, out scale);
         }
 
         /// <summary>
@@ -222,14 +171,13 @@ namespace SEE.Game.Evolution
                 foreach (GameObject newGameEdge in graphRenderer.EdgeLayout(gameNodes, city, false))
                 {
                     string edgeID = newGameEdge.GetComponent<EdgeRef>().Value.ID;
-                    if (edges.ContainsKey(edgeID))
+                    if (!edges.TryAdd(edgeID, newGameEdge))
                     {
                         // Edge object has already been created in previous call.
                         Destroyer.Destroy(newGameEdge);
                     }
                     else
                     {
-                        edges.Add(edgeID, newGameEdge);
                         // FIXME (@koschke): This should be rewritten so that the GraphElementIDMap isn't called here.
                         //                   That part should be handled by GraphRenderer.CreateGameNode.
                         GraphElementIDMap.Add(newGameEdge);

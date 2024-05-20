@@ -12,25 +12,18 @@ namespace SEE.GO
     public class Plane : MonoBehaviour
     {
         /// <summary>
-        /// The scale of the objects may not always be in Unity units (for Unity's
-        /// primitive Cubes they are, but for other objects provided by third parties
-        /// and also by Unity's plane they are not) in which case the scale needs to be
-        /// multiplied by a correction factor to get the value in Unity units.
+        /// The y offset of the plane when method <see cref="CenterTop"/> is called.
         /// </summary>
-        [Tooltip("The correction factor by which to scale to the true lengths in Unity units.")]
-        public float ScaleFactor = 1.0f;
-
         [HideInInspector]
         public float HeightOffset = 0.0f;
 
         /// <summary>
-        /// Returns the scale in Unity units by applying the ScaleFactor to the lossy scale
-        /// of the transform.
+        /// Returns the scale in Unity units (lossy scale of the transform).
         /// </summary>
         /// <returns>scale in Unity units after correction</returns>
         private Vector3 GetScale()
         {
-            return transform.lossyScale * ScaleFactor;
+            return transform.lossyScale;
         }
 
         /// <summary>
@@ -90,13 +83,12 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// The center of the plane's roof (plus some very small y delta).
+        /// The center of the plane's roof (plus some very small y delta, namely, <see cref="HeightOffset"/>).
         /// </summary>
         public Vector3 CenterTop
         {
             get
             {
-                Vector3 scale = GetScale();
                 return transform.position + new Vector3(0.0f, HeightOffset, 0.0f);
             }
         }

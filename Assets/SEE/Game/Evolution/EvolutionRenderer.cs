@@ -137,10 +137,11 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// An event fired upon the end of an animation.
         /// </summary>
-        private readonly UnityEvent animationFinishedEvent = new();
+        public readonly UnityEvent animationFinishedEvent = new();
 
         /// <summary>
-        /// True if animation is still ongoing.
+        /// True if an animation cycle is still ongoing. It is false, when all
+        /// nodes and edges are at their final position.
         /// </summary>
         public bool IsStillAnimating { get; private set; }
 
@@ -430,7 +431,7 @@ namespace SEE.Game.Evolution
                 UserInfoStillOccupied();
                 return false;
             }
-            if (IsAutoPlay || IsAutoPlayReverse)
+            if (IsAutoPlayForward || IsAutoPlayReverse)
             {
                 UserInfoAutoPlayIsOn();
                 return false;
@@ -466,7 +467,7 @@ namespace SEE.Game.Evolution
                 UserInfoStillOccupied();
                 return;
             }
-            if (IsAutoPlay || IsAutoPlayReverse)
+            if (IsAutoPlayForward || IsAutoPlayReverse)
             {
                 UserInfoAutoPlayIsOn();
                 return;
@@ -544,7 +545,7 @@ namespace SEE.Game.Evolution
         /// </summary>
         public void ShowPreviousGraph()
         {
-            if (IsStillAnimating || IsAutoPlay || IsAutoPlayReverse)
+            if (IsStillAnimating || IsAutoPlayForward || IsAutoPlayReverse)
             {
                 UserInfoStillOccupied();
                 return;
@@ -612,7 +613,6 @@ namespace SEE.Game.Evolution
             MarkNodes();
             UpdateNodeChangeBuffer();
             UpdateGameNodeHierarchy();
-            RenderPlane();
 
             LoadingSpinner.Hide(LoadingMessage);
             IsStillAnimating = false;
@@ -725,60 +725,58 @@ namespace SEE.Game.Evolution
                     markerFactory.MarkChanged(GraphElementIDMap.Find(node.ID, true));
                 }
             }
-
-            /// <summary>
-            /// Renders a plane enclosing all game objects of the currently shown graph.
-            /// </summary>
-            void RenderPlane()
-            {
-                bool isPlaneNew = !objectManager.GetPlane(out GameObject plane);
-                if (!isPlaneNew)
-                {
-                    // We are re-using the existing plane, hence, we animate its change
-                    // (new position and new scale).
-                    objectManager.GetPlaneTransform(out Vector3 centerPosition, out Vector3 scale);
-                    Tweens.Scale(plane, scale, AnimationLagFactor);
-                    Tweens.Move(plane, centerPosition, AnimationLagFactor / 2);
-                }
-            }
         }
         #endregion
 
         #region auto play mode
 
         /// <summary>
-        /// Whether the user has selected auto-play mode.
+        /// Possible states of the auto-play mode.
         /// </summary>
-        private bool isAutoplay;
-
-        /// <summary>
-        /// Returns true if automatic animations are active.
-        /// </summary>
-        public bool IsAutoPlay
+        private enum AutoPlayMode
         {
-            get => isAutoplay;
-            private set
-            {
-                shownGraphHasChangedEvent.Invoke();
-                isAutoplay = value;
-            }
+            /// <summary>
+            /// Auto-play mode is turned off.
+            /// </summary>
+            Off,
+            /// <summary>
+            /// Auto-play mode is turned on for forward animations.
+            /// </summary>
+            Forward,
+            /// <summary>
+            /// Auto-play mode is turned on for reverse animations.
+            /// </summary>
+            Reverse
         }
 
         /// <summary>
-        /// Whether the user has selected reverse auto-play mode.
+        /// The current auto-play mode.
         /// </summary>
-        private bool isAutoplayReverse;
+        private AutoPlayMode autoPlayMode = AutoPlayMode.Off;
+
+        /// <summary>
+        /// Returns true if automatic forward animations are active.
+        /// </summary>
+        public bool IsAutoPlayForward
+        {
+            get => autoPlayMode == AutoPlayMode.Forward;
+            private set
+            {
+                shownGraphHasChangedEvent.Invoke();
+                autoPlayMode = value ? AutoPlayMode.Forward : AutoPlayMode.Off;
+            }
+        }
 
         /// <summary>
         /// Returns true if automatic reverse animations are active.
         /// </summary>
         public bool IsAutoPlayReverse
         {
-            get => isAutoplayReverse;
+            get => autoPlayMode == AutoPlayMode.Reverse;
             private set
             {
                 shownGraphHasChangedEvent.Invoke();
-                isAutoplayReverse = value;
+                autoPlayMode = value ? AutoPlayMode.Reverse : AutoPlayMode.Off;
             }
         }
 
@@ -788,7 +786,7 @@ namespace SEE.Game.Evolution
         /// </summary>
         internal void ToggleAutoPlay()
         {
-            SetAutoPlay(!IsAutoPlay);
+            SetAutoPlay(!IsAutoPlayForward);
         }
 
         /// <summary>
@@ -810,8 +808,8 @@ namespace SEE.Game.Evolution
         /// <param name="enabled"> Specifies whether reverse auto-play mode should be enabled. </param>
         internal void SetAutoPlay(bool enabled)
         {
-            IsAutoPlay = enabled;
-            if (IsAutoPlay)
+            IsAutoPlayForward = enabled;
+            if (IsAutoPlayForward)
             {
                 animationFinishedEvent.AddListener(OnAutoPlayCanContinue);
                 if (!ShowNextIfPossible())
