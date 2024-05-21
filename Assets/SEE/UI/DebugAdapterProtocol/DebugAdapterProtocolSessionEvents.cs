@@ -35,7 +35,7 @@ namespace SEE.UI.DebugAdapterProtocol
         }
 
         /// <summary>
-        /// Handles the begin of hovering a word.
+        /// Handles the begining of hovering a word.
         /// </summary>
         /// <param name="codeWindow">The code window containing the hovered word.</param>
         /// <param name="wordInfo">The info of the hovered word.</param>
@@ -363,7 +363,10 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             actions.Enqueue(() =>
             {
-                if (IsRunning) return;
+                if (IsRunning)
+                {
+                    return;
+                }
                 adapterHost.SendRequest(new ContinueRequest { ThreadId = mainThread.Id }, _ => { });
             });
         }
@@ -375,7 +378,10 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             actions.Enqueue(() =>
             {
-                if (!IsRunning) return;
+                if (IsRunning)
+                {
+                    return;
+                }
                 adapterHost.SendRequest(new PauseRequest { ThreadId = mainThread.Id }, _ => { });
             });
         }
@@ -387,7 +393,10 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             actions.Enqueue(() =>
             {
-                if (IsRunning) return;
+                if (IsRunning)
+                {
+                    return;
+                }
                 adapterHost.SendRequest(new ReverseContinueRequest { ThreadId = mainThread.Id }, _ => { });
             });
         }
@@ -399,7 +408,10 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             actions.Enqueue(() =>
             {
-                if (IsRunning) return;
+                if (IsRunning)
+                {
+                    return;
+                }
                 adapterHost.SendRequest(new NextRequest { ThreadId = mainThread.Id, Granularity = steppingGranularity }, _ => { });
             });
         }
@@ -411,7 +423,10 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             actions.Enqueue(() =>
             {
-                if (IsRunning) return;
+                if (IsRunning)
+                {
+                    return;
+                }
                 adapterHost.SendRequest(new StepBackRequest { ThreadId = mainThread.Id, Granularity = steppingGranularity }, _ => { });
             });
         }
@@ -423,7 +438,10 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             actions.Enqueue(() =>
             {
-                if (IsRunning) return;
+                if (IsRunning)
+                {
+                    return;
+                }
                 adapterHost.SendRequest(new StepInRequest { ThreadId = mainThread.Id, Granularity = steppingGranularity }, _ => { });
             });
         }
@@ -435,7 +453,10 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             actions.Enqueue(() =>
             {
-                if (IsRunning) return;
+                if (IsRunning)
+                {
+                    return;
+                }
                 adapterHost.SendRequest(new StepOutRequest { ThreadId = mainThread.Id, Granularity = steppingGranularity }, _ => { });
             });
         }

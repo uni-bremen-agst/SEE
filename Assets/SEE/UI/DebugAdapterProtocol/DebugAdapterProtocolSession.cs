@@ -291,7 +291,7 @@ namespace SEE.UI.DebugAdapterProtocol
             }
             catch (Exception e)
             {
-                OnInitializationFailed(e.Message + "");
+                OnInitializationFailed(e.Message);
             }
         }
 
@@ -354,7 +354,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 adapterHost.Stop();
             }
         }
-        
+
         /// <summary>
         /// Creates the process for the debug adapter.
         /// </summary>
@@ -434,7 +434,7 @@ namespace SEE.UI.DebugAdapterProtocol
 
             return adapterHost.IsRunning;
         }
-        
+
         /// <summary>
         /// Updates <see cref="threads"/>.
         /// Must be executed on the main thread.
