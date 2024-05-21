@@ -13,44 +13,26 @@ namespace SEE.Game.Drawable.ValueHolders
         private byte[] fileData;
 
         /// <summary>
+        /// The byte file data property.
+        /// </summary>
+        public byte[] FileData 
+        { 
+            get { return fileData; }
+            set { fileData = value; }
+        }
+
+        /// <summary>
         /// The selected file path.
         /// </summary>
         private string path;
 
         /// <summary>
-        /// Sets the file data.
+        /// The path property.
         /// </summary>
-        /// <param name="fileData">The bytes of the image</param>
-        public void SetFileData(byte[] fileData)
-        {
-            this.fileData = fileData;
-        }
-
-        /// <summary>
-        /// Gets the bytes of the image.
-        /// </summary>
-        /// <returns>the bytes of the image</returns>
-        public byte[] GetFileData()
-        {
-            return fileData;
-        }
-
-        /// <summary>
-        /// Sets the path value of the image.
-        /// </summary>
-        /// <param name="path">The path where the image is located</param>
-        public void SetPath(string path)
-        {
-            this.path = path;
-        }
-
-        /// <summary>
-        /// Gets the path of the file.
-        /// </summary>
-        /// <returns>the file path.</returns>
-        public string GetPath()
-        {
-            return path;
+        public string Path 
+        { 
+            get { return path; } 
+            set {  path = value; } 
         }
     }
 }

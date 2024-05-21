@@ -53,8 +53,8 @@ namespace SEE.Game.Drawable
 
             /// Adds an order in layer value holder to the sticky note and sets the necessary values.
             OrderInLayerValueHolder holder = stickyNote.AddComponent<OrderInLayerValueHolder>();
-            holder.SetOriginPosition(raycastHit.point);
-            holder.SetOrderInLayer(ValueHolder.CurrentOrderInLayer);
+            holder.OriginPosition = raycastHit.point;
+            holder.OrderInLayer = ValueHolder.CurrentOrderInLayer;
 
             ValueHolder.CurrentOrderInLayer++;
             return stickyNote;
@@ -86,8 +86,8 @@ namespace SEE.Game.Drawable
 
             /// Adds an order in layer value holder to the sticky note and sets the necessary values.
             OrderInLayerValueHolder holder = stickyNote.AddComponent<OrderInLayerValueHolder>();
-            holder.SetOriginPosition(config.Position + config.Order * ValueHolder.DistanceToDrawable.z * stickyNote.transform.forward);
-            holder.SetOrderInLayer(config.Order);
+            holder.OriginPosition = config.Position + config.Order * ValueHolder.DistanceToDrawable.z * stickyNote.transform.forward;
+            holder.OrderInLayer = config.Order;
             return stickyNote;
         }
 
@@ -101,7 +101,7 @@ namespace SEE.Game.Drawable
         {
             stickyNoteHolder.transform.position = position;
             stickyNoteHolder.transform.eulerAngles = eulerAngles;
-            stickyNoteHolder.GetComponent<OrderInLayerValueHolder>().SetOriginPosition(position);
+            stickyNoteHolder.GetComponent<OrderInLayerValueHolder>().OriginPosition = position;
         }
 
         /// <summary>
@@ -111,10 +111,10 @@ namespace SEE.Game.Drawable
         /// <returns>The new position</returns>
         public static Vector3 FinishMoving(GameObject stickyNoteHolder)
         {
-            stickyNoteHolder.transform.position -= stickyNoteHolder.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer()
+            stickyNoteHolder.transform.position -= stickyNoteHolder.GetComponent<OrderInLayerValueHolder>().OrderInLayer
                 * ValueHolder.DistanceToDrawable.z * stickyNoteHolder.transform.forward;
             stickyNoteHolder.GetComponent<OrderInLayerValueHolder>()
-                .SetOriginPosition(stickyNoteHolder.transform.position);
+                .OriginPosition = stickyNoteHolder.transform.position;
             return stickyNoteHolder.transform.position;
         }
 
@@ -151,7 +151,7 @@ namespace SEE.Game.Drawable
                     break;
             }
             stickyNoteHolder.GetComponent<OrderInLayerValueHolder>()
-                .SetOriginPosition(stickyNoteHolder.transform.position);
+                .OriginPosition = stickyNoteHolder.transform.position;
             return stickyNoteHolder.transform.position;
         }
 
@@ -215,11 +215,11 @@ namespace SEE.Game.Drawable
             /// Gets the old order in layer.
             if (stickyNote.GetComponent<OrderInLayerValueHolder>() != null)
             {
-                oldLayer = stickyNote.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
+                oldLayer = stickyNote.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
             }
             else
             {
-                oldLayer = stickyNote.GetComponentInParent<OrderInLayerValueHolder>().GetOrderInLayer();
+                oldLayer = stickyNote.GetComponentInParent<OrderInLayerValueHolder>().OrderInLayer;
             }
 
             /// Checks if the order in layer should increase or decrease.

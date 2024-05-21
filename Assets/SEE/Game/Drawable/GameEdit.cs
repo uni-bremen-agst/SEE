@@ -53,7 +53,7 @@ namespace SEE.Game.Drawable
             if (obj.CompareTag(Tags.Line))
             {
                 LineRenderer renderer = obj.GetComponent<LineRenderer>();
-                switch (obj.GetComponent<LineValueHolder>().GetColorKind())
+                switch (obj.GetComponent<LineValueHolder>().ColorKind)
                 {
                     case GameDrawer.ColorKind.Monochrome:
                         renderer.startColor = renderer.endColor = Color.white;
@@ -80,7 +80,7 @@ namespace SEE.Game.Drawable
             if (obj.CompareTag(Tags.Line))
             {
                 LineRenderer renderer = obj.GetComponent<LineRenderer>();
-                switch (obj.GetComponent<LineValueHolder>().GetColorKind())
+                switch (obj.GetComponent<LineValueHolder>().ColorKind)
                 {
                     case GameDrawer.ColorKind.Gradient:
                         renderer.material.color = Color.white;
@@ -124,7 +124,7 @@ namespace SEE.Game.Drawable
         {
             if (Tags.DrawableTypes.Contains(obj.tag))
             {
-                int oldLayer = obj.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
+                int oldLayer = obj.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
                 if (newLayer - oldLayer > 0)
                 {
                     GameLayerChanger.Increase(obj, newLayer, false);

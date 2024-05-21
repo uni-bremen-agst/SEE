@@ -176,7 +176,7 @@ namespace SEE.Controls.Actions.Drawable
             Color color = Color.magenta;
             LineValueHolder holder = line.GetComponent<LineValueHolder>();
             LineRenderer renderer = line.GetComponent<LineRenderer>();
-            switch (holder.GetColorKind())
+            switch (holder.ColorKind)
             {
                 case GameDrawer.ColorKind.Monochrome:
                     color = line.GetColor();

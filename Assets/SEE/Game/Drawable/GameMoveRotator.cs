@@ -37,7 +37,7 @@ namespace SEE.Game.Drawable
             Vector3 convertedHitPoint = GameFinder.GetHighestParent(obj).transform.InverseTransformPoint(hitPoint);
 
             /// Ensure that the converted hit point preserves the distance to the drawable.
-            convertedHitPoint -= obj.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer()
+            convertedHitPoint -= obj.GetComponent<OrderInLayerValueHolder>().OrderInLayer
                 * ValueHolder.DistanceToDrawable.z * obj.transform.forward;
 
             /// Build the new object position.

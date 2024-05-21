@@ -212,7 +212,7 @@ namespace SEE.Game.Drawable
             meshCollider.sharedMesh = tmp.mesh;
 
             /// Adds the order in layer value holder component to the text object and sets the order.
-            textObj.AddComponent<OrderInLayerValueHolder>().SetOrderInLayer(order);
+            textObj.AddComponent<OrderInLayerValueHolder>().OrderInLayer = order;
             /// The Text Mesh Pro needs also the order.
             tmp.sortingOrder = order;
 
@@ -299,7 +299,7 @@ namespace SEE.Game.Drawable
             textObject.transform.localScale = scale;
             textObject.transform.localEulerAngles = eulerAngles;
             textObject.transform.localPosition = position;
-            textObject.GetComponent<OrderInLayerValueHolder>().SetOrderInLayer(order);
+            textObject.GetComponent<OrderInLayerValueHolder>().OrderInLayer = order;
 
             /// Is needed to fix an issue in the <see cref="TextMeshPro"/> component.
             /// If the outline color is set to black during creation; it is strangely always set to white.

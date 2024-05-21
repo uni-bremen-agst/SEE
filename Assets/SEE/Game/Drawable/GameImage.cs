@@ -84,7 +84,7 @@ namespace SEE.Game.Drawable
             {
                 byte[] fileData = File.ReadAllBytes(imageFilePath);
                 ImageValueHolder holder = image.AddComponent<ImageValueHolder>();
-                holder.SetFileData(fileData);
+                holder.FileData = fileData;
                 /// Saves the loaded file to the app data folder.
                 CreateImageFile(image, fileData, Path.GetFileName(imageFilePath), out string _);
 
@@ -98,7 +98,7 @@ namespace SEE.Game.Drawable
             else if (data != null)
             {
                 /// Block for the case that the byte data is not empty. Load the image based on the byte data.
-                image.AddComponent<ImageValueHolder>().SetFileData(data);
+                image.AddComponent<ImageValueHolder>().FileData = data;
                 Texture2D texture = new(2, 2)
                 {
                     anisoLevel = 5
@@ -116,7 +116,7 @@ namespace SEE.Game.Drawable
             /// Additionally, adopt the rotation of the attached object.
             image.transform.SetPositionAndRotation(position - order * ValueHolder.DistanceToDrawable.z * image.transform.forward, attachedObjects.transform.rotation);
             /// Adds the order in layer value holder component to the line object and sets the order.
-            image.AddComponent<OrderInLayerValueHolder>().SetOrderInLayer(order);
+            image.AddComponent<OrderInLayerValueHolder>().OrderInLayer = order;
         }
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace SEE.Game.Drawable
             imageObj.transform.localEulerAngles = eulerAngles;
             imageObj.transform.localPosition = position;
             imageObj.GetComponent<Image>().color = imageColor;
-            imageObj.GetComponent<OrderInLayerValueHolder>().SetOrderInLayer(order);
+            imageObj.GetComponent<OrderInLayerValueHolder>().OrderInLayer = order;
 
             return imageObj;
         }
@@ -229,7 +229,7 @@ namespace SEE.Game.Drawable
                     File.WriteAllBytes(path, fileData);
                     if (imageObj != null)
                     {
-                        imageObj.GetComponent<ImageValueHolder>().SetPath(path);
+                        imageObj.GetComponent<ImageValueHolder>().Path = path;
                     }
                 } else
                 {
@@ -274,7 +274,7 @@ namespace SEE.Game.Drawable
                                 Directory.Delete(tmpPath, true);
                                 if (imageObj != null)
                                 {
-                                    imageObj.GetComponent<ImageValueHolder>().SetPath(newPath);
+                                    imageObj.GetComponent<ImageValueHolder>().Path = newPath;
                                 }
                                 break;
                             }
@@ -286,7 +286,7 @@ namespace SEE.Game.Drawable
                     File.Delete(tmpPath);
                     if (imageObj != null)
                     {
-                        imageObj.GetComponent<ImageValueHolder>().SetPath(path);
+                        imageObj.GetComponent<ImageValueHolder>().Path = path;
                     }
                 }
             }

@@ -74,7 +74,7 @@ namespace SEE.Game.Drawable.Configurations
                     Position = obj.transform.localPosition,
                     Scale = obj.transform.localScale,
                     EulerAngles = obj.transform.localEulerAngles,
-                    OrderInLayer = obj.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer(),
+                    OrderInLayer = obj.GetComponent<OrderInLayerValueHolder>().OrderInLayer,
                     Layer = valueHolder.GetLayer(),
                     NodeKind = valueHolder.GetNodeKind(),
                     BorderConf = LineConf.GetLine(GameFinder.FindChildWithTag(obj, Tags.Line)),

@@ -74,13 +74,13 @@ namespace SEE.Game.Drawable.Configurations
                     Id = lineGameObject.name,
                     Position = lineGameObject.transform.localPosition,
                     Scale = lineGameObject.transform.localScale,
-                    OrderInLayer = lineGameObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer(),
+                    OrderInLayer = lineGameObject.GetComponent<OrderInLayerValueHolder>().OrderInLayer,
                     Thickness = renderer.startWidth,
                     Tiling = renderer.textureScale.x,
-                    LineKind = lineGameObject.GetComponent<LineValueHolder>().GetLineKind(),
+                    LineKind = lineGameObject.GetComponent<LineValueHolder>().LineKind,
                     Loop = renderer.loop,
                     EulerAngles = lineGameObject.transform.localEulerAngles,
-                    ColorKind = lineGameObject.GetComponent<LineValueHolder>().GetColorKind(),
+                    ColorKind = lineGameObject.GetComponent<LineValueHolder>().ColorKind,
                     RendererPositions = new Vector3[renderer.positionCount]
                 };
                 renderer.GetPositions(line.RendererPositions);

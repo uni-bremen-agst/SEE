@@ -128,7 +128,7 @@ namespace SEE.Game.Drawable
             /// Sets the correct material for the chosen line kind.
             renderer.sharedMaterial = GetMaterial(primaryColor, lineKind);
             /// Adds the line value holder to the object and assign the color kind to it.
-            line.AddComponent<LineValueHolder>().SetColorKind(colorKind);
+            line.AddComponent<LineValueHolder>().ColorKind = colorKind;
             /// Set the color(s) of the line depending on the chosen color kind.
             switch (colorKind)
             {
@@ -165,9 +165,9 @@ namespace SEE.Game.Drawable
             line.transform.position -= order * ValueHolder.DistanceToDrawable.z * line.transform.forward;
 
             /// Adds the order in layer value holder component to the line object and sets the order.
-            line.AddComponent<OrderInLayerValueHolder>().SetOrderInLayer(order);
+            line.AddComponent<OrderInLayerValueHolder>().OrderInLayer = order;
             /// Sets the line kind in the line value holder.
-            line.GetComponent<LineValueHolder>().SetLineKind(lineKind);
+            line.GetComponent<LineValueHolder>().LineKind = lineKind;
         }
 
         /// <summary>
@@ -359,7 +359,7 @@ namespace SEE.Game.Drawable
                 line.transform.localScale = scale;
                 line.transform.localEulerAngles = eulerAngles;
                 line.transform.localPosition = position;
-                line.GetComponent<OrderInLayerValueHolder>().SetOrderInLayer(orderInLayer);
+                line.GetComponent<OrderInLayerValueHolder>().OrderInLayer = orderInLayer;
                 Drawing(line, positions);
                 FinishDrawing(line, loop);
 
@@ -577,7 +577,7 @@ namespace SEE.Game.Drawable
                 /// Sets the correct texture scale for the renderer depending on the chosen line kind.
                 SetRendererTextrueScale(renderer, lineKind, tiling);
                 /// Sets the new line kind to the line value holder.
-                holder.SetLineKind(lineKind);
+                holder.LineKind = lineKind;
             }
         }
 
@@ -630,7 +630,7 @@ namespace SEE.Game.Drawable
                     }
                 }
                 /// Updates the <see cref="LineValueHolder"/>.
-                holder.SetColorKind(colorKind);
+                holder.ColorKind = colorKind;
 
                 /// Restores the primary and secondary color of the line.
                 GameEdit.ChangePrimaryColor(line, conf.PrimaryColor);

@@ -98,16 +98,16 @@ namespace SEE.Game.Drawable
 
             /// Ensures adherence to the order in layer distance.
             node.transform.position = position - node.transform.forward * ValueHolder.DistanceToDrawable.z *
-                            border.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
+                            border.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
             /// Sets the order in layer to a new created order in layer value holder for the node.
             node.AddComponent<OrderInLayerValueHolder>()
-                .SetOrderInLayer(border.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer());
+                .OrderInLayer = border.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
             /// Sets the border to the middle point of the node. And sets his order to zero.
             border.transform.localPosition = Vector3.zero;
-            border.GetComponent<OrderInLayerValueHolder>().SetOrderInLayer(0);
+            border.GetComponent<OrderInLayerValueHolder>().OrderInLayer = 0;
             /// Sets the order to the <see cref="TextMeshPro"/>, as the text otherwise does not inherit the order.
             text.GetComponent<TextMeshPro>().sortingOrder =
-                node.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
+                node.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
 
             /// Disables the Mesh Collider for the text and border, because they should only be editable through the node.
             /// This prevents inappropriate line operations on the border, such as <see cref="LineSplitAction"/>.
@@ -413,16 +413,16 @@ namespace SEE.Game.Drawable
         private static int GetBranchLineOrder(GameObject child, GameObject parent)
         {
             int order;
-            if (child.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer() >
-                parent.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer())
+            if (child.GetComponent<OrderInLayerValueHolder>().OrderInLayer >
+                parent.GetComponent<OrderInLayerValueHolder>().OrderInLayer)
             {
                 /// Block for: Parent has a lower order.
-                order = parent.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer() - 1;
+                order = parent.GetComponent<OrderInLayerValueHolder>().OrderInLayer - 1;
             }
             else
             {
                 /// Block for: Node has a lower order.
-                order = child.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer() - 1;
+                order = child.GetComponent<OrderInLayerValueHolder>().OrderInLayer - 1;
             }
 
             /// If the order would be lower then 0 it's set to 0.
@@ -785,7 +785,7 @@ namespace SEE.Game.Drawable
             /// Restores the text and sets the order.
             textConf.OrderInLayer = order;
             GameObject text = GameTexter.ReWriteText(drawable, textConf);
-            text.GetComponent<OrderInLayerValueHolder>().SetOrderInLayer(0);
+            text.GetComponent<OrderInLayerValueHolder>().OrderInLayer = 0;
 
             /// Assigns the border and the text to the node.
             border.transform.SetParent(createdNode.transform);
@@ -807,7 +807,7 @@ namespace SEE.Game.Drawable
             createdNode.transform.localScale = scale;
             createdNode.transform.localEulerAngles = eulerAngles;
             createdNode.transform.localPosition = position;
-            createdNode.GetComponent<OrderInLayerValueHolder>().SetOrderInLayer(order);
+            createdNode.GetComponent<OrderInLayerValueHolder>().OrderInLayer =order;
 
             /// Create the branch line, if the node has a parent.
             if (parent != null)

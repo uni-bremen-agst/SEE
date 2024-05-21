@@ -73,7 +73,7 @@ namespace SEE.Game.Drawable.Configurations
                     OutlineThickness = tmp.outlineWidth,
                     FontStyles = tmp.fontStyle,
                     FontSize = tmp.fontSize,
-                    OrderInLayer = textObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer()
+                    OrderInLayer = textObject.GetComponent<OrderInLayerValueHolder>().OrderInLayer
                 };
             }
 

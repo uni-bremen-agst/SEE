@@ -41,8 +41,8 @@ namespace SEE.Game.Drawable
                     {
                         OrderInLayerValueHolder highestHolder = highestParent.AddComponent<OrderInLayerValueHolder>();
                         OrderInLayerValueHolder oldHolder = parent.GetComponentInChildren<OrderInLayerValueHolder>();
-                        highestHolder.SetOrderInLayer(oldHolder.GetOrderInLayer());
-                        highestHolder.SetOriginPosition(oldHolder.GetOriginPosition());
+                        highestHolder.OrderInLayer = oldHolder.OrderInLayer;
+                        highestHolder.OriginPosition = oldHolder.OriginPosition;
                         Destroyer.Destroy(oldHolder);
                     }
                 }
@@ -75,8 +75,8 @@ namespace SEE.Game.Drawable
                 {
                     OrderInLayerValueHolder highestHolder = highestParent.AddComponent<OrderInLayerValueHolder>();
                     OrderInLayerValueHolder oldHolder = drawable.GetComponentInChildren<OrderInLayerValueHolder>();
-                    highestHolder.SetOrderInLayer(oldHolder.GetOrderInLayer());
-                    highestHolder.SetOriginPosition(oldHolder.GetOriginPosition());
+                    highestHolder.OrderInLayer = oldHolder.OrderInLayer;
+                    highestHolder.OriginPosition = oldHolder.OriginPosition;
                     Destroyer.Destroy(oldHolder);
                 }
             }

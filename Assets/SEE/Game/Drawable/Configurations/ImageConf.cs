@@ -47,10 +47,10 @@ namespace SEE.Game.Drawable.Configurations
                     Position = imageObject.transform.localPosition,
                     EulerAngles = imageObject.transform.localEulerAngles,
                     Scale = imageObject.transform.localScale,
-                    OrderInLayer = imageObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer(),
+                    OrderInLayer = imageObject.GetComponent<OrderInLayerValueHolder>().OrderInLayer,
                     ImageColor = imageObject.GetComponent<Image>().color,
-                    Path = imageObject.GetComponent<ImageValueHolder>().GetPath(),
-                    FileData = imageObject.GetComponent<ImageValueHolder>().GetFileData()
+                    Path = imageObject.GetComponent<ImageValueHolder>().Path,
+                    FileData = imageObject.GetComponent<ImageValueHolder>().FileData
                 };
             }
             return conf;

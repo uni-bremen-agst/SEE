@@ -160,7 +160,7 @@ namespace SEE.Controls.Actions.Drawable
             isInAction = true;
             GameObject drawable = GameFinder.GetDrawable(hitObject);
 
-            int oldOrder = hitObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
+            int oldOrder = hitObject.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
             int newOrder = oldOrder + 1;
             GameLayerChanger.Increase(hitObject, newOrder);
             memento = new Memento(drawable, GameLayerChanger.LayerChangerStates.Increase,
@@ -180,7 +180,7 @@ namespace SEE.Controls.Actions.Drawable
             isInAction = true;
             GameObject drawable = GameFinder.GetDrawable(hitObject);
 
-            int oldOrder = hitObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
+            int oldOrder = hitObject.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
             int newOrder = oldOrder - 1;
             newOrder = newOrder < 0 ? 0 : newOrder;
             GameLayerChanger.Decrease(hitObject, newOrder);

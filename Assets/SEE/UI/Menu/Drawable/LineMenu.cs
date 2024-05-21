@@ -602,7 +602,7 @@ namespace SEE.UI.Menu.Drawable
             LineConf lineHolder, GameObject drawable, string drawableParentName)
         {
             /// Assigns the current <see cref="LineKind"/> of the selected line to the menu variable.
-            AssignLineKind(selectedLine.GetComponent<LineValueHolder>().GetLineKind(), renderer.textureScale.x);
+            AssignLineKind(selectedLine.GetComponent<LineValueHolder>().LineKind, renderer.textureScale.x);
 
             /// Gets and sets the current selected line kind index.
             lineKindSelector.index = GetIndexOfSelectedLineKind();

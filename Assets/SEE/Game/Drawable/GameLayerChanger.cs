@@ -44,23 +44,23 @@ namespace SEE.Game.Drawable
                 OrderInLayerValueHolder holder = obj.GetComponent<OrderInLayerValueHolder>() != null ?
                     obj.GetComponent<OrderInLayerValueHolder>() : obj.GetComponentInChildren<OrderInLayerValueHolder>();
                 /// Block that is executed when the desired order in layer exceeds the maximum or is equal.
-                if (holder.GetOrderInLayer() >= ValueHolder.CurrentOrderInLayer)
+                if (holder.OrderInLayer >= ValueHolder.CurrentOrderInLayer)
                 {
                     if (showInformation)
                     {
                         ShowNotification.Warn("Maximum layer order", obj.name +
-                            " has reached the maximum layer order: " + holder.GetOrderInLayer());
+                            " has reached the maximum layer order: " + holder.OrderInLayer);
                     }
                 }
                 else
                 {
                     /// Block to execute if the desired order in the layer is less than the maximum.
-                    holder.SetOrderInLayer(order);
+                    holder.OrderInLayer = order;
 
                     if (showInformation)
                     {
                         ShowNotification.Info("Increases the order",
-                            "The order in layer of the chosen object increases to " + holder.GetOrderInLayer() + ".", 0.8f);
+                            "The order in layer of the chosen object increases to " + holder.OrderInLayer + ".", 0.8f);
                     }
                     /// For mind map nodes, it's important that the text is also assigned the order.
                     if (obj.CompareTag(Tags.MindMapNode))
@@ -99,21 +99,21 @@ namespace SEE.Game.Drawable
                 OrderInLayerValueHolder holder = obj.GetComponent<OrderInLayerValueHolder>() != null ?
                     obj.GetComponent<OrderInLayerValueHolder>() : obj.GetComponentInChildren<OrderInLayerValueHolder>();
                 /// Block that is executed if the minimum would be undercut.
-                if (holder.GetOrderInLayer() == 0)
+                if (holder.OrderInLayer == 0)
                 {
                     if (showInformation)
                     {
                         ShowNotification.Warn("Minimum layer order", obj.name +
-                            " has reached the minimum layer order: " + holder.GetOrderInLayer());
+                            " has reached the minimum layer order: " + holder.OrderInLayer);
                     }
                 }
                 else
                 {
-                    holder.SetOrderInLayer(order);
+                    holder.OrderInLayer = order;
                     if (showInformation)
                     {
                         ShowNotification.Info("Decreases the order",
-                            "The order in layer of the chosen object decreases to " + holder.GetOrderInLayer() + ".", 0.8f);
+                            "The order in layer of the chosen object decreases to " + holder.OrderInLayer + ".", 0.8f);
                     }
                     /// For mind map nodes, it's important that the text is also assigned the order.
                     if (obj.CompareTag(Tags.MindMapNode))
@@ -153,7 +153,7 @@ namespace SEE.Game.Drawable
             {
                 if (obj.GetComponent<OrderInLayerValueHolder>() != null)
                 {
-                    oldPos = obj.GetComponent<OrderInLayerValueHolder>().GetOriginPosition();
+                    oldPos = obj.GetComponent<OrderInLayerValueHolder>().OriginPosition;
                 }
             }
 

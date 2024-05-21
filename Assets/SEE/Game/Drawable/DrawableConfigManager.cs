@@ -207,10 +207,10 @@ namespace SEE.Game.Drawable
             int order = 0;
             if (transform.GetComponent<OrderInLayerValueHolder>() != null)
             {
-                order = transform.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
+                order = transform.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
             } else if (transform.GetComponentInParent<OrderInLayerValueHolder>() != null)
             {
-                order = transform.GetComponentInParent<OrderInLayerValueHolder>().GetOrderInLayer();
+                order = transform.GetComponentInParent<OrderInLayerValueHolder>().OrderInLayer;
             }
 
             /// Creates the <see cref="DrawableConfig"/> with the corresponding values.
