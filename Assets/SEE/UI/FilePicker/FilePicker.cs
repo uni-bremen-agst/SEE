@@ -5,7 +5,7 @@ using UnityEngine.Events;
 namespace SEE.UI.FilePicker
 {
     /// <summary>
-    /// Allows a user to pick a file.
+    /// Allows a user to pick a file or folder.
     /// </summary>
     public partial class FilePicker : PlatformDependentComponent
     {

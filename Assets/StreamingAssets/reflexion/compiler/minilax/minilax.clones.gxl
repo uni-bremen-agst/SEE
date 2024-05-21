@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="Clones" edgeids="true">
+    <node id="N1">
+      <attr name="Linkage.Name">
+        <string>f codegen.c</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>codegen.c</string>
+      </attr>
+      <attr name="Source.File">
+        <string>codegen.c</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N2">
+      <attr name="Linkage.Name">
+        <string>f codegen.c</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>codegen.c</string>
+      </attr>
+      <attr name="Source.File">
+        <string>codegen.c</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <edge id="E1" from="N1" to="N2">
+      <type xlink:href="Clone" />
+      <attr name="Clone.Source.Start.Line">
+        <int>493</int>
+      </attr>
+      <attr name="Clone.Source.Start.Column">
+        <int>0</int>
+      </attr>
+      <attr name="Clone.Source.End.Line">
+        <int>508</int>
+      </attr>
+      <attr name="Clone.Source.End.Column">
+        <int>0</int>
+      </attr>
+      <attr name="Clone.Target.Start.Line">
+        <int>573</int>
+      </attr>
+      <attr name="Clone.Target.Start.Column">
+        <int>0</int>
+      </attr>
+      <attr name="Clone.Target.End.Line">
+        <int>588</int>
+      </attr>
+      <attr name="Clone.Target.End.Column">
+        <int>0</int>
+      </attr>
+      <attr name="Clone.Type">
+        <int>2</int>
+      </attr>
+      <attr name="Clone.Source.Size">
+        <int>204</int>
+      </attr>
+      <attr name="Clone.Target.Size">
+        <int>204</int>
+      </attr>
+      <attr name="Clone.Length">
+        <int>204</int>
+      </attr>
+    </edge>
+    <node id="N3">
+      <attr name="Linkage.Name">
+        <string>f semantic.c</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>semantic.c</string>
+      </attr>
+      <attr name="Source.File">
+        <string>semantic.c</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N4">
+      <attr name="Linkage.Name">
+        <string>f semantic.c</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>semantic.c</string>
+      </attr>
+      <attr name="Source.File">
+        <string>semantic.c</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <edge id="E2" from="N3" to="N4">
+      <type xlink:href="Clone" />
+      <attr name="Clone.Source.Start.Line">
+        <int>83</int>
+      </attr>
+      <attr name="Clone.Source.Start.Column">
+        <int>0</int>
+      </attr>
+      <attr name="Clone.Source.End.Line">
+        <int>109</int>
+      </attr>
+      <attr name="Clone.Source.End.Column">
+        <int>0</int>
+      </attr>
+      <attr name="Clone.Target.Start.Line">
+        <int>112</int>
+      </attr>
+      <attr name="Clone.Target.Start.Column">
+        <int>0</int>
+      </attr>
+      <attr name="Clone.Target.End.Line">
+        <int>138</int>
+      </attr>
+      <attr name="Clone.Target.End.Column">
+        <int>0</int>
+      </attr>
+      <attr name="Clone.Type">
+        <int>2</int>
+      </attr>
+      <attr name="Clone.Source.Size">
+        <int>187</int>
+      </attr>
+      <attr name="Clone.Target.Size">
+        <int>187</int>
+      </attr>
+      <attr name="Clone.Length">
+        <int>187</int>
+      </attr>
+    </edge>
+    <node id="N5">
+      <attr name="Linkage.Name">
+        <string>f threeadr.c</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>threeadr.c</string>
+      </attr>
+      <attr name="Source.File">
+        <string>threeadr.c</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N6">
+      <attr name="Linkage.Name">
+        <string>f threeadr.c</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>threeadr.c</string>
+      </attr>
+      <attr name="Source.File">
+        <string>threeadr.c</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <edge id="E3" from="N5" to="N6">
+      <type xlink:href="Clone" />
+      <attr name="Clone.Source.Start.Line">
+        <int>380</int>
+      </attr>
+      <attr name="Clone.Source.Start.Column">
+        <int>0</int>
+      </attr>
+      <attr name="Clone.Source.End.Line">
+        <int>407</int>
+      </attr>
+      <attr name="Clone.Source.End.Column">
+        <int>0</int>
+      </attr>
+      <attr name="Clone.Target.Start.Line">
+        <int>407</int>
+      </attr>
+      <attr name="Clone.Target.Start.Column">
+        <int>0</int>
+      </attr>
+      <attr name="Clone.Target.End.Line">
+        <int>434</int>
+      </attr>
+      <attr name="Clone.Target.End.Column">
+        <int>0</int>
+      </attr>
+      <attr name="Clone.Type">
+        <int>2</int>
+      </attr>
+      <attr name="Clone.Source.Size">
+        <int>209</int>
+      </attr>
+      <attr name="Clone.Target.Size">
+        <int>209</int>
+      </attr>
+      <attr name="Clone.Length">
+        <int>209</int>
+      </attr>
+    </edge>
+    <node id="N7">
+      <attr name="Linkage.Name">
+        <string>f typechk.c</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>typechk.c</string>
+      </attr>
+      <attr name="Source.File">
+        <string>typechk.c</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N8">
+      <attr name="Linkage.Name">
+        <string>f typechk.c</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>typechk.c</string>
+      </attr>
+      <attr name="Source.File">
+        <string>typechk.c</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <edge id="E4" from="N7" to="N8">
+      <type xlink:href="Clone" />
+      <attr name="Clone.Source.Start.Line">
+        <int>287</int>
+      </attr>
+      <attr name="Clone.Source.Start.Column">
+        <int>0</int>
+      </attr>
+      <attr name="Clone.Source.End.Line">
+        <int>322</int>
+      </attr>
+      <attr name="Clone.Source.End.Column">
+        <int>0</int>
+      </attr>
+      <attr name="Clone.Target.Start.Line">
+        <int>331</int>
+      </attr>
+      <attr name="Clone.Target.Start.Column">
+        <int>0</int>
+      </attr>
+      <attr name="Clone.Target.End.Line">
+        <int>366</int>
+      </attr>
+      <attr name="Clone.Target.End.Column">
+        <int>0</int>
+      </attr>
+      <attr name="Clone.Type">
+        <int>2</int>
+      </attr>
+      <attr name="Clone.Source.Size">
+        <int>226</int>
+      </attr>
+      <attr name="Clone.Target.Size">
+        <int>226</int>
+      </attr>
+      <attr name="Clone.Length">
+        <int>226</int>
+      </attr>
+    </edge>
+  </graph>
+</gxl>

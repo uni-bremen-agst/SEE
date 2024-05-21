@@ -77,18 +77,16 @@ namespace SEE.GO
         /// <param name="nodes">source and target nodes of the <paramref name="edges"/></param>
         /// <param name="edges">the layout edges for which to create game objects</param>
         /// <returns>game objects representing the <paramref name="edges"/></returns>
-        public ICollection<GameObject> DrawEdges<T>(IEnumerable<T> nodes, ICollection<LayoutGraphEdge<T>> edges)
-        where T : LayoutGameNode, IHierarchyNode<ILayoutNode>
+        public IEnumerable<GameObject> DrawEdges<T>(IEnumerable<T> nodes, ICollection<LayoutGraphEdge<T>> edges)
+            where T : LayoutGameNode, IHierarchyNode<ILayoutNode>
         {
-            List<GameObject> result = new(edges.Count);
             if (edges.Count == 0)
             {
-                return result;
+                return new List<GameObject>();
             }
 
             layout.Create(nodes, edges);
-            result.AddRange(edges.Select(NewGameEdgeWithLineRenderer));
-            return result;
+            return edges.Select(NewGameEdgeWithLineRenderer);
         }
 
         /// <summary>

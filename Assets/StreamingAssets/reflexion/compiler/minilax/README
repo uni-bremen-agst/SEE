@@ -1,0 +1,7 @@
+known bugs and limitations:
+
+- functions can't return ARRAYs yet
+- use of STRINGs is quite limited (output works)
+- parser error recovery is not finished
+- some problem when passing an ARRAY as a VAR parameter
+- "forward declarations" are not treated correctly

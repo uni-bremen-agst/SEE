@@ -25,6 +25,7 @@ using System.Linq;
 using SEE.Controls;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.Net.Actions.Animation;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.UI;
@@ -181,10 +182,10 @@ namespace SEE.Game.Evolution
             animationDataModel.Slider.maxValue = evolutionRenderer.GraphCount - 1;
             animationDataModel.Slider.value = evolutionRenderer.CurrentGraphIndex;
 
-            animationDataModel.PlayButton.onClick.AddListener(TaskOnClickPlayButton);
-            animationDataModel.FastForwardButton.onClick.AddListener(TaskOnClickFastForwardButton);
-            animationDataModel.ReverseButton.onClick.AddListener(TaskOnClickReverseButton);
-            animationDataModel.FastBackwardButton.onClick.AddListener(TaskOnClickFastBackwardButton);
+            animationDataModel.PlayButton.onClick.AddListener(OnClickPlayButton);
+            animationDataModel.FastForwardButton.onClick.AddListener(OnClickFastForwardButton);
+            animationDataModel.ReverseButton.onClick.AddListener(OnClickReverseButton);
+            animationDataModel.FastBackwardButton.onClick.AddListener(OnClickFastBackwardButton);
 
             if (animationDataModel.Slider.gameObject.TryGetComponentOrLog(out SliderDrag sliderDrag))
             {
@@ -202,7 +203,7 @@ namespace SEE.Game.Evolution
 
             foreach (SliderMarker sliderMarker in sliderMarkerContainer.SliderMarkers)
             {
-                Vector3 markerPos = new Vector3(sliderMarker.MarkerX, sliderMarker.MarkerY, sliderMarker.MarkerZ);
+                Vector3 markerPos = new(sliderMarker.MarkerX, sliderMarker.MarkerY, sliderMarker.MarkerZ);
                 string comment = sliderMarker.Comment;
                 AddMarker(markerPos, comment);
             }
@@ -270,7 +271,7 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Saves the marker data on application quit
+        /// Saves the marker data on application quit.
         /// </summary>
         private void OnApplicationQuit()
         {
@@ -283,74 +284,101 @@ namespace SEE.Game.Evolution
             sliderMarkerContainer?.Save(Path.Combine(Application.persistentDataPath, "sliderMarkers.xml"));
         }
 
+        #region Button Actions
+
+        /// <summary>
+        /// Local callback for handling actions for when the Play/Pause button has been clicked.
+        /// </summary>
+        private void OnClickPlayButton()
+        {
+            if (!evolutionRenderer.IsAutoPlayReverse)
+            {
+                PressPlay();
+                new PressPlayNetAction(gameObject.FullName()).Execute();
+            }
+        }
 
         /// <summary>
         /// Handles actions for when the Play/Pause button has been clicked.
         /// </summary>
-        private void TaskOnClickPlayButton()
+        public void PressPlay()
         {
-            if (!evolutionRenderer.IsAutoPlayReverse)
+            if (isFastBackward)
             {
-                if (isFastBackward)
-                {
-                    additionalAnimationFactor = 2;
-                    evolutionRenderer.AnimationLagFactor = originalAnimationFactor*additionalAnimationFactor;
-                    isFastBackward = false;
-                    animationDataModel.FastBackwardButtonText.text = "◄◄";
-                }
-                if (!evolutionRenderer.IsAutoPlay)
-                {
-                    animationDataModel.PlayButtonText.text = "ll";
-                    evolutionRenderer.ToggleAutoPlay();
-                }
-                else
-                {
-                    animationDataModel.PlayButtonText.text = "►";
-                    evolutionRenderer.ToggleAutoPlay();
-                }
+                additionalAnimationFactor = 2;
+                evolutionRenderer.AnimationLagFactor = originalAnimationFactor * additionalAnimationFactor;
+                isFastBackward = false;
+                animationDataModel.FastBackwardButtonText.text = "◄◄";
             }
+            if (!evolutionRenderer.IsAutoPlayForward)
+            {
+                animationDataModel.PlayButtonText.text = "ll";
+                evolutionRenderer.ToggleAutoPlay();
+            }
+            else
+            {
+                animationDataModel.PlayButtonText.text = "►";
+                evolutionRenderer.ToggleAutoPlay();
+            }
+        }
 
+
+        /// <summary>
+        /// Local callback for handling actions for when the Reverse/Pause button has been clicked.
+        /// </summary>
+        private void OnClickReverseButton()
+        {
+            if (!evolutionRenderer.IsAutoPlayForward)
+            {
+                PressReverse();
+                new PressReverseNetAction(gameObject.FullName()).Execute();
+            }
         }
 
         /// <summary>
         /// Handles actions for when the Reverse/Pause button has been clicked.
         /// </summary>
-        private void TaskOnClickReverseButton()
+        public void PressReverse()
         {
-            if (!evolutionRenderer.IsAutoPlay)
+            if (isFastForward)
             {
-                if (isFastForward)
-                {
-                    additionalAnimationFactor = 2;
-                    evolutionRenderer.AnimationLagFactor = originalAnimationFactor*additionalAnimationFactor;
-                    isFastForward = false;
-                    animationDataModel.FastForwardButtonText.text = "►►";
-                }
-                if (!evolutionRenderer.IsAutoPlayReverse)
-                {
-                    animationDataModel.ReverseButtonText.text = "ll";
-                    evolutionRenderer.ToggleAutoPlayReverse();
-                }
-                else
-                {
-                    animationDataModel.ReverseButtonText.text = "◄";
-                    evolutionRenderer.ToggleAutoPlayReverse();
-                }
+                additionalAnimationFactor = 2;
+                evolutionRenderer.AnimationLagFactor = originalAnimationFactor * additionalAnimationFactor;
+                isFastForward = false;
+                animationDataModel.FastForwardButtonText.text = "►►";
             }
+            if (!evolutionRenderer.IsAutoPlayReverse)
+            {
+                animationDataModel.ReverseButtonText.text = "ll";
+                evolutionRenderer.ToggleAutoPlayReverse();
+            }
+            else
+            {
+                animationDataModel.ReverseButtonText.text = "◄";
+                evolutionRenderer.ToggleAutoPlayReverse();
+            }
+        }
 
+        /// <summary>
+        /// Callback to handle actions for when the fast forward button has been clicked.
+        /// Also resets the fast backward button.
+        /// If the animation is playing backwards it does nothing.
+        /// </summary>
+        private void OnClickFastForwardButton()
+        {
+            if (!evolutionRenderer.IsAutoPlayReverse)
+            {
+                PressFastForward();
+                new PressFastForwardNetAction(gameObject.FullName()).Execute();
+            }
         }
 
         /// <summary>
         /// Handles actions for when the fast forward button has been clicked.
         /// Also resets the fast backward button.
-        /// If the animation is playing backwards it does nothing.
         /// </summary>
-        private void TaskOnClickFastForwardButton()
+        public void PressFastForward()
         {
-            if (evolutionRenderer.IsAutoPlayReverse)
-            {
-                return;
-            }
             if (isFastBackward)
             {
                 additionalAnimationFactor = 2;
@@ -375,23 +403,31 @@ namespace SEE.Game.Evolution
                     animationDataModel.FastForwardButtonText.text = "►►";
                     break;
             }
-            evolutionRenderer.AnimationLagFactor = originalAnimationFactor*additionalAnimationFactor;
+            evolutionRenderer.AnimationLagFactor = originalAnimationFactor * additionalAnimationFactor;
+        }
+
+        /// <summary>
+        /// Callback to handle actions for when the fast forward button has been clicked.
+        /// If the animation is playing forwards it does nothing.
+        /// </summary>
+        private void OnClickFastBackwardButton()
+        {
+            if (!evolutionRenderer.IsAutoPlayForward)
+            {
+                PressFastBackward();
+                new PressFastBackwardNetAction(gameObject.FullName()).Execute();
+            }
         }
 
         /// <summary>
         /// Handles actions for when the fast forward button has been clicked.
-        /// If the animation is playing forwards it does nothing.
         /// </summary>
-        private void TaskOnClickFastBackwardButton()
+        public void PressFastBackward()
         {
             // TODO: There is a lot of opportunity for refactoring here, e.g., when comparing this method
-            //       with TaskOnClickFastForwardButton(). It also seems weird that the additionalAnimationFactor
+            //       with OnClickFastForwardButton(). It also seems weird that the additionalAnimationFactor
             //       is set to 2 by default, with the 2x option setting it to 1, rather than it starting at 1
             //       and then being set to 0.5 by the 2x option.
-            if (evolutionRenderer.IsAutoPlay)
-            {
-                return;
-            }
             if (isFastForward)
             {
                 additionalAnimationFactor = 2;
@@ -416,14 +452,14 @@ namespace SEE.Game.Evolution
                     animationDataModel.FastBackwardButtonText.text = "◄◄";
                     break;
             }
-            evolutionRenderer.AnimationLagFactor = originalAnimationFactor*additionalAnimationFactor;
+            evolutionRenderer.AnimationLagFactor = originalAnimationFactor * additionalAnimationFactor;
         }
 
         /// <summary>
         /// Handles actions for when a marker is clicked.
         /// </summary>
         /// <param name="clickedMarker"> Marker that has been clicked. </param>
-        private void TaskOnClickMarker(Button clickedMarker)
+        private void OnClickMarker(Button clickedMarker)
         {
             selectedMarker = clickedMarker;
             string commentName = clickedMarker.GetHashCode() + "-comment";
@@ -433,6 +469,10 @@ namespace SEE.Game.Evolution
                 comment.SetActive(!comment.activeSelf);
             }
         }
+
+        #endregion
+
+        #region Marker Handling
 
         /// <summary>
         /// Adds an InputField to enter comments to the specified marker.
@@ -458,7 +498,7 @@ namespace SEE.Game.Evolution
 
 
         /// <summary>
-        /// Adds a new marker at the specified position
+        /// Adds a new marker at the specified position.
         /// </summary>
         /// <param name="markerPos"> Position to add the marker at </param>
         /// <param name="comment"> Comment to be added to the marker, optional </param>
@@ -466,7 +506,7 @@ namespace SEE.Game.Evolution
         {
             Button newMarker = Instantiate(animationDataModel.MarkerPrefab, animationDataModel.Slider.transform, false);
             newMarker.transform.position = markerPos;
-            newMarker.onClick.AddListener(() => TaskOnClickMarker(newMarker));
+            newMarker.onClick.AddListener(() => OnClickMarker(newMarker));
             if (sliderMarkerContainer.GetSliderMarkerForLocation(markerPos) == null)
             {
                 SliderMarker newSliderMarker = new()
@@ -482,7 +522,7 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Removes the specified marker
+        /// Removes the specified marker.
         /// </summary>
         /// <param name="marker"> Marker to remove </param>
         private void RemoveMarker(Button marker)
@@ -494,6 +534,8 @@ namespace SEE.Game.Evolution
             Destroyer.Destroy(comment.gameObject);
             Destroyer.Destroy(marker.gameObject);
         }
+
+        #endregion
 
         /// <summary>
         /// Handles the user input as follows:
@@ -670,7 +712,7 @@ namespace SEE.Game.Evolution
                 + AllOrNothing("Message:\n", CurrentCommitMessage());
             animationDataModel.Slider.value = evolutionRenderer.CurrentGraphIndex;
 
-            string AllOrNothing(string prefix, string postfix)
+            static string AllOrNothing(string prefix, string postfix)
             {
                 if (string.IsNullOrWhiteSpace(postfix))
                 {

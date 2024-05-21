@@ -32,7 +32,6 @@ namespace SEE.GraphProviders
         public abstract UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
                                                     Action<float> changePercentage = null,
                                                     CancellationToken token = default);
-        // TODO (#729): Implement changePercentage for providers other than LSP and Pipeline.
 
         /// <summary>
         /// Saves the settings in the configuration file.
