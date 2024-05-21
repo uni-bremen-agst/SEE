@@ -234,6 +234,20 @@ namespace SEE.Controls.KeyActions
             Register(KeyAction.ToggleVoiceChat, KeyCode.F5, "Toggle voice chat",
                      KeyActionCategory.Chat, "Toggles the voice chat.");
             // Drawable
+            Register(KeyAction.PartUndo, KeyCode.CapsLock, "Part undo",
+                     KeyActionCategory.Drawable, "Undoes a part of the current running action.");
+            Register(KeyAction.MoveObjectUp, KeyCode.Keypad8, "Move object up",
+                     KeyActionCategory.Drawable, "Moves the object up.");
+            Register(KeyAction.MoveObjectDown, KeyCode.Keypad2, "Move object down",
+                     KeyActionCategory.Drawable, "Moves the object down.");
+            Register(KeyAction.MoveObjectLeft, KeyCode.Keypad4, "Move object left",
+                     KeyActionCategory.Drawable, "Moves the object left.");
+            Register(KeyAction.MoveObjectRight, KeyCode.Keypad6, "Move object right",
+                     KeyActionCategory.Drawable, "Moves the object right.");
+            Register(KeyAction.MoveObjectForward, KeyCode.Keypad9, "Move object forward",
+                     KeyActionCategory.Drawable, "Moves the object forward.");
+            Register(KeyAction.MoveObjectBackward, KeyCode.Keypad3, "Move object backward",
+                     KeyActionCategory.Drawable, "Moves the object backward.");
         }
 
         /// <summary>

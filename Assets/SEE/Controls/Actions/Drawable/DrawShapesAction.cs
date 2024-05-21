@@ -219,7 +219,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void RemoveLastPoint()
         {
-            if (drawing && Input.GetKeyDown(KeyCode.LeftAlt))
+            if (drawing && SEEInput.PartUndo())
             {
                 if (shape.GetComponent<LineRenderer>().positionCount >= 3)
                 {

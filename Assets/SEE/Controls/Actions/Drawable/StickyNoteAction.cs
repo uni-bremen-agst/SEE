@@ -522,9 +522,9 @@ namespace SEE.Controls.Actions.Drawable
         /// <param name="spawnMode">If this method will be called of the spawn method..</param>
         private void MoveByKey(GameObject stickyNote, bool spawnMode)
         {
-            if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow)
-                || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow)
-                || Input.GetKey(KeyCode.PageUp) || Input.GetKey(KeyCode.PageDown))
+            if (SEEInput.MoveObjectLeft() || SEEInput.MoveObjectRight()
+                || SEEInput.MoveObjectUp() || SEEInput.MoveObjectDown()
+                || SEEInput.MoveObjectForward() || SEEInput.MoveObjectBackward())
             {
                 ValueHolder.MoveDirection direction = GetDirection();
                 GameObject holder = GameFinder.GetHighestParent(stickyNote);
@@ -544,23 +544,23 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>The <see cref="ValueHolder.MoveDirection"/> of the pressed key.</returns>
         private ValueHolder.MoveDirection GetDirection()
         {
-            if (Input.GetKey(KeyCode.LeftArrow))
+            if (SEEInput.MoveObjectLeft())
             {
                 return ValueHolder.MoveDirection.Left;
             }
-            else if (Input.GetKey(KeyCode.RightArrow))
+            else if (SEEInput.MoveObjectRight())
             {
                 return ValueHolder.MoveDirection.Right;
             }
-            else if (Input.GetKey(KeyCode.PageUp))
+            else if (SEEInput.MoveObjectForward())
             {
                 return ValueHolder.MoveDirection.Forward;
             }
-            else if (Input.GetKey(KeyCode.PageDown))
+            else if (SEEInput.MoveObjectBackward())
             {
                 return ValueHolder.MoveDirection.Back;
             }
-            else if (Input.GetKey(KeyCode.UpArrow))
+            else if (SEEInput.MoveObjectUp())
             {
                 return ValueHolder.MoveDirection.Up;
             }

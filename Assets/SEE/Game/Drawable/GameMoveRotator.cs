@@ -61,11 +61,11 @@ namespace SEE.Game.Drawable
         /// Because if they are not zero, the axes are rotated.
         /// And that would lead to incorrect movement.
         /// </summary>
-        /// <param name="obj">The object that should be moved</param>
-        /// <param name="key">The pressed key for the movement direction</param>
-        /// <param name="speedUp">if true the speed is 0.01f. otherwise it's 0.001</param>
-        /// <returns>The new position of the object</returns>
-        public static Vector3 MoveObjectByKeyboard(GameObject obj, KeyCode key, bool speedUp, bool includeChildren)
+        /// <param name="obj">The object that should be moved.</param>
+        /// <param name="direction">The direction for the movement.</param>
+        /// <param name="speedUp">if true the speed is 0.01f. otherwise it's 0.001.</param>
+        /// <returns>The new position of the object.</returns>
+        public static Vector3 MoveObjectByKeyboard(GameObject obj, ValueHolder.MoveDirection direction, bool speedUp, bool includeChildren)
         {
             /// For mind map nodes.
             /// If child nodes are to be included, the child objects in the hierarchy are added to the parent object.
@@ -85,18 +85,18 @@ namespace SEE.Game.Drawable
             }
 
             /// Moves the object in the desired direction with the chosen speed.
-            switch (key)
+            switch (direction)
             {
-                case KeyCode.LeftArrow:
+                case ValueHolder.MoveDirection.Left:
                     newPosition -= Vector3.right * multiplyValue;
                     break;
-                case KeyCode.RightArrow:
+                case ValueHolder.MoveDirection.Right:
                     newPosition += Vector3.right * multiplyValue;
                     break;
-                case KeyCode.UpArrow:
+                case ValueHolder.MoveDirection.Up:
                     newPosition += Vector3.up * multiplyValue;
                     break;
-                case KeyCode.DownArrow:
+                case ValueHolder.MoveDirection.Down:
                     newPosition -= Vector3.up * multiplyValue;
                     break;
             }

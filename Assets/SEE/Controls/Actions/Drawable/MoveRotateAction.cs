@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MoveNetAction = SEE.Net.Actions.Drawable.MoveNetAction;
 using SEE.Utils.History;
+using UnityEngine.EventSystems;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -478,13 +479,13 @@ namespace SEE.Controls.Actions.Drawable
         private void MoveByKey(SwitchManager moveByMouse, SwitchManager speedUp,
             GameObject drawable, string drawableParentName)
         {
-            if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow)
-                || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow))
+            if (SEEInput.MoveObjectLeft() || SEEInput.MoveObjectRight()
+                || SEEInput.MoveObjectUp() || SEEInput.MoveObjectDown())
             {
-                KeyCode key = GetArrowKey();
+                ValueHolder.MoveDirection direction = GetDirection();
                 moveByMouse.isOn = false;
                 moveByMouse.UpdateUI();
-                newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, key,
+                newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, direction,
                     speedUp.isOn, MoveMenu.includeChildren);
                 new MoveNetAction(drawable.name, drawableParentName, selectedObject.name,
                     newObjectPosition, MoveMenu.includeChildren).Execute();
@@ -721,23 +722,23 @@ namespace SEE.Controls.Actions.Drawable
         /// Returns the pressed KeyCode of the arrow keys.
         /// </summary>
         /// <returns>The pressed arrow key.</returns>
-        private KeyCode GetArrowKey()
+        private ValueHolder.MoveDirection GetDirection()
         {
-            if (Input.GetKey(KeyCode.LeftArrow))
+            if (SEEInput.MoveObjectLeft())
             {
-                return KeyCode.LeftArrow;
+                return ValueHolder.MoveDirection.Left;
             }
-            else if (Input.GetKey(KeyCode.RightArrow))
+            else if (SEEInput.MoveObjectRight())
             {
-                return KeyCode.RightArrow;
+                return ValueHolder.MoveDirection.Right;
             }
-            else if (Input.GetKey(KeyCode.UpArrow))
+            else if (SEEInput.MoveObjectUp())
             {
-                return KeyCode.UpArrow;
+                return ValueHolder.MoveDirection.Up;
             }
             else
             {
-                return KeyCode.DownArrow;
+                return ValueHolder.MoveDirection.Down;
             }
         }
 
