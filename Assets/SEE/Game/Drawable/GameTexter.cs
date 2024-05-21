@@ -159,7 +159,7 @@ namespace SEE.Game.Drawable
         {
             /// If the object has been created earlier, it already has a name,
             /// and this name is taken from the parameters <paramref name="name"/>.
-            if (name.Length > 4)
+            if (name.Length > Tags.DText.Length)
             {
                 textObj = new(name);
             }

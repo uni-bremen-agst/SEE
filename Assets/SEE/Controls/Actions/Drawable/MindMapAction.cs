@@ -540,6 +540,20 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>empty set</returns>
         public override HashSet<string> GetChangedObjects()
         {
+            if (memento.Drawable != null)
+            {
+                HashSet<string> changedObjects = new() 
+                {
+                    memento.Drawable.ID,
+                    memento.Conf.Id
+                };
+                if (memento.Operation.Equals(Operation.Subtheme) 
+                    || memento.Operation.Equals(Operation.Leaf))
+                {
+                    changedObjects.Add(memento.Conf.BranchLineToParent);
+                }
+                return changedObjects;
+            }
             return new();
         }
     }

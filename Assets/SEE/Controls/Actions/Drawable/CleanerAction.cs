@@ -73,7 +73,7 @@ namespace SEE.Controls.Actions.Drawable
         /// This method finds and deletes all drawable types that are placed on the given drawable.
         /// </summary>
         /// <param name="drawable">is the drawable which should be cleaned.</param>
-        /// <returns>true if the drawable was successfull cleaned, false if the drawable was already cleaned</returns>
+        /// <returns>true if the drawable was successfully cleaned, false if the drawable was already cleaned.</returns>
         private bool DeleteDrawableChilds(GameObject drawable)
         {
             if (GameFinder.GetAttachedObjectsObject(drawable) != null)

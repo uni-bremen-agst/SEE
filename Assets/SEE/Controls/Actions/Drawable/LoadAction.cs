@@ -57,7 +57,9 @@ namespace SEE.Controls.Actions.Drawable
             /// The drawable configurations.
             /// </summary>
             public DrawablesConfigs Configs;
-
+            /// <summary>
+            /// Are the drawables that are created during the loading process.
+            /// </summary>
             public List<DrawableConfig> AddedDrawables;
 
             /// <summary>
@@ -321,8 +323,8 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Destroys the objects that were loaded from the configuration.
         /// </summary>
-        /// <param name="attachedObjects"></param>
-        /// <param name="config"></param>
+        /// <param name="attachedObjects">The objects that are attached on a drawable</param>
+        /// <param name="config">Configuration that contains all objects to be removed.</param>
         private void DestroyLoadedObjects(GameObject attachedObjects, DrawableConfig config)
         {
             if (attachedObjects != null)
@@ -450,7 +452,36 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>an empty set</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new();
+            if (memento == null)
+            {
+                return new();
+            } else
+            {
+                HashSet<string> changedObjects = new();
+                if (memento.State == LoadState.Regular)
+                {
+                    foreach(DrawableConfig config in memento.Configs.Drawables)
+                    {
+                        changedObjects.Add(config.ID);
+                        foreach(DrawableType type in config.GetAllDrawableTypes())
+                        {
+                            changedObjects.Add(type.Id);
+                        }
+                    }
+                } else
+                {
+                    changedObjects.Add(memento.SpecificDrawable.ID);
+                    foreach (DrawableConfig config in memento.Configs.Drawables)
+                    {
+                        foreach (DrawableType type in config.GetAllDrawableTypes())
+                        {
+                            changedObjects.Add(type.Id);
+                        }
+                    }
+                }
+                return changedObjects;
+            }
+            
         }
     }
 }

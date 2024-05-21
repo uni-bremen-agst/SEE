@@ -233,6 +233,7 @@ namespace SEE.Controls.KeyActions
                      KeyActionCategory.Chat, "Toggles the text chat.");
             Register(KeyAction.ToggleVoiceChat, KeyCode.F5, "Toggle voice chat",
                      KeyActionCategory.Chat, "Toggles the voice chat.");
+            // Drawable
         }
 
         /// <summary>

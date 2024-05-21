@@ -354,7 +354,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>the filepath of the save file</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new() { memento.FilePath.ToString() };
+            return new();
         }
     }
 }

@@ -208,8 +208,7 @@ namespace SEE.Game.Drawable
             if (transform.GetComponent<OrderInLayerValueHolder>() != null)
             {
                 order = transform.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
-            }
-            if (transform.GetComponentInParent<OrderInLayerValueHolder>() != null)
+            } else if (transform.GetComponentInParent<OrderInLayerValueHolder>() != null)
             {
                 order = transform.GetComponentInParent<OrderInLayerValueHolder>().GetOrderInLayer();
             }

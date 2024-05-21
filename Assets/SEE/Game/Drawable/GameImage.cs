@@ -42,7 +42,7 @@ namespace SEE.Game.Drawable
         {
             /// If the object has been created earlier, it already has a name,
             /// and this name is taken from the parameters <paramref name="name"/>.
-            if (name.Length > 4)
+            if (name.Length > Tags.Image.Length)
             {
                 image = new(name);
             }
@@ -242,22 +242,11 @@ namespace SEE.Game.Drawable
             {
                 /// If a file with the same name exists, it checks whether they are the same images.
                 /// This is done by comparing the byte count.
-                /// To do this, it is necessary to create a temporary image file.
-                /// This is done in a separate subfolder 'temp.'
-                /// After the examinations, this file and the folder are deleted.
-                string tmpPath = ValueHolder.ImagePath + "/temp/";
-                DrawableConfigManager.EnsureDrawableDirectoryExists(tmpPath);
-                string tmpFileName = fileNameWithoutExtension + "-"
-                                     + RandomStrings.GetRandomStringForFile(10) + fileExtension;
-
-                /// If the file already exists, find a new name.
-                while (File.Exists(tmpPath + tmpFileName))
-                {
-                    tmpFileName = fileNameWithoutExtension + "-"
-                                  + RandomStrings.GetRandomStringForFile(10) + fileExtension;
-                }
-                File.WriteAllBytes(tmpPath + tmpFileName, fileData);
-                FileInfo fileInfo = new (tmpPath + tmpFileName);
+                /// To do this, it is necessary to create a temporary file.
+                /// After the examinations, this file will be deleted.
+                string tmpPath = Path.GetTempFileName();
+                File.WriteAllBytes(tmpPath, fileData);
+                FileInfo fileInfo = new(tmpPath);
                 FileInfo existsInfo = new (path);
 
                 if (fileInfo.Length != existsInfo.Length)
@@ -273,7 +262,7 @@ namespace SEE.Game.Drawable
                             + "(" + i + ")" + fileExtension;
                         if (!File.Exists(newPath))
                         {
-                            Directory.Delete(tmpPath, true);
+                            File.Delete(tmpPath);
                             CreateImageFile(imageObj, fileData, Path.GetFileName(newPath), out filePath);
                             break;
                         }
@@ -294,7 +283,7 @@ namespace SEE.Game.Drawable
                 }
                 else
                 {
-                    Directory.Delete(tmpPath, true);
+                    File.Delete(tmpPath);
                     if (imageObj != null)
                     {
                         imageObj.GetComponent<ImageValueHolder>().SetPath(path);

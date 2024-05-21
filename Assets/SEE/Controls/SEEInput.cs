@@ -626,5 +626,9 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleFaceCamPosition);
         }
         #endregion
+        //----------------------------------------------------
+        #region Drawable
+
+        #endregion
     }
 }

@@ -324,6 +324,9 @@ namespace SEE.Controls.Actions.Drawable
                         MindMapEditMenu.Enable(selectedObj, newValueHolder);
                     }
                     break;
+                default:
+                    ShowNotification.Info("Object type not recognized", "The menu cannot be opened because the type of the object was not recognized.");
+                    break;
             }
             if (Input.GetMouseButtonUp(0))
             {
