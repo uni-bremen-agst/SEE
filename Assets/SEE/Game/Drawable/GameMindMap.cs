@@ -235,7 +235,7 @@ namespace SEE.Game.Drawable
             if (node.CompareTag(Tags.MindMapNode))
             {
                 MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
-                bool ellipse = valueHolder.GetNodeKind() != NodeKind.Subtheme;
+                bool ellipse = valueHolder.NodeKind != NodeKind.Subtheme;
                 GameObject nodeText = GameFinder.FindChildWithTag(node, Tags.DText);
                 /// Gets the new border positions.
                 Vector3[] positions = GetBorderPositions(ellipse, Vector3.zero, nodeText);
@@ -395,7 +395,7 @@ namespace SEE.Game.Drawable
             /// Enter the data in the own node holder.
             MMNodeValueHolder nodeValueHolder = child.GetComponent<MMNodeValueHolder>();
             nodeValueHolder.SetParent(parent, branchLine);
-            nodeValueHolder.SetLayer(parentValueHolder.GetLayer() + 1);
+            nodeValueHolder.Layer = parentValueHolder.Layer + 1;
 
             /// Disable the Mesh Collider of the branch line.
             /// It has the same reason as for the border.
@@ -575,8 +575,8 @@ namespace SEE.Game.Drawable
             GameObject nodeBorder = GameFinder.FindChildWithTag(node, Tags.Line);
             LineConf border = LineConf.GetLine(nodeBorder);
 
-            if (nodeValueHolder.GetNodeKind() != newNodeKind
-                && CheckValidNodeKindChange(node, newNodeKind, nodeValueHolder.GetNodeKind()))
+            if (nodeValueHolder.NodeKind != newNodeKind
+                && CheckValidNodeKindChange(node, newNodeKind, nodeValueHolder.NodeKind))
             {
                 bool ellipse = false;
                 switch (newNodeKind)
@@ -642,12 +642,12 @@ namespace SEE.Game.Drawable
                     GameEdit.ChangeLine(nodeBorder, borderConf);
                 }
                 /// Sets the new node kind to the <see cref="MMNodeValueHolder"/>.
-                nodeValueHolder.SetNodeKind(newNodeKind);
+                nodeValueHolder.NodeKind = newNodeKind;
 
                 /// At least refresh the branch lines.
                 ReDrawBranchLines(node);
             }
-            return nodeValueHolder.GetNodeKind();
+            return nodeValueHolder.NodeKind;
         }
 
         /// <summary>
@@ -657,7 +657,7 @@ namespace SEE.Game.Drawable
         /// <param name="newNodeKind">The new node kind whose prefix should be used.</param>
         private static void ChangeName(GameObject node, NodeKind newNodeKind)
         {
-            NodeKind old = node.GetComponent<MMNodeValueHolder>().GetNodeKind();
+            NodeKind old = node.GetComponent<MMNodeValueHolder>().NodeKind;
             node.name = node.name.Replace(GetPrefix(old), GetPrefix(newNodeKind));
         }
 
@@ -727,7 +727,7 @@ namespace SEE.Game.Drawable
             GameObject attacheds = GameFinder.GetAttachedObjectsObject(selectedNode);
             foreach (GameObject node in GameFinder.FindAllChildrenWithTag(attacheds, Tags.MindMapNode))
             {
-                if (node.GetComponent<MMNodeValueHolder>().GetNodeKind() == NodeKind.Theme
+                if (node.GetComponent<MMNodeValueHolder>().NodeKind == NodeKind.Theme
                     && ParentChangeIsValid(selectedNode, node))
                 {
                     return true;

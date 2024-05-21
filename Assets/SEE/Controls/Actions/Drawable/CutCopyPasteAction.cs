@@ -388,7 +388,7 @@ namespace SEE.Controls.Actions.Drawable
                 newValueHolder = DrawableType.Get(newObject);
                 Cut();
                 if (newObject.CompareTag(Tags.MindMapNode) &&
-                    newObject.GetComponent<MMNodeValueHolder>().GetNodeKind() != GameMindMap.NodeKind.Theme)
+                    newObject.GetComponent<MMNodeValueHolder>().NodeKind != GameMindMap.NodeKind.Theme)
                 {
                     progressState = ProgressState.OpenSelectParentMenu;
                 }

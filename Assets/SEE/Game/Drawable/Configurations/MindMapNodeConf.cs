@@ -75,8 +75,8 @@ namespace SEE.Game.Drawable.Configurations
                     Scale = obj.transform.localScale,
                     EulerAngles = obj.transform.localEulerAngles,
                     OrderInLayer = obj.GetComponent<OrderInLayerValueHolder>().OrderInLayer,
-                    Layer = valueHolder.GetLayer(),
-                    NodeKind = valueHolder.GetNodeKind(),
+                    Layer = valueHolder.Layer,
+                    NodeKind = valueHolder.NodeKind,
                     BorderConf = LineConf.GetLine(GameFinder.FindChildWithTag(obj, Tags.Line)),
                     TextConf = TextConf.GetText(GameFinder.FindChildWithTag(obj, Tags.DText)),
                     Children = valueHolder.GetChildren()

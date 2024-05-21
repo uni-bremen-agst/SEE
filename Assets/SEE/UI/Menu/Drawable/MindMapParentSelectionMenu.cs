@@ -66,7 +66,7 @@ namespace SEE.UI.Menu.Drawable
             List<GameObject> nodes = new();
             foreach (GameObject node in allNodes)
             {
-                if (node.GetComponent<MMNodeValueHolder>().GetNodeKind() != GameMindMap.NodeKind.Leaf
+                if (node.GetComponent<MMNodeValueHolder>().NodeKind != GameMindMap.NodeKind.Leaf
                     && node != addedNode)
                 {
                     nodes.Add(node);
@@ -150,7 +150,7 @@ namespace SEE.UI.Menu.Drawable
                 List<GameObject> nodes = new();
                 foreach (GameObject node in allNodes)
                 {
-                    if (node.GetComponent<MMNodeValueHolder>().GetNodeKind() != GameMindMap.NodeKind.Leaf
+                    if (node.GetComponent<MMNodeValueHolder>().NodeKind != GameMindMap.NodeKind.Leaf
                         && node != addedNode
                         && GameMindMap.ParentChangeIsValid(addedNode, node))
                     {
@@ -159,7 +159,7 @@ namespace SEE.UI.Menu.Drawable
                 }
                 /// If the user try to change the parent for a <see cref="GameMindMap.NodeKind.Theme"/>,
                 /// then show an error and close the menu.
-                if (addedNode.GetComponent<MMNodeValueHolder>().GetNodeKind() == GameMindMap.NodeKind.Theme)
+                if (addedNode.GetComponent<MMNodeValueHolder>().NodeKind == GameMindMap.NodeKind.Theme)
                 {
                     ShowNotification.Warn("Unauthorized action", "A theme can't have a parent.");
                     returnCall.Invoke();

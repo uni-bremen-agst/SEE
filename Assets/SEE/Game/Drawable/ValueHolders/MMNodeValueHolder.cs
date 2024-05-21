@@ -14,10 +14,38 @@ namespace SEE.Game.Drawable.ValueHolders
         private GameMindMap.NodeKind nodeKind;
 
         /// <summary>
+        /// Property for the node kind of the mind map node.
+        /// </summary>
+        public GameMindMap.NodeKind NodeKind
+        {
+            get { return nodeKind; }
+            set { nodeKind = value; }
+        }
+
+        /// <summary>
         /// The layer of the mind map node.
         /// Will be needed to load a mind map from file.
         /// </summary>
         private int layer;
+
+        /// <summary>
+        /// The property for the node layer.
+        /// </summary>
+        public int Layer
+        {
+            get { return layer; }
+            set 
+            {
+                if (nodeKind == GameMindMap.NodeKind.Theme)
+                {
+                    layer = 0;
+                }
+                else
+                {
+                    layer = value;
+                }
+            }
+        }
 
         /// <summary>
         /// The parent of this node.
@@ -56,49 +84,6 @@ namespace SEE.Game.Drawable.ValueHolders
                 nodeKind = GameMindMap.NodeKind.Leaf;
             }
             layer = 0;
-        }
-
-        /// <summary>
-        /// Gets the node kind.
-        /// </summary>
-        /// <returns>The node kind</returns>
-        public GameMindMap.NodeKind GetNodeKind()
-        {
-            return nodeKind;
-        }
-
-        /// <summary>
-        /// Sets a new node kind.
-        /// </summary>
-        /// <param name="nodeKind">The new node kind for the node.</param>
-        public void SetNodeKind(GameMindMap.NodeKind nodeKind)
-        {
-            this.nodeKind = nodeKind;
-        }
-
-        /// <summary>
-        /// Sets the node layer.
-        /// </summary>
-        /// <param name="layer">node layer</param>
-        public void SetLayer(int layer)
-        {
-            if (nodeKind == GameMindMap.NodeKind.Theme)
-            {
-                this.layer = 0;
-            }
-            else
-            {
-                this.layer = layer;
-            }
-        }
-
-        /// <summary>
-        /// Gets the node layer
-        /// </summary>
-        /// <returns>node layer</returns>
-        public int GetLayer()
-        {
-            return layer;
         }
 
         /// <summary>
