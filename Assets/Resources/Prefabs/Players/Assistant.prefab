@@ -1583,7 +1583,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad2cd940fecf01c4eb252fc5adffd870, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayWelcome: 1
+  PlayWelcome: 0
 --- !u!114 &1717172987428593047
 MonoBehaviour:
   m_ObjectHideFlags: 0

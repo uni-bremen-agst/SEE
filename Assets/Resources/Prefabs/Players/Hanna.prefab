@@ -244,6 +244,37 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &2177516827105058581
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9211431948729659886}
+  m_Layer: 0
+  m_Name: HeadAdjust
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9211431948729659886
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2177516827105058581}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.0034091535, y: 0.014073695, z: 0.70364904, w: -0.7104002}
+  m_LocalPosition: {x: -0.005471038, y: 0.06583625, z: 0.014136193}
+  m_LocalScale: {x: 0.8930103, y: 0.8572703, z: 0.8930099}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2503307745745576469}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3999315673813844652
 GameObject:
   m_ObjectHideFlags: 0
@@ -473,6 +504,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 4405328015911739841}
+    - targetCorrespondingSourceObject: {fileID: 3230203076670083041, guid: 3250d9a6dd9cf1a43a44333cecaa9e0b,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9211431948729659886}
     - targetCorrespondingSourceObject: {fileID: -4709192803230772745, guid: 3250d9a6dd9cf1a43a44333cecaa9e0b,
         type: 3}
       insertIndex: -1
@@ -604,7 +639,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3907500548
+  GlobalObjectIdHash: 2621676368
   InScenePlacedSourceGlobalObjectIdHash: 677127553
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -5026,7 +5061,7 @@ MonoBehaviour:
   randomHoldDurationMax: 0.5
   configReady: 0
   warnOnNullRefs: 1
-  inspSalsaLinked: 1
+  inspSalsaLinked: 0
   inspStateFoldoutProcessing: 1
   inspStateFoldoutSettings: 1
   inspStateFoldoutEmotes: 1

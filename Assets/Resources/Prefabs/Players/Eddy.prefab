@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &587373937695097456
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 367337489367161955}
+  m_Layer: 0
+  m_Name: HeadAdjust
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &367337489367161955
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 587373937695097456}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.0034092201, y: 0.0140735665, z: 0.7036489, w: -0.7104002}
+  m_LocalPosition: {x: -0.005471002, y: -0.041961554, z: 0.02919767}
+  m_LocalScale: {x: 0.89301056, y: 0.8572705, z: 0.89301}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1795476421734433394}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4595460482420900955
 GameObject:
   m_ObjectHideFlags: 0
@@ -463,6 +494,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 6806277190857036037}
+    - targetCorrespondingSourceObject: {fileID: 3230203076670083041, guid: b93f96cf429b12342ac1893df03cdecb,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 367337489367161955}
     - targetCorrespondingSourceObject: {fileID: -4709192803230772745, guid: b93f96cf429b12342ac1893df03cdecb,
         type: 3}
       insertIndex: -1
@@ -648,7 +683,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3900505306
+  GlobalObjectIdHash: 4276811476
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -5112,7 +5147,7 @@ MonoBehaviour:
   inspStateFoldoutAnimBones: 1
   inspStateFoldoutEyes: 0
   inspStateFoldoutEyeProps: 1
-  inspStateFoldoutEyelids: 1
+  inspStateFoldoutEyelids: 0
   inspStateFoldoutEyelidBlinkProps: 1
   inspStateFoldoutEyelidTrackProps: 1
   drawEyeBoneCaptureControls: 0
@@ -5121,10 +5156,10 @@ MonoBehaviour:
   headIsRoot: 0
   configReadyHead: 1
   configReadyEye: 1
-  configReadyBlink: 0
+  configReadyBlink: 1
   configReadyTrack: 1
   characterRoot: {fileID: 3725485843941698168}
-  queueProcessor: {fileID: 0}
+  queueProcessor: {fileID: 8692636033962490482}
   lookTarget: {fileID: 0}
   useAffinity: 0
   affinityPercentage: 0.75
@@ -5281,7 +5316,7 @@ MonoBehaviour:
         inspIsSetEnd: 0
         umaUepProxy: {fileID: 0}
         uepAmount: 0
-        smr: {fileID: 0}
+        smr: {fileID: 8946105637154090798}
         blendIndex: 54
         minShape: 0
         maxShape: 1
@@ -5322,7 +5357,7 @@ MonoBehaviour:
         inspIsSetEnd: 0
         umaUepProxy: {fileID: 0}
         uepAmount: 0
-        smr: {fileID: 0}
+        smr: {fileID: 8946105637154090798}
         blendIndex: 55
         minShape: 0
         maxShape: 1
@@ -5416,7 +5451,7 @@ MonoBehaviour:
         inspIsSetEnd: 0
         umaUepProxy: {fileID: 0}
         uepAmount: 0
-        smr: {fileID: 0}
+        smr: {fileID: 8946105637154090798}
         blendIndex: 54
         minShape: 0
         maxShape: 1
@@ -5457,7 +5492,7 @@ MonoBehaviour:
         inspIsSetEnd: 0
         umaUepProxy: {fileID: 0}
         uepAmount: 0
-        smr: {fileID: 0}
+        smr: {fileID: 8946105637154090798}
         blendIndex: 55
         minShape: 0
         maxShape: 1
@@ -5487,7 +5522,7 @@ MonoBehaviour:
   eyelidExpNames:
   - eyelid 0
   - eyelid 1
-  eyelidExpRend: {fileID: 0}
+  eyelidExpRend: {fileID: 8946105637154090798}
   eyelidExpRendItemCount: 1
   eyelidExpRendIsNullOrSmr: 1
   trackEnabled: 1
