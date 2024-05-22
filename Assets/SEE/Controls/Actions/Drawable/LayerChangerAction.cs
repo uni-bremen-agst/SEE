@@ -117,30 +117,21 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (!Raycasting.IsMouseOverGUI())
             {
-                /// Increase block.
-                /// It increses the order in layer of a <see cref="DrawableType"/> object
-                /// with a <see cref="OrderInLayerValueHolder"/> component.
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !isInAction
-                    && Raycasting.RaycastAnything(out RaycastHit raycastHit)
+                /// It increses or decreases the order in layer of a <see cref="DrawableType"/> object
+                /// with a <see cref="OrderInLayerValueHolder"/> component depending on the left or right click.
+                if (!isInAction && Raycasting.RaycastAnything(out RaycastHit raycastHit)
                     && GameFinder.HasDrawable(raycastHit.collider.gameObject)
                     && raycastHit.collider.gameObject.GetComponent<OrderInLayerValueHolder>() != null)
                 {
-                    Increase(raycastHit.collider.gameObject);
+                    if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)))
+                    {
+                        CalcOrder(raycastHit.collider.gameObject, GameLayerChanger.LayerChangerStates.Increase);
+                    } else if (Input.GetMouseButtonDown(1) || Input.GetMouseButton(1)) {
+                        CalcOrder(raycastHit.collider.gameObject, GameLayerChanger.LayerChangerStates.Decrease);
+                    }
                 }
-
-                /// Decrease block
-                /// it decreases the order in layer of a <see cref="DrawableType"/> object
-                /// with a <see cref="OrderInLayerValueHolder"/> component.
-                if ((Input.GetMouseButtonDown(1) || Input.GetMouseButton(1)) && !isInAction
-                    && Raycasting.RaycastAnything(out RaycastHit raycastHit2)
-                    && GameFinder.HasDrawable(raycastHit2.collider.gameObject)
-                    && raycastHit2.collider.gameObject.GetComponent<OrderInLayerValueHolder>() != null)
-                {
-                    Decrease(raycastHit2.collider.gameObject);
-                }
-
                 /// It completes the action after a layer change if the user releases the pressed mouse button.
-                if ((Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1) ) && isInAction)
+                if ((Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1)) && isInAction)
                 {
                     isInAction = false;
                     CurrentState = IReversibleAction.Progress.Completed;
@@ -151,41 +142,28 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Increases the order in layer by one.
-        /// Additionally, a memento of this action is created and the progress state is set to InProgress.
+        /// Calculates the new order in layer.
         /// </summary>
-        /// <param name="hitObject">The object to increase the order for</param>
-        private void Increase(GameObject hitObject)
+        /// <param name="hitObject">The object which order should be changed.</param>
+        /// <param name="state">The state if the order should increased or decreased.</param>
+        private void CalcOrder(GameObject hitObject, GameLayerChanger.LayerChangerStates state)
         {
             isInAction = true;
             GameObject drawable = GameFinder.GetDrawable(hitObject);
-
             int oldOrder = hitObject.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
-            int newOrder = oldOrder + 1;
-            GameLayerChanger.Increase(hitObject, newOrder);
-            memento = new Memento(drawable, GameLayerChanger.LayerChangerStates.Increase,
+            int newOrder = oldOrder;
+            if (state == GameLayerChanger.LayerChangerStates.Increase)
+            {
+                newOrder = oldOrder + 1;
+                GameLayerChanger.Increase(hitObject, newOrder);
+            } else
+            {
+                newOrder = oldOrder - 1;
+                newOrder = newOrder < 0 ? 0 : newOrder;
+                GameLayerChanger.Decrease(hitObject, newOrder);
+            }
+            memento = new Memento(drawable, state,
                             hitObject, hitObject.name, oldOrder, newOrder);
-            new LayerChangerNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
-                memento.Obj.name, memento.State, memento.NewOrder).Execute();
-            CurrentState = IReversibleAction.Progress.InProgress;
-        }
-
-        /// <summary>
-        /// Decreases the order in layer by one.
-        /// Additionally, a memento of this action is created and the progress state is set to InProgress.
-        /// </summary>
-        /// <param name="hitObject">The object to decrease the order for</param>
-        private void Decrease(GameObject hitObject)
-        {
-            isInAction = true;
-            GameObject drawable = GameFinder.GetDrawable(hitObject);
-
-            int oldOrder = hitObject.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
-            int newOrder = oldOrder - 1;
-            newOrder = newOrder < 0 ? 0 : newOrder;
-            GameLayerChanger.Decrease(hitObject, newOrder);
-            memento = new Memento(drawable, GameLayerChanger.LayerChangerStates.Decrease,
-                        hitObject, hitObject.name, oldOrder, newOrder);
             new LayerChangerNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
                 memento.Obj.name, memento.State, memento.NewOrder).Execute();
             CurrentState = IReversibleAction.Progress.InProgress;
