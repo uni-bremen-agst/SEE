@@ -127,11 +127,11 @@ namespace SEE.Game.Drawable
                 int oldLayer = obj.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
                 if (newLayer - oldLayer > 0)
                 {
-                    GameLayerChanger.Increase(obj, newLayer, false);
+                    GameLayerChanger.ChangeOrderInLayer(obj, newLayer, GameLayerChanger.LayerChangerStates.Increase, false);
                 }
                 else
                 {
-                    GameLayerChanger.Decrease(obj, newLayer, false);
+                    GameLayerChanger.ChangeOrderInLayer(obj, newLayer, GameLayerChanger.LayerChangerStates.Decrease, false);
                 }
             }
         }

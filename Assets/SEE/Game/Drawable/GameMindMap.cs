@@ -386,7 +386,7 @@ namespace SEE.Game.Drawable
             /// An order lower than the lower order (parent or node).
             /// But <0 will be 0.
             int order = GetBranchLineOrder(child, parent);
-            GameLayerChanger.Decrease(branchLine, order, false);
+            GameLayerChanger.ChangeOrderInLayer(branchLine, order, GameLayerChanger.LayerChangerStates.Decrease, false);
 
             /// Adds the node and their branch line as a child/branch line pair to the parent holder.
             MMNodeValueHolder parentValueHolder = parent.GetComponent<MMNodeValueHolder>();

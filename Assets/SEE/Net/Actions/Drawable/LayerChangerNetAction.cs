@@ -47,16 +47,7 @@ namespace SEE.Net.Actions.Drawable
             if (!IsRequester())
             {
                 base.ExecuteOnClient();
-                GameObject obj = FindChild(ObjectName);
-                switch (State) {
-                    case GameLayerChanger.LayerChangerStates.Increase:
-                        GameLayerChanger.Increase(obj, Order);
-                        break;
-
-                    case GameLayerChanger.LayerChangerStates.Decrease:
-                        GameLayerChanger.Decrease(obj, Order);
-                        break;
-                }
+                GameLayerChanger.ChangeOrderInLayer(FindChild(ObjectName), Order, State);
             }
         }
     }

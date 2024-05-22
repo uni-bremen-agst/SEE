@@ -155,13 +155,12 @@ namespace SEE.Controls.Actions.Drawable
             if (state == GameLayerChanger.LayerChangerStates.Increase)
             {
                 newOrder = oldOrder + 1;
-                GameLayerChanger.Increase(hitObject, newOrder);
             } else
             {
                 newOrder = oldOrder - 1;
                 newOrder = newOrder < 0 ? 0 : newOrder;
-                GameLayerChanger.Decrease(hitObject, newOrder);
             }
+            GameLayerChanger.ChangeOrderInLayer(hitObject, newOrder, state);
             memento = new Memento(drawable, state,
                             hitObject, hitObject.name, oldOrder, newOrder);
             new LayerChangerNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
@@ -179,18 +178,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 memento.Obj = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Id);
             }
-            switch (memento.State)
-            {
-                case GameLayerChanger.LayerChangerStates.Increase:
-                    GameLayerChanger.Decrease(memento.Obj, memento.OldOrder);
-                    break;
-                case GameLayerChanger.LayerChangerStates.Decrease:
-                    GameLayerChanger.Increase(memento.Obj, memento.OldOrder);
-                    break;
-                default:
-                    throw new NotImplementedException($"Unexpected {memento.State}");
-            }
-
+            GameLayerChanger.ChangeOrderInLayer(memento.Obj, memento.OldOrder, memento.State);
             new LayerChangerNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
                                       memento.Obj.name, memento.State, memento.OldOrder).Execute();
         }
@@ -205,17 +193,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 memento.Obj = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Id);
             }
-            switch (memento.State)
-            {
-                case GameLayerChanger.LayerChangerStates.Increase:
-                    GameLayerChanger.Increase(memento.Obj, memento.NewOrder);
-                    break;
-                case GameLayerChanger.LayerChangerStates.Decrease:
-                    GameLayerChanger.Decrease(memento.Obj, memento.NewOrder);
-                    break;
-                default:
-                    throw new NotImplementedException($"Unexpected {memento.State}");
-            }
+            GameLayerChanger.ChangeOrderInLayer(memento.Obj, memento.NewOrder, memento.State);
             new LayerChangerNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
                                       memento.Obj.name, memento.State, memento.NewOrder).Execute();
         }

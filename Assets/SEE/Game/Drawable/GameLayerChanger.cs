@@ -30,76 +30,32 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Increase the order in layer of an object with a <see cref="OrderInLayerValueHolder"/> component.
+        /// Changes the order in layer.
         /// </summary>
-        /// <param name="obj">The object whose order in layer is to be changed</param>
+        /// <param name="obj">The object whose order in layer is to be changed.</param>
         /// <param name="order">The new order of the object.</param>
-        /// <param name="showInformation">show a notification when the limit is reached</param>
-        /// <param name="useWorldPos">use world position for moving, only needed for sticky note</param>
-        public static void Increase(GameObject obj, int order, bool showInformation = true, bool useWorldPos = false)
+        /// <param name="state">Query for increase or decrease.</param>
+        /// <param name="showInformation">Show a notification when the limit is reached.</param>
+        /// <param name="useWorldPos">Use world position for moving, only needed for sticky note.</param>
+        public static void ChangeOrderInLayer(GameObject obj, int order, LayerChangerStates state, 
+            bool showInformation = true, bool useWorldPos = false)
         {
             if (obj.GetComponent<OrderInLayerValueHolder>() != null
                 || obj.GetComponentInChildren<OrderInLayerValueHolder>() != null)
             {
                 OrderInLayerValueHolder holder = obj.GetComponent<OrderInLayerValueHolder>() != null ?
                     obj.GetComponent<OrderInLayerValueHolder>() : obj.GetComponentInChildren<OrderInLayerValueHolder>();
-                /// Block that is executed when the desired order in layer exceeds the maximum or is equal.
-                if (holder.OrderInLayer >= ValueHolder.CurrentOrderInLayer)
+
+                /// Block that is executed if the order number is not permitted.
+                /// Exceeds the maximum or is equal or less then minimum.
+                if (holder.OrderInLayer >= ValueHolder.CurrentOrderInLayer && state == LayerChangerStates.Increase)
                 {
                     if (showInformation)
                     {
                         ShowNotification.Warn("Maximum layer order", obj.name +
                             " has reached the maximum layer order: " + holder.OrderInLayer);
                     }
-                }
-                else
-                {
-                    /// Block to execute if the desired order in the layer is less than the maximum.
-                    holder.OrderInLayer = order;
-
-                    if (showInformation)
-                    {
-                        ShowNotification.Info("Increases the order",
-                            "The order in layer of the chosen object increases to " + holder.OrderInLayer + ".", 0.8f);
-                    }
-                    /// For mind map nodes, it's important that the text is also assigned the order.
-                    if (obj.CompareTag(Tags.MindMapNode))
-                    {
-                        obj.GetComponentInChildren<TextMeshPro>().sortingOrder = order;
-                    }
-
-                    /// Moves the object along the z-axis.
-                    MoveObjectZ(obj, order, useWorldPos);
-
-                    /// Sets the order on the Canvas and TextMeshPro components, if present.
-                    if (obj.GetComponent<TextMeshPro>() != null)
-                    {
-                        obj.GetComponent<TextMeshPro>().sortingOrder = order;
-                    }
-                    if (obj.GetComponent<Canvas>() != null)
-                    {
-                        obj.GetComponent<Canvas>().sortingOrder = order;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Decrease the order in layer of an object with a <see cref="OrderInLayerValueHolder"/> component.
-        /// </summary>
-        /// <param name="obj">The object whose order in layer is to be changed</param>
-        /// <param name="order">The new order of the object.</param>
-        /// <param name="showInformation">show a notification when the limit is reached</param>
-        /// <param name="useWorldPos">use world position for moving, only needed for sticky note</param>
-        public static void Decrease(GameObject obj, int order, bool showInformation = true, bool useWorldPos = false)
-        {
-            if (obj.GetComponent<OrderInLayerValueHolder>() != null
-                || obj.GetComponentInChildren<OrderInLayerValueHolder>() != null)
-            {
-                OrderInLayerValueHolder holder = obj.GetComponent<OrderInLayerValueHolder>() != null ?
-                    obj.GetComponent<OrderInLayerValueHolder>() : obj.GetComponentInChildren<OrderInLayerValueHolder>();
-                /// Block that is executed if the minimum would be undercut.
-                if (holder.OrderInLayer == 0)
+                } else if (holder.OrderInLayer == 0 && state == LayerChangerStates.Decrease)
                 {
                     if (showInformation)
                     {
@@ -109,11 +65,20 @@ namespace SEE.Game.Drawable
                 }
                 else
                 {
+                    /// Block that is executed if the order number is permitted.
                     holder.OrderInLayer = order;
+
                     if (showInformation)
                     {
-                        ShowNotification.Info("Decreases the order",
-                            "The order in layer of the chosen object decreases to " + holder.OrderInLayer + ".", 0.8f);
+                        if (state == LayerChangerStates.Increase)
+                        {
+                            ShowNotification.Info("Increases the order",
+                                "The order in layer of the chosen object increases to " + holder.OrderInLayer + ".", 0.8f);
+                        } else
+                        {
+                            ShowNotification.Info("Decreases the order",
+                                "The order in layer of the chosen object decreases to " + holder.OrderInLayer + ".", 0.8f);
+                        }
                     }
                     /// For mind map nodes, it's important that the text is also assigned the order.
                     if (obj.CompareTag(Tags.MindMapNode))

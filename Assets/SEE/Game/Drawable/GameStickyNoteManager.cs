@@ -225,11 +225,13 @@ namespace SEE.Game.Drawable
             /// Checks if the order in layer should increase or decrease.
             if (newLayer - oldLayer > 0)
             {
-                GameLayerChanger.Increase(GameFinder.GetHighestParent(stickyNote), newLayer, false, true);
+                GameLayerChanger.ChangeOrderInLayer(GameFinder.GetHighestParent(stickyNote), newLayer, 
+                    GameLayerChanger.LayerChangerStates.Increase, false, true);
             }
             else
             {
-                GameLayerChanger.Decrease(GameFinder.GetHighestParent(stickyNote), newLayer, false, true);
+                GameLayerChanger.ChangeOrderInLayer(GameFinder.GetHighestParent(stickyNote), newLayer, 
+                    GameLayerChanger.LayerChangerStates.Decrease, false, true);
             }
         }
 
