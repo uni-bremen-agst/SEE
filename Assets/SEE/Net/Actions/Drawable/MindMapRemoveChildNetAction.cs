@@ -1,7 +1,5 @@
-﻿using SEE.Game.Drawable;
-using SEE.Game.Drawable.Configurations;
+﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {

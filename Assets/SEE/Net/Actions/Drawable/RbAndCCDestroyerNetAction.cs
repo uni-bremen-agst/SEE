@@ -1,5 +1,4 @@
 ﻿using SEE.Game.Drawable;
-using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {

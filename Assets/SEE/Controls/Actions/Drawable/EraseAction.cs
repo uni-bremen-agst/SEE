@@ -23,12 +23,6 @@ namespace SEE.Controls.Actions.Drawable
         private List<Memento> mementoList = new();
 
         /// <summary>
-        /// Saves all the information needed to revert or repeat this action for one
-        /// drawable type object.
-        /// </summary>
-        private Memento memento;
-
-        /// <summary>
         /// This class can store all the information needed to revert or repeat the <see cref="EraseAction"/>
         /// for one drawable type object.
         /// </summary>
@@ -75,16 +69,16 @@ namespace SEE.Controls.Actions.Drawable
 
                     if (Tags.DrawableTypes.Contains(hitObject.tag))
                     {
-                        memento = new Memento(GameFinder.GetDrawable(hitObject),
-                            DrawableType.Get(hitObject));
-                        mementoList.Add(memento);
+                        mementoList.Add(new Memento(GameFinder.GetDrawable(hitObject),
+                            DrawableType.Get(hitObject)));
 
-                        if (memento.DrawableType is MindMapNodeConf conf)
+                        if (mementoList.Last().DrawableType is MindMapNodeConf conf)
                         {
                             DeleteChildren(hitObject);
                         }
 
-                        new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                        new EraseNetAction(mementoList.Last().Drawable.ID, 
+                            mementoList.Last().Drawable.ParentID,
                             hitObject.name).Execute();
                         Destroyer.Destroy(hitObject);
                     }
@@ -115,10 +109,9 @@ namespace SEE.Controls.Actions.Drawable
             if (valueHolder.GetParentBranchLine() != null)
             {
                 GameObject pBranchLine = valueHolder.GetParentBranchLine();
-                memento = new Memento(drawable, DrawableType.Get(pBranchLine));
-                mementoList.Add(memento);
+                mementoList.Add(new Memento(drawable, DrawableType.Get(pBranchLine)));
 
-                new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                new EraseNetAction(mementoList.Last().Drawable.ID, mementoList.Last().Drawable.ParentID,
                     pBranchLine.name).Execute();
                 Destroyer.Destroy(pBranchLine);
             }
@@ -126,7 +119,8 @@ namespace SEE.Controls.Actions.Drawable
             if (valueHolder.GetParent() != null)
             {
                 valueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(node);
-                new MindMapRemoveChildNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                new MindMapRemoveChildNetAction(mementoList.Last().Drawable.ID, 
+                    mementoList.Last().Drawable.ParentID,
                     MindMapNodeConf.GetNodeConf(node)).Execute();
             }
 
@@ -141,10 +135,10 @@ namespace SEE.Controls.Actions.Drawable
             /// Is only executed for child nodes in recursively calling.
             if (delete)
             {
-                memento = new Memento(drawable, DrawableType.Get(node));
-                mementoList.Add(memento);
+                mementoList.Add(new Memento(drawable, DrawableType.Get(node)));
 
-                new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID, node.name).Execute();
+                new EraseNetAction(mementoList.Last().Drawable.ID, 
+                    mementoList.Last().Drawable.ParentID, node.name).Execute();
                 Destroyer.Destroy(node);
             }
         }
@@ -183,7 +177,7 @@ namespace SEE.Controls.Actions.Drawable
                     if (valueHolder.GetParent() != null)
                     {
                         valueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(toDelete);
-                        new MindMapRemoveChildNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                        new MindMapRemoveChildNetAction(mem.Drawable.ID, mem.Drawable.ParentID,
                             MindMapNodeConf.GetNodeConf(toDelete)).Execute();
                     }
                 }
@@ -228,18 +222,16 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>the id's of the deletes object's</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            if (memento == null || memento.Drawable == null)
+            if (mementoList.Count == 0)
             {
                 return new();
             }
             else
             {
-                HashSet<string> changedObjects = new()
-                {
-                    memento.Drawable.ID
-                };
+                HashSet<string> changedObjects = new();
                 foreach (Memento mem in mementoList)
                 {
+                    changedObjects.Add(mem.Drawable.ID);
                     changedObjects.Add(mem.DrawableType.Id);
                 }
                 return changedObjects;
