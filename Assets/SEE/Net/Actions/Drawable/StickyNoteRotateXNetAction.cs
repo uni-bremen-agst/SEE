@@ -6,16 +6,8 @@ namespace SEE.Net.Actions.Drawable
     /// <summary>
     /// This class is reponsible for change the x rotation of a sticky note on all clients.
     /// </summary>
-    public class StickyNoteRotateXNetAction : AbstractNetAction
+    public class StickyNoteRotateXNetAction : DrawableNetAction
     {
-        /// <summary>
-        /// The id of the drawable on which the object is located.
-        /// </summary>
-        public string DrawableID;
-        /// <summary>
-        /// The id of the drawable parent.
-        /// </summary>
-        public string ParentDrawableID;
         /// <summary>
         /// The degree by which the object should be rotated.
         /// </summary>
@@ -24,20 +16,12 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        public StickyNoteRotateXNetAction(string drawableID, string drawableParentID, float degree)
+        public StickyNoteRotateXNetAction(string drawableID, string parentDrawableID, float degree)
+            : base(drawableID, parentDrawableID)
         {
-            this.DrawableID = drawableID;
-            this.ParentDrawableID = drawableParentID;
             this.Degree = degree;
         }
 
-        /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
-        }
         /// <summary>
         /// Changes the x rotation of a sticky note on each client.
         /// </summary>
@@ -46,15 +30,8 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
-                if (drawable != null)
-                {
-                    GameStickyNoteManager.SetRotateX(GameFinder.GetHighestParent(drawable), Degree);
-                }
-                else
-                {
-                    throw new System.Exception($"There is no drawable with the ID {DrawableID} and {ParentDrawableID}.");
-                }
+                base.ExecuteOnClient();
+                GameStickyNoteManager.SetRotateX(GameFinder.GetHighestParent(Drawable), Degree);
             }
         }
     }

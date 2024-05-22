@@ -8,16 +8,8 @@ namespace SEE.Net.Actions.Drawable
     /// <summary>
     /// This class is responsible for deleting (<see cref="EraseAction"/>) an object on a drawable on all clients.
     /// </summary>
-    public class EraseNetAction : AbstractNetAction
+    public class EraseNetAction : DrawableNetAction
     {
-        /// <summary>
-        /// The id of the drawable on which the object is located
-        /// </summary>
-        public string DrawableID;
-        /// <summary>
-        /// The id of the drawable parent
-        /// </summary>
-        public string ParentDrawableID;
         /// <summary>
         /// The id of the object that should be deleted
         /// </summary>
@@ -29,20 +21,10 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="drawableID">The id of the drawable on which the object is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="objectName">The id of the object that should be deleted.</param>
-        public EraseNetAction(string drawableID, string parentDrawableID, string objectName) : base()
+        public EraseNetAction(string drawableID, string parentDrawableID, string objectName) 
+            : base(drawableID, parentDrawableID)
         {
-            DrawableID = drawableID;
-            ParentDrawableID = parentDrawableID;
             ObjectName = objectName;
-        }
-
-        /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
         }
 
         /// <summary>
@@ -53,16 +35,8 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                GameObject drawable = GameFinder.FindDrawable(DrawableID,ParentDrawableID);
-                if (drawable != null && GameFinder.FindChild(drawable, ObjectName) != null)
-                {
-                    GameObject toDelete = GameFinder.FindChild(drawable, ObjectName);
-                    Destroyer.Destroy(toDelete);
-                }
-                else
-                {
-                    throw new System.Exception($"There is no drawable with the ID {DrawableID} or line with the ID {ObjectName}.");
-                }
+                base.ExecuteOnClient();
+                Destroyer.Destroy(FindChild(ObjectName));
             }
         }
     }

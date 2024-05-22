@@ -34,6 +34,7 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
+                base.ExecuteOnClient();
                 GameFinder.FindChild(Drawable, ObjectName)?.AddOrGetComponent<BlinkEffect>();
             }
         }

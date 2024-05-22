@@ -44,6 +44,7 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
+                base.ExecuteOnClient();
                 GameDrawer.ChangeColorKind(FindChild(Line.Id), ColorKind, Line);
             }
         }

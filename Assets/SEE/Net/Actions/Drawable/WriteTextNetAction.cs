@@ -8,18 +8,8 @@ namespace SEE.Net.Actions.Drawable
     /// <summary>
     /// This class is reponsible for writing <see cref="WriteTextAction"/> a text on the given drawable on all clients.
     /// </summary>
-    public class WriteTextNetAction : AbstractNetAction
+    public class WriteTextNetAction : DrawableNetAction
     {
-        /// <summary>
-        /// The id of the drawable on which the text should be written.
-        /// </summary>
-        public string DrawableID;
-
-        /// <summary>
-        /// The id of the drawable parent
-        /// </summary>
-        public string ParentDrawableID;
-
         /// <summary>
         /// The text that should be written as <see cref="Text"/> object.
         /// </summary>
@@ -31,20 +21,12 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="drawableID">The id of the drawable on which the text should be written.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="text">The text that should be written.</param>
-        public WriteTextNetAction(string drawableID, string parentDrawableID, TextConf text)
+        public WriteTextNetAction(string drawableID, string parentDrawableID, TextConf text) 
+            : base (drawableID, parentDrawableID)
         {
-            this.DrawableID = drawableID;
-            this.ParentDrawableID = parentDrawableID;
             this.Text = text;
         }
 
-        /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
-        }
         /// <summary>
         /// Writes the text on each client.
         /// </summary>
@@ -53,15 +35,10 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
-                if (drawable == null)
-                {
-                    throw new System.Exception($"There is no drawable with the ID {DrawableID}.");
-                }
-
+                base.ExecuteOnClient();
                 if (Text != null && Text.Id != "")
                 {
-                    GameTexter.ReWriteText(drawable, Text);
+                    GameTexter.ReWriteText(Drawable, Text);
                 }
                 else
                 {

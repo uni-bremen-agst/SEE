@@ -48,6 +48,7 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
+                base.ExecuteOnClient();
                 GameDrawer.ChangeLineKind(FindChild(LineName), LineKind, Tiling);
             }
         }

@@ -29,6 +29,7 @@ namespace SEE.Net.Actions.Drawable
         protected override void ExecuteOnServer()
         {
         }
+
         /// <summary>
         /// Changes the values of the sticky note on each client.
         /// </summary>

@@ -35,6 +35,7 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
+                base.ExecuteOnClient();
                 GameEdit.ChangeImage(FindChild(Image.Id), Image);
             }
         }

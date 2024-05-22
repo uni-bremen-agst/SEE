@@ -1,4 +1,5 @@
-﻿using SEE.Game.Drawable;
+﻿using MathNet.Numerics.LinearAlgebra;
+using SEE.Game.Drawable;
 using SEE.GO;
 using UnityEngine;
 
@@ -17,6 +18,15 @@ namespace SEE.Net.Actions.Drawable
         protected GameObject Drawable { get; private set; }
 
         /// <summary>
+        /// The id of the drawable on which the object is located
+        /// </summary>
+        public string DrawableID;
+        /// <summary>
+        /// The id of the drawable parent
+        /// </summary>
+        public string ParentDrawableID;
+
+        /// <summary>
         /// The constructor of this action. Sets <paramref name="drawableID"/>, <paramref name="parentDrawableID"/>,
         /// and - based on these -<see cref="Drawable"/>.
         /// </summary>
@@ -24,7 +34,8 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         public DrawableNetAction(string drawableID, string parentDrawableID)
         {
-            Drawable = Find(drawableID, parentDrawableID);
+            DrawableID = drawableID;
+            ParentDrawableID = parentDrawableID;
         }
 
         /// <summary>
@@ -81,6 +92,11 @@ namespace SEE.Net.Actions.Drawable
         protected override void ExecuteOnServer()
         {
             // Nothing to do here.
+        }
+
+        protected override void ExecuteOnClient()
+        {
+            Drawable = Find(DrawableID, ParentDrawableID);
         }
     }
 }

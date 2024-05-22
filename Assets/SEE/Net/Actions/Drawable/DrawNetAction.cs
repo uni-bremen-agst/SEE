@@ -1,6 +1,8 @@
 ﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.UI.Notification;
+using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -35,6 +37,7 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
+                base.ExecuteOnClient();
                 if (Line != null && Line.Id != "")
                 {
                     GameDrawer.ReDrawLine(Drawable, Line);

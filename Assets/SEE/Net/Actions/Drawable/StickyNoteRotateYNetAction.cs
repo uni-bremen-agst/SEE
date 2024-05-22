@@ -6,16 +6,8 @@ namespace SEE.Net.Actions.Drawable
     /// <summary>
     /// This class is reponsible for change the y rotation of a sticky note on all clients.
     /// </summary>
-    public class StickyNoteRoateYNetAction : AbstractNetAction
+    public class StickyNoteRoateYNetAction : DrawableNetAction
     {
-        /// <summary>
-        /// The id of the drawable on which the object is located.
-        /// </summary>
-        public string DrawableID;
-        /// <summary>
-        /// The id of the drawable parent.
-        /// </summary>
-        public string ParentDrawableID;
         /// <summary>
         /// The degree by which the object should be rotated.
         /// </summary>
@@ -28,10 +20,9 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        public StickyNoteRoateYNetAction(string drawableID, string drawableParentID, float degree, Vector3 oldPosition)
+        public StickyNoteRoateYNetAction(string drawableID, string parentDrawableID, float degree, Vector3 oldPosition) 
+            : base(drawableID, parentDrawableID)
         {
-            this.DrawableID = drawableID;
-            this.ParentDrawableID = drawableParentID;
             this.Degree = degree;
             this.ObjectPosition = oldPosition;
         }
@@ -50,15 +41,8 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
-                if (drawable != null)
-                {
-                    GameStickyNoteManager.SetRotateY(GameFinder.GetHighestParent(drawable), Degree, ObjectPosition);
-                }
-                else
-                {
-                    throw new System.Exception($"There is no drawable with the ID {DrawableID}.");
-                }
+                base.ExecuteOnClient();
+                GameStickyNoteManager.SetRotateY(GameFinder.GetHighestParent(Drawable), Degree, ObjectPosition);
             }
         }
     }

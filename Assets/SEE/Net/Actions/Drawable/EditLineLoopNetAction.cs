@@ -41,6 +41,7 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
+                base.ExecuteOnClient();
                 GameEdit.ChangeLoop(FindChild(LineName), Loop);
             }
         }

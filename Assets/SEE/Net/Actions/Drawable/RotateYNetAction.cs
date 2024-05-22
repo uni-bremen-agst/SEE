@@ -1,6 +1,7 @@
 ﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using UnityEngine;
+using static RootMotion.FinalIK.RagdollUtility;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -8,16 +9,8 @@ namespace SEE.Net.Actions.Drawable
     /// This class is responsible for changing the y rotation of an object on all clients.
     /// It is needed to mirror an image on the y axis about 180°.
     /// </summary>
-    public class RotatorYNetAction : AbstractNetAction
+    public class RotatorYNetAction : DrawableNetAction
     {
-        /// <summary>
-        /// The id of the drawable on which the object is located.
-        /// </summary>
-        public string DrawableID;
-        /// <summary>
-        /// The id of the drawable parent.
-        /// </summary>
-        public string ParentDrawableID;
         /// <summary>
         /// The id of the object that should be changed.
         /// </summary>
@@ -35,21 +28,11 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="objectName">The id of the object that should be changed.</param>
         /// <param name="localEulerAnlgeY">The value to which the object should be rotated</param>
-        public RotatorYNetAction(string drawableID, string parentDrawableID, string objectName, float localEulerAnlgeY) : base()
+        public RotatorYNetAction(string drawableID, string parentDrawableID, string objectName, float localEulerAnlgeY)
+            : base(drawableID, parentDrawableID)
         {
-            DrawableID = drawableID;
-            ParentDrawableID = parentDrawableID;
             ObjectName = objectName;
             Degree = localEulerAnlgeY;
-        }
-
-        /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
-
         }
 
         /// <summary>
@@ -60,20 +43,8 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                if (!IsRequester())
-                {
-                    GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
-                    if (drawable != null && GameFinder.FindChild(drawable, ObjectName) != null)
-                    {
-                        GameObject child = GameFinder.FindChild(drawable, ObjectName);
-                        GameMoveRotator.SetRotateY(child, Degree);
-
-                    }
-                    else
-                    {
-                        throw new System.Exception($"There is no drawable with the ID {DrawableID} or line with the ID {ObjectName}.");
-                    }
-                }
+                base.ExecuteOnClient();
+                GameMoveRotator.SetRotateY(FindChild(ObjectName), Degree);
             }
         }
     }

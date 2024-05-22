@@ -42,6 +42,7 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
+                base.ExecuteOnClient();
                 GameEdit.ChangeSecondaryColor(FindChild(LineName), Color);
             }
         }

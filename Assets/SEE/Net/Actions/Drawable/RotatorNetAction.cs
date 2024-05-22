@@ -7,16 +7,8 @@ namespace SEE.Net.Actions.Drawable
     /// <summary>
     /// This class is responsible for changing the rotation (<see cref="MoveRotateAction"/>) of an object on all clients.
     /// </summary>
-    public class RotatorNetAction : AbstractNetAction
+    public class RotatorNetAction : DrawableNetAction
     {
-        /// <summary>
-        /// The id of the drawable on which the object is located.
-        /// </summary>
-        public string DrawableID;
-        /// <summary>
-        /// The id of the drawable parent.
-        /// </summary>
-        public string ParentDrawableID;
         /// <summary>
         /// The id of the object that should be changed.
         /// </summary>
@@ -47,10 +39,9 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="direction">The direction by which the object should be rotated.</param>
         /// <param name="degree">The value by which the object should be rotated</param>
         /// <param name="includeChildren">Option for mind map nodes, if children should also rotated.</param>
-        public RotatorNetAction(string drawableID, string parentDrawableID, string objectName, Vector3 direction, float degree, bool includeChildren) : base()
+        public RotatorNetAction(string drawableID, string parentDrawableID, string objectName, Vector3 direction, float degree, bool includeChildren)
+            : base(drawableID, parentDrawableID)
         {
-            DrawableID = drawableID;
-            ParentDrawableID = parentDrawableID;
             ObjectName = objectName;
             Direction = direction;
             Degree = degree;
@@ -66,23 +57,13 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="objectName">The id of the object that should be changed.</param>
         /// <param name="localEulerAnlgeZ">The value to which the object should be rotated</param>
         /// <param name="includeChildren">Option for mind map nodes, if children should also rotated.</param>
-        public RotatorNetAction(string drawableID, string parentDrawableID, string objectName, float localEulerAnlgeZ, bool includeChildren) : base()
+        public RotatorNetAction(string drawableID, string parentDrawableID, string objectName, float localEulerAnlgeZ, bool includeChildren)
+            : base(drawableID, parentDrawableID)
         {
-            DrawableID = drawableID;
-            ParentDrawableID = parentDrawableID;
             ObjectName = objectName;
             Degree = localEulerAnlgeZ;
             Direction = Vector3.zero;
             IncludeChildren = includeChildren;
-        }
-
-        /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
-
         }
 
         /// <summary>
@@ -93,24 +74,15 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                if (!IsRequester())
+                base.ExecuteOnClient();
+                GameObject child = FindChild(ObjectName);
+                if (Direction != Vector3.zero)
                 {
-                    GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
-                    if (drawable != null && GameFinder.FindChild(drawable, ObjectName) != null)
-                    {
-                        GameObject child = GameFinder.FindChild(drawable, ObjectName);
-                        if (Direction != Vector3.zero)
-                        {
-                            GameMoveRotator.RotateObject(child, Direction, Degree, IncludeChildren);
-                        } else
-                        {
-                            GameMoveRotator.SetRotate(child, Degree, IncludeChildren);
-                        }
-                    }
-                    else
-                    {
-                        throw new System.Exception($"There is no drawable with the ID {DrawableID} or line with the ID {ObjectName}.");
-                    }
+                    GameMoveRotator.RotateObject(child, Direction, Degree, IncludeChildren);
+                }
+                else
+                {
+                    GameMoveRotator.SetRotate(child, Degree, IncludeChildren);
                 }
             }
         }
