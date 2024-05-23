@@ -189,27 +189,32 @@ namespace SEE.Game.Drawable.Configurations
         /// </summary>
         /// <param name="type">The type to restore.</param>
         /// <param name="drawable">The drawable on which the drawable type should be restored.</param>
-        public static void Restore(DrawableType type, GameObject drawable)
+        public static GameObject Restore(DrawableType type, GameObject drawable)
         {
+            GameObject createdObject = null;
             switch (type)
             {
                 case LineConf line:
-                    GameDrawer.ReDrawLine(drawable, line);
+                    createdObject = GameDrawer.ReDrawLine(drawable, line);
+                    EnsureValidity(type, createdObject);
                     new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
                         line).Execute();
                     break;
                 case TextConf text:
-                    GameTexter.ReWriteText(drawable, text);
+                    createdObject = GameTexter.ReWriteText(drawable, text);
+                    EnsureValidity(type, createdObject);
                     new WriteTextNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
                         text).Execute();
                     break;
                 case ImageConf image:
-                    GameImage.RePlaceImage(drawable, image);
+                    createdObject = GameImage.RePlaceImage(drawable, image);
+                    EnsureValidity(type, createdObject);
                     new AddImageNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
                         image).Execute();
                     break;
                 case MindMapNodeConf node:
-                    GameMindMap.ReCreate(drawable, node);
+                    createdObject = GameMindMap.ReCreate(drawable, node);
+                    EnsureValidity(type, createdObject);
                     new MindMapCreateNodeNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
                         node).Execute();
                     break;
@@ -217,6 +222,16 @@ namespace SEE.Game.Drawable.Configurations
                     Debug.Log($"Can't restore {type.Id}.\n");
                     break;
             }
+            return createdObject;
+        }
+
+        private static DrawableType EnsureValidity(DrawableType type, GameObject createdObject)
+        {
+            if (type.Id == "")
+            {
+                type.Id = createdObject.name;
+            }
+            return type;
         }
 
         /// <summary>

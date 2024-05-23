@@ -5,7 +5,7 @@ namespace Assets.SEE.Game.Drawable.ActionHelpers
     /// <summary>
     /// This class provides various reused queries for the drawable actions.
     /// </summary>
-    public static class DrawableQuery
+    public static class DrawableQueries
     {
         /// <summary>
         /// Registers the users left mouse button input.

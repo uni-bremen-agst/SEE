@@ -373,13 +373,9 @@ namespace SEE.Controls.Actions.Drawable
                 switch (DrawableType.Get(selectedObj))
                 {
                     case LineConf:
-                        ProcessLine(newPosition);
-                        break;
                     case TextConf:
-                        ProcessText(newPosition);
-                        break;
                     case ImageConf:
-                        ProcessImage(newPosition);
+                        ProcessPrimitiveType(newPosition);
                         break;
                     case MindMapNodeConf:
                         ProcessMindMapNode(newPosition);
@@ -467,57 +463,29 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Draws a clone of the chosen line to the chosen position.
         /// </summary>
-        /// <param name="newPosition">The new position for the line.</param>
-        private void ProcessLine(Vector3 newPosition)
+        /// <param name="newPosition">The new position for the clone.</param>
+        private void ProcessPrimitiveType(Vector3 newPosition)
         {
-            LineConf lineConf = LineConf.GetLine(selectedObj);
-            lineConf.Id = "";
-            newObject = GameDrawer.ReDrawLine(newDrawable, lineConf);
-            newObject.transform.position = newPosition
-                - lineConf.OrderInLayer * ValueHolder.DistanceToDrawable.z * newObject.transform.forward;
-            new DrawNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable),
-                LineConf.GetLine(newObject)).Execute();
+            DrawableType conf = DrawableType.Get(selectedObj);
+            conf.Id = "";
+            newObject = DrawableType.Restore(conf, newDrawable);
+            MoveWithWorldPosition(newPosition);
         }
 
         /// <summary>
-        /// Writes a clone the chosen text to the chosen position.
+        ///  Moves the clone of the selected node to the destination (new position).
         /// </summary>
-        /// <param name="newPosition">The new position for the text.</param>
-        private void ProcessText(Vector3 newPosition)
+        /// <param name="newPosition">destination position</param>
+        private void MoveWithWorldPosition(Vector3 newPosition)
         {
-            TextConf textConf = TextConf.GetText(selectedObj);
-            textConf.Id = "";
-            newObject = GameTexter.ReWriteText(newDrawable, textConf);
-            newObject.transform.position = newPosition
-                - newObject.transform.forward * ValueHolder.DistanceToDrawable.z * textConf.OrderInLayer;
-            new WriteTextNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable),
-                TextConf.GetText(newObject)).Execute();
-        }
-
-        /// <summary>
-        /// Adds a clone of the chosen image to the chosen position.
-        /// </summary>
-        /// <param name="newPosition">The new position for the image.</param>
-        private void ProcessImage(Vector3 newPosition)
-        {
-            ImageConf imageConf = ImageConf.GetImageConf(selectedObj);
-            imageConf.Id = "";
-            bool mirrored = imageConf.EulerAngles.y == 180;
-            newObject = GameImage.RePlaceImage(newDrawable, imageConf);
-            newObject.transform.position = newPosition
-                - imageConf.OrderInLayer * ValueHolder.DistanceToDrawable.z * newObject.transform.forward;
-
-            if (mirrored)
-            {
-                newObject.transform.position = newPosition
-                    + imageConf.OrderInLayer * ValueHolder.DistanceToDrawable.z * newObject.transform.forward;
-            } else
-            {
-                newObject.transform.position = newPosition
-                    - imageConf.OrderInLayer * ValueHolder.DistanceToDrawable.z * newObject.transform.forward;
-            }
-            new AddImageNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable),
-                ImageConf.GetImageConf(newObject)).Execute();
+            /// Moves the clone of the selected node to the destination (new position).
+            Vector3 newLocalPosition = GameFinder.GetHighestParent(newDrawable).transform.
+                InverseTransformPoint(newPosition);
+            newLocalPosition = new Vector3(newLocalPosition.x, newLocalPosition.y,
+                selectedObj.transform.localPosition.z);
+            GameMoveRotator.SetPosition(newObject, newLocalPosition, true);
+            new MoveNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable),
+                newObject.name, newLocalPosition, true).Execute();
         }
 
         /// <summary>
@@ -541,15 +509,10 @@ namespace SEE.Controls.Actions.Drawable
                 DrawableType.Restore(type, newDrawable);
             }
 
-            /// Moves the clone of the selected node to the destination (new position).
-            Vector3 newLocalPosition = GameFinder.GetHighestParent(newDrawable).transform.
-                InverseTransformPoint(newPosition);
-            newLocalPosition = new Vector3(newLocalPosition.x, newLocalPosition.y,
-                selectedObj.transform.localPosition.z);
             newObject = GameFinder.FindChild(newDrawable, newNodesBranchLineHolder.MindMapNodeConfigs[0].Id);
-            GameMoveRotator.SetPosition(newObject, newLocalPosition, true);
-            new MoveNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable),
-                newObject.name, newLocalPosition, true).Execute();
+            MoveWithWorldPosition(newPosition);
+            /// Updating positions.
+            newNodesBranchLineHolder = GameMindMap.SummarizeSelectedNodeIncChildren(newObject);
         }
 
         /// <summary>
@@ -708,11 +671,11 @@ namespace SEE.Controls.Actions.Drawable
 
             if (memento.NewValueHolder is MindMapNodeConf)
             {
+                GameObject obj = DrawableType.Restore(memento.NewValueHolder, newDrawable);
                 foreach (DrawableType type in memento.NewNodesHolder.GetAllDrawableTypes())
                 {
                     DrawableType.Restore(type, newDrawable);
                 }
-                DrawableType.Restore(memento.NewValueHolder, newDrawable);
                 if (memento.OldBranchLineConfig != null)
                 {
                     GameObject newObject = GameFinder.FindChild(newDrawable, memento.NewValueHolder.Id);
