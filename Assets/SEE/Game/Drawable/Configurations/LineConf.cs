@@ -173,10 +173,8 @@ namespace SEE.Game.Drawable.Configurations
         /// Saves this instance's attributes using the given <see cref="ConfigWriter"/>.
         /// </summary>
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
-        override internal void Save(ConfigWriter writer)
+        protected override void SaveAttributes(ConfigWriter writer)
         {
-            writer.BeginGroup();
-            base.Save(writer);
             writer.Save(ColorKind.ToString(), colorKindLabel);
             writer.Save(PrimaryColor, primaryColorLabel);
             writer.Save(SecondaryColor, secondaryColorLabel);
@@ -189,7 +187,6 @@ namespace SEE.Game.Drawable.Configurations
                 rendererPositionConfigs.Add(new Vector3Config() { Value = pos });
             }
             writer.Save(rendererPositionConfigs, rendererPositionsLabel);
-            writer.EndGroup();
         }
 
         /// <summary>

@@ -169,10 +169,8 @@ namespace SEE.Game.Drawable.Configurations
         /// Saves this instance's attributes using the given <see cref="ConfigWriter"/>.
         /// </summary>
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
-        override internal void Save(ConfigWriter writer)
+        protected override void SaveAttributes(ConfigWriter writer)
         {
-            writer.BeginGroup();
-            base.Save(writer);
             writer.Save(Layer, layerLabel);
             writer.Save(ParentNode, parentIDLabel);
             writer.Save(BranchLineToParent, parentBranchLineLabel);
@@ -190,7 +188,6 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Writes the pair of the children names and their branch lines to the parent node.
             writer.SaveAsStrings(childrenNames, childrenLabel);
-            writer.EndGroup();
         }
 
         /// <summary>

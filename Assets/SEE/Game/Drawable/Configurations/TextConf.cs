@@ -144,10 +144,8 @@ namespace SEE.Game.Drawable.Configurations
         /// Saves this instance's attributes using the given <see cref="ConfigWriter"/>.
         /// </summary>
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
-        override internal void Save(ConfigWriter writer)
+        protected override void SaveAttributes(ConfigWriter writer)
         {
-            writer.BeginGroup();
-            base.Save(writer);
             writer.Save(Text, textLabel);
             writer.Save(FontColor, fontColorLabel);
             writer.Save(IsOutlined, outlineStatusLabel);
@@ -155,7 +153,6 @@ namespace SEE.Game.Drawable.Configurations
             writer.Save(OutlineThickness, outlineThicknessColorLabel);
             writer.Save(FontSize, fontSizeLabel);
             writer.Save(FontStyles.ToString(), fontStylesLabel);
-            writer.EndGroup();
         }
 
         /// <summary>

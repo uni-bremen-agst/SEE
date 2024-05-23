@@ -91,13 +91,10 @@ namespace SEE.Game.Drawable.Configurations
         /// Saves this instance's attributes using <see cref="ConfigWriter"/>.
         /// </summary>
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
-        override internal void Save(ConfigWriter writer)
+        protected override void SaveAttributes(ConfigWriter writer)
         {
-            writer.BeginGroup();
-            base.Save(writer);
             writer.Save(ImageColor, colorLabel);
             writer.Save(Path, pathLabel);
-            writer.EndGroup();
         }
 
         /// <summary>

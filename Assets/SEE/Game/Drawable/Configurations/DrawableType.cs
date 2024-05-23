@@ -225,12 +225,23 @@ namespace SEE.Game.Drawable.Configurations
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
         internal virtual void Save(ConfigWriter writer)
         {
+            writer.BeginGroup();
             writer.Save(Id, idLabel);
             writer.Save(Position, positionLabel);
             writer.Save(EulerAngles, eulerAnglesLabel);
             writer.Save(Scale, scaleLabel);
             writer.Save(OrderInLayer, orderInLayerLabel);
+            SaveAttributes(writer);
+            writer.EndGroup();
         }
+
+        /// <summary>
+        /// Subclasses must implement this so save their attributes. This class takes
+        /// care only to begin and end the grouping and to emit the key-value pair
+        /// for the 'kind'.
+        /// </summary>
+        /// <param name="writer">to be used for writing the settings</param>
+        protected abstract void SaveAttributes(ConfigWriter writer);
 
         /// <summary>
         /// Given the representation of a <see cref="DrawableType"/> as created by the <see cref="ConfigWriter"/>, this
