@@ -808,7 +808,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 stickyNoteHolder = GameFinder.GetHighestParent(stickyNote);
                 float newDegree = stickyNoteHolder.transform.localEulerAngles.y + degree;
-                GameStickyNoteManager.SetRotateY(stickyNoteHolder, newDegree, stickyNoteHolder.transform.position);
+                GameStickyNoteManager.SetRotateY(stickyNoteHolder, newDegree);
                 StickyNoteRotationMenu.AssignValueToYSlider(newDegree);
                 if (!spawnMode)
                 {

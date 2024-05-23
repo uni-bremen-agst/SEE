@@ -161,15 +161,12 @@ namespace SEE.Game.Drawable
         /// <param name="obj">The sticky note (holder)</param>
         /// <param name="localEulerAngleY">The new y rotation degree</param>
         /// <param name="oldPos">The old position of the object.</param>
-        public static void SetRotateY(GameObject obj, float localEulerAngleY, Vector3 oldPos)
+        public static void SetRotateY(GameObject obj, float localEulerAngleY)
         {
             Transform transform = obj.transform;
             /// Sets the y euler angle.
             transform.localEulerAngles = new Vector3(transform.localEulerAngles.x,
                 localEulerAngleY, transform.localEulerAngles.z);
-            /// Preserve the distance.
-            //obj.transform.position = oldPos - obj.transform.forward
-            //    * ValueHolder.distanceToDrawable.z * ValueHolder.currentOrderInLayer;
         }
         /// <summary>
         /// Sets the x rotation of a sticky note (holder)
@@ -262,7 +259,7 @@ namespace SEE.Game.Drawable
                 ChangeColor(stickyNote, config.Color);
                 ChangeLayer(root, config.Order);
                 SetRotateX(root, config.Rotation.x);
-                SetRotateY(root, config.Rotation.y, config.Position);
+                SetRotateY(root, config.Rotation.y);
                 GameScaler.SetScale(stickyNote, config.Scale);
             }
         }

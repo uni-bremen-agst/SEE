@@ -206,7 +206,7 @@ namespace SEE.UI.Menu.Drawable
                 .clickEvent.AddListener(() =>
             {
                 slider.AssignValue(0);
-                GameStickyNoteManager.SetRotateY(stickyNoteHolder, 0, stickyNoteHolder.transform.position);
+                GameStickyNoteManager.SetRotateY(stickyNoteHolder, 0);
                 if (!spawnMode)
                 {
                     new StickyNoteRoateYNetAction(drawable.name, drawableParentID, 0,
@@ -231,7 +231,7 @@ namespace SEE.UI.Menu.Drawable
                 .clickEvent.AddListener(() =>
                 {
                     slider.AssignValue(90);
-                    GameStickyNoteManager.SetRotateY(stickyNoteHolder, 90, stickyNoteHolder.transform.position);
+                    GameStickyNoteManager.SetRotateY(stickyNoteHolder, 90);
                     if (!spawnMode)
                     {
                         new StickyNoteRoateYNetAction(drawable.name, drawableParentID, 90,
@@ -256,7 +256,7 @@ namespace SEE.UI.Menu.Drawable
                 .clickEvent.AddListener(() =>
                 {
                     slider.AssignValue(180);
-                    GameStickyNoteManager.SetRotateY(stickyNoteHolder, 180, stickyNoteHolder.transform.position);
+                    GameStickyNoteManager.SetRotateY(stickyNoteHolder, 180);
                     if (!spawnMode)
                     {
                         new StickyNoteRoateYNetAction(drawable.name, drawableParentID, 180,
@@ -281,7 +281,7 @@ namespace SEE.UI.Menu.Drawable
                 .clickEvent.AddListener(() =>
                 {
                     slider.AssignValue(270);
-                    GameStickyNoteManager.SetRotateY(stickyNoteHolder, 270, stickyNoteHolder.transform.position);
+                    GameStickyNoteManager.SetRotateY(stickyNoteHolder, 270);
                     if (!spawnMode)
                     {
                         new StickyNoteRoateYNetAction(drawable.name, drawableParentID, 270,
@@ -324,7 +324,7 @@ namespace SEE.UI.Menu.Drawable
             slider.AssignValue(transform.localEulerAngles.y);
             slider.onValueChanged.AddListener(degree =>
             {
-                GameStickyNoteManager.SetRotateY(stickyNote, degree, stickyNote.transform.position);
+                GameStickyNoteManager.SetRotateY(stickyNote, degree);
                 if (!spawnMode)
                 {
                     new StickyNoteRoateYNetAction(drawable.name, drawableParentID, degree, stickyNote.transform.position).Execute();
