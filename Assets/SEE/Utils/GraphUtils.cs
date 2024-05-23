@@ -5,11 +5,35 @@ using SEE.DataModel.DG;
 
 namespace SEE.Utils
 {
-    public class GraphUtils
+    /// <summary>
+    /// This utility class can be used to work more easily with graphs.
+    ///</summary>
+    /// <remarks>
+    /// With GraphUtils it is possible to fill a graph with new nodes representing files and their coresponding directories.
+    /// </remarks>
+    /// 
+    /// <example>
+    /// <para>Filling a graph with nodes representing files</para>
+    /// <code>
+    ///  Node n = GraphUtils.GetOrAddNode("/path/to/file", rootNode, initialGraph);
+    /// </code>
+    /// <para>adding a suffix to each node</para>
+    /// <code>
+    ///  Node n = GraphUtils.GetOrAddNode("/path/to/file", rootNode, initialGraph, "-mySuffix");
+    /// </code>
+    /// In this case, "-mySuffix" will be added to the ids of all nodes including those representing directories.
+    /// </example>
+    public static class GraphUtils
     {
+        #region Contants
+
         private const string FileType = "file";
 
         private const string DirectoryType = "directory";
+
+        public const string RepositoryTypeName = "Repository";
+
+        #endregion
 
 
         /// <summary>
@@ -44,7 +68,7 @@ namespace SEE.Utils
         /// Files will have the node type <see cref="FileType"/> and also a Filename and Directory, so that the files can be opened in the CodeEditor.
         /// Diecotries will have the node type <see cref="DirectoryType"/> 
         /// </summary>
-        /// <param name="fullRelativePath">The full relative path of the file</param>
+        /// <param name="fullRelativePath">The full relative path of the file this will become the ID of the newly created node</param>
         /// <param name="rootNode">The root node of the repository</param>
         /// <param name="g">The graph to add the nodes to</param>
         /// <returns>The found file node</returns>

@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
 using SEE.DataModel.DG;
+using SEE.Game.City;
 using SEE.Utils.Config;
 
 namespace SEE.GraphProviders
 {
     /// <summary>
-    /// MultiGraphProvider
+    /// MultiGraphProvider is a graph provider for returning a series of graphs for an evolution city.
+    ///
+    /// This provider will be used in <see cref="SEECityEvolution"/>
     /// </summary>
     public abstract class MultiGraphProvider : GraphProvider<List<Graph>, MultiGraphProviderKind>
     {

@@ -18,12 +18,18 @@ using UnityEngine;
 
 namespace SEE.GraphProviders.Evolution
 {
+    /// <summary>
+    /// Provides an evolution for git repositories similar to <see cref="AllGitBranchesSingleGraphProvider"/>.
+    /// </summary>
     [Serializable]
     public class GitEvolutionGraphProvider : MultiGraphProvider
     {
+        /// <summary>
+        /// The git repository
+        /// </summary>
         [OdinSerialize, ShowInInspector, SerializeReference, HideReferenceObjectPicker,
          ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository"), RuntimeTab("Data")]
-        public GitRepository Repository = new();
+        public GitRepository GitRepository = new();
 
         /// <summary>
         /// The date limit until commits should be analysed
@@ -33,11 +39,26 @@ namespace SEE.GraphProviders.Evolution
          Tooltip("The date until commits should be analysed (DD-MM-YYYY)"), RuntimeTab(GraphProviderFoldoutGroup)]
         public string Date = "";
 
+        /// <summary>
+        /// Specifies if the resulting graph should be simplified.
+        /// This means that directories which only contains other directories will be combined to safe space in the code city.
+        /// </summary>
         [OdinSerialize]
         [ShowInInspector, InspectorName("Date Limit"),
          Tooltip("The date until commits should be analysed (DD-MM-YYYY)"), RuntimeTab(GraphProviderFoldoutGroup)]
         public bool SimplifyGraph;
 
+        /// <summary>
+        /// Provides the evolution graph of the git repository.
+        ///
+        /// This provider will run the calculations on the thread pool.
+        /// This can be cancled with <paramref name="token"/>
+        /// </summary>
+        /// <param name="graph">The graph series of the previous provider. Will most likely be empty</param>
+        /// <param name="city">The city where the graph series should be displayed</param>
+        /// <param name="changePercentage">Can be used to update the spinner</param>
+        /// <param name="token">CancellationToken to cancel the async operation </param>
+        /// <returns></returns>
         public override async UniTask<List<Graph>> ProvideAsync(List<Graph> graph, AbstractSEECity city,
             Action<float> changePercentage = null,
             CancellationToken token = default)
@@ -46,36 +67,45 @@ namespace SEE.GraphProviders.Evolution
             return await UniTask.RunOnThreadPool(() => GetGraph(graph), cancellationToken: token);
         }
 
+        /// <summary>
+        /// Checks if all attributes are set correctly.
+        /// Otherwise an exception is thrown.
+        /// </summary>
+        /// <exception cref="ArgumentException">If one attribute is not set correctly</exception>
         private void CheckAttributes()
         {
             if (Date == "" || !DateTime.TryParseExact(Date, "dd/MM/yyyy", CultureInfo.InvariantCulture,
                     DateTimeStyles.None, out _))
             {
-                throw new ArgumentException("Date is not set or cant be parsed");
+                throw new ArgumentException("Date is not set or can't be parsed");
             }
 
-            if (Repository.RepositoryPath.Path == "" || !Directory.Exists(Repository.RepositoryPath.Path))
+            if (GitRepository.RepositoryPath.Path == "" || !Directory.Exists(GitRepository.RepositoryPath.Path) ||
+                !Repository.IsValid(GitRepository.RepositoryPath.Path))
             {
-                throw new ArgumentException("Repository path is not set or does not exists");
+                throw new ArgumentException("Repository path is not set or does not point to a valid git repository");
             }
         }
 
+        /// <summary>
+        /// Calculates and returns the actual graph series.
+        ///
+        /// </summary>
+        /// <param name="graph">The input graph series</param>
+        /// <returns>The calculated graph series</returns>
         private List<Graph> GetGraph(List<Graph> graph)
         {
             DateTime timeLimit = DateTime.ParseExact(Date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
 
-            IEnumerable<string> includedFiles = Repository.PathGlobbing
+            IEnumerable<string> includedFiles = GitRepository.PathGlobbing
                 .Where(path => path.Value)
                 .Select(path => path.Key);
 
-            IEnumerable<string> excludedFiles = Repository.PathGlobbing
-                .Where(path => path.Value == false)
-                .Select(path => path.Key);
 
-            string[] pathSegments = Repository.RepositoryPath.Path.Split(Path.DirectorySeparatorChar);
+            string[] pathSegments = GitRepository.RepositoryPath.Path.Split(Path.DirectorySeparatorChar);
             string repositoryName = pathSegments[^1];
 
-            using (var repo = new Repository(Repository.RepositoryPath.Path))
+            using (var repo = new Repository(GitRepository.RepositoryPath.Path))
             {
                 List<Commit> commitList = repo.Commits
                     .QueryBy(new CommitFilter { IncludeReachableFrom = repo.Branches })
@@ -87,11 +117,11 @@ namespace SEE.GraphProviders.Evolution
                 Dictionary<Commit, Patch> commitChanges =
                     commitList.ToDictionary(commit => commit, commit => GetFileChanges(commit, repo));
 
+                // iterate over all commits where at least one file with a file extension in includedFiles is present
                 foreach (var currentCommit in
                          commitChanges.Where(x =>
-                             x.Value.All(y =>
-                                 includedFiles.Contains(Path.GetExtension(y.Path)) &&
-                                 !excludedFiles.Contains(Path.GetExtension(y.Path)))))
+                             x.Value.Any(y =>
+                                 includedFiles.Contains(Path.GetExtension(y.Path)))))
                 {
                     // All commits between the first commit in commitList and the current commit
                     List<Commit> commitsInBetween =
@@ -99,7 +129,7 @@ namespace SEE.GraphProviders.Evolution
 
                     graph.Add(GetGraphOfCommit(repositoryName, currentCommit.Key, commitsInBetween,
                         commitChanges,
-                        includedFiles, excludedFiles, repo));
+                        includedFiles, repo));
                 }
             }
 
@@ -116,21 +146,19 @@ namespace SEE.GraphProviders.Evolution
         /// <param name="commitsInBetween">All commits in between these two points</param>
         /// <param name="commitChanges">All changes made by all commits within the evolution range</param>
         /// <param name="includedFiles">All included file extensions</param>
-        /// <param name="excludedFiles">All excluded file extensions</param>
         /// <returns>The graoh of the evolution step</returns>
         private Graph GetGraphOfCommit(string repoName, Commit currentCommit, List<Commit> commitsInBetween,
-            IDictionary<Commit, Patch> commitChanges, IEnumerable<string> includedFiles,
-            IEnumerable<string> excludedFiles, Repository repo)
+            IDictionary<Commit, Patch> commitChanges, IEnumerable<string> includedFiles, Repository repo)
         {
-            Graph g = new Graph(Repository.RepositoryPath.Path);
-            g.BasePath = Repository.RepositoryPath.Path;
+            Graph g = new Graph(GitRepository.RepositoryPath.Path);
+            g.BasePath = GitRepository.RepositoryPath.Path;
             GraphUtils.NewNode(g, repoName + "-Evo", "Repository", repoName + "-Evo");
 
             g.StringAttributes.Add("CommitTimestamp", currentCommit.Author.When.Date.ToString("dd/MM/yyy"));
             g.StringAttributes.Add("CommitId", currentCommit.Sha);
 
 
-            GitFileMetricRepository metricRepository = new(repo, includedFiles, excludedFiles);
+            GitFileMetricRepository metricRepository = new(repo, includedFiles);
 
             foreach (var commitInBetween in commitsInBetween)
             {
@@ -141,15 +169,6 @@ namespace SEE.GraphProviders.Evolution
 
             GitFileMetricsGraphGenerator.FillGraphWithGitMetrics(metricRepository, g, repoName, SimplifyGraph,
                 idSuffix: "-Evo");
-            // foreach (var file in fileMetrics)
-            // {
-            //     Node n = GraphUtils.GetOrAddNode(file.Key, rootNode, g, idSuffix: "-evo");
-            //     n.SetInt(NumberOfAuthorsMetricName, file.Value.Authors.Count);
-            //     n.SetInt(NumberOfCommitsMetricName, file.Value.NumberOfCommits);
-            //     n.SetInt("Metric.File.Churn", file.Value.Churn);
-            //     n.SetInt(TruckFactorMetricName, file.Value.TruckFactor);
-            // }
-
             return g;
         }
 
@@ -163,25 +182,35 @@ namespace SEE.GraphProviders.Evolution
             .Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
 
 
+        /// <summary>
+        /// Returns the kind of this provider
+        /// </summary>
+        /// <returns>Returns <see cref="MultiGraphProviderKind.GitEvolution"/></returns>
         public override MultiGraphProviderKind GetKind()
-        {
-            return MultiGraphProviderKind.GitEvolution;
-        }
+            => MultiGraphProviderKind.GitEvolution;
 
+        /// <summary>
+        /// Saves the attributes of this provider to <paramref name="writer"/>
+        /// </summary>
+        /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes to</param>
         protected override void SaveAttributes(ConfigWriter writer)
         {
-            Repository.RepositoryPath.Save(writer, "RepositoryPath");
-            Dictionary<string, bool> pathGlobbing = string.IsNullOrEmpty(Repository.PathGlobbing.ToString())
+            GitRepository.RepositoryPath.Save(writer, "RepositoryPath");
+            Dictionary<string, bool> pathGlobbing = string.IsNullOrEmpty(GitRepository.PathGlobbing.ToString())
                 ? null
-                : Repository.PathGlobbing;
+                : GitRepository.PathGlobbing;
             writer.Save(pathGlobbing, "PathGlobing");
             writer.Save(Date, "Date");
         }
-
+        
+        /// <summary>
+        /// Restores the attributes of this provider from <paramref name="attributes"/>
+        /// </summary>
+        /// <param name="attributes">The attributes to restore from</param>
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
-            Repository.RepositoryPath.Restore(attributes, "RepositoryPath");
-            ConfigIO.Restore(attributes, "PathGlobing", ref Repository.PathGlobbing);
+            GitRepository.RepositoryPath.Restore(attributes, "RepositoryPath");
+            ConfigIO.Restore(attributes, "PathGlobing", ref GitRepository.PathGlobbing);
             ConfigIO.Restore(attributes, "Date", ref Date);
         }
     }

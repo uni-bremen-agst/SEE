@@ -35,6 +35,8 @@ namespace SEE.GraphProviders
     [Serializable]
     public class AllGitBranchesSingleGraphProvider : SingleGraphProvider
     {
+        #region Attributes
+
         /// <summary>
         /// The date limit until commits should be analysed
         /// </summary>
@@ -68,6 +70,32 @@ namespace SEE.GraphProviders
         [ShowInInspector]
         public bool AutoFetch { get; set; }
 
+        #endregion
+
+        #region Constants
+
+        private const string pathGlobbingLabel = "PathGlobbing";
+
+        private const string dataLabel = "Date";
+
+        private const string pathLabel = "Path";
+
+        private const string simplifyGraphLabel = "SimplifyGraph";
+
+        private const string autoFetchLabel = "AutoFetch";
+
+        #endregion
+
+
+        #region Methods
+
+        
+
+        /// <summary>
+        /// Checks if all attributes are set correctly.
+        /// Otherwise an exception is thrown.
+        /// </summary>
+        /// <exception cref="ArgumentException">If one attribute is not set correctly</exception>
         private void CheckAttributes()
         {
             if (Date == "" || !DateTime.TryParseExact(Date, "dd/MM/yyyy", CultureInfo.InvariantCulture,
@@ -99,6 +127,14 @@ namespace SEE.GraphProviders
             return newPoller;
         }
 
+        /// <summary>
+        /// Provides the graph of the git history 
+        /// </summary>
+        /// <param name="graph">The graph of the previous provider</param>
+        /// <param name="city">The city where the graph should be displayed</param>
+        /// <param name="changePercentage"></param>
+        /// <param name="token">Can be used to cancel the action</param>
+        /// <returns>The graph generated from the git repository <see cref="RepositoryData"/></returns>
         public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
             Action<float> changePercentage = null,
             CancellationToken token = default)
@@ -116,7 +152,10 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// Calculates and returns the actual graph
+        /// Calculates and returns the actual graph.
+        ///
+        /// This method will collect all commit from all branches which are not older than <see cref="Date"/>.
+        /// Then from all these commits the metrics are calculated with <see cref="GitFileMetricRepository.ProcessCommit(LibGit2Sharp.Commit,LibGit2Sharp.Patch)"/>
         /// </summary>
         /// <param name="graph">The input graph</param>
         /// <returns>The generated output graph</returns>
@@ -127,16 +166,14 @@ namespace SEE.GraphProviders
 
             string repositoryName = pathSegments[^1];
 
-            GraphUtils.NewNode(graph, repositoryName, "Repository", pathSegments[^1]);
+            GraphUtils.NewNode(graph, repositoryName, GraphUtils.RepositoryTypeName, pathSegments[^1]);
 
+            // Assuming that CheckAttributes() was already executed so that the date string is not empty nor malformed.  
             DateTime timeLimit = DateTime.ParseExact(Date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
 
+            // Analogue to VCSGraphProvider 
             IEnumerable<string> includedFiles = RepositoryData.PathGlobbing
                 .Where(path => path.Value)
-                .Select(path => path.Key);
-
-            IEnumerable<string> excludedFiles = RepositoryData.PathGlobbing
-                .Where(path => !path.Value)
                 .Select(path => path.Key);
 
             using (var repo = new Repository(RepositoryData.RepositoryPath.Path))
@@ -147,7 +184,7 @@ namespace SEE.GraphProviders
                     // Filter out merge commits
                     .Where(commit => commit.Parents.Count() == 1);
 
-                GitFileMetricRepository metricRepository = new(repo, includedFiles, excludedFiles);
+                GitFileMetricRepository metricRepository = new(repo, includedFiles);
 
                 foreach (var commit in commitList)
                 {
@@ -163,37 +200,48 @@ namespace SEE.GraphProviders
             return graph;
         }
 
-
+        /// <summary>
+        /// Returns the kind of this provider
+        /// </summary>
+        /// <returns>Returns <see cref="SingleGraphProviderKind.GitAllBranches"/></returns>
         public override SingleGraphProviderKind GetKind()
         {
             return SingleGraphProviderKind.GitAllBranches;
         }
 
+        /// <summary>
+        /// Saves the attributes of this provider to <paramref name="writer"/>
+        /// </summary>
+        /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes to</param>
         protected override void SaveAttributes(ConfigWriter writer)
         {
             Dictionary<string, bool> pathGlobbing = string.IsNullOrEmpty(RepositoryData.PathGlobbing.ToString())
                 ? null
                 : RepositoryData.PathGlobbing;
-            RepositoryData.RepositoryPath.Save(writer, "Path");
+            RepositoryData.RepositoryPath.Save(writer, pathLabel);
             writer.Save(pathGlobbing, pathGlobbingLabel);
-            writer.Save(Date, "Date");
-            writer.Save(SimplifyGraph, "SimplifyGraph");
-            writer.Save(AutoFetch, "AutoFetch");
+            writer.Save(Date, dataLabel);
+            writer.Save(SimplifyGraph, simplifyGraphLabel);
+            writer.Save(AutoFetch, autoFetchLabel);
         }
 
-        private const string pathGlobbingLabel = "PathGlobbing";
-
+        /// <summary>
+        /// Restores the attributes of this provider from <paramref name="attributes"/>
+        /// </summary>
+        /// <param name="attributes">The attributes to restore from</param>
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
             ConfigIO.Restore(attributes, pathGlobbingLabel, ref RepositoryData.PathGlobbing);
-            RepositoryData.RepositoryPath.Restore(attributes, "Path");
-            ConfigIO.Restore(attributes, "Date", ref Date);
+            RepositoryData.RepositoryPath.Restore(attributes, pathLabel);
+            ConfigIO.Restore(attributes, dataLabel, ref Date);
             var simplifyGraph = SimplifyGraph;
-            ConfigIO.Restore(attributes, "SimplifyGraph", ref simplifyGraph);
+            ConfigIO.Restore(attributes, simplifyGraphLabel, ref simplifyGraph);
             SimplifyGraph = simplifyGraph;
             var autoFetch = AutoFetch;
-            ConfigIO.Restore(attributes, "AutoFetch", ref autoFetch);
+            ConfigIO.Restore(attributes, autoFetchLabel, ref autoFetch);
             AutoFetch = autoFetch;
         }
+        
+        #endregion
     }
 }

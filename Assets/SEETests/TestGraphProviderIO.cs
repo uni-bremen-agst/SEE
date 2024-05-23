@@ -67,8 +67,8 @@ namespace SEE.GraphProviders
             Assert.IsTrue(saved.GetType() == loaded.GetType());
             GitEvolutionGraphProvider gitLoaded = loaded as GitEvolutionGraphProvider;
             Assert.AreEqual(gitLoaded.Date, saved.Date);
-            AreEqual(gitLoaded.Repository.RepositoryPath, saved.Repository.RepositoryPath);
-            Assert.AreEqual(gitLoaded.Repository.PathGlobbing, saved.Repository.PathGlobbing);
+            AreEqual(gitLoaded.GitRepository.RepositoryPath, saved.GitRepository.RepositoryPath);
+            Assert.AreEqual(gitLoaded.GitRepository.PathGlobbing, saved.GitRepository.PathGlobbing);
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace SEE.GraphProviders
             return new GitEvolutionGraphProvider()
             {
                 Date = "01/05/2024",
-                Repository = GetGitRepository()
+                GitRepository = GetGitRepository()
             };
         }
 

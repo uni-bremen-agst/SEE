@@ -7,15 +7,41 @@ using SEE.Utils;
 
 namespace SEE.DataModel.DG.IO.Git
 {
+    /// <summary>
+    /// Processes and collects all metrics from all files of a git repository.
+    ///
+    /// This class works by passing each commit to <see cref="ProcessCommit(LibGit2Sharp.Commit,LibGit2Sharp.Patch)"/> to collect the file changes.
+    ///
+    /// The calculated metrics for each file are stored in <see cref="FileToMetrics"/>
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// GitFileMetricRepository fileRepo = new(gitRepo, includedFiles, excludedFiles);
+    /// foreach (var commit in gitRepo.Commits)
+    /// {
+    ///     fileRepo.ProcessCommit(commit);
+    /// }
+    /// // Get the calculated metrics
+    /// fileRepo.FileToMetrics;
+    /// 
+    /// </code>
+    /// </example>
     public class GitFileMetricRepository
     {
+        /// <summary>
+        /// Maps the the filename to the collected git file metrics
+        /// </summary>
         public Dictionary<string, GitFileMetricsCollector> FileToMetrics { get; } = new();
 
-        private readonly Repository repo;
+        /// <summary>
+        /// The git repository to collect the metrics from
+        /// </summary>
+        private readonly Repository gitRepository;
 
+        /// <summary>
+        /// A list of file extensions which should be included
+        /// </summary>
         private readonly IEnumerable<string> includedFiles;
-
-        private readonly IEnumerable<string> excludedFiles;
 
 
         /// <summary>
@@ -26,17 +52,14 @@ namespace SEE.DataModel.DG.IO.Git
         private const float TruckFactorCoreDevRatio = 0.8f;
 
 
-        public GitFileMetricRepository(Repository repo, IEnumerable<string> includedFiles,
-            IEnumerable<string> excludedFiles)
+        public GitFileMetricRepository(Repository gitRepository, IEnumerable<string> includedFiles)
         {
-            this.repo = repo;
+            this.gitRepository = gitRepository;
             this.includedFiles = includedFiles;
-            this.excludedFiles = excludedFiles;
         }
 
         public void CalculateTruckFactor()
         {
-            
             foreach (var file in FileToMetrics)
             {
                 file.Value.TruckFactor = CalculateTruckFactor(file.Value.AuthorsChurn);
@@ -88,8 +111,7 @@ namespace SEE.DataModel.DG.IO.Git
             foreach (var changedFile in commitChanges)
             {
                 string filePath = changedFile.Path;
-                if (!includedFiles.Contains(Path.GetExtension(filePath)) ||
-                    excludedFiles.Contains(Path.GetExtension(filePath)))
+                if (!includedFiles.Contains(Path.GetExtension(filePath)))
                 {
                     continue;
                 }
@@ -121,7 +143,8 @@ namespace SEE.DataModel.DG.IO.Git
             {
                 return;
             }
-            var changedFilesPath = repo.Diff.Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
+
+            var changedFilesPath = gitRepository.Diff.Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
             ProcessCommit(commit, changedFilesPath);
         }
     }
