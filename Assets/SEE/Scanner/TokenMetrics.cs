@@ -4,13 +4,11 @@ using UnityEngine;
 
 namespace SEE.Scanner
 {
-
     /// <summary>
     /// Provides metrics calculated based on code tokens.
     /// </summary>
     public static class TokenMetrics
     {
-
         /// <summary>
         /// Calculates the McCabe cyclomatic complexity for provided code.
         /// </summary>
