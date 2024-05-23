@@ -155,7 +155,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// The constant for fast rotate by mouse wheel.
         /// </summary>
-        public const float FotateFast = 10;
+        public const float RotateFast = 10;
 
         /// <summary>
         /// The constant for moving speed by key.

@@ -596,7 +596,7 @@ namespace SEE.Controls.Actions.Drawable
             if (Input.mouseScrollDelta.y > 0 && Input.GetKey(KeyCode.LeftControl))
             {
                 direction = Vector3.forward;
-                degree = ValueHolder.FotateFast;
+                degree = ValueHolder.RotateFast;
                 rotate = true;
             }
             /// Rotates back with normal speed.
@@ -611,7 +611,7 @@ namespace SEE.Controls.Actions.Drawable
             if (Input.mouseScrollDelta.y < 0 && Input.GetKey(KeyCode.LeftControl))
             {
                 direction = Vector3.back;
-                degree = ValueHolder.FotateFast;
+                degree = ValueHolder.RotateFast;
                 rotate = true;
             }
 

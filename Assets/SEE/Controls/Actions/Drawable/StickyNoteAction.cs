@@ -9,6 +9,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Utils.History;
+using UnityEngine.UIElements;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -772,39 +773,59 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Enables scaling via the mouse wheel, as well as in the <see cref="MoveRotateAction"/>.
+        /// The two different action types for the wheel interaction.
+        /// </summary>
+        private enum WheelInteractionType
+        {
+            Rotate,
+            Scale
+        }
+
+        /// <summary>
+        /// Calculates the value for the wheel interaction depending on the 
+        /// direction of the mouse wheel interaction.
+        /// </summary>
+        /// <param name="state">The action state. Rotate or Scale.</param>
+        /// <param name="value">The calculated value for rotating or scaling.</param>
+        /// <returns>true if an interaction has taken place.</returns>
+        private bool WheelInteraction(WheelInteractionType state, out float value)
+        {
+            bool interaction = false;
+            value = 0;
+
+            if (Input.mouseScrollDelta.y > 0 && !Input.GetKey(KeyCode.LeftControl))
+            {
+                value = state == WheelInteractionType.Rotate? ValueHolder.Rotate : ValueHolder.ScaleUp;
+                interaction = true;
+            }
+            if (Input.mouseScrollDelta.y > 0 && Input.GetKey(KeyCode.LeftControl))
+            {
+                value = state == WheelInteractionType.Rotate ? ValueHolder.RotateFast : ValueHolder.ScaleUpFast;
+                interaction = true;
+            }
+
+            if (Input.mouseScrollDelta.y < 0 && !Input.GetKey(KeyCode.LeftControl))
+            {
+                value = state == WheelInteractionType.Rotate ? -ValueHolder.Rotate : ValueHolder.ScaleDown;
+                interaction = true;
+
+            }
+            if (Input.mouseScrollDelta.y < 0 && Input.GetKey(KeyCode.LeftControl))
+            {
+                value = state == WheelInteractionType.Rotate ? -ValueHolder.RotateFast : ValueHolder.ScaleDownFast;
+                interaction = true;
+            }
+            return interaction;
+        }
+
+        /// <summary>
+        /// Enables rotating via the mouse wheel, as well as in the <see cref="MoveRotateAction"/>.
         /// </summary>
         private void RotateByWheel(GameObject stickyNote, bool spawnMode)
         {
             GameObject drawable = GameFinder.GetDrawable(stickyNote);
             string drawableParentID = GameFinder.GetDrawableParentName(drawable);
-            bool rotate = false;
-            float degree = 0;
-
-            if (Input.mouseScrollDelta.y > 0 && !Input.GetKey(KeyCode.LeftControl))
-            {
-                degree = ValueHolder.Rotate;
-                rotate = true;
-            }
-            if (Input.mouseScrollDelta.y > 0 && Input.GetKey(KeyCode.LeftControl))
-            {
-                degree = ValueHolder.FotateFast;
-                rotate = true;
-            }
-
-            if (Input.mouseScrollDelta.y < 0 && !Input.GetKey(KeyCode.LeftControl))
-            {
-                degree = -ValueHolder.Rotate;
-                rotate = true;
-
-            }
-            if (Input.mouseScrollDelta.y < 0 && Input.GetKey(KeyCode.LeftControl))
-            {
-                degree = -ValueHolder.FotateFast;
-                rotate = true;
-            }
-
-            if (rotate)
+            if (WheelInteraction(WheelInteractionType.Rotate, out float degree))
             {
                 stickyNoteHolder = GameFinder.GetHighestParent(stickyNote);
                 float newDegree = stickyNoteHolder.transform.localEulerAngles.y + degree;
@@ -823,32 +844,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void ScaleByWheel()
         {
-            float scaleFactor = 0f;
-            bool isScaled = false;
-
-            if (Input.mouseScrollDelta.y > 0 && !Input.GetKey(KeyCode.LeftControl))
-            {
-                scaleFactor = ValueHolder.ScaleUp;
-                isScaled = true;
-            }
-            if (Input.mouseScrollDelta.y > 0 && Input.GetKey(KeyCode.LeftControl))
-            {
-                scaleFactor = ValueHolder.ScaleUpFast;
-                isScaled = true;
-            }
-
-            if (Input.mouseScrollDelta.y < 0 && !Input.GetKey(KeyCode.LeftControl))
-            {
-                scaleFactor = ValueHolder.ScaleDown;
-                isScaled = true;
-
-            }
-            if (Input.mouseScrollDelta.y < 0 && Input.GetKey(KeyCode.LeftControl))
-            {
-                scaleFactor = ValueHolder.ScaleDownFast;
-                isScaled = true;
-            }
-            if (isScaled)
+            if (WheelInteraction(WheelInteractionType.Scale, out float scaleFactor))
             {
                 memento.ChangedConfig.Scale = GameScaler.Scale(stickyNote, scaleFactor);
                 ScaleMenu.AssignValue(stickyNote);
