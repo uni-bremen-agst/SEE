@@ -144,8 +144,16 @@ namespace SEE.DataModel.DG.IO.Git
                 return;
             }
 
-            var changedFilesPath = gitRepository.Diff.Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
-            ProcessCommit(commit, changedFilesPath);
+            if (commit.Parents.Any())
+            {
+                var changedFilesPath = gitRepository.Diff.Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
+                ProcessCommit(commit, changedFilesPath);
+            }
+            else
+            {
+                var changedFilesPath = gitRepository.Diff.Compare<Patch>(null, commit.Tree);
+                ProcessCommit(commit, changedFilesPath);
+            }
         }
     }
 }

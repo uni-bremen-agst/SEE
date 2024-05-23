@@ -108,9 +108,9 @@ namespace SEE.GraphProviders.Evolution
             using (var repo = new Repository(GitRepository.RepositoryPath.Path))
             {
                 List<Commit> commitList = repo.Commits
-                    .QueryBy(new CommitFilter { IncludeReachableFrom = repo.Branches })
+                    .QueryBy(new CommitFilter { IncludeReachableFrom = repo.Branches, SortBy = CommitSortStrategies.None})
                     .Where(commit => DateTime.Compare(commit.Author.When.Date, timeLimit) > 0)
-                    .Where(commit => commit.Parents.Count() == 1)
+                    .Where(commit => commit.Parents.Count() <= 1)
                     .Reverse()
                     .ToList();
 
@@ -178,8 +178,16 @@ namespace SEE.GraphProviders.Evolution
         /// <param name="commit">The commit which files should be returned</param>
         /// <param name="repo">The repo</param>
         /// <returns>A list of all changed files (<see cref="PatchEntryChanges"/>)</returns>
-        private static Patch GetFileChanges(Commit commit, Repository repo) => repo.Diff
-            .Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
+        private static Patch GetFileChanges(Commit commit, Repository repo)
+        {
+            if (commit.Parents.Any())
+            {
+                return repo.Diff
+                    .Compare<Patch>(commit.Tree, commit.Parents.First().Tree); 
+            }
+            return repo.Diff
+                .Compare<Patch>(null, commit.Tree);
+        }
 
 
         /// <summary>

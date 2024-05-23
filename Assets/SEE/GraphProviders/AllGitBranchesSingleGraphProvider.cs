@@ -182,7 +182,7 @@ namespace SEE.GraphProviders
                     .QueryBy(new CommitFilter { IncludeReachableFrom = repo.Branches })
                     .Where(commit => DateTime.Compare(commit.Author.When.Date, timeLimit) > 0)
                     // Filter out merge commits
-                    .Where(commit => commit.Parents.Count() == 1);
+                    .Where(commit => commit.Parents.Count() <= 1);
 
                 GitFileMetricRepository metricRepository = new(repo, includedFiles);
 
