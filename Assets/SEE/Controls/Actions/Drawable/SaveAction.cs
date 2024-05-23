@@ -250,38 +250,29 @@ namespace SEE.Controls.Actions.Drawable
         /// <param name="result">The action state result.</param>
         private void Save(string filePath, ref bool result)
         {
-            switch (memento.SavedState)
+            memento.FilePath = new FilePath(filePath);
+            GameObject[] drawables = new GameObject[memento.Drawables.Length];
+            for (int i = 0; i < drawables.Length; i++)
             {
-                case SaveState.One:
-                    memento.FilePath = new FilePath(filePath);
-                    DrawableConfigManager.SaveDrawable(memento.Drawables[0].GetDrawable(), memento.FilePath);
-                    ShowNotification.Info("Saved!",
+                drawables[i] = memento.Drawables[i].GetDrawable();
+            }
+            DrawableConfigManager.SaveDrawables(drawables, memento.FilePath);
+            result = true;
+            CurrentState = IReversibleAction.Progress.Completed;
+
+            if (memento.SavedState == SaveState.One)
+            {
+                ShowNotification.Info("Saved!",
                             $"The selected drawable has been successfully saved to the file {filePath}.");
-                    CurrentState = IReversibleAction.Progress.Completed;
-                    result = true;
-                    break;
-                case SaveState.Multiple:
-                case SaveState.All:
-                    memento.FilePath = new FilePath(filePath);
-                    GameObject[] drawables = new GameObject[memento.Drawables.Length];
-                    for (int i = 0; i < drawables.Length; i++)
-                    {
-                        drawables[i] = memento.Drawables[i].GetDrawable();
-                    }
-                    DrawableConfigManager.SaveDrawables(drawables, memento.FilePath);
-                    string chosen;
-                    if (memento.SavedState == SaveState.Multiple)
-                    {
-                        chosen = "The chosen " + drawables.Length;
-                    } else
-                    {
-                        chosen = "All";
-                    }
-                    ShowNotification.Info("Saved!",
-                            chosen + $" drawables have been successfully saved to the file {filePath}");
-                    CurrentState = IReversibleAction.Progress.Completed;
-                    result = true;
-                    break;
+            }
+            else if (memento.SavedState == SaveState.Multiple)
+            {
+                ShowNotification.Info("Saved!",
+                        "The chosen " + drawables.Length + $" drawables have been successfully saved to the file {filePath}");
+            } else
+            {
+                ShowNotification.Info("Saved!",
+                        $"All drawables have been successfully saved to the file {filePath}");
             }
         }
 
@@ -303,19 +294,12 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            if (memento.SavedState == SaveState.One)
+            GameObject[] drawables = new GameObject[memento.Drawables.Length];
+            for (int i = 0; i < drawables.Length; i++)
             {
-                DrawableConfigManager.SaveDrawable(memento.Drawables[0].GetDrawable(), memento.FilePath);
+                drawables[i] = memento.Drawables[i].GetDrawable();
             }
-            else
-            {
-                GameObject[] drawables = new GameObject[memento.Drawables.Length];
-                for (int i = 0; i < drawables.Length; i++)
-                {
-                    drawables[i] = memento.Drawables[i].GetDrawable();
-                }
-                DrawableConfigManager.SaveDrawables(drawables, memento.FilePath);
-            }
+            DrawableConfigManager.SaveDrawables(drawables, memento.FilePath);
         }
 
         /// <summary>

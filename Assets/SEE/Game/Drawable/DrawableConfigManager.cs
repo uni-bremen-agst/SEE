@@ -132,30 +132,6 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Saves the <paramref name="drawable"/> configuration to the <paramref name="filePath"/>.
-        /// The method checks if the <paramref name="filePath"/> has the correct extension.
-        /// If not, it will be set.
-        /// </summary>
-        /// <param name="drawable">The drawable that should be saved.</param>
-        /// <param name="filePath">The file path where the saved file should be placed.</param>
-        internal static void SaveDrawable(GameObject drawable, FilePath filePath)
-        {
-            EnsureDrawableDirectoryExists(filePath.RootPath);
-            if (!Path.HasExtension(filePath.Path))
-            {
-                filePath = new FilePath(filePath.Path + Filenames.ConfigExtension);
-            }
-            else if (Path.GetExtension(filePath.Path) != Filenames.ConfigExtension)
-            {
-                Path.ChangeExtension(filePath.Path, Filenames.ConfigExtension);
-            }
-            using ConfigWriter writer = new(filePath.Path);
-            DrawableConfig config = GetDrawableConfig(drawable);
-            config.Save(writer);
-            Debug.Log($"Saved drawable configuration to file {filePath.Path}.\n");
-        }
-
-        /// <summary>
         /// Creates a <see cref="DrawablesConfigs"/> that holds all the <paramref name="drawables"/> configurations.
         /// Then saves the <see cref="DrawablesConfigs"/> to the <paramref name="filePath"/>.
         /// The method checks if the <paramref name="filePath"/> has the correct extension.
@@ -175,8 +151,15 @@ namespace SEE.Game.Drawable
                 Path.ChangeExtension(filePath.Path, Filenames.ConfigExtension);
             }
             using ConfigWriter writer = new(filePath.Path);
-            DrawablesConfigs configs = GetDrawablesConfigs(drawables);
-            configs.Save(writer);
+            if (drawables.Length > 1)
+            {
+                DrawablesConfigs configs = GetDrawablesConfigs(drawables);
+                configs.Save(writer);
+            } else
+            {
+                DrawableConfig config = GetDrawableConfig(drawables[0]);
+                config.Save(writer);
+            }
             Debug.Log($"Saved drawable configuration to file {filePath.Path}.\n");
         }
 
