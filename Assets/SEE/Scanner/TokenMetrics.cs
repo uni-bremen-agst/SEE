@@ -1,14 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using Antlr4.Runtime;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace SEE.Scanner
 {
+
     /// <summary>
     /// Provides metrics calculated based on code tokens.
     /// </summary>
     public static class TokenMetrics
     {
+
         /// <summary>
         /// Calculates the McCabe cyclomatic complexity for provided code.
         /// </summary>
@@ -18,11 +21,9 @@ namespace SEE.Scanner
         {
             int complexity = 1; // Starting complexity for a single method or function.
 
-            // Count decision points (if, for, while, case, &&, ||, ?).
-            complexity += tokens.Count(t => t.TokenType == SEEToken.Type.Keyword);
-
-            // Count nested cases (i.e. switch statements).
-            complexity += tokens.Count(t => t.TokenType == SEEToken.Type.Keyword && t.Text == "case");
+            // Count decision points (branches).
+            //complexity += tokens.Count(t => t.Language.BranchKeywords.Contains(t.Text));
+            complexity += tokens.Count(t => t.TokenType == SEEToken.Type.BranchKeyword);
 
             return complexity;
         }
@@ -70,6 +71,7 @@ namespace SEE.Scanner
             {
                 SEEToken.Type.Identifier,
                 SEEToken.Type.Keyword,
+                SEEToken.Type.BranchKeyword,
                 SEEToken.Type.NumberLiteral,
                 SEEToken.Type.StringLiteral
             };

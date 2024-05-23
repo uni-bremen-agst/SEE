@@ -164,6 +164,11 @@ namespace SEE.Scanner
             public static readonly Type Keyword = new("Keywords", "D988F2"); // purple
 
             /// <summary>
+            /// Branch keyword tokens.
+            /// </summary>
+            public static readonly Type BranchKeyword = new("BranchKeywords", "CBCE3"); // light purple
+
+            /// <summary>
             /// Number literal tokens. This includes integer literals, floating point literals, etc.
             /// </summary>
             public static readonly Type NumberLiteral = new("NumberLiterals", "D48F35"); // orange
