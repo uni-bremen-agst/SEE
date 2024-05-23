@@ -1,5 +1,4 @@
-﻿using Antlr4.Runtime;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -22,7 +21,6 @@ namespace SEE.Scanner
             int complexity = 1; // Starting complexity for a single method or function.
 
             // Count decision points (branches).
-            //complexity += tokens.Count(t => t.Language.BranchKeywords.Contains(t.Text));
             complexity += tokens.Count(t => t.TokenType == SEEToken.Type.BranchKeyword);
 
             return complexity;
