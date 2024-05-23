@@ -14,9 +14,9 @@
         /// </summary>
         ToggleMenu,
         /// <summary>
-        /// User toggles the voice chat.
+        /// User toggles the voice control (interpreted by the personal assistant).
         /// </summary>
-        ToggleVoiceInput,
+        ToggleVoiceControl,
         /// <summary>
         /// Turns on/off the settings menu.
         /// </summary>
@@ -179,25 +179,13 @@
         /// </summary>
         ShowWindowMenu,
         /// <summary>
-        /// Undoes an edit in the source-code viewer.
-        /// </summary>
-        CodeWindowUndo,
-        /// <summary>
-        /// Redoes an undone edit in the source-code viewer.
-        /// </summary>
-        CodeWindowRedo,
-        /// <summary>
-        /// Saves the content of the source-code viewer.
-        /// </summary>
-        CodeWindowSave,
-        /// <summary>
-        /// Refreshes syntax highlighting in the source-code viewer.
-        /// </summary>
-        RefreshSyntaxHighlighting,
-        /// <summary>
         /// Opens the text chat.
         /// </summary>
         ToggleTextChat,
+        /// <summary>
+        /// Toggles the voice chat.
+        /// </summary>
+        ToggleVoiceChat,
         /// <summary>
         /// Closes all open notifications.
         /// </summary>
