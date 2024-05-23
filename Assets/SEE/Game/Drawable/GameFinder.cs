@@ -40,7 +40,7 @@ namespace SEE.Game.Drawable
                     /// Block for searching without parent id.
                     /// Currently not used, as the drawables from
                     /// the Whiteboard and Sticky Notes each have a parent.
-                    if (string.Equals(drawableID, drawable.name))
+                    if (drawableID == drawable.name)
                     {
                         searchedDrawable = drawable;
                     }
