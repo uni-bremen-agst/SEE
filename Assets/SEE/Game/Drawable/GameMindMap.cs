@@ -573,7 +573,6 @@ namespace SEE.Game.Drawable
             MMNodeValueHolder nodeValueHolder = node.GetComponent<MMNodeValueHolder>();
             GameObject nodeText = GameFinder.FindChildWithTag(node, Tags.DText);
             GameObject nodeBorder = GameFinder.FindChildWithTag(node, Tags.Line);
-            LineConf border = LineConf.GetLine(nodeBorder);
 
             if (nodeValueHolder.NodeKind != newNodeKind
                 && CheckValidNodeKindChange(node, newNodeKind, nodeValueHolder.NodeKind))
@@ -599,6 +598,7 @@ namespace SEE.Game.Drawable
                         GameEdit.ChangeFontSize(nodeText, 1.0f);
                         ChangeLineKind(nodeBorder, LineKind.Solid, ValueHolder.StandardLineTiling);
                         GameEdit.ChangePrimaryColor(nodeBorder, Color.black);
+                        GameEdit.ChangeSecondaryColor(nodeBorder, Color.black);
                         break;
 
                     /// Block for change the <see cref="NodeKind"/> to <see cref="NodeKind.Subtheme"/>.
@@ -608,6 +608,7 @@ namespace SEE.Game.Drawable
                         GameEdit.ChangeFontSize(nodeText, 0.7f);
                         ChangeLineKind(nodeBorder, LineKind.Solid, ValueHolder.StandardLineTiling);
                         GameEdit.ChangePrimaryColor(nodeBorder, Color.black);
+                        GameEdit.ChangeSecondaryColor(nodeBorder, Color.black);
                         break;
 
                     /// Block for change the <see cref="NodeKind"/> to <see cref="NodeKind.Leaf"/>.
@@ -618,6 +619,7 @@ namespace SEE.Game.Drawable
                         GameEdit.ChangeFontSize(nodeText, 0.5f);
                         ChangeLineKind(nodeBorder, LineKind.Dashed25, ValueHolder.StandardLineTiling);
                         GameEdit.ChangePrimaryColor(nodeBorder, Color.clear);
+                        GameEdit.ChangeSecondaryColor(nodeBorder, Color.clear);
                         break;
                 }
                 /// Changes the prefix of the node.

@@ -19,7 +19,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// The shader keyword for the outline color.
         /// </summary>
-        public static readonly string outlineKeyWord = "OUTLINE_ON";
+        public static readonly string OutlineKeyWord = "OUTLINE_ON";
 
         /// <summary>
         /// Removes HTML tags from string using char array.
@@ -356,7 +356,7 @@ namespace SEE.Game.Drawable
             if (textObj.CompareTag(Tags.DText))
             {
                 TextMeshPro tmp = textObj.GetComponent<TextMeshPro>();
-                LocalKeyword outlineKeyword = new(tmp.fontMaterial.shader, outlineKeyWord);
+                LocalKeyword outlineKeyword = new(tmp.fontMaterial.shader, OutlineKeyWord);
                 tmp.fontMaterial.SetKeyword(outlineKeyword, status);
             }
         }
