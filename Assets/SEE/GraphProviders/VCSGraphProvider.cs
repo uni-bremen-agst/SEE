@@ -14,6 +14,7 @@ using System.Linq;
 using UnityEngine;
 using SEE.Scanner;
 using System.Threading;
+using Microsoft.Extensions.FileSystemGlobbing;
 
 namespace SEE.GraphProviders
 {
@@ -42,7 +43,7 @@ namespace SEE.GraphProviders
             Tooltip("Path globbings to include (true) or exclude files (false)"), RuntimeTab(GraphProviderFoldoutGroup), HideReferenceObjectPicker]
         public Dictionary<string, bool> PathGlobbing = new()
         {
-            { "", true }
+            { "**/*", true }
         };
 
         public override GraphProviderKind GetKind()
@@ -132,19 +133,8 @@ namespace SEE.GraphProviders
             {
                 LibGit2Sharp.Tree tree = repo.Lookup<Commit>(commitID).Tree;
                 // Get all files using "git ls-tree -r <CommitID> --name-only".
-                IEnumerable<string> files;
-                if (includedPathGlobs.Any() && !string.IsNullOrEmpty(includedPathGlobs.First()))
-                {
-                    files = ListTree(tree).Where(path => includedPathGlobs.Contains(Path.GetExtension(path)));
-                }
-                else if (excludedPathGlobs.Any())
-                {
-                    files = ListTree(tree).Where(path => !excludedPathGlobs.Contains(Path.GetExtension(path)));
-                }
-                else
-                {
-                    files = ListTree(tree);
-                }
+                IEnumerable<string> files = GetFilteredFiles(ListTree(tree), pathGlobbing);
+
                 // Build the graph structure.
                 foreach (string filePath in files.Where(path => !string.IsNullOrEmpty(path)))
                 {
@@ -164,6 +154,41 @@ namespace SEE.GraphProviders
             }
             graph.FinalizeNodeHierarchy();
             return graph;
+        }
+
+        /// <summary>
+        /// Filtering the files after include/exclude patterns.
+        /// </summary>
+        /// <param name="files">all files, unfiltered</param>
+        /// <param name="pathGlobbing">the include/exclude patterns</param>
+        /// <returns>filtered files</returns>
+        static List<string> GetFilteredFiles(List<string> files, Dictionary<string, bool> pathGlobbing)
+        {
+            Matcher matcher = new();
+
+            foreach(KeyValuePair<string, bool> pattern in pathGlobbing)
+            {
+                if (pattern.Value)
+                {
+                    matcher.AddInclude(pattern.Key);
+                }
+                else
+                {
+                    matcher.AddExclude(pattern.Key);
+                }
+            }
+
+            List<string> matchedFiles = new();
+
+            foreach (string file in files)
+            {
+                if (matcher.Match(file).HasMatches)
+                {
+                    matchedFiles.Add(file);
+                }
+            }
+
+            return matchedFiles;
         }
 
         /// <summary>
@@ -265,7 +290,7 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="tree">The tree of the given commit.</param>
         /// <returns>a list of paths.</returns>
-        private static IEnumerable<string> ListTree(LibGit2Sharp.Tree tree)
+        private static List<string> ListTree(LibGit2Sharp.Tree tree)
         {
             List<string> fileList = new();
 

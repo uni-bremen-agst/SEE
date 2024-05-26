@@ -66,7 +66,8 @@
         "Supercluster.KDTree.Standard.dll",
         "Markdig.dll",
         "System.Collections.Immutable.dll",
-        "MoreLinq.dll"
+        "MoreLinq.dll",
+        "Microsoft.Extensions.FileSystemGlobbing.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

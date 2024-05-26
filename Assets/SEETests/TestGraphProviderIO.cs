@@ -7,6 +7,7 @@ using SEE.Utils.Paths;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -274,19 +275,22 @@ namespace SEE.GraphProviders
         }
 
         [Test]
-        public void TestVCSGraphProvider()
+        public async Task TestVCSGraphProviderAsync()
         {
-            Graph graph = GetVCSGraphAsync().GetAwaiter().GetResult();
+            Graph graph = await GetVCSGraphAsync();
             List<string> pathsFromGraph = new();
             foreach (GraphElement elem in graph.Elements())
             {
-                Debug.Log(elem.ID);
                 pathsFromGraph.Add(elem.ID);
             }
 
+            string repositoryPath = Application.dataPath;
+            string projectPath = repositoryPath.Substring(0, repositoryPath.LastIndexOf("/"));
+            string projectName = Path.GetFileName(projectPath);
+
             List<string> actualList = new()
             {
-                "SEE",
+                projectName,
                 ".gitignore",
                 "Assets",
                 "Assets/Scenes.meta",
