@@ -1,6 +1,5 @@
 ﻿using SEE.Game;
 using System;
-using System.Net;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -65,20 +64,14 @@ namespace SEE.Net.Actions
         }
 
         /// <summary>
-        /// The implementation of the action for the server. Returns whether the action
-        /// could be executed successfully.
-        ///
-        /// If the implementation throws an exception, it will be interpreted just like
-        /// returning <code>false</code>.
+        /// The implementation of the action for the server. This method will be called
+        /// only for the server.
         /// </summary>
         public abstract void ExecuteOnServer();
 
         /// <summary>
-        /// The implementation of the action for the client. Returns whether the action
-        /// could be executed successfully.
-        ///
-        /// If the implementation throws an exception, it will be interpreted just like
-        /// returning <code>false</code>.
+        /// The implementation of the action for the client. This method will be called
+        /// for all connected clients excluding the requester.
         /// </summary>
         public abstract void ExecuteOnClient();
 

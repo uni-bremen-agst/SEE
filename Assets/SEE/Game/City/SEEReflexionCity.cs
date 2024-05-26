@@ -1,8 +1,10 @@
+using System;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
+using SEE.UI;
 using UnityEngine;
 using Sirenix.OdinInspector;
 
@@ -43,7 +45,17 @@ namespace SEE.Game.City
             {
                 Reset();
             }
-            LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this);
+            using (LoadingSpinner.ShowDeterminate($"Loading reflexion city \"{gameObject.name}\"...",
+                                                  out Action<float> reportProgress))
+            {
+                void UpdateProgress(float progress)
+                {
+                    reportProgress(progress);
+                    ProgressBar = progress;
+                }
+
+                LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, UpdateProgress, cancellationTokenSource.Token);
+            }
             visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
             visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
         }

@@ -245,14 +245,14 @@ namespace SEE.Utils.Paths
         /// <summary>
         /// Adjusts the root and path information of this data path based on the given <paramref name="path"/>.
         ///
-        /// If <paramref name="isURI"/> is true and the URI prefix matches <see cref="Network.ClientRestAPI"/>,
-        /// the path will be stored as a relative path (where <see cref="Network.ClientRestAPI"/> is removed
-        /// from <paramref name="path"/>. If the URI prefix does not match, <paramref name="path"/> will
-        /// stored as relative or absolute path, respectively, depending upon <paramref name="path"/>
-        /// interpreted as a universal resource identifier is relative or absolute. The <see cref="Root"/>
-        /// will be <see cref="RootKind.Url"/>.
+        /// If the <see cref="Root"/> is a <see cref="RootKind.Url"/> and the URI prefix matches
+        /// <see cref="Network.ClientRestAPI"/>, the path will be stored as a relative path,
+        /// where <see cref="Network.ClientRestAPI"/> is removed from <paramref name="path"/>.
+        /// If the URI prefix does not match, <paramref name="path"/> will be stored as relative
+        /// or absolute path, respectively, depending upon whether <paramref name="path"/>
+        /// interpreted as a universal resource identifier is relative or absolute.
         ///
-        /// If <paramref name="isURI"/> is false, the path is interpreted as a disk path.
+        /// If the <see cref="Root"/> is not a <see cref="RootKind.Url"/>, the path is interpreted as a disk path.
         /// If none of Unity's path prefixes for standard folders match, <paramref name="path"/> is considered
         /// an absolute path. Otherwise the <see cref="Root"/> will be set depending on which of Unity's
         /// path prefixes matches (<seealso cref="RootKind"/>) and the relative path will be set to

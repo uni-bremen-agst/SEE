@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.UI.RuntimeConfigMenu;
@@ -31,14 +32,13 @@ namespace SEE.Game.City
         /// <see cref="SEECity.Save(ConfigWriter)"/> and
         /// <see cref="SEECity.Restore(Dictionary{string,object})"/>,
         /// respectively. You should also extend the test cases in TestConfigIO.
-
         /// <summary>
         /// A provider of the data shown as code city.
         /// </summary>
         [OdinSerialize, ShowInInspector,
-            Tooltip("A graph provider yielding the data to be visualized as a code city."),
-            TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup),
-            HideReferenceObjectPicker]
+         Tooltip("A graph provider yielding the data to be visualized as a code city."),
+         TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup),
+         HideReferenceObjectPicker]
         public PipelineGraphProvider DataProvider = new();
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace SEE.Game.City
             get => loadedGraph;
             protected set
             {
-                if (loadedGraph  != null)
+                if (loadedGraph != null)
                 {
                     Reset();
                 }
@@ -100,6 +100,11 @@ namespace SEE.Game.City
                 LoadedGraph.BasePath = SourceCodeDirectory.Path;
             }
         }
+
+        /// <summary>
+        /// A token that can be used to cancel the loading of the graph.
+        /// </summary>
+        protected CancellationTokenSource cancellationTokenSource = new();
 
         /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
@@ -149,15 +154,12 @@ namespace SEE.Game.City
             loadedGraph = null;
             visualizedSubGraph = null;
 
-            using (LoadingSpinner.Show($"Loading city \"{gameObject.name}\""))
+            if (!gameObject.IsCodeCityDrawn())
             {
-                if (!gameObject.IsCodeCityDrawn())
-                {
-                    Debug.LogWarning($"There is no drawn code city for {gameObject.name}.");
-                    return;
-                }
-                LoadAsync().Forget();
+                Debug.LogWarning($"There is no drawn code city for {gameObject.name}.");
+                return;
             }
+            LoadAsync().Forget();
             return;
 
             async UniTaskVoid LoadAsync()
@@ -277,7 +279,7 @@ namespace SEE.Game.City
         /// Loads the graph data from the GXL file with GXLPath() and the metrics
         /// from the CSV file with CSVPath() and then draws it. Equivalent to:
         ///   LoadDataAsync();
-        ///   DrawGraph();
+        ///   DrawGraphAsync();
         /// </summary>
         public virtual async UniTaskVoid LoadAndDrawGraphAsync()
         {
@@ -303,12 +305,31 @@ namespace SEE.Game.City
             {
                 try
                 {
-                    LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this);
+                    using (LoadingSpinner.ShowDeterminate($"Loading city \"{gameObject.name}\"...",
+                                                          out Action<float> reportProgress))
+                    {
+                        void ReportProgress(float x)
+                        {
+                            ProgressBar = x;
+                            reportProgress(x);
+                        }
+
+                        ReportProgress(0.01f);
+
+                        LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, ReportProgress,
+                                                                      cancellationTokenSource.Token);
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    ShowNotification.Warn("Data loading cancelled", "Data loading was cancelled.\n", log: true);
+                    throw;
                 }
                 catch (Exception ex)
                 {
-                    ShowNotification.Error("Data failure", $"Graph provider failed with: {ex}\n");
                     Debug.LogException(ex);
+                    ShowNotification.Error("Data failure", $"Graph provider failed with: {ex.Message}\n", log: false);
+                    throw;
                 }
             }
             else
@@ -380,20 +401,40 @@ namespace SEE.Game.City
                 }
                 else
                 {
-                    using (LoadingSpinner.Show($"Drawing city \"{gameObject.name}\""))
-                    {
-                        graphRenderer = new GraphRenderer(this, theVisualizedSubGraph);
-                        // We assume here that this SEECity instance was added to a game object as
-                        // a component. The inherited attribute gameObject identifies this game object.
-                        graphRenderer.DrawGraph(theVisualizedSubGraph, gameObject);
+                    DrawAsync(theVisualizedSubGraph).Forget();
+                }
+            }
+            return;
 
-                        // If we're in editmode, InitializeAfterDrawn() will be called by Start() once the
-                        // game starts. Otherwise, in playmode, we have to call it ourselves.
-                        if (Application.isPlaying)
+            async UniTaskVoid DrawAsync(Graph subGraph)
+            {
+                graphRenderer = new GraphRenderer(this, subGraph);
+                // We assume here that this SEECity instance was added to a game object as
+                // a component. The inherited attribute gameObject identifies this game object.
+                try
+                {
+                    using (LoadingSpinner.ShowDeterminate($"Drawing city \"{gameObject.name}\"", out Action<float> updateProgress))
+                    {
+                        void ReportProgress(float x)
                         {
-                            InitializeAfterDrawn();
+                            ProgressBar = x;
+                            updateProgress(x);
                         }
+
+                        await graphRenderer.DrawGraphAsync(subGraph, gameObject, ReportProgress, cancellationTokenSource.Token);
                     }
+                }
+                catch (OperationCanceledException)
+                {
+                    ShowNotification.Warn("Drawing cancelled", "Drawing was cancelled.\n", log: true);
+                    throw;
+                }
+
+                // If we're in editmode, InitializeAfterDrawn() will be called by Start() once the
+                // game starts. Otherwise, in playmode, we have to call it ourselves.
+                if (Application.isPlaying)
+                {
+                    InitializeAfterDrawn();
                 }
             }
         }
@@ -460,6 +501,9 @@ namespace SEE.Game.City
         public override void Reset()
         {
             base.Reset();
+            // Cancel any ongoing loading operation and reset the token.
+            cancellationTokenSource.Cancel();
+            cancellationTokenSource = new CancellationTokenSource();
             // Delete the underlying graph.
             loadedGraph?.Destroy();
             loadedGraph = null;
@@ -502,9 +546,6 @@ namespace SEE.Game.City
         }
 
         #region Config I/O
-        //--------------------------------
-        // Configuration file input/output
-        //--------------------------------
 
         /// <summary>
         /// Label of attribute <see cref="DataProvider"/> in the configuration file.
@@ -522,6 +563,7 @@ namespace SEE.Game.City
             base.Restore(attributes);
             DataProvider = GraphProvider.Restore(attributes, dataProviderPathLabel) as PipelineGraphProvider;
         }
+
         #endregion
     }
 }

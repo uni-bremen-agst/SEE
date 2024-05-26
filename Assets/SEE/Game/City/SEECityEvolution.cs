@@ -1,25 +1,7 @@
-﻿//Copyright 2020 Florian Garbade
-
-//Permission is hereby granted, free of charge, to any person obtaining a
-//copy of this software and associated documentation files (the "Software"),
-//to deal in the Software without restriction, including without limitation
-//the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//and/or sell copies of the Software, and to permit persons to whom the Software
-//is furnished to do so, subject to the following conditions:
-
-//The above copyright notice and this permission notice shall be included in
-//all copies or substantial portions of the Software.
-
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-//INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-//PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-//LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-//USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.Evolution;
@@ -45,7 +27,6 @@ namespace SEE.Game.City
         /// <see cref="SEECityEvolution.Save(ConfigWriter)"/> and
         /// <see cref="SEECityEvolution.Restore(Dictionary{string,object})"/>,
         /// respectively. You should also extend the test cases in TestConfigIO.
-
         /// <summary>
         /// Name of the Inspector foldout group for the specific evolution setttings.
         /// </summary>
@@ -55,14 +36,14 @@ namespace SEE.Game.City
         /// Sets the maximum number of revisions to load.
         /// </summary>
         [SerializeField, ShowInInspector, Tooltip("Maximum number of revisions to load."), FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
-        public int MaxRevisionsToLoad = 500;  // serialized by Unity
+        public int MaxRevisionsToLoad = 500; // serialized by Unity
 
         /// <summary>
         /// The renderer for rendering the evolution of the graph series.
         ///
         /// Neither serialized nor saved in the configuration file.
         /// </summary>
-        private EvolutionRenderer evolutionRenderer;  // not serialized by Unity; will be set in Start()
+        private EvolutionRenderer evolutionRenderer; // not serialized by Unity; will be set in Start()
 
         /// <summary>
         /// The directory in which the GXL files of the graph series are located.
@@ -89,7 +70,7 @@ namespace SEE.Game.City
         /// Factory method to create the used EvolutionRenderer.
         /// </summary>
         /// <returns>the current or new evolution renderer attached to this city</returns>
-        protected EvolutionRenderer CreateEvolutionRenderer(List<Graph> graphs)
+        protected EvolutionRenderer CreateEvolutionRenderer(IList<Graph> graphs)
         {
             if (!gameObject.TryGetComponent(out EvolutionRenderer result))
             {
@@ -113,11 +94,13 @@ namespace SEE.Game.City
         /// Loads the graph data from the GXL files and the metrics from the CSV files contained
         /// in the directory with path PathPrefix and the metrics.
         /// </summary>
-        private List<Graph> LoadDataSeries()
+        private async UniTask<IList<Graph>> LoadDataSeriesAsync()
         {
             GraphsReader graphsReader = new();
             // Load all GXL graphs and CSV files in directory PathPrefix but not more than maxRevisionsToLoad many.
-            graphsReader.LoadAsync(GXLDirectory.Path, HierarchicalEdges, basePath: SourceCodeDirectory.Path, rootName: GXLDirectory.Path, MaxRevisionsToLoad);
+            await graphsReader.LoadAsync(GXLDirectory.Path, HierarchicalEdges, basePath: SourceCodeDirectory.Path,
+                                         rootName: GXLDirectory.Path, MaxRevisionsToLoad);
+
             return graphsReader.Graphs;
         }
 
@@ -156,14 +139,20 @@ namespace SEE.Game.City
             {
                 Reset();
             }
-            firstGraph = LoadFirstGraph();
-            if (firstGraph != null)
+            LoadAsync().Forget();
+            return;
+
+            async UniTask LoadAsync()
             {
-                Debug.Log($"Loaded graph with {firstGraph.NodeCount} nodes and {firstGraph.EdgeCount} edges.\n");
-            }
-            else
-            {
-                Debug.LogWarning("Could not load graph.\n");
+                firstGraph = await LoadFirstGraphAsync();
+                if (firstGraph != null)
+                {
+                    Debug.Log($"Loaded graph with {firstGraph.NodeCount} nodes and {firstGraph.EdgeCount} edges.\n");
+                }
+                else
+                {
+                    Debug.LogWarning("Could not load graph.\n");
+                }
             }
         }
 
@@ -194,7 +183,7 @@ namespace SEE.Game.City
             if (firstGraph)
             {
                 GraphRenderer graphRenderer = new(this, firstGraph);
-                graphRenderer.DrawGraph(firstGraph, gameObject);
+                graphRenderer.DrawGraphAsync(firstGraph, gameObject).Forget();
             }
             else
             {
@@ -214,10 +203,11 @@ namespace SEE.Game.City
         /// file system containing at least one GXL file.
         /// </summary>
         /// <returns>the loaded graph or null if none could be found</returns>
-        private Graph LoadFirstGraph()
+        private async UniTask<Graph> LoadFirstGraphAsync()
         {
             GraphsReader reader = new();
-            reader.LoadAsync(GXLDirectory.Path, HierarchicalEdges, basePath: SourceCodeDirectory.Path, rootName: GXLDirectory.Path, 1);
+            await reader.LoadAsync(GXLDirectory.Path, HierarchicalEdges, basePath: SourceCodeDirectory.Path,
+                                   rootName: GXLDirectory.Path, 1);
             List<Graph> graphs = reader.Graphs;
             if (graphs.Count == 0)
             {
@@ -249,11 +239,17 @@ namespace SEE.Game.City
         {
             base.Start();
             Reset();
-            List<Graph> graphs = LoadDataSeries();
-            evolutionRenderer = CreateEvolutionRenderer(graphs);
-            DrawGraphs(graphs);
-            gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
-            evolutionRenderer.ShowGraphEvolution();
+            LoadAsync().Forget();
+            return;
+
+            async UniTask LoadAsync()
+            {
+                IList<Graph> graphs = await LoadDataSeriesAsync();
+                evolutionRenderer = CreateEvolutionRenderer(graphs);
+                DrawGraphs(graphs);
+                gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
+                evolutionRenderer.ShowGraphEvolution();
+            }
         }
 
         /// <summary>
@@ -262,7 +258,7 @@ namespace SEE.Game.City
         /// for given <paramref name="graphs"/> using it.
         /// </summary>
         /// <param name="graphs">the series of graph to be drawn</param>
-        private void DrawGraphs(List<Graph> graphs)
+        private void DrawGraphs(IList<Graph> graphs)
         {
             for (int i = 0; i < graphs.Count; i++)
             {
@@ -301,6 +297,7 @@ namespace SEE.Game.City
         /// Label of attribute <see cref="GXLDirectory"/> in the configuration file.
         /// </summary>
         private const string gxlDirectoryLabel = "GXLDirectory";
+
         /// <summary>
         /// Label of attribute <see cref="MaxRevisionsToLoad"/> in the configuration file.
         /// </summary>

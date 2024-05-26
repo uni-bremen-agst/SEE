@@ -1,0 +1,6 @@
+PROGRAM test;
+DECLARE x : INTEGER
+
+BEGIN
+  WRITELN( "Hello World!" )
+END.

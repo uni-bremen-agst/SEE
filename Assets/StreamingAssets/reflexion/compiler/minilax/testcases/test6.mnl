@@ -1,0 +1,72 @@
+PROGRAM jeckeltest;
+DECLARE
+  a : ARRAY [1..10] OF INTEGER;
+  i : INTEGER;
+
+  PROCEDURE dummy;
+  DECLARE
+    x : INTEGER
+  BEGIN
+    x := 1
+  END;
+
+  PROCEDURE qsort( low : INTEGER; high : INTEGER );
+  DECLARE
+    tmp : INTEGER;
+    u : INTEGER;
+    o : INTEGER;
+    v : INTEGER
+  BEGIN
+    IF low >= high
+    THEN
+      RETURN()
+    ELSE
+      u := low;
+      o := high;
+      v := a[(low+high)/2];
+      WHILE u <= o DO
+        WHILE a[u] < v DO
+          u := u + 1
+	END;
+        WHILE a[o] > v DO
+          o := o - 1
+	END;
+        IF u <= o
+        THEN
+          tmp := a[u];
+          a[u] := a[o];
+          a[o] := tmp;
+  	  u := u + 1;
+	  o := o - 1
+        ELSE
+          dummy()
+	END
+      END;
+      qsort( low, o );
+      qsort( u, high )
+    END
+  END;
+
+  PROCEDURE ausgabe( von : INTEGER; bis : INTEGER );
+  DECLARE
+    i : INTEGER
+  BEGIN
+    i := von;
+    WRITE( "von " ++ FORMAT( von ) ++ " bis " ++ FORMAT( bis ) ++ ":  " );
+    WHILE i <= bis DO
+      WRITE( FORMAT( a[i] ) ++ "  " );
+      i := i + 1
+    END;
+    WRITELN( "[fini]" )
+  END
+
+BEGIN
+  i := 1;
+  WHILE i <= 10 DO
+    a[i] := 10/i+i;
+    i := i + 1
+  END;
+  ausgabe(1,10);
+  qsort( 1, 10 );
+  ausgabe(1,10)
+END.

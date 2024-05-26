@@ -1,19 +1,19 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using SEE.Tools.RandomGraphs;
 using SEE.Utils;
 using UnityEngine;
-using UnityEngine.TestTools;
 
 namespace SEE.DataModel.DG.IO
 {
     /// <summary>
     /// Unit tests for GraphWriter and GraphReader.
     /// </summary>
+    [SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods")]
     internal class TestGraphIO
     {
         /// <summary>
@@ -35,30 +35,32 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         private const string hierarchicalEdgeType = "Enclosing";
 
-        [UnityTest]
-        public IEnumerator TestMinilaxComparison() =>
-             UniTask.ToCoroutine(async () =>
+        [Test]
+        public async Task TestReadingRealBigGraph()
         {
             string filename = Application.streamingAssetsPath + "/SEE/CodeFacts.gxl.xz";
             Performance p = Performance.Begin("Loading big GXL file " + filename);
             await LoadGraphAsync(filename);
             p.End();
-        });
+        }
 
-        [UnityTest]
-        public IEnumerator TestReadingArchitecture() =>
-             UniTask.ToCoroutine(async ()
-                 => await LoadGraphAsync(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/Architecture.gxl"));
+        [Test]
+        public async Task TestReadingArchitecture()
+        {
+            await LoadGraphAsync(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/Architecture.gxl");
+        }
 
-        [UnityTest]
-        public IEnumerator TestReadingMapping() =>
-             UniTask.ToCoroutine(async ()
-                 => await LoadGraphAsync(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/Mapping.gxl"));
+        [Test]
+        public async Task TestReadingMapping()
+        {
+            await LoadGraphAsync(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/Mapping.gxl");
+        }
 
-        [UnityTest]
-        public IEnumerator TestReadingCodeFacts() =>
-             UniTask.ToCoroutine(async ()
-                 => await LoadGraphAsync(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/CodeFacts.gxl.xz"));
+        [Test]
+        public async Task TestReadingCodeFacts()
+        {
+            await LoadGraphAsync(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/CodeFacts.gxl.xz");
+        }
 
         private static bool CompressedWritingSupported()
         {
@@ -77,7 +79,7 @@ namespace SEE.DataModel.DG.IO
         /// Test for a simple artificially created graph.
         /// </summary>
         [Test, Sequential]
-        public async Task TestGraphWriterAsync([Values(true, false)] bool compress)
+        public async Task TestGraphWriter([Values(true, false)] bool compress)
         {
             const string basename = "test";
 
@@ -158,7 +160,7 @@ namespace SEE.DataModel.DG.IO
         /// <param name="basename">basename of the filename for storing graphs</param>
         /// <param name="outGraph">the initial graph to be written</param>
         /// <param name="compress">whether to LZMA compress the graph</param>
-        private static async Task WriteReadGraphAsync(string basename, Graph outGraph, bool compress)
+        private static async UniTask WriteReadGraphAsync(string basename, Graph outGraph, bool compress)
         {
             string Extension = compress ? CompressedExtension : NormalExtension;
             string filename = basename + Extension;
@@ -199,7 +201,7 @@ namespace SEE.DataModel.DG.IO
             }
         }
 
-        private static async Task<Graph> LoadGraphAsync(string filename)
+        private static async UniTask<Graph> LoadGraphAsync(string filename)
         {
             return await GraphReader.LoadAsync(filename, new HashSet<string> { hierarchicalEdgeType }, basePath: "");
         }

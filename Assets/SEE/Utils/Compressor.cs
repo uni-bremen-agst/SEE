@@ -2,6 +2,9 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using Joveler.Compression.XZ;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace SEE.Utils
@@ -9,6 +12,9 @@ namespace SEE.Utils
     /// <summary>
     /// Allows to compress and uncompress data.
     /// </summary>
+#if UNITY_EDITOR
+    [InitializeOnLoad]
+#endif
     internal static class Compressor
     {
         /// <summary>

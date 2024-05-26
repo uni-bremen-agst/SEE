@@ -26,7 +26,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="filename">GXL file</param>
         /// <returns>loaded graph</returns>
-        private static async Task<Graph> LoadGraphAsync(string filename)
+        private static async UniTask<Graph> LoadGraphAsync(string filename)
         {
             return await GraphReader.LoadAsync(filename, new HashSet<string> { hierarchicalEdgeType }, basePath: "");
         }
@@ -43,7 +43,7 @@ namespace SEE.DataModel.DG
             string xmlPath = Application.streamingAssetsPath + "/JLGExample/jacoco.xml";
 
             graph = await LoadGraphAsync(gxlPath);
-            JaCoCoImporter.Load(graph, xmlPath);
+            await JaCoCoImporter.LoadAsync(graph, xmlPath);
         }
 
         [TearDown]

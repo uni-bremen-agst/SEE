@@ -11,7 +11,7 @@ using UnityEngine;
 namespace SEE.UI.FilePicker
 {
     /// <summary>
-    /// Allows a user to pick a file.
+    /// Allows a user to pick a file or folder.
     /// Implementation for the desktop environment.
     /// </summary>
     public partial class FilePicker
@@ -133,7 +133,7 @@ namespace SEE.UI.FilePicker
                 FileBrowser.ShowLoadDialog(HandleFileBrowserSuccess,
                                            () => { },
                                            allowMultiSelection: false,
-                                           pickMode: FileBrowser.PickMode.Files,
+                                           pickMode: FileBrowser.PickMode.FilesAndFolders,
                                            title: "Pick a file/folder",
                                            initialPath: DataPathInstance.RootFileSystemPath);
 

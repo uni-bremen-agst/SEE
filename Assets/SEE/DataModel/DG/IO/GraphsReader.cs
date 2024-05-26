@@ -1,27 +1,8 @@
-﻿//Copyright 2020 Florian Garbade
-
-//Permission is hereby granted, free of charge, to any person obtaining a
-//copy of this software and associated documentation files (the "Software"),
-//to deal in the Software without restriction, including without limitation
-//the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//and/or sell copies of the Software, and to permit persons to whom the Software
-//is furnished to do so, subject to the following conditions:
-
-//The above copyright notice and this permission notice shall be included in
-//all copies or substantial portions of the Software.
-
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-//INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-//PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-//LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-//USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using SEE.Utils;
 using SEE.Utils.Paths;
 using UnityEngine;
@@ -54,8 +35,8 @@ namespace SEE.DataModel.DG.IO
         /// <param name="basePath">the base path of the graphs</param>
         /// <param name="rootName">name of the root node if any needs to be added to have a unique root</param>
         /// <param name="maxRevisionsToLoad">the upper limit of files to be loaded</param>
-        public async Task LoadAsync(string directory, HashSet<string> hierarchicalEdgeTypes,
-                                    string basePath, string rootName, int maxRevisionsToLoad)
+        public async UniTask LoadAsync(string directory, HashSet<string> hierarchicalEdgeTypes, string basePath,
+                                       string rootName, int maxRevisionsToLoad)
         {
             IEnumerable<string> sortedGraphNames = Filenames.GXLFilenames(directory).ToList();
             if (!sortedGraphNames.Any())
@@ -80,7 +61,7 @@ namespace SEE.DataModel.DG.IO
                     Path = gxlPath
                 };
 
-                graphCreator.Load(await dataPath.LoadAsync(), dataPath.Path);
+                await graphCreator.LoadAsync(await dataPath.LoadAsync(), dataPath.Path);
                 Graph graph = graphCreator.GetGraph();
 
                 // if graph was loaded, put in graph list
@@ -94,7 +75,7 @@ namespace SEE.DataModel.DG.IO
                     if (File.Exists(csvFilename))
                     {
                         Debug.Log($"Loading CSV file {csvFilename}.\n");
-                        int numberOfErrors = MetricImporter.LoadCsv(graph, csvFilename, ';');
+                        int numberOfErrors = await MetricImporter.LoadCsvAsync(graph, csvFilename);
                         if (numberOfErrors > 0)
                         {
                             Debug.LogError($"CSV file {csvFilename} has {numberOfErrors} many errors.\n");

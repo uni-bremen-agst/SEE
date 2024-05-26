@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using Cysharp.Threading.Tasks;
-using SEE.Utils;
 using SEE.Utils.Paths;
-
-
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 using UnityEngine;
 
 namespace SEE.DataModel.DG.IO
@@ -16,9 +11,6 @@ namespace SEE.DataModel.DG.IO
     /// <summary>
     /// Reads a graph from a GXL file and returns it as a graph.
     /// </summary>
-#if UNITY_EDITOR
-    [InitializeOnLoad]
-#endif
     public class GraphReader : GXLParser
     {
         /// <summary>
@@ -55,12 +47,13 @@ namespace SEE.DataModel.DG.IO
         /// <param name="path">path of the GXL data</param>
         /// <param name="hierarchicalEdgeTypes">edge types forming the node hierarchy</param>
         /// <param name="basePath">the base path of the graph</param>
+        /// <param name="token">token with which the loading can be cancelled</param>
         /// <param name="logger">logger to log the output</param>
         /// <returns>loaded graph</returns>
-        public static async UniTask<Graph> LoadAsync(DataPath path, HashSet<string> hierarchicalEdgeTypes, string basePath, Utils.ILogger logger = null)
+        public static async UniTask<Graph> LoadAsync(DataPath path, HashSet<string> hierarchicalEdgeTypes, string basePath,                                                       CancellationToken token = default, Utils.ILogger logger = null)
         {
             GraphReader graphReader = new(hierarchicalEdgeTypes, basePath, logger: logger);
-            graphReader.Load(await path.LoadAsync(), path.Path);
+            await graphReader.LoadAsync(await path.LoadAsync(), path.Path, token);
             return graphReader.GetGraph();
         }
 
@@ -97,10 +90,10 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="gxl">Stream containing GXL data that shall be processed</param>
         /// <param name="name">Name of the GXL data stream. Only used for display purposes in log messages</param>
-        public override void Load(Stream gxl, string name = "[unknown]")
+        /// <param name="token">token with which the loading can be cancelled</param>
+        public override async UniTask LoadAsync(Stream gxl, string name = "[unknown]", CancellationToken token = default)
         {
-            base.Load(gxl, name);
-
+            await base.LoadAsync(gxl, name, token);
             graph.BasePath = basePath;
             if (!string.IsNullOrWhiteSpace(rootName))
             {
@@ -176,6 +169,7 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         protected override void StartGraph()
         {
+            nodes.Clear();
             // We don't know the base path yet, hence, we use the empty string.
             graph = new Graph("")
             {
@@ -212,7 +206,10 @@ namespace SEE.DataModel.DG.IO
                 {
                     if (Reader.Name == "id")
                     {
-                        nodes.Add(Reader.Value, (Node)current);
+                        if (!nodes.TryAdd(Reader.Value, (Node)current))
+                        {
+                            LogError($"Node ID {Reader.Value} is not unique.");
+                        }
                         break;
                     }
                 }
@@ -604,11 +601,11 @@ namespace SEE.DataModel.DG.IO
                 {
                     case RegionLengthAttribute:
                         // NOTE: This assumes the Region_Length is always declared *after* the Region_Start.
-                        int endLine = current.GetInt(GraphElement.SourceRangeStartLineAttribute) + value;
-                        current.SetInt(GraphElement.SourceRangeEndLineAttribute, endLine);
+                        int endLine = current.GetInt(GraphElement.SourceRangeAttribute + Attributable.RangeStartLineSuffix) + value;
+                        current.SetInt(GraphElement.SourceRangeAttribute + Attributable.RangeEndLineSuffix, endLine);
                         break;
                     case RegionStartAttribute:
-                        current.SetInt(GraphElement.SourceRangeStartLineAttribute, value);
+                        current.SetInt(GraphElement.SourceRangeAttribute + Attributable.RangeStartLineSuffix, value);
                         break;
                     default:
                         current.SetInt(currentAttributeName, value);

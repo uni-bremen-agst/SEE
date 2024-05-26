@@ -2,16 +2,14 @@
 using SEE.DataModel.DG.IO;
 using SEE.Game.City;
 using SEE.Tools.ReflexionAnalysis;
-using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using System.Threading.Tasks;
 
 namespace SEE.GraphProviders
 {
@@ -51,14 +49,18 @@ namespace SEE.GraphProviders
             return GraphProviderKind.Reflexion;
         }
 
-        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
+        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
+                                                    Action<float> changePercentage = null,
+                                                    CancellationToken token = default)
         {
             if (city == null)
             {
                 throw new ArgumentException("The given city is null.\n");
             }
-            Graph architectureGraph = await LoadGraphAsync(Architecture, city);
-            Graph implementationGraph = await LoadGraphAsync(Implementation, city);
+            Graph architectureGraph = await LoadGraphAsync(Architecture, city, token);
+            changePercentage?.Invoke(0.33f);
+            Graph implementationGraph = await LoadGraphAsync(Implementation, city, token);
+            changePercentage?.Invoke(0.66f);
             Graph mappingGraph;
             if (string.IsNullOrEmpty(Mapping.Path))
             {
@@ -70,7 +72,8 @@ namespace SEE.GraphProviders
             }
             else
             {
-                mappingGraph = await LoadGraphAsync(Mapping, city);
+                mappingGraph = await LoadGraphAsync(Mapping, city, token);
+                changePercentage?.Invoke(1.0f);
             }
 
             return new ReflexionGraph(implementationGraph, architectureGraph, mappingGraph, CityName);
@@ -82,10 +85,10 @@ namespace SEE.GraphProviders
         /// <param name="path">the path of the GXL data from which to load</param>
         /// <param name="city">where the <see cref="AbstractSEECity.HierarchicalEdges"/>
         /// and <see cref="AbstractSEECity.SourceCodeDirectory"/> will be retrieved</param>
+        /// <param name="token">token with which the loading can be cancelled</param>
         /// <returns>loaded graph</returns>
-        /// <exception cref="ArgumentException">thrown if <paramref name="path"/> is null or empty
-        /// or does not exist</exception>
-        private async Task<Graph> LoadGraphAsync(DataPath path, AbstractSEECity city)
+        /// <exception cref="ArgumentException">thrown if <paramref name="path"/> is null</exception>
+        private async UniTask<Graph> LoadGraphAsync(DataPath path, AbstractSEECity city, CancellationToken token = default)
         {
             if (path == null)
             {

@@ -548,7 +548,7 @@ namespace SEE.DataModel.DG
         /// Returns all nodes of the graph.
         /// </summary>
         /// <returns>all nodes</returns>
-        public List<Node> Nodes()
+        public IList<Node> Nodes()
         {
             return nodes.Values.ToList();
         }
@@ -557,7 +557,7 @@ namespace SEE.DataModel.DG
         /// Returns all non-hierarchical edges of the graph.
         /// </summary>
         /// <returns>all non-hierarchical edges</returns>
-        public List<Edge> Edges()
+        public IList<Edge> Edges()
         {
             return edges.Values.ToList();
         }
@@ -579,6 +579,16 @@ namespace SEE.DataModel.DG
         public bool ContainsNodeID(string id)
         {
             return nodes.ContainsKey(id);
+        }
+
+        /// <summary>
+        /// Returns true if an edge with the given <paramref name="id"/> is part of the graph.
+        /// </summary>
+        /// <param name="id">unique ID of the edge searched</param>
+        /// <returns>true if an edge with the given <paramref name="id"/> is part of the graph</returns>
+        public bool ContainsEdgeID(string id)
+        {
+            return edges.ContainsKey(id);
         }
 
         /// <summary>

@@ -201,6 +201,9 @@ namespace SEE.Game.Avatars
                             case "goodBye":
                                 brain.GoodBye();
                                 break;
+                            case "project":
+                                brain.Project();
+                                break;
                         }
                     }
                 }
@@ -227,7 +230,7 @@ namespace SEE.Game.Avatars
             async UniTaskVoid SendChatMessage(ChatRequest request)
             {
                 string message;
-                using (LoadingSpinner.Show("ChatGPT is thinking about what you said..."))
+                using (LoadingSpinner.ShowIndeterminate("ChatGPT is thinking about what you said..."))
                 {
                     ChatResponse result = await openAiClient.ChatEndpoint.GetCompletionAsync(request);
                     message = result.FirstChoice.Message.Content.ToString();
@@ -307,7 +310,7 @@ namespace SEE.Game.Avatars
 
         private void Update()
         {
-            if (SEEInput.ToggleVoiceInput() && input != null)
+            if (SEEInput.ToggleVoiceControl() && input != null)
             {
                 if (currentlyListening)
                 {

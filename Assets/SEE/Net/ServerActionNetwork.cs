@@ -55,7 +55,8 @@ namespace SEE.Net
             deserializedAction.ExecuteOnServer();
             foreach (NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
             {
-                if(recipients == null || recipients.Contains(client.ClientId)) {
+                if (recipients == null || recipients.Contains(client.ClientId))
+                {
                     ClientActionNetwork clientNetwork = client.PlayerObject.GetComponent<ClientActionNetwork>();
                     clientNetwork.ExecuteActionClientRpc(serializedAction);
                 }

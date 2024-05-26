@@ -1,11 +1,10 @@
 ﻿using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.City;
-using SEE.Utils;
 using System;
 using System.IO;
+using System.Threading;
 using Cysharp.Threading.Tasks;
-using SEE.Utils.Paths;
 
 namespace SEE.GraphProviders
 {
@@ -28,15 +27,19 @@ namespace SEE.GraphProviders
         /// <param name="graph">input graph (currently ignored)</param>
         /// <param name="city">where the <see cref="AbstractSEECity.HierarchicalEdges"/>
         /// and <see cref="AbstractSEECity.SourceCodeDirectory"/> will be retrieved</param>
+        /// <param name="changePercentage">this parameter is currently ignored</param>
+        /// <param name="token">this parameter is currently ignored</param>
         /// <returns>loaded graph</returns>
         /// <exception cref="ArgumentException">thrown in case <see cref="Path"/>
         /// is undefined or does not exist or <paramref name="city"/> is null</exception>
         /// <exception cref="NotImplementedException">thrown if <paramref name="graph"/>
         /// has nodes; this case is currently not yet handled</exception>
-        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city)
+        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
+                                                          Action<float> changePercentage = null,
+                                                          CancellationToken token = default)
         {
             CheckArguments(city);
-            return await GraphReader.LoadAsync(Path, city.HierarchicalEdges, city.SourceCodeDirectory.Path);
+            return await GraphReader.LoadAsync(Path, city.HierarchicalEdges, city.SourceCodeDirectory.Path, token);
         }
 
         public override GraphProviderKind GetKind()

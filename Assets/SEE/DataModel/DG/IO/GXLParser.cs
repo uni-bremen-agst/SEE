@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Threading;
 using System.Xml;
+using Cysharp.Threading.Tasks;
 using SEE.Utils;
 
 namespace SEE.DataModel.DG.IO
@@ -172,15 +174,17 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="gxl">Stream containing GXL data that shall be processed</param>
         /// <param name="name">Name of the GXL data stream. Only used for display purposes in log messages</param>
-        public virtual void Load(Stream gxl, string name = "[unknown]")
+        /// <param name="token">token with which the loading can be cancelled</param>
+        public virtual async UniTask LoadAsync(Stream gxl, string name, CancellationToken token = default)
         {
-            this.Name = name;
+            Name = name;
 
             XmlReaderSettings settings = new()
             {
                 CloseInput = true,
                 IgnoreWhitespace = true,
                 IgnoreComments = true,
+                Async = true,
                 // TODO: Apparently enabling the below has security implications due to the URL being resolved.
                 DtdProcessing = DtdProcessing.Parse
             };
@@ -193,8 +197,13 @@ namespace SEE.DataModel.DG.IO
 
             try
             {
-                while (Reader.Read())
+                await UniTask.SwitchToThreadPool();
+                while (await Reader.ReadAsync())
                 {
+                    if (token.IsCancellationRequested)
+                    {
+                        throw new OperationCanceledException(token);
+                    }
                     // LogDebug("XML processing: name=" + reader.Name + " nodetype=" + reader.NodeType + " value=" + reader.Value + "\n");
 
                     // See https://docs.microsoft.com/de-de/dotnet/api/system.xml.xmlnodetype?view=netframework-4.8
@@ -393,6 +402,7 @@ namespace SEE.DataModel.DG.IO
             finally
             {
                 Reader.Close();
+                await UniTask.SwitchToMainThread();
             }
 
             if (Context.Count > 0)

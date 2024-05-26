@@ -66,7 +66,7 @@ namespace SEE.Net
                 return;
             }
             AbstractNetAction action = ActionSerializer.Deserialize(serializedAction);
-            if(action.Requester != NetworkManager.Singleton.LocalClientId)
+            if (action.Requester != NetworkManager.Singleton.LocalClientId)
             {
                 action.ExecuteOnClient();
             }

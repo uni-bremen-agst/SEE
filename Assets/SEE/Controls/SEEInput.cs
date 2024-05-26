@@ -20,6 +20,20 @@ namespace SEE.Controls
         /// </summary>
         public static bool KeyboardShortcutsEnabled { set; get; } = true;
 
+#if UNITY_EDITOR
+        /// <summary>
+        /// Sometimes if the game is not stopped correctly, the keyboard shortcuts
+        /// might still be disabled. This method ensures that the keyboard shortcuts
+        /// are always enabled when the game is started. This is needed only in the
+        /// editor, because the executable will start always with a fresh state.
+        /// </summary>
+        [UnityEditor.InitializeOnEnterPlayMode]
+        private static void ResetKeyboardShortcutsEnabled()
+        {
+            KeyboardShortcutsEnabled = true;
+        }
+#endif
+
         //-----------------------------------------------------
         #region General key bindings
         //-----------------------------------------------------
@@ -35,13 +49,13 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Toggles voice input (i.e., for voice commands) on/off.
+        /// Toggles voice control (i.e., for voice commands) on/off.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool ToggleVoiceInput()
+        public static bool ToggleVoiceControl()
         {
             return KeyboardShortcutsEnabled
-                && KeyBindings.IsDown(KeyAction.ToggleVoiceInput);
+                && KeyBindings.IsDown(KeyAction.ToggleVoiceControl);
         }
 
         /// <summary>
@@ -70,6 +84,15 @@ namespace SEE.Controls
         public static bool ToggleBrowser()
         {
             return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleBrowser);
+        }
+
+        /// <summary>
+        /// Turns on/off the mirror.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleMirror()
+        {
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleMirror);
         }
 
         /// <summary>
@@ -134,88 +157,6 @@ namespace SEE.Controls
             {
                 return false;
             }
-#endif
-        }
-
-        /// <summary>
-        /// Un-does the last change in the CodeWindow
-        /// </summary>
-        /// <returns>true if the user requests this action and not <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool CodeWindowUndo()
-        {
-#if UNITY_EDITOR == false
-            // Ctrl keys are not available when running the game in the editor
-            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
-            {
-               return !KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.CodeWindowUndo);
-            }
-            else
-            {
-                return false;
-            }
-#else
-            // Ctrl keys replaced with KeyBindings.CodeWindowUndo in the editor
-            return !KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.CodeWindowUndo);
-#endif
-        }
-
-        /// <summary>
-        /// Re-does the last change in the CodeWindow
-        /// </summary>
-        /// <returns>true if the user requests this action and not <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool CodeWindowRedo()
-        {
-#if UNITY_EDITOR == false
-            // Ctrl keys are not available when running the game in the editor
-            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
-            {
-                return !KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.CodeWindowRedo);
-            }
-            return false;
-#else
-            //ctrl keys replaced with KeyBindings.CodeWindowUndo in the editor
-            return !KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.CodeWindowRedo);
-#endif
-        }
-
-        /// <summary>
-        /// Saves the changes made in an active code window
-        /// </summary>
-        /// <returns>true if the user requests this action and not <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool SaveCodeWindow()
-        {
-#if UNITY_EDITOR == false
-            // Ctrl keys are not available when running the game in the editor
-            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
-            {
-                return !KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.CodeWindowSave);
-            }
-            else
-            {
-                return false;
-            }
-#else
-            // ctrl keys replaced with KeyBindings.CodeWindowSave in the editor
-            return !KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.CodeWindowSave);
-#endif
-        }
-
-        /// <summary>
-        /// Recalculates the Syntaxhighliting
-        /// </summary>
-        /// <returns>true if the user requests this action and not <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool ReCalculateSyntaxHighlighting()
-        {
-#if UNITY_EDITOR == false
-           // Ctrl keys are not available when running the game in the editor
-            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
-            {
-                return !KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.RefreshSyntaxHighlighting);
-            }
-            return false;
-#else
-            // ctrl keys replaced with KeyBindings.RefreshSyntaxHighlighting in the editor
-            return !KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.RefreshSyntaxHighlighting);
 #endif
         }
 
@@ -654,6 +595,15 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleTextChat);
         }
 
+        /// <summary>
+        /// Toggles the voice chat.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleVoiceChat()
+        {
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleVoiceChat);
+        }
+
         #endregion
 
         //----------------------------------------------------
@@ -689,7 +639,6 @@ namespace SEE.Controls
         {
             return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleFaceCamPosition);
         }
-
         #endregion
     }
 }
