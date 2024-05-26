@@ -159,7 +159,7 @@ namespace SEE.Game.City
 
             if (TryGetComponent(out GitPoller poller))
             {
-               Destroy(poller);
+               //Destroy(poller);
             }
 
             loadedGraph = null;
@@ -535,7 +535,7 @@ namespace SEE.Game.City
             // Remove the poller
             if (TryGetComponent(out GitPoller poller))
             {
-                Destroy(poller);
+               // Destroy(poller);
             }
 
             // Delete the underlying graph.
