@@ -1,0 +1,55 @@
+Prog		: PROGRAM Name ';' Block '.' .
+Decls		: Decl { ';' Decl } .
+Decl		: Name ':' Type
+		| PROCEDURE Name Formals ';' Block .
+		| FUNCTION Name Formals ':' Type ';' Block .
+Block		: DECLARE Decls BEGIN Stats END .
+Formals		: [ '(' Formal { ';' Formal } ')' ] .
+Formal		: Name ':' Type
+		| VAR Name ':' Type .
+Type		: INTEGER
+		| REAL
+		| BOOLEAN
+		| STRING
+		| ARRAY '[' IntConst '..' IntConst ']' OF Type .
+Stats		: Stat { ';' Stat } .
+Stat		: Name AssignOrCall
+		| IF Expr THEN Stats ELSE Stats END
+		| WHILE Expr DO Stats END
+		| READ '(' Var ')'
+		| WRITE '(' Expr ')'
+		| WRITELN '(' Expr ')'
+		| RETURN '(' Expr ')'
+		| FAIL '(' Expr ')' .
+AssignOrCall	: Index ':=' Expr
+		| [ '(' Actuals ')' ] .
+Actuals		: Expr { ',' Expr } .
+Expr		: Expr2 [ RelOpr Expr2 ] .
+		| IF Expr THEN Expr ELSE Expr END .
+Expr2		: Expr3 [ NewOpr Expr3 ] .
+Expr3		: Term { AddOpr Term } .
+Term		: Factor { MulOpr Factor } .
+Factor		: NOT Factor
+		| '(' Expr ')'
+		| Name VarOrFunc
+		| IntConst
+		| RealConst
+		| StringConst
+		| FALSE
+		| TRUE .
+VarOrFunc	: Index
+		| Stats
+Var		: Name Index .
+Index		: { '[' Expr ']' } .
+Name		: Ident .
+AddOpr		: '+'
+		| '-' .
+MulOpr		: '*'
+		| '/' .
+NewOpr		: '++'
+		| '%' .
+RelOpr		: '<'
+		| '<='
+		| '=='
+		| '>='
+		| '>' .

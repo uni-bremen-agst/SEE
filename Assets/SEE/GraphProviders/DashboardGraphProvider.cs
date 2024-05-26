@@ -45,7 +45,7 @@ namespace SEE.GraphProviders
         {
             string startVersion = string.IsNullOrEmpty(IssuesAddedFromVersion) ? null : IssuesAddedFromVersion;
             Debug.Log($"Loading metrics and added issues from the Axivion Dashboard for start version {startVersion}.\n");
-            return await MetricImporter.LoadDashboardAsync(graph, OverrideMetrics, startVersion);
+            return await MetricImporter.LoadDashboardAsync(graph, OverrideMetrics, startVersion, changePercentage, token);
         }
 
         public override SingleGraphProviderKind GetKind()

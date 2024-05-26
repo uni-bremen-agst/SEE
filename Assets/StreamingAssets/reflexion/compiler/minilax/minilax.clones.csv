@@ -1,0 +1,5 @@
+Filename1;StartLine1;EndLine1;Filename2;StartLine2;EndLine2;CloneType;CloneLength;CloneSize;startcolumn1;endcolumn1;startcolumn2;endcolumn2;classid;parameters;parameter_overlap;parameter_consistency;degree_of_valid_references;fraction_of_repeated_parameters;token_overlap;diversity;fragment_length;volume;fraction_of_non_repetitive_tokens;longest_repeat_length;longest_repeat_subsequence_length;longest_repeat_repetition
+codegen.c;493;508;codegen.c;573;588;2;16;204;30;52;26;52;1;87;0.972222;0.988506;0.980769;0.591954;0;17;204;408;0.000000;0;0;0
+semantic.c;83;109;semantic.c;112;138;2;27;187;8;21;28;21;3;119;0.806452;0.991597;0.989011;0.764706;0;18;187;374;0.000000;0;0;0
+threeadr.c;380;407;threeadr.c;407;434;2;28;209;39;31;33;31;4;100;0.852941;0.940000;0.914286;0.685000;0;24;209;418;0.000000;0;0;0
+typechk.c;287;322;typechk.c;331;366;2;36;226;10;25;44;22;2;126;0.857143;0.976190;0.968085;0.742063;0;18;226;452;0.000000;0;0;0

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Xml;
+using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG.GraphIndex;
 using UnityEngine;
 
@@ -37,7 +38,7 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="graph">Graph where to add the metrics</param>
         /// <param name="jaCoCoFilename">Path of the XML file</param>
-        public static void Load(Graph graph, string jaCoCoFilename)
+        public static async UniTask LoadAsync(Graph graph, string jaCoCoFilename)
         {
             if (graph == null)
             {
@@ -60,7 +61,14 @@ namespace SEE.DataModel.DG.IO
 
             SourceRangeIndex index = new(graph, IndexPath);
 
-            XmlReaderSettings settings = new() { DtdProcessing = DtdProcessing.Parse };
+            XmlReaderSettings settings = new()
+            {
+                CloseInput = true,
+                IgnoreWhitespace = true,
+                IgnoreComments = true,
+                Async = true,
+                DtdProcessing = DtdProcessing.Parse
+            };
             using XmlReader xmlReader = XmlReader.Create(jaCoCoFilename, settings);
 
             // The fully qualified name of the package currently processed.
@@ -106,7 +114,7 @@ namespace SEE.DataModel.DG.IO
             // Type of the XML node in JaCoCo's report currently processed, that is, the
             // one to add the metrics, to. This can be any of reportContext, packageContext,
             // classContext, or methodContext.
-            string nodeType = null;
+            string nodeType;
 
             // Note: A report clause is the outermost XML node and may have immediate
             // counter clauses itself. E.g.:
@@ -126,7 +134,7 @@ namespace SEE.DataModel.DG.IO
             // read metrics will be ignored.
             bool inSourcefile = false;
 
-            while (xmlReader.Read())
+            while (await xmlReader.ReadAsync())
             {
                 switch (xmlReader.NodeType)
                 {
@@ -286,12 +294,13 @@ namespace SEE.DataModel.DG.IO
                         break;
                 }
             }
+            return;
 
             // Retrieves the counter metrics from xmlReader and adds them to nodeToAddMetrics
             static void AddMetrics(XmlReader xmlReader, Node nodeToAddMetrics)
             {
-                int missed = int.Parse(xmlReader.GetAttribute("missed"), CultureInfo.InvariantCulture.NumberFormat);
-                int covered = int.Parse(xmlReader.GetAttribute("covered"), CultureInfo.InvariantCulture.NumberFormat);
+                int missed = int.Parse(xmlReader.GetAttribute("missed")!, CultureInfo.InvariantCulture.NumberFormat);
+                int covered = int.Parse(xmlReader.GetAttribute("covered")!, CultureInfo.InvariantCulture.NumberFormat);
 
                 string metricNamePrefix = JaCoCo.Prefix + "." + xmlReader.GetAttribute("type");
 
@@ -500,7 +509,7 @@ namespace SEE.DataModel.DG.IO
             // of the parent and the second element is the last simple name.
             static (string, string) SimpleName(string qualifiedName)
             {
-                int i = qualifiedName.LastIndexOf(".");
+                int i = qualifiedName.LastIndexOf(".", StringComparison.Ordinal);
                 if (i == -1)
                 {
                     return (string.Empty, qualifiedName);

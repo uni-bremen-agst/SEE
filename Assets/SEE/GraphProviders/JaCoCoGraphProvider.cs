@@ -27,7 +27,7 @@ namespace SEE.GraphProviders
         /// is undefined or does not exist or <paramref name="city"/> is null</exception>
         /// <exception cref="NotImplementedException">thrown in case <paramref name="graph"/> is
         /// null; this is currently not supported.</exception>
-        public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
+        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
                                                     Action<float> changePercentage = null,
                                                     CancellationToken token = default)
         {
@@ -38,8 +38,10 @@ namespace SEE.GraphProviders
             }
             else
             {
-                JaCoCoImporter.Load(graph, Path.Path);
-                return UniTask.FromResult(graph);
+                await UniTask.SwitchToThreadPool();
+                await JaCoCoImporter.LoadAsync(graph, Path.Path);
+                await UniTask.SwitchToMainThread();
+                return graph;
             }
         }
 

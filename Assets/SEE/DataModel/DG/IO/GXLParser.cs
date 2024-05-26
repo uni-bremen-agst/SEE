@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Threading;
 using System.Xml;
+using Cysharp.Threading.Tasks;
 using SEE.Utils;
 
 namespace SEE.DataModel.DG.IO
@@ -27,7 +29,7 @@ namespace SEE.DataModel.DG.IO
                 CloseInput = true,
                 IgnoreWhitespace = true,
                 IgnoreComments = true,
-                // TODO: Apparently enabling the below has security implications due to the URL being resolved.
+                Async = true,
                 DtdProcessing = DtdProcessing.Parse
             };
             Reader = XmlReader.Create(gxl, settings);
@@ -182,7 +184,7 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Loads the GXL file and parses it.
         /// </summary>
-        public virtual void Load()
+        public virtual async UniTask LoadAsync(CancellationToken token = default)
         {
             // Preserves the last text content of an XML node seen,
             // e.g., "mystring" in <string>mystring</string>.
@@ -191,8 +193,13 @@ namespace SEE.DataModel.DG.IO
 
             try
             {
-                while (Reader.Read())
+                await UniTask.SwitchToThreadPool();
+                while (await Reader.ReadAsync())
                 {
+                    if (token.IsCancellationRequested)
+                    {
+                        throw new OperationCanceledException(token);
+                    }
                     // LogDebug("XML processing: name=" + reader.Name + " nodetype=" + reader.NodeType + " value=" + reader.Value + "\n");
 
                     // See https://docs.microsoft.com/de-de/dotnet/api/system.xml.xmlnodetype?view=netframework-4.8
@@ -391,6 +398,7 @@ namespace SEE.DataModel.DG.IO
             finally
             {
                 Reader.Close();
+                await UniTask.SwitchToMainThread();
             }
 
             if (Context.Count > 0)

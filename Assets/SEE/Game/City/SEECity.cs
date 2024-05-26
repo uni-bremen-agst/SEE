@@ -291,7 +291,7 @@ namespace SEE.Game.City
         /// Loads the graph data from the GXL file with GXLPath() and the metrics
         /// from the CSV file with CSVPath() and then draws it. Equivalent to:
         ///   LoadDataAsync();
-        ///   DrawGraph();
+        ///   DrawGraphAsync();
         /// </summary>
         public virtual async UniTaskVoid LoadAndDrawGraphAsync()
         {
@@ -317,13 +317,22 @@ namespace SEE.Game.City
             {
                 try
                 {
-                    using (LoadingSpinner.ShowIndeterminate($"Loading city \"{gameObject.name}\""))
+                    using (LoadingSpinner.ShowDeterminate($"Loading city \"{gameObject.name}\"...",
+                                                          out Action<float> reportProgress))
                     {
                         ShowNotification.Info("SEECity", "Loading graph");
                         Debug.Log("Loading graph from provider");
                         IsPipelineRunning = true;
-                        LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, x => ProgressBar = x,
-                            cancellationTokenSource.Token);
+                        void ReportProgress(float x)
+                        {
+                            ProgressBar = x;
+                            reportProgress(x);
+                        }
+
+                        ReportProgress(0.01f);
+
+                        LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, ReportProgress,
+                                                                      cancellationTokenSource.Token);
                         IsPipelineRunning = false;
                         Debug.Log("Graph Provider finished");
                         ShowNotification.Info("SEECity", $"{DataProvider.Pipeline.Count()} Graph provider finished:");
@@ -418,20 +427,40 @@ namespace SEE.Game.City
                 }
                 else
                 {
-                    using (LoadingSpinner.ShowIndeterminate($"Drawing city \"{gameObject.name}\""))
-                    {
-                        graphRenderer = new GraphRenderer(this, theVisualizedSubGraph);
-                        // We assume here that this SEECity instance was added to a game object as
-                        // a component. The inherited attribute gameObject identifies this game object.
-                        graphRenderer.DrawGraph(theVisualizedSubGraph, gameObject);
+                    DrawAsync(theVisualizedSubGraph).Forget();
+                }
+            }
+            return;
 
-                        // If we're in editmode, InitializeAfterDrawn() will be called by Start() once the
-                        // game starts. Otherwise, in playmode, we have to call it ourselves.
-                        if (Application.isPlaying)
+            async UniTaskVoid DrawAsync(Graph subGraph)
+            {
+                graphRenderer = new GraphRenderer(this, subGraph);
+                // We assume here that this SEECity instance was added to a game object as
+                // a component. The inherited attribute gameObject identifies this game object.
+                try
+                {
+                    using (LoadingSpinner.ShowDeterminate($"Drawing city \"{gameObject.name}\"", out Action<float> updateProgress))
+                    {
+                        void ReportProgress(float x)
                         {
-                            InitializeAfterDrawn();
+                            ProgressBar = x;
+                            updateProgress(x);
                         }
+
+                        await graphRenderer.DrawGraphAsync(subGraph, gameObject, ReportProgress, cancellationTokenSource.Token);
                     }
+                }
+                catch (OperationCanceledException)
+                {
+                    ShowNotification.Warn("Drawing cancelled", "Drawing was cancelled.\n", log: true);
+                    throw;
+                }
+
+                // If we're in editmode, InitializeAfterDrawn() will be called by Start() once the
+                // game starts. Otherwise, in playmode, we have to call it ourselves.
+                if (Application.isPlaying)
+                {
+                    InitializeAfterDrawn();
                 }
             }
         }
@@ -550,10 +579,6 @@ namespace SEE.Game.City
         }
 
         #region Config I/O
-
-        //--------------------------------
-        // Configuration file input/output
-        //--------------------------------
 
         /// <summary>
         /// Label of attribute <see cref="DataProvider"/> in the configuration file.

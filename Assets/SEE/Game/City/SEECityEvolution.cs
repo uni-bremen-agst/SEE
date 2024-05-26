@@ -24,6 +24,7 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
 using SEE.Game.Evolution;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.GO;
@@ -256,11 +257,8 @@ namespace SEE.Game.City
         {
             if (firstGraph)
             {
-                GraphRenderer graphRenderer = new GraphRenderer(this, firstGraph);
-                // For some reason SetScaler needs to be called here a second time, the attribute Metic.Level
-                // can't be found otherwise.
-                // EvolutionRenderer.SetGraph doese this too.
-                graphRenderer.DrawGraph(firstGraph, gameObject);
+                GraphRenderer graphRenderer = new(this, firstGraph);
+                graphRenderer.DrawGraphAsync(firstGraph, gameObject).Forget();
             }
             else
             {
@@ -357,7 +355,7 @@ namespace SEE.Game.City
         /// for given <paramref name="graphs"/> using it.
         /// </summary>
         /// <param name="graphs">the series of graph to be drawn</param>
-        private void DrawGraphs(List<Graph> graphs)
+        private void DrawGraphs(IList<Graph> graphs)
         {
             for (int i = 0; i < graphs.Count; i++)
             {
