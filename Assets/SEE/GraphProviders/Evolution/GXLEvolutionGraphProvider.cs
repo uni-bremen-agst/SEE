@@ -54,17 +54,17 @@ namespace SEE.GraphProviders
         public override UniTask<List<Graph>> ProvideAsync(List<Graph> graphs, AbstractSEECity city,
             Action<float> changePercentage = null,
             CancellationToken token = default) =>
-            UniTask.FromResult(LoadGraph(city));
+            LoadGraph(city);
 
         /// <summary>
         /// Loads the actual graph series from the gxl files in <see cref="GXLDirectory"/>
         /// </summary>
         /// <param name="city">The city where the evolution should be displayed</param>
         /// <returns>The graph series generated from the gxl files</returns>
-        private List<Graph> LoadGraph(AbstractSEECity city)
+        private async UniTask<List<Graph>> LoadGraph(AbstractSEECity city)
         {
             GraphsReader reader = new();
-            reader.Load(GXLDirectory.Path, city.HierarchicalEdges, basePath: city.SourceCodeDirectory.Path,
+            await reader.LoadAsync(GXLDirectory.Path, city.HierarchicalEdges, basePath: city.SourceCodeDirectory.Path,
                 rootName: GXLDirectory.Path, MaxRevisionsToLoad);
             return reader.Graphs;
         }

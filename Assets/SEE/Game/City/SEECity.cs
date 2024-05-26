@@ -18,6 +18,7 @@ using SEE.GraphProviders;
 using SEE.UI.Notification;
 using SEE.DataModel.DG.IO;
 using SEE.DataModel;
+using SEE.GameObjects;
 
 namespace SEE.Game.City
 {
