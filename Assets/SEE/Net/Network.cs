@@ -675,7 +675,7 @@ namespace SEE.Net
         {
             if (RoomPassword == Encoding.ASCII.GetString(request.Payload))
             {
-                Debug.Log($"Client {request.ClientNetworkId} has sent right room password");
+                Debug.Log($"Client {request.ClientNetworkId} has sent right room password.\n");
                 response.Approved = true;
 
             }
@@ -683,7 +683,7 @@ namespace SEE.Net
             {
                 response.Approved = false;
                 response.Reason = "Invalid password";
-                Debug.LogWarning($"Client {request.ClientNetworkId} has sent wrong room password");
+                Debug.LogWarning($"Client {request.ClientNetworkId} has sent wrong room password.\n");
             }
         }
 
@@ -695,7 +695,7 @@ namespace SEE.Net
         /// <param name="owner">ID of the owner</param>
         private void OnClientConnectedCallback(ulong owner)
         {
-            callbackToMenu?.Invoke(true, "You are connected to " + ServerAddress);
+            callbackToMenu?.Invoke(true, $"You are connected to {ServerAddress}.\n");
             callbackToMenu = null;
         }
 
