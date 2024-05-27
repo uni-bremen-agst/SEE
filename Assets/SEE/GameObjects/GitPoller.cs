@@ -125,7 +125,7 @@ namespace SEE.GameObjects
         /// </summary>
         private void ShowNewCommitsMessage()
         {
-            Debug.Log("New commits");
+            Debug.Log("New commits detected");
             ShowNotification.Info("New commits detected", "Refreshing code city");
         }
 
