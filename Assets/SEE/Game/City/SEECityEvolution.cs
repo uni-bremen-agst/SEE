@@ -64,7 +64,6 @@ namespace SEE.Game.City
         /// </summary>
         private const string evolutionFoldoutGroup = "Evolution settings";
 
-
         private const string NoGraphsProvidedErrorMessage = "Graph providers didn't yield any graphs";
 
         private const string CantShowEvolutionMessage = "Can't show evolution";
@@ -195,11 +194,19 @@ namespace SEE.Game.City
 
             try
             {
-                using (LoadingSpinner.ShowIndeterminate($"Loading city \"{gameObject.name}\""))
+                using (LoadingSpinner.ShowDeterminate($"Loading city \"{gameObject.name}\"",
+                           out Action<float> reportProgress))
                 {
                     ShowNotification.Info("SEECity Evolution", "Loading graph");
                     Debug.Log("Loading graph series from provider");
-                    LoadedGraphSeries = await DataProvider.ProvideAsync(new List<Graph>(), this, x => ProgressBar = x,
+
+                    void ReportProgress(float x)
+                    {
+                        ProgressBar = x;
+                        reportProgress(x);
+                    }
+
+                    LoadedGraphSeries = await DataProvider.ProvideAsync(new List<Graph>(), this, ReportProgress,
                         cancellationTokenSource.Token);
 
                     if (LoadedGraphSeries.Count == 0)
@@ -226,7 +233,8 @@ namespace SEE.Game.City
             catch (Exception e)
             {
                 Debug.LogException(e);
-                ShowNotification.Error("Data failure", $"Evolution graph provider failed with: {e.Message}\n", log: false);
+                ShowNotification.Error("Data failure", $"Evolution graph provider failed with: {e.Message}\n",
+                    log: false);
                 throw;
             }
         }

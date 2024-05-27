@@ -11,6 +11,7 @@ using SEE.DataModel.DG.IO.Git;
 using SEE.Game.City;
 using SEE.GameObjects;
 using SEE.GO;
+using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using SEE.Utils.Config;
@@ -56,9 +57,7 @@ namespace SEE.GraphProviders
         /// <summary>
         /// This option fill simplify the graph with <see cref="GitFileMetricsGraphGenerator.DoSimplyfiGraph"/> and combine directories.
         /// </summary>
-        [OdinSerialize]
-        [ShowInInspector]
-        public bool SimplifyGraph { get; set; }
+        [OdinSerialize] [ShowInInspector] public bool SimplifyGraph = false;
 
         /// <summary>
         /// Specifies if SEE should automatically fetch for new commits in the repository <see cref="RepositoryData"/>.
@@ -67,9 +66,16 @@ namespace SEE.GraphProviders
         ///
         /// Note: the repository must be fetch-able without any credentials since we cant store them securely yet.
         /// </summary>
-        [OdinSerialize]
-        [ShowInInspector]
-        public bool AutoFetch { get; set; }
+        [OdinSerialize] [ShowInInspector] public bool AutoFetch = false;
+
+        [OdinSerialize, ShowInInspector, EnableIf(nameof(AutoFetch)), Range(5, 200)]
+        public int PollingInterval = 5;
+
+        [OdinSerialize, ShowInInspector, EnableIf(nameof(AutoFetch)), Range(5, 200)]
+        public int MarkerTime = 10;
+
+
+        private float progressPercantage = 0f;
 
         #endregion
 
@@ -89,8 +95,6 @@ namespace SEE.GraphProviders
 
 
         #region Methods
-
-        
 
         /// <summary>
         /// Checks if all attributes are set correctly.
@@ -116,7 +120,7 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="city">The code city where the <see cref="GitPoller"/> component should be attached.</param>
         /// <returns>The <see cref="GitPoller"/> component</returns>
-        private static GitPoller GetOrAddGitPollerComponent(AbstractSEECity city)
+        private GitPoller GetOrAddGitPollerComponent(SEECity city)
         {
             if (city.TryGetComponent(out GitPoller poller))
             {
@@ -124,7 +128,9 @@ namespace SEE.GraphProviders
             }
 
             GitPoller newPoller = city.gameObject.AddComponent<GitPoller>();
-            newPoller.CodeCity = (SEECity)city;
+            newPoller.CodeCity = city;
+            newPoller.PollingInterval = PollingInterval;
+            newPoller.MarkerTime = MarkerTime;
             return newPoller;
         }
 
@@ -142,10 +148,17 @@ namespace SEE.GraphProviders
         {
             CheckAttributes();
 
-            var task = await UniTask.RunOnThreadPool(() => GetGraph(graph), cancellationToken: token);
+            var task = await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage), cancellationToken: token);
             if (AutoFetch)
             {
-                GitPoller poller = GetOrAddGitPollerComponent(city);
+                if (city is not SEECity seeCity)
+                {
+                    ShowNotification.Warn("Can't enable auto fetch",
+                        "Automatically fetching git repos is only supported in SEECity");
+                    return task;
+                }
+
+                GitPoller poller = GetOrAddGitPollerComponent(seeCity);
                 poller.WatchedRepositories.Add(RepositoryData.RepositoryPath.Path);
             }
 
@@ -154,13 +167,14 @@ namespace SEE.GraphProviders
 
         /// <summary>
         /// Calculates and returns the actual graph.
-        ///
+        /// 
         /// This method will collect all commit from all branches which are not older than <see cref="Date"/>.
         /// Then from all these commits the metrics are calculated with <see cref="GitFileMetricRepository.ProcessCommit(LibGit2Sharp.Commit,LibGit2Sharp.Patch)"/>
         /// </summary>
         /// <param name="graph">The input graph</param>
+        /// <param name="changePercentage"></param>
         /// <returns>The generated output graph</returns>
-        private Graph GetGraph(Graph graph)
+        private Graph GetGraph(Graph graph, Action<float> changePercentage)
         {
             graph.BasePath = RepositoryData.RepositoryPath.Path;
             string[] pathSegments = RepositoryData.RepositoryPath.Path.Split(Path.DirectorySeparatorChar);
@@ -184,18 +198,25 @@ namespace SEE.GraphProviders
                     .Where(commit => DateTime.Compare(commit.Author.When.Date, timeLimit) > 0)
                     // Filter out merge commits
                     .Where(commit => commit.Parents.Count() <= 1);
-
                 GitFileMetricRepository metricRepository = new(repo, includedFiles);
 
+                int counter = 0;
+                int commitLength = commitList.Count();
                 foreach (var commit in commitList)
                 {
                     metricRepository.ProcessCommit(commit);
+                    changePercentage?.Invoke(Mathf.Clamp((float)counter / commitLength, 0, 0.98f));
+                    counter++;
                 }
 
-                metricRepository.CalculateTruckFactor();
+                //changePercentage(0.5f);
 
+
+                metricRepository.CalculateTruckFactor();
+                //changePercentage(0.75f);
                 GitFileMetricsGraphGenerator.FillGraphWithGitMetrics(metricRepository, graph, repositoryName,
                     SimplifyGraph);
+                changePercentage(1f);
             }
 
             return graph;
@@ -242,7 +263,7 @@ namespace SEE.GraphProviders
             ConfigIO.Restore(attributes, autoFetchLabel, ref autoFetch);
             AutoFetch = autoFetch;
         }
-        
+
         #endregion
     }
 }

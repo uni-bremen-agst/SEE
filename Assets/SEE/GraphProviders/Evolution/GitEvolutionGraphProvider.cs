@@ -64,7 +64,7 @@ namespace SEE.GraphProviders.Evolution
             CancellationToken token = default)
         {
             CheckAttributes();
-            return await UniTask.RunOnThreadPool(() => GetGraph(graph), cancellationToken: token);
+            return await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage), cancellationToken: token);
         }
 
         /// <summary>
@@ -89,11 +89,12 @@ namespace SEE.GraphProviders.Evolution
 
         /// <summary>
         /// Calculates and returns the actual graph series.
-        ///
+        /// 
         /// </summary>
         /// <param name="graph">The input graph series</param>
+        /// <param name="changePercentage"></param>
         /// <returns>The calculated graph series</returns>
-        private List<Graph> GetGraph(List<Graph> graph)
+        private List<Graph> GetGraph(List<Graph> graph, Action<float> changePercentage)
         {
             DateTime timeLimit = DateTime.ParseExact(Date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
 
@@ -108,14 +109,22 @@ namespace SEE.GraphProviders.Evolution
             using (var repo = new Repository(GitRepository.RepositoryPath.Path))
             {
                 List<Commit> commitList = repo.Commits
-                    .QueryBy(new CommitFilter { IncludeReachableFrom = repo.Branches, SortBy = CommitSortStrategies.None})
+                    .QueryBy(new CommitFilter
+                        { IncludeReachableFrom = repo.Branches, SortBy = CommitSortStrategies.None })
                     .Where(commit => DateTime.Compare(commit.Author.When.Date, timeLimit) > 0)
                     .Where(commit => commit.Parents.Count() <= 1)
                     .Reverse()
                     .ToList();
+                changePercentage(0.1f);
 
                 Dictionary<Commit, Patch> commitChanges =
                     commitList.ToDictionary(commit => commit, commit => GetFileChanges(commit, repo));
+                changePercentage(0.2f);
+
+                int counter = 0;
+                int commitLength = commitChanges.Where(x =>
+                    x.Value.Any(y =>
+                        includedFiles.Contains(Path.GetExtension(y.Path)))).Count();
 
                 // iterate over all commits where at least one file with a file extension in includedFiles is present
                 foreach (var currentCommit in
@@ -123,6 +132,8 @@ namespace SEE.GraphProviders.Evolution
                              x.Value.Any(y =>
                                  includedFiles.Contains(Path.GetExtension(y.Path)))))
                 {
+                    changePercentage?.Invoke(Mathf.Clamp((float)counter / commitLength, 0.2f, 0.98f));
+
                     // All commits between the first commit in commitList and the current commit
                     List<Commit> commitsInBetween =
                         commitList.GetRange(0, commitList.FindIndex(x => x.Sha == currentCommit.Key.Sha) + 1);
@@ -130,6 +141,7 @@ namespace SEE.GraphProviders.Evolution
                     graph.Add(GetGraphOfCommit(repositoryName, currentCommit.Key, commitsInBetween,
                         commitChanges,
                         includedFiles, repo));
+                    counter++;
                 }
             }
 
@@ -183,8 +195,9 @@ namespace SEE.GraphProviders.Evolution
             if (commit.Parents.Any())
             {
                 return repo.Diff
-                    .Compare<Patch>(commit.Tree, commit.Parents.First().Tree); 
+                    .Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
             }
+
             return repo.Diff
                 .Compare<Patch>(null, commit.Tree);
         }
@@ -210,7 +223,7 @@ namespace SEE.GraphProviders.Evolution
             writer.Save(pathGlobbing, "PathGlobing");
             writer.Save(Date, "Date");
         }
-        
+
         /// <summary>
         /// Restores the attributes of this provider from <paramref name="attributes"/>
         /// </summary>
