@@ -531,11 +531,6 @@ namespace SEE.Game.City
         public void OnClickResetButton()
         {
             Reset();
-            // Remove the poller
-            if (TryGetComponent(out GitPoller poller))
-            {
-                Destroy(poller);
-            }
         }
 
         /// <summary>
