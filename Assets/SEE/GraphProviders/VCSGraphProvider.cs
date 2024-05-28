@@ -2,17 +2,20 @@ using Cysharp.Threading.Tasks;
 using LibGit2Sharp;
 using SEE.DataModel.DG;
 using SEE.Game.City;
+using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils.Config;
+using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Dissonance;
 using UnityEngine;
 using SEE.Utils;
 using SEE.UI.Window.CodeWindow;
-using SEE.Utils.Paths;
 
 namespace SEE.GraphProviders
 {
@@ -22,29 +25,39 @@ namespace SEE.GraphProviders
     public class VCSGraphProvider : SingleGraphProvider
     {
         /// <summary>
+        /// The path to the git repository.
+        /// </summary>
+        [ShowInInspector, Tooltip("Path to the git repository."), HideReferenceObjectPicker]
+        public DirectoryPath RepositoryPath = new();
+
+        /// <summary>
         /// The commit id.
         /// </summary>
         [ShowInInspector, Tooltip("The new commit id."), HideReferenceObjectPicker]
         public string CommitID = "";
 
-        public GitRepository Repository;
-
-        private Dictionary<string, bool> PathGlobbing => Repository.PathGlobbing;
-
-        private DirectoryPath RepositoryPath => Repository.RepositoryPath;
+        /// <summary>
+        /// The List of filetypes that get included/excluded.
+        /// </summary>
+        [OdinSerialize]
+        [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
+         Tooltip("Paths and their inclusion/exclusion status."), RuntimeTab(GraphProviderFoldoutGroup),
+         HideReferenceObjectPicker]
+        public Dictionary<string, bool> PathGlobbing = new()
+        {
+            { "", false }
+        };
 
         /// <summary>
         /// Loads the metrics and nodes from the given git repository and commitID into the <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">The graph into which the metrics shall be loaded</param>
-        public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
-            Action<float> changePercentage = null,
+        public override UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city, Action<float> changePercentage = null,
             CancellationToken token = default)
         {
             CheckArguments(city);
-            UniTask<Graph> graphTask =
-                UniTask.FromResult<Graph>(GetVCSGraph(PathGlobbing, RepositoryPath.Path, CommitID));
-
+            UniTask<Graph> graphTask = UniTask.FromResult<Graph>(GetVCSGraph(PathGlobbing, RepositoryPath.Path, CommitID));
+    
             return graphTask;
         }
 
@@ -153,7 +166,7 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="tree">The tree of the given commit.</param>
         /// <returns>a list of paths.</returns>
-        public static List<string> ListTree(LibGit2Sharp.Tree tree)
+        static List<string> ListTree(LibGit2Sharp.Tree tree)
         {
             var fileList = new List<string>();
 
@@ -172,8 +185,7 @@ namespace SEE.GraphProviders
 
             return fileList;
         }
-
-
+        
         public override SingleGraphProviderKind GetKind()
         {
             return SingleGraphProviderKind.VCS;
@@ -204,11 +216,14 @@ namespace SEE.GraphProviders
 
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
-            ConfigIO.Restore(attributes, pathGlobbingLabel, ref Repository.PathGlobbing);
+            ConfigIO.Restore(attributes, pathGlobbingLabel, ref PathGlobbing);
             ConfigIO.Restore(attributes, newCommitIDLabel, ref CommitID);
             RepositoryPath.Restore(attributes, repositoryPathLabel);
         }
 
+ 
+
+       
 
         /// <summary>
         /// Creates and returns a new node to <paramref name="graph"/> as a child of <paramref name="parent"/>.
