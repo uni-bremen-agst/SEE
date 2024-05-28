@@ -121,14 +121,6 @@ namespace SEE.GraphProviders
             // The main directory.
             NewNode(graph, pathSegments[^1], directoryNodeType, pathSegments[^1]);
 
-            IEnumerable<string> includedPathGlobs = pathGlobbing
-                .Where(path => path.Value)
-                .Select(path => path.Key).ToHashSet();
-
-            IEnumerable<string> excludedPathGlobs = pathGlobbing
-                .Where(path => !path.Value)
-                .Select(path => path.Key).ToHashSet();
-
             using (Repository repo = new(repositoryPath))
             {
                 LibGit2Sharp.Tree tree = repo.Lookup<Commit>(commitID).Tree;
