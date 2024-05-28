@@ -71,8 +71,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Sets the maximum number of revisions to load.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Maximum number of revisions to load."),
-         FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
+        [SerializeField, ShowInInspector, Tooltip("Maximum number of revisions to load."), FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
         public int MaxRevisionsToLoad = 500; // serialized by Unity
 
         /// <summary>
@@ -142,7 +141,6 @@ namespace SEE.Game.City
                 result = gameObject.AddComponent<EvolutionRenderer>();
                 result.SetGraphEvolution(graphs);
             }
-
             return result;
         }
 

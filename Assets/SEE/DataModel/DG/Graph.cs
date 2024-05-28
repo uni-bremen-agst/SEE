@@ -70,7 +70,6 @@ namespace SEE.DataModel.DG
                 {
                     FinalizeNodeHierarchy();
                 }
-
                 return maxDepth;
             }
         }
@@ -130,8 +129,7 @@ namespace SEE.DataModel.DG
 
             if (nodes.TryGetValue(node.ID, out Node other))
             {
-                throw new InvalidOperationException(
-                    $"ID '{node.ID}' is not unique\n: {node}. \nDuplicate already in graph: {other}.");
+                throw new InvalidOperationException($"ID '{node.ID}' is not unique\n: {node}. \nDuplicate already in graph: {other}.");
             }
 
             if (node.ItsGraph != null)
@@ -178,6 +176,7 @@ namespace SEE.DataModel.DG
 
             if (nodes.Remove(node.ID))
             {
+
                 // We need to send out this event here, before the node is modified but after it has been removed.
                 Notify(new NodeEvent(Version, node, ChangeType.Removal));
 
@@ -205,7 +204,7 @@ namespace SEE.DataModel.DG
                 if (node.NumberOfChildren() > 0)
                 {
                     Reparent(node.Children().ToArray(),
-                        orphansBecomeRoots ? null : node.Parent);
+                             orphansBecomeRoots ? null : node.Parent);
                 }
 
                 node.Reset();
@@ -307,12 +306,10 @@ namespace SEE.DataModel.DG
                     id = $"{Name}#ROOT";
                     sourceName = $"{Name} (root)";
                 }
-
                 if (string.IsNullOrWhiteSpace(type))
                 {
                     type = UnknownType;
                 }
-
                 root = new() { SourceName = sourceName, ID = id, Type = type, ToggleAttributes = { RootToggle } };
                 AddNode(root);
                 foreach (Node oldRoot in roots)
@@ -610,7 +607,6 @@ namespace SEE.DataModel.DG
             {
                 throw new ArgumentException("ID must neither be null nor empty");
             }
-
             return nodes.TryGetValue(id, out node);
         }
 
@@ -771,7 +767,7 @@ namespace SEE.DataModel.DG
         /// <typeparam name="T">Type of the graph.</typeparam>
         /// <returns>The result from merging the <paramref name="other"/> graph into this one</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="other"/> is <c>null</c></exception>
-        public T MergeWith<T>(Graph other, string nodeIdSuffix = null, string edgeIdSuffix = null) where T : Graph
+        public T MergeWith<T>(Graph other, string nodeIdSuffix = null, string edgeIdSuffix = null) where T: Graph
         {
             if (other == null)
             {
@@ -847,7 +843,7 @@ namespace SEE.DataModel.DG
         private static int CalcMaxDepth(IEnumerable<Node> nodes, int currentDepth)
         {
             return nodes.Select(node => CalcMaxDepth(node.Children(), currentDepth + 1))
-                .Prepend(currentDepth + 1).Max();
+                        .Prepend(currentDepth + 1).Max();
         }
 
         /// <summary>
@@ -1199,10 +1195,9 @@ namespace SEE.DataModel.DG
 
             // We need to identify all nodes we want to keep, so all nodes which are attached to a kept edge.
             ISet<Node> keptNodes = new HashSet<Node>(nodes.Select(x => x.Value)
-                .Where(x => keptEdges.Overlaps(x.Incomings.Concat(x.Outgoings))));
+                                                          .Where(x => keptEdges.Overlaps(x.Incomings.Concat(x.Outgoings))));
 
-            return SubgraphBy(x => x is Node && keptNodes.Contains(x) || x is Edge && keptEdges.Contains(x),
-                ignoreSelfLoops);
+            return SubgraphBy(x => x is Node && keptNodes.Contains(x) || x is Edge && keptEdges.Contains(x), ignoreSelfLoops);
         }
 
         /// <summary>
@@ -1328,7 +1323,7 @@ namespace SEE.DataModel.DG
         /// <param name="mapsTo">mapping from nodes of this graph onto nodes in <paramref name="subgraph"/></param>
         /// <param name="parent">root of a subtree to be mapped; is a node in this graph</param>
         private static void AddToSubGraph(Graph subgraph, Func<GraphElement, bool> includeElement,
-            IDictionary<Node, Node> mapsTo, Node parent)
+                                          IDictionary<Node, Node> mapsTo, Node parent)
         {
             foreach (Node child in parent.Children())
             {
@@ -1378,8 +1373,8 @@ namespace SEE.DataModel.DG
         /// <param name="includeElement">function determining whether a respective edge shall be kept</param>
         /// <param name="ignoreSelfLoops">If true, lifted edges whose source and target nodes are the same are ignored</param>
         private void AddEdgesToSubgraph(Graph subgraph, IDictionary<Node, Node> mapsTo,
-            Func<GraphElement, bool> includeElement,
-            bool ignoreSelfLoops)
+                                        Func<GraphElement, bool> includeElement,
+                                        bool ignoreSelfLoops)
         {
             foreach (Edge edge in Edges())
             {
@@ -1404,7 +1399,6 @@ namespace SEE.DataModel.DG
                         {
                             edgeInSubgraph.SetToggle(Edge.IsLiftedToggle);
                         }
-
                         subgraph.AddEdge(edgeInSubgraph);
                     }
                 }
@@ -1489,7 +1483,7 @@ namespace SEE.DataModel.DG
         public override bool Equals(object other)
         {
             return (other is Graph otherGraph) && (GetType() == otherGraph.GetType())
-                                               && (Name == otherGraph.Name) && (Path == otherGraph.Path);
+                && (Name == otherGraph.Name) && (Path == otherGraph.Path);
         }
 
         /// <summary>
