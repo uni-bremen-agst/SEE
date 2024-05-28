@@ -85,9 +85,9 @@ namespace SEE.Scanner
             // Derivative Halstead metrics.
             int programVocabulary = operators.Count + operands.Count;
             int programLength = totalOperators + totalOperands;
-            float estimatedProgramLength = (float)((operators.Count * Mathf.Log(operators.Count, 2) + operands.Count * Mathf.Log(operands.Count, 2)));
-            float volume = (float)(programLength * Mathf.Log(programVocabulary, 2));
-            float difficulty = operators.Count == 0 ? 0 : operators.Count / 2.0f * (totalOperands / (float)operands.Count);
+            float estimatedProgramLength = operators.Count == 0 ? 0 : (float)((operators.Count * Mathf.Log(operators.Count, 2) + operands.Count * Mathf.Log(operands.Count, 2)));
+            float volume = programVocabulary == 0 ? 0 : (float)(programLength * Mathf.Log(programVocabulary, 2));
+            float difficulty = operands.Count == 0 ? 0 : operators.Count / 2.0f * (totalOperands / (float)operands.Count);
             float effort = difficulty * volume;
             float timeRequiredToProgram = effort / 18.0f; // Formula: Time T = effort E / S, where S = Stroud's number of psychological 'moments' per second; typically a figure of 18 is used in Software Science.
             float numberOfDeliveredBugs = volume / 3000.0f; // Formula: Bugs B = effort E^(2/3) / 3000 or bugs B = volume V / 3000 are both used. 3000 is an empirical estimate.
