@@ -159,7 +159,7 @@ namespace SEE.Game.City
 
             if (TryGetComponent(out GitPoller poller))
             {
-                //Destroy(poller);
+               //Destroy(poller);
             }
 
             loadedGraph = null;
@@ -319,12 +319,11 @@ namespace SEE.Game.City
                 try
                 {
                     using (LoadingSpinner.ShowDeterminate($"Loading city \"{gameObject.name}\"...",
-                               out Action<float> reportProgress))
+                                                          out Action<float> reportProgress))
                     {
                         ShowNotification.Info("SEECity", "Loading graph");
                         Debug.Log("Loading graph from provider");
                         IsPipelineRunning = true;
-
                         void ReportProgress(float x)
                         {
                             ProgressBar = x;
@@ -334,7 +333,7 @@ namespace SEE.Game.City
                         ReportProgress(0.01f);
 
                         LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, ReportProgress,
-                            cancellationTokenSource.Token);
+                                                                      cancellationTokenSource.Token);
                         IsPipelineRunning = false;
                         Debug.Log("Graph Provider finished");
                         ShowNotification.Info("SEECity", $"{DataProvider.Pipeline.Count()} Graph provider finished:");
@@ -432,7 +431,6 @@ namespace SEE.Game.City
                     DrawAsync(theVisualizedSubGraph).Forget();
                 }
             }
-
             return;
 
             async UniTaskVoid DrawAsync(Graph subGraph)
@@ -442,8 +440,7 @@ namespace SEE.Game.City
                 // a component. The inherited attribute gameObject identifies this game object.
                 try
                 {
-                    using (LoadingSpinner.ShowDeterminate($"Drawing city \"{gameObject.name}\"",
-                               out Action<float> updateProgress))
+                    using (LoadingSpinner.ShowDeterminate($"Drawing city \"{gameObject.name}\"", out Action<float> updateProgress))
                     {
                         void ReportProgress(float x)
                         {
@@ -451,8 +448,7 @@ namespace SEE.Game.City
                             updateProgress(x);
                         }
 
-                        await graphRenderer.DrawGraphAsync(subGraph, gameObject, ReportProgress,
-                            cancellationTokenSource.Token);
+                        await graphRenderer.DrawGraphAsync(subGraph, gameObject, ReportProgress, cancellationTokenSource.Token);
                     }
                 }
                 catch (OperationCanceledException)
@@ -522,22 +518,13 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// This method is by the runtime menu or the inspector.
-        /// It does the exact same as <see cref="Reset"/> but additionally removes the <see cref="GitPoller"/> component. 
-        /// </summary>
-        [Button(ButtonSizes.Small, Name = "Reset Data")]
-        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
-        [PropertyOrder(ResetButtonsGroupOrderReset)]
-        public void OnClickResetButton()
-        {
-            Reset();
-        }
-
-        /// <summary>
         /// Resets everything that is specific to a given graph. Here: the selected node types,
         /// the underlying and visualized graph, and all game objects visualizing information about it.
         /// </summary>
         /// <remarks>This method should be called whenever <see cref="loadedGraph"/> is re-assigned.</remarks>
+        [Button(ButtonSizes.Small, Name = "Reset Data")]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
+        [PropertyOrder(ResetButtonsGroupOrderReset)]
         public override void Reset()
         {
             base.Reset();
@@ -545,6 +532,11 @@ namespace SEE.Game.City
             cancellationTokenSource.Cancel();
             IsPipelineRunning = false;
             cancellationTokenSource = new CancellationTokenSource();
+            // Remove the poller
+            if (TryGetComponent(out GitPoller poller))
+            {
+               // Destroy(poller);
+            }
 
             // Delete the underlying graph.
             loadedGraph?.Destroy();
