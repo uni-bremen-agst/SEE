@@ -157,9 +157,12 @@ namespace SEE.GraphProviders
                         "Automatically fetching git repos is only supported in SEECity");
                     return task;
                 }
-
-                GitPoller poller = GetOrAddGitPollerComponent(seeCity);
-                poller.WatchedRepositories.Add(RepositoryData.RepositoryPath.Path);
+                // Only add the poller when in playing mode
+                if (Application.isPlaying)
+                {
+                    GitPoller poller = GetOrAddGitPollerComponent(seeCity);
+                    poller.WatchedRepositories.Add(RepositoryData.RepositoryPath.Path);
+                }
             }
 
             return task;

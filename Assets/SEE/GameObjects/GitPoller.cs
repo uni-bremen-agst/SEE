@@ -55,6 +55,9 @@ namespace SEE.GameObjects
         /// </summary>
         private MarkerFactory markerFactory;
 
+
+        private bool doNotPool = false;
+
         /// <summary>
         /// Runs git fetch on all remotes for all branches
         /// </summary>
@@ -141,54 +144,60 @@ namespace SEE.GameObjects
         /// </summary>
         async UniTaskVoid PollReposAsync()
         {
-            Dictionary<string, List<string>> newHashes = await UniTask.RunOnThreadPool(() =>
+            if (!doNotPool)
             {
-                RunGitFetch();
-                return GetTipHashes();
-            });
-
-            if (!newHashes.All(x => RepositoriesTipHashes[x.Key].SequenceEqual(x.Value)))
-            {
-                ShowNewCommitsMessage();
-
-                RepositoriesTipHashes = newHashes;
-                // Backup old graph
-                Graph oldGraph = CodeCity.LoadedGraph.Clone() as Graph;
-                await CodeCity.LoadDataAsync();
-                try
+                doNotPool = true;
+                Dictionary<string, List<string>> newHashes = await UniTask.RunOnThreadPool(() =>
                 {
-                    CodeCity.ReDrawGraph();
-                }
-                catch (Exception e)
+                    RunGitFetch();
+                    return GetTipHashes();
+                });
+
+                if (!newHashes.All(x => RepositoriesTipHashes[x.Key].SequenceEqual(x.Value)))
                 {
-                    Debug.LogError(e);
+                    ShowNewCommitsMessage();
+
+                    RepositoriesTipHashes = newHashes;
+                    // Backup old graph
+                    Graph oldGraph = CodeCity.LoadedGraph.Clone() as Graph;
+                    await CodeCity.LoadDataAsync();
+                    try
+                    {
+                        CodeCity.ReDrawGraph();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError(e);
+                    }
+
+                    ISet<Node> addedNodes;
+                    ISet<Node> changedNodes;
+
+                    CodeCity.LoadedGraph.Diff(oldGraph,
+                        g => g.Nodes(),
+                        (g, id) => g.GetNode(id),
+                        GraphExtensions.AttributeDiff(CodeCity.LoadedGraph, oldGraph),
+                        nodeEqualityComparer,
+                        out addedNodes,
+                        out _,
+                        out changedNodes,
+                        out _);
+                    Debug.Log($"{changedNodes.Count} changed nodes");
+
+                    foreach (var changedNode in changedNodes)
+                    {
+                        markerFactory.MarkChanged(GraphElementIDMap.Find(changedNode.ID, true));
+                    }
+
+                    foreach (var addedNode in addedNodes)
+                    {
+                        markerFactory.MarkBorn(GraphElementIDMap.Find(addedNode.ID, true));
+                    }
+
+                    Invoke(nameof(RemoveMarker), MarkerTime);
                 }
 
-                ISet<Node> addedNodes;
-                ISet<Node> changedNodes;
-
-                CodeCity.LoadedGraph.Diff(oldGraph,
-                    g => g.Nodes(),
-                    (g, id) => g.GetNode(id),
-                    GraphExtensions.AttributeDiff(CodeCity.LoadedGraph, oldGraph),
-                    nodeEqualityComparer,
-                    out addedNodes,
-                    out _,
-                    out changedNodes,
-                    out _);
-                Debug.Log($"{changedNodes.Count} changed nodes");
-
-                foreach (var changedNode in changedNodes)
-                {
-                    markerFactory.MarkChanged(GraphElementIDMap.Find(changedNode.ID, true));
-                }
-
-                foreach (var addedNode in addedNodes)
-                {
-                    markerFactory.MarkBorn(GraphElementIDMap.Find(addedNode.ID, true));
-                }
-
-                Invoke(nameof(RemoveMarker), MarkerTime);
+                doNotPool = false;
             }
         }
 
