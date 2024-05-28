@@ -13,8 +13,8 @@ using Network = SEE.Net.Network;
 namespace SEE.UI
 {
     /// <summary>
-    /// Implements the behaviour of the in-game menu for the selection of the networking
-    /// configuration (host, server, client, settings) that is shown at the start up.
+    /// Implements the behaviour of the in-game menu for the selection of the general
+    /// configuration (host, server, client, network and user-settings) that is shown at the start up.
     /// </summary>
     internal class OpeningDialog : MonoBehaviour
     {
@@ -215,9 +215,10 @@ namespace SEE.UI
             /// menu, which - in turn - will call menu.ShowMenuAsync(false). Thus
             /// at this time, menu is no longer visible. When the following dialog
             /// is finished, <see cref="Reactivate"/> will be called to turn the menu on again.
-            UserPropertyDialog dialog = new();
+            UserPropertyDialog dialog = new(network, Reactivate);
             dialog.Open();
         }
+
         /// <summary>
         /// Turns on the <see cref="menu"/>.
         /// </summary>

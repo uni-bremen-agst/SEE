@@ -43,6 +43,10 @@ namespace SEE.Game.Worlds
         private DissonanceComms dissonanceComms = null;
 
         NetworkManager networkManager = NetworkManager.Singleton;
+        /// <summary>
+        /// network config to read playername
+        /// </summary>
+        private SEE.Net.Network networkConfig;
 
         /// <summary>
         /// Starts the co-routine <see cref="SpawnPlayerCoroutine"/>.
@@ -62,6 +66,13 @@ namespace SEE.Game.Worlds
         /// <returns>enumerator as to how to continue this co-routine</returns>
         private IEnumerator SpawnPlayerCoroutine()
         {
+            networkConfig = FindObjectOfType<SEE.Net.Network>();
+            if (networkConfig == null)
+            {
+                Debug.LogError("Network configuration not found");
+                yield return null;
+            }
+
             while (ReferenceEquals(networkManager, null))
             {
                 networkManager = NetworkManager.Singleton;
@@ -72,7 +83,7 @@ namespace SEE.Game.Worlds
             if (!networkManager.IsServer)
             {
                 dissonanceComms = FindObjectOfType<DissonanceComms>();
-                dissonanceComms.LocalPlayerName = PlayerNameReader.ReadPlayerName();
+                dissonanceComms.LocalPlayerName = networkConfig.Username;
                 yield break;
             }
 
@@ -84,7 +95,7 @@ namespace SEE.Game.Worlds
             while (ReferenceEquals(dissonanceComms, null))
             {
                 dissonanceComms = FindObjectOfType<DissonanceComms>();
-                dissonanceComms.LocalPlayerName = PlayerNameReader.ReadPlayerName();
+                dissonanceComms.LocalPlayerName = networkConfig.Username;
                 yield return null;
             }
 

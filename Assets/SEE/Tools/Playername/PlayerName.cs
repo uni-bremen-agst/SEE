@@ -14,18 +14,26 @@ public class PlayerName : NetworkBehaviour
     /// </summary>
     string playername;
 
+    private SEE.Net.Network networkConfig;
+
     private void Start()
     {
-        // Read the player's name from JSON when the script starts.
-        ReadPlayerNameFromJson();
+        networkConfig = FindObjectOfType<SEE.Net.Network>();
+        if (networkConfig == null)
+        {
+            Debug.LogError("Network configuration not found");
+            return;
+        }
+        // Read the player's name when the script starts.
+        ReadPlayerName();
     }
 
     /// <summary>
-    /// Read the player's name from playername JSON which was created in menu.
+    /// Read the player's name from networkconfig.
     /// </summary>
-    private void ReadPlayerNameFromJson()
+    private void ReadPlayerName()
     {
-        string playerName = PlayerNameReader.ReadPlayerName();
+        string playerName = networkConfig.Username;
 
         // If a player name is retrieved from JSON, store it.
         if (playerName != null)
@@ -100,7 +108,8 @@ public class PlayerName : NetworkBehaviour
     /// </summary>
     private void DisplayLocalPlayername()
     {
-        displayNameText.text = "Me";
+        //displayNameText.text = "Me";
+        displayNameText.text = playername;
     }
 
     /// <summary>

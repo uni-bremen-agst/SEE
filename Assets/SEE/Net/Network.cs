@@ -75,6 +75,12 @@ namespace SEE.Net
             }
         }
 
+        private string username = string.Empty;
+        public string Username
+        {
+            get { return username; }
+            set { username = value; }
+        }
         /// <summary>
         /// Returns the underlying <see cref="UNetTransport"/> of the <see cref="NetworkManager"/>.
         /// This information is retrieved differently depending upon whether we are running
@@ -979,6 +985,8 @@ namespace SEE.Net
         /// </summary>
         private const string serverIP4AddressLabel = "serverIP4Address";
 
+        private const string usernameLabel = "username";
+
         /// <summary>
         /// Saves the settings of this network configuration to <paramref name="filename"/>.
         /// </summary>
@@ -1018,6 +1026,7 @@ namespace SEE.Net
             writer.Save(VoiceChat.ToString(), voiceChatLabel);
             writer.Save(ServerPort, serverPortLabel);
             writer.Save(ServerIP4Address, serverIP4AddressLabel);
+            writer.Save(Username, usernameLabel);
         }
 
         /// <summary>
@@ -1039,6 +1048,11 @@ namespace SEE.Net
                 string value = ServerIP4Address;
                 ConfigIO.Restore(attributes, serverIP4AddressLabel, ref value);
                 ServerIP4Address = value;
+            }
+            {
+                string value = Username;
+                ConfigIO.Restore(attributes, usernameLabel, ref value);
+                Username = value;
             }
         }
 
