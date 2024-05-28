@@ -17,7 +17,7 @@ namespace SEE.GraphProviders
         public IEnumerator TestGXLGraphProvider() =>
             UniTask.ToCoroutine(async () =>
             {
-                GraphProvider provider = new GXLGraphProvider()
+                SingleGraphProvider provider = new GXLSingleGraphProvider()
                 { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
 
                 GameObject go = new();
@@ -36,26 +36,26 @@ namespace SEE.GraphProviders
                 GameObject go = new();
                 SEECity city = go.AddComponent<SEECity>();
 
-                PipelineGraphProvider pipeline = new();
+                SingleGraphPipelineProvider graphPipeline = new();
 
                 {
-                    GraphProvider provider = new GXLGraphProvider()
+                    SingleGraphProvider provider = new GXLSingleGraphProvider()
                     { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
-                    pipeline.Add(provider);
+                    graphPipeline.Add(provider);
                 }
                 {
-                    GraphProvider provider = new JaCoCoGraphProvider()
+                    SingleGraphProvider provider = new JaCoCoSingleGraphProvider()
                     { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/jacoco.xml") };
-                    pipeline.Add(provider);
+                    graphPipeline.Add(provider);
                 }
 
                 {
-                    GraphProvider provider = new CSVGraphProvider()
+                    SingleGraphProvider provider = new CSVGraphProvider()
                     { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.csv") };
-                    pipeline.Add(provider);
+                    graphPipeline.Add(provider);
                 }
 
-                Graph loaded = await pipeline.ProvideAsync(new Graph(""), city);
+                Graph loaded = await graphPipeline.ProvideAsync(new Graph(""), city);
                 Assert.IsNotNull(loaded);
                 Assert.IsTrue(loaded.NodeCount > 0);
                 Assert.IsTrue(loaded.EdgeCount > 0);
@@ -84,14 +84,14 @@ namespace SEE.GraphProviders
                     // Newer graph
                     Graph graph;
                     {
-                        GraphProvider provider = new GXLGraphProvider()
+                        SingleGraphProvider provider = new GXLSingleGraphProvider()
                         { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mini-evolution/CodeFacts-5.gxl") };
                         graph = await provider.ProvideAsync(new Graph(""), city);
                     }
 
                     {
                         // Older graph
-                        GraphProvider provider = new GXLGraphProvider()
+                        SingleGraphProvider provider = new GXLSingleGraphProvider()
                         { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mini-evolution/CodeFacts-1.gxl") };
 
                         MergeDiffGraphProvider mergeDiffProvider = new()

@@ -14,7 +14,7 @@ namespace SEE.GraphProviders
     /// Reads metrics from a CSV file and adds these to a graph.
     /// </summary>
     [Serializable]
-    public class CSVGraphProvider : FileBasedGraphProvider
+    public class CSVGraphProvider : FileBasedSingleGraphProvider
     {
         /// <summary>
         /// Reads metrics from a CSV file and adds these to <paramref name="graph"/>.
@@ -42,9 +42,9 @@ namespace SEE.GraphProviders
             return graph;
         }
 
-        public override GraphProviderKind GetKind()
+        public override SingleGraphProviderKind GetKind()
         {
-            return GraphProviderKind.CSV;
+            return SingleGraphProviderKind.CSV;
         }
     }
 }

@@ -13,7 +13,7 @@ namespace SEE.GraphProviders
     /// A graph provider reading a graph from a GXL file.
     /// </summary>
     [Serializable]
-    public class GXLGraphProvider : FileBasedGraphProvider
+    public class GXLSingleGraphProvider : FileBasedSingleGraphProvider
     {
         /// <summary>
         /// Reads and returns a graph from a GXL file with <see cref="Path"/> where
@@ -47,9 +47,9 @@ namespace SEE.GraphProviders
             return graphCreator.GetGraph();
         }
 
-        public override GraphProviderKind GetKind()
+        public override SingleGraphProviderKind GetKind()
         {
-            return GraphProviderKind.GXL;
+            return SingleGraphProviderKind.GXL;
         }
     }
 }

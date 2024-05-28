@@ -12,7 +12,7 @@ namespace SEE.GraphProviders
     /// Reads metrics from a JaCoCo XML report file and adds these to a graph.
     /// </summary>
     [Serializable]
-    public class JaCoCoGraphProvider : FileBasedGraphProvider
+    public class JaCoCoSingleGraphProvider : FileBasedSingleGraphProvider
     {
         /// <summary>
         /// Reads metrics from a JaCoCo XML report file and adds these to <paramref name="graph"/>.
@@ -45,9 +45,9 @@ namespace SEE.GraphProviders
             }
         }
 
-        public override GraphProviderKind GetKind()
+        public override SingleGraphProviderKind GetKind()
         {
-            return GraphProviderKind.JaCoCo;
+            return SingleGraphProviderKind.JaCoCo;
         }
     }
 }

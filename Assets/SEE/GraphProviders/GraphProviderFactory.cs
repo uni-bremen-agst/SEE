@@ -1,4 +1,5 @@
 ﻿using System;
+using SEE.GraphProviders.Evolution;
 
 namespace SEE.GraphProviders
 {
@@ -17,17 +18,29 @@ namespace SEE.GraphProviders
         /// <returns>a new instance</returns>
         /// <exception cref="NotImplementedException">thrown in case the given <paramref name="kind"/>
         /// is not yet handled</exception>
-        internal static GraphProvider NewInstance(GraphProviderKind kind)
+        internal static SingleGraphProvider NewSingleGraphProviderInstance(SingleGraphProviderKind kind)
         {
             return kind switch
             {
-                GraphProviderKind.GXL => new GXLGraphProvider(),
-                GraphProviderKind.CSV => new CSVGraphProvider(),
-                GraphProviderKind.Reflexion => new ReflexionGraphProvider(),
-                GraphProviderKind.Pipeline => new PipelineGraphProvider(),
-                GraphProviderKind.JaCoCo => new JaCoCoGraphProvider(),
-                GraphProviderKind.MergeDiff => new MergeDiffGraphProvider(),
-                GraphProviderKind.LSP => new LSPGraphProvider(),
+                SingleGraphProviderKind.GXL => new GXLSingleGraphProvider(),
+                SingleGraphProviderKind.CSV => new CSVGraphProvider(),
+                SingleGraphProviderKind.Reflexion => new ReflexionGraphProvider(),
+                SingleGraphProviderKind.SinglePipeline => new SingleGraphPipelineProvider(),
+                SingleGraphProviderKind.JaCoCo => new JaCoCoSingleGraphProvider(),
+                SingleGraphProviderKind.MergeDiff => new MergeDiffGraphProvider(),
+                SingleGraphProviderKind.VCS => new VCSGraphProvider(),
+                SingleGraphProviderKind.GitAllBranches => new AllGitBranchesSingleGraphProvider(),
+                _ => throw new NotImplementedException($"Not implemented for {kind}")
+            };
+        }
+
+        internal static MultiGraphProvider NewMultiGraphProviderInstance(MultiGraphProviderKind kind)
+        {
+            return kind switch
+            {
+                MultiGraphProviderKind.MultiPipeline => new MultiGraphPipelineProvider(),
+                MultiGraphProviderKind.GitEvolution => new GitEvolutionGraphProvider(),
+                MultiGraphProviderKind.GXLEvolution => new GXLEvolutionGraphProvider(),
                 _ => throw new NotImplementedException($"Not implemented for {kind}")
             };
         }
