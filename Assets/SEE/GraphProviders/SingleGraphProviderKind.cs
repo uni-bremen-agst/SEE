@@ -21,7 +21,7 @@
         CSV,
 
         /// <summary>
-        /// For <see cref="JaCoCoSingleGraphProvider"/>.
+        /// For <see cref="JaCoCoGraphProvider"/>.
         /// </summary>
         JaCoCo,
 

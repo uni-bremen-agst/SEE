@@ -640,7 +640,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 case CSVGraphProvider:
                 case DashboardGraphProvider:
                 case GXLSingleGraphProvider:
-                case JaCoCoSingleGraphProvider:
+                case JaCoCoGraphProvider:
                 case ReflexionGraphProvider:
                     parent = CreateNestedSetting(settingName, parent);
                     CreateTypeField(parent, value as SingleGraphProvider);

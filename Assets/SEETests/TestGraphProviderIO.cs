@@ -81,7 +81,7 @@ namespace SEE.GraphProviders
             {
                 AreEqualReflexionGraphProviders(reflexionGraphProvider, actual);
             }
-            else if (expected is JaCoCoSingleGraphProvider jacocoGraphProvider)
+            else if (expected is JaCoCoGraphProvider jacocoGraphProvider)
             {
                 AreEqualJaCoCoGraphProviders(jacocoGraphProvider, actual);
             }
@@ -177,23 +177,23 @@ namespace SEE.GraphProviders
         [Test]
         public void TestJaCoCoGraphProvider()
         {
-            JaCoCoSingleGraphProvider saved = GetJaCoCoProvider();
+            JaCoCoGraphProvider saved = GetJaCoCoProvider();
             Save(saved);
             AreEqualJaCoCoGraphProviders(saved, LoadSingleGraph());
         }
 
-        private JaCoCoSingleGraphProvider GetJaCoCoProvider()
+        private JaCoCoGraphProvider GetJaCoCoProvider()
         {
-            return new JaCoCoSingleGraphProvider()
+            return new JaCoCoGraphProvider()
             {
                 Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
             };
         }
 
-        private static void AreEqualJaCoCoGraphProviders(JaCoCoSingleGraphProvider saved, SingleGraphProvider loaded)
+        private static void AreEqualJaCoCoGraphProviders(JaCoCoGraphProvider saved, SingleGraphProvider loaded)
         {
             Assert.IsTrue(saved.GetType() == loaded.GetType());
-            JaCoCoSingleGraphProvider loadedProvider = loaded as JaCoCoSingleGraphProvider;
+            JaCoCoGraphProvider loadedProvider = loaded as JaCoCoGraphProvider;
             AreEqual(saved.Path, loadedProvider.Path);
         }
 
@@ -334,7 +334,7 @@ namespace SEE.GraphProviders
         {
             return new MergeDiffGraphProvider()
             {
-                OldGraph = new JaCoCoSingleGraphProvider()
+                OldGraph = new JaCoCoGraphProvider()
                 {
                     Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
                 }

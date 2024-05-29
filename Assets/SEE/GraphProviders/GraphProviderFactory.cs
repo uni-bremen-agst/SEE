@@ -25,7 +25,7 @@ namespace SEE.GraphProviders
                 SingleGraphProviderKind.CSV => new CSVGraphProvider(),
                 SingleGraphProviderKind.Reflexion => new ReflexionGraphProvider(),
                 SingleGraphProviderKind.SinglePipeline => new SingleGraphPipelineProvider(),
-                SingleGraphProviderKind.JaCoCo => new JaCoCoSingleGraphProvider(),
+                SingleGraphProviderKind.JaCoCo => new JaCoCoGraphProvider(),
                 SingleGraphProviderKind.MergeDiff => new MergeDiffGraphProvider(),
                 _ => throw new NotImplementedException($"Not implemented for {kind}")
             };
