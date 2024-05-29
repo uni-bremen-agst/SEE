@@ -7,8 +7,6 @@ using SEE.Utils.Paths;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Cysharp.Threading.Tasks;
-using SEE.GraphProviders.Evolution;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -39,21 +37,16 @@ namespace SEE.GraphProviders
         public static void AreEqual(MultiGraphProvider expected, MultiGraphProvider actual)
         {
             Assert.IsTrue(expected.GetType() == actual.GetType());
-            if (expected is GitEvolutionGraphProvider gitEvolution)
-            {
-                AreEqualGitEvolutionProviders(gitEvolution, actual);
-            }
-            else if (expected is GXLEvolutionGraphProvider gxlEvolution)
+            if (expected is GXLEvolutionGraphProvider gxlEvolution)
             {
                 AreEqualGXLEvolutionProviders(gxlEvolution, actual);
             }
-
             else
             {
                 throw new System.NotImplementedException();
             }
         }
-
+        
         private static void AreEqualGXLEvolutionProviders(GXLEvolutionGraphProvider saved, MultiGraphProvider loaded)
         {
             Assert.IsTrue(saved.GetType() == loaded.GetType());
@@ -61,16 +54,7 @@ namespace SEE.GraphProviders
             AreEqual(gxlLoaded.GXLDirectory, saved.GXLDirectory);
             Assert.AreEqual(gxlLoaded.MaxRevisionsToLoad, saved.MaxRevisionsToLoad);
         }
-
-        private static void AreEqualGitEvolutionProviders(GitEvolutionGraphProvider saved, MultiGraphProvider loaded)
-        {
-            Assert.IsTrue(saved.GetType() == loaded.GetType());
-            GitEvolutionGraphProvider gitLoaded = loaded as GitEvolutionGraphProvider;
-            Assert.AreEqual(gitLoaded.Date, saved.Date);
-            AreEqual(gitLoaded.GitRepository.RepositoryPath, saved.GitRepository.RepositoryPath);
-            Assert.AreEqual(gitLoaded.GitRepository.PathGlobbing, saved.GitRepository.PathGlobbing);
-        }
-
+        
         /// <summary>
         /// Checks whether the two graph providers have identical types
         /// and whether their attributes are the same.
@@ -151,17 +135,7 @@ namespace SEE.GraphProviders
             {
                 GXLDirectory = new DirectoryPath() { Path = "/path/to/gxl/files" }
             };
-        }
-
-        private GitEvolutionGraphProvider GetGitEvolutionProvider()
-        {
-            return new GitEvolutionGraphProvider()
-            {
-                Date = "01/05/2024",
-                GitRepository = GetGitRepository()
-            };
-        }
-
+        } 
         private static void AreEqualGXLProviders(GXLSingleGraphProvider saved, SingleGraphProvider loaded)
         {
             Assert.IsTrue(saved.GetType() == loaded.GetType());
@@ -242,7 +216,6 @@ namespace SEE.GraphProviders
         public void TestMultiGraphPipelineProvider()
         {
             MultiGraphPipelineProvider saved = new();
-            saved.Pipeline.Add(GetGitEvolutionProvider());
             saved.Pipeline.Add(GetGXLEvolutionProvider());
 
             Save(saved);
@@ -299,46 +272,23 @@ namespace SEE.GraphProviders
 
         #endregion
 
-        #region GitProvider
+        #region GXLEvolution
 
         [Test]
-        public void TestGitEvolutionProvider()
+        public void TestGXLEvolutionGraphProvider()
         {
-            GitEvolutionGraphProvider saved = GetGitEvolutionProvider();
-            Save(saved);
-            AreEqualGitEvolutionProviders(saved, LoadMultiGraph());
-        }
-
-        [Test]
-        public void TestAllBranchGitSingleProvider()
-        {
-            AllGitBranchesSingleGraphProvider saved = GetAllBranchGitSingleProvider();
-            Save(saved);
-            AreEqualAllBranchGitSingleProvider(saved, LoadSingleGraph());
-        }
-
-        private void AreEqualAllBranchGitSingleProvider(AllGitBranchesSingleGraphProvider saved, SingleGraphProvider loaded)
-        {
-            Assert.IsTrue(saved.GetType() == loaded.GetType());
-            AllGitBranchesSingleGraphProvider gitBranchesLoaded = loaded as AllGitBranchesSingleGraphProvider;
-            Assert.AreEqual(gitBranchesLoaded.Date, saved.Date);
-            AreEqual(gitBranchesLoaded.RepositoryData.RepositoryPath, saved.RepositoryData.RepositoryPath);
-            Assert.AreEqual(gitBranchesLoaded.RepositoryData.PathGlobbing, saved.RepositoryData.PathGlobbing);
-            Assert.AreEqual(gitBranchesLoaded.SimplifyGraph, saved.SimplifyGraph);
-            Assert.AreEqual(gitBranchesLoaded.AutoFetch, saved.AutoFetch);
-        }
-
-        private AllGitBranchesSingleGraphProvider GetAllBranchGitSingleProvider()
-        {
-            return new AllGitBranchesSingleGraphProvider()
+            GXLEvolutionGraphProvider saved = new()
             {
-                Date = "01/05/2024",
-                RepositoryData = GetGitRepository()
+                GXLDirectory = new("/path/to/file.gxl"),
+                MaxRevisionsToLoad = 42
             };
+            Save(saved);
+            AreEqual(saved, LoadMultiGraph());
         }
+        
 
         #endregion
-
+        
         #region Reflexion provider
 
         [Test]
@@ -404,21 +354,11 @@ namespace SEE.GraphProviders
         {
             return new VCSGraphProvider()
             {
-                Repository = new GitRepository()
-                    { RepositoryPath = new DirectoryPath(System.IO.Path.GetDirectoryName(Application.dataPath)) },
+                RepositoryPath = new DirectoryPath(System.IO.Path.GetDirectoryName(Application.dataPath)),
                 CommitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461",
             };
         }
-
-        private GitRepository GetGitRepository()
-        {
-            return new GitRepository()
-            {
-                RepositoryPath = new DirectoryPath("/path/to/repo"),
-                PathGlobbing = new() { { ".cs", true }, { ".c", true }, { ".cbl", false } }
-            };
-        }
-
+        
         private static T NewVanillaSEECity<T>() where T : Component
         {
             return new GameObject().AddComponent<T>();

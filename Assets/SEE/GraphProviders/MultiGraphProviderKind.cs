@@ -1,4 +1,3 @@
-using SEE.GraphProviders.Evolution;
 
 namespace SEE.GraphProviders
 {
@@ -13,12 +12,7 @@ namespace SEE.GraphProviders
         /// For <see cref="MultiGraphPipelineProvider"/>
         /// </summary>
         MultiPipeline,
-
-        /// <summary>
-        /// For <see cref="GitEvolutionGraphProvider"/>
-        /// </summary>
-        GitEvolution,
-
+        
         /// <summary>
         /// For <see cref="GXLEvolutionGraphProvider"/>
         /// </summary>

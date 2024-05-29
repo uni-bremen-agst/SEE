@@ -30,8 +30,6 @@
         /// </summary>
         SinglePipeline,
 
-        MultiPipeline,
-
         /// <summary>
         /// For <see cref="DashboardGraphProvider"/>.
         /// </summary>
@@ -46,6 +44,7 @@
         /// For <see cref="ReflexionGraphProvider"/>.
         /// </summary>
         Reflexion,
+        
         /// <summary>
         /// For <see cref="MergeDiffGraphProvider"/>.
         /// </summary>
