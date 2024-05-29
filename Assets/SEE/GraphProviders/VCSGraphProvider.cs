@@ -310,7 +310,7 @@ namespace SEE.GraphProviders
         /// <param name="commitID">The commitID where the files exist.</param>
         /// <param name="language">The language the given text is written in.</param>
         /// <returns>The token stream for the specified file and commit.</returns>
-        private static IEnumerable<SEEToken> RetrieveTokens(string filePath, Repository repository, string commitID, TokenLanguage language)
+        public static IEnumerable<SEEToken> RetrieveTokens(string filePath, Repository repository, string commitID, TokenLanguage language)
         {
             Blob blob = repository.Lookup<Blob>($"{commitID}:{filePath}");
 

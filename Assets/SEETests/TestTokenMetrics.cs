@@ -55,7 +55,7 @@ namespace SEE.Scanner
         {
             const float tolerance = 0.001f; // Tolerance for float value comparisons.
 
-            // Test case for empty code. This is used in case either DistinctOperators, DistinctOperands and/or ProgramVocabulary are zero.
+            // Test case for empty code, in case DistinctOperators, DistinctOperands and/or ProgramVocabulary values are zero.
             string emptyCode = "";
 
             IEnumerable<SEEToken> tokensEmptyCode = SEEToken.FromString(emptyCode, TokenLanguage.Plain);
