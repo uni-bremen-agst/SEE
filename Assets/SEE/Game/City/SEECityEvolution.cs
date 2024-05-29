@@ -64,15 +64,17 @@ namespace SEE.Game.City
         /// </summary>
         private const string evolutionFoldoutGroup = "Evolution settings";
 
+        /// <summary>
+        /// Error message that will be shown, when the graph provider pipeline (<see cref="DataProvider"/>)
+        /// didn't yield any graphs.
+        /// </summary>
         private const string NoGraphsProvidedErrorMessage = "Graph providers didn't yield any graphs";
 
+        /// <summary>
+        /// Error message when will be shown if anything goes wrong in the pipeline 
+        /// </summary>
         private const string CantShowEvolutionMessage = "Can't show evolution";
 
-        /// <summary>
-        /// Sets the maximum number of revisions to load.
-        /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Maximum number of revisions to load."), FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
-        public int MaxRevisionsToLoad = 500; // serialized by Unity
 
         /// <summary>
         /// The renderer for rendering the evolution of the graph series.
@@ -80,13 +82,6 @@ namespace SEE.Game.City
         /// Neither serialized nor saved in the configuration file.
         /// </summary>
         private EvolutionRenderer evolutionRenderer; // not serialized by Unity; will be set in Start()
-
-        // /// <summary>
-        // /// The directory in which the GXL files of the graph series are located.
-        // /// </summary>
-        // [SerializeField, ShowInInspector, Tooltip("The directory in which the GXL files are located."),
-        //  FoldoutGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
-        // public DirectoryPath GXLDirectory = new();
 
         /// <summary>
         /// Yields the graph renderer that draws this city.
@@ -107,9 +102,15 @@ namespace SEE.Game.City
             get => evolutionRenderer?.GraphCurrent;
             protected set => throw new NotImplementedException();
         }
-
+        
+        /// <summary>
+        /// The currently loaded graph series
+        /// </summary>
         private List<Graph> _loadedGraphSeries = new();
 
+        /// <summary>
+        /// Public attribute for the currently loaded graph series.
+        /// </summary>
         private List<Graph> LoadedGraphSeries
         {
             get => _loadedGraphSeries;
@@ -141,6 +142,7 @@ namespace SEE.Game.City
                 result = gameObject.AddComponent<EvolutionRenderer>();
                 result.SetGraphEvolution(graphs);
             }
+
             return result;
         }
 
@@ -177,7 +179,7 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Loads the first graph of the graph series. If a graph was already
+        /// Loads the whole graph series and sets the first graph of the series. If a graph was already
         /// loaded, that graph will be destroyed.
         /// </summary>
         [Button(ButtonSizes.Small)]
@@ -398,19 +400,25 @@ namespace SEE.Game.City
         /// </summary>
         private const string dataProviderPathLabel = "data";
 
+        /// <summary>
+        /// Saves and writes the configuration to <paramref name="writer"/> 
+        /// </summary>
+        /// <param name="writer">The ConfigWriter to write the configuration to</param>
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
             DataProvider?.Save(writer, dataProviderPathLabel);
-            // writer.Save(MaxRevisionsToLoad, maxRevisionsToLoadLabel);
         }
 
+        /// <summary>
+        /// Restores the configuration from <paramref name="attributes"/>
+        /// </summary>
+        /// <param name="attributes">The attributes to restore the code city from</param>
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
             DataProvider =
                 MultiGraphProvider.Restore(attributes, dataProviderPathLabel) as MultiGraphPipelineProvider;
-            // ConfigIO.Restore(attributes, maxRevisionsToLoadLabel, ref MaxRevisionsToLoad);
         }
     }
 }
