@@ -1,12 +1,8 @@
 ﻿using NUnit.Framework;
-using SEE.DataModel.DG;
-using SEE.Game.City;
 using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -46,7 +42,7 @@ namespace SEE.GraphProviders
                 throw new System.NotImplementedException();
             }
         }
-        
+
         private static void AreEqualGXLEvolutionProviders(GXLEvolutionGraphProvider saved, MultiGraphProvider loaded)
         {
             Assert.IsTrue(saved.GetType() == loaded.GetType());
@@ -54,7 +50,7 @@ namespace SEE.GraphProviders
             AreEqual(gxlLoaded.GXLDirectory, saved.GXLDirectory);
             Assert.AreEqual(gxlLoaded.MaxRevisionsToLoad, saved.MaxRevisionsToLoad);
         }
-        
+
         /// <summary>
         /// Checks whether the two graph providers have identical types
         /// and whether their attributes are the same.
@@ -135,7 +131,7 @@ namespace SEE.GraphProviders
             {
                 GXLDirectory = new DirectoryPath() { Path = "/path/to/gxl/files" }
             };
-        } 
+        }
         private static void AreEqualGXLProviders(GXLSingleGraphProvider saved, SingleGraphProvider loaded)
         {
             Assert.IsTrue(saved.GetType() == loaded.GetType());
@@ -285,10 +281,10 @@ namespace SEE.GraphProviders
             Save(saved);
             AreEqual(saved, LoadMultiGraph());
         }
-        
+
 
         #endregion
-        
+
         #region Reflexion provider
 
         [Test]
@@ -349,7 +345,7 @@ namespace SEE.GraphProviders
         }
 
         #endregion
-        
+
         private SingleGraphProvider LoadSingleGraph()
         {
             using ConfigReader stream = new(filename);
