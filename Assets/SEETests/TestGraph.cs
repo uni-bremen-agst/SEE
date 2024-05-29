@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using SEE.Tools.ReflexionAnalysis;
 
 namespace SEE.DataModel.DG
 {
@@ -775,8 +776,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Tests <see cref="Graph.SubgraphBy"/>.
         /// </summary>
-        [Test]
-        public void TestSubgraph()
+        private void TestSubgraph<T>() where T : Graph, new()
         {
             const string floatAttribute = "float";
             const string intAttribute = "int";
@@ -788,7 +788,7 @@ namespace SEE.DataModel.DG
             const string stringAttributeValue = "hello, world";
             const bool toggleAttributeValue = true;
 
-            Graph g = NewEmptyGraph();
+            Graph g = new T();
             g.SetFloat(floatAttribute, floatAttributeValue);
             g.SetInt(intAttribute, intAttributeValue);
             g.SetString(stringAttribute, stringAttributeValue);
@@ -800,12 +800,24 @@ namespace SEE.DataModel.DG
 
             Graph sg = g.SubgraphBy(x => x is Node || (x is Edge e && e.Type == "set"));
             Assert.AreEqual(floatAttributeValue, sg.GetFloat(floatAttribute));
-            Assert.AreEqual(intAttributeValue, sg.GetFloat(intAttribute));
+            Assert.AreEqual(intAttributeValue, sg.GetInt(intAttribute));
             Assert.AreEqual(stringAttributeValue, sg.GetString(stringAttribute));
             Assert.IsTrue(sg.HasToggle(toggleAttribute));
 
             Assert.AreEqual(2, sg.NodeCount);
             Assert.AreEqual(1, sg.EdgeCount);
+        }
+
+        [Test]
+        public void TestSubgraphGraph()
+        {
+            TestSubgraph<Graph>();
+        }
+
+        [Test]
+        public void TestSubgraphReflexionGraph()
+        {
+            TestSubgraph<ReflexionGraph>();
         }
     }
 }
