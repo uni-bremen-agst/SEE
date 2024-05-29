@@ -44,7 +44,7 @@ namespace SEE.GraphProviders
                     graphPipeline.Add(provider);
                 }
                 {
-                    SingleGraphProvider provider = new JaCoCoSingleGraphProvider()
+                    SingleGraphProvider provider = new JaCoCoGraphProvider()
                     { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/jacoco.xml") };
                     graphPipeline.Add(provider);
                 }

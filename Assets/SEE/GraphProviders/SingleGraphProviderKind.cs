@@ -21,7 +21,7 @@
         CSV,
 
         /// <summary>
-        /// For <see cref="JaCoCoSingleGraphProvider"/>.
+        /// For <see cref="JaCoCoGraphProvider"/>.
         /// </summary>
         JaCoCo,
 
@@ -30,22 +30,16 @@
         /// </summary>
         SinglePipeline,
 
-        MultiPipeline,
-
         /// <summary>
         /// For <see cref="DashboardGraphProvider"/>.
         /// </summary>
         Dashboard,
-
-        /// <summary>
-        /// For <see cref="VCSGraphProvider"/>.
-        /// </summary>
-        VCS,
-
+        
         /// <summary>
         /// For <see cref="ReflexionGraphProvider"/>.
         /// </summary>
         Reflexion,
+        
         /// <summary>
         /// For <see cref="MergeDiffGraphProvider"/>.
         /// </summary>

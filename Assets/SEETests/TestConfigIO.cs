@@ -687,7 +687,7 @@ namespace SEE.Utils
         {
             AbstractSEECityAttributesAreEqual(expected, actual);
             TestGraphProviderIO.AreEqual(expected.DataProvider, actual.DataProvider);
-            Assert.AreEqual(expected.MaxRevisionsToLoad, actual.MaxRevisionsToLoad);
+            //Assert.AreEqual(expected.MaxRevisionsToLoad, actual.MaxRevisionsToLoad);
         }
 
         /// <summary>
@@ -875,7 +875,7 @@ namespace SEE.Utils
         {
             WipeOutAbstractSEECityAttributes(city);
             //city.GXLDirectory.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gxl");
-            city.MaxRevisionsToLoad++;
+            //city.MaxRevisionsToLoad++;
         }
 
         /// <summary>

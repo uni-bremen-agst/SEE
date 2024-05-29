@@ -7,8 +7,6 @@ using SEE.Utils.Paths;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Cysharp.Threading.Tasks;
-using SEE.GraphProviders.Evolution;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -39,21 +37,16 @@ namespace SEE.GraphProviders
         public static void AreEqual(MultiGraphProvider expected, MultiGraphProvider actual)
         {
             Assert.IsTrue(expected.GetType() == actual.GetType());
-            if (expected is GitEvolutionGraphProvider gitEvolution)
-            {
-                AreEqualGitEvolutionProviders(gitEvolution, actual);
-            }
-            else if (expected is GXLEvolutionGraphProvider gxlEvolution)
+            if (expected is GXLEvolutionGraphProvider gxlEvolution)
             {
                 AreEqualGXLEvolutionProviders(gxlEvolution, actual);
             }
-
             else
             {
                 throw new System.NotImplementedException();
             }
         }
-
+        
         private static void AreEqualGXLEvolutionProviders(GXLEvolutionGraphProvider saved, MultiGraphProvider loaded)
         {
             Assert.IsTrue(saved.GetType() == loaded.GetType());
@@ -61,16 +54,7 @@ namespace SEE.GraphProviders
             AreEqual(gxlLoaded.GXLDirectory, saved.GXLDirectory);
             Assert.AreEqual(gxlLoaded.MaxRevisionsToLoad, saved.MaxRevisionsToLoad);
         }
-
-        private static void AreEqualGitEvolutionProviders(GitEvolutionGraphProvider saved, MultiGraphProvider loaded)
-        {
-            Assert.IsTrue(saved.GetType() == loaded.GetType());
-            GitEvolutionGraphProvider gitLoaded = loaded as GitEvolutionGraphProvider;
-            Assert.AreEqual(gitLoaded.Date, saved.Date);
-            AreEqual(gitLoaded.GitRepository.RepositoryPath, saved.GitRepository.RepositoryPath);
-            Assert.AreEqual(gitLoaded.GitRepository.PathGlobbing, saved.GitRepository.PathGlobbing);
-        }
-
+        
         /// <summary>
         /// Checks whether the two graph providers have identical types
         /// and whether their attributes are the same.
@@ -97,7 +81,7 @@ namespace SEE.GraphProviders
             {
                 AreEqualReflexionGraphProviders(reflexionGraphProvider, actual);
             }
-            else if (expected is JaCoCoSingleGraphProvider jacocoGraphProvider)
+            else if (expected is JaCoCoGraphProvider jacocoGraphProvider)
             {
                 AreEqualJaCoCoGraphProviders(jacocoGraphProvider, actual);
             }
@@ -151,17 +135,7 @@ namespace SEE.GraphProviders
             {
                 GXLDirectory = new DirectoryPath() { Path = "/path/to/gxl/files" }
             };
-        }
-
-        private GitEvolutionGraphProvider GetGitEvolutionProvider()
-        {
-            return new GitEvolutionGraphProvider()
-            {
-                Date = "01/05/2024",
-                GitRepository = GetGitRepository()
-            };
-        }
-
+        } 
         private static void AreEqualGXLProviders(GXLSingleGraphProvider saved, SingleGraphProvider loaded)
         {
             Assert.IsTrue(saved.GetType() == loaded.GetType());
@@ -203,23 +177,23 @@ namespace SEE.GraphProviders
         [Test]
         public void TestJaCoCoGraphProvider()
         {
-            JaCoCoSingleGraphProvider saved = GetJaCoCoProvider();
+            JaCoCoGraphProvider saved = GetJaCoCoProvider();
             Save(saved);
             AreEqualJaCoCoGraphProviders(saved, LoadSingleGraph());
         }
 
-        private JaCoCoSingleGraphProvider GetJaCoCoProvider()
+        private JaCoCoGraphProvider GetJaCoCoProvider()
         {
-            return new JaCoCoSingleGraphProvider()
+            return new JaCoCoGraphProvider()
             {
                 Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
             };
         }
 
-        private static void AreEqualJaCoCoGraphProviders(JaCoCoSingleGraphProvider saved, SingleGraphProvider loaded)
+        private static void AreEqualJaCoCoGraphProviders(JaCoCoGraphProvider saved, SingleGraphProvider loaded)
         {
             Assert.IsTrue(saved.GetType() == loaded.GetType());
-            JaCoCoSingleGraphProvider loadedProvider = loaded as JaCoCoSingleGraphProvider;
+            JaCoCoGraphProvider loadedProvider = loaded as JaCoCoGraphProvider;
             AreEqual(saved.Path, loadedProvider.Path);
         }
 
@@ -242,7 +216,6 @@ namespace SEE.GraphProviders
         public void TestMultiGraphPipelineProvider()
         {
             MultiGraphPipelineProvider saved = new();
-            saved.Pipeline.Add(GetGitEvolutionProvider());
             saved.Pipeline.Add(GetGXLEvolutionProvider());
 
             Save(saved);
@@ -299,46 +272,23 @@ namespace SEE.GraphProviders
 
         #endregion
 
-        #region GitProvider
+        #region GXLEvolution
 
         [Test]
-        public void TestGitEvolutionProvider()
+        public void TestGXLEvolutionGraphProvider()
         {
-            GitEvolutionGraphProvider saved = GetGitEvolutionProvider();
-            Save(saved);
-            AreEqualGitEvolutionProviders(saved, LoadMultiGraph());
-        }
-
-        [Test]
-        public void TestAllBranchGitSingleProvider()
-        {
-            AllGitBranchesSingleGraphProvider saved = GetAllBranchGitSingleProvider();
-            Save(saved);
-            AreEqualAllBranchGitSingleProvider(saved, LoadSingleGraph());
-        }
-
-        private void AreEqualAllBranchGitSingleProvider(AllGitBranchesSingleGraphProvider saved, SingleGraphProvider loaded)
-        {
-            Assert.IsTrue(saved.GetType() == loaded.GetType());
-            AllGitBranchesSingleGraphProvider gitBranchesLoaded = loaded as AllGitBranchesSingleGraphProvider;
-            Assert.AreEqual(gitBranchesLoaded.Date, saved.Date);
-            AreEqual(gitBranchesLoaded.RepositoryData.RepositoryPath, saved.RepositoryData.RepositoryPath);
-            Assert.AreEqual(gitBranchesLoaded.RepositoryData.PathGlobbing, saved.RepositoryData.PathGlobbing);
-            Assert.AreEqual(gitBranchesLoaded.SimplifyGraph, saved.SimplifyGraph);
-            Assert.AreEqual(gitBranchesLoaded.AutoFetch, saved.AutoFetch);
-        }
-
-        private AllGitBranchesSingleGraphProvider GetAllBranchGitSingleProvider()
-        {
-            return new AllGitBranchesSingleGraphProvider()
+            GXLEvolutionGraphProvider saved = new()
             {
-                Date = "01/05/2024",
-                RepositoryData = GetGitRepository()
+                GXLDirectory = new("/path/to/file.gxl"),
+                MaxRevisionsToLoad = 42
             };
+            Save(saved);
+            AreEqual(saved, LoadMultiGraph());
         }
+        
 
         #endregion
-
+        
         #region Reflexion provider
 
         [Test]
@@ -384,7 +334,7 @@ namespace SEE.GraphProviders
         {
             return new MergeDiffGraphProvider()
             {
-                OldGraph = new JaCoCoSingleGraphProvider()
+                OldGraph = new JaCoCoGraphProvider()
                 {
                     Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
                 }
@@ -399,85 +349,7 @@ namespace SEE.GraphProviders
         }
 
         #endregion
-
-        private VCSGraphProvider GetVCSGraphProvider()
-        {
-            return new VCSGraphProvider()
-            {
-                Repository = new GitRepository()
-                    { RepositoryPath = new DirectoryPath(System.IO.Path.GetDirectoryName(Application.dataPath)) },
-                CommitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461",
-            };
-        }
-
-        private GitRepository GetGitRepository()
-        {
-            return new GitRepository()
-            {
-                RepositoryPath = new DirectoryPath("/path/to/repo"),
-                PathGlobbing = new() { { ".cs", true }, { ".c", true }, { ".cbl", false } }
-            };
-        }
-
-        private static T NewVanillaSEECity<T>() where T : Component
-        {
-            return new GameObject().AddComponent<T>();
-        }
-
-        public async System.Threading.Tasks.Task<Graph> GetVCSGraphAsync()
-        {
-            VCSGraphProvider saved = GetVCSGraphProvider();
-            SEECity testCity = NewVanillaSEECity<SEECity>();
-            ;
-            Graph testGraph = new("test", "test");
-            Graph graph = await saved.ProvideAsync(testGraph, testCity);
-            return graph;
-        }
-
-        [Test]
-        public void TestVCSGraphProvider()
-        {
-            Graph graph = GetVCSGraphAsync().GetAwaiter().GetResult();
-            List<string> pathsFromGraph = new();
-            foreach (GraphElement elem in graph.Elements())
-            {
-                pathsFromGraph.Add(elem.ID.Replace('\\', '/'));
-            }
-
-            List<string> actualList = new()
-            {
-                "SEE",
-                ".gitignore",
-                "Assets",
-                "Assets/Scenes.meta",
-                "Assets/Scenes",
-                "Assets/Scenes/SampleScene.unity",
-                "Assets/Scenes/SampleScene.unity.meta",
-                "Packages",
-                "Packages/manifest.json",
-                "ProjectSettings",
-                "ProjectSettings/AudioManager.asset",
-                "ProjectSettings/ClusterInputManager.asset",
-                "ProjectSettings/DynamicsManager.asset",
-                "ProjectSettings/EditorBuildSettings.asset",
-                "ProjectSettings/EditorSettings.asset",
-                "ProjectSettings/GraphicsSettings.asset",
-                "ProjectSettings/InputManager.asset",
-                "ProjectSettings/NavMeshAreas.asset",
-                "ProjectSettings/Physics2DSettings.asset",
-                "ProjectSettings/PresetManager.asset",
-                "ProjectSettings/ProjectSettings.asset",
-                "ProjectSettings/ProjectVersion.txt",
-                "ProjectSettings/QualitySettings.asset",
-                "ProjectSettings/TagManager.asset",
-                "ProjectSettings/TimeManager.asset",
-                "ProjectSettings/UnityConnectSettings.asset",
-                "ProjectSettings/VFXManager.asset",
-                "ProjectSettings/XRSettings.asset"
-            };
-            Assert.IsTrue(actualList.SequenceEqual(pathsFromGraph));
-        }
-
+        
         private SingleGraphProvider LoadSingleGraph()
         {
             using ConfigReader stream = new(filename);

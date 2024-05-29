@@ -24,7 +24,7 @@ using UnityEngine.UI;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using SEE.GraphProviders;
-using SEE.GraphProviders.Evolution;
+
 
 namespace SEE.UI.RuntimeConfigMenu
 {
@@ -640,24 +640,10 @@ namespace SEE.UI.RuntimeConfigMenu
                 case CSVGraphProvider:
                 case DashboardGraphProvider:
                 case GXLSingleGraphProvider:
-                case JaCoCoSingleGraphProvider:
-                case GitRepository:
-                    parent = CreateNestedSetting(settingName, parent);
-                    value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
-                    break;
+                case JaCoCoGraphProvider:
                 case ReflexionGraphProvider:
                     parent = CreateNestedSetting(settingName, parent);
                     CreateTypeField(parent, value as SingleGraphProvider);
-                    value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
-                    break;
-                case AllGitBranchesSingleGraphProvider:
-                    parent = CreateNestedSetting(settingName, parent);
-                    CreateTypeField(parent, value as SingleGraphProvider);
-                    value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
-                    break;
-                case GitEvolutionGraphProvider:
-                    parent = CreateNestedSetting(settingName, parent);
-                    CreateTypeField(parent, value as MultiGraphProvider);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
                 default:

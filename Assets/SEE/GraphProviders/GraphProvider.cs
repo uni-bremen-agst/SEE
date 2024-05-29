@@ -15,12 +15,12 @@ namespace SEE.GraphProviders
     /// implementing the method <see cref="ProvideAsync(x,AbstractSEECity,Action{float},CancellationToken)"/>.
     ///
     /// It is not recomended to inhert this class directly from a graph provider.
-    /// Instead you should use <see cref="SingleGraphProvider"/> and <see cref="MultiGraphProvider"/>.
+    /// Instead, you should use <see cref="SingleGraphProvider"/> and <see cref="MultiGraphProvider"/>.
     /// </summary>
     /// <typeparam name="T">The type of data which should be provided (e.g <see cref="Graph"/> for simple CodeCities or <see cref="Graph}"/> for evolution cities)</typeparam>
     /// <typeparam name="K">
-    /// The type of an enum specifying the concrete kind of graph provider.
-    /// Can either be a <see cref="SingleGraphProviderKind"/> or <see cref="MultiGraphProviderKind"/>.
+    /// This type specifies the graph provider kind enum type.
+    /// This can either be a <see cref="SingleGraphProviderKind"/> or <see cref="MultiGraphProviderKind"/>.
     /// This type will be returned by <see cref="GetKind"/>
     /// </typeparam>
     public abstract class GraphProvider<T, K> where K : Enum
