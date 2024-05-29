@@ -1,0 +1,40 @@
+PROGRAM test;
+DECLARE x : INTEGER;
+        s : STRING;
+        p : ARRAY [1..10] OF ARRAY [1..10] OF STRING;
+
+PROCEDURE test3;
+  DECLARE y : INTEGER;
+  PROCEDURE test2;
+    DECLARE x : INTEGER
+  BEGIN
+    x := 5
+  END
+BEGIN
+  y := 1
+END;
+
+PROCEDURE ReadPosInteger (VAR i: INTEGER);
+DECLARE
+  j: REAL
+BEGIN
+  i := 3;
+  j := IF i>5 THEN .1 ELSE 5.3 END;
+  WHILE NOT (0 < i) DO READ (i) END;
+  WRITELN(FORMAT(j))
+END;
+
+FUNCTION TestFunc : INTEGER;
+DECLARE
+  i : INTEGER
+BEGIN
+  i := 1
+END
+
+BEGIN
+  test3();
+  ReadPosInteger(x);
+  WRITE("Das ist ein Test...");
+  WRITELN("Das ist aber noch einer.");
+  x := 100+1
+END.

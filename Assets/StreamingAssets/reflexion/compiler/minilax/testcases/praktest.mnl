@@ -1,0 +1,104 @@
+PROGRAM test;
+
+  (* read, sort and write an array of n numbers *)
+  (* this program shows the following features: *)
+  (* etc. *)
+
+DECLARE
+  test : BOOLEAN;
+  n    : INTEGER;
+  a    : ARRAY [1..100] OF REAL;
+
+  PROCEDURE skip; (* kommentar *)
+  DECLARE
+    n: INTEGER
+  BEGIN
+    n := n
+  END;
+
+  PROCEDURE read (VAR n: INTEGER; VAR a: ARRAY [1..100] OF REAL);
+  DECLARE
+    i: INTEGER
+  BEGIN
+    WRITE (FORMAT(TRUE)); READ (test);
+    WRITE (FORMAT(5)); READ (n);
+    i := 1;
+    WHILE i < n + 1 DO
+      WRITE (FORMAT(1.0E-7)); READ (a [i]); i := i + 1
+    END
+  END;
+
+  PROCEDURE write (m: INTEGER); (* write a [m..n] *)
+  DECLARE
+    x: INTEGER
+  BEGIN
+    WRITE (FORMAT(a [m]));
+    IF m < n THEN write (m + 1) ELSE skip() END
+  END;
+
+  PROCEDURE sort (VAR a: ARRAY [1..100] OF REAL); (* sort a [1..n] *)
+  DECLARE
+    i : INTEGER;
+    j : INTEGER;
+    k : INTEGER;
+    h : REAL;
+    ok: BOOLEAN;
+
+    PROCEDURE check (VAR ok: BOOLEAN); (* check order of a [1..n] *)
+    DECLARE
+      continue: BOOLEAN
+    BEGIN
+      IF test THEN write (1) ELSE skip() END;
+      i := 1; continue := TRUE;
+      WHILE continue DO
+        IF i < n THEN
+          continue := NOT (a [i + 1] < a [i]);
+          IF continue THEN i := i + 1 ELSE skip() END
+        ELSE
+          continue := FALSE
+        END
+      END;
+      ok := NOT (i < n)
+    END
+
+  BEGIN (* sort *)
+    i := 1;
+    WHILE i < n DO
+      write (1);
+      j := i; k := i;
+      WHILE j < n DO   (* a [k] = MIN a [i..j] *)
+        j := j + 1;
+        IF a [j] < a [k] THEN k := j ELSE skip() END
+      END;
+      h := a [i]; a [i] := a [k]; a [k] := h;
+      i := i + 1
+    END;
+    check (ok); WRITE (FORMAT(ok))
+  END;
+
+  PROCEDURE square (n : INTEGER);
+  (* computes square numbers of numbers in intervall [0 .. 1). *)
+  (* with step wide 0.01 * n                                   *)
+  DECLARE x    : REAL;
+          step : REAL
+  BEGIN
+    x := 0; step := n; step := step * 0.01;
+    WHILE x < 1.0 DO
+      WRITE (FORMAT(11111)); WRITE (FORMAT(x)); WRITE (FORMAT(x*x));
+      x := x + step
+    END
+  END
+
+BEGIN (* main program *)
+  read (n, a);
+  sort (a);
+  IF NOT test THEN write (1) ELSE skip() END;
+
+  WRITE (FORMAT(99999)); READ (n);
+  square (n);
+
+  (* test index check, an error must occur *)
+  WRITE (FORMAT(77777));
+  n := 0;
+  a[n] := 99.99
+END.

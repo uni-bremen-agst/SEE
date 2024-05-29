@@ -1,0 +1,40 @@
+PROGRAM freqweichen;
+DECLARE
+  fakt : ARRAY [1..3] OF ARRAY [1..3] OF REAL;
+  z    : REAL;
+  flo  : REAL;
+  fhi  : REAL;
+  nach : INTEGER;
+  Pi   : REAL;
+  l1   : REAL
+
+BEGIN
+  fakt[1][1] := 1.5;     fakt[1][2] := 1.3333;  fakt[1][3] := 0.5;
+  fakt[2][1] := 1.4631;  fakt[2][2] := 0.8427;  fakt[2][3] := 0.2926;
+  fakt[3][1] := 1.5018;  fakt[3][2] := 0.9328;  fakt[3][3] := 0.3631;
+  Pi := 3.14159;
+  WRITELN("Bauteilberechnung fuer Lautsprecherfilter 3. Ordnung");
+  WRITELN("");
+  WRITE("kompensierte Lautsprecher-Impedanz (Ohm): ");
+  READ(z);
+  WRITE("untere Eckfrequenz (Hertz): ");
+  READ(flo);
+  WRITE("obere Eckfrequenz (Hertz):  ");
+  READ(fhi);
+  WRITE("nach (1) Butterworth, (2) Bessel oder (3) phasenlinear 0,005b ? ");
+  READ(nach);
+  WRITELN("");
+  l1 := ((fakt[nach][1]*z)/(2*Pi*flo))*1000;
+  WRITELN("Tiefpass:  L1 = " ++ FORMAT( l1) ++
+          " mH,  C = "++FORMAT( fakt[nach][2]/(2*Pi*flo*z)*1.0E+6) ++
+          " uF,  L2 = "++FORMAT(fakt[nach][3]*z/(2*Pi*flo)*1000) ++" mH");
+  WRITELN("Hochpass:  C1 = "++FORMAT(1.0E+6/(fakt[nach][1]*2*Pi*fhi*z)) ++
+          " uF,  L = "++FORMAT(z/(fakt[nach][2]*2*Pi*fhi)*1000) ++
+          " mH,  C2 = "++FORMAT(1.0E+6/(fakt[nach][3]*2*Pi*fhi*z))++" uF");
+  WRITELN("");
+  WRITELN("---- X1 ---+--- X2 ---+");
+  WRITELN("           |          |");
+  WRITELN("           Y          LS");
+  WRITELN("           |          |");
+  WRITELN("-----------+----------+")
+END.

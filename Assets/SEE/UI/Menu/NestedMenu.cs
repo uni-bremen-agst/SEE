@@ -71,7 +71,7 @@ namespace SEE.UI.Menu
         /// <summary>
         /// A semaphore to prevent multiple searches from happening at the same time.
         /// </summary>
-        private SemaphoreSlim searchSemaphore = new(1, 1);
+        private readonly SemaphoreSlim searchSemaphore = new(1, 1);
 
         /// <summary>
         /// True, if the search-input is focused, else false.
@@ -227,7 +227,10 @@ namespace SEE.UI.Menu
                 // and the level must be reset to the top.
                 if (!ShowMenu)
                 {
-                    searchInput.text = string.Empty;
+                    if (searchInput)
+                    {
+                        searchInput.text = string.Empty;
+                    }
                     ResetToBase();
                 }
             };

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="Clones" edgeids="true">
+    <node id="N1">
+      <type xlink:href="Routine" />
+      <attr name="Linkage.Name">
+        <string>R typechk.c:type_expr(atn_expr*)@typechk.o</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>type_expr</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+      <attr name="Source.File">
+        <string>typechk.c</string>
+      </attr>
+    </node>
+    <edge id="E1" from="N1" to="N1">
+      <type xlink:href="Clone" />
+      <attr name="Clone.Source.Start.Line">
+        <int>292</int>
+      </attr>
+      <attr name="Clone.Source.Start.Column">
+        <int>0</int>
+      </attr>
+      <attr name="Clone.Source.End.Line">
+        <int>322</int>
+      </attr>
+      <attr name="Clone.Source.End.Column">
+        <int>0</int>
+      </attr>
+      <attr name="Clone.Target.Start.Line">
+        <int>337</int>
+      </attr>
+      <attr name="Clone.Target.Start.Column">
+        <int>0</int>
+      </attr>
+      <attr name="Clone.Target.End.Line">
+        <int>366</int>
+      </attr>
+      <attr name="Clone.Target.End.Column">
+        <int>0</int>
+      </attr>
+      <attr name="Clone.Type">
+        <int>2</int>
+      </attr>
+      <attr name="Clone.Syntactic_Kind">
+        <string>Sequence_Clone</string>
+      </attr>
+      <attr name="Clone.Source.Size">
+        <int>139</int>
+      </attr>
+      <attr name="Clone.Target.Size">
+        <int>139</int>
+      </attr>
+    </edge>
+  </graph>
+</gxl>

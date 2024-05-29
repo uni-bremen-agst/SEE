@@ -1,0 +1,22 @@
+PROGRAM test9;
+DECLARE
+  xx : REAL;
+
+  FUNCTION test( p : INTEGER ) : INTEGER;
+  DECLARE
+    x : INTEGER
+  BEGIN
+    RETURN( p )
+  END;
+
+  PROCEDURE modify( VAR y : REAL );
+  DECLARE
+    yy : INTEGER
+  BEGIN
+    y := test( 10 )
+  END
+
+BEGIN
+  modify( xx );
+  WRITELN( FORMAT( xx ) )
+END.
