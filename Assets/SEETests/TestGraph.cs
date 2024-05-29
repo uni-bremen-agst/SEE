@@ -10,7 +10,6 @@ namespace SEE.DataModel.DG
     /// </summary>
     internal class TestGraph : TestGraphBase
     {
-
         /// <summary>
         /// Tests the following operations:
         ///   graph.AddNode
@@ -771,6 +770,42 @@ namespace SEE.DataModel.DG
 
             Assert.AreEqual(subgraphNodes.Count + 2, g.NodeCount);
             Assert.AreEqual(subgraphEdges.Count + 2, g.EdgeCount);
+        }
+
+        /// <summary>
+        /// Tests <see cref="Graph.SubgraphBy"/>.
+        /// </summary>
+        [Test]
+        public void TestSubgraph()
+        {
+            const string floatAttribute = "float";
+            const string intAttribute = "int";
+            const string stringAttribute = "string";
+            const string toggleAttribute = "toggle";
+
+            const float floatAttributeValue = 2.0f;
+            const int intAttributeValue = 1;
+            const string stringAttributeValue = "hello, world";
+            const bool toggleAttributeValue = true;
+
+            Graph g = NewEmptyGraph();
+            g.SetFloat(floatAttribute, floatAttributeValue);
+            g.SetInt(intAttribute, intAttributeValue);
+            g.SetString(stringAttribute, stringAttributeValue);
+            g.SetToggle(toggleAttribute, toggleAttributeValue);
+            Node a = NewNode(g, "a", "Routine");
+            Node b = NewNode(g, "b", "Field");
+            Edge e1 = NewEdge(g, a, b, "call");
+            Edge e2 = NewEdge(g, a, b, "set");
+
+            Graph sg = g.SubgraphBy(x => x is Node || (x is Edge e && e.Type == "set"));
+            Assert.AreEqual(floatAttributeValue, sg.GetFloat(floatAttribute));
+            Assert.AreEqual(intAttributeValue, sg.GetFloat(intAttribute));
+            Assert.AreEqual(stringAttributeValue, sg.GetString(stringAttribute));
+            Assert.IsTrue(sg.HasToggle(toggleAttribute));
+
+            Assert.AreEqual(2, sg.NodeCount);
+            Assert.AreEqual(1, sg.EdgeCount);
         }
     }
 }
