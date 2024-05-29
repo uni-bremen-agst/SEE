@@ -13,6 +13,14 @@ namespace SEE.DataModel.DG
     /// </summary>
     public partial class Graph : Attributable
     {
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        public Graph()
+        {
+            elementObserver = new ProxyObserver(this, x => x.CopyWithGuid(Version));
+        }
+
         // The list of graph nodes indexed by their unique IDs
         private Dictionary<string, Node> nodes = new();
 
@@ -104,7 +112,7 @@ namespace SEE.DataModel.DG
         ///
         /// Note: This attribute will not be stored in a GXL file.
         /// </summary>
-        public string BasePath { get; set; }
+        public string BasePath { get; set; } = string.Empty;
 
         /// <summary>
         /// Adds a node to the graph.
@@ -535,14 +543,14 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Name of the graph (the view name of the underlying RFG).
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The path of the file from which this graph was loaded. Could be the
         /// empty string if the graph was not created by loading it from disk.
         /// Not to be confused with <see cref="BasePath"/>.
         /// </summary>
-        public string Path { get; set; } = "";
+        public string Path { get; set; } = string.Empty;
 
         /// <summary>
         /// Returns all nodes of the graph.
@@ -1246,7 +1254,7 @@ namespace SEE.DataModel.DG
         public Graph SubgraphBy(Func<GraphElement, bool> includeElement, bool ignoreSelfLoops = false)
         {
             // The following will also clone the graph attributes.
-            Graph subgraph = (Graph)Clone();
+            Graph subgraph = (Graph)CloneAttributes();
             Dictionary<Node, Node> mapsTo = AddNodesToSubgraph(subgraph, includeElement);
             AddEdgesToSubgraph(subgraph, mapsTo, includeElement, ignoreSelfLoops);
             return subgraph;
