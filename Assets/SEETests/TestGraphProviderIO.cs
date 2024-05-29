@@ -6,7 +6,6 @@ using SEE.Scanner;
 using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -268,7 +267,7 @@ namespace SEE.GraphProviders
             return new GameObject().AddComponent<T>();
         }
 
-        public async System.Threading.Tasks.Task<Graph> GetVCSGraphAsync()
+        public async Task<Graph> GetVCSGraphAsync()
         {
             VCSGraphProvider saved = GetVCSGraphProvider();
             SEECity testCity = NewVanillaSEECity<SEECity>(); ;
@@ -367,7 +366,7 @@ namespace SEE.GraphProviders
         }
 
         [Test]
-        public async Task AddMetricsToNodeAsync()
+        public async Task TestAddMetricsToNodeAsync()
         {
             Graph graph = await GetVCSGraphAsync();
             string repoPath = Path.GetDirectoryName(Application.dataPath);
