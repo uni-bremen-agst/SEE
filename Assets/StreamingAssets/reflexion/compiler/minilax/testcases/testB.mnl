@@ -1,0 +1,8 @@
+PROGRAM test;
+DECLARE x : BOOLEAN
+
+BEGIN
+  WHILE TRUE DO
+    x := TRUE
+  END
+END.

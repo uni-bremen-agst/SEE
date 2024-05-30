@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using Joveler.Compression.XZ;
 using SEE.Utils;
 #if UNITY_EDITOR
@@ -245,9 +247,10 @@ namespace SEE.DataModel.DG.IO
         /// Loads the graph from the GXL file and adds an artificial root node if requested
         /// (see constructor). The node levels will be calculated, too.
         /// </summary>
-        public override void Load()
+        /// <param name="token">token with which the loading can be cancelled</param>
+        public override async UniTask LoadAsync(CancellationToken token = default)
         {
-            base.Load();
+            await base.LoadAsync(token);
             graph.BasePath = basePath;
             if (!string.IsNullOrWhiteSpace(rootName))
             {
@@ -751,11 +754,11 @@ namespace SEE.DataModel.DG.IO
                 {
                     case RegionLengthAttribute:
                         // NOTE: This assumes the Region_Length is always declared *after* the Region_Start.
-                        int endLine = current.GetInt(GraphElement.SourceRangeStartLineAttribute) + value;
-                        current.SetInt(GraphElement.SourceRangeEndLineAttribute, endLine);
+                        int endLine = current.GetInt(GraphElement.SourceRangeAttribute + Attributable.RangeStartLineSuffix) + value;
+                        current.SetInt(GraphElement.SourceRangeAttribute + Attributable.RangeEndLineSuffix, endLine);
                         break;
                     case RegionStartAttribute:
-                        current.SetInt(GraphElement.SourceRangeStartLineAttribute, value);
+                        current.SetInt(GraphElement.SourceRangeAttribute + Attributable.RangeStartLineSuffix, value);
                         break;
                     default:
                         current.SetInt(currentAttributeName, value);

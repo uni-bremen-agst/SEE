@@ -24,12 +24,12 @@ namespace SEE.Game.HolisticMetrics.Metrics
         /// metric for <paramref name="city"/></returns>
         internal override MetricValue Refresh(AbstractSEECity city)
         {
-            MetricValueCollection collection = new MetricValueCollection();
+            MetricValueCollection collection = new();
             foreach (Node node in city.LoadedGraph.Nodes())
             {
                 if (node.TryGetNumeric(attributeName, out float lines))
                 {
-                    MetricValueRange metricValue = new MetricValueRange
+                    MetricValueRange metricValue = new()
                     {
                         DecimalPlaces = 2,
                         Higher = 300, // FIXME: There can be more than 300 LOC.

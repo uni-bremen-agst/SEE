@@ -3,6 +3,7 @@ using SEE.Game.City;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 
 namespace SEE.GraphProviders
@@ -24,8 +25,13 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="graph">input graph</param>
         /// <param name="city">settings possibly necessary to provide a graph</param>
+        /// <param name="changePercentage">callback to report progress from 0 to 1</param>
+        /// <param name="token">cancellation token</param>
         /// <returns>provided graph based on <paramref name="graph"/></returns>
-        public abstract UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city);
+        /// <exception cref="OperationCanceledException">thrown if the operation is cancelled</exception>
+        public abstract UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
+                                                    Action<float> changePercentage = null,
+                                                    CancellationToken token = default);
 
         /// <summary>
         /// Saves the settings in the configuration file.

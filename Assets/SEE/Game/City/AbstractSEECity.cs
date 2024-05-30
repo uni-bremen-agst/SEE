@@ -14,6 +14,7 @@ using SEE.UI.RuntimeConfigMenu;
 using SEE.Game.CityRendering;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
+using UnityEngine.Rendering;
 
 namespace SEE.Game.City
 {
@@ -29,7 +30,7 @@ namespace SEE.Game.City
     {
         protected virtual void Awake()
         {
-            // Intentionally left blank
+            LabelLineMaterial = new Material(LineMaterial(Color.white));
         }
 
         protected virtual void Start()
@@ -169,6 +170,38 @@ namespace SEE.Game.City
         public ColorMap MetricToColor = new();
 
         /// <summary>
+        /// A progress bar, shown in the editor.
+        /// Can be used to indicate loading progress during city creation.
+        /// </summary>
+        [ProgressBar(0, 1, Height = 20, ColorGetter = nameof(GetProgressBarColor),
+                     CustomValueStringGetter = "$" + nameof(ProgressBarValueString))]
+        [PropertyOrder(999)]
+        [ShowIf(nameof(ShowProgressBar))]
+        [HideLabel]
+        [ReadOnly]
+        public float ProgressBar;
+
+        /// <summary>
+        /// Whether the progress bar should be shown.
+        /// </summary>
+        private bool ShowProgressBar => ProgressBar > 0;
+
+        /// <summary>
+        /// The string representation of the progress bar value.
+        /// </summary>
+        private string ProgressBarValueString => $"{ProgressBar * 100:F0}%";
+
+        /// <summary>
+        /// Returns the color for the progress bar, based on the current <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">The value (from 0–1) for which to determine the color.</param>
+        /// <returns>The color for the progress bar.</returns>
+        private static Color GetProgressBarColor(float value)
+        {
+            return Color.Lerp(Color.red, Color.green, Mathf.Pow(value, 2));
+        }
+
+        /// <summary>
         /// Yields a graph renderer that can draw this city.
         /// </summary>
         public abstract IGraphRenderer Renderer
@@ -245,18 +278,44 @@ namespace SEE.Game.City
         [Tooltip("Settings for holistic metric boards.")]
         public BoardAttributes BoardSettings = new();
 
+        #region LabelLineMaterial
         /// <summary>
-        /// Adds all game objects tagged by <see cref="Tags.Node"/> or <see cref="Tags.Edge"/>
-        /// of <paramref name="parent"/> including its descendants to <see cref="GraphElementIDMap"/>.
+        /// The material for the line connecting a node and its label. We use exactly one material
+        /// for all connecting lines within this city, different from the lines used for labels in
+        /// other cities. This allows us to set the portal independently from other other cities.
         /// </summary>
-        /// <param name="parent">root node of the game-object tree to be added to <see cref="GraphElementIDMap"/></param>
-        protected static void UpdateGraphElementIDMap(GameObject parent)
+        [HideInInspector]
+        public Material LabelLineMaterial
+        { get; private set; }
+
+        /// <summary>
+        /// Returns the material for the line connecting a node and its label.
+        /// </summary>
+        /// <param name="lineColor">the color for the requested line material</param>
+        /// <returns>a new material for the line connecting a node and its label</returns>
+        private static Material LineMaterial(Color lineColor)
         {
-            if (parent.CompareTag(Tags.Node) || parent.CompareTag(Tags.Edge))
+            return Materials.New(Materials.ShaderType.TransparentLine, lineColor, texture: null,
+                                 renderQueueOffset: (int)(RenderQueue.Transparent + 1));
+        }
+        #endregion
+
+
+        /// <summary>
+        /// Recurses into the game-object hierarchy rooted by <paramref name="root"/> and adds
+        /// all visited game objects (including <paramref name="root"/>) tagged by <see cref="Tags.Node"/>
+        /// or <see cref="Tags.Edge"/> to <see cref="GraphElementIDMap"/>.
+        /// </summary>
+        /// <param name="root">root node of the game-object tree to be added to <see cref="GraphElementIDMap"/></param>
+        /// <remarks>Generally, <paramref name="root"/> will be a game object representing a code city;
+        /// that is, a game object where a <see cref="AbstractSEECity"/> component is attached to.</remarks>
+        protected static void UpdateGraphElementIDMap(GameObject root)
+        {
+            if (root.CompareTag(Tags.Node) || root.CompareTag(Tags.Edge))
             {
-                GraphElementIDMap.Add(parent, true);
+                GraphElementIDMap.Add(root);
             }
-            foreach (Transform child in parent.transform)
+            foreach (Transform child in root.transform)
             {
                 UpdateGraphElementIDMap(child.gameObject);
             }
@@ -329,6 +388,7 @@ namespace SEE.Game.City
         public virtual void Reset()
         {
             DeleteGraphGameObjects();
+            ProgressBar = 0;
         }
 
         /// <summary>
