@@ -13,13 +13,17 @@ using UnityEngine;
 using SEE.Scanner;
 using System.Threading;
 using Microsoft.Extensions.FileSystemGlobbing;
+using SEE.UI.RuntimeConfigMenu;
+using SEE.Utils;
+using SEE.Utils.Paths;
+using Sirenix.Serialization;
 
 namespace SEE.GraphProviders
 {
     /// <summary>
     /// Provides a version control system graph based on a git repository.
     /// </summary>
-    public class VCSGraphProvider : GraphProvider
+    public class VCSGraphProvider : SingleGraphProvider
     {
         /// <summary>
         /// The path to the git repository.
@@ -44,9 +48,9 @@ namespace SEE.GraphProviders
             { "**/*", true }
         };
 
-        public override GraphProviderKind GetKind()
+        public override SingleGraphProviderKind GetKind()
         {
-            return GraphProviderKind.VCS;
+            return SingleGraphProviderKind.VCS;
         }
 
         /// <summary>
@@ -60,10 +64,7 @@ namespace SEE.GraphProviders
                                                           CancellationToken token = default)
         {
             CheckArguments(city);
-            UniTask<Graph> graphTask =
-                UniTask.FromResult<Graph>(GetVCSGraph(PathGlobbing, RepositoryPath.Path, CommitID));
-
-            return graphTask;
+            return await UniTask.FromResult<Graph>(GetVCSGraph(PathGlobbing, RepositoryPath.Path, CommitID));
         }
 
         /// <summary>
