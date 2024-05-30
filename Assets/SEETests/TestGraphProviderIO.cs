@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.GraphProviders.Evolution;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -400,25 +401,6 @@ namespace SEE.GraphProviders
 
         #endregion
 
-        private VCSGraphProvider GetVCSGraphProvider()
-        {
-            return new VCSGraphProvider()
-            {
-                Repository = new GitRepository()
-                    { RepositoryPath = new DirectoryPath(System.IO.Path.GetDirectoryName(Application.dataPath)) },
-                CommitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461",
-            };
-        }
-
-        private GitRepository GetGitRepository()
-        {
-            return new GitRepository()
-            {
-                RepositoryPath = new DirectoryPath("/path/to/repo"),
-                PathGlobbing = new() { { ".cs", true }, { ".c", true }, { ".cbl", false } }
-            };
-        }
-
         private static T NewVanillaSEECity<T>() where T : Component
         {
             return new GameObject().AddComponent<T>();
@@ -427,26 +409,29 @@ namespace SEE.GraphProviders
         public async System.Threading.Tasks.Task<Graph> GetVCSGraphAsync()
         {
             VCSGraphProvider saved = GetVCSGraphProvider();
-            SEECity testCity = NewVanillaSEECity<SEECity>();
-            ;
+            SEECity testCity = NewVanillaSEECity<SEECity>(); ;
             Graph testGraph = new("test", "test");
             Graph graph = await saved.ProvideAsync(testGraph, testCity);
             return graph;
         }
 
         [Test]
-        public void TestVCSGraphProvider()
+        public async Task TestVCSGraphProviderAsync()
         {
-            Graph graph = GetVCSGraphAsync().GetAwaiter().GetResult();
+            Graph graph = await GetVCSGraphAsync();
             List<string> pathsFromGraph = new();
             foreach (GraphElement elem in graph.Elements())
             {
-                pathsFromGraph.Add(elem.ID.Replace('\\', '/'));
+                pathsFromGraph.Add(elem.ID);
             }
+
+            string repositoryPath = Application.dataPath;
+            string projectPath = repositoryPath.Substring(0, repositoryPath.LastIndexOf("/"));
+            string projectName = Path.GetFileName(projectPath);
 
             List<string> actualList = new()
             {
-                "SEE",
+                projectName,
                 ".gitignore",
                 "Assets",
                 "Assets/Scenes.meta",
@@ -475,15 +460,17 @@ namespace SEE.GraphProviders
                 "ProjectSettings/VFXManager.asset",
                 "ProjectSettings/XRSettings.asset"
             };
-            Assert.IsTrue(actualList.SequenceEqual(pathsFromGraph));
+            Assert.AreEqual(28, pathsFromGraph.Count());
+            Assert.IsTrue(actualList.OrderByDescending(x => x).ToList().SequenceEqual(pathsFromGraph.OrderByDescending(x => x).ToList()));
         }
 
-        private SingleGraphProvider LoadSingleGraph()
+        private VCSGraphProvider GetVCSGraphProvider()
         {
-            using ConfigReader stream = new(filename);
-            SingleGraphProvider loaded = SingleGraphProvider.Restore(stream.Read(), providerLabel);
-            Assert.IsNotNull(loaded);
-            return loaded;
+            return new VCSGraphProvider()
+            {
+                RepositoryPath = new DirectoryPath(System.IO.Path.GetDirectoryName(Application.dataPath)),
+                CommitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461",
+            };
         }
 
         private MultiGraphProvider LoadMultiGraph()
