@@ -83,7 +83,7 @@ namespace SEE.Game.Worlds
             if (!networkManager.IsServer)
             {
                 dissonanceComms = FindObjectOfType<DissonanceComms>();
-                dissonanceComms.LocalPlayerName = networkConfig.Username;
+                dissonanceComms.LocalPlayerName = networkConfig.Playername;
                 yield break;
             }
 
@@ -95,7 +95,7 @@ namespace SEE.Game.Worlds
             while (ReferenceEquals(dissonanceComms, null))
             {
                 dissonanceComms = FindObjectOfType<DissonanceComms>();
-                dissonanceComms.LocalPlayerName = networkConfig.Username;
+                dissonanceComms.LocalPlayerName = networkConfig.Playername;
                 yield return null;
             }
 

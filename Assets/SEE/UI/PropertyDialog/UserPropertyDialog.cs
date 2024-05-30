@@ -1,15 +1,9 @@
 ﻿using SEE.Controls;
 using SEE.UI.Notification;
-using SEE.GO;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using SEE.Utils;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
-using SEE.UI.PropertyDialog;
-using static SEE.Net.Network;
 
 namespace SEE.UI.PropertyDialog
 {
@@ -43,9 +37,9 @@ namespace SEE.UI.PropertyDialog
         private GameObject dialog;
 
         /// <summary>
-        /// The dialog property for the username.
+        /// The dialog property for the playername.
         /// </summary>
-        private StringProperty userName;
+        private StringProperty playerName;
 
         /// <summary>
         /// The dialog for the user input.
@@ -76,15 +70,17 @@ namespace SEE.UI.PropertyDialog
         /// </summary>
         public void Open()
         {
+            networkConfig.Load();
+
             dialog = new GameObject("User settings");
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
             group.Name = "User settings";
             {
-                userName = dialog.AddComponent<StringProperty>();
-                userName.Name = "Username";
-                userName.Value = networkConfig.Username;
-                userName.Description = "Username which will be used as avatar-tag and in other function.";
-                group.AddProperty(userName);
+                playerName = dialog.AddComponent<StringProperty>();
+                playerName.Name = "Username";
+                playerName.Value = networkConfig.Playername;
+                playerName.Description = "Username which will be used as avatar-tag and in other function.";
+                group.AddProperty(playerName);
             }
             // Dialog
             propertyDialog = dialog.AddComponent<PropertyDialog>();
@@ -119,11 +115,11 @@ namespace SEE.UI.PropertyDialog
         {
             bool errorOccurred = false;
             {
-                string playername = userName.Value.Trim();
+                string playername = playerName.Value.Trim();
 
                 if (ValidUsername(playername))
                 {
-                    networkConfig.Username = playername;
+                    networkConfig.Playername = playername;
                 }
                 else
                 {

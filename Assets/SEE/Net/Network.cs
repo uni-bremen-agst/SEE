@@ -75,11 +75,14 @@ namespace SEE.Net
             }
         }
 
-        private string username = string.Empty;
-        public string Username
+        /// <summary>
+        /// Playername for chat and avatar tag
+        /// </summary>
+        private string playername = string.Empty;
+        public string Playername
         {
-            get { return username; }
-            set { username = value; }
+            get { return playername; }
+            set { playername = value; }
         }
         /// <summary>
         /// Returns the underlying <see cref="UNetTransport"/> of the <see cref="NetworkManager"/>.
@@ -984,8 +987,10 @@ namespace SEE.Net
         /// Label of attribute <see cref="ServerIP4Address"/> in the configuration file.
         /// </summary>
         private const string serverIP4AddressLabel = "serverIP4Address";
-
-        private const string usernameLabel = "username";
+        /// <summary>
+        /// Label of attribute <see cref="Playername"/> in the configuration file.
+        /// </summary>
+        private const string playernameLabel = "playername";
 
         /// <summary>
         /// Saves the settings of this network configuration to <paramref name="filename"/>.
@@ -1026,7 +1031,7 @@ namespace SEE.Net
             writer.Save(VoiceChat.ToString(), voiceChatLabel);
             writer.Save(ServerPort, serverPortLabel);
             writer.Save(ServerIP4Address, serverIP4AddressLabel);
-            writer.Save(Username, usernameLabel);
+            writer.Save(Playername, playernameLabel);
         }
 
         /// <summary>
@@ -1050,9 +1055,9 @@ namespace SEE.Net
                 ServerIP4Address = value;
             }
             {
-                string value = Username;
-                ConfigIO.Restore(attributes, usernameLabel, ref value);
-                Username = value;
+                string value = Playername;
+                ConfigIO.Restore(attributes, playernameLabel, ref value);
+                Playername = value;
             }
         }
 

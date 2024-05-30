@@ -33,10 +33,10 @@ public class PlayerName : NetworkBehaviour
     /// </summary>
     private void ReadPlayerName()
     {
-        string playerName = networkConfig.Username;
+        string playerName = networkConfig.Playername;
 
-        // If a player name is retrieved from JSON, store it.
-        if (playerName != null)
+        // If a player name is retrieved, store it.
+        if (playerName != null && playerName.Length != 0)
         {
             playername = playerName;
         }
@@ -69,9 +69,6 @@ public class PlayerName : NetworkBehaviour
     [ClientRpc]
     private void SendPlayernameToClientsToRenderItClientRPC(string playername)
     {
-#if DEBUG
-        Debug.Log($"[RPC] Client {NetworkManager.Singleton.LocalClientId} received SendPlayernameToClientsToRenderItClientRPC from server\n");
-#endif
         RenderNetworkPlayername(playername);
     }
 
@@ -83,10 +80,6 @@ public class PlayerName : NetworkBehaviour
     [ServerRpc]
     private void GetPlayernameFromClientAndSendItToClientsToRenderItServerRPC(string playername, ServerRpcParams serverRpcParams = default)
     {
-#if DEBUG
-        Debug.Log($"[RPC] Server received GetPlayernameFromClientAndSendItToClientsToRenderItServerRPC from {serverRpcParams.Receive.SenderClientId}\n");
-#endif
-
         // The server will render this playername onto his instance of the TextMeshPro.
         RenderNetworkPlayername(playername);
 
@@ -108,8 +101,7 @@ public class PlayerName : NetworkBehaviour
     /// </summary>
     private void DisplayLocalPlayername()
     {
-        //displayNameText.text = "Me";
-        displayNameText.text = playername;
+        displayNameText.text = "Me";
     }
 
     /// <summary>
