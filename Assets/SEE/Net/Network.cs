@@ -76,6 +76,15 @@ namespace SEE.Net
         }
 
         /// <summary>
+        /// Playername for chat and avatar tag
+        /// </summary>
+        private string playername = string.Empty;
+        public string Playername
+        {
+            get { return playername; }
+            set { playername = value; }
+        }
+        /// <summary>
         /// Returns the underlying <see cref="UNetTransport"/> of the <see cref="NetworkManager"/>.
         /// This information is retrieved differently depending upon whether we are running
         /// in the editor or in game play because <see cref="NetworkManager.Singleton"/> is
@@ -948,7 +957,7 @@ namespace SEE.Net
             Load(ConfigPath.Path);
         }
 
-#region ConfigIO
+        #region ConfigIO
 
         //--------------------------------
         // Configuration file input/output
@@ -978,6 +987,10 @@ namespace SEE.Net
         /// Label of attribute <see cref="ServerIP4Address"/> in the configuration file.
         /// </summary>
         private const string serverIP4AddressLabel = "serverIP4Address";
+        /// <summary>
+        /// Label of attribute <see cref="Playername"/> in the configuration file.
+        /// </summary>
+        private const string playernameLabel = "playername";
 
         /// <summary>
         /// Saves the settings of this network configuration to <paramref name="filename"/>.
@@ -1018,6 +1031,7 @@ namespace SEE.Net
             writer.Save(VoiceChat.ToString(), voiceChatLabel);
             writer.Save(ServerPort, serverPortLabel);
             writer.Save(ServerIP4Address, serverIP4AddressLabel);
+            writer.Save(Playername, playernameLabel);
         }
 
         /// <summary>
@@ -1040,11 +1054,16 @@ namespace SEE.Net
                 ConfigIO.Restore(attributes, serverIP4AddressLabel, ref value);
                 ServerIP4Address = value;
             }
+            {
+                string value = Playername;
+                ConfigIO.Restore(attributes, playernameLabel, ref value);
+                Playername = value;
+            }
         }
 
-#endregion
+        #endregion
 
-#region Vivox
+        #region Vivox
 
         public const string VivoxIssuer = "torben9605-se19-dev";
         public const string VivoxDomain = "vdx5.vivox.com";
@@ -1178,6 +1197,6 @@ namespace SEE.Net
             Util.Logger.Log(channelName + ": " + senderName + ": " + message + "\n");
         }
 
-#endregion
+        #endregion
     }
 }
