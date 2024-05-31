@@ -348,20 +348,20 @@ namespace SEE.GraphProviders
                         int complexity = TokenMetrics.CalculateMcCabeComplexity(tokens);
                         int linesOfCode = TokenMetrics.CalculateLinesOfCode(tokens);
                         TokenMetrics.HalsteadMetrics halsteadMetrics = TokenMetrics.CalculateHalsteadMetrics(tokens);
-                        node.SetInt("Metrics.LOC", linesOfCode);
-                        node.SetInt("Metrics.McCabe_Complexity", complexity);
-                        node.SetInt("Metrics.Halstead.Distinct_Operators", halsteadMetrics.DistinctOperators);
-                        node.SetInt("Metrics.Halstead.Distinct_Operands", halsteadMetrics.DistinctOperands);
-                        node.SetInt("Metrics.Halstead.Total_Operators", halsteadMetrics.TotalOperators);
-                        node.SetInt("Metrics.Halstead.Total_Operands", halsteadMetrics.TotalOperands);
-                        node.SetInt("Metrics.Halstead.Program_Vocabulary", halsteadMetrics.ProgramVocabulary);
-                        node.SetInt("Metrics.Halstead.Program_Length", halsteadMetrics.ProgramLength);
-                        node.SetFloat("Metrics.Halstead.Estimated_Program_Length", halsteadMetrics.EstimatedProgramLength);
-                        node.SetFloat("Metrics.Halstead.Volume", halsteadMetrics.Volume);
-                        node.SetFloat("Metrics.Halstead.Difficulty", halsteadMetrics.Difficulty);
-                        node.SetFloat("Metrics.Halstead.Effort", halsteadMetrics.Effort);
-                        node.SetFloat("Metrics.Halstead.Time_Required_To_Program", halsteadMetrics.TimeRequiredToProgram);
-                        node.SetFloat("Metrics.Halstead.Number_Of_Delivered_Bugs", halsteadMetrics.NumberOfDeliveredBugs);
+                        node.SetInt(Metrics.Prefix + "LOC", linesOfCode);
+                        node.SetInt(Metrics.Prefix + "McCabe_Complexity", complexity);
+                        node.SetInt(Metrics.Prefix + "Halstead.Distinct_Operators", halsteadMetrics.DistinctOperators);
+                        node.SetInt(Metrics.Prefix + "Halstead.Distinct_Operands", halsteadMetrics.DistinctOperands);
+                        node.SetInt(Metrics.Prefix + "Halstead.Total_Operators", halsteadMetrics.TotalOperators);
+                        node.SetInt(Metrics.Prefix + "Halstead.Total_Operands", halsteadMetrics.TotalOperands);
+                        node.SetInt(Metrics.Prefix + "Halstead.Program_Vocabulary", halsteadMetrics.ProgramVocabulary);
+                        node.SetInt(Metrics.Prefix + "Halstead.Program_Length", halsteadMetrics.ProgramLength);
+                        node.SetFloat(Metrics.Prefix + "Halstead.Estimated_Program_Length", halsteadMetrics.EstimatedProgramLength);
+                        node.SetFloat(Metrics.Prefix + "Halstead.Volume", halsteadMetrics.Volume);
+                        node.SetFloat(Metrics.Prefix + "Halstead.Difficulty", halsteadMetrics.Difficulty);
+                        node.SetFloat(Metrics.Prefix + "Halstead.Effort", halsteadMetrics.Effort);
+                        node.SetFloat(Metrics.Prefix + "Halstead.Time_Required_To_Program", halsteadMetrics.TimeRequiredToProgram);
+                        node.SetFloat(Metrics.Prefix + "Halstead.Number_Of_Delivered_Bugs", halsteadMetrics.NumberOfDeliveredBugs);
                     }
                 }
             }

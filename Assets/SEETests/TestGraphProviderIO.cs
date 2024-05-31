@@ -389,38 +389,38 @@ namespace SEE.GraphProviders
 
         private static void AssertMetricsCanBeAdded(Node node)
         {
-            Assert.IsTrue(node.HasToggle("Metrics.LOD"));
-            Assert.IsTrue(node.HasToggle("Metrics.McCabe_Complexity"));
-            Assert.IsTrue(node.HasToggle("Metrics.Halstead.Distinct_Operators"));
-            Assert.IsTrue(node.HasToggle("Metrics.Halstead.Distinct_Operands"));
-            Assert.IsTrue(node.HasToggle("Metrics.Halstead.Total_Operators"));
-            Assert.IsTrue(node.HasToggle("Metrics.Halstead.Total_Operands"));
-            Assert.IsTrue(node.HasToggle("Metrics.Halstead.Program_Vocabulary"));
-            Assert.IsTrue(node.HasToggle("Metrics.Halstead.Program_Length"));
-            Assert.IsTrue(node.HasToggle("Metrics.Halstead.Estimated_Program_Length"));
-            Assert.IsTrue(node.HasToggle("Metrics.Halstead.Volume"));
-            Assert.IsTrue(node.HasToggle("Metrics.Halstead.Difficulty"));
-            Assert.IsTrue(node.HasToggle("Metrics.Halstead.Effort"));
-            Assert.IsTrue(node.HasToggle("Metrics.Halstead.Time_Required_To_Program"));
-            Assert.IsTrue(node.HasToggle("Metrics.Halstead.Number_Of_Delivered_Bugs"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "LOD"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "McCabe_Complexity"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Distinct_Operators"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Distinct_Operands"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Total_Operators"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Total_Operands"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Program_Vocabulary"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Program_Length"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Estimated_Program_Length"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Volume"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Difficulty"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Effort"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Time_Required_To_Program"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Number_Of_Delivered_Bugs"));
         }
 
         private static void AssertMetricsCannotBeAdded(Node node)
         {
-            Assert.IsFalse(node.HasToggle("Metrics.LOC"));
-            Assert.IsFalse(node.HasToggle("Metrics.McCabe_Complexity"));
-            Assert.IsFalse(node.HasToggle("Metrics.Halstead.Distinct_Operators"));
-            Assert.IsFalse(node.HasToggle("Metrics.Halstead.Distinct_Operands"));
-            Assert.IsFalse(node.HasToggle("Metrics.Halstead.Total_Operators"));
-            Assert.IsFalse(node.HasToggle("Metrics.Halstead.Total_Operands"));
-            Assert.IsFalse(node.HasToggle("Metrics.Halstead.Program_Vocabulary"));
-            Assert.IsFalse(node.HasToggle("Metrics.Halstead.Program_Length"));
-            Assert.IsFalse(node.HasToggle("Metrics.Halstead.Estimated_Program_Length"));
-            Assert.IsFalse(node.HasToggle("Metrics.Halstead.Volume"));
-            Assert.IsFalse(node.HasToggle("Metrics.Halstead.Difficulty"));
-            Assert.IsFalse(node.HasToggle("Metrics.Halstead.Effort"));
-            Assert.IsFalse(node.HasToggle("Metrics.Halstead.Time_Required_To_Program"));
-            Assert.IsFalse(node.HasToggle("Metrics.Halstead.Number_Of_Delivered_Bugs"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "LOC"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "McCabe_Complexity"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Distinct_Operators"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Distinct_Operands"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Total_Operators"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Total_Operands"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Program_Vocabulary"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Program_Length"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Estimated_Program_Length"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Volume"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Difficulty"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Effort"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Time_Required_To_Program"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Number_Of_Delivered_Bugs"));
         }
     }
 }
