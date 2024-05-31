@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.Tools.ReflexionAnalysis;
+using Sirenix.Utilities;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -1149,7 +1149,7 @@ namespace SEE.DataModel.DG
         /// <returns>subgraph containing only nodes with given <paramref name="nodeTypes"/></returns>
         public Graph SubgraphByNodeType(IEnumerable<string> nodeTypes, bool ignoreSelfLoops = false)
         {
-            HashSet<string> relevantTypes = new HashSet<string>(nodeTypes);
+            HashSet<string> relevantTypes = new(nodeTypes);
             return SubgraphBy(element =>
             {
                 if (element is Node node)
@@ -1245,7 +1245,8 @@ namespace SEE.DataModel.DG
         /// </returns>
         public Graph SubgraphBy(Func<GraphElement, bool> includeElement, bool ignoreSelfLoops = false)
         {
-            Graph subgraph = this is ReflexionGraph ? new ReflexionGraph(BasePath) : new Graph(BasePath);
+            // The following will also clone the graph attributes.
+            Graph subgraph = (Graph)Clone();
             Dictionary<Node, Node> mapsTo = AddNodesToSubgraph(subgraph, includeElement);
             AddEdgesToSubgraph(subgraph, mapsTo, includeElement, ignoreSelfLoops);
             return subgraph;
@@ -1260,7 +1261,7 @@ namespace SEE.DataModel.DG
         /// <returns>a mapping of nodes from this graph onto the subgraph's nodes</returns>
         private Dictionary<Node, Node> AddNodesToSubgraph(Graph subgraph, Func<GraphElement, bool> includeElement)
         {
-            Dictionary<Node, Node> mapsTo = new Dictionary<Node, Node>();
+            Dictionary<Node, Node> mapsTo = new();
             foreach (Node root in GetRoots())
             {
                 // the node that corresponds to root in subgraph (may be null if
