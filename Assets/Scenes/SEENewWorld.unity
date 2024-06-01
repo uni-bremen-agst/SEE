@@ -34192,7 +34192,6 @@ GameObject:
   - component: {fileID: 1770094069}
   - component: {fileID: 1770094068}
   - component: {fileID: 1770094067}
-  - component: {fileID: 1770094066}
   - component: {fileID: 1770094065}
   m_Layer: 0
   m_Name: VCSCity
@@ -34324,13 +34323,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.784313738
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.784313738
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.784313738
     - Name: 
       Entry: 4
       Data: 1
@@ -34426,13 +34425,13 @@ MonoBehaviour:
       Data: 3
     - Name: 
       Entry: 1
-      Data: 0.001
+      Data: Metric.LOC
     - Name: 
       Entry: 1
-      Data: 0.001
+      Data: Metric.LOC
     - Name: 
       Entry: 1
-      Data: 0.001
+      Data: Metric.LOC
     - Name: 
       Entry: 13
       Data: 
@@ -34444,7 +34443,7 @@ MonoBehaviour:
       Data: 12|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: TypeColor
       Entry: 7
       Data: UnityEngine.Color, UnityEngine.CoreModule
@@ -34468,7 +34467,7 @@ MonoBehaviour:
       Data: true
     - Name: ColorMetric
       Entry: 1
-      Data: 
+      Data: Metric.McCabe_Complexity
     - Name: 
       Entry: 8
       Data: 
@@ -34615,7 +34614,61 @@ MonoBehaviour:
       Data: 3
     - Name: 
       Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Metric.McCabe_Complexity
+    - Name: $v
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: Lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
       Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 15
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -34778,7 +34831,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: cs
+      Data: Assets/SEE/**/*.cs
     - Name: $v
       Entry: 5
       Data: true
@@ -34872,416 +34925,6 @@ MonoBehaviour:
       Root: 2
       relativePath: 
       absolutePath: 
---- !u!114 &1770094066
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1770094063}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd7ef4ac2afe76645a67f18b81af6c74, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  serializationData:
-    SerializedFormat: 2
-    SerializedBytes: 
-    ReferencedUnityObjects: []
-    SerializedBytesString: 
-    Prefab: {fileID: 0}
-    PrefabModificationsReferencedUnityObjects: []
-    PrefabModifications: []
-    SerializationNodes:
-    - Name: HierarchicalEdges
-      Entry: 7
-      Data: 0|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
-    - Name: 
-      Entry: 12
-      Data: 4
-    - Name: 
-      Entry: 1
-      Data: Enclosing
-    - Name: 
-      Entry: 1
-      Data: Belongs_To
-    - Name: 
-      Entry: 1
-      Data: Part_Of
-    - Name: 
-      Entry: 1
-      Data: Defined_In
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NodeTypes
-      Entry: 7
-      Data: 1|SEE.Game.City.NodeTypeVisualsMap, SEE
-    - Name: map
-      Entry: 7
-      Data: 2|SEE.Game.City.VisualNodeAttributesMapping, SEE
-    - Name: comparer
-      Entry: 7
-      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MarkerAttributes
-      Entry: 7
-      Data: 4|SEE.Game.City.MarkerAttributes, SEE
-    - Name: MarkerHeight
-      Entry: 4
-      Data: 0.2
-    - Name: MarkerWidth
-      Entry: 4
-      Data: 0.01
-    - Name: AdditionBeamColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ChangeBeamColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0.921568632
-    - Name: 
-      Entry: 4
-      Data: 0.0156862754
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: DeletionBeamColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MetricToColor
-      Entry: 7
-      Data: 5|SEE.Game.City.ColorMap, SEE
-    - Name: map
-      Entry: 7
-      Data: 6|SEE.Game.City.ColorRangeMapping, SEE
-    - Name: comparer
-      Entry: 9
-      Data: 3
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: CoseGraphSettings
-      Entry: 7
-      Data: 7|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
-    - Name: EdgeLength
-      Entry: 3
-      Data: 20
-    - Name: UseSmartIdealEdgeCalculation
-      Entry: 5
-      Data: false
-    - Name: UseSmartMultilevelScaling
-      Entry: 5
-      Data: false
-    - Name: PerLevelIdealEdgeLengthFactor
-      Entry: 4
-      Data: 0.1
-    - Name: UseSmartRepulsionRangeCalculation
-      Entry: 5
-      Data: false
-    - Name: GravityStrength
-      Entry: 4
-      Data: 0.8
-    - Name: CompoundGravityStrength
-      Entry: 4
-      Data: 1.5
-    - Name: RepulsionStrength
-      Entry: 4
-      Data: 50
-    - Name: MultiLevelScaling
-      Entry: 5
-      Data: false
-    - Name: ListInnerNodeToggle
-      Entry: 7
-      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 9|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: InnerNodeLayout
-      Entry: 7
-      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
-        SEE]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 9
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: InnerNodeShape
-      Entry: 7
-      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
-        SEE]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 9
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LoadedForNodeTypes
-      Entry: 7
-      Data: 12|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 9
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: UseCalculationParameter
-      Entry: 5
-      Data: true
-    - Name: UseIterativeCalculation
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: DataProvider
-      Entry: 7
-      Data: 13|SEE.GraphProviders.PipelineGraphProvider, SEE
-    - Name: Pipeline
-      Entry: 7
-      Data: 14|System.Collections.Generic.List`1[[SEE.GraphProviders.GraphProvider,
-        SEE]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 15|SEE.GraphProviders.VCSGraphProvider, SEE
-    - Name: RepositoryPath
-      Entry: 7
-      Data: 16|SEE.Utils.Paths.DirectoryPath, SEE
-    - Name: Root
-      Entry: 3
-      Data: 2
-    - Name: relativePath
-      Entry: 1
-      Data: 
-    - Name: absolutePath
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: CommitID
-      Entry: 1
-      Data: 
-    - Name: PathGlobbing
-      Entry: 7
-      Data: 17|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 9
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: '*.cs'
-    - Name: $v
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-  LODCulling: 0.001
-  ConfigurationPath:
-    Root: 3
-    relativePath: /SEE/SEEVCS.cfg
-    absolutePath: 
-  sourceCodeDirectory:
-    Root: 1
-    relativePath: 
-    absolutePath: 
-  SolutionPath:
-    Root: 1
-    relativePath: /SEEIT.sln
-    absolutePath: 
-  IgnoreSelfLoopsInLifting: 0
-  MaximalAntennaSegmentHeight: 0.5
-  AntennaWidth: 0.1
-  BaseAnimationDuration: 1
-  ProgressBar: 0
-  ZScoreScale: 0
-  ScaleOnlyLeafMetrics: 1
-  NodeLayoutSettings:
-    Kind: 1
-    IncrementalTreeMap:
-      LocalMovesDepth: 3
-      LocalMovesBranchingLimit: 4
-      pNorm: 1
-      PaddingMm: 5
-      GradientDescentPrecision: -4
-    LayoutPath:
-      Root: 2
-      relativePath: 
-      absolutePath: 
-  EdgeLayoutSettings:
-    Kind: 3
-    AnimationKind: 2
-    AnimateInnerEdges: 1
-    EdgeWidth: 0.01
-    EdgesAboveBlocks: 1
-    Tension: 0.85
-  EdgeSelectionSettings:
-    TubularSegments: 50
-    Radius: 0.005
-    RadialSegments: 8
-    AreSelectable: 1
-  ErosionSettings:
-    ShowInnerErosions: 0
-    ShowLeafErosions: 0
-    ErosionScalingFactor: 1.5
-    ShowIssuesInCodeWindow: 0
-    ArchitectureIssue: Metric.Architecture_Violations
-    CloneIssue: Metric.Clone
-    CycleIssue: Metric.Cycle
-    DeadCodeIssue: Metric.Dead_Code
-    MetricIssue: Metric.Metric
-    StyleIssue: Metric.Style
-    UniversalIssue: Metric.Universal
-    ArchitectureIssueSum: Metric.Architecture_Violations_SUM
-    CloneIssueSum: Metric.Clone_SUM
-    CycleIssueSum: Metric.Cycle_SUM
-    DeadCodeIssueSum: Metric.Dead_Code_SUM
-    MetricIssueSum: Metric.Metric_SUM
-    StyleIssueSum: Metric.Style_SUM
-    UniversalIssueSum: Metric.Universal_SUM
-  BoardSettings:
-    LoadBoardOnStartup: 0
-    BoardPath:
-      Root: 2
-      relativePath: 
-      absolutePath: 
-  VCSPath:
-    Root: 1
-    relativePath: 
-    absolutePath: 
-  OldRevision: b75532155a59421836e737825da2815dedf9a2ee
-  NewRevision: 0878f91f900dc90d89c594c521ac1d3b9edd7097
 --- !u!114 &1770094067
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35306,7 +34949,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HeightOffset: 0.73702085
+  HeightOffset: 0.0010017157
 --- !u!65 &1770094069
 BoxCollider:
   m_ObjectHideFlags: 0
