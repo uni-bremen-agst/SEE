@@ -15,7 +15,7 @@ namespace SEE.Controls.Actions.Drawable
     /// <summary>
     /// This action allows drawing on a drawable.
     /// </summary>
-    class DrawFreehandAction : DrawableAction
+    class DrawFreehandAction : AbstractPlayerAction
     {
         /// <summary>
         /// The different progress states of this action.
@@ -38,13 +38,13 @@ namespace SEE.Controls.Actions.Drawable
         private GameObject line;
 
         /// <summary>
-        /// The drawable on which the line should be displayed.
+        /// The drawable on that the line should be displayed.
         /// </summary>
         private GameObject drawable;
 
         /// <summary>
         /// The positions of the line in local space.
-        /// It is used for the line renderer.
+        /// It's used for the line renderer.
         /// </summary>
         private Vector3[] positions = new Vector3[1];
 
@@ -54,41 +54,39 @@ namespace SEE.Controls.Actions.Drawable
         private Memento memento;
 
         /// <summary>
-        /// True while the user is drawing, false otherwise.
+        /// The state
         /// </summary>
         private bool drawing = false;
 
         /// <summary>
         /// Represents that drawing has been finished.
-        /// It will be needed to ensure that this action completes.
+        /// It will be needed to ensure, that completes this action.
         /// </summary>
         private bool finishDrawing = false;
 
         /// <summary>
-        /// This struct can store all the information needed to revert or repeat
-        /// a <see cref="DrawFreehandAction"/>.
+        /// This struct can store all the information needed to revert or repeat a <see cref="DrawFreehandAction"/>.
         /// </summary>
         private struct Memento
         {
             /// <summary>
-            /// The drawable on which the line should be displayed.
+            /// The drawable on that the line should be displayed.
             /// </summary>
-            public readonly DrawableConfig Drawable;
+            public readonly DrawableConfig drawable;
             /// <summary>
-            /// The line. The line configuration <see cref="LineConf"/> contains all required
-            /// values to redraw.
+            /// The line. The line configuration <see cref="LineConf"/> contains all required values to redraw.
             /// </summary>
-            public LineConf Line;
+            public LineConf line;
 
             /// <summary>
-            /// The constructor, which simply assigns its parameters to fields in this class.
+            /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
             /// <param name="drawable">The drawable where the line should be placed</param>
             /// <param name="line">Line configuration for redrawing.</param>
             public Memento(GameObject drawable, LineConf line)
             {
-                Drawable = DrawableConfigManager.GetDrawableConfig(drawable);
-                Line = line;
+                this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
+                this.line = line;
             }
         }
 
@@ -98,7 +96,6 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Start()
         {
-            base.Start();
             progressState = ProgressState.StartDrawing;
         }
 
@@ -107,7 +104,6 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Awake()
         {
-            base.Awake();
             LineMenu.EnableForDrawing();
         }
 
@@ -116,7 +112,6 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Stop()
         {
-            base.Stop();
             LineMenu.DisableLineMenu();
             if (progressState != ProgressState.FinishDrawing)
             {
@@ -126,23 +121,23 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.DrawOn"/>.
-        /// Specifically: Allows the user to draw.
-        /// For this, the left mouse button must be held down as long as you want to draw.
+        /// Specifically: Allows the user to draw. 
+        /// For this, the left mouse button must be held down as long as you want to draw. 
         /// To finish, release the left mouse button.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
             {
                 /// This block draws the line when the left mouse button is held down.
-                /// Drawing is only possible when targeting a drawable or an object placed on a drawable,
+                /// Drawing is only possible when targeting a drawable or an object placed on a drawable, 
                 /// and the drawable remains unchanged during drawing.
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !finishDrawing
-                    && Raycasting.RaycastAnything(out RaycastHit raycastHit)
+                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !finishDrawing 
+                    && Raycasting.RaycastAnything(out RaycastHit raycastHit) 
                     && (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                        GameFinder.HasDrawable(raycastHit.collider.gameObject))
-                    && (drawable == null || drawable != null
+                        GameFinder.hasDrawable(raycastHit.collider.gameObject))
+                    && (drawable == null || drawable != null 
                         && GameFinder.GetDrawable(raycastHit.collider.gameObject).Equals(drawable)))
                 {
                     switch (progressState)
@@ -167,9 +162,9 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Initializes drawing on the drawable.
-        /// It creates the line with the first hitpoint.
-        /// Since the Line Renderer has to work with local positions,
+        /// Initialize drawing on the drawable. 
+        /// It creates the line with the first hitpoint. 
+        /// Since the Line Renderer has to work with local positions, 
         /// the hitpoint is converted to a local position after creation.
         /// </summary>
         /// <param name="raycastHit">The raycast hit on the drawable.</param>
@@ -182,18 +177,18 @@ namespace SEE.Controls.Actions.Drawable
             progressState = ProgressState.Drawing;
             positions[0] = raycastHit.point;
             /// Create the line object.
-            line = GameDrawer.StartDrawing(drawable, positions, ValueHolder.CurrentColorKind,
-                ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor, ValueHolder.CurrentThickness,
-                ValueHolder.CurrentLineKind, ValueHolder.CurrentTiling);
+            line = GameDrawer.StartDrawing(drawable, positions, ValueHolder.currentColorKind,
+                ValueHolder.currentPrimaryColor, ValueHolder.currentSecondaryColor, ValueHolder.currentThickness,
+                ValueHolder.currentLineKind, ValueHolder.currentTiling);
             /// Transform the first position in local space.
             /// Beforehand, it's not possible because there is no line object on which 'InverseTransformPoint' can be applied.
-            positions[0] = line.transform.InverseTransformPoint(positions[0]) - ValueHolder.DistanceToDrawable;
+            positions[0] = line.transform.InverseTransformPoint(positions[0]) - ValueHolder.distanceToDrawable;
         }
 
         /// <summary>
         /// Extend the line created in <see cref="StartDrawing(RaycastHit)"/> with the new hitpoint.
         /// However, the new point must be different from the last one added.
-        /// Because, as mentioned earlier, the Line Renderer operates with local positions,
+        /// Because, as mentioned earlier, the Line Renderer operates with local positions, 
         /// the point is first transformed into a local coordinate.
         /// </summary>
         /// <param name="raycastHit">The raycast hit on the drawable</param>
@@ -201,29 +196,29 @@ namespace SEE.Controls.Actions.Drawable
         {
             /// The position at which to continue the line in local space.
             /// To maintain the distance from the drawable, the minimum distance on the Z-axis is subtracted.
-            Vector3 newPosition = line.transform.InverseTransformPoint(raycastHit.point) - ValueHolder.DistanceToDrawable;
-            Vector3 nPos = new(newPosition.x, newPosition.y, 0);
-            if (nPos != positions.Last()) // This query is required if <see cref="GameDrawer.Drawing"/> has already been
-                                          // executed (because of GameDrawer.UpdateZPositions()).
+            Vector3 newPosition = line.transform.InverseTransformPoint(raycastHit.point) - ValueHolder.distanceToDrawable;
+            Vector3 nPos = new Vector3(newPosition.x, newPosition.y, 0);
+            if (newPosition != positions.Last() /// This query is required in case <see cref="StartDrawing"/> was used previously.
+                && nPos != positions.Last()) /// This query is required if <see cref="GameDrawer.Drawing"/> has already been executed (because of GameDrawer.UpdateZPositions()).
             {
                 /// Add newPosition to the line renderer and and start drawing over the network.
                 Vector3[] newPositions = new Vector3[positions.Length + 1];
                 Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
-                newPositions[^1] = newPosition;
+                newPositions[newPositions.Length - 1] = newPosition;
                 positions = newPositions;
 
                 GameDrawer.Drawing(line, positions);
-                new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
+                new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
                     LineConf.GetLine(line)).Execute();
             }
         }
 
         /// <summary>
-        /// Finish drawing on the drawable.
-        /// Since a Mesh Collider requires at least three different vertices to function,
-        /// it is first checked whether the collider of the line meets this criterion.
-        /// If not, the line is deleted, and the action is reset.
-        /// Otherwise, the drawing is completed, and the pivot point of the line is set.
+        /// Finish drawing on the drawable. 
+        /// Since a Mesh Collider requires at least three different vertices to function, 
+        /// it is first checked whether the collider of the line meets this criterion. 
+        /// If not, the line is deleted, and the action is reset. 
+        /// Otherwise, the drawing is completed, and the pivot point of the line is set. 
         /// Subsequently, a Memento is created, and the progress state is completed.
         /// </summary>
         /// <returns>Whether drawing has been completed or not</returns>
@@ -240,7 +235,7 @@ namespace SEE.Controls.Actions.Drawable
                     line = GameDrawer.SetPivot(line);
                     LineConf currentLine = LineConf.GetLine(line);
                     memento = new Memento(drawable, currentLine);
-                    new DrawNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                    new DrawNetAction(memento.drawable.ID, memento.drawable.ParentID, 
                         currentLine).Execute();
                     CurrentState = IReversibleAction.Progress.Completed;
                     return true;
@@ -263,12 +258,12 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (line == null)
             {
-                line = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Line.Id);
+                line = GameFinder.FindChild(memento.drawable.GetDrawable(), memento.line.id);
             }
             if (line != null)
             {
-                new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
-                    memento.Line.Id).Execute();
+                new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                    memento.line.id).Execute();
                 Destroyer.Destroy(line);
                 line = null;
             }
@@ -280,10 +275,10 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            line = GameDrawer.ReDrawLine(memento.Drawable.GetDrawable(), memento.Line);
+            line = GameDrawer.ReDrawLine(memento.drawable.GetDrawable(), memento.line);
             if (line != null)
             {
-                new DrawNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                new DrawNetAction(memento.drawable.ID, memento.drawable.ParentID, 
                     LineConf.GetLine(line)).Execute();
             }
         }
@@ -318,13 +313,15 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// The set of IDs of all gameObjects changed by this action
-        /// (<see cref="ReversibleAction.GetActionStateType"/>).
+        /// The set of IDs of all gameObjects changed by this action.
+        /// <see cref="ReversibleAction.GetActionStateType"/>
+        /// Because this action does not actually change any game object, 
+        /// an empty set is always returned.
         /// </summary>
         /// <returns>an empty set or the drawable id and the line id</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            if (memento.Drawable == null)
+            if (memento.drawable == null)
             {
                 return new HashSet<string>();
             }
@@ -332,8 +329,8 @@ namespace SEE.Controls.Actions.Drawable
             {
                 return new HashSet<string>
                 {
-                    memento.Drawable.ID,
-                    memento.Line.Id
+                    memento.drawable.ID,
+                    memento.line.id
                 };
             }
         }

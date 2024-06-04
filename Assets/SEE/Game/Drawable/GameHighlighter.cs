@@ -1,23 +1,23 @@
 ﻿using HighlightPlus;
+using SEE.Utils;
 using SEE.Game.Drawable.Configurations;
 using UnityEngine;
-using SEE.GO;
 
 namespace SEE.Game.Drawable
 {
     /// <summary>
-    /// This class provides highlighters for drawables or <see cref="DrawableType"/> objects.
+    /// This class provides highlighter for drawables or <see cref="DrawableType"/> objects
     /// </summary>
     public static class GameHighlighter
     {
         /// <summary>
-        /// Enables the highlight effect for the given <paramref name="obj"/>
+        /// Enables the highlight effect for the given obj.
         /// </summary>
         /// <param name="obj">The object that should be highlighted.</param>
         /// <returns>The created highlight effect.</returns>
         public static HighlightEffect Enable(GameObject obj)
         {
-            HighlightEffect effect = obj.AddOrGetComponent<HighlightEffect>();
+            HighlightEffect effect = obj.AddComponent<HighlightEffect>();
             effect.highlighted = true;
             effect.previewInEditor = false;
             effect.outline = 1;
@@ -28,6 +28,18 @@ namespace SEE.Game.Drawable
             effect.glowHQColor = Color.yellow;
 
             return effect;
+        }
+
+        /// <summary>
+        /// Disable/Destroys the highlight effect.
+        /// </summary>
+        /// <param name="obj">The object in which the highlight effect should be disabled.</param>
+        public static void Disable(GameObject obj)
+        {
+            if (obj.GetComponent<HighlightEffect>() != null)
+            {
+                Destroyer.Destroy(obj.GetComponent<HighlightEffect>());
+            }
         }
     }
 }

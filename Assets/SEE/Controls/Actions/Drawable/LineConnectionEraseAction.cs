@@ -14,10 +14,10 @@ namespace SEE.Controls.Actions.Drawable
     /// This action allows the user to delete a line connector between two points.
     /// Is intended for shapes.
     /// </summary>
-    class LineConnectionEraseAction : DrawableAction
+    class LineConnectionEraseAction : AbstractPlayerAction
     {
         /// <summary>
-        /// True if the action is active.
+        /// Represents that the action is active.
         /// </summary>
         private bool isActive = false;
         /// <summary>
@@ -26,45 +26,45 @@ namespace SEE.Controls.Actions.Drawable
         private Memento memento;
 
         /// <summary>
-        /// This struct can store all the information needed to
+        /// This struct can store all the information needed to 
         /// revert or repeat a <see cref="LineConnectionEraseAction"/>.
         /// </summary>
-        private readonly struct Memento
+        private struct Memento
         {
             /// <summary>
             /// Is the configuration of line before it was modified.
             /// </summary>
-            public readonly LineConf OriginalLine;
+            public readonly LineConf originalLine;
             /// <summary>
-            /// Is the drawable on which the lines are displayed.
+            /// Is the drawable on that the lines are displayed.
             /// </summary>
-            public readonly DrawableConfig Drawable;
+            public readonly DrawableConfig drawable;
             /// <summary>
             /// The list of lines that resulted from modify the original line.
             /// </summary>
-            public readonly List<LineConf> Lines;
+            public readonly List<LineConf> lines;
 
             /// <summary>
-            /// The constructor.
+            /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
             /// <param name="originalLine">Is the configuration of line before it was modified.</param>
             /// <param name="drawable">The drawable where the lines are displayed</param>
             /// <param name="lines">The list of lines that resulted from modify the original line</param>
             public Memento(GameObject originalLine, GameObject drawable, List<LineConf> lines)
             {
-                OriginalLine = LineConf.GetLine(originalLine);
-                Drawable = DrawableConfigManager.GetDrawableConfig(drawable);
-                Lines = lines;
+                this.originalLine = LineConf.GetLine(originalLine);
+                this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
+                this.lines = lines;
             }
         }
 
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.LineConnectorErase"/>.
-        /// Specifically: Allows the user to delete a line connection between two points.
+        /// Specifically: Allows the user to delete a line connection between two points. 
         /// One action run allows to delete the line connections of one point.
         /// Is intended for shapes.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -72,28 +72,28 @@ namespace SEE.Controls.Actions.Drawable
                 /// This block is responsible for deleting the line connectors of the given point.
                 /// It searches for the nearest point on the line from the mouse position.
                 /// Multiple line points may overlap, so it works with a list of nearest points.
-                /// The line is split at the found points, and sublines are created,
+                /// The line is split at the found points, and sublines are created, 
                 /// with their starting and ending points corresponding to the splitting point.
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !isActive &&
                     Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                    GameFinder.HasDrawable(raycastHit.collider.gameObject))
+                    GameFinder.hasDrawable(raycastHit.collider.gameObject))
                 {
                     isActive = true;
-                    GameObject hitObject = raycastHit.collider.gameObject;
+                    GameObject hittedObject = raycastHit.collider.gameObject;
 
-                    if (hitObject.CompareTag(Tags.Line))
+                    if (hittedObject.CompareTag(Tags.Line))
                     {
-                        LineConf originLine = LineConf.GetLine(hitObject);
+                        LineConf originLine = LineConf.GetLine(hittedObject);
                         List<LineConf> lines = new();
-                        NearestPoints.GetNearestPoints(hitObject, raycastHit.point,
+                        NearestPoints.GetNearestPoints(hittedObject, raycastHit.point, 
                             out List<Vector3> positionsList, out List<int> matchedIndices);
-                        GameLineSplit.EraseLinePointConnection(GameFinder.GetDrawable(hitObject), originLine,
+                        GameLineSplit.EraseLinePointConnection(GameFinder.GetDrawable(hittedObject), originLine, 
                             matchedIndices, positionsList, lines);
 
-                        memento = new Memento(hitObject, GameFinder.GetDrawable(hitObject), lines);
-                        new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
-                            memento.OriginalLine.Id).Execute();
-                        Destroyer.Destroy(hitObject);
+                        memento = new Memento(hittedObject, GameFinder.GetDrawable(hittedObject), lines);
+                        new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                            memento.originalLine.id).Execute();
+                        Destroyer.Destroy(hittedObject);
                     }
                 }
                 /// This block completes the action.
@@ -102,6 +102,7 @@ namespace SEE.Controls.Actions.Drawable
                     CurrentState = IReversibleAction.Progress.Completed;
                     return true;
                 }
+                return false;
             }
             return false;
         }
@@ -112,14 +113,14 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo();
-            GameObject drawable = memento.Drawable.GetDrawable();
-            GameDrawer.ReDrawLine(drawable, memento.OriginalLine);
-            new DrawNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.OriginalLine).Execute();
+            GameObject drawable = memento.drawable.GetDrawable();
+            GameDrawer.ReDrawLine(drawable, memento.originalLine);
+            new DrawNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.originalLine).Execute();
 
-            foreach (LineConf line in memento.Lines)
+            foreach (LineConf line in memento.lines)
             {
-                GameObject lineObj = GameFinder.FindChild(drawable, line.Id);
-                new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID, line.Id).Execute();
+                GameObject lineObj = GameFinder.FindChild(drawable, line.id);
+                new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, line.id).Execute();
                 Destroyer.Destroy(lineObj);
             }
         }
@@ -130,15 +131,15 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            GameObject drawable = memento.Drawable.GetDrawable();
-            GameObject originObj = GameFinder.FindChild(drawable, memento.OriginalLine.Id);
-            new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.OriginalLine.Id).Execute();
+            GameObject drawable = memento.drawable.GetDrawable();
+            GameObject originObj = GameFinder.FindChild(drawable, memento.originalLine.id);
+            new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.originalLine.id).Execute();
             Destroyer.Destroy(originObj);
 
-            foreach (LineConf line in memento.Lines)
+            foreach (LineConf line in memento.lines)
             {
                 GameDrawer.ReDrawLine(drawable, line);
-                new DrawNetAction(memento.Drawable.ID, memento.Drawable.ParentID, line).Execute();
+                new DrawNetAction(memento.drawable.ID, memento.drawable.ParentID, line).Execute();
             }
         }
 
@@ -174,17 +175,19 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
+        /// Because this action does not actually change any game object, 
+        /// an empty set is always returned.
         /// </summary>
         /// <returns>the id of the line that was splitted.</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            if (memento.Drawable == null)
+            if (memento.drawable == null)
             {
-                return new();
+                return new HashSet<string>();
             }
             else
             {
-                return new() { memento.OriginalLine.Id };
+                return new HashSet<string> { memento.originalLine.id };
             }
         }
     }

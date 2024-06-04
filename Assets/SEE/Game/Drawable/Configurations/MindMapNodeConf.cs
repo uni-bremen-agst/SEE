@@ -1,4 +1,5 @@
 ﻿using SEE.Game.Drawable.ValueHolders;
+using SEE.Utils;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
@@ -15,50 +16,85 @@ namespace SEE.Game.Drawable.Configurations
         /// <summary>
         /// The mind map layer of the node.
         /// </summary>
-        public int Layer;
+        public int layer;
 
         /// <summary>
         /// The name of the parent node.
         /// </summary>
-        public string ParentNode;
+        public string parentNode;
 
         /// <summary>
         /// The name of the branch line to the parent.
         /// </summary>
-        public string BranchLineToParent;
+        public string branchLineToParent;
 
         /// <summary>
         /// The node kind of the node.
         /// </summary>
-        public GameMindMap.NodeKind NodeKind;
+        public GameMindMap.NodeKind nodeKind;
 
         /// <summary>
-        /// The configuration of the mind map border (line).
+        /// The configuration of the mind map border (line)
         /// </summary>
-        public LineConf BorderConf;
+        public LineConf borderConf;
 
         /// <summary>
-        /// The configuration of the mind map description (text).
+        /// The configuration of the mind map description (text)
         /// </summary>
-        public TextConf TextConf;
+        public TextConf textConf;
 
         /// <summary>
         /// The configuration of the branch line to parent.
         /// </summary>
-        public LineConf BranchLineConf;
+        public LineConf branchLineConf;
 
         /// <summary>
         /// The dictionary with the childs and the branch lines to them.
         /// </summary>
-        public IDictionary<GameObject, GameObject> Children;
+        public Dictionary<GameObject, GameObject> children;
         /// <summary>
         /// The dictionary with the children names and the branch line names.
         /// </summary>
-        private Dictionary<string, string> childrenNames = new();
+        private Dictionary<string, string> childrenStrings = new();
 
         /// <summary>
-        /// Creates a <see cref="MindMapNodeConf"/> for the given game object,
-        /// if it is a mind map node, otherwise the result is null.
+        /// Label in the configuration file for the mind map layer of the node.
+        /// </summary>
+        private const string LayerLabel = "LayerLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the parent id of the node.
+        /// </summary>
+        private const string ParentIDLabel = "ParentIDLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the parent branch line.
+        /// </summary>
+        private const string ParentBranchLineLabel = "ParentBranchLineLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the node kind.
+        /// </summary>
+        private const string NodeKindLabel = "NodeKindLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the mind map node border.
+        /// </summary>
+        private const string BorderLabel = "BorderLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the mind map node text.
+        /// </summary>
+        private const string TextLabel = "TextLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the childs.
+        /// </summary>
+        private const string ChildrenLabel = "ChildrenLabel";
+
+        /// <summary>
+        /// Creates a <see cref="MindMapNodeConf"/> for the given game object.
+        /// If it is a mind map node, otherwise it is null.
         /// </summary>
         /// <param name="obj">The game object with the <see cref="Tags.MindMapNode"/></param>
         /// <returns>The created <see cref="MindMapNodeConf"/> object</returns>
@@ -70,34 +106,34 @@ namespace SEE.Game.Drawable.Configurations
                 MMNodeValueHolder valueHolder = obj.GetComponent<MMNodeValueHolder>();
                 conf = new()
                 {
-                    Id = obj.name,
-                    Position = obj.transform.localPosition,
-                    Scale = obj.transform.localScale,
-                    EulerAngles = obj.transform.localEulerAngles,
-                    OrderInLayer = obj.GetComponent<OrderInLayerValueHolder>().OrderInLayer,
-                    Layer = valueHolder.Layer,
-                    NodeKind = valueHolder.NodeKind,
-                    BorderConf = LineConf.GetLine(GameFinder.FindChildWithTag(obj, Tags.Line)),
-                    TextConf = TextConf.GetText(GameFinder.FindChildWithTag(obj, Tags.DText)),
-                    Children = valueHolder.GetChildren()
+                    id = obj.name,
+                    position = obj.transform.localPosition,
+                    scale = obj.transform.localScale,
+                    eulerAngles = obj.transform.localEulerAngles,
+                    orderInLayer = obj.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer(),
+                    layer = valueHolder.GetLayer(),
+                    nodeKind = valueHolder.GetNodeKind(),
+                    borderConf = LineConf.GetLine(GameFinder.FindChildWithTag(obj, Tags.Line)),
+                    textConf = TextConf.GetText(GameFinder.FindChildWithTag(obj, Tags.DText)),
+                    children = valueHolder.GetChildren()
                 };
                 /// Set the parent information.
                 if (valueHolder.GetParent() != null)
                 {
-                    conf.ParentNode = valueHolder.GetParent().name;
-                    conf.BranchLineToParent = valueHolder.GetParentBranchLine().name;
-                    conf.BranchLineConf = LineConf.GetLine(valueHolder.GetParentBranchLine());
+                    conf.parentNode = valueHolder.GetParent().name;
+                    conf.branchLineToParent = valueHolder.GetParentBranchLine().name;
+                    conf.branchLineConf = LineConf.GetLine(valueHolder.GetParentBranchLine());
                 } else
                 {
-                    conf.ParentNode = "";
-                    conf.BranchLineToParent = "";
+                    conf.parentNode = "";
+                    conf.branchLineToParent = "";
                 }
                 /// Converts the children in a pair of strings based on their ids.
-                foreach (var item in conf.Children)
+                foreach (var item in conf.children)
                 {
                     if (item.Key != null && item.Value != null)
                     {
-                        conf.childrenNames.Add(item.Key.name, item.Value.name);
+                        conf.childrenStrings.Add(item.Key.name, item.Value.name);
                     }
                 }
             }
@@ -105,89 +141,56 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
-        /// Clones the mind map node configuration object.
+        /// Clons the mind map node configuration object.
         /// </summary>
         /// <returns>A copy of this configuration object.</returns>
         public object Clone()
         {
             return new MindMapNodeConf
-            {
-                Id = this.Id,
-                Position = this.Position,
-                Scale = this.Scale,
-                EulerAngles = this.EulerAngles,
-                OrderInLayer = this.OrderInLayer,
-                Layer = this.Layer,
-                ParentNode = this.ParentNode,
-                BranchLineToParent = this.BranchLineToParent,
-                NodeKind = this.NodeKind,
-                Children = this.Children,
-                childrenNames = this.childrenNames,
-                BorderConf = this.BorderConf,
-                TextConf = this.TextConf
+            { 
+                id = this.id,
+                position = this.position,
+                scale = this.scale,
+                eulerAngles = this.eulerAngles,
+                orderInLayer = this.orderInLayer,
+                layer = this.layer,
+                parentNode = this.parentNode,
+                branchLineToParent = this.branchLineToParent,
+                nodeKind = this.nodeKind,
+                children = this.children,
+                childrenStrings = this.childrenStrings,
+                borderConf = this.borderConf,
+                textConf = this.textConf
             };
         }
 
-        #region Config I/O
-
         /// <summary>
-        /// Label in the configuration file for the mind map layer of the node.
+        /// Writes this instances' attributes into the given <see cref="ConfigWriter"/>.
         /// </summary>
-        private const string layerLabel = "LayerLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the parent id of the node.
-        /// </summary>
-        private const string parentIDLabel = "ParentIDLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the parent branch line.
-        /// </summary>
-        private const string parentBranchLineLabel = "ParentBranchLineLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the node kind.
-        /// </summary>
-        private const string nodeKindLabel = "NodeKindLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the mind map node border.
-        /// </summary>
-        private const string borderLabel = "BorderLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the mind map node text.
-        /// </summary>
-        private const string textLabel = "TextLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the childs.
-        /// </summary>
-        private const string childrenLabel = "ChildrenLabel";
-
-        /// <summary>
-        /// Saves this instance's attributes using the given <see cref="ConfigWriter"/>.
-        /// </summary>
-        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
-        protected override void SaveAttributes(ConfigWriter writer)
+        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes into.</param>
+        override internal void Save(ConfigWriter writer)
         {
-            writer.Save(Layer, layerLabel);
-            writer.Save(ParentNode, parentIDLabel);
-            writer.Save(BranchLineToParent, parentBranchLineLabel);
-            writer.Save(NodeKind.ToString(), nodeKindLabel);
+
+            writer.BeginGroup();
+            base.Save(writer);
+            writer.Save(layer, LayerLabel);
+            writer.Save(parentNode, ParentIDLabel);
+            writer.Save(branchLineToParent, ParentBranchLineLabel);
+            writer.Save(nodeKind.ToString(), NodeKindLabel);
 
             /// Writes the border configuration (line configuration)
-            writer.BeginList(borderLabel);
-            BorderConf.Save(writer);
+            writer.BeginList(BorderLabel);
+            borderConf.Save(writer);
             writer.EndList();
 
             /// Writes the text configuration
-            writer.BeginList(textLabel);
-            TextConf.Save(writer);
+            writer.BeginList(TextLabel);
+            textConf.Save(writer);
             writer.EndList();
 
             /// Writes the pair of the children names and their branch lines to the parent node.
-            writer.SaveAsStrings(childrenNames, childrenLabel);
+            writer.SaveAsStrings(childrenStrings, ChildrenLabel);
+            writer.EndGroup();
         }
 
         /// <summary>
@@ -203,70 +206,70 @@ namespace SEE.Game.Drawable.Configurations
         {
             bool errors = base.Restore(attributes);
 
-            /// Try to restore the mind map node layer.
-            if (!ConfigIO.Restore(attributes, layerLabel, ref Layer))
+            /// Try to restores the mind map node layer.
+            if (!ConfigIO.Restore(attributes, LayerLabel, ref layer))
             {
                 errors = true;
             }
 
-            /// Try to restore the parent id.
-            if (attributes.TryGetValue(parentIDLabel, out object pName))
+            /// Try to restores the parent id.
+            if (attributes.TryGetValue(ParentIDLabel, out object pName))
             {
-                ParentNode = (string)pName;
+                parentNode = (string)pName;
             }
             else
             {
                 errors = true;
             }
 
-            /// Try to restore the parent branch line id.
-            if (attributes.TryGetValue(parentBranchLineLabel, out object pBranch))
+            /// Try to restores the parent branch line id.
+            if (attributes.TryGetValue(ParentBranchLineLabel, out object pBranch))
             {
-                BranchLineToParent = (string)pBranch;
+                branchLineToParent = (string)pBranch;
             }
             else
             {
                 errors = true;
             }
 
-            /// Try to restore the node kind.
-            if (attributes.TryGetValue(nodeKindLabel, out object kind)
+            /// Try to restores the node kind.
+            if (attributes.TryGetValue(NodeKindLabel, out object kind) 
                 && Enum.TryParse<GameMindMap.NodeKind>((string)kind, out GameMindMap.NodeKind result))
             {
-                NodeKind = result;
+                nodeKind = result;
             }
             else
             {
-                NodeKind = GameMindMap.NodeKind.Theme;
+                nodeKind = GameMindMap.NodeKind.Theme;
                 errors = true;
             }
 
-            /// Try to restore the mind map border (line configuration).
-            if (attributes.TryGetValue(borderLabel, out object lineList))
+            /// Try to restores the mind map border (line configuration).
+            if (attributes.TryGetValue(BorderLabel, out object lineList))
             {
                 foreach (object item in (List<object>)lineList)
                 {
                     Dictionary<string, object> lineDict = (Dictionary<string, object>)item;
                     LineConf config = new();
                     config.Restore(lineDict);
-                    BorderConf = config;
+                    borderConf = config;
                 }
             }
 
-            /// Try to restore the mind map text (text configuration).
-            if (attributes.TryGetValue(textLabel, out object textList))
+            /// Try to restores the mind map text (text configuration).
+            if (attributes.TryGetValue(TextLabel, out object textList))
             {
                 foreach (object item in (List<object>)textList)
                 {
                     Dictionary<string, object> textDict = (Dictionary<string, object>)item;
                     TextConf config = new();
                     config.Restore(textDict);
-                    TextConf = config;
+                    textConf = config;
                 }
             }
 
-            /// Try to restore the pair of child names and their branch lines.
-            if (attributes.TryGetValue(childrenLabel, out object childrenDict))
+            /// Try to restores the pair of child names and their branch lines.
+            if (attributes.TryGetValue(ChildrenLabel, out object childrenDict))
             {
                 foreach (object dict in (List<object>)childrenDict)
                 {
@@ -283,7 +286,7 @@ namespace SEE.Game.Drawable.Configurations
                             value = (string)item;
                         }
                     }
-                    childrenNames.Add(key, value);
+                    childrenStrings.Add(key, value);
                 }
             }
             else
@@ -292,7 +295,5 @@ namespace SEE.Game.Drawable.Configurations
             }
             return !errors;
         }
-
-        #endregion
     }
 }

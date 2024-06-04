@@ -474,16 +474,16 @@ namespace SEE.UI.Menu.Drawable
         public static void EnableForWriting()
         {
             /// Enables the text menu in writing mode.
-            EnableTextMenu(color => ValueHolder.CurrentPrimaryColor = color, ValueHolder.CurrentPrimaryColor, true);
+            EnableTextMenu(color => ValueHolder.currentPrimaryColor = color, ValueHolder.currentPrimaryColor, true);
 
             /// Disables the return button.
             instance.transform.Find("ReturnBtn").gameObject.SetActive(false);
 
             /// Adds the handler for the font color button.
-            /// It saves the changes in the global value for the primary color <see cref="ValueHolder.CurrentPrimaryColor"/>.
+            /// It saves the changes in the global value for the primary color <see cref="ValueHolder.currentPrimaryColor"/>.
             fontColorBMB.clickEvent.AddListener(() =>
             {
-                AssignColorArea(color => ValueHolder.CurrentPrimaryColor = color, ValueHolder.CurrentPrimaryColor);
+                AssignColorArea(color => ValueHolder.currentPrimaryColor = color, ValueHolder.currentPrimaryColor);
                 MenuHelper.CalculateHeight(instance);
             });
 
@@ -491,16 +491,16 @@ namespace SEE.UI.Menu.Drawable
             AssignOutlineThicknessForWriting();
 
             /// Adds the handler for the outline thickness slider.
-            /// It saves the changes in the global value for the outline thickness <see cref="ValueHolder.CurrentOutlineThickness"/>.
-            AssignOutlineThickness(thickness => ValueHolder.CurrentOutlineThickness = thickness,
-                ValueHolder.CurrentOutlineThickness);
+            /// It saves the changes in the global value for the outline thickness <see cref="ValueHolder.currentOutlineThickness"/>.
+            AssignOutlineThickness(thickness => ValueHolder.currentOutlineThickness = thickness,
+                ValueHolder.currentOutlineThickness);
 
             /// Disables the outline color.
             outlineSwitch.isOn = false;
             outlineSwitch.UpdateUI();
 
             /// Adds the handler for the font size component.
-            AssignFontSize(size => ValueHolder.CurrentFontSize = size, ValueHolder.CurrentFontSize);
+            AssignFontSize(size => ValueHolder.currentFontSize = size, ValueHolder.currentFontSize);
 
             /// Re-calculate the menu height.
             MenuHelper.CalculateHeight(instance);
@@ -508,7 +508,7 @@ namespace SEE.UI.Menu.Drawable
 
         /// <summary>
         /// Adds the handler for the outline color button.
-        /// It saves the changes in the global value for the secondary color <see cref="ValueHolder.CurrentSecondaryColor"/>.
+        /// It saves the changes in the global value for the secondary color <see cref="ValueHolder.currentSecondaryColor"/>.
         /// 
         /// Checks the current secondary color before assigning it.
         /// If it is clear (completely transparent), a new random color is chosen. 
@@ -525,17 +525,17 @@ namespace SEE.UI.Menu.Drawable
                 /// the secondary color is clear. 
                 /// Therefore, a random color is added first, 
                 /// and if the color's alpha is 0, it is set to 255 to ensure the color is not transparent.
-                if (ValueHolder.CurrentSecondaryColor == Color.clear)
+                if (ValueHolder.currentSecondaryColor == Color.clear)
                 {
-                    ValueHolder.CurrentSecondaryColor = Random.ColorHSV();
+                    ValueHolder.currentSecondaryColor = Random.ColorHSV();
                 }
 
-                if (ValueHolder.CurrentSecondaryColor.a == 0)
+                if (ValueHolder.currentSecondaryColor.a == 0)
                 {
-                    ValueHolder.CurrentSecondaryColor = new Color(ValueHolder.CurrentSecondaryColor.r,
-                        ValueHolder.CurrentSecondaryColor.g, ValueHolder.CurrentSecondaryColor.b, 255);
+                    ValueHolder.currentSecondaryColor = new Color(ValueHolder.currentSecondaryColor.r,
+                        ValueHolder.currentSecondaryColor.g, ValueHolder.currentSecondaryColor.b, 255);
                 }
-                AssignColorArea(color => ValueHolder.CurrentSecondaryColor = color, ValueHolder.CurrentSecondaryColor);
+                AssignColorArea(color => ValueHolder.currentSecondaryColor = color, ValueHolder.currentSecondaryColor);
                 MenuHelper.CalculateHeight(instance);
             });
         }
@@ -555,9 +555,9 @@ namespace SEE.UI.Menu.Drawable
                 EnableTextMenu(color =>
                 {
                     GameEdit.ChangeFontColor(selectedText, color);
-                    textHolder.FontColor = color;
+                    textHolder.fontColor = color;
                     new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
-                }, textHolder.FontColor, true, true);
+                }, textHolder.fontColor, true, true);
 
                 /// Adds the handler for the return button, if <paramref name="returnCall"/> not null.
                 AddReturnCall(returnCall);
@@ -573,16 +573,16 @@ namespace SEE.UI.Menu.Drawable
                 AssignOutlineThickness(thickness =>
                 {
                     GameEdit.ChangeOutlineThickness(selectedText, thickness);
-                    textHolder.OutlineThickness = thickness;
+                    textHolder.outlineThickness = thickness;
                     new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
-                }, textHolder.OutlineThickness);
+                }, textHolder.outlineThickness);
 
                 /// Adds the handler for the outline color status.
                 /// Changes are saved in the configuration.
                 AssignOutlineStatus(selectedText, textHolder, drawable, drawableParentName);
 
                 /// Assigns the current status to the switch and updates the UI.
-                outlineSwitch.isOn = textHolder.IsOutlined;
+                outlineSwitch.isOn = textHolder.outlineStatus;
                 outlineSwitch.UpdateUI();
 
                 /// Adds the handler for the font size component.
@@ -590,25 +590,25 @@ namespace SEE.UI.Menu.Drawable
                 AssignFontSize(size =>
                 {
                     GameEdit.ChangeFontSize(selectedText, size);
-                    textHolder.FontSize = size;
+                    textHolder.fontSize = size;
                     new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
-                }, textHolder.FontSize);
+                }, textHolder.fontSize);
 
                 /// Adds the handler to the font style buttons.
                 /// Changes are saved in the configuration.
                 AssignFontStyles(style =>
                 {
                     GameEdit.ChangeFontStyles(selectedText, style);
-                    textHolder.FontStyles = style;
+                    textHolder.fontStyles = style;
                     new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
-                }, textHolder.FontStyles);
+                }, textHolder.fontStyles);
 
                 /// Adds the handler to the edit text button.
                 /// Changes are saved in the configuration.
                 AssignEditTextButton(() =>
                 {
                     WriteEditTextDialog writeTextDialog = new();
-                    writeTextDialog.SetStringInit(textHolder.Text);
+                    writeTextDialog.SetStringInit(textHolder.text);
                     UnityAction<string> stringAction = textOut =>
                     {
                         if (textOut != null && textOut != "")
@@ -616,9 +616,9 @@ namespace SEE.UI.Menu.Drawable
                             /// The size of the new text is calculated, and the object is adjusted accordingly.
                             TextMeshPro tmp = selectedText.GetComponent<TextMeshPro>();
                             tmp.rectTransform.sizeDelta = GameTexter.CalculateWidthAndHeight(textOut, tmp.font,
-                                textHolder.FontSize, textHolder.FontStyles);
+                                textHolder.fontSize, textHolder.fontStyles);
                             GameEdit.ChangeText(selectedText, textOut);
-                            textHolder.Text = textOut;
+                            textHolder.text = textOut;
                             new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
                         }
                         else
@@ -635,9 +635,9 @@ namespace SEE.UI.Menu.Drawable
                 AssignOrderInLayer(order =>
                 {
                     GameEdit.ChangeLayer(selectedText, order);
-                    textHolder.OrderInLayer = order;
+                    textHolder.orderInLayer = order;
                     new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
-                }, textHolder.OrderInLayer);
+                }, textHolder.orderInLayer);
 
                 /// Re-calculate the menus height.
                 MenuHelper.CalculateHeight(instance);
@@ -681,9 +681,9 @@ namespace SEE.UI.Menu.Drawable
                 AssignColorArea(color =>
                 {
                     GameEdit.ChangeFontColor(selectedText, color);
-                    textHolder.FontColor = color;
+                    textHolder.fontColor = color;
                     new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
-                }, textHolder.FontColor);
+                }, textHolder.fontColor);
                 MenuHelper.CalculateHeight(instance);
             });
         }
@@ -706,23 +706,23 @@ namespace SEE.UI.Menu.Drawable
                 /// the secondary color is clear. 
                 /// Therefore, a random color is added first, 
                 /// and if the color's alpha is 0, it is set to 255 to ensure the color is not transparent.
-                if (textHolder.OutlineColor == Color.clear)
+                if (textHolder.outlineColor == Color.clear)
                 {
-                    textHolder.OutlineColor = Random.ColorHSV();
+                    textHolder.outlineColor = Random.ColorHSV();
                 }
 
-                if (textHolder.OutlineColor.a == 0)
+                if (textHolder.outlineColor.a == 0)
                 {
-                    textHolder.OutlineColor = new Color(textHolder.OutlineColor.r, textHolder.OutlineColor.g,
-                        textHolder.OutlineColor.b, 255);
+                    textHolder.outlineColor = new Color(textHolder.outlineColor.r, textHolder.outlineColor.g,
+                        textHolder.outlineColor.b, 255);
                 }
 
                 AssignColorArea(color =>
                 {
                     GameEdit.ChangeOutlineColor(selectedText, color);
-                    textHolder.OutlineColor = color;
+                    textHolder.outlineColor = color;
                     new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
-                }, textHolder.OutlineColor);
+                }, textHolder.outlineColor);
                 MenuHelper.CalculateHeight(instance);
             });
         }
@@ -790,20 +790,20 @@ namespace SEE.UI.Menu.Drawable
             outlineSwitch.OffEvents.AddListener(() =>
             {
                 GameTexter.ChangeOutlineStatus(selectedText, false);
-                textHolder.IsOutlined = false;
+                textHolder.outlineStatus = false;
                 new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
             });
 
             outlineSwitch.OnEvents.AddListener(() =>
             {
                 GameTexter.ChangeOutlineStatus(selectedText, true);
-                textHolder.IsOutlined = true;
+                textHolder.outlineStatus = true;
                 /// Changes the outline color if the outline was clear.
                 TextMeshPro tmp = selectedText.GetComponent<TextMeshPro>();
-                if (textHolder.OutlineColor != tmp.outlineColor
+                if (textHolder.outlineColor != tmp.outlineColor
                     && tmp.outlineColor == Color.clear)
                 {
-                    GameEdit.ChangeOutlineColor(selectedText, textHolder.OutlineColor);
+                    GameEdit.ChangeOutlineColor(selectedText, textHolder.outlineColor);
                 }
                 new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
             });

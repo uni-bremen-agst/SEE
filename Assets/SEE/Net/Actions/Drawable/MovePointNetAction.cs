@@ -8,8 +8,16 @@ namespace SEE.Net.Actions.Drawable
     /// <summary>
     /// This class is responsible for changing positions of a given line (<see cref="MovePointAction"/>) on all clients.
     /// </summary>
-    public class MovePointNetAction : DrawableNetAction
+    public class MovePointNetAction : AbstractNetAction
     {
+        /// <summary>
+        /// The id of the drawable on which the line is located
+        /// </summary>
+        public string DrawableID;
+        /// <summary>
+        /// The id of the drawable parent
+        /// </summary>
+        public string ParentDrawableID;
         /// <summary>
         /// The id of the line thats line renderer positions should be changed
         /// </summary>
@@ -31,12 +39,22 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="lineName">The id of the line thats line renderer positions should be changed</param>
         /// <param name="Indices">The selected positions of the line renderer</param>
         /// <param name="position">The new position that should be set for the selected positions.</param>
-        public MovePointNetAction(string drawableID, string parentDrawableID, string lineName, List<int> Indices, Vector3 position)
-            : base(drawableID, parentDrawableID)
+        public MovePointNetAction(string drawableID, string parentDrawableID, string lineName, List<int> Indices, Vector3 position) : base()
         {
+            DrawableID = drawableID;
+            ParentDrawableID = parentDrawableID;
             LineName = lineName;
             this.Position = position;
             this.Indices = Indices;
+        }
+
+        /// <summary>
+        /// Things to execute on the server (none for this class). Necessary because it is abstract
+        /// in the superclass.
+        /// </summary>
+        protected override void ExecuteOnServer()
+        {
+
         }
 
         /// <summary>
@@ -47,8 +65,18 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                base.ExecuteOnClient();
-                GameMoveRotator.MovePoint(FindChild(LineName), Indices, Position);
+                if (!IsRequester())
+                {
+                    GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
+                    if (drawable != null && GameFinder.FindChild(drawable, LineName) != null)
+                    {
+                        GameMoveRotator.MovePoint(GameFinder.FindChild(drawable, LineName), Indices, Position);
+                    }
+                    else
+                    {
+                        throw new System.Exception($"There is no drawable with the ID {DrawableID} or line with the ID {LineName}.");
+                    }
+                }
             }
         }
     }

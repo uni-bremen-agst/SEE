@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using SEE.Game.Drawable.Configurations;
+using UnityEngine;
 
 namespace SEE.Game.Drawable.ValueHolders
 {
     /// <summary>
-    /// This class represents a value holder component for the
+    /// This class represents a value holder component for the 
     /// order in layer value.
     /// </summary>
     public class OrderInLayerValueHolder : MonoBehaviour
@@ -14,27 +15,45 @@ namespace SEE.Game.Drawable.ValueHolders
         private int orderInLayer;
 
         /// <summary>
-        /// The order in layer property.
-        /// </summary>
-        public int OrderInLayer
-        {
-            get { return orderInLayer; }
-            set { orderInLayer = value; }
-        }
-
-        /// <summary>
         /// The original position.
         /// Only used for sticky note.
         /// </summary>
         private Vector3 originPos;
 
         /// <summary>
-        /// The origin position property.
+        /// Sets the given order.
         /// </summary>
-        public Vector3 OriginPosition
+        /// <param name="order">The given order that should be set.</param>
+        public void SetOrderInLayer(int order)
         {
-            get { return originPos; }
-            set { originPos = value; }
+            orderInLayer = order;
+        }
+
+        /// <summary>
+        /// Gets the current order in layer.
+        /// </summary>
+        /// <returns>current order</returns>
+        public int GetOrderInLayer()
+        {
+            return orderInLayer;
+        }
+
+        /// <summary>
+        /// Sets the given position
+        /// </summary>
+        /// <param name="pos">the position</param>
+        public void SetOriginPosition(Vector3 pos)
+        {
+            originPos = pos;
+        }
+
+        /// <summary>
+        /// Gets the origin position.
+        /// </summary>
+        /// <returns>origin position</returns>
+        public Vector3 GetOriginPosition()
+        {
+            return originPos;
         }
     }
 }

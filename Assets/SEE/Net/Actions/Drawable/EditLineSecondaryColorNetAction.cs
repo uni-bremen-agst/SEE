@@ -5,11 +5,18 @@ using UnityEngine;
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is responsible for changing the secondary color (<see cref="EditAction"/>)
-    /// of a line on all clients.
+    /// This class is responsible for changing the secondary color (<see cref="EditAction"/>) of a line on all clients.
     /// </summary>
-    public class EditLineSecondaryColorNetAction : DrawableNetAction
+    public class EditLineSecondaryColorNetAction : AbstractNetAction
     {
+        /// <summary>
+        /// The id of the drawable on which the line is located
+        /// </summary>
+        public string DrawableID;
+        /// <summary>
+        /// The id of the drawable parent
+        /// </summary>
+        public string ParentDrawableID;
         /// <summary>
         /// The id of the line that should be changed
         /// </summary>
@@ -17,7 +24,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The new color for the line.
         /// </summary>
-        public Color Color;
+        public Color color;
 
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
@@ -26,24 +33,43 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="lineName">The id of the line that should be changed.</param>
         /// <param name="color">The new color for the line.</param>
-        public EditLineSecondaryColorNetAction(string drawableID, string parentDrawableID, string lineName, Color color)
-            : base(drawableID, parentDrawableID)
+        public EditLineSecondaryColorNetAction(string drawableID, string parentDrawableID, string lineName, Color color) : base()
         {
+            DrawableID = drawableID;
+            ParentDrawableID = parentDrawableID;
             LineName = lineName;
-            Color = color;
+            this.color = color;
+        }
+
+        /// <summary>
+        /// Things to execute on the server (none for this class). Necessary because it is abstract
+        /// in the superclass.
+        /// </summary>
+        protected override void ExecuteOnServer()
+        {
+
         }
 
         /// <summary>
         /// Changes the secondary color of the given line on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="LineName"/>
-        /// don't exists.</exception>
+        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="LineName"/> don't exists.</exception>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
             {
-                base.ExecuteOnClient();
-                GameEdit.ChangeSecondaryColor(FindChild(LineName), Color);
+                if (!IsRequester())
+                {
+                    GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
+                    if (drawable != null && GameFinder.FindChild(drawable, LineName) != null)
+                    {
+                        GameEdit.ChangeSecondaryColor(GameFinder.FindChild(drawable, LineName), color);
+                    }
+                    else
+                    {
+                        throw new System.Exception($"There is no drawable with the ID {DrawableID} or line with the ID {LineName}.");
+                    }
+                }
             }
         }
     }

@@ -2,11 +2,12 @@
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Utils;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SEE.Game.Drawable
 {
     /// <summary>
-    /// This class manages the drawable sticky notes.
+    /// This class manages the drawable sticky notes
     /// </summary>
     public static class GameStickyNoteManager
     {
@@ -16,8 +17,8 @@ namespace SEE.Game.Drawable
         private const string stickyNotePrefabName = "Prefabs/Whiteboard/StickyNote";
 
         /// <summary>
-        /// Creates a new sticky note on the position of the raycast hit.
-        /// The rotation of the sticky note is based on the raycast hit object.
+        /// Create a new sticky note on the position of the raycast hit.
+        /// The rotation of the sticky notes is based on the raycast hit object.
         /// </summary>
         /// <param name="raycastHit">The chosen raycast hit</param>
         /// <returns>The created sticky note</returns>
@@ -27,51 +28,51 @@ namespace SEE.Game.Drawable
             GameObject stickyNote = PrefabInstantiator.InstantiatePrefab(stickyNotePrefabName);
 
             /// Sets the name of the sticky note.
-            stickyNote.name = ValueHolder.StickyNotePrefix + "-" + RandomStrings.GetRandomString(8);
+            stickyNote.name = ValueHolder.StickyNotePrefix + "-" + DrawableHolder.GetRandomString(8);
 
-            /// Adopts the rotation of the hit object,
-            /// unless it is a <see cref="DrawableType"/> object.
-            /// In that case, takes the rotation of the drawable.
+            /// Adopts the rotation of the hitted object,
+            /// unless it is a <see cref="DrawableType"/> object. 
+            /// In that case, take the rotation of the drawable.
             if (DrawableType.Get(raycastHit.collider.gameObject) == null)
             {
                 stickyNote.transform.rotation = raycastHit.collider.gameObject.transform.rotation;
-            }
-            else
+            } else
             {
                 GameObject drawable = GameFinder.GetDrawable(raycastHit.collider.gameObject);
                 stickyNote.transform.rotation = drawable.transform.rotation;
             }
 
-            /// Adopt the position of the hit object, but preserve the distance.
-            stickyNote.transform.position = raycastHit.point - ValueHolder.CurrentOrderInLayer * ValueHolder.DistanceToDrawable.z * stickyNote.transform.forward;
+            /// Adopt the position of the hitted object, but preserve the distance.
+            stickyNote.transform.position = raycastHit.point - stickyNote.transform.forward
+                * ValueHolder.distanceToDrawable.z * ValueHolder.currentOrderInLayer;
 
-            /// Sets the initial scale for sticky notes
+            /// Sets the inital scale for sticky notes
             stickyNote.transform.localScale = ValueHolder.StickyNoteScale;
 
             /// Sets a random color for the drawable.
             stickyNote.transform.Find("Front").GetComponent<MeshRenderer>().material.color = Random.ColorHSV().Darker();
 
-            /// Adds an order in layer value holder to the sticky note and sets the necessary values.
+            /// Adds a order in layer value holder to the sticky note and sets the necessary values.
             OrderInLayerValueHolder holder = stickyNote.AddComponent<OrderInLayerValueHolder>();
-            holder.OriginPosition = raycastHit.point;
-            holder.OrderInLayer = ValueHolder.CurrentOrderInLayer;
+            holder.SetOriginPosition(raycastHit.point);
+            holder.SetOrderInLayer(ValueHolder.currentOrderInLayer);
 
-            ValueHolder.CurrentOrderInLayer++;
+            ValueHolder.currentOrderInLayer++;
             return stickyNote;
         }
 
         /// <summary>
-        /// Spawns a sticky note from given configuration.
+        /// Spawn a sticky note from configuration.
         /// </summary>
         /// <param name="config">The configuration which holds the sticky note.</param>
         /// <returns>The created sticky note.</returns>
         public static GameObject Spawn(DrawableConfig config)
         {
-            /// Adjusts the current order in the layer if the
+            /// Adjusts the current order in the layer if the 
             /// order in layer for the line is greater than or equal to it.
-            if (config.Order >= ValueHolder.CurrentOrderInLayer)
+            if (config.Order >= ValueHolder.currentOrderInLayer)
             {
-                ValueHolder.CurrentOrderInLayer = config.Order + 1;
+                ValueHolder.currentOrderInLayer = config.Order + 1;
             }
 
             /// Instantiates the sticky note.
@@ -84,10 +85,10 @@ namespace SEE.Game.Drawable
             stickyNote.transform.localScale = config.Scale;
             stickyNote.transform.Find("Front").GetComponent<MeshRenderer>().material.color = config.Color;
 
-            /// Adds an order in layer value holder to the sticky note and sets the necessary values.
+            /// Adds a order in layer value holder to the sticky note and sets the necessary values.
             OrderInLayerValueHolder holder = stickyNote.AddComponent<OrderInLayerValueHolder>();
-            holder.OriginPosition = config.Position + config.Order * ValueHolder.DistanceToDrawable.z * stickyNote.transform.forward;
-            holder.OrderInLayer = config.Order;
+            holder.SetOriginPosition(config.Position + stickyNote.transform.forward * ValueHolder.distanceToDrawable.z * config.Order);
+            holder.SetOrderInLayer(config.Order);
             return stickyNote;
         }
 
@@ -101,7 +102,7 @@ namespace SEE.Game.Drawable
         {
             stickyNoteHolder.transform.position = position;
             stickyNoteHolder.transform.eulerAngles = eulerAngles;
-            stickyNoteHolder.GetComponent<OrderInLayerValueHolder>().OriginPosition = position;
+            stickyNoteHolder.GetComponent<OrderInLayerValueHolder>().SetOriginPosition(position);
         }
 
         /// <summary>
@@ -111,10 +112,11 @@ namespace SEE.Game.Drawable
         /// <returns>The new position</returns>
         public static Vector3 FinishMoving(GameObject stickyNoteHolder)
         {
-            stickyNoteHolder.transform.position -= stickyNoteHolder.GetComponent<OrderInLayerValueHolder>().OrderInLayer
-                * ValueHolder.DistanceToDrawable.z * stickyNoteHolder.transform.forward;
+            stickyNoteHolder.transform.position -= stickyNoteHolder.transform.forward
+                * ValueHolder.distanceToDrawable.z
+                * stickyNoteHolder.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
             stickyNoteHolder.GetComponent<OrderInLayerValueHolder>()
-                .OriginPosition = stickyNoteHolder.transform.position;
+                .SetOriginPosition(stickyNoteHolder.transform.position);
             return stickyNoteHolder.transform.position;
         }
 
@@ -151,25 +153,28 @@ namespace SEE.Game.Drawable
                     break;
             }
             stickyNoteHolder.GetComponent<OrderInLayerValueHolder>()
-                .OriginPosition = stickyNoteHolder.transform.position;
+                .SetOriginPosition(stickyNoteHolder.transform.position);
             return stickyNoteHolder.transform.position;
         }
 
         /// <summary>
-        /// Sets the y rotation of a sticky note (holder)
+        /// Sets the y rotation of an sticky note (holder)
         /// </summary>
         /// <param name="obj">The sticky note (holder)</param>
         /// <param name="localEulerAngleY">The new y rotation degree</param>
         /// <param name="oldPos">The old position of the object.</param>
-        public static void SetRotateY(GameObject obj, float localEulerAngleY)
+        public static void SetRotateY(GameObject obj, float localEulerAngleY, Vector3 oldPos)
         {
             Transform transform = obj.transform;
             /// Sets the y euler angle.
             transform.localEulerAngles = new Vector3(transform.localEulerAngles.x,
                 localEulerAngleY, transform.localEulerAngles.z);
+            /// Preserve the distance.
+            //obj.transform.position = oldPos - obj.transform.forward
+            //    * ValueHolder.distanceToDrawable.z * ValueHolder.currentOrderInLayer;
         }
         /// <summary>
-        /// Sets the x rotation of a sticky note (holder)
+        /// Sets the x rotation of an sticky note (holder)
         /// </summary>
         /// <param name="obj">The sticky note (holder)</param>
         /// <param name="localEulerAngleX">The new x rotation degree</param>
@@ -185,12 +190,12 @@ namespace SEE.Game.Drawable
             {
                 /// Preserve the distance.
                 obj.transform.position = oldPos - obj.transform.forward
-                    * ValueHolder.DistanceToDrawable.z * ValueHolder.CurrentOrderInLayer;
+                    * ValueHolder.distanceToDrawable.z * ValueHolder.currentOrderInLayer;
             }
         }
 
         /// <summary>
-        /// Sets the x rotation of a sticky note (holder)
+        /// Sets the x rotation of an sticky note (holder)
         /// </summary>
         /// <param name="obj">The sticky note (holder)</param>
         /// <param name="localEulerAngleX">The new x rotation degree</param>
@@ -212,23 +217,21 @@ namespace SEE.Game.Drawable
             /// Gets the old order in layer.
             if (stickyNote.GetComponent<OrderInLayerValueHolder>() != null)
             {
-                oldLayer = stickyNote.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
+                oldLayer = stickyNote.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
             }
             else
             {
-                oldLayer = stickyNote.GetComponentInParent<OrderInLayerValueHolder>().OrderInLayer;
+                oldLayer = stickyNote.GetComponentInParent<OrderInLayerValueHolder>().GetOrderInLayer();
             }
 
             /// Checks if the order in layer should increase or decrease.
             if (newLayer - oldLayer > 0)
             {
-                GameLayerChanger.ChangeOrderInLayer(GameFinder.GetHighestParent(stickyNote), newLayer, 
-                    GameLayerChanger.LayerChangerStates.Increase, false, true);
+                GameLayerChanger.Increase(GameFinder.GetHighestParent(stickyNote), newLayer, false, true);
             }
             else
             {
-                GameLayerChanger.ChangeOrderInLayer(GameFinder.GetHighestParent(stickyNote), newLayer, 
-                    GameLayerChanger.LayerChangerStates.Decrease, false, true);
+                GameLayerChanger.Decrease(GameFinder.GetHighestParent(stickyNote), newLayer, false, true);
             }
         }
 
@@ -247,7 +250,7 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Combines all edit method together.
+        /// Combine all edit method together
         /// </summary>
         /// <param name="stickyNote">The sticky note on that the changes should be executed.</param>
         /// <param name="config">The configuration which holds the values for the changing.</param>
@@ -259,7 +262,7 @@ namespace SEE.Game.Drawable
                 ChangeColor(stickyNote, config.Color);
                 ChangeLayer(root, config.Order);
                 SetRotateX(root, config.Rotation.x);
-                SetRotateY(root, config.Rotation.y);
+                SetRotateY(root, config.Rotation.y, config.Position);
                 GameScaler.SetScale(stickyNote, config.Scale);
             }
         }

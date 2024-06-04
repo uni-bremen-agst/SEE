@@ -73,16 +73,16 @@ namespace SEE.UI.Menu.Drawable
             {
                 if (primaryColor)
                 {
-                    chosenColor = conf.BorderConf.PrimaryColor;
+                    chosenColor = conf.borderConf.primaryColor;
                 }
                 else
                 {
-                    chosenColor = conf.BorderConf.SecondaryColor;
+                    chosenColor = conf.borderConf.secondaryColor;
                     /// For monochromatic lines, the secondary color is clear; 
                     /// therefore, the primary color is taken instead.
-                    if (conf.BorderConf.ColorKind == GameDrawer.ColorKind.Monochrome)
+                    if (conf.borderConf.colorKind == GameDrawer.ColorKind.Monochrome)
                     {
-                        chosenColor = conf.BorderConf.PrimaryColor;
+                        chosenColor = conf.borderConf.primaryColor;
                     }
                 }
                 gotColor = true;
@@ -104,11 +104,11 @@ namespace SEE.UI.Menu.Drawable
             {
                 if (primaryColor)
                 {
-                    chosenColor = conf.TextConf.FontColor;
+                    chosenColor = conf.textConf.fontColor;
                 }
                 else
                 {
-                    chosenColor = conf.TextConf.OutlineColor;
+                    chosenColor = conf.textConf.outlineColor;
                 }
                 gotColor = true;
             });
@@ -127,23 +127,23 @@ namespace SEE.UI.Menu.Drawable
         {
             /// Checks if the node has a parent. If not this area will be disabled.
             GameObject branchLineButtonArea = GameFinder.FindChild(instance, "BranchLine");
-            if (conf.BranchLineToParent != "")
+            if (conf.branchLineToParent != "")
             {
                 ButtonManagerBasic branchButton = branchLineButtonArea.GetComponent<ButtonManagerBasic>();
                 branchButton.clickEvent.AddListener(() =>
                 {
                     if (primaryColor)
                     {
-                        chosenColor = conf.BranchLineConf.PrimaryColor;
+                        chosenColor = conf.branchLineConf.primaryColor;
                     }
                     else
                     {
-                        chosenColor = conf.BranchLineConf.SecondaryColor;
+                        chosenColor = conf.branchLineConf.secondaryColor;
                         /// For monochromatic lines, the secondary color is clear; 
                         /// therefore, the primary color is taken instead.
-                        if (conf.BranchLineConf.ColorKind == GameDrawer.ColorKind.Monochrome)
+                        if (conf.branchLineConf.colorKind == GameDrawer.ColorKind.Monochrome)
                         {
-                            chosenColor = conf.BranchLineConf.PrimaryColor;
+                            chosenColor = conf.branchLineConf.primaryColor;
                         }
                     }
                     gotColor = true;

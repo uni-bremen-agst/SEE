@@ -17,7 +17,7 @@ namespace SEE.Controls.Actions.Drawable
     /// <summary>
     /// Allows the user to draw a shape.
     /// </summary>
-    public class DrawShapesAction : DrawableAction
+    public class DrawShapesAction : AbstractPlayerAction
     {
         /// <summary>
         /// The object holding the line renderer.
@@ -42,46 +42,45 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// This struct can store all the information needed to revert or repeat a <see cref="DrawShapesAction"/>.
         /// </summary>
-        private readonly struct Memento
+        private struct Memento
         {
             /// <summary>
             /// The drawable where the shape is displayed.
             /// </summary>
-            public readonly DrawableConfig Drawable;
+            public readonly DrawableConfig drawable;
             /// <summary>
             /// The configuration of the shape.
             /// </summary>
-            public readonly LineConf Shape;
+            public readonly LineConf shape;
 
             /// <summary>
-            /// The constructor, which simply assigns its parameters to the fields in this class.
+            /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
             /// <param name="drawable">The drawable where the shape is displayed.</param>
             /// <param name="shape">The configuration of the shape.</param>
             public Memento(GameObject drawable, LineConf shape)
             {
-                Drawable = DrawableConfigManager.GetDrawableConfig(drawable);
-                Shape = shape;
+                this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
+                this.shape = shape;
             }
         }
 
         /// <summary>
-        /// True if the action is drawing.
-        /// Also necessary to identify whether the line shape was successfully drawn.
+        /// Representing if the action is drawing. 
+        /// Also necessary to identifier if the line shape was successfully drawed.
         /// </summary>
         private bool drawing = false;
 
         /// <summary>
-        /// True if the user finished the line shape drawing via menu.
+        /// State that the user finish the line shape drawing via menu.
         /// </summary>
         private bool finishDrawingViaButton = false;
 
         /// <summary>
-        /// Enables the shape menu.
+        /// Enables the shape menu
         /// </summary>
         public override void Awake()
         {
-            base.Awake();
             ShapeMenu.Enable();
             ShapeMenu.AssignFinishButton(() =>
             {
@@ -95,12 +94,11 @@ namespace SEE.Controls.Actions.Drawable
 
 
         /// <summary>
-        /// Stops the action. It disable the shape menu and
+        /// Stops the action. It disable the shape menu and 
         /// destroys the line shape if it is not successfully completed.
         /// </summary>
         public override void Stop()
         {
-            base.Stop();
             ShapeMenu.Disable();
             if (drawing && shape != null)
             {
@@ -110,12 +108,12 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.DrawShapes"/>.
-        /// Specifically: Allows the user to draw a shape.
-        /// For all shapes except Line, a single click on the drawable is sufficient to draw the desired shape.
-        /// Simply enter the desired values in the Shape Menu.
+        /// Specifically: Allows the user to draw a shape. 
+        /// For all shapes except Line, a single click on the drawable is sufficient to draw the desired shape. 
+        /// Simply enter the desired values in the Shape Menu. 
         /// For the Line shape type, multiple clicks (one for each point) are required.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -125,7 +123,7 @@ namespace SEE.Controls.Actions.Drawable
                 if (Input.GetMouseButtonDown(0) &&
                     Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                    GameFinder.HasDrawable(raycastHit.collider.gameObject))
+                    GameFinder.hasDrawable(raycastHit.collider.gameObject))
                     && !drawing)
                 {
                     return ShapeDrawing(raycastHit);
@@ -134,7 +132,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// This block provides a line preview to select the desired position of the next line point.
                 LineShapePreview();
 
-                /// With this block, the user can add a new point to the line.
+                /// With this block, the user can add a new point to the line. 
                 AddLineShapePoint();
 
                 /// With left shift key can the loop option of the shape menu be toggled.
@@ -148,26 +146,29 @@ namespace SEE.Controls.Actions.Drawable
                 /// It adds a final point to the line.
                 /// It requires a left-click with the left Ctrl key held down.
                 if (Input.GetMouseButtonUp(0) && Input.GetKey(KeyCode.LeftControl)
-                    && drawing && positions.Length > 0
+                    && drawing && positions.Length > 1 
                     && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
                     && Raycasting.RaycastAnything(out RaycastHit hit)
                     && (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                        GameFinder.HasDrawable(hit.collider.gameObject)))
+                        GameFinder.hasDrawable(hit.collider.gameObject)))
                 {
-                    Vector3 newPosition = shape.transform.InverseTransformPoint(hit.point) - ValueHolder.DistanceToDrawable;
-                    Vector3[] newPositions = new Vector3[positions.Length + 1];
-                    Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
-                    newPositions[newPositions.Length - 1] = newPosition;
-                    positions = newPositions;
+                    Vector3 newPosition = shape.transform.InverseTransformPoint(hit.point) - ValueHolder.distanceToDrawable;
+                    if (newPosition != positions.Last())
+                    {
+                        Vector3[] newPositions = new Vector3[positions.Length + 1];
+                        Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
+                        newPositions[newPositions.Length - 1] = newPosition;
+                        positions = newPositions;
 
-                    GameDrawer.Drawing(shape, positions);
-                    new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
-                        LineConf.GetLine(shape)).Execute();
+                        GameDrawer.Drawing(shape, positions);
+                        new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
+                            LineConf.GetLine(shape)).Execute();
+                    }
                     FinishDrawing();
                     return true;
                 }
 
-                /// Block for successfully completing the line without adding a new point.
+                /// Block for successfully completing the line without adding a new point. 
                 /// It requires a wheel-click.
                 if (Input.GetMouseButtonUp(2)
                     && drawing && positions.Length > 1
@@ -177,9 +178,9 @@ namespace SEE.Controls.Actions.Drawable
                     return true;
                 }
             }
-            /// This block is outside the !Raycasting.IsMouseOverGUI check to allow
-            /// the immediate detection of a click on
-            /// the Finish button of the menu,
+            /// This block is outside the !Raycasting.IsMouseOverGUI check to allow 
+            /// the immediate detection of a click on 
+            /// the Finish button of the menu, 
             /// even if the mouse cursor is still over the GUI.
             if (finishDrawingViaButton)
             {
@@ -201,7 +202,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void CancelDrawing()
         {
-            if (drawing && SEEInput.Cancel())
+            if (drawing && Input.GetKeyDown(KeyCode.Escape))
             {
                 ShowNotification.Info("Line-Shape drawing canceled.", "The drawing of the shape art line has been canceled.");
                 new EraseNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), shape.name).Execute();
@@ -213,13 +214,13 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Provides the option to remove the last added point.
+        /// Provides the option to remove the last added point. 
         /// Press the Tab key for this action.
         /// If the line does not have enough points to remove, it will be deleted.
         /// </summary>
         private void RemoveLastPoint()
         {
-            if (drawing && SEEInput.PartUndo())
+            if (drawing && Input.GetKeyDown(KeyCode.Tab))
             {
                 if (shape.GetComponent<LineRenderer>().positionCount >= 3)
                 {
@@ -243,14 +244,14 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Performs the drawing of shapes.
-        /// However, for straight lines, only the drawing is initialized.
-        /// To do this, the <see cref="GetSelectedShapePosition(Vector3, Vector3)"/> method is
-        /// first called to determine the positions.
+        /// Performs the drawing of shapes. 
+        /// However, for straight lines, only the drawing is initialized. 
+        /// To do this, the <see cref="GetSelectedShapePosition(Vector3, Vector3)"/> method is 
+        /// first called to determine the positions. 
         /// Subsequently, for the selected shape (if it is not a line), the <see cref="DrawShape(Vector3)"/> method is called.
         /// </summary>
         /// <param name="raycastHit">The raycast hit of the selection.</param>
-        /// <returns>Whatever the shape creation is completed.</returns>
+        /// <returns>Whatever the state of the shape creation is</returns>
         private bool ShapeDrawing(RaycastHit raycastHit)
         {
             drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
@@ -269,9 +270,9 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Calculates the points for the selected shape based
-        /// on the chosen values in the <see cref="ShapeMenu"/>.
-        /// For the Line shape, only the first point is set,
+        /// Calculates the points for the selected shape based 
+        /// on the chosen values in the <see cref="ShapeMenu"/>. 
+        /// For the Line shape, only the first point is set, 
         /// as the others cannot be calculated and must be chosen by the user.
         /// </summary>
         /// <param name="convertedHitPoint">The hit point in local space, depending on the chosen drawable.</param>
@@ -283,11 +284,11 @@ namespace SEE.Controls.Actions.Drawable
                 case ShapePointsCalculator.Shape.Line:
 
                     positions[0] = hitpoint;
-                    shape = GameDrawer.StartDrawing(drawable, positions, ValueHolder.CurrentColorKind,
-                        ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor,
-                        ValueHolder.CurrentThickness, ValueHolder.CurrentLineKind,
-                        ValueHolder.CurrentTiling);
-                    positions[0] = shape.transform.InverseTransformPoint(positions[0]) - ValueHolder.DistanceToDrawable;
+                    shape = GameDrawer.StartDrawing(drawable, positions, ValueHolder.currentColorKind,
+                        ValueHolder.currentPrimaryColor, ValueHolder.currentSecondaryColor,
+                        ValueHolder.currentThickness, ValueHolder.currentLineKind,
+                        ValueHolder.currentTiling);
+                    positions[0] = shape.transform.InverseTransformPoint(positions[0]) - ValueHolder.distanceToDrawable;
                     break;
                 case ShapePointsCalculator.Shape.Square:
                     positions = ShapePointsCalculator.Square(convertedHitPoint, ShapeMenu.GetValue1());
@@ -333,24 +334,24 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Creates the calculated shape if it has at least three different positions.
         /// This ensures that the Mesh Collider can be created.
-        /// Subsequently, the pivot point of the shape is set,
+        /// Subsequently, the pivot point of the shape is set, 
         /// and the action is completed by creating a Memento and setting the progress state to Completed.
         /// If the shape cannot provide three different points, the action is reset.
         /// </summary>
         /// <param name="convertedHitPoint">The hit point in local space, depending on the chosen drawable.</param>
-        /// <returns>Whatever the state of the shape creation is completed.</returns>
+        /// <returns>Whatever the state of the shape creation is</returns>
         private bool DrawShape(Vector3 convertedHitPoint)
         {
             if (GameDrawer.DifferentPositionCounter(positions) > 1)
             {
-                shape = GameDrawer.DrawLine(drawable, "", positions, ValueHolder.CurrentColorKind,
-                    ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor, ValueHolder.CurrentThickness, false,
-                    ValueHolder.CurrentLineKind, ValueHolder.CurrentTiling);
+                shape = GameDrawer.DrawLine(drawable, "", positions, ValueHolder.currentColorKind,
+                    ValueHolder.currentPrimaryColor, ValueHolder.currentSecondaryColor, ValueHolder.currentThickness, false,
+                    ValueHolder.currentLineKind, ValueHolder.currentTiling);
                 shape.GetComponent<LineRenderer>().loop = false;
                 shape = GameDrawer.SetPivotShape(shape, convertedHitPoint);
                 LineConf currentShape = LineConf.GetLine(shape);
                 memento = new Memento(drawable, currentShape);
-                new DrawNetAction(memento.Drawable.ID, memento.Drawable.ParentID, currentShape).Execute();
+                new DrawNetAction(memento.drawable.ID, memento.drawable.ParentID, currentShape).Execute();
                 CurrentState = IReversibleAction.Progress.Completed;
                 drawing = false;
                 return true;
@@ -365,7 +366,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// This method provides a line preview for the user
+        /// This method provides a line preview for the user 
         /// to select the desired position of the next line point.
         /// </summary>
         private void LineShapePreview()
@@ -373,21 +374,21 @@ namespace SEE.Controls.Actions.Drawable
             if (drawing && !Input.GetMouseButton(0) && !Input.GetMouseButtonDown(0) &&
                     Raycasting.RaycastAnything(out RaycastHit rh) &&
                     (rh.collider.gameObject.CompareTag(Tags.Drawable) ||
-                    GameFinder.HasDrawable(rh.collider.gameObject)) &&
+                    GameFinder.hasDrawable(rh.collider.gameObject)) &&
                     ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
                     && (drawable == null || drawable != null && GameFinder.GetDrawable(rh.collider.gameObject).Equals(drawable)))
             {
-                Vector3 newPosition = shape.transform.InverseTransformPoint(rh.point) - ValueHolder.DistanceToDrawable;
+                Vector3 newPosition = shape.transform.InverseTransformPoint(rh.point) - ValueHolder.distanceToDrawable;
                 Vector3[] newPositions = new Vector3[positions.Length + 1];
                 Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
-                newPositions[^1] = newPosition;
+                newPositions[newPositions.Length - 1] = newPosition;
                 GameDrawer.Drawing(shape, newPositions);
                 new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), LineConf.GetLine(shape)).Execute();
             }
         }
 
         /// <summary>
-        /// Provides the function to add a new point in the Line shape.
+        /// Provides the function to add a new point in the Line shape. 
         /// However, the new point must be different from the previous one.
         /// This requires a left mouse click, with neither the left Shift nor the left Ctrl key pressed.
         /// </summary>
@@ -396,11 +397,11 @@ namespace SEE.Controls.Actions.Drawable
             if (Input.GetMouseButtonDown(0) && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift) &&
                 Raycasting.RaycastAnything(out RaycastHit hit) &&
                 (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                GameFinder.HasDrawable(hit.collider.gameObject))
+                GameFinder.hasDrawable(hit.collider.gameObject))
                 && drawing && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
                 && (drawable == null || drawable != null && GameFinder.GetDrawable(hit.collider.gameObject).Equals(drawable)))
             {
-                Vector3 newPosition = shape.transform.InverseTransformPoint(hit.point) - ValueHolder.DistanceToDrawable;
+                Vector3 newPosition = shape.transform.InverseTransformPoint(hit.point) - ValueHolder.distanceToDrawable;
                 if (newPosition != positions.Last())
                 {
                     Vector3[] newPositions = new Vector3[positions.Length + 1];
@@ -415,7 +416,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Finish the drawing of the line shape.
+        /// Finish the drawing of the line shape. 
         /// It must be a separate method as it can be called from two different points.
         /// </summary>
         private void FinishDrawing()
@@ -425,24 +426,24 @@ namespace SEE.Controls.Actions.Drawable
             shape = GameDrawer.SetPivot(shape);
             LineConf currentShape = LineConf.GetLine(shape);
             memento = new Memento(drawable, currentShape);
-            new DrawNetAction(memento.Drawable.ID, memento.Drawable.ParentID, currentShape).Execute();
+            new DrawNetAction(memento.drawable.ID, memento.drawable.ParentID, currentShape).Execute();
             CurrentState = IReversibleAction.Progress.Completed;
             drawing = false;
         }
 
         /// <summary>
-        /// Reverts this action, i.e., deletes the drawn shape.
+        /// Reverts this action, i.e., deletes the drawed shape.
         /// </summary>
         public override void Undo()
         {
             base.Undo();
             if (shape == null)
             {
-                shape = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Shape.Id);
+                shape = GameFinder.FindChild(memento.drawable.GetDrawable(), memento.shape.id);
             }
             if (shape != null)
             {
-                new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Shape.Id).Execute();
+                new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.shape.id).Execute();
                 Destroyer.Destroy(shape);
             }
         }
@@ -453,10 +454,10 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            shape = GameDrawer.ReDrawLine(memento.Drawable.GetDrawable(), memento.Shape);
+            shape = GameDrawer.ReDrawLine(memento.drawable.GetDrawable(), memento.shape);
             if (shape != null)
             {
-                new DrawNetAction(memento.Drawable.ID, memento.Drawable.ParentID, LineConf.GetLine(shape)).Execute();
+                new DrawNetAction(memento.drawable.ID, memento.drawable.ParentID, LineConf.GetLine(shape)).Execute();
             }
         }
 
@@ -492,11 +493,13 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
+        /// Because this action does not actually change any game object, 
+        /// an empty set is always returned.
         /// </summary>
         /// <returns>The id of the created shape</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            if (memento.Drawable == null)
+            if (memento.drawable == null)
             {
                 return new HashSet<string>();
             }
@@ -504,7 +507,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 return new HashSet<string>
                 {
-                    memento.Shape.Id
+                    memento.shape.id
                 };
             }
         }

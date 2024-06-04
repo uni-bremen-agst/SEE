@@ -1,4 +1,5 @@
 ﻿using SEE.Game.Drawable.ValueHolders;
+using SEE.Utils;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
@@ -13,50 +14,90 @@ namespace SEE.Game.Drawable.Configurations
     public class LineConf : DrawableType, ICloneable
     {
         /// <summary>
-        /// The renderer positions of the drawn points.
+        /// The renderer positions of the drawed points.
         /// </summary>
-        public Vector3[] RendererPositions;
+        public Vector3[] rendererPositions;
 
         /// <summary>
-        /// The configurations of the drawn points.
+        /// The configurations of the drawed points.
         /// Will be needed for correct saving / loading.
         /// </summary>
-        private readonly List<Vector3Config> rendererPositionConfigs = new();
+        private List<Vector3Config> rendererPositionConfigs = new();
 
         /// <summary>
-        /// If true, the line should loop.
+        /// Is the option, if the line should loop.
         /// </summary>
-        public bool Loop;
+        public bool loop;
 
         /// <summary>
         /// The primary color of the line.
         /// </summary>
-        public Color PrimaryColor;
+        public Color primaryColor;
 
         /// <summary>
         /// The secondary color of the line.
         /// </summary>
-        public Color SecondaryColor;
+        public Color secondaryColor;
 
         /// <summary>
-        /// The color kind of the line (Monochrome/Gradient/Two-color dashed).
+        /// The color kind of the line (Monochrome/Gradient/Two-color dashed)
         /// </summary>
-        public GameDrawer.ColorKind ColorKind;
+        public GameDrawer.ColorKind colorKind;
 
         /// <summary>
         /// The thickness of the line.
         /// </summary>
-        public float Thickness;
+        public float thickness;
 
         /// <summary>
         /// The line kind of the line (Solid/Dashed/Dashed25/Dashed50/Dashed75/Dashed100)
         /// </summary>
-        public GameDrawer.LineKind LineKind;
+        public GameDrawer.LineKind lineKind;
 
         /// <summary>
         /// The tiling of a dashed line. Only used for "Dashed" line kind.
         /// </summary>
-        public float Tiling;
+        public float tiling;
+
+        /// <summary>
+        /// Label in the configuration file for the positions of the line renderer for a line.
+        /// </summary>
+        private const string RendererPositionsLabel = "RendererPositions";
+
+        /// <summary>
+        /// Label in the configuration file for the loop option of a line.
+        /// </summary>
+        private const string LoopLabel = "LoopLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the primary color of a line.
+        /// </summary>
+        private const string PrimaryColorLabel = "PrimaryColorLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the secondary color of a line.
+        /// </summary>
+        private const string SecondaryColorLabel = "SecondaryColorLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the color kind of a line.
+        /// </summary>
+        private const string ColorKindLabel = "ColorKindLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the thickness of a line.
+        /// </summary>
+        private const string ThicknessLabel = "ThicknessLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the line kind of a line.
+        /// </summary>
+        private const string LineKindLabel = "LineKindLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the tiling of a line with a "Dashed" line kind.
+        /// </summary>
+        private const string TilingLabel = "TilingLabel";
 
         /// <summary>
         /// Creates a <see cref="LineConf"/> for the given game object.
@@ -67,36 +108,36 @@ namespace SEE.Game.Drawable.Configurations
         {
             LineConf line = null;
             if (lineGameObject != null && lineGameObject.CompareTag(Tags.Line))
-            {
+            {   
                 LineRenderer renderer = lineGameObject.GetComponent<LineRenderer>();
                 line = new()
                 {
-                    Id = lineGameObject.name,
-                    Position = lineGameObject.transform.localPosition,
-                    Scale = lineGameObject.transform.localScale,
-                    OrderInLayer = lineGameObject.GetComponent<OrderInLayerValueHolder>().OrderInLayer,
-                    Thickness = renderer.startWidth,
-                    Tiling = renderer.textureScale.x,
-                    LineKind = lineGameObject.GetComponent<LineValueHolder>().LineKind,
-                    Loop = renderer.loop,
-                    EulerAngles = lineGameObject.transform.localEulerAngles,
-                    ColorKind = lineGameObject.GetComponent<LineValueHolder>().ColorKind,
-                    RendererPositions = new Vector3[renderer.positionCount]
+                    id = lineGameObject.name,
+                    position = lineGameObject.transform.localPosition,
+                    scale = lineGameObject.transform.localScale,
+                    orderInLayer = lineGameObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer(),
+                    thickness = renderer.startWidth,
+                    tiling = renderer.textureScale.x,
+                    lineKind = lineGameObject.GetComponent<LineValueHolder>().GetLineKind(),
+                    loop = renderer.loop,
+                    eulerAngles = lineGameObject.transform.localEulerAngles,
+                    colorKind = lineGameObject.GetComponent<LineValueHolder>().GetColorKind(),
+                    rendererPositions = new Vector3[renderer.positionCount]
                 };
-                renderer.GetPositions(line.RendererPositions);
-                switch (line.ColorKind)
+                renderer.GetPositions(line.rendererPositions);
+                switch (line.colorKind)
                 {
                     case GameDrawer.ColorKind.Monochrome:
-                        line.PrimaryColor = renderer.material.color;
-                        line.SecondaryColor = Color.clear;
+                        line.primaryColor = renderer.material.color;
+                        line.secondaryColor = Color.clear;
                         break;
                     case GameDrawer.ColorKind.Gradient:
-                        line.PrimaryColor = renderer.startColor;
-                        line.SecondaryColor = renderer.endColor;
+                        line.primaryColor = renderer.startColor;
+                        line.secondaryColor = renderer.endColor;
                         break;
                     case GameDrawer.ColorKind.TwoDashed:
-                        line.PrimaryColor = renderer.materials[0].color;
-                        line.SecondaryColor = renderer.materials[1].color;
+                        line.primaryColor = renderer.materials[0].color;
+                        line.secondaryColor = renderer.materials[1].color;
                         break;
                 }
             }
@@ -104,89 +145,50 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
-        /// Clones this line object.
+        /// Clons the line object.
         /// </summary>
         /// <returns>A copy of this line object.</returns>
         public object Clone()
         {
             return new LineConf
             {
-                Id = this.Id,
-                Position = this.Position,
-                RendererPositions = this.RendererPositions,
-                Loop = this.Loop,
-                PrimaryColor = this.PrimaryColor,
-                SecondaryColor = this.SecondaryColor,
-                ColorKind = this.ColorKind,
-                OrderInLayer = this.OrderInLayer,
-                Thickness = this.Thickness,
-                EulerAngles = this.EulerAngles,
-                Scale = this.Scale,
-                LineKind = this.LineKind,
-                Tiling = this.Tiling,
+                id = this.id,
+                position = this.position,
+                rendererPositions = this.rendererPositions,
+                loop = this.loop,
+                primaryColor = this.primaryColor,
+                secondaryColor = this.secondaryColor,
+                colorKind = this.colorKind,
+                orderInLayer = this.orderInLayer,
+                thickness = this.thickness,
+                eulerAngles = this.eulerAngles,
+                scale = this.scale,
+                lineKind = this.lineKind,
+                tiling = this.tiling,
             };
         }
 
-        #region Config I/O
-
         /// <summary>
-        /// Label in the configuration file for the positions of the line renderer for a line.
+        /// Writes this instances' attributes into the given <see cref="ConfigWriter"/>.
         /// </summary>
-        private const string rendererPositionsLabel = "RendererPositions";
-
-        /// <summary>
-        /// Label in the configuration file for the loop option of a line.
-        /// </summary>
-        private const string loopLabel = "LoopLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the primary color of a line.
-        /// </summary>
-        private const string primaryColorLabel = "PrimaryColorLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the secondary color of a line.
-        /// </summary>
-        private const string secondaryColorLabel = "SecondaryColorLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the color kind of a line.
-        /// </summary>
-        private const string colorKindLabel = "ColorKindLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the thickness of a line.
-        /// </summary>
-        private const string thicknessLabel = "ThicknessLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the line kind of a line.
-        /// </summary>
-        private const string lineKindLabel = "LineKindLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the tiling of a line with a "Dashed" line kind.
-        /// </summary>
-        private const string tilingLabel = "TilingLabel";
-
-        /// <summary>
-        /// Saves this instance's attributes using the given <see cref="ConfigWriter"/>.
-        /// </summary>
-        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
-        protected override void SaveAttributes(ConfigWriter writer)
+        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes into.</param>
+        override internal void Save(ConfigWriter writer)
         {
-            writer.Save(ColorKind.ToString(), colorKindLabel);
-            writer.Save(PrimaryColor, primaryColorLabel);
-            writer.Save(SecondaryColor, secondaryColorLabel);
-            writer.Save(Thickness, thicknessLabel);
-            writer.Save(Loop, loopLabel);
-            writer.Save(LineKind.ToString(), lineKindLabel);
-            writer.Save(Tiling, tilingLabel);
-            foreach(Vector3 pos in RendererPositions)
+            writer.BeginGroup();
+            base.Save(writer);
+            writer.Save(colorKind.ToString(), ColorKindLabel);
+            writer.Save(primaryColor, PrimaryColorLabel);
+            writer.Save(secondaryColor, SecondaryColorLabel);
+            writer.Save(thickness, ThicknessLabel);
+            writer.Save(loop, LoopLabel);
+            writer.Save(lineKind.ToString(), LineKindLabel);
+            writer.Save(tiling, TilingLabel);
+            foreach(Vector3 pos in rendererPositions)
             {
-                rendererPositionConfigs.Add(new Vector3Config() { Value = pos });
+                rendererPositionConfigs.Add(new Vector3Config() { vector = pos });
             }
-            writer.Save(rendererPositionConfigs, rendererPositionsLabel);
+            writer.Save(rendererPositionConfigs, RendererPositionsLabel);
+            writer.EndGroup();
         }
 
         /// <summary>
@@ -202,104 +204,102 @@ namespace SEE.Game.Drawable.Configurations
         {
             bool errors = base.Restore(attributes);
 
-            /// Try to restore the color kind
-            if (attributes.TryGetValue(colorKindLabel, out object cKind)
+            /// Try to restores the color kind
+            if (attributes.TryGetValue(ColorKindLabel, out object cKind) 
                 && Enum.TryParse((string)cKind, out GameDrawer.ColorKind colorResult))
             {
-                ColorKind = colorResult;
+                colorKind = colorResult;
             }
             else
             {
-                ColorKind = GameDrawer.ColorKind.Monochrome;
+                colorKind = GameDrawer.ColorKind.Monochrome;
                 errors = true;
             }
 
-            /// Try to restore the primary color.
+            /// Try to restores the primary color.
             Color loadedColor = Color.black;
-            if (ConfigIO.Restore(attributes, primaryColorLabel, ref loadedColor))
+            if (ConfigIO.Restore(attributes, PrimaryColorLabel, ref loadedColor))
             {
-                PrimaryColor = loadedColor;
+                primaryColor = loadedColor;
             }
             else
             {
-                PrimaryColor = Color.black;
+                primaryColor = Color.black;
                 errors = true;
             }
 
-            /// Try to restore the secondary color.
+            /// Try to restores the secondary color.
             Color loadedSecColor = Color.black;
-            if (ConfigIO.Restore(attributes, secondaryColorLabel, ref loadedSecColor))
+            if (ConfigIO.Restore(attributes, SecondaryColorLabel, ref loadedSecColor))
             {
-                SecondaryColor = loadedSecColor;
+                secondaryColor = loadedSecColor;
             }
             else
             {
-                SecondaryColor = Color.black;
+                secondaryColor = Color.black;
                 errors = true;
             }
 
-            /// Try to restore the thickness.
-            if (attributes.TryGetValue(thicknessLabel, out object thick))
+            /// Try to restores the thickness.
+            if (attributes.TryGetValue(ThicknessLabel, out object thick))
             {
-                Thickness = (float)thick;
+                thickness = (float)thick;
             }
             else
             {
-                Thickness = ValueHolder.CurrentThickness;
+                thickness = ValueHolder.currentThickness;
                 errors = true;
             }
 
-            /// Try to restore the loop.
-            if (attributes.TryGetValue(loopLabel, out object loadedLoop))
+            /// Try to restores the loop.
+            if (attributes.TryGetValue(LoopLabel, out object loadedLoop))
             {
-                Loop = (bool)loadedLoop;
+                loop = (bool)loadedLoop;
             }
             else
             {
-                Loop = false;
+                loop = false;
                 errors = true;
             }
-
+            
             List<Vector3> listRendererPositions = new();
-            /// Try to restore the line position points.
-            if (attributes.TryGetValue(rendererPositionsLabel, out object positionList))
+            /// Try to restores the line position points.
+            if (attributes.TryGetValue(RendererPositionsLabel, out object positionList))
             {
                 foreach (object item in (List<object>) positionList)
                 {
                     Dictionary<string, object> dict = (Dictionary<string, object>)item;
                     Vector3Config config = new();
                     config.Restore(dict);
-                    listRendererPositions.Add(config.Value);
+                    listRendererPositions.Add(config.vector);
                 }
-                RendererPositions = listRendererPositions.ToArray();
+                rendererPositions = listRendererPositions.ToArray();
             }
 
-            /// Try to restore the tiling.
-            if (attributes.TryGetValue(tilingLabel, out object til))
+            /// Try to restores the tiling.
+            if (attributes.TryGetValue(TilingLabel, out object til))
             {
-                Tiling = (float)til;
+                tiling = (float)til;
             }
             else
             {
-                Tiling = 1;
+                tiling = 1;
                 errors = true;
             }
 
-            /// Try to restore the line kind.
-            if (attributes.TryGetValue(lineKindLabel, out object kind)
+            /// Try to restores the line kind.
+            if (attributes.TryGetValue(LineKindLabel, out object kind) 
                 && Enum.TryParse<GameDrawer.LineKind>((string)kind, out GameDrawer.LineKind result))
             {
-                LineKind = result;
+                lineKind = result;
             }
             else
             {
-                LineKind = GameDrawer.LineKind.Solid;
+                lineKind = GameDrawer.LineKind.Solid;
                 errors = true;
             }
 
             return !errors;
         }
-
-        #endregion
     }
 }

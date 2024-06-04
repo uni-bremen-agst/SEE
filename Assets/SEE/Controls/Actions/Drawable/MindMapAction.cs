@@ -18,10 +18,10 @@ namespace SEE.Controls.Actions.Drawable
     /// <summary>
     /// This class provides the operations for a mind map.
     /// </summary>
-    public class MindMapAction : DrawableAction
+    public class MindMapAction : AbstractPlayerAction
     {
         /// <summary>
-        /// The selected operation for the mind map.
+        /// The selected operation for the mind map
         /// </summary>
         private ProgressState progress = ProgressState.SelectPosition;
 
@@ -38,7 +38,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// The chosen operation from the mind map menu.
+        /// The chosen operation from mind map menu.
         /// </summary>
         private Operation chosenOperation = Operation.None;
 
@@ -63,7 +63,7 @@ namespace SEE.Controls.Actions.Drawable
         private GameObject node;
 
         /// <summary>
-        /// The branch line to the parent.
+        /// The branch line to parent.
         /// </summary>
         private GameObject branchLine;
 
@@ -85,33 +85,33 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// This struct can store all the information needed to revert or repeat a <see cref="MindMapAction"/>.
         /// </summary>
-        private readonly struct Memento
+        private struct Memento
         {
             /// <summary>
             /// The executed operation.
             /// </summary>
-            public readonly Operation Operation;
+            public readonly Operation operation;
             /// <summary>
-            /// The drawable on which the node should be displayed.
+            /// The drawable on that the node should be displayed.
             /// </summary>
-            public readonly DrawableConfig Drawable;
+            public readonly DrawableConfig drawable;
 
             /// <summary>
             /// The node configuration.
             /// </summary>
-            public readonly MindMapNodeConf Conf;
+            public readonly MindMapNodeConf conf;
 
             /// <summary>
-            /// The constructor.
+            /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
-            /// <param name="drawable">The drawable on which the node should be displayed.</param>
+            /// <param name="drawable">The drawable on that the node should be displayed.</param>
             /// <param name="conf">The node configuration</param>
             /// <param name="operation">The executed operation.</param>
             public Memento(GameObject drawable, MindMapNodeConf conf, Operation operation)
             {
-                Drawable = DrawableConfigManager.GetDrawableConfig(drawable);
-                Conf = conf;
-                Operation = operation;
+                this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
+                this.conf = conf;
+                this.operation = operation;
             }
         }
 
@@ -120,7 +120,6 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Awake()
         {
-            base.Awake();
             MindMapMenu.Enable();
         }
 
@@ -129,7 +128,6 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Stop()
         {
-            base.Stop();
             MindMapMenu.Disable();
             MindMapParentSelectionMenu.Disable();
 
@@ -147,7 +145,7 @@ namespace SEE.Controls.Actions.Drawable
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.MindMap"/>.
         /// It allows the user to set a mind map node.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -162,7 +160,7 @@ namespace SEE.Controls.Actions.Drawable
                     case Operation.None:
                         if (Input.GetMouseButtonDown(0))
                         {
-                            ShowNotification.Info("Select an operation",
+                            ShowNotification.Info("Select an operation", 
                                 "First you need to select an operation from the menu.");
                         }
                         break;
@@ -184,7 +182,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void ShowChangesFromMenu()
         {
-            if ((chosenOperation == Operation.Subtheme || chosenOperation == Operation.Leaf)
+            if ((chosenOperation == Operation.Subtheme || chosenOperation == Operation.Leaf) 
                 && progress == ProgressState.SelectParent)
             {
                 if (MindMapParentSelectionMenu.GetChosenParent() != null)
@@ -211,9 +209,9 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// The process of adding a mind map node.
+        /// The process of addition of a mind map node.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this Action is finished</returns>
         private bool AdditionProcess()
         {
             switch (progress)
@@ -243,16 +241,16 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// Handles the position selection.
-        /// Checks using <see cref="CheckValid"/> whether it is a valid state.
-        /// If so, the position is adopted, and it waits for the description for the node.
+        /// Checks using <see cref="CheckValid"/> whether it is a valid state. 
+        /// If so, the position is adopted, and it waits for the description for the node. 
         /// Otherwise, the action is aborted and reset.
         /// </summary>
         /// <returns>the success of the selection.</returns>
         private bool SelectPosition()
         {
-            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
-                && Raycasting.RaycastAnything(out RaycastHit raycastHit)
-                && (GameFinder.HasDrawable(raycastHit.collider.gameObject)
+            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) 
+                && Raycasting.RaycastAnything(out RaycastHit raycastHit) 
+                && (GameFinder.hasDrawable(raycastHit.collider.gameObject)
                     || raycastHit.collider.gameObject.CompareTag(Tags.Drawable)))
             {
                 MindMapMenu.Disable();
@@ -297,8 +295,7 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// This method handles the creation of the mind map node.
-        /// It creates the node, and if it is not a theme, the <see cref="SelectParent"/>
-        /// section is initiated.
+        /// It creates the node, and if it is not a theme, the SelectParent section is initiated.
         /// </summary>
         private void AddNode()
         {
@@ -312,12 +309,12 @@ namespace SEE.Controls.Actions.Drawable
             {
                 progress = ProgressState.SelectParent;
                 ShowNotification.Info("Select a Parent Node", "Now select a parent node.\n" +
-                    "To select, click on the specific parent node or choose it from the menu.", 3);
+                    "To select, click on the specific parent node, or choose it from the menu.", 3);
                 /// The following block is for a branch line preview.
                 branchLine = GameDrawer.StartDrawing(drawable, new Vector3[] { position },
                     GameDrawer.ColorKind.Monochrome, Color.black, Color.clear,
-                    ValueHolder.StandardLineThickness, GameDrawer.LineKind.Solid,
-                    ValueHolder.StandardLineTiling);
+                    ValueHolder.standardLineThickness, GameDrawer.LineKind.Solid,
+                    ValueHolder.standardLineTiling);
                 branchLine.transform.SetParent(node.transform);
                 branchLineRenderer = branchLine.GetComponent<LineRenderer>();
                 MindMapParentSelectionMenu.Enable(GameFinder.GetAttachedObjectsObject(drawable), node);
@@ -325,7 +322,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// This method handles the selection of a parent.
+        /// This Method handles the selection of a parent.
         /// </summary>
         private void SelectParent()
         {
@@ -334,10 +331,10 @@ namespace SEE.Controls.Actions.Drawable
 
             /// This block is for the branch line preview.
             /// It draws the line from the origin of the node to the position of the mouse cursor.
-            if (!Input.GetMouseButton(0) && Raycasting.RaycastAnything(out RaycastHit raycast)
+            if (!Input.GetMouseButton(0) && Raycasting.RaycastAnything(out RaycastHit raycast) 
                 && node != null
                 && (raycast.collider.gameObject.CompareTag(Tags.Drawable)
-                  || GameFinder.HasDrawable(raycast.collider.gameObject)))
+                  || GameFinder.hasDrawable(raycast.collider.gameObject)))
             {
                 Vector3[] positions = new Vector3[2];
                 positions[0] = GameFinder.GetHighestParent(node).transform
@@ -352,7 +349,7 @@ namespace SEE.Controls.Actions.Drawable
             /// It will executed if the left mouse button will be clicked.
             if (Input.GetMouseButtonDown(0) && node != null)
             {
-                /// A node can only be chosen as a parent node if it is a Theme or Subtheme Node.
+                /// A node can only be chosen as a parent node if it is a Theme or Subtheme Node. 
                 /// Additionally, the node must not choose itself.
                 if (Raycasting.RaycastAnything(out RaycastHit hit) &&
                    hit.collider.gameObject.CompareTag(Tags.MindMapNode) &&
@@ -367,18 +364,18 @@ namespace SEE.Controls.Actions.Drawable
                 }
                 else
                 {
-                    ShowNotification.Warn("Wrong selection.",
-                                          "You need to select a theme or a subtheme node of the currently selected drawable.");
+                    ShowNotification.Warn("Wrong selection.", "You need to select a theme or a subtheme node of the current selected drawable.");
                 }
             }
         }
 
         /// <summary>
-        /// Provides the option to cancel the action.
+        /// Provides the option to cancel the action. 
+        /// Simply press the "Esc" key if an object is selected for parent selecting.
         /// </summary>
         private void Cancel()
         {
-            if (SEEInput.Cancel())
+            if (Input.GetKeyDown(KeyCode.Escape))
             {
                 ShowNotification.Info("Canceled", "The action was canceled by the user.");
                 MindMapParentSelectionMenu.Disable();
@@ -401,25 +398,25 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Finishes the action.
+        /// Finish the action.
         /// </summary>
         /// <returns>true</returns>
         private bool FinishAdd()
         {
             memento = new(drawable, MindMapNodeConf.GetNodeConf(node), chosenOperation);
-            new MindMapCreateNodeNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Conf).Execute();
+            new MindMapCreateNodeNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.conf).Execute();
             CurrentState = IReversibleAction.Progress.Completed;
             return true;
         }
 
         /// <summary>
-        /// This method checks for validity by verifying
-        /// if at least one theme exists on the drawable.
-        /// If not, it provides an appropriate prompt
+        /// This method checks for validity by verifying 
+        /// if at least one theme exists on the drawable. 
+        /// If not, it provides an appropriate prompt 
         /// when attempting to add a node that is not a theme.
         /// </summary>
-        /// <param name="attachedObjects">The attached objects of the drawable</param>
-        /// <returns>the result of the validation</returns>
+        /// <param name="attachedObjects">The attached objects object of the drawable</param>
+        /// <returns>the result of the validation.</returns>
         private bool CheckValid(GameObject attachedObjects)
         {
             if (chosenOperation == Operation.Theme)
@@ -427,14 +424,14 @@ namespace SEE.Controls.Actions.Drawable
                 return true;
             }
 
-            if (attachedObjects != null && GameFinder.FindAllChildrenWithTag(attachedObjects,
+            if (attachedObjects != null && GameFinder.FindAllChildrenWithTag(attachedObjects, 
                 Tags.MindMapNode).Count > 0)
             {
                 return true;
             }
             else
             {
-                ShowNotification.Warn("Cannot add", "First you need to add a theme.");
+                ShowNotification.Warn("Can't add", "First you need to add a theme.");
             }
 
             return false;
@@ -467,29 +464,29 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// Reverts this action, i.e., it deletes the created mind map node
-        /// and deletes it from the list of child nodes in the parent node,
-        /// as well as the branch line to the parent node.
+        /// and deletes it from the list of child nodes in the parent node, 
+        /// as well as the branch line to the parent node. 
         /// </summary>
         public override void Undo()
         {
-            GameObject attached = GameFinder.GetAttachedObjectsObject(memento.Drawable.GetDrawable());
-            GameObject node = GameFinder.FindChild(attached, memento.Conf.Id);
-            if (memento.Operation != Operation.Theme)
+            GameObject attached = GameFinder.GetAttachedObjectsObject(memento.drawable.GetDrawable());
+            GameObject node = GameFinder.FindChild(attached, memento.conf.id);
+            if (memento.operation != Operation.Theme)
             {
-                GameObject parent = GameFinder.FindChild(attached, memento.Conf.ParentNode);
+                GameObject parent = GameFinder.FindChild(attached, memento.conf.parentNode);
                 if (parent != null)
                 {
                     parent.GetComponent<MMNodeValueHolder>().RemoveChild(node);
                 }
-                new MindMapRemoveChildNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
-                    memento.Conf).Execute();
-                GameObject branchToParent = GameFinder.FindChild(attached, memento.Conf.BranchLineToParent);
-                new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                new MindMapRemoveChildNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                    memento.conf).Execute();
+                GameObject branchToParent = GameFinder.FindChild(attached, memento.conf.branchLineToParent);
+                new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, 
                     branchToParent.name).Execute();
                 Destroyer.Destroy(branchToParent);
             }
-            new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
-                memento.Conf.Id).Execute();
+            new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                memento.conf.id).Execute();
             Destroyer.Destroy(node);
         }
 
@@ -498,8 +495,8 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Redo()
         {
-            GameMindMap.ReCreate(memento.Drawable.GetDrawable(), memento.Conf);
-            new MindMapCreateNodeNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Conf).Execute();
+            GameMindMap.ReCreate(memento.drawable.GetDrawable(), memento.conf);
+            new MindMapCreateNodeNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.conf).Execute();
         }
 
         /// <summary>
@@ -534,27 +531,13 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
-        /// Because this action does not actually change any game object,
+        /// Because this action does not actually change any game object, 
         /// an empty set is always returned.
         /// </summary>
         /// <returns>empty set</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            if (memento.Drawable != null)
-            {
-                HashSet<string> changedObjects = new() 
-                {
-                    memento.Drawable.ID,
-                    memento.Conf.Id
-                };
-                if (memento.Operation.Equals(Operation.Subtheme) 
-                    || memento.Operation.Equals(Operation.Leaf))
-                {
-                    changedObjects.Add(memento.Conf.BranchLineToParent);
-                }
-                return changedObjects;
-            }
-            return new();
+            return new HashSet<string>();
         }
     }
 }

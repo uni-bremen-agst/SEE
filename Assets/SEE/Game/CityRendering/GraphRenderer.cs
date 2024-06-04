@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.HolisticMetrics;
@@ -32,7 +34,7 @@ namespace SEE.Game.CityRendering
         {
             if (graph == null)
             {
-                throw new ArgumentNullException("Graph must not be null");
+                throw new ArgumentNullException(nameof(graph));
             }
             SetGraph(settings, new List<Graph> { graph });
         }
@@ -268,19 +270,19 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="graph">the graph to be drawn; it should be one initially passed to the constructor</param>
         /// <param name="parent">every game object drawn for this graph will be added to this parent</param>
-        public void DrawGraph(Graph graph, GameObject parent)
+        /// <param name="updateProgress">action to be called with the progress of the operation</param>
+        /// <param name="token">cancellation token with which to cancel the operation</param>
+        public async UniTask DrawGraphAsync(Graph graph, GameObject parent, Action<float> updateProgress = null,
+                                            CancellationToken token = default)
         {
             // all nodes of the graph
-            List<Node> nodes = graph.Nodes();
+            IList<Node> nodes = graph.Nodes();
             if (nodes.Count == 0)
             {
                 Debug.LogWarning("The graph has no nodes.\n");
                 return;
             }
-            // FIXME: The two following calls DrawLeafNodes and DrawInnerNodes can be merged into one.
-            Dictionary<Node, GameObject> nodeMap = DrawLeafNodes(nodes);
-
-            DrawInnerNodes(nodeMap, nodes);
+            IDictionary<Node, GameObject> nodeMap = await DrawNodesAsync(nodes, x => updateProgress?.Invoke(x * 0.5f), token);
 
             // the layout to be applied
             NodeLayout nodeLayout = GetLayout(parent);
@@ -311,7 +313,20 @@ namespace SEE.Game.CityRendering
             // representing the node hierarchy. This way the edges can be moved along with
             // the nodes.
             GameObject rootGameNode = RootGameNode(parent);
-            EdgeLayout(gameNodes, rootGameNode, true);
+            try
+            {
+                await EdgeLayoutAsync(gameNodes, rootGameNode, true, x => updateProgress?.Invoke(0.5f + x * 0.5f), token);
+            }
+            catch (OperationCanceledException)
+            {
+                // If the operation gets canceled, we need to clean up the dangling edge game objects.
+                foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge).Where(x => x.transform.parent is null))
+                {
+                    Destroyer.Destroy(edge);
+                }
+                // Then re-throw.
+                throw;
+            }
 
             // Decorations must be applied after the blocks have been placed, so that
             // we also know their positions.
@@ -327,24 +342,22 @@ namespace SEE.Game.CityRendering
                 portalPlane.HeightOffset = rootGameNode.transform.position.y - parent.transform.position.y;
             }
 
-            GameObject AddGameRootNodeIfNecessary(Graph graph, Dictionary<Node, GameObject> nodeMap)
+            // This is necessary for the holistic metrics boards. They need to be informed when a code city is being
+            // drawn because then there will be a new graph loaded. In that case, the metrics boards might
+            // need to start listening for change events from that graph.
+            BoardsManager.OnGraphDraw();
+
+            updateProgress?.Invoke(1.0f);
+            return;
+
+            void AddGameRootNodeIfNecessary(Graph graph, IDictionary<Node, GameObject> nodeMap)
             {
                 if (graph.GetRoots().Count > 1 && graph.AddSingleRoot(out Node artificialRoot))
                 {
                     nodeMap[artificialRoot] = DrawNode(artificialRoot);
                     Debug.Log($"Artificial unique root {artificialRoot.ID} was added.\n");
-                    return nodeMap[artificialRoot];
-                }
-                else
-                {
-                    return null;
                 }
             }
-
-            // This is necessary for the holistic metrics boards. They need to be informed when a code city is being
-            // drawn because then there will be a new graph loaded. In that case, the metrics boards might
-            // need to start listening for change events from that graph.
-            BoardsManager.OnGraphDraw();
         }
 
         /// <summary>
@@ -404,7 +417,7 @@ namespace SEE.Game.CityRendering
         /// <param name="root">the parent of every game object not nested in any other game object
         /// (must not be null)</param>
         /// <exception cref="ArgumentNullException">thrown if <paramref name="root"/> is null</exception>
-        public static void CreateGameNodeHierarchy(Dictionary<Node, GameObject> nodeMap, GameObject root)
+        public static void CreateGameNodeHierarchy(IDictionary<Node, GameObject> nodeMap, GameObject root)
         {
             if (root == null)
             {
@@ -420,127 +433,6 @@ namespace SEE.Game.CityRendering
                 AddToParent(entry.Value, parent == null ? root : nodeMap[parent]);
                 Portal.SetPortal(root, entry.Value);
             }
-        }
-
-        /// <summary>
-        /// Adds the decoration to the sublayout
-        /// </summary>
-        /// <param name="layoutNodes">the layoutnodes</param>
-        /// <param name="sublayoutLayoutNodes">the sublayout nodes</param>
-        private void AddDecorationsForSublayouts(IEnumerable<ILayoutNode> layoutNodes, IEnumerable<SublayoutLayoutNode> sublayoutLayoutNodes)
-        {
-            List<ILayoutNode> remainingLayoutNodes = layoutNodes.ToList();
-            foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
-            {
-                ICollection<GameObject> gameObjects = (from LayoutGameNode gameNode in layoutNode.Nodes select gameNode.GetGameObject()).ToList();
-                AddDecorations(gameObjects);
-                remainingLayoutNodes.RemoveAll(node => layoutNode.Nodes.Contains(node));
-            }
-
-            ICollection<GameObject> remainingGameObjects = (from LayoutGameNode gameNode in remainingLayoutNodes select gameNode.GetGameObject()).ToList();
-            AddDecorations(remainingGameObjects);
-        }
-
-        /// <summary>
-        /// Creates Sublayout and Adds the innerNodes for the sublayouts
-        /// </summary>
-        /// <param name="nodeMap">a map between a node and its gameobject</param>
-        /// <param name="nodes">a list with nodes</param>
-        /// <returns>the sublayouts</returns>
-        private List<SublayoutNode> AddInnerNodesForSublayouts(Dictionary<Node, GameObject> nodeMap, List<Node> nodes)
-        {
-            List<SublayoutNode> coseSublayoutNodes = CreateSublayoutNodes(nodes);
-
-            if (coseSublayoutNodes.Count > 0)
-            {
-                coseSublayoutNodes.Sort((n1, n2) => n2.Node.Level.CompareTo(n1.Node.Level));
-
-                CalculateNodesSublayout(coseSublayoutNodes);
-
-                List<Node> remainingNodes = new List<Node>(nodes);
-                foreach (SublayoutNode sublayoutNode in coseSublayoutNodes)
-                {
-                    DrawInnerNodes(nodeMap, sublayoutNode.Nodes);
-                    remainingNodes.RemoveAll(node => sublayoutNode.Nodes.Contains(node));
-                }
-                DrawInnerNodes(nodeMap, remainingNodes);
-            }
-            else
-            {
-                DrawInnerNodes(nodeMap, nodes);
-            }
-            return coseSublayoutNodes;
-        }
-
-        /// <summary>
-        /// Creates the sublayoutnodes for a given set of nodes
-        /// </summary>
-        /// <param name="nodes">the nodes, which should be layouted as sublayouts</param>
-        /// <returns>a list with sublayout nodes</returns>
-        private List<SublayoutNode> CreateSublayoutNodes(IReadOnlyCollection<Node> nodes) =>
-            (from dir in Settings.CoseGraphSettings.ListInnerNodeToggle
-             where dir.Value
-             select dir.Key into name
-             where Settings.CoseGraphSettings.InnerNodeLayout.ContainsKey(name)
-                   && Settings.CoseGraphSettings.InnerNodeShape.ContainsKey(name)
-             let matches = nodes.Where(i => i.ID.Equals(name))
-             where matches.Any()
-             select new SublayoutNode(matches.First(), Settings.CoseGraphSettings.InnerNodeShape[name],
-                                      Settings.CoseGraphSettings.InnerNodeLayout[name])).ToList();
-
-        /// <summary>
-        /// Calculate the child/ removed nodes for each sublayout
-        /// </summary>
-        /// <param name="sublayoutNodes">the sublayout nodes</param>
-        private static void CalculateNodesSublayout(ICollection<SublayoutNode> sublayoutNodes)
-        {
-            foreach (SublayoutNode sublayoutNode in sublayoutNodes)
-            {
-                List<Node> children = WithAllChildren(sublayoutNode.Node);
-                List<Node> childrenToRemove = new();
-
-                foreach (Node child in children)
-                {
-                    SublayoutNode sublayout = CoseHelper.CheckIfNodeIsSublayouRoot(sublayoutNodes, child.ID);
-
-                    if (sublayout != null)
-                    {
-                        childrenToRemove.AddRange(sublayout.Nodes);
-                    }
-                }
-
-                sublayoutNode.RemovedChildren = childrenToRemove;
-                children.RemoveAll(child => childrenToRemove.Contains(child));
-                sublayoutNode.Nodes = children;
-            }
-        }
-
-        private List<SublayoutLayoutNode> ConvertSublayoutToLayoutNodes(List<SublayoutNode> sublayouts)
-        {
-            List<SublayoutLayoutNode> sublayoutLayoutNodes = new();
-            sublayouts.ForEach(sublayoutNode =>
-            {
-                SublayoutLayoutNode sublayout = new SublayoutLayoutNode(toLayoutNode[sublayoutNode.Node], sublayoutNode.InnerNodeKind, sublayoutNode.NodeLayout);
-                sublayoutNode.Nodes.ForEach(n => sublayout.Nodes.Add(toLayoutNode[n]));
-                sublayoutNode.RemovedChildren.ForEach(n => sublayout.RemovedChildren.Add(toLayoutNode[n]));
-                sublayoutLayoutNodes.Add(sublayout);
-            });
-            return sublayoutLayoutNodes;
-        }
-
-        /// <summary>
-        /// Calculates a list with all children for a specific node
-        /// </summary>
-        /// <param name="root"></param>
-        /// <returns></returns>
-        private static List<Node> WithAllChildren(Node root)
-        {
-            List<Node> allNodes = new() { root };
-            foreach (Node node in root.Children())
-            {
-                allNodes.AddRange(WithAllChildren(node));
-            }
-            return allNodes;
         }
 
         /// <summary>
@@ -641,31 +533,26 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Creates and scales blocks for all leaf nodes in given list of nodes.
+        /// Draws the nodes of the graph and returns a mapping of each graph node onto its corresponding game object.
         /// </summary>
-        /// <param name="nodes">list of nodes for which to create blocks</param>
-        /// <returns>blocks for all leaf nodes in given list of nodes</returns>
-        protected Dictionary<Node, GameObject> DrawLeafNodes(IEnumerable<Node> nodes)
+        /// <param name="nodes">The nodes to be drawn</param>
+        /// <param name="updateProgress">action to be called with the progress of the operation</param>
+        /// <param name="token">token with which to cancel the operation</param>
+        /// <returns>mapping of graph node onto its corresponding game object</returns>
+        private async UniTask<IDictionary<Node, GameObject>> DrawNodesAsync(IList<Node> nodes,
+                                                                            Action<float> updateProgress,
+                                                                            CancellationToken token = default)
         {
-            return nodes.Where(n => n.IsLeaf()).ToDictionary(n => n, n => DrawNode(n));
-        }
+            IDictionary<Node, GameObject> nodeMap = new Dictionary<Node, GameObject>();
 
-        /// <summary>
-        /// Adds game objects for all inner nodes in given list of nodes to nodeMap.
-        /// Note: added game objects for inner nodes are not scaled.
-        /// </summary>
-        /// <param name="nodeMap">nodeMap to which the game objects are to be added</param>
-        /// <param name="nodes">list of nodes for which to create blocks</param>
-        protected void DrawInnerNodes(Dictionary<Node, GameObject> nodeMap, IEnumerable<Node> nodes)
-        {
-            foreach (Node node in nodes)
+            int totalNodes = nodes.Count;
+            int i = 0;
+            await foreach (Node node in nodes.BatchPerFrame(50, token))
             {
-                // We add only inner nodes.
-                if (!node.IsLeaf())
-                {
-                    nodeMap[node] = DrawNode(node);
-                }
+                nodeMap[node] = DrawNode(node);
+                updateProgress?.Invoke((float)++i / totalNodes);
             }
+            return nodeMap;
         }
 
         /// <summary>

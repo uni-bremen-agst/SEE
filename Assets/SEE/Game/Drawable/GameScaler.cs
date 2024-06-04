@@ -3,7 +3,7 @@
 namespace SEE.Game.Drawable
 {
     /// <summary>
-    /// This class scales an object.
+    /// This class scales an object
     /// </summary>
     public static class GameScaler
     {
@@ -22,7 +22,7 @@ namespace SEE.Game.Drawable
             newScale.z = 1f;
             transform.localScale = newScale;
 
-            /// After a line was scaled, the mesh collider needs to be refreshed,
+            /// After a line was scaled the mesh collider need to be refreshed,
             /// because it is not scaled along with it.
             if (objectToScale.CompareTag(Tags.Line))
             {
@@ -32,7 +32,7 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// This method sets a new scale to a drawable type object.
+        /// This method set's a new scale to a drawable type object.
         /// </summary>
         /// <param name="objectToScale">The drawable type object that should be scaled.</param>
         /// <param name="scale">The new scale for the object.</param>
@@ -41,7 +41,7 @@ namespace SEE.Game.Drawable
             Transform transform = objectToScale.transform;
             transform.localScale = scale;
 
-            /// After a line was scaled, the mesh collider needs to be refreshed,
+            /// After a line was scaled the mesh collider need to be refreshed,
             /// because it is not scaled along with it.
             if (objectToScale.CompareTag(Tags.Line))
             {

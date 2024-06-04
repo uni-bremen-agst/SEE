@@ -12,14 +12,13 @@ using SEE.Utils.History;
 using SEE.UI.PropertyDialog.Drawable;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
-using SEE.GO;
 
 namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
     /// This class provides an action to add an image to a drawable.
     /// </summary>
-    public class AddImageAction : DrawableAction
+    public class AddImageAction : AbstractPlayerAction
     {
         /// <summary>
         /// The game object that holds the image component.
@@ -27,7 +26,7 @@ namespace SEE.Controls.Actions.Drawable
         private GameObject imageObj;
 
         /// <summary>
-        /// The drawable on which the image should be displayed.
+        /// The drawable on that the image should be displayed.
         /// </summary>
         private GameObject drawable;
 
@@ -52,12 +51,12 @@ namespace SEE.Controls.Actions.Drawable
         private DrawableFileBrowser browser;
 
         /// <summary>
-        /// The dialog for inserting a web address.
+        /// The dialog for insert a web adress.
         /// </summary>
         private WebImageDialog webImageDialog;
 
         /// <summary>
-        /// Attribute for opened WebImageDialog.
+        /// Attribut for opened WebImageDialog.
         /// </summary>
         private bool isDialogOpen = false;
 
@@ -72,30 +71,30 @@ namespace SEE.Controls.Actions.Drawable
         private Memento memento;
 
         /// <summary>
-        /// This struct can store all the information needed to
-        /// revert or repeat an <see cref="AddImageAction"/>
+        /// This struct can store all the information needed to 
+        /// revert or repeat a <see cref="AddImageAction"/>
         /// </summary>
         private struct Memento
         {
             /// <summary>
-            /// The drawable on which the text should be displayed.
+            /// The drawable on that the text should be displayed
             /// </summary>
-            public DrawableConfig Drawable;
+            public DrawableConfig drawable;
 
             /// <summary>
             /// The written text.
             /// </summary>
-            public ImageConf Image;
+            public ImageConf image;
 
             /// <summary>
             /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
-            /// <param name="drawable">The drawable on which the text should be displayed.</param>
+            /// <param name="drawable">The drawable on that the text should be displayed.</param>
             /// <param name="image">The image configuration</param>
             public Memento(GameObject drawable, ImageConf image)
             {
-                Drawable = DrawableConfigManager.GetDrawableConfig(drawable);
-                Image = image;
+                this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
+                this.image = image;
             }
         }
 
@@ -104,14 +103,13 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Stop()
         {
-            base.Stop();
             ImageSourceMenu.Disable();
         }
 
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.AddImage"/>.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -119,14 +117,14 @@ namespace SEE.Controls.Actions.Drawable
                 /// The block for the selection of the position and a query from which source the image should be loaded.
                 SelectPosition();
 
-                /// When a source was chosen, this block opens the file browser (for local) or the web dialog (for web).
+                /// When a source was chosen this block opens the file browser (for local) or the web dialog (for web).
                 SelectSource();
 
                 /// The following blocks are for the web source case.
                 WebSource();
 
                 /// The following block is for the local source case.
-                /// When the player chose a file path, it will be loaded into the attribute.
+                /// When the player chose a file path it will be loaded into the attribut.
                 LocalSource();
 
                 /// When a file path was chosen, it loads the image on the chosen position.
@@ -140,12 +138,12 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void SelectPosition()
         {
-            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
-                && Raycasting.RaycastAnything(out RaycastHit raycastHit)
-                && (GameFinder.HasDrawable(raycastHit.collider.gameObject)
+            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) 
+                && Raycasting.RaycastAnything(out RaycastHit raycastHit) 
+                && (GameFinder.hasDrawable(raycastHit.collider.gameObject) 
                     || raycastHit.collider.gameObject.CompareTag(Tags.Drawable))
                 && !ImageSourceMenu.IsOpen()
-                && (browser == null
+                && (browser == null 
                     || (browser != null && !browser.IsOpen())) &&
                         (webImageDialog == null || (webImageDialog != null && !isDialogOpen)))
             {
@@ -158,8 +156,8 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// When the user has chosen a source, the corresponding menu for loading the image is opened.
-        /// For local source, a file browser will be opened.
-        /// For web source, a web image dialog will be opened.
+        /// For local source a file browser will be opened.
+        /// For web source a web image dialog will be opened.
         /// </summary>
         private void SelectSource()
         {
@@ -168,11 +166,11 @@ namespace SEE.Controls.Actions.Drawable
                 switch (source)
                 {
                     case ImageSourceMenu.Source.Local:
-                        browser = Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                        browser = GameObject.Find("UI Canvas").AddComponent<DrawableFileBrowser>();
                         browser.LoadImage();
                         break;
                     case ImageSourceMenu.Source.Web:
-                        webImageDialog = new();
+                        webImageDialog = new WebImageDialog();
                         isDialogOpen = true;
                         webImageDialog.Open();
                         break;
@@ -182,9 +180,9 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Downloads and displays an image from the internet.
-        /// The image is downloaded from the URL specified in the <see cref="webImageDialog"/>.
-        /// If no desired filename has been given, a random string is provided along with the PNG extension.
+        /// Provides the process for displaying an image from the internet. 
+        /// The image is downloaded from the URL specified in the WebImageDialog. 
+        /// If no desired filename has been given, a random string is provided along with the PNG extension. 
         /// If the desired filename is already associated with a different (but not the same) image, numbering is added.
         /// </summary>
         private void WebSource()
@@ -207,10 +205,10 @@ namespace SEE.Controls.Actions.Drawable
                 Texture2D tex = download.GetTexture();
                 if (string.IsNullOrEmpty(fileName))
                 {
-                    fileName = RandomStrings.GetRandomStringForFile(10) + Filenames.PNGExtension;
+                    fileName = DrawableHolder.GetRandomStringForFile(10) + Filenames.PNGExtension;
                 }
                 if (string.IsNullOrEmpty(Path.GetExtension(fileName)) ||
-                    (Path.GetExtension(fileName) != Filenames.PNGExtension
+                    (Path.GetExtension(fileName) != Filenames.PNGExtension 
                         && Path.GetExtension(fileName) != Filenames.JPGExtension))
                 {
                     fileName += Filenames.PNGExtension;
@@ -223,7 +221,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Displays an image from the local source.
+        /// Provides the process for displaying an image from the local source.
         /// </summary>
         private void LocalSource()
         {
@@ -234,18 +232,18 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// If a valid file path to an image (from Web/Local source) has been provided,
-        /// the image will be added to the desired position on the drawable.
+        /// If a valid file path to an image (from Web/Local source) has been provided, 
+        /// the image will be added to the desired position on the drawable. 
         /// Subsequently, a memento is created, and the action process is completed.
         /// </summary>
         /// <returns>true, if the action is completed. Otherwise false.</returns>
         private bool Finish()
         {
-            if (!string.IsNullOrWhiteSpace(filePath))
+            if (filePath != "")
             {
-                imageObj = GameImage.PlaceImage(drawable, filePath, position,
-                    ValueHolder.CurrentOrderInLayer);
-                new AddImageNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
+                imageObj = GameImage.PlaceImage(drawable, filePath, position, 
+                    ValueHolder.currentOrderInLayer);
+                new AddImageNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
                     ImageConf.GetImageConf(imageObj)).Execute();
                 memento = new Memento(drawable, ImageConf.GetImageConf(imageObj));
                 CurrentState = IReversibleAction.Progress.Completed;
@@ -255,15 +253,15 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Reverts this action, i.e., deletes the image that was added to the drawable.
+        /// Reverts this action, i.e., deletes the image that was add to the drawable.
         /// </summary>
         public override void Undo()
         {
             base.Undo();
-            GameObject obj = GameFinder.FindChild(memento.Drawable.GetDrawable(),
-                memento.Image.Id);
-            new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
-                memento.Image.Id).Execute();
+            GameObject obj = GameFinder.FindChild(memento.drawable.GetDrawable(), 
+                memento.image.id);
+            new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                memento.image.id).Execute();
             Destroyer.Destroy(obj);
         }
 
@@ -273,9 +271,9 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            GameImage.RePlaceImage(memento.Drawable.GetDrawable(), memento.Image);
-            new AddImageNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
-                memento.Image).Execute();
+            GameImage.RePlaceImage(memento.drawable.GetDrawable(), memento.image);
+            new AddImageNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                memento.image).Execute();
         }
 
         /// <summary>
@@ -310,13 +308,13 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
-        /// Because this action does not actually change any game object,
+        /// Because this action does not actually change any game object, 
         /// an empty set is always returned.
         /// </summary>
         /// <returns>the id of the created drawable text</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new HashSet<string> { memento.Image.Id };
+            return new HashSet<string> { memento.image.id };
         }
     }
 }

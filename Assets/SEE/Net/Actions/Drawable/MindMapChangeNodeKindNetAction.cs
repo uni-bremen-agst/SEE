@@ -1,14 +1,25 @@
 ﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
     /// This class is reponsible for change the <see cref="GameMindMap.NodeKind"/> <see cref="EditAction"/> of a mind map node on the given drawable on all clients.
     /// </summary>
-    public class MindMapChangeNodeKindNetAction : DrawableNetAction
+    public class MindMapChangeNodeKindNetAction : AbstractNetAction
     {
+        /// <summary>
+        /// The id of the drawable on which the node is located
+        /// </summary>
+        public string DrawableID;
+
+        /// <summary>
+        /// The id of the drawable parent
+        /// </summary>
+        public string ParentDrawableID;
+
         /// <summary>
         /// The mind map node that should be change the node kind as <see cref="MindMapNodeConf"/> object.
         /// </summary>
@@ -27,12 +38,20 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="node">The node that should be change the node kind.</param>
         /// <param name="nodeKind">The new node kind.</param>
         public MindMapChangeNodeKindNetAction(string drawableID, string parentDrawableID, MindMapNodeConf node, GameMindMap.NodeKind nodeKind)
-            : base (drawableID, parentDrawableID)
         {
+            this.DrawableID = drawableID;
+            this.ParentDrawableID = parentDrawableID;
             this.Node = node;
             this.NodeKind = nodeKind;
         }
 
+        /// <summary>
+        /// Things to execute on the server (none for this class). Necessary because it is abstract
+        /// in the superclass.
+        /// </summary>
+        protected override void ExecuteOnServer()
+        {
+        }
         /// <summary>
         /// Changes the node kind of a node on each client.
         /// </summary>
@@ -41,15 +60,21 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                base.ExecuteOnClient();
-                if (Node != null && Node.Id != "")
+                GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
+                if (drawable == null)
                 {
-                    GameMindMap.ChangeNodeKind(FindChild(Node.BorderConf.Id).transform.parent.gameObject, 
-                        NodeKind, Node.BorderConf);
+                    throw new System.Exception($"There is no drawable with the ID {DrawableID}.");
+                }
+
+                if (Node != null && Node.id != "")
+                {
+                    GameObject attached = GameFinder.GetAttachedObjectsObject(drawable);
+                    GameObject node = GameFinder.FindChild(attached, Node.borderConf.id).transform.parent.gameObject;
+                    GameMindMap.ChangeNodeKind(node, NodeKind, Node.borderConf);
                 }
                 else
                 {
-                    throw new System.Exception($"The node with the ID {Node.Id} or the parent node with the ID {Node.ParentNode} dont exists.");
+                    throw new System.Exception($"The node with the ID {Node.id} or the parent node with the ID {Node.parentNode} dont exists.");
                 }
             }
         }

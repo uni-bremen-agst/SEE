@@ -6,12 +6,65 @@ using UnityEngine;
 namespace SEE.Game.Drawable
 {
     /// <summary>
-    /// This class adds a drawable holder to a drawable.
-    /// This is needed to place the objects on the drawable without them being influenced
-    /// by the scale of the drawable.
+    /// This class adds a drawable holder to a drawable. 
+    /// This is needed to place the objects on the drawable without them being influenced by the scale of the drawable.
     /// </summary>
     public static class DrawableHolder
     {
+        /// <summary>
+        /// Const with low latin alphabet.
+        /// </summary>
+        private const string letters = "abcdefghijklmnopqrstuvwxyz";
+        /// <summary>
+        /// Const with the numbers.
+        /// </summary>
+        private const string numbers = "0123456789";
+        /// <summary>
+        /// Const with allowed special characters.
+        /// </summary>
+        private const string specialCharacters = "!?§$%&.,_#+*@";
+        /// <summary>
+        /// String that contains the low and uppder letters, numbers and special characters.
+        /// It will be needed for the calculation of a random string.
+        /// </summary>
+        private static readonly string characters = letters + letters.ToUpper() + numbers + specialCharacters;
+
+        /// <summary>
+        /// String that contains the low and uppder letters and numbers.
+        /// It will be needed for the calculation of a random string for file creation.
+        /// </summary>
+        private static readonly string charactersWithoutSpecial = letters + letters.ToUpper() + numbers;
+
+        /// <summary>
+        /// Calculates a random string of given length.
+        /// </summary>
+        /// <param name="size">The length of the random string</param>
+        /// <returns>The calculated random string of given length.</returns>
+        public static string GetRandomString(int size)
+        {
+            string randomString = "-";
+            for (int i = 0; i < size; i++)
+            {
+                randomString += characters[Random.Range(0, characters.Length)];
+            }
+            return randomString;
+        }
+
+        /// <summary>
+        /// Calculates a random string of given length for file creation.
+        /// </summary>
+        /// <param name="size">The length of the random string</param>
+        /// <returns>The calculated random string of given length.</returns>
+        public static string GetRandomStringForFile(int size)
+        {
+            string randomString = "";
+            for (int i = 0; i < size; i++)
+            {
+                randomString += charactersWithoutSpecial[Random.Range(0, charactersWithoutSpecial.Length)];
+            }
+            return randomString;
+        }
+
         /// <summary>
         /// Provides the drawable holder for a given drawable.
         /// </summary>
@@ -20,19 +73,20 @@ namespace SEE.Game.Drawable
         /// <param name="attachedObjects">Is the parent object of <see cref="DrawableType"/></param>
         public static void Setup(GameObject drawable, out GameObject highestParent, out GameObject attachedObjects)
         {
-            if (GameFinder.HasParent(drawable))
+            if (GameFinder.hasAParent(drawable))
             {
                 GameObject parent = GameFinder.GetHighestParent(drawable);
                 /// Block for drawable holder creation.
                 if (!parent.name.StartsWith(ValueHolder.DrawableHolderPrefix))
                 {
                     highestParent = new GameObject(ValueHolder.DrawableHolderPrefix + "-" + parent.name);
-                    highestParent.transform.SetPositionAndRotation(parent.transform.position, parent.transform.rotation);
-                    attachedObjects = new GameObject(ValueHolder.AttachedObject)
-                    {
-                        tag = Tags.AttachedObjects
-                    };
-                    attachedObjects.transform.SetPositionAndRotation(highestParent.transform.position, highestParent.transform.rotation);
+                    highestParent.transform.position = parent.transform.position;
+                    highestParent.transform.rotation = parent.transform.rotation;
+
+                    attachedObjects = new GameObject(ValueHolder.AttachedObject);
+                    attachedObjects.tag = Tags.AttachedObjects;
+                    attachedObjects.transform.position = highestParent.transform.position;
+                    attachedObjects.transform.rotation = highestParent.transform.rotation;
                     attachedObjects.transform.SetParent(highestParent.transform);
                     parent.transform.SetParent(highestParent.transform);
 
@@ -41,8 +95,8 @@ namespace SEE.Game.Drawable
                     {
                         OrderInLayerValueHolder highestHolder = highestParent.AddComponent<OrderInLayerValueHolder>();
                         OrderInLayerValueHolder oldHolder = parent.GetComponentInChildren<OrderInLayerValueHolder>();
-                        highestHolder.OrderInLayer = oldHolder.OrderInLayer;
-                        highestHolder.OriginPosition = oldHolder.OriginPosition;
+                        highestHolder.SetOrderInLayer(oldHolder.GetOrderInLayer());
+                        highestHolder.SetOriginPosition(oldHolder.GetOriginPosition());
                         Destroyer.Destroy(oldHolder);
                     }
                 }
@@ -56,16 +110,17 @@ namespace SEE.Game.Drawable
             else
             {
                 /// Block for the case where the drawable has no parent and is thus the highest instance.
-                /// Does not occur so far.
+                /// Does not occur so far. 
                 /// Both whiteboards and sticky notes have a parent object, as both offer borders for collision detection.
                 /// It creates a new parent for the drawable as well as an attached objects object.
-                highestParent = new(ValueHolder.DrawableHolderPrefix + drawable.GetInstanceID());
-                highestParent.transform.SetPositionAndRotation(drawable.transform.position, drawable.transform.rotation);
-                attachedObjects = new GameObject(ValueHolder.AttachedObject)
-                {
-                    tag = Tags.AttachedObjects
-                };
-                attachedObjects.transform.SetPositionAndRotation(highestParent.transform.position, highestParent.transform.rotation);
+                highestParent = new GameObject(ValueHolder.DrawableHolderPrefix + drawable.GetInstanceID());
+                highestParent.transform.position = drawable.transform.position;
+                highestParent.transform.rotation = drawable.transform.rotation;
+
+                attachedObjects = new GameObject(ValueHolder.AttachedObject);
+                attachedObjects.tag = Tags.AttachedObjects;
+                attachedObjects.transform.position = highestParent.transform.position;
+                attachedObjects.transform.rotation = highestParent.transform.rotation;
                 attachedObjects.transform.SetParent(highestParent.transform);
 
                 drawable.transform.SetParent(highestParent.transform);
@@ -75,8 +130,8 @@ namespace SEE.Game.Drawable
                 {
                     OrderInLayerValueHolder highestHolder = highestParent.AddComponent<OrderInLayerValueHolder>();
                     OrderInLayerValueHolder oldHolder = drawable.GetComponentInChildren<OrderInLayerValueHolder>();
-                    highestHolder.OrderInLayer = oldHolder.OrderInLayer;
-                    highestHolder.OriginPosition = oldHolder.OriginPosition;
+                    highestHolder.SetOrderInLayer(oldHolder.GetOrderInLayer());
+                    highestHolder.SetOriginPosition(oldHolder.GetOriginPosition());
                     Destroyer.Destroy(oldHolder);
                 }
             }

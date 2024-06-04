@@ -1,4 +1,5 @@
 ﻿using SEE.Net.Actions.Drawable;
+using SEE.Utils;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
@@ -15,55 +16,126 @@ namespace SEE.Game.Drawable.Configurations
         /// <summary>
         /// The name of the drawable type object.
         /// </summary>
-        public string Id;
+        public string id;
 
         /// <summary>
         /// The position of the drawable type object.
         /// </summary>
-        public Vector3 Position;
+        public Vector3 position;
 
         /// <summary>
         /// The euler angles of the drawable type object.
         /// </summary>
-        public Vector3 EulerAngles;
+        public Vector3 eulerAngles;
 
         /// <summary>
         /// The scale of the text.
         /// </summary>
-        public Vector3 Scale;
+        public Vector3 scale;
 
         /// <summary>
         /// The order in layer for this drawable type object.
         /// </summary>
-        public int OrderInLayer;
+        public int orderInLayer;
+
+        /// <summary>
+        /// Label in the configuration file for the id of a line.
+        /// </summary>
+        private const string IDLabel = "IDLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the position of a line.
+        /// </summary>
+        private const string PositionLabel = "PositionLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the scale of a line.
+        /// </summary>
+        private const string ScaleLabel = "ScaleLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the order in layer of a line.
+        /// </summary>
+        private const string OrderInLayerLabel = "OrderInLayerLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the euler angles of a line.
+        /// </summary>
+        private const string EulerAnglesLabel = "EulerAnglesLabel";
 
         /// <summary>
         /// Gets the drawable type of the given object.
         /// </summary>
         /// <param name="obj">The object from which the drawable type is to be determined.</param>
-        /// <returns>The drawable type</returns>
+        /// <returns>The drawable type</returns> 
         public static DrawableType Get(GameObject obj)
         {
-            DrawableType type = obj.tag switch
+            DrawableType type;
+            switch(obj.tag)
             {
-                Tags.Line => LineConf.GetLine(obj),
-                Tags.DText => TextConf.GetText(obj),
-                Tags.Image => ImageConf.GetImageConf(obj),
-                Tags.MindMapNode => MindMapNodeConf.GetNodeConf(obj),
-                _ => null,
-            };
+                case Tags.Line:
+                    type = LineConf.GetLine(obj);
+                    break;
+                case Tags.DText:
+                    type = TextConf.GetText(obj);
+                    break;
+                case Tags.Image:
+                    type = ImageConf.GetImageConf(obj);
+                    break;
+                case Tags.MindMapNode:
+                    type = MindMapNodeConf.GetNodeConf(obj);
+                    break;
+                default:
+                    type = null;
+                    break;
+            }
             return type;
         }
 
         /// <summary>
-        /// Edits the object to the given drawable type configuration.
-        /// It calls the corresponding <see cref="GameEdit"/> - change method of the respective
-        /// drawable type.
+        /// Restores the object to the given drawable type configuration.
+        /// It calls the corresponding re-creation method of the respective drawable type.
         /// </summary>
-        /// <param name="objectToEdit">The object to be edited.</param>
+        /// <param name="type">The type to restore.</param>
+        /// <param name="drawable">The drawable on which the drawable type should be restored.</param>
+        public static void Restore(DrawableType type, GameObject drawable)
+        {
+            switch(type)
+            {
+                case LineConf line:
+                    GameDrawer.ReDrawLine(drawable, line);
+                    new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
+                        line).Execute();
+                    break;
+                case TextConf text:
+                    GameTexter.ReWriteText(drawable, text);
+                    new WriteTextNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
+                        text).Execute();
+                    break;
+                case ImageConf image:
+                    GameImage.RePlaceImage(drawable, image);
+                    new AddImageNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
+                        image).Execute();
+                    break;
+                case MindMapNodeConf node:
+                    GameMindMap.ReCreate(drawable, node);
+                    new MindMapCreateNodeNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
+                        node).Execute();
+                    break;
+                default:
+                    Debug.Log("Can't restore " + type.id);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Edits the object to the given drawable type configuration.
+        /// It calls the corresponding <see cref="GameEdit"/> - Change method of the respective drawable type.
+        /// </summary>
+        /// <param name="objectToEdit">The object to be edit.</param>
         /// <param name="type">The drawable type configuration that should be applied.</param>
-        /// <param name="drawable">The drawable on which the object is displayed.</param>
-        public static void Edit(GameObject objectToEdit, DrawableType type, GameObject drawable)
+        /// <param name="drawable">The drawable on that the object is displayed.</param>
+        public static void Edit(GameObject objectToEdit, DrawableType type, GameObject drawable) 
         {
             string drawableParent = GameFinder.GetDrawableParentName(drawable);
             switch(type)
@@ -85,13 +157,13 @@ namespace SEE.Game.Drawable.Configurations
                     new EditMMNodeNetAction(drawable.name, drawableParent, node).Execute();
                     break;
                 default:
-                    Debug.Log($"Can't edit {type.Id}.\n");
+                    Debug.Log("Can't edit " + type.id);
                     break;
             }
         }
 
         /// <summary>
-        /// Returns the prefix for the drawable type.
+        /// Get the prefix for the drawable type.
         /// </summary>
         /// <param name="type">The type for which the prefix is needed.</param>
         /// <returns>The determined prefix.</returns>
@@ -99,22 +171,20 @@ namespace SEE.Game.Drawable.Configurations
         {
             switch (type)
             {
-                case LineConf:
+                case LineConf line:
                     return ValueHolder.LinePrefix;
-                case TextConf:
+                case TextConf text:
                     return ValueHolder.TextPrefix;
-                case ImageConf:
+                case ImageConf image:
                     return ValueHolder.ImagePrefix;
                 case MindMapNodeConf node:
-                    if (node.Id.StartsWith(ValueHolder.MindMapThemePrefix))
+                    if (node.id.StartsWith(ValueHolder.MindMapThemePrefix))
                     {
                         return ValueHolder.MindMapThemePrefix;
-                    }
-                    else if (node.Id.StartsWith(ValueHolder.MindMapSubthemePrefix))
+                    } else if (node.id.StartsWith(ValueHolder.MindMapSubthemePrefix))
                     {
                         return ValueHolder.MindMapSubthemePrefix;
-                    }
-                    else
+                    } else
                     {
                         return ValueHolder.MindMapLeafPrefix;
                     }
@@ -123,25 +193,30 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
-        /// Gets the sorting order for <paramref name="type"/>.
+        /// Gets the sorting order for order by
         /// </summary>
         /// <param name="type">The current drawable type</param>
         /// <returns>The number of the order</returns>
         public static int OrderOnType(DrawableType type)
         {
-            return type switch
+            switch (type)
             {
-                LineConf => 0,
-                TextConf => 1,
-                ImageConf => 2,
-                MindMapNodeConf => 3,
-                _ => 4,
-            };
+                case LineConf line:
+                    return 0;
+                case TextConf text:
+                    return 1;
+                case ImageConf image:
+                    return 2;
+                case MindMapNodeConf node:
+                    return 3;
+                default:
+                    return 4;
+            }
         }
 
         /// <summary>
         /// For sorting the nodes.
-        /// It is necessary because the nodes build on each other.
+        /// It is necessary because the nodes build on each other. 
         /// Therefore, the nodes with lower layers must be restored first.
         /// This method will be used in combination with <see cref="OrderOnType(DrawableType)"/>
         /// </summary>
@@ -149,114 +224,27 @@ namespace SEE.Game.Drawable.Configurations
         /// <returns>the order.</returns>
         public static int OrderMindMap(DrawableType type)
         {
-            return type switch
-            {
-                MindMapNodeConf node => node.Layer,
-                _ => 0,
-            };
-        }
-
-        #region Config I/O
-
-        /// <summary>
-        /// Label in the configuration file for the id of a line.
-        /// </summary>
-        private const string idLabel = "IDLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the position of a line.
-        /// </summary>
-        private const string positionLabel = "PositionLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the scale of a line.
-        /// </summary>
-        private const string scaleLabel = "ScaleLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the order in layer of a line.
-        /// </summary>
-        private const string orderInLayerLabel = "OrderInLayerLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the euler angles of a line.
-        /// </summary>
-        private const string eulerAnglesLabel = "EulerAnglesLabel";
-
-        /// <summary>
-        /// Restores the object to the given drawable type configuration.
-        /// It calls the corresponding re-creation method of the respective drawable type.
-        /// </summary>
-        /// <param name="type">The type to restore.</param>
-        /// <param name="drawable">The drawable on which the drawable type should be restored.</param>
-        public static GameObject Restore(DrawableType type, GameObject drawable)
-        {
-            GameObject createdObject = null;
             switch (type)
             {
-                case LineConf line:
-                    createdObject = GameDrawer.ReDrawLine(drawable, line);
-                    EnsureValidity(type, createdObject);
-                    new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
-                        line).Execute();
-                    break;
-                case TextConf text:
-                    createdObject = GameTexter.ReWriteText(drawable, text);
-                    EnsureValidity(type, createdObject);
-                    new WriteTextNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
-                        text).Execute();
-                    break;
-                case ImageConf image:
-                    createdObject = GameImage.RePlaceImage(drawable, image);
-                    EnsureValidity(type, createdObject);
-                    new AddImageNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
-                        image).Execute();
-                    break;
                 case MindMapNodeConf node:
-                    createdObject = GameMindMap.ReCreate(drawable, node);
-                    EnsureValidity(type, createdObject);
-                    new MindMapCreateNodeNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
-                        node).Execute();
-                    break;
+                    return node.layer;
                 default:
-                    Debug.Log($"Can't restore {type.Id}.\n");
-                    break;
+                    return 0;
             }
-            return createdObject;
-        }
-
-        private static DrawableType EnsureValidity(DrawableType type, GameObject createdObject)
-        {
-            if (type.Id == "")
-            {
-                type.Id = createdObject.name;
-            }
-            return type;
         }
 
         /// <summary>
-        /// Saves this instance's attributes using the given <see cref="ConfigWriter"/>.
+        /// Writes this instances' attributes into the given <see cref="ConfigWriter"/>.
         /// </summary>
-        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
+        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes into.</param>
         internal virtual void Save(ConfigWriter writer)
         {
-            writer.BeginGroup();
-            writer.Save(Id, idLabel);
-            writer.Save(Position, positionLabel);
-            writer.Save(EulerAngles, eulerAnglesLabel);
-            writer.Save(Scale, scaleLabel);
-            writer.Save(OrderInLayer, orderInLayerLabel);
-            SaveAttributes(writer);
-            writer.EndGroup();
+            writer.Save(id, IDLabel);
+            writer.Save(position, PositionLabel);
+            writer.Save(eulerAngles, EulerAnglesLabel);
+            writer.Save(scale, ScaleLabel);
+            writer.Save(orderInLayer, OrderInLayerLabel);
         }
-
-        /// <summary>
-        /// Subclasses must implement this so save their attributes. This class takes
-        /// care only to begin and end the grouping and to emit the key-value pair
-        /// for the 'kind'.
-        /// </summary>
-        /// <param name="writer">to be used for writing the settings</param>
-        protected abstract void SaveAttributes(ConfigWriter writer);
 
         /// <summary>
         /// Given the representation of a <see cref="DrawableType"/> as created by the <see cref="ConfigWriter"/>, this
@@ -271,61 +259,59 @@ namespace SEE.Game.Drawable.Configurations
         {
             bool errors = false;
 
-            /// Try to restore the id.
-            if (attributes.TryGetValue(idLabel, out object name))
+            /// Try to restores the id.
+            if (attributes.TryGetValue(IDLabel, out object name))
             {
-                Id = (string)name;
+                id = (string)name;
             }
             else
             {
                 errors = true;
             }
 
-            /// Try to restore the position.
+            /// Try to restores the position.
             Vector3 loadedPosition = Vector3.zero;
-            if (ConfigIO.Restore(attributes, positionLabel, ref loadedPosition))
+            if (ConfigIO.Restore(attributes, PositionLabel, ref loadedPosition))
             {
-                Position = loadedPosition;
+                position = loadedPosition;
             }
             else
             {
-                Position = Vector3.zero;
+                position = Vector3.zero;
                 errors = true;
             }
 
-            /// Try to restore the euler angles.
+            /// Try to restores the euler angles.
             Vector3 loadedEulerAngles = Vector3.zero;
-            if (ConfigIO.Restore(attributes, eulerAnglesLabel, ref loadedEulerAngles))
+            if (ConfigIO.Restore(attributes, EulerAnglesLabel, ref loadedEulerAngles))
             {
-                EulerAngles = loadedEulerAngles;
+                eulerAngles = loadedEulerAngles;
             }
             else
             {
-                EulerAngles = Vector3.zero;
+                eulerAngles = Vector3.zero;
                 errors = true;
             }
 
-            /// Try to restore the scale.
+            /// Try to restores the scale.
             Vector3 loadedScale = Vector3.zero;
-            if (ConfigIO.Restore(attributes, scaleLabel, ref loadedScale))
+            if (ConfigIO.Restore(attributes, ScaleLabel, ref loadedScale))
             {
-                Scale = loadedScale;
+                scale = loadedScale;
             }
             else
             {
-                Scale = Vector3.zero;
+                scale = Vector3.zero;
                 errors = true;
             }
 
-            /// Try to restore the order in layer.
-            if (!ConfigIO.Restore(attributes, orderInLayerLabel, ref OrderInLayer))
+            /// Try to restores the order in layer.
+            if (!ConfigIO.Restore(attributes, OrderInLayerLabel, ref orderInLayer))
             {
                 errors = true;
             }
 
             return errors;
         }
-
-        #endregion
     }
 }

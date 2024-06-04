@@ -8,8 +8,8 @@ using UnityEngine;
 namespace SEE.Game.Drawable
 {
     /// <summary>
-    /// This class provides functionality for splitting lines.
-    /// The splitting point can either be retained (split) or deleted (pointerase).
+    /// This class provides functionality for splitting lines. 
+    /// The splitting point can either be retained (split) or deleted (pointerase)
     /// </summary>
     public static class GameLineSplit
     {
@@ -17,13 +17,13 @@ namespace SEE.Game.Drawable
         /// Splits a line.
         /// The splitting point can either be retained (split) or deleted (pointerase)
         /// </summary>
-        /// <param name="drawable">The drawable on which the lines should be redrawn.</param>
+        /// <param name="drawable">The drawable on that the lines should be redrawn.</param>
         /// <param name="originLine">Configuration of the original line.</param>
         /// <param name="matchedIndices">The indices of the points to be split.</param>
         /// <param name="positions">The positions of the line.</param>
-        /// <param name="lines">List that holds the newly created line configurations.</param>
+        /// <param name="lines">List that holds the new created line configurations.</param>
         /// <param name="removeMatchedIndex">Specifies whether the split points should be deleted.</param>
-        public static void Split(GameObject drawable, LineConf originLine, List<int> matchedIndices,
+        public static void Split(GameObject drawable, LineConf originLine, List<int> matchedIndices, 
             List<Vector3> positions, List<LineConf> lines, bool removeMatchedIndex)
         {
             int removeCounter = removeMatchedIndex ? 1 : 0;
@@ -31,7 +31,7 @@ namespace SEE.Game.Drawable
             /// Block for the case where multiple indices were found that need to be split.
             if (matchedIndices.Count > 1)
             {
-                /// Creates the individual segments that remain when the line is split at the indices.
+                /// Creates the individual segments that remain when the line is split at the indices. 
                 /// Depending on whether the split point should be deleted, it is either removed immediately or retained.
                 List<List<Vector3>> parts = new();
                 for (int i = 0; i < matchedIndices.Count; i++)
@@ -81,7 +81,7 @@ namespace SEE.Game.Drawable
                         ShowNotification.Warn("Line Split Problem: ", "You can't split the line on the start point." +
                             "\nThe line was redrawn nonetheless.");
                     }
-                    else if (begin.Length == positions.Count && !removeMatchedIndex)
+                    else if (begin.Length == positions.Count && !removeMatchedIndex) 
                     {/// Block for the case where an attempt was made to split at the end point.
                         ShowNotification.Warn("Line Split Problem: ", "You can't split the line on the end point." +
                             "\nThe line was redrawn nonetheless.");
@@ -97,14 +97,13 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Erases a connection line between two points.
+        /// Erases a connection line between two points. 
         /// To do this, select the starting point of this line.
         /// Is intended for shapes.
         /// </summary>
-        /// <param name="drawable">The drawable on which the lines should be redrawn.</param>
+        /// <param name="drawable">The drawable on that the lines should be redrawn.</param>
         /// <param name="originLine">Configuration of the original line.</param>
-        /// <param name="matchedIndices">The indices of the points which connection lines should
-        /// be erased.</param>
+        /// <param name="matchedIndices">The indices of the points which connection lines should be erases.</param>
         /// <param name="positions">The positions of the line.</param>
         /// <param name="lines">List that holds the new created line configurations.</param>
         public static void EraseLinePointConnection(GameObject drawable, LineConf originLine, List<int> matchedIndices,
@@ -113,9 +112,8 @@ namespace SEE.Game.Drawable
             /// Block for the case where multiple indices were found that need to be split.
             if (matchedIndices.Count > 1)
             {
-                /// Creates the individual segments that remain when the line is split
-                /// at the indices. Depending on whether the split point should be deleted,
-                /// it is either removed immediately or retained.
+                /// Creates the individual segments that remain when the line is split at the indices. 
+                /// Depending on whether the split point should be deleted, it is either removed immediately or retained.
                 List<List<Vector3>> parts = new();
                 for (int i = 0; i < matchedIndices.Count; i++)
                 {
@@ -138,18 +136,17 @@ namespace SEE.Game.Drawable
                 int endI = positions.Count - endIndex;
                 parts.Add(positions.GetRange(endIndex, endI));
 
-                /// Tries to re-draw every segment.
+                /// Trys to re-draw every segment.
                 foreach (List<Vector3> list in parts)
                 {
                     TryReDraw(drawable, originLine, list.ToArray(), lines);
                 }
-
+                
                 /// Block for the case where an attempt was made to split at the start or end point.
-                if (lines.Count == 1
-                    && lines[0].RendererPositions.Length == positions.Count)
+                if (lines.Count == 1 
+                    && lines[0].rendererPositions.Length == positions.Count)
                 {
-                    ShowNotification.Warn("Line Connector Erase Problem:",
-                        "You can't erase a line connector on the endpoint. " +
+                    ShowNotification.Warn("Line Connector Erase Problem:", "You can't erase a line connector on the endpoint. " +
                         "Because the endpoint has none." +
                         "\nThe line was redrawn nonetheless.");
                 }
@@ -162,10 +159,8 @@ namespace SEE.Game.Drawable
                     Vector3[] begin = positions.GetRange(0, matchedIndices[0] + 1).ToArray();
 
                     if (begin.Length == positions.Count)
-                    {
-                        /// Block for the case where an attempt was made to split at the end point.
-                        ShowNotification.Warn("Line Connector Erase Problem: ",
-                            "You can't erase a line connector on the endpoint. " +
+                    {/// Block for the case where an attempt was made to split at the end point.
+                        ShowNotification.Warn("Line Connector Erase Problem: ", "You can't erase a line connector on the endpoint. " +
                             "Because the endpoint has none." +
                             "\nThe line was redrawn nonetheless.");
                     }
@@ -182,11 +177,11 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Checks if the line can be redrawn.
         /// </summary>
-        /// <param name="drawable">The drawable on which the line should be drawn.</param>
+        /// <param name="drawable">The drawable on that the line should be drawn.</param>
         /// <param name="originLine">The configuration of the original line.</param>
         /// <param name="positions">The positions for the new line.</param>
         /// <param name="lines">List that holds the new line configurations.</param>
-        private static void TryReDraw(GameObject drawable, LineConf originLine,
+        private static void TryReDraw(GameObject drawable, LineConf originLine, 
             Vector3[] positions, List<LineConf> lines)
         {
             if (positions.Length > 1)
@@ -198,19 +193,19 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Redraws the line with the new sub positions.
         /// </summary>
-        /// <param name="drawable">The drawable on which the line should be redrawn.</param>
+        /// <param name="drawable">Drawable on that the line should be redrawn.</param>
         /// <param name="originLine">Configuration of the old line.</param>
         /// <param name="positions">The new sub positions of the new line.</param>
         /// <returns>Configuration of the new sub line.</returns>
         private static LineConf ReDraw(GameObject drawable, LineConf originLine, Vector3[] positions)
         {
             LineConf lineToCreate = (LineConf)originLine.Clone();
-            lineToCreate.Id = "";
-            lineToCreate.RendererPositions = positions;
+            lineToCreate.id = "";
+            lineToCreate.rendererPositions = positions;
 
             GameObject newLine = GameDrawer.ReDrawLine(drawable, lineToCreate);
             GameDrawer.ChangePivot(newLine);
-            new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
+            new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
                 LineConf.GetLine(newLine)).Execute();
 
             return LineConf.GetLine(newLine);

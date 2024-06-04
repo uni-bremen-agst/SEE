@@ -68,7 +68,7 @@ namespace SEE.UI.Drawable
 
             /// The fast moving speed will be chosen here.
             /// Regular movement might take too long under certain circumstances.
-            float moveValue = ValueHolder.MoveFast;
+            float moveValue = ValueHolder.moveFast;
 
             Vector3 newPosition = transform.localPosition;
             /// Calculation of the new position, depending on which border registers a collision.

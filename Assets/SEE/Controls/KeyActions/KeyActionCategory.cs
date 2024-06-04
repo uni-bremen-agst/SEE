@@ -52,9 +52,5 @@
         /// Actions related to movements of the player within the world.
         /// </summary>
         Movement,
-        /// <summary>
-        /// Actions related to interact with a drawable.
-        /// </summary>
-        Drawable
     }
 }

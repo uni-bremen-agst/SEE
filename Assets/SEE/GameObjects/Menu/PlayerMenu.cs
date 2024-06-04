@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using InControl;
 using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.Controls.KeyActions;

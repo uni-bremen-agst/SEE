@@ -1,10 +1,70 @@
-﻿using SEE.Utils.Config;
+﻿using SEE.Utils;
+using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game.Drawable.Configurations
 {
+    /// <summary>
+    /// This class can persist the configurations for a list of drawables.
+    /// </summary>
+    [Serializable]
+    public class DrawablesConfigs
+    {
+        /// <summary>
+        /// A list of drawables that should be saved or loaded.
+        /// </summary>
+        public List<DrawableConfig> Drawables = new();
+
+        /// <summary>
+        /// Label in configuration file for the drawables configurations.
+        /// </summary>
+        private const string DrawablesLabel = "DrawablesConfigs";
+
+        /// <summary>
+        /// Writes this instances' attributes into the given <see cref="ConfigWriter"/>.
+        /// </summary>
+        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes into.</param>
+        internal void Save(ConfigWriter writer)
+        {
+            writer.BeginList(DrawablesLabel);
+            foreach (DrawableConfig drawableConfig in Drawables)
+            {
+                writer.BeginGroup();
+                drawableConfig.Save(writer);
+                writer.EndGroup();
+            }
+            writer.EndList();
+        }
+
+        /// <summary>
+        /// Loads the given attributes into this instance of the class <see cref="DrawablesConfigs"/>.
+        /// </summary>
+        /// <param name="attributes">The attributes to load in the format created by
+        /// <see cref="ConfigWriter"/>.</param>
+        /// <returns>Whether or not the attributes were loaded without any errors.</returns>
+        internal bool Restore(Dictionary<string, object> attributes)
+        {
+            bool errorFree = true;
+            if (attributes.TryGetValue(DrawablesLabel, out object drawableList))
+            {
+                foreach (object item in (List<object>)drawableList)
+                {
+                    Dictionary<string, object> dict = (Dictionary<string, object>)item;
+                    DrawableConfig config = new DrawableConfig();
+                    errorFree = config.Restore(dict);
+                    Drawables.Add(config);
+                }
+            } else
+            {
+                errorFree = false;
+            }
+
+            return errorFree;
+        }
+    }
+
     /// <summary>
     /// This class can hold all the information that is needed to configure a drawable.
     /// </summary>
@@ -68,30 +128,6 @@ namespace SEE.Game.Drawable.Configurations
         public List<MindMapNodeConf> MindMapNodeConfigs = new();
 
         /// <summary>
-        /// Gets the current game object of this drawable.
-        /// </summary>
-        /// <returns>the drawable game object.</returns>
-        public GameObject GetDrawable()
-        {
-            return GameFinder.FindDrawable(ID, ParentID);
-        }
-
-        /// <summary>
-        /// Gets all drawable type configs of this drawable config.
-        /// </summary>
-        /// <returns>A list that contains all drawable type configs of this drawable.</returns>
-        public List<DrawableType> GetAllDrawableTypes()
-        {
-            List<DrawableType> list = new(LineConfigs);
-            list.AddRange(TextConfigs);
-            list.AddRange(ImageConfigs);
-            list.AddRange(MindMapNodeConfigs);
-            return list;
-        }
-
-        #region Config I/O
-
-        /// <summary>
         /// The label for the drawable name in the configuration file.
         /// </summary>
         private const string DrawableNameLabel = "DrawableName";
@@ -147,9 +183,9 @@ namespace SEE.Game.Drawable.Configurations
         private const string MindMapNodeConfigsLabel = "MindMapNodeConfigs";
 
         /// <summary>
-        /// Saves this instance's attributes using the given <see cref="ConfigWriter"/>.
+        /// Writes this instances' attributes into the given <see cref="ConfigWriter"/>.
         /// </summary>
-        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
+        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes into.</param>
         internal void Save(ConfigWriter writer)
         {
             writer.Save(ID, DrawableNameLabel);
@@ -210,7 +246,7 @@ namespace SEE.Game.Drawable.Configurations
         internal bool Restore(Dictionary<string, object> attributes)
         {
             bool errorFree = true;
-            /// Try to restore the drawable name.
+            /// Try to restores the drawable name.
             if (attributes.TryGetValue(DrawableNameLabel, out object name))
             {
                 ID = (string)name;
@@ -220,7 +256,7 @@ namespace SEE.Game.Drawable.Configurations
                 errorFree = false;
             }
 
-            /// Try to restore the drawable parent name.
+            /// Try to restores the drawable parent name.
             if (attributes.TryGetValue(DrawableParentNameLabel, out object pName))
             {
                 ParentID = (string)pName;
@@ -230,7 +266,7 @@ namespace SEE.Game.Drawable.Configurations
                 errorFree = false;
             }
 
-            /// Try to restore the position.
+            /// Try to restores the position.
             Vector3 position = Vector3.zero;
             if (ConfigIO.Restore(attributes, PositionLabel, ref position))
             {
@@ -242,7 +278,7 @@ namespace SEE.Game.Drawable.Configurations
                 errorFree = false;
             }
 
-            /// Try to restore the rotation.
+            /// Try to restores the rotation.
             Vector3 rotation = Vector3.zero;
             if (ConfigIO.Restore(attributes, RotationLabel, ref rotation))
             {
@@ -254,7 +290,7 @@ namespace SEE.Game.Drawable.Configurations
                 errorFree = false;
             }
 
-            /// Try to restore the scale.
+            /// Try to restores the scale.
             Vector3 scale = Vector3.zero;
             if (ConfigIO.Restore(attributes, ScaleLabel, ref scale))
             {
@@ -266,7 +302,7 @@ namespace SEE.Game.Drawable.Configurations
                 errorFree = false;
             }
 
-            /// Try to restore the color.
+            /// Try to restores the color.
             Color color = Color.black;
             if (ConfigIO.Restore(attributes, ColorLabel, ref color))
             {
@@ -278,13 +314,13 @@ namespace SEE.Game.Drawable.Configurations
                 errorFree = false;
             }
 
-            /// Try to restore the order.
+            /// Try to restores the order.
             if (!ConfigIO.Restore(attributes, OrderLabel, ref Order))
             {
                 errorFree = false;
             }
 
-            /// Try to restore the lines that are displayed on this drawable.
+            /// Try to restores the lines that are displayed on this drawable.
             if (attributes.TryGetValue(LineConfigsLabel, out object lineList))
             {
                 foreach (object item in (List<object>)lineList)
@@ -296,7 +332,7 @@ namespace SEE.Game.Drawable.Configurations
                 }
             }
 
-            /// Try to restore the texts that are displayed on this drawable.
+            /// Try to restores the texts that are displayed on this drawable.
             if (attributes.TryGetValue(TextConfigsLabel, out object textList))
             {
                 int i = 0;
@@ -310,7 +346,7 @@ namespace SEE.Game.Drawable.Configurations
                 }
             }
 
-            /// Try to restore the images that are displayed on this drawable.
+            /// Try to restores the images that are displayed on this drawable.
             if (attributes.TryGetValue(ImageConfigsLabel, out object imageList))
             {
                 int i = 0;
@@ -324,7 +360,7 @@ namespace SEE.Game.Drawable.Configurations
                 }
             }
 
-            /// Try to restore the mind map nodes that are displayed on this drawable.
+            /// Try to restores the mind map nodes that are displayed on this drawable.
             if (attributes.TryGetValue(MindMapNodeConfigsLabel, out object nodeList))
             {
                 int i = 0;
@@ -341,6 +377,27 @@ namespace SEE.Game.Drawable.Configurations
             return errorFree;
         }
 
-        #endregion
+        /// <summary>
+        /// Gets the current game object of this drawable.
+        /// </summary>
+        /// <returns>the drawable game object.</returns>
+        public GameObject GetDrawable()
+        {
+            return GameFinder.FindDrawable(ID, ParentID);
+        }
+
+        /// <summary>
+        /// Gets all drawable type configs of this drawable config.
+        /// </summary>
+        /// <returns>A list that contains all drawable type configs of this drawable.</returns>
+        public List<DrawableType> GetAllDrawableTypes()
+        {
+            List<DrawableType> list = new (LineConfigs);
+            list.AddRange(TextConfigs);
+            list.AddRange(ImageConfigs);
+            list.AddRange(MindMapNodeConfigs);
+
+            return list;
+        }
     }
 }

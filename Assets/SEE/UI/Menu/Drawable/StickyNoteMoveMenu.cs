@@ -54,11 +54,11 @@ namespace SEE.UI.Menu.Drawable
             /// Register the switch for speed up option.
             SwitchManager speedUpManager = GameFinder.FindChild(moveMenu, "SpeedSwitch")
                 .GetComponent<SwitchManager>();
-            float speed = ValueHolder.Move;
-            /// Turn on increase the speed to <see cref="ValueHolder.MoveFast"/>.
-            speedUpManager.OnEvents.AddListener(() => speed = ValueHolder.MoveFast);
-            /// Turn off decrease the speed to <see cref="ValueHolder.Move"/>.
-            speedUpManager.OffEvents.AddListener(() => speed = ValueHolder.Move);
+            float speed = ValueHolder.move;
+            /// Turn on increase the speed to <see cref="ValueHolder.moveFast"/>.
+            speedUpManager.OnEvents.AddListener(() => speed = ValueHolder.moveFast);
+            /// Turn off decrease the speed to <see cref="ValueHolder.move"/>.
+            speedUpManager.OffEvents.AddListener(() => speed = ValueHolder.move);
 
             /// Register the finish button. It destroys the move menu and set the finish attribut.
             GameFinder.FindChild(moveMenu, "Finish").GetComponent<ButtonManagerBasic>()
@@ -174,7 +174,7 @@ namespace SEE.UI.Menu.Drawable
         public static float GetSpeed()
         {
             return GameFinder.FindChild(moveMenu, "SpeedSwitch")
-                .GetComponent<SwitchManager>().isOn ? ValueHolder.MoveFast : ValueHolder.Move;
+                .GetComponent<SwitchManager>().isOn ? ValueHolder.moveFast : ValueHolder.move;
         }
 
         /// <summary>

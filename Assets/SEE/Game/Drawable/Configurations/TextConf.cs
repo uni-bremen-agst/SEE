@@ -1,4 +1,5 @@
 ﻿using SEE.Game.Drawable.ValueHolders;
+using SEE.Utils;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
@@ -16,38 +17,73 @@ namespace SEE.Game.Drawable.Configurations
         /// <summary>
         /// The written text.
         /// </summary>
-        public string Text;
+        public string text;
 
         /// <summary>
         /// The text font color.
         /// </summary>
-        public Color FontColor;
+        public Color fontColor;
 
         /// <summary>
         /// The font outline color of the text.
         /// </summary>
-        public Color OutlineColor;
+        public Color outlineColor;
 
         /// <summary>
-        /// Whether the outline color is enabled or disabled.
+        /// The status if the outline color is enabled or disabled.
         /// True = enabled; false = disabled.
         /// </summary>
-        public bool IsOutlined;
+        public bool outlineStatus;
 
         /// <summary>
         /// The thickness for the text outline.
         /// </summary>
-        public float OutlineThickness;
+        public float outlineThickness;
 
         /// <summary>
         /// The current chosen font styles.
         /// </summary>
-        public FontStyles FontStyles;
+        public FontStyles fontStyles;
 
         /// <summary>
         /// The font size of the text.
         /// </summary>
-        public float FontSize;
+        public float fontSize;
+
+        /// <summary>
+        /// Label in the configuration file for the text of a text.
+        /// </summary>
+        private const string TextLabel = "TextLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the font color of a text.
+        /// </summary>
+        private const string FontColorLabel = "FontColorLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the outline color of a text.
+        /// </summary>
+        private const string OutlineColorLabel = "OutlineColorLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the outline color status.
+        /// </summary>
+        private const string OutlineStatusLabel = "OutlineStatusLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the thickness of a text outline.
+        /// </summary>
+        private const string OutlineThicknessColorLabel = "OutlineThicknessColorLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the font size of a text.
+        /// </summary>
+        private const string FontSizeLabel = "FontSizeLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the font styles of a text.
+        /// </summary>
+        private const string FontStylesLabel = "FontStylesLabel";
 
         /// <summary>
         /// Creates a <see cref="TextConf"/> for the given game object.
@@ -62,18 +98,18 @@ namespace SEE.Game.Drawable.Configurations
                 TextMeshPro tmp = textObject.GetComponent<TextMeshPro>();
                 text = new()
                 {
-                    Id = textObject.name,
-                    Position = textObject.transform.localPosition,
-                    EulerAngles = textObject.transform.localEulerAngles,
-                    Scale = textObject.transform.localScale,
-                    Text = tmp.text,
-                    FontColor = tmp.color,
-                    OutlineColor = tmp.outlineColor,
-                    IsOutlined = tmp.fontMaterial.IsKeywordEnabled(GameTexter.OutlineKeyWord),
-                    OutlineThickness = tmp.outlineWidth,
-                    FontStyles = tmp.fontStyle,
-                    FontSize = tmp.fontSize,
-                    OrderInLayer = textObject.GetComponent<OrderInLayerValueHolder>().OrderInLayer
+                    id = textObject.name,
+                    position = textObject.transform.localPosition,
+                    eulerAngles = textObject.transform.localEulerAngles,
+                    scale = textObject.transform.localScale,
+                    text = tmp.text,
+                    fontColor = tmp.color,
+                    outlineColor = tmp.outlineColor,
+                    outlineStatus = tmp.fontMaterial.IsKeywordEnabled(GameTexter.OutlineKeyWord),
+                    outlineThickness = tmp.outlineWidth,
+                    fontStyles = tmp.fontStyle,
+                    fontSize = tmp.fontSize,
+                    orderInLayer = textObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer()
                 };
             }
 
@@ -81,78 +117,44 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
-        /// Returns a clone of this <see cref="TextConf"/> object.
+        /// This method clons the <see cref="TextConf"/> object.
         /// </summary>
         /// <returns>A new <see cref="TextConf"/> with the values of this object.</returns>
         public object Clone()
         {
             return new TextConf
             {
-                Id = this.Id,
-                Position = this.Position,
-                EulerAngles = this.EulerAngles,
-                Scale = this.Scale,
-                Text = this.Text,
-                FontColor = this.FontColor,
-                OutlineColor = this.OutlineColor,
-                IsOutlined = this.IsOutlined,
-                OutlineThickness = this.OutlineThickness,
-                FontStyles = this.FontStyles,
-                FontSize = this.FontSize,
-                OrderInLayer = this.OrderInLayer
+                id = this.id,
+                position = this.position,
+                eulerAngles = this.eulerAngles,
+                scale = this.scale,
+                text = this.text,
+                fontColor = this.fontColor,
+                outlineColor = this.outlineColor,
+                outlineStatus = this.outlineStatus,
+                outlineThickness = this.outlineThickness,
+                fontStyles = this.fontStyles,
+                fontSize = this.fontSize,
+                orderInLayer = this.orderInLayer
             };
         }
 
-        #region Config I/O
-
         /// <summary>
-        /// Label in the configuration file for the text of a text.
+        /// Writes this instances' attributes into the given <see cref="ConfigWriter"/>.
         /// </summary>
-        private const string textLabel = "TextLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the font color of a text.
-        /// </summary>
-        private const string fontColorLabel = "FontColorLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the outline color of a text.
-        /// </summary>
-        private const string outlineColorLabel = "OutlineColorLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the outline color status.
-        /// </summary>
-        private const string outlineStatusLabel = "OutlineStatusLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the thickness of a text outline.
-        /// </summary>
-        private const string outlineThicknessColorLabel = "OutlineThicknessColorLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the font size of a text.
-        /// </summary>
-        private const string fontSizeLabel = "FontSizeLabel";
-
-        /// <summary>
-        /// Label in the configuration file for the font styles of a text.
-        /// </summary>
-        private const string fontStylesLabel = "FontStylesLabel";
-
-        /// <summary>
-        /// Saves this instance's attributes using the given <see cref="ConfigWriter"/>.
-        /// </summary>
-        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
-        protected override void SaveAttributes(ConfigWriter writer)
+        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes into.</param>
+        override internal void Save(ConfigWriter writer)
         {
-            writer.Save(Text, textLabel);
-            writer.Save(FontColor, fontColorLabel);
-            writer.Save(IsOutlined, outlineStatusLabel);
-            writer.Save(OutlineColor, outlineColorLabel);
-            writer.Save(OutlineThickness, outlineThicknessColorLabel);
-            writer.Save(FontSize, fontSizeLabel);
-            writer.Save(FontStyles.ToString(), fontStylesLabel);
+            writer.BeginGroup();
+            base.Save(writer);
+            writer.Save(text, TextLabel);
+            writer.Save(fontColor, FontColorLabel);
+            writer.Save(outlineStatus, OutlineStatusLabel);
+            writer.Save(outlineColor, OutlineColorLabel);
+            writer.Save(outlineThickness, OutlineThicknessColorLabel);
+            writer.Save(fontSize, FontSizeLabel);
+            writer.Save(fontStyles.ToString(), FontStylesLabel);
+            writer.EndGroup();
         }
 
         /// <summary>
@@ -168,88 +170,88 @@ namespace SEE.Game.Drawable.Configurations
         {
             bool errors = base.Restore(attributes);
 
-            /// Try to restore the text.
-            if (attributes.TryGetValue(textLabel, out object txt))
+            /// Try to restores the text.
+            if (attributes.TryGetValue(TextLabel, out object txt))
             {
-                Text = (string)txt;
+                text = (string)txt;
             }
             else
             {
                 errors = true;
             }
 
-            /// Try to restore the font color.
+            /// Try to restores the font color.
             Color loadedFontColor = Color.black;
-            if (ConfigIO.Restore(attributes, fontColorLabel, ref loadedFontColor))
+            if (ConfigIO.Restore(attributes, FontColorLabel, ref loadedFontColor))
             {
-                FontColor = loadedFontColor;
+                fontColor = loadedFontColor;
             }
             else
             {
-                FontColor = Color.black;
+                fontColor = Color.black;
                 errors = true;
             }
 
-            /// Try to restore the outline color.
+            /// Try to restores the outline color.
             Color loadedOutlineColor = Color.clear;
-            if (ConfigIO.Restore(attributes, outlineColorLabel, ref loadedOutlineColor))
+            if (ConfigIO.Restore(attributes, OutlineColorLabel, ref loadedOutlineColor))
             {
-                OutlineColor = loadedOutlineColor;
+                outlineColor = loadedOutlineColor;
             }
             else
             {
-                OutlineColor = Color.clear;
+                outlineColor = Color.clear;
                 errors = true;
             }
 
-            /// Try to restore the outline status.
-            if (attributes.TryGetValue(outlineStatusLabel, out object status))
+            /// Try to restores the outline status.
+            if (attributes.TryGetValue(OutlineStatusLabel, out object status))
             {
-                IsOutlined = (bool)status;
+                outlineStatus = (bool)status;
             }
             else
             {
-                IsOutlined = false;
+                outlineStatus = false;
                 errors = true;
             }
 
-            /// Try to restore the outline thickness.
-            if (attributes.TryGetValue(outlineThicknessColorLabel, out object thickness))
+            /// Try to restores the outline thickness.
+            if (attributes.TryGetValue(OutlineThicknessColorLabel, out object thickness))
             {
-                OutlineThickness = (float)thickness;
+                outlineThickness = (float)thickness;
             }
             else
             {
-                OutlineThickness = 0.4f;
+                outlineThickness = 0.4f;
                 errors = true;
             }
 
-            /// Try to restore the font size.
-            if (attributes.TryGetValue(fontSizeLabel, out object size))
+            /// Try to restores the font size.
+            if (attributes.TryGetValue(FontSizeLabel, out object size))
             {
-                FontSize = (float)size;
+                fontSize = (float)size;
             }
             else
             {
-                FontSize = 0.5f;
+                fontSize = 0.5f;
                 errors = true;
             }
 
-            /// Try to restore the font styles.
-            if (attributes.TryGetValue(fontStylesLabel, out object styles)
+            /// Try to restores the font styles.
+            if (attributes.TryGetValue(FontStylesLabel, out object styles) 
                 && Enum.TryParse<FontStyles>((string)styles, out FontStyles result))
             {
-                FontStyles = result;
+                fontStyles = result;
             }
             else
             {
-                FontStyles = FontStyles.Normal;
+                fontStyles = FontStyles.Normal;
                 errors = true;
             }
 
             return !errors;
         }
 
-        #endregion
+
     }
 }

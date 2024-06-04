@@ -69,7 +69,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     moveByMouseManager.isOn = false;
                     moveByMouseManager.UpdateUI();
-                    newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, ValueHolder.MoveDirection.Left,
+                    newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, KeyCode.LeftArrow,
                         speedUpManager.isOn, includeChildren);
                     new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition,
                         includeChildren).Execute();
@@ -81,7 +81,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     moveByMouseManager.isOn = false;
                     moveByMouseManager.UpdateUI();
-                    newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, ValueHolder.MoveDirection.Right,
+                    newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, KeyCode.RightArrow,
                         speedUpManager.isOn, includeChildren);
                     new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition,
                         includeChildren).Execute();
@@ -93,7 +93,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     moveByMouseManager.isOn = false;
                     moveByMouseManager.UpdateUI();
-                    newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, ValueHolder.MoveDirection.Up,
+                    newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, KeyCode.UpArrow,
                         speedUpManager.isOn, includeChildren);
                     new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition,
                         includeChildren).Execute();
@@ -105,7 +105,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     moveByMouseManager.isOn = false;
                     moveByMouseManager.UpdateUI();
-                    newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, ValueHolder.MoveDirection.Down,
+                    newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, KeyCode.DownArrow,
                         speedUpManager.isOn, includeChildren);
                     new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition,
                         includeChildren).Execute();

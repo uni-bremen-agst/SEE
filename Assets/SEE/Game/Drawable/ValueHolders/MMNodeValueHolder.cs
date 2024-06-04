@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using SEE.GO;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game.Drawable.ValueHolders
@@ -14,38 +15,10 @@ namespace SEE.Game.Drawable.ValueHolders
         private GameMindMap.NodeKind nodeKind;
 
         /// <summary>
-        /// Property for the node kind of the mind map node.
-        /// </summary>
-        public GameMindMap.NodeKind NodeKind
-        {
-            get { return nodeKind; }
-            set { nodeKind = value; }
-        }
-
-        /// <summary>
         /// The layer of the mind map node.
-        /// Will be needed to load a mind map from file.
+        /// Will needed for load a mind map from file.
         /// </summary>
         private int layer;
-
-        /// <summary>
-        /// The property for the node layer.
-        /// </summary>
-        public int Layer
-        {
-            get { return layer; }
-            set 
-            {
-                if (nodeKind == GameMindMap.NodeKind.Theme)
-                {
-                    layer = 0;
-                }
-                else
-                {
-                    layer = value;
-                }
-            }
-        }
 
         /// <summary>
         /// The parent of this node.
@@ -60,17 +33,17 @@ namespace SEE.Game.Drawable.ValueHolders
         private GameObject branchLineToParent;
 
         /// <summary>
-        /// The children of this node.
+        /// The childs of this node.
         /// Is empty if the node is a leaf.
         /// </summary>
-        private IDictionary<GameObject, GameObject> children;
+        private Dictionary<GameObject, GameObject> childs;
 
         /// <summary>
-        /// Initializes the properties.
+        /// Initialized the dictionary and the node kind.
         /// </summary>
         private void Awake()
         {
-            children = new Dictionary<GameObject, GameObject>();
+            childs = new Dictionary<GameObject, GameObject>();
             if (gameObject.name.StartsWith(ValueHolder.MindMapThemePrefix))
             {
                 nodeKind = GameMindMap.NodeKind.Theme;
@@ -84,6 +57,49 @@ namespace SEE.Game.Drawable.ValueHolders
                 nodeKind = GameMindMap.NodeKind.Leaf;
             }
             layer = 0;
+        }
+
+        /// <summary>
+        /// Gets the node kind
+        /// </summary>
+        /// <returns>The node kind</returns>
+        public GameMindMap.NodeKind GetNodeKind()
+        {
+            return nodeKind;
+        }
+
+        /// <summary>
+        /// Sets a new node kind.
+        /// </summary>
+        /// <param name="nodeKind">The new node kind for the node.</param>
+        public void SetNodeKind(GameMindMap.NodeKind nodeKind)
+        {
+            this.nodeKind = nodeKind;
+        }
+
+        /// <summary>
+        /// Sets the node layer.
+        /// </summary>
+        /// <param name="layer">node layer</param>
+        public void SetLayer(int layer)
+        {
+            if (nodeKind == GameMindMap.NodeKind.Theme)
+            {
+                this.layer = 0;
+            }
+            else
+            {
+                this.layer = layer;
+            }
+        }
+
+        /// <summary>
+        /// Gets the node layer
+        /// </summary>
+        /// <returns>node layer</returns>
+        public int GetLayer()
+        {
+            return layer;
         }
 
         /// <summary>
@@ -136,9 +152,9 @@ namespace SEE.Game.Drawable.ValueHolders
         /// It contains the child as key and as value the branch line.
         /// </summary>
         /// <returns>the child dictionary</returns>
-        public IDictionary<GameObject, GameObject> GetChildren()
+        public Dictionary<GameObject, GameObject> GetChildren()
         {
-            return children;
+            return childs;
         }
 
         /// <summary>
@@ -146,10 +162,10 @@ namespace SEE.Game.Drawable.ValueHolders
         /// Includes also the child's children recursively up to and including the lowest child.
         /// </summary>
         /// <returns>A dictionary with all children and their branch lines of this nodes</returns>
-        public IDictionary<GameObject, GameObject> GetAllChildren()
+        public Dictionary<GameObject, GameObject> GetAllChildren()
         {
-            IDictionary<GameObject, GameObject> children = new Dictionary<GameObject, GameObject>(this.children);
-            foreach (KeyValuePair<GameObject, GameObject> pair in this.children)
+            Dictionary<GameObject, GameObject> children = new(childs);
+            foreach (KeyValuePair<GameObject, GameObject> pair in childs)
             {
                 MMNodeValueHolder vH = pair.Key.GetComponent<MMNodeValueHolder>();
                 foreach (KeyValuePair<GameObject, GameObject> child in vH.GetAllChildren())
@@ -182,9 +198,9 @@ namespace SEE.Game.Drawable.ValueHolders
         /// <param name="branchLine">The branch line, will used as value.</param>
         public void AddChild(GameObject childNode, GameObject branchLine)
         {
-            if (!children.ContainsKey(childNode))
+            if (!childs.ContainsKey(childNode))
             {
-                children.Add(childNode, branchLine);
+                childs.Add(childNode, branchLine);
             }
         }
 
@@ -194,9 +210,9 @@ namespace SEE.Game.Drawable.ValueHolders
         /// <param name="child">The child that should be removed.</param>
         public void RemoveChild(GameObject child)
         {
-            if (children.ContainsKey(child))
+            if (childs.ContainsKey(child))
             {
-                children.Remove(child);
+                childs.Remove(child);
             }
         }
     }

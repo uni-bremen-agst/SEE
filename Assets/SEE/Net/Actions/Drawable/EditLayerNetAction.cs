@@ -6,11 +6,18 @@ using UnityEngine;
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is responsible for changing the order in layer (<see cref="EditAction"/>)
-    /// of a <see cref="DrawableType"/> object on all clients.
+    /// This class is responsible for changing the order in layer (<see cref="EditAction"/>) of a <see cref="DrawableType"/> object on all clients.
     /// </summary>
-    public class EditLayerNetAction : DrawableNetAction
+    public class EditLayerNetAction : AbstractNetAction
     {
+        /// <summary>
+        /// The id of the drawable on which the object is located
+        /// </summary>
+        public string DrawableID;
+        /// <summary>
+        /// The id of the drawable parent
+        /// </summary>
+        public string ParentDrawableID;
         /// <summary>
         /// The id of the drawable type that should be changed
         /// </summary>
@@ -27,30 +34,45 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="typeName">The id of the drawable type that should be changed.</param>
         /// <param name="orderInLayer">The new order in layer for the drawable type.</param>
-        public EditLayerNetAction(string drawableID, string parentDrawableID, string typeName, int orderInLayer)
-            : base(drawableID, parentDrawableID)
+        public EditLayerNetAction(string drawableID, string parentDrawableID, string typeName, int oderInLayer) : base()
         {
+            DrawableID = drawableID;
+            ParentDrawableID = parentDrawableID;
             TypeName = typeName;
-            OrderInLayer = orderInLayer;
+            this.OrderInLayer = oderInLayer;
+        }
+
+        /// <summary>
+        /// Things to execute on the server (none for this class). Necessary because it is abstract
+        /// in the superclass.
+        /// </summary>
+        protected override void ExecuteOnServer()
+        {
+
         }
 
         /// <summary>
         /// Changes the order in layer of the given object on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/>
-        /// or <see cref="TypeName"/> don't exists.</exception>
+        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="TypeName"/> don't exists.</exception>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
             {
-                base.ExecuteOnClient();
-                if (TryFindChild(TypeName, out GameObject typeName))
+                if (!IsRequester())
                 {
-                    GameEdit.ChangeLayer(typeName, OrderInLayer);
-                }
-                else
-                {
-                    GameStickyNoteManager.ChangeLayer(GameFinder.GetHighestParent(Drawable), OrderInLayer);
+                    GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
+                    if (drawable != null && GameFinder.FindChild(drawable, TypeName) != null)
+                    {
+                        GameEdit.ChangeLayer(GameFinder.FindChild(drawable, TypeName), OrderInLayer);
+                    } else if (drawable != null)
+                    {
+                        GameStickyNoteManager.ChangeLayer(GameFinder.GetHighestParent(drawable), OrderInLayer);
+                    }
+                    else
+                    {
+                        throw new System.Exception($"There is no drawable with the ID {DrawableID} or drawable type with the ID {TypeName}.");
+                    }
                 }
             }
         }

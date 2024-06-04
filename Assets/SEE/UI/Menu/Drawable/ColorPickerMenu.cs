@@ -50,11 +50,11 @@ namespace SEE.UI.Menu.Drawable
 
             /// Gets and assign the color picker for the primary color.
             pickerForPrimaryColor = GameFinder.FindChild(instance, "Primary").GetComponent<ColorPicker>();
-            pickerForPrimaryColor.AssignColor(ValueHolder.CurrentPrimaryColor);
+            pickerForPrimaryColor.AssignColor(ValueHolder.currentPrimaryColor);
 
             /// Gets and assign the color picker for the secondary color.
             pickerForSecondColor = GameFinder.FindChild(instance, "Second").GetComponent<ColorPicker>();
-            pickerForSecondColor.AssignColor(ValueHolder.CurrentSecondaryColor);
+            pickerForSecondColor.AssignColor(ValueHolder.currentSecondaryColor);
 
             /// Hides the menu.
             instance.SetActive(false);
