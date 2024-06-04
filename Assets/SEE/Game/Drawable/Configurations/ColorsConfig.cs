@@ -1,5 +1,4 @@
 ﻿using SEE.UI.Menu.Drawable;
-using SEE.Utils;
 using SEE.Utils.Config;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,7 +6,8 @@ using UnityEngine;
 namespace SEE.Game.Drawable.Configurations
 {
     /// <summary>
-    /// This class can hold all the information that is needed to configure the color presets of the color picker.
+    /// This class can hold all the information that is needed to configure the
+    /// color presets of the color picker.
     /// Used for the line configuration menu.
     /// </summary>
     public class ColorsConfig
@@ -63,16 +63,16 @@ namespace SEE.Game.Drawable.Configurations
         private const string ColorPresets10 = "ColorPresets10";
 
         /// <summary>
-        /// An array that holdes the eleven color presets labels. It is needed for iterating.
+        /// An array that holds the eleven color-preset labels. It is needed for iterating.
         /// </summary>
-        private string[] presets = { ColorPresets0, ColorPresets1, ColorPresets2, 
-            ColorPresets3, ColorPresets4, ColorPresets5, ColorPresets6, ColorPresets7, 
+        private readonly string[] presets = { ColorPresets0, ColorPresets1, ColorPresets2,
+            ColorPresets3, ColorPresets4, ColorPresets5, ColorPresets6, ColorPresets7,
             ColorPresets8, ColorPresets9, ColorPresets10};
 
         /// <summary>
-        /// Writes this instances' attributes into the given <see cref="ConfigWriter"/>.
+        /// Saves this instance's attributes using the given <see cref="ConfigWriter"/>.
         /// </summary>
-        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes into.</param>
+        /// <param name="writer">The <see cref="ConfigWriter"/> to be used to to write the attributes.</param>
         internal void Save(ConfigWriter writer)
         {
             for (int i = 0; i < Colors.Length; i++)

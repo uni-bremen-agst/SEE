@@ -53,7 +53,7 @@ namespace SEE.Game.Drawable
             if (obj.CompareTag(Tags.Line))
             {
                 LineRenderer renderer = obj.GetComponent<LineRenderer>();
-                switch (obj.GetComponent<LineValueHolder>().GetColorKind())
+                switch (obj.GetComponent<LineValueHolder>().ColorKind)
                 {
                     case GameDrawer.ColorKind.Monochrome:
                         renderer.startColor = renderer.endColor = Color.white;
@@ -80,7 +80,7 @@ namespace SEE.Game.Drawable
             if (obj.CompareTag(Tags.Line))
             {
                 LineRenderer renderer = obj.GetComponent<LineRenderer>();
-                switch (obj.GetComponent<LineValueHolder>().GetColorKind())
+                switch (obj.GetComponent<LineValueHolder>().ColorKind)
                 {
                     case GameDrawer.ColorKind.Gradient:
                         renderer.material.color = Color.white;
@@ -105,13 +105,13 @@ namespace SEE.Game.Drawable
         {
             if (lineObj.CompareTag(Tags.Line))
             {
-                ChangeThickness(lineObj, line.thickness);
-                ChangeLayer(lineObj, line.orderInLayer);
-                GameDrawer.ChangeColorKind(lineObj, line.colorKind, line);
-                ChangePrimaryColor(lineObj, line.primaryColor);
-                ChangeSecondaryColor(lineObj, line.secondaryColor);
-                ChangeLoop(lineObj, line.loop);
-                GameDrawer.ChangeLineKind(lineObj, line.lineKind, line.tiling);
+                ChangeThickness(lineObj, line.Thickness);
+                ChangeLayer(lineObj, line.OrderInLayer);
+                GameDrawer.ChangeColorKind(lineObj, line.ColorKind, line);
+                ChangePrimaryColor(lineObj, line.PrimaryColor);
+                ChangeSecondaryColor(lineObj, line.SecondaryColor);
+                ChangeLoop(lineObj, line.Loop);
+                GameDrawer.ChangeLineKind(lineObj, line.LineKind, line.Tiling);
             }
         }
 
@@ -124,14 +124,14 @@ namespace SEE.Game.Drawable
         {
             if (Tags.DrawableTypes.Contains(obj.tag))
             {
-                int oldLayer = obj.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
+                int oldLayer = obj.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
                 if (newLayer - oldLayer > 0)
                 {
-                    GameLayerChanger.Increase(obj, newLayer, false);
+                    GameLayerChanger.ChangeOrderInLayer(obj, newLayer, GameLayerChanger.LayerChangerStates.Increase, false);
                 }
                 else
                 {
-                    GameLayerChanger.Decrease(obj, newLayer, false);
+                    GameLayerChanger.ChangeOrderInLayer(obj, newLayer, GameLayerChanger.LayerChangerStates.Decrease, false);
                 }
             }
         }
@@ -145,14 +145,14 @@ namespace SEE.Game.Drawable
         {
             if (textObj.CompareTag(Tags.DText))
             {
-                ChangeText(textObj, text.text);
-                ChangeFontSize(textObj, text.fontSize);
-                ChangeLayer(textObj, text.orderInLayer);
-                ChangeFontStyles(textObj, text.fontStyles);
-                ChangeFontColor(textObj, text.fontColor);
-                GameTexter.ChangeOutlineStatus(textObj, text.outlineStatus);
-                ChangeOutlineColor(textObj, text.outlineColor);
-                ChangeOutlineThickness(textObj, text.outlineThickness);
+                ChangeText(textObj, text.Text);
+                ChangeFontSize(textObj, text.FontSize);
+                ChangeLayer(textObj, text.OrderInLayer);
+                ChangeFontStyles(textObj, text.FontStyles);
+                ChangeFontColor(textObj, text.FontColor);
+                GameTexter.ChangeOutlineStatus(textObj, text.IsOutlined);
+                ChangeOutlineColor(textObj, text.OutlineColor);
+                ChangeOutlineThickness(textObj, text.OutlineThickness);
                 textObj.GetComponent<TextMeshPro>().ForceMeshUpdate(true);
                 GameTexter.RefreshMeshCollider(textObj);
             }
@@ -162,7 +162,7 @@ namespace SEE.Game.Drawable
         /// This method changes the text of a drawable text.
         /// If the text object is a part of a mind map node, the border will refreshed.
         /// </summary>
-        /// <param name="textObj">The textObj whose text should be changed.</param>
+        /// <param name="textObj">The object whose text should be changed.</param>
         /// <param name="text">The new text.</param>
         public static void ChangeText(GameObject textObj, string text)
         {
@@ -183,9 +183,9 @@ namespace SEE.Game.Drawable
 
         /// <summary>
         /// This method changes the font size of a text.
-        /// If the text object is a part of a mind map node, the border will refreshed.
+        /// If the text object is a part of a mind map node, the border will be refreshed.
         /// </summary>
-        /// <param name="textObj">The textObj whose text should be changed.</param>
+        /// <param name="textObj">The object whose text should be changed.</param>
         /// <param name="fontSize">The new font size.</param>
         public static void ChangeFontSize(GameObject textObj, float fontSize)
         {
@@ -211,7 +211,7 @@ namespace SEE.Game.Drawable
         /// This method changes the font style of a text.
         /// If the text object is a part of a mind map node, the border will refreshed.
         /// </summary>
-        /// <param name="textObj">The textObj whose text should be changed.</param>
+        /// <param name="textObj">The object whose text should be changed.</param>
         /// <param name="styles">The new font style.</param>
         public static void ChangeFontStyles(GameObject textObj, FontStyles styles)
         {
@@ -236,7 +236,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// This method changes the font color of a text.
         /// </summary>
-        /// <param name="textObj">The textObj whose text should be changed.</param>
+        /// <param name="textObj">The object whose text should be changed.</param>
         /// <param name="color">The new font color.</param>
         public static void ChangeFontColor(GameObject textObj, Color color)
         {
@@ -250,7 +250,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// This method changes the outline color of a text.
         /// </summary>
-        /// <param name="textObj">The textObj whose text should be changed.</param>
+        /// <param name="textObj">The object whose text should be changed.</param>
         /// <param name="color">The new outline color.</param>
         public static void ChangeOutlineColor(GameObject textObj, Color color)
         {
@@ -263,7 +263,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// This method changes the outline thickness of a text.
         /// </summary>
-        /// <param name="textObj">The textObj whose text should be changed.</param>
+        /// <param name="textObj">The object whose text should be changed.</param>
         /// <param name="thickness">The new outline thickness.</param>
         public static void ChangeOutlineThickness(GameObject textObj, float thickness)
         {
@@ -297,9 +297,9 @@ namespace SEE.Game.Drawable
         {
             if (imageObj.CompareTag(Tags.Image))
             {
-                ChangeLayer(imageObj, conf.orderInLayer);
-                ChangeImageColor(imageObj, conf.imageColor);
-                GameMoveRotator.SetRotateY(imageObj, conf.eulerAngles.y);
+                ChangeLayer(imageObj, conf.OrderInLayer);
+                ChangeImageColor(imageObj, conf.ImageColor);
+                GameMoveRotator.SetRotateY(imageObj, conf.EulerAngles.y);
             }
         }
 
@@ -312,22 +312,22 @@ namespace SEE.Game.Drawable
         {
             if (node.CompareTag(Tags.MindMapNode))
             {
-                GameMindMap.ChangeNodeKind(node, conf.nodeKind, conf.borderConf);
-                ChangeLine(GameFinder.FindChildWithTag(node, Tags.Line), conf.borderConf);
-                ChangeText(GameFinder.FindChildWithTag(node, Tags.DText), conf.textConf);
+                GameMindMap.ChangeNodeKind(node, conf.NodeKind, conf.BorderConf);
+                ChangeLine(GameFinder.FindChildWithTag(node, Tags.Line), conf.BorderConf);
+                ChangeText(GameFinder.FindChildWithTag(node, Tags.DText), conf.TextConf);
                 GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(
                         GameFinder.GetDrawable(node));
-                GameObject parent = GameFinder.FindChild(attachedObjects, conf.parentNode);
+                GameObject parent = GameFinder.FindChild(attachedObjects, conf.ParentNode);
                 GameMindMap.ChangeParent(node, parent);
 
                 GameMindMap.ChangeBoxSize(node);
 
                 GameFinder.FindChildWithTag(node, Tags.Line).GetComponent<MeshCollider>().enabled = false;
                 GameFinder.FindChildWithTag(node, Tags.DText).GetComponent<MeshCollider>().enabled = false;
-                if (conf.branchLineToParent != "")
+                if (conf.BranchLineToParent != "")
                 {
-                    GameObject branch = GameFinder.FindChild(attachedObjects, conf.branchLineToParent);
-                    ChangeLine(branch, conf.branchLineConf);
+                    GameObject branch = GameFinder.FindChild(attachedObjects, conf.BranchLineToParent);
+                    ChangeLine(branch, conf.BranchLineConf);
                     branch.GetComponent<MeshCollider>().enabled = false;
                 }
 

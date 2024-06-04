@@ -58,7 +58,7 @@ namespace SEE.UI.Menu.Drawable
                 .GetComponent<HorizontalSelector>();
 
             /// Gets all Mind Map Nodes of the given attached object - object.
-            List<GameObject> allNodes = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.MindMapNode);
+            IList<GameObject> allNodes = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.MindMapNode);
 
             /// Gather all Mind Map Nodes with the <see cref="GameMindMap.NodeKind"/>:
             /// <see cref="GameMindMap.NodeKind.Theme"/> or <see cref="GameMindMap.NodeKind.Subtheme"/>.
@@ -66,7 +66,7 @@ namespace SEE.UI.Menu.Drawable
             List<GameObject> nodes = new();
             foreach (GameObject node in allNodes)
             {
-                if (node.GetComponent<MMNodeValueHolder>().GetNodeKind() != GameMindMap.NodeKind.Leaf
+                if (node.GetComponent<MMNodeValueHolder>().NodeKind != GameMindMap.NodeKind.Leaf
                     && node != addedNode)
                 {
                     nodes.Add(node);
@@ -140,26 +140,26 @@ namespace SEE.UI.Menu.Drawable
                     .GetComponent<HorizontalSelector>();
 
                 /// Gets all Mind Map Nodes of the given attached object - object.
-                List<GameObject> allNodes = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.MindMapNode);
+                IList<GameObject> allNodes = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.MindMapNode);
 
-                /// Collect all Mind Map Nodes with the <see cref="GameMindMap.NodeKind"/>: 
-                /// <see cref="GameMindMap.NodeKind.Theme"/> or <see cref="GameMindMap.NodeKind.Subtheme"/> 
+                /// Collect all Mind Map Nodes with the <see cref="GameMindMap.NodeKind"/>:
+                /// <see cref="GameMindMap.NodeKind.Theme"/> or <see cref="GameMindMap.NodeKind.Subtheme"/>
                 /// that qualify as a new (valid) parent.
                 /// Note: A <see cref="GameMindMap.NodeKind.Leaf"/> can not be a parent
                 ///     and nodes are prohibited as a parent if selecting them would create a cycle.
                 List<GameObject> nodes = new();
                 foreach (GameObject node in allNodes)
                 {
-                    if (node.GetComponent<MMNodeValueHolder>().GetNodeKind() != GameMindMap.NodeKind.Leaf
+                    if (node.GetComponent<MMNodeValueHolder>().NodeKind != GameMindMap.NodeKind.Leaf
                         && node != addedNode
-                        && GameMindMap.CheckValidParentChange(addedNode, node))
+                        && GameMindMap.ParentChangeIsValid(addedNode, node))
                     {
                         nodes.Add(node);
                     }
                 }
                 /// If the user try to change the parent for a <see cref="GameMindMap.NodeKind.Theme"/>,
                 /// then show an error and close the menu.
-                if (addedNode.GetComponent<MMNodeValueHolder>().GetNodeKind() == GameMindMap.NodeKind.Theme)
+                if (addedNode.GetComponent<MMNodeValueHolder>().NodeKind == GameMindMap.NodeKind.Theme)
                 {
                     ShowNotification.Warn("Unauthorized action", "A theme can't have a parent.");
                     returnCall.Invoke();
@@ -182,7 +182,7 @@ namespace SEE.UI.Menu.Drawable
                 }
 
                 /// Get the index of the current parent.
-                int index = nodes.IndexOf(GameFinder.FindChild(attachedObjects, newConf.parentNode));
+                int index = nodes.IndexOf(GameFinder.FindChild(attachedObjects, newConf.ParentNode));
 
                 /// If the index can't be found, take the default index 0.
                 index = index < 0 ? 0 : index;
@@ -205,7 +205,7 @@ namespace SEE.UI.Menu.Drawable
                 });
                 parentSelector.defaultIndex = index;
 
-                /// For the <paramref name="cutCopyMode", provide a Finish Button. 
+                /// For the <paramref name="cutCopyMode", provide a Finish Button.
                 /// Disable it for all others.
                 if (!cutCopyMode)
                 {
@@ -229,11 +229,11 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="addedNode">The selected node.</param>
         /// <param name="newConf">The configuration that holds the changes.</param>
-        /// <param name="drawable">The drawable on that the node is placed.</param>
+        /// <param name="drawable">The drawable on which the node is placed.</param>
         private static void ChangeParent(GameObject addedNode, MindMapNodeConf newConf, GameObject drawable)
         {
             GameMindMap.ChangeParent(addedNode, chosenObject);
-            newConf.parentNode = chosenObject.name;
+            newConf.ParentNode = chosenObject.name;
             new MindMapChangeParentNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
                 newConf).Execute();
         }

@@ -10,16 +10,16 @@ using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
 using SEE.Utils.History;
 
 namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
-    /// This action provides the cut and copy functionality for a <see cref="DrawableType"/> object.
+    /// This action provides the cut, copy, and paste functionality
+    /// for a <see cref="DrawableType"/> object.
     /// </summary>
-    public class CutCopyPasteAction : AbstractPlayerAction
+    public class CutCopyPasteAction : DrawableAction
     {
         /// <summary>
         /// Holds the current progress state.
@@ -27,7 +27,7 @@ namespace SEE.Controls.Actions.Drawable
         private ProgressState progressState = ProgressState.SelectObject;
 
         /// <summary>
-        /// The progress states of the <see cref="CutCopyPasteAction"/>
+        /// The progress states of the <see cref="CutCopyPasteAction"/>.
         /// </summary>
         private enum ProgressState
         {
@@ -59,77 +59,77 @@ namespace SEE.Controls.Actions.Drawable
         private Memento memento;
 
         /// <summary>
-        /// This struct can store all the information needed to 
-        /// revert or repeat a <see cref="CutCopyPasteAction"/>
+        /// This struct can store all the information needed to
+        /// revert or repeat a <see cref="CutCopyPasteAction"/>.
         /// </summary>
         private struct Memento
         {
             /// <summary>
             /// The old values of the drawable type object.
             /// </summary>
-            public readonly DrawableType oldValueHolder;
+            public readonly DrawableType OldValueHolder;
             /// <summary>
             /// The new values of the drawable type object.
             /// </summary>
-            public readonly DrawableType newValueHolder;
+            public readonly DrawableType NewValueHolder;
             /// <summary>
-            /// The drawable on that the drawable type object was displayed.
+            /// The drawable on which the drawable type object was displayed.
             /// </summary>
-            public readonly DrawableConfig oldDrawable;
+            public readonly DrawableConfig OldDrawable;
             /// <summary>
-            /// The drawable on that the drawable type object is now displayed.
+            /// The drawable on which the drawable type object is now displayed.
             /// </summary>
-            public readonly DrawableConfig newDrawable;
+            public readonly DrawableConfig NewDrawable;
             /// <summary>
-            /// Holds the original configurations for the children and branches of an mind map node.
+            /// Holds the original configurations for the children and branches of a mind map node.
             /// </summary>
-            public DrawableConfig oldNodesHolder;
+            public DrawableConfig OldNodesHolder;
             /// <summary>
-            /// Holds the new configurations for the children and branches of an mind map node.
+            /// Holds the new configurations for the children and branches of a mind map node.
             /// </summary>
-            public DrawableConfig newNodesHolder;
+            public DrawableConfig NewNodesHolder;
             /// <summary>
-            /// The old branch line config, will needed for restore the optical data of it.
+            /// The old branch line config; will be needed for restore the visual data of it.
             /// </summary>
-            public LineConf oldBranchLineConfig;
+            public LineConf OldBranchLineConfig;
             /// <summary>
-            /// The state if it was copied or cutted.
+            /// The state if it was copied or cut.
             /// </summary>
-            public readonly CutCopy state;
+            public readonly CutCopy State;
 
             /// <summary>
-            /// The constructor, which simply assigns its only parameter to a field in this class.
+            /// The constructor, which simply assigns its parameters to the fields of this class.
             /// </summary>
             /// <param name="oldValueHolder">The old values of the drawable type object.</param>
             /// <param name="newValueHolder">The new edited values of the drawable type object.</param>
-            /// <param name="oldDrawable">The drawable on that the drawable type object was displayed.</param>
-            /// <param name="newDrawable">The drawable on that the drawable type object is displayed.</param>
-            /// <param name="cutCopy">The stat if it was cutted or copied.</param>
+            /// <param name="oldDrawable">The drawable on which the drawable type object was displayed.</param>
+            /// <param name="newDrawable">The drawable on which the drawable type object is displayed.</param>
+            /// <param name="cutCopy">The state whether it was cut or copied.</param>
             public Memento(DrawableType oldValueHolder,
                 DrawableType newValueHolder, GameObject oldDrawable, GameObject newDrawable, CutCopy cutCopy)
             {
-                this.oldValueHolder = oldValueHolder;
-                this.newValueHolder = newValueHolder;
-                this.oldDrawable = DrawableConfigManager.GetDrawableConfig(oldDrawable);
-                this.newDrawable = DrawableConfigManager.GetDrawableConfig(newDrawable);
-                state = cutCopy;
-                oldNodesHolder = null;
-                newNodesHolder = null;
-                oldBranchLineConfig = null;
+                OldValueHolder = oldValueHolder;
+                NewValueHolder = newValueHolder;
+                OldDrawable = DrawableConfigManager.GetDrawableConfig(oldDrawable);
+                NewDrawable = DrawableConfigManager.GetDrawableConfig(newDrawable);
+                State = cutCopy;
+                OldNodesHolder = null;
+                NewNodesHolder = null;
+                OldBranchLineConfig = null;
             }
         }
 
         /// <summary>
-        /// The prefab of the cut copy paste menu.
+        /// The prefab of the cut-copy-paste menu.
         /// </summary>
         private const string cutCopyPasteMenuPrefab = "Prefabs/UI/Drawable/CutCopyPaste";
         /// <summary>
-        /// The instance of the cut copy paste menu
+        /// The instance of the cut-copy-paste menu
         /// </summary>
         private GameObject cutCopyPasteMenu;
 
         /// <summary>
-        /// The new created object.
+        /// The newly created object.
         /// </summary>
         private GameObject newObject;
 
@@ -144,10 +144,10 @@ namespace SEE.Controls.Actions.Drawable
         private static string oldSelectedId;
 
         /// <summary>
-        /// Bool that represents that the left mouse button was released after finish.
-        /// It is necessary to prevent the previously selected object from being accidentally selected again. 
-        /// After the action has successfully completed, it starts again, allowing for the selection of a new object. 
-        /// This option enables the immediate selection of another object while holding down the mouse button.
+        /// True if the left mouse button was released after finish.
+        /// It is necessary to prevent the previously selected object from being accidentally selected again.
+        /// After the action has successfully completed, it starts again, allowing for the selection of a new object.
+        /// This option enables the immediate selection of another object while pressing the mouse button.
         /// </summary>
         private static bool mouseWasReleased = true;
 
@@ -173,12 +173,12 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// The configuration that includes the node children and their branch lines.
-        /// Only necessary for interacting with a <see cref="MindMapNodeConf"/>
+        /// Only necessary for interacting with a <see cref="MindMapNodeConf"/>.
         /// </summary>
         private DrawableConfig oldNodesBranchLineHolder = null;
         /// <summary>
         /// The configuration that includes the changed node children and their branch lines.
-        /// Only necessary for interacting with a <see cref="MindMapNodeConf"/>
+        /// Only necessary for interacting with a <see cref="MindMapNodeConf"/>.
         /// </summary>
         private DrawableConfig newNodesBranchLineHolder = null;
         /// <summary>
@@ -186,12 +186,12 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private LineConf oldBranchLineConf = null;
         /// <summary>
-        /// Query that ensures the optical data from the previous branch line is taken over.
+        /// Query that ensures the visual data from the previous branch line is taken over.
         /// </summary>
         private bool editToOldBranchLine = false;
 
         /// <summary>
-        /// Resets the old selected object, if the action state will leave.
+        /// Resets the old selected object, if the action state will be left.
         /// </summary>
         public static void Reset()
         {
@@ -200,7 +200,8 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Deactivates the blink effect if, it is still active and destroys cut copy paste menu.
+        /// Deactivates the blink effect if it is still active and destroys the
+        /// cut-copy-paste menu.
         /// </summary>
         public override void Stop()
         {
@@ -217,7 +218,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Adds the necessary Handler for the cut, copy and paste button.
+        /// Adds the necessary handler for the cut, copy and paste button.
         /// </summary>
         /// <param name="menu">The instance of the cut copy paste menu</param>
         private void SetupButtons(GameObject menu)
@@ -229,7 +230,7 @@ namespace SEE.Controls.Actions.Drawable
             cut.clickEvent.AddListener(() =>
             {
                 state = CutCopy.Cut;
-                ShowNotification.Info("Select position", "Choose a suitable position for pasting the cutted object.", 2);
+                ShowNotification.Info("Select position", "Choose a suitable position for pasting the cut object.", 2);
             });
 
             copy.clickEvent.AddListener(() =>
@@ -241,9 +242,9 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// This method manages the player's interaction with the action <see cref="ActionStateType.CutCopyPaste"/>.
-        /// It allows to cut or copy drawable type objects and paste them on a specific position on a specific drawbale.
+        /// It allows to cut or copy drawable type objects and paste them on a specific position on a specific drawable.
         /// </summary>
-        /// <returns>Whether this Action is finished</returns>
+        /// <returns>Whether this action is finished</returns>
         public override bool Update()
         {
             /// Block for canceling the action.
@@ -258,18 +259,18 @@ namespace SEE.Controls.Actions.Drawable
                         SelectObject();
                         break;
 
-                    /// Block in which the object is duplicated at the desired location, 
+                    /// Block in which the object is duplicated at the desired location,
                     /// and the original may be deleted if necessary.
                     case ProgressState.CutCopyPaste:
                         CutCopyPaste();
                         break;
 
-                    /// Block in which the select parent menu will be open.
+                    /// Block in which the selected parent menu will be open.
                     case ProgressState.OpenSelectParentMenu:
                         OpenSelectParent();
                         break;
 
-                    /// Block in which it will wait for the user selection.
+                    /// Block in which we will wait for the user selection.
                     case ProgressState.SelectParent:
                         SelectParent();
                         break;
@@ -279,9 +280,9 @@ namespace SEE.Controls.Actions.Drawable
                         mouseWasReleased = false;
                         memento = new Memento(oldValueHolder, newValueHolder, oldDrawable, newDrawable, state)
                         {
-                            oldNodesHolder = oldNodesBranchLineHolder,
-                            newNodesHolder = newNodesBranchLineHolder,
-                            oldBranchLineConfig = oldBranchLineConf
+                            OldNodesHolder = oldNodesBranchLineHolder,
+                            NewNodesHolder = newNodesBranchLineHolder,
+                            OldBranchLineConfig = oldBranchLineConf
                         };
                         CurrentState = IReversibleAction.Progress.Completed;
                         return true;
@@ -294,12 +295,11 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Provides the option to cancel the action. 
-        /// Simply press the "Esc" key if an object is selected for Cut/Copy/Paste.
+        /// Provides the option to cancel the action.
         /// </summary>
         private void Cancel()
         {
-            if (selectedObj != null && Input.GetKeyDown(KeyCode.Escape))
+            if (selectedObj != null && SEEInput.Cancel())
             {
                 ShowNotification.Info("Canceled", "The action was canceled by the user.");
                 SetToInitialState();
@@ -308,7 +308,7 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// Allows the user to choose a Drawable Type Object for copying/cutting.
-        /// It's activate the blink effect and enables the cut copy paste menu.
+        /// It activates the blink effect and enables the cut-copy-paste menu.
         /// </summary>
         private void SelectObject()
         {
@@ -332,12 +332,10 @@ namespace SEE.Controls.Actions.Drawable
 
                 selectedObj.AddOrGetComponent<BlinkEffect>();
 
-                if (GameObject.Find("UI Canvas").GetComponent<ValueResetter>() == null)
-                {
-                    GameObject.Find("UI Canvas").AddComponent<ValueResetter>().SetAllowedState(GetActionStateType());
-                }
+                Canvas.AddOrGetComponent<ValueResetter>().SetAllowedState(GetActionStateType());
+
                 cutCopyPasteMenu = PrefabInstantiator.InstantiatePrefab(cutCopyPasteMenuPrefab,
-                            GameObject.Find("UI Canvas").transform, false);
+                                                                        Canvas.transform, false);
                 SetupButtons(cutCopyPasteMenu);
             }
 
@@ -354,18 +352,18 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// Provides the interaction for cut/copy/paste.
-        /// It closes the CutCopyPasteMenu, deactivates the BlinkEffect, 
-        /// and restores the drawable-type object to the new position. 
-        /// If Cut was chosen, the original object is destroyed. 
+        /// It closes the CutCopyPasteMenu, deactivates the BlinkEffect,
+        /// and restores the drawable-type object to the new position.
+        /// If Cut was chosen, the original object is destroyed.
         /// If no action (Cut/Copy) was chosen, and a left-click occurs, then the action is reset.
         /// </summary>
         private void CutCopyPaste()
         {
-            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj != null 
-                && selectedObj.GetComponent<BlinkEffect>() != null && state != CutCopy.None 
-                && Raycasting.RaycastAnything(out RaycastHit hit) 
+            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj != null
+                && selectedObj.GetComponent<BlinkEffect>() != null && state != CutCopy.None
+                && Raycasting.RaycastAnything(out RaycastHit hit)
                 && (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                     GameFinder.hasDrawable(hit.collider.gameObject)))
+                     GameFinder.HasDrawable(hit.collider.gameObject)))
             {
                 Destroyer.Destroy(cutCopyPasteMenu);
                 selectedObj.GetComponent<BlinkEffect>().Deactivate();
@@ -375,13 +373,9 @@ namespace SEE.Controls.Actions.Drawable
                 switch (DrawableType.Get(selectedObj))
                 {
                     case LineConf:
-                        ProcessLine(newPosition);
-                        break;
                     case TextConf:
-                        ProcessText(newPosition);
-                        break;
                     case ImageConf:
-                        ProcessImage(newPosition);
+                        ProcessPrimitiveType(newPosition);
                         break;
                     case MindMapNodeConf:
                         ProcessMindMapNode(newPosition);
@@ -390,13 +384,13 @@ namespace SEE.Controls.Actions.Drawable
                 newValueHolder = DrawableType.Get(newObject);
                 Cut();
                 if (newObject.CompareTag(Tags.MindMapNode) &&
-                    newObject.GetComponent<MMNodeValueHolder>().GetNodeKind() != GameMindMap.NodeKind.Theme)
+                    newObject.GetComponent<MMNodeValueHolder>().NodeKind != GameMindMap.NodeKind.Theme)
                 {
                     progressState = ProgressState.OpenSelectParentMenu;
                 }
             }
 
-            if (Input.GetMouseButtonUp(0) && state != CutCopy.None && newObject != null 
+            if (Input.GetMouseButtonUp(0) && state != CutCopy.None && newObject != null
                 && progressState == ProgressState.CutCopyPaste)
             {
                 progressState = ProgressState.Finish;
@@ -426,7 +420,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Deletes the original drawable type object that are cut after pasting.
+        /// Deletes the original drawable type objects that were cut after pasting.
         /// </summary>
         private void Cut()
         {
@@ -438,29 +432,29 @@ namespace SEE.Controls.Actions.Drawable
                     if (valueHolder.GetParent() != null)
                     {
                         valueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(selectedObj);
-                        new MindMapRemoveChildNetAction(oldDrawable.name, 
+                        new MindMapRemoveChildNetAction(oldDrawable.name,
                             GameFinder.GetDrawableParentName(oldDrawable),
                             MindMapNodeConf.GetNodeConf(selectedObj)).Execute();
                     }
 
                     if (valueHolder.GetParentBranchLine() != null)
                     {
-                        new EraseNetAction(oldDrawable.name, GameFinder.GetDrawableParentName(oldDrawable), 
+                        new EraseNetAction(oldDrawable.name, GameFinder.GetDrawableParentName(oldDrawable),
                             valueHolder.GetParentBranchLine().name).Execute();
                         Destroyer.Destroy(valueHolder.GetParentBranchLine());
                     }
                     foreach (KeyValuePair<GameObject, GameObject> pair in valueHolder.GetAllChildren())
                     {
-                        new EraseNetAction(oldDrawable.name, GameFinder.GetDrawableParentName(oldDrawable), 
+                        new EraseNetAction(oldDrawable.name, GameFinder.GetDrawableParentName(oldDrawable),
                             pair.Value.name).Execute();
                         Destroyer.Destroy(pair.Value);
 
-                        new EraseNetAction(oldDrawable.name, GameFinder.GetDrawableParentName(oldDrawable), 
+                        new EraseNetAction(oldDrawable.name, GameFinder.GetDrawableParentName(oldDrawable),
                             pair.Key.name).Execute();
                         Destroyer.Destroy(pair.Key);
                     }
                 }
-                new EraseNetAction(oldDrawable.name, GameFinder.GetDrawableParentName(oldDrawable), 
+                new EraseNetAction(oldDrawable.name, GameFinder.GetDrawableParentName(oldDrawable),
                     selectedObj.name).Execute();
                 Destroyer.Destroy(selectedObj);
             }
@@ -469,61 +463,33 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Draws a clone of the chosen line to the chosen position.
         /// </summary>
-        /// <param name="newPosition">The new position for the line.</param>
-        private void ProcessLine(Vector3 newPosition)
+        /// <param name="newPosition">The new position for the clone.</param>
+        private void ProcessPrimitiveType(Vector3 newPosition)
         {
-            LineConf lineConf = LineConf.GetLine(selectedObj);
-            lineConf.id = "";
-            newObject = GameDrawer.ReDrawLine(newDrawable, lineConf);
-            newObject.transform.position = newPosition 
-                - newObject.transform.forward * ValueHolder.distanceToDrawable.z * lineConf.orderInLayer;
-            new DrawNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable), 
-                LineConf.GetLine(newObject)).Execute();
+            DrawableType conf = DrawableType.Get(selectedObj);
+            conf.Id = "";
+            newObject = DrawableType.Restore(conf, newDrawable);
+            MoveWithWorldPosition(newPosition);
         }
 
         /// <summary>
-        /// Writes a clone the chosen text to the chosen position.
+        ///  Moves the clone of the selected node to the destination (new position).
         /// </summary>
-        /// <param name="newPosition">The new position for the text.</param>
-        private void ProcessText(Vector3 newPosition)
+        /// <param name="newPosition">destination position</param>
+        private void MoveWithWorldPosition(Vector3 newPosition)
         {
-            TextConf textConf = TextConf.GetText(selectedObj);
-            textConf.id = "";
-            newObject = GameTexter.ReWriteText(newDrawable, textConf);
-            newObject.transform.position = newPosition 
-                - newObject.transform.forward * ValueHolder.distanceToDrawable.z * textConf.orderInLayer;
-            new WriteTextNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable), 
-                TextConf.GetText(newObject)).Execute();
+            /// Moves the clone of the selected node to the destination (new position).
+            Vector3 newLocalPosition = GameFinder.GetHighestParent(newDrawable).transform.
+                InverseTransformPoint(newPosition);
+            newLocalPosition = new Vector3(newLocalPosition.x, newLocalPosition.y,
+                selectedObj.transform.localPosition.z);
+            GameMoveRotator.SetPosition(newObject, newLocalPosition, true);
+            new MoveNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable),
+                newObject.name, newLocalPosition, true).Execute();
         }
 
         /// <summary>
-        /// Adds a clone of the chosen image to the chosen position.
-        /// </summary>
-        /// <param name="newPosition">The new position for the image.</param>
-        private void ProcessImage(Vector3 newPosition)
-        {
-            ImageConf imageConf = ImageConf.GetImageConf(selectedObj);
-            imageConf.id = "";
-            bool mirrored = imageConf.eulerAngles.y == 180;
-            newObject = GameImage.RePlaceImage(newDrawable, imageConf);
-            newObject.transform.position = newPosition 
-                - newObject.transform.forward * ValueHolder.distanceToDrawable.z * imageConf.orderInLayer;
-
-            if (mirrored)
-            {
-                newObject.transform.position = newPosition
-                    + newObject.transform.forward * ValueHolder.distanceToDrawable.z * imageConf.orderInLayer;
-            } else
-            {
-                newObject.transform.position = newPosition
-                    - newObject.transform.forward * ValueHolder.distanceToDrawable.z * imageConf.orderInLayer;
-            }
-            new AddImageNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable), 
-                ImageConf.GetImageConf(newObject)).Execute();
-        }
-
-        /// <summary>
-        /// Adds a clone of the chosen node and their children to the chosen position.
+        /// Adds a clone of the chosen node and its children to the chosen position.
         /// </summary>
         /// <param name="newPosition">The new position for the node.</param>
         private void ProcessMindMapNode(Vector3 newPosition)
@@ -533,9 +499,9 @@ namespace SEE.Controls.Actions.Drawable
                 oldBranchLineConf = LineConf.GetLine(selectedObj.GetComponent<MMNodeValueHolder>()
                     .GetParentBranchLine());
             }
-            newNodesBranchLineHolder.MindMapNodeConfigs[0].branchLineToParent = "";
-            newNodesBranchLineHolder.MindMapNodeConfigs[0].parentNode = "";
-            GameMindMap.RenameMindMap(newNodesBranchLineHolder, 
+            newNodesBranchLineHolder.MindMapNodeConfigs[0].BranchLineToParent = "";
+            newNodesBranchLineHolder.MindMapNodeConfigs[0].ParentNode = "";
+            GameMindMap.RenameMindMap(newNodesBranchLineHolder,
                 GameFinder.GetAttachedObjectsObject(newDrawable));
 
             foreach (DrawableType type in newNodesBranchLineHolder.GetAllDrawableTypes())
@@ -543,19 +509,14 @@ namespace SEE.Controls.Actions.Drawable
                 DrawableType.Restore(type, newDrawable);
             }
 
-            /// Moves the clone of the selected node to the destination (new position).
-            Vector3 newLocalPosition = GameFinder.GetHighestParent(newDrawable).transform.
-                InverseTransformPoint(newPosition);
-            newLocalPosition = new Vector3(newLocalPosition.x, newLocalPosition.y, 
-                selectedObj.transform.localPosition.z);
-            newObject = GameFinder.FindChild(newDrawable, newNodesBranchLineHolder.MindMapNodeConfigs[0].id);
-            GameMoveRotator.SetPosition(newObject, newLocalPosition, true);
-            new MoveNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable), 
-                newObject.name, newLocalPosition, true).Execute();
+            newObject = GameFinder.FindChild(newDrawable, newNodesBranchLineHolder.MindMapNodeConfigs[0].Id);
+            MoveWithWorldPosition(newPosition);
+            /// Updating positions.
+            newNodesBranchLineHolder = GameMindMap.SummarizeSelectedNodeIncChildren(newObject);
         }
 
         /// <summary>
-        /// Opens the select parent menu and switches the progress state to select parent.
+        /// Opens the selected parent menu and switches the progress state to select the parent.
         /// Is executed only if a subtheme or leaf node has been chosen for Cut/Copy.
         /// </summary>
         private void OpenSelectParent()
@@ -563,17 +524,17 @@ namespace SEE.Controls.Actions.Drawable
             GameObject newAttachedObjects = GameFinder.GetAttachedObjectsObject(newDrawable);
             if (newAttachedObjects != null)
             {
-                MindMapParentSelectionMenu.EnableForEditing(newAttachedObjects, newObject, 
+                MindMapParentSelectionMenu.EnableForEditing(newAttachedObjects, newObject,
                     MindMapNodeConf.GetNodeConf(newObject), null, true);
                 progressState = ProgressState.SelectParent;
             }
         }
 
         /// <summary>
-        /// Waits for user selection. 
-        /// A node can only be added if it is a theme node 
+        /// Waits for user selection.
+        /// A node can only be added if it is a theme node
         /// or if the drawable already has a theme node that qualifies as a parent node.
-        /// If the node cant be added, the action is canceled and reset.
+        /// If the node cannot be added, the action is canceled and reset.
         /// </summary>
         private void SelectParent()
         {
@@ -582,42 +543,43 @@ namespace SEE.Controls.Actions.Drawable
                 /// Block for the case when the node can be added.
                 if (newValueHolder is MindMapNodeConf conf)
                 {
-                    conf.parentNode = parent.name;
+                    conf.ParentNode = parent.name;
                     GameObject branchLineToParent = parent.GetComponent<MMNodeValueHolder>().GetChildren()[newObject];
-                    conf.branchLineToParent = branchLineToParent.name;
+                    conf.BranchLineToParent = branchLineToParent.name;
                     if (oldBranchLineConf != null)
                     {
                         GameEdit.ChangeLine(branchLineToParent, oldBranchLineConf);
-                        new EditLineNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable), 
+                        new EditLineNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable),
                             LineConf.GetLine(branchLineToParent)).Execute();
                     }
                     newNodesBranchLineHolder = GameMindMap.SummarizeSelectedNodeIncChildren(newObject);
                 }
                 progressState = ProgressState.Finish;
-            } else if (!MindMapParentSelectionMenu.IsActive())
-            { /// Block for the case when the node cannot be added. 
-              /// The previous changes are reverted. 
+            }
+            else if (!MindMapParentSelectionMenu.IsActive())
+            { /// Block for the case when the node cannot be added.
+              /// The previous changes are reverted.
               /// This means the clone nodes are deleted, and the original nodes are restored if they were deleted (cut).
                 foreach (DrawableType type in newNodesBranchLineHolder.GetAllDrawableTypes())
                 {
-                    GameObject typeObject = GameFinder.FindChild(newDrawable, type.id);
-                    new EraseNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable), 
+                    GameObject typeObject = GameFinder.FindChild(newDrawable, type.Id);
+                    new EraseNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable),
                         typeObject.name).Execute();
                     Destroyer.Destroy(typeObject);
                 }
 
-                if(state == CutCopy.Cut)
+                if (state == CutCopy.Cut)
                 {
-                    foreach(DrawableType type in oldNodesBranchLineHolder.GetAllDrawableTypes())
+                    foreach (DrawableType type in oldNodesBranchLineHolder.GetAllDrawableTypes())
                     {
                         DrawableType.Restore(type, oldDrawable);
                     }
                     if (oldBranchLineConf != null)
                     {
-                        GameObject branchLineToParent = GameFinder.FindChild(oldDrawable, oldValueHolder.id).
+                        GameObject branchLineToParent = GameFinder.FindChild(oldDrawable, oldValueHolder.Id).
                             GetComponent<MMNodeValueHolder>().GetParentBranchLine();
                         GameEdit.ChangeLine(branchLineToParent, oldBranchLineConf);
-                        new EditLineNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable), 
+                        new EditLineNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable),
                             LineConf.GetLine(branchLineToParent)).Execute();
                     }
                 }
@@ -629,138 +591,137 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     GameObject branchLineToParent = newObject.GetComponent<MMNodeValueHolder>().GetParentBranchLine();
                     GameEdit.ChangeLine(branchLineToParent, oldBranchLineConf);
-                    new EditLineNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable), 
+                    new EditLineNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable),
                         LineConf.GetLine(branchLineToParent)).Execute();
                     editToOldBranchLine = true;
                 }
             }
-            
+
         }
 
         /// <summary>
-        /// Reverts this action, i.e., restores the old object and destroyes the new one.
+        /// Reverts this action, i.e., restores the old object and destroys the new one.
         /// </summary>
         public override void Undo()
         {
             base.Undo();
             /// Block to restore the original cut object.
-            if (memento.state == CutCopy.Cut)
+            if (memento.State == CutCopy.Cut)
             {
-                GameObject oldDrawable = memento.oldDrawable.GetDrawable();
-                
-                if (memento.oldValueHolder is MindMapNodeConf)
+                GameObject oldDrawable = memento.OldDrawable.GetDrawable();
+
+                if (memento.OldValueHolder is MindMapNodeConf)
                 {
-                    foreach(DrawableType type in memento.oldNodesHolder.GetAllDrawableTypes())
+                    foreach(DrawableType type in memento.OldNodesHolder.GetAllDrawableTypes())
                     {
                         DrawableType.Restore(type, oldDrawable);
                     }
-                    if (memento.oldBranchLineConfig != null)
+                    if (memento.OldBranchLineConfig != null)
                     {
-                        GameObject oldObject = GameFinder.FindChild(oldDrawable, memento.oldValueHolder.id);
+                        GameObject oldObject = GameFinder.FindChild(oldDrawable, memento.OldValueHolder.Id);
                         if (oldObject.GetComponent<MMNodeValueHolder>().GetParentBranchLine() != null)
                         {
                             GameObject branchLineToParent = oldObject.GetComponent<MMNodeValueHolder>().
                                 GetParentBranchLine();
-                            GameEdit.ChangeLine(branchLineToParent, memento.oldBranchLineConfig);
-                            new EditLineNetAction(oldDrawable.name, GameFinder.GetDrawableParentName(oldDrawable), 
+                            GameEdit.ChangeLine(branchLineToParent, memento.OldBranchLineConfig);
+                            new EditLineNetAction(oldDrawable.name, GameFinder.GetDrawableParentName(oldDrawable),
                                 LineConf.GetLine(branchLineToParent)).Execute();
                         }
                     }
                 } else
                 {
-                    DrawableType.Restore(memento.oldValueHolder, oldDrawable);
+                    DrawableType.Restore(memento.OldValueHolder, oldDrawable);
                 }
             }
 
             /// Block to destroy the clone object.
-            GameObject newObject = GameFinder.FindChild(memento.newDrawable.GetDrawable(), 
-                memento.newValueHolder.id);
+            GameObject newObject = GameFinder.FindChild(memento.NewDrawable.GetDrawable(),
+                memento.NewValueHolder.Id);
             if (newObject.CompareTag(Tags.MindMapNode))
             {
                 MMNodeValueHolder valueHolder = newObject.GetComponent<MMNodeValueHolder>();
                 if (valueHolder.GetParentBranchLine() != null)
                 {
-                    new EraseNetAction(memento.newDrawable.ID, memento.newDrawable.ParentID, 
+                    new EraseNetAction(memento.NewDrawable.ID, memento.NewDrawable.ParentID,
                         valueHolder.GetParentBranchLine().name).Execute();
                     Destroyer.Destroy(valueHolder.GetParentBranchLine());
 
                     valueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(newObject);
-                    new MindMapRemoveChildNetAction(memento.newDrawable.ID, memento.newDrawable.ParentID, 
+                    new MindMapRemoveChildNetAction(memento.NewDrawable.ID, memento.NewDrawable.ParentID,
                         MindMapNodeConf.GetNodeConf(newObject)).Execute();
                 }
-                foreach (DrawableType type in memento.newNodesHolder.GetAllDrawableTypes())
+                foreach (DrawableType type in memento.NewNodesHolder.GetAllDrawableTypes())
                 {
-                    new EraseNetAction(memento.newDrawable.ID, memento.newDrawable.ParentID, type.id).Execute();
-                    Destroyer.Destroy(GameFinder.FindChild(memento.newDrawable.GetDrawable(), type.id));
+                    new EraseNetAction(memento.NewDrawable.ID, memento.NewDrawable.ParentID, type.Id).Execute();
+                    Destroyer.Destroy(GameFinder.FindChild(memento.NewDrawable.GetDrawable(), type.Id));
                 }
             }
-            new EraseNetAction(memento.newDrawable.ID, memento.newDrawable.ParentID, newObject.name).Execute();
+            new EraseNetAction(memento.NewDrawable.ID, memento.NewDrawable.ParentID, newObject.name).Execute();
             Destroyer.Destroy(newObject);
         }
 
         /// <summary>
-        /// Repeats this action, i.e., create again the new object and deletes the old one if it was cutted.
+        /// Repeats this action, i.e., creates again the new object and deletes the old one if it was cut.
         /// </summary>
         public override void Redo()
         {
             base.Redo();
             /// Block to restore the clone object.
-            GameObject newDrawable = memento.newDrawable.GetDrawable();
-            
-            if (memento.newValueHolder is MindMapNodeConf)
+            GameObject newDrawable = memento.NewDrawable.GetDrawable();
+
+            if (memento.NewValueHolder is MindMapNodeConf)
             {
-                foreach (DrawableType type in memento.newNodesHolder.GetAllDrawableTypes())
+                GameObject obj = DrawableType.Restore(memento.NewValueHolder, newDrawable);
+                foreach (DrawableType type in memento.NewNodesHolder.GetAllDrawableTypes())
                 {
                     DrawableType.Restore(type, newDrawable);
                 }
-                DrawableType.Restore(memento.newValueHolder, newDrawable);
-                if (memento.oldBranchLineConfig != null)
+                if (memento.OldBranchLineConfig != null)
                 {
-                    GameObject newObject = GameFinder.FindChild(newDrawable, memento.newValueHolder.id);
+                    GameObject newObject = GameFinder.FindChild(newDrawable, memento.NewValueHolder.Id);
                     if (newObject.GetComponent<MMNodeValueHolder>().GetParentBranchLine() != null)
                     {
                         GameObject branchLineToParent = newObject.GetComponent<MMNodeValueHolder>().
                             GetParentBranchLine();
-                        GameEdit.ChangeLine(branchLineToParent, memento.oldBranchLineConfig);
-                        new EditLineNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable), 
+                        GameEdit.ChangeLine(branchLineToParent, memento.OldBranchLineConfig);
+                        new EditLineNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable),
                             LineConf.GetLine(branchLineToParent)).Execute();
                     }
                 }
             } else
             {
-                DrawableType.Restore(memento.newValueHolder, newDrawable);
+                DrawableType.Restore(memento.NewValueHolder, newDrawable);
             }
 
             /// Block to destroy the original object, if cut was selected.
-            if (memento.state == CutCopy.Cut)
+            if (memento.State == CutCopy.Cut)
             {
-                GameObject oldObject = GameFinder.FindChild(memento.oldDrawable.GetDrawable(), 
-                    memento.oldValueHolder.id);
+                GameObject oldObject = GameFinder.FindChild(memento.OldDrawable.GetDrawable(),
+                    memento.OldValueHolder.Id);
                 if (oldObject.CompareTag(Tags.MindMapNode))
                 {
                     MMNodeValueHolder valueHolder = oldObject.GetComponent<MMNodeValueHolder>();
                     if (valueHolder.GetParentBranchLine() != null)
                     {
-                        new EraseNetAction(memento.oldDrawable.ID, memento.oldDrawable.ParentID, 
+                        new EraseNetAction(memento.OldDrawable.ID, memento.OldDrawable.ParentID,
                             valueHolder.GetParentBranchLine().name).Execute();
                         Destroyer.Destroy(valueHolder.GetParentBranchLine());
 
                         valueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(oldObject);
-                        new MindMapRemoveChildNetAction(memento.oldDrawable.ID, memento.oldDrawable.ParentID, 
+                        new MindMapRemoveChildNetAction(memento.OldDrawable.ID, memento.OldDrawable.ParentID,
                             MindMapNodeConf.GetNodeConf(oldObject)).Execute();
                     }
-                    foreach (DrawableType type in memento.oldNodesHolder.GetAllDrawableTypes())
+                    foreach (DrawableType type in memento.OldNodesHolder.GetAllDrawableTypes())
                     {
-                        new EraseNetAction(memento.oldDrawable.ID, memento.oldDrawable.ParentID, type.id).Execute();
-                        Destroyer.Destroy(GameFinder.FindChild(memento.oldDrawable.GetDrawable(), type.id));
+                        new EraseNetAction(memento.OldDrawable.ID, memento.OldDrawable.ParentID, type.Id).Execute();
+                        Destroyer.Destroy(GameFinder.FindChild(memento.OldDrawable.GetDrawable(), type.Id));
                     }
                 }
-                new EraseNetAction(memento.oldDrawable.ID, memento.oldDrawable.ParentID, oldObject.name).Execute();
+                new EraseNetAction(memento.OldDrawable.ID, memento.OldDrawable.ParentID, oldObject.name).Execute();
                 Destroyer.Destroy(oldObject);
 
             }
         }
-
 
         /// <summary>
         /// A new instance of <see cref="CutCopyPasteAction"/>.
@@ -794,7 +755,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
-        /// Because this action does not actually change any game object, 
+        /// Because this action does not actually change any game object,
         /// an empty set is always returned.
         /// </summary>
         /// <returns>The object id of the changed object.</returns>
@@ -802,8 +763,8 @@ namespace SEE.Controls.Actions.Drawable
         {
             return new HashSet<string>
                 {
-                    memento.oldValueHolder.id,
-                    memento.newValueHolder.id
+                    memento.OldValueHolder.Id,
+                    memento.NewValueHolder.Id
                 };
         }
     }

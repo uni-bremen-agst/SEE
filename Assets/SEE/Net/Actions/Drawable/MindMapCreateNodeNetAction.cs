@@ -10,18 +10,8 @@ namespace SEE.Net.Actions.Drawable
     /// <summary>
     /// This class is reponsible for create <see cref="MindMapAction"/> a mind map node on the given drawable on all clients.
     /// </summary>
-    public class MindMapCreateNodeNetAction : AbstractNetAction
+    public class MindMapCreateNodeNetAction : DrawableNetAction
     {
-        /// <summary>
-        /// The id of the drawable on which the node should be created
-        /// </summary>
-        public string DrawableID;
-
-        /// <summary>
-        /// The id of the drawable parent
-        /// </summary>
-        public string ParentDrawableID;
-
         /// <summary>
         /// The mind map node that should be created as <see cref="MindMapNodeConf"/> object.
         /// </summary>
@@ -34,19 +24,11 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="node">The node that should be created.</param>
         public MindMapCreateNodeNetAction(string drawableID, string parentDrawableID, MindMapNodeConf node)
+            : base(drawableID, parentDrawableID)
         {
-            this.DrawableID = drawableID;
-            this.ParentDrawableID = parentDrawableID;
             this.Node = node;
         }
 
-        /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
-        }
         /// <summary>
         /// Creates the node on each client.
         /// </summary>
@@ -55,15 +37,10 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
-                if (drawable == null)
+                base.ExecuteOnClient();
+                if (Node != null && Node.Id != "")
                 {
-                    throw new System.Exception($"There is no drawable with the ID {DrawableID}.");
-                }
-
-                if (Node != null && Node.id != "")
-                {
-                    GameMindMap.ReCreate(drawable, Node);
+                    GameMindMap.ReCreate(Drawable, Node);
                 }
                 else
                 {

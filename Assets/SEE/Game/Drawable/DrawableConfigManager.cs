@@ -18,23 +18,23 @@ namespace SEE.Game.Drawable
     public static class DrawableConfigManager
     {
         /// <summary>
-        /// The path to the configuration folder of the saved drawables. 
+        /// The path to the configuration folder of the saved drawables.
         /// This is saved in a field because multiple methods of this class and other classes use it.
         /// </summary>
-        public static readonly string configurationPath = ValueHolder.drawablePath + "Configuration/";
+        public static readonly string configurationPath = ValueHolder.DrawablePath + "Configuration/";
 
         /// <summary>
         /// The path to the folder of saved drawable (single).
         /// </summary>
-        public static readonly string singleConfPath = configurationPath + "1. Single Drawable/";
+        public static readonly string singleConfPath = configurationPath + "1_Single_Drawable/";
 
         /// <summary>
         /// The path to the folder of saved drawables (multiple).
         /// </summary>
-        public static readonly string multipleConfPath = configurationPath + "2. Multiple Drawables/";
+        public static readonly string multipleConfPath = configurationPath + "2_Multiple_Drawables/";
 
         /// <summary>
-        /// This method checks whether the directory for the saved drawable exists. 
+        /// This method checks whether the directory for the saved drawable exists.
         /// If not, then it creates that directory.
         /// </summary>
         public static void EnsureDrawableDirectoryExists(string path)
@@ -48,7 +48,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Loads a single drawable from a file at the given <paramref name="path"/>.
         /// </summary>
-        /// <param name="path">The path to the file which shall be loaded</param>
+        /// <param name="path">The path of the file which shall be loaded</param>
         /// <returns>The drawable configuration of the loaded file.</returns>
         internal static DrawableConfig LoadDrawable(FilePath path)
         {
@@ -66,7 +66,7 @@ namespace SEE.Game.Drawable
             }
             catch (Exception e)
             {
-                ShowNotification.Error("Error loading drawable", 
+                ShowNotification.Error("Error loading drawable",
                     $"Could not load settings from {path.Path}: {e.Message}");
                 throw e;
             }
@@ -102,7 +102,7 @@ namespace SEE.Game.Drawable
             }
             catch (Exception e)
             {
-                ShowNotification.Error("Error loading drawable", 
+                ShowNotification.Error("Error loading drawable",
                     $"Could not load settings from {path.Path}: {e.Message}");
                 throw e;
             }
@@ -112,7 +112,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Loads a drawable from a file.
         /// </summary>
-        /// <param name="fileName">The file name without the extension of the file to load</param>
+        /// <param name="fileName">The file name without the extension of the file to be loaded</param>
         /// <returns>The loaded drawable configuraion</returns>
         internal static DrawableConfig LoadDrawable(string fileName)
         {
@@ -129,30 +129,6 @@ namespace SEE.Game.Drawable
         {
             EnsureDrawableDirectoryExists(multipleConfPath);
             return LoadDrawables(new FilePath(multipleConfPath + fileName + Filenames.ConfigExtension));
-        }
-
-        /// <summary>
-        /// Saves the <paramref name="drawable"/> configuration to the <paramref name="filePath"/>.
-        /// The method checks if the <paramref name="filePath"/> has the correct extension.
-        /// If not, it will be set.
-        /// </summary>
-        /// <param name="drawable">The drawable that should be saved.</param>
-        /// <param name="filePath">The file path where the save file should be placed.</param>
-        internal static void SaveDrawable(GameObject drawable, FilePath filePath)
-        {
-            EnsureDrawableDirectoryExists(filePath.RootPath);
-            if (!Path.HasExtension(filePath.Path))
-            {
-                filePath = new FilePath(filePath.Path + Filenames.ConfigExtension);
-            }
-            else if (Path.GetExtension(filePath.Path) != Filenames.ConfigExtension)
-            {
-                Path.ChangeExtension(filePath.Path, Filenames.ConfigExtension);
-            }
-            using ConfigWriter writer = new(filePath.Path);
-            DrawableConfig config = GetDrawableConfig(drawable);
-            config.Save(writer);
-            Debug.Log($"Saved drawable configuration to file {filePath.Path}.\n");
         }
 
         /// <summary>
@@ -175,8 +151,15 @@ namespace SEE.Game.Drawable
                 Path.ChangeExtension(filePath.Path, Filenames.ConfigExtension);
             }
             using ConfigWriter writer = new(filePath.Path);
-            DrawablesConfigs configs = GetDrawablesConfigs(drawables);
-            configs.Save(writer);
+            if (drawables.Length > 1)
+            {
+                DrawablesConfigs configs = GetDrawablesConfigs(drawables);
+                configs.Save(writer);
+            } else
+            {
+                DrawableConfig config = GetDrawableConfig(drawables[0]);
+                config.Save(writer);
+            }
             Debug.Log($"Saved drawable configuration to file {filePath.Path}.\n");
         }
 
@@ -186,14 +169,11 @@ namespace SEE.Game.Drawable
         /// <param name="path">The path of the file to delete</param>
         internal static void DeleteDrawables(FilePath path)
         {
-            if (File.Exists(path.Path))
-            {
-                File.Delete(path.Path);
-            }
+            FileIO.DeleteIfExists(path.Path);
         }
 
         /// <summary>
-        /// Creates a new drawable config instance from the given drawable. 
+        /// Creates a new drawable config instance from the given drawable.
         /// </summary>
         /// <param name="drawable">The drawable for which a configuration is to be created.</param>
         /// <returns>The created <see cref="DrawableConfig"/></returns>
@@ -205,16 +185,15 @@ namespace SEE.Game.Drawable
                 transform = drawable.transform.parent;
             }
 
-            /// Get the order in layer for drawables. 
+            /// Get the order in layering for drawables.
             /// Only needed for sticky notes.
             int order = 0;
             if (transform.GetComponent<OrderInLayerValueHolder>() != null)
             {
-                order = transform.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
-            }
-            if (transform.GetComponentInParent<OrderInLayerValueHolder>() != null)
+                order = transform.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
+            } else if (transform.GetComponentInParent<OrderInLayerValueHolder>() != null)
             {
-                order = transform.GetComponentInParent<OrderInLayerValueHolder>().GetOrderInLayer();
+                order = transform.GetComponentInParent<OrderInLayerValueHolder>().OrderInLayer;
             }
 
             /// Creates the <see cref="DrawableConfig"/> with the corresponding values.
@@ -229,12 +208,12 @@ namespace SEE.Game.Drawable
                 Order = order
             };
 
-            /// Block for create the <see cref="DrawableType"/> of the drawable.
+            /// Block for creating the <see cref="DrawableType"/> of the drawable.
             GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(drawable);
             if (attachedObjects != null)
             {
                 /// Creates configurations for all lines of the drawable, except the Mind Map Node borders.
-                GameObject[] lines = GameFinder.FindAllChildrenWithTagExceptParentHasTag(attachedObjects, 
+                GameObject[] lines = GameFinder.FindAllChildrenWithTagExceptParentHasTag(attachedObjects,
                     Tags.Line, Tags.MindMapNode).ToArray();
                 foreach (GameObject line in lines)
                 {
@@ -243,7 +222,7 @@ namespace SEE.Game.Drawable
                 }
 
                 /// Creates configurations for all texts of the drawable, except the Mind Map Node texts.
-                GameObject[] texts = GameFinder.FindAllChildrenWithTagExceptParentHasTag(attachedObjects, 
+                GameObject[] texts = GameFinder.FindAllChildrenWithTagExceptParentHasTag(attachedObjects,
                     Tags.DText, Tags.MindMapNode).ToArray();
                 foreach (GameObject text in texts)
                 {
@@ -252,7 +231,7 @@ namespace SEE.Game.Drawable
                 }
 
                 /// Creates configurations for all images of the drawable.
-                GameObject[] images = GameFinder.FindAllChildrenWithTag(attachedObjects, 
+                GameObject[] images = GameFinder.FindAllChildrenWithTag(attachedObjects,
                     Tags.Image).ToArray();
                 foreach (GameObject image in images)
                 {
@@ -261,8 +240,8 @@ namespace SEE.Game.Drawable
                 }
 
                 /// Creates configurations for all Mind Map nodes of the drawable.
-                List<GameObject> nodes = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.MindMapNode);
-                nodes = nodes.OrderBy(o => o.GetComponent<MMNodeValueHolder>().GetLayer()).ToList();
+                IList<GameObject> nodes = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.MindMapNode);
+                nodes = nodes.OrderBy(o => o.GetComponent<MMNodeValueHolder>().Layer).ToList();
                 foreach (GameObject node in nodes)
                 {
                     MindMapNodeConf nodeConf = MindMapNodeConf.GetNodeConf(node);
@@ -273,7 +252,7 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Creates a new <see cref="DrawablesConfigs"/> from the given drawables. 
+        /// Creates a new <see cref="DrawablesConfigs"/> from the given drawables.
         /// </summary>
         /// <param name="drawables<">The drawables for which a configuration is to be created.</param>
         /// <returns>The created <see cref="DrawablesConfigs"/></returns>

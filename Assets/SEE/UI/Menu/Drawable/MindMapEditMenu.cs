@@ -50,13 +50,13 @@ namespace SEE.Game.UI.Menu.Drawable
                 if (returned)
                 {
                     MindMapNodeConf confOfReturn = (MindMapNodeConf)DrawableType.Get(node);
-                    conf.parentNode = confOfReturn.parentNode;
-                    conf.branchLineToParent = confOfReturn.branchLineToParent;
-                    conf.branchLineConf = confOfReturn.branchLineConf;
-                    conf.nodeKind = confOfReturn.nodeKind;
-                    conf.id = confOfReturn.id;
-                    conf.textConf = confOfReturn.textConf;
-                    conf.borderConf = confOfReturn.borderConf;
+                    conf.ParentNode = confOfReturn.ParentNode;
+                    conf.BranchLineToParent = confOfReturn.BranchLineToParent;
+                    conf.BranchLineConf = confOfReturn.BranchLineConf;
+                    conf.NodeKind = confOfReturn.NodeKind;
+                    conf.Id = confOfReturn.Id;
+                    conf.TextConf = confOfReturn.TextConf;
+                    conf.BorderConf = confOfReturn.BorderConf;
                 }
                 
                 /// Instantiates the menu.
@@ -151,7 +151,7 @@ namespace SEE.Game.UI.Menu.Drawable
             changeBorder.clickEvent.AddListener(() =>
             {
                 instance.SetActive(false);
-                LineMenu.EnableForEditing(GameFinder.FindChildWithTag(node, Tags.Line), conf.borderConf, callback);
+                LineMenu.EnableForEditing(GameFinder.FindChildWithTag(node, Tags.Line), conf.BorderConf, callback);
             });
         }
 
@@ -170,7 +170,7 @@ namespace SEE.Game.UI.Menu.Drawable
             changeText.clickEvent.AddListener(() =>
             {
                 instance.SetActive(false);
-                TextMenu.EnableForEditing(GameFinder.FindChildWithTag(node, Tags.DText), conf.textConf, callback);
+                TextMenu.EnableForEditing(GameFinder.FindChildWithTag(node, Tags.DText), conf.TextConf, callback);
             });
         }
 
@@ -186,14 +186,14 @@ namespace SEE.Game.UI.Menu.Drawable
         private static void InitializeChangeBranchLine(GameObject attached, MindMapNodeConf conf, UnityAction callback)
         {
             GameObject branchLineButtonArea = GameFinder.FindChild(instance, "BranchLine");
-            if (conf.branchLineToParent != "")
+            if (conf.BranchLineToParent != "")
             {
                 ButtonManagerBasic branchButton = branchLineButtonArea.GetComponent<ButtonManagerBasic>();
                 branchButton.clickEvent.AddListener(() =>
                 {
                     instance.SetActive(false);
-                    GameObject bLine = GameFinder.FindChild(attached, conf.branchLineToParent);
-                    LineMenu.EnableForEditing(bLine, conf.branchLineConf, callback);
+                    GameObject bLine = GameFinder.FindChild(attached, conf.BranchLineToParent);
+                    LineMenu.EnableForEditing(bLine, conf.BranchLineConf, callback);
                 });
             }
             else

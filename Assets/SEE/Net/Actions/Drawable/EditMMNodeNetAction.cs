@@ -1,23 +1,14 @@
 ﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
     /// This class is responsible for changing all values (<see cref="EditAction"/>) of a mind map node on all clients.
     /// </summary>
-    public class EditMMNodeNetAction : AbstractNetAction
+    public class EditMMNodeNetAction : DrawableNetAction
     {
-        /// <summary>
-        /// The id of the drawable on which the node is located
-        /// </summary>
-        public string DrawableID;
-        /// <summary>
-        /// The id of the drawable parent
-        /// </summary>
-        public string ParentDrawableID;
         /// <summary>
         /// The Mind map node that should be changed. The conf object contains all relevant values to change.
         /// </summary>
@@ -29,20 +20,10 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="drawableID">The id of the drawable on which the node is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="conf">The configuration that contains the values to change the associated game object.</param>
-        public EditMMNodeNetAction(string drawableID, string parentDrawableID, MindMapNodeConf conf) : base()
+        public EditMMNodeNetAction(string drawableID, string parentDrawableID, MindMapNodeConf conf) 
+            : base(drawableID, parentDrawableID)
         {
-            DrawableID = drawableID;
-            ParentDrawableID = parentDrawableID;
             Conf = conf;
-        }
-
-        /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
-
         }
 
         /// <summary>
@@ -53,16 +34,10 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
-                GameObject attached = GameFinder.GetAttachedObjectsObject(drawable);
-                if (drawable != null && GameFinder.FindChild(attached, Conf.borderConf.id).transform.parent.gameObject != null)
+                base.ExecuteOnClient();
+                if (FindChild(Conf.BorderConf.Id).transform.parent.gameObject != null)
                 {
-                    GameObject nodeObj = GameFinder.FindChild(attached, Conf.borderConf.id).transform.parent.gameObject;
-                    GameEdit.ChangeMindMapNode(nodeObj, Conf);
-                }
-                else
-                {
-                    throw new System.Exception($"There is no drawable with the ID {DrawableID} or node with the ID {Conf.id}.");
+                    GameEdit.ChangeMindMapNode(FindChild(Conf.BorderConf.Id).transform.parent.gameObject, Conf);
                 }
             }
         }

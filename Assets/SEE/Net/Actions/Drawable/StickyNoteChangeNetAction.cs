@@ -29,6 +29,7 @@ namespace SEE.Net.Actions.Drawable
         protected override void ExecuteOnServer()
         {
         }
+
         /// <summary>
         /// Changes the values of the sticky note on each client.
         /// </summary>
@@ -46,7 +47,7 @@ namespace SEE.Net.Actions.Drawable
                     GameStickyNoteManager.ChangeLayer(root, DrawableConf.Order);
                     GameStickyNoteManager.ChangeColor(stickyNote, DrawableConf.Color);
                     GameStickyNoteManager.SetRotateX(root, DrawableConf.Rotation.x);
-                    GameStickyNoteManager.SetRotateY(root, DrawableConf.Rotation.y, DrawableConf.Position);
+                    GameStickyNoteManager.SetRotateY(root, DrawableConf.Rotation.y);
                     GameScaler.SetScale(stickyNote, DrawableConf.Scale);
                 } else
                 {

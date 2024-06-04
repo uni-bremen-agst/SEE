@@ -1,7 +1,6 @@
 ﻿using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.Controls.Actions.Drawable;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -9,7 +8,6 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using static SEE.Game.Drawable.GameDrawer;
-using UnityEngine.UIElements;
 
 namespace SEE.Game.Drawable
 {
@@ -30,7 +28,7 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Get a list of the different node kinds.
+        /// Returns the list of the different node kinds.
         /// </summary>
         /// <returns>A list of the node kinds</returns>
         public static List<NodeKind> GetNodeKinds()
@@ -39,44 +37,45 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Setups a mind map node.
-        /// It adds the <see cref="Tags.MindMapNode"/> to the node. 
+        /// Sets up a mind map node.
+        /// It adds the <see cref="Tags.MindMapNode"/> to the node.
         /// It also creates the border and the text for the node and disables the collider of that.
         /// The box collider of the node will be calculated on the border size.
         /// Additionally, the node receives an <see cref="MMNodeValueHolder"/> component.
         /// </summary>
-        /// <param name="drawable">The drawable on that the node should be displayed.</param>
+        /// <param name="drawable">The drawable on which the node should be displayed.</param>
         /// <param name="name">The id of the node</param>
         /// <param name="prefix">The id prefix.</param>
         /// <param name="writtenText">The displayed text of the node</param>
         /// <param name="position">The position for the node</param>
         /// <param name="node">The created node.</param>
-        private static void Setup(GameObject drawable, string name, string prefix, string writtenText, 
+        private static void Setup(GameObject drawable, string name, string prefix, string writtenText,
             Vector3 position, out GameObject node)
         {
-            /// If the object has been created earlier, it already has a name, 
+            /// If the object has been created earlier, it already has a name,
             /// and this name is taken from the parameters <paramref name="name"/>.
-            if (name.Length > 4)
+            if (name.Length > prefix.Length)
             {
                 node = new(name);
             }
             else
             {
                 /// Otherwise, a name for the node will be generated.
-                /// For this, the node prefix <paramref name="prefix"/> is concatenated with 
+                /// For this, the node prefix <paramref name="prefix"/> is concatenated with
                 /// the object ID along with a random string consisting of four characters.
                 node = new("");
-                name = prefix + node.GetInstanceID() + DrawableHolder.GetRandomString(4);
+
+                name = prefix + node.GetInstanceID() + RandomStrings.GetRandomString(4);
                 /// Check if the name is already in use. If so, generate a new name.
                 while (GameFinder.FindChild(drawable, name) != null)
                 {
-                    name = prefix + node.GetInstanceID() + DrawableHolder.GetRandomString(4);
+                    name = prefix + node.GetInstanceID() + RandomStrings.GetRandomString(4);
                 }
                 node.name = name;
             }
 
-            /// Setups the drawable holder <see cref="DrawableHolder"/>.
-            DrawableHolder.Setup(drawable, out GameObject highestParent, out GameObject attachedObjects);
+            /// Sets up the drawable holder <see cref="DrawableHolder"/>.
+            DrawableHolder.Setup(drawable, out GameObject _, out GameObject attachedObjects);
 
             /// Assign the mind map node tag to the node object.
             node.tag = Tags.MindMapNode;
@@ -98,17 +97,17 @@ namespace SEE.Game.Drawable
             border.transform.SetParent(node.transform);
 
             /// Ensures adherence to the order in layer distance.
-            node.transform.position = position - node.transform.forward * ValueHolder.distanceToDrawable.z *
-                            border.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
+            node.transform.position = position - node.transform.forward * ValueHolder.DistanceToDrawable.z *
+                            border.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
             /// Sets the order in layer to a new created order in layer value holder for the node.
             node.AddComponent<OrderInLayerValueHolder>()
-                .SetOrderInLayer(border.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer());
+                .OrderInLayer = border.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
             /// Sets the border to the middle point of the node. And sets his order to zero.
             border.transform.localPosition = Vector3.zero;
-            border.GetComponent<OrderInLayerValueHolder>().SetOrderInLayer(0);
+            border.GetComponent<OrderInLayerValueHolder>().OrderInLayer = 0;
             /// Sets the order to the <see cref="TextMeshPro"/>, as the text otherwise does not inherit the order.
-            text.GetComponent<TextMeshPro>().sortingOrder = 
-                node.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
+            text.GetComponent<TextMeshPro>().sortingOrder =
+                node.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
 
             /// Disables the Mesh Collider for the text and border, because they should only be editable through the node.
             /// This prevents inappropriate line operations on the border, such as <see cref="LineSplitAction"/>.
@@ -125,16 +124,16 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Creates the text for the mind map node (description)
+        /// Creates the text for the mind map node (description).
         /// </summary>
-        /// <param name="drawable">The drawable on that the node should be displayed.</param>
+        /// <param name="drawable">The drawable on which the node should be displayed.</param>
         /// <param name="position">The position for the text.</param>
         /// <param name="writtenText">The text (description) for the node</param>
         /// <param name="prefix">The id prefix, necessary for the font size.</param>
         /// <returns>The created text.</returns>
         private static GameObject CreateText(GameObject drawable, Vector3 position, string writtenText, string prefix)
         {
-            /// Style for Subthemes and Leafes
+            /// Style for Subthemes and Leaves
             FontStyles fontStyles = FontStyles.Normal;
             /// Size for Subthemes
             float fontSize = 0.7f;
@@ -147,13 +146,14 @@ namespace SEE.Game.Drawable
                 fontSize = 1f;
             }
             else if (prefix == ValueHolder.MindMapLeafPrefix)
-            {/// If the node is a Leaf it has a smaller font size.
+            {
+                /// If the node is a Leaf it has a smaller font size.
                 fontSize = 0.5f;
             }
 
-            /// Create the text. Initial the color is black. It can be changed with the <see cref="EditAction"/>.
+            /// Create the text. The initial color is black. It can be changed with the <see cref="EditAction"/>.
             GameObject text = GameTexter.WriteText(drawable, writtenText, position, Color.black, Color.clear, false,
-                ValueHolder.standardTextOutlineThickness, fontSize, 0, fontStyles);
+                ValueHolder.StandardTextOutlineThickness, fontSize, 0, fontStyles);
 
             return text;
         }
@@ -162,7 +162,7 @@ namespace SEE.Game.Drawable
         /// Creates the border of the mind map node.
         /// Themes receive an ellipse shape, sub-themes a rectangle, and leaves receive an invisible ellipse shape.
         /// </summary>
-        /// <param name="drawable">The drawable on that the node should be displayed.</param>
+        /// <param name="drawable">The drawable on which the node should be displayed.</param>
         /// <param name="position">The position for the border.</param>
         /// <param name="text">The text object, necessary for the width/height calculation</param>
         /// <param name="prefix">The id prefix</param>
@@ -174,7 +174,7 @@ namespace SEE.Game.Drawable
             LineKind lineKind = LineKind.Solid;
             Color lineColor = Color.black;
             bool ellipse = false;
-            /// If the node is a Theme or a Leaf it will use an ellipse shape.
+            /// If the node is a Theme or a Leaf, it will use an ellipse shape.
             /// Subthemes have a rectangle shape.
             switch (prefix)
             {
@@ -194,8 +194,8 @@ namespace SEE.Game.Drawable
             Vector3[] positions = GetBorderPositions(ellipse, convertedHitPoint, text);
             /// Draws the border.
             shape = DrawLine(drawable, "", positions, ColorKind.Monochrome,
-                        lineColor, ValueHolder.currentSecondaryColor, ValueHolder.standardLineThickness, true,
-                        lineKind, ValueHolder.standardLineTiling, false);
+                        lineColor, ValueHolder.CurrentSecondaryColor, ValueHolder.StandardLineThickness, true,
+                        lineKind, ValueHolder.StandardLineTiling, false);
             /// Sets the pivot to the middle.
             shape = SetPivotShape(shape, convertedHitPoint);
             return shape;
@@ -210,17 +210,18 @@ namespace SEE.Game.Drawable
         /// <returns>The calculated positions.</returns>
         private static Vector3[] GetBorderPositions(bool ellipse, Vector3 position, GameObject text)
         {
-            /// If the node has the <see cref="NodeKind.Theme"/> or <see cref="NodeKind.Leaf"/>
+            /// If the node has the <see cref="NodeKind.Theme"/> or <see cref="NodeKind.Leaf"/>.
             if (ellipse)
             {
                 return ShapePointsCalculator.Ellipse(position,
-                    text.GetComponent<RectTransform>().rect.width, 
+                    text.GetComponent<RectTransform>().rect.width,
                     text.GetComponent<RectTransform>().rect.height);
             }
             else
-            { /// For the <see cref="NodeKind.Subtheme"/>
+            {
+                /// For the <see cref="NodeKind.Subtheme"/>.
                 return ShapePointsCalculator.MindMapRectangle(position,
-                    text.GetComponent<RectTransform>().rect.width + 0.05f, 
+                    text.GetComponent<RectTransform>().rect.width + 0.05f,
                     text.GetComponent<RectTransform>().rect.height + 0.05f);
             }
         }
@@ -228,13 +229,13 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Redraws the mind map node border.
         /// </summary>
-        /// <param name="node">The node which border should be redrawed.</param>
+        /// <param name="node">The node whose border should be redrawn.</param>
         public static void ReDrawBorder(GameObject node)
         {
             if (node.CompareTag(Tags.MindMapNode))
             {
                 MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
-                bool ellipse = valueHolder.GetNodeKind() != NodeKind.Subtheme;
+                bool ellipse = valueHolder.NodeKind != NodeKind.Subtheme;
                 GameObject nodeText = GameFinder.FindChildWithTag(node, Tags.DText);
                 /// Gets the new border positions.
                 Vector3[] positions = GetBorderPositions(ellipse, Vector3.zero, nodeText);
@@ -290,8 +291,8 @@ namespace SEE.Game.Drawable
         /// Converts an axis of a Vector3 array to a float array.
         /// The z axis will be ignored because it is always zero.
         /// </summary>
-        /// <param name="positions">The vector3 array which holds the positions</param>
-        /// <param name="xValue">true, if the x axis should be converted. Otherwise it will convert the y axis.</param>
+        /// <param name="positions">The vector3 array which holds the positions.</param>
+        /// <param name="xValue">True, if the x axis should be converted. Otherwise it will convert the y axis.</param>
         /// <returns>The float array with the chosen converted axis.</returns>
         private static float[] ConvertVector3ArrayToFloatArray(Vector3[] positions, bool xValue)
         {
@@ -306,7 +307,8 @@ namespace SEE.Game.Drawable
                 }
             }
             else
-            { /// Block for converting the y values.
+            {
+                /// Block for converting the y values.
                 for (int i = 0; i < positions.Length; i++)
                 {
                     arr[i] = positions[i].y;
@@ -318,7 +320,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Creates a mind map node.
         /// </summary>
-        /// <param name="drawable">The drawable on that the node should be displayed.</param>
+        /// <param name="drawable">The drawable on which the node should be displayed.</param>
         /// <param name="prefix">The id prefix for the node.</param>
         /// <param name="writtenText">The text (description) of the node.</param>
         /// <param name="position">The position for the node.</param>
@@ -330,7 +332,7 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Extract the id of a drawable type name.
+        /// Returns the id of a drawable type name.
         /// </summary>
         /// <param name="name">The drawable type name from which the ID should be extracted.</param>
         /// <returns>The extracted ID.</returns>
@@ -344,59 +346,59 @@ namespace SEE.Game.Drawable
         /// If the parameter name is not empty, an attempt is made to redraw the branch line.
         /// The order of the branch line is a sequence lower than the lower sequence of both nodes (node/parent).
         /// The mesh collider of the branch line will be deactivated.
-        /// In the <see cref="MMNodeValueHolder"/> component of the node, 
+        /// In the <see cref="MMNodeValueHolder"/> component of the node,
         /// the branch line is added as the parent branch line and the parent as parent.
         /// The <see cref="MMNodeValueHolder"/> component of the parent, adds the node and the branch line as children.
         /// </summary>
-        /// <param name="node">The child node</param>
+        /// <param name="child">The child node</param>
         /// <param name="parent">The parent node</param>
         /// <param name="name">The branch line id, empty if it's a new branch line.</param>
         /// <returns>The created branch line.</returns>
-        public static GameObject CreateBranchLine(GameObject node, GameObject parent, string name = "")
+        public static GameObject CreateBranchLine(GameObject child, GameObject parent, string name = "")
         {
             /// Calculates the end point of the branch line.
             /// Depending on the parent node and the node position.
-            Vector3 endPoint = NearestPoints.GetNearestPoint(parent, node.transform.position);
+            Vector3 endPoint = NearestPoints.GetNearestPoint(parent, child.transform.position);
 
             /// Calculates the start point of the branch line.
             /// Depending on the node and the end point.
-            Vector3 startPoint = NearestPoints.GetNearestPoint(node, endPoint);
+            Vector3 startPoint = NearestPoints.GetNearestPoint(child, endPoint);
 
-            /// Array that contains the start and end point
+            /// Array that contains the start and end point.
             Vector3[] positions = new Vector3[2];
             positions[0] = startPoint;
             positions[1] = endPoint;
             /// Convert the positions to local space.
-            GameFinder.GetHighestParent(node).transform.InverseTransformPoints(positions);
+            GameFinder.GetHighestParent(child).transform.InverseTransformPoints(positions);
 
-            GameObject drawable = GameFinder.GetDrawable(node);
+            GameObject drawable = GameFinder.GetDrawable(child);
             /// If no name was chosen, use <see cref="ValueHolder.MindMapBranchLine"/> - ParentID - NodeID.
             if (name == "")
             {
-                name = ValueHolder.MindMapBranchLine + "-" + GetIDofName(parent.name) + "-" + GetIDofName(node.name);
+                name = ValueHolder.MindMapBranchLine + "-" + GetIDofName(parent.name) + "-" + GetIDofName(child.name);
             }
             /// Creates the branch line.
             GameObject branchLine = DrawLine(drawable, name, positions, ColorKind.Monochrome,
-                        Color.black, ValueHolder.currentSecondaryColor, ValueHolder.standardLineThickness, true,
-                        LineKind.Solid, ValueHolder.standardLineTiling, false);
+                        Color.black, ValueHolder.CurrentSecondaryColor, ValueHolder.StandardLineThickness, true,
+                        LineKind.Solid, ValueHolder.StandardLineTiling, false);
 
             /// Calculates the order.
             /// An order lower than the lower order (parent or node).
             /// But <0 will be 0.
-            int order = GetBranchLineOrder(node, parent);
-            GameLayerChanger.Decrease(branchLine, order, false);
+            int order = GetBranchLineOrder(child, parent);
+            GameLayerChanger.ChangeOrderInLayer(branchLine, order, GameLayerChanger.LayerChangerStates.Decrease, false);
 
             /// Adds the node and their branch line as a child/branch line pair to the parent holder.
             MMNodeValueHolder parentValueHolder = parent.GetComponent<MMNodeValueHolder>();
-            parentValueHolder.AddChild(node, branchLine);
+            parentValueHolder.AddChild(child, branchLine);
 
             /// Enter the data in the own node holder.
-            MMNodeValueHolder nodeValueHolder = node.GetComponent<MMNodeValueHolder>();
+            MMNodeValueHolder nodeValueHolder = child.GetComponent<MMNodeValueHolder>();
             nodeValueHolder.SetParent(parent, branchLine);
-            nodeValueHolder.SetLayer(parentValueHolder.GetLayer() + 1);
+            nodeValueHolder.Layer = parentValueHolder.Layer + 1;
 
             /// Disable the Mesh Collider of the branch line.
-            /// It has the same reason as the border.
+            /// It has the same reason as for the border.
             branchLine.GetComponent<MeshCollider>().enabled = false;
             return branchLine;
         }
@@ -405,22 +407,22 @@ namespace SEE.Game.Drawable
         /// Calculates the order for the branch line.
         /// The order of the branch line is a sequence lower than the lower sequence of both nodes (node/parent).
         /// </summary>
-        /// <param name="node">The child node.</param>
+        /// <param name="child">The child node.</param>
         /// <param name="parent">The parent node.</param>
         /// <returns>The calculated order</returns>
-        private static int GetBranchLineOrder(GameObject node, GameObject parent)
+        private static int GetBranchLineOrder(GameObject child, GameObject parent)
         {
             int order;
-            if (node.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer() > 
-                parent.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer())
+            if (child.GetComponent<OrderInLayerValueHolder>().OrderInLayer >
+                parent.GetComponent<OrderInLayerValueHolder>().OrderInLayer)
             {
                 /// Block for: Parent has a lower order.
-                order = parent.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer() - 1;
+                order = parent.GetComponent<OrderInLayerValueHolder>().OrderInLayer - 1;
             }
             else
             {
                 /// Block for: Node has a lower order.
-                order = node.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer() - 1;
+                order = child.GetComponent<OrderInLayerValueHolder>().OrderInLayer - 1;
             }
 
             /// If the order would be lower then 0 it's set to 0.
@@ -434,7 +436,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Redraws the branch line to the parent node.
         /// </summary>
-        /// <param name="node">The node which parent branch line should be redrawed.</param>
+        /// <param name="node">The node whose parent branch line should be redrawn.</param>
         public static void ReDrawParentBranchLine(GameObject node)
         {
             if (node.CompareTag(Tags.MindMapNode))
@@ -450,11 +452,11 @@ namespace SEE.Game.Drawable
 
         /// <summary>
         /// Redraws the branch lines of a node.
-        /// Includes the parent branch line and 
+        /// Includes the parent branch line and
         /// the branch lines to the children of the given node.
         /// </summary>
-        /// <param name="node">The node which branch lines should be redrawed.</param>
-        /// <returns>true, if the given node has a <see cref="Tags.MindMapNode"/> and the redraw was successfully.</returns>
+        /// <param name="node">The node whose branch lines should be redrawn.</param>
+        /// <returns>true, if the given node has a <see cref="Tags.MindMapNode"/> and the redraw was successful.</returns>
         public static bool ReDrawBranchLines(GameObject node)
         {
             if (node.CompareTag(Tags.MindMapNode))
@@ -477,27 +479,27 @@ namespace SEE.Game.Drawable
 
         /// <summary>
         /// Provides the changing of the parent.
-        /// If the newly chosen parent is different from the previous one, 
+        /// If the newly chosen parent is different from the previous one,
         /// and if the validity check returns a positive result, the following will happen:
-        /// - It removes the node of the children list of the old parent 
+        /// - It removes the node of the children list of the old parent
         ///   and destroys the old parent branch line.
-        /// - Create a new branch line to the new chosen parent.
+        /// - It creates a new branch line to the new chosen parent.
         ///   (<see cref="CreateBranchLine"/>)
         /// </summary>
-        /// <param name="node">The child node</param>
-        /// <param name="parent">The new chosen parent node</param>
-        public static void ChangeParent(GameObject node, GameObject parent)
+        /// <param name="child">The child node</param>
+        /// <param name="parent">The newly chosen parent node</param>
+        public static void ChangeParent(GameObject child, GameObject parent)
         {
-            if (node.CompareTag(Tags.MindMapNode) && parent != null 
+            if (child.CompareTag(Tags.MindMapNode) && parent != null
                 && parent.CompareTag(Tags.MindMapNode))
             {
-                MMNodeValueHolder nodeValueHolder = node.GetComponent<MMNodeValueHolder>();
-                if (nodeValueHolder.GetParent() != parent && CheckValidParentChange(node, parent))
+                MMNodeValueHolder nodeValueHolder = child.GetComponent<MMNodeValueHolder>();
+                if (nodeValueHolder.GetParent() != parent && ParentChangeIsValid(child, parent))
                 {
                     /// Remove the node from the list of children of the old parent.
                     if (nodeValueHolder.GetParent() != null)
                     {
-                        nodeValueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(node);
+                        nodeValueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(child);
                     }
 
                     LineConf oldBranchLine = null;
@@ -513,7 +515,7 @@ namespace SEE.Game.Drawable
                     Destroyer.Destroy(nodeValueHolder.GetParentBranchLine());
 
                     /// Creates the new branch line.
-                    GameObject newBranchLine = CreateBranchLine(node, parent, "");
+                    GameObject newBranchLine = CreateBranchLine(child, parent, "");
 
                     /// Restores the branch line appearance.
                     if (oldBranchLine != null)
@@ -528,23 +530,23 @@ namespace SEE.Game.Drawable
         /// Validity check for the change of parent.
         /// The check prevents the formation of a cycle.
         /// </summary>
-        /// <param name="node">The child node</param>
+        /// <param name="child">The child node</param>
         /// <param name="parent">The parent</param>
         /// <param name="result">Iteration variable, for the result</param>
         /// <returns>if the parent change is possible or not.</returns>
-        public static bool CheckValidParentChange(GameObject node, GameObject parent, bool result = true)
+        public static bool ParentChangeIsValid(GameObject child, GameObject parent, bool result = true)
         {
-            if (node.CompareTag(Tags.MindMapNode) && parent.CompareTag(Tags.MindMapNode))
+            if (child.CompareTag(Tags.MindMapNode) && parent.CompareTag(Tags.MindMapNode))
             {
-                MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
-                if (node == parent)
+                MMNodeValueHolder valueHolder = child.GetComponent<MMNodeValueHolder>();
+                if (child == parent)
                 {
                     result = false;
                 }
                 /// Check to prevent cycles.
                 foreach (KeyValuePair<GameObject, GameObject> pair in valueHolder.GetChildren())
                 {
-                    result = result && CheckValidParentChange(pair.Key, parent, result);
+                    result = result && ParentChangeIsValid(pair.Key, parent, result);
                 }
                 return result;
             }
@@ -553,16 +555,16 @@ namespace SEE.Game.Drawable
 
         /// <summary>
         /// Provides the changing of the node kind.
-        /// If the newly chosen node kind is different from the previous one, 
+        /// If the newly chosen node kind is different from the previous one,
         /// and if the validity check returns a positive result, the following will happen:
-        /// - If the new node kind is a theme, the old parent branch line will 
-        ///   be deleted and the parent will set to null.
-        /// - It adjusts the font size, font styles, border shape, and line kind of the borders. 
-        /// - If the node kind will switched from leaf to another node kind the border will be black.
-        /// - The prefix of the node id will change to the new selected node kind prefix.
-        /// - The branch lines will be redrawed.
+        /// - If the new node kind is a theme, the old parent branch line will
+        ///   be deleted and the parent will be set to null.
+        /// - It adjusts the font size, font styles, border shape, and line kind of the borders.
+        /// - If the node kind will be switched from leaf to another node kind, the border will be black.
+        /// - The prefix of the node id will change to the newly selected node kind prefix.
+        /// - The branch lines will be redrawn.
         /// </summary>
-        /// <param name="node">The node which should change the node kind.</param>
+        /// <param name="node">The node that should change the node kind.</param>
         /// <param name="newNodeKind">The new node kind for the node.</param>
         /// <param name="borderConf">Optional parameter: To make the border look like the old one.</param>
         /// <returns>The new node kind of the node.</returns>
@@ -571,15 +573,14 @@ namespace SEE.Game.Drawable
             MMNodeValueHolder nodeValueHolder = node.GetComponent<MMNodeValueHolder>();
             GameObject nodeText = GameFinder.FindChildWithTag(node, Tags.DText);
             GameObject nodeBorder = GameFinder.FindChildWithTag(node, Tags.Line);
-            LineConf border = LineConf.GetLine(nodeBorder);
 
-            if (nodeValueHolder.GetNodeKind() != newNodeKind 
-                && CheckValidNodeKindChange(node, newNodeKind, nodeValueHolder.GetNodeKind()))
+            if (nodeValueHolder.NodeKind != newNodeKind
+                && CheckValidNodeKindChange(node, newNodeKind, nodeValueHolder.NodeKind))
             {
                 bool ellipse = false;
                 switch (newNodeKind)
                 {
-                    /// Block for change the <see cref="NodeKind"/> to <see cref="NodeKind.Theme"/>.
+                    /// Block to change the <see cref="NodeKind"/> to <see cref="NodeKind.Theme"/>.
                     case NodeKind.Theme:
                         /// Remove the node from the list of children of the old parent.
                         if (nodeValueHolder.GetParent() != null)
@@ -595,8 +596,9 @@ namespace SEE.Game.Drawable
                         ellipse = true;
                         GameEdit.ChangeFontStyles(nodeText, FontStyles.Bold | FontStyles.Underline);
                         GameEdit.ChangeFontSize(nodeText, 1.0f);
-                        ChangeLineKind(nodeBorder, LineKind.Solid, ValueHolder.standardLineTiling);
+                        ChangeLineKind(nodeBorder, LineKind.Solid, ValueHolder.StandardLineTiling);
                         GameEdit.ChangePrimaryColor(nodeBorder, Color.black);
+                        GameEdit.ChangeSecondaryColor(nodeBorder, Color.black);
                         break;
 
                     /// Block for change the <see cref="NodeKind"/> to <see cref="NodeKind.Subtheme"/>.
@@ -604,8 +606,9 @@ namespace SEE.Game.Drawable
                         /// Change the node appearance to the appearance of a Subtheme.
                         GameEdit.ChangeFontStyles(nodeText, FontStyles.Normal);
                         GameEdit.ChangeFontSize(nodeText, 0.7f);
-                        ChangeLineKind(nodeBorder, LineKind.Solid, ValueHolder.standardLineTiling);
+                        ChangeLineKind(nodeBorder, LineKind.Solid, ValueHolder.StandardLineTiling);
                         GameEdit.ChangePrimaryColor(nodeBorder, Color.black);
+                        GameEdit.ChangeSecondaryColor(nodeBorder, Color.black);
                         break;
 
                     /// Block for change the <see cref="NodeKind"/> to <see cref="NodeKind.Leaf"/>.
@@ -614,19 +617,20 @@ namespace SEE.Game.Drawable
                         ellipse = true;
                         GameEdit.ChangeFontStyles(nodeText, FontStyles.Normal);
                         GameEdit.ChangeFontSize(nodeText, 0.5f);
-                        ChangeLineKind(nodeBorder, LineKind.Dashed25, ValueHolder.standardLineTiling);
+                        ChangeLineKind(nodeBorder, LineKind.Dashed25, ValueHolder.StandardLineTiling);
                         GameEdit.ChangePrimaryColor(nodeBorder, Color.clear);
+                        GameEdit.ChangeSecondaryColor(nodeBorder, Color.clear);
                         break;
                 }
                 /// Changes the prefix of the node.
                 ChangeName(node, newNodeKind);
-                
+
                 /// Disables the text and border collider. The changes before can activate them.
                 DisableTextAndBorderCollider(node);
-                
+
                 /// Calculates the new border positions.
                 Vector3[] positions = GetBorderPositions(ellipse, Vector3.zero, nodeText);
-                
+
                 /// Refreshes the border line.
                 Drawing(nodeBorder, positions);
 
@@ -635,29 +639,28 @@ namespace SEE.Game.Drawable
 
                 /// Restores the old border appearance, if the new node kind is not a Leaf.
                 if (newNodeKind != NodeKind.Leaf && borderConf != null
-                    && borderConf.primaryColor != Color.clear)
+                    && borderConf.PrimaryColor != Color.clear)
                 {
                     GameEdit.ChangeLine(nodeBorder, borderConf);
                 }
                 /// Sets the new node kind to the <see cref="MMNodeValueHolder"/>.
-                nodeValueHolder.SetNodeKind(newNodeKind);
+                nodeValueHolder.NodeKind = newNodeKind;
 
                 /// At least refresh the branch lines.
                 ReDrawBranchLines(node);
             }
-            return nodeValueHolder.GetNodeKind();
+            return nodeValueHolder.NodeKind;
         }
 
         /// <summary>
         /// Changes the prefix of a node.
         /// </summary>
-        /// <param name="node">The node which id should be changed.</param>
-        /// <param name="newNodeKind">The new node kind, which prefix should be used.</param>
+        /// <param name="node">The node whose id should be changed.</param>
+        /// <param name="newNodeKind">The new node kind whose prefix should be used.</param>
         private static void ChangeName(GameObject node, NodeKind newNodeKind)
         {
-            NodeKind old = node.GetComponent<MMNodeValueHolder>().GetNodeKind();
+            NodeKind old = node.GetComponent<MMNodeValueHolder>().NodeKind;
             node.name = node.name.Replace(GetPrefix(old), GetPrefix(newNodeKind));
-
         }
 
         /// <summary>
@@ -667,22 +670,19 @@ namespace SEE.Game.Drawable
         /// <returns>The node kind prefix.</returns>
         private static string GetPrefix(NodeKind nodeKind)
         {
-            switch (nodeKind)
+            return nodeKind switch
             {
-                case NodeKind.Theme:
-                    return ValueHolder.MindMapThemePrefix;
-                case NodeKind.Subtheme:
-                    return ValueHolder.MindMapSubthemePrefix;
-                case NodeKind.Leaf:
-                    return ValueHolder.MindMapLeafPrefix;
-            }
-            return "";
+                NodeKind.Theme => ValueHolder.MindMapThemePrefix,
+                NodeKind.Subtheme => ValueHolder.MindMapSubthemePrefix,
+                NodeKind.Leaf => ValueHolder.MindMapLeafPrefix,
+                _ => "",
+            };
         }
 
         /// <summary>
         /// Disables the text and border mesh collider of a node.
         /// </summary>
-        /// <param name="node">The node which text and border collider should be disabled.</param>
+        /// <param name="node">The node whose text and border collider should be disabled.</param>
         public static void DisableTextAndBorderCollider(GameObject node)
         {
             GameFinder.FindChildWithTag(node, Tags.Line).GetComponent<Collider>().enabled = false;
@@ -690,14 +690,14 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Checks the validity and possibility <see cref="CheckChangeIsPosible"/> of the node kind change.
-        /// - A leaf can be transformed into any other node kind at any time. 
-        /// - A theme can only be transformed if a suitable parent is present. 
-        ///     For the transformation into a leaf, it additionally must not have any child nodes. 
-        /// - A subtheme can be transformed into a theme at any time. 
+        /// Checks the validity and possibility <see cref="ChangeIsPossible"/> of the node kind change.
+        /// - A leaf can be transformed into any other node kind at any time.
+        /// - A theme can only be transformed if a suitable parent is present.
+        ///     For the transformation into a leaf, it additionally must not have any child nodes.
+        /// - A subtheme can be transformed into a theme at any time.
         ///     It can only be transformed into a leaf if it has no children.
         /// </summary>
-        /// <param name="node">The node which node kind should be changed</param>
+        /// <param name="node">The node whose node kind should be changed</param>
         /// <param name="newNodeKind">The new node kind</param>
         /// <param name="oldNodeKind">The old node kind</param>
         /// <returns>the result of the check.</returns>
@@ -707,11 +707,11 @@ namespace SEE.Game.Drawable
             if (oldNodeKind == NodeKind.Theme)
             {
                 return (newNodeKind == NodeKind.Leaf && valueHolder.GetChildren().Count == 0
-                            || newNodeKind == NodeKind.Subtheme) && CheckChangeIsPosible(node);
+                            || newNodeKind == NodeKind.Subtheme) && ChangeIsPossible(node);
             }
             if (oldNodeKind == NodeKind.Subtheme)
             {
-                return newNodeKind == NodeKind.Theme 
+                return newNodeKind == NodeKind.Theme
                     || newNodeKind == NodeKind.Leaf && valueHolder.GetChildren().Count == 0;
             }
             return true;
@@ -719,19 +719,18 @@ namespace SEE.Game.Drawable
 
         /// <summary>
         /// Checks if a node kind change from theme to subtheme is possible.
-        /// For this, another theme node must exist on the drawable 
+        /// For this, another theme node must exist on the drawable
         /// that is considered as a new parent.
         /// </summary>
         /// <param name="selectedNode">The selected node</param>
-        /// <returns>The result of the check</returns>
-        private static bool CheckChangeIsPosible(GameObject selectedNode)
+        /// <returns>True if change is possible.</returns>
+        private static bool ChangeIsPossible(GameObject selectedNode)
         {
             GameObject attacheds = GameFinder.GetAttachedObjectsObject(selectedNode);
-            List<GameObject> nodes = GameFinder.FindAllChildrenWithTag(attacheds, Tags.MindMapNode);
-            foreach (GameObject node in nodes)
+            foreach (GameObject node in GameFinder.FindAllChildrenWithTag(attacheds, Tags.MindMapNode))
             {
-                if (node.GetComponent<MMNodeValueHolder>().GetNodeKind() == NodeKind.Theme 
-                    && CheckValidParentChange(selectedNode, node))
+                if (node.GetComponent<MMNodeValueHolder>().NodeKind == NodeKind.Theme
+                    && ParentChangeIsValid(selectedNode, node))
                 {
                     return true;
                 }
@@ -742,7 +741,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Re-creates a mind map node
         /// </summary>
-        /// <param name="drawable">The drawable on that the node should be displayed.</param>
+        /// <param name="drawable">The drawable on which the node should be displayed.</param>
         /// <param name="parent">The parent mind map node</param>
         /// <param name="name">The id of the node</param>
         /// <param name="textConf">The text configuration for the text (description) of the node</param>
@@ -758,11 +757,11 @@ namespace SEE.Game.Drawable
             TextConf textConf, LineConf borderConf, Vector3 position, Vector3 scale,
             Vector3 eulerAngles, int order, NodeKind nodeKind, string branchToParentName)
         {
-            /// Adjusts the current order in the layer if the 
+            /// Adjusts the current order in the layer if the
             /// order in layer for the line is greater than or equal to it.
-            if (order >= ValueHolder.currentOrderInLayer)
+            if (order >= ValueHolder.CurrentOrderInLayer)
             {
-                ValueHolder.currentOrderInLayer = order + 1;
+                ValueHolder.CurrentOrderInLayer = order + 1;
             }
             GameObject createdNode;
 
@@ -774,7 +773,7 @@ namespace SEE.Game.Drawable
             else
             {
                 /// Creates the node.
-                Setup(drawable, name, GetPrefix(nodeKind), textConf.text, 
+                Setup(drawable, name, GetPrefix(nodeKind), textConf.Text,
                     drawable.transform.TransformPoint(position), out GameObject node);
                 /// Destroyes the text and border, because the originals will be restored below.
                 Destroyer.Destroy(GameFinder.FindChildWithTag(node, Tags.Line));
@@ -786,9 +785,9 @@ namespace SEE.Game.Drawable
             GameObject border = ReDrawLine(drawable, borderConf);
 
             /// Restores the text and sets the order.
-            textConf.orderInLayer = order;
+            textConf.OrderInLayer = order;
             GameObject text = GameTexter.ReWriteText(drawable, textConf);
-            text.GetComponent<OrderInLayerValueHolder>().SetOrderInLayer(0);
+            text.GetComponent<OrderInLayerValueHolder>().OrderInLayer = 0;
 
             /// Assigns the border and the text to the node.
             border.transform.SetParent(createdNode.transform);
@@ -797,12 +796,12 @@ namespace SEE.Game.Drawable
             /// Disables the colliders. For the reason look in <see cref="Setup"/>.
             text.GetComponent<MeshCollider>().enabled = false;
             border.GetComponent<MeshCollider>().enabled = false;
-            
+
             /// Sets the position to the middle of the node.
             border.transform.localPosition = Vector3.zero;
             text.transform.localPosition = Vector3.zero;
 
-            /// Adds and calculates the box collider size
+            /// Adds and calculates the box collider size.
             BoxCollider box = createdNode.GetComponent<BoxCollider>();
             box.size = GetBoxSize(border);
 
@@ -810,9 +809,9 @@ namespace SEE.Game.Drawable
             createdNode.transform.localScale = scale;
             createdNode.transform.localEulerAngles = eulerAngles;
             createdNode.transform.localPosition = position;
-            createdNode.GetComponent<OrderInLayerValueHolder>().SetOrderInLayer(order);
+            createdNode.GetComponent<OrderInLayerValueHolder>().OrderInLayer =order;
 
-            /// Create the branch line, if the node has a parent
+            /// Create the branch line, if the node has a parent.
             if (parent != null)
             {
                 CreateBranchLine(createdNode, parent, branchToParentName);
@@ -823,7 +822,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Recreates a mind map node based on <paramref name="conf"/>.
         /// </summary>
-        /// <param name="drawable">The drawable on that the node should be displayed.</param>
+        /// <param name="drawable">The drawable on which the node should be displayed.</param>
         /// <param name="conf">The node configuration for restore.</param>
         /// <returns>The mind map node.</returns>
         public static GameObject ReCreate(GameObject drawable, MindMapNodeConf conf)
@@ -833,21 +832,21 @@ namespace SEE.Game.Drawable
             /// Try to find the parent of the configuration.
             if (GameFinder.GetAttachedObjectsObject(drawable) != null)
             {
-                parent = GameFinder.FindChild(GameFinder.GetAttachedObjectsObject(drawable), 
-                    conf.parentNode);
+                parent = GameFinder.FindChild(GameFinder.GetAttachedObjectsObject(drawable),
+                    conf.ParentNode);
             }
 
             return ReCreate(drawable,
                 parent,
-                conf.id,
-                conf.textConf,
-                conf.borderConf,
-                conf.position,
-                conf.scale,
-                conf.eulerAngles,
-                conf.orderInLayer,
-                conf.nodeKind,
-                conf.branchLineToParent);
+                conf.Id,
+                conf.TextConf,
+                conf.BorderConf,
+                conf.Position,
+                conf.Scale,
+                conf.EulerAngles,
+                conf.OrderInLayer,
+                conf.NodeKind,
+                conf.BranchLineToParent);
         }
 
         /// <summary>
@@ -861,15 +860,15 @@ namespace SEE.Game.Drawable
             {
                 Dictionary<string, string> nameDictionary = new();
                 Dictionary<string, string> idDictionary = new();
-                /// Block for renames the nodes.
+                /// Block to rename the nodes.
                 foreach (MindMapNodeConf node in config.MindMapNodeConfigs)
                 {
                     RenameNode(node, attachedObject, nameDictionary, idDictionary);
                 }
-                /// Block for renames the branch lines.
+                /// Block to rename the branch lines.
                 foreach (LineConf branchLine in config.LineConfigs)
                 {
-                    if (branchLine.id.StartsWith(ValueHolder.MindMapBranchLine))
+                    if (branchLine.Id.StartsWith(ValueHolder.MindMapBranchLine))
                     {
                         RenameBranchLine(branchLine, idDictionary);
                     }
@@ -884,45 +883,45 @@ namespace SEE.Game.Drawable
         /// <param name="attachedObjects">The attached objects object where the drawable types should be placed.</param>
         /// <param name="nameDictionary">The dictionary that holds the old name and the new name</param>
         /// <param name="idDictionary">Dictionary that holds the old id's and the new names.</param>
-        private static void RenameNode(MindMapNodeConf conf, GameObject attachedObjects, 
+        private static void RenameNode(MindMapNodeConf conf, GameObject attachedObjects,
             Dictionary<string, string> nameDictionary, Dictionary<string, string> idDictionary)
         {
-            string prefix = GetPrefix(conf.nodeKind); ;
+            string prefix = GetPrefix(conf.NodeKind);
 
-            if (GameFinder.FindChild(attachedObjects, conf.id) != null)
+            if (GameFinder.FindChild(attachedObjects, conf.Id) != null)
             {
                 /// Gets a new id for the object based on a random string.
-                string id = DrawableHolder.GetRandomString(8);
+                string id = RandomStrings.GetRandomString(8);
                 string newName = prefix + id;
 
                 /// Check if the name is already in use. If so, generate a new name.
                 while (GameFinder.FindChild(attachedObjects, newName) != null)
                 {
-                    id = DrawableHolder.GetRandomString(8);
+                    id = RandomStrings.GetRandomString(8);
                     newName = prefix + id;
                 }
 
                 /// Adds the old and the new name to a dictionary.
-                nameDictionary.Add(conf.id, newName);
+                nameDictionary.Add(conf.Id, newName);
 
                 /// Adds a pair of the old id and the new name in a other dictionary.
-                idDictionary.Add(GetIDofName(conf.id), newName);
+                idDictionary.Add(GetIDofName(conf.Id), newName);
 
                 /// Change the names to the new name.
-                conf.id = newName;
-                conf.borderConf.id = ValueHolder.LinePrefix + id;
-                conf.textConf.id = ValueHolder.TextPrefix + id;
+                conf.Id = newName;
+                conf.BorderConf.Id = ValueHolder.LinePrefix + id;
+                conf.TextConf.Id = ValueHolder.TextPrefix + id;
 
                 /// If the node has a parent, replace the old parent name with the new one.
-                if (conf.parentNode != "")
+                if (conf.ParentNode != "")
                 {
-                    conf.parentNode = nameDictionary[conf.parentNode];
+                    conf.ParentNode = nameDictionary[conf.ParentNode];
                     /// Rename the branch line with the new id's of the parent and the node.
-                    conf.branchLineToParent = ValueHolder.MindMapBranchLine + "-" 
-                        + GetIDofName(conf.parentNode) + "-" + GetIDofName(conf.id);
-                    if (conf.branchLineConf != null)
+                    conf.BranchLineToParent = ValueHolder.MindMapBranchLine + "-"
+                        + GetIDofName(conf.ParentNode) + "-" + GetIDofName(conf.Id);
+                    if (conf.BranchLineConf != null)
                     {
-                        conf.branchLineConf.id = conf.branchLineToParent;
+                        conf.BranchLineConf.Id = conf.BranchLineToParent;
                     }
                 }
             }
@@ -938,30 +937,28 @@ namespace SEE.Game.Drawable
             string prefix = ValueHolder.MindMapBranchLine;
 
             /// Splits the old name into three parts.
-            string[] splitted = conf.id.Split("-");
+            string[] splitOfOldName = conf.Id.Split("-");
 
             /// Get the new parent id.
-            string newParentID = splitted[1];
-            string nPID;
-            if (idDictionary.TryGetValue(newParentID, out nPID))
+            string newParentID = splitOfOldName[1];
+            if (idDictionary.TryGetValue(newParentID, out string nPID))
             {
                 newParentID = GetIDofName(nPID);
             }
 
             /// Get the new node id.
-            string newChildID = splitted[2];
-            string nCID;
-            if (idDictionary.TryGetValue(newChildID, out nCID))
+            string newChildID = splitOfOldName[2];
+            if (idDictionary.TryGetValue(newChildID, out string nCID))
             {
                 newChildID = GetIDofName(nCID);
             }
 
             /// Rename the branch line.
-            conf.id = prefix + "-" + newParentID + "-" + newChildID;
+            conf.Id = prefix + "-" + newParentID + "-" + newChildID;
         }
 
         /// <summary>
-        /// Summerize the selected node, including children and branch lines, into a DrawableConfig.
+        /// Summerizes the selected node, including children and branch lines, into a DrawableConfig.
         /// </summary>
         /// <param name="node">The selected node</param>
         /// <returns>A drawable configuration that only contains the selected node with children and branch lines.</returns>

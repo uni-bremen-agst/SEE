@@ -7,8 +7,8 @@ using UnityEngine.Networking;
 namespace SEE.Game.Drawable.ActionHelpers
 {
     /// <summary>
-    /// Component to download an image from web.
-    /// 
+    /// Component to download an image from the web.
+    ///
     /// Idea by Marcus Ansley
     /// https://m-ansley.medium.com/unity-web-requests-downloading-an-image-e88d7389dd5a
     /// last visite: 12.12.2023
@@ -39,17 +39,17 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// Coroutine that handles the download.
         /// Displays a warning if an error occurs during the download.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>enumerator to continue</returns>
         private IEnumerator DownloadTexture()
         {
             UnityWebRequest request = UnityWebRequestTexture.GetTexture(imageUrl);
 
             yield return request.SendWebRequest();
 
-            if (request.result == UnityWebRequest.Result.ProtocolError 
+            if (request.result == UnityWebRequest.Result.ProtocolError
                 ||  request.result == UnityWebRequest.Result.ConnectionError)
             {
-                ShowNotification.Warn("Can't download", "The image of the http can't be downloaded.");
+                Warn(imageUrl);
                 Destroyer.Destroy(this);
             }
             else
@@ -57,9 +57,14 @@ namespace SEE.Game.Drawable.ActionHelpers
                 texture = DownloadHandlerTexture.GetContent(request);
                 if (texture == null)
                 {
-                    ShowNotification.Warn("Can't download", "The image of the http can't be downloaded.");
+                    Warn(imageUrl);
                     Destroyer.Destroy(this);
                 }
+            }
+
+            static void Warn(string imageUrl)
+            {
+                ShowNotification.Warn("Can't download", $"The image can't be downloaded from {imageUrl}.");
             }
         }
 

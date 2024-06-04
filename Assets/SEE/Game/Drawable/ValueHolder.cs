@@ -12,47 +12,47 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// The current chosen primary color for drawing.
         /// </summary>
-        public static Color currentPrimaryColor { get; set; }
+        public static Color CurrentPrimaryColor { get; set; }
 
         /// <summary>
         /// The current chosen secondary color for drawing.
         /// </summary>
-        public static Color currentSecondaryColor { get; set; }
+        public static Color CurrentSecondaryColor { get; set; }
 
         /// <summary>
         /// The current chosen thickness for drawing.
         /// </summary>
-        public static float currentThickness { get; set; }
+        public static float CurrentThickness { get; set; }
 
         /// <summary>
         /// The current chosen thickness for text outline.
         /// </summary>
-        public static float currentOutlineThickness { get; set; }
+        public static float CurrentOutlineThickness { get; set; }
 
         /// <summary>
         /// The current chosen text font size.
         /// </summary>
-        public static float currentFontSize { get; set; }
+        public static float CurrentFontSize { get; set; }
 
         /// <summary>
         /// The current chosen line kind for drawing.
         /// </summary>
-        public static GameDrawer.LineKind currentLineKind { get; set; }
+        public static GameDrawer.LineKind CurrentLineKind { get; set; }
 
         /// <summary>
         /// The current chosen color kind for drawing.
         /// </summary>
-        public static GameDrawer.ColorKind currentColorKind { get; set; }
+        public static GameDrawer.ColorKind CurrentColorKind { get; set; }
 
         /// <summary>
         /// The current chosen tiling for drawing a dashed line kind.
         /// </summary>
-        public static float currentTiling { get; set; }
+        public static float CurrentTiling { get; set; }
 
         /// <summary>
         /// The current order in layer value.
         /// </summary>
-        public static int currentOrderInLayer { get; set; }
+        public static int CurrentOrderInLayer { get; set; }
         #endregion
 
         #region prefixes
@@ -67,7 +67,7 @@ namespace SEE.Game.Drawable
         public const string TextPrefix = "Text";
 
         /// <summary>
-        /// The prefix of a image object name.
+        /// The prefix of an image object name.
         /// </summary>
         public const string ImagePrefix = "Image";
 
@@ -92,7 +92,7 @@ namespace SEE.Game.Drawable
         public const string MindMapBranchLine = "BranchLine";
 
         /// <summary>
-        /// The prefix of a sticky notes.
+        /// The prefix of a sticky note.
         /// </summary>
         public const string StickyNotePrefix = "StickyNote";
 
@@ -110,82 +110,82 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// The distance to a drawable that is used by default to place objects.
         /// </summary>
-        public static readonly Vector3 distanceToDrawable = new(0, 0, 0.0001f);
+        public static readonly Vector3 DistanceToDrawable = new(0, 0, 0.0001f);
 
         /// <summary>
-        /// The standard line thickness
+        /// The standard line thickness.
         /// </summary>
-        public const float standardLineThickness = 0.01f;
+        public const float StandardLineThickness = 0.01f;
 
         /// <summary>
         /// The standard line tiling.
         /// </summary>
-        public const float standardLineTiling = 1.0f;
+        public const float StandardLineTiling = 1.0f;
 
         /// <summary>
         /// The standard text outline thickness.
         /// </summary>
-        public const float standardTextOutlineThickness = 0.4f;
+        public const float StandardTextOutlineThickness = 0.4f;
 
         /// <summary>
         /// The standard scale up factor.
         /// </summary>
-        public const float scaleUp = 1.01f;
+        public const float ScaleUp = 1.01f;
 
         /// <summary>
         /// The scale up factor for fast scaling.
         /// </summary>
-        public const float scaleUpFast = 1.1f;
+        public const float ScaleUpFast = 1.1f;
 
         /// <summary>
         /// The standard scale down factor.
         /// </summary>
-        public const float scaleDown = 0.99f;
+        public const float ScaleDown = 0.99f;
 
         /// <summary>
         /// The scale down factor for fast scaling.
         /// </summary>
-        public const float scaleDownFast = 0.9f;
+        public const float ScaleDownFast = 0.9f;
 
         /// <summary>
-        /// The constant for rotate by mouse wheel.
+        /// The constant to rotate by mouse wheel.
         /// </summary>
-        public const float rotate = 1;
+        public const float Rotate = 1;
 
         /// <summary>
         /// The constant for fast rotate by mouse wheel.
         /// </summary>
-        public const float rotateFast = 10;
+        public const float RotateFast = 10;
 
         /// <summary>
         /// The constant for moving speed by key.
         /// </summary>
-        public const float move = 0.001f;
+        public const float Move = 0.001f;
 
         /// <summary>
         /// The constant for fast moving speed by key.
         /// </summary>
-        public const float moveFast = 0.01f;
+        public const float MoveFast = 0.01f;
 
         /// <summary>
         /// Specifies the radius for the line split marker.
         /// </summary>
-        public const float lineSplitMarkerRadius = 0.022f;
+        public const float LineSplitMarkerRadius = 0.022f;
 
         /// <summary>
         /// Specifies the number of edges for the polygon of the line split marker.
         /// </summary>
-        public const int lineSplitMarkerVertices = 30;
+        public const int LineSplitMarkerVertices = 30;
 
         /// <summary>
         /// Specifies the time after which the Line Split marker should be deleted.
         /// </summary>
-        public const float lineSplitTimer = 3.0f;
+        public const float LineSplitTimer = 3.0f;
 
         /// <summary>
         /// The default marker color for colors that do not have a complementary color.
         /// </summary>
-        public static readonly Color lineSplitDefaultMarkerColor = Color.magenta;
+        public static readonly Color LineSplitDefaultMarkerColor = Color.magenta;
 
         /// <summary>
         /// The initial scale for sticky notes.
@@ -193,25 +193,25 @@ namespace SEE.Game.Drawable
         public static readonly Vector3 StickyNoteScale = new (0.5f, 0.5f, 0.5f);
 
         /// <summary>
-        /// The path to the folder drawable folder of the saved files. This is saved in a field because multiple
+        /// The path to the drawable folder of the saved files. This is saved in a field because multiple
         /// methods of this class and other classes use it.
         /// </summary>
-        public static readonly string drawablePath = Application.persistentDataPath + "/Drawable/";
+        public static readonly string DrawablePath = Application.persistentDataPath + "/Drawable/";
 
         /// <summary>
         /// The path to the drawable image folder. This is saved in a field because multiple
         /// methods of this class and other classes use it.
         /// </summary>
-        public static readonly string imagePath = drawablePath + "Image/";
+        public static readonly string ImagePath = DrawablePath + "Image/";
 
         /// <summary>
         /// The list of object names or <see cref="Tags"/> whose rotation is suitable for spawning/moving Sticky Notes.
         /// In the list, object names or <see cref="Tags"/> of suitable objects can be added.
         /// Since the name cannot be uniquely determined for objects added during runtime, the solution with <see cref="Tags"/> is provided.
-        /// In addition to these objects, objects with the tag 'Drawable' are also suitable. 
+        /// In addition to these objects, objects with the tag <see cref="Tags.Drawable"/> are also suitable.
         /// The respective Sticky Note should then adopt its rotation.
         /// </summary>
-        public static readonly List<string> SuitableObjectsForStickyNotes = new() {
+        public static readonly IList<string> SuitableObjectsForStickyNotes = new List<string>() {
             "Mirror",
         };
 
@@ -227,7 +227,7 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// The direction's for moving. Will needed for sticky note menu.
+        /// The direction for moving. Will be needed for sticky note menu.
         /// </summary>
         public enum MoveDirection
         {
@@ -240,19 +240,19 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// The constructor, it sets the default values for the current values.
+        /// The constructor. It sets the default values for the current values.
         /// </summary>
         static ValueHolder()
         {
-            currentPrimaryColor = UnityEngine.Random.ColorHSV();
-            currentSecondaryColor = Color.clear;
-            currentOutlineThickness = 0.4f;
-            currentFontSize = 0.5f;
-            currentThickness = 0.01f;
-            currentLineKind = GameDrawer.LineKind.Solid;
-            currentColorKind = GameDrawer.ColorKind.Monochrome;
-            currentTiling = 1f;
-            currentOrderInLayer = 1;
+            CurrentPrimaryColor = UnityEngine.Random.ColorHSV();
+            CurrentSecondaryColor = Color.clear;
+            CurrentOutlineThickness = 0.4f;
+            CurrentFontSize = 0.5f;
+            CurrentThickness = 0.01f;
+            CurrentLineKind = GameDrawer.LineKind.Solid;
+            CurrentColorKind = GameDrawer.ColorKind.Monochrome;
+            CurrentTiling = 1f;
+            CurrentOrderInLayer = 1;
         }
     }
 }

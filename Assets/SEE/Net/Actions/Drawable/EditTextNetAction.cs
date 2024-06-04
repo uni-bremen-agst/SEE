@@ -8,16 +8,8 @@ namespace SEE.Net.Actions.Drawable
     /// <summary>
     /// This class is responsible for changing all values (<see cref="EditAction"/>) of a text on all clients.
     /// </summary>
-    public class EditTextNetAction : AbstractNetAction
+    public class EditTextNetAction : DrawableNetAction
     {
-        /// <summary>
-        /// The id of the drawable on which the object is located
-        /// </summary>
-        public string DrawableID;
-        /// <summary>
-        /// The id of the drawable parent
-        /// </summary>
-        public string ParentDrawableID;
         /// <summary>
         /// The Text that should be changed. The Text object contains all relevant values to change.
         /// </summary>
@@ -29,20 +21,10 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="drawableID">The id of the drawable on which the object is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="text">The text that contains the values to change the associated game object.</param>
-        public EditTextNetAction(string drawableID, string parentDrawableID, TextConf text) : base()
+        public EditTextNetAction(string drawableID, string parentDrawableID, TextConf text) 
+            : base(drawableID, parentDrawableID)
         {
-            DrawableID = drawableID;
-            ParentDrawableID = parentDrawableID;
             Text = text;
-        }
-
-        /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
-
         }
 
         /// <summary>
@@ -53,16 +35,8 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
-                if (drawable != null && GameFinder.FindChild(drawable, Text.id) != null)
-                {
-                    GameObject textObj = GameFinder.FindChild(drawable, Text.id);
-                    GameEdit.ChangeText(textObj, Text);
-                }
-                else
-                {
-                    throw new System.Exception($"There is no drawable with the ID {DrawableID} or text with the ID {Text.id}.");
-                }
+                base.ExecuteOnClient();
+                GameEdit.ChangeText(FindChild(Text.Id), Text);
             }
         }
     }

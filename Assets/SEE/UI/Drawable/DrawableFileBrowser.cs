@@ -119,7 +119,7 @@ namespace SEE.UI.Drawable
                     break;
 
                 /// Block for save more drawables.
-                case SaveState.More:
+                case SaveState.Multiple:
                     DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.multipleConfPath);
                     initPath = DrawableConfigManager.multipleConfPath;
                     title = "Save specific Drawables";
@@ -167,8 +167,8 @@ namespace SEE.UI.Drawable
         /// <returns>nothing</returns>
         private IEnumerator ShowLoadImageDialogCoroutine()
         {
-            DrawableConfigManager.EnsureDrawableDirectoryExists(ValueHolder.imagePath);
-            initPath = ValueHolder.imagePath;
+            DrawableConfigManager.EnsureDrawableDirectoryExists(ValueHolder.ImagePath);
+            initPath = ValueHolder.ImagePath;
             string title = "Load an image";
 
             /// Ensures that only PNG or JPG files can be selected.

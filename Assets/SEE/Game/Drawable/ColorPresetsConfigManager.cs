@@ -15,15 +15,15 @@ namespace SEE.Game.Drawable
     public static class ColorPresetsConfigManager
     {
         /// <summary>
-        /// The path to the file containing the saved color presets. 
+        /// The path to the file containing the saved color presets.
         /// This is saved in a field because multiple methods of this class use it.
         /// </summary>
-        private static readonly string colorPresetsFile = DrawableConfigManager.configurationPath 
+        private static readonly string colorPresetsFile = DrawableConfigManager.configurationPath
             + "ColorPresets" + Filenames.ConfigExtension;
 
         /// <summary>
-        /// This method checks whether the directory for the saved drawable exists. 
-        /// If not, then it creates that directory.
+        /// This method checks whether the directory for the saved drawable exists.
+        /// If not, it creates that directory.
         /// </summary>
         private static void EnsureDrawableDirectoryExists()
         {
@@ -31,7 +31,7 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Checks if the file exists
+        /// True if the color-preset file exists
         /// </summary>
         /// <returns>Whether the file exists or not.</returns>
         public static bool IsFileExists()
@@ -54,7 +54,7 @@ namespace SEE.Game.Drawable
             }
             catch (Exception e)
             {
-                ShowNotification.Error("Error loading colors", 
+                ShowNotification.Error("Error loading colors",
                     $"Could not load settings from {colorPresetsFile}: {e.Message}");
                 throw e;
             }
@@ -62,7 +62,7 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Persist the color presets of the color picker to a file.
+        // Saves the color presets of the color picker to a file.
         /// </summary>
         /// <param name="colors">The colors to save.</param>
         internal static void SaveColors(Color[] colors)

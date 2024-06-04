@@ -1,23 +1,15 @@
 ﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is responsible for changing all values (<see cref="EditAction"/>) of a image on all clients.
+    /// This class is responsible for changing all values (<see cref="EditAction"/>) of a
+    /// image on all clients.
     /// </summary>
-    public class EditImageNetAction : AbstractNetAction
+    public class EditImageNetAction : DrawableNetAction
     {
-        /// <summary>
-        /// The id of the drawable on which the image is located
-        /// </summary>
-        public string DrawableID;
-        /// <summary>
-        /// The id of the drawable parent
-        /// </summary>
-        public string ParentDrawableID;
         /// <summary>
         /// The Image that should be changed. The Image object contains all relevant values to change.
         /// </summary>
@@ -29,20 +21,10 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="drawableID">The id of the drawable on which the object is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="image">The image configuration that contains the values to change the associated game object.</param>
-        public EditImageNetAction(string drawableID, string parentDrawableID, ImageConf image) : base()
+        public EditImageNetAction(string drawableID, string parentDrawableID, ImageConf image)
+            : base(drawableID, parentDrawableID)
         {
-            DrawableID = drawableID;
-            ParentDrawableID = parentDrawableID;
             Image = image;
-        }
-
-        /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
-
         }
 
         /// <summary>
@@ -53,16 +35,8 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
-                if (drawable != null && GameFinder.FindChild(drawable, Image.id) != null)
-                {
-                    GameObject imageObj = GameFinder.FindChild(drawable, Image.id);
-                    GameEdit.ChangeImage(imageObj, Image);
-                }
-                else
-                {
-                    throw new System.Exception($"There is no drawable with the ID {DrawableID} or image with the ID {Image.id}.");
-                }
+                base.ExecuteOnClient();
+                GameEdit.ChangeImage(FindChild(Image.Id), Image);
             }
         }
     }

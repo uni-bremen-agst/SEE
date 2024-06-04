@@ -7,16 +7,8 @@ namespace SEE.Net.Actions.Drawable
     /// <summary>
     /// This class is responsible for changing the scale (<see cref="ScaleAction"/>) of an object on all clients.
     /// </summary>
-    public class ScaleNetAction : AbstractNetAction
+    public class ScaleNetAction : DrawableNetAction
     {
-        /// <summary>
-        /// The id of the drawable on which the object is located
-        /// </summary>
-        public string DrawableID;
-        /// <summary>
-        /// The id of the drawable parent
-        /// </summary>
-        public string ParentDrawableID;
         /// <summary>
         /// The id of the object that should be changed
         /// </summary>
@@ -33,21 +25,11 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="objectName">The id of the object that should be changed.</param>
         /// <param name="scale">The scale that should be set.</param>
-        public ScaleNetAction(string drawableID, string parentDrawableID, string objectName, Vector3 scale) : base()
+        public ScaleNetAction(string drawableID, string parentDrawableID, string objectName, Vector3 scale) 
+            : base(drawableID, parentDrawableID)
         {
-            DrawableID = drawableID;
-            ParentDrawableID = parentDrawableID;
             ObjectName = objectName;
             Scale = scale;
-        }
-
-        /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
-
         }
 
         /// <summary>
@@ -58,21 +40,15 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
-                if (drawable != null && GameFinder.FindChild(drawable, ObjectName) != null)
+                base.ExecuteOnClient();
+                if (TryFindChild(ObjectName, out GameObject child))
                 {
-                    GameScaler.SetScale(GameFinder.FindChild(drawable, ObjectName), Scale);
-                } else if (drawable != null)
+                    GameScaler.SetScale(GameFinder.FindChild(Drawable, ObjectName), Scale);
+                } else
                 {
-                    GameScaler.SetScale(drawable.transform.parent.gameObject, Scale);
-                }
-                else
-                {
-                    throw new System.Exception($"There is no drawable with the ID {DrawableID} or drawable type object with the ID {ObjectName}.");
+                    GameScaler.SetScale(Drawable.transform.parent.gameObject, Scale);
                 }
             }
         }
-
-        
     }
 }
