@@ -81,6 +81,7 @@ namespace SEE.Controls.Actions
                 // TODO (#666): Better properties view
                 new("Properties", ShowProperties, Icons.Info),
                 new("Show Metrics", ShowMetrics, Icons.Info),
+                new("Create Note", CreateNote, Icons.Node),
             };
 
             if (gameObject != null)
@@ -119,6 +120,11 @@ namespace SEE.Controls.Actions
             void ShowMetrics()
             {
                 ActivateWindow(CreateMetricWindow(gameObject.MustGetComponent<GraphElementRef>()));
+            }
+
+            void CreateNote()
+            {
+                ActivateWindow(CreateNoteWindow(gameObject.MustGetComponent<GraphElementRef>()));
             }
 
             void ShowCode()
@@ -182,6 +188,17 @@ namespace SEE.Controls.Actions
                 metricMenu.GraphElement = graphElementRef.Elem;
             }
             return metricMenu;
+        }
+
+        private static NoteWindow CreateNoteWindow(GraphElementRef graphElementRef)
+        {
+            // Create new window for active selection, or use existing one
+            if (!graphElementRef.TryGetComponent(out NoteWindow noteWindow))
+            {
+                noteWindow = graphElementRef.gameObject.AddComponent<NoteWindow>();
+                noteWindow.Title = "Notes for " + graphElementRef.Elem.ToShortString();
+            }
+            return noteWindow;
         }
 
         /// <summary>
