@@ -27,6 +27,7 @@ namespace SEE.GraphProviders
                 GraphProviderKind.Pipeline => new PipelineGraphProvider(),
                 GraphProviderKind.JaCoCo => new JaCoCoGraphProvider(),
                 GraphProviderKind.MergeDiff => new MergeDiffGraphProvider(),
+                GraphProviderKind.VCS => new VCSGraphProvider(),
                 GraphProviderKind.LSP => new LSPGraphProvider(),
                 GraphProviderKind.Git => new GitGraphProvider(),
                 _ => throw new NotImplementedException($"Not implemented for {kind}")

@@ -1,7 +1,15 @@
-﻿using NUnit.Framework;
+﻿using LibGit2Sharp;
+using NUnit.Framework;
+using SEE.DataModel.DG;
+using SEE.Game.City;
+using SEE.Scanner;
 using SEE.Utils;
 using SEE.Utils.Config;
+using SEE.Utils.Paths;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -254,6 +262,157 @@ namespace SEE.GraphProviders
 
         #endregion
 
+        #region VCSGraphProvider
+
+        public async Task<Graph> GetVCSGraphAsync()
+        {
+            VCSGraphProvider saved = GetVCSGraphProvider();
+            SEECity testCity = NewVanillaSEECity<SEECity>(); ;
+            Graph testGraph = new("test", "test");
+            Graph graph = await saved.ProvideAsync(testGraph, testCity);
+            return graph;
+        }
+
+        [Test]
+        public async Task TestVCSGraphProviderAsync()
+        {
+            Graph graph = await GetVCSGraphAsync();
+            List<string> pathsFromGraph = new();
+            foreach (GraphElement elem in graph.Elements())
+            {
+                pathsFromGraph.Add(elem.ID);
+            }
+
+            string repositoryPath = Application.dataPath;
+            string projectPath = repositoryPath.Substring(0, repositoryPath.LastIndexOf("/"));
+            string projectName = Path.GetFileName(projectPath);
+
+            List<string> actualList = new()
+            {
+                projectName,
+                ".gitignore",
+                "Assets",
+                "Assets/Scenes.meta",
+                "Assets/Scenes",
+                "Assets/Scenes/SampleScene.unity",
+                "Assets/Scenes/SampleScene.unity.meta",
+                "Packages",
+                "Packages/manifest.json",
+                "ProjectSettings",
+                "ProjectSettings/AudioManager.asset",
+                "ProjectSettings/ClusterInputManager.asset",
+                "ProjectSettings/DynamicsManager.asset",
+                "ProjectSettings/EditorBuildSettings.asset",
+                "ProjectSettings/EditorSettings.asset",
+                "ProjectSettings/GraphicsSettings.asset",
+                "ProjectSettings/InputManager.asset",
+                "ProjectSettings/NavMeshAreas.asset",
+                "ProjectSettings/Physics2DSettings.asset",
+                "ProjectSettings/PresetManager.asset",
+                "ProjectSettings/ProjectSettings.asset",
+                "ProjectSettings/ProjectVersion.txt",
+                "ProjectSettings/QualitySettings.asset",
+                "ProjectSettings/TagManager.asset",
+                "ProjectSettings/TimeManager.asset",
+                "ProjectSettings/UnityConnectSettings.asset",
+                "ProjectSettings/VFXManager.asset",
+                "ProjectSettings/XRSettings.asset"
+            };
+            Assert.AreEqual(28, pathsFromGraph.Count());
+            Assert.IsTrue(actualList.OrderByDescending(x => x).ToList().SequenceEqual(pathsFromGraph.OrderByDescending(x => x).ToList()));
+        }
+
+        private VCSGraphProvider GetVCSGraphProvider()
+        {
+            return new VCSGraphProvider()
+            {
+                RepositoryPath = new DirectoryPath(Path.GetDirectoryName(Application.dataPath)),
+                CommitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461",
+            };
+        }
+
+        [Test]
+        public async Task TestRetrieveTokensAsync()
+        {
+            Graph graph = await GetVCSGraphAsync();
+            Node fileNode = graph.Nodes().First(t => t.Type == "File");
+            string filePath = fileNode.ID;
+            string commitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461";
+            string repoPath = Path.GetDirectoryName(Application.dataPath);
+            using Repository repo = new(repoPath);
+            TokenLanguage language = TokenLanguage.FromFileExtension(Path.GetExtension(filePath).TrimStart('.'));
+
+            IEnumerable<SEEToken> tokens = VCSGraphProvider.RetrieveTokens(filePath, repo, commitID, language);
+
+            Assert.IsNotNull(tokens);
+            Assert.NotZero(tokens.Count());
+        }
+
+        [Test]
+        public async Task TestAddMetricsToNodeAsync()
+        {
+            Graph graph = await GetVCSGraphAsync();
+            string repoPath = Path.GetDirectoryName(Application.dataPath);
+            string commitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461";
+            using Repository repo = new(repoPath);
+
+            foreach (Node node in graph.Nodes())
+            {
+                string filePath = node.ID.Replace('\\', '/');
+                TokenLanguage language = TokenLanguage.FromFileExtension(Path.GetExtension(filePath).TrimStart('.'));
+                if (node.Type == "File" && language != TokenLanguage.Plain)
+                {
+                    IEnumerable<SEEToken> tokens = VCSGraphProvider.RetrieveTokens(filePath, repo, commitID, language);
+                    AssertMetricsCanBeAdded(node);
+                }
+
+                AssertMetricsCannotBeAdded(node);
+            }
+        }
+
+        private static void AssertMetricsCanBeAdded(Node node)
+        {
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "LOD"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "McCabe_Complexity"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Distinct_Operators"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Distinct_Operands"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Total_Operators"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Total_Operands"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Program_Vocabulary"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Program_Length"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Estimated_Program_Length"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Volume"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Difficulty"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Effort"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Time_Required_To_Program"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Number_Of_Delivered_Bugs"));
+        }
+
+        private static void AssertMetricsCannotBeAdded(Node node)
+        {
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "LOC"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "McCabe_Complexity"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Distinct_Operators"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Distinct_Operands"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Total_Operators"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Total_Operands"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Program_Vocabulary"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Program_Length"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Estimated_Program_Length"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Volume"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Difficulty"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Effort"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Time_Required_To_Program"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Number_Of_Delivered_Bugs"));
+        }
+
+        #endregion
+
+        private static T NewVanillaSEECity<T>() where T : Component
+        {
+            return new GameObject().AddComponent<T>();
+        }
+
         private GraphProvider Load()
         {
             using ConfigReader stream = new(filename);
@@ -269,3 +428,4 @@ namespace SEE.GraphProviders
         }
     }
 }
+
