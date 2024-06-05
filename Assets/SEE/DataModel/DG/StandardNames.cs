@@ -73,7 +73,7 @@
         /// <summary>
         /// The prefix of each JaCoCo metric.
         /// </summary>
-        public const string Prefix = Metrics.Prefix + "JaCoCo";
+        public const string Prefix = Metrics.Prefix + "JaCoCo.";
         /// <summary>
         /// The number of instructions that were not executed.
         /// </summary>
