@@ -34877,7 +34877,7 @@ MonoBehaviour:
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
-    Kind: 1
+    Kind: 3
     IncrementalTreeMap:
       LocalMovesDepth: 3
       LocalMovesBranchingLimit: 4
@@ -34949,7 +34949,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HeightOffset: 0.0010017157
+  HeightOffset: 0.0015009642
 --- !u!65 &1770094069
 BoxCollider:
   m_ObjectHideFlags: 0
