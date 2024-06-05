@@ -15,11 +15,16 @@ using UnityEngine;
 using SEE.Scanner;
 using System.Threading;
 using Microsoft.Extensions.FileSystemGlobbing;
+using SEE.Utils;
 
 namespace SEE.GraphProviders
 {
     /// <summary>
-    /// Provides a version control system graph based on a git repository.
+    /// Creates a graph based on the content of a version control system.
+    /// Nodes represent directories and files. Their nesting corresponds to
+    /// the directory structure of the repository. Files are leaf nodes.
+    /// Files nodes contain metrics that can be gathered based on a simple
+    /// lexical analysis, such as Halstead, McCabe and lines of code.
     /// </summary>
     public class VCSGraphProvider : GraphProvider
     {
@@ -213,31 +218,31 @@ namespace SEE.GraphProviders
         /// <param name="parent">The parent node from the current element of the path</param>
         /// <param name="parentPath">The path of the current parent, which will eventually be part of the ID</param>
         /// <param name="graph">The graph to which the new node belongs to</param>
-        /// <param name="mainNode">The root node of the main directory</param>
+        /// <param name="rootNode">The root node of the main directory</param>
+        /// <returns>The node for the given path or null.</returns>
         public static Node BuildGraphFromPath(string path, Node parent, string parentPath,
-            Graph graph, Node mainNode)
+            Graph graph, Node rootNode)
         {
             string[] pathSegments = path.Split('/');
-            string nodePath = string.Join('/', pathSegments, 1,
-                pathSegments.Length - 1);
+            string nodePath = string.Join('/', pathSegments, 1, pathSegments.Length - 1);
 
             // Current pathSegment is in the main directory.
             if (parentPath == null)
             {
                 Node currentSegmentNode = graph.GetNode(pathSegments[0]);
 
-                // Directory already exists.
+                // Directory exists already.
                 if (currentSegmentNode != null)
                 {
-                    return BuildGraphFromPath(nodePath, currentSegmentNode, pathSegments[0], graph, mainNode);
+                    return BuildGraphFromPath(nodePath, currentSegmentNode, pathSegments[0], graph, rootNode);
                 }
 
                 // Directory does not exist.
                 if (currentSegmentNode == null && pathSegments.Length > 1 && parent == null)
                 {
-                    mainNode.AddChild(NewNode(graph, pathSegments[0], directoryNodeType, pathSegments[0]));
+                    rootNode.AddChild(NewNode(graph, pathSegments[0], directoryNodeType, pathSegments[0]));
                     return BuildGraphFromPath(nodePath, graph.GetNode(pathSegments[0]),
-                        pathSegments[0], graph, mainNode);
+                        pathSegments[0], graph, rootNode);
                 }
             }
 
@@ -251,7 +256,7 @@ namespace SEE.GraphProviders
                 if (currentPathSegmentNode != null)
                 {
                     return BuildGraphFromPath(nodePath, currentPathSegmentNode,
-                        currentPathSegment, graph, mainNode);
+                        currentPathSegment, graph, rootNode);
                 }
 
                 // The node for the current pathSegment does not exist, and the node is a directory.
@@ -260,7 +265,7 @@ namespace SEE.GraphProviders
                 {
                     parent.AddChild(NewNode(graph, currentPathSegment, directoryNodeType, pathSegments[0]));
                     return BuildGraphFromPath(nodePath, graph.GetNode(currentPathSegment),
-                        currentPathSegment, graph, mainNode);
+                        currentPathSegment, graph, rootNode);
                 }
 
                 // The node for the current pathSegment does not exist, and the node is a file.
@@ -310,7 +315,8 @@ namespace SEE.GraphProviders
         /// <param name="commitID">The commitID where the files exist.</param>
         /// <param name="language">The language the given text is written in.</param>
         /// <returns>The token stream for the specified file and commit.</returns>
-        public static IEnumerable<SEEToken> RetrieveTokens(string filePath, Repository repository, string commitID, TokenLanguage language)
+        public static IEnumerable<SEEToken> RetrieveTokens(string filePath, Repository repository, string commitID,
+                                                           TokenLanguage language)
         {
             Blob blob = repository.Lookup<Blob>($"{commitID}:{filePath}");
 
@@ -340,7 +346,7 @@ namespace SEE.GraphProviders
             {
                 if (node.Type == fileNodeType)
                 {
-                    string filePath = node.ID.Replace('\\', '/');
+                    string filePath = Filenames.OnCurrentPlatform(node.ID);
                     TokenLanguage language = TokenLanguage.FromFileExtension(Path.GetExtension(filePath).TrimStart('.'));
                     if (language != TokenLanguage.Plain)
                     {
@@ -386,8 +392,7 @@ namespace SEE.GraphProviders
 
         protected override void SaveAttributes(ConfigWriter writer)
         {
-            Dictionary<string, bool> pathGlobbing = string.IsNullOrEmpty(PathGlobbing.ToString()) ? null : PathGlobbing;
-            writer.Save(pathGlobbing, pathGlobbingLabel);
+            writer.Save(PathGlobbing, pathGlobbingLabel);
             writer.Save(CommitID, commitIDLabel);
             RepositoryPath.Save(writer, repositoryPathLabel);
         }
