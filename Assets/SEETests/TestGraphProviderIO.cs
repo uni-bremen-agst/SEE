@@ -262,10 +262,7 @@ namespace SEE.GraphProviders
 
         #endregion
 
-        private static T NewVanillaSEECity<T>() where T : Component
-        {
-            return new GameObject().AddComponent<T>();
-        }
+        #region VCSGraphProvider
 
         public async Task<Graph> GetVCSGraphAsync()
         {
@@ -332,20 +329,6 @@ namespace SEE.GraphProviders
                 RepositoryPath = new DirectoryPath(Path.GetDirectoryName(Application.dataPath)),
                 CommitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461",
             };
-        }
-
-        private GraphProvider Load()
-        {
-            using ConfigReader stream = new(filename);
-            GraphProvider loaded = GraphProvider.Restore(stream.Read(), providerLabel);
-            Assert.IsNotNull(loaded);
-            return loaded;
-        }
-
-        private void Save(GraphProvider saved)
-        {
-            using ConfigWriter writer = new(filename);
-            saved.Save(writer, providerLabel);
         }
 
         [Test]
@@ -421,6 +404,27 @@ namespace SEE.GraphProviders
             Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Effort"));
             Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Time_Required_To_Program"));
             Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Number_Of_Delivered_Bugs"));
+        }
+
+        #endregion
+
+        private static T NewVanillaSEECity<T>() where T : Component
+        {
+            return new GameObject().AddComponent<T>();
+        }
+
+        private GraphProvider Load()
+        {
+            using ConfigReader stream = new(filename);
+            GraphProvider loaded = GraphProvider.Restore(stream.Read(), providerLabel);
+            Assert.IsNotNull(loaded);
+            return loaded;
+        }
+
+        private void Save(GraphProvider saved)
+        {
+            using ConfigWriter writer = new(filename);
+            saved.Save(writer, providerLabel);
         }
     }
 }
