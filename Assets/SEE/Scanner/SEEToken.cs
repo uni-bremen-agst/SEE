@@ -166,7 +166,9 @@ namespace SEE.Scanner
             /// <summary>
             /// Branch keyword tokens.
             /// </summary>
-            public static readonly Type BranchKeyword = new("BranchKeywords", "CBCE3"); // light purple
+            /// <remarks>We want <see cref="BranchKeyword"/>s have the same color as
+            /// other <see cref="Keyword"/>s.</remarks>
+            public static readonly Type BranchKeyword = new("BranchKeywords", "D988F2"); // purple
 
             /// <summary>
             /// Number literal tokens. This includes integer literals, floating point literals, etc.
