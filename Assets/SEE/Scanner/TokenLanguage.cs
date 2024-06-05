@@ -99,12 +99,12 @@ namespace SEE.Scanner
         };
 
         /// <summary>
-        /// Set of antlr type names for Java keywords.
+        /// Set of antlr type names for Java keywords excluding <see cref="javaBranchKeywords"/>.
         /// </summary>
         private static readonly HashSet<string> javaKeywords = new()
         {
-            "ABSTRACT", "ASSERT", "BOOLEAN", "BYTE", "CHAR", "CLASS", "CONST",
-            "DEFAULT", "DOUBLE", "ENUM", "EXPORTS", "EXTENDS", "FINAL", "FINALLY", "FLOAT",
+            "ABSTRACT", "ASSERT", "BOOLEAN", "BREAK",  "BYTE", "CASE", "CATCH", "CHAR", "CLASS", "CONST", "CONTINUE",
+            "DEFAULT", "DO", "DOUBLE", "ELSE", "ENUM", "EXPORTS", "EXTENDS", "FINAL", "FINALLY", "FLOAT",
             "GOTO", "IMPLEMENTS", "IMPORT", "INSTANCEOF", "INT", "INTERFACE", "LONG", "MODULE", "NATIVE", "NEW",
             "OPEN", "OPERNS", "PACKAGE", "PRIVATE", "PROTECTED", "PROVIDES", "PUBLIC", "REQUIRES", "RETURN", "SHORT",
             "STATIC", "STRICTFP", "SUPER", "SYNCHRONIZED", "THIS", "THROW", "THROWS", "TO", "TRANSIENT",
@@ -117,7 +117,7 @@ namespace SEE.Scanner
         /// </summary>
         private static readonly HashSet<string> javaBranchKeywords = new()
         {
-            "BREAK", "CASE", "CATCH", "CONTINUE", "DO", "ELSE", "FOR", "IF", "SWITCH", "TRY", "WHILE"
+            "FOR", "IF", "SWITCH", "TRY", "WHILE"
         };
 
         /// <summary>
@@ -175,14 +175,14 @@ namespace SEE.Scanner
         };
 
         /// <summary>
-        /// Set of antlr type names for CSharp keywords.
+        /// Set of antlr type names for CSharp keywords excluding <see cref="cSharpBranchKeywords"/>.
         /// </summary>
         private static readonly HashSet<string> cSharpKeywords = new()
         {
             // General keywords
-            "ABSTRACT", "ADD", "ALIAS", "ARGLIST", "AS", "ASCENDING", "ASYNC", "AWAIT", "BASE", "BOOL", "BY",
-            "BYTE", "CHAR", "CHECKED", "CLASS", "CONST", "DECIMAL", "DEFAULT", "DELEGATE",
-            "DESCENDING", "DOUBLE", "DYNAMIC", "ENUM", "EQUALS", "EVENT", "EXPLICIT", "EXTERN", "FALSE",
+            "ABSTRACT", "ADD", "ALIAS", "ARGLIST", "AS", "ASCENDING", "ASYNC", "AWAIT", "BASE", "BOOL", "BREAK", "BY",
+            "BYTE", "CASE", "CATCH", "CHAR", "CHECKED", "CLASS", "CONST", "CONTINUE", "DECIMAL", "DEFAULT", "DELEGATE",
+            "DESCENDING", "DO", "DOUBLE", "DYNAMIC", "ELSE", "ENUM", "EQUALS", "EVENT", "EXPLICIT", "EXTERN", "FALSE",
             "FINALLY", "FIXED", "FLOAT", "FROM", "GET", "GOTO", "GROUP", "IMPLICIT", "IN", "INT",
             "INTERFACE", "INTERNAL", "INTO", "IS", "JOIN", "LET", "LOCK", "LONG", "NAMEOF", "NAMESPACE", "NEW", "NULL_",
             "OBJECT", "ON", "OPERATOR", "ORDERBY", "OUT", "OVERRIDE", "PARAMS", "PARTIAL", "PRIVATE", "PROTECTED",
@@ -202,7 +202,7 @@ namespace SEE.Scanner
         /// </summary>
         private static readonly HashSet<string> cSharpBranchKeywords = new()
         {
-            "BREAK", "CASE", "CATCH", "CONTINUE", "DO", "ELSE", "FOR", "FOREACH", "IF", "SWITCH", "TRY", "WHILE"
+            "FOR", "FOREACH", "IF", "SWITCH", "TRY", "WHILE"
         };
 
         /// <summary>
@@ -282,13 +282,13 @@ namespace SEE.Scanner
         };
 
         /// <summary>
-        /// Set of antlr type names for CPP keywords.
+        /// Set of antlr type names for CPP keywords excluding <see cref="cppBranchKeywords"/>.
         /// </summary>
         private static readonly HashSet<string> cppKeywords = new()
         {
-            "Alignas", "Alignof", "Asm", "Auto", "Bool",
+            "Alignas", "Alignof", "Asm", "Auto", "Bool", "Break", "Case", "Catch", "Continue",
             "Char", "Char16", "Char32", "Class", "Const", "Constexpr", "Const_cast",
-            "Decltype", "Default", "Delete", "Double", "Dynamic_cast",
+            "Decltype", "Default", "Delete", "Do", "Double", "Dynamic_cast", "Else",
             "Enum", "Explicit", "Export", "Extern", "False_", "Final", "Float",
             "Friend", "Goto", "Inline", "Int", "Long", "Mutable", "Namespace",
             "New", "Noexcept", "Nullptr", "Operator", "Override", "Private", "Protected",
@@ -306,7 +306,7 @@ namespace SEE.Scanner
         /// </summary>
         private static readonly HashSet<string> cppBranchKeywords = new()
         {
-            "Break", "Case", "Catch", "Continue", "Do", "Else", "For", "If", "Switch", "Try", "While"
+            "For", "If", "Switch", "Try", "While"
         };
 
         /// <summary>

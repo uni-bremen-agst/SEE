@@ -31,7 +31,7 @@ namespace SEE.Scanner
                                 Console.WriteLine(""Hello, else World!"");
                             }
                         }
-                    }", 3)]
+                    }", 2)]
         [TestCase(@"public class NoBranchProgram
                     {
                         public int Add(int a, int b)
@@ -40,6 +40,7 @@ namespace SEE.Scanner
                         }
                     }", 1)]
         [TestCase("public class EmptyClass\n                    {\n                    }", 1)]
+        [TestCase("public class DoesNotCompile\n{\n break; continue; case 2: while do if else foreach for switch try catch }", 7)]
         public void TestCalculateMcCabeComplexity(string code, int expected)
         {
             IEnumerable<SEEToken> tokens = SEEToken.FromString(code, TokenLanguage.CSharp);
