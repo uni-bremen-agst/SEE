@@ -256,7 +256,7 @@ namespace SEE.GraphProviders
 
             try
             {
-                LSPImporter importer = new(handler, SourcePaths, ExcludedSourcePaths, IncludedNodeTypes,
+                LSPImporter importer = new(handler, SourcePaths, ExcludedSourcePaths ?? Array.Empty<string>(), IncludedNodeTypes,
                                            IncludedEdgeTypes, AvoidSelfReferences, AvoidParentReferences);
                 using (LoadingSpinner.ShowDeterminate("Creating graph using LSP...", out Action<float> updateProgress))
                 {

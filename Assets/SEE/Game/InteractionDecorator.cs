@@ -45,6 +45,7 @@ namespace SEE.Game
             if (gameObject.HasNodeRef())
             {
                 gameObject.AddComponentIfNecessary<ShowLabel>();
+                gameObject.AddComponentIfNecessary<ShowHoverInfo>();
                 gameObject.AddComponentIfNecessary<ShowEdges>();
                 gameObject.AddComponentIfNecessary<HighlightErosion>();
             }
