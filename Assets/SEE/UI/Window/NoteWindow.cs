@@ -46,9 +46,14 @@ namespace SEE.UI.Window
 
             ButtonManagerBasic loadButton = noteWindow.transform.Find("ScrollView/Viewport/Content/LoadButton").gameObject.MustGetComponent<ButtonManagerBasic>();
             loadButton.clickEvent.AddListener(LoadFromFile);
+
+            ButtonManagerBasic deleteButton = noteWindow.transform.Find("ScrollView/Viewport/Content/DeleteButton").gameObject.MustGetComponent<ButtonManagerBasic>();
+            deleteButton.clickEvent.AddListener(DeleteFile);
+
+            LoadNote();
         }
 
-        public void WriteToFile()
+        private void WriteToFile()
         {
             string path = EditorUtility.SaveFilePanel(
             "Save Note",
@@ -57,13 +62,13 @@ namespace SEE.UI.Window
             "");
             if (path.Length != 0)
             {
-                string pngData = searchField.text;
-                if (pngData != null)
-                    File.WriteAllText(path, pngData);
+                string stringData = searchField.text;
+                if (stringData != null)
+                    File.WriteAllText(path, stringData);
             }
         }
 
-        public void LoadFromFile()
+        private void LoadFromFile()
         {
             string path = EditorUtility.OpenFilePanel("Overwrite with txt", "", "");
             if (path.Length != 0)
@@ -71,7 +76,34 @@ namespace SEE.UI.Window
                 string fileContent = File.ReadAllText(path);
                 searchField.text = fileContent;
             }
+        }
 
+        private void DeleteFile()
+        {
+            searchField.text = "";
+        }
+
+        private void SaveNote()
+        {
+            PlayerPrefs.SetString(Title, searchField.text);
+            //PlayerPrefs.Save();
+        }
+
+        private void LoadNote()
+        {
+            if (searchField != null)
+            {
+                if (PlayerPrefs.HasKey(Title))
+                {
+                    searchField.text = PlayerPrefs.GetString(Title);
+                }
+            }
+        }
+
+        private void OnDestroy()
+        {
+            // Save the note content when the window is destroyed (closed)
+            SaveNote();
         }
 
         public override void RebuildLayout()
