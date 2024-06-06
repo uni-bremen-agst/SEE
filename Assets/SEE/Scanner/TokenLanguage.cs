@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Antlr4.Runtime;
 
-namespace SEE.UI.Window.CodeWindow
+namespace SEE.Scanner
 {
     /// <summary>
     /// Represents a language a <see cref="SEEToken.Type"/> is in.
@@ -47,6 +47,11 @@ namespace SEE.UI.Window.CodeWindow
         /// Symbolic names for keywords of a language. This also includes boolean literals and null literals.
         /// </summary>
         public ISet<string> Keywords { get; }
+
+        /// <summary>
+        /// Symbolic names for branch keywords of a language.
+        /// </summary>
+        public ISet<string> BranchKeywords { get; }
 
         /// <summary>
         /// Symbolic names for number literals of a language. This includes integer literals, floating point literals, etc.
@@ -94,17 +99,25 @@ namespace SEE.UI.Window.CodeWindow
         };
 
         /// <summary>
-        /// Set of antlr type names for Java keywords.
+        /// Set of antlr type names for Java keywords excluding <see cref="javaBranchKeywords"/>.
         /// </summary>
         private static readonly HashSet<string> javaKeywords = new()
         {
-            "ABSTRACT", "ASSERT", "BOOLEAN", "BREAK", "BYTE", "CASE", "CATCH", "CHAR", "CLASS", "CONST", "CONTINUE",
-            "DEFAULT", "DO", "DOUBLE", "ELSE", "ENUM", "EXPORTS", "EXTENDS", "FINAL", "FINALLY", "FLOAT", "FOR",
-            "IF", "GOTO", "IMPLEMENTS", "IMPORT", "INSTANCEOF", "INT", "INTERFACE", "LONG", "MODULE", "NATIVE", "NEW",
+            "ABSTRACT", "ASSERT", "BOOLEAN", "BREAK",  "BYTE", "CASE", "CATCH", "CHAR", "CLASS", "CONST", "CONTINUE",
+            "DEFAULT", "DO", "DOUBLE", "ELSE", "ENUM", "EXPORTS", "EXTENDS", "FINAL", "FINALLY", "FLOAT",
+            "GOTO", "IMPLEMENTS", "IMPORT", "INSTANCEOF", "INT", "INTERFACE", "LONG", "MODULE", "NATIVE", "NEW",
             "OPEN", "OPERNS", "PACKAGE", "PRIVATE", "PROTECTED", "PROVIDES", "PUBLIC", "REQUIRES", "RETURN", "SHORT",
-            "STATIC", "STRICTFP", "SUPER", "SWITCH", "SYNCHRONIZED", "THIS", "THROW", "THROWS", "TO", "TRANSIENT",
-            "TRANSITIVE", "TRY", "USES", "VOID", "VOLATILE", "WHILE", "WITH", "UNDER_SCORE",
+            "STATIC", "STRICTFP", "SUPER", "SYNCHRONIZED", "THIS", "THROW", "THROWS", "TO", "TRANSIENT",
+            "TRANSITIVE", "USES", "VOID", "VOLATILE", "WITH", "UNDER_SCORE",
             "BooleanLiteral", "NullLiteral"
+        };
+
+        /// <summary>
+        /// Set of antlr type names for Java branch keywords.
+        /// </summary>
+        private static readonly HashSet<string> javaBranchKeywords = new()
+        {
+            "FOR", "IF", "SWITCH", "TRY", "WHILE"
         };
 
         /// <summary>
@@ -162,7 +175,7 @@ namespace SEE.UI.Window.CodeWindow
         };
 
         /// <summary>
-        /// Set of antlr type names for CSharp keywords.
+        /// Set of antlr type names for CSharp keywords excluding <see cref="cSharpBranchKeywords"/>.
         /// </summary>
         private static readonly HashSet<string> cSharpKeywords = new()
         {
@@ -170,18 +183,26 @@ namespace SEE.UI.Window.CodeWindow
             "ABSTRACT", "ADD", "ALIAS", "ARGLIST", "AS", "ASCENDING", "ASYNC", "AWAIT", "BASE", "BOOL", "BREAK", "BY",
             "BYTE", "CASE", "CATCH", "CHAR", "CHECKED", "CLASS", "CONST", "CONTINUE", "DECIMAL", "DEFAULT", "DELEGATE",
             "DESCENDING", "DO", "DOUBLE", "DYNAMIC", "ELSE", "ENUM", "EQUALS", "EVENT", "EXPLICIT", "EXTERN", "FALSE",
-            "FINALLY", "FIXED", "FLOAT", "FOR", "FOREACH", "FROM", "GET", "GOTO", "GROUP", "IF", "IMPLICIT", "IN", "INT",
+            "FINALLY", "FIXED", "FLOAT", "FROM", "GET", "GOTO", "GROUP", "IMPLICIT", "IN", "INT",
             "INTERFACE", "INTERNAL", "INTO", "IS", "JOIN", "LET", "LOCK", "LONG", "NAMEOF", "NAMESPACE", "NEW", "NULL_",
             "OBJECT", "ON", "OPERATOR", "ORDERBY", "OUT", "OVERRIDE", "PARAMS", "PARTIAL", "PRIVATE", "PROTECTED",
             "PUBLIC", "READONLY", "REF", "REMOVE", "RETURN", "SBYTE", "SEALED", "SELECT", "SET", "SHORT", "SIZEOF",
-            "STACKALLOC", "STATIC", "STRING", "STRUCT", "SWITCH", "THIS", "THROW", "TRUE", "TRY", "TYPEOF", "UINT",
+            "STACKALLOC", "STATIC", "STRING", "STRUCT", "THIS", "THROW", "TRUE", "TYPEOF", "UINT",
             "ULONG", "UNCHECKED", "UNMANAGED", "UNSAFE", "USHORT", "USING", "VAR", "VIRTUAL", "VOID", "VOLATILE", "WHEN",
-            "WHERE", "WHILE", "YIELD", "SHARP",
+            "WHERE", "YIELD", "SHARP",
             // Directive keywords (anything within a directive is treated as a keyword, similar to IDEs
             "DIRECTIVE_TRUE", "DIRECTIVE_FALSE", "DEFINE", "UNDEF", "DIRECTIVE_IF",
             "ELIF", "DIRECTIVE_ELSE", "ENDIF", "LINE", "ERROR", "WARNING", "REGION", "ENDREGION", "PRAGMA", "NULLABLE",
             "DIRECTIVE_DEFAULT", "DIRECTIVE_HIDDEN", "DIRECTIVE_OPEN_PARENS", "DIRECTIVE_CLOSE_PARENS", "DIRECTIVE_BANG",
             "DIRECTIVE_OP_EQ", "DIRECTIVE_OP_NE", "DIRECTIVE_OP_AND", "DIRECTIVE_OP_OR", "CONDITIONAL_SYMBOL"
+        };
+
+        /// <summary>
+        /// Set of antlr type names for CSharp branch keywords.
+        /// </summary>
+        private static readonly HashSet<string> cSharpBranchKeywords = new()
+        {
+            "FOR", "FOREACH", "IF", "SWITCH", "TRY", "WHILE"
         };
 
         /// <summary>
@@ -261,23 +282,31 @@ namespace SEE.UI.Window.CodeWindow
         };
 
         /// <summary>
-        /// Set of antlr type names for CPP keywords.
+        /// Set of antlr type names for CPP keywords excluding <see cref="cppBranchKeywords"/>.
         /// </summary>
         private static readonly HashSet<string> cppKeywords = new()
         {
-            "Alignas", "Alignof", "Asm", "Auto", "Bool", "Break", "Case",
-            "Catch", "Char", "Char16", "Char32", "Class", "Const", "Constexpr", "Const_cast",
-            "Continue", "Decltype", "Default", "Delete", "Do", "Double", "Dynamic_cast",
-            "Else", "Enum", "Explicit", "Export", "Extern", "False_", "Final", "Float",
-            "For", "Friend", "Goto", "If", "Inline", "Int", "Long", "Mutable", "Namespace",
+            "Alignas", "Alignof", "Asm", "Auto", "Bool", "Break", "Case", "Catch", "Continue",
+            "Char", "Char16", "Char32", "Class", "Const", "Constexpr", "Const_cast",
+            "Decltype", "Default", "Delete", "Do", "Double", "Dynamic_cast", "Else",
+            "Enum", "Explicit", "Export", "Extern", "False_", "Final", "Float",
+            "Friend", "Goto", "Inline", "Int", "Long", "Mutable", "Namespace",
             "New", "Noexcept", "Nullptr", "Operator", "Override", "Private", "Protected",
             "Public", "Register", "Reinterpret_cast", "Return", "Short", "Signed",
-            "Sizeof", "Static", "Static_assert", "Static_cast", "Struct", "Switch",
-            "Template", "This", "Thread_local", "Throw", "True_", "Try", "Typedef",
+            "Sizeof", "Static", "Static_assert", "Static_cast", "Struct",
+            "Template", "This", "Thread_local", "Throw", "True_", "Typedef",
             "Typeid_", "Typename_", "Union", "Unsigned", "Using", "Virtual", "Void",
-            "Volatile", "Wchar", "While",
+            "Volatile", "Wchar",
             "BooleanLiteral", "PointerLiteral", "UserDefinedLiteral",
             "MultiLineMacro", "Directive"
+        };
+
+        /// <summary>
+        /// Set of antlr type names for CPP branch keywords.
+        /// </summary>
+        private static readonly HashSet<string> cppBranchKeywords = new()
+        {
+            "For", "If", "Switch", "Try", "While"
         };
 
         /// <summary>
@@ -344,6 +373,9 @@ namespace SEE.UI.Window.CodeWindow
         /// <summary> Set of antlr type names for keywords. There are none here. </summary>
         private static readonly HashSet<string> plainKeywords = new();
 
+        /// <summary> Set of antlr type names for branch keywords. There are none here. </summary>
+        private static readonly HashSet<string> plainBranchKeywords = new();
+
         /// <summary> Set of antlr type names for numbers. </summary>
         private static readonly HashSet<string> plainNumbers = new();
 
@@ -380,25 +412,25 @@ namespace SEE.UI.Window.CodeWindow
         /// <summary>
         /// Token Language for Java.
         /// </summary>
-        public static readonly TokenLanguage Java = new(javaFileName, javaExtensions, javaKeywords, javaNumbers,
+        public static readonly TokenLanguage Java = new(javaFileName, javaExtensions, javaKeywords, javaBranchKeywords, javaNumbers,
                                                         javaStrings, javaPunctuation, javaIdentifiers, javaWhitespace, javaNewlines, javaComments);
 
         /// <summary>
         /// Token Language for C#.
         /// </summary>
-        public static readonly TokenLanguage CSharp = new(cSharpFileName, cSharpExtensions, cSharpKeywords, cSharpNumbers,
+        public static readonly TokenLanguage CSharp = new(cSharpFileName, cSharpExtensions, cSharpKeywords, cSharpBranchKeywords, cSharpNumbers,
                                                           cSharpStrings, cSharpPunctuation, cSharpIdentifiers, cSharpWhitespace, cSharpNewlines, cSharpComments);
 
         /// <summary>
         /// Token Language for CPP.
         /// </summary>
-        public static readonly TokenLanguage CPP = new(cppFileName, cppExtensions, cppKeywords, cppNumbers,
+        public static readonly TokenLanguage CPP = new(cppFileName, cppExtensions, cppKeywords, cppBranchKeywords, cppNumbers,
                                                        cppStrings, cppPunctuation, cppIdentifiers, cppWhitespace, cppNewlines, cppComments);
 
         /// <summary>
         /// Token language for plain text.
         /// </summary>
-        public static readonly TokenLanguage Plain = new(plainFileName, plainExtensions, plainKeywords, plainNumbers,
+        public static readonly TokenLanguage Plain = new(plainFileName, plainExtensions, plainKeywords, plainBranchKeywords, plainNumbers,
                                                          plainStrings, plainPunctuation, plainIdentifiers, plainWhitespace, plainNewlines, plainComments);
 
         #endregion
@@ -417,8 +449,9 @@ namespace SEE.UI.Window.CodeWindow
         /// <param name="whitespace">Whitespace for this language</param>
         /// <param name="newline">Newlines for this language</param>
         /// <param name="comments">Comments for this language</param>
+        /// <param name="branchKeywords">Branches for this language</param>
         /// <param name="tabWidth">Number of spaces a tab is equivalent to</param>
-        private TokenLanguage(string lexerFileName, ISet<string> fileExtensions, ISet<string> keywords,
+        private TokenLanguage(string lexerFileName, ISet<string> fileExtensions, ISet<string> keywords, ISet<string> branchKeywords,
                               ISet<string> numberLiterals, ISet<string> stringLiterals, ISet<string> punctuation,
                               ISet<string> identifiers, ISet<string> whitespace, ISet<string> newline,
                               ISet<string> comments, int tabWidth = defaultTabWidth)
@@ -436,6 +469,7 @@ namespace SEE.UI.Window.CodeWindow
             LexerFileName = lexerFileName;
             FileExtensions = fileExtensions;
             Keywords = keywords;
+            BranchKeywords = branchKeywords;
             NumberLiterals = numberLiterals;
             StringLiterals = stringLiterals;
             Punctuation = punctuation;
@@ -452,7 +486,7 @@ namespace SEE.UI.Window.CodeWindow
             {
                 return keywords.Intersect(numberLiterals).Intersect(stringLiterals).Intersect(punctuation)
                                .Intersect(identifiers).Intersect(whitespace).Intersect(newline)
-                               .Intersect(comments).Any();
+                               .Intersect(comments).Intersect(branchKeywords).Any();
             }
         }
 
@@ -535,6 +569,10 @@ namespace SEE.UI.Window.CodeWindow
             if (Keywords.Contains(token))
             {
                 return nameof(Keywords);
+            }
+            if (BranchKeywords.Contains(token))
+            {
+                return nameof(BranchKeywords);
             }
             if (NumberLiterals.Contains(token))
             {

@@ -5,7 +5,7 @@ using System.Linq;
 using Antlr4.Runtime;
 using UnityEngine;
 
-namespace SEE.UI.Window.CodeWindow
+namespace SEE.Scanner
 {
     /// <summary>
     /// Represents a token from a source code file, including <see cref="Text"/> and a <see cref="Type"/>.
@@ -164,6 +164,13 @@ namespace SEE.UI.Window.CodeWindow
             public static readonly Type Keyword = new("Keywords", "D988F2"); // purple
 
             /// <summary>
+            /// Branch keyword tokens.
+            /// </summary>
+            /// <remarks>We want <see cref="BranchKeyword"/>s have the same color as
+            /// other <see cref="Keyword"/>s.</remarks>
+            public static readonly Type BranchKeyword = new("BranchKeywords", "D988F2"); // purple
+
+            /// <summary>
             /// Number literal tokens. This includes integer literals, floating point literals, etc.
             /// </summary>
             public static readonly Type NumberLiteral = new("NumberLiterals", "D48F35"); // orange
@@ -241,7 +248,7 @@ namespace SEE.UI.Window.CodeWindow
                 Type type = AllTokens.SingleOrDefault(x => x.Name.Equals(typeName));
                 if (type == null)
                 {
-                    Debug.LogError($"Unknown token type: {typeName}");
+                    Debug.LogError($"Unknown token type: {typeName}/{symbolicName}");
                 }
                 return type ?? Unknown;
             }
