@@ -12,7 +12,6 @@ namespace SEE.UI.PropertyDialog
     /// </summary>
     public class SelectionProperty : Property<string>
     {
-
         public void AddOptions(IEnumerable<string> options)
         {
             this.options.AddRange(options);
@@ -46,12 +45,6 @@ namespace SEE.UI.PropertyDialog
         /// </summary>
         private GameObject parentOfInputField;
 
-        /// <summary>
-        /// The tooltip containing the <see cref="Description"/> of this <see cref="Property"/>, which will
-        /// be displayed when hovering above it.
-        /// </summary>
-        private Tooltip.Tooltip tooltip;
-
         private HorizontalSelector horizontalSelector;
 
         /// <summary>
@@ -82,14 +75,13 @@ namespace SEE.UI.PropertyDialog
 
             void SetupTooltip(GameObject field)
             {
-                tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
                 if (!field.TryGetComponent(out PointerHelper pointerHelper))
                 {
                     pointerHelper = field.AddComponent<PointerHelper>();
                 }
                 // Register listeners on entry and exit events, respectively
-                pointerHelper.EnterEvent.AddListener(_ => tooltip.Show(Description));
-                pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
+                pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith(Description));
+                pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
                 // FIXME scrolling doesn't work while hovering above the field, because
                 // the Modern UI Pack uses an Event Trigger (see Utils/PointerHelper for an explanation.)
                 // It is unclear how to resolve this without either abstaining from using the Modern UI Pack
@@ -193,7 +185,7 @@ namespace SEE.UI.PropertyDialog
                 {
                     for (int i = targetIndex - currentIndex; i >= 1; i--)
                     {
-                        horizontalSelector.ForwardClick(); ;
+                        horizontalSelector.ForwardClick();
                     }
                 }
             }

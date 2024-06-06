@@ -37,7 +37,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// List of operators of currently displayed node labels.
         /// </summary>
-        public static IList<NodeOperator> DisplayedLabelOperators = new List<NodeOperator>();
+        public static readonly IList<NodeOperator> DisplayedLabelOperators = new List<NodeOperator>();
 
         /// <summary>
         /// Registers On() and Off() for the respective hovering and selection events.
