@@ -254,10 +254,28 @@ namespace SEE.Controls.Actions
         public static CodeWindow ShowCode(GraphElementRef graphElementRef)
         {
             GraphElement graphElement = graphElementRef.Elem;
-            // File name of source code file to read from it
-            (string filename, string absolutePlatformPath) = GetPath(graphElement);
-            CodeWindow codeWindow = GetOrCreateCodeWindow(graphElementRef, filename);
-            codeWindow.EnterFromFile(absolutePlatformPath);
+            CodeWindow codeWindow;
+            if (graphElement.TryGetCommitID(out string commitID))
+            {
+                codeWindow = GetOrCreateCodeWindow(graphElementRef, graphElement.Filename);
+                if (!graphElement.TryGetRepositoryPath(out string repositoryPath))
+                {
+                    string message = $"Selected {GetName(graphElement)} has no repository path.";
+                    ShowNotification.Error("No repository path", message, log: false);
+                    throw new InvalidOperationException(message);
+                }
+                IVersionControl vcs = VersionControlFactory.GetVersionControl(VCSKind.Git, repositoryPath);
+                string[] fileContent = vcs.Show(graphElement.ID, commitID).
+                    Split("\\n", StringSplitOptions.RemoveEmptyEntries);
+                codeWindow.EnterFromText(fileContent);
+            }
+            else
+            {
+                (string filename, string absolutePlatformPath) = GetPath(graphElement);
+                codeWindow = GetOrCreateCodeWindow(graphElementRef, filename);
+                // File name of source code file to read from it
+                codeWindow.EnterFromFile(absolutePlatformPath);
+            }
 
             // Pass line number to automatically scroll to it, if it exists
             if (graphElement.SourceLine is { } line)

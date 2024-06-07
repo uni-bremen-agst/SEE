@@ -305,7 +305,7 @@ namespace SEE.Game.City
             {
                 try
                 {
-                    using (LoadingSpinner.ShowDeterminate($"Loading city \"{gameObject.name}\"...",
+                    using (LoadingSpinner.ShowDeterminate($"Loading city \"{gameObject.name}\"...\n",
                                                           out Action<float> reportProgress))
                     {
                         void ReportProgress(float x)
