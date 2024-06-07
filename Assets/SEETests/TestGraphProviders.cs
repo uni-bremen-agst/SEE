@@ -129,10 +129,7 @@ namespace SEE.GraphProviders
         public IEnumerator TestGitGraphProvider() =>
             UniTask.ToCoroutine(async () =>
             {
-                LogAssert.ignoreFailingMessages = true;
-
                 GameObject go = new();
-
                 DiffCity city = go.AddComponent<DiffCity>();
                 city.VCSPath = new DirectoryPath(Path.GetDirectoryName(Application.dataPath));
                 city.OldRevision = "887e1fc1d6fe87ee1178822b5eeb666e62af3710";
