@@ -75,35 +75,6 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// Label of attribute <see cref="VCSPath"/> in the configuration file.
-        /// </summary>
-        private const string vcsPathLabel = "VCSPath";
-
-        /// <summary>
-        /// Label of attribute <see cref="OldRevision"/> in the configuration file.
-        /// </summary>
-        private const string oldRevisionLabel = "OldRevision";
-
-        /// <summary>
-        /// Label of attribute <see cref="NewRevision"/> in the configuration file.
-        /// </summary>
-        private const string newRevisionLabel = "NewRevision";
-
-        protected override void SaveAttributes(ConfigWriter writer)
-        {
-            writer.Save(VCSPath, vcsPathLabel);
-            writer.Save(OldRevision, oldRevisionLabel);
-            writer.Save(NewRevision, newRevisionLabel);
-        }
-
-        protected override void RestoreAttributes(Dictionary<string, object> attributes)
-        {
-            ConfigIO.Restore(attributes, vcsPathLabel, ref VCSPath);
-            ConfigIO.Restore(attributes, oldRevisionLabel, ref OldRevision);
-            ConfigIO.Restore(attributes, newRevisionLabel, ref NewRevision);
-        }
-
-        /// <summary>
         /// Checks whether the assumptions on <see cref="VCSPath"/> and
         /// <see cref="OldRevision"/> and <see cref="NewRevision"/> and <paramref name="city"/> hold.
         /// If not, exceptions are thrown accordingly.
@@ -280,5 +251,38 @@ namespace SEE.GraphProviders
                 }
             }
         }
+
+        #region ConfigIO
+
+        /// <summary>
+        /// Label of attribute <see cref="VCSPath"/> in the configuration file.
+        /// </summary>
+        private const string vcsPathLabel = "VCSPath";
+
+        /// <summary>
+        /// Label of attribute <see cref="OldRevision"/> in the configuration file.
+        /// </summary>
+        private const string oldRevisionLabel = "OldRevision";
+
+        /// <summary>
+        /// Label of attribute <see cref="NewRevision"/> in the configuration file.
+        /// </summary>
+        private const string newRevisionLabel = "NewRevision";
+
+        protected override void SaveAttributes(ConfigWriter writer)
+        {
+            writer.Save(VCSPath, vcsPathLabel);
+            writer.Save(OldRevision, oldRevisionLabel);
+            writer.Save(NewRevision, newRevisionLabel);
+        }
+
+        protected override void RestoreAttributes(Dictionary<string, object> attributes)
+        {
+            ConfigIO.Restore(attributes, vcsPathLabel, ref VCSPath);
+            ConfigIO.Restore(attributes, oldRevisionLabel, ref OldRevision);
+            ConfigIO.Restore(attributes, newRevisionLabel, ref NewRevision);
+        }
+
+        #endregion
     }
 }
