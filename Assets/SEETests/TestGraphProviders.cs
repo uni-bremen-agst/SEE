@@ -135,7 +135,7 @@ namespace SEE.GraphProviders
                 city.OldRevision = "887e1fc1d6fe87ee1178822b5eeb666e62af3710";
                 city.NewRevision = "5efa95913a6e894e5340f07fab26c9958b5c1096";
 
-                GraphProvider provider = new GitGraphProvider();
+                GraphProvider provider = new VCSMetricsProvider();
 
                 Graph loaded = await provider.ProvideAsync(new Graph(""), city);
                 Assert.IsNotNull(loaded);

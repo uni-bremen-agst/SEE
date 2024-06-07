@@ -14,7 +14,7 @@ namespace SEE.GraphProviders
     /// Calculates metrics between two revisions from a git repository and adds these to a graph.
     /// </summary>
     [Serializable]
-    public class GitGraphProvider : GraphProvider
+    public class VCSMetricsProvider : GraphProvider
     {
         /// <summary>
         /// The path to the VCS containing the two revisions to be compared.

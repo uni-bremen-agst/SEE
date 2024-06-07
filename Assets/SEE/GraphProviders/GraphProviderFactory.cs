@@ -29,7 +29,7 @@ namespace SEE.GraphProviders
                 GraphProviderKind.MergeDiff => new MergeDiffGraphProvider(),
                 GraphProviderKind.VCS => new VCSGraphProvider(),
                 GraphProviderKind.LSP => new LSPGraphProvider(),
-                GraphProviderKind.Git => new GitGraphProvider(),
+                GraphProviderKind.Git => new VCSMetricsProvider(),
                 _ => throw new NotImplementedException($"Not implemented for {kind}")
             };
         }

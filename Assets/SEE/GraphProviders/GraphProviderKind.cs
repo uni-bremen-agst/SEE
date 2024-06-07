@@ -46,7 +46,7 @@
         /// </summary>
         LSP,
         /// <summary>
-        /// For <see cref="GitGraphProvider"/>.
+        /// For <see cref="VCSMetricsProvider"/>.
         /// </summary>
         Git
     }
