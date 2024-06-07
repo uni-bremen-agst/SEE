@@ -48,6 +48,6 @@
         /// <summary>
         /// For <see cref="VCSMetricsProvider"/>.
         /// </summary>
-        Git
+        VCSMetrics
     }
 }

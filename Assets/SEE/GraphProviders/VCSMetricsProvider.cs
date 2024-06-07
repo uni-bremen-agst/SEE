@@ -70,7 +70,7 @@ namespace SEE.GraphProviders
 
         public override GraphProviderKind GetKind()
         {
-            return GraphProviderKind.Git;
+            return GraphProviderKind.VCSMetrics;
         }
 
         /// <summary>
