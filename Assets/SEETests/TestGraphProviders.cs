@@ -20,7 +20,7 @@ namespace SEE.GraphProviders
             UniTask.ToCoroutine(async () =>
             {
                 GraphProvider provider = new GXLGraphProvider()
-                { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
+                { Path = new FilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
 
                 GameObject go = new();
                 SEECity city = go.AddComponent<SEECity>();
@@ -42,18 +42,18 @@ namespace SEE.GraphProviders
 
                 {
                     GraphProvider provider = new GXLGraphProvider()
-                    { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
+                    { Path = new FilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
                     pipeline.Add(provider);
                 }
                 {
                     GraphProvider provider = new JaCoCoGraphProvider()
-                    { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/jacoco.xml") };
+                    { Path = new FilePath(Application.streamingAssetsPath + "/JLGExample/jacoco.xml") };
                     pipeline.Add(provider);
                 }
 
                 {
                     GraphProvider provider = new CSVGraphProvider()
-                    { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.csv") };
+                    { Path = new FilePath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.csv") };
                     pipeline.Add(provider);
                 }
 
@@ -87,14 +87,14 @@ namespace SEE.GraphProviders
                     Graph graph;
                     {
                         GraphProvider provider = new GXLGraphProvider()
-                        { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mini-evolution/CodeFacts-5.gxl") };
+                        { Path = new FilePath(Application.streamingAssetsPath + "/mini-evolution/CodeFacts-5.gxl") };
                         graph = await provider.ProvideAsync(new Graph(""), city);
                     }
 
                     {
                         // Older graph
                         GraphProvider provider = new GXLGraphProvider()
-                        { Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mini-evolution/CodeFacts-1.gxl") };
+                        { Path = new FilePath(Application.streamingAssetsPath + "/mini-evolution/CodeFacts-1.gxl") };
 
                         MergeDiffGraphProvider mergeDiffProvider = new()
                         {
@@ -129,7 +129,7 @@ namespace SEE.GraphProviders
         public IEnumerator TestGitGraphProvider() =>
             UniTask.ToCoroutine(async () =>
             {
-                LogAssert.ignoreFailingMessages = true;
+                //LogAssert.ignoreFailingMessages = true;
 
                 GameObject go = new();
 
@@ -138,25 +138,9 @@ namespace SEE.GraphProviders
                 city.OldRevision = "887e1fc1d6fe87ee1178822b5eeb666e62af3710";
                 city.NewRevision = "5efa95913a6e894e5340f07fab26c9958b5c1096";
 
-                PipelineGraphProvider pipeline = new();
+                GraphProvider provider = new GitGraphProvider();
 
-                {
-                    GraphProvider provider = new VCSGraphProvider()
-                    {
-                        RepositoryPath = new DirectoryPath(Path.GetDirectoryName(Application.dataPath)),
-                        CommitID = "5efa95913a6e894e5340f07fab26c9958b5c1096",
-                    };
-                    pipeline.Add(provider);
-                }
-
-                {
-                    GraphProvider provider = new GitGraphProvider()
-                    {
-                    };
-                    pipeline.Add(provider);
-                }
-
-                Graph loaded = await pipeline.ProvideAsync(new Graph(""), city);
+                Graph loaded = await provider.ProvideAsync(new Graph(""), city);
                 Assert.IsNotNull(loaded);
                 Assert.IsTrue(loaded.NodeCount > 0);
 
