@@ -399,12 +399,11 @@ namespace SEE.Game.CityRendering
 
 
             int rows = Mathf.FloorToInt(Mathf.Sqrt(nodeCount));
-
             int columns = Mathf.CeilToInt((float)nodeCount / rows);
+            float spacingZ = (parentRenderer.bounds.size.z / (columns - 1));
+            float spacingX = (parentRenderer.bounds.size.x / (rows - 1));
 
 
-            float spacingZ = (parentRenderer.bounds.size.z / (columns));
-            float spacingX = (parentRenderer.bounds.size.x / (rows));
             if (float.IsInfinity(spacingX) || float.IsNaN(spacingX))
             {
                 spacingX = parentRenderer.bounds.size.x;
@@ -422,6 +421,8 @@ namespace SEE.Game.CityRendering
                 gameObject.AddComponent<NodeRef>().Value = new Node();
                 gameObject.GetComponent<NodeRef>().Value.StringAttributes.Add("Source.Name", author);
                 gameObject.AddComponent<ShowLabel>();
+                gameObject.AddComponent<ShowHovering>();
+                gameObject.AddComponent<ShowEdges>();
                 Renderer renderer = gameObject.GetComponent<Renderer>();
                 var mat = materials.Get(0, counter);
                 renderer.sharedMaterial = mat;
@@ -433,8 +434,14 @@ namespace SEE.Game.CityRendering
 
             MoveAuthorSpheres(rows, columns, nodeCount, gameObjects, spacingX, spacingZ, parentRenderer, parent);
 
+            // Drawing edges
             var maxHeight = nodeMap.Values.Max(x => x.transform.position.y);
             float offset = Mathf.Max(Settings.EdgeLayoutSettings.EdgeWidth, 0.2f * maxHeight);
+
+            int maximalChurn = nodeMap.Keys
+                .Where(x => x.IntAttributes.ContainsKey("Metric.File.Churn"))
+                .Max(x => x.IntAttributes["Metric.File.Churn"]);
+
             foreach (var sphere in gameObjects)
             {
                 NodeRef nodeRef = sphere.GetComponent<NodeRef>();
@@ -452,6 +459,8 @@ namespace SEE.Game.CityRendering
                     var bSpline = SplineEdgeLayout.CreateSpline(sphere.transform.position,
                         nodeOfAuthor.Value.transform.position,
                         above: true, offset);
+
+                    var churn = nodeOfAuthor.Key.IntAttributes["Metric.File.Churn" + ":" + authorName];
 
                     GameObject gameEdge = new()
                     {
@@ -484,7 +493,10 @@ namespace SEE.Game.CityRendering
 
 
                     LineFactory.SetDefaults(line);
-                    LineFactory.SetWidth(line, Settings.EdgeLayoutSettings.EdgeWidth);
+                    var width = Mathf.Clamp(churn / maximalChurn, Settings.EdgeLayoutSettings.EdgeWidth * 0.5f,
+                        Settings.EdgeLayoutSettings.EdgeWidth);
+                    LineFactory.SetWidth(line, width);
+                    LineFactory.SetColor(line, sphere.GetComponent<Renderer>().sharedMaterial.color);
 
                     // If enabled, the lines are defined in world space. This
                     // means the object's position is ignored and the lines are
@@ -506,6 +518,35 @@ namespace SEE.Game.CityRendering
             //layout.Apply(layoutNodes);
             //Fit(parent, layoutNodes);
         }
+
+        void MoveAuthorSpheres(int rows, int columns, int nodeCount, IList<GameObject> gameObjects, float spacingX,
+            float spacingZ, Renderer parentRenderer, GameObject parent)
+        {
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < columns; j++)
+                {
+                    int sphereIndex = i * rows + j;
+                    if (sphereIndex >= nodeCount)
+                    {
+                        return;
+                    }
+
+                    GameObject gameObject = gameObjects[sphereIndex];
+                    Renderer renderer = gameObject.GetComponent<Renderer>();
+
+                    // Calculate the position of the sphere
+                    float xPos = (i * spacingX - (parentRenderer.bounds.size.x / 2));
+                    //xPos += (renderer.bounds.size.x / 2);
+                    float zPos = (j * spacingZ - (parentRenderer.bounds.size.z / 2));
+                    // zPos += (renderer.bounds.size.z / 2);
+                    Vector3 spherePosition = new Vector3(xPos, parentRenderer.bounds.size.y + 0.8f, zPos) +
+                                             parent.transform.position;
+                    gameObjects[sphereIndex].transform.position = spherePosition;
+                }
+            }
+        }
+
 
         /// <summary>
         /// The <paramref name="layoutNodes"/> are put just above the <paramref name="plane"/> w.r.t. the y axis.
@@ -546,33 +587,6 @@ namespace SEE.Game.CityRendering
             light.intensity = 1.0f;
         }
 
-        void MoveAuthorSpheres(int rows, int columns, int nodeCount, IList<GameObject> gameObjects, float spacingX,
-            float spacingZ, Renderer parentRenderer, GameObject parent)
-        {
-            for (int i = 0; i <= rows; i++)
-            {
-                for (int j = 0; j <= columns; j++)
-                {
-                    int sphereIndex = i * rows + j;
-                    if (sphereIndex >= nodeCount)
-                    {
-                        return;
-                    }
-
-                    GameObject gameObject = gameObjects[sphereIndex];
-                    Renderer renderer = gameObject.GetComponent<Renderer>();
-
-                    // Calculate the position of the sphere
-                    float xPos = (i * spacingX - (parentRenderer.bounds.size.x / 2));
-                    //xPos += (renderer.bounds.size.x / 2);
-                    float zPos = (j * spacingZ - (parentRenderer.bounds.size.z / 2));
-                    // zPos += (renderer.bounds.size.z / 2);
-                    Vector3 spherePosition = new Vector3(xPos, parentRenderer.bounds.size.y + 0.8f, zPos) +
-                                             parent.transform.position;
-                    gameObjects[sphereIndex].transform.position = spherePosition;
-                }
-            }
-        }
 
         /// <summary>
         /// Scales and moves the <paramref name="layoutNodes"/> so that they fit into the <paramref name="parent"/>.
