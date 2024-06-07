@@ -1,8 +1,11 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using SEE.Controls;
+using SEE.Controls.Actions;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.HolisticMetrics;
@@ -10,6 +13,7 @@ using SEE.GO;
 using SEE.GO.Decorators;
 using SEE.GO.NodeFactories;
 using SEE.Layout;
+using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
@@ -384,11 +388,11 @@ namespace SEE.Game.CityRendering
             List<string> authors =
                 nodeMap.Keys.Where(x => x.Type == "file")
                     .SelectMany(x => x.StringAttributes.Where(y => y.Key == "Metric.File.Authors"))
-                    .Select(x => x.Value)
+                    .SelectMany(x => x.Value.Split(","))
                     .Distinct()
                     .ToList();
 
-            int nodeCount = 15;
+            int nodeCount = authors.Count;
 
             IList<GameObject> gameObjects = new List<GameObject>();
             Renderer parentRenderer = parent.GetComponent<Renderer>();
@@ -399,46 +403,101 @@ namespace SEE.Game.CityRendering
             int columns = Mathf.CeilToInt((float)nodeCount / rows);
 
 
-            float spacingZ = parentRenderer.bounds.size.z / (columns  );
-            float spacingX = parentRenderer.bounds.size.x / (rows );
+            float spacingZ = (parentRenderer.bounds.size.z / (columns));
+            float spacingX = (parentRenderer.bounds.size.x / (rows));
             if (float.IsInfinity(spacingX) || float.IsNaN(spacingX))
             {
                 spacingX = parentRenderer.bounds.size.x;
             }
-            for (int i = 0; i < nodeCount; i++)
+
+            int counter = 0;
+            var materials = new Materials(Materials.ShaderType.OpaqueMetallic,
+                new ColorRange(Color.red, Color.blue, (uint)nodeCount + 1));
+            foreach (var author in authors)
             {
-                var materials = new Materials(Materials.ShaderType.OpaqueMetallic,
-                    new ColorRange(Color.red, Color.magenta, 1));
+                counter++;
 
                 GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                gameObject.AddComponent<NodeRef>();
+                gameObject.AddComponent<InteractableObject>();
+                gameObject.AddComponent<NodeRef>().Value = new Node();
+                gameObject.GetComponent<NodeRef>().Value.StringAttributes.Add("Source.Name", author);
+                gameObject.AddComponent<ShowLabel>();
+                Renderer renderer = gameObject.GetComponent<Renderer>();
+                var mat = materials.Get(0, counter);
+                renderer.sharedMaterial = mat;
                 gameObject.transform.parent = parent.transform;
                 gameObject.transform.transform.localScale *= 0.25f;
                 gameObjects.Add(gameObject);
             }
 
 
-            for (int i = 0; i <= rows; i++)
+            MoveAuthorSpheres(rows, columns, nodeCount, gameObjects, spacingX, spacingZ, parentRenderer, parent);
+
+            var maxHeight = nodeMap.Values.Max(x => x.transform.position.y);
+            float offset = Mathf.Max(Settings.EdgeLayoutSettings.EdgeWidth, 0.2f * maxHeight);
+            foreach (var sphere in gameObjects)
             {
-                for (int j = 0; j <= columns; j++)
+                NodeRef nodeRef = sphere.GetComponent<NodeRef>();
+                var authorName = nodeRef.Value.StringAttributes["Source.Name"];
+
+                var nodesOfAuthor = nodeMap
+                    .Where(x => x.Key.StringAttributes.ContainsKey("Metric.File.Authors"))
+                    .Where(x =>
+                        x.Key.StringAttributes["Metric.File.Authors"]
+                            .Split(',')
+                            .Contains(authorName));
+
+                foreach (var nodeOfAuthor in nodesOfAuthor)
                 {
-                    int sphereIndex = i * rows + j;
-                    if (sphereIndex > nodeCount)
+                    var bSpline = SplineEdgeLayout.CreateSpline(sphere.transform.position,
+                        nodeOfAuthor.Value.transform.position,
+                        above: true, offset);
+
+                    GameObject gameEdge = new()
                     {
-                        return;
-                    }
+                        tag = Tags.Edge,
+                        isStatic = false,
+                        name = authorName + ":" + nodeOfAuthor.Key.ID
+                    };
+                    gameEdge.transform.parent = parent.transform;
 
-                    GameObject gameObject = gameObjects[sphereIndex];
-                    Renderer renderer = gameObject.GetComponent<Renderer>();
+                    // EdgeRef edgeRef = gameEdge.AddComponent<EdgeRef>();
+                    // edgeRef.Value = layoutGraphEdge.ItsEdge;
+                    // edgeRef.SourceNodeID = layoutGraphEdge.Source.ID;
+                    // edgeRef.TargetNodeID = layoutGraphEdge.Source.ID;
 
-                    // Calculate the position of the sphere
-                    float xPos = (i * spacingX - (parentRenderer.bounds.size.x / 2));
-                    //xPos += (renderer.bounds.size.x / 2);
-                    float zPos = (j * spacingZ - (parentRenderer.bounds.size.z / 2));
-                   // zPos += (renderer.bounds.size.z / 2);
-                    Vector3 spherePosition = new Vector3(xPos, parentRenderer.bounds.size.y + 0.1f, zPos) +
-                                             parent.transform.position;
-                    gameObjects[sphereIndex].transform.position = spherePosition;
+                    gameEdge.AddComponent<SEESpline>().Spline = bSpline;
+
+                    //ZScoreScale scaler = new();
+
+                    // Add a line renderer which serves as a preview in the Unity
+                    // editor. The line renderer will be replaced with a mesh
+                    // renderer at runtime (i.e., when starting the application).
+                    LineRenderer line = gameEdge.AddComponent<LineRenderer>();
+
+                    // Use sharedMaterial if changes to the original material
+                    // should affect all objects using this material;
+                    // renderer.material instead will create a copy of the
+                    // material and will not be affected by changes of the
+                    // original material.
+                    line.sharedMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
+
+
+                    LineFactory.SetDefaults(line);
+                    LineFactory.SetWidth(line, Settings.EdgeLayoutSettings.EdgeWidth);
+
+                    // If enabled, the lines are defined in world space. This
+                    // means the object's position is ignored and the lines are
+                    // rendered around world origin.
+                    line.useWorldSpace = false;
+
+                    // Draw spline as concatenation of subsplines (polyline).
+                    SEESpline spline = gameEdge.GetComponent<SEESpline>();
+                    Vector3[] positions = TinySplineInterop.ListToVectors(spline.Spline.Sample());
+                    line.positionCount = positions.Length; // number of vertices
+                    line.SetPositions(positions);
+
+                    // return gameEdge;
                 }
             }
             //ICollection<LayoutGameNode> gameNodes = ToLayoutNodes(gameObjects);
@@ -485,6 +544,34 @@ namespace SEE.Game.CityRendering
             light.range = 3.0f * Mathf.Sqrt(boundingBoxWidth * boundingBoxWidth + boundingBoxDepth * boundingBoxDepth);
             light.type = LightType.Point;
             light.intensity = 1.0f;
+        }
+
+        void MoveAuthorSpheres(int rows, int columns, int nodeCount, IList<GameObject> gameObjects, float spacingX,
+            float spacingZ, Renderer parentRenderer, GameObject parent)
+        {
+            for (int i = 0; i <= rows; i++)
+            {
+                for (int j = 0; j <= columns; j++)
+                {
+                    int sphereIndex = i * rows + j;
+                    if (sphereIndex >= nodeCount)
+                    {
+                        return;
+                    }
+
+                    GameObject gameObject = gameObjects[sphereIndex];
+                    Renderer renderer = gameObject.GetComponent<Renderer>();
+
+                    // Calculate the position of the sphere
+                    float xPos = (i * spacingX - (parentRenderer.bounds.size.x / 2));
+                    //xPos += (renderer.bounds.size.x / 2);
+                    float zPos = (j * spacingZ - (parentRenderer.bounds.size.z / 2));
+                    // zPos += (renderer.bounds.size.z / 2);
+                    Vector3 spherePosition = new Vector3(xPos, parentRenderer.bounds.size.y + 0.8f, zPos) +
+                                             parent.transform.position;
+                    gameObjects[sphereIndex].transform.position = spherePosition;
+                }
+            }
         }
 
         /// <summary>
