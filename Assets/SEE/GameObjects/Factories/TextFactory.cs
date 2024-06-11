@@ -21,7 +21,7 @@ namespace SEE.GO
         /// <summary>
         /// Name of the font used for the text. This must be a font with portal information.
         /// </summary>
-        private const string portalFontName = "Fonts & Materials/LiberationSans SDF - Portal";
+        private const string portalFontName = "Fonts/LiberationSans SDF - Portal";
 
         /// <summary>
         /// The font asset used for all texts created by this <see cref="TextFactory"/>.
