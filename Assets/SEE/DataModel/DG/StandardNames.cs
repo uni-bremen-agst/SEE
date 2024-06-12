@@ -204,25 +204,29 @@
     }
 
     /// <summary>
-    /// Defines names of node attributes for Git metrics.
+    /// Defines names of node attributes for VCS metrics.
     /// </summary>
-    public static class Git
+    public static class VCS
     {
+        /// <summary>
+        /// Prefix for VCS metrics.
+        /// </summary>
+        public const string Prefix = Metrics.Prefix + "VCS.";
         /// <summary>
         /// The number of lines of code added for a file that was changed between two commits.
         /// </summary>
-        public const string LinesAdded = "Metric.Git.Lines_Added";
+        public const string LinesAdded = Prefix + "Lines_Added";
         /// <summary>
         /// The number of lines of code deleted for a file that was changed between two commits.
         /// </summary>
-        public const string LinesDeleted = "Metric.Git.Lines_Deleted";
+        public const string LinesDeleted = Prefix + "Lines_Deleted";
         /// <summary>
         /// The number of unique developers who contributed to a file that was changed between two commits.
         /// </summary>
-        public const string NumberOfDevelopers = "Metric.Git.Number_Of_Developers";
+        public const string NumberOfDevelopers = Prefix + "Number_Of_Developers";
         /// <summary>
         /// The number of times a file was changed between two commits.
         /// </summary>
-        public const string CommitFrequency = "Metric.Git.Commit_Frequency";
+        public const string CommitFrequency = Prefix + "Commit_Frequency";
     }
 }

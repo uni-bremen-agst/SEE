@@ -30,8 +30,8 @@ namespace SEE.GraphProviders
                 {
                     if (node.ID.Replace('\\', '/') == change.Path)
                     {
-                        node.SetInt(Git.LinesAdded, change.LinesAdded);
-                        node.SetInt(Git.LinesDeleted, change.LinesDeleted);
+                        node.SetInt(DataModel.DG.VCS.LinesAdded, change.LinesAdded);
+                        node.SetInt(DataModel.DG.VCS.LinesDeleted, change.LinesDeleted);
                     }
                 }
             }
@@ -82,7 +82,7 @@ namespace SEE.GraphProviders
                 {
                     if (node.ID.Replace('\\', '/') == entry.Key)
                     {
-                        node.SetInt(Git.NumberOfDevelopers, entry.Value.Count);
+                        node.SetInt(DataModel.DG.VCS.NumberOfDevelopers, entry.Value.Count);
                     }
                 }
             }
@@ -136,7 +136,7 @@ namespace SEE.GraphProviders
                 {
                     if (node.ID.Replace('\\', '/') == entry.Key)
                     {
-                        node.SetInt(Git.CommitFrequency, entry.Value);
+                        node.SetInt(DataModel.DG.VCS.CommitFrequency, entry.Value);
                     }
                 }
             }

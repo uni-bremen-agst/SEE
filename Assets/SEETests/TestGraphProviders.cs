@@ -145,7 +145,7 @@ namespace SEE.GraphProviders
 
                 // Metric from Git.
                 {
-                    Assert.IsTrue(node.TryGetInt(Git.LinesAdded, out int value));
+                    Assert.IsTrue(node.TryGetInt(DataModel.DG.VCS.LinesAdded, out int value));
                     Assert.AreEqual(40, value);
                 }
             });
