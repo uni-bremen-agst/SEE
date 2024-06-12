@@ -157,14 +157,44 @@ namespace SEE.GraphProviders
             }
         }
 
-        internal static void AddMetrics(Graph graph, Repository repo, string oldRevision, string newRevision)
+        /// <summary>
+        /// Adds VCS metrics to all nodes in <paramref name="graph"/> based on the
+        /// VCS information derived from <paramref name="repository"/>. The metrics are gathered
+        /// in between the <paramref name="oldRevision"/> and <paramref name="newRevision"/>.
+        /// If <paramref name="oldRevision"/> or <paramref name="newRevision"/> is null or empty,
+        /// an exception is thrown.
+        /// </summary>
+        /// <param name="graph">The graph where the metric should be added.</param>
+        /// <param name="repository">The repository from which the file content is retrieved.</param>
+        /// <param name="oldRevision">The starting commit ID (baseline).</param>
+        /// <param name="newRevision">The ending commit.</param>
+        /// <exception cref="System.Exception">thrown if <paramref name="oldRevision"/>
+        /// or <paramref name="newRevision"/> is null or empty or if they do not
+        /// refer to an existing revision</exception>
+        internal static void AddMetrics(Graph graph, Repository repository, string oldRevision, string newRevision)
         {
-            Commit oldCommit = repo.Lookup<Commit>(oldRevision);
-            Commit newCommit = repo.Lookup<Commit>(newRevision);
+            if (string.IsNullOrWhiteSpace(oldRevision))
+            {
+                throw new System.Exception("The old revision must neither be null nor empty.");
+            }
+            if (string.IsNullOrWhiteSpace(newRevision))
+            {
+                throw new System.Exception("The new revision must neither be null nor empty.");
+            }
+            Commit oldCommit = repository.Lookup<Commit>(oldRevision);
+            if (oldCommit == null)
+            {
+                throw new System.Exception($"There is no revision {oldCommit}");
+            }
+            Commit newCommit = repository.Lookup<Commit>(newRevision);
+            if (newCommit == null)
+            {
+                throw new System.Exception($"There is no revision {newCommit}");
+            }
 
-            AddLinesOfCodeChurnMetric(graph, repo, oldCommit, newCommit);
-            AddNumberOfDevelopersMetric(graph, repo, oldCommit, newCommit);
-            AddCommitFrequencyMetric(graph, repo, newCommit, oldCommit);
+            AddLinesOfCodeChurnMetric(graph, repository, oldCommit, newCommit);
+            AddNumberOfDevelopersMetric(graph, repository, oldCommit, newCommit);
+            AddCommitFrequencyMetric(graph, repository, newCommit, oldCommit);
         }
     }
 }
