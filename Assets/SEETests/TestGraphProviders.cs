@@ -4,6 +4,7 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Utils.Paths;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -126,16 +127,24 @@ namespace SEE.GraphProviders
                 });
 
         [UnityTest]
-        public IEnumerator TestGitGraphProvider() =>
+        public IEnumerator TestVCSMetrics() =>
             UniTask.ToCoroutine(async () =>
             {
                 GameObject go = new();
-                DiffCity city = go.AddComponent<DiffCity>();
-                city.VCSPath = new DirectoryPath(Path.GetDirectoryName(Application.dataPath));
-                city.OldRevision = "887e1fc1d6fe87ee1178822b5eeb666e62af3710";
-                city.NewRevision = "5efa95913a6e894e5340f07fab26c9958b5c1096";
+                SEECity city = go.AddComponent<SEECity>();
 
-                GraphProvider provider = new VCSMetricsProvider();
+                Dictionary<string, bool> pathGlobbing = new()
+                {
+                    { "Assets/SEE/**/*.cs", true }
+                };
+
+                VCSGraphProvider provider = new()
+                {
+                    RepositoryPath = new DirectoryPath(Path.GetDirectoryName(Application.dataPath)),
+                    BaselineCommitID = "887e1fc1d6fe87ee1178822b5eeb666e62af3710",
+                    CommitID = "5efa95913a6e894e5340f07fab26c9958b5c1096",
+                    PathGlobbing = pathGlobbing
+                };
 
                 Graph loaded = await provider.ProvideAsync(new Graph(""), city);
                 Assert.IsNotNull(loaded);
