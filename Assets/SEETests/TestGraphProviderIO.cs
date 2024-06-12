@@ -583,14 +583,14 @@ namespace SEE.GraphProviders
             return new GameObject().AddComponent<T>();
         }
 
-        private GraphProvider Load()
+        private MultiGraphProvider LoadMultiGraph()
         {
             using ConfigReader stream = new(filename);
             MultiGraphProvider loaded = MultiGraphProvider.Restore(stream.Read(), providerLabel);
             Assert.IsNotNull(loaded);
             return loaded;
         }
-
+        
         private void Save(SingleGraphProvider saved)
         {
             using ConfigWriter writer = new(filename);
