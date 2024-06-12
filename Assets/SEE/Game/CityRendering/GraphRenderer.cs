@@ -383,7 +383,7 @@ namespace SEE.Game.CityRendering
             }
         }
 
-        private void DrawAuthorSpheres(IDictionary<Node, GameObject> nodeMap, GameObject parent)
+        public void DrawAuthorSpheres(IDictionary<Node, GameObject> nodeMap, GameObject parent)
         {
             List<string> authors =
                 nodeMap.Keys.Where(x => x.Type == "file")
@@ -417,12 +417,11 @@ namespace SEE.Game.CityRendering
                 counter++;
 
                 GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                gameObject.AddComponent<InteractableObject>();
-                gameObject.AddComponent<NodeRef>().Value = new Node();
-                gameObject.GetComponent<NodeRef>().Value.StringAttributes.Add("Source.Name", author);
-                gameObject.AddComponent<ShowLabel>();
-                gameObject.AddComponent<ShowHovering>();
-                gameObject.AddComponent<ShowEdges>();
+                NodeRef nodeRef = gameObject.AddComponent<NodeRef>();
+                nodeRef.Value = new();
+                nodeRef.Value.StringAttributes.Add("Source.Name", author);
+                InteractionDecorator.PrepareForInteraction(gameObject);
+                AddLOD(gameObject);
                 Renderer renderer = gameObject.GetComponent<Renderer>();
                 var mat = materials.Get(0, counter);
                 renderer.sharedMaterial = mat;
@@ -436,7 +435,7 @@ namespace SEE.Game.CityRendering
 
             // Drawing edges
             var maxHeight = nodeMap.Values.Max(x => x.transform.position.y);
-            float offset = Mathf.Max(Settings.EdgeLayoutSettings.EdgeWidth, 0.2f * maxHeight);
+            float offset = Mathf.Max(2.5f * Settings.EdgeLayoutSettings.EdgeWidth, 0.2f * maxHeight);
 
             int maximalChurn = nodeMap.Keys
                 .Where(x => x.IntAttributes.ContainsKey("Metric.File.Churn"))
@@ -469,6 +468,7 @@ namespace SEE.Game.CityRendering
                         name = authorName + ":" + nodeOfAuthor.Key.ID
                     };
                     gameEdge.transform.parent = parent.transform;
+
 
                     // EdgeRef edgeRef = gameEdge.AddComponent<EdgeRef>();
                     // edgeRef.Value = layoutGraphEdge.ItsEdge;
@@ -509,6 +509,8 @@ namespace SEE.Game.CityRendering
                     line.positionCount = positions.Length; // number of vertices
                     line.SetPositions(positions);
 
+                    InteractionDecorator.PrepareForInteraction(gameEdge);
+                    AddLOD(gameEdge);
                     // return gameEdge;
                 }
             }
@@ -558,6 +560,7 @@ namespace SEE.Game.CityRendering
             NodeLayout.Stack(layoutNodes,
                 plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + levelDistance);
         }
+
 
         /// <summary>
         /// Adds light to simulate an emissive effect. The new light object will be added to
