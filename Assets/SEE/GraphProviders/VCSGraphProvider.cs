@@ -365,23 +365,21 @@ namespace SEE.GraphProviders
                     if (language != TokenLanguage.Plain)
                     {
                         IEnumerable<SEEToken> tokens = RetrieveTokens(filePath, repository, commitID, language);
-                        int complexity = TokenMetrics.CalculateMcCabeComplexity(tokens);
-                        int linesOfCode = TokenMetrics.CalculateLinesOfCode(tokens);
+                        node.SetInt(Metrics.Prefix + "LOC", TokenMetrics.CalculateLinesOfCode(tokens));
+                        node.SetInt(Metrics.Prefix + "McCabe_Complexity", TokenMetrics.CalculateMcCabeComplexity(tokens));
                         TokenMetrics.HalsteadMetrics halsteadMetrics = TokenMetrics.CalculateHalsteadMetrics(tokens);
-                        node.SetInt(Metrics.Prefix + "LOC", linesOfCode);
-                        node.SetInt(Metrics.Prefix + "McCabe_Complexity", complexity);
-                        node.SetInt(Metrics.Prefix + "Halstead.Distinct_Operators", halsteadMetrics.DistinctOperators);
-                        node.SetInt(Metrics.Prefix + "Halstead.Distinct_Operands", halsteadMetrics.DistinctOperands);
-                        node.SetInt(Metrics.Prefix + "Halstead.Total_Operators", halsteadMetrics.TotalOperators);
-                        node.SetInt(Metrics.Prefix + "Halstead.Total_Operands", halsteadMetrics.TotalOperands);
-                        node.SetInt(Metrics.Prefix + "Halstead.Program_Vocabulary", halsteadMetrics.ProgramVocabulary);
-                        node.SetInt(Metrics.Prefix + "Halstead.Program_Length", halsteadMetrics.ProgramLength);
-                        node.SetFloat(Metrics.Prefix + "Halstead.Estimated_Program_Length", halsteadMetrics.EstimatedProgramLength);
-                        node.SetFloat(Metrics.Prefix + "Halstead.Volume", halsteadMetrics.Volume);
-                        node.SetFloat(Metrics.Prefix + "Halstead.Difficulty", halsteadMetrics.Difficulty);
-                        node.SetFloat(Metrics.Prefix + "Halstead.Effort", halsteadMetrics.Effort);
-                        node.SetFloat(Metrics.Prefix + "Halstead.Time_Required_To_Program", halsteadMetrics.TimeRequiredToProgram);
-                        node.SetFloat(Metrics.Prefix + "Halstead.Number_Of_Delivered_Bugs", halsteadMetrics.NumberOfDeliveredBugs);
+                        node.SetInt(Halstead.DistinctOperators, halsteadMetrics.DistinctOperators);
+                        node.SetInt(Halstead.DistinctOperands, halsteadMetrics.DistinctOperands);
+                        node.SetInt(Halstead.TotalOperators, halsteadMetrics.TotalOperators);
+                        node.SetInt(Halstead.TotalOperands, halsteadMetrics.TotalOperands);
+                        node.SetInt(Halstead.ProgramVocabulary, halsteadMetrics.ProgramVocabulary);
+                        node.SetInt(Halstead.ProgramLength, halsteadMetrics.ProgramLength);
+                        node.SetFloat(Halstead.EstimatedProgramLength, halsteadMetrics.EstimatedProgramLength);
+                        node.SetFloat(Halstead.Volume, halsteadMetrics.Volume);
+                        node.SetFloat(Halstead.Difficulty, halsteadMetrics.Difficulty);
+                        node.SetFloat(Halstead.Effort, halsteadMetrics.Effort);
+                        node.SetFloat(Halstead.TimeRequiredToProgram, halsteadMetrics.TimeRequiredToProgram);
+                        node.SetFloat(Halstead.NumberOfDeliveredBugs, halsteadMetrics.NumberOfDeliveredBugs);
                     }
                 }
             }
