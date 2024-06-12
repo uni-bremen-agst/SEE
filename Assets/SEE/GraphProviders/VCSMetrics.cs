@@ -22,6 +22,11 @@ namespace SEE.GraphProviders
         public static void AddLineofCodeChurnMetric(Graph graph, string vcsPath, Commit oldCommit, Commit newCommit)
         {
             using Repository repo = new(vcsPath);
+            AddLinesOfCodeChurnMetric(graph, repo, oldCommit, newCommit);
+        }
+
+        private static void AddLinesOfCodeChurnMetric(Graph graph, Repository repo, Commit oldCommit, Commit newCommit)
+        {
             Patch changes = repo.Diff.Compare<Patch>(oldCommit.Tree, newCommit.Tree);
 
             foreach (PatchEntryChanges change in changes)
@@ -49,6 +54,11 @@ namespace SEE.GraphProviders
         public static void AddNumberofDevelopersMetric(Graph graph, string vcsPath, Commit oldCommit, Commit newCommit)
         {
             using Repository repo = new(vcsPath);
+            AddNumberOfDevelopersMetric(graph, repo, oldCommit, newCommit);
+        }
+
+        private static void AddNumberOfDevelopersMetric(Graph graph, Repository repo, Commit oldCommit, Commit newCommit)
+        {
             ICommitLog commits = repo.Commits.QueryBy(new CommitFilter { SortBy = CommitSortStrategies.Topological });
 
             Dictionary<string, HashSet<string>> uniqueContributorsPerFile = new();
@@ -100,6 +110,11 @@ namespace SEE.GraphProviders
         public static void AddCommitFrequencyMetric(Graph graph, string vcsPath, Commit oldCommit, Commit newCommit)
         {
             using Repository repo = new(vcsPath);
+            AddCommitFrequencyMetric(graph, repo, oldCommit, newCommit);
+        }
+
+        private static void AddCommitFrequencyMetric(Graph graph, Repository repo, Commit oldCommit, Commit newCommit)
+        {
             ICommitLog commitsBetween = repo.Commits.QueryBy(new CommitFilter
             {
                 IncludeReachableFrom = newCommit,
@@ -140,6 +155,16 @@ namespace SEE.GraphProviders
                     }
                 }
             }
+        }
+
+        internal static void AddMetrics(Graph graph, Repository repo, string oldRevision, string newRevision)
+        {
+            Commit oldCommit = repo.Lookup<Commit>(oldRevision);
+            Commit newCommit = repo.Lookup<Commit>(newRevision);
+
+            AddLinesOfCodeChurnMetric(graph, repo, oldCommit, newCommit);
+            AddNumberOfDevelopersMetric(graph, repo, oldCommit, newCommit);
+            AddCommitFrequencyMetric(graph, repo, newCommit, oldCommit);
         }
     }
 }
