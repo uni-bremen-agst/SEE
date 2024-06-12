@@ -24,6 +24,12 @@ namespace SEE.DataModel.DG.GraphSearch
         public readonly ISet<GraphElement> ExcludeElements = new HashSet<GraphElement>();
 
         /// <summary>
+        /// Specifies the only elements that should be included.
+        /// If the set is empty, all elements are included.
+        /// </summary>
+        public readonly ISet<GraphElement> IncludeElements = new HashSet<GraphElement>();
+
+        /// <summary>
         /// Whether to include nodes.
         /// </summary>
         public bool IncludeNodes = true;
@@ -47,8 +53,9 @@ namespace SEE.DataModel.DG.GraphSearch
                     Edge => IncludeEdges,
                     _ => false
                 }
-                && (IncludeToggleAttributes.Count == 0 || IncludeToggleAttributes.Overlaps(element.ToggleAttributes))
+                && (IncludeElements.Count == 0 || IncludeElements.Contains(element))
                 && !ExcludeElements.Contains(element)
+                && (IncludeToggleAttributes.Count == 0 || IncludeToggleAttributes.Overlaps(element.ToggleAttributes))
                 && !ExcludeToggleAttributes.Overlaps(element.ToggleAttributes);
         }
 
