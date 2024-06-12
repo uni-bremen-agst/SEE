@@ -17,21 +17,6 @@ namespace SEE.GraphProviders
     public class VCSMetricsProvider : GraphProvider
     {
         /// <summary>
-        /// The path to the VCS containing the two revisions to be compared.
-        /// </summary>
-        private string VCSPath = string.Empty;
-
-        /// <summary>
-        /// The older revision that constitutes the baseline of the comparison.
-        /// </summary>
-        private string OldRevision = string.Empty;
-
-        /// <summary>
-        /// The newer revision against which the <see cref="OldRevision"/> is to be compared.
-        /// </summary>
-        private string NewRevision = string.Empty;
-
-        /// <summary>
         /// Calculates metrics between two revisions from a git repository and adds these to <paramref name="graph"/>.
         /// The resulting graph is returned.
         /// </summary>
@@ -48,23 +33,51 @@ namespace SEE.GraphProviders
                                                     Action<float> changePercentage = null,
                                                     CancellationToken token = default)
         {
-            CheckArguments(city);
             if (graph == null)
             {
                 throw new NotImplementedException();
             }
-            else
+            if (city == null)
             {
-                using (Repository repo = new(VCSPath))
-                {
-                    Commit OldCommit = repo.Lookup<Commit>(OldRevision);
-                    Commit NewCommit = repo.Lookup<Commit>(NewRevision);
+                throw new ArgumentException("The given city is null.\n");
+            }
+            if (city is DiffCity diffcity)
+            {
+                string oldRevision = diffcity.OldRevision;
+                string newRevision = diffcity.NewRevision;
+                string vcsPath = diffcity.VCSPath.Path;
 
-                    VCSMetrics.AddLineofCodeChurnMetric(graph, VCSPath, OldCommit, NewCommit);
-                    VCSMetrics.AddNumberofDevelopersMetric(graph, VCSPath, OldCommit, NewCommit);
-                    VCSMetrics.AddCommitFrequencyMetric(graph, VCSPath, OldCommit, NewCommit);
+                if (string.IsNullOrEmpty(vcsPath))
+                {
+                    throw new ArgumentException("Empty VCS Path.\n");
+                }
+                if (!Directory.Exists(vcsPath))
+                {
+                    throw new ArgumentException($"Directory {vcsPath} does not exist.\n");
+                }
+                if (string.IsNullOrEmpty(oldRevision))
+                {
+                    throw new ArgumentException("Empty old Revision.\n");
+                }
+                if (string.IsNullOrEmpty(newRevision))
+                {
+                    throw new ArgumentException("Empty new Revision.\n");
+                }
+
+                using (Repository repo = new(vcsPath))
+                {
+                    Commit oldCommit = repo.Lookup<Commit>(oldRevision);
+                    Commit newCommit = repo.Lookup<Commit>(newRevision);
+
+                    VCSMetrics.AddLineofCodeChurnMetric(graph, vcsPath, oldCommit, newCommit);
+                    VCSMetrics.AddNumberofDevelopersMetric(graph, vcsPath, oldCommit, newCommit);
+                    VCSMetrics.AddCommitFrequencyMetric(graph, vcsPath, oldCommit, newCommit);
                 }
                 return UniTask.FromResult(graph);
+            }
+            else
+            {
+                throw new ArgumentException($"To generate VCS metrics, the given city should be a {nameof(DiffCity)}.\n");
             }
         }
 
@@ -73,84 +86,14 @@ namespace SEE.GraphProviders
             return GraphProviderKind.VCSMetrics;
         }
 
-        /// <summary>
-        /// Checks whether the assumptions on <see cref="VCSPath"/> and
-        /// <see cref="OldRevision"/> and <see cref="NewRevision"/> and <paramref name="city"/> hold.
-        /// If not, exceptions are thrown accordingly.
-        /// </summary>
-        /// <param name="city">To be checked</param>
-        /// <exception cref="ArgumentException">thrown in case <see cref="VCSPath"/>,
-        /// or <see cref="OldRevision"/> or <see cref="NewRevision"/>
-        /// is undefined or does not exist or <paramref name="city"/> is null or is not a DiffCity</exception>
-        protected void CheckArguments(AbstractSEECity city)
-        {
-            if (city == null)
-            {
-                throw new ArgumentException("The given city is null.\n");
-            }
-            else
-            {
-                if (city is DiffCity diffcity)
-                {
-                    OldRevision = diffcity.OldRevision;
-                    NewRevision = diffcity.NewRevision;
-                    VCSPath = diffcity.VCSPath.Path;
-
-                    if (string.IsNullOrEmpty(VCSPath))
-                    {
-                        throw new ArgumentException("Empty VCS Path.\n");
-                    }
-                    if (!Directory.Exists(VCSPath))
-                    {
-                        throw new ArgumentException($"Directory {VCSPath} does not exist.\n");
-                    }
-                    if (string.IsNullOrEmpty(OldRevision))
-                    {
-                        throw new ArgumentException("Empty Old Revision.\n");
-                    }
-                    if (string.IsNullOrEmpty(NewRevision))
-                    {
-                        throw new ArgumentException("Empty New Revision.\n");
-                    }
-                }
-                else
-                {
-                    throw new ArgumentException($"To generate Git metrics, the given city should be a {nameof(DiffCity)}.\n");
-                }
-            }
-        }
-
-        #region ConfigIO
-
-        /// <summary>
-        /// Label of attribute <see cref="VCSPath"/> in the configuration file.
-        /// </summary>
-        private const string vcsPathLabel = "VCSPath";
-
-        /// <summary>
-        /// Label of attribute <see cref="OldRevision"/> in the configuration file.
-        /// </summary>
-        private const string oldRevisionLabel = "OldRevision";
-
-        /// <summary>
-        /// Label of attribute <see cref="NewRevision"/> in the configuration file.
-        /// </summary>
-        private const string newRevisionLabel = "NewRevision";
-
         protected override void SaveAttributes(ConfigWriter writer)
         {
-            writer.Save(VCSPath, vcsPathLabel);
-            writer.Save(OldRevision, oldRevisionLabel);
-            writer.Save(NewRevision, newRevisionLabel);
+            // Nothing to be saved. This class has not attributes.
         }
 
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
-            ConfigIO.Restore(attributes, vcsPathLabel, ref VCSPath);
-            ConfigIO.Restore(attributes, oldRevisionLabel, ref OldRevision);
-            ConfigIO.Restore(attributes, newRevisionLabel, ref NewRevision);
+            // Nothing to be restored. This class has not attributes.
         }
-
-        #endregion
     }
 }
