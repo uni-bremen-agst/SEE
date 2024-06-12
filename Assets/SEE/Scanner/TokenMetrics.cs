@@ -40,7 +40,6 @@ namespace SEE.Scanner
         /// <param name="TimeRequiredToProgram">The estimated time required to program the code, based on the program effort.</param>
         /// <param name="NumberOfDeliveredBugs">The estimated number of delivered bugs in the code, based on the program volume.</param>
         public record HalsteadMetrics(
-
             int DistinctOperators,
             int DistinctOperands,
             int TotalOperators,
@@ -93,7 +92,6 @@ namespace SEE.Scanner
             float numberOfDeliveredBugs = volume / 3000.0f; // Formula: Bugs B = effort E^(2/3) / 3000 or bugs B = volume V / 3000 are both used. 3000 is an empirical estimate.
 
             return new HalsteadMetrics(
-
                 operators.Count,
                 operands.Count,
                 totalOperators,

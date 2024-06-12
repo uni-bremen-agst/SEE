@@ -69,7 +69,7 @@ namespace SEE.GraphProviders
                 }
                 // Metric from CSV import.
                 {
-                    Assert.IsTrue(node.TryGetInt("Metric.Developers", out int value));
+                    Assert.IsTrue(node.TryGetInt(Metrics.Prefix + "Developers", out int value));
                     Assert.AreEqual(3, value);
                 }
             });

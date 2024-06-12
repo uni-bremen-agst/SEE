@@ -1,6 +1,8 @@
-﻿using NUnit.Framework;
+﻿using LibGit2Sharp;
+using NUnit.Framework;
 using SEE.DataModel.DG;
 using SEE.Game.City;
+using SEE.Scanner;
 using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
@@ -419,12 +421,9 @@ namespace SEE.GraphProviders
 
         #endregion
 
-        private static T NewVanillaSEECity<T>() where T : Component
-        {
-            return new GameObject().AddComponent<T>();
-        }
+        #region VCSGraphProvider
 
-        public async System.Threading.Tasks.Task<Graph> GetVCSGraphAsync()
+        public async Task<Graph> GetVCSGraphAsync()
         {
             VCSGraphProvider saved = GetVCSGraphProvider();
             SEECity testCity = NewVanillaSEECity<SEECity>();
@@ -497,12 +496,94 @@ namespace SEE.GraphProviders
         {
             return new VCSGraphProvider()
             {
-                RepositoryPath = new DirectoryPath(System.IO.Path.GetDirectoryName(Application.dataPath)),
+                RepositoryPath = new DirectoryPath(Path.GetDirectoryName(Application.dataPath)),
                 CommitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461",
             };
         }
 
-        private MultiGraphProvider LoadMultiGraph()
+        [Test]
+        public async Task TestRetrieveTokensAsync()
+        {
+            Graph graph = await GetVCSGraphAsync();
+            Node fileNode = graph.Nodes().First(t => t.Type == "File");
+            string filePath = fileNode.ID;
+            string commitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461";
+            string repoPath = Path.GetDirectoryName(Application.dataPath);
+            using Repository repo = new(repoPath);
+            TokenLanguage language = TokenLanguage.FromFileExtension(Path.GetExtension(filePath).TrimStart('.'));
+
+            IEnumerable<SEEToken> tokens = VCSGraphProvider.RetrieveTokens(filePath, repo, commitID, language);
+
+            Assert.IsNotNull(tokens);
+            Assert.NotZero(tokens.Count());
+        }
+
+        [Test]
+        public async Task TestAddMetricsToNodeAsync()
+        {
+            Graph graph = await GetVCSGraphAsync();
+            string repoPath = Path.GetDirectoryName(Application.dataPath);
+            string commitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461";
+            using Repository repo = new(repoPath);
+
+            foreach (Node node in graph.Nodes())
+            {
+                string filePath = node.ID.Replace('\\', '/');
+                TokenLanguage language = TokenLanguage.FromFileExtension(Path.GetExtension(filePath).TrimStart('.'));
+                if (node.Type == "File" && language != TokenLanguage.Plain)
+                {
+                    IEnumerable<SEEToken> tokens = VCSGraphProvider.RetrieveTokens(filePath, repo, commitID, language);
+                    AssertMetricsCanBeAdded(node);
+                }
+
+                AssertMetricsCannotBeAdded(node);
+            }
+        }
+
+        private static void AssertMetricsCanBeAdded(Node node)
+        {
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "LOD"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "McCabe_Complexity"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Distinct_Operators"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Distinct_Operands"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Total_Operators"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Total_Operands"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Program_Vocabulary"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Program_Length"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Estimated_Program_Length"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Volume"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Difficulty"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Effort"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Time_Required_To_Program"));
+            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Number_Of_Delivered_Bugs"));
+        }
+
+        private static void AssertMetricsCannotBeAdded(Node node)
+        {
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "LOC"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "McCabe_Complexity"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Distinct_Operators"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Distinct_Operands"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Total_Operators"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Total_Operands"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Program_Vocabulary"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Program_Length"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Estimated_Program_Length"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Volume"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Difficulty"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Effort"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Time_Required_To_Program"));
+            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Number_Of_Delivered_Bugs"));
+        }
+
+        #endregion
+
+        private static T NewVanillaSEECity<T>() where T : Component
+        {
+            return new GameObject().AddComponent<T>();
+        }
+
+        private GraphProvider Load()
         {
             using ConfigReader stream = new(filename);
             MultiGraphProvider loaded = MultiGraphProvider.Restore(stream.Read(), providerLabel);
@@ -523,3 +604,4 @@ namespace SEE.GraphProviders
         }
     }
 }
+

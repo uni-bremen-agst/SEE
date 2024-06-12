@@ -82,7 +82,7 @@ namespace SEE.Game.Charts
         /// <returns>either entry or entry with the ChartManager.MetricPrefix</returns>
         private string GetEntry(string entry)
         {
-            return entry.Equals(specialEntry) ? entry : ChartManager.MetricPrefix + entry;
+            return entry.Equals(specialEntry) ? entry : DataModel.DG.Metrics.Prefix + entry;
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace SEE.Game.Charts
             {
                 // Add all node metrics without their prefix
                 string[] options = chartContent.AllMetricNames.ToArray();
-                int metricPrefixLength = ChartManager.MetricPrefix.Length;
+                int metricPrefixLength = DataModel.DG.Metrics.Prefix.Length;
                 for (int i = 0; i < options.Length; i++)
                 {
                     options[i] = options[i].Remove(0, metricPrefixLength);

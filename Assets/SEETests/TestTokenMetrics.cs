@@ -31,7 +31,7 @@ namespace SEE.Scanner
                                 Console.WriteLine(""Hello, else World!"");
                             }
                         }
-                    }", 3)]
+                    }", 2)]
         [TestCase(@"public class NoBranchProgram
                     {
                         public int Add(int a, int b)
@@ -40,6 +40,7 @@ namespace SEE.Scanner
                         }
                     }", 1)]
         [TestCase("public class EmptyClass\n                    {\n                    }", 1)]
+        [TestCase("public class DoesNotCompile\n{\n break; continue; case 2: while do if else foreach for switch try catch }", 7)]
         public void TestCalculateMcCabeComplexity(string code, int expected)
         {
             IEnumerable<SEEToken> tokens = SEEToken.FromString(code, TokenLanguage.CSharp);
@@ -55,7 +56,7 @@ namespace SEE.Scanner
         {
             const float tolerance = 0.001f; // Tolerance for float value comparisons.
 
-            // Test case for empty code. This is used in case either DistinctOperators, DistinctOperands and/or ProgramVocabulary are zero.
+            // Test case for empty code, in case DistinctOperators, DistinctOperands and/or ProgramVocabulary values are zero.
             string emptyCode = "";
 
             IEnumerable<SEEToken> tokensEmptyCode = SEEToken.FromString(emptyCode, TokenLanguage.Plain);
