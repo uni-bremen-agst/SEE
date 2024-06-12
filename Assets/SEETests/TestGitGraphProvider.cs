@@ -58,16 +58,11 @@ namespace SEETests
         private async UniTask<Graph> ProvidingGraph(string date = "01/01/2024")
         {
             GameObject go = new();
-            SEECity city = go.AddComponent<SEECity>();
+            BranchCity city = go.AddComponent<BranchCity>();
 
             AllGitBranchesSingleGraphProvider provider = new();
-            provider.Date = date;
-            provider.RepositoryData = new GitRepository()
-            {
-                RepositoryPath = new DirectoryPath(gitDirPath),
-                PathGlobbing = new() { { ".cs", true } }
-            };
-
+            city.Date = date;
+            
             Graph g = await provider.ProvideAsync(new Graph(""), city);
             return g;
         }

@@ -191,7 +191,7 @@ namespace SEE.Controls.Actions
         /// in; it is used to determine version control information needed to
         /// calculate the diff</param>
         /// <returns>new CodeWindow showing a diff</returns>
-        public static CodeWindow ShowVCSDiff(GraphElementRef graphElementRef, DiffCity city)
+        public static CodeWindow ShowVCSDiff(GraphElementRef graphElementRef, CommitCity city)
         {
             GraphElement graphElement = graphElementRef.Elem;
             string sourceFilename = graphElement.Filename;

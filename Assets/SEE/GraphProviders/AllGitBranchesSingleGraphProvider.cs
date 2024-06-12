@@ -10,7 +10,6 @@ using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO.Git;
 using SEE.Game.City;
 using SEE.GameObjects;
-using SEE.GO;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
@@ -40,20 +39,25 @@ namespace SEE.GraphProviders
         #region Attributes
 
         /// <summary>
-        /// The date limit until commits should be analysed
-        /// </summary>
-        [OdinSerialize]
-        [ShowInInspector, InspectorName("Date Limit"),
-         Tooltip("The date until commits should be analysed (DD/MM/YYYY)"), RuntimeTab(GraphProviderFoldoutGroup)]
-        public string Date = "";
-
-        /// <summary>
         /// The repository from where the data should be fetched
         /// </summary>
-        [OdinSerialize, ShowInInspector, SerializeReference, HideReferenceObjectPicker,
-         ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository"), RuntimeTab("Data")]
-        public GitRepository RepositoryData = new();
+        // [OdinSerialize, ShowInInspector, SerializeReference, HideReferenceObjectPicker,
+        //  ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository"), RuntimeTab("Data")]
+        // public GitRepository RepositoryData = new();
 
+        
+        /// <summary>
+        /// The List of filetypes that get included/excluded.
+        /// </summary>
+        [OdinSerialize]
+        [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
+         Tooltip("Paths and their inclusion/exclusion status."), RuntimeTab(GraphProviderFoldoutGroup),
+         HideReferenceObjectPicker]
+        public Dictionary<string, bool> PathGlobbing = new()
+        {
+            { "", false }
+        };
+        
         /// <summary>
         /// This option fill simplify the graph with <see cref="GitFileMetricsGraphGenerator.DoSimplyfiGraph"/> and combine directories.
         /// </summary>
@@ -93,23 +97,24 @@ namespace SEE.GraphProviders
 
         #endregion
 
-
         #region Methods
 
         /// <summary>
         /// Checks if all attributes are set correctly.
         /// Otherwise an exception is thrown.
         /// </summary>
+        /// <param name="branchCity">The <see cref="BranchCity"/> where this provider was executed</param>
         /// <exception cref="ArgumentException">If one attribute is not set correctly</exception>
-        private void CheckAttributes()
+        private void CheckAttributes(BranchCity branchCity)
         {
-            if (Date == "" || !DateTime.TryParseExact(Date, "dd/MM/yyyy", CultureInfo.InvariantCulture,
+            if (branchCity.Date == "" || !DateTime.TryParseExact(branchCity.Date, "dd/MM/yyyy",
+                    CultureInfo.InvariantCulture,
                     DateTimeStyles.None, out _))
             {
                 throw new ArgumentException("Date is not set or cant be parsed");
             }
 
-            if (RepositoryData.RepositoryPath.Path == "" || !Directory.Exists(RepositoryData.RepositoryPath.Path))
+            if (branchCity.VCSPath.Path == "" || !Directory.Exists(branchCity.VCSPath.Path))
             {
                 throw new ArgumentException("Repository path is not set or does not exists");
             }
@@ -146,9 +151,15 @@ namespace SEE.GraphProviders
             Action<float> changePercentage = null,
             CancellationToken token = default)
         {
-            CheckAttributes();
+            if (city is not BranchCity branchCity)
+            {
+                throw new ArgumentException("Only a Branch city is supported");
+            }
 
-            var task = await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage), cancellationToken: token);
+            CheckAttributes(branchCity);
+
+            var task = await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity),
+                cancellationToken: token);
             if (AutoFetch)
             {
                 if (city is not SEECity seeCity)
@@ -157,11 +168,12 @@ namespace SEE.GraphProviders
                         "Automatically fetching git repos is only supported in SEECity");
                     return task;
                 }
+
                 // Only add the poller when in playing mode
                 if (Application.isPlaying)
                 {
                     GitPoller poller = GetOrAddGitPollerComponent(seeCity);
-                    poller.WatchedRepositories.Add(RepositoryData.RepositoryPath.Path);
+                    poller.WatchedRepositories.Add(branchCity.VCSPath.Path);
                 }
             }
 
@@ -176,25 +188,26 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="graph">The input graph</param>
         /// <param name="changePercentage"></param>
+        /// <param name="branchCity"></param>
         /// <returns>The generated output graph</returns>
-        private Graph GetGraph(Graph graph, Action<float> changePercentage)
+        private Graph GetGraph(Graph graph, Action<float> changePercentage, BranchCity branchCity)
         {
-            graph.BasePath = RepositoryData.RepositoryPath.Path;
-            string[] pathSegments = RepositoryData.RepositoryPath.Path.Split(Path.DirectorySeparatorChar);
+            graph.BasePath = branchCity.VCSPath.Path;
+            string[] pathSegments = graph.BasePath.Split(Path.DirectorySeparatorChar);
 
             string repositoryName = pathSegments[^1];
 
             GraphUtils.NewNode(graph, repositoryName, GraphUtils.RepositoryTypeName, pathSegments[^1]);
 
             // Assuming that CheckAttributes() was already executed so that the date string is not empty nor malformed.  
-            DateTime timeLimit = DateTime.ParseExact(Date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            DateTime timeLimit = DateTime.ParseExact(branchCity.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
 
             // Analogue to VCSGraphProvider 
-            IEnumerable<string> includedFiles = RepositoryData.PathGlobbing
+            IEnumerable<string> includedFiles = PathGlobbing
                 .Where(path => path.Value)
                 .Select(path => path.Key);
 
-            using (var repo = new Repository(RepositoryData.RepositoryPath.Path))
+            using (var repo = new Repository(graph.BasePath))
             {
                 IEnumerable<Commit> commitList = repo.Commits
                     .QueryBy(new CommitFilter { IncludeReachableFrom = repo.Branches })
@@ -212,11 +225,7 @@ namespace SEE.GraphProviders
                     counter++;
                 }
 
-                //changePercentage(0.5f);
-
-
                 metricRepository.CalculateTruckFactor();
-                //changePercentage(0.75f);
                 GitFileMetricsGraphGenerator.FillGraphWithGitMetrics(metricRepository, graph, repositoryName,
                     SimplifyGraph);
                 changePercentage(1f);
@@ -240,12 +249,12 @@ namespace SEE.GraphProviders
         /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes to</param>
         protected override void SaveAttributes(ConfigWriter writer)
         {
-            Dictionary<string, bool> pathGlobbing = string.IsNullOrEmpty(RepositoryData.PathGlobbing.ToString())
-                ? null
-                : RepositoryData.PathGlobbing;
-            RepositoryData.RepositoryPath.Save(writer, pathLabel);
-            writer.Save(pathGlobbing, pathGlobbingLabel);
-            writer.Save(Date, dataLabel);
+            //   Dictionary<string, bool> pathGlobbing = string.IsNullOrEmpty(RepositoryData.PathGlobbing.ToString())
+            //       ? null
+            //     : RepositoryData.PathGlobbing;
+            // RepositoryData.RepositoryPath.Save(writer, pathLabel);
+            // writer.Save(pathGlobbing, pathGlobbingLabel);
+            //  writer.Save(Date, dataLabel);
             writer.Save(SimplifyGraph, simplifyGraphLabel);
             writer.Save(AutoFetch, autoFetchLabel);
         }
@@ -256,9 +265,9 @@ namespace SEE.GraphProviders
         /// <param name="attributes">The attributes to restore from</param>
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
-            ConfigIO.Restore(attributes, pathGlobbingLabel, ref RepositoryData.PathGlobbing);
-            RepositoryData.RepositoryPath.Restore(attributes, pathLabel);
-            ConfigIO.Restore(attributes, dataLabel, ref Date);
+            //ConfigIO.Restore(attributes, pathGlobbingLabel, ref RepositoryData.PathGlobbing);
+            //RepositoryData.RepositoryPath.Restore(attributes, pathLabel);
+            //ConfigIO.Restore(attributes, dataLabel, ref Date);
             var simplifyGraph = SimplifyGraph;
             ConfigIO.Restore(attributes, simplifyGraphLabel, ref simplifyGraph);
             SimplifyGraph = simplifyGraph;

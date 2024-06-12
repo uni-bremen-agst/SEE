@@ -129,7 +129,7 @@ namespace SEE.Controls.Actions
             void ShowDiffCode()
             {
                 ActivateWindow(ShowCodeAction.ShowVCSDiff(gameObject.MustGetComponent<GraphElementRef>(),
-                                                          gameObject.ContainingCity<DiffCity>()));
+                                                          gameObject.ContainingCity<CommitCity>()));
             }
 
             void Highlight()
