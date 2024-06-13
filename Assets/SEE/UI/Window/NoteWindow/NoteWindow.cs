@@ -1,6 +1,8 @@
 using Michsky.UI.ModernUIPack;
 using SEE.Controls;
+using SEE.Controls.Actions.Drawable;
 using SEE.DataModel.DG;
+using SEE.Game.Drawable;
 using SEE.GO;
 using SEE.Utils;
 using System;
@@ -12,7 +14,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SEE.UI.Window
+namespace SEE.UI.Window.NoteWindow
 {
     public class NoteWindow : BaseWindow
     {
@@ -22,6 +24,10 @@ namespace SEE.UI.Window
         private static string WindowPrefab => UIPrefabFolder + "NoteWindow";
 
         public TMP_InputField searchField;
+
+        private GameObject stickyNote;
+
+        public GraphElement graphElement;
 
         // Start is called before the first frame update
         protected override void StartDesktop()
@@ -51,6 +57,10 @@ namespace SEE.UI.Window
             deleteButton.clickEvent.AddListener(DeleteFile);
 
             LoadNote();
+
+            GameObject graphObject = graphElement.GameObject();
+            stickyNote = GameStickyNoteManager.Spawn(graphObject);
+            Debug.Log("Spawn StickyNote");
         }
 
         private void WriteToFile()
@@ -85,24 +95,21 @@ namespace SEE.UI.Window
 
         private void SaveNote()
         {
-            PlayerPrefs.SetString(Title, searchField.text);
-            //PlayerPrefs.Save();
+            string title = Title;
+            string content = searchField.text;
+
+            NoteManager.Instance.SaveNote(title, content);
         }
 
         private void LoadNote()
         {
-            if (searchField != null)
-            {
-                if (PlayerPrefs.HasKey(Title))
-                {
-                    searchField.text = PlayerPrefs.GetString(Title);
-                }
-            }
+            string title = Title;
+            searchField.text = NoteManager.Instance.LoadNoteContent(title);
         }
 
         private void OnDestroy()
         {
-            // Save the note content when the window is destroyed (closed)
+            // Save the note content when the window is destroyed (closed) and mark the Node/Edge with a sticky note
             SaveNote();
         }
 
@@ -113,20 +120,69 @@ namespace SEE.UI.Window
 
         protected override void InitializeFromValueObject(WindowValues valueObject)
         {
-            // TODO : Should metric windows be sent over the network?
-            throw new NotImplementedException();
+            if (valueObject is not NoteWindowValues noteValues)
+            {
+                throw new UnsupportedTypeException(typeof(NoteWindowValues), valueObject.GetType());
+            }
+            if (noteValues.Text != null)
+            {
+                // Nothings needs to be done
+            }
         }
 
         public override void UpdateFromNetworkValueObject(WindowValues valueObject)
         {
-            // TODO : Should metric windows be sent over the network?
-            throw new NotImplementedException();
+            if(valueObject is not NoteWindowValues noteValues)
+            {
+                throw new UnsupportedTypeException(typeof(NoteWindowValues), valueObject.GetType());
+            }
         }
 
         public override WindowValues ToValueObject()
         {
-            // TODO : Should metric windows be sent over the network?
-            throw new NotImplementedException();
+            string attachedTo = gameObject.name;
+            return new NoteWindowValues(Title, attachedTo, searchField.text);
+        }
+    }
+
+    /// <summary>
+    /// Represents the values of a code window needed to re-create its content.
+    /// Used for serialization when sending a <see cref="CodeWindow"/> over the network.
+    /// </summary>
+    [Serializable]
+    public class NoteWindowValues : WindowValues
+    {
+        /// <summary>
+        /// Text of the note window. May be <c>null</c> or <c>empty</c>, in which case <see cref="Path"/> is not <c>null</c>.
+        /// </summary>
+        [field: SerializeField]
+        public string Text { get; private set; }
+
+
+        /// <summary>
+        /// The line number which is currently visible in / at the top of the code window.
+        /// </summary>
+        //[field: SerializeField]
+        //public int VisibleLine { get; private set; }
+
+        /// <summary>
+        /// Creates a new CodeWindowValues object from the given parameters.
+        /// Note that either <paramref name="text"/> or <paramref name="title"/> must not be <c>null</c>.
+        /// </summary>
+        /// <param name="title">The title of the code window.</param>
+        /// <param name="attachedTo">Name of the game object the note window is attached to.</param>
+        /// <param name="text">The text of the code window. May be <c>null</c>, in which case
+        /// May be <c>null</c>, in which case <paramref name="text"/> may not.</param>
+        /// <exception cref="ArgumentException">Thrown when both <paramref name="path"/> and
+        /// <paramref name="text"/> are <c>null</c>.</exception>
+        internal NoteWindowValues(string title, string attachedTo = null, string text = null) : base(title, attachedTo)
+        {
+            if (text == null)
+            {
+                throw new ArgumentException("Either text or filename must not be null!");
+            }
+
+            Text = text;
         }
     }
 }

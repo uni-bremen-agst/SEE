@@ -14,6 +14,7 @@ using SEE.UI.Window.TreeWindow;
 using SEE.Utils;
 using UnityEngine;
 using SEE.Game.City;
+using SEE.UI.Window.NoteWindow;
 
 namespace SEE.Controls.Actions
 {
@@ -197,6 +198,7 @@ namespace SEE.Controls.Actions
             {
                 noteWindow = graphElementRef.gameObject.AddComponent<NoteWindow>();
                 noteWindow.Title = "Notes for " + graphElementRef.Elem.ToShortString();
+                noteWindow.graphElement = graphElementRef.Elem;
             }
             return noteWindow;
         }

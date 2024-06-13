@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Utils
+namespace SEE.UI.Window.NoteWindow
 {
     public class NoteManager : MonoBehaviour
     {

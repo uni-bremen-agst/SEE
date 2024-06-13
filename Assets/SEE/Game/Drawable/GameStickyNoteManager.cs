@@ -31,7 +31,7 @@ namespace SEE.Game.Drawable
             stickyNote.name = ValueHolder.StickyNotePrefix + "-" + DrawableHolder.GetRandomString(8);
 
             /// Adopts the rotation of the hitted object,
-            /// unless it is a <see cref="DrawableType"/> object. 
+            /// unless it is a <see cref="DrawableType"/> object.
             /// In that case, take the rotation of the drawable.
             if (DrawableType.Get(raycastHit.collider.gameObject) == null)
             {
@@ -62,13 +62,61 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
+        /// Create a new sticky note on the position of the raycast hit.
+        /// The rotation of the sticky notes is based on the raycast hit object.
+        /// </summary>
+        /// <param name="gameObject">The chosen GameObject</param>
+        /// <returns>The created sticky note</returns>
+        public static GameObject Spawn(GameObject gameObject)
+        {
+            /// Instantiates the sticky note.
+            GameObject stickyNote = PrefabInstantiator.InstantiatePrefab(stickyNotePrefabName, gameObject.transform);
+
+            /// Sets the name of the sticky note.
+            stickyNote.name = ValueHolder.StickyNotePrefix + "-" + DrawableHolder.GetRandomString(8);
+
+
+            stickyNote.transform.rotation = gameObject.transform.rotation;
+
+            Renderer targetRenderer = gameObject.GetComponent<Renderer>();
+            if (targetRenderer != null)
+            {
+                Bounds targetBounds = targetRenderer.bounds;
+                Vector3 targetSize = targetBounds.size;
+
+                // Set the position to be outside the bounds of the target object
+                Vector3 newPosition = targetBounds.center + gameObject.transform.forward * (targetSize.y / 2 + ValueHolder.distanceToDrawable.y);
+                stickyNote.transform.position = newPosition;
+            }
+            else
+            {
+                Debug.LogError("Target object has no Renderer component!");
+                stickyNote.transform.position = gameObject.transform.position + gameObject.transform.forward * ValueHolder.distanceToDrawable.z;
+            }
+
+            /// Sets the inital scale for sticky notes
+            stickyNote.transform.localScale = ValueHolder.StickyNoteScale;
+
+            /// Sets a random color for the drawable.
+            stickyNote.transform.Find("Front").GetComponent<MeshRenderer>().material.color = Random.ColorHSV().Darker();
+
+            /// Adds a order in layer value holder to the sticky note and sets the necessary values.
+            //stickyNote.transform.position = gameObject.transform.position;
+
+            //stickyNote.transform.position.y  = gameObject.transform.lossyScale.y;
+
+            return stickyNote;
+        }
+
+
+        /// <summary>
         /// Spawn a sticky note from configuration.
         /// </summary>
         /// <param name="config">The configuration which holds the sticky note.</param>
         /// <returns>The created sticky note.</returns>
         public static GameObject Spawn(DrawableConfig config)
         {
-            /// Adjusts the current order in the layer if the 
+            /// Adjusts the current order in the layer if the
             /// order in layer for the line is greater than or equal to it.
             if (config.Order >= ValueHolder.currentOrderInLayer)
             {
