@@ -218,7 +218,7 @@ namespace SEE.DataModel.DG.IO
             };
             result.SetToggle("Linkage.Is_Definition");
             result.SetString("stringAttribute", "somestring");
-            result.SetFloat(Metrics.Prefix + "Halstead.Volume", 49.546f);
+            result.SetFloat(Halstead.Volume, 49.546f);
             result.SetInt(Metrics.Prefix + "LOC", 10);
             graph.AddNode(result);
             return result;

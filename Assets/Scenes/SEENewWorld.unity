@@ -34816,6 +34816,9 @@ MonoBehaviour:
     - Name: CommitID
       Entry: 1
       Data: 0878f91f900dc90d89c594c521ac1d3b9edd7097
+    - Name: BaselineCommitID
+      Entry: 1
+      Data: a5fe5e6a2692f41aeb8448d5114000e6f82e605e
     - Name: PathGlobbing
       Entry: 7
       Data: 29|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,

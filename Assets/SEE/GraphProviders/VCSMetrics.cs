@@ -12,17 +12,55 @@ namespace SEE.GraphProviders
     public static class VCSMetrics
     {
         /// <summary>
+        /// Adds VCS metrics to all nodes in <paramref name="graph"/> based on the
+        /// VCS information derived from <paramref name="repository"/>. The metrics are gathered
+        /// in between the <paramref name="oldRevision"/> and <paramref name="newRevision"/>.
+        /// If <paramref name="oldRevision"/> or <paramref name="newRevision"/> is null or empty,
+        /// an exception is thrown.
+        /// </summary>
+        /// <param name="graph">The graph where the metric should be added.</param>
+        /// <param name="repository">The repository from which the file content is retrieved.</param>
+        /// <param name="oldRevision">The starting commit ID (baseline).</param>
+        /// <param name="newRevision">The ending commit.</param>
+        /// <exception cref="System.Exception">thrown if <paramref name="oldRevision"/>
+        /// or <paramref name="newRevision"/> is null or empty or if they do not
+        /// refer to an existing revision</exception>
+        internal static void AddMetrics(Graph graph, Repository repository, string oldRevision, string newRevision)
+        {
+            if (string.IsNullOrWhiteSpace(oldRevision))
+            {
+                throw new System.Exception("The old revision must neither be null nor empty.");
+            }
+            if (string.IsNullOrWhiteSpace(newRevision))
+            {
+                throw new System.Exception("The new revision must neither be null nor empty.");
+            }
+            Commit oldCommit = repository.Lookup<Commit>(oldRevision);
+            if (oldCommit == null)
+            {
+                throw new System.Exception($"There is no revision {oldCommit}");
+            }
+            Commit newCommit = repository.Lookup<Commit>(newRevision);
+            if (newCommit == null)
+            {
+                throw new System.Exception($"There is no revision {newCommit}");
+            }
+
+            AddLinesOfCodeChurnMetric(graph, repository, oldCommit, newCommit);
+            AddNumberOfDevelopersMetric(graph, repository, oldCommit, newCommit);
+            AddCommitFrequencyMetric(graph, repository, oldCommit, newCommit);
+        }
+
+        /// <summary>
         /// Calculates the number of lines of code added and deleted for each file changed
         /// between two commits and adds them as metrics to <paramref name="graph"/>.
         /// <param name="graph">an existing graph where to add the metrics</param>
-        /// <param name="vcsPath">the path to the VCS containing the two revisions to be compared</param>
+        /// <param name="repository">the VCS containing the two revisions to be compared</param>
         /// <param name="oldCommit">the older commit that constitutes the baseline of the comparison</param>
         /// <param name="newCommit">the newer commit against which the <paramref name="oldCommit"/> is
-        /// to be compared</param>
-        public static void AddLineofCodeChurnMetric(Graph graph, string vcsPath, Commit oldCommit, Commit newCommit)
+        private static void AddLinesOfCodeChurnMetric(Graph graph, Repository repository, Commit oldCommit, Commit newCommit)
         {
-            using Repository repo = new(vcsPath);
-            Patch changes = repo.Diff.Compare<Patch>(oldCommit.Tree, newCommit.Tree);
+            Patch changes = repository.Diff.Compare<Patch>(oldCommit.Tree, newCommit.Tree);
 
             foreach (PatchEntryChanges change in changes)
             {
@@ -32,8 +70,8 @@ namespace SEE.GraphProviders
                     // Can't we just use the path attribute of the node as it is?
                     if (node.ID.Replace('\\', '/') == change.Path)
                     {
-                        node.SetInt(Git.LinesAdded, change.LinesAdded);
-                        node.SetInt(Git.LinesDeleted, change.LinesDeleted);
+                        node.SetInt(DataModel.DG.VCS.LinesAdded, change.LinesAdded);
+                        node.SetInt(DataModel.DG.VCS.LinesDeleted, change.LinesDeleted);
                     }
                 }
             }
@@ -44,14 +82,13 @@ namespace SEE.GraphProviders
         /// between two commits and adds it as a metric to <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">an existing graph where to add the metrics</param>
-        /// <param name="vcsPath">the path to the VCS containing the two revisions to be compared</param>
+        /// <param name="repository">the VCS containing the two revisions to be compared</param>
         /// <param name="oldCommit">the older commit that constitutes the baseline of the comparison</param>
         /// <param name="newCommit">the newer commit against which the <paramref name="oldCommit"/> is
         /// to be compared</param>
-        public static void AddNumberofDevelopersMetric(Graph graph, string vcsPath, Commit oldCommit, Commit newCommit)
+        private static void AddNumberOfDevelopersMetric(Graph graph, Repository repository, Commit oldCommit, Commit newCommit)
         {
-            using Repository repo = new(vcsPath);
-            ICommitLog commits = repo.Commits.QueryBy(new CommitFilter { SortBy = CommitSortStrategies.Topological });
+            ICommitLog commits = repository.Commits.QueryBy(new CommitFilter { SortBy = CommitSortStrategies.Topological });
 
             Dictionary<string, HashSet<string>> uniqueContributorsPerFile = new();
 
@@ -61,7 +98,7 @@ namespace SEE.GraphProviders
                 {
                     foreach (Commit parent in commit.Parents)
                     {
-                        Patch changes = repo.Diff.Compare<Patch>(parent.Tree, commit.Tree);
+                        Patch changes = repository.Diff.Compare<Patch>(parent.Tree, commit.Tree);
 
                         foreach (PatchEntryChanges change in changes)
                         {
@@ -84,7 +121,7 @@ namespace SEE.GraphProviders
                 {
                     if (node.ID.Replace('\\', '/') == entry.Key)
                     {
-                        node.SetInt(Git.NumberOfDevelopers, entry.Value.Count);
+                        node.SetInt(DataModel.DG.VCS.NumberOfDevelopers, entry.Value.Count);
                     }
                 }
             }
@@ -95,14 +132,13 @@ namespace SEE.GraphProviders
         /// two commits and adds it as a metric to <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">an existing graph where to add the metrics</param>
-        /// <param name="vcsPath">the path to the VCS containing the two revisions to be compared</param>
+        /// <param name="repository">the VCS containing the two revisions to be compared</param>
         /// <param name="oldCommit">the older commit that constitutes the baseline of the comparison</param>
         /// <param name="newCommit">the newer commit against which the <paramref name="oldCommit"/> is
         /// to be compared</param>
-        public static void AddCommitFrequencyMetric(Graph graph, string vcsPath, Commit oldCommit, Commit newCommit)
+        private static void AddCommitFrequencyMetric(Graph graph, Repository repository, Commit oldCommit, Commit newCommit)
         {
-            using Repository repo = new(vcsPath);
-            ICommitLog commitsBetween = repo.Commits.QueryBy(new CommitFilter
+            ICommitLog commitsBetween = repository.Commits.QueryBy(new CommitFilter
             {
                 IncludeReachableFrom = newCommit,
                 ExcludeReachableFrom = oldCommit
@@ -114,7 +150,7 @@ namespace SEE.GraphProviders
             {
                 foreach (Commit parent in commit.Parents)
                 {
-                    TreeChanges changes = repo.Diff.Compare<TreeChanges>(parent.Tree, commit.Tree);
+                    TreeChanges changes = repository.Diff.Compare<TreeChanges>(parent.Tree, commit.Tree);
 
                     foreach (TreeEntryChanges change in changes)
                     {
@@ -138,7 +174,7 @@ namespace SEE.GraphProviders
                 {
                     if (node.ID.Replace('\\', '/') == entry.Key)
                     {
-                        node.SetInt(Git.CommitFrequency, entry.Value);
+                        node.SetInt(DataModel.DG.VCS.CommitFrequency, entry.Value);
                     }
                 }
             }
