@@ -1,4 +1,6 @@
+using System;
 using System.Linq;
+using MoreLinq.Extensions;
 using SEE.Utils;
 
 namespace SEE.DataModel.DG.IO.Git
@@ -45,12 +47,18 @@ namespace SEE.DataModel.DG.IO.Git
 
             foreach (var file in metricRepository.FileToMetrics)
             {
-                Node n = GraphUtils.GetOrAddNode(file.Key, initialGraph.GetNode(repositoryName + idSuffix), initialGraph,
+                Node n = GraphUtils.GetOrAddNode(file.Key, initialGraph.GetNode(repositoryName + idSuffix),
+                    initialGraph,
                     idSuffix: idSuffix);
                 n.SetInt(NumberOfAuthorsMetricName, file.Value.Authors.Count);
                 n.SetInt(NumberOfCommitsMetricName, file.Value.NumberOfCommits);
                 n.SetInt(NumberOfFileChurnMetricName, file.Value.Churn);
                 n.SetInt(TruckFactorMetricName, file.Value.TruckFactor);
+                n.SetString("Metric.File.Authors", String.Join(',', file.Value.Authors));
+                foreach (var authorChurn in file.Value.AuthorsChurn)
+                {
+                    n.SetInt(NumberOfFileChurnMetricName + ":" + authorChurn.Key, authorChurn.Value);
+                }
             }
 
             if (simplifyGraph)
@@ -64,7 +72,7 @@ namespace SEE.DataModel.DG.IO.Git
 
         private static void DoSimplyfiGraph(Node root, Graph g)
         {
-            if (root.Children().ToList().TrueForAll(x => x.Type != "file"))
+            if (root.Children().ToList().TrueForAll(x => x.Type != "file") && root.Children().Any())
             {
                 foreach (var child in root.Children().ToList())
                 {

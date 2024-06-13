@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using LibGit2Sharp;
 using SEE.Utils;
@@ -30,7 +31,7 @@ namespace SEE.DataModel.DG.IO.Git
     public class GitFileMetricRepository
     {
         /// <summary>
-        /// Maps the the filename to the collected git file metrics
+        /// Maps the filename to the collected git file metrics
         /// </summary>
         public Dictionary<string, GitFileMetricsCollector> FileToMetrics { get; } = new();
 
@@ -59,6 +60,9 @@ namespace SEE.DataModel.DG.IO.Git
             this.includedFiles = includedFiles;
         }
 
+        /// <summary>
+        /// Calculates the truck factor of all files
+        /// </summary>
         public void CalculateTruckFactor()
         {
             foreach (var file in FileToMetrics)
@@ -132,12 +136,25 @@ namespace SEE.DataModel.DG.IO.Git
                     FileToMetrics[filePath].Authors.Add(commit.Author.Email);
                     FileToMetrics[filePath].Churn += changedFile.LinesAdded + changedFile.LinesDeleted;
                     FileToMetrics[filePath].AuthorsChurn.GetOrAdd(commit.Author.Email, 0);
+                    foreach (var otherFiles in commitChanges.Where(e => !e.Equals(changedFile)).ToList())
+                    {
+                        FileToMetrics[filePath].FilesChangesTogehter.GetOrAdd(otherFiles.Path, 0);
+                        FileToMetrics[filePath].FilesChangesTogehter[otherFiles.Path] += 1;
+                    }
+                    
                     FileToMetrics[filePath].AuthorsChurn[commit.Author.Email] +=
                         (changedFile.LinesAdded + changedFile.LinesDeleted);
                 }
             }
         }
 
+        /// <summary>
+        /// Processes a commit and calculates the metrics.
+        ///
+        /// This method will get the changes by comparing <paramref name="commit"/> with its parent (if one exists).
+        /// If the changes are already calculated <see cref="ProcessCommit(LibGit2Sharp.Commit,LibGit2Sharp.Patch)"/> can be used.
+        /// </summary>
+        /// <param name="commit"></param>
         public void ProcessCommit(Commit commit)
         {
             if (commit == null)
