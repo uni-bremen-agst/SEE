@@ -28,6 +28,8 @@ namespace SEE.GraphProviders
             {
                 foreach (Node node in graph.Nodes())
                 {
+                    // TODO: Why is this needed? Is it always needed on every platform?
+                    // Can't we just use the path attribute of the node as it is?
                     if (node.ID.Replace('\\', '/') == change.Path)
                     {
                         node.SetInt(Git.LinesAdded, change.LinesAdded);
