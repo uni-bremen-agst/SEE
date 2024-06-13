@@ -2,6 +2,9 @@
 using TMPro;
 using Unity.Netcode;
 
+/// <summary>
+/// Sends and show playerName for each player
+/// </summary>
 public class PlayerName : NetworkBehaviour
 {
     /// <summary>
@@ -12,8 +15,11 @@ public class PlayerName : NetworkBehaviour
     /// <summary>
     /// Variable to store the player's name.
     /// </summary>
-    string playername;
+    private string playerName;
 
+    /// <summary>
+    /// network config to read playername
+    /// </summary>
     private SEE.Net.Network networkConfig;
 
     private void Start()
@@ -33,16 +39,16 @@ public class PlayerName : NetworkBehaviour
     /// </summary>
     private void ReadPlayerName()
     {
-        string playerName = networkConfig.Playername;
+        string playerName = networkConfig.PlayerName;
 
         // If a player name is retrieved, store it.
         if (playerName != null && playerName.Length != 0)
         {
-            playername = playerName;
+            this.playerName = playerName;
         }
         else
         {
-            playername = "uknown Playername";
+            this.playerName = "uknown Playername";
         }
     }
 
@@ -78,7 +84,7 @@ public class PlayerName : NetworkBehaviour
     /// <param name="playername">Playername that will be sent</param>
     /// <param name="serverRpcParams"></param>
     [ServerRpc]
-    private void GetPlayernameFromClientAndSendItToClientsToRenderItServerRPC(string playername, ServerRpcParams serverRpcParams = default)
+    private void GetPlayernameFromClientAndSendItToClientsToRenderItServerRPC(string playername)
     {
         // The server will render this playername onto his instance of the TextMeshPro.
         RenderNetworkPlayername(playername);
@@ -112,12 +118,12 @@ public class PlayerName : NetworkBehaviour
         // Send the player's name to the server for distribution to other clients.
         if (!IsServer)
         {
-            GetPlayernameFromClientAndSendItToClientsToRenderItServerRPC(playername);
+            GetPlayernameFromClientAndSendItToClientsToRenderItServerRPC(playerName);
         }
         else
         {
             // Send the player's name to all clients for rendering.
-            SendPlayernameToClientsToRenderItClientRPC(playername);
+            SendPlayernameToClientsToRenderItClientRPC(playerName);
         }
     }
 }

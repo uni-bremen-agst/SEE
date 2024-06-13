@@ -7,6 +7,9 @@ using UnityEngine.Events;
 
 namespace SEE.UI.PropertyDialog
 {
+    /// <summary>
+    /// Dialog to enter the Username/Playername.
+    /// </summary>
     internal class UserPropertyDialog
     {
         /// <summary>
@@ -58,8 +61,6 @@ namespace SEE.UI.PropertyDialog
         /// </summary>
         public readonly UnityEvent OnCancel = new();
 
-
-
         /// <summary>
         /// The network configuration to be manipulated by this dialog.
         /// </summary>
@@ -78,8 +79,8 @@ namespace SEE.UI.PropertyDialog
             {
                 playerName = dialog.AddComponent<StringProperty>();
                 playerName.Name = "Username";
-                playerName.Value = networkConfig.Playername;
-                playerName.Description = "Username which will be used as avatar-tag and in other function.";
+                playerName.Value = networkConfig.PlayerName;
+                playerName.Description = "Username which will be used as avatar-tag and elsewhere.";
                 group.AddProperty(playerName);
             }
             // Dialog
@@ -115,17 +116,15 @@ namespace SEE.UI.PropertyDialog
         {
             bool errorOccurred = false;
             {
-                string playername = playerName.Value.Trim();
+                string playerName = this.playerName.Value.Trim();
 
-                if (ValidUsername(playername))
+                if (ValidUsername(playerName))
                 {
-                    networkConfig.Playername = playername;
+                    networkConfig.PlayerName = playerName;
                 }
                 else
                 {
-                    ShowNotification.Error
-                       ("Username Error",
-                        "Username needs to be minimum one character long.");
+                    ShowNotification.Error("Username Error", "Username needs to be at least one character long.");
                     errorOccurred = true;
                 }
             }
@@ -142,11 +141,11 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// Checks if playername is at least one character long. Other restrictions could be added in this method too.
         /// </summary>
-        /// <param name="playername">the playername to validate</param>
-        /// <returns>true if <paramref name="playername"/> conforms the restrictions</returns>
-        private static bool ValidUsername(string playername)
+        /// <param name="playerName">the playername to validate</param>
+        /// <returns>true if <paramref name="playerName"/> conforms the restrictions</returns>
+        private static bool ValidUsername(string playerName)
         {
-            return !String.IsNullOrWhiteSpace(playername);
+            return !String.IsNullOrWhiteSpace(playerName);
         }
 
 

@@ -78,11 +78,11 @@ namespace SEE.Net
         /// <summary>
         /// Playername for chat and avatar tag
         /// </summary>
-        private string playername = string.Empty;
-        public string Playername
+        private string playerName = string.Empty;
+        public string PlayerName
         {
-            get { return playername; }
-            set { playername = value; }
+            get { return playerName; }
+            set { playerName = value; }
         }
         /// <summary>
         /// Returns the underlying <see cref="UNetTransport"/> of the <see cref="NetworkManager"/>.
@@ -988,7 +988,7 @@ namespace SEE.Net
         /// </summary>
         private const string serverIP4AddressLabel = "serverIP4Address";
         /// <summary>
-        /// Label of attribute <see cref="Playername"/> in the configuration file.
+        /// Label of attribute <see cref="PlayerName"/> in the configuration file.
         /// </summary>
         private const string playernameLabel = "playername";
 
@@ -1031,7 +1031,7 @@ namespace SEE.Net
             writer.Save(VoiceChat.ToString(), voiceChatLabel);
             writer.Save(ServerPort, serverPortLabel);
             writer.Save(ServerIP4Address, serverIP4AddressLabel);
-            writer.Save(Playername, playernameLabel);
+            writer.Save(PlayerName, playernameLabel);
         }
 
         /// <summary>
@@ -1055,9 +1055,9 @@ namespace SEE.Net
                 ServerIP4Address = value;
             }
             {
-                string value = Playername;
+                string value = PlayerName;
                 ConfigIO.Restore(attributes, playernameLabel, ref value);
-                Playername = value;
+                PlayerName = value;
             }
         }
 
