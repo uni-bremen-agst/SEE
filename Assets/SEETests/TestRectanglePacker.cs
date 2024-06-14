@@ -43,7 +43,7 @@ namespace SEE.Layout.RectanglePacking
         }
 
         /// <summary>
-        /// Runs the example scenario used by Richard Wettel in his dissertation 
+        /// Runs the example scenario used by Richard Wettel in his dissertation
         /// plus two additions at the end to check situations he did not cover
         /// in this example. See page 36 in "Software Systems as Cities" by
         /// Richard Wettel.
@@ -51,10 +51,8 @@ namespace SEE.Layout.RectanglePacking
         [Test]
         public void TestSplit()
         {
-            Debug.Log("TestSplit\n");
-
             Vector2 totalSize = new Vector2(14, 12);
-            PTree tree = new PTree(Vector2.zero, totalSize);
+            PTree tree = new(Vector2.zero, totalSize);
 
             PNode A = tree.Root;
             Assert.That(A.Occupied, Is.False);

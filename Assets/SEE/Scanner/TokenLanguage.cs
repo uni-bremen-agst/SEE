@@ -194,7 +194,7 @@ namespace SEE.Scanner
             "DIRECTIVE_TRUE", "DIRECTIVE_FALSE", "DEFINE", "UNDEF", "DIRECTIVE_IF",
             "ELIF", "DIRECTIVE_ELSE", "ENDIF", "LINE", "ERROR", "WARNING", "REGION", "ENDREGION", "PRAGMA", "NULLABLE",
             "DIRECTIVE_DEFAULT", "DIRECTIVE_HIDDEN", "DIRECTIVE_OPEN_PARENS", "DIRECTIVE_CLOSE_PARENS", "DIRECTIVE_BANG",
-            "DIRECTIVE_OP_EQ", "DIRECTIVE_OP_NE", "DIRECTIVE_OP_AND", "DIRECTIVE_OP_OR", "CONDITIONAL_SYMBOL"
+            "DIRECTIVE_OP_EQ", "DIRECTIVE_OP_NE", "DIRECTIVE_OP_AND", "DIRECTIVE_OP_OR", "CONDITIONAL_SYMBOL",
         };
 
         /// <summary>
@@ -224,8 +224,8 @@ namespace SEE.Scanner
         /// <summary>Set of antlr type names for CSharp separators and operators.</summary>
         private static readonly HashSet<string> cSharpPunctuation = new()
         {
-            "OPEN_BRACE", "CLOSE_BRACE", "OPEN_BRACKET",
-            "CLOSE_BRACKET", "OPEN_PARENS", "CLOSE_PARENS", "DOT", "COMMA", "COLON", "SEMICOLON", "PLUS", "MINUS", "STAR", "DIV",
+            "OPEN_BRACE", "CLOSE_BRACE", "CLOSE_BRACE_INSIDE", "OPEN_BRACKET",
+            "CLOSE_BRACKET", "OPEN_PARENS", "CLOSE_PARENS", "DOT", "COMMA", "FORMAT_STRING", "COLON", "SEMICOLON", "PLUS", "MINUS", "STAR", "DIV",
             "PERCENT", "AMP", "BITWISE_OR", "CARET", "BANG", "TILDE", "ASSIGNMENT", "LT", "GT", "INTERR", "DOUBLE_COLON",
             "OP_COALESCING", "OP_INC", "OP_DEC", "OP_AND", "OP_OR", "OP_PTR", "OP_EQ", "OP_NE", "OP_LE", "OP_GE", "OP_ADD_ASSIGNMENT",
             "OP_SUB_ASSIGNMENT", "OP_MULT_ASSIGNMENT", "OP_DIV_ASSIGNMENT", "OP_MOD_ASSIGNMENT", "OP_AND_ASSIGNMENT", "OP_OR_ASSIGNMENT",

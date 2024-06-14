@@ -23,22 +23,33 @@ namespace SEE.GraphProviders
     /// Creates a graph based on the content of a version control system.
     /// Nodes represent directories and files. Their nesting corresponds to
     /// the directory structure of the repository. Files are leaf nodes.
-    /// Files nodes contain metrics that can be gathered based on a simple
-    /// lexical analysis, such as Halstead, McCabe and lines of code.
+    /// File nodes contain metrics that can be gathered based on a simple
+    /// lexical analysis, such as Halstead, McCabe and lines of code, as
+    /// well as from the version control system, such as number of developers,
+    /// number of commits, or code churn.
     /// </summary>
     public class VCSGraphProvider : GraphProvider
     {
         /// <summary>
         /// The path to the git repository.
         /// </summary>
-        [ShowInInspector, Tooltip("Path to the git repository."), HideReferenceObjectPicker]
+        [ShowInInspector, Tooltip("Path to the version control repository."), HideReferenceObjectPicker]
         public DirectoryPath RepositoryPath = new();
 
         /// <summary>
         /// The commit id.
         /// </summary>
-        [ShowInInspector, Tooltip("The new commit id."), HideReferenceObjectPicker]
-        public string CommitID = "";
+        [ShowInInspector, Tooltip("The commit id for which to generate the graph."), HideReferenceObjectPicker]
+        public string CommitID = string.Empty;
+
+        /// <summary>
+        /// The commit id of the baseline. The VCS metrics will be gathered for the time
+        /// between <see cref="BaselineCommitID"/> and <see cref="CommitID"/>.
+        /// If <see cref="BaselineCommitID"/> is null or empty, no VCS metrics are gathered.
+        /// </summary>
+        [ShowInInspector, Tooltip("VCS metrics will be gathered relative to this commit id. If undefined, no VCS metrics will be gathered"),
+            HideReferenceObjectPicker]
+        public string BaselineCommitID = string.Empty;
 
         /// <summary>
         /// The list of path globbings to include or exclude files.
@@ -61,13 +72,15 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="graph">The graph into which the metrics shall be loaded</param>
         /// <param name="city">This parameter is currently ignored.</param>
-        /// <param name="changePercentage">This parameter is currently ignored.</param>
-        /// <param name="token">This parameter is currently ignored.</param>
-        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city, Action<float> changePercentage = null,
+        /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
+        /// <param name="token">Cancellation token.</param>
+        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
+                                                          Action<float> changePercentage = null,
                                                           CancellationToken token = default)
         {
             CheckArguments(city);
-            return await UniTask.FromResult<Graph>(GetVCSGraph(PathGlobbing, RepositoryPath.Path, CommitID));
+            return await UniTask.FromResult<Graph>(GetVCSGraph(PathGlobbing, RepositoryPath.Path, CommitID, BaselineCommitID,
+                                                               changePercentage, token));
         }
 
         /// <summary>
@@ -113,9 +126,13 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="pathGlobbing">The paths which get included/excluded.</param>
         /// <param name="repositoryPath">The path to the repository.</param>
-        /// <param name="commitID">The commitID where the files exist.</param>
-        /// <returns>the graph.</returns>
-        private static Graph GetVCSGraph(Dictionary<string, bool> pathGlobbing, string repositoryPath, string commitID)
+        /// <param name="commitID">The commit id where the files exist.</param>
+        /// <param name="baselineCommitID">The commit id of the baseline against which to gather
+        /// the VCS metrics</param>
+        /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
+        /// <param name="token">Cancellation token.</param>
+        /// <returns>the resulting graph</returns>
+        private static Graph GetVCSGraph(Dictionary<string, bool> pathGlobbing, string repositoryPath, string commitID, string baselineCommitID, Action<float> changePercentage, CancellationToken token)
         {
             string[] pathSegments = repositoryPath.Split(Path.DirectorySeparatorChar);
 
@@ -130,11 +147,17 @@ namespace SEE.GraphProviders
             {
                 LibGit2Sharp.Tree tree = repo.Lookup<Commit>(commitID).Tree;
                 // Get all files using "git ls-tree -r <CommitID> --name-only".
-                IEnumerable<string> files = GetFilteredFiles(ListTree(tree), pathGlobbing);
+                List<string> files = GetFilteredFiles(ListTree(tree), pathGlobbing);
 
+                float totalSteps = files.Count;
+                int currentStep = 0;
                 // Build the graph structure.
                 foreach (string filePath in files.Where(path => !string.IsNullOrEmpty(path)))
                 {
+                    if (token.IsCancellationRequested)
+                    {
+                        throw new OperationCanceledException(token);
+                    }
                     string[] filePathSegments = filePath.Split('/');
                     // Files in the main directory.
                     if (filePathSegments.Length == 1)
@@ -146,10 +169,14 @@ namespace SEE.GraphProviders
                     {
                         BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(pathSegments[^1]));
                     }
+                    currentStep++;
+                    changePercentage?.Invoke(currentStep / totalSteps);
                 }
-                AddMetricsToNode(graph, repo, commitID);
+                AddCodeMetrics(graph, repo, commitID);
+                ADDVCSMetrics(graph, repo, baselineCommitID, commitID);
             }
             graph.FinalizeNodeHierarchy();
+            changePercentage?.Invoke(1f);
             return graph;
         }
 
@@ -310,15 +337,16 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Retrieves the token stream for given file content from its repository and commit ID.
         /// </summary>
-        /// <param name="filePath">The filePath from the node.</param>
+        /// <param name="repositoryFilePath">The file path from the node. This must be a relative path
+        /// in the syntax of the repository regarding the directory separator</param>
         /// <param name="repository">The repository from which the file content is retrieved.</param>
         /// <param name="commitID">The commitID where the files exist.</param>
         /// <param name="language">The language the given text is written in.</param>
         /// <returns>The token stream for the specified file and commit.</returns>
-        public static IEnumerable<SEEToken> RetrieveTokens(string filePath, Repository repository, string commitID,
-                                                           TokenLanguage language)
+        public static IEnumerable<SEEToken> RetrieveTokens(string repositoryFilePath, Repository repository,
+                                                           string commitID, TokenLanguage language)
         {
-            Blob blob = repository.Lookup<Blob>($"{commitID}:{filePath}");
+            Blob blob = repository.Lookup<Blob>($"{commitID}:{repositoryFilePath}");
 
             if (blob != null)
             {
@@ -328,6 +356,7 @@ namespace SEE.GraphProviders
             else
             {
                 // Blob does not exist.
+                Debug.LogWarning($"File {repositoryFilePath} does not exist.\n");
                 return Enumerable.Empty<SEEToken>();
             }
         }
@@ -340,36 +369,53 @@ namespace SEE.GraphProviders
         /// <param name="graph">The graph where the metric should be added.</param>
         /// <param name="repository">The repository from which the file content is retrieved.</param>
         /// <param name="commitID">The commitID where the files exist.</param>
-        protected static void AddMetricsToNode(Graph graph, Repository repository, string commitID)
+        private static void AddCodeMetrics(Graph graph, Repository repository, string commitID)
         {
             foreach (Node node in graph.Nodes())
             {
                 if (node.Type == fileNodeType)
                 {
-                    string filePath = Filenames.OnCurrentPlatform(node.ID);
-                    TokenLanguage language = TokenLanguage.FromFileExtension(Path.GetExtension(filePath).TrimStart('.'));
+                    string repositoryFilePath = node.ID;
+                    TokenLanguage language = TokenLanguage.FromFileExtension(Path.GetExtension(repositoryFilePath).TrimStart('.'));
                     if (language != TokenLanguage.Plain)
                     {
-                        IEnumerable<SEEToken> tokens = RetrieveTokens(filePath, repository, commitID, language);
-                        int complexity = TokenMetrics.CalculateMcCabeComplexity(tokens);
-                        int linesOfCode = TokenMetrics.CalculateLinesOfCode(tokens);
+                        IEnumerable<SEEToken> tokens = RetrieveTokens(repositoryFilePath, repository, commitID, language);
+                        node.SetInt(Metrics.Prefix + "LOC", TokenMetrics.CalculateLinesOfCode(tokens));
+                        node.SetInt(Metrics.Prefix + "McCabe_Complexity", TokenMetrics.CalculateMcCabeComplexity(tokens));
                         TokenMetrics.HalsteadMetrics halsteadMetrics = TokenMetrics.CalculateHalsteadMetrics(tokens);
-                        node.SetInt(Metrics.Prefix + "LOC", linesOfCode);
-                        node.SetInt(Metrics.Prefix + "McCabe_Complexity", complexity);
-                        node.SetInt(Metrics.Prefix + "Halstead.Distinct_Operators", halsteadMetrics.DistinctOperators);
-                        node.SetInt(Metrics.Prefix + "Halstead.Distinct_Operands", halsteadMetrics.DistinctOperands);
-                        node.SetInt(Metrics.Prefix + "Halstead.Total_Operators", halsteadMetrics.TotalOperators);
-                        node.SetInt(Metrics.Prefix + "Halstead.Total_Operands", halsteadMetrics.TotalOperands);
-                        node.SetInt(Metrics.Prefix + "Halstead.Program_Vocabulary", halsteadMetrics.ProgramVocabulary);
-                        node.SetInt(Metrics.Prefix + "Halstead.Program_Length", halsteadMetrics.ProgramLength);
-                        node.SetFloat(Metrics.Prefix + "Halstead.Estimated_Program_Length", halsteadMetrics.EstimatedProgramLength);
-                        node.SetFloat(Metrics.Prefix + "Halstead.Volume", halsteadMetrics.Volume);
-                        node.SetFloat(Metrics.Prefix + "Halstead.Difficulty", halsteadMetrics.Difficulty);
-                        node.SetFloat(Metrics.Prefix + "Halstead.Effort", halsteadMetrics.Effort);
-                        node.SetFloat(Metrics.Prefix + "Halstead.Time_Required_To_Program", halsteadMetrics.TimeRequiredToProgram);
-                        node.SetFloat(Metrics.Prefix + "Halstead.Number_Of_Delivered_Bugs", halsteadMetrics.NumberOfDeliveredBugs);
+                        node.SetInt(Halstead.DistinctOperators, halsteadMetrics.DistinctOperators);
+                        node.SetInt(Halstead.DistinctOperands, halsteadMetrics.DistinctOperands);
+                        node.SetInt(Halstead.TotalOperators, halsteadMetrics.TotalOperators);
+                        node.SetInt(Halstead.TotalOperands, halsteadMetrics.TotalOperands);
+                        node.SetInt(Halstead.ProgramVocabulary, halsteadMetrics.ProgramVocabulary);
+                        node.SetInt(Halstead.ProgramLength, halsteadMetrics.ProgramLength);
+                        node.SetFloat(Halstead.EstimatedProgramLength, halsteadMetrics.EstimatedProgramLength);
+                        node.SetFloat(Halstead.Volume, halsteadMetrics.Volume);
+                        node.SetFloat(Halstead.Difficulty, halsteadMetrics.Difficulty);
+                        node.SetFloat(Halstead.Effort, halsteadMetrics.Effort);
+                        node.SetFloat(Halstead.TimeRequiredToProgram, halsteadMetrics.TimeRequiredToProgram);
+                        node.SetFloat(Halstead.NumberOfDeliveredBugs, halsteadMetrics.NumberOfDeliveredBugs);
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Adds VCS metrics to all nodes in <paramref name="graph"/> based on the
+        /// VCS information derived from <paramref name="repository"/>. The metrics are gathered
+        /// in between the <paramref name="oldCommit"/> and <paramref name="newCommit"/>.
+        /// If <paramref name="oldCommit"/> is null or empty, no metrics will be
+        /// gathered.
+        /// </summary>
+        /// <param name="graph">The graph where the metric should be added.</param>
+        /// <param name="repository">The repository from which the file content is retrieved.</param>
+        /// <param name="oldCommit">The starting commit ID (baseline).</param>
+        /// <param name="newCommit">The ending commit.</param>
+        private static void ADDVCSMetrics(Graph graph, Repository repository, string oldCommit, string newCommit)
+        {
+            if (!string.IsNullOrWhiteSpace(oldCommit))
+            {
+                VCSMetrics.AddMetrics(graph, repository, oldCommit, newCommit);
             }
         }
 
@@ -386,14 +432,19 @@ namespace SEE.GraphProviders
         private const string repositoryPathLabel = "RepositoryPath";
 
         /// <summary>
-        /// Label of attribute <see cref="NewCommitID"/> in the configuration file.
+        /// Label of attribute <see cref="CommitID"/> in the configuration file.
         /// </summary>
         private const string commitIDLabel = "CommitID";
+        /// <summary>
+        /// Label of attribute <see cref="BaselineCommitID"/> in the configuration file.
+        /// </summary>
+        private const string baselineCommitIDLabel = "BaselineCommitID";
 
         protected override void SaveAttributes(ConfigWriter writer)
         {
             writer.Save(PathGlobbing, pathGlobbingLabel);
             writer.Save(CommitID, commitIDLabel);
+            writer.Save(BaselineCommitID, baselineCommitIDLabel);
             RepositoryPath.Save(writer, repositoryPathLabel);
         }
 
@@ -401,6 +452,7 @@ namespace SEE.GraphProviders
         {
             ConfigIO.Restore(attributes, pathGlobbingLabel, ref PathGlobbing);
             ConfigIO.Restore(attributes, commitIDLabel, ref CommitID);
+            ConfigIO.Restore(attributes, baselineCommitIDLabel, ref BaselineCommitID);
             RepositoryPath.Restore(attributes, repositoryPathLabel);
         }
 

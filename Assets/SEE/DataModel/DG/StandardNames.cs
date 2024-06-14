@@ -65,6 +65,30 @@
     }
 
     /// <summary>
+    /// Provides a common prefix for all Halstead metrics.
+    /// </summary>
+    public static class Halstead
+    {
+        /// <summary>
+        /// Prefix for all metrics.
+        /// </summary>
+        public const string Prefix = Metrics.Prefix + "Halstead.";
+
+        public const string DistinctOperators = Prefix + "Distinct_Operators";
+        public const string DistinctOperands = Prefix + "Distinct_Operands";
+        public const string TotalOperators = Prefix + "Total_Operators";
+        public const string TotalOperands = Prefix + "Total_Operands";
+        public const string ProgramVocabulary = Prefix + "Program_Vocabulary";
+        public const string ProgramLength = Prefix + "Program_Length";
+        public const string EstimatedProgramLength = Prefix + "Estimated_Program_Length";
+        public const string Volume = Prefix + "Volume";
+        public const string Difficulty = Prefix + "Difficulty";
+        public const string Effort = Prefix + "Effort";
+        public const string TimeRequiredToProgram = Prefix + "Time_Required_To_Program";
+        public const string NumberOfDeliveredBugs = Prefix + "Number_Of_Delivered_Bugs";
+    }
+
+    /// <summary>
     /// Defines names of node attributes for JaCoCo code-coverage metrics.
     /// See also: https://www.eclemma.org/jacoco/trunk/doc/counters.html
     /// </summary>
@@ -179,6 +203,33 @@
         /// ClassCovered / (ClassMissed + ClassCovered).
         /// </summary>
         public const string PercentageOfClassCovered = Prefix + "CLASS_percentage";
+    }
+
+    /// <summary>
+    /// Defines names of node attributes for VCS metrics.
+    /// </summary>
+    public static class VCS
+    {
+        /// <summary>
+        /// Prefix for VCS metrics.
+        /// </summary>
+        public const string Prefix = Metrics.Prefix + "VCS.";
+        /// <summary>
+        /// The number of lines of code added for a file that was changed between two commits.
+        /// </summary>
+        public const string LinesAdded = Prefix + "Lines_Added";
+        /// <summary>
+        /// The number of lines of code deleted for a file that was changed between two commits.
+        /// </summary>
+        public const string LinesDeleted = Prefix + "Lines_Deleted";
+        /// <summary>
+        /// The number of unique developers who contributed to a file that was changed between two commits.
+        /// </summary>
+        public const string NumberOfDevelopers = Prefix + "Number_Of_Developers";
+        /// <summary>
+        /// The number of times a file was changed between two commits.
+        /// </summary>
+        public const string CommitFrequency = Prefix + "Commit_Frequency";
     }
 
     /// <summary>

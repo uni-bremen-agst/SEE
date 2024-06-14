@@ -44,6 +44,6 @@
         /// <summary>
         /// For <see cref="LSPGraphProvider"/>.
         /// </summary>
-        LSP
+        LSP,
     }
 }
