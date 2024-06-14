@@ -72,13 +72,15 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="graph">The graph into which the metrics shall be loaded</param>
         /// <param name="city">This parameter is currently ignored.</param>
-        /// <param name="changePercentage">This parameter is currently ignored.</param>
-        /// <param name="token">This parameter is currently ignored.</param>
-        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city, Action<float> changePercentage = null,
+        /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
+        /// <param name="token">Cancellation token.</param>
+        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
+                                                          Action<float> changePercentage = null,
                                                           CancellationToken token = default)
         {
             CheckArguments(city);
-            return await UniTask.FromResult<Graph>(GetVCSGraph(PathGlobbing, RepositoryPath.Path, CommitID, BaselineCommitID));
+            return await UniTask.FromResult<Graph>(GetVCSGraph(PathGlobbing, RepositoryPath.Path, CommitID, BaselineCommitID,
+                                                               changePercentage, token));
         }
 
         /// <summary>
@@ -127,8 +129,10 @@ namespace SEE.GraphProviders
         /// <param name="commitID">The commit id where the files exist.</param>
         /// <param name="baselineCommitID">The commit id of the baseline against which to gather
         /// the VCS metrics</param>
+        /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
+        /// <param name="token">Cancellation token.</param>
         /// <returns>the resulting graph</returns>
-        private static Graph GetVCSGraph(Dictionary<string, bool> pathGlobbing, string repositoryPath, string commitID, string baselineCommitID)
+        private static Graph GetVCSGraph(Dictionary<string, bool> pathGlobbing, string repositoryPath, string commitID, string baselineCommitID, Action<float> changePercentage, CancellationToken token)
         {
             string[] pathSegments = repositoryPath.Split(Path.DirectorySeparatorChar);
 
@@ -143,11 +147,17 @@ namespace SEE.GraphProviders
             {
                 LibGit2Sharp.Tree tree = repo.Lookup<Commit>(commitID).Tree;
                 // Get all files using "git ls-tree -r <CommitID> --name-only".
-                IEnumerable<string> files = GetFilteredFiles(ListTree(tree), pathGlobbing);
+                List<string> files = GetFilteredFiles(ListTree(tree), pathGlobbing);
 
+                float totalSteps = files.Count;
+                int currentStep = 0;
                 // Build the graph structure.
                 foreach (string filePath in files.Where(path => !string.IsNullOrEmpty(path)))
                 {
+                    if (token.IsCancellationRequested)
+                    {
+                        throw new OperationCanceledException(token);
+                    }
                     string[] filePathSegments = filePath.Split('/');
                     // Files in the main directory.
                     if (filePathSegments.Length == 1)
@@ -159,11 +169,14 @@ namespace SEE.GraphProviders
                     {
                         BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(pathSegments[^1]));
                     }
+                    currentStep++;
+                    changePercentage?.Invoke(currentStep / totalSteps);
                 }
                 AddCodeMetrics(graph, repo, commitID);
                 ADDVCSMetrics(graph, repo, baselineCommitID, commitID);
             }
             graph.FinalizeNodeHierarchy();
+            changePercentage?.Invoke(1f);
             return graph;
         }
 
@@ -324,15 +337,16 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Retrieves the token stream for given file content from its repository and commit ID.
         /// </summary>
-        /// <param name="filePath">The filePath from the node.</param>
+        /// <param name="repositoryFilePath">The file path from the node. This must be a relative path
+        /// in the syntax of the repository regarding the directory separator</param>
         /// <param name="repository">The repository from which the file content is retrieved.</param>
         /// <param name="commitID">The commitID where the files exist.</param>
         /// <param name="language">The language the given text is written in.</param>
         /// <returns>The token stream for the specified file and commit.</returns>
-        public static IEnumerable<SEEToken> RetrieveTokens(string filePath, Repository repository, string commitID,
-                                                           TokenLanguage language)
+        public static IEnumerable<SEEToken> RetrieveTokens(string repositoryFilePath, Repository repository,
+                                                           string commitID, TokenLanguage language)
         {
-            Blob blob = repository.Lookup<Blob>($"{commitID}:{filePath}");
+            Blob blob = repository.Lookup<Blob>($"{commitID}:{repositoryFilePath}");
 
             if (blob != null)
             {
@@ -342,6 +356,7 @@ namespace SEE.GraphProviders
             else
             {
                 // Blob does not exist.
+                Debug.LogWarning($"File {repositoryFilePath} does not exist.\n");
                 return Enumerable.Empty<SEEToken>();
             }
         }
@@ -360,11 +375,11 @@ namespace SEE.GraphProviders
             {
                 if (node.Type == fileNodeType)
                 {
-                    string filePath = Filenames.OnCurrentPlatform(node.ID);
-                    TokenLanguage language = TokenLanguage.FromFileExtension(Path.GetExtension(filePath).TrimStart('.'));
+                    string repositoryFilePath = node.ID;
+                    TokenLanguage language = TokenLanguage.FromFileExtension(Path.GetExtension(repositoryFilePath).TrimStart('.'));
                     if (language != TokenLanguage.Plain)
                     {
-                        IEnumerable<SEEToken> tokens = RetrieveTokens(filePath, repository, commitID, language);
+                        IEnumerable<SEEToken> tokens = RetrieveTokens(repositoryFilePath, repository, commitID, language);
                         node.SetInt(Metrics.Prefix + "LOC", TokenMetrics.CalculateLinesOfCode(tokens));
                         node.SetInt(Metrics.Prefix + "McCabe_Complexity", TokenMetrics.CalculateMcCabeComplexity(tokens));
                         TokenMetrics.HalsteadMetrics halsteadMetrics = TokenMetrics.CalculateHalsteadMetrics(tokens);
