@@ -1,9 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
-using LibGit2Sharp;
 using NUnit.Framework;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.Scanner;
 using SEE.Utils.Paths;
 using System.Collections;
 using System.Collections.Generic;
@@ -133,6 +131,31 @@ namespace SEE.GraphProviders
         [Test]
         public async Task TestVCSGraphProviderAsync()
         {
+            string repositoryPath = Application.dataPath;
+            string projectPath = repositoryPath[..repositoryPath.LastIndexOf("/")];
+            string projectName = Path.GetFileName(projectPath);
+
+            List<string> expectedPaths = new()
+            {
+                projectName,
+                "Assets",
+                "Assets/SEE",
+                "Assets/SEE/GraphProviders",
+                "Assets/SEE/GraphProviders/CSVGraphProvider.cs",
+                "Assets/SEE/GraphProviders/DashboardGraphProvider.cs",
+                "Assets/SEE/GraphProviders/FileBasedGraphProvider.cs",
+                "Assets/SEE/GraphProviders/GXLGraphProvider.cs",
+                "Assets/SEE/GraphProviders/GraphProvider.cs",
+                "Assets/SEE/GraphProviders/GraphProviderFactory.cs",
+                "Assets/SEE/GraphProviders/GraphProviderKind.cs",
+                "Assets/SEE/GraphProviders/JaCoCoGraphProvider.cs",
+                "Assets/SEE/GraphProviders/LSPGraphProvider.cs",
+                "Assets/SEE/GraphProviders/MergeDiffGraphProvider.cs",
+                "Assets/SEE/GraphProviders/PipelineGraphProvider.cs",
+                "Assets/SEE/GraphProviders/ReflexionGraphProvider.cs",
+                "Assets/SEE/GraphProviders/VCSGraphProvider.cs"
+            };
+
             Graph graph = await GetVCSGraphAsync();
 
             List<string> pathsFromGraph = new();
@@ -140,46 +163,8 @@ namespace SEE.GraphProviders
             {
                 pathsFromGraph.Add(elem.ID);
             }
-            const int numberOfCSFiles = 759;
-            Assert.AreEqual(numberOfCSFiles, pathsFromGraph.Count());
-
-            string repositoryPath = Application.dataPath;
-            string projectPath = repositoryPath[..repositoryPath.LastIndexOf("/")];
-            string projectName = Path.GetFileName(projectPath);
-
-            List<string> actualList = new()
-            {
-                projectName,
-                ".gitignore",
-                "Assets",
-                "Assets/Scenes.meta",
-                "Assets/Scenes",
-                "Assets/Scenes/SampleScene.unity",
-                "Assets/Scenes/SampleScene.unity.meta",
-                "Packages",
-                "Packages/manifest.json",
-                "ProjectSettings",
-                "ProjectSettings/AudioManager.asset",
-                "ProjectSettings/ClusterInputManager.asset",
-                "ProjectSettings/DynamicsManager.asset",
-                "ProjectSettings/EditorBuildSettings.asset",
-                "ProjectSettings/EditorSettings.asset",
-                "ProjectSettings/GraphicsSettings.asset",
-                "ProjectSettings/InputManager.asset",
-                "ProjectSettings/NavMeshAreas.asset",
-                "ProjectSettings/Physics2DSettings.asset",
-                "ProjectSettings/PresetManager.asset",
-                "ProjectSettings/ProjectSettings.asset",
-                "ProjectSettings/ProjectVersion.txt",
-                "ProjectSettings/QualitySettings.asset",
-                "ProjectSettings/TagManager.asset",
-                "ProjectSettings/TimeManager.asset",
-                "ProjectSettings/UnityConnectSettings.asset",
-                "ProjectSettings/VFXManager.asset",
-                "ProjectSettings/XRSettings.asset"
-            };
-
-            Assert.IsTrue(actualList.OrderByDescending(x => x).ToList().SequenceEqual(pathsFromGraph.OrderByDescending(x => x).ToList()));
+            Assert.AreEqual(expectedPaths.Count, pathsFromGraph.Count());
+            Assert.IsTrue(expectedPaths.OrderByDescending(x => x).ToList().SequenceEqual(pathsFromGraph.OrderByDescending(x => x).ToList()));
         }
 
         /// <summary>
@@ -243,6 +228,10 @@ namespace SEE.GraphProviders
                 }
             });
 
+        /// <summary>
+        /// The graph consisting of all C# files in folder Assets/SEE/GraphProviders.
+        /// </summary>
+        /// <returns>graph consisting of all C# files in folder Assets/SEE/GraphProviders</returns>
         private static async Task<Graph> GetVCSGraphAsync()
         {
             GameObject go = new();
@@ -250,7 +239,7 @@ namespace SEE.GraphProviders
 
             Dictionary<string, bool> pathGlobbing = new()
                 {
-                    { "Assets/SEE/**/*.cs", true }
+                    { "Assets/SEE/GraphProviders/**/*.cs", true }
                 };
 
             VCSGraphProvider provider = new()
