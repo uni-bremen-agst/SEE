@@ -1,0 +1,17 @@
+PROGRAM test12;
+DECLARE
+  a : ARRAY [1..2] OF INTEGER;
+
+  FUNCTION something(i:INTEGER; j:INTEGER) : ARRAY [1..2] OF INTEGER;
+  DECLARE
+    b : ARRAY [1..2] OF INTEGER
+  BEGIN
+    b[1] := i+1;
+    b[2] := j+1;
+    RETURN( b )
+  END
+
+BEGIN
+  a := something( 1,2);
+  WRITELN( FORMAT( a[1] ) ++ "  " ++ FORMAT( a[2] ) )
+END.

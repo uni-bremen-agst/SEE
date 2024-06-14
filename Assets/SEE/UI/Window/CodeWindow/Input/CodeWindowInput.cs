@@ -10,6 +10,7 @@ using SEE.GO;
 using SEE.UI.Notification;
 using SEE.Net.Dashboard;
 using SEE.Net.Dashboard.Model.Issues;
+using SEE.Scanner;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;

@@ -1,0 +1,18 @@
+PROGRAM a;
+
+DECLARE
+  b : ARRAY [1..2] OF ARRAY [1..2] OF REAL;
+  i : INTEGER;
+  j : INTEGER
+
+BEGIN
+  i := 1;
+  WHILE i <= 2 DO
+    j := 1;
+    WHILE j <= 2 DO
+      b[i][j] := 10 * i + j;
+      j := j + 1
+    END;
+    i := i + 1
+  END
+END.

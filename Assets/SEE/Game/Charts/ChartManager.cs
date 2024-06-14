@@ -20,7 +20,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.Controls;
-using SEE.DataModel;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -32,11 +31,6 @@ namespace SEE.Game.Charts
     /// </summary>
     public class ChartManager : MonoBehaviour
     {
-        /// <summary>
-        /// The prefix of the name of a metric shown in a chart.
-        /// </summary>
-        public const string MetricPrefix = "Metric.";
-
         /// <summary>
         /// The instance of the <see cref="ChartManager" />, to ensure there will be only one.
         /// </summary>
