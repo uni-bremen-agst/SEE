@@ -183,7 +183,6 @@ namespace SEE.GraphProviders
 
         private static void AssertTokenMetricsExist(Node node)
         {
-            Debug.Log(node.ToString());
             Assert.IsTrue(node.TryGetInt(Metrics.Prefix + "LOC", out int _));
             Assert.IsTrue(node.TryGetInt(Metrics.Prefix + "McCabe_Complexity", out int _));
             Assert.IsTrue(node.TryGetInt(Halstead.DistinctOperators, out int _));
