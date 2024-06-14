@@ -66,9 +66,7 @@ namespace SEE.GraphProviders
             {
                 foreach (Node node in graph.Nodes())
                 {
-                    // TODO: Why is this needed? Is it always needed on every platform?
-                    // Can't we just use the path attribute of the node as it is?
-                    if (node.ID.Replace('\\', '/') == change.Path)
+                    if (node.ID == change.Path)
                     {
                         node.SetInt(DataModel.DG.VCS.LinesAdded, change.LinesAdded);
                         node.SetInt(DataModel.DG.VCS.LinesDeleted, change.LinesDeleted);
@@ -119,7 +117,7 @@ namespace SEE.GraphProviders
             {
                 foreach (Node node in graph.Nodes())
                 {
-                    if (node.ID.Replace('\\', '/') == entry.Key)
+                    if (node.ID == entry.Key)
                     {
                         node.SetInt(DataModel.DG.VCS.NumberOfDevelopers, entry.Value.Count);
                     }
@@ -172,7 +170,7 @@ namespace SEE.GraphProviders
             {
                 foreach (Node node in graph.Nodes())
                 {
-                    if (node.ID.Replace('\\', '/') == entry.Key)
+                    if (node.ID == entry.Key)
                     {
                         node.SetInt(DataModel.DG.VCS.CommitFrequency, entry.Value);
                     }
