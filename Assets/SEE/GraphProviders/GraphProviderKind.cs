@@ -45,9 +45,5 @@
         /// For <see cref="LSPGraphProvider"/>.
         /// </summary>
         LSP,
-        /// <summary>
-        /// For <see cref="VCSMetricsProvider"/>.
-        /// </summary>
-        VCSMetrics
     }
 }
