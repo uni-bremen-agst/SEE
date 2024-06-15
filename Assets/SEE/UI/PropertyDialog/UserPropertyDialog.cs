@@ -145,7 +145,7 @@ namespace SEE.UI.PropertyDialog
         /// <returns>true if <paramref name="playerName"/> conforms the restrictions</returns>
         private static bool ValidUsername(string playerName)
         {
-            return !String.IsNullOrWhiteSpace(playerName);
+            return !string.IsNullOrWhiteSpace(playerName);
         }
 
 

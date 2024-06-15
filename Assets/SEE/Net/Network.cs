@@ -78,12 +78,7 @@ namespace SEE.Net
         /// <summary>
         /// Playername for chat and avatar tag
         /// </summary>
-        private string playerName = string.Empty;
-        public string PlayerName
-        {
-            get { return playerName; }
-            set { playerName = value; }
-        }
+        public string PlayerName { get; set; } = string.Empty;
         /// <summary>
         /// Returns the underlying <see cref="UNetTransport"/> of the <see cref="NetworkManager"/>.
         /// This information is retrieved differently depending upon whether we are running
