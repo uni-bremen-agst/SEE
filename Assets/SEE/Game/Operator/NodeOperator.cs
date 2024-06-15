@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
+using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.Game.City;
+using SEE.GameObjects;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Tools.ReflexionAnalysis;
@@ -75,11 +77,7 @@ namespace SEE.Game.Operator
         ///
         /// <em>Be aware that this may be null if the node operator is attached to an artificial node.</em>
         /// </summary>
-        public Node Node
-        {
-            get;
-            private set;
-        }
+        public Node Node { get; private set; }
 
         /// <summary>
         /// If this isn't null, represents the duration in seconds the layout update should take,
@@ -284,14 +282,25 @@ namespace SEE.Game.Operator
 
                         if (City is BranchCity)
                         {
-                            foreach (var edge in gameObject.GetComponent<AuthorRef>().Edges)
+                            if (gameObject.TryGetComponent(out AuthorRef authorRef))
                             {
-                                SEESpline seeSpline = edge.GetComponent<SEESpline>();
-                                seeSpline.UpdateEndPosition(gameObject.transform.position);
-                                //edge.EdgeOperator().MorphTo(seeSpline.Spline, ToFactor(duration));
+                                foreach (var edge in authorRef.Edges)
+                                {
+                                    SEESpline seeSpline = edge.GetComponent<SEESpline>();
+                                    seeSpline.UpdateEndPosition(gameObject.transform.position);
+                                }
                             }
-                            //var renderer = City.Renderer as GraphRenderer;
-                            //renderer.DrawAuthorSpheres();
+                            else
+                            {
+                                var children = gameObject.GetComponentsInChildren<AuthorRef>();
+
+                                foreach (var child in children)
+                                {
+                                    child.Edges.ForEach(x =>
+                                        x.GetComponent<SEESpline>()
+                                            .UpdateEndPosition(child.gameObject.transform.position));
+                                }
+                            }
                         }
                     }
                 }
@@ -331,7 +340,7 @@ namespace SEE.Game.Operator
                 {
                     // This node may be mapped to. We need to expand it to include the node we're mapped to.
                     return mappedNode.Incomings.Where(ReflexionGraphTools.IsInMapping)
-                                     .SelectMany(x => x.Source.PostOrderDescendants()).Append(mappedNode);
+                        .SelectMany(x => x.Source.PostOrderDescendants()).Append(mappedNode);
                 }
 
                 return new[] { mappedNode };
@@ -342,10 +351,10 @@ namespace SEE.Game.Operator
             //       we can use the hierarchy we're actually interested in and don't need to, e.g., look at
             //       mapped nodes which may be relevant. Before implementing this, measure actual performance, though.
             IEnumerable<Edge> relevantEdges = node.PostOrderDescendants()
-                                                  .SelectMany(GetMappedNodes)
-                                                  .SelectMany(n => n.Incomings.Union(n.Outgoings))
-                                                  .Where(edge => !edge.HasToggle(GraphElement.IsVirtualToggle))
-                                                  .Distinct();
+                .SelectMany(GetMappedNodes)
+                .SelectMany(n => n.Incomings.Union(n.Outgoings))
+                .Where(edge => !edge.HasToggle(GraphElement.IsVirtualToggle))
+                .Distinct();
             MorphEdges(relevantEdges, duration);
 
             // Once we're done, we reset the gameObject to its original position.
@@ -373,6 +382,7 @@ namespace SEE.Game.Operator
                     Debug.LogWarning($"Edge {edge.ToShortString()} has no associated GameObject!\n");
                     continue;
                 }
+
                 gameEdges.Add(gameEdge);
             }
 
@@ -413,7 +423,8 @@ namespace SEE.Game.Operator
             {
                 return new Tween[]
                 {
-                    material.DOColor(Color.TargetValue.Invert(), duration / (2 * Mathf.Abs(count))).SetEase(Ease.Linear).SetLoops(2 * count, LoopType.Yoyo).Play()
+                    material.DOColor(Color.TargetValue.Invert(), duration / (2 * Mathf.Abs(count))).SetEase(Ease.Linear)
+                        .SetLoops(2 * count, LoopType.Yoyo).Play()
                 };
             }
             else
@@ -452,14 +463,19 @@ namespace SEE.Game.Operator
             PrepareLabel();
             labelAlpha = new TweenOperation<float>(AnimateLabelAlphaAction, 0f);
             labelTextPosition = new TweenOperation<Vector3>(AnimateLabelTextPositionAction, DesiredLabelTextPosition);
-            labelStartLinePosition = new TweenOperation<Vector3>(AnimateLabelStartLinePositionAction, DesiredLabelStartLinePosition);
-            labelEndLinePosition = new TweenOperation<Vector3>(AnimateLabelEndLinePositionAction, DesiredLabelEndLinePosition);
+            labelStartLinePosition =
+                new TweenOperation<Vector3>(AnimateLabelStartLinePositionAction, DesiredLabelStartLinePosition);
+            labelEndLinePosition =
+                new TweenOperation<Vector3>(AnimateLabelEndLinePositionAction, DesiredLabelEndLinePosition);
             return;
 
             Tween[] AnimateToXAction(float x, float d) => new Tween[] { transform.DOMoveX(x, d).Play() };
             Tween[] AnimateToYAction(float y, float d) => new Tween[] { transform.DOMoveY(y, d).Play() };
             Tween[] AnimateToZAction(float z, float d) => new Tween[] { transform.DOMoveZ(z, d).Play() };
-            Tween[] AnimateToRotationAction(Quaternion r, float d) => new Tween[] { transform.DORotateQuaternion(r, d).Play() };
+
+            Tween[] AnimateToRotationAction(Quaternion r, float d) =>
+                new Tween[] { transform.DORotateQuaternion(r, d).Play() };
+
             Tween[] AnimateToScaleAction(Vector3 s, float d) => new Tween[] { transform.DOScale(s, d).Play() };
 
             static Node GetNode(GameObject gameObject)
@@ -467,7 +483,8 @@ namespace SEE.Game.Operator
                 // We allow a null value for artificial nodes, but at least a NodeRef must be attached.
                 if (!gameObject.TryGetComponent(out NodeRef nodeRef))
                 {
-                    throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()} must have {nameof(NodeRef)} attached!");
+                    throw new InvalidOperationException(
+                        $"NodeOperator-operated object {gameObject.FullName()} must have {nameof(NodeRef)} attached!");
                 }
 
                 return nodeRef.Value;
@@ -486,7 +503,8 @@ namespace SEE.Game.Operator
         {
             if (!gameObject.TryGetComponent(out Renderer renderer))
             {
-                throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()} must have a Renderer component!");
+                throw new InvalidOperationException(
+                    $"NodeOperator-operated object {gameObject.FullName()} must have a Renderer component!");
             }
 
             return renderer;
