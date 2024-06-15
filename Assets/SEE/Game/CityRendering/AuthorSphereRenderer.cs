@@ -1,11 +1,11 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Game.City;
+using SEE.GameObjects;
 using SEE.GO;
-using SEE.Layout.EdgeLayouts;
 using SEE.Utils;
+using TinySpline;
 using UnityEngine;
 
 namespace SEE.Game.CityRendering
@@ -40,9 +40,16 @@ namespace SEE.Game.CityRendering
                     .ToList();
 
             Renderer parentRenderer = parent.GetComponent<Renderer>();
-            IList<GameObject> gameSpheresObjects = RenderSpheres(authors, parent, parentRenderer);
+            IList<GameObject> gameSpheresObjects = RenderSpheres(authors, parent);
 
             // Drawing edges
+            RenderEdgesForSpheres(nodeMap, gameSpheresObjects, parent);
+        }
+
+
+        private void RenderEdgesForSpheres(IDictionary<Node, GameObject> nodeMap,
+            IEnumerable<GameObject> gameSpheresObjects, GameObject parent)
+        {
             var maxHeight = nodeMap.Values.Max(x => x.transform.position.y);
             float offset = Mathf.Max(2.5f * Settings.EdgeLayoutSettings.EdgeWidth, 0.2f * maxHeight);
 
@@ -64,10 +71,11 @@ namespace SEE.Game.CityRendering
 
                 foreach (var nodeOfAuthor in nodesOfAuthor)
                 {
-                    var bSpline = SplineEdgeLayout.CreateSpline(sphere.transform.position,
-                        nodeOfAuthor.Value.transform.position,
-                        above: true, offset);
+                    //var bSpline = SplineEdgeLayout.CreateSpline(sphere.transform.position,
+                    //    nodeOfAuthor.Value.transform.position,
+                    //   above: true, offset);
 
+                    BSpline bSpline = CreateSpline(sphere.transform.position, nodeOfAuthor.Value.transform.position);
                     var churn = nodeOfAuthor.Key.IntAttributes["Metric.File.Churn" + ":" + authorName];
 
                     GameObject gameEdge = new()
@@ -83,20 +91,21 @@ namespace SEE.Game.CityRendering
                     // editor. The line renderer will be replaced with a mesh
                     // renderer at runtime (i.e., when starting the application).
                     LineRenderer line = gameEdge.AddComponent<LineRenderer>();
-
+                    //gameEdge.AddComponent<MeshRenderer>();
                     // Use sharedMaterial if changes to the original material
                     // should affect all objects using this material;
                     // renderer.material instead will create a copy of the
                     // material and will not be affected by changes of the
                     // original material.
-                    line.sharedMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
+                    Color edgeColor = sphere.GetComponent<Renderer>().sharedMaterial.color;
+                    line.sharedMaterial = Materials.New(Materials.ShaderType.Opaque, edgeColor);
 
 
                     LineFactory.SetDefaults(line);
                     var width = Mathf.Clamp(churn / maximalChurn, Settings.EdgeLayoutSettings.EdgeWidth * 0.5f,
                         Settings.EdgeLayoutSettings.EdgeWidth);
                     LineFactory.SetWidth(line, width);
-                    LineFactory.SetColor(line, sphere.GetComponent<Renderer>().sharedMaterial.color);
+                    LineFactory.SetColor(line, edgeColor);
 
                     // If enabled, the lines are defined in world space. This
                     // means the object's position is ignored and the lines are
@@ -104,29 +113,51 @@ namespace SEE.Game.CityRendering
                     line.useWorldSpace = false;
 
                     // Draw spline as concatenation of subsplines (polyline).
-                    //SEESpline spline = gameEdge.AddComponent<SEESpline>();
-                    //spline.Spline = bSpline;
+                    SEESpline spline = gameEdge.AddComponent<SEESpline>();
+                    spline.Spline = bSpline;
+                    spline.GradientColors = (edgeColor, edgeColor);
+                    //spline.CreateMesh();
+
                     Vector3[] positions = TinySplineInterop.ListToVectors(bSpline.Sample());
                     line.positionCount = positions.Length; // number of vertices
                     line.SetPositions(positions);
 
                     InteractionDecorator.PrepareForInteraction(gameEdge);
                     AddLOD(gameEdge);
+
+                    AuthorRef authorRef = nodeOfAuthor.Value.AddOrGetComponent<AuthorRef>();
+                    authorRef.AuthorSphere = sphere;
+                    authorRef.Edges.Add(gameEdge);
                     // return gameEdge;
                 }
             }
         }
 
-
-        private void RenderEdgesForSpheres()
+        private BSpline CreateSpline(Vector3 start, Vector3 end)
         {
-            
+            Vector3[] points = new Vector3[2];
+            points[0] = start;
+            //points[1] = points[0]; // we are maintaining the x and z co-ordinates,
+            //points[1].y = yLevel;   // but adjust the y co-ordinate
+            // points[2] = end;
+            //points[2].y = yLevel;
+            points[1] = end;
+            return new TinySpline.BSpline(2, 3, 1)
+            {
+                ControlPoints = TinySplineInterop.VectorsToList(points)
+            };
         }
-        
-        private IList<GameObject> RenderSpheres(IList<string> authors, GameObject parent,
-            Renderer parentRenderer)
+
+        /// <summary>
+        /// This method renders all spheres for the authors specified in <paramref name="authors"/> 
+        /// </summary>
+        /// <param name="authors">The authors to create the spheres for</param>
+        /// <param name="parent">The parent <see cref="GameObject"/> to add the to</param>
+        /// <returns></returns>
+        private IList<GameObject> RenderSpheres(IList<string> authors, GameObject parent)
         {
             IList<GameObject> result = new List<GameObject>();
+            Renderer parentRenderer = parent.GetComponent<Renderer>();
             int authorsCount = authors.Count;
 
             int rows = Mathf.FloorToInt(Mathf.Sqrt(authorsCount));
@@ -142,7 +173,7 @@ namespace SEE.Game.CityRendering
 
             int counter = 0;
             // Define materials for the spheres
-            var materials = new Materials(Materials.ShaderType.OpaqueMetallic,
+            var materials = new Materials(Materials.ShaderType.PortalFree,
                 new ColorRange(Color.red, Color.blue, (uint)authorsCount + 1));
 
             // iterate over all rows
@@ -170,16 +201,17 @@ namespace SEE.Game.CityRendering
 
                     Renderer renderer = gameObject.GetComponent<Renderer>();
                     var mat = materials.Get(0, counter);
+                    // Override shader
+                    mat.shader = Shader.Find("Standard");
                     renderer.sharedMaterial = mat;
                     gameObject.transform.parent = parent.transform;
                     gameObject.transform.transform.localScale *= 0.25f;
 
                     // Calculate the position of the sphere
                     float xPos = (i * spacingX - (parentRenderer.bounds.size.x / 2));
-                    //xPos += (renderer.bounds.size.x / 2);
                     float zPos = (j * spacingZ - (parentRenderer.bounds.size.z / 2));
-                    // zPos += (renderer.bounds.size.z / 2);
-                    Vector3 spherePosition = new Vector3(xPos, parentRenderer.bounds.size.y + 0.8f, zPos) +
+
+                    Vector3 spherePosition = new Vector3(xPos, parentRenderer.bounds.size.y + 0.9f, zPos) +
                                              parent.transform.position;
                     gameObject.transform.position = spherePosition;
 

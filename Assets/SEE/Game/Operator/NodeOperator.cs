@@ -281,8 +281,21 @@ namespace SEE.Game.Operator
                     {
                         // The edge layout needs to be updated only if we actually have an edge layout.
                         UpdateEdgeLayout(duration);
+
+                        if (City is BranchCity)
+                        {
+                            foreach (var edge in gameObject.GetComponent<AuthorRef>().Edges)
+                            {
+                                SEESpline seeSpline = edge.GetComponent<SEESpline>();
+                                seeSpline.UpdateEndPosition(gameObject.transform.position);
+                                //edge.EdgeOperator().MorphTo(seeSpline.Spline, ToFactor(duration));
+                            }
+                            //var renderer = City.Renderer as GraphRenderer;
+                            //renderer.DrawAuthorSpheres();
+                        }
                     }
                 }
+
                 UpdateLabelLayout(duration);
             }
         }
