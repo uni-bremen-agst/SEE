@@ -13,14 +13,14 @@ namespace SEE.Game.City
     public class ErosionAttributes : VisualAttributes
     {
         /// <summary>
-        /// Whether erosions should be visible above inner node blocks.
+        /// Whether inner erosions should be visible above node blocks.
         /// </summary>
-        public bool ShowInnerErosions = false;
+        public bool ShowInnerErosions;
 
         /// <summary>
-        /// Whether erosions should be visible above leaf node blocks.
+        /// Whether leaf erosions should be visible above node blocks.
         /// </summary>
-        public bool ShowLeafErosions = false;
+        public bool ShowLeafErosions;
 
         /// <summary>
         /// The maximal value for <see cref="ErosionScalingFactor"/>.

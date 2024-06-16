@@ -610,17 +610,6 @@ namespace SEE.Game.City
             };
 
         /// <summary>
-        /// Yields a mapping of all node attribute names that define erosion issues
-        /// for inner nodes onto the icons to be used for visualizing them.
-        /// These are usually the same attributes from <see cref="LeafIssueMap"/>, appended with
-        /// <see cref="MetricAggregator.SumExtension"/>, i.e., they represent the aggregated issue metrics.
-        /// </summary>
-        /// <returns>mapping of all node attribute names for inner nodes onto icon ids</returns>
-        public Dictionary<string, IconFactory.Erosion> InnerIssueMap() =>
-            LeafIssueMap().Select(x => (Key: x.Key + MetricAggregator.SumExtension, x.Value))
-                          .ToDictionary(x => x.Key, x => x.Value);
-
-        /// <summary>
         /// Lists the metrics for each node type.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "List Node Metrics")]

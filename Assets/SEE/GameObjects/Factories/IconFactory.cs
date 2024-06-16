@@ -163,11 +163,14 @@ namespace SEE.GO
         /// <returns>a new game object for this type of erosion</returns>
         public GameObject GetIcon(Vector3 position, Erosion erosion, string metricText, Color color = default)
         {
-            GameObject gameObject = new GameObject(ToString(erosion))
+            GameObject gameObject = new(ToString(erosion))
             {
-                tag = Tags.Erosion
+                tag = Tags.Erosion,
+                transform =
+                {
+                    position = position
+                }
             };
-            gameObject.transform.position = position;
             HorizontalLayoutGroup layoutGroup = gameObject.AddComponent<HorizontalLayoutGroup>();
             layoutGroup.spacing = 7;
             layoutGroup.childControlHeight = true;
