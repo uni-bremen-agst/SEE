@@ -16,6 +16,10 @@
         Metric,
         Style,
         Universal,
+        LspError,
+        LspWarning,
+        LspInfo,
+        LspHint,
         IssuesTotal
     }
 
@@ -59,6 +63,10 @@
                 NumericAttributeNames.Style => Metrics.Prefix + "Style",
                 NumericAttributeNames.Universal => Metrics.Prefix + "Universal",
                 NumericAttributeNames.IssuesTotal => Metrics.Prefix + "IssuesTotal",
+                NumericAttributeNames.LspError => Metrics.Prefix + "LSP_Error",
+                NumericAttributeNames.LspWarning => Metrics.Prefix + "LSP_Warning",
+                NumericAttributeNames.LspInfo => Metrics.Prefix + "LSP_Info",
+                NumericAttributeNames.LspHint => Metrics.Prefix + "LSP_Hint",
                 _ => throw new System.Exception("Unknown attribute name " + numericAttributeName)
             };
         }

@@ -971,6 +971,10 @@ namespace SEE.Utils
             city.ErosionSettings.CycleIssue = "X";
             city.ErosionSettings.CloneIssue = "X";
             city.ErosionSettings.ArchitectureIssue = "X";
+            city.ErosionSettings.LspHint = "X";
+            city.ErosionSettings.LspInfo = "X";
+            city.ErosionSettings.LspWarning = "X";
+            city.ErosionSettings.LspError = "X";
 
             city.ErosionSettings.StyleIssueSum = "X";
             city.ErosionSettings.UniversalIssueSum = "X";
@@ -995,6 +999,10 @@ namespace SEE.Utils
             Assert.AreEqual(expected.CycleIssue, actual.CycleIssue);
             Assert.AreEqual(expected.CloneIssue, actual.CloneIssue);
             Assert.AreEqual(expected.ArchitectureIssue, actual.ArchitectureIssue);
+            Assert.AreEqual(expected.LspHint, actual.LspHint);
+            Assert.AreEqual(expected.LspInfo, actual.LspInfo);
+            Assert.AreEqual(expected.LspWarning, actual.LspWarning);
+            Assert.AreEqual(expected.LspError, actual.LspError);
 
             Assert.AreEqual(expected.StyleIssueSum, actual.StyleIssueSum);
             Assert.AreEqual(expected.UniversalIssueSum, actual.UniversalIssueSum);

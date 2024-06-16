@@ -110,6 +110,24 @@ namespace SEE.DataModel.DG.IO
         All = ~(~0 << 7)
     }
 
+    /// <summary>
+    /// The kinds of diagnostics that can be imported for nodes.
+    ///
+    /// These are the same as in OmniSharp.Extensions.LanguageServer.Protocol.Models.DiagnosticSeverity,
+    /// but with values that are powers of 2 (and an offset of 1), so that they can be used as flags.
+    /// </summary>
+    /// <seealso cref="OmniSharp.Extensions.LanguageServer.Protocol.Models.DiagnosticSeverity"/>
+    [Flags]
+    public enum DiagnosticKind
+    {
+        None = 0,
+        Error = 1 << 0,
+        Warning = 1 << 1,
+        Information = 1 << 2,
+        Hint = 1 << 3,
+        All = ~(~0 << 4)
+    }
+
 
     /// <summary>
     /// A class that creates a graph from the output of a language server.
@@ -118,6 +136,7 @@ namespace SEE.DataModel.DG.IO
     /// <param name="SourcePaths">The paths to the source files to be imported.</param>
     /// <param name="ExcludedPaths">The paths to be excluded from the import.</param>
     /// <param name="IncludeNodeTypes">The types of nodes to include in the import.</param>
+    /// <param name="IncludeDiagnostics">The kinds of diagnostics to include in the import.</param>
     /// <param name="IncludeEdgeTypes">The types of edges to include in the import.</param>
     /// <param name="AvoidSelfReferences">If true, no self-references will be created.</param>
     /// <param name="AvoidParentReferences">If true, no edges to parent nodes will be created.</param>
@@ -126,6 +145,7 @@ namespace SEE.DataModel.DG.IO
         IList<string> SourcePaths,
         IList<string> ExcludedPaths,
         NodeKind IncludeNodeTypes = NodeKind.All,
+        DiagnosticKind IncludeDiagnostics = DiagnosticKind.All,
         // By default, all edge types are included, except for <see cref="EdgeKind.Definition"/>
         // and <see cref="EdgeKind.Declaration"/>, since nodes would otherwise often get a self-reference.
         EdgeKind IncludeEdgeTypes = EdgeKind.All & ~(EdgeKind.Definition | EdgeKind.Declaration),
@@ -178,6 +198,14 @@ namespace SEE.DataModel.DG.IO
                                            .Count(x => x != EdgeKind.None && x != EdgeKind.All && IncludeEdgeTypes.HasFlag(x));
             float edgeProgressFactor = 0.9f - 0.9f / (activatedEdgeKinds + 1);
 
+            bool supportsPullDiagnostics = Handler.ServerCapabilities.DiagnosticProvider != null;
+            if (!supportsPullDiagnostics && IncludeDiagnostics != DiagnosticKind.None)
+            {
+                Debug.LogWarning("The language server does not support pull diagnostics. "
+                                 + "We can only catch diagnostics that have been emitted until the graph import is done,"
+                                 + "hence, some diagnostics might be missing.\n");
+            }
+
             int documentCount;
             for (documentCount = 0; documentCount < relevantDocuments.Count; documentCount++)
             {
@@ -198,6 +226,14 @@ namespace SEE.DataModel.DG.IO
                     graph.AddNode(fileNode);
                     fileNode.Reparent(dirNode);
                     symbolParent = fileNode;
+                    if (supportsPullDiagnostics)
+                    {
+                        IEnumerable<Diagnostic> diagnostics = await Handler.PullDocumentDiagnosticsAsync(path);
+                        if (diagnostics != null)
+                        {
+                            HandleDiagnostics(diagnostics, path);
+                        }
+                    }
                 }
 
                 IUniTaskAsyncEnumerable<SymbolInformationOrDocumentSymbol> symbols = Handler.DocumentSymbols(path);
@@ -218,9 +254,6 @@ namespace SEE.DataModel.DG.IO
                 // ~20% of the progress is made by loading the documents and its symbols.
                 changePercentage?.Invoke((1 - edgeProgressFactor) * documentCount / relevantDocuments.Count);
             }
-
-            // Aggregate LOC upwards.
-            MetricAggregator.AggregateSum(graph, new[] { NumericAttributeNames.LOC.Name() }, false, asInt: true);
 
             // Relevant nodes (for edges) are those that have a source range and are not already in the graph.
             IList<Node> relevantNodes = graph.Nodes().Except(originalNodes).Where(x => x.SourceRange != null).ToList();
@@ -279,11 +312,29 @@ namespace SEE.DataModel.DG.IO
                     }
 
                     // The remaining 80% of the progress is made by connecting the nodes.
-                    changePercentage?.Invoke(1 - edgeProgressFactor + edgeProgressFactor * i++ / relevantNodes.Count);
+                    // The Count+1 prevents the progress from reaching 1.0, since the diagnostics may not yet be pulled.
+                    changePercentage?.Invoke(1 - edgeProgressFactor + edgeProgressFactor * i++ / (relevantNodes.Count+1));
                 }
-                Handler.CloseDocument(path);
+                //Handler.CloseDocument(path);
             }
             Debug.Log($"LSPImporter: Imported {graph.Nodes().Except(originalNodes).Count()} new nodes and {newEdges} new edges.\n");
+
+            // Handle diagnostics if not pulled.
+            if (!supportsPullDiagnostics && IncludeDiagnostics != DiagnosticKind.None)
+            {
+                // In this case, we will wait one additional second to give the server at least some time to emit diagnostics.
+                // TODO (#746): Collect diagnostics in background, or find a better way to handle this.
+                await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: token);
+                foreach (PublishDiagnosticsParams diagnosticsParams in Handler.GetPublishedDiagnostics())
+                {
+                    HandleDiagnostics(diagnosticsParams.Diagnostics, diagnosticsParams.Uri.Path);
+                }
+            }
+
+            // Aggregate LOC upwards.
+            MetricAggregator.AggregateSum(graph, new[] { NumericAttributeNames.LOC.Name() }, withSuffix: false, asInt: true);
+            // Aggregate diagnostics upwards. We do this with a suffix, since these metrics may be used for erosion icons.
+            MetricAggregator.AggregateSum(graph, IncludeDiagnostics.ToDiagnosticSeverity().Select(x => x.Name()), withSuffix: true, asInt: true);
 
             changePercentage?.Invoke(1);
 
@@ -292,6 +343,37 @@ namespace SEE.DataModel.DG.IO
             IEnumerable<string> RelevantDocumentsForPath(string path)
             {
                 return relevantExtensions.SelectMany(x => Directory.EnumerateFiles(path, $"*.{x}", SearchOption.AllDirectories));
+            }
+        }
+
+        /// <summary>
+        /// Associates the <paramref name="diagnostics"/> for the file at the given <paramref name="path"/>
+        /// with the corresponding nodes in the graph. Specifically, the diagnostics are counted for each node
+        /// and stored as attributes in the nodes.
+        /// </summary>
+        /// <param name="diagnostics">The diagnostics to associate with the nodes.</param>
+        /// <param name="path">The path of the file to which the diagnostics belong.</param>
+        private void HandleDiagnostics(IEnumerable<Diagnostic> diagnostics, string path)
+        {
+            foreach (Diagnostic diagnostic in diagnostics)
+            {
+                if (diagnostic.Severity.HasValue && IncludeDiagnostics.HasFlag(diagnostic.Severity.Value.ToDiagnosticKind()))
+                {
+                    IEnumerable<Node> diagnosticNodes = FindNodesByLocation(path, Range.FromLspRange(diagnostic.Range));
+                    foreach (Node node in diagnosticNodes)
+                    {
+                        DiagnosticSeverity severity = diagnostic.Severity.Value;
+                        if (node.TryGetInt(severity.Name(), out int count))
+                        {
+                            node.SetInt(severity.Name(), count + 1);
+                        }
+                        else
+                        {
+                            // If the severity metric is not yet set, we set it to 1.
+                            node.SetInt(severity.Name(), 1);
+                        }
+                    }
+                }
             }
         }
 
@@ -699,18 +781,97 @@ namespace SEE.DataModel.DG.IO
         /// <returns>The corresponding symbol kinds.</returns>
         public static IEnumerable<SymbolKind> ToSymbolKind(this NodeKind kind)
         {
-            foreach (NodeKind nodeKind in Enum.GetValues(typeof(NodeKind)).Cast<NodeKind>().Where(x => x.HasFlag(kind)))
+            if (kind == NodeKind.All)
             {
-                // This has to do the inverse to the above, i.e., log2, to get the original enum value.
-                int nodeKindValue = (int)nodeKind;
-                int symbolKindValue = (int)Math.Log(nodeKindValue, 2) + 1;
-                // If the enum is not defined, we don't throw an exception, because we have a flag enum
-                // with certain values (like None) that are not defined in the original enum.
-                if (Enum.IsDefined(typeof(SymbolKind), symbolKindValue))
+                foreach (SymbolKind symbolKind in Enum.GetValues(typeof(SymbolKind)).Cast<SymbolKind>())
                 {
-                    yield return (SymbolKind)symbolKindValue;
+                    yield return symbolKind;
                 }
             }
+            else
+            {
+                foreach (NodeKind nodeKind in Enum.GetValues(typeof(NodeKind)).Cast<NodeKind>().Where(x => x.HasFlag(kind)))
+                {
+                    // This has to do the inverse to the above, i.e., log2, to get the original enum value.
+                    int nodeKindValue = (int)nodeKind;
+                    int symbolKindValue = (int)Math.Log(nodeKindValue, 2) + 1;
+                    // If the enum is not defined, we don't throw an exception, because we have a flag enum
+                    // with certain values (like None) that are not defined in the original enum.
+                    if (Enum.IsDefined(typeof(SymbolKind), symbolKindValue))
+                    {
+                        yield return (SymbolKind)symbolKindValue;
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Provides helper extensions methods to convert between <see cref="DiagnosticSeverity"/>
+    /// and <see cref="DiagnosticKind"/>.
+    /// </summary>
+    public static class DiagnosticKindExtensions
+    {
+        /// <summary>
+        /// Converts a <see cref="DiagnosticSeverity"/> to a <see cref="DiagnosticKind"/>.
+        /// </summary>
+        /// <param name="severity">The diagnostic severity to convert.</param>
+        /// <returns>The corresponding diagnostic kind.</returns>
+        public static DiagnosticKind ToDiagnosticKind(this DiagnosticSeverity severity)
+        {
+            // By taking the power of 2, we can use the original enum values as flags.
+            int shiftedValue = 1 << (int)(severity - 1);
+            if (Enum.IsDefined(typeof(DiagnosticKind), shiftedValue))
+            {
+                return (DiagnosticKind)shiftedValue;
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(severity), severity, "The given DiagnosticSeverity is not supported by the importer.");
+            }
+        }
+
+        /// <summary>
+        /// Converts a <see cref="DiagnosticKind"/> to an enumeration of <see cref="DiagnosticSeverity"/>.
+        /// </summary>
+        /// <param name="kind">The diagnostic kind to convert.</param>
+        /// <returns>The corresponding diagnostic severities.</returns>
+        public static IEnumerable<DiagnosticSeverity> ToDiagnosticSeverity(this DiagnosticKind kind)
+        {
+            if (kind == DiagnosticKind.All)
+            {
+                foreach (DiagnosticSeverity diagnosticSeverity in Enum.GetValues(typeof(DiagnosticSeverity)).Cast<DiagnosticSeverity>())
+                {
+                    yield return diagnosticSeverity;
+                }
+            }
+            else
+            {
+                foreach (DiagnosticKind diagnosticKind in Enum.GetValues(typeof(DiagnosticKind)).Cast<DiagnosticKind>().Where(x => x.HasFlag(kind)))
+                {
+                    // This has to do the inverse to the above, i.e., log2, to get the original enum value.
+                    int diagnosticKindValue = (int)diagnosticKind;
+                    int diagnosticSeverityValue = (int)Math.Log(diagnosticKindValue, 2) + 1;
+                    // If the enum is not defined, we don't throw an exception, because we have a flag enum
+                    // with certain values (like None) that are not defined in the original enum.
+                    if (Enum.IsDefined(typeof(DiagnosticSeverity), diagnosticSeverityValue))
+                    {
+                        yield return (DiagnosticSeverity)diagnosticSeverityValue;
+                    }
+                }
+            }
+        }
+
+        public static string Name(this DiagnosticSeverity severity)
+        {
+            return severity switch
+            {
+                DiagnosticSeverity.Error => NumericAttributeNames.LspError.Name(),
+                DiagnosticSeverity.Warning => NumericAttributeNames.LspWarning.Name(),
+                DiagnosticSeverity.Information => NumericAttributeNames.LspInfo.Name(),
+                DiagnosticSeverity.Hint => NumericAttributeNames.LspHint.Name(),
+                _ => throw new ArgumentOutOfRangeException(nameof(severity), severity, null)
+            };
         }
     }
 }
