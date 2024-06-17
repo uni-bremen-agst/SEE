@@ -9,7 +9,6 @@ using System.Linq;
 using TMPro;
 using Debug = UnityEngine.Debug;
 
-
 namespace SEE.UI.DebugAdapterProtocol
 {
     /// <summary>
@@ -91,10 +90,10 @@ namespace SEE.UI.DebugAdapterProtocol
         /// Handles events of the debug adapter.
         /// </summary>
         /// <param name="sender">The sender.</param>
-        /// <param name="e">The event.</param>
-        private void OnEventReceived(object sender, EventReceivedEventArgs e)
+        /// <param name="theEvent">The event to be handled.</param>
+        private void OnEventReceived(object sender, EventReceivedEventArgs theEvent)
         {
-            switch (e.Body)
+            switch (theEvent.Body)
             {
                 case InitializedEvent initializedEvent:
                     OnInitializedEvent(initializedEvent);
