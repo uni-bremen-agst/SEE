@@ -6,37 +6,39 @@ namespace SEE.UI.Window.NoteWindow
 {
     public class NoteManager : MonoBehaviour
     {
-        private static NoteManager _instance;
+        private static NoteManager instance;
 
         public static NoteManager Instance
         {
             get
             {
-                if (_instance == null)
+                if (instance == null)
                 {
                     GameObject go = new GameObject("NoteManager");
-                    _instance = go.AddComponent<NoteManager>();
+                    instance = go.AddComponent<NoteManager>();
                     DontDestroyOnLoad(go);
                 }
-                return _instance;
+                return instance;
             }
         }
 
-        private Dictionary<string, string> notesDictionary = new Dictionary<string, string>();
+        private static Dictionary<KeyValuePair<string, bool>, string> notesDictionary = new Dictionary<KeyValuePair<string, bool>, string>();
 
-        public void SaveNote(string title, string content)
+        public static void SaveNote(string title, bool isPublic, string content)
         {
             if (!string.IsNullOrEmpty(title))
             {
-                notesDictionary[title] = content;
+                KeyValuePair<string, bool> keyPair = new KeyValuePair<string, bool>(title, isPublic);
+                notesDictionary[keyPair] = content;
             }
         }
 
-        public string LoadNoteContent(string title)
+        public static string LoadNote(string title, bool isPublic)
         {
-            if (notesDictionary.ContainsKey(title))
+            KeyValuePair<string, bool> keyPair = new KeyValuePair<string, bool>(title, isPublic);
+            if (notesDictionary.ContainsKey(keyPair))
             {
-                return notesDictionary[title];
+                return notesDictionary[keyPair];
             }
             return "";
         }

@@ -198,7 +198,7 @@ namespace SEE.Controls.Actions
             {
                 noteWindow = graphElementRef.gameObject.AddComponent<NoteWindow>();
                 noteWindow.Title = "Notes for " + graphElementRef.Elem.ToShortString();
-                noteWindow.graphElement = graphElementRef.Elem;
+                //noteWindow.graphElement = graphElementRef.Elem;
             }
             return noteWindow;
         }
