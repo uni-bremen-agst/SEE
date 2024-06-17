@@ -114,7 +114,8 @@ namespace SEE.Game.Drawable
 
             /// Set the position of the line and ensure the correct order in the layer.
             /// Additionally, adopt the rotation of the attached object.
-            image.transform.SetPositionAndRotation(position - order * ValueHolder.DistanceToDrawable.z * image.transform.forward, attachedObjects.transform.rotation);
+            image.transform.rotation = attachedObjects.transform.rotation;
+            image.transform.position = position - image.transform.forward * ValueHolder.DistanceToDrawable.z * order;
             /// Adds the order in layer value holder component to the line object and sets the order.
             image.AddComponent<OrderInLayerValueHolder>().OrderInLayer = order;
         }

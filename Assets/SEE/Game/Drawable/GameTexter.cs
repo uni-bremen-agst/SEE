@@ -201,9 +201,12 @@ namespace SEE.Game.Drawable
             tmp.outlineWidth = outlineThickness;
             tmp.alignment = TextAlignmentOptions.Center;
 
-            /// Adopt the rotation of the attached object.
+            /// /// Adopt the rotation of the attached object.
+            textObj.transform.rotation = attachedObjects.transform.rotation;
+
             /// Calculates the position and preserve the distance.
-            textObj.transform.SetPositionAndRotation(position - order * ValueHolder.DistanceToDrawable.z * textObj.transform.forward, attachedObjects.transform.rotation);
+            textObj.transform.position = position - textObj.transform.forward * ValueHolder.DistanceToDrawable.z * order;
+
             /// Forces the updated of the <see cref="TextMeshPro"/>'s mesh.
             tmp.ForceMeshUpdate(true);
 
