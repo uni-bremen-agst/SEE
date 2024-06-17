@@ -1,7 +1,7 @@
 ﻿using Accord.MachineLearning.Text.Stemmers;
 using SEE.DataModel.DG;
+using SEE.Scanner;
 using SEE.Tools.ReflexionAnalysis;
-using SEE.UI.Window.CodeWindow;
 using System;
 using System.Collections.Generic;
 using System.Linq;
