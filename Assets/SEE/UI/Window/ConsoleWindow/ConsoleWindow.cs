@@ -77,7 +77,7 @@ namespace SEE.UI.Window.ConsoleWindow
 
         /// <summary>
         /// Keeps track of console events.
-        /// 
+        ///
         /// So that <see cref="Update"/> can respond to them.
         /// </summary>
         private ConsoleEvent consoleEvent = ConsoleEvent.None;
@@ -148,7 +148,7 @@ namespace SEE.UI.Window.ConsoleWindow
 
         /// <summary>
         /// Adds a console message.
-        /// 
+        ///
         /// <para>
         /// Uses <see cref="DefaultChannel"/> and <see cref="DefaultChannelLevel"/> as default if these parameters are omitted.
         /// </para>
@@ -252,7 +252,7 @@ namespace SEE.UI.Window.ConsoleWindow
 
         /// <summary>
         /// Returns the message index to which a new message should be appended.
-        /// -1 if a new message should be created.
+        /// Returns null if a new message should be created.
         /// </summary>
         /// <param name="channel">The channel.</param>
         /// <param name="level">The level.</param>
@@ -510,17 +510,17 @@ namespace SEE.UI.Window.ConsoleWindow
 
         protected override void InitializeFromValueObject(WindowValues valueObject)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override void UpdateFromNetworkValueObject(WindowValues valueObject)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override WindowValues ToValueObject()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -577,7 +577,6 @@ namespace SEE.UI.Window.ConsoleWindow
             /// <summary>
             /// Whether the level is enabled.
             /// </summary>
-
             public bool Enabled { get; set; } = enabled;
         };
 
