@@ -224,9 +224,10 @@ def main():
                 warn(f"Invalid unified diff file indicator: {line}")
                 # Nonetheless, this is not a fatal error, so we can continue.
                 continue
-            # We need to remove the 'b/' prefix from the filename.
+            filename = split[1]
             if split[1].startswith("b/"):
-                filename = split[1][2:]
+                # We need to remove the 'b/' prefix from the filename.
+                filename = filename[2:]
             skip_file = filename == "dev/null"
         elif skip_file:
             continue

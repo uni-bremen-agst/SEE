@@ -23,7 +23,7 @@ namespace SEE.UI
     /// </summary>
     public class Tooltip : PlatformDependentComponent
     {
-        // TODO: Make this work on VR.
+        // TODO (#596): Make this work on VR.
 
         /// <summary>
         /// The kinds of behavior the tooltip can have after it has been shown.
