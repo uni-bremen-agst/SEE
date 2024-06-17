@@ -6,6 +6,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Markdig;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
+using OmniSharp.Extensions.LanguageServer.Server;
 using SEE.Tools;
 using SEE.Tools.LSP;
 using SEE.Utils;
@@ -394,7 +395,7 @@ namespace SEE.DataModel.DG.IO
                     throw new OperationCanceledException();
                 }
                 Node targetNode = FindNodesByLocation(item.Uri.Path, Range.FromLspRange(item.Range)).First();
-                Edge edge = AddEdge(node, targetNode, "Call", false, graph);
+                Edge edge = AddEdge(node, targetNode, LSP.Call, false, graph);
                 edge.SetRange(SelectionRangeAttribute, Range.FromLspRange(item.SelectionRange));
             }
             return;
@@ -422,7 +423,7 @@ namespace SEE.DataModel.DG.IO
                     throw new OperationCanceledException();
                 }
                 Node targetNode = FindNodesByLocation(item.Uri.Path, Range.FromLspRange(item.Range)).First();
-                Edge edge = AddEdge(node, targetNode, "Extend", false, graph);
+                Edge edge = AddEdge(node, targetNode, LSP.Extend, false, graph);
                 edge.SetRange(SelectionRangeAttribute, Range.FromLspRange(item.SelectionRange));
             }
             return;

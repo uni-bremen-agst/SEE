@@ -25,6 +25,14 @@
         /// Name of edge type for LSP implementation-of relation.
         /// </summary>
         public const string ImplementationOf = "Implementation_Of";
+        /// <summary>
+        /// Name of edge type for LSP call relation.
+        /// </summary>
+        public const string Call = "Call";
+        /// <summary>
+        /// Name of edge type for LSP extend relation.
+        /// </summary>
+        public const string Extend = "Extend";
     }
 
     /// <summary>
