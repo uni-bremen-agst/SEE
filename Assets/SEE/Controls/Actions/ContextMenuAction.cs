@@ -7,7 +7,6 @@ using SEE.Game;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
-using SEE.UI;
 using SEE.UI.Notification;
 using SEE.UI.PopupMenu;
 using SEE.UI.Window;
@@ -218,21 +217,21 @@ namespace SEE.Controls.Actions
                 new("Reveal in TreeView", RevealInTreeView, Icons.TreeView),
             };
 
-            if (node.OutgoingsOfType("Reference").Any())
+            if (node.OutgoingsOfType(LSP.Reference).Any())
             {
-                actions.Add(new("Show References", () => ShowTargets("Reference", false).Forget(), Icons.IncomingEdge));
+                actions.Add(new("Show References", () => ShowTargets(LSP.Reference, false).Forget(), Icons.IncomingEdge));
             }
-            if (node.OutgoingsOfType("Declaration").Any())
+            if (node.OutgoingsOfType(LSP.Declaration).Any())
             {
-                actions.Add(new("Show Declaration", () => ShowTargets("Declaration").Forget(), Icons.OutgoingEdge));
+                actions.Add(new("Show Declaration", () => ShowTargets(LSP.Declaration).Forget(), Icons.OutgoingEdge));
             }
-            if (node.OutgoingsOfType("Definition").Any())
+            if (node.OutgoingsOfType(LSP.Definition).Any())
             {
-                actions.Add(new("Show Definition", () => ShowTargets("Definition").Forget(), Icons.OutgoingEdge));
+                actions.Add(new("Show Definition", () => ShowTargets(LSP.Definition).Forget(), Icons.OutgoingEdge));
             }
-            if (node.OutgoingsOfType("Of_Type").Any())
+            if (node.OutgoingsOfType(LSP.OfType).Any())
             {
-                actions.Add(new("Show Type", () => ShowTargets("Of_Type").Forget(), 'T'));
+                actions.Add(new("Show Type", () => ShowTargets(LSP.OfType).Forget(), 'T'));
             }
 
             return actions;

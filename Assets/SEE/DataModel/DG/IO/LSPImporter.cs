@@ -283,23 +283,23 @@ namespace SEE.DataModel.DG.IO
                     // Depending on capabilities and settings, we connect the nodes with edges.
                     if (IncludeEdgeTypes.HasFlag(EdgeKind.Definition) && Handler.ServerCapabilities.DefinitionProvider.TrueOrValue())
                     {
-                        await ConnectNodeViaAsync(Handler.Definition, "Definition", node, graph, token: token);
+                        await ConnectNodeViaAsync(Handler.Definition, LSP.Definition, node, graph, token: token);
                     }
                     if (IncludeEdgeTypes.HasFlag(EdgeKind.Declaration) && Handler.ServerCapabilities.DeclarationProvider.TrueOrValue())
                     {
-                        await ConnectNodeViaAsync(Handler.Declaration, "Declaration", node, graph, token: token);
+                        await ConnectNodeViaAsync(Handler.Declaration, LSP.Declaration, node, graph, token: token);
                     }
                     if (IncludeEdgeTypes.HasFlag(EdgeKind.TypeDefinition) && Handler.ServerCapabilities.TypeDefinitionProvider.TrueOrValue())
                     {
-                        await ConnectNodeViaAsync(Handler.TypeDefinition, "Of_Type", node, graph, token: token);
+                        await ConnectNodeViaAsync(Handler.TypeDefinition, LSP.OfType, node, graph, token: token);
                     }
                     if (IncludeEdgeTypes.HasFlag(EdgeKind.Implementation) && Handler.ServerCapabilities.ImplementationProvider.TrueOrValue())
                     {
-                        await ConnectNodeViaAsync(Handler.Implementation, "Implementation_Of", node, graph, reverseDirection: true, token);
+                        await ConnectNodeViaAsync(Handler.Implementation, LSP.ImplementationOf, node, graph, reverseDirection: true, token);
                     }
                     if (IncludeEdgeTypes.HasFlag(EdgeKind.Reference) && Handler.ServerCapabilities.ReferencesProvider.TrueOrValue())
                     {
-                        await ConnectNodeViaAsync((p, line, character) => Handler.References(p, line, character), "Reference", node, graph, reverseDirection: true, token);
+                        await ConnectNodeViaAsync((p, line, character) => Handler.References(p, line, character), LSP.Reference, node, graph, reverseDirection: true, token);
                     }
                     if (IncludeEdgeTypes.HasFlag(EdgeKind.Call) && Handler.ServerCapabilities.CallHierarchyProvider.TrueOrValue())
                     {

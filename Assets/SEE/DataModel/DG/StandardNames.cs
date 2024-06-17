@@ -1,6 +1,33 @@
 ﻿namespace SEE.DataModel.DG
 {
     /// <summary>
+    /// Standard names for LSP concepts.
+    /// </summary>
+    public static class LSP
+    {
+        /// <summary>
+        /// Name of edge type for LSP references.
+        /// </summary>
+        public const string Reference = "Reference";
+        /// <summary>
+        /// Name of edge type for LSP declarations.
+        /// </summary>
+        public const string Declaration = "Declaration";
+        /// <summary>
+        /// Name of edge type for LSP definitions.
+        /// </summary>
+        public const string Definition = "Definition";
+        /// <summary>
+        /// Name of edge type for LSP of-type relation.
+        /// </summary>
+        public const string OfType = "Of_Type";
+        /// <summary>
+        /// Name of edge type for LSP implementation-of relation.
+        /// </summary>
+        public const string ImplementationOf = "Implementation_Of";
+    }
+
+    /// <summary>
     /// Names of node attributes provided by the Axivion Suite.
     /// </summary>
     public enum NumericAttributeNames
