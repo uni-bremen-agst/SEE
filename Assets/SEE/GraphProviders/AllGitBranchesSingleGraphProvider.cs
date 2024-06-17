@@ -55,7 +55,7 @@ namespace SEE.GraphProviders
          HideReferenceObjectPicker]
         public Dictionary<string, bool> PathGlobbing = new()
         {
-            { "", false }
+            { "**/*", true }
         };
         
         /// <summary>
@@ -201,12 +201,7 @@ namespace SEE.GraphProviders
 
             // Assuming that CheckAttributes() was already executed so that the date string is not empty nor malformed.  
             DateTime timeLimit = DateTime.ParseExact(branchCity.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-
-            // Analogue to VCSGraphProvider 
-            IEnumerable<string> includedFiles = PathGlobbing
-                .Where(path => path.Value)
-                .Select(path => path.Key);
-
+            
             using (var repo = new Repository(graph.BasePath))
             {
                 IEnumerable<Commit> commitList = repo.Commits
@@ -214,7 +209,7 @@ namespace SEE.GraphProviders
                     .Where(commit => DateTime.Compare(commit.Author.When.Date, timeLimit) > 0)
                     // Filter out merge commits
                     .Where(commit => commit.Parents.Count() <= 1);
-                GitFileMetricRepository metricRepository = new(repo, includedFiles);
+                GitFileMetricRepository metricRepository = new(repo, PathGlobbing);
 
                 int counter = 0;
                 int commitLength = commitList.Count();
@@ -265,9 +260,6 @@ namespace SEE.GraphProviders
         /// <param name="attributes">The attributes to restore from</param>
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
-            //ConfigIO.Restore(attributes, pathGlobbingLabel, ref RepositoryData.PathGlobbing);
-            //RepositoryData.RepositoryPath.Restore(attributes, pathLabel);
-            //ConfigIO.Restore(attributes, dataLabel, ref Date);
             var simplifyGraph = SimplifyGraph;
             ConfigIO.Restore(attributes, simplifyGraphLabel, ref simplifyGraph);
             SimplifyGraph = simplifyGraph;

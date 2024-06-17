@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using LibGit2Sharp;
+using Microsoft.Extensions.FileSystemGlobbing;
 using SEE.Utils;
 
 namespace SEE.DataModel.DG.IO.Git
@@ -43,8 +44,9 @@ namespace SEE.DataModel.DG.IO.Git
         /// <summary>
         /// A list of file extensions which should be included
         /// </summary>
-        private readonly IEnumerable<string> includedFiles;
+        private readonly Dictionary<string, bool> pathGlobbing;
 
+        private Matcher matcher;
 
         /// <summary>
         /// Used in the calculation of the truck factor.
@@ -54,10 +56,24 @@ namespace SEE.DataModel.DG.IO.Git
         private const float TruckFactorCoreDevRatio = 0.8f;
 
 
-        public GitFileMetricRepository(Repository gitRepository, IEnumerable<string> includedFiles)
+        public GitFileMetricRepository(Repository gitRepository, Dictionary<string, bool> PathGlobbing)
         {
             this.gitRepository = gitRepository;
-            this.includedFiles = includedFiles;
+            this.pathGlobbing = PathGlobbing;
+
+            this.matcher = new();
+
+            foreach (KeyValuePair<string, bool> pattern in pathGlobbing)
+            {
+                if (pattern.Value)
+                {
+                    matcher.AddInclude(pattern.Key);
+                }
+                else
+                {
+                    matcher.AddExclude(pattern.Key);
+                }
+            }
         }
 
         /// <summary>
@@ -116,7 +132,7 @@ namespace SEE.DataModel.DG.IO.Git
             foreach (var changedFile in commitChanges)
             {
                 string filePath = changedFile.Path;
-                if (!includedFiles.Contains(Path.GetExtension(filePath)))
+                if (!matcher.Match(filePath).HasMatches)
                 {
                     continue;
                 }
@@ -141,7 +157,7 @@ namespace SEE.DataModel.DG.IO.Git
                         FileToMetrics[filePath].FilesChangesTogehter.GetOrAdd(otherFiles.Path, 0);
                         FileToMetrics[filePath].FilesChangesTogehter[otherFiles.Path] += 1;
                     }
-                    
+
                     FileToMetrics[filePath].AuthorsChurn[commit.Author.Email] +=
                         (changedFile.LinesAdded + changedFile.LinesDeleted);
                 }

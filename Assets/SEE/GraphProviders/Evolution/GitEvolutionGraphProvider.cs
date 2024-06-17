@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using LibGit2Sharp;
+using Microsoft.Extensions.FileSystemGlobbing;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO.Git;
 using SEE.Game.City;
@@ -98,10 +99,19 @@ namespace SEE.GraphProviders.Evolution
         {
             DateTime timeLimit = DateTime.ParseExact(Date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
 
-            IEnumerable<string> includedFiles = GitRepository.PathGlobbing
-                .Where(path => path.Value)
-                .Select(path => path.Key);
+            Matcher matcher = new();
 
+            foreach (KeyValuePair<string, bool> pattern in GitRepository.PathGlobbing)
+            {
+                if (pattern.Value)
+                {
+                    matcher.AddInclude(pattern.Key);
+                }
+                else
+                {
+                    matcher.AddExclude(pattern.Key);
+                }
+            }
 
             string[] pathSegments = GitRepository.RepositoryPath.Path.Split(Path.DirectorySeparatorChar);
             string repositoryName = pathSegments[^1];
@@ -124,13 +134,13 @@ namespace SEE.GraphProviders.Evolution
                 int counter = 0;
                 int commitLength = commitChanges.Where(x =>
                     x.Value.Any(y =>
-                        includedFiles.Contains(Path.GetExtension(y.Path)))).Count();
+                        matcher.Match(y.Path).HasMatches)).Count();
 
                 // iterate over all commits where at least one file with a file extension in includedFiles is present
                 foreach (var currentCommit in
                          commitChanges.Where(x =>
                              x.Value.Any(y =>
-                                 includedFiles.Contains(Path.GetExtension(y.Path)))))
+                                 matcher.Match(y.Path).HasMatches)))
                 {
                     changePercentage?.Invoke(Mathf.Clamp((float)counter / commitLength, 0.2f, 0.98f));
 
@@ -140,7 +150,7 @@ namespace SEE.GraphProviders.Evolution
 
                     graph.Add(GetGraphOfCommit(repositoryName, currentCommit.Key, commitsInBetween,
                         commitChanges,
-                        includedFiles, repo));
+                        repo));
                     counter++;
                 }
             }
@@ -160,7 +170,7 @@ namespace SEE.GraphProviders.Evolution
         /// <param name="includedFiles">All included file extensions</param>
         /// <returns>The graoh of the evolution step</returns>
         private Graph GetGraphOfCommit(string repoName, Commit currentCommit, List<Commit> commitsInBetween,
-            IDictionary<Commit, Patch> commitChanges, IEnumerable<string> includedFiles, Repository repo)
+            IDictionary<Commit, Patch> commitChanges, Repository repo)
         {
             Graph g = new Graph(GitRepository.RepositoryPath.Path);
             g.BasePath = GitRepository.RepositoryPath.Path;
@@ -170,7 +180,7 @@ namespace SEE.GraphProviders.Evolution
             g.StringAttributes.Add("CommitId", currentCommit.Sha);
 
 
-            GitFileMetricRepository metricRepository = new(repo, includedFiles);
+            GitFileMetricRepository metricRepository = new(repo, GitRepository.PathGlobbing);
 
             foreach (var commitInBetween in commitsInBetween)
             {
