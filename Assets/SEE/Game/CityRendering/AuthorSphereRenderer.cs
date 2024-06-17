@@ -1,11 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Controls;
+using SEE.Controls.Actions;
 using SEE.DataModel.DG;
 using SEE.Game.City;
+using SEE.Game.Operator;
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.Utils;
 using TinySpline;
+using TMPro;
 using UnityEngine;
 
 namespace SEE.Game.CityRendering
@@ -53,14 +57,22 @@ namespace SEE.Game.CityRendering
             var maxHeight = nodeMap.Values.Max(x => x.transform.position.y);
             float offset = Mathf.Max(2.5f * Settings.EdgeLayoutSettings.EdgeWidth, 0.2f * maxHeight);
 
-            int maximalChurn = nodeMap.Keys
-                .Where(x => x.IntAttributes.ContainsKey("Metric.File.Churn"))
+            IEnumerable<Node> nodesWithChurn = nodeMap.Keys
+                .Where(x => x.IntAttributes.ContainsKey("Metric.File.Churn"));
+
+            if (!nodesWithChurn.Any())
+            {
+                return;
+            }
+
+            int maximalChurn = nodesWithChurn
                 .Max(x => x.IntAttributes["Metric.File.Churn"]);
+
 
             foreach (var sphere in gameSpheresObjects)
             {
-                NodeRef nodeRef = sphere.GetComponent<NodeRef>();
-                var authorName = nodeRef.Value.StringAttributes["Source.Name"];
+                AuthorSphere authorSphere = sphere.GetComponent<AuthorSphere>();
+                var authorName = authorSphere.Author;
 
                 var nodesOfAuthor = nodeMap
                     .Where(x => x.Key.StringAttributes.ContainsKey("Metric.File.Authors"))
@@ -182,8 +194,7 @@ namespace SEE.Game.CityRendering
                 // iterate over all columns
                 for (int j = 0; j < columns; j++)
                 {
-                    int sphereIndex = i * rows + j;
-                    if (sphereIndex >= authorsCount)
+                    if (counter >= authorsCount)
                     {
                         return result;
                     }
@@ -191,11 +202,32 @@ namespace SEE.Game.CityRendering
 
                     GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                     gameObject.name = "AuthorSphere:" + authors[counter];
-                    NodeRef nodeRef = gameObject.AddComponent<NodeRef>();
-                    nodeRef.Value = new();
-                    nodeRef.Value.StringAttributes.Add("Source.Name", authors[counter]);
-                    counter++;
-                    InteractionDecorator.PrepareForInteraction(gameObject);
+     
+                    AuthorSphere author = gameObject.AddComponent<AuthorSphere>();
+                    author.Author = authors[counter];
+                
+                    gameObject.AddComponent<InteractableObject>();
+                    var op = gameObject.AddComponent<NodeOperator>();
+                    gameObject.AddComponent<ShowHovering>();
+      
+                    Vector3 startLabelPosition = gameObject.GetTop();
+                    float fontSize = 2f;
+                    
+                    GameObject nodeLabel = new GameObject("Text " + authors[counter])
+                    {
+                        tag = Tags.Text
+                    };
+                    nodeLabel.transform.position = startLabelPosition;
+
+                    TextMeshPro tm = nodeLabel.AddComponent<TextMeshPro>();
+                    tm.font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
+                    tm.fontSize = fontSize;
+                    tm.text = authors[counter];
+                    tm.color = Color.white;
+                    tm.alignment = TextAlignmentOptions.Center;
+                    
+                    nodeLabel.name = "Label:" + authors[counter];
+                    nodeLabel.transform.SetParent(gameObject.transform);
 
                     AddLOD(gameObject);
 
@@ -216,6 +248,7 @@ namespace SEE.Game.CityRendering
                     gameObject.transform.position = spherePosition;
 
                     result.Add(gameObject);
+                    counter++;
                 }
             }
 
