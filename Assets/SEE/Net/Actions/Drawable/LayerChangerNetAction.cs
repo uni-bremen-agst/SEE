@@ -47,7 +47,7 @@ namespace SEE.Net.Actions.Drawable
             if (!IsRequester())
             {
                 base.ExecuteOnClient();
-                GameLayerChanger.ChangeOrderInLayer(FindChild(ObjectName), Order, State);
+                GameLayerChanger.ChangeOrderInLayer(FindChild(ObjectName), Order, State, false);
             }
         }
     }
