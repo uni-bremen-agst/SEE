@@ -1,7 +1,12 @@
 ﻿using NUnit.Framework;
+using SEE.DataModel.DG;
 using SEE.Utils;
 using SEE.Utils.Config;
+using SEE.Utils.Paths;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -240,7 +245,7 @@ namespace SEE.GraphProviders
             {
                 OldGraph = new JaCoCoGraphProvider()
                 {
-                    Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
+                    Path = new FilePath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
                 }
             };
         }
@@ -250,6 +255,54 @@ namespace SEE.GraphProviders
             Assert.IsTrue(saved.GetType() == loaded.GetType());
             MergeDiffGraphProvider loadedProvider = loaded as MergeDiffGraphProvider;
             AreEqual(saved.OldGraph, loadedProvider.OldGraph);
+        }
+
+        #endregion
+
+        #region VCSGraphProvider
+
+        public void TestVCSGraphProvider()
+        {
+            VCSGraphProvider saved = GetVCSGraphProvider();
+            Save(saved);
+            AreEqualVCSGraphProviders(saved, Load());
+        }
+
+        private void AreEqualVCSGraphProviders(VCSGraphProvider saved, GraphProvider loaded)
+        {
+            Assert.IsTrue(saved.GetType() == loaded.GetType());
+            VCSGraphProvider loadedProvider = loaded as VCSGraphProvider;
+            AreEqual(saved.RepositoryPath, loadedProvider.RepositoryPath);
+            Assert.AreEqual(saved.CommitID, loadedProvider.CommitID);
+            Assert.AreEqual(saved.BaselineCommitID, loadedProvider.BaselineCommitID);
+            AreEqual(saved.PathGlobbing, loadedProvider.PathGlobbing);
+        }
+
+        private void AreEqual(IDictionary<string, bool> expected, IDictionary<string, bool> actual)
+        {
+            Assert.AreEqual(expected.Count, actual.Count);
+            foreach (var kv in expected)
+            {
+                Assert.IsTrue(actual.TryGetValue(kv.Key, out bool value));
+                Assert.AreEqual(kv.Value, value);
+            }
+        }
+
+        private VCSGraphProvider GetVCSGraphProvider()
+        {
+            Dictionary<string, bool> pathGlobbing = new()
+                {
+                    { "Assets/SEE/**/*.cs", true }
+                };
+
+            return new VCSGraphProvider()
+            {
+                RepositoryPath = new DirectoryPath(Path.GetDirectoryName(Application.dataPath)),
+                CommitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461",
+                BaselineCommitID = "5efa95913a6e894e5340f07fab26c9958b5c1096",
+                PathGlobbing = pathGlobbing
+
+            };
         }
 
         #endregion
@@ -269,3 +322,4 @@ namespace SEE.GraphProviders
         }
     }
 }
+

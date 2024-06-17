@@ -1,0 +1,53 @@
+PROFILE=-pg 
+
+CC = gcc
+CFLAGS = -I. $(PROFILE) -g -ansi -Wall -pedantic
+OBJECTS = macros.o error.o xmem.o argument.o symtable.o constab.o \
+	  scanner.o parser.o prntree.o semantic.o typechk.o \
+	  codegenS.o codegen.o threeadr.o codelist.o minilax.o
+
+all: minilax
+
+minilax: $(OBJECTS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o minilax
+
+INCLUDE = Makefile.depend
+
+depend:
+	gcc -MM *.c > Makefile.depend
+
+cleanobjs:
+	rm -f *.o minilax
+
+clean: cleanobjs
+
+backup:
+	zip minilax_$('date +%y%m%d') * -x *.o *~ *.zip CBAM *.cbam minilax
+
+##############################################################
+
+PROFILES=profiles/start-end \
+	profiles/h \
+	profiles/simple \
+	profiles/o \
+	profiles/ov \
+	profiles/ovd \
+	profiles/ovdR \
+	profiles/ovdRS \
+	profiles/ovdRSN
+
+profiling: minilax profiles $(PROFILES) 
+
+profiles:
+	mkdir profiles
+
+
+#            "-o outfilename  set output file name\n"
+#            "-help           print this help screen\n"
+#            "-v              show verbose messages during compilation\n"
+#            "-debug          show debug information during compilation\n"
+#            "-O              code improvement (optimization)\n"
+#            "-R              disable range checking\n"
+#            "-S              force use of the stack generation scheme\n"
+#           "-N              force use of the new code generation scheme\n",
+	

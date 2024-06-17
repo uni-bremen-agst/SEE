@@ -122,6 +122,13 @@ namespace SEE.Tools.ReflexionAnalysis
     public partial class ReflexionGraph : Graph
     {
         /// <summary>
+        /// Default constructor.
+        /// </summary>
+        public ReflexionGraph() : base()
+        {
+        }
+
+        /// <summary>
         /// Runs the reflexion analysis. If an observer has registered before,
         /// the observer will receive the results via the callback Update(ChangeEvent).
         /// </summary>

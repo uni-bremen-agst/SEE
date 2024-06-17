@@ -1,0 +1,10 @@
+PROGRAM a;
+
+DECLARE
+  b : ARRAY [1..10] OF ARRAY [1..20] OF INTEGER;
+  c : ARRAY [11..20] OF REAL;
+  d : INTEGER
+
+BEGIN
+  c[15] := b[2][3]
+END.

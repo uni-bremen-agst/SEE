@@ -20,6 +20,18 @@
     }
 
     /// <summary>
+    /// Provides a common prefix for all metrics.
+    /// </summary>
+    public static class Metrics
+    {
+        /// <summary>
+        /// Prefix for all metrics.
+        /// </summary>
+        public const string Prefix = "Metric.";
+    }
+
+
+    /// <summary>
     /// Provides an extension <see cref="Name(NumericAttributeNames)"/> for <see cref="NumericAttributeNames"/>.
     /// </summary>
     public static class AttributeNamesExtensions
@@ -35,21 +47,45 @@
         {
             return numericAttributeName switch
             {
-                NumericAttributeNames.NumberOfTokens => "Metric.Number_of_Tokens",
-                NumericAttributeNames.CloneRate => "Metric.Clone_Rate",
-                NumericAttributeNames.LOC => "Metric.Lines.LOC",
-                NumericAttributeNames.Complexity => "Metric.Complexity",
-                NumericAttributeNames.ArchitectureViolations => "Metric.Architecture_Violations",
-                NumericAttributeNames.Clone => "Metric.Clone",
-                NumericAttributeNames.Cycle => "Metric.Cycle",
-                NumericAttributeNames.DeadCode => "Metric.Dead_Code",
-                NumericAttributeNames.Metric => "Metric.Metric",
-                NumericAttributeNames.Style => "Metric.Style",
-                NumericAttributeNames.Universal => "Metric.Universal",
-                NumericAttributeNames.IssuesTotal => "Metric.IssuesTotal",
+                NumericAttributeNames.NumberOfTokens => Metrics.Prefix + "Number_of_Tokens",
+                NumericAttributeNames.CloneRate => Metrics.Prefix + "Clone_Rate",
+                NumericAttributeNames.LOC => Metrics.Prefix + "Lines.LOC",
+                NumericAttributeNames.Complexity => Metrics.Prefix + "Complexity",
+                NumericAttributeNames.ArchitectureViolations => Metrics.Prefix + "Architecture_Violations",
+                NumericAttributeNames.Clone => Metrics.Prefix + "Clone",
+                NumericAttributeNames.Cycle => Metrics.Prefix + "Cycle",
+                NumericAttributeNames.DeadCode => Metrics.Prefix + "Dead_Code",
+                NumericAttributeNames.Metric => Metrics.Prefix + "Metric",
+                NumericAttributeNames.Style => Metrics.Prefix + "Style",
+                NumericAttributeNames.Universal => Metrics.Prefix + "Universal",
+                NumericAttributeNames.IssuesTotal => Metrics.Prefix + "IssuesTotal",
                 _ => throw new System.Exception("Unknown attribute name " + numericAttributeName)
             };
         }
+    }
+
+    /// <summary>
+    /// Provides a common prefix for all Halstead metrics.
+    /// </summary>
+    public static class Halstead
+    {
+        /// <summary>
+        /// Prefix for all metrics.
+        /// </summary>
+        public const string Prefix = Metrics.Prefix + "Halstead.";
+
+        public const string DistinctOperators = Prefix + "Distinct_Operators";
+        public const string DistinctOperands = Prefix + "Distinct_Operands";
+        public const string TotalOperators = Prefix + "Total_Operators";
+        public const string TotalOperands = Prefix + "Total_Operands";
+        public const string ProgramVocabulary = Prefix + "Program_Vocabulary";
+        public const string ProgramLength = Prefix + "Program_Length";
+        public const string EstimatedProgramLength = Prefix + "Estimated_Program_Length";
+        public const string Volume = Prefix + "Volume";
+        public const string Difficulty = Prefix + "Difficulty";
+        public const string Effort = Prefix + "Effort";
+        public const string TimeRequiredToProgram = Prefix + "Time_Required_To_Program";
+        public const string NumberOfDeliveredBugs = Prefix + "Number_Of_Delivered_Bugs";
     }
 
     /// <summary>
@@ -61,32 +97,32 @@
         /// <summary>
         /// The prefix of each JaCoCo metric.
         /// </summary>
-        public const string Prefix = "Metric.JaCoCo";
+        public const string Prefix = Metrics.Prefix + "JaCoCo.";
         /// <summary>
         /// The number of instructions that were not executed.
         /// </summary>
-        public const string InstructionMissed = "Metric.JaCoCo.INSTRUCTION_missed";
+        public const string InstructionMissed = Prefix + "INSTRUCTION_missed";
         /// <summary>
         /// The number of instructions that were executed.
         /// </summary>
-        public const string InstructionCovered = "Metric.JaCoCo.INSTRUCTION_covered";
+        public const string InstructionCovered = Prefix + "INSTRUCTION_covered";
         /// <summary>
         /// InstructionCovered / (InstructionCovered + InstructionMissed).
         /// </summary>
-        public const string PercentageOfInstructionCovered = "Metric.JaCoCo.INSTRUCTION_percentage";
+        public const string PercentageOfInstructionCovered = Prefix + "INSTRUCTION_percentage";
 
         /// <summary>
         /// The number of branches (conditional statement constitute branches) that were not executed.
         /// </summary>
-        public const string BranchMissed = "Metric.JaCoCo.BRANCH_missed";
+        public const string BranchMissed = Prefix + "BRANCH_missed";
         /// <summary>
         /// The number of branches (conditional statement constitute branches) that were executed.
         /// </summary>
-        public const string BranchCovered = "Metric.JaCoCo.BRANCH_covered";
+        public const string BranchCovered = Prefix + "BRANCH_covered";
         /// <summary>
         /// BranchCovered / (BranchMissed + BranchCovered).
         /// </summary>
-        public const string PercentageOfBranchCovered = "Metric.JaCoCo.BRANCH_percentage";
+        public const string PercentageOfBranchCovered = Prefix + "BRANCH_percentage";
 
         /// <summary>
         /// Cyclomatic complexity is defined for each non-abstract method and is also
@@ -95,7 +131,7 @@
         /// in (linear) combination, generate all possible paths through a method.
         /// This metric counts the missed such paths.
         /// </summary>
-        public const string ComplexityMissed = "Metric.JaCoCo.COMPLEXITY_missed";
+        public const string ComplexityMissed = Prefix + "COMPLEXITY_missed";
         /// <summary>
         /// Cyclomatic complexity is defined for each non-abstract method and is also
         /// aggregated from methods to classes, packages, and groups they are contained.
@@ -103,11 +139,11 @@
         /// in (linear) combination, generate all possible paths through a method.
         /// This metric counts the covered such paths.
         /// </summary>
-        public const string ComplexityCovered = "Metric.JaCoCo.COMPLEXITY_covered";
+        public const string ComplexityCovered = Prefix + "COMPLEXITY_covered";
         /// <summary>
         /// ComplexityCovered / (ComplexityMissed + ComplexityCovered).
         /// </summary>
-        public const string PercentageOfComplexityCovered = "Metric.JaCoCo.COMPLEXITY_percentage";
+        public const string PercentageOfComplexityCovered = Prefix + "COMPLEXITY_percentage";
 
         /// <summary>
         /// This metric is defined for all class files that have been compiled with debug information,
@@ -116,7 +152,7 @@
         /// this line has been executed.
         /// This metric counts the number of such lines missed.
         /// </summary>
-        public const string LineMissed = "Metric.JaCoCo.LINE_missed";
+        public const string LineMissed = Prefix + "LINE_missed";
         /// <summary>
         /// This metric is defined for all class files that have been compiled with debug information,
         /// such that coverage information for individual lines can be calculated.
@@ -124,11 +160,11 @@
         /// this line has been executed
         /// This metric counts the number of such lines covered.
         /// </summary>
-        public const string LineCovered = "Metric.JaCoCo.LINE_covered";
+        public const string LineCovered = Prefix + "LINE_covered";
         /// <summary>
         /// LineCovered / (LineMissed + LineCovered).
         /// </summary>
-        public const string PercentageOfLineCovered = "Metric.JaCoCo.LINE_percentage";
+        public const string PercentageOfLineCovered = Prefix + "LINE_percentage";
 
         /// <summary>
         /// A method is considered as executed when at least one of its instructions has been executed.
@@ -137,7 +173,7 @@
         /// like implicit and thus generated default constructors or initializers for constants.
         /// This metric counts the number of missed methods.
         /// </summary>
-        public const string MethodMissed = "Metric.JaCoCo.METHOD_missed";
+        public const string MethodMissed = Prefix + "METHOD_missed";
         /// <summary>
         /// A method is considered as executed when at least one of its instructions has been executed.
         /// As JaCoCo works on byte code level also constructors and static initializers are counted as methods.
@@ -145,28 +181,55 @@
         /// like implicit and thus generated default constructors or initializers for constants.
         /// This metric counts the number of covered methods.
         /// </summary>
-        public const string MethodCovered = "Metric.JaCoCo.METHOD_covered";
+        public const string MethodCovered = Prefix + "METHOD_covered";
         /// <summary>
         /// MethodCovered / (MethodMissed + MethodCovered).
         /// </summary>
-        public const string PercentageOfMethodCovered = "Metric.JaCoCo.METHOD_percentage";
+        public const string PercentageOfMethodCovered = Prefix + "METHOD_percentage";
 
         /// <summary>
         /// A class is considered as executed when at least one of its methods has been executed.
         /// Note that JaCoCo considers constructors as well as static initializers as methods.
         /// This metric counts the number of missed classes.
         /// </summary>
-        public const string ClassMissed = "Metric.JaCoCo.CLASS_missed";
+        public const string ClassMissed = Prefix + "CLASS_missed";
         /// <summary>
         /// A class is considered as executed when at least one of its methods has been executed.
         /// Note that JaCoCo considers constructors as well as static initializers as methods.
         /// This metric counts the number of covered classes.
         /// </summary>
-        public const string ClassCovered = "Metric.JaCoCo.CLASS_covered";
+        public const string ClassCovered = Prefix + "CLASS_covered";
         /// <summary>
         /// ClassCovered / (ClassMissed + ClassCovered).
         /// </summary>
-        public const string PercentageOfClassCovered = "Metric.JaCoCo.CLASS_percentage";
+        public const string PercentageOfClassCovered = Prefix + "CLASS_percentage";
+    }
+
+    /// <summary>
+    /// Defines names of node attributes for VCS metrics.
+    /// </summary>
+    public static class VCS
+    {
+        /// <summary>
+        /// Prefix for VCS metrics.
+        /// </summary>
+        public const string Prefix = Metrics.Prefix + "VCS.";
+        /// <summary>
+        /// The number of lines of code added for a file that was changed between two commits.
+        /// </summary>
+        public const string LinesAdded = Prefix + "Lines_Added";
+        /// <summary>
+        /// The number of lines of code deleted for a file that was changed between two commits.
+        /// </summary>
+        public const string LinesDeleted = Prefix + "Lines_Deleted";
+        /// <summary>
+        /// The number of unique developers who contributed to a file that was changed between two commits.
+        /// </summary>
+        public const string NumberOfDevelopers = Prefix + "Number_Of_Developers";
+        /// <summary>
+        /// The number of times a file was changed between two commits.
+        /// </summary>
+        public const string CommitFrequency = Prefix + "Commit_Frequency";
     }
 
     /// <summary>

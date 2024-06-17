@@ -636,6 +636,20 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// Returns a shallow clone of this attributable. Shallow means that
+        /// only the immediate list of attributes of this attributable
+        /// (i.e., <see cref="ToggleAttributes"/>, <see cref="StringAttributes"/>,
+        /// <see cref="FloatAttributes"/>, and <see cref="IntAttributes"/>) are copied, too.
+        /// </summary>
+        /// <returns>shallow clone</returns>
+        public virtual object CloneAttributes()
+        {
+            Attributable clone = (Attributable)Activator.CreateInstance(GetType());
+            CopyAttributes(clone);
+            return clone;
+        }
+
+        /// <summary>
         /// Returns a deep clone of this attributable. Deep means that the list
         /// of attributes of this attributable are copied, too.
         /// </summary>
@@ -662,6 +676,17 @@ namespace SEE.DataModel.DG
             // original attributable.
             // Because the keys and values are primitive types, the following are deep copies of the
             // attributes.
+            CopyAttributes(target);
+        }
+
+        /// <summary>
+        /// Copies <see cref="ToggleAttributes"/>, <see cref="StringAttributes"/>,
+        /// <see cref="FloatAttributes"/>, and <see cref="IntAttributes"/>) from this
+        /// attributable to <paramref name="target"/>.
+        /// </summary>
+        /// <param name="target">receiver of the copied attributes</param>
+        private void CopyAttributes(Attributable target)
+        {
             target.toggleAttributes = new HashSet<string>(toggleAttributes);
             target.StringAttributes = new Dictionary<string, string>(StringAttributes);
             target.FloatAttributes = new Dictionary<string, float>(FloatAttributes);

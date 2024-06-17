@@ -39,7 +39,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 781349736}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -191,7 +190,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 175ce339391b42b1b31b4db72cbdb2ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PublicKey: 3082018A028201810081E4030BF9F8A7A743BEA7FE402B268A27D58257C9BD2BCEA9E7B0DC1CC23AF5F0AADCD1E443C5DCB9B3ADFC3BEE02DD3E07E28405FD47476C312288D084B46E53B82AADF37CB28287AA0B3386BBE7FF0EBA41C7CA22A3B82C457ADD410F32E06A1DABCDFFC73A634D754380378E5A9B1B0C2495D9DA7EE066D79EECACCEAB76B726DA85B1115514E6AA24C3BD413873E8575F3C2B64BA2CD93F61F29D01BB125ADA0F9E2CF9BA3D4B6C20A0D14A613564ED0BE820ED8C4A03D6F9E429E19B1682A804FEF468C2CF853B581CCCA499F969C571D420BA7140A932761E6FBFB782F64FC341282C57F3567C4CB7B1BE2EFEEAC78153AB86F26B7C942F5A1AF97FCF3AE44C5850DD3C692C6618A651995E87846A104B2908DE0D545ADD9130DA74EA42BED5F732D95D86A8A21A05B44ECD07F3A1DFE24CB90EB9CBB9BB13FC8424278277E8FC096B95CD23FF6DA7237F8CF90253F9F24DCB621EC811925210C5BC0C7B13F182C321B0F8130858B25447832CB2751383EE8F22A78BADC268413638010203010001
+  PublicKey: 3082018A0282018100A302EA2CC9324FAF313D6CE3930BACF377215EA94BC7DA68FDCB9764DC912A8C8F7AD08D7C81A2185E3204DAC3C7F6B4EC938DDE7B7803B1D83586F8F47FE1A917C47DE55051D7662347891E95DB2D893B730FA32566784F3B309B8854214EB944170B1B0F0D3D11604221422CA08D434591EB3CFE21DC126FA5C13BE34CD86A2DC050EFE992C294C7E337FD7EC0CC13A92E88434CB55D6399E60FD2F21149CDA3BB9F615A124BF6F3A0F278C7D20E65671EBC4DAC737720991367A23091854F57083C4FE3DB9132D9CFCEED2C4F0B7FD0771F052ADDC65A80C5D68F08BFBEB70E1B92AF08031E964F87A82B9BA5CD6E7D77C99A3E88D5FE663B0FD67BBF9EEAC95EE08CC53CDAC861C90C0B824FBA91E6EAB562685486E0ED9849379FBD5E766B6F84DA704FAD6E8E07E673FA177595D013ED29D452464995939E4F4071E6ABFAB4B970EA30FF8628C1E1C92D14EAEEA9BAF2DAB298984E88DA7E94BD3C00BBD8E4210E018FFD17FBCF39463A5734A5161A3DA7741385F8EA96F6F2C0D12C6F0203010001
   BaseUrl: https://stvr2.informatik.uni-bremen.de:9443/axivion/projects/SEE/
   Token: 0.000000000000Q.2Jb6PIgB1pk4g8ss-DtnfdtDp0xlcugYQHFRcRvBRH4
   StrictMode: 0
@@ -3923,6 +3922,7 @@ MonoBehaviour:
   MaximalAntennaSegmentHeight: 0.5
   AntennaWidth: 0.1
   BaseAnimationDuration: 1
+  ProgressBar: 0
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
@@ -4008,7 +4008,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ScaleFactor: 1
   HeightOffset: 0.0010153651
 --- !u!65 &264006616
 BoxCollider:
@@ -7574,6 +7573,7 @@ MonoBehaviour:
   MaximalAntennaSegmentHeight: 0.1
   AntennaWidth: 0.01
   BaseAnimationDuration: 1
+  ProgressBar: 0
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
@@ -7649,7 +7649,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ScaleFactor: 1
   HeightOffset: 0.0015009642
 --- !u!65 &326121979
 BoxCollider:
@@ -7839,6 +7838,18 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2c50758a6d3b8114a8ce30a2fd9e4380, type: 3}
+--- !u!114 &351767374 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 824823894133727455, guid: 2c50758a6d3b8114a8ce30a2fd9e4380,
+    type: 3}
+  m_PrefabInstance: {fileID: 351767373}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8cb4dc319de88dc4cb76c47aafb46b1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &351832308
 GameObject:
   m_ObjectHideFlags: 0
@@ -10048,6 +10059,118 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dc09ca83af09d6d4b8b33c7c5c4a13ee, type: 3}
+--- !u!1001 &471867952
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -4216859302048453862, guid: 616cd0a1c5e06384e8441efb4837d445,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 140
+      objectReference: {fileID: 0}
+    - target: {fileID: -4216859302048453862, guid: 616cd0a1c5e06384e8441efb4837d445,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -30.14087
+      objectReference: {fileID: 0}
+    - target: {fileID: -4216859302048453862, guid: 616cd0a1c5e06384e8441efb4837d445,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.4470662
+      objectReference: {fileID: 0}
+    - target: {fileID: -4216859302048453862, guid: 616cd0a1c5e06384e8441efb4837d445,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 13.127973
+      objectReference: {fileID: 0}
+    - target: {fileID: -4216859302048453862, guid: 616cd0a1c5e06384e8441efb4837d445,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -4216859302048453862, guid: 616cd0a1c5e06384e8441efb4837d445,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -4216859302048453862, guid: 616cd0a1c5e06384e8441efb4837d445,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -4216859302048453862, guid: 616cd0a1c5e06384e8441efb4837d445,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -4216859302048453862, guid: 616cd0a1c5e06384e8441efb4837d445,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -4216859302048453862, guid: 616cd0a1c5e06384e8441efb4837d445,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -4216859302048453862, guid: 616cd0a1c5e06384e8441efb4837d445,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 616cd0a1c5e06384e8441efb4837d445,
+        type: 3}
+      propertyPath: m_Name
+      value: Desk01
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 616cd0a1c5e06384e8441efb4837d445,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 616cd0a1c5e06384e8441efb4837d445, type: 3}
+      propertyPath: m_Name
+      value: VCSTable
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 616cd0a1c5e06384e8441efb4837d445, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 616cd0a1c5e06384e8441efb4837d445, type: 3}
+      propertyPath: m_RootOrder
+      value: 17
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 616cd0a1c5e06384e8441efb4837d445, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -1.6799998
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 616cd0a1c5e06384e8441efb4837d445, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.963
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 616cd0a1c5e06384e8441efb4837d445, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 400000, guid: 616cd0a1c5e06384e8441efb4837d445,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1770094064}
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 616cd0a1c5e06384e8441efb4837d445, type: 3}
+--- !u!4 &471867953 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400000, guid: 616cd0a1c5e06384e8441efb4837d445,
+    type: 3}
+  m_PrefabInstance: {fileID: 471867952}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &484407758
 GameObject:
   m_ObjectHideFlags: 0
@@ -13099,6 +13222,7 @@ MonoBehaviour:
   MaximalAntennaSegmentHeight: 0.1
   AntennaWidth: 0.01
   BaseAnimationDuration: 1
+  ProgressBar: 0
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
@@ -13179,7 +13303,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ScaleFactor: 1
   HeightOffset: 0.0015009642
 --- !u!65 &551406259
 BoxCollider:
@@ -14687,52 +14810,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1043097161}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &817192564
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 817192565}
-  - component: {fileID: 817192566}
-  m_Layer: 0
-  m_Name: XR Interaction Manager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &817192565
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 817192564}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.6794491, y: 0.80270994, z: -10.779926}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &817192566
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 817192564}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 83e4e6cca11330d4088d729ab4fc9d9f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_StartingHoverFilters: []
-  m_StartingSelectFilters: []
 --- !u!4 &820607629 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4846815275869615973, guid: dc09ca83af09d6d4b8b33c7c5c4a13ee,
@@ -14925,6 +15002,38 @@ Transform:
   - {fileID: 438738216}
   m_Father: {fileID: 145013813}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &844328355 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1163841103170078, guid: 7e7e1770b238e724caee49f153d1b3d6,
+    type: 3}
+  m_PrefabInstance: {fileID: 1702936838}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &844328357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 844328355}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7dbc27bbb0a6ff45b4714421b3a8f20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Comms: {fileID: 351767374}
+--- !u!114 &844328358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 844328355}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d40fb11164cb3e84999cbdafd27e8eb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Comms: {fileID: 351767374}
 --- !u!1 &847505608
 GameObject:
   m_ObjectHideFlags: 0
@@ -17597,27 +17706,27 @@ MonoBehaviour:
   playerSpawns:
   - PlayerPrefab: {fileID: 1540848273603986277, guid: e24fb68f145dafb4b9fe506c2d7ae0a0,
       type: 3}
-    Position: {x: 3, y: 0, z: -5}
+    Position: {x: 0.4, y: 0, z: -5.8}
     Rotation: 270
   - PlayerPrefab: {fileID: 5742082173775082023, guid: d3731029eb4ac1641a0db38185e57382,
       type: 3}
-    Position: {x: 3, y: 0, z: -6}
+    Position: {x: 0.4, y: 0, z: -6.6}
     Rotation: 270
   - PlayerPrefab: {fileID: 1592577805375857840, guid: 60b12fcbdbb597e40a8d036aa796583c,
       type: 3}
-    Position: {x: 3, y: 0, z: -7}
+    Position: {x: 0.4, y: 0, z: -7.8}
     Rotation: 270
   - PlayerPrefab: {fileID: 1056781579854251772, guid: 7e3c3a5fd5a77c6498e41bbe7ba387c4,
       type: 3}
-    Position: {x: 3, y: 0, z: -5}
+    Position: {x: 0.4, y: 0, z: -5.8}
     Rotation: 270
   - PlayerPrefab: {fileID: 7839154548958412681, guid: aa2505da96d6e284a9ff9d911702535a,
       type: 3}
-    Position: {x: 3, y: 0, z: -6}
+    Position: {x: 0.4, y: 0, z: -6.8}
     Rotation: 270
   - PlayerPrefab: {fileID: 4749666707957422873, guid: 1c018d74588b5b74eaaf639548ff76fa,
       type: 3}
-    Position: {x: 3, y: 0, z: -7}
+    Position: {x: 0.4, y: 0, z: -7.8}
     Rotation: 270
 --- !u!1 &1137182440
 GameObject:
@@ -24039,7 +24148,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ScaleFactor: 1
   HeightOffset: 0.0015009642
 --- !u!65 &1222147445
 BoxCollider:
@@ -25680,6 +25788,7 @@ MonoBehaviour:
   MaximalAntennaSegmentHeight: 0.5
   AntennaWidth: 0.1
   BaseAnimationDuration: 1
+  ProgressBar: 0
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
@@ -33221,6 +33330,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1009563281660046, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1047069224676776, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -33255,7 +33368,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1517357890693092, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1643126648504472, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
       propertyPath: m_IsActive
@@ -33388,7 +33501,27 @@ PrefabInstance:
       propertyPath: m_Size.z
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 114173693958980838, guid: 7e7e1770b238e724caee49f153d1b3d6,
+        type: 3}
+      propertyPath: Comms
+      value: 
+      objectReference: {fileID: 351767374}
+    - target: {fileID: 114173693958980838, guid: 7e7e1770b238e724caee49f153d1b3d6,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 114441250342680924, guid: 7e7e1770b238e724caee49f153d1b3d6,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114620803245189188, guid: 7e7e1770b238e724caee49f153d1b3d6,
+        type: 3}
+      propertyPath: Comms
+      value: 
+      objectReference: {fileID: 351767374}
+    - target: {fileID: 114620803245189188, guid: 7e7e1770b238e724caee49f153d1b3d6,
         type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -33430,61 +33563,63 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 114125503372306616, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
-    m_RemovedGameObjects: []
+    - {fileID: 114173693958980838, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+    - {fileID: 114620803245189188, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+    m_RemovedGameObjects:
+    - {fileID: 1517357890693092, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+    - {fileID: 1706114631358294, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+    - {fileID: 1219238646228308, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+    - {fileID: 1071528346688116, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+    - {fileID: 1047069224676776, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+    - {fileID: 1240725178886710, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+    - {fileID: 1764493501854154, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+    - {fileID: 1643126648504472, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1643126648504472, guid: 7e7e1770b238e724caee49f153d1b3d6,
+    - targetCorrespondingSourceObject: {fileID: 1163841103170078, guid: 7e7e1770b238e724caee49f153d1b3d6,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1702936841}
+      addedObject: {fileID: 844328357}
+    - targetCorrespondingSourceObject: {fileID: 1163841103170078, guid: 7e7e1770b238e724caee49f153d1b3d6,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 844328358}
+    - targetCorrespondingSourceObject: {fileID: 1794417805202770, guid: 7e7e1770b238e724caee49f153d1b3d6,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1702936843}
   m_SourcePrefab: {fileID: 100100000, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
---- !u!1 &1702936840 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1643126648504472, guid: 7e7e1770b238e724caee49f153d1b3d6,
+--- !u!114 &1702936839 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114207693767522266, guid: 7e7e1770b238e724caee49f153d1b3d6,
     type: 3}
   m_PrefabInstance: {fileID: 1702936838}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1702936841
+  m_GameObject: {fileID: 1702936842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a066ddbf125f9546bcadc947418566b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &1702936842 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1794417805202770, guid: 7e7e1770b238e724caee49f153d1b3d6,
+    type: 3}
+  m_PrefabInstance: {fileID: 1702936838}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1702936843
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1702936840}
+  m_GameObject: {fileID: 1702936842}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
+  m_Script: {fileID: 11500000, guid: e5cd6d3208eb6af4bb40eea65e762a5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_SendPointerHoverToParent: 1
-  m_MoveRepeatDelay: 0.5
-  m_MoveRepeatRate: 0.1
-  m_XRTrackingOrigin: {fileID: 0}
-  m_ActionsAsset: {fileID: -944628639613478452, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_PointAction: {fileID: -1654692200621890270, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_MoveAction: {fileID: -8784545083839296357, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_SubmitAction: {fileID: 392368643174621059, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_CancelAction: {fileID: 7727032971491509709, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_LeftClickAction: {fileID: 3001919216989983466, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_MiddleClickAction: {fileID: -2185481485913320682, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_RightClickAction: {fileID: -4090225696740746782, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_ScrollWheelAction: {fileID: 6240969308177333660, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_TrackedDevicePositionAction: {fileID: 6564999863303420839, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_TrackedDeviceOrientationAction: {fileID: 7970375526676320489, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_DeselectOnBackgroundClick: 1
-  m_PointerBehavior: 0
-  m_CursorLockBehavior: 0
+  Trigger: {fileID: 1702936839}
 --- !u!1 &1704744505
 GameObject:
   m_ObjectHideFlags: 0
@@ -34044,6 +34179,843 @@ Transform:
   - {fileID: 1042245598}
   m_Father: {fileID: 1658517675}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1770094063
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1770094064}
+  - component: {fileID: 1770094070}
+  - component: {fileID: 1770094069}
+  - component: {fileID: 1770094068}
+  - component: {fileID: 1770094067}
+  - component: {fileID: 1770094065}
+  m_Layer: 0
+  m_Name: VCSCity
+  m_TagString: Code City
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1770094064
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1770094063}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 45.799995, z: 0}
+  m_LocalScale: {x: 147.204, y: 0.0001859913, z: 322.03818}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 471867953}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1770094065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1770094063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 253abae38e5d8014abb73913836a3d5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: HierarchicalEdges
+      Entry: 7
+      Data: 0|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 1
+      Data: Enclosing
+    - Name: 
+      Entry: 1
+      Data: Belongs_To
+    - Name: 
+      Entry: 1
+      Data: Part_Of
+    - Name: 
+      Entry: 1
+      Data: Defined_In
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NodeTypes
+      Entry: 7
+      Data: 1|SEE.Game.City.NodeTypeVisualsMap, SEE
+    - Name: map
+      Entry: 7
+      Data: 2|SEE.Game.City.VisualNodeAttributesMapping, SEE
+    - Name: comparer
+      Entry: 7
+      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Directory
+    - Name: $v
+      Entry: 7
+      Data: 4|SEE.Game.City.VisualNodeAttributes, SEE
+    - Name: IsRelevant
+      Entry: 5
+      Data: true
+    - Name: Shape
+      Entry: 3
+      Data: 0
+    - Name: MetricToLength
+      Entry: 7
+      Data: 5|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 3
+    - Name: 
+      Entry: 1
+      Data: 0.001
+    - Name: 
+      Entry: 1
+      Data: 0.001
+    - Name: 
+      Entry: 1
+      Data: 0.001
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ColorProperty
+      Entry: 7
+      Data: 6|SEE.Game.City.ColorProperty, SEE
+    - Name: Property
+      Entry: 3
+      Data: 0
+    - Name: TypeColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0.784313738
+    - Name: 
+      Entry: 4
+      Data: 0.784313738
+    - Name: 
+      Entry: 4
+      Data: 0.784313738
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ByLevel
+      Entry: 5
+      Data: true
+    - Name: ColorMetric
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MinimalBlockLength
+      Entry: 4
+      Data: 0.001
+    - Name: MaximalBlockLength
+      Entry: 4
+      Data: 1
+    - Name: AntennaSettings
+      Entry: 7
+      Data: 7|SEE.Game.City.AntennaAttributes, SEE
+    - Name: AntennaSections
+      Entry: 7
+      Data: 8|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LabelSettings
+      Entry: 7
+      Data: 9|SEE.Game.LabelAttributes, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationFactor
+      Entry: 4
+      Data: 0.5
+    - Name: LabelAlpha
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: OutlineWidth
+      Entry: 4
+      Data: 1
+    - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: File
+    - Name: $v
+      Entry: 7
+      Data: 10|SEE.Game.City.VisualNodeAttributes, SEE
+    - Name: IsRelevant
+      Entry: 5
+      Data: true
+    - Name: Shape
+      Entry: 3
+      Data: 0
+    - Name: MetricToLength
+      Entry: 7
+      Data: 11|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 3
+    - Name: 
+      Entry: 1
+      Data: Metric.LOC
+    - Name: 
+      Entry: 1
+      Data: Metric.LOC
+    - Name: 
+      Entry: 1
+      Data: Metric.LOC
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ColorProperty
+      Entry: 7
+      Data: 12|SEE.Game.City.ColorProperty, SEE
+    - Name: Property
+      Entry: 3
+      Data: 1
+    - Name: TypeColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ByLevel
+      Entry: 5
+      Data: true
+    - Name: ColorMetric
+      Entry: 1
+      Data: Metric.McCabe_Complexity
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MinimalBlockLength
+      Entry: 4
+      Data: 0.001
+    - Name: MaximalBlockLength
+      Entry: 4
+      Data: 1
+    - Name: AntennaSettings
+      Entry: 7
+      Data: 13|SEE.Game.City.AntennaAttributes, SEE
+    - Name: AntennaSections
+      Entry: 7
+      Data: 14|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LabelSettings
+      Entry: 7
+      Data: 15|SEE.Game.LabelAttributes, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationFactor
+      Entry: 4
+      Data: 0.5
+    - Name: LabelAlpha
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: OutlineWidth
+      Entry: 4
+      Data: 1
+    - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MarkerAttributes
+      Entry: 7
+      Data: 16|SEE.Game.City.MarkerAttributes, SEE
+    - Name: MarkerHeight
+      Entry: 4
+      Data: 0.2
+    - Name: MarkerWidth
+      Entry: 4
+      Data: 0.01
+    - Name: AdditionBeamColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ChangeBeamColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: DeletionBeamColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MetricToColor
+      Entry: 7
+      Data: 17|SEE.Game.City.ColorMap, SEE
+    - Name: map
+      Entry: 7
+      Data: 18|SEE.Game.City.ColorRangeMapping, SEE
+    - Name: comparer
+      Entry: 9
+      Data: 3
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Metric.McCabe_Complexity
+    - Name: $v
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: Lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 15
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CoseGraphSettings
+      Entry: 7
+      Data: 19|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+    - Name: EdgeLength
+      Entry: 3
+      Data: 20
+    - Name: UseSmartIdealEdgeCalculation
+      Entry: 5
+      Data: false
+    - Name: UseSmartMultilevelScaling
+      Entry: 5
+      Data: false
+    - Name: PerLevelIdealEdgeLengthFactor
+      Entry: 4
+      Data: 0.1
+    - Name: UseSmartRepulsionRangeCalculation
+      Entry: 5
+      Data: false
+    - Name: GravityStrength
+      Entry: 4
+      Data: 0.8
+    - Name: CompoundGravityStrength
+      Entry: 4
+      Data: 1.5
+    - Name: RepulsionStrength
+      Entry: 4
+      Data: 50
+    - Name: MultiLevelScaling
+      Entry: 5
+      Data: false
+    - Name: ListInnerNodeToggle
+      Entry: 7
+      Data: 20|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 21|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeLayout
+      Entry: 7
+      Data: 22|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 21
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeShape
+      Entry: 7
+      Data: 23|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 21
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LoadedForNodeTypes
+      Entry: 7
+      Data: 24|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 21
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: UseCalculationParameter
+      Entry: 5
+      Data: true
+    - Name: UseIterativeCalculation
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: DataProvider
+      Entry: 7
+      Data: 25|SEE.GraphProviders.PipelineGraphProvider, SEE
+    - Name: Pipeline
+      Entry: 7
+      Data: 26|System.Collections.Generic.List`1[[SEE.GraphProviders.GraphProvider,
+        SEE]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 27|SEE.GraphProviders.VCSGraphProvider, SEE
+    - Name: RepositoryPath
+      Entry: 7
+      Data: 28|SEE.Utils.Paths.DirectoryPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 1
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CommitID
+      Entry: 1
+      Data: 0878f91f900dc90d89c594c521ac1d3b9edd7097
+    - Name: BaselineCommitID
+      Entry: 1
+      Data: a5fe5e6a2692f41aeb8448d5114000e6f82e605e
+    - Name: PathGlobbing
+      Entry: 7
+      Data: 29|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 21
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Assets/SEE/**/*.cs
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+  LODCulling: 0.001
+  ConfigurationPath:
+    Root: 3
+    relativePath: /SEE/SEEVCS.cfg
+    absolutePath: 
+  sourceCodeDirectory:
+    Root: 1
+    relativePath: 
+    absolutePath: 
+  SolutionPath:
+    Root: 1
+    relativePath: /SEEIT.sln
+    absolutePath: 
+  IgnoreSelfLoopsInLifting: 0
+  MaximalAntennaSegmentHeight: 0.5
+  AntennaWidth: 0.1
+  BaseAnimationDuration: 1
+  ProgressBar: 0
+  ZScoreScale: 0
+  ScaleOnlyLeafMetrics: 1
+  NodeLayoutSettings:
+    Kind: 3
+    IncrementalTreeMap:
+      LocalMovesDepth: 3
+      LocalMovesBranchingLimit: 4
+      pNorm: 1
+      PaddingMm: 5
+      GradientDescentPrecision: -4
+    LayoutPath:
+      Root: 2
+      relativePath: 
+      absolutePath: 
+  EdgeLayoutSettings:
+    Kind: 3
+    AnimationKind: 2
+    AnimateInnerEdges: 1
+    EdgeWidth: 0.01
+    EdgesAboveBlocks: 1
+    Tension: 0.85
+  EdgeSelectionSettings:
+    TubularSegments: 50
+    Radius: 0.005
+    RadialSegments: 8
+    AreSelectable: 1
+  ErosionSettings:
+    ShowInnerErosions: 0
+    ShowLeafErosions: 0
+    ErosionScalingFactor: 1.5
+    ShowIssuesInCodeWindow: 0
+    ArchitectureIssue: Metric.Architecture_Violations
+    CloneIssue: Metric.Clone
+    CycleIssue: Metric.Cycle
+    DeadCodeIssue: Metric.Dead_Code
+    MetricIssue: Metric.Metric
+    StyleIssue: Metric.Style
+    UniversalIssue: Metric.Universal
+    ArchitectureIssueSum: Metric.Architecture_Violations_SUM
+    CloneIssueSum: Metric.Clone_SUM
+    CycleIssueSum: Metric.Cycle_SUM
+    DeadCodeIssueSum: Metric.Dead_Code_SUM
+    MetricIssueSum: Metric.Metric_SUM
+    StyleIssueSum: Metric.Style_SUM
+    UniversalIssueSum: Metric.Universal_SUM
+  BoardSettings:
+    LoadBoardOnStartup: 0
+    BoardPath:
+      Root: 2
+      relativePath: 
+      absolutePath: 
+--- !u!114 &1770094067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1770094063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7623b0249cfceff40b25a7b4ea3b89f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1770094068
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1770094063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HeightOffset: 0.0015009642
+--- !u!65 &1770094069
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1770094063}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &1770094070
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1770094063}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 800ec33a9c0fe564b9b72cdd97dc8d9e, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &1777023170
 GameObject:
   m_ObjectHideFlags: 0
@@ -39533,6 +40505,7 @@ MonoBehaviour:
   MaximalAntennaSegmentHeight: 0.1
   AntennaWidth: 0.01
   BaseAnimationDuration: 1
+  ProgressBar: 0
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
@@ -39620,7 +40593,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ScaleFactor: 1
   HeightOffset: 0.0015009642
 --- !u!65 &2147363518
 BoxCollider:
@@ -40145,6 +41117,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1654884164}
     m_Modifications:
+    - target: {fileID: 1385307744840649191, guid: f2d7a76992d23fc4a87b3421d0b077d4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 1615085233621451865, guid: f2d7a76992d23fc4a87b3421d0b077d4,
         type: 3}
       propertyPath: m_Size.z
@@ -40219,6 +41196,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Double Door
+      objectReference: {fileID: 0}
+    - target: {fileID: 8868810850202492932, guid: f2d7a76992d23fc4a87b3421d0b077d4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -40401,7 +41383,6 @@ SceneRoots:
   - {fileID: 296817417}
   - {fileID: 351767373}
   - {fileID: 1702936838}
-  - {fileID: 817192565}
   - {fileID: 866352771}
   - {fileID: 886582256}
   - {fileID: 1031960704}
@@ -40414,3 +41395,4 @@ SceneRoots:
   - {fileID: 387723966}
   - {fileID: 1706202779}
   - {fileID: 1166896206}
+  - {fileID: 471867952}

@@ -1,0 +1,92 @@
+PROGRAM test;
+ 
+  (* read, sort and write an array of n numbers            *)
+  (* this program shows the following features:            *)
+  (*   addressing and alignment                            *)
+  (*   procedure calls from main level, to a local, and to *)
+  (*     a global procedure                                *)
+  (*   access to a global array                            *)
+  (*   access to local, global and intermediate variables  *)
+  (*   recursion                                           *)
+  (*   reading and writing of all types                    *)
+  (*   integer to real conversion                          *)
+ 
+DECLARE
+  test : BOOLEAN;
+  n    : INTEGER;
+  a    : ARRAY [1..100] OF REAL;
+ 
+  PROCEDURE skip; (* do nothing *)
+  DECLARE
+    n: INTEGER
+  BEGIN
+    n := n
+  END;
+ 
+  PROCEDURE read (VAR n: INTEGER; VAR a: ARRAY [1..100] OF REAL);
+  DECLARE
+    i: INTEGER
+  BEGIN
+    WRITE (TRUE); READ (test);
+    WRITE (5); READ (n);
+    i := 1;
+    WHILE i < n DO
+      i := i + 1; WRITE (1.0E-7); READ (a [i])
+    END
+  END;
+ 
+  PROCEDURE write (m: INTEGER); (* write a [m..n] *)
+  DECLARE
+    x: INTEGER
+  BEGIN
+    WRITE (a [m]);
+    IF m < n THEN write (m + 1) ELSE skip END
+  END;
+ 
+  PROCEDURE sort (VAR a: ARRAY [1..100] OF REAL); (* sort a [1..n] *)
+  DECLARE
+    i : INTEGER;
+    j : INTEGER;
+    k : INTEGER;
+    h : REAL;
+    ok: BOOLEAN;
+ 
+    PROCEDURE check (VAR ok: BOOLEAN); (* check order of a [1..n] *)
+    DECLARE
+      continue: BOOLEAN
+    BEGIN
+      IF test THEN write (1) ELSE skip END;
+      i := 1; continue := TRUE;
+      WHILE continue DO
+        IF i < n THEN
+          continue := NOT (a [i + 1] < a [i]);
+          IF continue THEN i := i + 1 ELSE skip END
+        ELSE
+          continue := FALSE
+        END
+      END;
+      ok := NOT (i < n)
+    END
+ 
+  BEGIN (* sort *)
+    i := 1;
+    WHILE i < n DO
+      write (1);
+      j := i; k := i;
+      WHILE j < n DO   (* a [k] = MIN a [i..j] *)
+        j := j + 1;
+        IF a [j] < a [k] THEN k := j ELSE skip END
+      END;
+      h := a [i]; a [i] := a [k]; a [k] := h;
+      i := i + 1
+    END;
+    check (ok); WRITE (ok)
+  END
+ 
+BEGIN (* main program *)
+  a [1] := 2.1415926536;
+  a [1] := a [1] + 1.0;
+  read (n, a);
+  sort (a);
+  IF NOT test THEN write (0) ELSE skip END
+END.

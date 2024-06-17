@@ -7,6 +7,7 @@ using SEE.Game;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
+using SEE.UI;
 using SEE.UI.Notification;
 using SEE.UI.PopupMenu;
 using SEE.UI.Window;
@@ -80,6 +81,7 @@ namespace SEE.Controls.Actions
                 new("Delete", DeleteElement, Icons.Trash),
                 // TODO (#666): Better properties view
                 new("Properties", ShowProperties, Icons.Info),
+                new("Show Metrics", ShowMetrics, Icons.Info),
             };
 
             if (gameObject != null)
@@ -113,6 +115,11 @@ namespace SEE.Controls.Actions
             void ShowProperties()
             {
                 ShowNotification.Info("Node Properties", graphElement.ToString(), log: false);
+            }
+
+            void ShowMetrics()
+            {
+                ActivateWindow(CreateMetricWindow(gameObject.MustGetComponent<GraphElementRef>()));
             }
 
             void ShowCode()
@@ -181,6 +188,23 @@ namespace SEE.Controls.Actions
             }
             manager.ActiveWindow = openWindow;
             return openWindow;
+        }
+
+        /// <summary>
+        /// Returns a <see cref="MetricWindow"/> showing the attributes of <paramref name="graphElementRef"/>.
+        /// </summary>
+        /// <param name="graphElementRef">The graph element to activate the metric window for</param>
+        /// <returns>The <see cref="MetricWindow"/> object showing the attributes of the specified graph element.</returns>
+        private static MetricWindow CreateMetricWindow(GraphElementRef graphElementRef)
+        {
+            // Create new window for active selection, or use existing one
+            if (!graphElementRef.TryGetComponent(out MetricWindow metricMenu))
+            {
+                metricMenu = graphElementRef.gameObject.AddComponent<MetricWindow>();
+                metricMenu.Title = "Metrics for " + graphElementRef.Elem.ToShortString();
+                metricMenu.GraphElement = graphElementRef.Elem;
+            }
+            return metricMenu;
         }
 
         /// <summary>

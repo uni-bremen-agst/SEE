@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using SEE.Tools.RandomGraphs;
 using SEE.Utils;
@@ -10,6 +13,7 @@ namespace SEE.DataModel.DG.IO
     /// <summary>
     /// Unit tests for GraphWriter and GraphReader.
     /// </summary>
+    [SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods")]
     internal class TestGraphIO
     {
         /// <summary>
@@ -32,30 +36,30 @@ namespace SEE.DataModel.DG.IO
         private const string hierarchicalEdgeType = "Enclosing";
 
         [Test]
-        public void TestReadingRealBigGraph()
+        public async Task TestReadingRealBigGraph()
         {
             string filename = Application.streamingAssetsPath + "/SEE/CodeFacts.gxl.xz";
             Performance p = Performance.Begin("Loading big GXL file " + filename);
-            LoadGraph(filename);
+            await LoadGraphAsync(filename);
             p.End();
         }
 
         [Test]
-        public void TestReadingArchitecture()
+        public async Task TestReadingArchitecture()
         {
-            LoadGraph(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/Architecture.gxl");
+            await LoadGraphAsync(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/Architecture.gxl");
         }
 
         [Test]
-        public void TestReadingMapping()
+        public async Task TestReadingMapping()
         {
-            LoadGraph(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/Mapping.gxl");
+            await LoadGraphAsync(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/Mapping.gxl");
         }
 
         [Test]
-        public void TestReadingCodeFacts()
+        public async Task TestReadingCodeFacts()
         {
-            LoadGraph(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/CodeFacts.gxl.xz");
+            await LoadGraphAsync(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/CodeFacts.gxl.xz");
         }
 
         private static bool CompressedWritingSupported()
@@ -75,7 +79,7 @@ namespace SEE.DataModel.DG.IO
         /// Test for a simple artificially created graph.
         /// </summary>
         [Test, Sequential]
-        public void TestGraphWriter([Values(true, false)] bool compress)
+        public async Task TestGraphWriter([Values(true, false)] bool compress)
         {
             const string basename = "test";
 
@@ -89,7 +93,7 @@ namespace SEE.DataModel.DG.IO
 
             if (!compress || CompressedWritingSupported())
             {
-                WriteReadGraph(basename, outGraph, compress);
+                await WriteReadGraphAsync(basename, outGraph, compress);
             }
         }
 
@@ -97,14 +101,14 @@ namespace SEE.DataModel.DG.IO
         /// Test with randomly generated graphs with increasing number of nodes.
         /// </summary>
         [Test, Sequential]
-        public void TestRandomGraphWriter([Values(true, false)] bool compress)
+        public async Task TestRandomGraphWriter([Values(true, false)] bool compress)
         {
             Constraint leafConstraint = new("Routine", 10, "calls", 0.01f);
             Constraint innerNodesConstraint = new("File", 3, "imports", 0.01f);
             List<RandomAttributeDescriptor> attributeConstraints = new()
             {
-                new RandomAttributeDescriptor("Metric.LOC", 200, 50, -10, 100),
-                new RandomAttributeDescriptor("Metric.Clone_Rate", 0.5f, 0.1f, -0.5f, 1.3f),
+                new RandomAttributeDescriptor(Metrics.Prefix + "LOC", 200, 50, -10, 100),
+                new RandomAttributeDescriptor(Metrics.Prefix + "Clone_Rate", 0.5f, 0.1f, -0.5f, 1.3f),
             };
             const string basename = "random";
 
@@ -126,7 +130,7 @@ namespace SEE.DataModel.DG.IO
 
                 if (!compress || CompressedWritingSupported())
                 {
-                    WriteReadGraph(basename, outGraph, compress);
+                    await WriteReadGraphAsync(basename, outGraph, compress);
                 }
             }
         }
@@ -156,7 +160,7 @@ namespace SEE.DataModel.DG.IO
         /// <param name="basename">basename of the filename for storing graphs</param>
         /// <param name="outGraph">the initial graph to be written</param>
         /// <param name="compress">whether to LZMA compress the graph</param>
-        private static void WriteReadGraph(string basename, Graph outGraph, bool compress)
+        private static async UniTask WriteReadGraphAsync(string basename, Graph outGraph, bool compress)
         {
             string Extension = compress ? CompressedExtension : NormalExtension;
             string filename = basename + Extension;
@@ -174,14 +178,14 @@ namespace SEE.DataModel.DG.IO
                 GraphWriter.Save(filename, outGraph, hierarchicalEdgeType);
 
                 // Read the saved outGraph again
-                Graph inGraph = LoadGraph(filename);
+                Graph inGraph = await LoadGraphAsync(filename);
                 Assert.AreEqual(filename, inGraph.Path);
 
                 // Write the loaded saved initial graph again as a backup
                 GraphWriter.Save(backupFilename, inGraph, hierarchicalEdgeType);
 
                 // Read the backup graph again
-                Graph backupGraph = LoadGraph(backupFilename);
+                Graph backupGraph = await LoadGraphAsync(backupFilename);
                 // The path of backupGraph will be backupFilename.
                 Assert.AreEqual(backupFilename, backupGraph.Path);
                 // For the comparison, we need to reset the path.
@@ -197,10 +201,10 @@ namespace SEE.DataModel.DG.IO
             }
         }
 
-        private static Graph LoadGraph(string filename)
+        private static async UniTask<Graph> LoadGraphAsync(string filename)
         {
             GraphReader graphReader = new(filename, new HashSet<string> { hierarchicalEdgeType }, basePath: "");
-            graphReader.Load();
+            await graphReader.LoadAsync();
             return graphReader.GetGraph();
         }
 
@@ -214,8 +218,8 @@ namespace SEE.DataModel.DG.IO
             };
             result.SetToggle("Linkage.Is_Definition");
             result.SetString("stringAttribute", "somestring");
-            result.SetFloat("Metric.Halstead.Volume", 49.546f);
-            result.SetInt("Metric.LOC", 10);
+            result.SetFloat(Halstead.Volume, 49.546f);
+            result.SetInt(Metrics.Prefix + "LOC", 10);
             graph.AddNode(result);
             return result;
         }

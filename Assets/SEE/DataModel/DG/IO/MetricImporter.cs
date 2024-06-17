@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.Utils.Paths;
 using SEE.Net.Dashboard;
@@ -13,6 +14,7 @@ using UnityEngine;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Newtonsoft.Json.Linq;
+using SEE.Utils;
 
 namespace SEE.DataModel.DG.IO
 {
@@ -30,8 +32,13 @@ namespace SEE.DataModel.DG.IO
         /// <param name="override">Whether any existing metrics present in the graph's nodes shall be updated</param>
         /// <param name="addedFrom">If empty, all issues will be retrieved. Otherwise, only those issues which have been added from
         /// the given version to the most recent one will be loaded.</param>
+        /// <param name="changePercentage">Used to report progress of the operation as a percentage</param>
+        /// <param name="token">Token to cancel the operation</param>
         /// <returns>The graph with the updated metrics and issues</returns>
-        public static async UniTask<Graph> LoadDashboardAsync(Graph graph, bool @override = true, string addedFrom = "")
+        public static async UniTask<Graph> LoadDashboardAsync(Graph graph, bool @override = true,
+                                                              string addedFrom = "",
+                                                              Action<float> changePercentage = null,
+                                                              CancellationToken token = default)
         {
             IDictionary<(string path, string entity), List<MetricValueTableRow>> metrics = await DashboardRetriever.Instance.GetAllMetricRowsAsync();
             IDictionary<string, List<Issue>> issues = await LoadIssueMetrics(string.IsNullOrWhiteSpace(addedFrom) ? null : addedFrom);
@@ -41,9 +48,16 @@ namespace SEE.DataModel.DG.IO
 
             HashSet<Node> encounteredIssueNodes = new();
             int updatedMetrics = 0;
+            IList<Node> nodes = graph.Nodes();
+            float i = 0;
             // Go through all nodes, checking whether any metric in the dashboard matches it.
-            foreach (Node node in graph.Nodes())
+            await foreach (Node node in nodes.BatchPerFrame())
             {
+                if (token.IsCancellationRequested)
+                {
+                    throw new OperationCanceledException(token);
+                }
+                changePercentage?.Invoke(++i / nodes.Count);
                 string nodePath = $"{node.RelativeDirectory(projectFolder)}{node.Filename ?? string.Empty}";
                 if (metrics.TryGetValue((nodePath, node.SourceName), out List<MetricValueTableRow> metricValues))
                 {
@@ -163,8 +177,10 @@ namespace SEE.DataModel.DG.IO
         /// <param name="graph">graph for which node metrics are to be imported</param>
         /// <param name="filename">CSV file from which to import node metrics</param>
         /// <param name="separator">used to separate column entries</param>
+        /// <param name="token">token to cancel the operation</param>
         /// <returns>the number of errors</returns>
-        public static int LoadCsv(Graph graph, string filename, char separator = ';')
+        public static async UniTask<int> LoadCsvAsync(Graph graph, string filename, char separator = ';',
+                                                      CancellationToken token = default)
         {
             if (!File.Exists(filename))
             {
@@ -183,7 +199,11 @@ namespace SEE.DataModel.DG.IO
             int numberOfErrors = 0;
             int lineCount = 1;
 
-            csv.Read();
+            await csv.ReadAsync();
+            if (token.IsCancellationRequested)
+            {
+                throw new OperationCanceledException(token);
+            }
             if (csv.ReadHeader())
             {
                 string[] header = csv.HeaderRecord;
@@ -202,8 +222,12 @@ namespace SEE.DataModel.DG.IO
                     Debug.LogWarning($"There are no data columns in {filename}.\n");
                     return 0;
                 }
-                while (csv.Read())
+                while (await csv.ReadAsync())
                 {
+                    if (token.IsCancellationRequested)
+                    {
+                        throw new OperationCanceledException(token);
+                    }
                     lineCount++;
                     string id = csv.GetField<string>(IDColumnName);
 
@@ -218,7 +242,7 @@ namespace SEE.DataModel.DG.IO
                             {
                                 if (entry.Contains("."))
                                 {
-                                    node.SetFloat(column, (float)float.Parse(entry, CultureInfo.InvariantCulture));
+                                    node.SetFloat(column, float.Parse(entry, CultureInfo.InvariantCulture));
                                 }
                                 else
                                 {
@@ -251,7 +275,7 @@ namespace SEE.DataModel.DG.IO
             }
             else
             {
-                string errorMessage = "There is no header.";
+                const string errorMessage = "There is no header.";
                 Debug.LogError(errorMessage + "\n");
                 throw new IOException(errorMessage);
 
@@ -259,10 +283,7 @@ namespace SEE.DataModel.DG.IO
 
             return numberOfErrors;
 
-            string SourceLocation()
-            {
-                return $"{filename}:{lineCount}: ";
-            }
+            string SourceLocation() => $"{filename}:{lineCount}: ";
         }
     }
 }

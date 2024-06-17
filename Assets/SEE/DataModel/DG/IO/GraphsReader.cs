@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using SEE.Utils;
 using UnityEngine;
 
@@ -52,7 +53,7 @@ namespace SEE.DataModel.DG.IO
         /// <param name="basePath">the base path of the graphs</param>
         /// <param name="rootName">name of the root node if any needs to be added to have a unique root</param>
         /// <param name="maxRevisionsToLoad">the upper limit of files to be loaded</param>
-        public void Load(string directory, HashSet<string> hierarchicalEdgeTypes, string basePath, string rootName, int maxRevisionsToLoad)
+        public async UniTask LoadAsync(string directory, HashSet<string> hierarchicalEdgeTypes, string basePath, string rootName, int maxRevisionsToLoad)
         {
             IEnumerable<string> sortedGraphNames = Filenames.GXLFilenames(directory).ToList();
             if (!sortedGraphNames.Any())
@@ -71,7 +72,7 @@ namespace SEE.DataModel.DG.IO
                                                basePath: basePath,
                                                rootID: rootName,
                                                logger: new SEELogger());
-                graphCreator.Load();
+                await graphCreator.LoadAsync();
                 Graph graph = graphCreator.GetGraph();
 
                 // if graph was loaded put in graph list
@@ -85,7 +86,7 @@ namespace SEE.DataModel.DG.IO
                     if (File.Exists(csvFilename))
                     {
                         Debug.Log($"Loading CSV file {csvFilename}.\n");
-                        int numberOfErrors = MetricImporter.LoadCsv(graph, csvFilename, ';');
+                        int numberOfErrors = await MetricImporter.LoadCsvAsync(graph, csvFilename);
                         if (numberOfErrors > 0)
                         {
                             Debug.LogError($"CSV file {csvFilename} has {numberOfErrors} many errors.\n");
