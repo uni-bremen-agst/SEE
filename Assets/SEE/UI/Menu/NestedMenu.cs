@@ -228,7 +228,7 @@ namespace SEE.UI.Menu
                 if (!ShowMenu)
                 {
                     searchInput.text = string.Empty;
-                    ResetToBase();
+                    //ResetToBase();
                 }
             };
         }
