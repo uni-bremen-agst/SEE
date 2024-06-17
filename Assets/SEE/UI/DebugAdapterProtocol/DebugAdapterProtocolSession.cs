@@ -66,7 +66,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// The prefab for the debug controls.
         /// </summary>
-        private const string DebugControlsPrefab = UIPrefabFolder + "DebugAdapterProtocolControls";
+        private const string debugControlsPrefab = UIPrefabFolder + "DebugAdapterProtocolControls";
 
         /// <summary>
         /// The debug adapter.
@@ -74,7 +74,7 @@ namespace SEE.UI.DebugAdapterProtocol
         public DebugAdapter.DebugAdapter Adapter;
 
         /// <summary>
-        /// Used for highlighing code position.
+        /// Used for highlighting code position.
         /// <see cref="HighlightInCity(string, int)"/>
         /// </summary>
         public AbstractSEECity City;
@@ -143,7 +143,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </para>
         /// <seealso cref="Update"/>
         /// </summary>
-        private Queue<Action> actions = new();
+        private readonly Queue<Action> actions = new();
 
         /// <summary>
         /// Buffers the hovered word if the debuggee is currently running.
@@ -151,14 +151,14 @@ namespace SEE.UI.DebugAdapterProtocol
         private TMP_WordInfo? hoveredWord;
 
         /// <summary>
-        /// Whether the debug adapter is currently executing the program.
-        /// </summary>
-        private bool isRunning;
-
-        /// <summary>
         /// The source range index to find graph element corresponding to code position.
         /// </summary>
         private SourceRangeIndex sourceRangeIndex;
+
+        /// <summary>
+        /// Whether the debug adapter is currently executing the program.
+        /// </summary>
+        private bool isRunning;
 
         /// <summary>
         /// Whether the debug adapter is currently executing the program.
@@ -196,7 +196,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Returns the first active thread.
         /// </summary>
-        private Thread mainThread => threads.FirstOrDefault();
+        private Thread MainThread => threads.FirstOrDefault();
 
         /// <summary>
         /// The currently active stack frames.
@@ -206,7 +206,8 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// The current stack frame.
         /// </summary>
-        private StackFrame stackFrame {
+        private StackFrame StackFrame
+        {
             get
             {
                 if (IsRunning)
@@ -361,7 +362,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <returns>Whether the creation was sucessful.</returns>
         private bool CreateAdapterProcess()
         {
-            adapterProcess = new Process()
+            adapterProcess = new Process
             {
                 StartInfo = new ProcessStartInfo()
                 {
@@ -377,9 +378,9 @@ namespace SEE.UI.DebugAdapterProtocol
                     StandardInputEncoding = Encoding.ASCII,
                     StandardOutputEncoding = Encoding.ASCII,
                     StandardErrorEncoding = Encoding.ASCII,
-                }
+                },
+                EnableRaisingEvents = true
             };
-            adapterProcess.EnableRaisingEvents = true;
             adapterProcess.Exited += (_, args) => ConsoleWindow.AddMessage($"Process: Exited! ({(!adapterProcess.HasExited ? adapterProcess.ProcessName : null)})");
             adapterProcess.Disposed += (_, args) => ConsoleWindow.AddMessage($"Process: Exited! ({(!adapterProcess.HasExited ? adapterProcess.ProcessName : null)})");
             adapterProcess.OutputDataReceived += (_, args) => ConsoleWindow.AddMessage($"Process: OutputDataReceived! ({adapterProcess.ProcessName})\n\t{args.Data}");
@@ -460,7 +461,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 return;
             }
 
-            stackFrames = adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = mainThread.Id }).StackFrames;
+            stackFrames = adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = MainThread.Id }).StackFrames;
         }
 
 
@@ -524,7 +525,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 EvaluateResponse value = adapterHost.SendRequestSync(new EvaluateRequest()
                 {
                     Expression = variable.EvaluateName,
-                    FrameId = IsRunning ? null : stackFrame.Id
+                    FrameId = IsRunning ? null : StackFrame.Id
                 });
                 return value.Result;
             }

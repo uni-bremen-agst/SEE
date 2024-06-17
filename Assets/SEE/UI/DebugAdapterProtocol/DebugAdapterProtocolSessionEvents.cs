@@ -75,7 +75,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 {
                     Expression = expression,
                     Context = capabilities.SupportsEvaluateForHovers == true ? EvaluateArguments.ContextValue.Hover : null,
-                    FrameId = stackFrame.Id
+                    FrameId = StackFrame.Id
                 });
                 tooltip.Show(result.Result, 0.25f);
             }
@@ -230,7 +230,7 @@ namespace SEE.UI.DebugAdapterProtocol
 
                     ExceptionInfoResponse exceptionInfo = adapterHost.SendRequestSync(new ExceptionInfoRequest()
                     {
-                        ThreadId = mainThread.Id,
+                        ThreadId = MainThread.Id,
                     });
                     string description = $"{exceptionInfo.ExceptionId}" + (exceptionInfo.Description != null ? $"\n{exceptionInfo.Description}" : "");
                     OpenConsole();
@@ -344,7 +344,7 @@ namespace SEE.UI.DebugAdapterProtocol
                     {
                         Expression = text,
                         Context = EvaluateArguments.ContextValue.Repl,
-                        FrameId = IsRunning ? null : stackFrame.Id
+                        FrameId = IsRunning ? null : StackFrame.Id
                     });
                     ConsoleWindow.AddMessage(result.Result + "\n", "Program", "Log");
                 }
@@ -367,7 +367,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 {
                     return;
                 }
-                adapterHost.SendRequest(new ContinueRequest { ThreadId = mainThread.Id }, _ => { });
+                adapterHost.SendRequest(new ContinueRequest { ThreadId = MainThread.Id }, _ => { });
             });
         }
 
@@ -382,7 +382,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 {
                     return;
                 }
-                adapterHost.SendRequest(new PauseRequest { ThreadId = mainThread.Id }, _ => { });
+                adapterHost.SendRequest(new PauseRequest { ThreadId = MainThread.Id }, _ => { });
             });
         }
 
@@ -397,7 +397,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 {
                     return;
                 }
-                adapterHost.SendRequest(new ReverseContinueRequest { ThreadId = mainThread.Id }, _ => { });
+                adapterHost.SendRequest(new ReverseContinueRequest { ThreadId = MainThread.Id }, _ => { });
             });
         }
 
@@ -412,7 +412,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 {
                     return;
                 }
-                adapterHost.SendRequest(new NextRequest { ThreadId = mainThread.Id, Granularity = steppingGranularity }, _ => { });
+                adapterHost.SendRequest(new NextRequest { ThreadId = MainThread.Id, Granularity = steppingGranularity }, _ => { });
             });
         }
 
@@ -427,7 +427,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 {
                     return;
                 }
-                adapterHost.SendRequest(new StepBackRequest { ThreadId = mainThread.Id, Granularity = steppingGranularity }, _ => { });
+                adapterHost.SendRequest(new StepBackRequest { ThreadId = MainThread.Id, Granularity = steppingGranularity }, _ => { });
             });
         }
 
@@ -442,7 +442,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 {
                     return;
                 }
-                adapterHost.SendRequest(new StepInRequest { ThreadId = mainThread.Id, Granularity = steppingGranularity }, _ => { });
+                adapterHost.SendRequest(new StepInRequest { ThreadId = MainThread.Id, Granularity = steppingGranularity }, _ => { });
             });
         }
 
@@ -457,7 +457,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 {
                     return;
                 }
-                adapterHost.SendRequest(new StepOutRequest { ThreadId = mainThread.Id, Granularity = steppingGranularity }, _ => { });
+                adapterHost.SendRequest(new StepOutRequest { ThreadId = MainThread.Id, Granularity = steppingGranularity }, _ => { });
             });
         }
 

@@ -25,7 +25,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </summary>
         private void SetupControls()
         {
-            controls = PrefabInstantiator.InstantiatePrefab(DebugControlsPrefab, transform, false);
+            controls = PrefabInstantiator.InstantiatePrefab(debugControlsPrefab, transform, false);
             controls.transform.position = new Vector3(Screen.width * 0.5f, Screen.height * 0.9f, 0);
 
             actions.Enqueue(() =>
