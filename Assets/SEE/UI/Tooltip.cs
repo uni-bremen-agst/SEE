@@ -129,7 +129,7 @@ namespace SEE.UI
         /// <summary>
         /// The instance of the tooltip.
         ///
-        /// Prefer using <see cref="tooltip"/> instead of this field.
+        /// Prefer using <see cref="Instance"/> instead of this field.
         /// </summary>
         private static Tooltip instance;
 
@@ -146,7 +146,7 @@ namespace SEE.UI
         /// <summary>
         /// Lazily initialized tooltip instance. Behaves like a singleton.
         /// </summary>
-        private static Tooltip tooltip
+        private static Tooltip Instance
         {
             get
             {
@@ -204,7 +204,7 @@ namespace SEE.UI
         /// </summary>
         public static void Deactivate()
         {
-            tooltip.ChangeText(null);
+            Instance.ChangeText(null);
         }
 
         /// <summary>
@@ -218,7 +218,7 @@ namespace SEE.UI
             {
                 Debug.LogWarning($"Prefer using {nameof(Deactivate)} instead of passing null to {nameof(ActivateWith)}.\n");
             }
-            tooltip.ChangeText(text, afterShownBehavior);
+            Instance.ChangeText(text, afterShownBehavior);
         }
 
         /// <summary>
