@@ -58,17 +58,17 @@ namespace SEE.UI
         private const string tooltipName = "SEETooltip";
 
         /// <summary>
-        /// The time it shall take to fade in the tooltip.
+        /// The time it shall take to fade in the tooltip in seconds.
         /// </summary>
         private const float fadeInDuration = 0.3f;
 
         /// <summary>
-        /// The time it will take to fade out.
+        /// The time it will take to fade out in seconds.
         /// </summary>
         private const float fadeOutDuration = fadeInDuration / 2;
 
         /// <summary>
-        /// The time to wait before showing the tooltip.
+        /// The time to wait before showing the tooltip in seconds.
         /// </summary>
         private const float delay = 0.5f;
 
@@ -134,7 +134,7 @@ namespace SEE.UI
         private static Tooltip instance;
 
         /// <summary>
-        /// The time which has passed since the last time the mouse was moved.
+        /// The time in seconds that has passed since the last time the mouse was moved.
         /// </summary>
         private float waitTime;
 
