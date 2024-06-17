@@ -395,12 +395,33 @@ namespace SEE.Game.Drawable
             /// Enter the data in the own node holder.
             MMNodeValueHolder nodeValueHolder = child.GetComponent<MMNodeValueHolder>();
             nodeValueHolder.SetParent(parent, branchLine);
-            nodeValueHolder.Layer = parentValueHolder.Layer + 1;
+            //nodeValueHolder.Layer = parentValueHolder.Layer + 1;
+            MindMapLayer(nodeValueHolder, parentValueHolder);
 
             /// Disable the Mesh Collider of the branch line.
             /// It has the same reason as for the border.
             branchLine.GetComponent<MeshCollider>().enabled = false;
             return branchLine;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="holder"></param>
+        /// <param name="parent"></param>
+        private static void MindMapLayer(MMNodeValueHolder holder, MMNodeValueHolder parent)
+        {
+            int oldLayer = holder.Layer;
+            holder.Layer = parent.Layer + 1;
+
+            if (holder.Layer != oldLayer && holder.GetChildren().Count > 0)
+            {
+                foreach(GameObject child in holder.GetChildren().Keys) 
+                {
+                    MMNodeValueHolder childHolder = child.GetComponent<MMNodeValueHolder>();
+                    MindMapLayer(childHolder, holder);
+                }
+            }
         }
 
         /// <summary>
