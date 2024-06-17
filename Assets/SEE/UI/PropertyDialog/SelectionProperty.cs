@@ -13,26 +13,24 @@ namespace SEE.UI.PropertyDialog
     public class SelectionProperty : Property<string>
     {
 
+        /// <summary>
+        /// Adds options to the list of options.
+        /// </summary>
+        /// <param name="options">additional options</param>
         public void AddOptions(IEnumerable<string> options)
         {
             this.options.AddRange(options);
         }
 
+        /// <summary>
+        /// The list of options.
+        /// </summary>
         private readonly List<string> options = new();
 
         /// <summary>
         /// The prefab for a string input field.
         /// </summary>
         private const string inputFieldPrefab = "Prefabs/UI/InputFields/SelectionInputField";
-
-        /// <summary>
-        /// The text field in which the value will be entered by the user.
-        /// Note: The input field has a child Text Area/Text with a TextMeshProUGUI
-        /// component holding the text, too. Yet, one should never use the latter, because
-        /// the latter contains invisible characters. One must always use the attribute
-        /// text of the TMP_InputField.
-        /// </summary>
-        private TMP_InputField textField;
 
         /// <summary>
         /// Instantiation of the prefab <see cref="inputFieldPrefab"/>.
@@ -55,7 +53,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// The horizontal selector.
         /// </summary>
-        public HorizontalSelector horizontalSelector { get; private set; }
+        public HorizontalSelector HorizontalSelector { get; private set; }
 
         /// <summary>
         /// Sets <see cref="inputField"/> as an instantiation of prefab <see cref="inputFieldPrefab"/>.
@@ -68,9 +66,9 @@ namespace SEE.UI.PropertyDialog
             {
                 SetParent(parentOfInputField);
             }
-            inputField.gameObject.name = Name;
-            horizontalSelector = GetHorizontalSelector(inputField);
-            SetOptions(horizontalSelector, options);
+            inputField.name = Name;
+            HorizontalSelector = GetHorizontalSelector(inputField);
+            SetOptions(HorizontalSelector, options);
             SetupTooltip(inputField);
 
             #region Local Methods
@@ -137,20 +135,20 @@ namespace SEE.UI.PropertyDialog
         /// The buffered selected value. Because <see cref="Value"/> may be set before
         /// <see cref="StartDesktop"/> is called, the parameter passed to
         /// <see cref="Value"/> will be buffered in this attribute if <see cref="StartDesktop"/>
-        /// has not been called and, hence, <see cref="horizontalSelector"/> does not exist yet.
+        /// has not been called and, hence, <see cref="HorizontalSelector"/> does not exist yet.
         /// </summary>
         private string savedValue;
 
         /// <summary>
         /// Moves the selector to the <see cref="savedValue"/>.
-        /// Assumption: <see cref="horizontalSelector"/> is not null.
+        /// Assumption: <see cref="HorizontalSelector"/> is not null.
         /// </summary>
         /// <exception cref="Exception">thrown in case <see cref="savedValue"/> is not
         /// contained in <see cref="options"/></exception>
         public override void GetReady()
         {
-            UnityEngine.Assertions.Assert.IsNotNull(horizontalSelector);
-            if (savedValue != options[horizontalSelector.index])
+            UnityEngine.Assertions.Assert.IsNotNull(HorizontalSelector);
+            if (savedValue != options[HorizontalSelector.index])
             {
                 MoveToSelection(savedValue);
             }
@@ -161,7 +159,7 @@ namespace SEE.UI.PropertyDialog
         /// </summary>
         public override string Value
         {
-            get => horizontalSelector == null ? savedValue : options[horizontalSelector.index];
+            get => HorizontalSelector == null ? savedValue : options[HorizontalSelector.index];
             set
             {
                 // Because the Value could be set before StartDesktop() was called,
@@ -181,22 +179,22 @@ namespace SEE.UI.PropertyDialog
         /// contained in <see cref="options"/></exception>
         private void MoveToSelection(string option)
         {
-            if (horizontalSelector != null)
+            if (HorizontalSelector != null)
             {
                 int targetIndex = GetIndex(option);
-                int currentIndex = horizontalSelector.index;
+                int currentIndex = HorizontalSelector.index;
                 if (targetIndex < currentIndex)
                 {
                     for (int i = currentIndex - targetIndex; i >= 1; i--)
                     {
-                        horizontalSelector.PreviousClick();
+                        HorizontalSelector.PreviousClick();
                     }
                 }
                 else if (targetIndex > currentIndex)
                 {
                     for (int i = targetIndex - currentIndex; i >= 1; i--)
                     {
-                        horizontalSelector.ForwardClick(); ;
+                        HorizontalSelector.ForwardClick(); ;
                     }
                 }
             }

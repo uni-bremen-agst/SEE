@@ -180,10 +180,10 @@ namespace SEE.UI.DebugAdapterProtocol
             OnAdapterChanged();
             debugAdapterProperty.OnComponentInitialized += () =>
             {
-                debugAdapterProperty.horizontalSelector.selectorEvent.AddListener(_ =>
+                debugAdapterProperty.HorizontalSelector.selectorEvent.AddListener(_ =>
                 {
                     UpdateValues();
-                    adapter = adapters[debugAdapterProperty.horizontalSelector.index];
+                    adapter = adapters[debugAdapterProperty.HorizontalSelector.index];
                     OnAdapterChanged();
                 });
             };
