@@ -133,14 +133,12 @@ namespace SEE.Game.CityRendering
                     Vector3[] positions = TinySplineInterop.ListToVectors(bSpline.Sample());
                     line.positionCount = positions.Length; // number of vertices
                     line.SetPositions(positions);
-
-                    InteractionDecorator.PrepareForInteraction(gameEdge);
+                    gameEdge.AddComponent<InteractableObject>();
                     AddLOD(gameEdge);
 
                     AuthorRef authorRef = nodeOfAuthor.Value.AddOrGetComponent<AuthorRef>();
                     authorRef.AuthorSphere = sphere;
                     authorRef.Edges.Add(gameEdge);
-                    // return gameEdge;
                 }
             }
         }
@@ -149,10 +147,6 @@ namespace SEE.Game.CityRendering
         {
             Vector3[] points = new Vector3[2];
             points[0] = start;
-            //points[1] = points[0]; // we are maintaining the x and z co-ordinates,
-            //points[1].y = yLevel;   // but adjust the y co-ordinate
-            // points[2] = end;
-            //points[2].y = yLevel;
             points[1] = end;
             return new TinySpline.BSpline(2, 3, 1)
             {
@@ -182,6 +176,11 @@ namespace SEE.Game.CityRendering
                 spacingX = parentRenderer.bounds.size.x;
             }
 
+            if (float.IsInfinity(spacingZ) || float.IsNaN(spacingZ))
+            {
+                spacingZ = parentRenderer.bounds.size.z;
+            }
+
 
             int counter = 0;
             // Define materials for the spheres
@@ -202,17 +201,17 @@ namespace SEE.Game.CityRendering
 
                     GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                     gameObject.name = "AuthorSphere:" + authors[counter];
-     
+
                     AuthorSphere author = gameObject.AddComponent<AuthorSphere>();
                     author.Author = authors[counter];
-                
+
                     gameObject.AddComponent<InteractableObject>();
-                    var op = gameObject.AddComponent<NodeOperator>();
+                    //var op = gameObject.AddComponent<NodeOperator>();
                     gameObject.AddComponent<ShowHovering>();
-      
+
                     Vector3 startLabelPosition = gameObject.GetTop();
                     float fontSize = 2f;
-                    
+
                     GameObject nodeLabel = new GameObject("Text " + authors[counter])
                     {
                         tag = Tags.Text
@@ -225,7 +224,7 @@ namespace SEE.Game.CityRendering
                     tm.text = authors[counter];
                     tm.color = Color.white;
                     tm.alignment = TextAlignmentOptions.Center;
-                    
+
                     nodeLabel.name = "Label:" + authors[counter];
                     nodeLabel.transform.SetParent(gameObject.transform);
 
