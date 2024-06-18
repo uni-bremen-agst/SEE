@@ -16,24 +16,25 @@ namespace SEE.UI.Window.NoteWindow
                 {
                     GameObject go = new GameObject("NoteManager");
                     instance = go.AddComponent<NoteManager>();
-                    DontDestroyOnLoad(go);
+                    //DontDestroyOnLoad(go);
                 }
                 return instance;
             }
         }
 
-        private static Dictionary<KeyValuePair<string, bool>, string> notesDictionary = new Dictionary<KeyValuePair<string, bool>, string>();
+        private Dictionary<KeyValuePair<string, bool>, string> notesDictionary = new Dictionary<KeyValuePair<string, bool>, string>();
 
-        public static void SaveNote(string title, bool isPublic, string content)
+        public void SaveNote(string title, bool isPublic, string content)
         {
             if (!string.IsNullOrEmpty(title))
             {
                 KeyValuePair<string, bool> keyPair = new KeyValuePair<string, bool>(title, isPublic);
                 notesDictionary[keyPair] = content;
+                //Debug.Log("DictionaryLength: " + notesDictionary.Count);
             }
         }
 
-        public static string LoadNote(string title, bool isPublic)
+        public string LoadNote(string title, bool isPublic)
         {
             KeyValuePair<string, bool> keyPair = new KeyValuePair<string, bool>(title, isPublic);
             if (notesDictionary.ContainsKey(keyPair))
@@ -41,6 +42,11 @@ namespace SEE.UI.Window.NoteWindow
                 return notesDictionary[keyPair];
             }
             return "";
+        }
+
+        private void OnApplicationQuit()
+        {
+            Destroy(gameObject); // Löscht das GameObject und somit auch die Komponente
         }
     }
 }

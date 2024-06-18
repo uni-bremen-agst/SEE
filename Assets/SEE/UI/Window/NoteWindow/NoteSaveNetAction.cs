@@ -24,9 +24,11 @@ namespace SEE.UI.Window.NoteWindow
 
         protected override void ExecuteOnClient()
         {
+            Debug.Log("SaveNetBeforeIf");
             if (!IsRequester())
             {
-                NoteManager.SaveNote(title, isPublic, content);
+                Debug.Log("SaveNetActionAfterIf");
+                NoteManager.Instance.SaveNote(title, isPublic, content);
             }
         }
 

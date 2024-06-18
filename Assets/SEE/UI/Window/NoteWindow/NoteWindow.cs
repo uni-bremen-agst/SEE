@@ -58,11 +58,16 @@ namespace SEE.UI.Window.NoteWindow
             ButtonManagerBasic deleteButton = noteWindow.transform.Find("ScrollView/Viewport/Content/DeleteButton").gameObject.MustGetComponent<ButtonManagerBasic>();
             deleteButton.clickEvent.AddListener(DeleteFile);
 
+            ButtonManagerBasic refreshButton = noteWindow.transform.Find("ScrollView/Viewport/Content/RefreshButton").gameObject.MustGetComponent<ButtonManagerBasic>();
+            refreshButton.clickEvent.AddListener(LoadNote);
+
             switchManager = noteWindow.transform.Find("ScrollView/Viewport/Content/Switch").gameObject.MustGetComponent<SwitchManager>();
             switchManager.OnEvents.AddListener(onSwitch);
             switchManager.OffEvents.AddListener(offSwitch);
 
             noteManager = NoteManager.Instance;
+
+            searchField.onDeselect.AddListener(_ => SaveNote(switchManager.isOn));
 
             LoadNote();
         }
@@ -78,8 +83,6 @@ namespace SEE.UI.Window.NoteWindow
             SaveNote(true);
             LoadNote();
         }
-
-
 
         private void WriteToFile()
         {
@@ -113,25 +116,33 @@ namespace SEE.UI.Window.NoteWindow
 
         private void SaveNote(bool isPublic)
         {
-            string title = Title;
-            string content = searchField.text;
+            if (isPublic)
+            {
+                string title = Title;
+                string content = searchField.text;
 
-            NoteManager.SaveNote(title, isPublic, content);
-            new NoteSaveNetAction(title, isPublic, content).Execute();
+                NoteManager.Instance.SaveNote(title, isPublic, content);
+                new NoteSaveNetAction(title, true, content).Execute();
+            }
+            else
+            {
+                string title = Title;
+                string content = searchField.text;
+
+                NoteManager.Instance.SaveNote(title, isPublic, content);
+            }
         }
 
-        private void LoadNote()
+        public void LoadNote()
         {
             string title = Title;
             bool isPublic = switchManager.isOn;
-            searchField.text = NoteManager.LoadNote(title, isPublic);
+            searchField.text = NoteManager.Instance.LoadNote(title, isPublic);
         }
 
         private void OnDestroy()
         {
             // Save the note content when the window is destroyed (closed) and mark the Node/Edge with a sticky note
-            bool isPublic = switchManager.isOn;
-            SaveNote(isPublic);
         }
 
         public override void RebuildLayout()

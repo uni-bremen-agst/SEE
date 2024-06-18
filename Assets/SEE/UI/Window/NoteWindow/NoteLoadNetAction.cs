@@ -13,16 +13,22 @@ namespace SEE.UI.Window.NoteWindow
 
         public bool isPublic;
 
-        public NoteLoadNetAction(string title, bool isPublic)
+        public NoteWindow noteWindow;
+
+        public NoteLoadNetAction(string title, bool isPublic, NoteWindow noteWindow)
         {
             this.title = title;
             this.isPublic = isPublic;
+            this.noteWindow = noteWindow;
+            Debug.Log("noteWindow: " + noteWindow);
         }
         protected override void ExecuteOnClient()
         {
+            Debug.Log("NoteLoadBeforeIf");
             if (!IsRequester())
             {
-                NoteManager.LoadNote(title, isPublic);
+                Debug.Log("NoteLoadAfterIf" );
+                noteWindow.searchField.text = NoteManager.Instance.LoadNote(title, isPublic);
             }
         }
 
