@@ -244,7 +244,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
                         arguments.Add(currentArgument.ToString());
                     }
                     inString = !inString;
-                } 
+                }
                 else if (inString)
                 {
                     // backslash escapes the next character (allows quotation marks)
