@@ -594,10 +594,10 @@ namespace SEE.Game.City
 
         /// <summary>
         /// Yields a mapping of all node attribute names that define erosion issues
-        /// for leaf nodes in the GXL file onto the icons to be used for visualizing them.
+        /// for nodes in the GXL file onto the icons to be used for visualizing them.
         /// </summary>
-        /// <returns>mapping of all node attribute names for leaves onto icon ids</returns>
-        public Dictionary<string, IconFactory.Erosion> LeafIssueMap() =>
+        /// <returns>mapping of all node attribute names onto icon ids</returns>
+        public Dictionary<string, IconFactory.Erosion> IssueMap() =>
             new()
             {
                 { ErosionSettings.ArchitectureIssue, IconFactory.Erosion.ArchitectureViolation },
@@ -606,19 +606,12 @@ namespace SEE.Game.City
                 { ErosionSettings.DeadCodeIssue, IconFactory.Erosion.DeadCode },
                 { ErosionSettings.MetricIssue, IconFactory.Erosion.Metric },
                 { ErosionSettings.StyleIssue, IconFactory.Erosion.Style },
-                { ErosionSettings.UniversalIssue, IconFactory.Erosion.Universal }
+                { ErosionSettings.UniversalIssue, IconFactory.Erosion.Universal },
+                { ErosionSettings.LspError, IconFactory.Erosion.LspError },
+                { ErosionSettings.LspWarning, IconFactory.Erosion.LspWarning },
+                { ErosionSettings.LspInfo, IconFactory.Erosion.LspInfo },
+                { ErosionSettings.LspHint, IconFactory.Erosion.LspHint }
             };
-
-        /// <summary>
-        /// Yields a mapping of all node attribute names that define erosion issues
-        /// for inner nodes onto the icons to be used for visualizing them.
-        /// These are usually the same attributes from <see cref="LeafIssueMap"/>, appended with
-        /// <see cref="MetricAggregator.SumExtension"/>, i.e., they represent the aggregated issue metrics.
-        /// </summary>
-        /// <returns>mapping of all node attribute names for inner nodes onto icon ids</returns>
-        public Dictionary<string, IconFactory.Erosion> InnerIssueMap() =>
-            LeafIssueMap().Select(x => (Key: x.Key + MetricAggregator.SumExtension, x.Value))
-                          .ToDictionary(x => x.Key, x => x.Value);
 
         /// <summary>
         /// Lists the metrics for each node type.

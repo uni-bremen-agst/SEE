@@ -105,11 +105,6 @@ namespace SEE.UI.DebugAdapterProtocol
         private InitializeResponse capabilities;
 
         /// <summary>
-        /// The tooltip.
-        /// </summary>
-        private Tooltip.Tooltip tooltip;
-
-        /// <summary>
         /// The variables window.
         /// </summary>
         private VariablesWindow variablesWindow;
@@ -228,8 +223,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </summary>
         protected override void StartDesktop()
         {
-            // creates ui elements
-            tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
+            // creates UI elements
             OpenConsole(true);
             ConsoleWindow.OnInputSubmit += OnConsoleInput;
             SetupControls();
@@ -341,10 +335,6 @@ namespace SEE.UI.DebugAdapterProtocol
             if (controls)
             {
                 Destroyer.Destroy(controls);
-            }
-            if (tooltip)
-            {
-                Destroyer.Destroy(tooltip);
             }
             if (adapterProcess != null && !adapterProcess.HasExited)
             {

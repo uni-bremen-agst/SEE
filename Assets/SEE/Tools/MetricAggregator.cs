@@ -92,8 +92,6 @@ namespace SEE.Tools
                     {
                         if (TryGetNumeric(child, leafMetric, innerMetric, out float childValue))
                         {
-                            // Note: Comparisons to NaN as nodeValue == float.NaN always return false,
-                            // no matter what the value of the float is. We must use float.IsNaN(nodeValue).
                             if (nodeValue.HasValue)
                             {
                                 nodeValue = func(nodeValue.Value, childValue);

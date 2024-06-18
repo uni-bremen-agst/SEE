@@ -52,7 +52,7 @@ namespace SEE.UI.DebugAdapterProtocol
         private void OnWordHoverEnd(CodeWindow codeWindow, TMP_WordInfo wordInfo)
         {
             hoveredWord = null;
-            tooltip.Hide();
+            Tooltip.Deactivate();
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace SEE.UI.DebugAdapterProtocol
                     Context = capabilities.SupportsEvaluateForHovers == true ? EvaluateArguments.ContextValue.Hover : null,
                     FrameId = StackFrame.Id
                 });
-                tooltip.Show(result.Result, 0.25f);
+                Tooltip.ActivateWith(result.Result);
             }
             catch (ProtocolException e)
             {

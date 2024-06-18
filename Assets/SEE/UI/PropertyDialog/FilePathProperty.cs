@@ -62,12 +62,6 @@ namespace SEE.UI.PropertyDialog
         private GameObject parentOfInputField;
 
         /// <summary>
-        /// The tooltip containing the <see cref="Description"/> of this <see cref="Property"/>, which will
-        /// be displayed when hovering above it.
-        /// </summary>
-        private Tooltip.Tooltip tooltip;
-
-        /// <summary>
         /// Sets <see cref="inputField"/> as an instantiation of prefab <see cref="filePathInputFieldPrefab"/>.
         /// Sets the label and value of the field.
         /// </summary>
@@ -78,7 +72,7 @@ namespace SEE.UI.PropertyDialog
             {
                 SetParent(parentOfInputField);
             }
-            inputField.gameObject.name = Name;
+            inputField.name = Name;
             SetLabel(inputField);
             SetInitialInput(inputField, savedValue);
             textField = GetInputField(inputField);
@@ -91,12 +85,11 @@ namespace SEE.UI.PropertyDialog
 
             void SetupTooltip(GameObject field)
             {
-                tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
                 if (field.TryGetComponentOrLog(out PointerHelper pointerHelper))
                 {
                     // Register listeners on entry and exit events, respectively
-                    pointerHelper.EnterEvent.AddListener(_ => tooltip.Show(Description));
-                    pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
+                    pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith(Description));
+                    pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
                 }
             }
 
@@ -106,7 +99,7 @@ namespace SEE.UI.PropertyDialog
                 {
                     tmPro.text = value;
                     // Hide tooltip when any text is entered so as not to obscure the text
-                    tmPro.onValueChanged.AddListener(_ => tooltip.Hide());
+                    tmPro.onValueChanged.AddListener(_ => Tooltip.Deactivate());
                 }
             }
 

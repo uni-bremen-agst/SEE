@@ -67,11 +67,6 @@ namespace SEE.UI.DebugAdapterProtocol
         private static DebugAdapterProtocolSession session;
 
         /// <summary>
-        /// The tooltip.
-        /// </summary>
-        private Tooltip.Tooltip tooltip;
-
-        /// <summary>
         /// The run button.
         /// </summary>
         public GameObject RunButton;
@@ -103,23 +98,21 @@ namespace SEE.UI.DebugAdapterProtocol
         /// Adds listeners and tooltips to the BaseWindow buttons.
         /// </summary>
         protected override void StartDesktop() {
-            tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
-
             RunButton.MustGetComponent<ButtonManagerBasic>().clickEvent.AddListener(Run);
             DebugAdapterConfigButton.MustGetComponent<ButtonManagerBasic>().clickEvent.AddListener(OpenDebugAdapterConfig);
             LaunchConfigButton.MustGetComponent<ButtonManagerBasic>().clickEvent.AddListener(OpenLaunchConfig);
 
             PointerHelper pointerHelper = RunButton.MustGetComponent<PointerHelper>();
-            pointerHelper.EnterEvent.AddListener(_ => tooltip.Show("Run"));
-            pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
-            
+            pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith("Run"));
+            pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
+
             pointerHelper = DebugAdapterConfigButton.MustGetComponent<PointerHelper>();
-            pointerHelper.EnterEvent.AddListener(_ => tooltip.Show("Debug Adapter"));
-            pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
+            pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith("Debug Adapter"));
+            pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
 
             pointerHelper = LaunchConfigButton.MustGetComponent<PointerHelper>();
-            pointerHelper.EnterEvent.AddListener(_ => tooltip.Show("Launch Configuration"));
-            pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
+            pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith("Launch Configuration"));
+            pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
         }
 
         /// <summary>

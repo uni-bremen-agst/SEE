@@ -32,11 +32,6 @@ namespace SEE.UI.PropertyDialog
         private GameObject parentOfInputField;
 
         /// <summary>
-        /// The tooltip.
-        /// </summary>
-        private Tooltip.Tooltip tooltip;
-
-        /// <summary>
         /// The value before the <see cref="switchManager"/> is initialized.
         /// </summary>
         private bool savedValue;
@@ -69,7 +64,7 @@ namespace SEE.UI.PropertyDialog
             {
                 SetParent(parentOfInputField);
             }
-            inputField.gameObject.name = Name;
+            inputField.name = Name;
 
             Transform placeHolder = inputField.transform.Find("Label");
             if (placeHolder.gameObject.TryGetComponentOrLog(out TextMeshProUGUI nameTextMeshPro))
@@ -77,11 +72,10 @@ namespace SEE.UI.PropertyDialog
                 nameTextMeshPro.text = Name;
             }
 
-            tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
             if (inputField.TryGetComponentOrLog(out PointerHelper pointerHelper))
             {
-                pointerHelper.EnterEvent.AddListener(_ => tooltip.Show(Description));
-                pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
+                pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith(Description));
+                pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
             }
         }
 

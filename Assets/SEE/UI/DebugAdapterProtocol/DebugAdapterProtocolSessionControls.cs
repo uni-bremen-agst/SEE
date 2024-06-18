@@ -51,8 +51,8 @@ namespace SEE.UI.DebugAdapterProtocol
                     button.MustGetComponent<ButtonManagerBasic>().clickEvent.AddListener(() => action());
                     if (button.TryGetComponentOrLog(out PointerHelper pointerHelper))
                     {
-                        pointerHelper.EnterEvent.AddListener(_ => tooltip.Show(description));
-                        pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
+                        pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith(description));
+                        pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
                     }
                 }
                 UpdateVisibility();
