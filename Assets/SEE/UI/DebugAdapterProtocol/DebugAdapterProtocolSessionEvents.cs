@@ -78,7 +78,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 });
                 Tooltip.ActivateWith(result.Result);
             }
-            catch (ProtocolException e)
+            catch (ProtocolException)
             {
                 // Ignore exceptions on hover
                 // Thrown when the hovered word isn't known
