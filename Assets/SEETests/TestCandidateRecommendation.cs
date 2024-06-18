@@ -76,45 +76,48 @@ namespace SEE.Tools.Architecture
 
         private void SetupCountAttract(float phi = 1.0f)
         {
-            MappingExperimentConfig config = new MappingExperimentConfig();
+            RecommendationSettings config = new RecommendationSettings();
             CountAttractConfig attractConfig = new CountAttractConfig();
             attractConfig.Phi = phi;
             attractConfig.CandidateType = "Candidate";
             attractConfig.ClusterType = "Cluster";
-            config.AttractFunctionConfig = attractConfig;
+            config.CountAttractConfig = attractConfig;
+            config.AttractFunctionType = AttractFunction.AttractFunctionType.CountAttract;
             candidateRecommendation.UpdateConfiguration(graph, config);
             candidateRecommendation.UpdateRecommendations();
         }
 
         private void SetupNBAttract(INodeReader nodeReader, bool useCda = false)
         {
-            MappingExperimentConfig config = new MappingExperimentConfig();
+            RecommendationSettings config = new RecommendationSettings();
             NBAttractConfig attractConfig = new NBAttractConfig();
             config.NodeReader = nodeReader;
             attractConfig.UseCDA = useCda;
             attractConfig.CandidateType = "Candidate";
             attractConfig.ClusterType = "Cluster";
             attractConfig.AlphaSmoothing = 1.0;
-            config.AttractFunctionConfig = attractConfig;
+            config.NBAttractConfig = attractConfig;
+            config.AttractFunctionType = AttractFunction.AttractFunctionType.NBAttract;
             candidateRecommendation.UpdateConfiguration(graph, config);
             candidateRecommendation.UpdateRecommendations();
         }
 
         private void SetupADCAttract(INodeReader nodeReader, Document.DocumentMergingType mergingType) 
         {
-            MappingExperimentConfig config = GetADCAttractConfig(mergingType);
+            RecommendationSettings config = GetADCAttractConfig(mergingType);
             config.NodeReader = nodeReader;
             candidateRecommendation.UpdateConfiguration(graph, config);
             candidateRecommendation.UpdateRecommendations();
         }
 
-        private MappingExperimentConfig GetADCAttractConfig(Document.DocumentMergingType mergingType)
+        private RecommendationSettings GetADCAttractConfig(Document.DocumentMergingType mergingType)
         {
-            MappingExperimentConfig config = new MappingExperimentConfig();
+            RecommendationSettings config = new RecommendationSettings();
             ADCAttractConfig attractConfig = new ADCAttractConfig(mergingType);
             attractConfig.CandidateType = "Candidate";
             attractConfig.ClusterType = "Cluster";
-            config.AttractFunctionConfig = attractConfig;
+            config.ADCAttractConfig = attractConfig;
+            config.AttractFunctionType = AttractFunction.AttractFunctionType.ADCAttract;
             return config;
         }
 
@@ -343,7 +346,7 @@ namespace SEE.Tools.Architecture
              *          
              * dis() is overlap(X,Y) = |(X Intersect Y)| / Min(|X|, |Y|)
              * 
-             * Matches(A,i) = { e | (e.source = i or e.target = e) and i maps to A => e is allowed or e is implicitlyAllowed}
+             * Matches(A,i) = { e | (e.source = i or e.target = i) and i maps to A => e is allowed or e is implicitlyAllowed}
              * 
              * AllowedBy(e) = E | E.Source in MapsTo(e.Source).Outgoings and E.Target in MapsTo(e.Source).Incomings
              * 

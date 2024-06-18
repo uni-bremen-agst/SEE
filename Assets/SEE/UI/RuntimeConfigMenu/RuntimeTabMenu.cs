@@ -24,6 +24,8 @@ using UnityEngine.UI;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using SEE.GraphProviders;
+using Assets.SEE.Tools.ReflexionAnalysis;
+using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
 
 namespace SEE.UI.RuntimeConfigMenu
 {
@@ -405,7 +407,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="memberInfo">field or property info</param>
         /// <param name="parent">parent (container game object: <see cref="CreateNestedSetting"/>)</param>
         /// <param name="obj">object which contains the field or property</param>
-        private void CreateSetting(MemberInfo memberInfo, GameObject parent, object obj)
+        private void CreateSetting(MemberInfo memberInfo, GameObject parent, object obj, bool debug = false)
         {
             // obsolete members are ignored
             if (memberInfo.GetCustomAttributes().Any(attribute => attribute is ObsoleteAttribute))
@@ -614,7 +616,11 @@ namespace SEE.UI.RuntimeConfigMenu
                 case IncrementalTreeMapAttributes:
                 case VisualAttributes:
                 case ConfigIO.IPersistentConfigItem:
-                case LabelAttributes:
+                case LabelAttributes:         
+                case RecommendationSettings:
+                case CountAttractConfig:
+                case ADCAttractConfig:
+                case NBAttractConfig:
                     parent = CreateNestedSetting(settingName, parent);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;

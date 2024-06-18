@@ -12,7 +12,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
     {
         public int Seed { get; set; }
 
-        private MappingExperimentConfig config;
+        private RecommendationSettings config;
 
         public double Hits { get; private set; }
         public double Fails { get; private set; }
@@ -57,7 +57,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         //    this.resultsOrdered.Clear();
         //}
 
-        public void AddConfigInformation(MappingExperimentConfig config)
+        public void AddConfigInformation(RecommendationSettings config)
         {
             this.config = config;
         }
@@ -166,7 +166,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         }
 
         public static MappingExperimentResult AverageResults(IEnumerable<MappingExperimentResult> results, 
-                                                             MappingExperimentConfig config)
+                                                             RecommendationSettings config)
         {
             MappingExperimentResult averageResult = new MappingExperimentResult();
 

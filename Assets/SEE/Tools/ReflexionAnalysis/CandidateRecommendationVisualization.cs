@@ -36,9 +36,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         private object visualizedReflexionGraphLock = new object();
 
         private bool ProcessingEvents { get; set; }
+        
+        private bool ProcessingData { get; set; }
+
+        private bool Processing { get => ProcessingEvents || ProcessingData; }
 
         private const string updateConfigurationButtonLabel = "Update Configuration";
-        private const string createInitialMappingLabel = "Create Initial Mapping";
         private const string startAutomatedMappingLabel = "Start Automated Mapping";
         private const string runExperimentLabel = "Run Experiment";
         private const string showRecommendationLabel = "Show Recommendation";
@@ -56,7 +59,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         private const string debugButtonGroup = "debugButtonGroup";
 
         // TODO: Resolve target language properly, when creating AttractFunctions
-        public MappingExperimentConfig mappingConfig;
+        private RecommendationSettings recommendationSettings;
 
         private string csvFileName = "output.csv";
         private string xmlFileName = "output.xml";
@@ -66,6 +69,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         private ReflexionGraph reflexionGraphViz;
 
         private Graph oracleMapping;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool OracleGraphLoaded { get => CandidateRecommendation.OracleGraphLoaded; }
 
         #region IObserver
         public void OnCompleted()
@@ -80,26 +88,24 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         public void OnNext(ChangeEvent value)
         {
-            UnityEngine.Debug.Log($"Received event in Visualization: {value.ToString()}");
+            // UnityEngine.Debug.Log($"Received event in Visualization: {value.ToString()}");
 
             if (value is NodeEvent || value is EdgeEvent || value is HierarchyEvent)
             {
                 changeEventQueue.Enqueue(value);
-                // UnityEngine.Debug.Log($"Received Change event {value}. Enqueued event.");
+                UnityEngine.Debug.Log($"Received Change event {value}. Enqueued event.");
             }
 
             // TODO: How to solve event filtering in both classes, EventFilter class?
             if (!ProcessingEvents && value is EdgeEvent edgeEvent && edgeEvent.Affected == ReflexionSubgraphs.Mapping)
             {
-                // Debug.Log($"In Vizualization: Queued Changeevent in Mapping... {edgeEvent.ToString()} sender: {edgeEvent.Sender} to process...");
-                ProcessEvents().Forget();
-                TriggerBlinkAnimation().Forget();
+                ProcessEvents().ContinueWith(() => TriggerBlinkAnimation().Forget());         
             }
         }
 
         public void SendEventToCalculationGraph(ChangeEvent value)
         {
-            // UnityEngine.Debug.Log($"Try to send Change event {value} to calculation reflexion graph");
+            UnityEngine.Debug.Log($"Try to send Change event {value} to calculation reflexion graph");
             switch (value)
             {
                 case NodeEvent nodeEvent:
@@ -234,7 +240,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         [Button(generateOracleLabel, ButtonSizes.Small)]
         [ButtonGroup(debugButtonGroup)]
-        public void GenerateOracleLabel()
+        public void GenerateOracleMapping()
         {            
             GameObject codeCityObject = SceneQueries.GetCodeCity(this.transform)?.gameObject;
             if (codeCityObject == null)
@@ -263,7 +269,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         [ButtonGroup(statisticButtonGroup)]
         public void StartRecording()
         {
-            string csvFile = Path.Combine(this.mappingConfig.OutputPath.Path, csvFileName);
+            string csvFile = Path.Combine(this.recommendationSettings.OutputPath.Path, csvFileName);
             CandidateRecommendation.Statistics.StartRecording(csvFile);
         }
 
@@ -278,94 +284,88 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         [ButtonGroup(statisticButtonGroup)]
         public void ProcessData()
         {
-            string csvFile = Path.Combine(this.mappingConfig.OutputPath.Path, csvFileName);
-            string xmlFile = Path.Combine(this.mappingConfig.OutputPath.Path, xmlFileName);
+            string csvFile = Path.Combine(this.recommendationSettings.OutputPath.Path, csvFileName);
+            string xmlFile = Path.Combine(this.recommendationSettings.OutputPath.Path, xmlFileName);
             CandidateRecommendation.Statistics.StopRecording();
             CandidateRecommendation.Statistics.ProcessMappingData(csvFile, xmlFile);
         }
 
-        public void UpdateConfiguration(ReflexionGraph visualizedGraph, Graph oracleMapping = null)
+        public async void UpdateConfiguration(ReflexionGraph visualizedGraph, 
+                                        RecommendationSettings recommendationSettings,
+                                        Graph oracleMapping = null)
         {
+            await UniTask.WaitWhile(() => Processing);
             ProcessingEvents = false;
+            ProcessingData = false;
             changeEventQueue.Clear();
 
-            if (visualizedGraph != null) 
-            {
-                this.reflexionGraphViz = visualizedGraph;     
-            } 
-            else
-            {
-                throw new Exception("Given Reflexion Graph was null. Cannot update Candidate Recommendation configuration.");
-            }
-
-            if(oracleMapping != null)
+            if (oracleMapping != null)
             {
                 this.oracleMapping = oracleMapping;
             }
 
-            if(CandidateRecommendation == null)
+            if (CandidateRecommendation == null)
             {
                 CandidateRecommendation = new CandidateRecommendation();
             }
 
-            if(mappingConfig == null)
+            if (recommendationSettings == null)
             {
-                mappingConfig = new MappingExperimentConfig();
+                throw new Exception("Given Recommendation Settings were null.");
             }
-
-            lock (visualizedReflexionGraphLock)
-            {
-                reflexionGraphCalc = new ReflexionGraph(reflexionGraphViz);
-            }
-            reflexionGraphCalc.Name = "reflexionGraph for Recommendations";
-                
+           
             // These calls are triggering rerunning of the reflexion analysis 
             // within the reflexion graph and the oracle graph. During the analysis
             // we will exclude any parallel writes through processing events
             // or assignments of recommendations towards the graphs
             lock (calculationReflexionGraphLock)
             {
-                UnityEngine.Debug.Log($"Update Configuration called! {oracleMapping}");
+                lock (visualizedReflexionGraphLock)
+                {
+                    if (visualizedGraph != null)
+                    {
+                        this.reflexionGraphViz = visualizedGraph;
+                    }
+                    else
+                    {
+                        throw new Exception("Given Reflexion Graph was null. Cannot update Candidate Recommendation configuration.");
+                    }
+
+                    reflexionGraphCalc = new ReflexionGraph(reflexionGraphViz);
+                }
+
+                reflexionGraphCalc.Name = "reflexionGraph for Recommendations";
                 CandidateRecommendation.UpdateConfiguration(reflexionGraphCalc, 
-                                                            mappingConfig,
-                                                            oracleMapping);     
-            }          
+                                                            recommendationSettings,
+                                                            oracleMapping);
+                TriggerBlinkAnimation().Forget();
+            }
         }
-       
-        //public async UniTask UpdateConfigurationAsync()
-        //{
-        //    await UniTask.RunOnThreadPool(async () => 
-        //    {
-        //    	await UniTask.WaitWhile(() => ProcessingEvents);
-        //        await UniTask.SwitchToMainThread();
-        //        UpdateConfiguration(reflexionGraphViz, oracleMapping);
-        //    });
-        //}
 
         [Button(updateConfigurationButtonLabel, ButtonSizes.Small)]
         public void UpdateConfigurationCommand()
         {
-            UpdateConfiguration(this.reflexionGraphViz, this.oracleMapping);
+            UpdateConfiguration(this.reflexionGraphViz, this.recommendationSettings, this.oracleMapping);
         }
 
-        [Button(createInitialMappingLabel,ButtonSizes.Small)]
-        [ButtonGroup(mappingButtonGroup)]
         // TODO: Move into other class? CandidateRecommendation or ReflexionGraph class?
-        public void CreateInitialMapping()
+        public async UniTask CreateInitialMapping(RecommendationSettings recommendationSettings)
         {
+            // TODO: change datatype to mapping pair list
             Dictionary<Node, HashSet<Node>> initialMapping;
-            UnityEngine.Debug.Log($"Create Initial mapping with seed {mappingConfig.InitialMappingPercentage}");
+            UnityEngine.Debug.Log($"Create Initial mapping with seed {recommendationSettings.InitialMappingPercentage}");
             lock (visualizedReflexionGraphLock)
             {
-                 initialMapping = this.CandidateRecommendation.CreateInitialMapping(mappingConfig.InitialMappingPercentage,
-                                                                               mappingConfig.MasterSeed,
-                                                                               reflexionGraphViz); 
+                 initialMapping = this.CandidateRecommendation.CreateInitialMapping(recommendationSettings.InitialMappingPercentage,
+                                                                               recommendationSettings.MasterSeed,
+                                                                               reflexionGraphViz);
+
             }
             foreach (Node cluster in initialMapping.Keys)
             {
                 foreach (Node candidate in initialMapping[cluster])
                 {
-                    // Debug.Log($"Artificial initial mapping {candidate.ID} --> {cluster.ID}");
+                    Debug.Log($"Artificial initial mapping: {candidate.ID} -mapped to-> {cluster.ID}");
                     MapRecommendation(candidate, cluster).Forget();
                 }
             }
@@ -374,14 +374,16 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         [Button(resetMappingLabel, ButtonSizes.Small)]
         [ButtonGroup(mappingButtonGroup)]
         // TODO: Move into other class? CandidateRecommendation or ReflexionGraph class?
-        public void ResetMapping()
+        public async UniTask ResetMappingAsync()
         {
             // TODO: Implement this within the reflexion graph itself?
-            // TODO: Make this call async
-            lock (visualizedReflexionGraphLock)
+            await UniTask.RunOnThreadPool(() =>
             {
-                reflexionGraphViz.ResetMapping();
-            }
+                lock (visualizedReflexionGraphLock)
+                {
+                    reflexionGraphViz?.ResetMapping();
+                }
+            });
         }
 
         [Button(dumbTrainingDataLabel, ButtonSizes.Small)]
@@ -413,7 +415,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             await UniTask.RunOnThreadPool(() =>
             {
-                RunExperiment(this.mappingConfig, graph, oracleMapping);
+                RunExperiment(this.recommendationSettings, graph, oracleMapping);
             });
         }
 
@@ -466,12 +468,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
 
             string output = sb.ToString();
-            string outputFile = Path.Combine(this.mappingConfig.OutputPath.Path, "oracle.txt");
+            string outputFile = Path.Combine(this.recommendationSettings.OutputPath.Path, "oracle.txt");
 
             File.WriteAllText(outputFile, output);
         }
 
-        public static void RunExperiment(MappingExperimentConfig config, 
+        public static void RunExperiment(RecommendationSettings config, 
                                          ReflexionGraph graph, 
                                          Graph oracleMapping)
         {

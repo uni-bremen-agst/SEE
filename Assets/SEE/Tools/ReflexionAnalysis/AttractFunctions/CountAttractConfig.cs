@@ -1,11 +1,4 @@
-﻿using OpenAI.Chat;
-using SEE.UI.Window.CodeWindow;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 using UnityEngine;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
@@ -16,25 +9,19 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         [SerializeField]
         private float phi;
 
-        [SerializeField]
-        private float delta;
-
         public float Phi { get => phi; set => phi = value; }
-        public float Delta { get => delta; set => delta = value; }
-        public CountAttractConfig(float phi = 1.0f, float delta = 0.0f) 
+        public override AttractFunction.AttractFunctionType AttractFunctionType { get => AttractFunction.AttractFunctionType.CountAttract;}
+
+        public CountAttractConfig(float phi = 1.0f) 
         {
             this.Phi = phi;
-            this.Delta = delta;
-            this.AttractFunctionType = AttractFunction.AttractFunctionType.CountAttract;
         }
 
         public override XElement ToXElement()
         {
             XElement config = base.ToXElement();
             XAttribute phi = new XAttribute("Phi", Phi);
-            XAttribute delta = new XAttribute("Delta", Delta);
             config.Add(phi);
-            config.Add(delta);
             return config;
         }
     }

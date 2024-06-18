@@ -28,6 +28,8 @@ namespace SEE.Game.City
         /// </summary>
         public ReflexionGraph ReflexionGraph => VisualizedSubGraph as ReflexionGraph;
 
+        private Graph oracleMapping = null;
+
         /// <summary>
         /// The <see cref="ReflexionVisualization"/> responsible for handling reflexion analysis changes.
         /// </summary>
@@ -42,7 +44,7 @@ namespace SEE.Game.City
             Tooltip("A graph provider yielding the oracle mapping for a corresponding reflexion graph"),
             TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup),
             HideReferenceObjectPicker]
-        private PipelineGraphProvider OracleMappingProvider { get; set; }
+        public PipelineGraphProvider OracleMappingProvider { get; set; }
 
         /// <summary>
         /// First, if a graph was already loaded, everything will be reset by calling <see cref="Reset"/>.
@@ -70,28 +72,17 @@ namespace SEE.Game.City
                     ProgressBar = progress;
                 }
 
-            LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, UpdateProgress, cancellationTokenSource.Token);
-            Graph oracleMapping = null;
-            if(OracleMappingProvider != null)
-            {
-                oracleMapping = await OracleMappingProvider.ProvideAsync(new Graph(""), this, UpdateProgress, cancellationTokenSource.Token);
-            }
-            AddCandidateRecommendation(LoadedGraph as ReflexionGraph, oracleMapping);
+	            LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, UpdateProgress, cancellationTokenSource.Token);
+                Graph oracleMapping = null;
+	            if(OracleMappingProvider != null)
+	            {
+	                oracleMapping = await OracleMappingProvider.ProvideAsync(new Graph(""), this, UpdateProgress, cancellationTokenSource.Token);
+	            }
+            	UpdateRecommendationSettings();
             }
 
             visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
             visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
-        }
-
-        private void AddCandidateRecommendation(ReflexionGraph loadedGraph, Graph oracleMapping)
-        {
-            CandidateRecommendationVisualization candidateRecommendationViz = gameObject.AddOrGetComponent<CandidateRecommendationVisualization>();
-            if (candidateRecommendationViz != null)
-            {
-                LoadedGraph.Subscribe(candidateRecommendationViz);
-                Debug.Log("Registered CandidateRecommendation.");
-                candidateRecommendationViz.UpdateConfiguration(loadedGraph, oracleMapping);
-            }
         }
 
         protected override void InitializeAfterDrawn()
@@ -111,7 +102,88 @@ namespace SEE.Game.City
             if (attributes.ContainsKey(oracleProviderPathLabel))
             {
                 OracleMappingProvider = GraphProvider.Restore(attributes, oracleProviderPathLabel) as PipelineGraphProvider; 
+            } 
+            else
+            {
+                // TODO: Maybe a provider returning an empty graph would be the better approach
+                OracleMappingProvider = null;
             }
         }
+
+        #region CandidateRecommendation
+
+        private CandidateRecommendationVisualization candidateRecommendationViz;
+
+        private void UpdateRecommendationSettings(ReflexionGraph loadedGraph, RecommendationSettings recommendationSettings, Graph oracleMapping)
+        {
+            candidateRecommendationViz = gameObject.AddOrGetComponent<CandidateRecommendationVisualization>();
+            if (candidateRecommendationViz != null)
+            {
+                loadedGraph.Subscribe(candidateRecommendationViz);
+                candidateRecommendationViz.UpdateConfiguration(loadedGraph, recommendationSettings, oracleMapping);
+            }
+        }
+
+        /// <summary>
+        /// The name of the group for the Inspector buttons managing the candidate recommendation.
+        /// </summary>
+        protected const string RecommendationsButtonsGroup = "RecommendationsButtonsGroup";
+
+        protected const string RecommendationsFoldoutGroup = "Recommendations";
+
+        private bool enableRecommendations = false;
+
+        /// <summary>
+        /// TODO:
+        /// </summary>
+        [OdinSerialize, ShowInInspector,
+        Tooltip("Settings that used to choose candidate recommendations within the reflexion graph."),
+        TabGroup(RecommendationsFoldoutGroup), RuntimeTab(RecommendationsFoldoutGroup),
+        HideReferenceObjectPicker]
+        [PropertyOrder(2)]
+        public RecommendationSettings recommendationSettings = new RecommendationSettings();
+
+        [Button("Update Recommendation Settings", ButtonSizes.Small)]
+        [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Update Recommendation")]
+        // TODO: Property order?
+        // necessary regarding disabling enabling?
+        [PropertyOrder(2)]
+        public void UpdateRecommendationSettings()
+        {
+            UpdateRecommendationSettings(VisualizedSubGraph as ReflexionGraph, recommendationSettings, oracleMapping);
+        }
+
+        [Button("Reset Mapping", ButtonSizes.Small)]
+        [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Reset Mapping")]
+        // TODO: Property order?
+        // necessary regarding disabling enabling?
+        // TODO: Make this call async?
+        [PropertyOrder(3)]
+        public void ResetMapping()
+        {
+            if(VisualizedSubGraph != null)
+            {
+                ((ReflexionGraph)VisualizedSubGraph).ResetMapping();
+            }
+        }
+
+        [Button("Generate initial mapping", ButtonSizes.Small)]
+        [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Generate initial mapping")]
+        // TODO: Make this call async?
+        public async UniTask GenerateOracleMapping()
+        {
+            if (candidateRecommendationViz != null)
+            {
+                if (candidateRecommendationViz.OracleGraphLoaded)
+                {
+                    await candidateRecommendationViz.CreateInitialMapping(recommendationSettings); 
+                } 
+                else
+                {
+                    
+                }
+            }
+        }
+        #endregion
     }
 }

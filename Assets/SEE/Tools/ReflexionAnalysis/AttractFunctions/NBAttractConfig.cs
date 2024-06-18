@@ -1,6 +1,6 @@
-﻿using SEE.Scanner;
 using System.Xml.Linq;
 using UnityEngine;
+using static SEE.Scanner.TokenLanguage;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
@@ -22,20 +22,21 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         public double AlphaSmoothing { get => alphaSmoothing; set => alphaSmoothing = value; }
 
-        public NBAttractConfig(bool useCda = true) : this(TokenLanguage.Plain, useCda)
+        public override AttractFunction.AttractFunctionType AttractFunctionType { get => AttractFunction.AttractFunctionType.NBAttract; }
+
+        public NBAttractConfig(bool useCda = true) : this(TokenLanguageType.Plain, useCda)
         {
         }
 
-        public NBAttractConfig(TokenLanguage language, bool useCda = true) : this(language, useCda, true)
+        public NBAttractConfig(TokenLanguageType language, bool useCda = true) : this(language, useCda, true)
         {
         }
 
-        public NBAttractConfig(TokenLanguage language, bool useCda, bool useStandardTerms)
+        public NBAttractConfig(TokenLanguageType language, bool useCda, bool useStandardTerms)
         {
             this.UseCDA = useCda;
             this.UseStandardTerms = useStandardTerms;
-            this.TargetLanguage = language;
-            this.AttractFunctionType = AttractFunction.AttractFunctionType.NBAttract;
+            this.TokenLanguageType = language;
         }
 
         public override XElement ToXElement()

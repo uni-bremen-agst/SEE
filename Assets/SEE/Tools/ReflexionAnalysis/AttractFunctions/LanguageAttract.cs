@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using static Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions.Document;
+using static SEE.Scanner.TokenLanguage;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
@@ -14,7 +15,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
     {
         private Dictionary<string, Document> cachedDocuments = new Dictionary<string, Document>();
 
-        public TokenLanguage TargetLanguage { get => config.TargetLanguage; set => config.TargetLanguage = value; }
+        public TokenLanguageType TokenLanguageType { get => config.TokenLanguageType; set => config.TokenLanguageType = value; }
 
         private LanguageAttractConfig config;
 
@@ -157,7 +158,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             
             string codeRegion = nodeReader.ReadRegion(node);
 
-            IList<SEEToken> tokens = SEEToken.FromString(codeRegion, TargetLanguage);
+            TokenLanguage tokenLanguage = TokenLanguage.GetTokenLanguageByType(this.TokenLanguageType);
+            IList<SEEToken> tokens = SEEToken.FromString(codeRegion, tokenLanguage);
 
             List<string> words = new List<string>();
 

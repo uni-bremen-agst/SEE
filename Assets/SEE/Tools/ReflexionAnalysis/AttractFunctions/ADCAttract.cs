@@ -67,11 +67,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                     Node clusterSource = isCandidateSource ? cluster : neighborCluster;
                     Node clusterTarget = isCandidateSource ? neighborCluster : cluster;
 
-                    Edge architectureEdge = this.GetSpecifyingArchitectureDepedency(clusterSource, clusterTarget, edge.Type);
+                    Edge architectureEdge = this.AllowedBy(clusterSource, clusterTarget, edgeState, edge.Type);
 
                     if(architectureEdge == null) 
                     {
-                        throw new Exception($"No specifying architecture dependency was found for the edge {edge.ID} in state {edgeState}.");
+                        throw new Exception($"No specifying architecture dependency was found for the edge {edge.ID} in edgeState {edgeState}.");
                     }
 
                     if (this.wordsPerDependency.ContainsKey(architectureEdge.ID))
@@ -109,11 +109,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// 
         /// </summary>
         /// <param name="implEdge">incoming or outgoing implementation edge associated with the changed node</param>
-        public void AddDocumentsToSpecifyingDependency(Edge implEdge)
+        public void AddDocumentsToAllowingDependency(Edge implEdge)
         {
             // UnityEngine.Debug.Log($"Try to add Documents of edge {implEdge.Source.ID} --> {implEdge.Target.ID} (State: {implEdge.State()}, Graph: {implEdge.ItsGraph.Name})");
-            State state = implEdge.State();
-            if ((state == State.Allowed || state == State.ImplicitlyAllowed) 
+            State edgeState = implEdge.State();
+            if ((edgeState == State.Allowed || edgeState == State.ImplicitlyAllowed) 
                  && !this.specifiedByDependency.ContainsKey(implEdge.ID))
             {
                 Node mapsToSource = this.reflexionGraph.MapsTo(implEdge.Source);
@@ -122,12 +122,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 this.AddClusterToUpdate(mapsToSource.ID);
                 this.AddClusterToUpdate(mapsToTarget.ID);
 
-                Edge architectureEdge = GetSpecifyingArchitectureDepedency(mapsToSource, mapsToTarget, implEdge.Type);
+                Edge architectureEdge = AllowedBy(implEdge, edgeState, implEdge.Type);
 
                 if(architectureEdge == null)
                 {
                     throw new Exception($"No matching architecture edge was found for {mapsToSource.ID} -{implEdge.Type}-> {mapsToTarget.ID}." +
-                                          $" Expected by implementation Edge {implEdge.ToShortString()} in state {state}");
+                                          $" Expected by implementation Edge {implEdge.ToShortString()} in edgeState {edgeState}");
                 }
 
                 this.specifiedByDependency[implEdge.ID] = architectureEdge;
@@ -145,26 +145,64 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             } 
         }
 
-        private Edge GetSpecifyingArchitectureDepedency(Node source, Node target, string type) 
-        {
-            // TODO: Use type hierarchy in the future
+        //private Edge GetSpecifyingArchitectureDepedency(Node source, Node target, string type) 
+        //{
+        //    // TODO: Use type hierarchy in the future
 
-            Edge architectureEdge;
-            if (!source.ID.Equals(target.ID))
+        //    Edge architectureEdge;
+        //    if (!source.ID.Equals(target.ID))
+        //    {
+        //        List<Edge> architectureEdges = source.FromTo(target, null).Where(e => ReflexionGraph.IsSpecified(e) 
+        //                                                                         || e.Source.ID.Equals(e.Target.ID)).ToList(); ;
+        //        architectureEdge = architectureEdges.SingleOrDefault();
+        //    } 
+        //    else
+        //    {
+        //        // special case: The architecture dependencies which are allowing implementation edges within the same 
+        //        // cluster are not specified and are only add when there are already two connected nodes mapped to an 
+        //        // architecture node. So if only one node 'a' is add to a Cluster A, the calculation for (A,b) for a second node 'b'
+        //        // with the dependecy b->a could not compare b->a with A->A even A->A is assumed per definition. A->A will only be 
+        //        // created after b was already add. We create a corresponding architecure edge ourselve, so we do not have 
+        //        // to depend on the lifecycle of artificial architecture edges created by the reflexion analysis.
+        //        architectureEdge = new Edge(source, target, type);
+        //    }
+
+        //    return architectureEdge;
+        //}
+
+        private Edge AllowedBy(Edge edge, State expectedState, string type)
+        {
+            Node sourceCluster = reflexionGraph.MapsTo(edge.Source);
+            Node targetCluster = reflexionGraph.MapsTo(edge.Target);
+            return AllowedBy(sourceCluster, targetCluster, expectedState, type);
+        }
+
+        // TODO: wording of function name
+        private Edge AllowedBy(Node sourceCluster, Node targetCluster, State expectedState, string type)
+        {
+            Edge architectureEdge = null;
+            if (expectedState == State.Allowed && !sourceCluster.ID.Equals(targetCluster.ID))
             {
-                List<Edge> architectureEdges = source.FromTo(target, null).Where(e => ReflexionGraph.IsSpecified(e) 
+                // TODO: Use type hierarchy in the future
+                List<Edge> architectureEdges = sourceCluster.FromTo(targetCluster, null).Where(e => ReflexionGraph.IsSpecified(e)
                                                                                  || e.Source.ID.Equals(e.Target.ID)).ToList(); ;
                 architectureEdge = architectureEdges.SingleOrDefault();
-            } 
-            else
+                return architectureEdge;
+            }
+            else if (expectedState == State.ImplicitlyAllowed)
             {
-                // special case: The architecture dependencies which are allowing implementation edges within the same 
-                // cluster are not specified and are only add when there are already two connected nodes mapped to an 
+                // special case for implicitly allowed edges: 
+                // The architecture dependencies which are allowing implementation edges within the same 
+                // cluster are not specified until there are already two connected nodes mapped to an 
                 // architecture node. So if only one node 'a' is add to a Cluster A, the calculation for (A,b) for a second node 'b'
                 // with the dependecy b->a could not compare b->a with A->A even A->A is assumed per definition. A->A will only be 
-                // created after b was already add. We create a corresponding architecure edge ourselve, so we do not have 
-                // to depend on the lifecycle of artificial architecture edges created by the reflexion analysis.
-                architectureEdge = new Edge(source, target, type);
+                // created after b was already add. We create a corresponding architecure edge ourself, so we do not have 
+                // to depend on the lifecycle of artificial self loop architecture edges created by the reflexion analysis.
+                architectureEdge = new Edge(sourceCluster, targetCluster, type);
+            }
+            else
+            {
+                throw new Exception("State must be allowed or implicitly allowed to find allowing architecture dependency.");
             }
 
             return architectureEdge;
@@ -284,7 +322,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 && edgeChange.OldState != State.ImplicitlyAllowed
                 && edgeChange.Edge.IsInImplementation())
             {
-                AddDocumentsToSpecifyingDependency(edgeChange.Edge);
+                AddDocumentsToAllowingDependency(edgeChange.Edge);
             }
 
             if ((edgeChange.OldState == State.Allowed || edgeChange.OldState == State.ImplicitlyAllowed)

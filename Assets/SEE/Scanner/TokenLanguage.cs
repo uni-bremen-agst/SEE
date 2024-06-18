@@ -404,6 +404,30 @@ namespace SEE.Scanner
 
         #region Static Types
 
+        public enum TokenLanguageType
+        {
+            Plain, 
+            Java, 
+            CSharp,
+            CPP
+        }
+
+        public static TokenLanguage GetTokenLanguageByType(TokenLanguageType type)
+        {
+            switch(type)
+            {
+                case TokenLanguageType.Plain:
+                    return Plain;
+                case TokenLanguageType.Java: 
+                    return Java;
+                case TokenLanguageType.CSharp: 
+                    return CSharp;
+                case TokenLanguageType.CPP:
+                    return CPP;
+            }
+            throw new Exception("Unknown Token Language Type.");
+        }
+
         /// <summary>
         /// A list of all token languages there are.
         /// </summary>

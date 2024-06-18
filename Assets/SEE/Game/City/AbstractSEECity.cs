@@ -547,7 +547,9 @@ namespace SEE.Game.City
             {
                 ICollection<string> relevantNodeTypes = NodeTypes.Where(pair => pair.Value.IsRelevant)
                                                                  .Select(pair => pair.Key).ToList();
-                return graph.SubgraphByNodeType(relevantNodeTypes, IgnoreSelfLoopsInLifting);
+                Graph relevantGraph = graph.SubgraphByNodeType(relevantNodeTypes, IgnoreSelfLoopsInLifting);
+                relevantGraph.BasePath = graph.BasePath;
+                return relevantGraph;
             }
         }
 

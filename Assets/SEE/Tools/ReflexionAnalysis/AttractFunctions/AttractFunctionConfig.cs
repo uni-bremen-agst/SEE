@@ -8,7 +8,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
     [System.Serializable]
     public abstract class AttractFunctionConfig
     {
-        AttractFunctionType attractFunction;
+        private AttractFunctionType attractFunctionType;
 
         [SerializeField]
         private string candidateType = "File";
@@ -19,11 +19,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         private string clusterType = "Cluster";
 
         public string ClusterType { get => clusterType; set => clusterType = value; }
-        public AttractFunctionType AttractFunctionType
-        {
-            get => attractFunction;
-            protected set => attractFunction = value;
-        }
+
+        public abstract AttractFunctionType AttractFunctionType { get; }
 
         public virtual XElement ToXElement()
         {

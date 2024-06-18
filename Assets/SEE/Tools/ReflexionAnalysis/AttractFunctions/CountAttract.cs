@@ -32,11 +32,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <summary>
         /// 
         /// </summary>
-        public float Delta { get;  private set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="graph"></param>
         /// <param name="config"></param>
         public CountAttract(ReflexionGraph graph, 
@@ -46,7 +41,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             overallValues = new Dictionary<string, double>();
             mappingCount = new Dictionary<string, int>();
             this.Phi = config.Phi;
-            this.Delta = config.Delta;
         }
 
         /// <summary>

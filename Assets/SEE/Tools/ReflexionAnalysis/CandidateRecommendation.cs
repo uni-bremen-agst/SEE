@@ -30,6 +30,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         public ReflexionGraph OracleGraph { get; private set; }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public bool OracleGraphLoaded { get => OracleGraph != null; }
+
+        /// <summary>
         /// Object representing the attractFunction
         /// </summary>
         private AttractFunction attractFunction;
@@ -109,17 +114,26 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             HashSet<string> visisited = new HashSet<string>();
             List<MappingPair> currentMappingPairs = new List<MappingPair>();
 
-            if (MappingPairs.Count() == 0) return graph;
+            if (MappingPairs.Count() == 0)
+            {
+                return graph;
+            }
 
             foreach (Node relatedNode in relatedNodes)
             {
                 // skip mapped implementation nodes
-                if (relatedNode.IsInImplementation() && this.ReflexionGraph.MapsTo(relatedNode) != null) continue;
+                if (relatedNode.IsInImplementation() && this.ReflexionGraph.MapsTo(relatedNode) != null)
+                {
+                    continue;
+                }
                 MappingPair mappingPair = examinedNode.IsInArchitecture() ? 
                             recommendedNodes.GetMappingPair(relatedNode.ID,examinedNode.ID)
                           : recommendedNodes.GetMappingPair(examinedNode.ID, relatedNode.ID);
-                
-                currentMappingPairs.Add(mappingPair);
+
+                if (mappingPair.AttractionValue > 0)
+                {
+                    currentMappingPairs.Add(mappingPair); 
+                }
             }
 
             currentMappingPairs.Sort((x,y) => y.CompareTo(x));
@@ -150,73 +164,66 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <param name="config"></param>
         /// <param name="oracleMapping"></param>
         public void UpdateConfiguration(ReflexionGraph reflexionGraph, 
-                                        MappingExperimentConfig config,
+                                        RecommendationSettings config,
                                         Graph oracleMapping = null)
         {
-            try
+            if (reflexionGraph == null)
             {
-                if (reflexionGraph == null)
-                {
-                    throw new Exception("Could not update configuration. Reflexion graph is null.");
-                }
-
-                ReflexionGraph = reflexionGraph;
-
-                if (config.AttractFunctionConfig == null)
-                {
-                    throw new Exception("Could not update configuration. Attract function config is null");
-                }
-
-                if (oracleMapping != null)
-                {
-                    (Graph implementation, Graph architecture, _) = ReflexionGraph.Disassemble();
-                    OracleGraph = new ReflexionGraph(implementation, architecture, oracleMapping);
-                    OracleGraph.RunAnalysis();
-                }
-                else
-                {
-                    OracleGraph = null;
-                }
-
-                attractFunction = AttractFunction.Create(config.AttractFunctionConfig, this, reflexionGraph);
-
-                // TODO: Handle node reader initialization differently?
-                //(This set operation is only necessary for the test cases)
-                if(attractFunction is LanguageAttract && config.NodeReader != null)
-                {
-                    ((LanguageAttract)attractFunction).SetNodeReader(config.NodeReader);
-                }
-
-                subscription?.Dispose();
-                subscription = reflexionGraph.Subscribe(this);
-
-                // Stop and reset the recording
-                bool wasActive = Statistics.Active;
-                Statistics.Reset();
-                Statistics.SetCandidateRecommendation(this);
-                Statistics.SetConfigInformation(config);
-                recommendedNodes.Reset();
-                this.UnmappedCandidates = this.GetUnmappedCandidates().Select(n => n.ID).ToHashSet();
-
-                foreach(Node cluster in this.GetCluster())
-                {
-                    this.attractFunction.AddClusterToUpdate(cluster.ID);
-                }
-
-                ReflexionGraph.RunAnalysis();
-
-                // Restart after the analysis was run, so initially/already
-                // mapped candidates will not recorded twice
-                if (wasActive)
-                {
-                    Statistics.StartRecording();
-                }
+                throw new Exception("Could not update configuration. Reflexion graph is null.");
             }
-            catch (Exception e) 
+
+            ReflexionGraph = reflexionGraph;
+
+            if (config.AttractFunctionConfig == null)
             {
-                UnityEngine.Debug.LogError($"Could not update Candidate Recommendation configuration.{Environment.NewLine}{e}");
-                throw e;
+                throw new Exception("Could not update configuration. Attract function config is null");
             }
+
+            if (oracleMapping != null)
+            {
+                (Graph implementation, Graph architecture, _) = ReflexionGraph.Disassemble();
+                OracleGraph = new ReflexionGraph(implementation, architecture, oracleMapping);
+                OracleGraph.RunAnalysis();
+            }
+            else
+            {
+                OracleGraph = null;
+            }
+
+            attractFunction = AttractFunction.Create(config.AttractFunctionConfig, this, reflexionGraph);
+
+            // TODO: Handle node reader initialization differently?
+            //(This set operation is only necessary for the test cases)
+            if(attractFunction is LanguageAttract && config.NodeReader != null)
+            {
+                ((LanguageAttract)attractFunction).SetNodeReader(config.NodeReader);
+            }
+
+            subscription?.Dispose();
+            subscription = reflexionGraph.Subscribe(this);
+
+            // Stop and reset the recording
+            bool wasActive = Statistics.Active;
+            Statistics.Reset();
+            Statistics.SetCandidateRecommendation(this);
+            Statistics.SetConfigInformation(config);
+            recommendedNodes.Reset();
+            this.UnmappedCandidates = this.GetUnmappedCandidates().Select(n => n.ID).ToHashSet();
+
+            foreach(Node cluster in this.GetCluster())
+            {
+                this.attractFunction.AddClusterToUpdate(cluster.ID);
+            }
+
+            ReflexionGraph.RunAnalysis();
+
+            // Restart after the analysis was run, so initially/already
+            // mapped candidates will not recorded twice
+            if (wasActive)
+            {
+                Statistics.StartRecording();
+            }
+            this.UpdateRecommendations();
         }
 
         public void OnCompleted()
@@ -407,9 +414,18 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                                                                             ReflexionGraph oracleGraph)
         {
             Dictionary<Node, HashSet<Node>> initialMapping = new Dictionary<Node, HashSet<Node>>();
-            if (percentage > 1 || percentage < 0) throw new Exception("Parameter percentage have to be a double value between 0.0 and 1.0");
-            if (oracleGraph == null) throw new Exception("OracleGraph is null. Cannot generate initial mapping.");
-            if (reflexionGraph == null) throw new Exception("ReflexionGraph is null. Cannot generate initial mapping.");
+            if (percentage > 1 || percentage < 0)
+            {
+                throw new Exception("Parameter percentage have to be a double value between 0.0 and 1.0");
+            }
+            if (oracleGraph == null)
+            {
+                throw new Exception("OracleGraph is null. Cannot generate initial mapping.");
+            }
+            if (reflexionGraph == null)
+            {
+                throw new Exception("ReflexionGraph is null. Cannot generate initial mapping.");
+            }
 
             List<Node> candidates = GetCandidates(reflexionGraph, candidateType);
 

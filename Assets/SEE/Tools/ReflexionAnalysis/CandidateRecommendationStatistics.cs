@@ -55,7 +55,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// </summary>
         private MappingExperimentResult mappingResult;
 
-        MappingExperimentConfig config;
+        RecommendationSettings config;
 
         /// <summary>
         /// 
@@ -81,7 +81,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             Reset();
         }
 
-        public void SetConfigInformation(MappingExperimentConfig config)
+        public void SetConfigInformation(RecommendationSettings config)
         {
             this.mappingResult.AddConfigInformation(config);
             this.config = config;
