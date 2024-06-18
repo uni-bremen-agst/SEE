@@ -1,6 +1,41 @@
 ﻿namespace SEE.DataModel.DG
 {
     /// <summary>
+    /// Standard names for LSP concepts.
+    /// </summary>
+    public static class LSP
+    {
+        /// <summary>
+        /// Name of edge type for LSP references.
+        /// </summary>
+        public const string Reference = "Reference";
+        /// <summary>
+        /// Name of edge type for LSP declarations.
+        /// </summary>
+        public const string Declaration = "Declaration";
+        /// <summary>
+        /// Name of edge type for LSP definitions.
+        /// </summary>
+        public const string Definition = "Definition";
+        /// <summary>
+        /// Name of edge type for LSP of-type relation.
+        /// </summary>
+        public const string OfType = "Of_Type";
+        /// <summary>
+        /// Name of edge type for LSP implementation-of relation.
+        /// </summary>
+        public const string ImplementationOf = "Implementation_Of";
+        /// <summary>
+        /// Name of edge type for LSP call relation.
+        /// </summary>
+        public const string Call = "Call";
+        /// <summary>
+        /// Name of edge type for LSP extend relation.
+        /// </summary>
+        public const string Extend = "Extend";
+    }
+
+    /// <summary>
     /// Names of node attributes provided by the Axivion Suite.
     /// </summary>
     public enum NumericAttributeNames
@@ -16,6 +51,10 @@
         Metric,
         Style,
         Universal,
+        LspError,
+        LspWarning,
+        LspInfo,
+        LspHint,
         IssuesTotal
     }
 
@@ -59,6 +98,10 @@
                 NumericAttributeNames.Style => Metrics.Prefix + "Style",
                 NumericAttributeNames.Universal => Metrics.Prefix + "Universal",
                 NumericAttributeNames.IssuesTotal => Metrics.Prefix + "IssuesTotal",
+                NumericAttributeNames.LspError => Metrics.Prefix + "LSP_Error",
+                NumericAttributeNames.LspWarning => Metrics.Prefix + "LSP_Warning",
+                NumericAttributeNames.LspInfo => Metrics.Prefix + "LSP_Info",
+                NumericAttributeNames.LspHint => Metrics.Prefix + "LSP_Hint",
                 _ => throw new System.Exception("Unknown attribute name " + numericAttributeName)
             };
         }

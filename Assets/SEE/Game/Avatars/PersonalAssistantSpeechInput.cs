@@ -11,6 +11,7 @@ using SEE.UI;
 using SEE.UI.Notification;
 using UnityEngine;
 using UnityEngine.Windows.Speech;
+using FilePath = SEE.Utils.Paths.FilePath;
 
 namespace SEE.Game.Avatars
 {

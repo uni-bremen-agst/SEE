@@ -86,11 +86,6 @@ namespace SEE.UI.Window.CodeWindow
             ScrolledVisibleLine = Mathf.Clamp(Mathf.FloorToInt(preStartLine), 1, lines);
         }
 
-        /// <summary>
-        /// Tooltip containing all issue descriptions.
-        /// </summary>
-        private Tooltip.Tooltip issueTooltip;
-
         protected override void UpdateDesktop()
         {
             // Show issue info on click (on hover would be too expensive)
@@ -101,22 +96,11 @@ namespace SEE.UI.Window.CodeWindow
                 if (link != -1)
                 {
                     char linkId = textMesh.textInfo.linkInfo[link].GetLinkID()[0];
-                    issueTooltip ??= gameObject.AddComponent<Tooltip.Tooltip>();
                     // Display tooltip containing all issue descriptions
                     UniTask.WhenAll(issueDictionary[linkId].Select(x => x.ToDisplayStringAsync()))
-                           .ContinueWith(x => issueTooltip.Show(string.Join("\n", x), 0f))
+                           .ContinueWith(x => Tooltip.ActivateWith(string.Join("\n", x), Tooltip.AfterShownBehavior.HideUntilActivated))
                            .Forget();
                 }
-                else if (issueTooltip != null)
-                {
-                    // Hide tooltip by clicking somewhere else
-                    issueTooltip.Hide();
-                }
-            }
-            else if (issueDictionary.Count != 0 && Input.GetMouseButtonDown(1) && issueTooltip != null)
-            {
-                // Hide tooltip by right-clicking
-                issueTooltip.Hide();
             }
         }
 

@@ -99,6 +99,13 @@ namespace SEE.GraphProviders
         public NodeKind IncludedNodeTypes = NodeKind.All;
 
         /// <summary>
+        /// The diagnostic levels to be included.
+        /// </summary>
+        [Title("Diagnostic levels"), Tooltip("The diagnostic levels to be included."), HideLabel]
+        [EnumToggleButtons, FoldoutGroup("Import Settings")]
+        public DiagnosticKind IncludedDiagnosticLevels = DiagnosticKind.All;
+
+        /// <summary>
         /// If true, the communication between the language server and SEE will be logged.
         /// </summary>
         [Tooltip("If true, the communication between the language server and SEE will be logged."), RuntimeTab(GraphProviderFoldoutGroup)]
@@ -256,7 +263,8 @@ namespace SEE.GraphProviders
 
             try
             {
-                LSPImporter importer = new(handler, SourcePaths, ExcludedSourcePaths, IncludedNodeTypes,
+                LSPImporter importer = new(handler, SourcePaths, ExcludedSourcePaths ?? Array.Empty<string>(),
+                                           IncludedNodeTypes, IncludedDiagnosticLevels,
                                            IncludedEdgeTypes, AvoidSelfReferences, AvoidParentReferences);
                 using (LoadingSpinner.ShowDeterminate("Creating graph using LSP...", out Action<float> updateProgress))
                 {
