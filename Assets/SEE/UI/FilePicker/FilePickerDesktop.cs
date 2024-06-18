@@ -130,14 +130,11 @@ namespace SEE.UI.FilePicker
             // opens a file picker with the picker button
             PickerButton.clickEvent.AddListener(() =>
             {
-                FileBrowser.PickMode pickingMode = DataPathInstance is DirectoryPath
-                                                    ? FileBrowser.PickMode.Folders : FileBrowser.PickMode.Files;
-                string whatToPick = pickingMode == FileBrowser.PickMode.Folders ? "folder" : "file";
                 FileBrowser.ShowLoadDialog(HandleFileBrowserSuccess,
                                            () => { },
                                            allowMultiSelection: false,
-                                           pickMode: pickingMode,
-                                           title: "Pick a " + whatToPick,
+                                           pickMode: FileBrowser.PickMode.FilesAndFolders,
+                                           title: "Pick a file/folder",
                                            initialPath: DataPathInstance.RootPath);
 
                 // Find the newly opened file browser and optimize it for VR.
