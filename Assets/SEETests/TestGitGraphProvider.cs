@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using LibGit2Sharp;
 using NUnit.Framework;
@@ -59,11 +60,20 @@ namespace SEETests
         {
             GameObject go = new();
             BranchCity city = go.AddComponent<BranchCity>();
-
+            city.VCSPath = new DirectoryPath(gitDirPath);
             AllGitBranchesSingleGraphProvider provider = new();
+            provider.PathGlobbing = new()
+            {
+                { "**/*.cs", true }
+            };
             city.Date = date;
-            
-            Graph g = await provider.ProvideAsync(new Graph(""), city);
+
+            void ReportProgress(float x)
+            {
+                // Do nothing here
+            }
+
+            Graph g = await provider.ProvideAsync(new Graph(""), city, changePercentage: ReportProgress);
             return g;
         }
 
@@ -82,10 +92,15 @@ namespace SEETests
             provider.GitRepository = new GitRepository()
             {
                 RepositoryPath = new DirectoryPath(gitDirPath),
-                PathGlobbing = new() { { ".cs", true } }
+                PathGlobbing = new() { { "**/*.cs", true } }
             };
 
-            List<Graph> g = await provider.ProvideAsync(new List<Graph>(), city);
+            void ReportProgress(float x)
+            {
+                // Do nothing here
+            }
+
+            List<Graph> g = await provider.ProvideAsync(new List<Graph>(), city, changePercentage: ReportProgress);
             return g;
         }
 
@@ -108,7 +123,6 @@ namespace SEETests
 
                 Assert.AreEqual(2, series[2].GetNode("AnotherFile.cs-Evo").IntAttributes["Metric.File.Commits"]);
                 Assert.AreEqual(1, series[2].GetNode("firstFile.cs-Evo").IntAttributes["Metric.File.Commits"]);
-
             });
         }
 
