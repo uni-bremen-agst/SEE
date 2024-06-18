@@ -9,6 +9,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Utils.History;
+using Assets.SEE.Game.Drawable.ActionHelpers;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -252,11 +253,7 @@ namespace SEE.Controls.Actions.Drawable
         private void SelectObject()
         {
             /// The selection
-            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj == null
-                && Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                (oldSelectedObj == null || oldSelectedObj != raycastHit.collider.gameObject
-                    || (oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased))
-                && GameFinder.HasDrawable(raycastHit.collider.gameObject))
+            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, Canvas, true, false, true, GetActionStateType(), false))
             {
                 /// If an object was already selected, the Rigidbody and Collision Controller are removed if they are still present.
                 if (oldSelectedObj != null)
@@ -270,20 +267,11 @@ namespace SEE.Controls.Actions.Drawable
                         Destroyer.Destroy(oldSelectedObj.GetComponent<CollisionController>());
                     }
                 }
-
-                selectedObj = raycastHit.collider.gameObject;
                 drawable = GameFinder.GetDrawable(selectedObj);
                 oldSelectedObj = selectedObj;
-
-                /// Adds and activates the necessary components to detect a collision.
-                /// Additionally, the selection is highlighted by the blink effect.
-                selectedObj.AddOrGetComponent<Rigidbody>().isKinematic = true;
-                selectedObj.AddOrGetComponent<CollisionController>();
-                selectedObj.AddOrGetComponent<BlinkEffect>();
-
                 oldScale = selectedObj.transform.localScale;
-                Canvas.AddOrGetComponent<ValueResetter>().SetAllowedState(GetActionStateType());
             }
+
             /// Tracked a released mouse button.
             if (Input.GetMouseButtonUp(0))
             {

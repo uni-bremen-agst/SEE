@@ -1,18 +1,17 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Assets.SEE.Game.Drawable.ActionHelpers;
+using Michsky.UI.ModernUIPack;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.UI.Notification;
-using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
+using SEE.UI.Notification;
 using SEE.Utils;
+using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
 using MoveNetAction = SEE.Net.Actions.Drawable.MoveNetAction;
-using SEE.Utils.History;
-using UnityEngine.EventSystems;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -309,6 +308,32 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
+        /// Creates the switch menu for selection of move or rotate.
+        /// </summary>
+        private void InitSwitchMenu()
+        {
+            switchMenu = PrefabInstantiator.InstantiatePrefab(switchMenuPrefab,
+                                                     Canvas.transform, false);
+            /// Adds the functionality to the move button
+            GameFinder.FindChild(switchMenu, "Move").GetComponent<ButtonManagerBasic>().clickEvent
+                .AddListener(() =>
+                {
+                    progressState = ProgressState.Move;
+                    executedOperation = ProgressState.Move;
+                    Destroyer.Destroy(switchMenu);
+                });
+            /// Adds the funcitonality to the rotate button.
+            GameFinder.FindChild(switchMenu, "Rotate").GetComponent<ButtonManagerBasic>().clickEvent.
+                AddListener(() =>
+                {
+                    progressState = ProgressState.Rotate;
+                    executedOperation = ProgressState.Rotate;
+                    oldObjectPosition = selectedObject.transform.localPosition;
+                    Destroyer.Destroy(switchMenu);
+                });
+        }
+
+        /// <summary>
         /// Enables the user to select a <see cref="DrawableType"/> object.
         /// After the selection, a menu is opened, providing the user with options to move and rotate.
         /// The respective choices are initiated by using the corresponding buttons.
@@ -317,43 +342,11 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void Selection()
         {
-            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
-                && Raycasting.RaycastAnything(out RaycastHit raycastHit) && selectedObject == null
-                && (oldSelectedObj == null || oldSelectedObj != raycastHit.collider.gameObject
-                    || (oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased))
-                && GameFinder.HasDrawable(raycastHit.collider.gameObject))
+            if (Selector.SelectObject(ref selectedObject, ref oldSelectedObj, ref mouseWasReleased, Canvas, true, false, true))
             {
-                selectedObject = raycastHit.collider.gameObject;
                 oldObjectPosition = selectedObject.transform.localPosition;
                 oldObjectLocalEulerAngles = selectedObject.transform.localEulerAngles;
-
-                /// Adds the necessary components to the object.
-                /// The rigidbody and the collision controller are needed to detect a collision with a border.
-                selectedObject.AddOrGetComponent<Rigidbody>().isKinematic = true;
-                selectedObject.AddOrGetComponent<CollisionController>();
-                selectedObject.AddOrGetComponent<BlinkEffect>();
-
-                mouseWasReleased = false;
-
-                switchMenu = PrefabInstantiator.InstantiatePrefab(switchMenuPrefab,
-                                                                  Canvas.transform, false);
-                /// Adds the functionality to the move button
-                GameFinder.FindChild(switchMenu, "Move").GetComponent<ButtonManagerBasic>().clickEvent
-                    .AddListener(() =>
-                {
-                    progressState = ProgressState.Move;
-                    executedOperation = ProgressState.Move;
-                    Destroyer.Destroy(switchMenu);
-                });
-                /// Adds the funcitonality to the rotate button.
-                GameFinder.FindChild(switchMenu, "Rotate").GetComponent<ButtonManagerBasic>().clickEvent.
-                    AddListener(() =>
-                {
-                    progressState = ProgressState.Rotate;
-                    executedOperation = ProgressState.Rotate;
-                    oldObjectPosition = selectedObject.transform.localPosition;
-                    Destroyer.Destroy(switchMenu);
-                });
+                InitSwitchMenu();
             }
 
             /// To ensure a object change.

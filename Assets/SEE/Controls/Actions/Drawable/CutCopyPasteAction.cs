@@ -12,6 +12,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Utils.History;
+using Assets.SEE.Game.Drawable.ActionHelpers;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -139,9 +140,9 @@ namespace SEE.Controls.Actions.Drawable
         private GameObject selectedObj;
 
         /// <summary>
-        /// The id of the old selected object of the last run.
+        /// The old selected object of the privous run.
         /// </summary>
-        private static string oldSelectedId;
+        private static GameObject oldSelectedObj;
 
         /// <summary>
         /// True if the left mouse button was released after finish.
@@ -195,7 +196,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public static void Reset()
         {
-            oldSelectedId = "";
+            oldSelectedObj = null;
             mouseWasReleased = true;
         }
 
@@ -312,28 +313,15 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void SelectObject()
         {
-            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj == null &&
-                Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                (oldSelectedId == "" || oldSelectedId != raycastHit.collider.gameObject.name ||
-                    oldSelectedId == raycastHit.collider.gameObject.name && mouseWasReleased)
-                && Tags.DrawableTypes.Contains(raycastHit.collider.gameObject.tag))
+            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, Canvas, false, true, false, GetActionStateType()))
             {
-                selectedObj = raycastHit.collider.gameObject;
                 oldDrawable = GameFinder.GetDrawable(selectedObj);
-                oldSelectedId = selectedObj.name;
                 oldValueHolder = DrawableType.Get(selectedObj);
-
                 if (selectedObj.CompareTag(Tags.MindMapNode))
                 {
                     oldNodesBranchLineHolder = GameMindMap.SummarizeSelectedNodeIncChildren(selectedObj);
                     newNodesBranchLineHolder = GameMindMap.SummarizeSelectedNodeIncChildren(selectedObj);
-
                 }
-
-                selectedObj.AddOrGetComponent<BlinkEffect>();
-
-                Canvas.AddOrGetComponent<ValueResetter>().SetAllowedState(GetActionStateType());
-
                 cutCopyPasteMenu = PrefabInstantiator.InstantiatePrefab(cutCopyPasteMenuPrefab,
                                                                         Canvas.transform, false);
                 SetupButtons(cutCopyPasteMenu);

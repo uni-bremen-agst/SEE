@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using TextConf = SEE.Game.Drawable.Configurations.TextConf;
 using SEE.Utils.History;
+using Michsky.UI.ModernUIPack;
+using Assets.SEE.Game.Drawable.ActionHelpers;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -269,20 +271,10 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void Selection()
         {
-            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj == null
-                && Raycasting.RaycastAnything(out RaycastHit raycastHit)
-                && (oldSelectedObj == null || oldSelectedObj != raycastHit.collider.gameObject
-                    || (oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased))
-                && Tags.DrawableTypes.Contains(raycastHit.collider.gameObject.tag))
+            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, Canvas, false, true, false, GetActionStateType()))
             {
-                selectedObj = raycastHit.collider.gameObject;
-                oldSelectedObj = selectedObj;
                 oldValueHolder = DrawableType.Get(selectedObj);
                 newValueHolder = DrawableType.Get(selectedObj);
-
-                selectedObj.AddOrGetComponent<BlinkEffect>();
-
-                Canvas.AddOrGetComponent<ValueResetter>().SetAllowedState(GetActionStateType());
                 progressState = ProgressState.OpenEditMenu;
             }
 
