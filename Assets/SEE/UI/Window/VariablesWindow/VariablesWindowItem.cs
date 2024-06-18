@@ -14,7 +14,7 @@ namespace SEE.UI.Window.VariablesWindow
 {
     /// <summary>
     /// Represents an item in the <see cref="VariablesWindow"/>.
-    /// 
+    ///
     /// <para>
     /// Can be used to group items and/or represent an actual variable.
     /// </para>
@@ -114,7 +114,7 @@ namespace SEE.UI.Window.VariablesWindow
         /// <summary>
         /// List of all items.
         /// </summary>
-        private List<VariablesWindowItem> children = new();
+        private readonly List<VariablesWindowItem> children = new();
 
         /// <summary>
         /// Whether this item is visible.
@@ -207,7 +207,6 @@ namespace SEE.UI.Window.VariablesWindow
             variableItem.RetrieveVariableValue = RetrieveVariableValue;
             variableItem.BackgroundColor = variableColor;
             AddChild(variableItem);
-
         }
 
         /// <summary>
@@ -254,7 +253,6 @@ namespace SEE.UI.Window.VariablesWindow
                 }
             }
 
-
             UpdateVisibility();
             UpdateIndent();
             UpdateExpand();
@@ -262,7 +260,7 @@ namespace SEE.UI.Window.VariablesWindow
 
         /// <summary>
         /// Updates the item.
-        /// 
+        ///
         /// <para>
         /// Retrieves child items if necessary.
         /// </para>
