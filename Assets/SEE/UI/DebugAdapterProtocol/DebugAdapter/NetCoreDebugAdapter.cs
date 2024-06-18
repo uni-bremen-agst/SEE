@@ -238,7 +238,7 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
                     if (!inString)
                     {
                         currentArgument = new();
-                    } 
+                    }
                     else
                     {
                         arguments.Add(currentArgument.ToString());
