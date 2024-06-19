@@ -34,10 +34,10 @@ namespace SEE.GraphProviders
         /// Provides a graph based as a result of the serial execution of all
         /// graph providers in <see cref="Pipeline"/> from first to last.
         ///
-        /// If the <see cref="Pipeline"/> is empty, <paramref name="graph"/>
+        /// If the <see cref="Pipeline"/> is empty, <paramref name="graphs"/>
         /// will be returned.
         /// </summary>
-        /// <param name="graph">this graph will be input to the first
+        /// <param name="graphs">this list of graphs will be input to the first
         /// graph provider in <see cref="Pipeline"/></param>
         /// <param name="city">this value will be passed to each graph provider
         /// in <see cref="Pipeline"/></param>
@@ -46,18 +46,20 @@ namespace SEE.GraphProviders
         /// <param name="token">can be used to cancel the operation</param>
         /// <returns></returns>
         /// <remarks>Exceptions may be thrown by each nested graph provider.</remarks>
-        public override async UniTask<List<Graph>> ProvideAsync(List<Graph> graph, AbstractSEECity city,
+        public override async UniTask<List<Graph>> ProvideAsync(List<Graph> graphs, AbstractSEECity city,
             Action<float> changePercentage = null,
             CancellationToken token = default)
         {
-            UniTask<List<Graph>> initial = UniTask.FromResult(graph);
-            int count = -1; // -1 because the first provider will increment it to 0.
+            UniTask<List<Graph>> initial = UniTask.FromResult(graphs);
+            // Counts the number of providers that have been executed so far.
+            // Initially -1 because the first provider will increment it to 0.
+            int count = -1;
+
             return await Pipeline.Aggregate(initial, (current, provider) =>
                 current.ContinueWith(g => provider.ProvideAsync(g, city, AggregatePercentage(), token)));
 
             Action<float> AggregatePercentage()
             {
-                // Counts the number of providers that have been executed so far.
                 count++;
                 // Each stage of the pipeline gets an equal share of the total percentage.
                 return percentage => changePercentage?.Invoke((count + percentage) / Pipeline.Count);
@@ -90,7 +92,6 @@ namespace SEE.GraphProviders
             {
                 provider.Save(writer, "");
             }
-
             writer.EndList();
         }
 
