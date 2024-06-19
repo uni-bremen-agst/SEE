@@ -400,7 +400,7 @@ namespace SEE.Game.City
         private const string dataProviderPathLabel = "data";
 
         /// <summary>
-        /// Saves and writes the configuration to <paramref name="writer"/> 
+        /// Saves and writes the configuration to <paramref name="writer"/>
         /// </summary>
         /// <param name="writer">The ConfigWriter to write the configuration to</param>
         protected override void Save(ConfigWriter writer)
