@@ -1050,6 +1050,17 @@ namespace SEE.UI.Menu.Drawable
             secondaryColorBMB.buttonVar.interactable = !secondaryColorBMB.buttonVar.IsInteractable();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public static void RefreshHorizontalSelectors()
+        {
+            lineKindSelector.index = LineMenu.GetIndexOfSelectedLineKind();
+            colorKindSelector.index = LineMenu.GetIndexOfSelectedColorKind();
+            lineKindSelector.UpdateUI();
+            colorKindSelector.UpdateUI();
+        }
+
         #region Enable/Disable Layer
         /// <summary>
         /// Enables all line menu layers that can be hidden.
