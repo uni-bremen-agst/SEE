@@ -56,11 +56,6 @@ namespace SEE.Game.City
         public MultiGraphPipelineProvider DataProvider = new();
 
         /// <summary>
-        /// Name of the Inspector foldout group for the specific evolution setttings.
-        /// </summary>
-        private const string evolutionFoldoutGroup = "Evolution settings";
-
-        /// <summary>
         /// Error message that will be shown, when the graph provider pipeline (<see cref="DataProvider"/>)
         /// didn't yield any graphs.
         /// </summary>
@@ -136,7 +131,6 @@ namespace SEE.Game.City
                 result = gameObject.AddComponent<EvolutionRenderer>();
                 result.SetGraphEvolution(graphs);
             }
-
             return result;
         }
 
@@ -369,7 +363,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Saves and writes the configuration to <paramref name="writer"/>
         /// </summary>
-        /// <param name="writer">The ConfigWriter to write the configuration to</param>
+        /// <param name="writer">The <see cref="ConfigWriter"/> to write the configuration to</param>
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
