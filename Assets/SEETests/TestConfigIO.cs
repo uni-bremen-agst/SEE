@@ -874,8 +874,6 @@ namespace SEE.Utils
         private static void WipeOutSEEEvolutionCityAttributes(SEECityEvolution city)
         {
             WipeOutAbstractSEECityAttributes(city);
-            //city.GXLDirectory.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gxl");
-            //city.MaxRevisionsToLoad++;
         }
 
         /// <summary>

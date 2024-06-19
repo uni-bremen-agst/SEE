@@ -223,8 +223,6 @@ namespace SEE.GraphProviders
         public void TestEmptyGraphPipelineProvider()
         {
             MultiGraphPipelineProvider saved = new();
-            //saved.Pipeline.Add(GetGitEvolutionProvider());
-            //saved.Pipeline.Add(GetGXLEvolutionProvider());
 
             Save(saved);
             AreEqual(saved, LoadMultiGraph());

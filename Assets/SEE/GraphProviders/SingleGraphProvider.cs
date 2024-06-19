@@ -10,7 +10,7 @@ namespace SEE.GraphProviders
     /// SingleGraphProvider is a graph provider for returning a single graph.
     ///
     /// This kind of graph provider is used in <see cref="SEECity"/>.
-    /// It can also be used in <see cref="SingleGraphPipelineProvider"/> to create a pipeline
+    /// It can also be used in <see cref="SingleGraphPipelineProvider"/> to create a pipeline.
     /// </summary>
     public abstract class SingleGraphProvider : GraphProvider<Graph, SingleGraphProviderKind>
     {
@@ -33,7 +33,6 @@ namespace SEE.GraphProviders
                 throw new Exception($"A graph provider could not be found under the label {label}.");
             }
         }
-
 
         /// <summary>
         /// Restores the graph provider's attributes from <paramref name="values"/>.
