@@ -5,7 +5,6 @@ using Sirenix.Serialization;
 using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Layout.NodeLayouts.Cose;
-using SEE.Tools;
 using SEE.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -300,7 +299,6 @@ namespace SEE.Game.City
         }
         #endregion
 
-
         /// <summary>
         /// Recurses into the game-object hierarchy rooted by <paramref name="root"/> and adds
         /// all visited game objects (including <paramref name="root"/>) tagged by <see cref="Tags.Node"/>
@@ -359,7 +357,7 @@ namespace SEE.Game.City
         /// <param name="filename">name of the file from which the settings are restored</param>
         public void Load(string filename)
         {
-            using Utils.Config.ConfigReader stream = new(filename);
+            using ConfigReader stream = new(filename);
             Restore(stream.Read());
         }
 
