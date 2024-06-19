@@ -330,7 +330,7 @@ namespace SEE.Game.Drawable
                     ChangeLine(branch, conf.BranchLineConf);
                     branch.GetComponent<MeshCollider>().enabled = false;
                 }
-
+                ChangeLayer(node, conf.OrderInLayer);
             }
         }
     }

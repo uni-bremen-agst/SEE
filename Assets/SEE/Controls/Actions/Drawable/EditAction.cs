@@ -168,7 +168,8 @@ namespace SEE.Controls.Actions.Drawable
                     && oldConf.NodeKind.Equals(newConf.NodeKind)
                     && CheckEquals(oldConf.BorderConf, newConf.BorderConf)
                     && CheckEquals(oldConf.TextConf, newConf.TextConf)
-                    && CheckEquals(oldConf.BranchLineConf, newConf.BranchLineConf);
+                    && CheckEquals(oldConf.BranchLineConf, newConf.BranchLineConf)
+                    && oldConf.OrderInLayer.Equals(newConf.OrderInLayer);
             }
 
             /// This case will be needed for mind-map nodes.

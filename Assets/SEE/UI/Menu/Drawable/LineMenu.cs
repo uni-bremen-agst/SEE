@@ -805,7 +805,6 @@ namespace SEE.UI.Menu.Drawable
         /// Furthermore, the action that should be executed on a order change is added.
         /// </summary>
         /// <param name="selectedLine">The selected line.</param>
-        /// <param name="renderer">The line renderer of the selected line.</param>
         /// <param name="lineHolder">The configuration which holds the changes.</param>
         /// <param name="drawable">The drawable on which the line is displayed.</param>
         /// <param name="drawableParentName">The parent id of the drawable.</param>

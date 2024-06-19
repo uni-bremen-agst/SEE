@@ -1,6 +1,8 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Net.Actions.Drawable;
+using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.Utils;
 using UnityEngine;
@@ -57,6 +59,7 @@ namespace SEE.Game.UI.Menu.Drawable
                     conf.Id = confOfReturn.Id;
                     conf.TextConf = confOfReturn.TextConf;
                     conf.BorderConf = confOfReturn.BorderConf;
+                    conf.OrderInLayer = confOfReturn.OrderInLayer;
                 }
                 
                 /// Instantiates the menu.
@@ -92,6 +95,7 @@ namespace SEE.Game.UI.Menu.Drawable
                 InitializeChangeBorder(node, conf, callback);
                 InitializeChangeText(node, conf, callback);
                 InitializeChangeBranchLine(attached, conf, callback);
+                InitializeChangeOrderInLayer(node, conf);
             }
         }
 
@@ -202,6 +206,31 @@ namespace SEE.Game.UI.Menu.Drawable
                 branchLineButtonArea.GetComponent<ButtonManagerBasic>().enabled = false;
                 branchLineButtonArea.GetComponent<Button>().interactable = false;
             }
+        }
+
+        /// <summary>
+        /// Init the order in layer slider for the mind-map menu.
+        /// </summary>
+        /// <param name="node">The selected mind-map node.</param>
+        /// <param name="conf">The configuration which holds the changes.</param>
+        private static void InitializeChangeOrderInLayer(GameObject node, MindMapNodeConf conf)
+        {
+            LayerSliderController layerSlider = instance.GetComponentInChildren<LayerSliderController>();
+            /// Assigns the current value to the slider.
+            layerSlider.AssignValue(conf.OrderInLayer);
+            GameObject drawable = GameFinder.GetDrawable(node);
+            string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+            /// Adds the handler for changing.
+            layerSlider.onValueChanged.AddListener(layerOrder =>
+            {
+                GameEdit.ChangeLayer(node, layerOrder);
+                conf.OrderInLayer = layerOrder;
+                new EditLayerNetAction(drawable.name, drawableParentName,
+                    node.name, layerOrder).Execute();
+                GameMindMap.ReDrawBranchLines(node);
+                new MindMapRefreshBranchLinesNetAction(drawable.name, drawableParentName,
+                    MindMapNodeConf.GetNodeConf(node)).Execute();
+            });
         }
 
         /// <summary>

@@ -11,10 +11,10 @@ namespace SEE.Game.Drawable
     public static class GameFinder
     {
         /// <summary>
-        /// Searches for the drawable in the scene.
+        /// Searches for the drawable surface in the scene.
         /// </summary>
-        /// <param name="drawableID">the drawable id.</param>
-        /// <param name="parentDrawableID">the parent id of the drawable.</param>
+        /// <param name="drawableID">the drawable surface id.</param>
+        /// <param name="parentDrawableID">the parent id of the drawable surface.</param>
         /// <param name="useFindWithTagList">Option to select which list should be searched. 
         /// By default, the <see cref="ValueHolder.DrawableSurfaces"> is used. 
         /// When this option is set to true, the expensive <see cref="GameObject.FindGameObjectsWithTag(string)"/> functionality is used.</param>
