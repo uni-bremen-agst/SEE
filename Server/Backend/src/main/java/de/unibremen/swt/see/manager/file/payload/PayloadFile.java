@@ -4,11 +4,7 @@ import lombok.Data;
 
 import java.time.ZonedDateTime;
 
-/**
- * Copyright 2021 LFS-Software UG, all rights reserved.
- *
- * @author Thorsten Friedewold (friedewold@lfs-software.de)
- */
+
 @Data
 public class PayloadFile {
 

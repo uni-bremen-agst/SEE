@@ -7,12 +7,6 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/**
- * Copyright 2021 LFS-Software UG, all rights reserved.
- *
- * @author Thorsten Friedewold (friedewold@lfs-software.de)
- */
-
 
 @Configuration
 @EnableWebMvc
