@@ -14,12 +14,12 @@ using UnityEngine;
 namespace SEE.GraphProviders
 {
     /// <summary>
-    /// Evolution graph provider for gxl files
+    /// Evolution graph provider for GXL files
     /// </summary>
     public class GXLEvolutionGraphProvider : MultiGraphProvider
     {
         /// <summary>
-        /// The directory where the GXL file are stored
+        /// The directory where the GXL file are stored.
         /// </summary>
         [ShowInInspector, Tooltip("Path to the git repository."), HideReferenceObjectPicker]
         public DirectoryPath GXLDirectory = new();
@@ -32,23 +32,23 @@ namespace SEE.GraphProviders
         public int MaxRevisionsToLoad = 500;
 
         /// <summary>
-        /// Provides an evolution graph series for gxl files
+        /// Provides an evolution graph series for GXL files.
         /// </summary>
         /// <param name="graphs">The graph series of the previous provider</param>
         /// <param name="city">The city where the evolution should be displayed</param>
         /// <param name="changePercentage"></param>
-        /// <param name="token">Can be used to cancel the action</param>
-        /// <returns>The graph series generated from the gxl files <see cref="UniTask{T}"/></returns>
+        /// <param name="token">Can be used to cancel the action.</param>
+        /// <returns>The graph series generated from the GXL files <see cref="UniTask{T}"/>.</returns>
         public override UniTask<List<Graph>> ProvideAsync(List<Graph> graphs, AbstractSEECity city,
             Action<float> changePercentage = null,
             CancellationToken token = default) =>
             LoadGraphAsync(city);
 
         /// <summary>
-        /// Loads the actual graph series from the gxl files in <see cref="GXLDirectory"/>
+        /// Loads the actual graph series from the GXL files in <see cref="GXLDirectory"/>
         /// </summary>
-        /// <param name="city">The city where the evolution should be displayed</param>
-        /// <returns>The graph series generated from the gxl files</returns>
+        /// <param name="city">The city where the evolution should be displayed.</param>
+        /// <returns>The graph series generated from the GXL files.</returns>
         private async UniTask<List<Graph>> LoadGraphAsync(AbstractSEECity city)
         {
             GraphsReader reader = new();
@@ -58,7 +58,7 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// Returns the kind of this provider
+        /// Returns the kind of this provider.
         /// </summary>
         /// <returns>returns <see cref="MultiGraphProviderKind.GXLEvolution"/></returns>
         public override MultiGraphProviderKind GetKind()
