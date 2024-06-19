@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using SEE.Game.Drawable.Configurations;
+using SEE.UI.Notification;
 using UnityEngine;
 
 namespace SEE.Game.Drawable
@@ -14,15 +15,28 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="drawableID">the drawable id.</param>
         /// <param name="parentDrawableID">the parent id of the drawable.</param>
+        /// <param name="useFindWithTagList">Option to select which list should be searched. 
+        /// By default, the <see cref="ValueHolder.DrawableSurfaces"> is used. 
+        /// When this option is set to true, the expensive <see cref="GameObject.FindGameObjectsWithTag(string)"/> functionality is used.</param>
         /// <returns>The sought-after drawable, if found. Otherwise, null.</returns>
         /// <remarks>This method will iterate over all game objects in the
         /// scene and, hence, is expensive.</remarks>
-        public static GameObject FindDrawable(string drawableID, string parentDrawableID)
+        public static GameObject FindDrawable(string drawableID, string parentDrawableID, bool useFindWithTagList = false)
         {
             GameObject searchedDrawable = null;
-            /// Gets all drawables of the scene.
-            List<GameObject> drawables = new(GameObject.FindGameObjectsWithTag(Tags.Drawable));
-
+            List<GameObject> drawables;
+            
+            /// Selection of the list to be checked.
+            if (!useFindWithTagList)
+            {
+                drawables = ValueHolder.DrawableSurfaces;
+            }
+            else
+            {
+                /// Gets all drawables of the scene.
+                drawables = new(GameObject.FindGameObjectsWithTag(Tags.Drawable));
+            }
+            /// Search for the desired drawable surface.
             foreach (GameObject drawable in drawables)
             {
                 /// Block for searching includes the parend id.
@@ -45,6 +59,12 @@ namespace SEE.Game.Drawable
                         searchedDrawable = drawable;
                     }
                 }
+            }
+            /// If the search with the <see cref="ValueHolder.DrawableSurfaces"> list is unsuccessful, 
+            /// initiate a search using the <see cref="GameObject.FindGameObjectsWithTag(string)"/> method.
+            if (!useFindWithTagList && searchedDrawable == null)
+            {
+                return FindDrawable(drawableID, parentDrawableID, true);
             }
             return searchedDrawable;
         }

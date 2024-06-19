@@ -240,6 +240,11 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
+        /// This list manages all drawable surfaces in the scene.
+        /// </summary>
+        public static List<GameObject> DrawableSurfaces = new List<GameObject>();
+
+        /// <summary>
         /// The constructor. It sets the default values for the current values.
         /// </summary>
         static ValueHolder()
