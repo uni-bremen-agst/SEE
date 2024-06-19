@@ -56,13 +56,13 @@ namespace SEE.Game.City
         public MultiGraphPipelineProvider DataProvider = new();
 
         /// <summary>
-        /// Error message that will be shown, when the graph provider pipeline (<see cref="DataProvider"/>)
+        /// Error message that will be shown when the graph provider pipeline (<see cref="DataProvider"/>)
         /// didn't yield any graphs.
         /// </summary>
         private const string NoGraphsProvidedErrorMessage = "Graph providers didn't yield any graphs";
 
         /// <summary>
-        /// Error message when will be shown if anything goes wrong in the pipeline
+        /// Error message that will be shown if anything goes wrong in the pipeline.
         /// </summary>
         private const string CantShowEvolutionMessage = "Can't show evolution";
 
@@ -93,7 +93,7 @@ namespace SEE.Game.City
             protected set => throw new NotImplementedException();
         }
         /// <summary>
-        /// The currently loaded graph series
+        /// The currently loaded graph series.
         /// </summary>
         private List<Graph> loadedGraphSeries = new();
 
