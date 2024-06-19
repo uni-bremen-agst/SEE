@@ -25,7 +25,7 @@ public class SeeApplication {
     }
 
     @Bean
-    CommandLineRunner inti(ServerRepo serverRepo, ServerService serverService, UserRepo userRepo, UserService userService, FileService fileService, RoleRepository roleRepository, ServerConfigRepo serverConfigRepo) {
+    CommandLineRunner cliRunner(ServerRepo serverRepo, ServerService serverService, UserRepo userRepo, UserService userService, FileService fileService, RoleRepository roleRepository, ServerConfigRepo serverConfigRepo) {
         return args -> {
             ServerConfig serverConfig = new ServerConfig();
             serverConfig.setDomain("localhost:8080");
