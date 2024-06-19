@@ -95,42 +95,39 @@ namespace SEE.Game.City
         /// <summary>
         /// The currently loaded graph series
         /// </summary>
-        private List<Graph> _loadedGraphSeries = new();
+        private List<Graph> loadedGraphSeries = new();
 
         /// <summary>
         /// Public attribute for the currently loaded graph series.
         /// </summary>
         private List<Graph> LoadedGraphSeries
         {
-            get => _loadedGraphSeries;
+            get => loadedGraphSeries;
 
             set
             {
-                if (_loadedGraphSeries.Count != 0)
+                if (loadedGraphSeries.Count != 0)
                 {
                     Reset();
                 }
 
-                _loadedGraphSeries = value;
+                loadedGraphSeries = value;
                 for (int i = 0; i < value.Count - 1; i++)
                 {
-                    InspectSchema(_loadedGraphSeries[i]);
-                    _loadedGraphSeries[i] = RelevantGraph(_loadedGraphSeries[i]);
+                    InspectSchema(loadedGraphSeries[i]);
+                    loadedGraphSeries[i] = RelevantGraph(loadedGraphSeries[i]);
                 }
             }
         }
 
         /// <summary>
-        /// Factory method to create the used EvolutionRenderer.
+        /// Factory method to create the used <see cref="EvolutionRenderer"/>.
         /// </summary>
         /// <returns>the current or new evolution renderer attached to this city</returns>
         protected EvolutionRenderer CreateEvolutionRenderer(IList<Graph> graphs)
         {
-            if (!gameObject.TryGetComponent(out EvolutionRenderer result))
-            {
-                result = gameObject.AddComponent<EvolutionRenderer>();
-                result.SetGraphEvolution(graphs);
-            }
+            EvolutionRenderer result = gameObject.AddOrGetComponent<EvolutionRenderer>();
+            result.SetGraphEvolution(graphs);
             return result;
         }
 
@@ -168,9 +165,10 @@ namespace SEE.Game.City
         /// <summary>
         /// Loads the whole graph series and sets the first graph of the series. If a graph was already
         /// loaded, that graph will be destroyed.
+        /// This button is intended for the Unity Editor only, but not in the runtime configuration menu.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Load Data")]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
+        [ButtonGroup(DataButtonsGroup)]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
         public async UniTask LoadDataAsync()
         {
@@ -194,22 +192,22 @@ namespace SEE.Game.City
                     }
 
                     LoadedGraphSeries = await DataProvider.ProvideAsync(new List<Graph>(), this, ReportProgress,
-                        cancellationTokenSource.Token);
+                                                                        cancellationTokenSource.Token);
 
                     if (LoadedGraphSeries.Count == 0)
                     {
-                        Debug.LogWarning("Could not load graph.\n");
+                        Debug.LogWarning("Could not load any graph.\n");
                         return;
                     }
 
-                    Debug.Log($"Loaded {LoadedGraphSeries.Count} graphs");
-                    ShowNotification.Info("SEECity Evolution", "Graphs loaded");
+                    Debug.Log($"Loaded {LoadedGraphSeries.Count} graphs.\n");
+                    ShowNotification.Info("SEECity Evolution", $"{LoadedGraphSeries.Count} Graphs loaded");
 
                     firstGraph = LoadedGraphSeries.First();
                     if (firstGraph != null)
                     {
                         Debug.Log(
-                            $"Loaded graph with {firstGraph.NodeCount} nodes and {firstGraph.EdgeCount} edges.\n");
+                            $"Loaded the first graph with {firstGraph.NodeCount} nodes and {firstGraph.EdgeCount} edges.\n");
                     }
                     else
                     {
@@ -227,11 +225,36 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Starts the evolution rendering at runtime.
+        /// Is intended to be used in the runtime configuration menu during play mode only,
+        /// but not in the Unity Editor. Will call <see cref="LoadDataAsync"/>.
+        /// Acts like Load and Draw in the Unity Editor, except that not only the first
+        /// graph will drawn, but the whole series subsequently.
+        /// </summary>
+        [RuntimeButton(DataButtonsGroup, "Load and Draw")]
+        [PropertyOrder(DataButtonsGroupOrderDraw)]
+        public async UniTask StartEvolutionAsync()
+        {
+            Reset();
+            await LoadDataAsync();
+
+            if (!LoadedGraphSeries.Any())
+            {
+                ShowNotification.Error(CantShowEvolutionMessage, NoGraphsProvidedErrorMessage);
+                return;
+            }
+
+            DrawGraphs(LoadedGraphSeries);
+            StartEvolution();
+        }
+
+        /// <summary>
         /// Destroys <see cref="firstGraph"/> if not <c>null</c>.
         /// Postcondition: <see cref="firstGraph"/> will be <c>null</c>.
+        /// This button is intended only for the Unity Editor, but not in the runtime configuration menu.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
-        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset")]
+        [ButtonGroup(ResetButtonsGroup)]
         [PropertyOrder(ResetButtonsGroupOrderReset)]
         public override void Reset()
         {
@@ -244,9 +267,10 @@ namespace SEE.Game.City
         /// <summary>
         /// Draws the graph.
         /// Precondition: The graph and its metrics have been loaded.
+        /// This button is intended for the Unity Editor only, but not in the runtime configuration menu.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Draw Data")]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
+        [ButtonGroup(DataButtonsGroup)]
         [PropertyOrder(DataButtonsGroupOrderDraw)]
         public void DrawGraph()
         {
@@ -277,44 +301,19 @@ namespace SEE.Game.City
         protected override void Start()
         {
             base.Start();
-            Reset();
-            LoadAsync().Forget();
-            return;
-
-            async UniTaskVoid LoadAsync()
-            {
-                await LoadDataAsync();
-                evolutionRenderer = CreateEvolutionRenderer(LoadedGraphSeries);
-                DrawGraphs(LoadedGraphSeries);
-                gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
-                evolutionRenderer.ShowGraphEvolution();
-            }
+            StartEvolutionAsync().Forget();
         }
 
         /// <summary>
-        /// Doesn't do anything when run in the Unity Editor. Is intended to be used in
-        /// the runtime configuration menu during play mode only. Starts the evolution at runtime.
-        /// <see cref="LoadDataAsync"/> doesn't need to be called first.
+        /// Sets up <see cref="evolutionRenderer"/> and initiates the visualization of the
+        /// evolving series of graphs.
         /// </summary>
-        [RuntimeButton(DataButtonsGroup, "Start Evolution")]
-        [PropertyOrder(DataButtonsGroupOrderDraw)]
-        public async UniTask StartEvolutionAsync()
+        private void StartEvolution()
         {
-            Reset();
-            await LoadDataAsync();
-
-            if (!LoadedGraphSeries.Any())
-            {
-                ShowNotification.Error(CantShowEvolutionMessage, NoGraphsProvidedErrorMessage);
-                return;
-            }
-
-            DrawGraphs(LoadedGraphSeries);
             evolutionRenderer = CreateEvolutionRenderer(LoadedGraphSeries);
             gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
             evolutionRenderer.ShowGraphEvolution();
         }
-
 
         /// <summary>
         /// Creates <see cref="evolutionRenderer"/> and shows the nodes having one of the selected
@@ -324,6 +323,7 @@ namespace SEE.Game.City
         /// <param name="graphs">the series of graph to be drawn</param>
         private void DrawGraphs(IList<Graph> graphs)
         {
+            // Note: We need this kind of loop because we assign graphs[i] in its body.
             for (int i = 0; i < graphs.Count; i++)
             {
                 Graph relevantGraph = RelevantGraph(graphs[i]);
