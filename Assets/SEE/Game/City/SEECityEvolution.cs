@@ -71,7 +71,7 @@ namespace SEE.Game.City
         private const string NoGraphsProvidedErrorMessage = "Graph providers didn't yield any graphs";
 
         /// <summary>
-        /// Error message when will be shown if anything goes wrong in the pipeline 
+        /// Error message when will be shown if anything goes wrong in the pipeline
         /// </summary>
         private const string CantShowEvolutionMessage = "Can't show evolution";
 
