@@ -146,7 +146,7 @@ namespace SEE.Game.City
         /// The first graph of the graph series. It is used only to let the user see
         /// his/her settings in action. It will be destroyed when the game starts.
         /// </summary>
-        [NonSerialized] 
+        [NonSerialized]
         private Graph firstGraph;
 
         /// <summary>
