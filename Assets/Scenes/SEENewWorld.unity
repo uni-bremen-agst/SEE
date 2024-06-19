@@ -416,8 +416,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 48650346}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.027065484, y: 0.25297463, z: -0.066630885, w: -0.9647962}
-  m_LocalPosition: {x: -0.029417127, y: 0.00000010132018, z: -0.000000045068727}
+  m_LocalRotation: {x: -0.027065504, y: 0.25297463, z: -0.06663085, w: -0.9647962}
+  m_LocalPosition: {x: -0.02941714, y: 0.00000010132018, z: -0.000000046394277}
   m_LocalScale: {x: 0.99999976, y: 0.9999999, z: 0.9999998}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -830,8 +830,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 81516335}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.019979028, y: -0.08762817, z: -0.0070953174, w: 0.99592763}
-  m_LocalPosition: {x: -0.44173005, y: -0.00000007173158, z: 0.000000029000837}
+  m_LocalRotation: {x: 0.019979108, y: -0.08762808, z: -0.0070953574, w: 0.9959277}
+  m_LocalPosition: {x: -0.44173002, y: -0.00000007173158, z: 0.000000029000836}
   m_LocalScale: {x: 0.99999976, y: 0.99999994, z: 0.9999999}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -863,8 +863,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 82449184}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.050502103, y: 0.19991642, z: -0.03600311, w: -0.97784805}
-  m_LocalPosition: {x: -0.019071631, y: -0.0000000764804, z: -0.0000000016569386}
+  m_LocalRotation: {x: -0.05050219, y: 0.19991642, z: -0.036003094, w: -0.977848}
+  m_LocalPosition: {x: -0.019071646, y: -0.00000007582672, z: -0.000000002319714}
   m_LocalScale: {x: 0.9999998, y: 0.99999976, z: 1.0000001}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1161,8 +1161,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 145013812}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.41746408, y: 0.000000044703484, z: 0.90869343, w: 0}
-  m_LocalPosition: {x: -0.04889738, y: -0.00009102992, z: 0.03809568}
+  m_LocalRotation: {x: -0.41746414, y: 0.000000022351738, z: 0.90869343, w: 0}
+  m_LocalPosition: {x: -0.04889738, y: -0.00009102993, z: 0.03809568}
   m_LocalScale: {x: 0.984891, y: 0.9848911, z: 0.9848911}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1201,8 +1201,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 150797813}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.21691807, y: 0.10752076, z: -0.41999927, w: 0.8746351}
-  m_LocalPosition: {x: -0.12266765, y: -0.00007851965, z: 0.000026953752}
+  m_LocalRotation: {x: -0.21691802, y: 0.10752079, z: -0.41999924, w: 0.8746351}
+  m_LocalPosition: {x: -0.12266766, y: -0.00007851965, z: 0.000026953752}
   m_LocalScale: {x: 1.0236676, y: 1.0236675, z: 1.0236677}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1690,8 +1690,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 201091164}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.14769825, y: -0.063014574, z: -0.08059367, w: 0.9837271}
-  m_LocalPosition: {x: -0.09022802, y: 0.031496085, z: 0.00107835}
+  m_LocalRotation: {x: -0.14769822, y: -0.06301456, z: -0.08059365, w: 0.98372716}
+  m_LocalPosition: {x: -0.09022801, y: 0.03149609, z: 0.00107835}
   m_LocalScale: {x: 0.9999998, y: 0.9999997, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1843,13 +1843,130 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 221778133}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.001346945, y: -0.29872674, z: -0.071168505, w: 0.9516804}
-  m_LocalPosition: {x: -0.028636819, y: 0.000000022225061, z: -0.00000007224253}
+  m_LocalRotation: {x: -0.0013470015, y: -0.29872668, z: -0.07116851, w: 0.9516805}
+  m_LocalPosition: {x: -0.028636824, y: 0.000000020590866, z: -0.00000007290531}
   m_LocalScale: {x: 1, y: 0.99999994, z: 1.0000001}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 577435189}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &223409955
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 223409956}
+  - component: {fileID: 223409960}
+  - component: {fileID: 223409959}
+  - component: {fileID: 223409958}
+  - component: {fileID: 223409957}
+  m_Layer: 0
+  m_Name: RevisionSelectionCanvas
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &223409956
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 223409955}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 569324151}
+  m_Father: {fileID: 551406255}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0, y: 0}
+--- !u!114 &223409957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 223409955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3abf2970e2b81b840a0182f50c117729, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RevisionDropdown: {fileID: 1586055253}
+  CloseViewButton: {fileID: 1537750019}
+--- !u!114 &223409958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 223409955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 2147484471
+--- !u!114 &223409959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 223409955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_UiScaleMode: 0
+  m_ReferencePixelsPerUnit: 100
+  m_ScaleFactor: 1
+  m_ReferenceResolution: {x: 800, y: 600}
+  m_ScreenMatchMode: 0
+  m_MatchWidthOrHeight: 0
+  m_PhysicalUnit: 3
+  m_FallbackScreenDPI: 96
+  m_DefaultSpriteDPI: 96
+  m_DynamicPixelsPerUnit: 1
+  m_PresetInfoIsWorld: 0
+--- !u!223 &223409960
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 223409955}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 0
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
 --- !u!4 &224117771 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5359129155390165875, guid: 87c48d261903b2d4a80733fe430125fe,
@@ -1880,8 +1997,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 228457460}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.033184197, y: 0.1774246, z: 0.013663752, w: -0.98347986}
-  m_LocalPosition: {x: -0.031541884, y: -0.00000003922072, z: 0.00000014978724}
+  m_LocalRotation: {x: -0.03318416, y: 0.1774246, z: 0.013663707, w: -0.98347986}
+  m_LocalPosition: {x: -0.03154189, y: -0.000000037913363, z: 0.00000014846168}
   m_LocalScale: {x: 0.99999964, y: 0.99999946, z: 0.9999999}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3925,6 +4042,10 @@ MonoBehaviour:
     MetricIssue: Metric.Metric
     StyleIssue: Metric.Style
     UniversalIssue: Metric.Universal
+    LspHint: Metric.LSP_Hint
+    LspInfo: Metric.LSP_Info
+    LspWarning: Metric.LSP_Warning
+    LspError: Metric.LSP_Error
     ArchitectureIssueSum: Metric.Architecture_Violations_SUM
     CloneIssueSum: Metric.Clone_SUM
     CycleIssueSum: Metric.Cycle_SUM
@@ -4153,12 +4274,307 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 268762458}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &277250597
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 277250598}
+  - component: {fileID: 277250600}
+  - component: {fileID: 277250599}
+  m_Layer: 0
+  m_Name: Text
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &277250598
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 277250597}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1537750018}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &277250599
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 277250597}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 14
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 4
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: Close
+--- !u!222 &277250600
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 277250597}
+  m_CullTransparentMesh: 0
 --- !u!4 &280294901 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4846815275869615973, guid: dc09ca83af09d6d4b8b33c7c5c4a13ee,
     type: 3}
   m_PrefabInstance: {fileID: 933640839}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &287997181
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 287997182}
+  - component: {fileID: 287997185}
+  - component: {fileID: 287997184}
+  - component: {fileID: 287997183}
+  m_Layer: 0
+  m_Name: Viewport
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &287997182
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 287997181}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1547463252}
+  m_Father: {fileID: 1718672805}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: -18, y: 0}
+  m_Pivot: {x: 0, y: 1}
+--- !u!114 &287997183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 287997181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31a19414c41e5ae4aae2af33fee712f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ShowMaskGraphic: 0
+--- !u!114 &287997184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 287997181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10917, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &287997185
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 287997181}
+  m_CullTransparentMesh: 0
+--- !u!1 &295819618
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 295819619}
+  - component: {fileID: 295819622}
+  - component: {fileID: 295819621}
+  - component: {fileID: 295819620}
+  m_Layer: 0
+  m_Name: Scrollbar
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &295819619
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 295819618}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1371232449}
+  m_Father: {fileID: 1718672805}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 20, y: 0}
+  m_Pivot: {x: 1, y: 1}
+--- !u!114 &295819620
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 295819618}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a4db7a114972834c8e4117be1d82ba3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 1269396874}
+  m_HandleRect: {fileID: 1269396873}
+  m_Direction: 2
+  m_Value: 0
+  m_Size: 0.2
+  m_NumberOfSteps: 0
+  m_OnValueChanged:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &295819621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 295819618}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &295819622
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 295819618}
+  m_CullTransparentMesh: 0
 --- !u!1001 &296817417
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4352,8 +4768,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 311288987}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.05231398, y: -0.2804481, z: -0.055634234, w: 0.9568265}
-  m_LocalPosition: {x: -0.0190717, y: 0.000000007599014, z: -0.00000031283002}
+  m_LocalRotation: {x: -0.052314006, y: -0.28044808, z: -0.055634275, w: 0.9568265}
+  m_LocalPosition: {x: -0.0190717, y: 0.000000007925853, z: -0.00000031216726}
   m_LocalScale: {x: 1, y: 0.99999994, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4550,8 +4966,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 325795082}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.04785329, y: 0.20875508, z: 0.05713693, w: -0.975124}
-  m_LocalPosition: {x: -0.038383927, y: 0.000000053601646, z: 0.000000041092072}
+  m_LocalRotation: {x: 0.047853228, y: 0.2087551, z: 0.05713694, w: -0.97512394}
+  m_LocalPosition: {x: -0.038383927, y: 0.000000053601646, z: 0.00000004109207}
   m_LocalScale: {x: 0.9999999, y: 1.0000002, z: 1.0000004}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5083,13 +5499,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.215686277
+      Data: 0.2156863
     - Name: 
       Entry: 4
-      Data: 0.215686277
+      Data: 0.2156863
     - Name: 
       Entry: 4
-      Data: 0.215686277
+      Data: 0.2156863
     - Name: 
       Entry: 4
       Data: 1
@@ -7054,7 +7470,7 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.858823538
+      Data: 0.8588235
     - Name: 
       Entry: 4
       Data: 1
@@ -7111,7 +7527,7 @@ MonoBehaviour:
       Data: 0.9425198
     - Name: 
       Entry: 4
-      Data: 0.362095058
+      Data: 0.3620951
     - Name: 
       Entry: 4
       Data: 0.9716981
@@ -7162,7 +7578,7 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.224679589
+      Data: 0.2246796
     - Name: 
       Entry: 4
       Data: 0.7557063
@@ -7183,7 +7599,7 @@ MonoBehaviour:
       Data: 0.09531862
     - Name: 
       Entry: 4
-      Data: 0.741935432
+      Data: 0.7419354
     - Name: 
       Entry: 4
       Data: 0.9622642
@@ -7489,7 +7905,28 @@ MonoBehaviour:
         SEE]], mscorlib
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 111|SEE.GraphProviders.GXLSingleGraphProvider, SEE
+    - Name: Path
+      Entry: 7
+      Data: 112|SEE.Utils.Paths.FilePath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 3
+    - Name: relativePath
+      Entry: 1
+      Data: /SEE/CodeFacts.gxl.xz
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -7555,6 +7992,10 @@ MonoBehaviour:
     MetricIssue: Metric.Metric
     StyleIssue: Metric.Style
     UniversalIssue: Metric.Universal
+    LspHint: Metric.LSP_Hint
+    LspInfo: Metric.LSP_Info
+    LspWarning: Metric.LSP_Warning
+    LspError: Metric.LSP_Error
     ArchitectureIssueSum: Metric.Architecture_Violations_SUM
     CloneIssueSum: Metric.Clone_SUM
     CycleIssueSum: Metric.Cycle_SUM
@@ -8448,6 +8889,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8963412478501909177, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -8483,8 +8929,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 373395492}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.067862876, y: 0.25613508, z: 0.05736778, w: -0.96254784}
-  m_LocalPosition: {x: -0.04944698, y: 0.00000012289158, z: -0.00000025914517}
+  m_LocalRotation: {x: -0.06786285, y: 0.2561351, z: 0.0573678, w: -0.9625479}
+  m_LocalPosition: {x: -0.04944699, y: 0.00000012485262, z: -0.00000025914514}
   m_LocalScale: {x: 0.9999995, y: 0.99999994, z: 0.99999994}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -8744,8 +9190,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 389502053}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.034855682, y: 0.14176805, z: 0.0031385461, w: 0.9892811}
-  m_LocalPosition: {x: -0.26411507, y: -0.0000008867418, z: -0.000000082563155}
+  m_LocalRotation: {x: 0.0348555, y: 0.14176802, z: 0.0031385943, w: 0.9892811}
+  m_LocalPosition: {x: -0.26411504, y: -0.0000008867418, z: -0.00000008256315}
   m_LocalScale: {x: 1.0078583, y: 1.0078585, z: 1.0078589}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -8868,8 +9314,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 397525882}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.0125339795, y: 0.08406394, z: -0.084716864, w: -0.99277353}
-  m_LocalPosition: {x: -0.09584586, y: 0.009588151, z: 0.012485808}
+  m_LocalRotation: {x: -0.012533891, y: 0.0840639, z: -0.08471686, w: -0.99277353}
+  m_LocalPosition: {x: -0.095846, y: 0.009588142, z: 0.012485812}
   m_LocalScale: {x: 0.99999994, y: 0.9999998, z: 1.0000002}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -9063,8 +9509,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 406595746}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.5883787, y: -0.036457177, z: 0.3957536, w: -0.7041736}
-  m_LocalPosition: {x: -0.03970783, y: 0.039045595, z: -0.021918515}
+  m_LocalRotation: {x: 0.58837867, y: -0.036457162, z: 0.39575356, w: -0.7041737}
+  m_LocalPosition: {x: -0.039707847, y: 0.03904563, z: -0.021918526}
   m_LocalScale: {x: 1.0000004, y: 1.0000002, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -9921,8 +10367,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 467350947}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.14543778, y: 0.07245354, z: -0.092463, w: -0.98236907}
-  m_LocalPosition: {x: -0.09022874, y: -0.031496234, z: 0.0010786616}
+  m_LocalRotation: {x: -0.14543791, y: 0.07245363, z: -0.09246307, w: -0.98236907}
+  m_LocalPosition: {x: -0.09022877, y: -0.031496245, z: 0.0010786656}
   m_LocalScale: {x: 0.9999999, y: 1, z: 0.99999994}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -10002,6 +10448,85 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dc09ca83af09d6d4b8b33c7c5c4a13ee, type: 3}
+--- !u!1 &470155962
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 470155963}
+  - component: {fileID: 470155965}
+  - component: {fileID: 470155964}
+  m_Layer: 0
+  m_Name: Label
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &470155963
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 470155962}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1586055252}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -7.5, y: -0.5}
+  m_SizeDelta: {x: -35, y: -13}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &470155964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 470155962}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 14
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 3
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: Option A
+--- !u!222 &470155965
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 470155962}
+  m_CullTransparentMesh: 0
 --- !u!1001 &471867952
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10393,7 +10918,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 529013749}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.07879806, y: -0.07117018, z: 0.861214, w: 0.49702737}
+  m_LocalRotation: {x: 0.07879805, y: -0.07117018, z: 0.8612139, w: 0.49702737}
   m_LocalPosition: {x: -0.17375474, y: -0.0715072, z: 0.0032270448}
   m_LocalScale: {x: 1.0099998, y: 1.0000001, z: 1}
   m_ConstrainProportionsScale: 0
@@ -10506,7 +11031,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 551143612}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.036327384, y: -0.12648481, z: 0.01934141, w: 0.99111444}
+  m_LocalRotation: {x: 0.03632735, y: -0.12648483, z: 0.019341378, w: 0.99111444}
   m_LocalPosition: {x: -0.17674594, y: 0.00000007126134, z: -0.00000009501514}
   m_LocalScale: {x: 1.0000001, y: 1.0000001, z: 1}
   m_ConstrainProportionsScale: 0
@@ -10527,6 +11052,7 @@ GameObject:
   - component: {fileID: 551406258}
   - component: {fileID: 551406257}
   - component: {fileID: 551406256}
+  - component: {fileID: 551406262}
   m_Layer: 0
   m_Name: EvolutionCity
   m_TagString: Code City
@@ -10548,6 +11074,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 371578611}
+  - {fileID: 223409956}
   m_Father: {fileID: 387723967}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &551406256
@@ -10610,19 +11137,19 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 18
+      Data: 3
     - Name: 
       Entry: 7
       Data: 
     - Name: $k
       Entry: 1
-      Data: Method
+      Data: File
     - Name: $v
       Entry: 7
       Data: 4|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
-      Data: false
+      Data: true
     - Name: Shape
       Entry: 3
       Data: 0
@@ -10634,13 +11161,13 @@ MonoBehaviour:
       Data: 3
     - Name: 
       Entry: 1
-      Data: 0.001
+      Data: Metric.Number_of_Tokens
     - Name: 
       Entry: 1
-      Data: 0.001
+      Data: Metric.LOC
     - Name: 
       Entry: 1
-      Data: 0.001
+      Data: Metric.Number_of_Tokens
     - Name: 
       Entry: 13
       Data: 
@@ -10652,7 +11179,7 @@ MonoBehaviour:
       Data: 6|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: TypeColor
       Entry: 7
       Data: UnityEngine.Color, UnityEngine.CoreModule
@@ -10676,7 +11203,7 @@ MonoBehaviour:
       Data: true
     - Name: ColorMetric
       Entry: 1
-      Data: 
+      Data: Metric.Clone_Rate
     - Name: 
       Entry: 8
       Data: 
@@ -10742,13 +11269,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Class
+      Data: Directory
     - Name: $v
       Entry: 7
       Data: 10|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
-      Data: false
+      Data: true
     - Name: Shape
       Entry: 3
       Data: 0
@@ -10760,13 +11287,13 @@ MonoBehaviour:
       Data: 3
     - Name: 
       Entry: 1
-      Data: Metric.Fan.Out.Call.ssum
+      Data: 0.001
     - Name: 
       Entry: 1
-      Data: Metric.LOC.ssum
+      Data: 0.001
     - Name: 
       Entry: 1
-      Data: Metric.Fan.In.Call.ssum
+      Data: 0.001
     - Name: 
       Entry: 13
       Data: 
@@ -10778,16 +11305,16 @@ MonoBehaviour:
       Data: 12|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
-      Data: 1
+      Data: 0
     - Name: TypeColor
       Entry: 7
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 4
       Data: 1
@@ -10802,7 +11329,7 @@ MonoBehaviour:
       Data: true
     - Name: ColorMetric
       Entry: 1
-      Data: Metric.McCabe_Complexity.ssum
+      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -10820,10 +11347,7 @@ MonoBehaviour:
       Data: 14|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 1
-      Data: Metric.Lines.Fixme.ssum
+      Data: 0
     - Name: 
       Entry: 13
       Data: 
@@ -10859,7 +11383,7 @@ MonoBehaviour:
       Data: 1
     - Name: ShowNames
       Entry: 5
-      Data: true
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -10871,16 +11395,16 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Package
+      Data: UNKNOWNTYPE
     - Name: $v
       Entry: 7
       Data: 16|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
-      Data: false
+      Data: true
     - Name: Shape
       Entry: 3
-      Data: 1
+      Data: 0
     - Name: MetricToLength
       Entry: 7
       Data: 17|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
@@ -10907,19 +11431,19 @@ MonoBehaviour:
       Data: 18|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
-      Data: 1
+      Data: 0
     - Name: TypeColor
       Entry: 7
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 4
       Data: 1
@@ -10931,7 +11455,7 @@ MonoBehaviour:
       Data: true
     - Name: ColorMetric
       Entry: 1
-      Data: Metric.McCabe_Complexity
+      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -10985,1906 +11509,7 @@ MonoBehaviour:
       Data: 1
     - Name: ShowNames
       Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Field
-    - Name: $v
-      Entry: 7
-      Data: 22|SEE.Game.City.VisualNodeAttributes, SEE
-    - Name: IsRelevant
-      Entry: 5
-      Data: false
-    - Name: Shape
-      Entry: 3
-      Data: 1
-    - Name: MetricToLength
-      Entry: 7
-      Data: 23|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 3
-    - Name: 
-      Entry: 1
-      Data: 0.01
-    - Name: 
-      Entry: 1
-      Data: 0.03
-    - Name: 
-      Entry: 1
-      Data: 0.01
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ColorProperty
-      Entry: 7
-      Data: 24|SEE.Game.City.ColorProperty, SEE
-    - Name: Property
-      Entry: 3
-      Data: 0
-    - Name: TypeColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.9730417
-    - Name: 
-      Entry: 4
-      Data: 0.126157
-    - Name: 
-      Entry: 4
-      Data: 0.990566
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ByLevel
-      Entry: 5
       Data: true
-    - Name: ColorMetric
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MinimalBlockLength
-      Entry: 4
-      Data: 0.001
-    - Name: MaximalBlockLength
-      Entry: 4
-      Data: 1
-    - Name: AntennaSettings
-      Entry: 7
-      Data: 25|SEE.Game.City.AntennaAttributes, SEE
-    - Name: AntennaSections
-      Entry: 7
-      Data: 26|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LabelSettings
-      Entry: 7
-      Data: 27|SEE.Game.LabelAttributes, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationFactor
-      Entry: 4
-      Data: 0.5
-    - Name: LabelAlpha
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: OutlineWidth
-      Entry: 4
-      Data: 1
-    - Name: ShowNames
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Member
-    - Name: $v
-      Entry: 7
-      Data: 28|SEE.Game.City.VisualNodeAttributes, SEE
-    - Name: IsRelevant
-      Entry: 5
-      Data: false
-    - Name: Shape
-      Entry: 3
-      Data: 0
-    - Name: MetricToLength
-      Entry: 7
-      Data: 29|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 3
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ColorProperty
-      Entry: 7
-      Data: 30|SEE.Game.City.ColorProperty, SEE
-    - Name: Property
-      Entry: 3
-      Data: 0
-    - Name: TypeColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ByLevel
-      Entry: 5
-      Data: true
-    - Name: ColorMetric
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MinimalBlockLength
-      Entry: 4
-      Data: 0.001
-    - Name: MaximalBlockLength
-      Entry: 4
-      Data: 1
-    - Name: AntennaSettings
-      Entry: 7
-      Data: 31|SEE.Game.City.AntennaAttributes, SEE
-    - Name: AntennaSections
-      Entry: 7
-      Data: 32|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LabelSettings
-      Entry: 7
-      Data: 33|SEE.Game.LabelAttributes, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationFactor
-      Entry: 4
-      Data: 0.5
-    - Name: LabelAlpha
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: OutlineWidth
-      Entry: 4
-      Data: 1
-    - Name: ShowNames
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Namespace
-    - Name: $v
-      Entry: 7
-      Data: 34|SEE.Game.City.VisualNodeAttributes, SEE
-    - Name: IsRelevant
-      Entry: 5
-      Data: false
-    - Name: Shape
-      Entry: 3
-      Data: 0
-    - Name: MetricToLength
-      Entry: 7
-      Data: 35|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 3
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ColorProperty
-      Entry: 7
-      Data: 36|SEE.Game.City.ColorProperty, SEE
-    - Name: Property
-      Entry: 3
-      Data: 0
-    - Name: TypeColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ByLevel
-      Entry: 5
-      Data: true
-    - Name: ColorMetric
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MinimalBlockLength
-      Entry: 4
-      Data: 0.001
-    - Name: MaximalBlockLength
-      Entry: 4
-      Data: 1
-    - Name: AntennaSettings
-      Entry: 7
-      Data: 37|SEE.Game.City.AntennaAttributes, SEE
-    - Name: AntennaSections
-      Entry: 7
-      Data: 38|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LabelSettings
-      Entry: 7
-      Data: 39|SEE.Game.LabelAttributes, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationFactor
-      Entry: 4
-      Data: 0.5
-    - Name: LabelAlpha
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: OutlineWidth
-      Entry: 4
-      Data: 1
-    - Name: ShowNames
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: UNKNOWNTYPE
-    - Name: $v
-      Entry: 7
-      Data: 40|SEE.Game.City.VisualNodeAttributes, SEE
-    - Name: IsRelevant
-      Entry: 5
-      Data: true
-    - Name: Shape
-      Entry: 3
-      Data: 0
-    - Name: MetricToLength
-      Entry: 7
-      Data: 41|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 3
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ColorProperty
-      Entry: 7
-      Data: 42|SEE.Game.City.ColorProperty, SEE
-    - Name: Property
-      Entry: 3
-      Data: 0
-    - Name: TypeColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ByLevel
-      Entry: 5
-      Data: true
-    - Name: ColorMetric
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MinimalBlockLength
-      Entry: 4
-      Data: 0.001
-    - Name: MaximalBlockLength
-      Entry: 4
-      Data: 1
-    - Name: AntennaSettings
-      Entry: 7
-      Data: 43|SEE.Game.City.AntennaAttributes, SEE
-    - Name: AntennaSections
-      Entry: 7
-      Data: 44|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LabelSettings
-      Entry: 7
-      Data: 45|SEE.Game.LabelAttributes, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationFactor
-      Entry: 4
-      Data: 0.5
-    - Name: LabelAlpha
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: OutlineWidth
-      Entry: 4
-      Data: 1
-    - Name: ShowNames
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Interface
-    - Name: $v
-      Entry: 7
-      Data: 46|SEE.Game.City.VisualNodeAttributes, SEE
-    - Name: IsRelevant
-      Entry: 5
-      Data: false
-    - Name: Shape
-      Entry: 3
-      Data: 0
-    - Name: MetricToLength
-      Entry: 7
-      Data: 47|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 3
-    - Name: 
-      Entry: 1
-      Data: Metric.Fan.Out.Call.ssum
-    - Name: 
-      Entry: 1
-      Data: Metric.LOC.ssum
-    - Name: 
-      Entry: 1
-      Data: Metric.Fan.In.Call.ssum
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ColorProperty
-      Entry: 7
-      Data: 48|SEE.Game.City.ColorProperty, SEE
-    - Name: Property
-      Entry: 3
-      Data: 0
-    - Name: TypeColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.533485
-    - Name: 
-      Entry: 4
-      Data: 0.6226415
-    - Name: 
-      Entry: 4
-      Data: 0.1321645
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ByLevel
-      Entry: 5
-      Data: true
-    - Name: ColorMetric
-      Entry: 1
-      Data: Metric.Halstead.Difficulty
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MinimalBlockLength
-      Entry: 4
-      Data: 0.001
-    - Name: MaximalBlockLength
-      Entry: 4
-      Data: 0.2
-    - Name: AntennaSettings
-      Entry: 7
-      Data: 49|SEE.Game.City.AntennaAttributes, SEE
-    - Name: AntennaSections
-      Entry: 7
-      Data: 50|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 1
-      Data: Metric.Lines.Fixme.ssum
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LabelSettings
-      Entry: 7
-      Data: 51|SEE.Game.LabelAttributes, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationFactor
-      Entry: 4
-      Data: 0.5
-    - Name: LabelAlpha
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: OutlineWidth
-      Entry: 4
-      Data: 1
-    - Name: ShowNames
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Module
-    - Name: $v
-      Entry: 7
-      Data: 52|SEE.Game.City.VisualNodeAttributes, SEE
-    - Name: IsRelevant
-      Entry: 5
-      Data: false
-    - Name: Shape
-      Entry: 3
-      Data: 0
-    - Name: MetricToLength
-      Entry: 7
-      Data: 53|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 3
-    - Name: 
-      Entry: 1
-      Data: 1
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 1
-      Data: 1
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ColorProperty
-      Entry: 7
-      Data: 54|SEE.Game.City.ColorProperty, SEE
-    - Name: Property
-      Entry: 3
-      Data: 0
-    - Name: TypeColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.5019608
-    - Name: 
-      Entry: 4
-      Data: 0.5019608
-    - Name: 
-      Entry: 4
-      Data: 0.5019608
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ByLevel
-      Entry: 5
-      Data: true
-    - Name: ColorMetric
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MinimalBlockLength
-      Entry: 4
-      Data: 0.001
-    - Name: MaximalBlockLength
-      Entry: 4
-      Data: 1
-    - Name: AntennaSettings
-      Entry: 7
-      Data: 55|SEE.Game.City.AntennaAttributes, SEE
-    - Name: AntennaSections
-      Entry: 7
-      Data: 56|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LabelSettings
-      Entry: 7
-      Data: 57|SEE.Game.LabelAttributes, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationFactor
-      Entry: 4
-      Data: 0.5
-    - Name: LabelAlpha
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: OutlineWidth
-      Entry: 4
-      Data: 1
-    - Name: ShowNames
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Routine
-    - Name: $v
-      Entry: 7
-      Data: 58|SEE.Game.City.VisualNodeAttributes, SEE
-    - Name: IsRelevant
-      Entry: 5
-      Data: false
-    - Name: Shape
-      Entry: 3
-      Data: 0
-    - Name: MetricToLength
-      Entry: 7
-      Data: 59|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 3
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ColorProperty
-      Entry: 7
-      Data: 60|SEE.Game.City.ColorProperty, SEE
-    - Name: Property
-      Entry: 3
-      Data: 0
-    - Name: TypeColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ByLevel
-      Entry: 5
-      Data: true
-    - Name: ColorMetric
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MinimalBlockLength
-      Entry: 4
-      Data: 0.001
-    - Name: MaximalBlockLength
-      Entry: 4
-      Data: 1
-    - Name: AntennaSettings
-      Entry: 7
-      Data: 61|SEE.Game.City.AntennaAttributes, SEE
-    - Name: AntennaSections
-      Entry: 7
-      Data: 62|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LabelSettings
-      Entry: 7
-      Data: 63|SEE.Game.LabelAttributes, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationFactor
-      Entry: 4
-      Data: 0.5
-    - Name: LabelAlpha
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: OutlineWidth
-      Entry: 4
-      Data: 1
-    - Name: ShowNames
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Constant
-    - Name: $v
-      Entry: 7
-      Data: 64|SEE.Game.City.VisualNodeAttributes, SEE
-    - Name: IsRelevant
-      Entry: 5
-      Data: false
-    - Name: Shape
-      Entry: 3
-      Data: 0
-    - Name: MetricToLength
-      Entry: 7
-      Data: 65|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 3
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ColorProperty
-      Entry: 7
-      Data: 66|SEE.Game.City.ColorProperty, SEE
-    - Name: Property
-      Entry: 3
-      Data: 0
-    - Name: TypeColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ByLevel
-      Entry: 5
-      Data: true
-    - Name: ColorMetric
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MinimalBlockLength
-      Entry: 4
-      Data: 0.001
-    - Name: MaximalBlockLength
-      Entry: 4
-      Data: 1
-    - Name: AntennaSettings
-      Entry: 7
-      Data: 67|SEE.Game.City.AntennaAttributes, SEE
-    - Name: AntennaSections
-      Entry: 7
-      Data: 68|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LabelSettings
-      Entry: 7
-      Data: 69|SEE.Game.LabelAttributes, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationFactor
-      Entry: 4
-      Data: 0.5
-    - Name: LabelAlpha
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: OutlineWidth
-      Entry: 4
-      Data: 1
-    - Name: ShowNames
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Type
-    - Name: $v
-      Entry: 7
-      Data: 70|SEE.Game.City.VisualNodeAttributes, SEE
-    - Name: IsRelevant
-      Entry: 5
-      Data: false
-    - Name: Shape
-      Entry: 3
-      Data: 0
-    - Name: MetricToLength
-      Entry: 7
-      Data: 71|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 3
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ColorProperty
-      Entry: 7
-      Data: 72|SEE.Game.City.ColorProperty, SEE
-    - Name: Property
-      Entry: 3
-      Data: 0
-    - Name: TypeColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ByLevel
-      Entry: 5
-      Data: true
-    - Name: ColorMetric
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MinimalBlockLength
-      Entry: 4
-      Data: 0.001
-    - Name: MaximalBlockLength
-      Entry: 4
-      Data: 1
-    - Name: AntennaSettings
-      Entry: 7
-      Data: 73|SEE.Game.City.AntennaAttributes, SEE
-    - Name: AntennaSections
-      Entry: 7
-      Data: 74|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LabelSettings
-      Entry: 7
-      Data: 75|SEE.Game.LabelAttributes, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationFactor
-      Entry: 4
-      Data: 0.5
-    - Name: LabelAlpha
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: OutlineWidth
-      Entry: 4
-      Data: 1
-    - Name: ShowNames
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Method_Template
-    - Name: $v
-      Entry: 7
-      Data: 76|SEE.Game.City.VisualNodeAttributes, SEE
-    - Name: IsRelevant
-      Entry: 5
-      Data: false
-    - Name: Shape
-      Entry: 3
-      Data: 0
-    - Name: MetricToLength
-      Entry: 7
-      Data: 77|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 3
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ColorProperty
-      Entry: 7
-      Data: 78|SEE.Game.City.ColorProperty, SEE
-    - Name: Property
-      Entry: 3
-      Data: 0
-    - Name: TypeColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ByLevel
-      Entry: 5
-      Data: true
-    - Name: ColorMetric
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MinimalBlockLength
-      Entry: 4
-      Data: 0.001
-    - Name: MaximalBlockLength
-      Entry: 4
-      Data: 1
-    - Name: AntennaSettings
-      Entry: 7
-      Data: 79|SEE.Game.City.AntennaAttributes, SEE
-    - Name: AntennaSections
-      Entry: 7
-      Data: 80|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LabelSettings
-      Entry: 7
-      Data: 81|SEE.Game.LabelAttributes, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationFactor
-      Entry: 4
-      Data: 0.5
-    - Name: LabelAlpha
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: OutlineWidth
-      Entry: 4
-      Data: 1
-    - Name: ShowNames
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Class_Template
-    - Name: $v
-      Entry: 7
-      Data: 82|SEE.Game.City.VisualNodeAttributes, SEE
-    - Name: IsRelevant
-      Entry: 5
-      Data: false
-    - Name: Shape
-      Entry: 3
-      Data: 0
-    - Name: MetricToLength
-      Entry: 7
-      Data: 83|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 3
-    - Name: 
-      Entry: 1
-      Data: Metric.Fan.Out.Call.ssum
-    - Name: 
-      Entry: 1
-      Data: Metric.LOC.ssum
-    - Name: 
-      Entry: 1
-      Data: Metric.Fan.In.Call.ssum
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ColorProperty
-      Entry: 7
-      Data: 84|SEE.Game.City.ColorProperty, SEE
-    - Name: Property
-      Entry: 3
-      Data: 0
-    - Name: TypeColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ByLevel
-      Entry: 5
-      Data: true
-    - Name: ColorMetric
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MinimalBlockLength
-      Entry: 4
-      Data: 0.001
-    - Name: MaximalBlockLength
-      Entry: 4
-      Data: 1
-    - Name: AntennaSettings
-      Entry: 7
-      Data: 85|SEE.Game.City.AntennaAttributes, SEE
-    - Name: AntennaSections
-      Entry: 7
-      Data: 86|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 1
-      Data: Metric.Lines.Fixme.ssum
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LabelSettings
-      Entry: 7
-      Data: 87|SEE.Game.LabelAttributes, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationFactor
-      Entry: 4
-      Data: 0.5
-    - Name: LabelAlpha
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: OutlineWidth
-      Entry: 4
-      Data: 1
-    - Name: ShowNames
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Interface_Template
-    - Name: $v
-      Entry: 7
-      Data: 88|SEE.Game.City.VisualNodeAttributes, SEE
-    - Name: IsRelevant
-      Entry: 5
-      Data: false
-    - Name: Shape
-      Entry: 3
-      Data: 0
-    - Name: MetricToLength
-      Entry: 7
-      Data: 89|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 3
-    - Name: 
-      Entry: 1
-      Data: Metric.Fan.Out.Call.ssum
-    - Name: 
-      Entry: 1
-      Data: Metric.LOC.ssum
-    - Name: 
-      Entry: 1
-      Data: Metric.Fan.In.Call.ssum
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ColorProperty
-      Entry: 7
-      Data: 90|SEE.Game.City.ColorProperty, SEE
-    - Name: Property
-      Entry: 3
-      Data: 0
-    - Name: TypeColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.5333334
-    - Name: 
-      Entry: 4
-      Data: 0.6235294
-    - Name: 
-      Entry: 4
-      Data: 0.1333333
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ByLevel
-      Entry: 5
-      Data: true
-    - Name: ColorMetric
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MinimalBlockLength
-      Entry: 4
-      Data: 0.001
-    - Name: MaximalBlockLength
-      Entry: 4
-      Data: 1
-    - Name: AntennaSettings
-      Entry: 7
-      Data: 91|SEE.Game.City.AntennaAttributes, SEE
-    - Name: AntennaSections
-      Entry: 7
-      Data: 92|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 1
-      Data: Metric.Lines.Fixme.ssum
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LabelSettings
-      Entry: 7
-      Data: 93|SEE.Game.LabelAttributes, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationFactor
-      Entry: 4
-      Data: 0.5
-    - Name: LabelAlpha
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: OutlineWidth
-      Entry: 4
-      Data: 1
-    - Name: ShowNames
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Cluster
-    - Name: $v
-      Entry: 7
-      Data: 94|SEE.Game.City.VisualNodeAttributes, SEE
-    - Name: IsRelevant
-      Entry: 5
-      Data: false
-    - Name: Shape
-      Entry: 3
-      Data: 0
-    - Name: MetricToLength
-      Entry: 7
-      Data: 95|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 3
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ColorProperty
-      Entry: 7
-      Data: 96|SEE.Game.City.ColorProperty, SEE
-    - Name: Property
-      Entry: 3
-      Data: 0
-    - Name: TypeColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ByLevel
-      Entry: 5
-      Data: true
-    - Name: ColorMetric
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MinimalBlockLength
-      Entry: 4
-      Data: 0.001
-    - Name: MaximalBlockLength
-      Entry: 4
-      Data: 1
-    - Name: AntennaSettings
-      Entry: 7
-      Data: 97|SEE.Game.City.AntennaAttributes, SEE
-    - Name: AntennaSections
-      Entry: 7
-      Data: 98|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LabelSettings
-      Entry: 7
-      Data: 99|SEE.Game.LabelAttributes, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationFactor
-      Entry: 4
-      Data: 0.5
-    - Name: LabelAlpha
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: OutlineWidth
-      Entry: 4
-      Data: 1
-    - Name: ShowNames
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: File
-    - Name: $v
-      Entry: 7
-      Data: 100|SEE.Game.City.VisualNodeAttributes, SEE
-    - Name: IsRelevant
-      Entry: 5
-      Data: true
-    - Name: Shape
-      Entry: 3
-      Data: 0
-    - Name: MetricToLength
-      Entry: 7
-      Data: 101|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 3
-    - Name: 
-      Entry: 1
-      Data: Metric.Number_of_Tokens
-    - Name: 
-      Entry: 1
-      Data: Metric.LOC
-    - Name: 
-      Entry: 1
-      Data: Metric.Number_of_Tokens
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ColorProperty
-      Entry: 7
-      Data: 102|SEE.Game.City.ColorProperty, SEE
-    - Name: Property
-      Entry: 3
-      Data: 1
-    - Name: TypeColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ByLevel
-      Entry: 5
-      Data: true
-    - Name: ColorMetric
-      Entry: 1
-      Data: Metric.Clone_Rate
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MinimalBlockLength
-      Entry: 4
-      Data: 0.001
-    - Name: MaximalBlockLength
-      Entry: 4
-      Data: 1
-    - Name: AntennaSettings
-      Entry: 7
-      Data: 103|SEE.Game.City.AntennaAttributes, SEE
-    - Name: AntennaSections
-      Entry: 7
-      Data: 104|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LabelSettings
-      Entry: 7
-      Data: 105|SEE.Game.LabelAttributes, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationFactor
-      Entry: 4
-      Data: 0.5
-    - Name: LabelAlpha
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: OutlineWidth
-      Entry: 4
-      Data: 1
-    - Name: ShowNames
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Directory
-    - Name: $v
-      Entry: 7
-      Data: 106|SEE.Game.City.VisualNodeAttributes, SEE
-    - Name: IsRelevant
-      Entry: 5
-      Data: true
-    - Name: Shape
-      Entry: 3
-      Data: 0
-    - Name: MetricToLength
-      Entry: 7
-      Data: 107|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 3
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ColorProperty
-      Entry: 7
-      Data: 108|SEE.Game.City.ColorProperty, SEE
-    - Name: Property
-      Entry: 3
-      Data: 0
-    - Name: TypeColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ByLevel
-      Entry: 5
-      Data: true
-    - Name: ColorMetric
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MinimalBlockLength
-      Entry: 4
-      Data: 0.001
-    - Name: MaximalBlockLength
-      Entry: 4
-      Data: 1
-    - Name: AntennaSettings
-      Entry: 7
-      Data: 109|SEE.Game.City.AntennaAttributes, SEE
-    - Name: AntennaSections
-      Entry: 7
-      Data: 110|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LabelSettings
-      Entry: 7
-      Data: 111|SEE.Game.LabelAttributes, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationFactor
-      Entry: 4
-      Data: 0.5
-    - Name: LabelAlpha
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: OutlineWidth
-      Entry: 4
-      Data: 1
-    - Name: ShowNames
-      Entry: 5
-      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -12902,7 +11527,7 @@ MonoBehaviour:
       Data: 
     - Name: MarkerAttributes
       Entry: 7
-      Data: 112|SEE.Game.City.MarkerAttributes, SEE
+      Data: 22|SEE.Game.City.MarkerAttributes, SEE
     - Name: MarkerHeight
       Entry: 4
       Data: 0.2
@@ -12968,10 +11593,10 @@ MonoBehaviour:
       Data: 
     - Name: MetricToColor
       Entry: 7
-      Data: 113|SEE.Game.City.ColorMap, SEE
+      Data: 23|SEE.Game.City.ColorMap, SEE
     - Name: map
       Entry: 7
-      Data: 114|SEE.Game.City.ColorRangeMapping, SEE
+      Data: 24|SEE.Game.City.ColorRangeMapping, SEE
     - Name: comparer
       Entry: 9
       Data: 3
@@ -13043,7 +11668,7 @@ MonoBehaviour:
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 115|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 25|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -13073,11 +11698,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 116|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 26|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 117|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 27|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -13093,11 +11718,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 118|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 28|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 117
+      Data: 27
     - Name: 
       Entry: 12
       Data: 0
@@ -13109,11 +11734,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 119|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+      Data: 29|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 117
+      Data: 27
     - Name: 
       Entry: 12
       Data: 0
@@ -13125,11 +11750,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 120|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 30|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 117
+      Data: 27
     - Name: 
       Entry: 12
       Data: 0
@@ -13150,14 +11775,38 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 121|SEE.GraphProviders.MultiGraphPipelineProvider, SEE
+      Data: 31|SEE.GraphProviders.MultiGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 122|System.Collections.Generic.List`1[[SEE.GraphProviders.MultiGraphProvider,
+      Data: 32|System.Collections.Generic.List`1[[SEE.GraphProviders.MultiGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 33|SEE.GraphProviders.GXLEvolutionGraphProvider, SEE
+    - Name: GXLDirectory
+      Entry: 7
+      Data: 34|SEE.Utils.Paths.DirectoryPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 3
+    - Name: relativePath
+      Entry: 1
+      Data: /animation-clones-SEE
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MaxRevisionsToLoad
+      Entry: 3
+      Data: 500
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -13223,6 +11872,10 @@ MonoBehaviour:
     MetricIssue: Metric.Metric
     StyleIssue: Metric.Style
     UniversalIssue: Metric.Universal
+    LspHint: Metric.LSP_Hint
+    LspInfo: Metric.LSP_Info
+    LspWarning: Metric.LSP_Warning
+    LspError: Metric.LSP_Error
     ArchitectureIssueSum: Metric.Architecture_Violations_SUM
     CloneIssueSum: Metric.Clone_SUM
     CycleIssueSum: Metric.Cycle_SUM
@@ -13324,6 +11977,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &551406262
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 551406254}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4874e0649dc8ad742a50b1d3b5845fd6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animationFactor: 1
 --- !u!1 &554349512
 GameObject:
   m_ObjectHideFlags: 0
@@ -13348,8 +12014,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 554349512}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.04780049, y: 0.2199507, z: -0.05983804, w: -0.9725}
-  m_LocalPosition: {x: -0.038384456, y: -0.000000009478343, z: -0.0000001070382}
+  m_LocalRotation: {x: -0.047800574, y: 0.21995065, z: -0.05983803, w: -0.9725}
+  m_LocalPosition: {x: -0.03838456, y: -0.000000017322488, z: -0.000000106375424}
   m_LocalScale: {x: 0.9999997, y: 0.99999994, z: 0.9999997}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -13444,8 +12110,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 563726547}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.80483526, y: 0.03768035, z: -0.03058644, w: 0.5915107}
-  m_LocalPosition: {x: -0.29989377, y: -0.00000013835123, z: 0.0000000120892665}
+  m_LocalRotation: {x: -0.80483526, y: 0.037680328, z: -0.03058645, w: 0.59151065}
+  m_LocalPosition: {x: -0.2998938, y: -0.00000013835121, z: 0.0000000120892665}
   m_LocalScale: {x: 0.826759, y: 0.826759, z: 0.826759}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -13535,6 +12201,85 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 563875309}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &569324150
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 569324151}
+  - component: {fileID: 569324153}
+  - component: {fileID: 569324152}
+  m_Layer: 0
+  m_Name: Background
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &569324151
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 569324150}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1056191452}
+  - {fileID: 1586055252}
+  - {fileID: 1863996901}
+  - {fileID: 1537750018}
+  m_Father: {fileID: 223409956}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &569324152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 569324150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &569324153
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 569324150}
+  m_CullTransparentMesh: 0
 --- !u!1001 &573019368
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13632,8 +12377,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 577435188}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.027146153, y: -0.21985865, z: -0.058516238, w: 0.9733967}
-  m_LocalPosition: {x: -0.029417267, y: -0.00000013253327, z: -0.000000042417625}
+  m_LocalRotation: {x: -0.027146136, y: -0.21985866, z: -0.058516197, w: 0.9733968}
+  m_LocalPosition: {x: -0.029417269, y: -0.0000001344943, z: -0.000000045068727}
   m_LocalScale: {x: 0.9999997, y: 1, z: 0.9999998}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -13664,7 +12409,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 582208883}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.05435871, y: -0.23874585, z: 0.00092539185, w: 0.969559}
+  m_LocalRotation: {x: -0.05435875, y: -0.23874584, z: 0.00092540646, w: 0.969559}
   m_LocalPosition: {x: -0.044654068, y: -0.0000000019610344, z: -0.000000049045354}
   m_LocalScale: {x: 0.9999998, y: 0.99999994, z: 1}
   m_ConstrainProportionsScale: 0
@@ -13835,6 +12580,81 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 589102452}
   m_CullTransparentMesh: 1
+--- !u!1 &592939633
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 592939634}
+  - component: {fileID: 592939636}
+  - component: {fileID: 592939635}
+  m_Layer: 0
+  m_Name: Arrow
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &592939634
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 592939633}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1586055252}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: -15, y: 0}
+  m_SizeDelta: {x: 20, y: 20}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &592939635
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 592939633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &592939636
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 592939633}
+  m_CullTransparentMesh: 0
 --- !u!1 &605072882
 GameObject:
   m_ObjectHideFlags: 0
@@ -13891,7 +12711,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 617121555}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.069707766, y: -0.070272684, z: 0.0023847998, w: 0.99508643}
+  m_LocalRotation: {x: 0.06970774, y: -0.07027259, z: 0.002384835, w: 0.99508643}
   m_LocalPosition: {x: -0.44173032, y: 0, z: 0.000000088543594}
   m_LocalScale: {x: 0.9999999, y: 0.9999998, z: 0.99999964}
   m_ConstrainProportionsScale: 0
@@ -13924,8 +12744,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 619135065}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.06765387, y: -0.2288535, z: 0.04853462, w: 0.9698935}
-  m_LocalPosition: {x: -0.049446795, y: -0.00000006798254, z: -0.00000008284692}
+  m_LocalRotation: {x: -0.067653954, y: -0.22885355, z: 0.048534613, w: 0.9698936}
+  m_LocalPosition: {x: -0.049446795, y: -0.00000006798254, z: -0.00000008284691}
   m_LocalScale: {x: 0.99999994, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -14072,14 +12892,89 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 665123564}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.054207005, y: 0.2678686, z: 0.002148375, w: -0.96192694}
-  m_LocalPosition: {x: -0.044653933, y: 0.000000019610367, z: -0.00000026676702}
+  m_LocalRotation: {x: -0.054206934, y: 0.26786864, z: 0.0021484492, w: -0.96192694}
+  m_LocalPosition: {x: -0.044654034, y: 0.000000011439382, z: -0.00000026809258}
   m_LocalScale: {x: 1.0000002, y: 1.0000001, z: 1.0000002}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1969154368}
   m_Father: {fileID: 397525883}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &668606194
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 668606195}
+  - component: {fileID: 668606197}
+  - component: {fileID: 668606196}
+  m_Layer: 0
+  m_Name: Item Background
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &668606195
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 668606194}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 951036323}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &668606196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 668606194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &668606197
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 668606194}
+  m_CullTransparentMesh: 0
 --- !u!1001 &676683349
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14302,6 +13197,85 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1155417661}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &740891591
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 740891592}
+  - component: {fileID: 740891594}
+  - component: {fileID: 740891593}
+  m_Layer: 0
+  m_Name: Item Label
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &740891592
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740891591}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 951036323}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 5, y: -0.5}
+  m_SizeDelta: {x: -30, y: -3}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &740891593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740891591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 14
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 3
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: Option A
+--- !u!222 &740891594
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740891591}
+  m_CullTransparentMesh: 0
 --- !u!1 &742937570
 GameObject:
   m_ObjectHideFlags: 0
@@ -14339,6 +13313,81 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 375693025942914858}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &749481727
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 749481728}
+  - component: {fileID: 749481730}
+  - component: {fileID: 749481729}
+  m_Layer: 0
+  m_Name: Item Checkmark
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &749481728
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 749481727}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 951036323}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 10, y: 0}
+  m_SizeDelta: {x: 20, y: 20}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &749481729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 749481727}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &749481730
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 749481727}
+  m_CullTransparentMesh: 0
 --- !u!4 &750281272 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5359129155390165875, guid: 87c48d261903b2d4a80733fe430125fe,
@@ -14674,8 +13723,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 789553729}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.16362025, y: -0.050673634, z: -0.08385647, w: 0.98164594}
-  m_LocalPosition: {x: -0.090864524, y: 0.014048014, z: 0.01110627}
+  m_LocalRotation: {x: -0.16362022, y: -0.05067359, z: -0.08385646, w: 0.98164594}
+  m_LocalPosition: {x: -0.09086452, y: 0.014048016, z: 0.01110627}
   m_LocalScale: {x: 0.99999994, y: 0.9999996, z: 0.99999994}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -15015,8 +14064,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 847505608}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.5921569, y: 0.028629411, z: 0.38956162, w: 0.70482075}
-  m_LocalPosition: {x: -0.03970776, y: -0.039045647, z: -0.021918721}
+  m_LocalRotation: {x: 0.59215707, y: 0.028629407, z: 0.38956162, w: 0.7048207}
+  m_LocalPosition: {x: -0.039707758, y: -0.03904565, z: -0.021918721}
   m_LocalScale: {x: 1, y: 1.0000001, z: 0.9999998}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -15291,8 +14340,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 875603953}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.011049821, y: 0.0357746, z: 0.0055409665, w: 0.99928343}
-  m_LocalPosition: {x: -1.0981987, y: -0.00009316806, z: 0.026183652}
+  m_LocalRotation: {x: 0.011049818, y: 0.035774592, z: 0.0055412035, w: 0.99928343}
+  m_LocalPosition: {x: -1.0981987, y: -0.0000937379, z: 0.026183652}
   m_LocalScale: {x: 1.0000002, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -15715,7 +14764,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 915217467}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.70887125, y: 0.0011765846, z: -0.70532316, w: 0.004425719}
+  m_LocalRotation: {x: 0.70887125, y: 0.0011765845, z: -0.70532316, w: 0.0044257184}
   m_LocalPosition: {x: -0.047010984, y: -0.027248176, z: 0.100209795}
   m_LocalScale: {x: 0.9999998, y: 1.0000001, z: 0.99999994}
   m_ConstrainProportionsScale: 0
@@ -15747,7 +14796,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 933620173}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.00000003054447, y: 0.0000000018626451, z: -0.00000004284084,
+  m_LocalRotation: {x: 0.00000006034679, y: 0.0000000018626451, z: -0.000000040978193,
     w: 1}
   m_LocalPosition: {x: 0.00000008911416, y: -0.0000000486555, z: 0.00000014671171}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -15834,6 +14883,93 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1472369271}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &951036322
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 951036323}
+  - component: {fileID: 951036324}
+  m_Layer: 0
+  m_Name: Item
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &951036323
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 951036322}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 668606195}
+  - {fileID: 749481728}
+  - {fileID: 740891592}
+  m_Father: {fileID: 1547463252}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 20}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &951036324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 951036322}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9085046f02f69544eb97fd06b6048fe2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 668606196}
+  toggleTransition: 1
+  graphic: {fileID: 749481729}
+  m_Group: {fileID: 0}
+  onValueChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_IsOn: 1
 --- !u!4 &969881887 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4846815275869615973, guid: dc09ca83af09d6d4b8b33c7c5c4a13ee,
@@ -17184,6 +16320,85 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1049773854}
   m_CullTransparentMesh: 1
+--- !u!1 &1056191451
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1056191452}
+  - component: {fileID: 1056191454}
+  - component: {fileID: 1056191453}
+  m_Layer: 0
+  m_Name: GraphTitle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1056191452
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1056191451}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 569324151}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 290, y: -15}
+  m_SizeDelta: {x: -570, y: 40}
+  m_Pivot: {x: 0, y: 1}
+--- !u!114 &1056191453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1056191451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 16
+    m_FontStyle: 1
+    m_BestFit: 0
+    m_MinSize: 1
+    m_MaxSize: 40
+    m_Alignment: 3
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: Graph version
+--- !u!222 &1056191454
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1056191451}
+  m_CullTransparentMesh: 0
 --- !u!1001 &1066035272
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17608,8 +16823,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1102421517}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.050395034, y: 0.15443397, z: 0.038668677, w: -0.98595905}
-  m_LocalPosition: {x: -0.031863503, y: 0.000000070270445, z: -0.00000037977023}
+  m_LocalRotation: {x: 0.050395023, y: 0.15443395, z: 0.038668677, w: -0.9859591}
+  m_LocalPosition: {x: -0.0318635, y: 0.000000070270445, z: -0.00000037977023}
   m_LocalScale: {x: 0.9999996, y: 0.99999994, z: 0.9999997}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -23951,7 +23166,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1215719611}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.067552015, y: -0.07230096, z: 0.9947366, w: 0.026614182}
+  m_LocalRotation: {x: -0.06755199, y: -0.07230103, z: 0.9947367, w: 0.02661413}
   m_LocalPosition: {x: 0.016968133, y: -0.1109525, z: 0.0019851236}
   m_LocalScale: {x: 0.98299915, y: 0.9929993, z: 0.99299985}
   m_ConstrainProportionsScale: 0
@@ -25630,12 +24845,70 @@ MonoBehaviour:
         SEE]], mscorlib
     - Name: 
       Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 69|SEE.GraphProviders.GXLSingleGraphProvider, SEE
+    - Name: Path
+      Entry: 7
+      Data: 70|SEE.Utils.Paths.FilePath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 3
+    - Name: relativePath
+      Entry: 1
+      Data: /jacoco/jacoco-2-f5c5b1f831903c9c2f771e467916ce9664aedb1b.gxl.xz
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 71|SEE.GraphProviders.MergeDiffGraphProvider, SEE
+    - Name: OldGraph
+      Entry: 7
+      Data: 72|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
+    - Name: Pipeline
+      Entry: 7
+      Data: 73|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
+        SEE]], mscorlib
+    - Name: 
+      Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 69|SEE.GraphProviders.MergeDiffGraphProvider, SEE
-    - Name: OldGraph
-      Entry: 6
+      Data: 74|SEE.GraphProviders.GXLSingleGraphProvider, SEE
+    - Name: Path
+      Entry: 7
+      Data: 75|SEE.Utils.Paths.FilePath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 3
+    - Name: relativePath
+      Entry: 1
+      Data: /jacoco/jacoco-1-a50585b9e0770c363c56d887a8f639dc05411073.gxl.xz
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
       Data: 
     - Name: 
       Entry: 8
@@ -25666,7 +24939,7 @@ MonoBehaviour:
   MaximalAntennaSegmentHeight: 0.5
   AntennaWidth: 0.1
   BaseAnimationDuration: 1
-  ProgressBar: 0
+  ProgressBar: 0.5
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
@@ -25705,6 +24978,10 @@ MonoBehaviour:
     MetricIssue: Metric.Metric
     StyleIssue: Metric.Style
     UniversalIssue: Metric.Universal
+    LspHint: Metric.LSP_Hint
+    LspInfo: Metric.LSP_Info
+    LspWarning: Metric.LSP_Warning
+    LspError: Metric.LSP_Error
     ArchitectureIssueSum: Metric.Architecture_Violations_SUM
     CloneIssueSum: Metric.Clone_SUM
     CycleIssueSum: Metric.Cycle_SUM
@@ -25883,8 +25160,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1238361918}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.10030474, y: -0.054669105, z: -0.041606296, w: 0.9925821}
-  m_LocalPosition: {x: -0.09721397, y: -0.029632669, z: 0.0027948518}
+  m_LocalRotation: {x: 0.10030468, y: -0.054669116, z: -0.041606326, w: 0.9925821}
+  m_LocalPosition: {x: -0.097213954, y: -0.02963267, z: 0.0027948518}
   m_LocalScale: {x: 0.99999994, y: 1.0000001, z: 0.99999994}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -25996,6 +25273,81 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1289557182}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1269396872
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1269396873}
+  - component: {fileID: 1269396875}
+  - component: {fileID: 1269396874}
+  m_Layer: 0
+  m_Name: Handle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1269396873
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1269396872}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1371232449}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 0.2}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 20, y: 20}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1269396874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1269396872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1269396875
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1269396872}
+  m_CullTransparentMesh: 0
 --- !u!1 &1275836988
 GameObject:
   m_ObjectHideFlags: 0
@@ -26090,7 +25442,7 @@ Transform:
   m_GameObject: {fileID: 1287274282}
   serializedVersion: 2
   m_LocalRotation: {x: 0.71245414, y: -0.0000000060535923, z: -0.7017186, w: 0.00000017811531}
-  m_LocalPosition: {x: -0.09147271, y: 0.034824166, z: 0.11445906}
+  m_LocalPosition: {x: -0.09147271, y: 0.03482417, z: 0.11445906}
   m_LocalScale: {x: 1.0005883, y: 1.0005883, z: 1.0005882}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -26256,8 +25608,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1336523151}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.16135533, y: 0.05921011, z: -0.09393814, w: -0.98062956}
-  m_LocalPosition: {x: -0.09086446, y: -0.014047932, z: 0.011106557}
+  m_LocalRotation: {x: -0.16135536, y: 0.05921009, z: -0.09393813, w: -0.98062956}
+  m_LocalPosition: {x: -0.09086458, y: -0.014047953, z: 0.011106564}
   m_LocalScale: {x: 1, y: 0.9999999, z: 1.0000002}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -26482,7 +25834,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1347089388}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.00000008904317, y: 0.000000023283064, z: -0.00000002142042,
+  m_LocalRotation: {x: -0.00000011881639, y: 0.000000023283064, z: -0.000000023283064,
     w: 1}
   m_LocalPosition: {x: 0.000000026365646, y: 0.000000006634684, z: 0.0000001445206}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -26711,6 +26063,42 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1658517675}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1371232448
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1371232449}
+  m_Layer: 0
+  m_Name: Sliding Area
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1371232449
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1371232448}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1269396873}
+  m_Father: {fileID: 295819619}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: -20, y: -20}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &1394733444
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -27286,7 +26674,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1437342940}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.058128282, y: 0.110892355, z: 0.99130136, w: -0.04056703}
+  m_LocalRotation: {x: -0.058128353, y: 0.11089249, z: 0.99130136, w: -0.040567003}
   m_LocalPosition: {x: 0.016968204, y: 0.11095241, z: 0.001984996}
   m_LocalScale: {x: 0.98299956, y: 0.9929998, z: 0.9930001}
   m_ConstrainProportionsScale: 0
@@ -27399,7 +26787,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1456686657}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.04704271, y: -0.15939933, z: -0.021112725, w: 0.9858667}
+  m_LocalRotation: {x: -0.0470427, y: -0.15939936, z: -0.021112729, w: 0.9858667}
   m_LocalPosition: {x: -0.17674594, y: 0.00000017102727, z: -0.00000012351964}
   m_LocalScale: {x: 0.9999996, y: 1, z: 1.0000002}
   m_ConstrainProportionsScale: 0
@@ -27430,8 +26818,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1461535815}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.016693348, y: -0.06056476, z: -0.07359031, w: 0.99530786}
-  m_LocalPosition: {x: -0.09584546, y: -0.009588159, z: 0.012486366}
+  m_LocalRotation: {x: -0.01669337, y: -0.060564734, z: -0.07359031, w: 0.9953079}
+  m_LocalPosition: {x: -0.09584545, y: -0.00958816, z: 0.012486366}
   m_LocalScale: {x: 0.99999994, y: 1.0000002, z: 1.0000004}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -31070,8 +30458,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1504960200}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.031542324, y: -0.25927734, z: 0.038838856, w: 0.96450603}
-  m_LocalPosition: {x: -0.031541508, y: 0.000000002287874, z: 0.00000007356806}
+  m_LocalRotation: {x: -0.031542316, y: -0.2592773, z: 0.03883885, w: 0.9645061}
+  m_LocalPosition: {x: -0.031541504, y: 0.000000002287874, z: 0.00000007356805}
   m_LocalScale: {x: 0.9999997, y: 0.9999999, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -31495,6 +30883,127 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1991087966}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1537750017
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1537750018}
+  - component: {fileID: 1537750021}
+  - component: {fileID: 1537750020}
+  - component: {fileID: 1537750019}
+  m_Layer: 0
+  m_Name: CloseViewButton
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1537750018
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537750017}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 277250598}
+  m_Father: {fileID: 569324151}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -20, y: -20}
+  m_SizeDelta: {x: 60, y: 30}
+  m_Pivot: {x: 1, y: 1}
+--- !u!114 &1537750019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537750017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 1537750020}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &1537750020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537750017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1537750021
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537750017}
+  m_CullTransparentMesh: 0
 --- !u!1001 &1543072516
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -31746,6 +31255,42 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!1 &1547463251
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1547463252}
+  m_Layer: 0
+  m_Name: Content
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1547463252
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1547463251}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 951036323}
+  m_Father: {fileID: 287997182}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 28}
+  m_Pivot: {x: 0.5, y: 1}
 --- !u!1001 &1564800337
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -32025,6 +31570,144 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1581649473}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1586055251
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1586055252}
+  - component: {fileID: 1586055255}
+  - component: {fileID: 1586055254}
+  - component: {fileID: 1586055253}
+  m_Layer: 0
+  m_Name: RevisionSelectionDropdown
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1586055252
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1586055251}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 470155963}
+  - {fileID: 592939634}
+  - {fileID: 1718672805}
+  m_Father: {fileID: 569324151}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: -70}
+  m_SizeDelta: {x: -580, y: 30}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1586055253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1586055251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d0b652f32a2cc243917e4028fa0f046, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 1586055254}
+  m_Template: {fileID: 1718672805}
+  m_CaptionText: {fileID: 470155964}
+  m_CaptionImage: {fileID: 0}
+  m_ItemText: {fileID: 740891593}
+  m_ItemImage: {fileID: 0}
+  m_Value: 0
+  m_Options:
+    m_Options:
+    - m_Text: Option A
+      m_Image: {fileID: 0}
+    - m_Text: Option B
+      m_Image: {fileID: 0}
+    - m_Text: Option C
+      m_Image: {fileID: 0}
+  m_OnValueChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_AlphaFadeSpeed: 0.15
+--- !u!114 &1586055254
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1586055251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1586055255
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1586055251}
+  m_CullTransparentMesh: 0
 --- !u!1 &1594491696
 GameObject:
   m_ObjectHideFlags: 0
@@ -32200,7 +31883,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1609455802}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.84696466, y: 0.034072995, z: -0.506444, w: -0.15812787}
+  m_LocalRotation: {x: 0.84696466, y: 0.034072995, z: -0.50644404, w: -0.15812786}
   m_LocalPosition: {x: -0.5189228, y: -0.000000035865778, z: 0.00000013113424}
   m_LocalScale: {x: 0.9236079, y: 0.943686, z: 0.94368577}
   m_ConstrainProportionsScale: 0
@@ -32232,7 +31915,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1620843684}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.15074241, y: 0.6500588, z: -0.16197194, w: 0.72695625}
+  m_LocalRotation: {x: -0.1507424, y: 0.6500588, z: -0.16197193, w: 0.72695625}
   m_LocalPosition: {x: -0.017507296, y: 0.0733811, z: 0.111666046}
   m_LocalScale: {x: 1.0031374, y: 1.0039217, z: 1.0039217}
   m_ConstrainProportionsScale: 0
@@ -32295,8 +31978,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1623608797}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.0013390697, y: 0.29750705, z: -0.07086676, w: -0.9520849}
-  m_LocalPosition: {x: -0.02863681, y: -0.00000024643685, z: 0.000000009941632}
+  m_LocalRotation: {x: -0.001339078, y: 0.29750708, z: -0.07086671, w: -0.95208496}
+  m_LocalPosition: {x: -0.02863682, y: -0.00000024643685, z: 0.0000000066277552}
   m_LocalScale: {x: 1.0000004, y: 1.0000001, z: 1.0000002}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -32373,8 +32056,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1646392791}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.0995736, y: 0.060680464, z: -0.03611537, w: -0.9925214}
-  m_LocalPosition: {x: -0.09721433, y: 0.02963266, z: 0.0027946243}
+  m_LocalRotation: {x: 0.09957358, y: 0.06068047, z: -0.03611536, w: -0.9925214}
+  m_LocalPosition: {x: -0.09721446, y: 0.029632678, z: 0.002794452}
   m_LocalScale: {x: 1.0000006, y: 1.0000002, z: 1.0000001}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -32716,7 +32399,7 @@ Transform:
   m_GameObject: {fileID: 1658517674}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7124539, y: 0.00000044051532, z: -0.70171905, w: 0.00000041280848}
-  m_LocalPosition: {x: -0.091472656, y: -0.034824155, z: 0.11445908}
+  m_LocalPosition: {x: -0.091472656, y: -0.03482416, z: 0.11445908}
   m_LocalScale: {x: 1.0005879, y: 1.0005883, z: 1.0005882}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -32907,8 +32590,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1672276667}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.8440367, y: -0.02348582, z: -0.52559954, w: 0.10390224}
-  m_LocalPosition: {x: -0.51892245, y: 0.00000010759737, z: 0.000000019053692}
+  m_LocalRotation: {x: 0.84403664, y: -0.023485856, z: -0.52559966, w: 0.10390227}
+  m_LocalPosition: {x: -0.5189224, y: 0.00000010759737, z: 0.000000019053692}
   m_LocalScale: {x: 0.9236081, y: 0.9436862, z: 0.9436861}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -33185,7 +32868,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1697193741}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.00000038143486, y: 0.090722926, z: -0.00000010430814, w: 0.9958762}
+  m_LocalRotation: {x: -0.00000025826742, y: 0.09072288, z: -0.0000001024455, w: 0.99587625}
   m_LocalPosition: {x: -0.1910127, y: 0.000000017842337, z: -0.000000056261506}
   m_LocalScale: {x: 0.9999998, y: 0.99999976, z: 0.99999994}
   m_ConstrainProportionsScale: 0
@@ -33716,7 +33399,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1713051574}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.010334045, y: 0.097852714, z: -0.0042442456, w: 0.9951382}
+  m_LocalRotation: {x: -0.010333898, y: 0.09785277, z: -0.004244362, w: 0.99513817}
   m_LocalPosition: {x: -0.26411498, y: 0.0000001941492, z: -0.000000009802646}
   m_LocalScale: {x: 1.0078585, y: 1.0078588, z: 1.0078589}
   m_ConstrainProportionsScale: 0
@@ -33732,6 +33415,114 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 465312149}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1718672804
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1718672805}
+  - component: {fileID: 1718672808}
+  - component: {fileID: 1718672807}
+  - component: {fileID: 1718672806}
+  m_Layer: 0
+  m_Name: Template
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &1718672805
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1718672804}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 287997182}
+  - {fileID: 295819619}
+  m_Father: {fileID: 1586055252}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: 0, y: 2}
+  m_SizeDelta: {x: 0, y: 150}
+  m_Pivot: {x: 0.5, y: 1}
+--- !u!114 &1718672806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1718672804}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Content: {fileID: 1547463252}
+  m_Horizontal: 0
+  m_Vertical: 1
+  m_MovementType: 2
+  m_Elasticity: 0.1
+  m_Inertia: 1
+  m_DecelerationRate: 0.135
+  m_ScrollSensitivity: 1
+  m_Viewport: {fileID: 287997182}
+  m_HorizontalScrollbar: {fileID: 0}
+  m_VerticalScrollbar: {fileID: 295819620}
+  m_HorizontalScrollbarVisibility: 0
+  m_VerticalScrollbarVisibility: 2
+  m_HorizontalScrollbarSpacing: 0
+  m_VerticalScrollbarSpacing: -3
+  m_OnValueChanged:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &1718672807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1718672804}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1718672808
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1718672804}
+  m_CullTransparentMesh: 0
 --- !u!1 &1723737376
 GameObject:
   m_ObjectHideFlags: 0
@@ -33828,6 +33619,85 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1654782449}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1742004692
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1742004693}
+  - component: {fileID: 1742004695}
+  - component: {fileID: 1742004694}
+  m_Layer: 0
+  m_Name: SettingsTitle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1742004693
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1742004692}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1863996901}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 10, y: 0}
+  m_SizeDelta: {x: -10, y: 40}
+  m_Pivot: {x: 0, y: 1}
+--- !u!114 &1742004694
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1742004692}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 16
+    m_FontStyle: 1
+    m_BestFit: 0
+    m_MinSize: 1
+    m_MaxSize: 40
+    m_Alignment: 3
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: Settings
+--- !u!222 &1742004695
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1742004692}
+  m_CullTransparentMesh: 0
 --- !u!1 &1743959446
 GameObject:
   m_ObjectHideFlags: 0
@@ -33956,8 +33826,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1750851979}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.007892753, y: 0.10752808, z: 0.0042783325, w: 0.99416155}
-  m_LocalPosition: {x: -0.17041516, y: 0, z: -0.000019680356}
+  m_LocalRotation: {x: -0.007892722, y: 0.10752809, z: 0.0042783357, w: 0.99416155}
+  m_LocalPosition: {x: -0.17041515, y: 0, z: -0.000019680356}
   m_LocalScale: {x: 0.9999999, y: 0.9999999, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -34665,10 +34535,10 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 25|SEE.GraphProviders.PipelineGraphProvider, SEE
+      Data: 25|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 26|System.Collections.Generic.List`1[[SEE.GraphProviders.GraphProvider,
+      Data: 26|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
@@ -34754,7 +34624,7 @@ MonoBehaviour:
   MaximalAntennaSegmentHeight: 0.5
   AntennaWidth: 0.1
   BaseAnimationDuration: 1
-  ProgressBar: 0
+  ProgressBar: 1
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
@@ -34793,6 +34663,10 @@ MonoBehaviour:
     MetricIssue: Metric.Metric
     StyleIssue: Metric.Style
     UniversalIssue: Metric.Universal
+    LspHint: Metric.LSP_Hint
+    LspInfo: Metric.LSP_Info
+    LspWarning: Metric.LSP_Warning
+    LspError: Metric.LSP_Error
     ArchitectureIssueSum: Metric.Architecture_Violations_SUM
     CloneIssueSum: Metric.Clone_SUM
     CycleIssueSum: Metric.Cycle_SUM
@@ -34918,7 +34792,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1777023170}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7453254, y: 0.00040420395, z: -0.6667006, w: 0.00042104322}
+  m_LocalRotation: {x: 0.7453254, y: 0.00040420398, z: -0.6667006, w: 0.00042104325}
   m_LocalPosition: {x: -0.10819455, y: 0.048424195, z: 0.06866192}
   m_LocalScale: {x: 0.99999976, y: 0.9999999, z: 1.0000001}
   m_ConstrainProportionsScale: 0
@@ -35154,8 +35028,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1829796789}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.05036808, y: 0.1666474, z: -0.041202176, w: -0.98386693}
-  m_LocalPosition: {x: -0.031863183, y: -0.00000003824021, z: -0.00000049244215}
+  m_LocalRotation: {x: -0.05036811, y: 0.16664743, z: -0.04120218, w: -0.98386693}
+  m_LocalPosition: {x: -0.03186321, y: -0.000000028108188, z: -0.0000004960874}
   m_LocalScale: {x: 0.99999994, y: 1.0000002, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -35265,8 +35139,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1848741910}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.79385936, y: 0.018305602, z: 0.04459577, w: 0.60618764}
-  m_LocalPosition: {x: -0.2998946, y: 0.00000037181908, z: 0.000000024418268}
+  m_LocalRotation: {x: 0.7938593, y: 0.018305564, z: 0.04459581, w: 0.6061877}
+  m_LocalPosition: {x: -0.2998947, y: 0.00000037073818, z: 0.000000017842801}
   m_LocalScale: {x: 0.82675916, y: 0.82675874, z: 0.826759}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -35478,6 +35352,82 @@ Transform:
   - {fileID: 1650264700}
   m_Father: {fileID: 2021080135}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1863996900
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1863996901}
+  - component: {fileID: 1863996903}
+  - component: {fileID: 1863996902}
+  m_Layer: 0
+  m_Name: SettingsPanel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &1863996901
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1863996900}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1742004693}
+  m_Father: {fileID: 569324151}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0, y: -290}
+  m_SizeDelta: {x: 400, y: 250}
+  m_Pivot: {x: 0.5, y: 1}
+--- !u!114 &1863996902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1863996900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1863996903
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1863996900}
+  m_CullTransparentMesh: 0
 --- !u!1 &1866516214
 GameObject:
   m_ObjectHideFlags: 0
@@ -35502,8 +35452,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1866516214}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.020417891, y: -0.27995074, z: -0.0010267646, w: 0.95979667}
-  m_LocalPosition: {x: -0.04047909, y: 0.000000016015116, z: -0.00000005501033}
+  m_LocalRotation: {x: -0.020417882, y: -0.27995074, z: -0.0010267792, w: 0.95979667}
+  m_LocalPosition: {x: -0.040479086, y: 0.000000016015116, z: -0.00000005501033}
   m_LocalScale: {x: 1, y: 0.9999999, z: 0.99999964}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -36501,8 +36451,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1965935966}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.03241226, y: 0.20017198, z: -0.06999637, w: -0.97671956}
-  m_LocalPosition: {x: -0.0316917, y: -0.00000011243277, z: -0.00000032542275}
+  m_LocalRotation: {x: -0.032412257, y: 0.20017192, z: -0.06999636, w: -0.9767196}
+  m_LocalPosition: {x: -0.031691797, y: -0.00000011864273, z: -0.0000003181322}
   m_LocalScale: {x: 0.9999999, y: 0.99999964, z: 0.9999998}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -36538,8 +36488,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1969154367}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.019850383, y: 0.19074939, z: -0.004200012, w: -0.9814291}
-  m_LocalPosition: {x: -0.040479198, y: 0.000000042489123, z: 0.00000030951594}
+  m_LocalRotation: {x: -0.019850343, y: 0.19074939, z: -0.0041999817, w: -0.98142904}
+  m_LocalPosition: {x: -0.040479317, y: 0.000000036606014, z: 0.0000003141554}
   m_LocalScale: {x: 0.9999997, y: 0.9999999, z: 0.99999994}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -36884,7 +36834,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1991087965}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.08129206, y: 0.07423277, z: 0.8726671, w: -0.47574496}
+  m_LocalRotation: {x: 0.08129205, y: 0.07423277, z: 0.87266713, w: -0.47574496}
   m_LocalPosition: {x: -0.1737547, y: 0.071507215, z: 0.0032269922}
   m_LocalScale: {x: 1.0100002, y: 1.0000002, z: 0.99999976}
   m_ConstrainProportionsScale: 0
@@ -37003,7 +36953,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2019583652}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.255413, y: 0.13082089, z: 0.4186416, w: 0.8616202}
+  m_LocalRotation: {x: 0.255413, y: 0.13082086, z: 0.41864163, w: 0.8616202}
   m_LocalPosition: {x: -0.12266697, y: 0.00007929859, z: 0.000026936787}
   m_LocalScale: {x: 1.0236679, y: 1.0236677, z: 1.0236677}
   m_ConstrainProportionsScale: 0
@@ -37036,8 +36986,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2021080134}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.00000001645549, y: -0.090827726, z: 0.00000029802325, w: 0.9958666}
-  m_LocalPosition: {x: -0.09909806, y: 0, z: -0.005999974}
+  m_LocalRotation: {x: 0.000000016455486, y: -0.09082772, z: 0.0000002942979, w: 0.9958666}
+  m_LocalPosition: {x: -0.09909805, y: 0, z: -0.005999974}
   m_LocalScale: {x: 1.007859, y: 1.0078589, z: 1.0078585}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -37415,7 +37365,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2051931577}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.00813029, y: -0.027500963, z: 0.0016347357, w: 0.99958736}
+  m_LocalRotation: {x: -0.008130286, y: -0.027500954, z: 0.0016347315, w: 0.9995874}
   m_LocalPosition: {x: -0.1744029, y: 0.000000035684675, z: -0.000113480324}
   m_LocalScale: {x: 1.0000001, y: 1.0000001, z: 1}
   m_ConstrainProportionsScale: 0
@@ -37448,8 +37398,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2054497220}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.032001864, y: -0.2822811, z: -0.09053223, w: 0.95451415}
-  m_LocalPosition: {x: -0.03169193, y: -0.000000028435013, z: 0.000000068928614}
+  m_LocalRotation: {x: -0.032001913, y: -0.2822811, z: -0.09053227, w: 0.95451415}
+  m_LocalPosition: {x: -0.031691924, y: -0.000000023205585, z: 0.00000007157971}
   m_LocalScale: {x: 0.99999994, y: 0.9999997, z: 0.99999994}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -40422,6 +40372,10 @@ MonoBehaviour:
     MetricIssue: Metric.Metric
     StyleIssue: Metric.Style
     UniversalIssue: Metric.Universal
+    LspHint: Metric.LSP_Hint
+    LspInfo: Metric.LSP_Info
+    LspWarning: Metric.LSP_Warning
+    LspError: Metric.LSP_Error
     ArchitectureIssueSum: Metric.Architecture_Violations_SUM
     CloneIssueSum: Metric.Clone_SUM
     CycleIssueSum: Metric.Cycle_SUM
@@ -41267,10 +41221,10 @@ SceneRoots:
   - {fileID: 442716585}
   - {fileID: 1003946421}
   - {fileID: 2034689789}
+  - {fileID: 1166896206}
   - {fileID: 1462978785}
   - {fileID: 2134247849}
   - {fileID: 365534681}
   - {fileID: 387723966}
   - {fileID: 1706202779}
-  - {fileID: 1166896206}
   - {fileID: 471867952}
