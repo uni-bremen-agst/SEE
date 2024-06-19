@@ -64,7 +64,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Error message that will be shown if anything goes wrong in the pipeline.
         /// </summary>
-        private const string CantShowEvolutionMessage = "Can't show evolution";
+        private const string CantShowEvolutionMessage = "An error occurred in the evolution provider pipeline";
 
         /// <summary>
         /// The renderer for rendering the evolution of the graph series.
@@ -123,6 +123,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Factory method to create the used <see cref="EvolutionRenderer"/>.
         /// </summary>
+        /// <param name="graphs">The graphs with which the <see cref="EvolutionRenderer"/> is created</param>
         /// <returns>the current or new evolution renderer attached to this city</returns>
         protected EvolutionRenderer CreateEvolutionRenderer(IList<Graph> graphs)
         {
@@ -145,7 +146,8 @@ namespace SEE.Game.City
         /// The first graph of the graph series. It is used only to let the user see
         /// his/her settings in action. It will be destroyed when the game starts.
         /// </summary>
-        [NonSerialized] private Graph firstGraph;
+        [NonSerialized] 
+        private Graph firstGraph;
 
         /// <summary>
         /// Dumps the metric names of all node types of the currently loaded graph.
@@ -182,7 +184,6 @@ namespace SEE.Game.City
                 using (LoadingSpinner.ShowDeterminate($"Loading city \"{gameObject.name}\"",
                            out Action<float> reportProgress))
                 {
-                    ShowNotification.Info("SEECity Evolution", "Loading graph");
                     Debug.Log("Loading graph series from provider");
 
                     void ReportProgress(float x)
@@ -200,10 +201,9 @@ namespace SEE.Game.City
                         return;
                     }
 
-                    Debug.Log($"Loaded {LoadedGraphSeries.Count} graphs.\n");
                     ShowNotification.Info("SEECity Evolution", $"{LoadedGraphSeries.Count} Graphs loaded");
 
-                    firstGraph = LoadedGraphSeries.First();
+                    firstGraph = LoadedGraphSeries.FirstOrDefault();
                     if (firstGraph != null)
                     {
                         Debug.Log(
@@ -211,7 +211,7 @@ namespace SEE.Game.City
                     }
                     else
                     {
-                        Debug.LogWarning("Could not load graph.\n");
+                        Debug.LogWarning("Could not load graph because the provider pipeline didn't yield any graphs.");
                     }
                 }
             }
