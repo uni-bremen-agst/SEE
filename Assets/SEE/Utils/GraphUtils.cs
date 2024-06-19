@@ -42,7 +42,7 @@ namespace SEE.Utils
         /// This method will also add all directories in between.
         ///
         /// Files will have the node type <see cref="FileType"/>
-        /// Diecotries will have the node type <see cref="DirectoryType"/> 
+        /// Diecotries will have the node type <see cref="DirectoryType"/>
         /// </summary>
         /// <param name="fullRelativePath">The full relative path of the file</param>
         /// <param name="rootNode">The root node of the repository</param>
