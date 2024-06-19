@@ -17,12 +17,6 @@ namespace SEE.GraphProviders
     public class MultiGraphPipelineProvider : MultiGraphProvider
     {
         /// <summary>
-        /// The label for <see cref="Pipeline"/> in the configuration file.
-        /// </summary>
-        protected const string pipelineLabel = "pipeline";
-
-
-        /// <summary>
         /// The list of nested providers in this pipeline. These will be executed
         /// from first to last.
         /// </summary>
@@ -81,6 +75,12 @@ namespace SEE.GraphProviders
             return MultiGraphProviderKind.MultiPipeline;
         }
 
+        #region Config I/O
+        /// <summary>
+        /// The label for <see cref="Pipeline"/> in the configuration file.
+        /// </summary>
+        private const string pipelineLabel = "pipeline";
+
         /// <summary>
         /// Saves the attributes to the config writer <paramref name="writer"/>
         /// </summary>
@@ -123,5 +123,6 @@ namespace SEE.GraphProviders
                 }
             }
         }
+        #endregion
     }
 }
