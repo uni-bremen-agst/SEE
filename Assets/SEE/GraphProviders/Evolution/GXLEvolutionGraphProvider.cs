@@ -14,7 +14,7 @@ using UnityEngine;
 namespace SEE.GraphProviders
 {
     /// <summary>
-    /// Evolution graph provider for gxl files 
+    /// Evolution graph provider for gxl files
     /// </summary>
     public class GXLEvolutionGraphProvider : MultiGraphProvider
     {
