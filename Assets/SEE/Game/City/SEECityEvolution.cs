@@ -102,7 +102,6 @@ namespace SEE.Game.City
             get => evolutionRenderer?.GraphCurrent;
             protected set => throw new NotImplementedException();
         }
-        
         /// <summary>
         /// The currently loaded graph series
         /// </summary>
