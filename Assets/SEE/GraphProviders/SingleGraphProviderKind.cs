@@ -26,7 +26,7 @@
         JaCoCo,
 
         /// <summary>
-        /// For <see cref="PipelineGraphProvider"/>.
+        /// For <see cref="SingleGraphPipelineProvider"/>.
         /// </summary>
         SinglePipeline,
 
@@ -34,12 +34,12 @@
         /// For <see cref="DashboardGraphProvider"/>.
         /// </summary>
         Dashboard,
-        
+
         /// <summary>
         /// For <see cref="ReflexionGraphProvider"/>.
         /// </summary>
         Reflexion,
-        
+
         /// <summary>
         /// For <see cref="MergeDiffGraphProvider"/>.
         /// </summary>
@@ -48,6 +48,11 @@
         /// <summary>
         /// For <see cref="LSPGraphProvider"/>.
         /// </summary>
-        LSP
+        LSP,
+
+        /// <summary>
+        /// For <see cref="VCSGraphProvider"/>.
+        /// </summary>
+        VCS,
     }
 }

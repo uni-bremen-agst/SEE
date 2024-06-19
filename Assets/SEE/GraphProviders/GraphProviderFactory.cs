@@ -27,13 +27,15 @@ namespace SEE.GraphProviders
                 SingleGraphProviderKind.SinglePipeline => new SingleGraphPipelineProvider(),
                 SingleGraphProviderKind.JaCoCo => new JaCoCoGraphProvider(),
                 SingleGraphProviderKind.MergeDiff => new MergeDiffGraphProvider(),
+                SingleGraphProviderKind.VCS => new VCSGraphProvider(),
+                SingleGraphProviderKind.LSP => new LSPGraphProvider(),
                 _ => throw new NotImplementedException($"Not implemented for {kind}")
             };
         }
 
         /// <summary>
         /// Returns a new instance of the corresponding <see cref="MultiGraphProvider"/> to the
-        /// passed <see cref="MultiGraphPipelineProvider"/> <paramref name="kind"/> 
+        /// passed <see cref="MultiGraphPipelineProvider"/> <paramref name="kind"/>
         /// </summary>
         /// <param name="kind">The requested kind of <see cref="MultiGraphProvider"/></param>
         /// <returns>a new instance</returns>
