@@ -1,5 +1,4 @@
 ﻿//Copyright 2020 Florian Garbade
-//Copyright 2020 Florian Garbade
 
 //Permission is hereby granted, free of charge, to any person obtaining a
 //copy of this software and associated documentation files (the "Software"),
@@ -24,7 +23,6 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
 using SEE.Game.Evolution;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.GO;
@@ -35,7 +33,6 @@ using SEE.GraphProviders;
 using SEE.UI;
 using SEE.UI.Notification;
 using SEE.Utils.Config;
-using SEE.Utils.Paths;
 using Sirenix.Serialization;
 
 namespace SEE.Game.City
@@ -58,7 +55,6 @@ namespace SEE.Game.City
          HideReferenceObjectPicker]
         public MultiGraphPipelineProvider DataProvider = new();
 
-
         /// <summary>
         /// Name of the Inspector foldout group for the specific evolution setttings.
         /// </summary>
@@ -74,7 +70,6 @@ namespace SEE.Game.City
         /// Error message when will be shown if anything goes wrong in the pipeline
         /// </summary>
         private const string CantShowEvolutionMessage = "Can't show evolution";
-
 
         /// <summary>
         /// The renderer for rendering the evolution of the graph series.
@@ -155,7 +150,6 @@ namespace SEE.Game.City
             evolutionRenderer?.ProjectPathChanged(SourceCodeDirectory.Path);
         }
 
-
         /// <summary>
         /// The first graph of the graph series. It is used only to let the user see
         /// his/her settings in action. It will be destroyed when the game starts.
@@ -181,7 +175,7 @@ namespace SEE.Game.City
         /// Loads the whole graph series and sets the first graph of the series. If a graph was already
         /// loaded, that graph will be destroyed.
         /// </summary>
-        [Button(ButtonSizes.Small)]
+        [Button(ButtonSizes.Small, Name = "Load Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
         public async UniTask LoadDataAsync()
@@ -274,33 +268,6 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Yields the graph of the first GXL found in the directory named <code>PathPrefix</code>.
-        /// The order is ascending and alphabetic by the GXL filenames located in that directory.
-        /// If the first GXL file has a corresponding CSV with additional metrics, this CSV file
-        /// will be read, too, and the node metrics added to the graph.
-        /// Furthermore the selection of the specific node types selected by the user is applied in case
-        /// the user specified it before. By default every node type is selected.
-        ///
-        /// Precondition: PathPrefix must be set and denote an existing directory in the
-        /// file system containing at least one GXL file.
-        /// </summary>
-        /// <returns>the loaded graph or null if none could be found</returns>
-        private async UniTask<Graph> LoadFirstGraphAsync()
-        {
-            List<Graph> graphs = new List<Graph>(await DataProvider.ProvideAsync(new List<Graph>(), this));
-
-            if (graphs.Count == 0)
-            {
-                return null;
-            }
-
-            Graph graph = graphs.First();
-            InspectSchema(graph);
-            graph = RelevantGraph(graph);
-            return graph;
-        }
-
-        /// <summary>
         /// Draws the given <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">graph to be drawn</param>
@@ -331,15 +298,14 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Starts the evolution on runtime.
-        /// <see cref="LoadDataAsync"/> doesn't need to be called first
+        /// Doesn't do anything when run in the Unity Editor. Is intended to be used in
+        /// the runtime configuration menu during play mode only. Starts the evolution at runtime.
+        /// <see cref="LoadDataAsync"/> doesn't need to be called first.
         /// </summary>
-        //[Button(ButtonSizes.Small, Name = "Start Evolution")]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Start Evolution")]
+        [RuntimeButton(DataButtonsGroup, "Start Evolution")]
         [PropertyOrder(DataButtonsGroupOrderDraw)]
         public async UniTask StartEvolutionAsync()
         {
-            //Start();
             Reset();
             await LoadDataAsync();
 
@@ -394,6 +360,7 @@ namespace SEE.Game.City
             return evolutionRenderer.AllExistingMetrics();
         }
 
+        #region Config I/O
         /// <summary>
         /// The same as in <see cref="SEECity"/>
         /// </summary>
@@ -419,5 +386,6 @@ namespace SEE.Game.City
             DataProvider =
                 MultiGraphProvider.Restore(attributes, dataProviderPathLabel) as MultiGraphPipelineProvider;
         }
+        #endregion
     }
 }
