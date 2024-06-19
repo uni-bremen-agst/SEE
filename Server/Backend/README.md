@@ -58,8 +58,8 @@ NetBeans seems to work pretty well, enjoy coding!
 ### Eclipse
 
 Eclipse seems to have problems recognizing getters/setters generated using Lombok.
-There was an attempt to fix this issue, but it did help.
-If you are using Eclipse and know how to fix it, please do and update this section.
+There was an attempt to fix this issue, but to no avail.
+If you are using Eclipse and know how to fix it, please do so and update this section.
 
 #### Lombok
 
