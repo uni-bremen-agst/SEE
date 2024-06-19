@@ -1,12 +1,11 @@
 ﻿namespace SEE.GraphProviders
 {
-
     /// <summary>
     /// The kind of single graph providers. These values are shown to a user, e.g., in a configuration
     /// file or in the configuration of code cities at run-time. They should be short and
     /// self-explanatory.
     /// </summary>
-    /// <remarks>If a concrete subclass is derived from <see cref="GraphProvider"/>, a new
+    /// <remarks>If a concrete subclass is derived from <see cref="SingleGraphProvider"/>, a new
     /// value should be added here.</remarks>
     public enum SingleGraphProviderKind
     {
