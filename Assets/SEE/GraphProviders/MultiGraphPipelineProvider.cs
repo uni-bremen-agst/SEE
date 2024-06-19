@@ -30,7 +30,6 @@ namespace SEE.GraphProviders
          ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = nameof(GetKind))]
         public List<MultiGraphProvider> Pipeline = new();
 
-        
         /// <summary>
         /// Provides a graph based as a result of the serial execution of all
         /// graph providers in <see cref="Pipeline"/> from first to last.

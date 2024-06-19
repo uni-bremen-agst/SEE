@@ -71,7 +71,7 @@ namespace SEE.Game.City
         private const string NoGraphsProvidedErrorMessage = "Graph providers didn't yield any graphs";
 
         /// <summary>
-        /// Error message when will be shown if anything goes wrong in the pipeline 
+        /// Error message when will be shown if anything goes wrong in the pipeline
         /// </summary>
         private const string CantShowEvolutionMessage = "Can't show evolution";
 
@@ -102,7 +102,6 @@ namespace SEE.Game.City
             get => evolutionRenderer?.GraphCurrent;
             protected set => throw new NotImplementedException();
         }
-        
         /// <summary>
         /// The currently loaded graph series
         /// </summary>
@@ -401,7 +400,7 @@ namespace SEE.Game.City
         private const string dataProviderPathLabel = "data";
 
         /// <summary>
-        /// Saves and writes the configuration to <paramref name="writer"/> 
+        /// Saves and writes the configuration to <paramref name="writer"/>
         /// </summary>
         /// <param name="writer">The ConfigWriter to write the configuration to</param>
         protected override void Save(ConfigWriter writer)
