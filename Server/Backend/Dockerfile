@@ -11,7 +11,6 @@ COPY pom.xml .
 # Führe den Maven-Build aus
 RUN mvn clean package -DskipTests
 
-# Verwende ein offizielles OpenJDK 17-Image für die Laufzeit
 # Verwende das offizielle Ubuntu 20.04 als Basisimage
 FROM ubuntu:20.04
 # Aktualisiere die Paketliste und installiere OpenJDK 17

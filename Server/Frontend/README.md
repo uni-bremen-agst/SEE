@@ -1,3 +1,11 @@
+# SEE Managed Server Frontend
+
+This is the frontend application to control the management backend.
+
+
+--------------------------------------------------------------------------------
+## Getting Started
+
 Zum Ausführen des Frontends müssen [NodeJS](https://nodejs.org/en/download) und [pnpm](https://pnpm.io/installation) installiert sein.
 
 Um nun das Frontend auszuführen, müssen zunächst die Libraries installiert werden.

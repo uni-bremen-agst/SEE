@@ -8,7 +8,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import de.unibremen.swt.see.manager.util.FileType;
 import de.unibremen.swt.see.manager.file.payload.PayloadFile;
-import de.unibremen.swt.see.manager.model.File;
 import de.unibremen.swt.see.manager.model.Server;
 import de.unibremen.swt.see.manager.service.FileService;
 import de.unibremen.swt.see.manager.service.ServerService;

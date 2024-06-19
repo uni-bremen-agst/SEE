@@ -1,5 +1,14 @@
+# SEE Managed Server
 
-# How to run:
+This is the management server for SEE, consisting of a backend and a frontend project.
+Both projects have their own README file in their respective subfolders, which comes with additional information.
+
+The management server can be used to configure, run, and stop SEE game server instances.
+Additionally, it provides an API to store and retrieve files for the use in multiple connected SEE clients.
+
+
+--------------------------------------------------------------------------------
+## How to run:
 
 - Vorbereitung: 
 Um das Projekt zu starten, wird Docker benötigt. Docker kann unter Linux mit den meisten 
