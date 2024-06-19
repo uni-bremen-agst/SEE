@@ -9,15 +9,17 @@ using Cysharp.Threading.Tasks;
 namespace SEE.GraphProviders
 {
     /// <summary>
-    /// The GraphProvider class is an abstract base class that provides a framework
-    /// for creating and managing graph data. Concrete subclasses of GraphProvider
-    /// are responsible for providing a graph based on the input graph by
-    /// implementing the method <see cref="ProvideAsync(x,AbstractSEECity,Action{float},CancellationToken)"/>.
+    /// The <see cref="GraphProvider"/> class is an abstract base class that provides a framework
+    /// for creating and managing graph data. Concrete subclasses of <see cref="GraphProvider"/>
+    /// are responsible for providing a graph (or a list of graphs) based on the input graph
+    /// (or a list of graphs) by implementing the method
+    /// <see cref="ProvideAsync(x,AbstractSEECity,Action{float},CancellationToken)"/>.
     ///
-    /// It is not recomended to inhert this class directly from a graph provider.
+    /// It is not recomended to inhert a class directly from <see cref="GraphProvider"/>.
     /// Instead, you should use <see cref="SingleGraphProvider"/> and <see cref="MultiGraphProvider"/>.
     /// </summary>
-    /// <typeparam name="T">The type of data which should be provided (e.g <see cref="Graph"/> for simple CodeCities or <see cref="Graph}"/> for evolution cities)</typeparam>
+    /// <typeparam name="T">The type of data which should be provided (e.g. a single <see cref="Graph"/> for
+    /// simple code cities or a list of <see cref="Graph}"/>s for evolution cities)</typeparam>
     /// <typeparam name="K">
     /// This type specifies the graph provider kind enum type.
     /// This can either be a <see cref="SingleGraphProviderKind"/> or <see cref="MultiGraphProviderKind"/>.
@@ -25,8 +27,6 @@ namespace SEE.GraphProviders
     /// </typeparam>
     public abstract class GraphProvider<T, K> where K : Enum
     {
-        protected const string GraphProviderFoldoutGroup = "Data";
-
         /// <summary>
         /// Yields a new graph based on the input <paramref name="graph"/>.
         /// The input <paramref name="graph"/> may be empty. Subclasses are free to
@@ -40,6 +40,12 @@ namespace SEE.GraphProviders
         public abstract UniTask<T> ProvideAsync(T graph, AbstractSEECity city,
             Action<float> changePercentage = null,
             CancellationToken token = default);
+
+        /// <summary>
+        /// The fold out group for the graph provider in the runtime configuration
+        /// of a code city.
+        /// </summary>
+        protected const string GraphProviderFoldoutGroup = "Data";
 
         /// <summary>
         /// Saves the settings in the configuration file.
@@ -77,6 +83,7 @@ namespace SEE.GraphProviders
         /// <returns>kind of graph provider</returns>
         public abstract K GetKind();
 
+        #region Config I/O
         /// <summary>
         /// Subclasses must implement this so save their attributes. This class takes
         /// care only to begin and end the grouping and to emit the key-value pair
@@ -84,7 +91,6 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="writer">to be used for writing the settings</param>
         protected abstract void SaveAttributes(ConfigWriter writer);
-
 
         /// <summary>
         /// Must be implemented by subclasses to restore their attributes.
@@ -96,5 +102,7 @@ namespace SEE.GraphProviders
         /// The label for kind of graph provider in the configuration file.
         /// </summary>
         protected const string kindLabel = "kind";
+
+        #endregion
     }
 }
