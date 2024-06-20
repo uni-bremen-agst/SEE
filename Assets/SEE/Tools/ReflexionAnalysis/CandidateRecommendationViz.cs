@@ -21,7 +21,7 @@ using UnityEngine;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis
 {
-    public class CandidateRecommendationVisualization : MonoBehaviour, IObserver<ChangeEvent>
+    public class CandidateRecommendationViz : MonoBehaviour, IObserver<ChangeEvent>
     {
         private static float BLINK_EFFECT_DELAY = 0.1f;
 
@@ -348,9 +348,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             UpdateConfiguration(this.reflexionGraphViz, this.recommendationSettings, this.oracleMapping);
         }
 
-        // TODO: Move into other class? CandidateRecommendation or ReflexionGraph class?
-        public async UniTask CreateInitialMapping(RecommendationSettings recommendationSettings)
+        public async UniTask CreateInitialMapping(RecommendationSettings recommendationSettings, Action<float> reportProgress = null)
         {
+            // TODO: use reportProgress parameter
             // TODO: change datatype to mapping pair list
             Dictionary<Node, HashSet<Node>> initialMapping;
             UnityEngine.Debug.Log($"Create Initial mapping with seed {recommendationSettings.InitialMappingPercentage}");
@@ -359,14 +359,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                  initialMapping = this.CandidateRecommendation.CreateInitialMapping(recommendationSettings.InitialMappingPercentage,
                                                                                recommendationSettings.MasterSeed,
                                                                                reflexionGraphViz);
-
             }
             foreach (Node cluster in initialMapping.Keys)
             {
                 foreach (Node candidate in initialMapping[cluster])
                 {
                     Debug.Log($"Artificial initial mapping: {candidate.ID} -mapped to-> {cluster.ID}");
-                    MapRecommendation(candidate, cluster).Forget();
+                    
+                    await MapRecommendation(candidate, cluster);
                 }
             }
         }

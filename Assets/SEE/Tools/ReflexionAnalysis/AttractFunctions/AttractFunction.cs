@@ -76,17 +76,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             this.reflexionGraph= reflexionGraph;
             this.CandidateType = config.CandidateType;
             this.ClusterType = config.ClusterType;
+            this.edgeWeights = config.EdgeWeights != null ? new(config.EdgeWeights) : new();
             this.edgeStateCache = new EdgeStatesCache(this.reflexionGraph);
             this.clustersToUpdate = new HashSet<string>();
             this.handledCandidates = new HashSet<string>();
-        }
-        
-        public AttractFunction(ReflexionGraph reflexionGraph,
-                               CandidateRecommendation candidateRecommendation,
-                               AttractFunctionConfig config,
-                               Dictionary<string, double> edgeWeights) : this(reflexionGraph, candidateRecommendation, config)
-        {
-            this.edgeWeights = edgeWeights;
         }
 
         public static AttractFunction Create(AttractFunctionConfig config, 
@@ -109,7 +102,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         protected double GetEdgeWeight(Edge edge)
         {
-            return this.edgeWeights.TryGetValue(edge.ID, out var weight) ? weight : 1.0;
+            return this.edgeWeights.TryGetValue(edge.Type, out var weight) ? weight : 1.0;
         }
 
         public void ClearStateCache()

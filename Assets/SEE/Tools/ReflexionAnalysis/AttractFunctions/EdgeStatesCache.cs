@@ -1,6 +1,8 @@
-﻿using SEE.DataModel.DG;
+﻿using MoreLinq;
+using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
@@ -35,16 +37,22 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             reflexionGraph.AddToMappingSilent(cluster, candidate);
 
-            IEnumerable<Edge> edges = candidate.GetImplementationEdges();
+            List<Edge> subtreeEdgesIncoming = new List<Edge>();
+            List<Edge> subtreeEdgesOutgoing = new List<Edge>();
+            IList<Node> subtreeNodes = candidate.PostOrderDescendants();
+            subtreeNodes.ForEach(d => subtreeEdgesIncoming.AddRange(d.Incomings.Where(x => x.IsInImplementation())));
+            subtreeNodes.ForEach(d => subtreeEdgesOutgoing.AddRange(d.Outgoings.Where(x => x.IsInImplementation())));
 
-            foreach (Edge edge in edges)
+            subtreeEdgesIncoming.ForEach(e => WriteToCache(e, e.Source));
+            subtreeEdgesOutgoing.ForEach(e => WriteToCache(e, e.Target));
+
+            void WriteToCache(Edge edge, Node neighborOfSubtree)
             {
-                Node candidateNeighbor = edge.Source.Equals(candidate) ? edge.Target : edge.Source;
-                Node neighborCluster = reflexionGraph.MapsTo(candidateNeighbor);
+                Node neighborCluster = reflexionGraph.MapsTo(neighborOfSubtree);
 
                 if (neighborCluster != null)
                 {
-                    string key = $"{candidate.ID}#{cluster.ID}#{candidateNeighbor.ID}#{neighborCluster.ID}#{edge.ID}";
+                    string key = $"{candidate.ID}#{cluster.ID}#{neighborOfSubtree.ID}#{neighborCluster.ID}#{edge.ID}";
                     this.cache[key] = edge.State();
                 }
             }
@@ -56,7 +64,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 reflexionGraph.AddToMappingSilent(mapsTo, explicitlyMappedNode);
             }
         }
-        
+
+        // TODO: Adjust wording and doc
         public State GetFromCache(string clusterId, string candidateId, string candidateNeighborId, string edgeId)
         {
             Node candidate = reflexionGraph.GetNode(candidateId);

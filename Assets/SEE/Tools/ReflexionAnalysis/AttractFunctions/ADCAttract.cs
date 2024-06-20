@@ -1,4 +1,5 @@
-﻿using SEE.DataModel;
+﻿using MoreLinq;
+using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
 using System;
@@ -12,16 +13,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
     {
         private Dictionary<string, Document> wordsPerDependency = new Dictionary<string, Document>();
 
-        private new ADCAttractConfig config;
-
         private Dictionary<string, Edge> specifiedByDependency = new Dictionary<string, Edge>();
+
+        private Document.DocumentMergingType MergingType { get; }
 
         public ADCAttract(ReflexionGraph reflexionGraph, 
                           CandidateRecommendation candidateRecommendation, 
                           ADCAttractConfig config) : base(reflexionGraph, candidateRecommendation, config)
         {   
-            // TODO: Copy values from config?
-            this.config = config;
+            this.MergingType = config.MergingType;
         }
 
         public override string DumpTrainingData()
@@ -43,29 +43,41 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             }
             return sb.ToString();
         }
-
         public override double GetAttractionValue(Node candidate, Node cluster)
         {
-            List<Edge> implementationEdges = candidate.GetImplementationEdges();
+            if (!candidate.Type.Equals(this.CandidateType))
+            {
+                return 0;
+            }
+
+            double attraction = 0;
+            candidate.PostOrderDescendants().ForEach(d => attraction += GetAttractionValueLocal(candidate, descendant:d, cluster));
+
+            return attraction;
+        }
+
+        public double GetAttractionValueLocal(Node candidate, Node descendant, Node cluster)
+        {
+            List<Edge> implementationEdges = descendant.GetImplementationEdges();
 
             double attraction = 0;
 
             foreach (Edge edge in implementationEdges)
             {
-                bool isCandidateSource = edge.Source.Equals(candidate);
-                Node candidateNeighbor = isCandidateSource ? edge.Target : edge.Source;
+                bool isDescendantSource = edge.Source.Equals(descendant);
+                Node descendantNeighbor = isDescendantSource ? edge.Target : edge.Source;
 
                 // Get the state of the current implementation edge if the candidate would be mapped to the cluster 
                 State edgeState = this.edgeStateCache.GetFromCache(clusterId: cluster.ID,
                                                                     candidateId: candidate.ID,
-                                                                    candidateNeighborId: candidateNeighbor.ID,
+                                                                    candidateNeighborId: descendantNeighbor.ID,
                                                                     edgeId: edge.ID);
 
                 if ((edgeState == State.Allowed || edgeState == State.ImplicitlyAllowed))
                 {
-                    Node neighborCluster = reflexionGraph.MapsTo(candidateNeighbor);
-                    Node clusterSource = isCandidateSource ? cluster : neighborCluster;
-                    Node clusterTarget = isCandidateSource ? neighborCluster : cluster;
+                    Node neighborCluster = reflexionGraph.MapsTo(descendantNeighbor);
+                    Node clusterSource = isDescendantSource ? cluster : neighborCluster;
+                    Node clusterTarget = isDescendantSource ? neighborCluster : cluster;
 
                     Edge architectureEdge = this.AllowedBy(clusterSource, clusterTarget, edgeState, edge.Type);
 
@@ -77,7 +89,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                     if (this.wordsPerDependency.ContainsKey(architectureEdge.ID))
                     {
                         Document architectureEdgeDoc = this.wordsPerDependency[architectureEdge.ID];
-                        Document mergedDocument = this.GetMergedTerms(edge.Source, edge.Target, config.MergingType);
+                        Document mergedDocument = this.GetMergedTerms(edge.Source, edge.Target, MergingType);
                         double similarity = Document.OverlapCoefficient(mergedDocument, architectureEdgeDoc);
                         attraction += similarity;
                     }
@@ -132,7 +144,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
                 this.specifiedByDependency[implEdge.ID] = architectureEdge;
 
-                Document mergedDocument = this.GetMergedTerms(implEdge.Source, implEdge.Target, config.MergingType);
+                Document mergedDocument = this.GetMergedTerms(implEdge.Source, implEdge.Target, MergingType);
 
                 if (!wordsPerDependency.ContainsKey(architectureEdge.ID))
                 {
@@ -144,31 +156,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 }
             } 
         }
-
-        //private Edge GetSpecifyingArchitectureDepedency(Node source, Node target, string type) 
-        //{
-        //    // TODO: Use type hierarchy in the future
-
-        //    Edge architectureEdge;
-        //    if (!source.ID.Equals(target.ID))
-        //    {
-        //        List<Edge> architectureEdges = source.FromTo(target, null).Where(e => ReflexionGraph.IsSpecified(e) 
-        //                                                                         || e.Source.ID.Equals(e.Target.ID)).ToList(); ;
-        //        architectureEdge = architectureEdges.SingleOrDefault();
-        //    } 
-        //    else
-        //    {
-        //        // special case: The architecture dependencies which are allowing implementation edges within the same 
-        //        // cluster are not specified and are only add when there are already two connected nodes mapped to an 
-        //        // architecture node. So if only one node 'a' is add to a Cluster A, the calculation for (A,b) for a second node 'b'
-        //        // with the dependecy b->a could not compare b->a with A->A even A->A is assumed per definition. A->A will only be 
-        //        // created after b was already add. We create a corresponding architecure edge ourselve, so we do not have 
-        //        // to depend on the lifecycle of artificial architecture edges created by the reflexion analysis.
-        //        architectureEdge = new Edge(source, target, type);
-        //    }
-
-        //    return architectureEdge;
-        //}
 
         private Edge AllowedBy(Edge edge, State expectedState, string type)
         {
@@ -232,7 +219,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
                 this.specifiedByDependency.Remove(implEdge.ID);
 
-                Document mergedDocument = this.GetMergedTerms(implEdge.Source, implEdge.Target, config.MergingType);
+                Document mergedDocument = this.GetMergedTerms(implEdge.Source, implEdge.Target, MergingType);
 
                 if (wordsPerDependency.ContainsKey(architectureEdge.ID))
                 {

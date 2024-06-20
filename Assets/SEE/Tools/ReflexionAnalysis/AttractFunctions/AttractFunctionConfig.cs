@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using System.Xml.Linq;
 using UnityEngine;
 using static Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions.AttractFunction;
@@ -21,6 +22,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         public string ClusterType { get => clusterType; set => clusterType = value; }
 
         public abstract AttractFunctionType AttractFunctionType { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [SerializeField]
+        public Dictionary<string, double> EdgeWeights { get; set; }
 
         public virtual XElement ToXElement()
         {

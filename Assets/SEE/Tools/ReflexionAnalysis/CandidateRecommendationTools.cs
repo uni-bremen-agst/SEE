@@ -1,3 +1,4 @@
+using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
 using System;
@@ -8,13 +9,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 {
     public static class CandidateRecommendationTools
     {
-        public static List<Edge> GetImplementationEdges(this Node targetedEntity)
+        public static List<Edge> GetImplementationEdges(this Node implNode)
         {
-            // TODO: How to determine the right edges, more processing needed?
-            // TODO: Which types are relevant?
             List<Edge> edges = new List<Edge>();
-            edges.AddRange(targetedEntity.Incomings);
-            edges.AddRange(targetedEntity.Outgoings);
+            edges.AddRange(implNode.Incomings);
+            edges.AddRange(implNode.Outgoings);
             edges = edges.Distinct().Where(x => x.IsInImplementation()).ToList();
             return edges;
         }

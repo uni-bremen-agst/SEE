@@ -235,7 +235,7 @@ namespace SEE.Controls.Actions
             };
 
             GameObject city = SceneQueries.GetCodeCity(gameObject.transform).gameObject;
-            CandidateRecommendationVisualization candidateRecommendationViz = city.GetComponent<CandidateRecommendationVisualization>();
+            CandidateRecommendationViz candidateRecommendationViz = city.GetComponent<CandidateRecommendationViz>();
 
             // Add action if candidate recommendation is active and if it is unmapped and part of the implementation graph
             if (candidateRecommendationViz != null && 

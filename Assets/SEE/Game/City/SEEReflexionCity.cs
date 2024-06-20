@@ -11,6 +11,7 @@ using Assets.SEE.Tools.ReflexionAnalysis;
 using SEE.GraphProviders;
 using System.Collections.Generic;
 using Sirenix.Serialization;
+using SEE.UI.Notification;
 
 namespace SEE.Game.City
 {
@@ -112,11 +113,11 @@ namespace SEE.Game.City
 
         #region CandidateRecommendation
 
-        private CandidateRecommendationVisualization candidateRecommendationViz;
+        private CandidateRecommendationViz candidateRecommendationViz;
 
         private void UpdateRecommendationSettings(ReflexionGraph loadedGraph, RecommendationSettings recommendationSettings, Graph oracleMapping)
         {
-            candidateRecommendationViz = gameObject.AddOrGetComponent<CandidateRecommendationVisualization>();
+            candidateRecommendationViz = gameObject.AddOrGetComponent<CandidateRecommendationViz>();
             if (candidateRecommendationViz != null)
             {
                 loadedGraph.Subscribe(candidateRecommendationViz);
@@ -131,13 +132,11 @@ namespace SEE.Game.City
 
         protected const string RecommendationsFoldoutGroup = "Recommendations";
 
-        private bool enableRecommendations = false;
-
         /// <summary>
         /// TODO:
         /// </summary>
         [OdinSerialize, ShowInInspector,
-        Tooltip("Settings that used to choose candidate recommendations within the reflexion graph."),
+        Tooltip("Settings that are used to calculate candidate recommendations within the reflexion graph."),
         TabGroup(RecommendationsFoldoutGroup), RuntimeTab(RecommendationsFoldoutGroup),
         HideReferenceObjectPicker]
         [PropertyOrder(2)]
@@ -165,22 +164,35 @@ namespace SEE.Game.City
             {
                 ((ReflexionGraph)VisualizedSubGraph).ResetMapping();
             }
+            else
+            {
+                ShowNotification.Warn("Cannot reset Mapping.", "Cannot reset Mapping. No Graph has been loaded.");
+            }
         }
 
         [Button("Generate initial mapping", ButtonSizes.Small)]
         [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Generate initial mapping")]
-        // TODO: Make this call async?
-        public async UniTask GenerateOracleMapping()
+        public async UniTask GenerateInitialOracleMapping()
         {
-            if (candidateRecommendationViz != null)
+            using (LoadingSpinner.ShowDeterminate($"Generate initial mapping...",
+                                       out Action<float> reportProgress))
             {
-                if (candidateRecommendationViz.OracleGraphLoaded)
+                void UpdateProgress(float progress)
                 {
-                    await candidateRecommendationViz.CreateInitialMapping(recommendationSettings); 
-                } 
-                else
+                    reportProgress(progress);
+                    ProgressBar = progress;
+                }
+
+                if (candidateRecommendationViz != null)
                 {
-                    
+                    if (candidateRecommendationViz.OracleGraphLoaded)
+                    {
+                        await candidateRecommendationViz.CreateInitialMapping(recommendationSettings);
+                    }
+                    else
+                    {
+                        ShowNotification.Warn("Cannot generate initial mapping", "No Oracle Graph loaded. Cannot generate inital mapping.");
+                    }
                 }
             }
         }

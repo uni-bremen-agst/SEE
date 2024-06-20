@@ -1,8 +1,10 @@
-﻿using SEE.DataModel;
+﻿using MoreLinq;
+using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
@@ -12,17 +14,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
     /// </summary>
     public class CountAttract : AttractFunction
     {
-        // TODO: Implementation of delta
-
         /// <summary>
         /// 
         /// </summary>
-        private Dictionary<string, double> overallValues;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private Dictionary<string, int> mappingCount;
+        private Dictionary<string, double> localOverallValues;
 
         /// <summary>
         /// 
@@ -38,33 +33,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                             CandidateRecommendation candidateRecommendation, 
                             CountAttractConfig config) : base(graph, candidateRecommendation, config)
         {
-            overallValues = new Dictionary<string, double>();
-            mappingCount = new Dictionary<string, int>();
+            localOverallValues = new Dictionary<string, double>();
             this.Phi = config.Phi;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="candidateNode"></param>
-        /// <param name="cluster"></param>
-        /// <returns></returns>
-        public override double GetAttractionValue(Node candidateNode, Node cluster)
-        {
-            if (!candidateNode.Type.Equals(this.CandidateType))
-            {
-                return 0;
-            }
-
-            if (overallValues.TryGetValue(candidateNode.ID, out double overall))
-            {
-                double toOthers = GetToOthersValue(candidateNode, cluster);
-                return overall - toOthers;
-            } 
-            else
-            {
-                return 0;
-            };
         }
 
         /// <summary>
@@ -73,15 +43,39 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <param name="candidate"></param>
         /// <param name="cluster"></param>
         /// <returns></returns>
-        private double GetToOthersValue(Node candidate, Node cluster)
+        public override double GetAttractionValue(Node candidate, Node cluster)
         {
-            List<Edge> implementationEdges = candidate.GetImplementationEdges();
+            if (!candidate.Type.Equals(this.CandidateType))
+            {
+                return 0;
+            }
+
+            double attraction = 0;
+            candidate.PostOrderDescendants().ForEach(d => attraction += GetOverallLocal(d) - GetToOthersLocal(candidate, descendant: d, cluster));
+
+            return attraction;
+        }
+
+        private double GetOverallLocal(Node node)
+        {
+            return localOverallValues.TryGetValue(node.ID, out double overall) == true ? overall : 0;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="candidate"></param>
+        /// <param name="cluster"></param>
+        /// <returns></returns>
+        private double GetToOthersLocal(Node candidate, Node descendant, Node cluster)
+        {
+            List<Edge> implementationEdges = descendant.GetImplementationEdges();
             double toOthers = 0;
 
             foreach (Edge edge in implementationEdges)
             {
-                Node candidateNeighbor = edge.Source.Equals(candidate) ? edge.Target : edge.Source;
-                Node neighborCluster = reflexionGraph.MapsTo(candidateNeighbor);
+                Node descendantNeighbor = edge.Source.ID.Equals(descendant.ID) ? edge.Target : edge.Source;
+                Node neighborCluster = reflexionGraph.MapsTo(descendantNeighbor);
 
                 if (neighborCluster == null || neighborCluster.ID.Equals(cluster.ID))
                 {
@@ -90,8 +84,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
                 double weight = GetEdgeWeight(edge);
 
-                State edgeState = this.edgeStateCache.GetFromCache(cluster.ID, candidate.ID, candidateNeighbor.ID, edge.ID);
-                
+                State edgeState = this.edgeStateCache.GetFromCache(cluster.ID, candidate.ID, descendantNeighbor.ID, edge.ID);
+
                 if (edgeState == State.Allowed || edgeState == State.ImplicitlyAllowed)
                 {
                     weight *= Phi;
@@ -103,9 +97,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return toOthers;
         }
 
-        public override void HandleChangedCandidate(Node cluster, Node nodeChangedInMapping, ChangeType changeType)
+        public override void HandleChangedCandidate(Node cluster, Node changedNode, ChangeType changeType)
         {
-            if (!this.HandlingRequired(nodeChangedInMapping.ID, changeType, updateHandling: true))
+            if (!this.HandlingRequired(changedNode.ID, changeType, updateHandling: true))
             {
                 return;
             }
@@ -113,16 +107,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             // TODO: is the cluster still there? regarding removal of architecture node
             this.AddClusterToUpdate(cluster.ID);
 
-            List<Edge> implementationEdges = nodeChangedInMapping.GetImplementationEdges();
+            List<Edge> implementationEdges = changedNode.GetImplementationEdges();
+
             foreach (Edge edge in implementationEdges)
             {
-                Node neighborOfAffectedNode = edge.Source.ID.Equals(nodeChangedInMapping.ID) ? edge.Target : edge.Source;
+                Node neighborOfAffectedNode = edge.Source.ID.Equals(changedNode.ID) ? edge.Target : edge.Source;
 
                 UpdateOverallTable(neighborOfAffectedNode, edge, changeType);
-                    
-                // TODO: Is there a way to also update a datastructure for the ToOthers value efficiently?
-                
-                UpdateMappingCountTable(neighborOfAffectedNode, changeType);
             }
         }
 
@@ -134,9 +125,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <param name="changeType"></param>
         private void UpdateOverallTable(Node NeighborOfMappedNode, Edge edge, ChangeType changeType)
         {
-            if (!overallValues.ContainsKey(NeighborOfMappedNode.ID))
+            if (!localOverallValues.ContainsKey(NeighborOfMappedNode.ID))
             {
-                overallValues.Add(NeighborOfMappedNode.ID, 0);
+                localOverallValues.Add(NeighborOfMappedNode.ID, 0);
             }
 
             double edgeWeight = GetEdgeWeight(edge);
@@ -146,7 +137,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 edgeWeight *= -1;
             }
 
-            overallValues[NeighborOfMappedNode.ID] += edgeWeight;
+            localOverallValues[NeighborOfMappedNode.ID] += edgeWeight;
 
             Node neighborCluster = reflexionGraph.MapsTo(NeighborOfMappedNode);
 
@@ -159,34 +150,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="NeighborOfMappedNode"></param>
-        /// <param name="changeType"></param>
-        public void UpdateMappingCountTable(Node NeighborOfMappedNode, ChangeType changeType)
-        {
-            if (!mappingCount.ContainsKey(NeighborOfMappedNode.ID))
-            {
-                mappingCount.Add(NeighborOfMappedNode.ID, 0);
-            }
-            int count = 1;
-            if (changeType == ChangeType.Removal)
-            {
-                count *= -1;
-            }
-            mappingCount[NeighborOfMappedNode.ID] += count;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <returns></returns>
         public override string DumpTrainingData()
         {
             StringBuilder sb = new StringBuilder();
             sb.Append($"overall values:{Environment.NewLine}");
-            foreach (string nodeID in overallValues.Keys)
+            foreach (string nodeID in localOverallValues.Keys)
             {
                 sb.Append(nodeID.PadRight(10));
-                sb.Append($" :{overallValues[nodeID]}{Environment.NewLine}");
+                sb.Append($" :{localOverallValues[nodeID]}{Environment.NewLine}");
             }
             return sb.ToString();
         }
@@ -197,9 +169,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <returns></returns>
         public override bool EmptyTrainingData()
         {
-            foreach(string key in this.overallValues.Keys)
+            foreach(string key in this.localOverallValues.Keys)
             {
-                if (this.overallValues[key] != 0)
+                if (this.localOverallValues[key] != 0)
                 {
                     return false;
                 }
@@ -212,7 +184,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// </summary>
         public override void Reset()
         {
-            this.overallValues.Clear();
+            this.localOverallValues.Clear();
             this.edgeStateCache.ClearCache();
         }
 

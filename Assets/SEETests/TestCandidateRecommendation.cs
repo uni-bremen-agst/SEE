@@ -74,13 +74,14 @@ namespace SEE.Tools.Architecture
             candidateRecommendation = new CandidateRecommendation();
         }
 
-        private void SetupCountAttract(float phi = 1.0f)
+        private void SetupCountAttract(float phi = 1.0f, Dictionary<string, double> edgeWeights = null)
         {
             RecommendationSettings config = new RecommendationSettings();
             CountAttractConfig attractConfig = new CountAttractConfig();
             attractConfig.Phi = phi;
             attractConfig.CandidateType = "Candidate";
             attractConfig.ClusterType = "Cluster";
+            attractConfig.EdgeWeights = edgeWeights != null ? edgeWeights : attractConfig.EdgeWeights;
             config.CountAttractConfig = attractConfig;
             config.AttractFunctionType = AttractFunction.AttractFunctionType.CountAttract;
             candidateRecommendation.UpdateConfiguration(graph, config);
@@ -102,7 +103,7 @@ namespace SEE.Tools.Architecture
             candidateRecommendation.UpdateRecommendations();
         }
 
-        private void SetupADCAttract(INodeReader nodeReader, Document.DocumentMergingType mergingType) 
+        private void SetupADCAttract(INodeReader nodeReader, Document.DocumentMergingType mergingType)
         {
             RecommendationSettings config = GetADCAttractConfig(mergingType);
             config.NodeReader = nodeReader;
@@ -158,7 +159,41 @@ namespace SEE.Tools.Architecture
             }
 
             ae = CreateEdgesDictionary(edgesFromTo, a);
-        } 
+        }
+
+        public void AddHierarchy((int, int)[] edgesFromTo, ReflexionSubgraphs subgraphType)
+        {
+            if (subgraphType == ReflexionSubgraphs.None
+                || subgraphType == ReflexionSubgraphs.Mapping
+                || subgraphType == ReflexionSubgraphs.FullReflexion)
+            {
+                throw new Exception("Unexpected reflexion subgraph.");
+            }
+
+            Dictionary<int, Node> subgraph = subgraphType == ReflexionSubgraphs.Implementation ? i : a;
+
+            foreach ((int, int) edge in edgesFromTo)
+            {
+                subgraph[edge.Item1].Reparent(subgraph[edge.Item2]);
+            }
+        }
+
+        public void OverrideDefaultEdgeType((int, int)[] edgesFromTo, ReflexionSubgraphs subgraphType, string edgeType)
+        {
+            if (subgraphType == ReflexionSubgraphs.None
+                || subgraphType == ReflexionSubgraphs.Mapping
+                || subgraphType == ReflexionSubgraphs.FullReflexion)
+            {
+                throw new Exception("Unexpected reflexion subgraph.");
+            }
+
+            Dictionary<(int,int), Edge> edges = subgraphType == ReflexionSubgraphs.Implementation ? ie : ae;
+
+            foreach ((int,int) edge in edgesFromTo)
+            {
+                edges[edge].Type = edgeType;
+            }
+        }
 
         private void AddToMapping(Node from, Node to)
         {
@@ -176,7 +211,7 @@ namespace SEE.Tools.Architecture
             candidateRecommendation.UpdateRecommendations();
         }
 
-        private void RemoveEdge(Edge edge) 
+        private void RemoveEdge(Edge edge)
         {
             graph.StartCaching();
             graph.RemoveEdge(edge);
@@ -299,7 +334,7 @@ namespace SEE.Tools.Architecture
                 (1, 2), (3,2)
             };
 
-            this.AddArchitecture(numberNodes : 3, edgesFromTo);
+            this.AddArchitecture(numberNodes: 3, edgesFromTo);
 
             edgesFromTo = new (int, int)[]
             {
@@ -480,8 +515,8 @@ namespace SEE.Tools.Architecture
         public void TestADCAttractImplicitlyAllowed()
         {
             // no architecture dependencies
-            this.AddArchitecture(numberNodes: 2, new (int,int)[]{});
-            
+            this.AddArchitecture(numberNodes: 2, new (int, int)[] { });
+
             (int, int)[] edgesFromTo =
             {
                 (2, 1), (3, 2), (5, 4), (6, 5), (7,1), (7,4)
@@ -671,7 +706,7 @@ namespace SEE.Tools.Architecture
 
             Assert.AreEqual(1, candidateRecommendation.AttractFunction.GetAttractionValue(i[7], a[1]));
             Assert.AreEqual(1, candidateRecommendation.AttractFunction.GetAttractionValue(i[7], a[2]));
-            
+
             graph.ResetMapping();
 
             Assert.That(this.candidateRecommendation.AttractFunction.EmptyTrainingData());
@@ -768,7 +803,7 @@ namespace SEE.Tools.Architecture
             // add arch edge again to ensure the phi value still affects the recommendations
             this.graph.AddEdge(archEdge);
             this.candidateRecommendation.UpdateRecommendations();
-            
+
             Assert.That(DIsRecommendedForA1ButNotA2());
 
             this.graph.RemoveNode(a[1]);
@@ -788,7 +823,7 @@ namespace SEE.Tools.Architecture
                 IList<MappingPair> recommendationsOfD = candidateRecommendation.GetRecommendations(i[4]).ToList();
                 IEnumerable<MappingPair> recommendationsOfA1 = candidateRecommendation.GetRecommendations(a[1]);
                 IEnumerable<MappingPair> recommendationsOfA2 = candidateRecommendation.GetRecommendations(a[2]);
-                
+
                 MappingPair recommendation0 = recommendationsOfD[0];
                 MappingPair recommendation1 = recommendationsOfD[1];
 
@@ -797,7 +832,7 @@ namespace SEE.Tools.Architecture
                           && (recommendation0.ClusterID.Equals(a[1].ID) && recommendation1.ClusterID.Equals(a[2].ID)
                              || recommendation0.ClusterID.Equals(a[2].ID) && recommendation1.ClusterID.Equals(a[1].ID));
 
-                bool validForA1 = recommendationsOfA1.FirstOrDefault().CandidateID.Equals(i[4].ID) 
+                bool validForA1 = recommendationsOfA1.FirstOrDefault().CandidateID.Equals(i[4].ID)
                                && recommendationsOfA1.FirstOrDefault().ClusterID.Equals(a[1].ID);
 
                 bool validForA2 = recommendationsOfA2.FirstOrDefault().CandidateID.Equals(i[4].ID)
@@ -813,13 +848,13 @@ namespace SEE.Tools.Architecture
                 IEnumerable<MappingPair> recommendationsOfA2 = candidateRecommendation.GetRecommendations(a[2]);
 
                 MappingPair recommendation = recommendationsOfD[0];
-                bool validForD = recommendationsOfD.Count() == 1 
-                              && recommendation.CandidateID.Equals(i[4].ID) 
+                bool validForD = recommendationsOfD.Count() == 1
+                              && recommendation.CandidateID.Equals(i[4].ID)
                               && recommendation.ClusterID.Equals(a[1].ID);
 
                 recommendation = recommendationsOfA1.FirstOrDefault();
 
-                bool validForA1 = recommendation.CandidateID.Equals(i[4].ID) 
+                bool validForA1 = recommendation.CandidateID.Equals(i[4].ID)
                                && recommendation.ClusterID.Equals(a[1].ID);
 
                 bool validForA2 = recommendationsOfA2.Count() == 0;
@@ -846,8 +881,121 @@ namespace SEE.Tools.Architecture
                 bool validForA1 = recommendationsOfA1.Count() == 0;
 
                 return validForD && validForA1 && validForA1;
-            } 
+            }
             #endregion
+        }
+
+        [Test]
+        public void TestADCAttractHierarchical()
+        {
+            (int, int)[] edgesFromTo = {(1,2),(2,1)}; // allow birectional dependencies
+
+            this.AddArchitecture(numberNodes: 2, edgesFromTo: edgesFromTo);
+
+            edgesFromTo = new (int, int)[]
+            {
+                (1,2), (1,11), (11,1), // training edges  
+                (3,8), (5,10), // incoming edges of candidate tree
+                (7,3), (8,4), (9,6), // outgoing edges of candidate tree 
+            };
+
+            this.AddImplementation(numberNodes: 11, edgesFromTo);
+
+            edgesFromTo = new (int, int)[]
+            {
+                (4,3),(5,3),(6,4), // mapped tree
+                (8,7),(9,7),(10,9) // candidate tree
+            };
+
+            this.AddHierarchy(edgesFromTo, ReflexionSubgraphs.Implementation);
+
+            this.nodeReader = new NodeReaderTest();
+            SetupADCAttract(this.nodeReader, Document.DocumentMergingType.Intersection);
+
+            // setup initial mapping to train the abstract dependencies:
+            // doc(A1 -> A1) = {w1}
+            // doc(A1 -> A2) = {w2}
+            this.AddToMapping(i[1], a[1]);
+            this.AddToMapping(i[2], a[1]);
+            this.AddToMapping(i[11], a[2]);
+
+            this.AddToMapping(i[3], a[1]);
+
+            // every edge in subtree should be overlapping by 1
+            void runAsserts(int archIndex)
+            {
+                Assert.AreEqual(5, this.candidateRecommendation.AttractFunction.GetAttractionValue(i[7], a[archIndex]));
+                Assert.AreEqual(2, this.candidateRecommendation.AttractFunction.GetAttractionValue(i[8], a[archIndex]));
+                Assert.AreEqual(2, this.candidateRecommendation.AttractFunction.GetAttractionValue(i[9], a[archIndex]));
+                Assert.AreEqual(1, this.candidateRecommendation.AttractFunction.GetAttractionValue(i[10], a[archIndex])); 
+            }
+            
+            runAsserts(1);
+            runAsserts(2);
+
+            this.AddToMapping(i[7], a[1]);
+            this.RemoveFromMapping(i[7]);
+
+            runAsserts(1);
+            runAsserts(2);
+
+            this.AddToMapping(i[7], a[2]);
+            this.RemoveFromMapping(i[7]);
+
+            runAsserts(1);
+            runAsserts(2);
+        }
+
+        /**
+         * TODO: cite source of this Testcase
+         * */
+        [Test]
+        public void TestCountAttractHierarchical()
+        {
+            (int, int)[] edgesFromTo =
+            {
+                (2, 1),(2,3)
+            };
+
+            this.AddArchitecture(numberNodes: 3, edgesFromTo: edgesFromTo);
+
+            edgesFromTo = new (int, int)[]
+            {
+               (5,1),(6,3),(6,2),(6,5),(6,8)
+            };
+
+            this.AddImplementation(numberNodes: 8, edgesFromTo);
+
+            edgesFromTo = new (int, int)[]
+            {
+                (2,1),(3,1),(5,4),(6,4),(8,7)
+            };
+
+            this.AddHierarchy(edgesFromTo, ReflexionSubgraphs.Implementation);
+
+            edgesFromTo = new (int, int)[]
+            {
+                (6,2), (6,3), (6,8)
+            };
+
+            this.OverrideDefaultEdgeType(edgesFromTo, ReflexionSubgraphs.Implementation, "Use");
+
+            Dictionary<string, double> edgeWeights = new Dictionary<string, double>()
+            {
+                { "Use", 2.0 }
+            };
+
+            SetupCountAttract(phi: 1.0f, edgeWeights);
+
+            // Initial Mapping
+            this.AddToMapping(i[1], a[1]);
+            this.AddToMapping(i[7], a[3]);
+
+            Assert.AreEqual(5, this.candidateRecommendation.AttractFunction.GetAttractionValue(i[4], a[1]));
+
+            this.RemoveFromMapping(i[1]);
+
+            Assert.AreEqual(0, this.candidateRecommendation.AttractFunction.GetAttractionValue(i[4], a[1]));
         }
     }
 }
