@@ -182,7 +182,7 @@ namespace SEE.Game.City
             try
             {
                 using (LoadingSpinner.ShowDeterminate($"Loading city \"{gameObject.name}\"",
-                           out Action<float> reportProgress))
+                                                      out Action<float> reportProgress))
                 {
                     Debug.Log("Loading graph series from provider");
 
@@ -211,7 +211,7 @@ namespace SEE.Game.City
                     }
                     else
                     {
-                        Debug.LogWarning("Could not load graph because the provider pipeline didn't yield any graphs.");
+                        Debug.LogWarning("Could not load graph because the provider pipeline did not yield any graphs.");
                     }
                 }
             }
