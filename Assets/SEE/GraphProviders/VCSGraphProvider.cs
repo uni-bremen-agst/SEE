@@ -15,7 +15,6 @@ using UnityEngine;
 using SEE.Scanner;
 using System.Threading;
 using Microsoft.Extensions.FileSystemGlobbing;
-using SEE.Utils;
 
 namespace SEE.GraphProviders
 {
@@ -28,7 +27,7 @@ namespace SEE.GraphProviders
     /// well as from the version control system, such as number of developers,
     /// number of commits, or code churn.
     /// </summary>
-    public class VCSGraphProvider : GraphProvider
+    public class VCSGraphProvider : SingleGraphProvider
     {
         /// <summary>
         /// The path to the git repository.
@@ -62,9 +61,9 @@ namespace SEE.GraphProviders
             { "**/*", true }
         };
 
-        public override GraphProviderKind GetKind()
+        public override SingleGraphProviderKind GetKind()
         {
-            return GraphProviderKind.VCS;
+            return SingleGraphProviderKind.VCS;
         }
 
         /// <summary>

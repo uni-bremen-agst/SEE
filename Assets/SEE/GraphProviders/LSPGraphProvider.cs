@@ -22,7 +22,7 @@ namespace SEE.GraphProviders
     /// <summary>
     /// A graph provider that uses a language server to create a graph.
     /// </summary>
-    public class LSPGraphProvider : GraphProvider
+    public class LSPGraphProvider : SingleGraphProvider
     {
         /// <summary>
         /// The path to the software project for which the graph shall be generated.
@@ -206,9 +206,9 @@ namespace SEE.GraphProviders
         /// </summary>
         private void SetLSPServerPath() => ServerPath = GetExecutablePath();
 
-        public override GraphProviderKind GetKind()
+        public override SingleGraphProviderKind GetKind()
         {
-            return GraphProviderKind.LSP;
+            return SingleGraphProviderKind.LSP;
         }
 
         public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,

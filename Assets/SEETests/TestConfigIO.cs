@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
+using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.GraphProviders;
@@ -685,22 +686,7 @@ namespace SEE.Utils
         private static void SEEEvolutionCityAttributesAreEqual(SEECityEvolution expected, SEECityEvolution actual)
         {
             AbstractSEECityAttributesAreEqual(expected, actual);
-            AreEqual(expected.GXLDirectory, actual.GXLDirectory);
-            Assert.AreEqual(expected.MaxRevisionsToLoad, actual.MaxRevisionsToLoad);
-        }
-
-        /// <summary>
-        /// Checks whether <paramref name="actual"/> has the same values as <paramref name="expected"/>.
-        /// </summary>
-        /// <param name="expected">expected values</param>
-        /// <param name="actual">actual values</param>
-        private static void AreEqual(MarkerAttributes expected, MarkerAttributes actual)
-        {
-            Assert.AreEqual(expected.MarkerHeight, actual.MarkerHeight);
-            Assert.AreEqual(expected.MarkerWidth, actual.MarkerWidth);
-            AreEqual(expected.AdditionBeamColor, actual.AdditionBeamColor);
-            AreEqual(expected.ChangeBeamColor, actual.ChangeBeamColor);
-            AreEqual(expected.DeletionBeamColor, actual.DeletionBeamColor);
+            TestGraphProviderIO.AreEqual(expected.DataProvider, actual.DataProvider);
         }
 
         /// <summary>
@@ -720,6 +706,21 @@ namespace SEE.Utils
             AreEqualEdgeSelectionSettings(expected.EdgeSelectionSettings, actual.EdgeSelectionSettings);
             AreEqualErosionSettings(expected.ErosionSettings, actual.ErosionSettings);
             AreEqualCoseGraphSettings(expected.CoseGraphSettings, actual.CoseGraphSettings);
+            AreEqual(expected.MarkerAttributes, actual.MarkerAttributes);
+        }
+
+        /// <summary>
+        /// Checks whether <paramref name="actual"/> has the same values as <paramref name="expected"/>.
+        /// </summary>
+        /// <param name="expected">expected values</param>
+        /// <param name="actual">actual values</param>
+        private static void AreEqual(MarkerAttributes expected, MarkerAttributes actual)
+        {
+            Assert.AreEqual(expected.MarkerHeight, actual.MarkerHeight);
+            Assert.AreEqual(expected.MarkerWidth, actual.MarkerWidth);
+            AreEqual(expected.AdditionBeamColor, actual.AdditionBeamColor);
+            AreEqual(expected.ChangeBeamColor, actual.ChangeBeamColor);
+            AreEqual(expected.DeletionBeamColor, actual.DeletionBeamColor);
         }
 
         /// <summary>
@@ -811,7 +812,7 @@ namespace SEE.Utils
         private static void WipeOutSEECityAttributes(SEECity city)
         {
             WipeOutAbstractSEECityAttributes(city);
-            city.DataProvider = new PipelineGraphProvider();
+            city.DataProvider = new SingleGraphPipelineProvider();
         }
 
         /// <summary>
@@ -873,8 +874,6 @@ namespace SEE.Utils
         private static void WipeOutSEEEvolutionCityAttributes(SEECityEvolution city)
         {
             WipeOutAbstractSEECityAttributes(city);
-            city.GXLDirectory.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gxl");
-            city.MaxRevisionsToLoad++;
         }
 
         /// <summary>

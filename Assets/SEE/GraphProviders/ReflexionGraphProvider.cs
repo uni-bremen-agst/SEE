@@ -20,7 +20,7 @@ namespace SEE.GraphProviders
     /// implementation, mapping).
     /// </summary>
     [Serializable]
-    public class ReflexionGraphProvider : GraphProvider
+    public class ReflexionGraphProvider : SingleGraphProvider
     {
         /// <summary>
         /// The path to the GXL file containing the architecture.
@@ -46,9 +46,9 @@ namespace SEE.GraphProviders
         [Tooltip("The name of the resulting reflexion city.")]
         public string CityName = "Reflexion Analysis";
 
-        public override GraphProviderKind GetKind()
+        public override SingleGraphProviderKind GetKind()
         {
-            return GraphProviderKind.Reflexion;
+            return SingleGraphProviderKind.Reflexion;
         }
 
         public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
