@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
@@ -43,40 +42,14 @@ namespace SEE.GraphProviders
         /// <param name="changePercentage">this callback will be called with
         /// the percentage (0–1) of completion of the pipeline</param>
         /// <param name="token">can be used to cancel the operation</param>
-        /// <returns></returns>
+        /// <returns>task that can be awaited</returns>
         /// <remarks>Exceptions may be thrown by each nested graph provider.</remarks>
         public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
-            Action<float> changePercentage = null,
-            CancellationToken token = default)
+                                                          Action<float> changePercentage = null,
+                                                          CancellationToken token = default)
         {
-            UniTask<Graph> initial = UniTask.FromResult(graph);
-            int count = -1; // -1 because the first provider will increment it to 0.
-            return await Pipeline.Aggregate(initial, (current, provider) =>
-                current.ContinueWith(g => provider.ProvideAsync(g, city, AggregatePercentage(), token)));
-
-            Action<float> AggregatePercentage()
-            {
-                // Counts the number of providers that have been executed so far.
-                count++;
-                // Each stage of the pipeline gets an equal share of the total percentage.
-                return percentage => changePercentage?.Invoke((count + percentage) / Pipeline.Count);
-            }
-        }
-
-        public override SingleGraphProviderKind GetKind()
-        {
-            return SingleGraphProviderKind.SinglePipeline;
-        }
-
-        protected override void SaveAttributes(ConfigWriter writer)
-        {
-            writer.BeginList(pipelineLabel);
-            foreach (SingleGraphProvider provider in Pipeline)
-            {
-                provider.Save(writer, "");
-            }
-
-            writer.EndList();
+            return await GraphProviderPipeline.AggregateAsync<SingleGraphProvider, Graph, SingleGraphProviderKind>
+                              (Pipeline, graph, city, changePercentage, token);
         }
 
         /// <summary>
@@ -84,6 +57,22 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="provider">graph provider to be added</param>
         internal void Add(SingleGraphProvider provider) => Pipeline.Add(provider);
+
+        public override SingleGraphProviderKind GetKind()
+        {
+            return SingleGraphProviderKind.SinglePipeline;
+        }
+
+        #region Config I/O
+        protected override void SaveAttributes(ConfigWriter writer)
+        {
+            writer.BeginList(pipelineLabel);
+            foreach (SingleGraphProvider provider in Pipeline)
+            {
+                provider.Save(writer, "");
+            }
+            writer.EndList();
+        }
 
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
@@ -103,10 +92,12 @@ namespace SEE.GraphProviders
                 catch (InvalidCastException e)
                 {
                     throw new InvalidCastException("Types are not assignment compatible."
-                                                   + $" Expected type: IList<{typeof(MultiGraphProvider)}>. Actual type: {v.GetType()}."
+                                                   + $" Expected type: IList<{typeof(SingleGraphProvider)}>. Actual type: {v.GetType()}."
                                                    + $" Original exception: {e.Message} {e.StackTrace}");
                 }
             }
         }
+
+        #endregion
     }
 }
