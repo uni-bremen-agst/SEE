@@ -10,8 +10,8 @@ using System.Threading;
 namespace SEE.GraphProviders
 {
     /// <summary>
-    /// Provides utility methods for aggregating the results of multiple
-    /// graph provider in a sequential pipeline.
+    /// Provides utility methods for multiple graph providers contained in a
+    /// sequential pipeline.
     /// </summary>
     internal static class GraphProviderPipeline
     {
