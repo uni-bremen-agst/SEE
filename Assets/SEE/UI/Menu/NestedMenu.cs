@@ -56,7 +56,7 @@ namespace SEE.UI.Menu
         /// Whether to reset the level of the menu when clicking on the close button.
         /// Can only be changed before this component has been started.
         /// </summary>
-        public bool ResetLevelOnClose = true;
+        public bool ResetLevelOnClose = false;
 
         /// <summary>
         /// All leaf-entries of the nestedMenu.

@@ -106,12 +106,12 @@ namespace SEE.Controls.Actions
               new("Show Code", "Display the source code of a node.",
                   Color.black, "Materials/ModernUIPack/Document",
                   ShowCodeAction.CreateReversibleAction);
-
+            /*
             Draw =
               new("Draw", "Draw a line",
                   Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                   DrawAction.CreateReversibleAction);
-
+            */
             AcceptDivergence =
               new("Accept Divergence", "Accept a diverging edge into the architecture",
                   Color.grey.Darker(), "Materials/ModernUIPack/Arrow Bold",
