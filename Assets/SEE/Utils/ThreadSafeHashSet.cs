@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
@@ -9,7 +8,7 @@ namespace SEE.Utils
     /// A thread-safe hash set.
     /// </summary>
     /// <typeparam name="T">the element type of the set</typeparam>
-    public class ThreadSafeHashSet<T> : IEnumerable
+    public class ThreadSafeHashSet<T> : IEnumerable<T>
     {
         /// <summary>
         /// Content of the set.
@@ -40,9 +39,10 @@ namespace SEE.Utils
         /// The elements of the set as an <see cref="IEnumerable{T}"/>.
         /// </summary>
         /// <returns>elements of the set</returns>
-        public IEnumerable<T> ToList()
+
+        IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {
-            return content.Keys;
+            return content.Keys.GetEnumerator();
         }
 
         /// <summary>
