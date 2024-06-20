@@ -219,7 +219,7 @@ namespace SEE.GraphProviders
                 }
                 {
                     Assert.IsTrue(node.TryGetInt(DataModel.DG.VCS.NumberOfDevelopers, out int value));
-                    Assert.AreEqual(3, value);
+                    Assert.AreEqual(4, value);
                 }
                 {
                     Assert.IsTrue(node.TryGetInt(DataModel.DG.VCS.CommitFrequency, out int value));
