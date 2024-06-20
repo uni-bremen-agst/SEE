@@ -15,7 +15,7 @@ namespace SEE.GraphProviders
     /// (or a list of graphs) by implementing the method
     /// <see cref="ProvideAsync(x,AbstractSEECity,Action{float},CancellationToken)"/>.
     ///
-    /// It is not recomended to inhert a class directly from <see cref="GraphProvider"/>.
+    /// It is not recomended to inherit a class directly from <see cref="GraphProvider"/>.
     /// Instead, you should use <see cref="SingleGraphProvider"/> and <see cref="MultiGraphProvider"/>.
     /// </summary>
     /// <typeparam name="T">The type of data which should be provided (e.g. a single <see cref="Graph"/> for
