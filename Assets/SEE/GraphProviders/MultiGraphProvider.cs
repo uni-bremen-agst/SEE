@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
 using SEE.DataModel.DG;
-using SEE.Game.City;
 using SEE.Utils.Config;
 
 namespace SEE.GraphProviders
 {
     /// <summary>
-    /// MultiGraphProvider is a graph provider for returning a series of graphs for an evolution city.
-    ///
-    /// This provider will be used in <see cref="SEECityEvolution"/>
+    /// MultiGraphProvider is a graph provider for returning a series of graphs (e.g., for an evolution city).
     /// </summary>
     public abstract class MultiGraphProvider : GraphProvider<List<Graph>, MultiGraphProviderKind>
     {
@@ -32,7 +29,6 @@ namespace SEE.GraphProviders
                 throw new Exception($"A graph provider could not be found under the label {label}.");
             }
         }
-
 
         /// <summary>
         /// Restores the graph provider's attributes from <paramref name="values"/>.
