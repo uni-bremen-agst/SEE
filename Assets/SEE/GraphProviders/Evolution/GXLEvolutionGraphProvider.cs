@@ -21,7 +21,7 @@ namespace SEE.GraphProviders
         /// <summary>
         /// The directory where the GXL file are stored.
         /// </summary>
-        [ShowInInspector, Tooltip("Path to the git repository."), HideReferenceObjectPicker]
+        [ShowInInspector, Tooltip("Path to the directory containing the GXL files."), HideReferenceObjectPicker]
         public DirectoryPath GXLDirectory = new();
 
         /// <summary>
