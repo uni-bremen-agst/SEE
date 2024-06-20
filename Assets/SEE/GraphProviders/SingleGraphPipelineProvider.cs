@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -15,11 +14,6 @@ namespace SEE.GraphProviders
     /// </summary>
     public class SingleGraphPipelineProvider : SingleGraphProvider
     {
-        /// <summary>
-        /// The label for <see cref="Pipeline"/> in the configuration file.
-        /// </summary>
-        protected const string pipelineLabel = "pipeline";
-
         /// <summary>
         /// The list of nested providers in this pipeline. These will be executed
         /// from first to last.
@@ -66,36 +60,13 @@ namespace SEE.GraphProviders
         #region Config I/O
         protected override void SaveAttributes(ConfigWriter writer)
         {
-            writer.BeginList(pipelineLabel);
-            foreach (SingleGraphProvider provider in Pipeline)
-            {
-                provider.Save(writer, "");
-            }
-            writer.EndList();
+            GraphProviderPipeline.SaveAttributes<SingleGraphProvider, Graph, SingleGraphProviderKind>(Pipeline, writer);
         }
 
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
-            if (attributes.TryGetValue(pipelineLabel, out object v))
-            {
-                try
-                {
-                    IList items = (IList)v;
-                    Pipeline.Clear();
-                    foreach (object item in items)
-                    {
-                        Dictionary<string, object> dict = (Dictionary<string, object>)item;
-                        SingleGraphProvider provider = SingleGraphProvider.RestoreProvider(dict);
-                        Pipeline.Add(provider);
-                    }
-                }
-                catch (InvalidCastException e)
-                {
-                    throw new InvalidCastException("Types are not assignment compatible."
-                                                   + $" Expected type: IList<{typeof(SingleGraphProvider)}>. Actual type: {v.GetType()}."
-                                                   + $" Original exception: {e.Message} {e.StackTrace}");
-                }
-            }
+            GraphProviderPipeline.RestoreAttributes<SingleGraphProvider, Graph, SingleGraphProviderKind>
+                                      (Pipeline, attributes, SingleGraphProvider.RestoreProvider);
         }
 
         #endregion

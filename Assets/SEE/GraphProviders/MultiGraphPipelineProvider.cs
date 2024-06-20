@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -63,10 +62,6 @@ namespace SEE.GraphProviders
         }
 
         #region Config I/O
-        /// <summary>
-        /// The label for <see cref="Pipeline"/> in the configuration file.
-        /// </summary>
-        private const string pipelineLabel = "pipeline";
 
         /// <summary>
         /// Saves the attributes to the config writer <paramref name="writer"/>
@@ -74,12 +69,7 @@ namespace SEE.GraphProviders
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes to</param>
         protected override void SaveAttributes(ConfigWriter writer)
         {
-            writer.BeginList(pipelineLabel);
-            foreach (MultiGraphProvider provider in Pipeline)
-            {
-                provider.Save(writer, "");
-            }
-            writer.EndList();
+            GraphProviderPipeline.SaveAttributes<MultiGraphProvider, List<Graph>, MultiGraphProviderKind>(Pipeline, writer);
         }
 
         /// <summary>
@@ -89,26 +79,9 @@ namespace SEE.GraphProviders
         /// <exception cref="InvalidCastException">If some types don't match in the config file</exception>
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
-            if (attributes.TryGetValue(pipelineLabel, out object v))
-            {
-                try
-                {
-                    IList items = (IList)v;
-                    Pipeline.Clear();
-                    foreach (object item in items)
-                    {
-                        Dictionary<string, object> dict = (Dictionary<string, object>)item;
-                        MultiGraphProvider provider = MultiGraphProvider.RestoreProvider(dict);
-                        Pipeline.Add(provider);
-                    }
-                }
-                catch (InvalidCastException e)
-                {
-                    throw new InvalidCastException("Types are not assignment compatible."
-                                                   + $" Expected type: IList<{typeof(MultiGraphProvider)}>. Actual type: {v.GetType()}."
-                                                   + $" Original exception: {e.Message} {e.StackTrace}");
-                }
-            }
+            GraphProviderPipeline.RestoreAttributes<MultiGraphProvider, List<Graph>, MultiGraphProviderKind>
+                          (Pipeline, attributes, MultiGraphProvider.RestoreProvider);
+
         }
         #endregion
     }
