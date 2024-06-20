@@ -687,21 +687,6 @@ namespace SEE.Utils
         {
             AbstractSEECityAttributesAreEqual(expected, actual);
             TestGraphProviderIO.AreEqual(expected.DataProvider, actual.DataProvider);
-            //Assert.AreEqual(expected.MaxRevisionsToLoad, actual.MaxRevisionsToLoad);
-        }
-
-        /// <summary>
-        /// Checks whether <paramref name="actual"/> has the same values as <paramref name="expected"/>.
-        /// </summary>
-        /// <param name="expected">expected values</param>
-        /// <param name="actual">actual values</param>
-        private static void AreEqual(MarkerAttributes expected, MarkerAttributes actual)
-        {
-            Assert.AreEqual(expected.MarkerHeight, actual.MarkerHeight);
-            Assert.AreEqual(expected.MarkerWidth, actual.MarkerWidth);
-            AreEqual(expected.AdditionBeamColor, actual.AdditionBeamColor);
-            AreEqual(expected.ChangeBeamColor, actual.ChangeBeamColor);
-            AreEqual(expected.DeletionBeamColor, actual.DeletionBeamColor);
         }
 
         /// <summary>
@@ -721,6 +706,21 @@ namespace SEE.Utils
             AreEqualEdgeSelectionSettings(expected.EdgeSelectionSettings, actual.EdgeSelectionSettings);
             AreEqualErosionSettings(expected.ErosionSettings, actual.ErosionSettings);
             AreEqualCoseGraphSettings(expected.CoseGraphSettings, actual.CoseGraphSettings);
+            AreEqual(expected.MarkerAttributes, actual.MarkerAttributes);
+        }
+
+        /// <summary>
+        /// Checks whether <paramref name="actual"/> has the same values as <paramref name="expected"/>.
+        /// </summary>
+        /// <param name="expected">expected values</param>
+        /// <param name="actual">actual values</param>
+        private static void AreEqual(MarkerAttributes expected, MarkerAttributes actual)
+        {
+            Assert.AreEqual(expected.MarkerHeight, actual.MarkerHeight);
+            Assert.AreEqual(expected.MarkerWidth, actual.MarkerWidth);
+            AreEqual(expected.AdditionBeamColor, actual.AdditionBeamColor);
+            AreEqual(expected.ChangeBeamColor, actual.ChangeBeamColor);
+            AreEqual(expected.DeletionBeamColor, actual.DeletionBeamColor);
         }
 
         /// <summary>
