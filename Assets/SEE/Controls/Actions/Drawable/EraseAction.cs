@@ -1,3 +1,4 @@
+using Assets.SEE.Game.Drawable.ActionHelpers;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
@@ -61,9 +62,7 @@ namespace SEE.Controls.Actions.Drawable
             if (!Raycasting.IsMouseOverGUI())
             {
                 /// Block to get the drawable object to delete.
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
-                    Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                    GameFinder.HasDrawable(raycastHit.collider.gameObject))
+                if (Selector.SelectQueryHasDrawable(out RaycastHit raycastHit))
                 {
                     GameObject hitObject = raycastHit.collider.gameObject;
 
@@ -84,7 +83,7 @@ namespace SEE.Controls.Actions.Drawable
                     }
                 }
                 /// Completes this action run.
-                if (Input.GetMouseButtonUp(0))
+                if (Queries.MouseUp(MouseButton.Left))
                 {
                     CurrentState = IReversibleAction.Progress.Completed;
                     return true;

@@ -9,24 +9,23 @@ namespace SEE.Controls.Actions.Drawable
     public abstract class DrawableAction : AbstractPlayerAction
     {
         /// <summary>
-        ///  The canvas on which the drawables are displayed.
+        ///  The drawable surface on which the drawables are displayed.
         ///  Set by lazy initialization.
         /// </summary>
-        /// <remarks>There can only be one canvas in the scene.</remarks>
-        private static GameObject canvas;
+        private static GameObject surface;
 
         /// <summary>
-        /// The canvas on which the drawables are displayed.
+        /// The surface on which the drawables are displayed.
         /// </summary>
-        protected static GameObject Canvas
+        protected static GameObject Surface
         {
             get
             {
-                if (canvas == null)
+                if (surface == null)
                 {
-                    canvas = GameObject.Find("UI Canvas");
+                    surface = GameObject.Find("UI Canvas");
                 }
-                return canvas;
+                return surface;
             }
         }
     }

@@ -10,6 +10,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Utils.History;
+using Assets.SEE.Game.Drawable.ActionHelpers;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -74,9 +75,8 @@ namespace SEE.Controls.Actions.Drawable
                 /// Multiple line points may overlap, so it works with a list of nearest points.
                 /// The line is split at the found points, and sublines are created,
                 /// with their starting and ending points corresponding to the splitting point.
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !isActive &&
-                    Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                    GameFinder.HasDrawable(raycastHit.collider.gameObject))
+                if (Selector.SelectQueryHasDrawable(out RaycastHit raycastHit)
+                    && !isActive)
                 {
                     isActive = true;
                     GameObject hitObject = raycastHit.collider.gameObject;
@@ -105,7 +105,7 @@ namespace SEE.Controls.Actions.Drawable
                     }
                 }
                 /// This block completes the action.
-                if (Input.GetMouseButtonUp(0) && isActive)
+                if (Queries.MouseUp(MouseButton.Left) && isActive)
                 {
                     CurrentState = IReversibleAction.Progress.Completed;
                     return true;

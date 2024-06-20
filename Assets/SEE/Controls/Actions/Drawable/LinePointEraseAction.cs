@@ -1,3 +1,4 @@
+using Assets.SEE.Game.Drawable.ActionHelpers;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
@@ -78,9 +79,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// Multiple line points may overlap, so it works with a list of nearest points.
                 /// The line is split at the found points and the points will be removed. Sublines will be created,
                 /// with their starting and ending points corresponding to the nearest point of the removed point.
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
-                    Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                    GameFinder.HasDrawable(raycastHit.collider.gameObject))
+                if (Selector.SelectQueryHasDrawable(out RaycastHit raycastHit))
                 {
                     GameObject hitObject = raycastHit.collider.gameObject;
                     isActive = true;
@@ -103,7 +102,7 @@ namespace SEE.Controls.Actions.Drawable
                     }
                 }
                 /// This block completes the action.
-                if (Input.GetMouseButtonUp(0) && isActive)
+                if (Queries.MouseUp(MouseButton.Left) && isActive)
                 {
                     CurrentState = IReversibleAction.Progress.Completed;
                     return true;

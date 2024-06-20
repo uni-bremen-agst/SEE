@@ -110,8 +110,8 @@ namespace SEE.Game.Drawable
                 }
                 line.name = name;
             }
-            /// Sets up the drawable holder <see cref="DrawableHolder"/>.
-            DrawableHolder.Setup(drawable, out GameObject _, out GameObject attachedObjects);
+            /// Sets up the drawable holder <see cref="DrawableSetupManager"/>.
+            DrawableSetupManager.Setup(drawable, out GameObject _, out GameObject attachedObjects);
 
             /// Assign the line tag to the line object.
             line.tag = Tags.Line;

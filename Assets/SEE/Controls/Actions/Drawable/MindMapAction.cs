@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static SEE.UI.Menu.Drawable.MindMapMenu;
 using SEE.Utils.History;
+using Assets.SEE.Game.Drawable.ActionHelpers;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -160,7 +161,7 @@ namespace SEE.Controls.Actions.Drawable
                 switch (chosenOperation)
                 {
                     case Operation.None:
-                        if (Input.GetMouseButtonDown(0))
+                        if (Queries.LeftMouseDown())
                         {
                             ShowNotification.Info("Select an operation",
                                 "First you need to select an operation from the menu.");
@@ -250,15 +251,11 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>the success of the selection.</returns>
         private bool SelectPosition()
         {
-            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
-                && Raycasting.RaycastAnything(out RaycastHit raycastHit)
-                && (GameFinder.HasDrawable(raycastHit.collider.gameObject)
-                    || raycastHit.collider.gameObject.CompareTag(Tags.Drawable)))
+            if (Selector.SelectQueryHasOrIsDrawable(out RaycastHit raycastHit))
             {
                 MindMapMenu.Disable();
                 drawable = GameFinder.GetDrawable(raycastHit.collider.gameObject);
-                bool validState = CheckValid(GameFinder.GetAttachedObjectsObject(drawable));
-                if (validState)
+                if (CheckValid(GameFinder.GetAttachedObjectsObject(drawable)))
                 {
                     position = raycastHit.point;
                     progress = ProgressState.WaitForText;
@@ -302,8 +299,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void AddNode()
         {
-            string prefix = GetPrefix();
-            node = GameMindMap.Create(drawable, prefix, writtenText, position);
+            node = GameMindMap.Create(drawable, GetPrefix(), writtenText, position);
             if (chosenOperation == Operation.Theme)
             {
                 progress = ProgressState.Finish;
@@ -334,31 +330,30 @@ namespace SEE.Controls.Actions.Drawable
 
             /// This block is for the branch line preview.
             /// It draws the line from the origin of the node to the position of the mouse cursor.
-            if (!Input.GetMouseButton(0) && Raycasting.RaycastAnything(out RaycastHit raycast)
-                && node != null
-                && (raycast.collider.gameObject.CompareTag(Tags.Drawable)
-                  || GameFinder.HasDrawable(raycast.collider.gameObject)))
+            if (!Queries.MouseHold(MouseButton.Left) 
+                && Selector.SelectQueryHasOrIsWithoutMouse(out RaycastHit raycastHit)
+                && node != null)
             {
                 Vector3[] positions = new Vector3[2];
                 positions[0] = GameFinder.GetHighestParent(node).transform
-                    .InverseTransformPoint(NearestPoints.GetNearestPoint(node, raycast.point));
+                    .InverseTransformPoint(NearestPoints.GetNearestPoint(node, raycastHit.point));
                 positions[1] = GameFinder.GetHighestParent(node).transform
-                    .InverseTransformPoint(raycast.point);
+                    .InverseTransformPoint(raycastHit.point);
                 branchLineRenderer.positionCount = 2;
                 branchLineRenderer.SetPositions(positions);
             }
 
             /// This block is for the selection of a parent node.
             /// It will executed if the left mouse button will be clicked.
-            if (Input.GetMouseButtonDown(0) && node != null)
+            if (Queries.LeftMouseDown() && node != null)
             {
                 /// A node can only be chosen as a parent node if it is a Theme or Subtheme Node.
                 /// Additionally, the node must not choose itself.
-                if (Raycasting.RaycastAnything(out RaycastHit hit) &&
-                   hit.collider.gameObject.CompareTag(Tags.MindMapNode) &&
-                    (hit.collider.gameObject.name.StartsWith(ValueHolder.MindMapThemePrefix) ||
-                    hit.collider.gameObject.name.StartsWith(ValueHolder.MindMapSubthemePrefix)) &&
-                    hit.collider.gameObject != node
+                if (Raycasting.RaycastAnything(out RaycastHit hit) 
+                    && hit.collider.gameObject.CompareTag(Tags.MindMapNode) 
+                    && (hit.collider.gameObject.name.StartsWith(ValueHolder.MindMapThemePrefix) ||
+                        hit.collider.gameObject.name.StartsWith(ValueHolder.MindMapSubthemePrefix)) 
+                    && hit.collider.gameObject != node
                     && GameFinder.GetDrawable(hit.collider.gameObject).Equals(GameFinder.GetDrawable(node)))
                 {
                     Destroyer.Destroy(branchLine);

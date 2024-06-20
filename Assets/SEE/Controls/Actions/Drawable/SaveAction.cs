@@ -12,6 +12,7 @@ using UnityEngine.Events;
 using SEE.UI.Menu.Drawable;
 using SEE.Utils.Paths;
 using SEE.Utils.History;
+using Assets.SEE.Game.Drawable.ActionHelpers;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -109,7 +110,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     if (selectedDrawables.Count > 0)
                     {
-                        browser = Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                        browser = Surface.AddOrGetComponent<DrawableFileBrowser>();
                         if (selectedDrawables.Count == 1)
                         {
                             browser.SaveDrawableConfiguration(SaveState.One);
@@ -140,7 +141,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 if (browser == null || (browser != null && !browser.IsOpen()))
                 {
-                    browser = Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                    browser = Surface.AddOrGetComponent<DrawableFileBrowser>();
                     browser.SaveDrawableConfiguration(SaveState.All);
                     List<GameObject> drawables = new(GameObject.FindGameObjectsWithTag(Tags.Drawable));
                     DrawableConfig[] configs = new DrawableConfig[drawables.Count];
@@ -171,7 +172,7 @@ namespace SEE.Controls.Actions.Drawable
                 DrawableSelection();
 
                 /// Needed for selecting multiple drawables to save.
-                if (Input.GetMouseButtonUp(0))
+                if (Queries.MouseUp(MouseButton.Left))
                 {
                     clicked = false;
                 }
@@ -212,28 +213,17 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void DrawableSelection()
         {
-            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
-                && !clicked && Raycasting.RaycastAnything(out RaycastHit hit)
-                && (GameFinder.HasDrawable(hit.collider.gameObject)
-                    || hit.collider.gameObject.CompareTag(Tags.Drawable))
+            if (Selector.SelectQueryHasOrIsDrawable(out RaycastHit raycastHit)
+                && !clicked
                 && (browser == null || (browser != null && !browser.IsOpen())))
             {
                 clicked = true;
-                GameObject drawable = hit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                    hit.collider.gameObject : GameFinder.GetDrawable(hit.collider.gameObject);
+                GameObject drawable = GameFinder.GetDrawable(raycastHit.collider.gameObject);
 
                 if (drawable.GetComponent<HighlightEffect>() == null)
                 {
                     selectedDrawables.Add(drawable);
-                    HighlightEffect effect = drawable.AddComponent<HighlightEffect>();
-                    effect.highlighted = true;
-                    effect.previewInEditor = false;
-                    effect.outline = 0;
-                    effect.glowQuality = HighlightPlus.QualityLevel.Highest;
-                    effect.glow = 1.0f;
-                    effect.glowHQColor = Color.yellow;
-                    effect.overlay = 1.0f;
-                    effect.overlayColor = Color.magenta;
+                    GameHighlighter.EnableGlowOverlay(drawable);
                 }
                 else
                 {

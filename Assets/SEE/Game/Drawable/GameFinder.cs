@@ -132,6 +132,17 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
+        /// Query wheter the given object is a drawable surface or
+        /// is located on one.
+        /// </summary>
+        /// <param name="obj">The object to be examined.</param>
+        /// <returns>true if the object is a drawable surface or if is located on one.</returns>
+        public static bool IsOrHasDrawable(GameObject obj)
+        {
+            return obj.CompareTag(Tags.Drawable) || HasDrawable(obj);
+        }
+
+        /// <summary>
         /// Query whether the given game object is part of a drawable.
         /// It is checked whether the highest game object in the hierarchy of
         /// the given game object contains a drawable child object.

@@ -62,8 +62,8 @@ namespace SEE.Game.Drawable
                 image.name = name;
             }
 
-            /// Sets up the drawable holder <see cref="DrawableHolder"/>.
-            DrawableHolder.Setup(drawable, out GameObject _, out GameObject attachedObjects);
+            /// Sets up the drawable holder <see cref="DrawableSetupManager"/>.
+            DrawableSetupManager.Setup(drawable, out GameObject _, out GameObject attachedObjects);
 
             /// Assign the image tag to the image object.
             image.tag = Tags.Image;

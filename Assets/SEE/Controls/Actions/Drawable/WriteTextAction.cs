@@ -10,6 +10,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Utils.History;
+using Assets.SEE.Game.Drawable.ActionHelpers;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -108,7 +109,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Awake();
             if (firstStart)
             {
-                Canvas.AddComponent<ValueResetter>().SetAllowedState(GetActionStateType());
+                Surface.AddComponent<ValueResetter>().SetAllowedState(GetActionStateType());
                 TextMenu.EnableForWriting();
                 firstStart = false;
             }
@@ -151,13 +152,9 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void GettingPosition()
         {
-            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
-                && Raycasting.RaycastAnything(out RaycastHit raycastHit)
-                && (GameFinder.HasDrawable(raycastHit.collider.gameObject)
-                    || raycastHit.collider.gameObject.CompareTag(Tags.Drawable)))
+            if (Selector.SelectQueryHasOrIsDrawable(out RaycastHit raycastHit))
             {
-                drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                    raycastHit.collider.gameObject : GameFinder.GetDrawable(raycastHit.collider.gameObject);
+                drawable = GameFinder.GetDrawable(raycastHit.collider.gameObject);
                 position = raycastHit.point;
                 progress = ProgressState.GettingText;
                 writeTextDialog = new WriteEditTextDialog();

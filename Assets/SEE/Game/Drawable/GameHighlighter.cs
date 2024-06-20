@@ -11,11 +11,11 @@ namespace SEE.Game.Drawable
     public static class GameHighlighter
     {
         /// <summary>
-        /// Enables the highlight effect for the given <paramref name="obj"/>
+        /// Enables the highlight glow and outline effect for the given <paramref name="obj"/>
         /// </summary>
         /// <param name="obj">The object that should be highlighted.</param>
         /// <returns>The created highlight effect.</returns>
-        public static HighlightEffect Enable(GameObject obj)
+        public static HighlightEffect EnableGlowOutline(GameObject obj)
         {
             HighlightEffect effect = obj.AddOrGetComponent<HighlightEffect>();
             effect.highlighted = true;
@@ -27,6 +27,25 @@ namespace SEE.Game.Drawable
             effect.glow = 1.0f;
             effect.glowHQColor = Color.yellow;
 
+            return effect;
+        }
+
+        /// <summary>
+        /// Enables the highlight glow and overlay effect for the given <paramref name="obj"/>.
+        /// </summary>
+        /// <param name="obj">The object that should be highlighted.</param>
+        /// <returns>The created highlight effect.</returns>
+        public static HighlightEffect EnableGlowOverlay(GameObject obj)
+        {
+            HighlightEffect effect = obj.AddComponent<HighlightEffect>();
+            effect.highlighted = true;
+            effect.previewInEditor = false;
+            effect.outline = 0;
+            effect.glowQuality = HighlightPlus.QualityLevel.Highest;
+            effect.glow = 1.0f;
+            effect.glowHQColor = Color.yellow;
+            effect.overlay = 1.0f;
+            effect.overlayColor = Color.magenta;
             return effect;
         }
     }

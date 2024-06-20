@@ -8,7 +8,7 @@ namespace Assets.SEE.Game.Drawable.ActionHelpers
     /// <summary>
     /// This class provides methods to enable the collision detection and disable them.  
     /// </summary>
-    public static class CollisionDetectionEnabler
+    public static class CollisionDetectionManager
     {
         /// <summary>
         /// Enables the collision detection for the given object.
@@ -26,8 +26,17 @@ namespace Assets.SEE.Game.Drawable.ActionHelpers
         /// <param name="obj">The object for which collision detection should be deactivated.</param>
         public static void Disable(GameObject obj) 
         {
-            Destroyer.Destroy(obj.GetComponent<Rigidbody>());
-            Destroyer.Destroy(obj.GetComponent<CollisionController>());
+            if (obj != null)
+            {
+                if (obj.GetComponent<Rigidbody>() != null)
+                {
+                    Destroyer.Destroy(obj.GetComponent<Rigidbody>());
+                }
+                if (obj.GetComponent<CollisionController>() != null)
+                {
+                    Destroyer.Destroy(obj.GetComponent<CollisionController>());
+                }
+            }
         }
     }
 }

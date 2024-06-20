@@ -7,6 +7,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Utils.History;
+using Assets.SEE.Game.Drawable.ActionHelpers;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -51,8 +52,8 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (!Raycasting.IsMouseOverGUI())
             {
-                if (Input.GetMouseButtonDown(0) &&
-                    Raycasting.RaycastAnything(out RaycastHit raycastHit))
+                if (Queries.LeftMouseDown() 
+                    && Raycasting.RaycastAnything(out RaycastHit raycastHit))
                 {
                     GameObject hitObject = raycastHit.collider.gameObject;
 

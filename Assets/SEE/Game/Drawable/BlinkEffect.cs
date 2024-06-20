@@ -120,6 +120,18 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
+        /// Deactivate the blink effect of the given object.
+        /// </summary>
+        /// <param name="obj">The object which blink effect should be deactivated.</param>
+        public static void Deactivate(GameObject obj)
+        {
+            if (obj != null && obj.GetComponent<BlinkEffect>() != null)
+            {
+                obj.GetComponent<BlinkEffect>().Deactivate();
+            }
+        }
+
+        /// <summary>
         /// Executed upon assigning the component.
         /// It searches for a renderer, child renderers, or a highlight effect.
         /// If none of these components are present, a highlight effect is created,
@@ -155,7 +167,7 @@ namespace SEE.Game.Drawable
             else
             {
                 /// Creates a highlight effect, if none of the other cases apply.
-                highlight = GameHighlighter.Enable(obj);
+                highlight = GameHighlighter.EnableGlowOutline(obj);
             }
             loopOn = true;
             StartCoroutine(Blink());

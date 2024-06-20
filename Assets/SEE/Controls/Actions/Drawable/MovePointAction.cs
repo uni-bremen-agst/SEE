@@ -9,6 +9,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Utils.History;
+using Assets.SEE.Game.Drawable.ActionHelpers;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -157,10 +158,7 @@ namespace SEE.Controls.Actions.Drawable
             if (selectedLine != null && SEEInput.Cancel())
             {
                 ShowNotification.Info("Canceled", "The action was canceled by the user.");
-                if (selectedLine != null && selectedLine.GetComponent<BlinkEffect>() != null)
-                {
-                    selectedLine.GetComponent<BlinkEffect>().Deactivate();
-                }
+                BlinkEffect.Deactivate(selectedLine);
                 if (progressState != ProgressState.Finish && selectedLine != null)
                 {
                     GameObject drawable = GameFinder.GetDrawable(selectedLine);
@@ -181,9 +179,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void SelectLine()
         {
-            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
-                && Raycasting.RaycastAnything(out RaycastHit raycastHit)
-                && GameFinder.HasDrawable(raycastHit.collider.gameObject)
+            if (Selector.SelectQueryHasDrawable(out RaycastHit raycastHit)
                 && raycastHit.collider.gameObject.CompareTag(Tags.Line))
             {
                 selectedLine = raycastHit.collider.gameObject;
@@ -195,7 +191,7 @@ namespace SEE.Controls.Actions.Drawable
                 Indices = matchedIndices;
                 oldPointPosition = positionsList[Indices[0]];
             }
-            if (Input.GetMouseButtonUp(0) && selectedLine != null)
+            if (Queries.MouseUp(MouseButton.Left) && selectedLine != null)
             {
                 progressState = ProgressState.MovePoint;
             }
@@ -211,8 +207,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 if (Raycasting.RaycastAnything(out RaycastHit hit))
                 {
-                    if (hit.collider.gameObject.CompareTag(Tags.Drawable)
-                        || GameFinder.HasDrawable(hit.collider.gameObject))
+                    if (GameFinder.IsOrHasDrawable(hit.collider.gameObject))
                     {
                         newPointPosition = selectedLine.transform.InverseTransformPoint(hit.point);
                         GameMoveRotator.MovePoint(selectedLine, Indices, newPointPosition);
@@ -221,14 +216,15 @@ namespace SEE.Controls.Actions.Drawable
                     }
                 }
 
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)))
+                if (Queries.LeftMouseInteraction())
                 {
                     selectedLine.GetComponent<BlinkEffect>().Deactivate();
                 }
             }
             /// Left click when the desired point has been reached.
             /// Then the action will be completed in the next steps.
-            if (Input.GetMouseButtonUp(0) && selectedLine.GetComponent<BlinkEffect>() == null)
+            if (Queries.MouseUp(MouseButton.Left) 
+                && selectedLine.GetComponent<BlinkEffect>() == null)
             {
                 progressState = ProgressState.Finish;
                 GameMoveRotator.MovePoint(selectedLine, Indices, newPointPosition);
@@ -244,10 +240,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Stop()
         {
             base.Stop();
-            if (selectedLine != null && selectedLine.GetComponent<BlinkEffect>() != null)
-            {
-                selectedLine.GetComponent<BlinkEffect>().Deactivate();
-            }
+            BlinkEffect.Deactivate(selectedLine);
 
             if (progressState != ProgressState.Finish && selectedLine != null)
             {

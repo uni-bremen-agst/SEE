@@ -20,14 +20,14 @@ namespace Assets.SEE.Game.Drawable.ActionHelpers
         /// <param name="selectedObj">The object for the selected object.</param>
         /// <param name="oldSelectedObj">The object of the previous selected object.</param>
         /// <param name="mouseWasReleased">The state, if the mouse was released.</param>
-        /// <param name="Canvas">The canvas of the executed drawable action.</param>
+        /// <param name="Surface">The drawable surface of the executed drawable action.</param>
         /// <param name="hasDrawable">Status indicating whether the hasDrawable check should be performed.</param>
         /// <param name="isDrawableType">Status indicating whether the hasDrawable check should be performed.</param>
         /// <param name="collisionDetection">Check whether the tag of the selected object should be a <see cref="DrawableType"> tag.</param>
         /// <param name="action">The action to be taken if data needs to be reset after an action change.</param>
         /// <param name="setOldObject">Status indicating whether the previously selected object should be set.</param>
         /// <returns>Status indicating whether the selection was successful or not.</returns>
-        public static bool SelectObject(ref GameObject selectedObj, ref GameObject oldSelectedObj, ref bool mouseWasReleased, GameObject Canvas, 
+        public static bool SelectObject(ref GameObject selectedObj, ref GameObject oldSelectedObj, ref bool mouseWasReleased, GameObject Surface, 
             bool hasDrawable, bool isDrawableType, bool collisionDetection = false, ActionStateType action = null, bool setOldObject = true)
         {
             if (Queries.LeftMouseInteraction()
@@ -52,13 +52,13 @@ namespace Assets.SEE.Game.Drawable.ActionHelpers
                 /// If the action should reset after changing the actions.
                 if (action != null)
                 {
-                    Canvas.AddOrGetComponent<ValueResetter>().SetAllowedState(action);
+                    Surface.AddOrGetComponent<ValueResetter>().SetAllowedState(action);
                 }
 
                 /// The rigidbody and the collision controller are needed to detect a collision with a border.
                 if (collisionDetection)
                 {
-                    CollisionDetectionEnabler.Enable(selectedObj);
+                    CollisionDetectionManager.Enable(selectedObj);
                 }
                 return true;
             }
@@ -66,38 +66,77 @@ namespace Assets.SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
-        /// Selects an object if it is placed on a drawable.
+        /// Selects an object if it is placed on a drawable surface.
         /// </summary>
-        /// <param name="hitObject">The selected object</param>
+        /// <param name="raycastHit">The detected <see cref="RaycastHit">.</param>
         /// <returns>Status indicating whether the selection was successful or not.</returns>
-        public static bool SelectQueryHasDrawable(out GameObject hitObject)
+        public static bool SelectQueryHasDrawable(out RaycastHit raycastHit)
         {
             if (Queries.LeftMouseInteraction()
-                && Raycasting.RaycastAnything(out RaycastHit raycastHit)
-                && GameFinder.HasDrawable(raycastHit.collider.gameObject)) 
+                && Raycasting.RaycastAnything(out RaycastHit hit)
+                && GameFinder.HasDrawable(hit.collider.gameObject)) 
             {
-                hitObject = raycastHit.collider.gameObject;
+                raycastHit = hit;
                 return true;
             }
-            hitObject = null;
+            raycastHit = new RaycastHit();
+            return false;
+        }
+
+        /// <summary>
+        /// Selects an object if it is placed on a drawable surface.
+        /// </summary>
+        /// <param name="raycastHit">The detected <see cref="RaycastHit">.</param>
+        /// <param name="leftMouseButton">Status indicating whether the left or right mouse button should be used.</param>
+        /// <param name="onlyLeftDown">True if only the down click should be registered. Not holding them.</param>
+        /// <returns>Status indicating whether the selection was successful or not.</returns>
+        public static bool SelectQueryHasOrIsDrawable(out RaycastHit raycastHit, bool leftMouseButton = true, bool onlyLeftDown = false)
+        {
+            if ((Queries.LeftMouseInteraction() && leftMouseButton && !onlyLeftDown
+                 || Queries.LeftMouseDown() && leftMouseButton && onlyLeftDown
+                 || Queries.RightMouseInteraction() && !leftMouseButton)
+                && Raycasting.RaycastAnything(out RaycastHit hit)
+                && GameFinder.IsOrHasDrawable(hit.collider.gameObject))
+            {
+                raycastHit = hit;
+                return true;
+            }
+            raycastHit = new RaycastHit();
             return false;
         }
 
         /// <summary>
         /// Selects an object if it has a tag of a <see cref="DrawableType">.
         /// </summary>
-        /// <param name="hitObject">The selected object</param>
+        /// <param name="raycastHit">The detected <see cref="RaycastHit">.</param>
         /// <returns>Status indicating whether the selection was successful or not.</returns>
-        public static bool SelectQueryIsDrawableType(out GameObject hitObject)
+        public static bool SelectQueryIsDrawableType(out RaycastHit raycastHit)
         {
             if (Queries.LeftMouseInteraction()
-                && Raycasting.RaycastAnything(out RaycastHit raycastHit)
-                && Tags.DrawableTypes.Contains(raycastHit.collider.gameObject.tag))
+                && Raycasting.RaycastAnything(out RaycastHit hit)
+                && Tags.DrawableTypes.Contains(hit.collider.gameObject.tag))
             {
-                hitObject = raycastHit.collider.gameObject;
+                raycastHit = hit;
                 return true;
             }
-            hitObject = null;
+            raycastHit = new RaycastHit();
+            return false;
+        }
+
+        /// <summary>
+        /// Selects an object if it is placed on a drawable surface without a mouse click.
+        /// </summary>
+        /// <param name="raycastHit">The detected <see cref="RaycastHit">.</param>
+        /// <returns>Status indicating whether the selection was successful or not.</returns>
+        public static bool SelectQueryHasOrIsWithoutMouse(out RaycastHit raycastHit)
+        {
+            if (Raycasting.RaycastAnything(out RaycastHit hit)
+                && GameFinder.IsOrHasDrawable(hit.collider.gameObject))
+            {
+                raycastHit = hit;
+                return true;
+            }
+            raycastHit = new RaycastHit();
             return false;
         }
     }

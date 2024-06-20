@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using SEE.Utils.History;
+using Assets.SEE.Game.Drawable.ActionHelpers;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -122,10 +123,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 /// Block for initiating shape drawing.
                 /// All shapes, except for straight lines, are also completed within this block.
-                if (Input.GetMouseButtonDown(0) &&
-                    Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                    (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                    GameFinder.HasDrawable(raycastHit.collider.gameObject))
+                if (Selector.SelectQueryHasOrIsDrawable(out RaycastHit raycastHit, true, true)
                     && !drawing)
                 {
                     return ShapeDrawing(raycastHit);
@@ -147,12 +145,12 @@ namespace SEE.Controls.Actions.Drawable
                 /// Block for successfully completing the line.
                 /// It adds a final point to the line.
                 /// It requires a left-click with the left Ctrl key held down.
-                if (Input.GetMouseButtonUp(0) && Input.GetKey(KeyCode.LeftControl)
-                    && drawing && positions.Length > 0
+                if (Queries.MouseUp(MouseButton.Left) 
+                    && Input.GetKey(KeyCode.LeftControl)
+                    && drawing 
+                    && positions.Length > 0
                     && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
-                    && Raycasting.RaycastAnything(out RaycastHit hit)
-                    && (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                        GameFinder.HasDrawable(hit.collider.gameObject)))
+                    && Selector.SelectQueryHasOrIsWithoutMouse(out RaycastHit hit))
                 {
                     Vector3 newPosition = shape.transform.InverseTransformPoint(hit.point) - ValueHolder.DistanceToDrawable;
                     Vector3[] newPositions = new Vector3[positions.Length + 1];
@@ -169,8 +167,9 @@ namespace SEE.Controls.Actions.Drawable
 
                 /// Block for successfully completing the line without adding a new point.
                 /// It requires a wheel-click.
-                if (Input.GetMouseButtonUp(2)
-                    && drawing && positions.Length > 1
+                if (Queries.MouseUp(MouseButton.Middle)
+                    && drawing 
+                    && positions.Length > 1
                     && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line)
                 {
                     FinishDrawing();
@@ -203,7 +202,8 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (drawing && SEEInput.Cancel())
             {
-                ShowNotification.Info("Line-Shape drawing canceled.", "The drawing of the shape art line has been canceled.");
+                ShowNotification.Info("Line-Shape drawing canceled.", 
+                    "The drawing of the shape art line has been canceled.");
                 new EraseNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), shape.name).Execute();
                 Destroyer.Destroy(shape);
                 positions = new Vector3[1];
@@ -223,7 +223,8 @@ namespace SEE.Controls.Actions.Drawable
             {
                 if (shape.GetComponent<LineRenderer>().positionCount >= 3)
                 {
-                    ShowNotification.Info("Last point removed.", "The last placed point of the line has been removed.");
+                    ShowNotification.Info("Last point removed.", 
+                        "The last placed point of the line has been removed.");
                     LineRenderer renderer = shape.GetComponent<LineRenderer>();
                     renderer.positionCount -= 2;
                     positions = positions.ToList().GetRange(0, positions.Length - 1).ToArray();
@@ -232,7 +233,8 @@ namespace SEE.Controls.Actions.Drawable
                 }
                 else
                 {
-                    ShowNotification.Info("Line-Shape drawing canceled.", "The drawing of the shape art line has been canceled.");
+                    ShowNotification.Info("Line-Shape drawing canceled.", 
+                        "The drawing of the shape art line has been canceled.");
                     new EraseNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), shape.name).Execute();
                     Destroyer.Destroy(shape);
                     positions = new Vector3[1];
@@ -253,8 +255,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>Whatever the shape creation is completed.</returns>
         private bool ShapeDrawing(RaycastHit raycastHit)
         {
-            drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                        raycastHit.collider.gameObject : GameFinder.GetDrawable(raycastHit.collider.gameObject);
+            drawable = GameFinder.GetDrawable(raycastHit.collider.gameObject);
             drawing = true;
             Vector3 convertedHitPoint = GameDrawer.GetConvertedPosition(drawable, raycastHit.point);
 
@@ -370,14 +371,12 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void LineShapePreview()
         {
-            if (drawing && !Input.GetMouseButton(0) && !Input.GetMouseButtonDown(0) &&
-                    Raycasting.RaycastAnything(out RaycastHit rh) &&
-                    (rh.collider.gameObject.CompareTag(Tags.Drawable) ||
-                    GameFinder.HasDrawable(rh.collider.gameObject)) &&
-                    ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
-                    && (drawable == null || drawable != null && GameFinder.GetDrawable(rh.collider.gameObject).Equals(drawable)))
+            if (drawing && !Queries.LeftMouseInteraction() 
+                && Selector.SelectQueryHasOrIsWithoutMouse(out RaycastHit raycastHit)
+                && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
+                && Queries.DrawableSurfaceNullOrSame(drawable, raycastHit.collider.gameObject))
             {
-                Vector3 newPosition = shape.transform.InverseTransformPoint(rh.point) - ValueHolder.DistanceToDrawable;
+                Vector3 newPosition = shape.transform.InverseTransformPoint(raycastHit.point) - ValueHolder.DistanceToDrawable;
                 Vector3[] newPositions = new Vector3[positions.Length + 1];
                 Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
                 newPositions[^1] = newPosition;
@@ -393,14 +392,12 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void AddLineShapePoint()
         {
-            if (Input.GetMouseButtonDown(0) && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift) &&
-                Raycasting.RaycastAnything(out RaycastHit hit) &&
-                (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                GameFinder.HasDrawable(hit.collider.gameObject))
+            if (Queries.LeftMouseDown() && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift) 
+                && Selector.SelectQueryHasOrIsWithoutMouse(out RaycastHit raycastHit)
                 && drawing && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
-                && (drawable == null || drawable != null && GameFinder.GetDrawable(hit.collider.gameObject).Equals(drawable)))
+                && Queries.DrawableSurfaceNullOrSame(drawable, raycastHit.collider.gameObject))
             {
-                Vector3 newPosition = shape.transform.InverseTransformPoint(hit.point) - ValueHolder.DistanceToDrawable;
+                Vector3 newPosition = shape.transform.InverseTransformPoint(raycastHit.point) - ValueHolder.DistanceToDrawable;
                 if (newPosition != positions.Last())
                 {
                     Vector3[] newPositions = new Vector3[positions.Length + 1];

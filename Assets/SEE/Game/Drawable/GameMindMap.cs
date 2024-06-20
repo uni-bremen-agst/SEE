@@ -74,8 +74,8 @@ namespace SEE.Game.Drawable
                 node.name = name;
             }
 
-            /// Sets up the drawable holder <see cref="DrawableHolder"/>.
-            DrawableHolder.Setup(drawable, out GameObject _, out GameObject attachedObjects);
+            /// Sets up the drawable holder <see cref="DrawableSetupManager"/>.
+            DrawableSetupManager.Setup(drawable, out GameObject _, out GameObject attachedObjects);
 
             /// Assign the mind map node tag to the node object.
             node.tag = Tags.MindMapNode;

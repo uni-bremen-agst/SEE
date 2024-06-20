@@ -10,6 +10,7 @@ using UnityEngine;
 using SEE.Utils.History;
 using SEE.GO;
 using System;
+using Assets.SEE.Game.Drawable.ActionHelpers;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -105,7 +106,7 @@ namespace SEE.Controls.Actions.Drawable
                 showInfo = true;
                 ShowNotification.Info("Usage note", "Use the left mouse button to increase the layer." +
                     "\nUse the right mouse button to decrease the layer.");
-                Canvas.AddOrGetComponent<ValueResetter>().SetAllowedState(GetActionStateType());
+                Surface.AddOrGetComponent<ValueResetter>().SetAllowedState(GetActionStateType());
             }
         }
 
@@ -123,15 +124,15 @@ namespace SEE.Controls.Actions.Drawable
                     && GameFinder.HasDrawable(raycastHit.collider.gameObject)
                     && raycastHit.collider.gameObject.GetComponent<OrderInLayerValueHolder>() != null)
                 {
-                    if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)))
+                    if (Queries.LeftMouseInteraction())
                     {
                         CalcOrder(raycastHit.collider.gameObject, GameLayerChanger.LayerChangerStates.Increase);
-                    } else if (Input.GetMouseButtonDown(1) || Input.GetMouseButton(1)) {
+                    } else if (Queries.RightMouseInteraction()) {
                         CalcOrder(raycastHit.collider.gameObject, GameLayerChanger.LayerChangerStates.Decrease);
                     }
                 }
                 /// It completes the action after a layer change if the user releases the pressed mouse button.
-                if ((Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1)) && isInAction)
+                if ((Queries.MouseUp(MouseButton.Left) || Queries.MouseUp(MouseButton.Right)) && isInAction)
                 {
                     isInAction = false;
                     CurrentState = IReversibleAction.Progress.Completed;

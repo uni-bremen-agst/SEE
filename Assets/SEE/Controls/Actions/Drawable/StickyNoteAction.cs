@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using SEE.Utils.History;
 using UnityEngine.UIElements;
+using Assets.SEE.Game.Drawable.ActionHelpers;
+using MouseButton = Assets.SEE.Game.Drawable.ActionHelpers.MouseButton;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -303,7 +305,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void SpawnOnPosition()
         {
-            if (Input.GetMouseButtonDown(0) && !inProgress
+            if (Queries.LeftMouseDown() && !inProgress
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit))
             {
                 inProgress = true;
@@ -415,7 +417,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>true, if a sticky not was selected, Otherwise false</returns>
         private bool MoveSelection()
         {
-            if (Input.GetMouseButtonDown(0)
+            if (Queries.LeftMouseDown()
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit) && !inProgress
                 && (raycastHit.collider.gameObject.CompareTag(Tags.Drawable)
                     || GameFinder.HasDrawable(raycastHit.collider.gameObject)
@@ -505,7 +507,7 @@ namespace SEE.Controls.Actions.Drawable
                     newPos, eulerAngles).Execute();
 
                 /// Opens the move and rotation menu for fine-tuning.
-                if (Input.GetMouseButton(0))
+                if (Queries.MouseHold(MouseButton.Left))
                 {
                     GameFinder.GetDrawable(stickyNoteHolder).GetComponent<Collider>().enabled = true;
                     StickyNoteRotationMenu.Enable(stickyNoteHolder);
@@ -624,7 +626,7 @@ namespace SEE.Controls.Actions.Drawable
         /// False, if the update method should return false.</returns>
         private EditReturnState EditSelection()
         {
-            if (Input.GetMouseButtonDown(0)
+            if (Queries.LeftMouseDown()
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit)
                 && (raycastHit.collider.gameObject.CompareTag(Tags.Drawable)
                     || GameFinder.HasDrawable(raycastHit.collider.gameObject)
@@ -700,7 +702,7 @@ namespace SEE.Controls.Actions.Drawable
                 if (GameFinder.GetDrawableParentName(drawable).Contains(ValueHolder.StickyNotePrefix))
                 {
                     stickyNote = drawable.transform.parent.gameObject;
-                    GameHighlighter.Enable(stickyNote);
+                    GameHighlighter.EnableGlowOutline(stickyNote);
 
                     memento = new(DrawableConfigManager.GetDrawableConfig(drawable), selectedAction)
                     {

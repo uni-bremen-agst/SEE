@@ -1,3 +1,4 @@
+using Assets.SEE.Game.Drawable.ActionHelpers;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
@@ -138,12 +139,9 @@ namespace SEE.Controls.Actions.Drawable
                 /// This block draws the line when the left mouse button is held down.
                 /// Drawing is only possible when targeting a drawable or an object placed on a drawable,
                 /// and the drawable remains unchanged during drawing.
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !finishDrawing
-                    && Raycasting.RaycastAnything(out RaycastHit raycastHit)
-                    && (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                        GameFinder.HasDrawable(raycastHit.collider.gameObject))
-                    && (drawable == null || drawable != null
-                        && GameFinder.GetDrawable(raycastHit.collider.gameObject).Equals(drawable)))
+                if (Selector.SelectQueryHasOrIsDrawable(out RaycastHit raycastHit) 
+                    && !finishDrawing
+                    && Queries.DrawableSurfaceNullOrSame(drawable, raycastHit.collider.gameObject))
                 {
                     switch (progressState)
                     {
@@ -158,7 +156,8 @@ namespace SEE.Controls.Actions.Drawable
                 }
 
                 /// This block is executed when the drawing should be completed.
-                if ((Input.GetMouseButtonUp(0) || !Input.GetMouseButton(0)) && drawing)
+                if ((Queries.MouseUp(MouseButton.Left) || !Queries.MouseHold(MouseButton.Left)) 
+                    && drawing)
                 {
                     return FinishDrawing();
                 }
@@ -176,8 +175,7 @@ namespace SEE.Controls.Actions.Drawable
         private void StartDrawing(RaycastHit raycastHit)
         {
             /// Find the drawable for this line.
-            drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                    raycastHit.collider.gameObject : GameFinder.GetDrawable(raycastHit.collider.gameObject);
+            drawable = GameFinder.GetDrawable(raycastHit.collider.gameObject);
             drawing = true;
             progressState = ProgressState.Drawing;
             positions[0] = raycastHit.point;

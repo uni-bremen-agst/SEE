@@ -3,7 +3,7 @@
 namespace SEE.Game.Drawable.ValueHolders
 {
     /// <summary>
-    /// This class represents a line kind value holder component for the line gameobjects.
+    /// This class represents a value holder component for the line gameobjects.
     /// </summary>
     public class LineValueHolder : MonoBehaviour
     {

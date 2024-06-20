@@ -207,10 +207,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Stop()
         {
             base.Stop();
-            if (selectedObj != null && selectedObj.GetComponent<BlinkEffect>() != null)
-            {
-                selectedObj.GetComponent<BlinkEffect>().Deactivate();
-            }
+            BlinkEffect.Deactivate(selectedObj);
 
             if (cutCopyPasteMenu != null)
             {
@@ -313,7 +310,8 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void SelectObject()
         {
-            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, Canvas, false, true, false, GetActionStateType()))
+            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, Surface, 
+                false, true, false, GetActionStateType()))
             {
                 oldDrawable = GameFinder.GetDrawable(selectedObj);
                 oldValueHolder = DrawableType.Get(selectedObj);
@@ -323,16 +321,16 @@ namespace SEE.Controls.Actions.Drawable
                     newNodesBranchLineHolder = GameMindMap.SummarizeSelectedNodeIncChildren(selectedObj);
                 }
                 cutCopyPasteMenu = PrefabInstantiator.InstantiatePrefab(cutCopyPasteMenuPrefab,
-                                                                        Canvas.transform, false);
+                                                                        Surface.transform, false);
                 SetupButtons(cutCopyPasteMenu);
             }
 
-            if (Input.GetMouseButtonUp(0) && selectedObj == null)
+            if (Queries.MouseUp(MouseButton.Left) && selectedObj == null)
             {
                 mouseWasReleased = true;
             }
 
-            if (Input.GetMouseButtonUp(0) && selectedObj != null)
+            if (Queries.MouseUp(MouseButton.Left) && selectedObj != null)
             {
                 progressState = ProgressState.CutCopyPaste;
             }
@@ -347,17 +345,15 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void CutCopyPaste()
         {
-            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj != null
-                && selectedObj.GetComponent<BlinkEffect>() != null && state != CutCopy.None
-                && Raycasting.RaycastAnything(out RaycastHit hit)
-                && (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                     GameFinder.HasDrawable(hit.collider.gameObject)))
+            if (Selector.SelectQueryHasOrIsDrawable(out RaycastHit raycastHit) 
+                && selectedObj != null
+                && selectedObj.GetComponent<BlinkEffect>() != null 
+                && state != CutCopy.None)
             {
                 Destroyer.Destroy(cutCopyPasteMenu);
                 selectedObj.GetComponent<BlinkEffect>().Deactivate();
-                Vector3 newPosition = hit.point;
-                newDrawable = hit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                        hit.collider.gameObject : GameFinder.GetDrawable(hit.collider.gameObject);
+                Vector3 newPosition = raycastHit.point;
+                newDrawable = GameFinder.GetDrawable(raycastHit.collider.gameObject);
                 switch (DrawableType.Get(selectedObj))
                 {
                     case LineConf:
@@ -378,13 +374,13 @@ namespace SEE.Controls.Actions.Drawable
                 }
             }
 
-            if (Input.GetMouseButtonUp(0) && state != CutCopy.None && newObject != null
+            if (Queries.MouseUp(MouseButton.Left) && state != CutCopy.None && newObject != null
                 && progressState == ProgressState.CutCopyPaste)
             {
                 progressState = ProgressState.Finish;
             }
 
-            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && state == CutCopy.None)
+            if (Queries.LeftMouseInteraction() && state == CutCopy.None)
             {
                 SetToInitialState();
             }
@@ -396,10 +392,7 @@ namespace SEE.Controls.Actions.Drawable
         private void SetToInitialState()
         {
             Destroyer.Destroy(cutCopyPasteMenu);
-            if (selectedObj != null && selectedObj.GetComponent<BlinkEffect>() != null)
-            {
-                selectedObj.GetComponent<BlinkEffect>().Deactivate();
-            }
+            BlinkEffect.Deactivate(selectedObj);
             selectedObj = null;
             mouseWasReleased = false;
             editToOldBranchLine = false;

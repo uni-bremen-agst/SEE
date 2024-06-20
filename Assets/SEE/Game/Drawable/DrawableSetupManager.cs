@@ -6,11 +6,11 @@ using UnityEngine;
 namespace SEE.Game.Drawable
 {
     /// <summary>
-    /// This class adds a drawable holder to a drawable.
-    /// This is needed to place the objects on the drawable without them being influenced
-    /// by the scale of the drawable.
+    /// This class adds a parent object with an area for the <see cref="DrawableType"/> objects to a drawable surface.
+    /// This is needed to place the objects on the surface without them being influenced
+    /// by the scale of the surface.
     /// </summary>
-    public static class DrawableHolder
+    public static class DrawableSetupManager
     {
         /// <summary>
         /// Provides the drawable holder for a given drawable.

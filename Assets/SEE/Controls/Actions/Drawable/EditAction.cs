@@ -187,10 +187,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Stop()
         {
             base.Stop();
-            if (selectedObj != null && selectedObj.GetComponent<BlinkEffect>() != null)
-            {
-                selectedObj.GetComponent<BlinkEffect>().Deactivate();
-            }
+            BlinkEffect.Deactivate(selectedObj);
             if (progressState != ProgressState.Finish && selectedObj != null)
             {
                 GameObject drawable = GameFinder.GetDrawable(selectedObj);
@@ -242,10 +239,7 @@ namespace SEE.Controls.Actions.Drawable
             if (selectedObj != null && SEEInput.Cancel())
             {
                 ShowNotification.Info("Canceled", "The action was canceled by the user.");
-                if (selectedObj != null && selectedObj.GetComponent<BlinkEffect>() != null)
-                {
-                    selectedObj.GetComponent<BlinkEffect>().Deactivate();
-                }
+                BlinkEffect.Deactivate(selectedObj);
                 if (progressState != ProgressState.Finish && selectedObj != null)
                 {
                     GameObject drawable = GameFinder.GetDrawable(selectedObj);
@@ -272,14 +266,15 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void Selection()
         {
-            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, Canvas, false, true, false, GetActionStateType()))
+            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, Surface,
+                false, true, false, GetActionStateType()))
             {
                 oldValueHolder = DrawableType.Get(selectedObj);
                 newValueHolder = DrawableType.Get(selectedObj);
                 progressState = ProgressState.OpenEditMenu;
             }
 
-            if (Input.GetMouseButtonUp(0))
+            if (Queries.MouseUp(MouseButton.Left))
             {
                 mouseWasReleased = true;
             }
@@ -318,10 +313,11 @@ namespace SEE.Controls.Actions.Drawable
                     }
                     break;
                 default:
-                    ShowNotification.Info("Object type not recognized", "The menu cannot be opened because the type of the object was not recognized.");
+                    ShowNotification.Info("Object type not recognized", 
+                        "The menu cannot be opened because the type of the object was not recognized.");
                     break;
             }
-            if (Input.GetMouseButtonUp(0))
+            if (Queries.MouseUp(MouseButton.Left))
             {
                 progressState = ProgressState.Edit;
             }
@@ -334,7 +330,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void Edit()
         {
-            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
+            if (Queries.LeftMouseInteraction()
                 && selectedObj.GetComponent<BlinkEffect>() != null)
             {
                 selectedObj.GetComponent<BlinkEffect>().Deactivate();

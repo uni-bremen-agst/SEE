@@ -1,3 +1,4 @@
+using Assets.SEE.Game.Drawable.ActionHelpers;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
@@ -80,8 +81,9 @@ namespace SEE.Controls.Actions.Drawable
                 /// either into <see cref="ValueHolder.CurrentPrimaryColor"/> or
                 /// <see cref="ValueHolder.CurrentSecondaryColor"/>.
                 /// Subsequently, a memento is created, and the action process is completed.
-                if (((Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1)) && isInAction && !waitForHelperMenu) ||
-                    finishChosingMMColor)
+                if (((Queries.MouseUp(MouseButton.Left) || Queries.MouseUp(MouseButton.Right)) 
+                        && isInAction && !waitForHelperMenu) 
+                    || finishChosingMMColor)
                 {
                     if (!ColorPickerMenu.GetSwitchStatus())
                     {
@@ -119,12 +121,8 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void PickingPrimaryColor()
         {
-            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !isInAction
-                && Raycasting.RaycastAnything(out RaycastHit raycastHit)
-                && (GameFinder.HasDrawable(raycastHit.collider.gameObject) ||
-                    raycastHit.collider.gameObject.CompareTag(Tags.Drawable) &&
-                    GameFinder.GetHighestParent(raycastHit.collider.gameObject).name.
-                        StartsWith(ValueHolder.StickyNotePrefix)))
+            if (Selector.SelectQueryHasOrIsDrawable(out RaycastHit raycastHit) 
+                && !isInAction)
             {
                 isInAction = true;
                 GameObject hitObject = raycastHit.collider.gameObject;
@@ -160,15 +158,11 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void PickingSecondaryColor()
         {
-            if ((Input.GetMouseButtonDown(1) || Input.GetMouseButton(1)) && !isInAction
-                && Raycasting.RaycastAnything(out RaycastHit hit)
-                && (GameFinder.HasDrawable(hit.collider.gameObject) ||
-                    hit.collider.gameObject.CompareTag(Tags.Drawable) &&
-                    GameFinder.GetHighestParent(hit.collider.gameObject).name.
-                        StartsWith(ValueHolder.StickyNotePrefix)))
+            if (Selector.SelectQueryHasOrIsDrawable(out RaycastHit raycastHit, false)
+                && !isInAction)
             {
                 isInAction = true;
-                GameObject hitObject = hit.collider.gameObject;
+                GameObject hitObject = raycastHit.collider.gameObject;
 
                 switch (hitObject.tag)
                 {
@@ -215,7 +209,7 @@ namespace SEE.Controls.Actions.Drawable
 
             oldChosenPrimaryColor = ValueHolder.CurrentPrimaryColor;
             oldChosenSecondColor = ValueHolder.CurrentSecondaryColor;
-            Canvas.AddOrGetComponent<ColorPickerMenuDisabler>();
+            Surface.AddOrGetComponent<ColorPickerMenuDisabler>();
             ColorPickerMenu.Enable();
         }
 

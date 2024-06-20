@@ -13,6 +13,7 @@ using SEE.UI.PropertyDialog.Drawable;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.GO;
+using Assets.SEE.Game.Drawable.ActionHelpers;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -140,17 +141,12 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void SelectPosition()
         {
-            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
-                && Raycasting.RaycastAnything(out RaycastHit raycastHit)
-                && (GameFinder.HasDrawable(raycastHit.collider.gameObject)
-                    || raycastHit.collider.gameObject.CompareTag(Tags.Drawable))
+            if (Selector.SelectQueryHasOrIsDrawable(out RaycastHit raycastHit)
                 && !ImageSourceMenu.IsOpen()
-                && (browser == null
-                    || (browser != null && !browser.IsOpen())) &&
-                        (webImageDialog == null || (webImageDialog != null && !isDialogOpen)))
+                && (browser == null || (browser != null && !browser.IsOpen())) 
+                && (webImageDialog == null || (webImageDialog != null && !isDialogOpen)))
             {
-                drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                    raycastHit.collider.gameObject : GameFinder.GetDrawable(raycastHit.collider.gameObject);
+                drawable = GameFinder.GetDrawable(raycastHit.collider.gameObject);
                 position = raycastHit.point;
                 ImageSourceMenu.Enable();
             }
@@ -168,7 +164,7 @@ namespace SEE.Controls.Actions.Drawable
                 switch (source)
                 {
                     case ImageSourceMenu.Source.Local:
-                        browser = Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                        browser = Surface.AddOrGetComponent<DrawableFileBrowser>();
                         browser.LoadImage();
                         break;
                     case ImageSourceMenu.Source.Web:

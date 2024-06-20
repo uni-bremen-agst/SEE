@@ -13,6 +13,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using SEE.Utils.Paths;
 using SEE.Utils.History;
+using Assets.SEE.Game.Drawable.ActionHelpers;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -101,7 +102,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 if (browser == null || (browser != null && !browser.IsOpen()))
                 {
-                    browser = Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                    browser = Surface.AddOrGetComponent<DrawableFileBrowser>();
                     browser.LoadDrawableConfiguration(LoadState.Regular);
                     memento = new(LoadState.Regular);
                 }
@@ -113,7 +114,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     if (selectedDrawable != null)
                     {
-                        browser = Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                        browser = Surface.AddOrGetComponent<DrawableFileBrowser>();
                         browser.LoadDrawableConfiguration(LoadState.Specific);
                         memento = new(LoadState.Specific);
                     }
@@ -156,21 +157,18 @@ namespace SEE.Controls.Actions.Drawable
                 /// This block marks the selected drawable.
                 /// If it has already been selected, the marking is cleared.
                 /// For execution, no open file browser should exist.
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
-                    && !clicked && Raycasting.RaycastAnything(out RaycastHit hit) &&
-                    (GameFinder.HasDrawable(hit.collider.gameObject)
-                        || hit.collider.gameObject.CompareTag(Tags.Drawable))
+                if (Selector.SelectQueryHasOrIsDrawable(out RaycastHit raycastHit)
+                    && !clicked
                     && (browser == null || (browser != null && !browser.IsOpen())))
                 {
                     clicked = true;
-                    GameObject drawable = hit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                        hit.collider.gameObject : GameFinder.GetDrawable(hit.collider.gameObject);
+                    GameObject drawable = GameFinder.GetDrawable(raycastHit.collider.gameObject);
 
                     ManageHighlightEffect(drawable);
                 }
 
                 /// It is needed to enable the switching of the drawable for the specific load.
-                if (Input.GetMouseButtonUp(0))
+                if (Queries.MouseUp(MouseButton.Left))
                 {
                     clicked = false;
                 }
@@ -213,15 +211,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 selectedDrawable?.Destroy<HighlightEffect>();
                 selectedDrawable = drawable;
-                HighlightEffect effect = selectedDrawable.AddComponent<HighlightEffect>();
-                effect.highlighted = true;
-                effect.previewInEditor = false;
-                effect.outline = 0;
-                effect.glowQuality = HighlightPlus.QualityLevel.Highest;
-                effect.glow = 1.0f;
-                effect.glowHQColor = Color.yellow;
-                effect.overlay = 1.0f;
-                effect.overlayColor = Color.magenta;
+                GameHighlighter.EnableGlowOverlay(selectedDrawable);
             }
             else
             {

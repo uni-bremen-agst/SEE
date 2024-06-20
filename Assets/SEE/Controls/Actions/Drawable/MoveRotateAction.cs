@@ -170,21 +170,8 @@ namespace SEE.Controls.Actions.Drawable
         public override void Stop()
         {
             base.Stop();
-            if (selectedObject != null)
-            {
-                if (selectedObject.GetComponent<BlinkEffect>() != null)
-                {
-                    selectedObject.GetComponent<BlinkEffect>().Deactivate();
-                }
-                if (selectedObject.GetComponent<Rigidbody>() != null)
-                {
-                    Destroyer.Destroy(selectedObject.GetComponent<Rigidbody>());
-                }
-                if (selectedObject.GetComponent<CollisionController>() != null)
-                {
-                    Destroyer.Destroy(selectedObject.GetComponent<CollisionController>());
-                }
-            }
+            BlinkEffect.Deactivate(selectedObject);
+            CollisionDetectionManager.Disable(selectedObject);
             if (progressState != ProgressState.Finish && selectedObject != null)
             {
                 GameObject drawable = GameFinder.GetDrawable(selectedObject);
@@ -260,21 +247,8 @@ namespace SEE.Controls.Actions.Drawable
             if (selectedObject != null && SEEInput.Cancel())
             {
                 ShowNotification.Info("Canceled", "The action was canceled by the user.");
-                if (selectedObject != null)
-                {
-                    if (selectedObject.GetComponent<BlinkEffect>() != null)
-                    {
-                        selectedObject.GetComponent<BlinkEffect>().Deactivate();
-                    }
-                    if (selectedObject.GetComponent<Rigidbody>() != null)
-                    {
-                        Destroyer.Destroy(selectedObject.GetComponent<Rigidbody>());
-                    }
-                    if (selectedObject.GetComponent<CollisionController>() != null)
-                    {
-                        Destroyer.Destroy(selectedObject.GetComponent<CollisionController>());
-                    }
-                }
+                BlinkEffect.Deactivate(selectedObject);
+                CollisionDetectionManager.Disable(selectedObject);
                 if (progressState != ProgressState.Finish && selectedObject != null)
                 {
                     GameObject drawable = GameFinder.GetDrawable(selectedObject);
@@ -313,7 +287,7 @@ namespace SEE.Controls.Actions.Drawable
         private void InitSwitchMenu()
         {
             switchMenu = PrefabInstantiator.InstantiatePrefab(switchMenuPrefab,
-                                                     Canvas.transform, false);
+                                                     Surface.transform, false);
             /// Adds the functionality to the move button
             GameFinder.FindChild(switchMenu, "Move").GetComponent<ButtonManagerBasic>().clickEvent
                 .AddListener(() =>
@@ -342,7 +316,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void Selection()
         {
-            if (Selector.SelectObject(ref selectedObject, ref oldSelectedObj, ref mouseWasReleased, Canvas, true, false, true))
+            if (Selector.SelectObject(ref selectedObject, ref oldSelectedObj, ref mouseWasReleased, Surface, true, false, true))
             {
                 oldObjectPosition = selectedObject.transform.localPosition;
                 oldObjectLocalEulerAngles = selectedObject.transform.localEulerAngles;
@@ -350,7 +324,7 @@ namespace SEE.Controls.Actions.Drawable
             }
 
             /// To ensure a object change.
-            if (Input.GetMouseButtonUp(0) && !mouseWasReleased)
+            if (Queries.MouseUp(MouseButton.Left) && !mouseWasReleased)
             {
                 mouseWasReleased = true;
             }
@@ -369,13 +343,12 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void EnableObjectChange()
         {
-            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
+            if (Queries.LeftMouseInteraction()
                 && selectedObject != null && mouseWasReleased)
             {
                 Destroyer.Destroy(switchMenu);
-                Destroyer.Destroy(selectedObject.GetComponent<BlinkEffect>());
-                Destroyer.Destroy(selectedObject.GetComponent<Rigidbody>());
-                Destroyer.Destroy(selectedObject.GetComponent<CollisionController>());
+                BlinkEffect.Deactivate(selectedObject);
+                CollisionDetectionManager.Disable(selectedObject);
 
                 /// The following part is needed to ensure that the renderer(s)/canvas is/are enabled.
                 if (selectedObject.GetComponent<Renderer>() != null)
@@ -434,7 +407,7 @@ namespace SEE.Controls.Actions.Drawable
                 MoveByKey(moveByMouse, speedUp, drawable, drawableParentName);
 
                 /// For switching the move by mouse option.
-                if (Input.GetMouseButtonDown(2))
+                if (Queries.MouseDown(MouseButton.Middle))
                 {
                     moveByMouse.isOn = !moveByMouse.isOn;
                     moveByMouse.UpdateUI();
@@ -447,13 +420,13 @@ namespace SEE.Controls.Actions.Drawable
                 MoveByMouse(moveByMouse, childInCollision, drawable, drawableParentName);
 
                 /// Initializes the end of the movement.
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)))
+                if (Queries.LeftMouseInteraction())
                 {
-                    selectedObject.GetComponent<BlinkEffect>().Deactivate();
+                    BlinkEffect.Deactivate(selectedObject);
                 }
             }
             /// Part 2 of initializing the end: The new position is saved, and the progress state is switched to finish.
-            if (Input.GetMouseButtonUp(0))
+            if (Queries.MouseUp(MouseButton.Left))
             {
                 newObjectPosition = selectedObject.transform.localPosition;
                 progressState = ProgressState.Finish;
@@ -520,8 +493,8 @@ namespace SEE.Controls.Actions.Drawable
             GameObject drawable, string drawableParentName)
         {
             if (moveByMouse.isOn && Raycasting.RaycastAnything(out RaycastHit hit)
-                    && !selectedObject.GetComponent<CollisionController>().IsInCollision()
-                    && !childInCollision)
+                && !selectedObject.GetComponent<CollisionController>().IsInCollision()
+                && !childInCollision)
             {
                 if ((hit.collider.gameObject.CompareTag(Tags.Drawable)
                         && hit.collider.gameObject.Equals(drawable))
@@ -554,14 +527,14 @@ namespace SEE.Controls.Actions.Drawable
                 RotateByWheel();
 
                 /// Initializes the end of the rotation.
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)))
+                if (Queries.LeftMouseInteraction())
                 {
                     selectedObject.GetComponent<BlinkEffect>().Deactivate();
 
                 }
             }
             /// Part 2 of initializing the end: The progress state is switched to finish.
-            if (Input.GetMouseButtonUp(0))
+            if (Queries.MouseUp(MouseButton.Left))
             {
                 progressState = ProgressState.Finish;
             }
@@ -697,8 +670,7 @@ namespace SEE.Controls.Actions.Drawable
             else
             {
                 /// Block for reset.
-                Destroyer.Destroy(selectedObject.GetComponent<Rigidbody>());
-                Destroyer.Destroy(selectedObject.GetComponent<CollisionController>());
+                CollisionDetectionManager.Disable(selectedObject);
                 GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(selectedObject);
                 GameObject drawable = GameFinder.GetDrawable(selectedObject);
                 new RbAndCCDestroyerNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
