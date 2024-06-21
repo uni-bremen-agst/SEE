@@ -589,7 +589,7 @@ namespace SEE.Controls.Actions.Drawable
             /// Block to restore the original cut object.
             if (memento.State == CutCopy.Cut)
             {
-                GameObject oldSurface = memento.OldSurface.GetDrawable();
+                GameObject oldSurface = memento.OldSurface.GetDrawableSurface();
 
                 if (memento.OldValueHolder is MindMapNodeConf)
                 {
@@ -616,7 +616,7 @@ namespace SEE.Controls.Actions.Drawable
             }
 
             /// Block to destroy the clone object.
-            GameObject newObject = GameFinder.FindChild(memento.NewSurface.GetDrawable(),
+            GameObject newObject = GameFinder.FindChild(memento.NewSurface.GetDrawableSurface(),
                 memento.NewValueHolder.Id);
             if (newObject.CompareTag(Tags.MindMapNode))
             {
@@ -634,7 +634,7 @@ namespace SEE.Controls.Actions.Drawable
                 foreach (DrawableType type in memento.NewNodesHolder.GetAllDrawableTypes())
                 {
                     new EraseNetAction(memento.NewSurface.ID, memento.NewSurface.ParentID, type.Id).Execute();
-                    Destroyer.Destroy(GameFinder.FindChild(memento.NewSurface.GetDrawable(), type.Id));
+                    Destroyer.Destroy(GameFinder.FindChild(memento.NewSurface.GetDrawableSurface(), type.Id));
                 }
             }
             new EraseNetAction(memento.NewSurface.ID, memento.NewSurface.ParentID, newObject.name).Execute();
@@ -648,7 +648,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             base.Redo();
             /// Block to restore the clone object.
-            GameObject newSurface = memento.NewSurface.GetDrawable();
+            GameObject newSurface = memento.NewSurface.GetDrawableSurface();
 
             if (memento.NewValueHolder is MindMapNodeConf)
             {
@@ -677,7 +677,7 @@ namespace SEE.Controls.Actions.Drawable
             /// Block to destroy the original object, if cut was selected.
             if (memento.State == CutCopy.Cut)
             {
-                GameObject oldObject = GameFinder.FindChild(memento.OldSurface.GetDrawable(),
+                GameObject oldObject = GameFinder.FindChild(memento.OldSurface.GetDrawableSurface(),
                     memento.OldValueHolder.Id);
                 if (oldObject.CompareTag(Tags.MindMapNode))
                 {
@@ -695,7 +695,7 @@ namespace SEE.Controls.Actions.Drawable
                     foreach (DrawableType type in memento.OldNodesHolder.GetAllDrawableTypes())
                     {
                         new EraseNetAction(memento.OldSurface.ID, memento.OldSurface.ParentID, type.Id).Execute();
-                        Destroyer.Destroy(GameFinder.FindChild(memento.OldSurface.GetDrawable(), type.Id));
+                        Destroyer.Destroy(GameFinder.FindChild(memento.OldSurface.GetDrawableSurface(), type.Id));
                     }
                 }
                 new EraseNetAction(memento.OldSurface.ID, memento.OldSurface.ParentID, oldObject.name).Execute();

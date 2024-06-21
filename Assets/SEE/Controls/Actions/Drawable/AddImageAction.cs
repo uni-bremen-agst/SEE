@@ -251,7 +251,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo();
-            GameObject obj = GameFinder.FindChild(memento.Surface.GetDrawable(),
+            GameObject obj = GameFinder.FindChild(memento.Surface.GetDrawableSurface(),
                 memento.Image.Id);
             new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
                 memento.Image.Id).Execute();
@@ -264,7 +264,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            GameImage.RePlaceImage(memento.Surface.GetDrawable(), memento.Image);
+            GameImage.RePlaceImage(memento.Surface.GetDrawableSurface(), memento.Image);
             new AddImageNetAction(memento.Surface.ID, memento.Surface.ParentID,
                 memento.Image).Execute();
         }

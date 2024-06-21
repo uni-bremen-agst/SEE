@@ -49,7 +49,7 @@ namespace SEE.Game.Drawable
             stickyNote.transform.localScale = ValueHolder.StickyNoteScale;
 
             /// Sets a random color for the drawable.
-            stickyNote.transform.Find("Front").GetComponent<MeshRenderer>().material.color = Random.ColorHSV().Darker();
+            GameFinder.GetDrawableSurface(stickyNote).GetComponent<MeshRenderer>().material.color = Random.ColorHSV().Darker();
 
             /// Adds an order in layer value holder to the sticky note and sets the necessary values.
             OrderInLayerValueHolder holder = stickyNote.AddComponent<OrderInLayerValueHolder>();
@@ -82,7 +82,8 @@ namespace SEE.Game.Drawable
             stickyNote.transform.position = config.Position;
             stickyNote.name = config.ParentID;
             stickyNote.transform.localScale = config.Scale;
-            stickyNote.transform.Find("Front").GetComponent<MeshRenderer>().material.color = config.Color;
+            GameFinder.GetDrawableSurface(stickyNote).GetComponent<MeshRenderer>().material.color = config.Color;
+            stickyNote.transform.GetComponentInChildren<Light>().enabled = config.Lightning;
 
             /// Adds an order in layer value holder to the sticky note and sets the necessary values.
             OrderInLayerValueHolder holder = stickyNote.AddComponent<OrderInLayerValueHolder>();
@@ -247,6 +248,16 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
+        /// Change the lighting of a sticky note.
+        /// </summary>
+        /// <param name="stickyNote">The sticky note.</param>
+        /// <param name="state">The state of the light. true = on; false = off.</param>
+        public static void ChangeLightning(GameObject stickyNote, bool state)
+        {
+            stickyNote.transform.GetComponentInChildren<Light>().enabled = state;
+        }
+
+        /// <summary>
         /// Combines all edit method together.
         /// </summary>
         /// <param name="stickyNote">The sticky note on that the changes should be executed.</param>
@@ -258,6 +269,7 @@ namespace SEE.Game.Drawable
             {
                 ChangeColor(stickyNote, config.Color);
                 ChangeLayer(root, config.Order);
+                ChangeLightning(stickyNote, config.Lightning);
                 SetRotateX(root, config.Rotation.x);
                 SetRotateY(root, config.Rotation.y);
                 GameScaler.SetScale(stickyNote, config.Scale);

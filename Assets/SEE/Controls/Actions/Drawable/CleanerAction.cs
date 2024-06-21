@@ -112,7 +112,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             foreach(DrawableType type in memento.Surface.GetAllDrawableTypes())
             {
-                GameObject surface = memento.Surface.GetDrawable();
+                GameObject surface = memento.Surface.GetDrawableSurface();
                 DrawableType.Restore(type, surface);
             }
         }
@@ -126,7 +126,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             foreach (DrawableType type in memento.Surface.GetAllDrawableTypes())
             {
-                GameObject toDelete = GameFinder.FindChild(memento.Surface.GetDrawable(), type.Id); ;
+                GameObject toDelete = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), type.Id); ;
                 new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, type.Id).Execute();
                 Destroyer.Destroy(toDelete);
             }

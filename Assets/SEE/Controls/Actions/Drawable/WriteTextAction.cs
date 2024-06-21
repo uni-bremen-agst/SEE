@@ -215,7 +215,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo();
-            GameObject obj = GameFinder.FindChild(memento.Surface.GetDrawable(), memento.Text.Id);
+            GameObject obj = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.Text.Id);
             new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Text.Id).Execute();
             Destroyer.Destroy(obj);
         }
@@ -226,7 +226,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            GameTexter.ReWriteText(memento.Surface.GetDrawable(), memento.Text);
+            GameTexter.ReWriteText(memento.Surface.GetDrawableSurface(), memento.Text);
             new WriteTextNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Text).Execute();
 
         }

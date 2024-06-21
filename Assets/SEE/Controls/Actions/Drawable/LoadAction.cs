@@ -236,7 +236,7 @@ namespace SEE.Controls.Actions.Drawable
                     DrawablesConfigs configsSpecific = DrawableConfigManager.LoadDrawables(new FilePath(filePath));
                     foreach (DrawableConfig drawableConfig in configsSpecific.Drawables)
                     {
-                        Restore(memento.SpecificSurface.GetDrawable(), drawableConfig);
+                        Restore(memento.SpecificSurface.GetDrawableSurface(), drawableConfig);
                     }
                     memento.Configs = configsSpecific;
                     CurrentState = IReversibleAction.Progress.Completed;
@@ -342,7 +342,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 case LoadState.Specific:
                     GameObject attachedObjs = GameFinder.GetAttachedObjectsObject(
-                        memento.SpecificSurface.GetDrawable());
+                        memento.SpecificSurface.GetDrawableSurface());
                     foreach (DrawableConfig config in memento.Configs.Drawables)
                     {
                         DestroyLoadedObjects(attachedObjs, config);
@@ -380,7 +380,7 @@ namespace SEE.Controls.Actions.Drawable
             switch (memento.State)
             {
                 case LoadState.Specific:
-                    GameObject specificSurface = memento.SpecificSurface.GetDrawable();
+                    GameObject specificSurface = memento.SpecificSurface.GetDrawableSurface();
                     foreach (DrawableConfig config in memento.Configs.Drawables)
                     {
                         Restore(specificSurface, config);

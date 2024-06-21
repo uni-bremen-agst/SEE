@@ -462,7 +462,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Undo()
         {
-            GameObject attached = GameFinder.GetAttachedObjectsObject(memento.Surface.GetDrawable());
+            GameObject attached = GameFinder.GetAttachedObjectsObject(memento.Surface.GetDrawableSurface());
             GameObject node = GameFinder.FindChild(attached, memento.Conf.Id);
             if (memento.Operation != Operation.Theme)
             {
@@ -488,7 +488,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Redo()
         {
-            GameMindMap.ReCreate(memento.Surface.GetDrawable(), memento.Conf);
+            GameMindMap.ReCreate(memento.Surface.GetDrawableSurface(), memento.Conf);
             new MindMapCreateNodeNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Conf).Execute();
         }
 

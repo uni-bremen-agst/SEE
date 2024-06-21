@@ -45,6 +45,7 @@ namespace SEE.Net.Actions.Drawable
                     GameObject root = GameFinder.GetHighestParent(surface);
 
                     GameStickyNoteManager.ChangeLayer(root, DrawableConf.Order);
+                    GameStickyNoteManager.ChangeLightning(root, DrawableConf.Lightning);
                     GameStickyNoteManager.ChangeColor(stickyNote, DrawableConf.Color);
                     GameStickyNoteManager.SetRotateX(root, DrawableConf.Rotation.x);
                     GameStickyNoteManager.SetRotateY(root, DrawableConf.Rotation.y);

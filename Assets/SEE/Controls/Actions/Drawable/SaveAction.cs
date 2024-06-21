@@ -244,7 +244,7 @@ namespace SEE.Controls.Actions.Drawable
             GameObject[] surfaces = new GameObject[memento.Surfaces.Length];
             for (int i = 0; i < surfaces.Length; i++)
             {
-                surfaces[i] = memento.Surfaces[i].GetDrawable();
+                surfaces[i] = memento.Surfaces[i].GetDrawableSurface();
             }
             DrawableConfigManager.SaveDrawables(surfaces, memento.FilePath);
             result = true;
@@ -287,7 +287,7 @@ namespace SEE.Controls.Actions.Drawable
             GameObject[] surfaces = new GameObject[memento.Surfaces.Length];
             for (int i = 0; i < surfaces.Length; i++)
             {
-                surfaces[i] = memento.Surfaces[i].GetDrawable();
+                surfaces[i] = memento.Surfaces[i].GetDrawableSurface();
             }
             DrawableConfigManager.SaveDrawables(surfaces, memento.FilePath);
         }

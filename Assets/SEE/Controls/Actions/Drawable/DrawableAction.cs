@@ -32,12 +32,12 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// The drawable surface on which the drawables are displayed.
         /// </summary>
-        private static GameObject surface;
+        private GameObject surface;
 
         /// <summary>
         /// The surface on which the drawables are displayed.
         /// </summary>
-        protected static GameObject Surface
+        protected GameObject Surface
         {
             get
             {

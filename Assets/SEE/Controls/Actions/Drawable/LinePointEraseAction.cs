@@ -121,7 +121,7 @@ namespace SEE.Controls.Actions.Drawable
             reverseList.Reverse();
             foreach (Memento mem in reverseList)
             {
-                GameObject surface = mem.Surface.GetDrawable();
+                GameObject surface = mem.Surface.GetDrawableSurface();
                 GameDrawer.ReDrawLine(surface, mem.OriginalLine);
                 new DrawNetAction(mem.Surface.ID, mem.Surface.ParentID, mem.OriginalLine).Execute();
 
@@ -141,7 +141,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             foreach (Memento mem in mementoList)
             {
-                GameObject surface = mem.Surface.GetDrawable();
+                GameObject surface = mem.Surface.GetDrawableSurface();
                 GameObject originObj = GameFinder.FindChild(surface, mem.OriginalLine.Id);
                 new EraseNetAction(mem.Surface.ID, mem.Surface.ParentID, mem.OriginalLine.Id).Execute();
                 Destroyer.Destroy(originObj);

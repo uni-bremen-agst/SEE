@@ -892,8 +892,9 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns></returns>
         private bool CheckEquals(DrawableConfig original, DrawableConfig changed)
         {
-            return original.Scale.Equals(changed.Scale) && original.Color.Equals(changed.Color) &&
-                original.Rotation.Equals(changed.Rotation) && original.Order.Equals(changed.Order);
+            return original.Scale.Equals(changed.Scale) && original.Color.Equals(changed.Color) 
+                && original.Rotation.Equals(changed.Rotation) && original.Order.Equals(changed.Order)
+                && original.Lightning.Equals(changed.Lightning);
         }
 
         /// <summary>

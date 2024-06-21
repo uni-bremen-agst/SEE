@@ -198,7 +198,11 @@ namespace SEE.Game.Drawable
                 {
                     order = transform.GetComponentInParent<OrderInLayerValueHolder>().OrderInLayer;
                 }
-
+                bool lightning = false;
+                if (GameFinder.GetHighestParent(surface).transform.GetComponentInChildren<Light>() != null)
+                {
+                    lightning = GameFinder.GetHighestParent(surface).transform.GetComponentInChildren<Light>().enabled;
+                }
                 /// Creates the <see cref="DrawableConfig"/> with the corresponding values.
                 DrawableConfig config = new()
                 {
@@ -208,7 +212,8 @@ namespace SEE.Game.Drawable
                     Rotation = transform.eulerAngles,
                     Scale = transform.localScale,
                     Color = surface.GetComponent<MeshRenderer>().material.color,
-                    Order = order
+                    Order = order,
+                    Lightning = lightning
                 };
 
                 /// Block for creating the <see cref="DrawableType"/> of the drawable.

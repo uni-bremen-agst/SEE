@@ -156,7 +156,7 @@ namespace SEE.Controls.Actions.Drawable
                 ThenBy(m => DrawableType.OrderMindMap(m.DrawableType)).ToList();
             foreach (Memento mem in mementoList)
             {
-                GameObject surface = mem.Surface.GetDrawable();
+                GameObject surface = mem.Surface.GetDrawableSurface();
                 DrawableType.Restore(mem.DrawableType, surface);
             }
         }
@@ -169,7 +169,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             foreach (Memento mem in mementoList)
             {
-                GameObject toDelete = GameFinder.FindChild(mem.Surface.GetDrawable(), mem.DrawableType.Id);
+                GameObject toDelete = GameFinder.FindChild(mem.Surface.GetDrawableSurface(), mem.DrawableType.Id);
                 if (mem.DrawableType is MindMapNodeConf conf)
                 {
                     MMNodeValueHolder valueHolder = toDelete.GetComponent<MMNodeValueHolder>();

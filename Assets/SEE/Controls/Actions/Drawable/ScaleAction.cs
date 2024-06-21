@@ -353,7 +353,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (memento.SelectedObject == null && memento.Id != null)
             {
-                memento.SelectedObject = GameFinder.FindChild(memento.Surface.GetDrawable(), memento.Id);
+                memento.SelectedObject = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.Id);
             }
 
             if (memento.SelectedObject != null)
@@ -382,7 +382,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             if (memento.SelectedObject == null && memento.Id != null)
             {
-                memento.SelectedObject = GameFinder.FindChild(memento.Surface.GetDrawable(), memento.Id);
+                memento.SelectedObject = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.Id);
             }
             if (memento.SelectedObject != null)
             {

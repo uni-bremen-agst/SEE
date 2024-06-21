@@ -256,7 +256,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (line == null)
             {
-                line = GameFinder.FindChild(memento.Surface.GetDrawable(), memento.Line.Id);
+                line = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.Line.Id);
             }
             if (line != null)
             {
@@ -273,7 +273,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            line = GameDrawer.ReDrawLine(memento.Surface.GetDrawable(), memento.Line);
+            line = GameDrawer.ReDrawLine(memento.Surface.GetDrawableSurface(), memento.Line);
             if (line != null)
             {
                 new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID,

@@ -25,18 +25,18 @@ namespace SEE.Game.Drawable
         {
             new SynchronizeCurrentOrderInLayer(ValueHolder.CurrentOrderInLayer).Execute();
 
-            ArrayList surfaces = new(GameObject.FindGameObjectsWithTag(Tags.Drawable));
-            foreach (GameObject surface in surfaces)
+            ArrayList drawables = new(GameObject.FindGameObjectsWithTag(Tags.Drawable));
+            foreach (GameObject drawable in drawables)
             {
-                if (GameFinder.GetDrawableSurfaceParentName(surface).Contains(ValueHolder.StickyNotePrefix))
+                if (GameFinder.GetDrawableSurfaceParentName(drawable).Contains(ValueHolder.StickyNotePrefix))
                 {
-                    new StickyNoteSpawnNetAction(DrawableConfigManager.GetDrawableConfig(surface)).Execute();
+                    new StickyNoteSpawnNetAction(DrawableConfigManager.GetDrawableConfig(drawable)).Execute();
                 }
 
-                if (GameFinder.GetAttachedObjectsObject(surface) != null)
+                if (GameFinder.GetAttachedObjectsObject(drawable) != null)
                 {
-                    string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
-                    Transform[] allChildren = GameFinder.GetAttachedObjectsObject(surface)
+                    string drawableParent = GameFinder.GetDrawableSurfaceParentName(drawable);
+                    Transform[] allChildren = GameFinder.GetAttachedObjectsObject(drawable)
                         .GetComponentsInChildren<Transform>();
 
                     foreach (Transform childTransform in allChildren)
@@ -46,19 +46,19 @@ namespace SEE.Game.Drawable
                         switch (child.tag)
                         {
                             case Tags.Line:
-                                new DrawNetAction(surface.name, surfaceParentName,
+                                new DrawNetAction(drawable.name, drawableParent,
                                     LineConf.GetLine(child)).Execute();
                                 break;
                             case Tags.DText:
-                                new WriteTextNetAction(surface.name, surfaceParentName,
+                                new WriteTextNetAction(drawable.name, drawableParent,
                                     TextConf.GetText(child)).Execute();
                                 break;
                             case Tags.Image:
-                                new AddImageNetAction(surface.name, surfaceParentName,
+                                new AddImageNetAction(drawable.name, drawableParent,
                                     ImageConf.GetImageConf(child)).Execute();
                                 break;
                             case Tags.MindMapNode:
-                                new MindMapCreateNodeNetAction(surface.name, surfaceParentName,
+                                new MindMapCreateNodeNetAction(drawable.name, drawableParent,
                                     MindMapNodeConf.GetNodeConf(child)).Execute();
                                 break;
                         }

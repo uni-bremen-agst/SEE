@@ -48,6 +48,11 @@ namespace SEE.Game.Drawable.Configurations
         public int Order;
 
         /// <summary>
+        /// The lightning state of the drawable.
+        /// </summary>
+        public bool Lightning;
+
+        /// <summary>
         /// All the lines that should be displayed on this drawable.
         /// </summary>
         public List<LineConf> LineConfigs = new();
@@ -68,10 +73,10 @@ namespace SEE.Game.Drawable.Configurations
         public List<MindMapNodeConf> MindMapNodeConfigs = new();
 
         /// <summary>
-        /// Gets the current game object of this drawable.
+        /// Gets the surface game object of this drawable.
         /// </summary>
         /// <returns>the drawable game object.</returns>
-        public GameObject GetDrawable()
+        public GameObject GetDrawableSurface()
         {
             return GameFinder.FindDrawableSurface(ID, ParentID);
         }
@@ -92,14 +97,14 @@ namespace SEE.Game.Drawable.Configurations
         #region Config I/O
 
         /// <summary>
-        /// The label for the drawable name in the configuration file.
+        /// The label for the drawable surface name in the configuration file.
         /// </summary>
-        private const string DrawableNameLabel = "DrawableName";
+        private const string SurfaceNameLabel = "SurfaceName";
 
         /// <summary>
-        /// The label for the drawable parent name in the configuration file.
+        /// The label for the drawable surface parent name in the configuration file.
         /// </summary>
-        private const string DrawableParentNameLabel = "DrawableParentName";
+        private const string SurfaceParentNameLabel = "SurfaceParentName";
 
         /// <summary>
         /// The label for the position of a drawable in the configuration file.
@@ -127,6 +132,11 @@ namespace SEE.Game.Drawable.Configurations
         private const string OrderLabel = "Order";
 
         /// <summary>
+        /// The label for the lightning of a drawable in the configuration file.
+        /// </summary>
+        private const string LightningLabel = "Lightning";
+
+        /// <summary>
         /// The label for the group of line configurations in the configuration file.
         /// </summary>
         private const string LineConfigsLabel = "LineConfigs";
@@ -152,13 +162,14 @@ namespace SEE.Game.Drawable.Configurations
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
         internal void Save(ConfigWriter writer)
         {
-            writer.Save(ID, DrawableNameLabel);
-            writer.Save(ParentID, DrawableParentNameLabel);
+            writer.Save(ID, SurfaceNameLabel);
+            writer.Save(ParentID, SurfaceParentNameLabel);
             writer.Save(Position, PositionLabel);
             writer.Save(Rotation, RotationLabel);
             writer.Save(Scale, ScaleLabel);
             writer.Save(Color, ColorLabel);
             writer.Save(Order, OrderLabel);
+            writer.Save(Lightning, LightningLabel);
 
             if (LineConfigs != null && LineConfigs.Count > 0)
             {
@@ -211,7 +222,7 @@ namespace SEE.Game.Drawable.Configurations
         {
             bool errorFree = true;
             /// Try to restore the drawable name.
-            if (attributes.TryGetValue(DrawableNameLabel, out object name))
+            if (attributes.TryGetValue(SurfaceNameLabel, out object name))
             {
                 ID = (string)name;
             }
@@ -221,7 +232,7 @@ namespace SEE.Game.Drawable.Configurations
             }
 
             /// Try to restore the drawable parent name.
-            if (attributes.TryGetValue(DrawableParentNameLabel, out object pName))
+            if (attributes.TryGetValue(SurfaceParentNameLabel, out object pName))
             {
                 ParentID = (string)pName;
             }
@@ -281,6 +292,17 @@ namespace SEE.Game.Drawable.Configurations
             /// Try to restore the order.
             if (!ConfigIO.Restore(attributes, OrderLabel, ref Order))
             {
+                errorFree = false;
+            }
+
+            /// Try to restore the lightning status.
+            if (attributes.TryGetValue(LightningLabel, out object status))
+            {
+                Lightning = (bool)status;
+            }
+            else
+            {
+                Lightning = false;
                 errorFree = false;
             }
 

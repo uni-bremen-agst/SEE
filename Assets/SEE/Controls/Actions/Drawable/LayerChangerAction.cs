@@ -177,7 +177,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (memento.Obj == null && memento.Id != null)
             {
-                memento.Obj = GameFinder.FindChild(memento.Surface.GetDrawable(), memento.Id);
+                memento.Obj = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.Id);
             }
             GameLayerChanger.ChangeOrderInLayer(memento.Obj, memento.OldOrder, memento.State);
             new LayerChangerNetAction(memento.Surface.ID, memento.Surface.ParentID,
@@ -192,7 +192,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             if (memento.Obj == null && memento.Id != null)
             {
-                memento.Obj = GameFinder.FindChild(memento.Surface.GetDrawable(), memento.Id);
+                memento.Obj = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.Id);
             }
             GameLayerChanger.ChangeOrderInLayer(memento.Obj, memento.NewOrder, memento.State);
             new LayerChangerNetAction(memento.Surface.ID, memento.Surface.ParentID,

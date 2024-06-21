@@ -1,4 +1,5 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Assets.SEE.Net.Actions.Drawable;
+using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Net.Actions.Drawable;
@@ -63,6 +64,9 @@ namespace SEE.UI.Menu.Drawable
 
             /// Initialize the edit scale button.
             Scale(stickyNote, callback);
+
+            /// Initialize the lightning switch manager.
+            Lightning(stickyNote, newConfig);
         }
 
         /// <summary>
@@ -83,6 +87,34 @@ namespace SEE.UI.Menu.Drawable
                 new EditLayerNetAction(GameFinder.GetDrawableSurface(stickyNote).name, stickyNote.name, "",
                     order).Execute();
             });
+        }
+
+        /// <summary>
+        /// Initializes the lightning switch manager and adds the required handler.
+        /// The handler executes the <see cref="GameStickyNoteManager.ChangeLightning"/>
+        /// and saves the new lightning state in the configuration.
+        /// </summary>
+        /// <param name="stickyNote">The sticky note which lightning should be changed.</param>
+        /// <param name="newConfig">The configuration which holds the new values.</param>
+        private static void Lightning(GameObject stickyNote, DrawableConfig newConfig)
+        {
+            SwitchManager lightningManager = instance.GetComponentInChildren<SwitchManager>();
+            lightningManager.OffEvents.AddListener(() =>
+            {
+                newConfig.Lightning = false;
+                GameStickyNoteManager.ChangeLightning(stickyNote, false);
+                new StickyNoteChangeLightningNetAction(newConfig).Execute();
+            });
+            lightningManager.OnEvents.AddListener(() =>
+            {
+                newConfig.Lightning = true;
+                GameStickyNoteManager.ChangeLightning(stickyNote, true);
+                new StickyNoteChangeLightningNetAction(newConfig).Execute();
+            });
+
+            /// Assigns the current status to the switch and updates the UI.
+            lightningManager.isOn = newConfig.Lightning;
+            lightningManager.UpdateUI();
         }
 
         /// <summary>
