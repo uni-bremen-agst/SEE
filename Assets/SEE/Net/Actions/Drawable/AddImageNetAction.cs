@@ -38,7 +38,7 @@ namespace SEE.Net.Actions.Drawable
                 base.ExecuteOnClient();
                 if (Conf != null && Conf.Id != "")
                 {
-                    GameImage.RePlaceImage(Drawable, Conf);
+                    GameImage.RePlaceImage(Surface, Conf);
                 }
                 else
                 {

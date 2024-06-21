@@ -71,7 +71,7 @@ namespace SEE.Game.Drawable
         /// Sets up a line object based on the parameters.
         /// It creates the initial line.
         /// </summary>
-        /// <param name="drawable">The drawable on which the line should displayed.</param>
+        /// <param name="surface">The drawable surface on which the line should displayed.</param>
         /// <param name="name">The line name, can be empty.</param>
         /// <param name="positions">The positions of the line.</param>
         /// <param name="colorKind">The color kind of the line.</param>
@@ -84,7 +84,7 @@ namespace SEE.Game.Drawable
         /// <param name="line">The created line object</param>
         /// <param name="renderer">The line renderer of the line.</param>
         /// <param name="meshCollider">The mesh collider of the line.</param>
-        private static void Setup(GameObject drawable, string name, Vector3[] positions,
+        private static void Setup(GameObject surface, string name, Vector3[] positions,
             ColorKind colorKind, Color primaryColor, Color secondaryColor, float thickness,
             int order, LineKind lineKind, float tiling,
             out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider)
@@ -104,14 +104,14 @@ namespace SEE.Game.Drawable
 
                 name = ValueHolder.LinePrefix + line.GetInstanceID() + RandomStrings.GetRandomString(4);
                 /// Check if the name is already in use. If so, generate a new name.
-                while (GameFinder.FindChild(drawable, name) != null)
+                while (GameFinder.FindChild(surface, name) != null)
                 {
                     name = ValueHolder.LinePrefix + line.GetInstanceID() + RandomStrings.GetRandomString(4);
                 }
                 line.name = name;
             }
             /// Sets up the drawable holder <see cref="DrawableSetupManager"/>.
-            DrawableSetupManager.Setup(drawable, out GameObject _, out GameObject attachedObjects);
+            DrawableSetupManager.Setup(surface, out GameObject _, out GameObject attachedObjects);
 
             /// Assign the line tag to the line object.
             line.tag = Tags.Line;
@@ -200,7 +200,7 @@ namespace SEE.Game.Drawable
         /// To complete the drawing, <see cref="FinishDrawing"/> should be executed at the end.
         /// If desired, <see cref="SetPivot"/> can then be called to set the correct pivot.
         /// </summary>
-        /// <param name="drawable">The drawable on which the line should be displayed.</param>
+        /// <param name="surface">The drawable surface on which the line should be displayed.</param>
         /// <param name="positions">The start positions for the line.</param>
         /// <param name="colorKind">The chosen color kind for the line.</param>
         /// <param name="primaryColor">The chosen primary color for the line.</param>
@@ -209,10 +209,10 @@ namespace SEE.Game.Drawable
         /// <param name="lineKind">The chosen line kind.</param>
         /// <param name="tiling">The tiling for a dashed line kind.</param>
         /// <returns>The created line.</returns>
-        public static GameObject StartDrawing(GameObject drawable, Vector3[] positions, ColorKind colorKind,
+        public static GameObject StartDrawing(GameObject surface, Vector3[] positions, ColorKind colorKind,
             Color primaryColor, Color secondaryColor, float thickness, LineKind lineKind, float tiling)
         {
-            Setup(drawable, "", positions, colorKind, primaryColor, secondaryColor, thickness,
+            Setup(surface, "", positions, colorKind, primaryColor, secondaryColor, thickness,
                 ValueHolder.CurrentOrderInLayer, lineKind, tiling,
                 out GameObject line, out LineRenderer _, out MeshCollider _);
             ValueHolder.CurrentOrderInLayer++;
@@ -268,7 +268,7 @@ namespace SEE.Game.Drawable
         /// If so, the line is only refreshed.
         /// Otherwise, it is newly created.
         /// </summary>
-        /// <param name="drawable">The drawable on which the line should be displayed.</param>
+        /// <param name="surface">The drawable surface on which the line should be displayed.</param>
         /// <param name="name">The name of the line, can be empty.</param>
         /// <param name="positions">The positions for the line.</param>
         /// <param name="colorKind">The chosen color kind.</param>
@@ -281,7 +281,7 @@ namespace SEE.Game.Drawable
         /// <param name="increaseCurrentOrder">Option to increase the current order in the layer value.
         /// By default, it is set to true.</param>
         /// <returns>The created or updated line.</returns>
-        public static GameObject DrawLine(GameObject drawable, string name, Vector3[] positions, ColorKind colorKind,
+        public static GameObject DrawLine(GameObject surface, string name, Vector3[] positions, ColorKind colorKind,
             Color primaryColor, Color secondaryColor, float thickness, bool loop, LineKind lineKind,
             float tiling, bool increaseCurrentOrder = true)
         {
@@ -289,16 +289,16 @@ namespace SEE.Game.Drawable
             /// Updates the z axis values of the positions to 0.
             UpdateZPositions(ref positions);
             /// If the drawable already has a child with this name, update it.
-            if (GameFinder.FindChild(drawable, name) != null)
+            if (GameFinder.FindChild(surface, name) != null)
             {
-                lineObject = GameFinder.FindChild(drawable, name);
+                lineObject = GameFinder.FindChild(surface, name);
                 Drawing(lineObject, positions);
                 FinishDrawing(lineObject, loop);
             }
             else
             {
                 /// Block for creating a new line.
-                Setup(drawable, name, positions, colorKind, primaryColor, secondaryColor, thickness,
+                Setup(surface, name, positions, colorKind, primaryColor, secondaryColor, thickness,
                     ValueHolder.CurrentOrderInLayer, lineKind, tiling,
                     out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
                 lineObject = line;
@@ -322,7 +322,7 @@ namespace SEE.Game.Drawable
         /// This only happens if the order in layer of the line to be created is greater
         /// than or equal to the current maximum order.
         /// </summary>
-        /// <param name="drawable">The drawable on which the line should be displayed.</param>
+        /// <param name="surface">The drawable surface on which the line should be displayed.</param>
         /// <param name="name">The name of the line, can be empty.</param>
         /// <param name="positions">The positions for the line.</param>
         /// <param name="colorKind">The chosen color kind.</param>
@@ -337,7 +337,7 @@ namespace SEE.Game.Drawable
         /// <param name="lineKind">The line kind for the line.</param>
         /// <param name="tiling">The tiling for a dashed line kind</param>
         /// <returns>The recreated or updated line.</returns>
-        public static GameObject ReDrawLine(GameObject drawable, string name, Vector3[] positions,
+        public static GameObject ReDrawLine(GameObject surface, string name, Vector3[] positions,
             ColorKind colorKind, Color primaryColor, Color secondaryColor, float thickness,
             int orderInLayer, Vector3 position, Vector3 eulerAngles, Vector3 scale, bool loop,
             LineKind lineKind, float tiling)
@@ -353,9 +353,9 @@ namespace SEE.Game.Drawable
             }
 
             /// Block for update an existing line with the given name.
-            if (GameFinder.FindChild(drawable, name) != null)
+            if (GameFinder.FindChild(surface, name) != null)
             {
-                GameObject line = GameFinder.FindChild(drawable, name);
+                GameObject line = GameFinder.FindChild(surface, name);
                 line.transform.localScale = scale;
                 line.transform.localEulerAngles = eulerAngles;
                 line.transform.localPosition = position;
@@ -368,7 +368,7 @@ namespace SEE.Game.Drawable
             else
             {
                 /// Block for creating of a new line.
-                Setup(drawable, name, positions, colorKind, primaryColor, secondaryColor, thickness,
+                Setup(surface, name, positions, colorKind, primaryColor, secondaryColor, thickness,
                     orderInLayer, lineKind, tiling,
                     out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
                 line.transform.localScale = scale;
@@ -383,16 +383,16 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Redraws or updates the line of the given <see cref="LineConf"/> to the <paramref name="drawable"/>.
+        /// Redraws or updates the line of the given <see cref="LineConf"/> to the <paramref name="surface"/>.
         /// It calls <see cref="ReDrawLine(GameObject, string, Vector3[], ColorKind, Color, Color,
         /// float, int, Vector3, Vector3, Vector3, bool, LineKind, float)"/>.
         /// </summary>
-        /// <param name="drawable">The drawable on which the line should be displayed.</param>
+        /// <param name="surface">The drawable surface on which the line should be displayed.</param>
         /// <param name="lineToRedraw">The configuration of the line to be restore.</param>
         /// <returns>The created line.</returns>
-        public static GameObject ReDrawLine(GameObject drawable, LineConf lineToRedraw)
+        public static GameObject ReDrawLine(GameObject surface, LineConf lineToRedraw)
         {
-            GameObject line = ReDrawLine(drawable,
+            GameObject line = ReDrawLine(surface,
                  lineToRedraw.Id,
                  lineToRedraw.RendererPositions,
                  lineToRedraw.ColorKind,
@@ -760,13 +760,13 @@ namespace SEE.Game.Drawable
         /// as if it were a line originating from that point.
         /// A line is created for the calculation and then deleted afterward.
         /// </summary>
-        /// <param name="drawable">The targeted drawable.</param>
+        /// <param name="surface">The targeted drawable surface.</param>
         /// <param name="position">The position to be transformed.</param>
         /// <returns>The converted position.</returns>
-        public static Vector3 GetConvertedPosition(GameObject drawable, Vector3 position)
+        public static Vector3 GetConvertedPosition(GameObject surface, Vector3 position)
         {
             Vector3 convertedPosition;
-            Setup(drawable, "", new Vector3[] { position }, ColorKind.Monochrome, ValueHolder.CurrentPrimaryColor,
+            Setup(surface, "", new Vector3[] { position }, ColorKind.Monochrome, ValueHolder.CurrentPrimaryColor,
                 Color.clear, ValueHolder.CurrentThickness, 0, ValueHolder.CurrentLineKind, 1,
                 out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
             convertedPosition = line.transform.InverseTransformPoint(position) - ValueHolder.DistanceToDrawable;

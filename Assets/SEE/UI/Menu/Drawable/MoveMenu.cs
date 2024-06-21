@@ -59,9 +59,9 @@ namespace SEE.UI.Menu.Drawable
                 /// The new position for the object.
                 Vector3 newObjectPosition;
 
-                GameObject drawable = GameFinder.GetDrawable(selectedObject);
-                string drawableName = drawable.name;
-                string drawableParent = GameFinder.GetDrawableParentName(drawable);
+                GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
+                string surfaceName = surface.name;
+                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
                 /// Initialize the button for left moving.
                 /// Enables the functionality to hold down the left mouse button.
@@ -71,7 +71,7 @@ namespace SEE.UI.Menu.Drawable
                     moveByMouseManager.UpdateUI();
                     newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, ValueHolder.MoveDirection.Left,
                         speedUpManager.isOn, includeChildren);
-                    new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition,
+                    new MoveNetAction(surfaceName, surfaceParentName, selectedObject.name, newObjectPosition,
                         includeChildren).Execute();
                 }, true);
 
@@ -83,7 +83,7 @@ namespace SEE.UI.Menu.Drawable
                     moveByMouseManager.UpdateUI();
                     newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, ValueHolder.MoveDirection.Right,
                         speedUpManager.isOn, includeChildren);
-                    new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition,
+                    new MoveNetAction(surfaceName, surfaceParentName, selectedObject.name, newObjectPosition,
                         includeChildren).Execute();
                 }, true);
 
@@ -95,7 +95,7 @@ namespace SEE.UI.Menu.Drawable
                     moveByMouseManager.UpdateUI();
                     newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, ValueHolder.MoveDirection.Up,
                         speedUpManager.isOn, includeChildren);
-                    new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition,
+                    new MoveNetAction(surfaceName, surfaceParentName, selectedObject.name, newObjectPosition,
                         includeChildren).Execute();
                 }, true);
 
@@ -107,7 +107,7 @@ namespace SEE.UI.Menu.Drawable
                     moveByMouseManager.UpdateUI();
                     newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, ValueHolder.MoveDirection.Down,
                         speedUpManager.isOn, includeChildren);
-                    new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition,
+                    new MoveNetAction(surfaceName, surfaceParentName, selectedObject.name, newObjectPosition,
                         includeChildren).Execute();
                 }, true);
 
@@ -127,8 +127,8 @@ namespace SEE.UI.Menu.Drawable
         {
             if (selectedObject.CompareTag(Tags.MindMapNode))
             {
-                GameObject drawable = GameFinder.GetDrawable(selectedObject);
-                string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+                GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
+                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
                 /// The old position of the object.
                 /// Is needed to include the children later on.
@@ -161,9 +161,9 @@ namespace SEE.UI.Menu.Drawable
                     {
                         Vector3 newPosition = selectedObject.transform.localPosition;
                         GameMoveRotator.SetPosition(selectedObject, oldPosition, false);
-                        new MoveNetAction(drawable.name, drawableParentName, selectedObject.name, oldPosition, false).Execute();
+                        new MoveNetAction(surface.name, surfaceParentName, selectedObject.name, oldPosition, false).Execute();
                         GameMoveRotator.SetPosition(selectedObject, newPosition, true);
-                        new MoveNetAction(drawable.name, drawableParentName, selectedObject.name, newPosition, true).Execute();
+                        new MoveNetAction(surface.name, surfaceParentName, selectedObject.name, newPosition, true).Execute();
                     }
 
                     changeSwitch = true;
@@ -178,7 +178,7 @@ namespace SEE.UI.Menu.Drawable
                         foreach (KeyValuePair<GameObject, Vector3> pair in oldPositions)
                         {
                             GameMoveRotator.SetPosition(pair.Key, pair.Value, false);
-                            new MoveNetAction(drawable.name, drawableParentName, pair.Key.name, pair.Value, false).Execute();
+                            new MoveNetAction(surface.name, surfaceParentName, pair.Key.name, pair.Value, false).Execute();
                         }
                     }
                 });

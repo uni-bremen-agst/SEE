@@ -47,9 +47,9 @@ namespace SEE.Controls.Actions.Drawable
             internal FilePath FilePath;
 
             /// <summary>
-            /// The drawables that should be saved.
+            /// The drawable surfaces that should be saved.
             /// </summary>
-            internal readonly DrawableConfig[] Drawables;
+            internal readonly DrawableConfig[] Surfaces;
 
             /// <summary>
             /// The state if one or more drawables has been saved in this file.
@@ -59,11 +59,11 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The constructor.
             /// </summary>
-            /// <param name="drawables">The drawables to save into this file</param>
+            /// <param name="surfaces">The drawable surfaces to save into this file</param>
             /// <param name="savedState">Represents if one or more drawables saved in this file.</param>
-            internal Memento(DrawableConfig[] drawables, SaveState savedState)
+            internal Memento(DrawableConfig[] surfaces, SaveState savedState)
             {
-                Drawables = drawables;
+                Surfaces = surfaces;
                 SavedState = savedState;
             }
         }
@@ -76,7 +76,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// List of all selected drawable for saving.
         /// </summary>
-        private readonly List<GameObject> selectedDrawables = new();
+        private readonly List<GameObject> selectedSurfaces = new();
 
         /// <summary>
         /// The instance for the drawable file browser.
@@ -90,9 +90,9 @@ namespace SEE.Controls.Actions.Drawable
         public override void Stop()
         {
             base.Stop();
-            foreach (GameObject drawable in selectedDrawables)
+            foreach (GameObject surface in selectedSurfaces)
             {
-                drawable.Destroy<HighlightEffect>();
+                surface.Destroy<HighlightEffect>();
             }
             SaveMenu.Disable();
         }
@@ -108,24 +108,24 @@ namespace SEE.Controls.Actions.Drawable
             {
                 if (browser == null || (browser != null && !browser.IsOpen()))
                 {
-                    if (selectedDrawables.Count > 0)
+                    if (selectedSurfaces.Count > 0)
                     {
-                        browser = Surface.AddOrGetComponent<DrawableFileBrowser>();
-                        if (selectedDrawables.Count == 1)
+                        browser = Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                        if (selectedSurfaces.Count == 1)
                         {
                             browser.SaveDrawableConfiguration(SaveState.One);
                             memento = new Memento(new DrawableConfig[]
                             {
-                                DrawableConfigManager.GetDrawableConfig(selectedDrawables[0])
+                                DrawableConfigManager.GetDrawableConfig(selectedSurfaces[0])
                             }, SaveState.One);
                         }
                         else
                         {
                             browser.SaveDrawableConfiguration(SaveState.Multiple);
-                            DrawableConfig[] configs = new DrawableConfig[selectedDrawables.Count];
+                            DrawableConfig[] configs = new DrawableConfig[selectedSurfaces.Count];
                             for (int i = 0; i < configs.Length; i++)
                             {
-                                configs[i] = DrawableConfigManager.GetDrawableConfig(selectedDrawables[i]);
+                                configs[i] = DrawableConfigManager.GetDrawableConfig(selectedSurfaces[i]);
                             }
                             memento = new Memento(configs, SaveState.Multiple);
                         }
@@ -141,7 +141,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 if (browser == null || (browser != null && !browser.IsOpen()))
                 {
-                    browser = Surface.AddOrGetComponent<DrawableFileBrowser>();
+                    browser = Canvas.AddOrGetComponent<DrawableFileBrowser>();
                     browser.SaveDrawableConfiguration(SaveState.All);
                     List<GameObject> drawables = new(GameObject.FindGameObjectsWithTag(Tags.Drawable));
                     DrawableConfig[] configs = new DrawableConfig[drawables.Count];
@@ -194,15 +194,15 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void Cancel()
         {
-            if (selectedDrawables.Count > 0 && Input.GetKeyDown(KeyCode.Escape)
+            if (selectedSurfaces.Count > 0 && Input.GetKeyDown(KeyCode.Escape)
                 && (browser == null || (browser != null && !browser.IsOpen())))
             {
                 ShowNotification.Info("Unselect drawables", "The marked drawables was unselected.");
-                foreach (GameObject drawable in selectedDrawables)
+                foreach (GameObject surface in selectedSurfaces)
                 {
-                    drawable.Destroy<HighlightEffect>();
+                    surface.Destroy<HighlightEffect>();
                 }
-                selectedDrawables.Clear();
+                selectedSurfaces.Clear();
             }
         }
 
@@ -213,22 +213,22 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void DrawableSelection()
         {
-            if (Selector.SelectQueryHasOrIsDrawable(out RaycastHit raycastHit)
+            if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit)
                 && !clicked
                 && (browser == null || (browser != null && !browser.IsOpen())))
             {
                 clicked = true;
-                GameObject drawable = GameFinder.GetDrawable(raycastHit.collider.gameObject);
+                GameObject surface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
 
-                if (drawable.GetComponent<HighlightEffect>() == null)
+                if (surface.GetComponent<HighlightEffect>() == null)
                 {
-                    selectedDrawables.Add(drawable);
-                    GameHighlighter.EnableGlowOverlay(drawable);
+                    selectedSurfaces.Add(surface);
+                    GameHighlighter.EnableGlowOverlay(surface);
                 }
                 else
                 {
-                    Destroyer.Destroy(drawable.GetComponent<HighlightEffect>());
-                    selectedDrawables.Remove(drawable);
+                    Destroyer.Destroy(surface.GetComponent<HighlightEffect>());
+                    selectedSurfaces.Remove(surface);
                 }
             }
         }
@@ -241,12 +241,12 @@ namespace SEE.Controls.Actions.Drawable
         private void Save(string filePath, ref bool result)
         {
             memento.FilePath = new FilePath(filePath);
-            GameObject[] drawables = new GameObject[memento.Drawables.Length];
-            for (int i = 0; i < drawables.Length; i++)
+            GameObject[] surfaces = new GameObject[memento.Surfaces.Length];
+            for (int i = 0; i < surfaces.Length; i++)
             {
-                drawables[i] = memento.Drawables[i].GetDrawable();
+                surfaces[i] = memento.Surfaces[i].GetDrawable();
             }
-            DrawableConfigManager.SaveDrawables(drawables, memento.FilePath);
+            DrawableConfigManager.SaveDrawables(surfaces, memento.FilePath);
             result = true;
             CurrentState = IReversibleAction.Progress.Completed;
 
@@ -258,7 +258,7 @@ namespace SEE.Controls.Actions.Drawable
             else if (memento.SavedState == SaveState.Multiple)
             {
                 ShowNotification.Info("Saved!",
-                        "The chosen " + drawables.Length + $" drawables have been successfully saved to the file {filePath}");
+                        "The chosen " + surfaces.Length + $" drawables have been successfully saved to the file {filePath}");
             } else
             {
                 ShowNotification.Info("Saved!",
@@ -284,12 +284,12 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            GameObject[] drawables = new GameObject[memento.Drawables.Length];
-            for (int i = 0; i < drawables.Length; i++)
+            GameObject[] surfaces = new GameObject[memento.Surfaces.Length];
+            for (int i = 0; i < surfaces.Length; i++)
             {
-                drawables[i] = memento.Drawables[i].GetDrawable();
+                surfaces[i] = memento.Surfaces[i].GetDrawable();
             }
-            DrawableConfigManager.SaveDrawables(drawables, memento.FilePath);
+            DrawableConfigManager.SaveDrawables(surfaces, memento.FilePath);
         }
 
         /// <summary>

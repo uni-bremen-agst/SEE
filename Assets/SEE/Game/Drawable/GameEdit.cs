@@ -316,7 +316,7 @@ namespace SEE.Game.Drawable
                 ChangeLine(GameFinder.FindChildWithTag(node, Tags.Line), conf.BorderConf);
                 ChangeText(GameFinder.FindChildWithTag(node, Tags.DText), conf.TextConf);
                 GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(
-                        GameFinder.GetDrawable(node));
+                        GameFinder.GetDrawableSurface(node));
                 GameObject parent = GameFinder.FindChild(attachedObjects, conf.ParentNode);
                 GameMindMap.ChangeParent(node, parent);
 

@@ -44,11 +44,6 @@ namespace SEE.Controls.Actions.Drawable
         private Operation chosenOperation = Operation.None;
 
         /// <summary>
-        /// The drawable of the chosen position.
-        /// </summary>
-        private GameObject drawable;
-
-        /// <summary>
         /// The chosen position.
         /// </summary>
         private Vector3 position;
@@ -93,9 +88,9 @@ namespace SEE.Controls.Actions.Drawable
             /// </summary>
             public readonly Operation Operation;
             /// <summary>
-            /// The drawable on which the node should be displayed.
+            /// The drawable surface on which the node should be displayed.
             /// </summary>
-            public readonly DrawableConfig Drawable;
+            public readonly DrawableConfig Surface;
 
             /// <summary>
             /// The node configuration.
@@ -105,12 +100,12 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The constructor.
             /// </summary>
-            /// <param name="drawable">The drawable on which the node should be displayed.</param>
+            /// <param name="surface">The drawable surface on which the node should be displayed.</param>
             /// <param name="conf">The node configuration</param>
             /// <param name="operation">The executed operation.</param>
-            public Memento(GameObject drawable, MindMapNodeConf conf, Operation operation)
+            public Memento(GameObject surface, MindMapNodeConf conf, Operation operation)
             {
-                Drawable = DrawableConfigManager.GetDrawableConfig(drawable);
+                Surface = DrawableConfigManager.GetDrawableConfig(surface);
                 Conf = conf;
                 Operation = operation;
             }
@@ -251,11 +246,11 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>the success of the selection.</returns>
         private bool SelectPosition()
         {
-            if (Selector.SelectQueryHasOrIsDrawable(out RaycastHit raycastHit))
+            if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit))
             {
                 MindMapMenu.Disable();
-                drawable = GameFinder.GetDrawable(raycastHit.collider.gameObject);
-                if (CheckValid(GameFinder.GetAttachedObjectsObject(drawable)))
+                Surface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
+                if (CheckValid(GameFinder.GetAttachedObjectsObject(Surface)))
                 {
                     position = raycastHit.point;
                     progress = ProgressState.WaitForText;
@@ -265,7 +260,7 @@ namespace SEE.Controls.Actions.Drawable
                 }
                 else
                 {
-                    drawable = null;
+                    Surface = null;
                     chosenOperation = Operation.None;
                     MindMapMenu.Enable();
                     return false;
@@ -299,7 +294,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void AddNode()
         {
-            node = GameMindMap.Create(drawable, GetPrefix(), writtenText, position);
+            node = GameMindMap.Create(Surface, GetPrefix(), writtenText, position);
             if (chosenOperation == Operation.Theme)
             {
                 progress = ProgressState.Finish;
@@ -310,13 +305,13 @@ namespace SEE.Controls.Actions.Drawable
                 ShowNotification.Info("Select a Parent Node", "Now select a parent node.\n" +
                     "To select, click on the specific parent node or choose it from the menu.", 3);
                 /// The following block is for a branch line preview.
-                branchLine = GameDrawer.StartDrawing(drawable, new Vector3[] { position },
+                branchLine = GameDrawer.StartDrawing(Surface, new Vector3[] { position },
                     GameDrawer.ColorKind.Monochrome, Color.black, Color.clear,
                     ValueHolder.StandardLineThickness, GameDrawer.LineKind.Solid,
                     ValueHolder.StandardLineTiling);
                 branchLine.transform.SetParent(node.transform);
                 branchLineRenderer = branchLine.GetComponent<LineRenderer>();
-                MindMapParentSelectionMenu.Enable(GameFinder.GetAttachedObjectsObject(drawable), node);
+                MindMapParentSelectionMenu.Enable(GameFinder.GetAttachedObjectsObject(Surface), node);
             }
         }
 
@@ -331,7 +326,7 @@ namespace SEE.Controls.Actions.Drawable
             /// This block is for the branch line preview.
             /// It draws the line from the origin of the node to the position of the mouse cursor.
             if (!Queries.MouseHold(MouseButton.Left) 
-                && Selector.SelectQueryHasOrIsWithoutMouse(out RaycastHit raycastHit)
+                && Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit raycastHit)
                 && node != null)
             {
                 Vector3[] positions = new Vector3[2];
@@ -354,7 +349,7 @@ namespace SEE.Controls.Actions.Drawable
                     && (hit.collider.gameObject.name.StartsWith(ValueHolder.MindMapThemePrefix) ||
                         hit.collider.gameObject.name.StartsWith(ValueHolder.MindMapSubthemePrefix)) 
                     && hit.collider.gameObject != node
-                    && GameFinder.GetDrawable(hit.collider.gameObject).Equals(GameFinder.GetDrawable(node)))
+                    && GameFinder.GetDrawableSurface(hit.collider.gameObject).Equals(GameFinder.GetDrawableSurface(node)))
                 {
                     Destroyer.Destroy(branchLine);
                     branchLine = GameMindMap.CreateBranchLine(node, hit.collider.gameObject);
@@ -401,8 +396,8 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>true</returns>
         private bool FinishAdd()
         {
-            memento = new(drawable, MindMapNodeConf.GetNodeConf(node), chosenOperation);
-            new MindMapCreateNodeNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Conf).Execute();
+            memento = new(Surface, MindMapNodeConf.GetNodeConf(node), chosenOperation);
+            new MindMapCreateNodeNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Conf).Execute();
             CurrentState = IReversibleAction.Progress.Completed;
             return true;
         }
@@ -467,7 +462,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Undo()
         {
-            GameObject attached = GameFinder.GetAttachedObjectsObject(memento.Drawable.GetDrawable());
+            GameObject attached = GameFinder.GetAttachedObjectsObject(memento.Surface.GetDrawable());
             GameObject node = GameFinder.FindChild(attached, memento.Conf.Id);
             if (memento.Operation != Operation.Theme)
             {
@@ -476,14 +471,14 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     parent.GetComponent<MMNodeValueHolder>().RemoveChild(node);
                 }
-                new MindMapRemoveChildNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                new MindMapRemoveChildNetAction(memento.Surface.ID, memento.Surface.ParentID,
                     memento.Conf).Execute();
                 GameObject branchToParent = GameFinder.FindChild(attached, memento.Conf.BranchLineToParent);
-                new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
                     branchToParent.name).Execute();
                 Destroyer.Destroy(branchToParent);
             }
-            new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+            new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
                 memento.Conf.Id).Execute();
             Destroyer.Destroy(node);
         }
@@ -493,8 +488,8 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Redo()
         {
-            GameMindMap.ReCreate(memento.Drawable.GetDrawable(), memento.Conf);
-            new MindMapCreateNodeNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Conf).Execute();
+            GameMindMap.ReCreate(memento.Surface.GetDrawable(), memento.Conf);
+            new MindMapCreateNodeNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Conf).Execute();
         }
 
         /// <summary>
@@ -535,11 +530,11 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>empty set</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            if (memento.Drawable != null)
+            if (memento.Surface != null)
             {
                 HashSet<string> changedObjects = new() 
                 {
-                    memento.Drawable.ID,
+                    memento.Surface.ID,
                     memento.Conf.Id
                 };
                 if (memento.Operation.Equals(Operation.Subtheme) 

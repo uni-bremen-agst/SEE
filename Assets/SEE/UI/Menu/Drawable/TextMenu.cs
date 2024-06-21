@@ -548,25 +548,25 @@ namespace SEE.UI.Menu.Drawable
         {
             if (newValueHolder is TextConf textHolder)
             {
-                GameObject drawable = GameFinder.GetDrawable(selectedText);
-                string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+                GameObject surface = GameFinder.GetDrawableSurface(selectedText);
+                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
                 /// Enables the text menu in edit mode.
                 EnableTextMenu(color =>
                 {
                     GameEdit.ChangeFontColor(selectedText, color);
                     textHolder.FontColor = color;
-                    new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
+                    new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
                 }, textHolder.FontColor, true, true);
 
                 /// Adds the handler for the return button, if <paramref name="returnCall"/> not null.
                 AddReturnCall(returnCall);
 
                 /// Adds the handler for the font color button.
-                AddFontColorButtonForEdit(selectedText, textHolder, drawable, drawableParentName);
+                AddFontColorButtonForEdit(selectedText, textHolder, surface, surfaceParentName);
 
                 /// Adds the handler for the outline color button.
-                AddOutlineColorButtonForEdit(selectedText, textHolder, drawable, drawableParentName);
+                AddOutlineColorButtonForEdit(selectedText, textHolder, surface, surfaceParentName);
 
                 /// Adds the handler for the outline thickness slider.
                 /// Changes are saved in the configuration.
@@ -574,12 +574,12 @@ namespace SEE.UI.Menu.Drawable
                 {
                     GameEdit.ChangeOutlineThickness(selectedText, thickness);
                     textHolder.OutlineThickness = thickness;
-                    new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
+                    new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
                 }, textHolder.OutlineThickness);
 
                 /// Adds the handler for the outline color status.
                 /// Changes are saved in the configuration.
-                AssignOutlineStatus(selectedText, textHolder, drawable, drawableParentName);
+                AssignOutlineStatus(selectedText, textHolder, surface, surfaceParentName);
 
                 /// Assigns the current status to the switch and updates the UI.
                 outlineSwitch.isOn = textHolder.IsOutlined;
@@ -591,7 +591,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     GameEdit.ChangeFontSize(selectedText, size);
                     textHolder.FontSize = size;
-                    new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
+                    new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
                 }, textHolder.FontSize);
 
                 /// Adds the handler to the font style buttons.
@@ -600,7 +600,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     GameEdit.ChangeFontStyles(selectedText, style);
                     textHolder.FontStyles = style;
-                    new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
+                    new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
                 }, textHolder.FontStyles);
 
                 /// Adds the handler to the edit text button.
@@ -619,7 +619,7 @@ namespace SEE.UI.Menu.Drawable
                                 textHolder.FontSize, textHolder.FontStyles);
                             GameEdit.ChangeText(selectedText, textOut);
                             textHolder.Text = textOut;
-                            new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
+                            new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
                         }
                         else
                         {
@@ -636,7 +636,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     GameEdit.ChangeLayer(selectedText, order);
                     textHolder.OrderInLayer = order;
-                    new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
+                    new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
                 }, textHolder.OrderInLayer);
 
                 /// Re-calculate the menus height.
@@ -671,10 +671,10 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="selectedText">The text to be edit.</param>
         /// <param name="textHolder">The configuration which holds the changes.</param>
-        /// <param name="drawable">The drawable on which the text is displayed</param>
-        /// <param name="drawableParentName">The id of the drawable parent</param>
+        /// <param name="surface">The drawable surface on which the text is displayed</param>
+        /// <param name="surfaceParentName">The id of the drawable surface parent</param>
         private static void AddFontColorButtonForEdit(GameObject selectedText, TextConf textHolder,
-            GameObject drawable, string drawableParentName)
+            GameObject surface, string surfaceParentName)
         {
             fontColorBMB.clickEvent.AddListener(() =>
             {
@@ -682,7 +682,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     GameEdit.ChangeFontColor(selectedText, color);
                     textHolder.FontColor = color;
-                    new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
+                    new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
                 }, textHolder.FontColor);
                 MenuHelper.CalculateHeight(instance);
             });
@@ -695,10 +695,10 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="selectedText">The text to be edit.</param>
         /// <param name="textHolder">The configuration which holds the changes.</param>
-        /// <param name="drawable">The drawable on which the text is displayed</param>
-        /// <param name="drawableParentName">The id of the drawable parent</param>
+        /// <param name="surface">The drawable surface on which the text is displayed</param>
+        /// <param name="surfaceParentName">The id of the drawable surface parent</param>
         private static void AddOutlineColorButtonForEdit(GameObject selectedText, TextConf textHolder,
-            GameObject drawable, string drawableParentName)
+            GameObject surface, string surfaceParentName)
         {
             outlineColorBMB.clickEvent.AddListener(() =>
             {
@@ -721,7 +721,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     GameEdit.ChangeOutlineColor(selectedText, color);
                     textHolder.OutlineColor = color;
-                    new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
+                    new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
                 }, textHolder.OutlineColor);
                 MenuHelper.CalculateHeight(instance);
             });
@@ -782,16 +782,16 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="selectedText">The chosen text to be edited.</param>
         /// <param name="textHolder">The configuration which holds the new value.</param>
-        /// <param name="drawable">The drawable on which the text is displayed</param>
-        /// <param name="drawableParentName">The id of the drawable parent</param>
+        /// <param name="surface">The drawable surface on which the text is displayed</param>
+        /// <param name="surfaceParentName">The id of the drawable surface parent</param>
         public static void AssignOutlineStatus(GameObject selectedText, TextConf textHolder,
-            GameObject drawable, string drawableParentName)
+            GameObject surface, string surfaceParentName)
         {
             outlineSwitch.OffEvents.AddListener(() =>
             {
                 GameTexter.ChangeOutlineStatus(selectedText, false);
                 textHolder.IsOutlined = false;
-                new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
+                new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
             });
 
             outlineSwitch.OnEvents.AddListener(() =>
@@ -805,7 +805,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     GameEdit.ChangeOutlineColor(selectedText, textHolder.OutlineColor);
                 }
-                new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
+                new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
             });
         }
 

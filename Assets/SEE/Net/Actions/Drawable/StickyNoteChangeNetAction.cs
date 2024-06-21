@@ -38,11 +38,11 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                if (DrawableConf != null && GameFinder.FindDrawable(DrawableConf.ID, DrawableConf.ParentID) != null)
+                if (DrawableConf != null && GameFinder.FindDrawableSurface(DrawableConf.ID, DrawableConf.ParentID) != null)
                 {
-                    GameObject drawable = GameFinder.FindDrawable(DrawableConf.ID, DrawableConf.ParentID);
-                    GameObject stickyNote = drawable.transform.parent.gameObject;
-                    GameObject root = GameFinder.GetHighestParent(drawable);
+                    GameObject surface = GameFinder.FindDrawableSurface(DrawableConf.ID, DrawableConf.ParentID);
+                    GameObject stickyNote = surface.transform.parent.gameObject;
+                    GameObject root = GameFinder.GetHighestParent(surface);
 
                     GameStickyNoteManager.ChangeLayer(root, DrawableConf.Order);
                     GameStickyNoteManager.ChangeColor(stickyNote, DrawableConf.Color);

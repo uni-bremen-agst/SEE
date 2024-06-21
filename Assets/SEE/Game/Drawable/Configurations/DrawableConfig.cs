@@ -73,7 +73,7 @@ namespace SEE.Game.Drawable.Configurations
         /// <returns>the drawable game object.</returns>
         public GameObject GetDrawable()
         {
-            return GameFinder.FindDrawable(ID, ParentID);
+            return GameFinder.FindDrawableSurface(ID, ParentID);
         }
 
         /// <summary>

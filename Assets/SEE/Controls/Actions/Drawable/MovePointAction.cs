@@ -17,7 +17,7 @@ namespace SEE.Controls.Actions.Drawable
     /// This action allows the user to move a point of a <see cref="LineConf"/>.
     /// It searches for the nearest point based on the mouse position at the moment of selecting.
     /// </summary>
-    public class MovePointAction : AbstractPlayerAction
+    public class MovePointAction : DrawableAction
     {
         /// <summary>
         /// This struct can store all the information needed to revert or repeat a <see cref="MovePointAction"/>
@@ -34,9 +34,9 @@ namespace SEE.Controls.Actions.Drawable
             /// </summary>
             public GameObject Line;
             /// <summary>
-            /// The drawable on which the line is placed.
+            /// The drawable surface on which the line is placed.
             /// </summary>
-            public readonly DrawableConfig Drawable;
+            public readonly DrawableConfig Surface;
             /// <summary>
             /// The id of the line.
             /// </summary>
@@ -59,17 +59,17 @@ namespace SEE.Controls.Actions.Drawable
             /// The constructor.
             /// </summary>
             /// <param name="line">the selected line</param>
-            /// <param name="drawable">The drawable on which the line is placed.</param>
+            /// <param name="surface">The drawable surface on which the line is placed.</param>
             /// <param name="id">the id of the selected line</param>
             /// <param name="indices">The Indices of the founded nearest position.
             /// It can be more then one, because points can overlap.</param>
             /// <param name="oldPointPosition">The old position of the selected points</param>
             /// <param name="newPointPosition">The new position for the selected points</param>
-            public Memento(GameObject line, GameObject drawable, string id, List<int> indices,
+            public Memento(GameObject line, GameObject surface, string id, List<int> indices,
                 Vector3 oldPointPosition, Vector3 newPointPosition)
             {
                 Line = line;
-                Drawable = DrawableConfigManager.GetDrawableConfig(drawable);
+                Surface = DrawableConfigManager.GetDrawableConfig(surface);
                 Id = id;
                 Indices = indices;
                 OldPointPosition = oldPointPosition;
@@ -108,10 +108,6 @@ namespace SEE.Controls.Actions.Drawable
         /// The new point position.
         /// </summary>
         private Vector3 newPointPosition;
-        /// <summary>
-        /// The drawable on which the line is displayed.
-        /// </summary>
-        private GameObject drawable;
 
         /// <summary>
         /// This method manages the player's interaction with the mode
@@ -140,7 +136,7 @@ namespace SEE.Controls.Actions.Drawable
 
                     /// Ends the action, creates a memento, and finalizes the progress.
                     case ProgressState.Finish:
-                        memento = new Memento(selectedLine, GameFinder.GetDrawable(selectedLine),
+                        memento = new Memento(selectedLine, GameFinder.GetDrawableSurface(selectedLine),
                             selectedLine.name, Indices, oldPointPosition, newPointPosition);
                         CurrentState = IReversibleAction.Progress.Completed;
                         return true;
@@ -161,10 +157,10 @@ namespace SEE.Controls.Actions.Drawable
                 BlinkEffect.Deactivate(selectedLine);
                 if (progressState != ProgressState.Finish && selectedLine != null)
                 {
-                    GameObject drawable = GameFinder.GetDrawable(selectedLine);
-                    string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+                    GameObject surface = GameFinder.GetDrawableSurface(selectedLine);
+                    string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
                     GameMoveRotator.MovePoint(selectedLine, Indices, oldPointPosition);
-                    new MovePointNetAction(drawable.name, drawableParentName, selectedLine.name, Indices,
+                    new MovePointNetAction(surface.name, surfaceParentName, selectedLine.name, Indices,
                         oldPointPosition).Execute();
                 }
                 selectedLine = null;
@@ -179,11 +175,11 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void SelectLine()
         {
-            if (Selector.SelectQueryHasDrawable(out RaycastHit raycastHit)
+            if (Selector.SelectQueryHasDrawableSurface(out RaycastHit raycastHit)
                 && raycastHit.collider.gameObject.CompareTag(Tags.Line))
             {
                 selectedLine = raycastHit.collider.gameObject;
-                drawable = GameFinder.GetDrawable(selectedLine);
+                Surface = GameFinder.GetDrawableSurface(selectedLine);
 
                 selectedLine.AddOrGetComponent<BlinkEffect>();
                 NearestPoints.GetNearestPoints(selectedLine, raycastHit.point,
@@ -202,16 +198,16 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void MovePoint()
         {
-            string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+            string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(Surface);
             if (selectedLine.GetComponent<BlinkEffect>() != null)
             {
                 if (Raycasting.RaycastAnything(out RaycastHit hit))
                 {
-                    if (GameFinder.IsOrHasDrawable(hit.collider.gameObject))
+                    if (GameFinder.IsOrHasDrawableSurface(hit.collider.gameObject))
                     {
                         newPointPosition = selectedLine.transform.InverseTransformPoint(hit.point);
                         GameMoveRotator.MovePoint(selectedLine, Indices, newPointPosition);
-                        new MovePointNetAction(drawable.name, drawableParentName, selectedLine.name,
+                        new MovePointNetAction(Surface.name, surfaceParentName, selectedLine.name,
                             Indices, newPointPosition).Execute();
                     }
                 }
@@ -228,7 +224,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 progressState = ProgressState.Finish;
                 GameMoveRotator.MovePoint(selectedLine, Indices, newPointPosition);
-                new MovePointNetAction(drawable.name, drawableParentName, selectedLine.name, Indices,
+                new MovePointNetAction(Surface.name, surfaceParentName, selectedLine.name, Indices,
                     newPointPosition).Execute();
             }
         }
@@ -244,10 +240,10 @@ namespace SEE.Controls.Actions.Drawable
 
             if (progressState != ProgressState.Finish && selectedLine != null)
             {
-                GameObject drawable = GameFinder.GetDrawable(selectedLine);
-                string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+                GameObject surface = GameFinder.GetDrawableSurface(selectedLine);
+                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
                 GameMoveRotator.MovePoint(selectedLine, Indices, oldPointPosition);
-                new MovePointNetAction(drawable.name, drawableParentName, selectedLine.name, Indices,
+                new MovePointNetAction(surface.name, surfaceParentName, selectedLine.name, Indices,
                     oldPointPosition).Execute();
             }
         }
@@ -260,13 +256,13 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (memento.Line == null && memento.Id != null)
             {
-                memento.Line = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Id);
+                memento.Line = GameFinder.FindChild(memento.Surface.GetDrawable(), memento.Id);
             }
 
             if (memento.Line != null)
             {
                 GameMoveRotator.MovePoint(memento.Line, memento.Indices, memento.OldPointPosition);
-                new MovePointNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Line.name,
+                new MovePointNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Line.name,
                     memento.Indices, memento.OldPointPosition).Execute();
             }
         }
@@ -279,12 +275,12 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             if (memento.Line == null && memento.Id != null)
             {
-                memento.Line = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Id);
+                memento.Line = GameFinder.FindChild(memento.Surface.GetDrawable(), memento.Id);
             }
             if (memento.Line != null)
             {
                 GameMoveRotator.MovePoint(memento.Line, memento.Indices, memento.NewPointPosition);
-                new MovePointNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Line.name,
+                new MovePointNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Line.name,
                     memento.Indices, memento.NewPointPosition).Execute();
             }
         }

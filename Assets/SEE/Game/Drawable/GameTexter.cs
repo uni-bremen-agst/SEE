@@ -141,7 +141,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// This method creates the inital drawable text object.
         /// </summary>
-        /// <param name="drawable">The drawable on which the text should be displayed</param>
+        /// <param name="surface">The drawable surface on which the text should be displayed</param>
         /// <param name="name">The name of the text object.</param>
         /// <param name="text">The text that should be displayed.</param>
         /// <param name="position">The inital position of the text object.</param>
@@ -152,7 +152,7 @@ namespace SEE.Game.Drawable
         /// <param name="order">The current order in layer.</param>
         /// <param name="styles">The chosen font styles for the text.</param>
         /// <param name="textObj">The created drawable text object.</param>
-        private static void Setup(GameObject drawable, string name, string text, Vector3 position,
+        private static void Setup(GameObject surface, string name, string text, Vector3 position,
             Color fontColor, Color outlineColor, bool outlineStatus, float outlineThickness,
             float fontSize, int order, FontStyles styles,
             out GameObject textObj)
@@ -172,14 +172,14 @@ namespace SEE.Game.Drawable
 
                 name = ValueHolder.TextPrefix + textObj.GetInstanceID() + RandomStrings.GetRandomString(4);
                 /// Check if the name is already in use. If so, generate a new name.
-                while (GameFinder.FindChild(drawable, name) != null)
+                while (GameFinder.FindChild(surface, name) != null)
                 {
                     name = ValueHolder.TextPrefix + textObj.GetInstanceID() + RandomStrings.GetRandomString(4);
                 }
                 textObj.name = name;
             }
             /// Sets up the drawable holder <see cref="DrawableSetupManager"/>.
-            DrawableSetupManager.Setup(drawable, out _, out GameObject attachedObjects);
+            DrawableSetupManager.Setup(surface, out _, out GameObject attachedObjects);
 
             textObj.tag = Tags.DText;
 
@@ -231,7 +231,7 @@ namespace SEE.Game.Drawable
         /// Writes a drawbale text on a drawable.
         /// The name for it is currently empty, because the setup method will create a unique one.
         /// </summary>
-        /// <param name="drawable">The drawable on which the text should be displayed</param>
+        /// <param name="surface">The drawable surface on which the text should be displayed</param>
         /// <param name="text">The text that should be displayed</param>
         /// <param name="position">The inital position of the text object</param>
         /// <param name="fontColor">The chosen font color of the text.</param>
@@ -241,10 +241,10 @@ namespace SEE.Game.Drawable
         /// <param name="order">The current order in layer</param>
         /// <param name="styles">The chosen font styles for the text</param>
         /// <returns>The created drawable text object</returns>
-        public static GameObject WriteText(GameObject drawable, string text, Vector3 position,
+        public static GameObject WriteText(GameObject surface, string text, Vector3 position,
             Color fontColor, Color outlineColor, bool outlineStatus, float outlineThickness, float fontSize, int order, FontStyles styles)
         {
-            Setup(drawable, "", text, position, fontColor, outlineColor, outlineStatus, outlineThickness, fontSize,
+            Setup(surface, "", text, position, fontColor, outlineColor, outlineStatus, outlineThickness, fontSize,
                 order, styles, out GameObject textObj);
             ValueHolder.CurrentOrderInLayer++;
 
@@ -257,7 +257,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Rewrites a drawbale text on a drawable.
         /// </summary>
-        /// <param name="drawable">The drawable on which the text should be displayed</param>
+        /// <param name="surface">The drawable surface on which the text should be displayed</param>
         /// <param name="id">The name of the drawable text</param>
         /// <param name="text">The text that should be displayed</param>
         /// <param name="position">The inital position of the text object</param>
@@ -270,7 +270,7 @@ namespace SEE.Game.Drawable
         /// <param name="order">The current order in layer</param>
         /// <param name="styles">The chosen font styles for the text</param>
         /// <returns>The created drawable text object</returns>
-        private static GameObject ReWriteText(GameObject drawable, string id, string text, Vector3 position,
+        private static GameObject ReWriteText(GameObject surface, string id, string text, Vector3 position,
             Vector3 scale, Vector3 eulerAngles, Color fontColor, Color outlineColor, bool outlineStatus,
             float outlineThickness, float fontSize, int order, FontStyles styles)
         {
@@ -284,15 +284,15 @@ namespace SEE.Game.Drawable
             GameObject textObject;
 
             /// Tries to find the text on the drawable.
-            if (GameFinder.FindChild(drawable, id) != null)
+            if (GameFinder.FindChild(surface, id) != null)
             {
-                textObject = GameFinder.FindChild(drawable, id);
+                textObject = GameFinder.FindChild(surface, id);
                 textObject.GetComponent<TextMeshPro>().sortingOrder = order;
             }
             else
             {
                 /// Creates the text object.
-                Setup(drawable, id, text, position, fontColor, outlineColor, outlineStatus, outlineThickness, fontSize, order,
+                Setup(surface, id, text, position, fontColor, outlineColor, outlineStatus, outlineThickness, fontSize, order,
                     styles, out GameObject textObj);
                 textObject = textObj;
 
@@ -314,12 +314,12 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Rewrites a given <see cref="TextConf"/> configuration.
         /// </summary>
-        /// <param name="drawable">The drawable on which the text should be displayed.</param>
+        /// <param name="surface">The drawable surface on which the text should be displayed.</param>
         /// <param name="text">The text configuration which contains the necessary values.</param>
         /// <returns>The created drawable text object</returns>
-        public static GameObject ReWriteText(GameObject drawable, TextConf text)
+        public static GameObject ReWriteText(GameObject surface, TextConf text)
         {
-            return ReWriteText(drawable,
+            return ReWriteText(surface,
                 text.Id,
                 text.Text,
                 text.Position,

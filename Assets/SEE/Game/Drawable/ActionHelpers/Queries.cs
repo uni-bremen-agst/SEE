@@ -67,25 +67,43 @@ namespace Assets.SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
+        /// Registers the use of the mouse wheel for scrolling down.
+        /// </summary>
+        /// <returns>True if the user scrolls down.</returns>
+        public static bool ScrollDown()
+        {
+            return Input.mouseScrollDelta.y <= -0.1;
+        }
+
+        /// <summary>
+        /// Registers the use of the mouse wheel for scrolling up.
+        /// </summary>
+        /// <returns>True if the user scrolls up.</returns>
+        public static bool ScrollUp()
+        {
+            return Input.mouseScrollDelta.y >= 0.1;
+        }
+
+        /// <summary>
         /// Checks if the given drawable surface object is the same object as the other one.
         /// </summary>
-        /// <param name="drawable">The drawable surface to be checked.</param>
+        /// <param name="surface">The drawable surface to be checked.</param>
         /// <param name="other">>The other object.</param>
         /// <returns>True if the drawable surface is the same as the other object.</returns>
-        public static bool SameDrawableSurface(GameObject drawable, GameObject other)
+        public static bool SameDrawableSurface(GameObject surface, GameObject other)
         {
-           return drawable != null && GameFinder.GetDrawable(other).Equals(drawable);
+           return surface != null && GameFinder.GetDrawableSurface(other).Equals(surface);
         }
 
         /// <summary>
         /// Checks if the given drawable surface is null or the same object as the other <see cref="GameObject"/>.
         /// </summary>
-        /// <param name="drawable">The drawable surface to be checked.</param>
+        /// <param name="surface">The drawable surface to be checked.</param>
         /// <param name="other">The other object.</param>
         /// <returns>True if the drawable surface is null or the same as the other object.</returns>
-        public static bool DrawableSurfaceNullOrSame(GameObject drawable, GameObject other)
+        public static bool DrawableSurfaceNullOrSame(GameObject surface, GameObject other)
         {
-            return drawable == null || SameDrawableSurface(drawable, other);
+            return surface == null || SameDrawableSurface(surface, other);
         }
     }
 }

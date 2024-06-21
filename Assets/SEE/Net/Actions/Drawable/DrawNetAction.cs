@@ -40,7 +40,7 @@ namespace SEE.Net.Actions.Drawable
                 base.ExecuteOnClient();
                 if (Line != null && Line.Id != "")
                 {
-                    GameDrawer.ReDrawLine(Drawable, Line);
+                    GameDrawer.ReDrawLine(Surface, Line);
                 }
                 else
                 {

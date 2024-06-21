@@ -38,8 +38,8 @@ namespace SEE.Game.Drawable
             }
             else
             {
-                GameObject drawable = GameFinder.GetDrawable(raycastHit.collider.gameObject);
-                stickyNote.transform.rotation = drawable.transform.rotation;
+                GameObject surface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
+                stickyNote.transform.rotation = surface.transform.rotation;
             }
 
             /// Adopt the position of the hit object, but preserve the distance.
@@ -239,10 +239,10 @@ namespace SEE.Game.Drawable
         /// <param name="color">The new color for the drawable</param>
         public static void ChangeColor(GameObject stickyNote, Color color)
         {
-            if (GameFinder.GetDrawable(stickyNote) != null
-                && GameFinder.GetDrawable(stickyNote).GetComponent<MeshRenderer>() != null)
+            if (GameFinder.GetDrawableSurface(stickyNote) != null
+                && GameFinder.GetDrawableSurface(stickyNote).GetComponent<MeshRenderer>() != null)
             {
-                GameFinder.GetDrawable(stickyNote).GetComponent<MeshRenderer>().material.color = color;
+                GameFinder.GetDrawableSurface(stickyNote).GetComponent<MeshRenderer>().material.color = color;
             }
         }
 

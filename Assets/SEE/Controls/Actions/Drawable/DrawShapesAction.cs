@@ -26,11 +26,6 @@ namespace SEE.Controls.Actions.Drawable
         private GameObject shape;
 
         /// <summary>
-        /// The drawable where the shape is displayed.
-        /// </summary>
-        private GameObject drawable;
-
-        /// <summary>
         /// The positions of the line in local space.
         /// </summary>
         private Vector3[] positions = new Vector3[1];
@@ -46,9 +41,9 @@ namespace SEE.Controls.Actions.Drawable
         private readonly struct Memento
         {
             /// <summary>
-            /// The drawable where the shape is displayed.
+            /// The drawable surface where the shape is displayed.
             /// </summary>
-            public readonly DrawableConfig Drawable;
+            public readonly DrawableConfig Surface;
             /// <summary>
             /// The configuration of the shape.
             /// </summary>
@@ -57,11 +52,11 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The constructor, which simply assigns its parameters to the fields in this class.
             /// </summary>
-            /// <param name="drawable">The drawable where the shape is displayed.</param>
+            /// <param name="surface">The drawable surface where the shape is displayed.</param>
             /// <param name="shape">The configuration of the shape.</param>
-            public Memento(GameObject drawable, LineConf shape)
+            public Memento(GameObject surface, LineConf shape)
             {
-                Drawable = DrawableConfigManager.GetDrawableConfig(drawable);
+                Surface = DrawableConfigManager.GetDrawableConfig(surface);
                 Shape = shape;
             }
         }
@@ -123,7 +118,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 /// Block for initiating shape drawing.
                 /// All shapes, except for straight lines, are also completed within this block.
-                if (Selector.SelectQueryHasOrIsDrawable(out RaycastHit raycastHit, true, true)
+                if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit, true, true)
                     && !drawing)
                 {
                     return ShapeDrawing(raycastHit);
@@ -150,7 +145,7 @@ namespace SEE.Controls.Actions.Drawable
                     && drawing 
                     && positions.Length > 0
                     && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
-                    && Selector.SelectQueryHasOrIsWithoutMouse(out RaycastHit hit))
+                    && Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit hit))
                 {
                     Vector3 newPosition = shape.transform.InverseTransformPoint(hit.point) - ValueHolder.DistanceToDrawable;
                     Vector3[] newPositions = new Vector3[positions.Length + 1];
@@ -159,7 +154,7 @@ namespace SEE.Controls.Actions.Drawable
                     positions = newPositions;
 
                     GameDrawer.Drawing(shape, positions);
-                    new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
+                    new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                         LineConf.GetLine(shape)).Execute();
                     FinishDrawing();
                     return true;
@@ -204,7 +199,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 ShowNotification.Info("Line-Shape drawing canceled.", 
                     "The drawing of the shape art line has been canceled.");
-                new EraseNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), shape.name).Execute();
+                new EraseNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), shape.name).Execute();
                 Destroyer.Destroy(shape);
                 positions = new Vector3[1];
                 drawing = false;
@@ -229,13 +224,13 @@ namespace SEE.Controls.Actions.Drawable
                     renderer.positionCount -= 2;
                     positions = positions.ToList().GetRange(0, positions.Length - 1).ToArray();
                     renderer.SetPositions(positions);
-                    new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), LineConf.GetLine(shape)).Execute();
+                    new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(shape)).Execute();
                 }
                 else
                 {
                     ShowNotification.Info("Line-Shape drawing canceled.", 
                         "The drawing of the shape art line has been canceled.");
-                    new EraseNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), shape.name).Execute();
+                    new EraseNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), shape.name).Execute();
                     Destroyer.Destroy(shape);
                     positions = new Vector3[1];
                     drawing = false;
@@ -255,9 +250,9 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>Whatever the shape creation is completed.</returns>
         private bool ShapeDrawing(RaycastHit raycastHit)
         {
-            drawable = GameFinder.GetDrawable(raycastHit.collider.gameObject);
+            Surface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
             drawing = true;
-            Vector3 convertedHitPoint = GameDrawer.GetConvertedPosition(drawable, raycastHit.point);
+            Vector3 convertedHitPoint = GameDrawer.GetConvertedPosition(Surface, raycastHit.point);
 
             GetSelectedShapePosition(convertedHitPoint, raycastHit.point);
 
@@ -284,7 +279,7 @@ namespace SEE.Controls.Actions.Drawable
                 case ShapePointsCalculator.Shape.Line:
 
                     positions[0] = hitpoint;
-                    shape = GameDrawer.StartDrawing(drawable, positions, ValueHolder.CurrentColorKind,
+                    shape = GameDrawer.StartDrawing(Surface, positions, ValueHolder.CurrentColorKind,
                         ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor,
                         ValueHolder.CurrentThickness, ValueHolder.CurrentLineKind,
                         ValueHolder.CurrentTiling);
@@ -344,14 +339,14 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (GameDrawer.DifferentPositionCounter(positions) > 1)
             {
-                shape = GameDrawer.DrawLine(drawable, "", positions, ValueHolder.CurrentColorKind,
+                shape = GameDrawer.DrawLine(Surface, "", positions, ValueHolder.CurrentColorKind,
                     ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor, ValueHolder.CurrentThickness, false,
                     ValueHolder.CurrentLineKind, ValueHolder.CurrentTiling);
                 shape.GetComponent<LineRenderer>().loop = false;
                 shape = GameDrawer.SetPivotShape(shape, convertedHitPoint);
                 LineConf currentShape = LineConf.GetLine(shape);
-                memento = new Memento(drawable, currentShape);
-                new DrawNetAction(memento.Drawable.ID, memento.Drawable.ParentID, currentShape).Execute();
+                memento = new Memento(Surface, currentShape);
+                new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, currentShape).Execute();
                 CurrentState = IReversibleAction.Progress.Completed;
                 drawing = false;
                 return true;
@@ -372,16 +367,16 @@ namespace SEE.Controls.Actions.Drawable
         private void LineShapePreview()
         {
             if (drawing && !Queries.LeftMouseInteraction() 
-                && Selector.SelectQueryHasOrIsWithoutMouse(out RaycastHit raycastHit)
+                && Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit raycastHit)
                 && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
-                && Queries.DrawableSurfaceNullOrSame(drawable, raycastHit.collider.gameObject))
+                && Queries.DrawableSurfaceNullOrSame(Surface, raycastHit.collider.gameObject))
             {
                 Vector3 newPosition = shape.transform.InverseTransformPoint(raycastHit.point) - ValueHolder.DistanceToDrawable;
                 Vector3[] newPositions = new Vector3[positions.Length + 1];
                 Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
                 newPositions[^1] = newPosition;
                 GameDrawer.Drawing(shape, newPositions);
-                new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), LineConf.GetLine(shape)).Execute();
+                new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(shape)).Execute();
             }
         }
 
@@ -393,9 +388,9 @@ namespace SEE.Controls.Actions.Drawable
         private void AddLineShapePoint()
         {
             if (Queries.LeftMouseDown() && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift) 
-                && Selector.SelectQueryHasOrIsWithoutMouse(out RaycastHit raycastHit)
+                && Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit raycastHit)
                 && drawing && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
-                && Queries.DrawableSurfaceNullOrSame(drawable, raycastHit.collider.gameObject))
+                && Queries.DrawableSurfaceNullOrSame(Surface, raycastHit.collider.gameObject))
             {
                 Vector3 newPosition = shape.transform.InverseTransformPoint(raycastHit.point) - ValueHolder.DistanceToDrawable;
                 if (newPosition != positions.Last())
@@ -406,7 +401,7 @@ namespace SEE.Controls.Actions.Drawable
                     positions = newPositions;
 
                     GameDrawer.Drawing(shape, positions);
-                    new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), LineConf.GetLine(shape)).Execute();
+                    new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(shape)).Execute();
                 }
             }
         }
@@ -421,8 +416,8 @@ namespace SEE.Controls.Actions.Drawable
             shape.GetComponent<LineRenderer>().loop = ShapeMenu.GetLoopManager().isOn;
             shape = GameDrawer.SetPivot(shape);
             LineConf currentShape = LineConf.GetLine(shape);
-            memento = new Memento(drawable, currentShape);
-            new DrawNetAction(memento.Drawable.ID, memento.Drawable.ParentID, currentShape).Execute();
+            memento = new Memento(Surface, currentShape);
+            new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, currentShape).Execute();
             CurrentState = IReversibleAction.Progress.Completed;
             drawing = false;
         }
@@ -435,11 +430,11 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (shape == null)
             {
-                shape = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Shape.Id);
+                shape = GameFinder.FindChild(memento.Surface.GetDrawable(), memento.Shape.Id);
             }
             if (shape != null)
             {
-                new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Shape.Id).Execute();
+                new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Shape.Id).Execute();
                 Destroyer.Destroy(shape);
             }
         }
@@ -450,10 +445,10 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            shape = GameDrawer.ReDrawLine(memento.Drawable.GetDrawable(), memento.Shape);
+            shape = GameDrawer.ReDrawLine(memento.Surface.GetDrawable(), memento.Shape);
             if (shape != null)
             {
-                new DrawNetAction(memento.Drawable.ID, memento.Drawable.ParentID, LineConf.GetLine(shape)).Execute();
+                new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, LineConf.GetLine(shape)).Execute();
             }
         }
 
@@ -493,7 +488,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>The id of the created shape</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            if (memento.Drawable == null)
+            if (memento.Surface == null)
             {
                 return new HashSet<string>();
             }

@@ -527,14 +527,14 @@ namespace SEE.UI.Menu.Drawable
                 SetUpReturnButtonForEditing(returnCall);
 
                 LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
-                GameObject drawable = GameFinder.GetDrawable(selectedLine);
-                string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+                GameObject surface = GameFinder.GetDrawableSurface(selectedLine);
+                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
                 /// Set up the line kind selector.
-                SetUpLineKindSelectorForEditing(selectedLine, renderer, lineHolder, drawable, drawableParentName);
+                SetUpLineKindSelectorForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
 
                 /// Set up the color kind selector.
-                SetUpColorKindSelectorForEditing(selectedLine, renderer, lineHolder, drawable, drawableParentName);
+                SetUpColorKindSelectorForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
 
                 /// Adds the action that should be executed if the tiling silder changed.
                 /// It only is available for <see cref="LineKind.Dashed"/>.
@@ -543,27 +543,27 @@ namespace SEE.UI.Menu.Drawable
                     ChangeLineKind(selectedLine, LineKind.Dashed, tiling);
                     lineHolder.LineKind = LineKind.Dashed;
                     lineHolder.Tiling = tiling;
-                    new ChangeLineKindNetAction(drawable.name, drawableParentName, selectedLine.name,
+                    new ChangeLineKindNetAction(surface.name, surfaceParentName, selectedLine.name,
                             LineKind.Dashed, tiling).Execute();
                 });
 
                 /// Sets up the primary color button. 
-                SetUpPrimaryColorButtonForEditing(selectedLine, lineHolder, drawable, drawableParentName);
+                SetUpPrimaryColorButtonForEditing(selectedLine, lineHolder, surface, surfaceParentName);
 
                 /// Sets up the secondary color button. 
-                SetUpSecondaryColorButtonForEditing(selectedLine, lineHolder, drawable, drawableParentName);
+                SetUpSecondaryColorButtonForEditing(selectedLine, lineHolder, surface, surfaceParentName);
 
                 /// Set up the outline thickness slider.
-                SetUpOutlineThicknessSliderForEditing(selectedLine, renderer, lineHolder, drawable, drawableParentName);
+                SetUpOutlineThicknessSliderForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
 
                 /// Set up the order in layer slider.
-                SetUpOrderInLayerSliderForEditing(selectedLine, lineHolder, drawable, drawableParentName);
+                SetUpOrderInLayerSliderForEditing(selectedLine, lineHolder, surface, surfaceParentName);
 
                 /// Set up the loop switch.
-                SetUpLoopSwitchForEditing(selectedLine, lineHolder, drawable, drawableParentName);
+                SetUpLoopSwitchForEditing(selectedLine, lineHolder, surface, surfaceParentName);
 
                 /// Set up the <see cref="HSVPicker.ColorPicker"/>.
-                SetUpColorPickerForEditing(selectedLine, renderer, lineHolder, drawable, drawableParentName);
+                SetUpColorPickerForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
 
                 /// Re-calculates the menu height.
                 MenuHelper.CalculateHeight(instance, true);
@@ -596,10 +596,10 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="selectedLine">The selected line.</param>
         /// <param name="renderer">The line renderer of the selected line.</param>
         /// <param name="lineHolder">The configuration which holds the changes.</param>
-        /// <param name="drawable">The drawable on which the line is displayed.</param>
-        /// <param name="drawableParentName">The parent id of the drawable.</param>
+        /// <param name="surface">The drawable surface on which the line is displayed.</param>
+        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
         private static void SetUpLineKindSelectorForEditing(GameObject selectedLine, LineRenderer renderer,
-            LineConf lineHolder, GameObject drawable, string drawableParentName)
+            LineConf lineHolder, GameObject surface, string surfaceParentName)
         {
             /// Assigns the current <see cref="LineKind"/> of the selected line to the menu variable.
             AssignLineKind(selectedLine.GetComponent<LineValueHolder>().LineKind, renderer.textureScale.x);
@@ -633,13 +633,13 @@ namespace SEE.UI.Menu.Drawable
                     {
                         lineHolder.ColorKind = ColorKind.Monochrome;
                         ChangeColorKind(selectedLine, lineHolder.ColorKind, lineHolder);
-                        new ChangeColorKindNetAction(drawable.name, drawableParentName,
+                        new ChangeColorKindNetAction(surface.name, surfaceParentName,
                             LineConf.GetLine(selectedLine), lineHolder.ColorKind).Execute();
                     }
 
                     /// Apply the line kind change.
                     ChangeLineKind(selectedLine, lineHolder.LineKind, lineHolder.Tiling);
-                    new ChangeLineKindNetAction(drawable.name, drawableParentName, selectedLine.name,
+                    new ChangeLineKindNetAction(surface.name, surfaceParentName, selectedLine.name,
                             lineHolder.LineKind, lineHolder.Tiling).Execute();
                 }
             };
@@ -654,10 +654,10 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="selectedLine">The selected line.</param>
         /// <param name="renderer">The line renderer of the selected line.</param>
         /// <param name="lineHolder">The configuration which holds the changes.</param>
-        /// <param name="drawable">The drawable on which the line is displayed.</param>
-        /// <param name="drawableParentName">The parent id of the drawable.</param>
+        /// <param name="surface">The drawable surface on which the line is displayed.</param>
+        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
         private static void SetUpColorKindSelectorForEditing(GameObject selectedLine, LineRenderer renderer,
-            LineConf lineHolder, GameObject drawable, string drawableParentName)
+            LineConf lineHolder, GameObject surface, string surfaceParentName)
         {
             /// Assigns the current <see cref="ColorKind"/> of the selected line to the menu variable.
             AssignColorKind(lineHolder.ColorKind);
@@ -677,7 +677,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 lineHolder.ColorKind = GetColorKinds(true)[index];
                 ChangeColorKind(selectedLine, lineHolder.ColorKind, lineHolder);
-                new ChangeColorKindNetAction(drawable.name, drawableParentName, LineConf.GetLine(selectedLine),
+                new ChangeColorKindNetAction(surface.name, surfaceParentName, LineConf.GetLine(selectedLine),
                     lineHolder.ColorKind).Execute();
 
                 /// Activates the primary color button, if it changes to <see cref="ColorKind.Monochrome"/>
@@ -686,7 +686,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     picker.onValueChanged.RemoveListener(colorAction);
                     MutuallyExclusiveColorButtons();
-                    SetUpColorPickerForEditing(selectedLine, renderer, lineHolder, drawable, drawableParentName);
+                    SetUpColorPickerForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
                 }
             };
 
@@ -701,10 +701,10 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="selectedLine">The selected line.</param>
         /// <param name="lineHolder">The configuration which holds the changes.</param>
-        /// <param name="drawable">The drawable on which the line is displayed.</param>
-        /// <param name="drawableParentName">The parent id of the drawable.</param>
+        /// <param name="surface">The drawable surface on which the line is displayed.</param>
+        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
         private static void SetUpPrimaryColorButtonForEditing(GameObject selectedLine, LineConf lineHolder,
-            GameObject drawable, string drawableParentName)
+            GameObject surface, string surfaceParentName)
         {
             /// Removes the old handler
             primaryColorBMB.clickEvent.RemoveAllListeners();
@@ -717,7 +717,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     GameEdit.ChangePrimaryColor(selectedLine, color);
                     lineHolder.PrimaryColor = color;
-                    new EditLinePrimaryColorNetAction(drawable.name, drawableParentName, selectedLine.name, color).Execute();
+                    new EditLinePrimaryColorNetAction(surface.name, surfaceParentName, selectedLine.name, color).Execute();
                 }, lineHolder.PrimaryColor);
             });
             /// Makes the button unclickable.
@@ -731,10 +731,10 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="selectedLine">The selected line.</param>
         /// <param name="lineHolder">The configuration which holds the changes.</param>
-        /// <param name="drawable">The drawable on which the line is displayed.</param>
-        /// <param name="drawableParentName">The parent id of the drawable.</param>
+        /// <param name="surface">The drawable surface on which the line is displayed.</param>
+        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
         private static void SetUpSecondaryColorButtonForEditing(GameObject selectedLine, LineConf lineHolder,
-            GameObject drawable, string drawableParentName)
+            GameObject surface, string surfaceParentName)
         {
             /// Removes the old handler.
             secondaryColorBMB.clickEvent.RemoveAllListeners();
@@ -761,7 +761,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     GameEdit.ChangeSecondaryColor(selectedLine, color);
                     lineHolder.SecondaryColor = color;
-                    new EditLineSecondaryColorNetAction(drawable.name, drawableParentName,
+                    new EditLineSecondaryColorNetAction(surface.name, surfaceParentName,
                         selectedLine.name, color).Execute();
                 }, lineHolder.SecondaryColor);
             });
@@ -777,10 +777,10 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="selectedLine">The selected line.</param>
         /// <param name="renderer">The line renderer of the selected line.</param>
         /// <param name="lineHolder">The configuration which holds the changes.</param>
-        /// <param name="drawable">The drawable on which the line is displayed.</param>
-        /// <param name="drawableParentName">The parent id of the drawable.</param>
+        /// <param name="surface">The drawable surface on which the line is displayed.</param>
+        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
         private static void SetUpOutlineThicknessSliderForEditing(GameObject selectedLine, LineRenderer renderer,
-            LineConf lineHolder, GameObject drawable, string drawableParentName)
+            LineConf lineHolder, GameObject surface, string surfaceParentName)
         {
             ThicknessSliderController thicknessSlider = instance.GetComponentInChildren<ThicknessSliderController>();
             /// Assigns the current value to the slider.
@@ -793,7 +793,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     GameEdit.ChangeThickness(selectedLine, thickness);
                     lineHolder.Thickness = thickness;
-                    new EditLineThicknessNetAction(drawable.name, drawableParentName,
+                    new EditLineThicknessNetAction(surface.name, surfaceParentName,
                         selectedLine.name, thickness).Execute();
                 }
             });
@@ -806,10 +806,10 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="selectedLine">The selected line.</param>
         /// <param name="lineHolder">The configuration which holds the changes.</param>
-        /// <param name="drawable">The drawable on which the line is displayed.</param>
-        /// <param name="drawableParentName">The parent id of the drawable.</param>
+        /// <param name="surface">The drawable surface on which the line is displayed.</param>
+        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
         private static void SetUpOrderInLayerSliderForEditing(GameObject selectedLine, LineConf lineHolder,
-            GameObject drawable, string drawableParentName)
+            GameObject surface, string surfaceParentName)
         {
             LayerSliderController layerSlider = instance.GetComponentInChildren<LayerSliderController>();
             /// Assigns the current value to the slider.
@@ -819,7 +819,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 GameEdit.ChangeLayer(selectedLine, layerOrder);
                 lineHolder.OrderInLayer = layerOrder;
-                new EditLayerNetAction(drawable.name, drawableParentName,
+                new EditLayerNetAction(surface.name, surfaceParentName,
                     selectedLine.name, layerOrder).Execute();
             });
         }
@@ -831,10 +831,10 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="selectedLine">The selected line.</param>
         /// <param name="lineHolder">The configuration which holds the changes.</param>
-        /// <param name="drawable">The drawable on which the line is displayed.</param>
-        /// <param name="drawableParentName">The parent id of the drawable.</param>
+        /// <param name="surface">The drawable surface on which the line is displayed.</param>
+        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
         private static void SetUpLoopSwitchForEditing(GameObject selectedLine, LineConf lineHolder,
-            GameObject drawable, string drawableParentName)
+            GameObject surface, string surfaceParentName)
         {
             /// Removes the old on handler.
             loopManager.OnEvents.RemoveAllListeners();
@@ -845,7 +845,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 GameEdit.ChangeLoop(selectedLine, true);
                 lineHolder.Loop = true;
-                new EditLineLoopNetAction(drawable.name, drawableParentName, selectedLine.name, true).Execute();
+                new EditLineLoopNetAction(surface.name, surfaceParentName, selectedLine.name, true).Execute();
             });
             /// Removes the old off handler.
             loopManager.OffEvents.RemoveAllListeners();
@@ -854,7 +854,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 GameEdit.ChangeLoop(selectedLine, false);
                 lineHolder.Loop = false;
-                new EditLineLoopNetAction(drawable.name, drawableParentName, selectedLine.name, false).Execute();
+                new EditLineLoopNetAction(surface.name, surfaceParentName, selectedLine.name, false).Execute();
             });
 
             /// Update the switch to the current value.
@@ -870,10 +870,10 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="selectedLine">The selected line.</param>
         /// <param name="renderer">The line renderer of the selected line.</param>
         /// <param name="lineHolder">The configuration which holds the changes.</param>
-        /// <param name="drawable">The drawable on which the line is displayed.</param>
-        /// <param name="drawableParentName">The parent id of the drawable.</param>
+        /// <param name="surface">The drawable surface on which the line is displayed.</param>
+        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
         private static void SetUpColorPickerForEditing(GameObject selectedLine, LineRenderer renderer,
-            LineConf lineHolder, GameObject drawable, string drawableParentName)
+            LineConf lineHolder, GameObject surface, string surfaceParentName)
         {
             /// Assign the color to the <see cref="HSVPicker.ColorPicker"/> depending on 
             /// the current <see cref="ColorKind"/> of the selected line.
@@ -896,7 +896,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 GameEdit.ChangePrimaryColor(selectedLine, color);
                 lineHolder.PrimaryColor = color;
-                new EditLinePrimaryColorNetAction(drawable.name, drawableParentName,
+                new EditLinePrimaryColorNetAction(surface.name, surfaceParentName,
                     selectedLine.name, color).Execute();
             });
         }

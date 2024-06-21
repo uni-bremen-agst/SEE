@@ -29,14 +29,14 @@ namespace SEE.Game.Drawable
         /// Setsup the image game object with all the needed components.
         /// Either the file path is empty or the file data.
         /// </summary>
-        /// <param name="drawable">The drawable where the image should be displayed.</param>
+        /// <param name="surface">The drawable surface where the image should be displayed.</param>
         /// <param name="name">the name of the image game object</param>
         /// <param name="imageFilePath">the path where the image is located</param>
         /// <param name="data">the file data of the image.</param>
         /// <param name="position">the position where the image should be</param>
         /// <param name="order">the order in layer for the image</param>
         /// <param name="image">the output image game object.</param>
-        private static void Setup(GameObject drawable, string name, string imageFilePath,
+        private static void Setup(GameObject surface, string name, string imageFilePath,
             byte[] data, Vector3 position, int order,
             out GameObject image)
         {
@@ -55,7 +55,7 @@ namespace SEE.Game.Drawable
 
                 name = ValueHolder.ImagePrefix + image.GetInstanceID() + RandomStrings.GetRandomString(4);
                 /// Check if the name is already in use. If so, generate a new name.
-                while (GameFinder.FindChild(drawable, name) != null)
+                while (GameFinder.FindChild(surface, name) != null)
                 {
                     name = ValueHolder.ImagePrefix + image.GetInstanceID() + RandomStrings.GetRandomString(4);
                 }
@@ -63,7 +63,7 @@ namespace SEE.Game.Drawable
             }
 
             /// Sets up the drawable holder <see cref="DrawableSetupManager"/>.
-            DrawableSetupManager.Setup(drawable, out GameObject _, out GameObject attachedObjects);
+            DrawableSetupManager.Setup(surface, out GameObject _, out GameObject attachedObjects);
 
             /// Assign the image tag to the image object.
             image.tag = Tags.Image;
@@ -124,14 +124,14 @@ namespace SEE.Game.Drawable
         /// Adds an image to a drawable.
         /// The current order in layer will be increased.
         /// </summary>
-        /// <param name="drawable">The drawable where the image should be displayed.</param>
+        /// <param name="surface">The drawable surface where the image should be displayed.</param>
         /// <param name="imageFilePath">The file path where the image is located.</param>
         /// <param name="position">The position where the image should be placed.</param>
         /// <param name="order">The order in layer for the image</param>
         /// <returns>The created image game object.</returns>
-        public static GameObject PlaceImage(GameObject drawable, string imageFilePath, Vector3 position, int order)
+        public static GameObject PlaceImage(GameObject surface, string imageFilePath, Vector3 position, int order)
         {
-            Setup(drawable, "", imageFilePath, null, position, order, out GameObject image);
+            Setup(surface, "", imageFilePath, null, position, order, out GameObject image);
             ValueHolder.CurrentOrderInLayer++;
             return image;
         }
@@ -139,7 +139,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Re-adds an image to a drawable.
         /// </summary>
-        /// <param name="drawable">The drawable where the image should be displayed.</param>
+        /// <param name="surface">The drawable surface where the image should be displayed.</param>
         /// <param name="name">The name of the image game object</param>
         /// <param name="fileData">The file data that contains the image</param>
         /// <param name="position">The position where the image should be placed.</param>
@@ -149,7 +149,7 @@ namespace SEE.Game.Drawable
         /// <param name="imageColor">The image color</param>
         /// <param name="fileName">The file name of the image</param>
         /// <returns>The created image game object.</returns>
-        public static GameObject RePlaceImage(GameObject drawable, string name, byte[] fileData, Vector3 position,
+        public static GameObject RePlaceImage(GameObject surface, string name, byte[] fileData, Vector3 position,
             Vector3 scale, Vector3 eulerAngles, int order, Color imageColor, string fileName)
         {
             /// Adjusts the current order in the layer if the
@@ -161,15 +161,15 @@ namespace SEE.Game.Drawable
             GameObject imageObj;
 
             /// Block to update an existing image with the given name.
-            if (GameFinder.FindChild(drawable, name) != null)
+            if (GameFinder.FindChild(surface, name) != null)
             {
-                imageObj = GameFinder.FindChild(drawable, name);
+                imageObj = GameFinder.FindChild(surface, name);
                 imageObj.GetComponent<Canvas>().sortingOrder = order;
             }
             else
             {
                 /// Block to create a new image.
-                Setup(drawable, name, "", fileData, position, order, out GameObject image);
+                Setup(surface, name, "", fileData, position, order, out GameObject image);
                 imageObj = image;
             }
             /// Saves the loaded image to the app data folder.
@@ -185,17 +185,17 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Re-adds the given image of the <paramref name="conf"/> to the <paramref name="drawable"/>.
+        /// Re-adds the given image of the <paramref name="conf"/> to the <paramref name="surface"/>.
         /// It calls the RePlaceImage - Method with all the attributes.
         /// </summary>
-        /// <param name="drawable">The drawable where the image should be displayed.</param>
+        /// <param name="surface">The drawable surface where the image should be displayed.</param>
         /// <param name="conf">The image configuration to restore the old image</param>
         /// <returns>The created image game object.</returns>
-        public static GameObject RePlaceImage(GameObject drawable, ImageConf conf)
+        public static GameObject RePlaceImage(GameObject surface, ImageConf conf)
         {
             string fileName = Path.GetFileName(conf.Path);
             return RePlaceImage(
-                drawable,
+                surface,
                 conf.Id,
                 conf.FileData,
                 conf.Position,

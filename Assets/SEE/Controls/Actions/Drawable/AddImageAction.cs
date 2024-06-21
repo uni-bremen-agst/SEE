@@ -28,11 +28,6 @@ namespace SEE.Controls.Actions.Drawable
         private GameObject imageObj;
 
         /// <summary>
-        /// The drawable on which the image should be displayed.
-        /// </summary>
-        private GameObject drawable;
-
-        /// <summary>
         /// The position on the drawable where the image should be displayed.
         /// </summary>
         private Vector3 position;
@@ -79,9 +74,9 @@ namespace SEE.Controls.Actions.Drawable
         private struct Memento
         {
             /// <summary>
-            /// The drawable on which the text should be displayed.
+            /// The drawable surface on which the text should be displayed.
             /// </summary>
-            public DrawableConfig Drawable;
+            public DrawableConfig Surface;
 
             /// <summary>
             /// The written text.
@@ -91,11 +86,11 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
-            /// <param name="drawable">The drawable on which the text should be displayed.</param>
+            /// <param name="surface">The drawable surface on which the text should be displayed.</param>
             /// <param name="image">The image configuration</param>
-            public Memento(GameObject drawable, ImageConf image)
+            public Memento(GameObject surface, ImageConf image)
             {
-                Drawable = DrawableConfigManager.GetDrawableConfig(drawable);
+                Surface = DrawableConfigManager.GetDrawableConfig(surface);
                 Image = image;
             }
         }
@@ -141,12 +136,12 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void SelectPosition()
         {
-            if (Selector.SelectQueryHasOrIsDrawable(out RaycastHit raycastHit)
+            if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit)
                 && !ImageSourceMenu.IsOpen()
                 && (browser == null || (browser != null && !browser.IsOpen())) 
                 && (webImageDialog == null || (webImageDialog != null && !isDialogOpen)))
             {
-                drawable = GameFinder.GetDrawable(raycastHit.collider.gameObject);
+                Surface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
                 position = raycastHit.point;
                 ImageSourceMenu.Enable();
             }
@@ -164,7 +159,7 @@ namespace SEE.Controls.Actions.Drawable
                 switch (source)
                 {
                     case ImageSourceMenu.Source.Local:
-                        browser = Surface.AddOrGetComponent<DrawableFileBrowser>();
+                        browser = Canvas.AddOrGetComponent<DrawableFileBrowser>();
                         browser.LoadImage();
                         break;
                     case ImageSourceMenu.Source.Web:
@@ -193,7 +188,7 @@ namespace SEE.Controls.Actions.Drawable
             if (webImageDialog != null && webImageDialog.GetUserInput(out string http, out string fileNameOut))
             {
                 isDialogOpen = false;
-                download = drawable.AddComponent<DownloadImage>();
+                download = Surface.AddComponent<DownloadImage>();
                 download.Download(http);
                 fileName = fileNameOut;
             }
@@ -239,11 +234,11 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (!string.IsNullOrWhiteSpace(filePath))
             {
-                imageObj = GameImage.PlaceImage(drawable, filePath, position,
+                imageObj = GameImage.PlaceImage(Surface, filePath, position,
                     ValueHolder.CurrentOrderInLayer);
-                new AddImageNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
+                new AddImageNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                     ImageConf.GetImageConf(imageObj)).Execute();
-                memento = new Memento(drawable, ImageConf.GetImageConf(imageObj));
+                memento = new Memento(Surface, ImageConf.GetImageConf(imageObj));
                 CurrentState = IReversibleAction.Progress.Completed;
                 return true;
             }
@@ -256,9 +251,9 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo();
-            GameObject obj = GameFinder.FindChild(memento.Drawable.GetDrawable(),
+            GameObject obj = GameFinder.FindChild(memento.Surface.GetDrawable(),
                 memento.Image.Id);
-            new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+            new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
                 memento.Image.Id).Execute();
             Destroyer.Destroy(obj);
         }
@@ -269,8 +264,8 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            GameImage.RePlaceImage(memento.Drawable.GetDrawable(), memento.Image);
-            new AddImageNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+            GameImage.RePlaceImage(memento.Surface.GetDrawable(), memento.Image);
+            new AddImageNetAction(memento.Surface.ID, memento.Surface.ParentID,
                 memento.Image).Execute();
         }
 

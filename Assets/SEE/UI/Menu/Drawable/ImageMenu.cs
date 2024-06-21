@@ -80,8 +80,8 @@ namespace SEE.UI.Menu.Drawable
             if (newValueHolder is ImageConf imageConf)
             {
                 Instantiate();
-                GameObject drawable = GameFinder.GetDrawable(imageObj);
-                string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+                GameObject surface = GameFinder.GetDrawableSurface(imageObj);
+                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
                 /// Assigns an action to the slider that should be executed 
                 /// along with the current order in layer value
@@ -91,7 +91,7 @@ namespace SEE.UI.Menu.Drawable
                     imageConf.OrderInLayer = order;
                     ImageConf conf = ImageConf.GetImageConf(imageObj);
                     conf.FileData = null;
-                    new EditImageNetAction(drawable.name, drawableParentName, conf).Execute();
+                    new EditImageNetAction(surface.name, surfaceParentName, conf).Execute();
                 }, imageConf.OrderInLayer);
 
                 /// Assigns an action to the color picker that should be executed 
@@ -102,11 +102,11 @@ namespace SEE.UI.Menu.Drawable
                     imageConf.ImageColor = color;
                     ImageConf conf = ImageConf.GetImageConf(imageObj);
                     conf.FileData = null;
-                    new EditImageNetAction(drawable.name, drawableParentName, conf).Execute();
+                    new EditImageNetAction(surface.name, surfaceParentName, conf).Execute();
                 }, imageConf.ImageColor);
 
                 /// Initialize the switch for mirror the image.
-                InitMirrorSwitch(imageObj, imageConf, drawable, drawableParentName);
+                InitMirrorSwitch(imageObj, imageConf, surface, surfaceParentName);
 
                 /// Sets the thumbnail of the original image.
                 thumbnail.sprite = imageObj.GetComponent<Image>().sprite;
@@ -134,10 +134,10 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="imageObj">The image object</param>
         /// <param name="imageConf">The configuration which holds the new values.</param>
-        /// <param name="drawable">The drawable on which the image is displayed</param>
-        /// <param name="drawableParentName">The id of the drawable parent</param>
+        /// <param name="surface">The drawable surface on which the image is displayed</param>
+        /// <param name="surfaceParentName">The id of the drawable surface parent</param>
         private static void InitMirrorSwitch(GameObject imageObj, ImageConf imageConf,
-            GameObject drawable, string drawableParentName)
+            GameObject surface, string surfaceParentName)
         {
             /// Removes the old handler.
             mirrorSwitch.OnEvents.RemoveAllListeners();
@@ -148,7 +148,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 GameMoveRotator.SetRotateY(imageObj, 180f);
                 imageConf.EulerAngles = new Vector3(0, 180, imageConf.EulerAngles.z);
-                new RotatorYNetAction(drawable.name, drawableParentName, imageObj.name, 180f).Execute();
+                new RotatorYNetAction(surface.name, surfaceParentName, imageObj.name, 180f).Execute();
             });
 
             /// Normal display
@@ -156,7 +156,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 GameMoveRotator.SetRotateY(imageObj, 0);
                 imageConf.EulerAngles = new Vector3(0, 0, imageConf.EulerAngles.z);
-                new RotatorYNetAction(drawable.name, drawableParentName, imageObj.name, 0).Execute();
+                new RotatorYNetAction(surface.name, surfaceParentName, imageObj.name, 0).Execute();
             });
 
             /// Sets the state of the switch.

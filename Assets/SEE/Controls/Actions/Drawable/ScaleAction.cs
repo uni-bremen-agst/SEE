@@ -53,9 +53,9 @@ namespace SEE.Controls.Actions.Drawable
         private Vector3 newScale;
 
         /// <summary>
-        /// The drawable on which the selected object is displayed.
+        /// The drawable surface on which the selected object is displayed.
         /// </summary>
-        private GameObject drawable;
+        private GameObject surface;
 
         /// <summary>
         /// The selected object of the last run.
@@ -80,9 +80,9 @@ namespace SEE.Controls.Actions.Drawable
             /// </summary>
             public GameObject SelectedObject;
             /// <summary>
-            /// The drawable on which the selected object is displayed.
+            /// The drawable surface on which the selected object is displayed.
             /// </summary>
-            public readonly DrawableConfig Drawable;
+            public readonly DrawableConfig Surface;
             /// <summary>
             /// The id of the selected object.
             /// </summary>
@@ -100,15 +100,15 @@ namespace SEE.Controls.Actions.Drawable
             /// The constructor.
             /// </summary>
             /// <param name="selectedObject">The selected drawable object</param>
-            /// <param name="drawable">The drawable on which the selected object is displayed</param>
+            /// <param name="surface">The drawable surface on which the selected object is displayed</param>
             /// <param name="id">The id of the selected object</param>
             /// <param name="oldScale">The old scale of the selected object</param>
             /// <param name="newScale">The new scale of the selected object</param>
-            public Memento(GameObject selectedObject, GameObject drawable, string id,
+            public Memento(GameObject selectedObject, GameObject surface, string id,
                 Vector3 oldScale, Vector3 newScale)
             {
                 SelectedObject = selectedObject;
-                Drawable = DrawableConfigManager.GetDrawableConfig(drawable);
+                Surface = DrawableConfigManager.GetDrawableConfig(surface);
                 Id = id;
                 OldScale = oldScale;
                 NewScale = newScale;
@@ -135,10 +135,10 @@ namespace SEE.Controls.Actions.Drawable
             CollisionDetectionManager.Disable(selectedObj);
             if (progressState != ProgressState.Finish && selectedObj != null)
             {
-                GameObject drawable = GameFinder.GetDrawable(selectedObj);
-                string drawableParent = GameFinder.GetDrawableParentName(drawable);
+                GameObject surface = GameFinder.GetDrawableSurface(selectedObj);
+                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
                 GameScaler.SetScale(selectedObj, oldScale);
-                new ScaleNetAction(drawable.name, drawableParent, selectedObj.name, oldScale).Execute();
+                new ScaleNetAction(surface.name, surfaceParentName, selectedObj.name, oldScale).Execute();
             }
             ScaleMenu.Disable();
         }
@@ -203,10 +203,10 @@ namespace SEE.Controls.Actions.Drawable
                 CollisionDetectionManager.Disable(selectedObj);
                 if (progressState != ProgressState.Finish && selectedObj != null)
                 {
-                    GameObject drawable = GameFinder.GetDrawable(selectedObj);
-                    string drawableParent = GameFinder.GetDrawableParentName(drawable);
+                    GameObject surface = GameFinder.GetDrawableSurface(selectedObj);
+                    string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
                     GameScaler.SetScale(selectedObj, oldScale);
-                    new ScaleNetAction(drawable.name, drawableParent, selectedObj.name, oldScale).Execute();
+                    new ScaleNetAction(surface.name, surfaceParentName, selectedObj.name, oldScale).Execute();
                 }
                 ScaleMenu.Disable();
 
@@ -225,7 +225,7 @@ namespace SEE.Controls.Actions.Drawable
         private void SelectObject()
         {
             /// The selection
-            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, Surface, 
+            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, Canvas, 
                 true, false, true, GetActionStateType(), false))
             {
                 /// If an object was already selected, 
@@ -235,7 +235,7 @@ namespace SEE.Controls.Actions.Drawable
                     CollisionDetectionManager.Disable(oldSelectedObj);
                 }
 
-                drawable = GameFinder.GetDrawable(selectedObj);
+                surface = GameFinder.GetDrawableSurface(selectedObj);
                 oldSelectedObj = selectedObj;
                 oldScale = selectedObj.transform.localScale;
             }
@@ -263,25 +263,25 @@ namespace SEE.Controls.Actions.Drawable
             float scaleFactor = 0f;
             bool isScaled = false;
             /// Scale up with normal speed.
-            if (Input.mouseScrollDelta.y > 0 && !Input.GetKey(KeyCode.LeftControl))
+            if (Queries.ScrollUp() && !Input.GetKey(KeyCode.LeftControl))
             {
                 scaleFactor = ValueHolder.ScaleUp;
                 isScaled = true;
             }
             /// Scale up with faster speed.
-            if (Input.mouseScrollDelta.y > 0 && Input.GetKey(KeyCode.LeftControl))
+            if (Queries.ScrollUp() && Input.GetKey(KeyCode.LeftControl))
             {
                 scaleFactor = ValueHolder.ScaleUpFast;
                 isScaled = true;
             }
             /// Scale down with normal speed.
-            if (Input.mouseScrollDelta.y < 0 && !Input.GetKey(KeyCode.LeftControl))
+            if (Queries.ScrollDown() && !Input.GetKey(KeyCode.LeftControl))
             {
                 scaleFactor = ValueHolder.ScaleDown;
                 isScaled = true;
             }
             /// Scale down with faster speed.
-            if (Input.mouseScrollDelta.y < 0 && Input.GetKey(KeyCode.LeftControl))
+            if (Queries.ScrollDown() && Input.GetKey(KeyCode.LeftControl))
             {
                 scaleFactor = ValueHolder.ScaleDownFast;
                 isScaled = true;
@@ -301,15 +301,15 @@ namespace SEE.Controls.Actions.Drawable
         /// <param name="scaleFactor">The scale factor by which the existing scale should be multiplied.</param>
         private void Scaling(float scaleFactor)
         {
-            string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+            string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
             newScale = GameScaler.Scale(selectedObj, scaleFactor);
             ScaleMenu.AssignValue(selectedObj);
             bool refresh = GameMindMap.ReDrawBranchLines(selectedObj);
-            new ScaleNetAction(drawable.name, drawableParentName, selectedObj.name, newScale).Execute();
+            new ScaleNetAction(surface.name, surfaceParentName, selectedObj.name, newScale).Execute();
             if (refresh)
             {
-                new MindMapRefreshBranchLinesNetAction(drawable.name, drawableParentName,
+                new MindMapRefreshBranchLinesNetAction(surface.name, surfaceParentName,
                     MindMapNodeConf.GetNodeConf(selectedObj)).Execute();
             }
         }
@@ -330,7 +330,7 @@ namespace SEE.Controls.Actions.Drawable
                 if (!selectedObj.GetComponent<CollisionController>().IsInCollision())
                 {
                     CollisionDetectionManager.Disable(selectedObj);
-                    memento = new Memento(selectedObj, GameFinder.GetDrawable(selectedObj),
+                    memento = new Memento(selectedObj, GameFinder.GetDrawableSurface(selectedObj),
                         selectedObj.name, oldScale, newScale);
                     CurrentState = IReversibleAction.Progress.Completed;
                     return true;
@@ -353,18 +353,18 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (memento.SelectedObject == null && memento.Id != null)
             {
-                memento.SelectedObject = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Id);
+                memento.SelectedObject = GameFinder.FindChild(memento.Surface.GetDrawable(), memento.Id);
             }
 
             if (memento.SelectedObject != null)
             {
                 GameScaler.SetScale(memento.SelectedObject, memento.OldScale);
                 bool refresh = GameMindMap.ReDrawBranchLines(memento.SelectedObject);
-                new ScaleNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                new ScaleNetAction(memento.Surface.ID, memento.Surface.ParentID,
                     memento.SelectedObject.name, memento.OldScale).Execute();
                 if (refresh)
                 {
-                    new MindMapRefreshBranchLinesNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                    new MindMapRefreshBranchLinesNetAction(memento.Surface.ID, memento.Surface.ParentID,
                         MindMapNodeConf.GetNodeConf(memento.SelectedObject)).Execute();
                 }
             }
@@ -382,16 +382,16 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             if (memento.SelectedObject == null && memento.Id != null)
             {
-                memento.SelectedObject = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Id);
+                memento.SelectedObject = GameFinder.FindChild(memento.Surface.GetDrawable(), memento.Id);
             }
             if (memento.SelectedObject != null)
             {
                 GameScaler.SetScale(memento.SelectedObject, memento.NewScale);
                 bool refresh = GameMindMap.ReDrawBranchLines(memento.SelectedObject);
-                new ScaleNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.SelectedObject.name, memento.NewScale).Execute();
+                new ScaleNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.SelectedObject.name, memento.NewScale).Execute();
                 if (refresh)
                 {
-                    new MindMapRefreshBranchLinesNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                    new MindMapRefreshBranchLinesNetAction(memento.Surface.ID, memento.Surface.ParentID,
                         MindMapNodeConf.GetNodeConf(memento.SelectedObject)).Execute();
                 }
             }

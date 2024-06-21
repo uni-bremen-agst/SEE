@@ -121,7 +121,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void PickingPrimaryColor()
         {
-            if (Selector.SelectQueryHasOrIsDrawable(out RaycastHit raycastHit) 
+            if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit) 
                 && !isInAction)
             {
                 isInAction = true;
@@ -158,7 +158,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void PickingSecondaryColor()
         {
-            if (Selector.SelectQueryHasOrIsDrawable(out RaycastHit raycastHit, false)
+            if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit, false)
                 && !isInAction)
             {
                 isInAction = true;
@@ -209,7 +209,7 @@ namespace SEE.Controls.Actions.Drawable
 
             oldChosenPrimaryColor = ValueHolder.CurrentPrimaryColor;
             oldChosenSecondColor = ValueHolder.CurrentSecondaryColor;
-            Surface.AddOrGetComponent<ColorPickerMenuDisabler>();
+            Canvas.AddOrGetComponent<ColorPickerMenuDisabler>();
             ColorPickerMenu.Enable();
         }
 

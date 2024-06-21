@@ -76,8 +76,8 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="newConf">The configuration of the node which saves the changes.</param>
         private static void AddNodeKindSelectorHandler(GameObject addedNode, MindMapNodeConf newConf)
         {
-            GameObject drawable = GameFinder.GetDrawable(addedNode);
-            string drawableParent = GameFinder.GetDrawableParentName(drawable);
+            GameObject surface = GameFinder.GetDrawableSurface(addedNode);
+            string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
             /// Gets the configurations for the mind map border and the branch line to the parent.
             LineConf boarderConf = newConf.BorderConf;
@@ -94,7 +94,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     /// Executes the Node Kind change if it is possible.
                     GameMindMap.ChangeNodeKind(addedNode, newNodeKind, boarderConf);
-                    new MindMapChangeNodeKindNetAction(drawable.name, drawableParent, newConf, newNodeKind).Execute();
+                    new MindMapChangeNodeKindNetAction(surface.name, surfaceParentName, newConf, newNodeKind).Execute();
                     newConf.NodeKind = newNodeKind;
                     newConf.TextConf = ((MindMapNodeConf)DrawableType.Get(addedNode)).TextConf;
                     if (newNodeKind == GameMindMap.NodeKind.Theme)
@@ -110,7 +110,7 @@ namespace SEE.UI.Menu.Drawable
                     {
                         MindMapParentSelectionMenu.Disable();
                         GameObject pMenu = MindMapParentSelectionMenu.EnableForEditing(
-                            GameFinder.GetAttachedObjectsObject(drawable), addedNode, newConf, null);
+                            GameFinder.GetAttachedObjectsObject(surface), addedNode, newConf, null);
                         GameFinder.FindChild(pMenu, "Dragger").GetComponent<WindowDragger>().enabled = false;
                         pMenu.transform.SetParent(GameFinder.FindChild(instance, "Content").transform);
 
@@ -120,7 +120,7 @@ namespace SEE.UI.Menu.Drawable
                         {
                             GameObject pBranchLine = addedNode.GetComponent<MMNodeValueHolder>().GetParentBranchLine();
                             GameEdit.ChangeLine(pBranchLine, parentBranchLineConf);
-                            new EditLineNetAction(drawable.name, drawableParent,
+                            new EditLineNetAction(surface.name, surfaceParentName,
                                 LineConf.GetLine(pBranchLine)).Execute();
                         }
                     }

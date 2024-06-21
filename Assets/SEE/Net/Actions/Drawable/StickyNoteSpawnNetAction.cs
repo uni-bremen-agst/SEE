@@ -36,7 +36,7 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                if (GameFinder.FindDrawable(DrawableConf.ID, DrawableConf.ParentID) == null)
+                if (GameFinder.FindDrawableSurface(DrawableConf.ID, DrawableConf.ParentID) == null)
                 {
                     GameStickyNoteManager.Spawn(DrawableConf);
                 }

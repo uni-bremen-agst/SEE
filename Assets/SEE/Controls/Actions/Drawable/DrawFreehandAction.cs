@@ -39,11 +39,6 @@ namespace SEE.Controls.Actions.Drawable
         private GameObject line;
 
         /// <summary>
-        /// The drawable on which the line should be displayed.
-        /// </summary>
-        private GameObject drawable;
-
-        /// <summary>
         /// The positions of the line in local space.
         /// It is used for the line renderer.
         /// </summary>
@@ -72,9 +67,9 @@ namespace SEE.Controls.Actions.Drawable
         private struct Memento
         {
             /// <summary>
-            /// The drawable on which the line should be displayed.
+            /// The drawable surface on which the line should be displayed.
             /// </summary>
-            public readonly DrawableConfig Drawable;
+            public readonly DrawableConfig Surface;
             /// <summary>
             /// The line. The line configuration <see cref="LineConf"/> contains all required
             /// values to redraw.
@@ -84,11 +79,11 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The constructor, which simply assigns its parameters to fields in this class.
             /// </summary>
-            /// <param name="drawable">The drawable where the line should be placed</param>
+            /// <param name="surface">The drawable surface where the line should be placed</param>
             /// <param name="line">Line configuration for redrawing.</param>
-            public Memento(GameObject drawable, LineConf line)
+            public Memento(GameObject surface, LineConf line)
             {
-                Drawable = DrawableConfigManager.GetDrawableConfig(drawable);
+                Surface = DrawableConfigManager.GetDrawableConfig(surface);
                 Line = line;
             }
         }
@@ -139,9 +134,9 @@ namespace SEE.Controls.Actions.Drawable
                 /// This block draws the line when the left mouse button is held down.
                 /// Drawing is only possible when targeting a drawable or an object placed on a drawable,
                 /// and the drawable remains unchanged during drawing.
-                if (Selector.SelectQueryHasOrIsDrawable(out RaycastHit raycastHit) 
+                if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit) 
                     && !finishDrawing
-                    && Queries.DrawableSurfaceNullOrSame(drawable, raycastHit.collider.gameObject))
+                    && Queries.DrawableSurfaceNullOrSame(Surface, raycastHit.collider.gameObject))
                 {
                     switch (progressState)
                     {
@@ -175,12 +170,12 @@ namespace SEE.Controls.Actions.Drawable
         private void StartDrawing(RaycastHit raycastHit)
         {
             /// Find the drawable for this line.
-            drawable = GameFinder.GetDrawable(raycastHit.collider.gameObject);
+            Surface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
             drawing = true;
             progressState = ProgressState.Drawing;
             positions[0] = raycastHit.point;
             /// Create the line object.
-            line = GameDrawer.StartDrawing(drawable, positions, ValueHolder.CurrentColorKind,
+            line = GameDrawer.StartDrawing(Surface, positions, ValueHolder.CurrentColorKind,
                 ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor, ValueHolder.CurrentThickness,
                 ValueHolder.CurrentLineKind, ValueHolder.CurrentTiling);
             /// Transform the first position in local space.
@@ -211,7 +206,7 @@ namespace SEE.Controls.Actions.Drawable
                 positions = newPositions;
 
                 GameDrawer.Drawing(line, positions);
-                new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
+                new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                     LineConf.GetLine(line)).Execute();
             }
         }
@@ -237,8 +232,8 @@ namespace SEE.Controls.Actions.Drawable
                     finishDrawing = true;
                     line = GameDrawer.SetPivot(line);
                     LineConf currentLine = LineConf.GetLine(line);
-                    memento = new Memento(drawable, currentLine);
-                    new DrawNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                    memento = new Memento(Surface, currentLine);
+                    new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID,
                         currentLine).Execute();
                     CurrentState = IReversibleAction.Progress.Completed;
                     return true;
@@ -261,11 +256,11 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (line == null)
             {
-                line = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Line.Id);
+                line = GameFinder.FindChild(memento.Surface.GetDrawable(), memento.Line.Id);
             }
             if (line != null)
             {
-                new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
                     memento.Line.Id).Execute();
                 Destroyer.Destroy(line);
                 line = null;
@@ -278,10 +273,10 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            line = GameDrawer.ReDrawLine(memento.Drawable.GetDrawable(), memento.Line);
+            line = GameDrawer.ReDrawLine(memento.Surface.GetDrawable(), memento.Line);
             if (line != null)
             {
-                new DrawNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID,
                     LineConf.GetLine(line)).Execute();
             }
         }
@@ -322,7 +317,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>an empty set or the drawable id and the line id</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            if (memento.Drawable == null)
+            if (memento.Surface == null)
             {
                 return new HashSet<string>();
             }
@@ -330,7 +325,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 return new HashSet<string>
                 {
-                    memento.Drawable.ID,
+                    memento.Surface.ID,
                     memento.Line.Id
                 };
             }

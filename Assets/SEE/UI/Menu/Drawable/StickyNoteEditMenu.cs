@@ -80,7 +80,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 newConfig.Order = order;
                 GameStickyNoteManager.ChangeLayer(stickyNote, order);
-                new EditLayerNetAction(GameFinder.GetDrawable(stickyNote).name, stickyNote.name, "",
+                new EditLayerNetAction(GameFinder.GetDrawableSurface(stickyNote).name, stickyNote.name, "",
                     order).Execute();
             });
         }

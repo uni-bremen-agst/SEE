@@ -35,9 +35,9 @@ namespace SEE.Controls.Actions.Drawable
             /// </summary>
             public GameObject SelectedObject;
             /// <summary>
-            /// The drawable where the selected object is displayed.
+            /// The drawable surface where the selected object is displayed.
             /// </summary>
-            public readonly DrawableConfig Drawable;
+            public readonly DrawableConfig Surface;
             /// <summary>
             /// The id of the selected object.
             /// </summary>
@@ -71,19 +71,19 @@ namespace SEE.Controls.Actions.Drawable
             /// The constructor.
             /// </summary>
             /// <param name="selectedObject">Is the selected drawable type object.</param>
-            /// <param name="drawable">Is the drawable where the selected object is displayed.</param>
+            /// <param name="surface">Is the drawable surface where the selected object is displayed.</param>
             /// <param name="id">Is the id of the selected object.</param>
             /// <param name="oldObjectPosition">The old position of the selected object.</param>
             /// <param name="newObjectPosition">The new position of the selected object.</param>
             /// <param name="oldObjectLocalEulerAngles">The old local euler angles of the selected object.</param>
             /// <param name="degree">The degree on that the object was rotated. (Is the z value of the local euler angeles)</param>
             /// <param name="moveOrRotate">The state if was moved or rotated.</param>
-            public Memento(GameObject selectedObject, GameObject drawable, string id,
+            public Memento(GameObject selectedObject, GameObject surface, string id,
                 Vector3 oldObjectPosition, Vector3 newObjectPosition, Vector3 oldObjectLocalEulerAngles,
                 float degree, ProgressState moveOrRotate, bool includeChildren)
             {
                 SelectedObject = selectedObject;
-                Drawable = DrawableConfigManager.GetDrawableConfig(drawable);
+                Surface = DrawableConfigManager.GetDrawableConfig(surface);
                 Id = id;
                 OldObjectPosition = oldObjectPosition;
                 NewObjectPosition = newObjectPosition;
@@ -174,13 +174,13 @@ namespace SEE.Controls.Actions.Drawable
             CollisionDetectionManager.Disable(selectedObject);
             if (progressState != ProgressState.Finish && selectedObject != null)
             {
-                GameObject drawable = GameFinder.GetDrawable(selectedObject);
-                string drawableParent = GameFinder.GetDrawableParentName(drawable);
+                GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
+                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
                 if (progressState == ProgressState.Move)
                 {
                     GameMoveRotator.SetPosition(selectedObject, oldObjectPosition,
                         MoveMenu.includeChildren);
-                    new MoveNetAction(drawable.name, drawableParent, selectedObject.name,
+                    new MoveNetAction(surface.name, surfaceParentName, selectedObject.name,
                         oldObjectPosition, MoveMenu.includeChildren).Execute();
                 }
 
@@ -188,7 +188,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     GameMoveRotator.SetRotate(selectedObject, oldObjectLocalEulerAngles.z,
                         RotationMenu.includeChildren);
-                    new RotatorNetAction(drawable.name, drawableParent, selectedObject.name,
+                    new RotatorNetAction(surface.name, surfaceParentName, selectedObject.name,
                         oldObjectLocalEulerAngles.z, RotationMenu.includeChildren).Execute();
                 }
             }
@@ -251,13 +251,13 @@ namespace SEE.Controls.Actions.Drawable
                 CollisionDetectionManager.Disable(selectedObject);
                 if (progressState != ProgressState.Finish && selectedObject != null)
                 {
-                    GameObject drawable = GameFinder.GetDrawable(selectedObject);
-                    string drawableParent = GameFinder.GetDrawableParentName(drawable);
+                    GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
+                    string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
                     if (progressState == ProgressState.Move)
                     {
                         GameMoveRotator.SetPosition(selectedObject, oldObjectPosition,
                             MoveMenu.includeChildren);
-                        new MoveNetAction(drawable.name, drawableParent, selectedObject.name,
+                        new MoveNetAction(surface.name, surfaceParentName, selectedObject.name,
                             oldObjectPosition, MoveMenu.includeChildren).Execute();
                     }
 
@@ -265,7 +265,7 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         GameMoveRotator.SetRotate(selectedObject, oldObjectLocalEulerAngles.z,
                             RotationMenu.includeChildren);
-                        new RotatorNetAction(drawable.name, drawableParent, selectedObject.name,
+                        new RotatorNetAction(surface.name, surfaceParentName, selectedObject.name,
                             oldObjectLocalEulerAngles.z, RotationMenu.includeChildren).Execute();
                     }
                 }
@@ -287,7 +287,7 @@ namespace SEE.Controls.Actions.Drawable
         private void InitSwitchMenu()
         {
             switchMenu = PrefabInstantiator.InstantiatePrefab(switchMenuPrefab,
-                                                     Surface.transform, false);
+                                                     Canvas.transform, false);
             /// Adds the functionality to the move button
             GameFinder.FindChild(switchMenu, "Move").GetComponent<ButtonManagerBasic>().clickEvent
                 .AddListener(() =>
@@ -316,7 +316,8 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void Selection()
         {
-            if (Selector.SelectObject(ref selectedObject, ref oldSelectedObj, ref mouseWasReleased, Surface, true, false, true))
+            if (Selector.SelectObject(ref selectedObject, ref oldSelectedObj, ref mouseWasReleased, Canvas,
+                true, false, true))
             {
                 oldObjectPosition = selectedObject.transform.localPosition;
                 oldObjectLocalEulerAngles = selectedObject.transform.localEulerAngles;
@@ -390,8 +391,8 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (selectedObject.GetComponent<BlinkEffect>() != null)
             {
-                GameObject drawable = GameFinder.GetDrawable(selectedObject);
-                string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+                GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
+                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
                 MoveMenu.Enable(selectedObject);
                 SwitchManager speedUp = MoveMenu.GetSpeedUpManager();
@@ -404,7 +405,7 @@ namespace SEE.Controls.Actions.Drawable
                 }
 
                 /// Invocation for the option to move the object by key.
-                MoveByKey(moveByMouse, speedUp, drawable, drawableParentName);
+                MoveByKey(moveByMouse, speedUp, surface, surfaceParentName);
 
                 /// For switching the move by mouse option.
                 if (Queries.MouseDown(MouseButton.Middle))
@@ -417,7 +418,7 @@ namespace SEE.Controls.Actions.Drawable
                 bool childInCollision = CheckChildrenCollision();
 
                 /// Is executed when move by mouse is active and if the object and none of the children are in collision.
-                MoveByMouse(moveByMouse, childInCollision, drawable, drawableParentName);
+                MoveByMouse(moveByMouse, childInCollision, surface, surfaceParentName);
 
                 /// Initializes the end of the movement.
                 if (Queries.LeftMouseInteraction())
@@ -440,10 +441,10 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         /// <param name="moveByMouse">The switch manager for the move by mouse option from the menu</param>
         /// <param name="speedUp">The switch manager for the speed up option from the menu</param>
-        /// <param name="drawable">The drawable on which the object is displayed.</param>
-        /// <param name="drawableParentName">The parent name of the drawable</param>
+        /// <param name="surface">The drawable surface on which the object is displayed.</param>
+        /// <param name="surfaceParentName">The parent name of the drawable surface</param>
         private void MoveByKey(SwitchManager moveByMouse, SwitchManager speedUp,
-            GameObject drawable, string drawableParentName)
+            GameObject surface, string surfaceParentName)
         {
             if (SEEInput.MoveObjectLeft() || SEEInput.MoveObjectRight()
                 || SEEInput.MoveObjectUp() || SEEInput.MoveObjectDown())
@@ -453,7 +454,7 @@ namespace SEE.Controls.Actions.Drawable
                 moveByMouse.UpdateUI();
                 newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, direction,
                     speedUp.isOn, MoveMenu.includeChildren);
-                new MoveNetAction(drawable.name, drawableParentName, selectedObject.name,
+                new MoveNetAction(surface.name, surfaceParentName, selectedObject.name,
                     newObjectPosition, MoveMenu.includeChildren).Execute();
             }
         }
@@ -487,23 +488,23 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         /// <param name="moveByMouse">The switch manager for the move-by-mouse option from the menu</param>
         /// <param name="childInCollision">Identifies whether any of the children are in collision</param>
-        /// <param name="drawable">The drawable on which the object is displayed.</param>
-        /// <param name="drawableParentName">The parent name of the drawable</param>
+        /// <param name="surface">The drawable surface on which the object is displayed.</param>
+        /// <param name="surfaceParentName">The parent name of the drawable surface</param>
         private void MoveByMouse(SwitchManager moveByMouse, bool childInCollision,
-            GameObject drawable, string drawableParentName)
+            GameObject surface, string surfaceParentName)
         {
             if (moveByMouse.isOn && Raycasting.RaycastAnything(out RaycastHit hit)
                 && !selectedObject.GetComponent<CollisionController>().IsInCollision()
                 && !childInCollision)
             {
                 if ((hit.collider.gameObject.CompareTag(Tags.Drawable)
-                        && hit.collider.gameObject.Equals(drawable))
-                    || (GameFinder.HasDrawable(hit.collider.gameObject)
-                        && GameFinder.GetDrawable(hit.collider.gameObject).Equals(drawable)))
+                        && hit.collider.gameObject.Equals(surface))
+                    || (GameFinder.HasDrawableSurface(hit.collider.gameObject)
+                        && GameFinder.GetDrawableSurface(hit.collider.gameObject).Equals(surface)))
                 {
                     newObjectPosition = GameMoveRotator.MoveObjectByMouse(selectedObject,
                         hit.point, MoveMenu.includeChildren);
-                    new MoveNetAction(drawable.name, drawableParentName, selectedObject.name,
+                    new MoveNetAction(surface.name, surfaceParentName, selectedObject.name,
                         newObjectPosition, MoveMenu.includeChildren).Execute();
                 }
             }
@@ -552,21 +553,21 @@ namespace SEE.Controls.Actions.Drawable
             float degree = 0;
 
             /// Rotates forward with normal speed.
-            if (Input.mouseScrollDelta.y > 0 && !Input.GetKey(KeyCode.LeftControl))
+            if (Queries.ScrollUp() && !Input.GetKey(KeyCode.LeftControl))
             {
                 direction = Vector3.forward;
                 degree = ValueHolder.Rotate;
                 rotate = true;
             }
             /// Rotates forward with fast speed.
-            if (Input.mouseScrollDelta.y > 0 && Input.GetKey(KeyCode.LeftControl))
+            if (Queries.ScrollUp() && Input.GetKey(KeyCode.LeftControl))
             {
                 direction = Vector3.forward;
                 degree = ValueHolder.RotateFast;
                 rotate = true;
             }
             /// Rotates back with normal speed.
-            if (Input.mouseScrollDelta.y < 0 && !Input.GetKey(KeyCode.LeftControl))
+            if (Queries.ScrollDown() && !Input.GetKey(KeyCode.LeftControl))
             {
                 direction = Vector3.back;
                 degree = ValueHolder.Rotate;
@@ -574,7 +575,7 @@ namespace SEE.Controls.Actions.Drawable
 
             }
             /// Rotates back with fast speed.
-            if (Input.mouseScrollDelta.y < 0 && Input.GetKey(KeyCode.LeftControl))
+            if (Queries.ScrollDown() && Input.GetKey(KeyCode.LeftControl))
             {
                 direction = Vector3.back;
                 degree = ValueHolder.RotateFast;
@@ -595,8 +596,8 @@ namespace SEE.Controls.Actions.Drawable
         /// <param name="degree">The degree by which the object is to be rotated.</param>
         private void PerformRotate(Vector3 direction, float degree)
         {
-            GameObject drawable = GameFinder.GetDrawable(selectedObject);
-            string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+            GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
+            string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
             newObjectLocalEulerAngles = GameMoveRotator.RotateObject(selectedObject, direction,
                 degree, RotationMenu.includeChildren);
@@ -604,7 +605,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 newObjectPosition = selectedObject.transform.localPosition;
             }
-            new RotatorNetAction(drawable.name, drawableParentName, selectedObject.name, direction,
+            new RotatorNetAction(surface.name, surfaceParentName, selectedObject.name, direction,
                 degree, RotationMenu.includeChildren).Execute();
         }
 
@@ -644,13 +645,13 @@ namespace SEE.Controls.Actions.Drawable
                     bool includeChildren = RotationMenu.includeChildren
                         && executedOperation == ProgressState.Rotate ||
                         MoveMenu.includeChildren && executedOperation == ProgressState.Move;
-                    memento = new Memento(selectedObject, GameFinder.GetDrawable(selectedObject), selectedObject.name,
+                    memento = new Memento(selectedObject, GameFinder.GetDrawableSurface(selectedObject), selectedObject.name,
                         oldObjectPosition, newObjectPosition, oldObjectLocalEulerAngles, degree, executedOperation,
                         includeChildren);
                     Destroyer.Destroy(selectedObject.GetComponent<Rigidbody>());
                     Destroyer.Destroy(selectedObject.GetComponent<CollisionController>());
                     GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(selectedObject);
-                    new RbAndCCDestroyerNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                    new RbAndCCDestroyerNetAction(memento.Surface.ID, memento.Surface.ParentID,
                         memento.SelectedObject.name).Execute();
                     RotationMenu.Disable();
                     MoveMenu.Disable();
@@ -672,8 +673,8 @@ namespace SEE.Controls.Actions.Drawable
                 /// Block for reset.
                 CollisionDetectionManager.Disable(selectedObject);
                 GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(selectedObject);
-                GameObject drawable = GameFinder.GetDrawable(selectedObject);
-                new RbAndCCDestroyerNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
+                GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
+                new RbAndCCDestroyerNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
                     selectedObject.name).Execute();
                 selectedObject = null;
                 RotationMenu.Disable();
@@ -715,7 +716,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (memento.SelectedObject == null && memento.Id != null)
             {
-                memento.SelectedObject = GameFinder.FindChild(memento.Drawable.GetDrawable(),
+                memento.SelectedObject = GameFinder.FindChild(memento.Surface.GetDrawable(),
                     memento.Id);
             }
 
@@ -725,20 +726,20 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     GameMoveRotator.SetPosition(memento.SelectedObject, memento.OldObjectPosition,
                                             memento.IncludeChildren);
-                    new MoveNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Id,
+                    new MoveNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Id,
                         memento.OldObjectPosition, memento.IncludeChildren).Execute();
                 }
                 else if (memento.MoveOrRotate == ProgressState.Rotate)
                 {
                     GameMoveRotator.SetRotate(memento.SelectedObject, memento.OldObjectLocalEulerAngles.z,
                         memento.IncludeChildren);
-                    new RotatorNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Id,
+                    new RotatorNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Id,
                         memento.OldObjectLocalEulerAngles.z, memento.IncludeChildren).Execute();
                 }
 
                 GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(
                     GameFinder.GetAttachedObjectsObject(memento.SelectedObject));
-                new RbAndCCDestroyerNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                new RbAndCCDestroyerNetAction(memento.Surface.ID, memento.Surface.ParentID,
                     memento.SelectedObject.name).Execute();
             }
         }
@@ -751,7 +752,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             if (memento.SelectedObject == null && memento.Id != null)
             {
-                memento.SelectedObject = GameFinder.FindChild(memento.Drawable.GetDrawable(),
+                memento.SelectedObject = GameFinder.FindChild(memento.Surface.GetDrawable(),
                     memento.Id);
             }
             if (memento.SelectedObject != null)
@@ -760,18 +761,18 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     GameMoveRotator.SetPosition(memento.SelectedObject, memento.NewObjectPosition,
                         memento.IncludeChildren);
-                    new MoveNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Id,
+                    new MoveNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Id,
                         memento.NewObjectPosition, memento.IncludeChildren).Execute();
                 }
                 else if (memento.MoveOrRotate == ProgressState.Rotate)
                 {
                     GameMoveRotator.SetRotate(memento.SelectedObject, memento.Degree, memento.IncludeChildren);
-                    new RotatorNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Id,
+                    new RotatorNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Id,
                         memento.Degree, memento.IncludeChildren).Execute();
                 }
                 GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(
                     GameFinder.GetAttachedObjectsObject(memento.SelectedObject));
-                new RbAndCCDestroyerNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                new RbAndCCDestroyerNetAction(memento.Surface.ID, memento.Surface.ParentID,
                     memento.SelectedObject.name).Execute();
             }
         }

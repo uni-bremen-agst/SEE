@@ -29,17 +29,17 @@ namespace SEE.Controls.Actions.Drawable
         private readonly struct Memento
         {
             /// <summary>
-            /// The drawable on which the drawable type is displayed.
+            /// The drawable surface on which the drawable type is displayed.
             /// </summary>
-            public readonly DrawableConfig Drawable;
+            public readonly DrawableConfig Surface;
 
             /// <summary>
             /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
-            /// <param name="drawable">The drawable on which the drawable type is displayed</param>
-            public Memento(GameObject drawable)
+            /// <param name="surface">The drawable surface on which the drawable type is displayed</param>
+            public Memento(GameObject surface)
             {
-                Drawable = DrawableConfigManager.GetDrawableConfig(drawable);
+                Surface = DrawableConfigManager.GetDrawableConfig(surface);
             }
         }
 
@@ -60,9 +60,9 @@ namespace SEE.Controls.Actions.Drawable
                     if (hitObject.CompareTag(Tags.Drawable))
                     {
                         return DeleteDrawableChilds(hitObject);
-                    } else if (GameFinder.HasDrawable(hitObject))
+                    } else if (GameFinder.HasDrawableSurface(hitObject))
                     {
-                        return DeleteDrawableChilds(GameFinder.GetDrawable(hitObject));
+                        return DeleteDrawableChilds(GameFinder.GetDrawableSurface(hitObject));
                     }
                 }
                 return false;
@@ -73,13 +73,13 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// This method finds and deletes all drawable types that are placed on the given drawable.
         /// </summary>
-        /// <param name="drawable">is the drawable which should be cleaned.</param>
+        /// <param name="surface">is the drawable surface which should be cleaned.</param>
         /// <returns>true if the drawable was successfully cleaned, false if the drawable was already cleaned.</returns>
-        private bool DeleteDrawableChilds(GameObject drawable)
+        private bool DeleteDrawableChilds(GameObject surface)
         {
-            if (GameFinder.GetAttachedObjectsObject(drawable) != null)
+            if (GameFinder.GetAttachedObjectsObject(surface) != null)
             {
-                List<DrawableType> allDrawableTypes = DrawableConfigManager.GetDrawableConfig(drawable).
+                List<DrawableType> allDrawableTypes = DrawableConfigManager.GetDrawableConfig(surface).
                     GetAllDrawableTypes();
                 if (allDrawableTypes.Count == 0)
                 {
@@ -88,13 +88,13 @@ namespace SEE.Controls.Actions.Drawable
 
                 foreach (DrawableType type in allDrawableTypes)
                 {
-                    GameObject child = GameFinder.FindChild(drawable, type.Id);
-                    new EraseNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
+                    GameObject child = GameFinder.FindChild(surface, type.Id);
+                    new EraseNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
                         child.name).Execute();
                     Destroyer.Destroy(child);
                 }
 
-                memento = new Memento(drawable);
+                memento = new Memento(surface);
                 CurrentState = IReversibleAction.Progress.Completed;
                 return true;
             } else
@@ -110,10 +110,10 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo();
-            foreach(DrawableType type in memento.Drawable.GetAllDrawableTypes())
+            foreach(DrawableType type in memento.Surface.GetAllDrawableTypes())
             {
-                GameObject drawable = memento.Drawable.GetDrawable();
-                DrawableType.Restore(type, drawable);
+                GameObject surface = memento.Surface.GetDrawable();
+                DrawableType.Restore(type, surface);
             }
         }
 
@@ -124,10 +124,10 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            foreach (DrawableType type in memento.Drawable.GetAllDrawableTypes())
+            foreach (DrawableType type in memento.Surface.GetAllDrawableTypes())
             {
-                GameObject toDelete = GameFinder.FindChild(memento.Drawable.GetDrawable(), type.Id); ;
-                new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID, type.Id).Execute();
+                GameObject toDelete = GameFinder.FindChild(memento.Surface.GetDrawable(), type.Id); ;
+                new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, type.Id).Execute();
                 Destroyer.Destroy(toDelete);
             }
         }
@@ -168,7 +168,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>ids of the deletes drawable types</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            if (memento.Drawable == null)
+            if (memento.Surface == null)
             {
                 return new HashSet<string>();
             }
@@ -176,9 +176,9 @@ namespace SEE.Controls.Actions.Drawable
             {
                 HashSet<string> changedObjects = new()
                 {
-                    memento.Drawable.ID
+                    memento.Surface.ID
                 };
-                foreach(DrawableType type in memento.Drawable.GetAllDrawableTypes())
+                foreach(DrawableType type in memento.Surface.GetAllDrawableTypes())
                 {
                     changedObjects.Add(type.Id);
                 }

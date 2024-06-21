@@ -175,80 +175,85 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Creates a new drawable config instance from the given drawable.
         /// </summary>
-        /// <param name="drawable">The drawable for which a configuration is to be created.</param>
+        /// <param name="surface">The drawable surface for which a configuration is to be created.</param>
         /// <returns>The created <see cref="DrawableConfig"/></returns>
-        internal static DrawableConfig GetDrawableConfig(GameObject drawable)
+        internal static DrawableConfig GetDrawableConfig(GameObject surface)
         {
-            Transform transform = drawable.transform;
-            if (GameFinder.GetDrawableParentName(drawable) != "")
+            if (surface.CompareTag(Tags.Drawable))
             {
-                transform = drawable.transform.parent;
+                Transform transform = surface.transform;
+                if (GameFinder.GetDrawableSurfaceParentName(surface) != "")
+                {
+                    transform = surface.transform.parent;
+                }
+
+                /// Get the order in layering for drawables.
+                /// Only needed for sticky notes.
+                int order = 0;
+                if (transform.GetComponent<OrderInLayerValueHolder>() != null)
+                {
+                    order = transform.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
+                }
+                else if (transform.GetComponentInParent<OrderInLayerValueHolder>() != null)
+                {
+                    order = transform.GetComponentInParent<OrderInLayerValueHolder>().OrderInLayer;
+                }
+
+                /// Creates the <see cref="DrawableConfig"/> with the corresponding values.
+                DrawableConfig config = new()
+                {
+                    ID = surface.name,
+                    ParentID = GameFinder.GetDrawableSurfaceParentName(surface),
+                    Position = transform.position,
+                    Rotation = transform.eulerAngles,
+                    Scale = transform.localScale,
+                    Color = surface.GetComponent<MeshRenderer>().material.color,
+                    Order = order
+                };
+
+                /// Block for creating the <see cref="DrawableType"/> of the drawable.
+                GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(surface);
+                if (attachedObjects != null)
+                {
+                    /// Creates configurations for all lines of the drawable, except the Mind Map Node borders.
+                    GameObject[] lines = GameFinder.FindAllChildrenWithTagExceptParentHasTag(attachedObjects,
+                        Tags.Line, Tags.MindMapNode).ToArray();
+                    foreach (GameObject line in lines)
+                    {
+                        LineConf lineConfig = LineConf.GetLine(line);
+                        config.LineConfigs.Add(lineConfig);
+                    }
+
+                    /// Creates configurations for all texts of the drawable, except the Mind Map Node texts.
+                    GameObject[] texts = GameFinder.FindAllChildrenWithTagExceptParentHasTag(attachedObjects,
+                        Tags.DText, Tags.MindMapNode).ToArray();
+                    foreach (GameObject text in texts)
+                    {
+                        TextConf textConfig = TextConf.GetText(text);
+                        config.TextConfigs.Add(textConfig);
+                    }
+
+                    /// Creates configurations for all images of the drawable.
+                    GameObject[] images = GameFinder.FindAllChildrenWithTag(attachedObjects,
+                        Tags.Image).ToArray();
+                    foreach (GameObject image in images)
+                    {
+                        ImageConf imageConf = ImageConf.GetImageConf(image);
+                        config.ImageConfigs.Add(imageConf);
+                    }
+
+                    /// Creates configurations for all Mind Map nodes of the drawable.
+                    IList<GameObject> nodes = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.MindMapNode);
+                    nodes = nodes.OrderBy(o => o.GetComponent<MMNodeValueHolder>().Layer).ToList();
+                    foreach (GameObject node in nodes)
+                    {
+                        MindMapNodeConf nodeConf = MindMapNodeConf.GetNodeConf(node);
+                        config.MindMapNodeConfigs.Add(nodeConf);
+                    }
+                }
+                return config;
             }
-
-            /// Get the order in layering for drawables.
-            /// Only needed for sticky notes.
-            int order = 0;
-            if (transform.GetComponent<OrderInLayerValueHolder>() != null)
-            {
-                order = transform.GetComponent<OrderInLayerValueHolder>().OrderInLayer;
-            } else if (transform.GetComponentInParent<OrderInLayerValueHolder>() != null)
-            {
-                order = transform.GetComponentInParent<OrderInLayerValueHolder>().OrderInLayer;
-            }
-
-            /// Creates the <see cref="DrawableConfig"/> with the corresponding values.
-            DrawableConfig config = new()
-            {
-                ID = drawable.name,
-                ParentID = GameFinder.GetDrawableParentName(drawable),
-                Position = transform.position,
-                Rotation = transform.eulerAngles,
-                Scale = transform.localScale,
-                Color = drawable.GetComponent<MeshRenderer>().material.color,
-                Order = order
-            };
-
-            /// Block for creating the <see cref="DrawableType"/> of the drawable.
-            GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(drawable);
-            if (attachedObjects != null)
-            {
-                /// Creates configurations for all lines of the drawable, except the Mind Map Node borders.
-                GameObject[] lines = GameFinder.FindAllChildrenWithTagExceptParentHasTag(attachedObjects,
-                    Tags.Line, Tags.MindMapNode).ToArray();
-                foreach (GameObject line in lines)
-                {
-                    LineConf lineConfig = LineConf.GetLine(line);
-                    config.LineConfigs.Add(lineConfig);
-                }
-
-                /// Creates configurations for all texts of the drawable, except the Mind Map Node texts.
-                GameObject[] texts = GameFinder.FindAllChildrenWithTagExceptParentHasTag(attachedObjects,
-                    Tags.DText, Tags.MindMapNode).ToArray();
-                foreach (GameObject text in texts)
-                {
-                    TextConf textConfig = TextConf.GetText(text);
-                    config.TextConfigs.Add(textConfig);
-                }
-
-                /// Creates configurations for all images of the drawable.
-                GameObject[] images = GameFinder.FindAllChildrenWithTag(attachedObjects,
-                    Tags.Image).ToArray();
-                foreach (GameObject image in images)
-                {
-                    ImageConf imageConf = ImageConf.GetImageConf(image);
-                    config.ImageConfigs.Add(imageConf);
-                }
-
-                /// Creates configurations for all Mind Map nodes of the drawable.
-                IList<GameObject> nodes = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.MindMapNode);
-                nodes = nodes.OrderBy(o => o.GetComponent<MMNodeValueHolder>().Layer).ToList();
-                foreach (GameObject node in nodes)
-                {
-                    MindMapNodeConf nodeConf = MindMapNodeConf.GetNodeConf(node);
-                    config.MindMapNodeConfigs.Add(nodeConf);
-                }
-            }
-            return config;
+            return null;
         }
 
         /// <summary>

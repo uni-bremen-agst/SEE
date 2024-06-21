@@ -48,8 +48,8 @@ namespace SEE.UI.Menu.Drawable
         {
             moveMenu = PrefabInstantiator.InstantiatePrefab(moveMenuPrefab,
                 GameObject.Find("UI Canvas").transform, false);
-            GameObject drawable = GameFinder.GetDrawable(stickyNoteHolder);
-            string drawableParentID = GameFinder.GetDrawableParentName(drawable);
+            GameObject surface = GameFinder.GetDrawableSurface(stickyNoteHolder);
+            string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
             /// Register the switch for speed up option.
             SwitchManager speedUpManager = GameFinder.FindChild(moveMenu, "SpeedSwitch")
@@ -79,7 +79,7 @@ namespace SEE.UI.Menu.Drawable
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Left, speed);
                 if (!spawnMode)
                 {
-                    new StickyNoteMoveNetAction(drawable.name, drawableParentID,
+                    new StickyNoteMoveNetAction(surface.name, surfaceParentName,
                         newPos, stickyNoteHolder.transform.eulerAngles).Execute();
                 }
             }, true);
@@ -89,7 +89,7 @@ namespace SEE.UI.Menu.Drawable
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Right, speed);
                 if (!spawnMode)
                 {
-                    new StickyNoteMoveNetAction(drawable.name, drawableParentID,
+                    new StickyNoteMoveNetAction(surface.name, surfaceParentName,
                         newPos, stickyNoteHolder.transform.eulerAngles).Execute();
                 }
             }, true);
@@ -99,7 +99,7 @@ namespace SEE.UI.Menu.Drawable
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Up, speed);
                 if (!spawnMode)
                 {
-                    new StickyNoteMoveNetAction(drawable.name, drawableParentID,
+                    new StickyNoteMoveNetAction(surface.name, surfaceParentName,
                         newPos, stickyNoteHolder.transform.eulerAngles).Execute();
                 }
             }, true);
@@ -109,7 +109,7 @@ namespace SEE.UI.Menu.Drawable
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Down, speed);
                 if (!spawnMode)
                 {
-                    new StickyNoteMoveNetAction(drawable.name, drawableParentID,
+                    new StickyNoteMoveNetAction(surface.name, surfaceParentName,
                         newPos, stickyNoteHolder.transform.eulerAngles).Execute();
                 }
             }, true);
@@ -119,7 +119,7 @@ namespace SEE.UI.Menu.Drawable
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Forward, speed);
                 if (!spawnMode)
                 {
-                    new StickyNoteMoveNetAction(drawable.name, drawableParentID,
+                    new StickyNoteMoveNetAction(surface.name, surfaceParentName,
                         newPos, stickyNoteHolder.transform.eulerAngles).Execute();
                 }
             }, true);
@@ -129,7 +129,7 @@ namespace SEE.UI.Menu.Drawable
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Back, speed);
                 if (!spawnMode)
                 {
-                    new StickyNoteMoveNetAction(drawable.name, drawableParentID,
+                    new StickyNoteMoveNetAction(surface.name, surfaceParentName,
                         newPos, stickyNoteHolder.transform.eulerAngles).Execute();
                 }
             }, true);

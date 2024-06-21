@@ -31,7 +31,7 @@ namespace SEE.Net.Actions.Drawable
             if (!IsRequester())
             {
                 base.ExecuteOnClient();
-                GameStickyNoteManager.SetRotateX(GameFinder.GetHighestParent(Drawable), Degree);
+                GameStickyNoteManager.SetRotateX(GameFinder.GetHighestParent(Surface), Degree);
             }
         }
     }

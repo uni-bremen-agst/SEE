@@ -30,11 +30,6 @@ namespace SEE.Controls.Actions.Drawable
         private GameObject textObj;
 
         /// <summary>
-        /// The drawable on which the text should be displayed.
-        /// </summary>
-        private GameObject drawable;
-
-        /// <summary>
         /// The position on the drawable where the text should be displayed.
         /// </summary>
         private Vector3 position;
@@ -71,9 +66,9 @@ namespace SEE.Controls.Actions.Drawable
         private struct Memento
         {
             /// <summary>
-            /// The drawable on which the text should be displayed.
+            /// The drawable surface on which the text should be displayed.
             /// </summary>
-            public DrawableConfig Drawable;
+            public DrawableConfig Surface;
 
             /// <summary>
             /// The written text.
@@ -83,11 +78,11 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The constructor.
             /// </summary>
-            /// <param name="drawable">The drawable on which the text should be displayed.</param>
+            /// <param name="surface">The drawable surface on which the text should be displayed.</param>
             /// <param name="text">The written text</param>
-            public Memento(GameObject drawable, TextConf text)
+            public Memento(GameObject surface, TextConf text)
             {
-                Drawable = DrawableConfigManager.GetDrawableConfig(drawable);
+                Surface = DrawableConfigManager.GetDrawableConfig(surface);
                 Text = text;
             }
         }
@@ -109,7 +104,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Awake();
             if (firstStart)
             {
-                Surface.AddComponent<ValueResetter>().SetAllowedState(GetActionStateType());
+                Canvas.AddComponent<ValueResetter>().SetAllowedState(GetActionStateType());
                 TextMenu.EnableForWriting();
                 firstStart = false;
             }
@@ -152,9 +147,9 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void GettingPosition()
         {
-            if (Selector.SelectQueryHasOrIsDrawable(out RaycastHit raycastHit))
+            if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit))
             {
-                drawable = GameFinder.GetDrawable(raycastHit.collider.gameObject);
+                Surface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
                 position = raycastHit.point;
                 progress = ProgressState.GettingText;
                 writeTextDialog = new WriteEditTextDialog();
@@ -177,14 +172,14 @@ namespace SEE.Controls.Actions.Drawable
             {
                 if (textOut != null && textOut != "")
                 {
-                    textObj = GameTexter.WriteText(drawable, textOut, position,
+                    textObj = GameTexter.WriteText(Surface, textOut, position,
                         ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor,
                         TextMenu.GetOutlineStatus(),
                         ValueHolder.CurrentOutlineThickness, ValueHolder.CurrentFontSize,
                         ValueHolder.CurrentOrderInLayer, TextMenu.GetFontStyle());
-                    new WriteTextNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
+                    new WriteTextNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                         TextConf.GetText(textObj)).Execute();
-                    memento = new Memento(drawable, TextConf.GetText(textObj));
+                    memento = new Memento(Surface, TextConf.GetText(textObj));
                     GameTexter.RefreshMeshCollider(textObj);
                     CurrentState = IReversibleAction.Progress.Completed;
                     return true;
@@ -220,8 +215,8 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo();
-            GameObject obj = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Text.Id);
-            new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Text.Id).Execute();
+            GameObject obj = GameFinder.FindChild(memento.Surface.GetDrawable(), memento.Text.Id);
+            new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Text.Id).Execute();
             Destroyer.Destroy(obj);
         }
 
@@ -231,8 +226,8 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            GameTexter.ReWriteText(memento.Drawable.GetDrawable(), memento.Text);
-            new WriteTextNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.Text).Execute();
+            GameTexter.ReWriteText(memento.Surface.GetDrawable(), memento.Text);
+            new WriteTextNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Text).Execute();
 
         }
 

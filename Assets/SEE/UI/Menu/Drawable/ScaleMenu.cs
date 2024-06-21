@@ -99,9 +99,9 @@ namespace SEE.UI.Menu.Drawable
             {
                 Vector3 newScale = new(xScale, yScale.GetValue(), 1);
                 GameScaler.SetScale(objToScale, newScale);
-                GameObject drawable = GameFinder.GetDrawable(objToScale);
-                string drawableParent = GameFinder.GetDrawableParentName(drawable);
-                new ScaleNetAction(drawable.name, drawableParent, objToScale.name, newScale).Execute();
+                GameObject surface = GameFinder.GetDrawableSurface(objToScale);
+                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
+                new ScaleNetAction(surface.name, surfaceParentName, objToScale.name, newScale).Execute();
             });
         }
 
@@ -116,9 +116,9 @@ namespace SEE.UI.Menu.Drawable
             {
                 Vector3 newScale = new(xScale.GetValue(), yScale, 1);
                 GameScaler.SetScale(objToScale, newScale);
-                GameObject drawable = GameFinder.GetDrawable(objToScale);
-                string drawableParent = GameFinder.GetDrawableParentName(drawable);
-                new ScaleNetAction(drawable.name, drawableParent, objToScale.name, newScale).Execute();
+                GameObject surface = GameFinder.GetDrawableSurface(objToScale);
+                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
+                new ScaleNetAction(surface.name, surfaceParentName, objToScale.name, newScale).Execute();
             });
         }
 

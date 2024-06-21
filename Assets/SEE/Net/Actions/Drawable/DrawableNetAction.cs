@@ -1,12 +1,11 @@
-﻿using MathNet.Numerics.LinearAlgebra;
-using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable;
 using SEE.GO;
 using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// Superclass for all drawable new actions. Provides the drawable object
+    /// Superclass for all drawable new actions. Provides the drawable surface object
     /// and an implelentation of <see cref="ExecuteOnServer"/> that does nothing.
     /// </summary>
     public abstract class DrawableNetAction : AbstractNetAction
@@ -15,59 +14,59 @@ namespace SEE.Net.Actions.Drawable
         /// The drawable object that should be manipulated by this action.
         /// Will be set in the constructor.
         /// </summary>
-        protected GameObject Drawable { get; private set; }
+        protected GameObject Surface { get; private set; }
 
         /// <summary>
         /// The id of the drawable on which the object is located
         /// </summary>
-        public string DrawableID;
+        public string SurfaceID;
         /// <summary>
-        /// The id of the drawable parent
+        /// The id of the drawable surface parent
         /// </summary>
-        public string ParentDrawableID;
+        public string SurfaceParentID;
 
         /// <summary>
-        /// The constructor of this action. Sets <paramref name="drawableID"/>, <paramref name="parentDrawableID"/>,
-        /// and - based on these -<see cref="Drawable"/>.
+        /// The constructor of this action. Sets <paramref name="surfaceID"/>, <paramref name="surfaceParentID"/>,
+        /// and - based on these -<see cref="Surface"/>.
         /// </summary>
-        /// <param name="drawableID">The id of the drawable on which the object should be placed.</param>
-        /// <param name="parentDrawableID">The id of the drawable parent.</param>
-        public DrawableNetAction(string drawableID, string parentDrawableID)
+        /// <param name="surfaceID">The id of the drawable surface on which the object should be placed.</param>
+        /// <param name="surfaceParentID">The id of the drawable surface parent.</param>
+        public DrawableNetAction(string surfaceID, string surfaceParentID)
         {
-            DrawableID = drawableID;
-            ParentDrawableID = parentDrawableID;
+            SurfaceID = surfaceID;
+            SurfaceParentID = surfaceParentID;
         }
 
         /// <summary>
-        /// Returns the drawable object with the id <see cref="DrawableID"/>
-        /// and the parent id <see cref="ParentDrawableID"/>.
+        /// Returns the drawable object with the id <see cref="SurfaceID"/>
+        /// and the parent id <see cref="SurfaceParentID"/>.
         /// </summary>
-        /// <param name="drawableID">The id of the drawable object.</param>
-        /// <param name="parentDrawableID">The id of the parent drawable object.</param>
+        /// <param name="surfaceID">The id of the drawable object.</param>
+        /// <param name="surfaceParentID">The id of the parent drawable object.</param>
         /// <returns>the found drawable object (never null)</returns>
         /// <exception cref="System.Exception">thrown if a drawable object cannot be found</exception>
-        protected static GameObject Find(string drawableID, string parentDrawableID)
+        protected static GameObject Find(string surfaceID, string surfaceParentID)
         {
-            GameObject drawable = GameFinder.FindDrawable(drawableID, parentDrawableID);
-            if (drawable == null)
+            GameObject surface = GameFinder.FindDrawableSurface(surfaceID, surfaceParentID);
+            if (surface == null)
             {
-                throw new System.Exception($"There is no drawable with the ID {drawableID} and parent ID {parentDrawableID}.");
+                throw new System.Exception($"There is no drawable with the ID {surfaceID} and parent ID {surfaceParentID}.");
             }
-            return drawable;
+            return surface;
         }
 
         /// <summary>
-        /// Returns the child of <see cref="Drawable"/> with the id <paramref name="childID"/>.
+        /// Returns the child of <see cref="Surface"/> with the id <paramref name="childID"/>.
         /// </summary>
         /// <param name="childID">the ID of the requested child</param>
         /// <returns>the child (will never be null)</returns>
         /// <exception cref="System.Exception">thrown in case the child does not exist</exception>
         protected GameObject FindChild(string childID)
         {
-            GameObject child = GameFinder.FindChild(Drawable, childID);
+            GameObject child = GameFinder.FindChild(Surface, childID);
             if (child == null)
             {
-                throw new System.Exception($"The drawable {Drawable.FullName()} has no child with the ID {childID}.");
+                throw new System.Exception($"The drawable {Surface.FullName()} has no child with the ID {childID}.");
             }
             return child;
         }
@@ -82,7 +81,7 @@ namespace SEE.Net.Actions.Drawable
         /// <returns>true if the child exists</returns>
         protected bool TryFindChild(string childId, out GameObject child)
         {
-            child = GameFinder.FindChild(Drawable, childId);
+            child = GameFinder.FindChild(Surface, childId);
             return child != null;
         }
 
@@ -96,7 +95,7 @@ namespace SEE.Net.Actions.Drawable
 
         protected override void ExecuteOnClient()
         {
-            Drawable = Find(DrawableID, ParentDrawableID);
+            Surface = Find(SurfaceID, SurfaceParentID);
         }
     }
 }

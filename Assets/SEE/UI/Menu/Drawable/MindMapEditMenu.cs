@@ -66,8 +66,8 @@ namespace SEE.Game.UI.Menu.Drawable
                 instance = PrefabInstantiator.InstantiatePrefab(mmEditPrefab,
                     GameObject.Find("UI Canvas").transform, false);
 
-                GameObject drawable = GameFinder.GetDrawable(node);
-                GameObject attached = GameFinder.GetAttachedObjectsObject(drawable);
+                GameObject surface = GameFinder.GetDrawableSurface(node);
+                GameObject attached = GameFinder.GetAttachedObjectsObject(surface);
 
                 /// The return call back, to return to the (this) parent menu.
                 UnityAction callback = () =>
@@ -218,17 +218,17 @@ namespace SEE.Game.UI.Menu.Drawable
             LayerSliderController layerSlider = instance.GetComponentInChildren<LayerSliderController>();
             /// Assigns the current value to the slider.
             layerSlider.AssignValue(conf.OrderInLayer);
-            GameObject drawable = GameFinder.GetDrawable(node);
-            string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+            GameObject surface = GameFinder.GetDrawableSurface(node);
+            string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
             /// Adds the handler for changing.
             layerSlider.onValueChanged.AddListener(layerOrder =>
             {
                 GameEdit.ChangeLayer(node, layerOrder);
                 conf.OrderInLayer = layerOrder;
-                new EditLayerNetAction(drawable.name, drawableParentName,
+                new EditLayerNetAction(surface.name, surfaceParentName,
                     node.name, layerOrder).Execute();
                 GameMindMap.ReDrawBranchLines(node);
-                new MindMapRefreshBranchLinesNetAction(drawable.name, drawableParentName,
+                new MindMapRefreshBranchLinesNetAction(surface.name, surfaceParentName,
                     MindMapNodeConf.GetNodeConf(node)).Execute();
             });
         }

@@ -275,13 +275,13 @@ namespace SEE.Game.Drawable
                 if (node.CompareTag(Tags.MindMapNode))
                 {
                     MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
-                    GameObject drawable = GameFinder.GetDrawable(node);
-                    string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+                    GameObject surface = GameFinder.GetDrawableSurface(node);
+                    string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
                     /// If this method was not called by a set method (<see cref="SetRotate"/> or <see cref="SetPosition"/>),
                     /// then disable collision detection for the children.
                     if (!setMode)
                     {
-                        new RbAndCCDestroyerNetAction(drawable.name, drawableParentName, node.name).Execute();
+                        new RbAndCCDestroyerNetAction(surface.name, surfaceParentName, node.name).Execute();
                         foreach (KeyValuePair<GameObject, GameObject> pair in valueHolder.GetAllChildren())
                         {
                             if (pair.Key.GetComponent<Rigidbody>() != null)

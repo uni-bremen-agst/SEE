@@ -60,9 +60,9 @@ namespace SEE.Controls.Actions.Drawable
             /// </summary>
             public readonly DrawableType NewValueHolder;
             /// <summary>
-            /// The drawable on which the drawable type object is displayed.
+            /// The drawable surface on which the drawable type object is displayed.
             /// </summary>
-            public readonly DrawableConfig Drawable;
+            public readonly DrawableConfig Surface;
             /// <summary>
             /// The id of the drawable type object.
             /// </summary>
@@ -74,15 +74,15 @@ namespace SEE.Controls.Actions.Drawable
             /// <param name="obj">The selected drawable type object that should be edit</param>
             /// <param name="oldValueHolder">The old values of the drawable type object.</param>
             /// <param name="newValueHolder">The newly edited values of the drawable type object.</param>
-            /// <param name="drawable">The drawable on which the drawable type object is displayed.</param>
+            /// <param name="surface">The drawable surface on which the drawable type object is displayed.</param>
             /// <param name="id">The id of the drawable type object.</param>
             public Memento(GameObject obj, DrawableType oldValueHolder,
-                DrawableType newValueHolder, GameObject drawable, string id)
+                DrawableType newValueHolder, GameObject surface, string id)
             {
                 SelectedObj = obj;
                 OldValueHolder = oldValueHolder;
                 NewValueHolder = newValueHolder;
-                Drawable = DrawableConfigManager.GetDrawableConfig(drawable);
+                Surface = DrawableConfigManager.GetDrawableConfig(surface);
                 Id = id;
             }
         }
@@ -190,8 +190,8 @@ namespace SEE.Controls.Actions.Drawable
             BlinkEffect.Deactivate(selectedObj);
             if (progressState != ProgressState.Finish && selectedObj != null)
             {
-                GameObject drawable = GameFinder.GetDrawable(selectedObj);
-                DrawableType.Edit(selectedObj, oldValueHolder, drawable);
+                GameObject surface = GameFinder.GetDrawableSurface(selectedObj);
+                DrawableType.Edit(selectedObj, oldValueHolder, surface);
             }
             TextMenu.Disable();
             LineMenu.DisableLineMenu();
@@ -242,8 +242,8 @@ namespace SEE.Controls.Actions.Drawable
                 BlinkEffect.Deactivate(selectedObj);
                 if (progressState != ProgressState.Finish && selectedObj != null)
                 {
-                    GameObject drawable = GameFinder.GetDrawable(selectedObj);
-                    DrawableType.Edit(selectedObj, oldValueHolder, drawable);
+                    GameObject surface = GameFinder.GetDrawableSurface(selectedObj);
+                    DrawableType.Edit(selectedObj, oldValueHolder, surface);
                 }
                 selectedObj = null;
                 progressState = ProgressState.SelectObject;
@@ -266,7 +266,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void Selection()
         {
-            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, Surface,
+            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, Canvas,
                 false, true, false, GetActionStateType()))
             {
                 oldValueHolder = DrawableType.Get(selectedObj);
@@ -350,7 +350,7 @@ namespace SEE.Controls.Actions.Drawable
             if (!CheckEquals(oldValueHolder, newValueHolder))
             {
                 memento = new Memento(selectedObj, oldValueHolder, newValueHolder,
-                         GameFinder.GetDrawable(selectedObj), selectedObj.name);
+                         GameFinder.GetDrawableSurface(selectedObj), selectedObj.name);
                 CurrentState = IReversibleAction.Progress.Completed;
                 return true;
             }
@@ -374,13 +374,13 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (memento.SelectedObj == null && memento.Id != null)
             {
-                memento.SelectedObj = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Id);
+                memento.SelectedObj = GameFinder.FindChild(memento.Surface.GetDrawable(), memento.Id);
             }
 
             if (memento.SelectedObj != null)
             {
-                GameObject drawable = GameFinder.GetDrawable(memento.SelectedObj);
-                DrawableType.Edit(memento.SelectedObj, memento.OldValueHolder, drawable);
+                GameObject surface = GameFinder.GetDrawableSurface(memento.SelectedObj);
+                DrawableType.Edit(memento.SelectedObj, memento.OldValueHolder, surface);
             }
         }
 
@@ -392,13 +392,13 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             if (memento.SelectedObj == null && memento.Id != null)
             {
-                memento.SelectedObj = GameFinder.FindChild(memento.Drawable.GetDrawable(), memento.Id);
+                memento.SelectedObj = GameFinder.FindChild(memento.Surface.GetDrawable(), memento.Id);
             }
 
             if (memento.SelectedObj != null)
             {
-                GameObject drawable = GameFinder.GetDrawable(memento.SelectedObj);
-                DrawableType.Edit(memento.SelectedObj, memento.NewValueHolder, drawable);
+                GameObject surface = GameFinder.GetDrawableSurface(memento.SelectedObj);
+                DrawableType.Edit(memento.SelectedObj, memento.NewValueHolder, surface);
             }
         }
 

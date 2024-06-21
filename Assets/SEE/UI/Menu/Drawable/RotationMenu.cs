@@ -66,8 +66,8 @@ namespace SEE.UI.Menu.Drawable
         {
             if (selectedObject.CompareTag(Tags.MindMapNode))
             {
-                GameObject drawable = GameFinder.GetDrawable(selectedObject);
-                string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+                GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
+                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
                 /// The old rotation of the object.
                 /// Is needed to include the children later on.
@@ -98,10 +98,10 @@ namespace SEE.UI.Menu.Drawable
                     includeChildren = true;
                     Vector3 newRotation = selectedObject.transform.localEulerAngles;
                     GameMoveRotator.SetRotate(selectedObject, oldRotation.z, false);
-                    new RotatorNetAction(drawable.name, drawableParentName, selectedObject.name, oldRotation.z,
+                    new RotatorNetAction(surface.name, surfaceParentName, selectedObject.name, oldRotation.z,
                         false).Execute();
                     GameMoveRotator.SetRotate(selectedObject, newRotation.z, true);
-                    new RotatorNetAction(drawable.name, drawableParentName, selectedObject.name, newRotation.z,
+                    new RotatorNetAction(surface.name, surfaceParentName, selectedObject.name, newRotation.z,
                         true).Execute();
                     changeSwitch = true;
                 });
@@ -116,10 +116,10 @@ namespace SEE.UI.Menu.Drawable
                         {
                             (Vector3 pos, Vector3 rot) = pair.Value;
                             GameMoveRotator.SetPosition(pair.Key, pos, false);
-                            new MoveNetAction(drawable.name, drawableParentName, pair.Key.name, pos,
+                            new MoveNetAction(surface.name, surfaceParentName, pair.Key.name, pos,
                                 false).Execute();
                             GameMoveRotator.SetRotate(pair.Key, rot.z, false);
-                            new RotatorNetAction(drawable.name, drawableParentName, pair.Key.name, rot.z,
+                            new RotatorNetAction(surface.name, surfaceParentName, pair.Key.name, rot.z,
                                 false).Execute();
                         }
                     }
@@ -148,8 +148,8 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="selectedObject">The selected object to rotate</param>
         private static void SliderListener(RotationSliderController slider, GameObject selectedObject)
         {
-            GameObject drawable = GameFinder.GetDrawable(selectedObject);
-            string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+            GameObject surface = GameFinder.GetDrawableSurface(selectedObject);
+            string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
             Transform transform = selectedObject.transform;
 
             /// Assigns the current degree to the slider.
@@ -180,7 +180,7 @@ namespace SEE.UI.Menu.Drawable
                 if (unequal)
                 {
                     GameMoveRotator.RotateObject(selectedObject, currentDirection, degreeToMove, includeChildren);
-                    new RotatorNetAction(drawable.name, drawableParentName, selectedObject.name, currentDirection,
+                    new RotatorNetAction(surface.name, surfaceParentName, selectedObject.name, currentDirection,
                         degreeToMove, includeChildren).Execute();
                 }
             });

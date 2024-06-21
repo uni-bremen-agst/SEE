@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using SEE.Game.Drawable.Configurations;
-using SEE.UI.Notification;
+﻿using SEE.Game.Drawable.Configurations;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game.Drawable
@@ -13,40 +12,40 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Searches for the drawable surface in the scene.
         /// </summary>
-        /// <param name="drawableID">the drawable surface id.</param>
-        /// <param name="parentDrawableID">the parent id of the drawable surface.</param>
+        /// <param name="surfaceID">the drawable surface id.</param>
+        /// <param name="surfaceParentID">the parent id of the drawable surface.</param>
         /// <param name="useFindWithTagList">Option to select which list should be searched. 
         /// By default, the <see cref="ValueHolder.DrawableSurfaces"> is used. 
         /// When this option is set to true, the expensive <see cref="GameObject.FindGameObjectsWithTag(string)"/> functionality is used.</param>
         /// <returns>The sought-after drawable, if found. Otherwise, null.</returns>
         /// <remarks>This method will iterate over all game objects in the
         /// scene and, hence, is expensive.</remarks>
-        public static GameObject FindDrawable(string drawableID, string parentDrawableID, bool useFindWithTagList = false)
+        public static GameObject FindDrawableSurface(string surfaceID, string surfaceParentID, bool useFindWithTagList = false)
         {
-            GameObject searchedDrawable = null;
-            List<GameObject> drawables;
+            GameObject searchedSurface = null;
+            List<GameObject> surfaces;
             
             /// Selection of the list to be checked.
             if (!useFindWithTagList)
             {
-                drawables = ValueHolder.DrawableSurfaces;
+                surfaces = ValueHolder.DrawableSurfaces;
             }
             else
             {
                 /// Gets all drawables of the scene.
-                drawables = new(GameObject.FindGameObjectsWithTag(Tags.Drawable));
+                surfaces = new(GameObject.FindGameObjectsWithTag(Tags.Drawable));
             }
             /// Search for the desired drawable surface.
-            foreach (GameObject drawable in drawables)
+            foreach (GameObject surface in surfaces)
             {
                 /// Block for searching includes the parend id.
-                if (!string.IsNullOrWhiteSpace(parentDrawableID)
-                    && drawable.transform.parent != null)
+                if (!string.IsNullOrWhiteSpace(surfaceParentID)
+                    && surface.transform.parent != null)
                 {
-                    string parentName = drawable.transform.parent.gameObject.name;
-                    if (parentDrawableID == parentName && drawableID == drawable.name)
+                    string parentName = surface.transform.parent.gameObject.name;
+                    if (surfaceParentID == parentName && surfaceID == surface.name)
                     {
-                        searchedDrawable = drawable;
+                        searchedSurface = surface;
                     }
                 }
                 else
@@ -54,19 +53,19 @@ namespace SEE.Game.Drawable
                     /// Block for searching without parent id.
                     /// Currently not used, as the drawables from
                     /// the Whiteboard and Sticky Notes each have a parent.
-                    if (drawableID == drawable.name)
+                    if (surfaceID == surface.name)
                     {
-                        searchedDrawable = drawable;
+                        searchedSurface = surface;
                     }
                 }
             }
             /// If the search with the <see cref="ValueHolder.DrawableSurfaces"> list is unsuccessful, 
             /// initiate a search using the <see cref="GameObject.FindGameObjectsWithTag(string)"/> method.
-            if (!useFindWithTagList && searchedDrawable == null)
+            if (!useFindWithTagList && searchedSurface == null)
             {
-                return FindDrawable(drawableID, parentDrawableID, true);
+                return FindDrawableSurface(surfaceID, surfaceParentID, true);
             }
-            return searchedDrawable;
+            return searchedSurface;
         }
 
         /// <summary>
@@ -105,25 +104,25 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Gets the drawable of the given object.
+        /// Gets the drawable surface of the given object.
         /// </summary>
         /// <param name="obj">An object of the searched drawable.</param>
         /// <returns>The drawable object.</returns>
-        public static GameObject GetDrawable(GameObject obj)
+        public static GameObject GetDrawableSurface(GameObject obj)
         {
             return FindChildWithTag(GetHighestParent(obj), Tags.Drawable);
         }
 
         /// <summary>
-        /// Query whether the given object is located on a drawable.
+        /// Query whether the given object is located on a drawable surface.
         /// </summary>
         /// <param name="child">The child to be examined.</param>
         /// <returns>true, if the child has a drawable. Otherwise false</returns>
-        public static bool HasDrawable(GameObject child)
+        public static bool HasDrawableSurface(GameObject child)
         {
             if (HasParentWithTag(child, Tags.AttachedObjects))
             {
-                return GetDrawable(child) != null;
+                return GetDrawableSurface(child) != null;
             }
             else
             {
@@ -137,9 +136,9 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="obj">The object to be examined.</param>
         /// <returns>true if the object is a drawable surface or if is located on one.</returns>
-        public static bool IsOrHasDrawable(GameObject obj)
+        public static bool IsOrHasDrawableSurface(GameObject obj)
         {
-            return obj.CompareTag(Tags.Drawable) || HasDrawable(obj);
+            return obj.CompareTag(Tags.Drawable) || HasDrawableSurface(obj);
         }
 
         /// <summary>
@@ -151,7 +150,7 @@ namespace SEE.Game.Drawable
         /// <returns>true, if a drawable will be found. Otherwise false</returns>
         public static bool IsPartOfADrawable(GameObject component)
         {
-            return GetDrawable(component) != null;
+            return GetDrawableSurface(component) != null;
         }
 
         /// <summary>
@@ -260,15 +259,15 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Gets the parent name of the drawable.
+        /// Gets the parent name of the drawable surface.
         /// </summary>
-        /// <param name="drawable">The drawable</param>
+        /// <param name="surface">The drawable surface</param>
         /// <returns>The name, empty if no parent exists.</returns>
-        public static string GetDrawableParentName(GameObject drawable)
+        public static string GetDrawableSurfaceParentName(GameObject surface)
         {
-            if (drawable.CompareTag(Tags.Drawable))
+            if (surface.CompareTag(Tags.Drawable))
             {
-                return HasParent(drawable) ? drawable.transform.parent.name : "";
+                return HasParent(surface) ? surface.transform.parent.name : "";
             }
             else
             {

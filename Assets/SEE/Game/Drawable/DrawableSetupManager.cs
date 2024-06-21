@@ -15,14 +15,14 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Provides the drawable holder for a given drawable.
         /// </summary>
-        /// <param name="drawable">The drawable that should get a drawable holder.</param>
+        /// <param name="surface">The drawable surface that should get a drawable holder.</param>
         /// <param name="highestParent">Is the drawable holder</param>
         /// <param name="attachedObjects">Is the parent object of <see cref="DrawableType"/></param>
-        public static void Setup(GameObject drawable, out GameObject highestParent, out GameObject attachedObjects)
+        public static void Setup(GameObject surface, out GameObject highestParent, out GameObject attachedObjects)
         {
-            if (GameFinder.HasParent(drawable))
+            if (GameFinder.HasParent(surface))
             {
-                GameObject parent = GameFinder.GetHighestParent(drawable);
+                GameObject parent = GameFinder.GetHighestParent(surface);
                 /// Block for drawable holder creation.
                 if (!parent.name.StartsWith(ValueHolder.DrawableHolderPrefix))
                 {
@@ -59,8 +59,8 @@ namespace SEE.Game.Drawable
                 /// Does not occur so far.
                 /// Both whiteboards and sticky notes have a parent object, as both offer borders for collision detection.
                 /// It creates a new parent for the drawable as well as an attached objects object.
-                highestParent = new(ValueHolder.DrawableHolderPrefix + drawable.GetInstanceID());
-                highestParent.transform.SetPositionAndRotation(drawable.transform.position, drawable.transform.rotation);
+                highestParent = new(ValueHolder.DrawableHolderPrefix + surface.GetInstanceID());
+                highestParent.transform.SetPositionAndRotation(surface.transform.position, surface.transform.rotation);
                 attachedObjects = new GameObject(ValueHolder.AttachedObject)
                 {
                     tag = Tags.AttachedObjects
@@ -68,13 +68,13 @@ namespace SEE.Game.Drawable
                 attachedObjects.transform.SetPositionAndRotation(highestParent.transform.position, highestParent.transform.rotation);
                 attachedObjects.transform.SetParent(highestParent.transform);
 
-                drawable.transform.SetParent(highestParent.transform);
+                surface.transform.SetParent(highestParent.transform);
 
                 /// Copies the order in layer component to the highest parent.
-                if (drawable.GetComponentInChildren<OrderInLayerValueHolder>() != null)
+                if (surface.GetComponentInChildren<OrderInLayerValueHolder>() != null)
                 {
                     OrderInLayerValueHolder highestHolder = highestParent.AddComponent<OrderInLayerValueHolder>();
-                    OrderInLayerValueHolder oldHolder = drawable.GetComponentInChildren<OrderInLayerValueHolder>();
+                    OrderInLayerValueHolder oldHolder = surface.GetComponentInChildren<OrderInLayerValueHolder>();
                     highestHolder.OrderInLayer = oldHolder.OrderInLayer;
                     highestHolder.OriginPosition = oldHolder.OriginPosition;
                     Destroyer.Destroy(oldHolder);

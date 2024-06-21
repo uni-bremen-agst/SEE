@@ -37,7 +37,7 @@ namespace Assets.SEE.Game.Drawable.ActionHelpers
                     || oldSelectedObj != raycastHit.collider.gameObject
                     || (oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased))
                 && (!hasDrawable 
-                    || (hasDrawable && GameFinder.HasDrawable(raycastHit.collider.gameObject)))
+                    || (hasDrawable && GameFinder.HasDrawableSurface(raycastHit.collider.gameObject)))
                 && (!isDrawableType
                     || (isDrawableType && Tags.DrawableTypes.Contains(raycastHit.collider.gameObject.tag))))
             {
@@ -70,11 +70,11 @@ namespace Assets.SEE.Game.Drawable.ActionHelpers
         /// </summary>
         /// <param name="raycastHit">The detected <see cref="RaycastHit">.</param>
         /// <returns>Status indicating whether the selection was successful or not.</returns>
-        public static bool SelectQueryHasDrawable(out RaycastHit raycastHit)
+        public static bool SelectQueryHasDrawableSurface(out RaycastHit raycastHit)
         {
             if (Queries.LeftMouseInteraction()
                 && Raycasting.RaycastAnything(out RaycastHit hit)
-                && GameFinder.HasDrawable(hit.collider.gameObject)) 
+                && GameFinder.HasDrawableSurface(hit.collider.gameObject)) 
             {
                 raycastHit = hit;
                 return true;
@@ -90,13 +90,13 @@ namespace Assets.SEE.Game.Drawable.ActionHelpers
         /// <param name="leftMouseButton">Status indicating whether the left or right mouse button should be used.</param>
         /// <param name="onlyLeftDown">True if only the down click should be registered. Not holding them.</param>
         /// <returns>Status indicating whether the selection was successful or not.</returns>
-        public static bool SelectQueryHasOrIsDrawable(out RaycastHit raycastHit, bool leftMouseButton = true, bool onlyLeftDown = false)
+        public static bool SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit, bool leftMouseButton = true, bool onlyLeftDown = false)
         {
             if ((Queries.LeftMouseInteraction() && leftMouseButton && !onlyLeftDown
                  || Queries.LeftMouseDown() && leftMouseButton && onlyLeftDown
                  || Queries.RightMouseInteraction() && !leftMouseButton)
                 && Raycasting.RaycastAnything(out RaycastHit hit)
-                && GameFinder.IsOrHasDrawable(hit.collider.gameObject))
+                && GameFinder.IsOrHasDrawableSurface(hit.collider.gameObject))
             {
                 raycastHit = hit;
                 return true;
@@ -128,10 +128,10 @@ namespace Assets.SEE.Game.Drawable.ActionHelpers
         /// </summary>
         /// <param name="raycastHit">The detected <see cref="RaycastHit">.</param>
         /// <returns>Status indicating whether the selection was successful or not.</returns>
-        public static bool SelectQueryHasOrIsWithoutMouse(out RaycastHit raycastHit)
+        public static bool SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit raycastHit)
         {
             if (Raycasting.RaycastAnything(out RaycastHit hit)
-                && GameFinder.IsOrHasDrawable(hit.collider.gameObject))
+                && GameFinder.IsOrHasDrawableSurface(hit.collider.gameObject))
             {
                 raycastHit = hit;
                 return true;

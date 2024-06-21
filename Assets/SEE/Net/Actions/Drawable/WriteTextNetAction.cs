@@ -38,7 +38,7 @@ namespace SEE.Net.Actions.Drawable
                 base.ExecuteOnClient();
                 if (Text != null && Text.Id != "")
                 {
-                    GameTexter.ReWriteText(Drawable, Text);
+                    GameTexter.ReWriteText(Surface, Text);
                 }
                 else
                 {

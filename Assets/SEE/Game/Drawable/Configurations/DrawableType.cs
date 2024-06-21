@@ -62,27 +62,27 @@ namespace SEE.Game.Drawable.Configurations
         /// </summary>
         /// <param name="objectToEdit">The object to be edited.</param>
         /// <param name="type">The drawable type configuration that should be applied.</param>
-        /// <param name="drawable">The drawable on which the object is displayed.</param>
-        public static void Edit(GameObject objectToEdit, DrawableType type, GameObject drawable)
+        /// <param name="surface">The drawable surface on which the object is displayed.</param>
+        public static void Edit(GameObject objectToEdit, DrawableType type, GameObject surface)
         {
-            string drawableParent = GameFinder.GetDrawableParentName(drawable);
+            string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
             switch(type)
             {
                 case LineConf line:
                     GameEdit.ChangeLine(objectToEdit, line);
-                    new EditLineNetAction(drawable.name, drawableParent, line).Execute();
+                    new EditLineNetAction(surface.name, surfaceParentName, line).Execute();
                     break;
                 case TextConf text:
                     GameEdit.ChangeText(objectToEdit, text);
-                    new EditTextNetAction(drawable.name, drawableParent, text).Execute();
+                    new EditTextNetAction(surface.name, surfaceParentName, text).Execute();
                     break;
                 case ImageConf image:
                     GameEdit.ChangeImage(objectToEdit, image);
-                    new EditImageNetAction(drawable.name, drawableParent, image).Execute();
+                    new EditImageNetAction(surface.name, surfaceParentName, image).Execute();
                     break;
                 case MindMapNodeConf node:
                     GameEdit.ChangeMindMapNode(objectToEdit, node);
-                    new EditMMNodeNetAction(drawable.name, drawableParent, node).Execute();
+                    new EditMMNodeNetAction(surface.name, surfaceParentName, node).Execute();
                     break;
                 default:
                     Debug.Log($"Can't edit {type.Id}.\n");
@@ -188,34 +188,34 @@ namespace SEE.Game.Drawable.Configurations
         /// It calls the corresponding re-creation method of the respective drawable type.
         /// </summary>
         /// <param name="type">The type to restore.</param>
-        /// <param name="drawable">The drawable on which the drawable type should be restored.</param>
-        public static GameObject Restore(DrawableType type, GameObject drawable)
+        /// <param name="surface">The drawable surface on which the drawable type should be restored.</param>
+        public static GameObject Restore(DrawableType type, GameObject surface)
         {
             GameObject createdObject = null;
             switch (type)
             {
                 case LineConf line:
-                    createdObject = GameDrawer.ReDrawLine(drawable, line);
+                    createdObject = GameDrawer.ReDrawLine(surface, line);
                     EnsureValidity(type, createdObject);
-                    new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
+                    new DrawNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
                         line).Execute();
                     break;
                 case TextConf text:
-                    createdObject = GameTexter.ReWriteText(drawable, text);
+                    createdObject = GameTexter.ReWriteText(surface, text);
                     EnsureValidity(type, createdObject);
-                    new WriteTextNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
+                    new WriteTextNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
                         text).Execute();
                     break;
                 case ImageConf image:
-                    createdObject = GameImage.RePlaceImage(drawable, image);
+                    createdObject = GameImage.RePlaceImage(surface, image);
                     EnsureValidity(type, createdObject);
-                    new AddImageNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
+                    new AddImageNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
                         image).Execute();
                     break;
                 case MindMapNodeConf node:
-                    createdObject = GameMindMap.ReCreate(drawable, node);
+                    createdObject = GameMindMap.ReCreate(surface, node);
                     EnsureValidity(type, createdObject);
-                    new MindMapCreateNodeNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
+                    new MindMapCreateNodeNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
                         node).Execute();
                     break;
                 default:

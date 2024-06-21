@@ -17,13 +17,13 @@ namespace SEE.Game.Drawable
         /// Splits a line.
         /// The splitting point can either be retained (split) or deleted (pointerase)
         /// </summary>
-        /// <param name="drawable">The drawable on which the lines should be redrawn.</param>
+        /// <param name="surface">The drawable surface on which the lines should be redrawn.</param>
         /// <param name="originLine">Configuration of the original line.</param>
         /// <param name="matchedIndices">The indices of the points to be split.</param>
         /// <param name="positions">The positions of the line.</param>
         /// <param name="lines">List that holds the newly created line configurations.</param>
         /// <param name="removeMatchedIndex">Specifies whether the split points should be deleted.</param>
-        public static void Split(GameObject drawable, LineConf originLine, List<int> matchedIndices,
+        public static void Split(GameObject surface, LineConf originLine, List<int> matchedIndices,
             List<Vector3> positions, List<LineConf> lines, bool removeMatchedIndex)
         {
             int removeCounter = removeMatchedIndex ? 1 : 0;
@@ -59,7 +59,7 @@ namespace SEE.Game.Drawable
                 /// Trys to re-draw every segment.
                 foreach (List<Vector3> list in parts)
                 {
-                    TryReDraw(drawable, originLine, list.ToArray(), lines);
+                    TryReDraw(surface, originLine, list.ToArray(), lines);
                 }
                 /// Block for the case where an attempt was made to split at the start or end point.
                 if (lines.Count == 1 && !removeMatchedIndex)
@@ -90,8 +90,8 @@ namespace SEE.Game.Drawable
                     Vector3[] end = positions.GetRange(matchedIndices[0] + removeCounter, lastIndex).ToArray();
 
                     /// Trys to re-draw the first and second segment.
-                    TryReDraw(drawable, originLine, begin, lines);
-                    TryReDraw(drawable, originLine, end, lines);
+                    TryReDraw(surface, originLine, begin, lines);
+                    TryReDraw(surface, originLine, end, lines);
                 }
             }
         }
@@ -101,13 +101,13 @@ namespace SEE.Game.Drawable
         /// To do this, select the starting point of this line.
         /// Is intended for shapes.
         /// </summary>
-        /// <param name="drawable">The drawable on which the lines should be redrawn.</param>
+        /// <param name="surface">The drawable surface on which the lines should be redrawn.</param>
         /// <param name="originLine">Configuration of the original line.</param>
         /// <param name="matchedIndices">The indices of the points which connection lines should
         /// be erased.</param>
         /// <param name="positions">The positions of the line.</param>
         /// <param name="lines">List that holds the new created line configurations.</param>
-        public static void EraseLinePointConnection(GameObject drawable, LineConf originLine, List<int> matchedIndices,
+        public static void EraseLinePointConnection(GameObject surface, LineConf originLine, List<int> matchedIndices,
             List<Vector3> positions, List<LineConf> lines)
         {
             /// Block for the case where multiple indices were found that need to be split.
@@ -141,7 +141,7 @@ namespace SEE.Game.Drawable
                 /// Tries to re-draw every segment.
                 foreach (List<Vector3> list in parts)
                 {
-                    TryReDraw(drawable, originLine, list.ToArray(), lines);
+                    TryReDraw(surface, originLine, list.ToArray(), lines);
                 }
 
                 /// Block for the case where an attempt was made to split at the start or end point.
@@ -173,8 +173,8 @@ namespace SEE.Game.Drawable
                     Vector3[] end = positions.GetRange(matchedIndices[0] + 1, lastIndex).ToArray();
 
                     /// Trys to re-draw the first and second segment.
-                    TryReDraw(drawable, originLine, begin, lines);
-                    TryReDraw(drawable, originLine, end, lines);
+                    TryReDraw(surface, originLine, begin, lines);
+                    TryReDraw(surface, originLine, end, lines);
                 }
             }
         }
@@ -182,35 +182,35 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Checks if the line can be redrawn.
         /// </summary>
-        /// <param name="drawable">The drawable on which the line should be drawn.</param>
+        /// <param name="surface">The drawable surface on which the line should be drawn.</param>
         /// <param name="originLine">The configuration of the original line.</param>
         /// <param name="positions">The positions for the new line.</param>
         /// <param name="lines">List that holds the new line configurations.</param>
-        private static void TryReDraw(GameObject drawable, LineConf originLine,
+        private static void TryReDraw(GameObject surface, LineConf originLine,
             Vector3[] positions, List<LineConf> lines)
         {
             if (positions.Length > 1)
             {
-                lines.Add(ReDraw(drawable, originLine, positions));
+                lines.Add(ReDraw(surface, originLine, positions));
             }
         }
 
         /// <summary>
         /// Redraws the line with the new sub positions.
         /// </summary>
-        /// <param name="drawable">The drawable on which the line should be redrawn.</param>
+        /// <param name="surface">The drawable surface on which the line should be redrawn.</param>
         /// <param name="originLine">Configuration of the old line.</param>
         /// <param name="positions">The new sub positions of the new line.</param>
         /// <returns>Configuration of the new sub line.</returns>
-        private static LineConf ReDraw(GameObject drawable, LineConf originLine, Vector3[] positions)
+        private static LineConf ReDraw(GameObject surface, LineConf originLine, Vector3[] positions)
         {
             LineConf lineToCreate = (LineConf)originLine.Clone();
             lineToCreate.Id = "";
             lineToCreate.RendererPositions = positions;
 
-            GameObject newLine = GameDrawer.ReDrawLine(drawable, lineToCreate);
+            GameObject newLine = GameDrawer.ReDrawLine(surface, lineToCreate);
             GameDrawer.ChangePivot(newLine);
-            new DrawNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
+            new DrawNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
                 LineConf.GetLine(newLine)).Execute();
 
             return LineConf.GetLine(newLine);

@@ -51,17 +51,17 @@ namespace SEE.Controls.Actions.Drawable
             /// </summary>
             public readonly LoadState State;
             /// <summary>
-            /// The specific chosen drawable (needed for LoadState.Specific)
+            /// The specific chosen drawable surface (needed for LoadState.Specific)
             /// </summary>
-            public DrawableConfig SpecificDrawable;
+            public DrawableConfig SpecificSurface;
             /// <summary>
             /// The drawable configurations.
             /// </summary>
             public DrawablesConfigs Configs;
             /// <summary>
-            /// Are the drawables that are created during the loading process.
+            /// Are the drawable surfaces that are created during the loading process.
             /// </summary>
-            public List<DrawableConfig> AddedDrawables;
+            public List<DrawableConfig> AddedSurface;
 
             /// <summary>
             /// The constructor, which simply assigns its only parameter to a field in this class.
@@ -70,9 +70,9 @@ namespace SEE.Controls.Actions.Drawable
             public Memento(LoadState state)
             {
                 State = state;
-                SpecificDrawable = null;
+                SpecificSurface = null;
                 Configs = null;
-                AddedDrawables = new();
+                AddedSurface = new();
             }
         }
 
@@ -82,9 +82,9 @@ namespace SEE.Controls.Actions.Drawable
         private bool clicked = false;
 
         /// <summary>
-        /// The selected drawable for specific loading.
+        /// The selected drawable surface for specific loading.
         /// </summary>
-        private GameObject selectedDrawable;
+        private GameObject selectedSurface;
 
         /// <summary>
         /// The instance for the drawable file browser.
@@ -102,7 +102,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 if (browser == null || (browser != null && !browser.IsOpen()))
                 {
-                    browser = Surface.AddOrGetComponent<DrawableFileBrowser>();
+                    browser = Canvas.AddOrGetComponent<DrawableFileBrowser>();
                     browser.LoadDrawableConfiguration(LoadState.Regular);
                     memento = new(LoadState.Regular);
                 }
@@ -112,9 +112,9 @@ namespace SEE.Controls.Actions.Drawable
             {
                 if (browser == null || (browser != null && !browser.IsOpen()))
                 {
-                    if (selectedDrawable != null)
+                    if (selectedSurface != null)
                     {
-                        browser = Surface.AddOrGetComponent<DrawableFileBrowser>();
+                        browser = Canvas.AddOrGetComponent<DrawableFileBrowser>();
                         browser.LoadDrawableConfiguration(LoadState.Specific);
                         memento = new(LoadState.Specific);
                     }
@@ -137,7 +137,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             base.Stop();
             LoadMenu.Disable();
-            selectedDrawable?.Destroy<HighlightEffect>();
+            selectedSurface?.Destroy<HighlightEffect>();
         }
 
         /// <summary>
@@ -157,14 +157,12 @@ namespace SEE.Controls.Actions.Drawable
                 /// This block marks the selected drawable.
                 /// If it has already been selected, the marking is cleared.
                 /// For execution, no open file browser should exist.
-                if (Selector.SelectQueryHasOrIsDrawable(out RaycastHit raycastHit)
+                if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit)
                     && !clicked
                     && (browser == null || (browser != null && !browser.IsOpen())))
                 {
                     clicked = true;
-                    GameObject drawable = GameFinder.GetDrawable(raycastHit.collider.gameObject);
-
-                    ManageHighlightEffect(drawable);
+                    ManageHighlightEffect(GameFinder.GetDrawableSurface(raycastHit.collider.gameObject));
                 }
 
                 /// It is needed to enable the switching of the drawable for the specific load.
@@ -188,13 +186,13 @@ namespace SEE.Controls.Actions.Drawable
         private void Cancel()
         {
             if (SEEInput.Cancel()
-                && selectedDrawable != null
-                && selectedDrawable.GetComponent<HighlightEffect>() != null
+                && selectedSurface != null
+                && selectedSurface.GetComponent<HighlightEffect>() != null
                 && (browser == null || (browser != null && !browser.IsOpen())))
             {
                 ShowNotification.Info("Unselect drawable", "The marked drawable was unselected.");
-                selectedDrawable.Destroy<HighlightEffect>();
-                selectedDrawable = null;
+                selectedSurface.Destroy<HighlightEffect>();
+                selectedSurface = null;
             }
         }
 
@@ -204,19 +202,19 @@ namespace SEE.Controls.Actions.Drawable
         /// When a new selection is made, the highlight of the previous drawable is cleared.
         /// Additionally, the option to deselect the drawable is provided.
         /// </summary>
-        /// <param name="drawable">The drawable to be highlighted</param>
-        private void ManageHighlightEffect(GameObject drawable)
+        /// <param name="surface">The drawable surface to be highlighted</param>
+        private void ManageHighlightEffect(GameObject surface)
         {
-            if (drawable.GetComponent<HighlightEffect>() == null)
+            if (surface.GetComponent<HighlightEffect>() == null)
             {
-                selectedDrawable?.Destroy<HighlightEffect>();
-                selectedDrawable = drawable;
-                GameHighlighter.EnableGlowOverlay(selectedDrawable);
+                selectedSurface?.Destroy<HighlightEffect>();
+                selectedSurface = surface;
+                GameHighlighter.EnableGlowOverlay(selectedSurface);
             }
             else
             {
-                Destroyer.Destroy(drawable.GetComponent<HighlightEffect>());
-                selectedDrawable = null;
+                Destroyer.Destroy(surface.GetComponent<HighlightEffect>());
+                selectedSurface = null;
             }
         }
 
@@ -234,11 +232,11 @@ namespace SEE.Controls.Actions.Drawable
             {
                 /// This block loads one drawable onto the specific chosen drawable.
                 case LoadState.Specific:
-                    memento.SpecificDrawable = DrawableConfigManager.GetDrawableConfig(selectedDrawable);
+                    memento.SpecificSurface = DrawableConfigManager.GetDrawableConfig(selectedSurface);
                     DrawablesConfigs configsSpecific = DrawableConfigManager.LoadDrawables(new FilePath(filePath));
                     foreach (DrawableConfig drawableConfig in configsSpecific.Drawables)
                     {
-                        Restore(memento.SpecificDrawable.GetDrawable(), drawableConfig);
+                        Restore(memento.SpecificSurface.GetDrawable(), drawableConfig);
                     }
                     memento.Configs = configsSpecific;
                     CurrentState = IReversibleAction.Progress.Completed;
@@ -250,16 +248,16 @@ namespace SEE.Controls.Actions.Drawable
                     DrawablesConfigs configs = DrawableConfigManager.LoadDrawables(new FilePath(filePath));
                     foreach (DrawableConfig drawableConfig in configs.Drawables)
                     {
-                        GameObject drawableOfFile = GameFinder.FindDrawable(drawableConfig.ID, drawableConfig.ParentID);
+                        GameObject surfaceOfFile = GameFinder.FindDrawableSurface(drawableConfig.ID, drawableConfig.ParentID);
                         /// If the drawable does not exist it will be spawned as a sticky note.
-                        if (drawableOfFile == null)
+                        if (surfaceOfFile == null)
                         {
-                            memento.AddedDrawables.Add(drawableConfig);
+                            memento.AddedSurface.Add(drawableConfig);
                             GameObject stickyNote = GameStickyNoteManager.Spawn(drawableConfig);
-                            drawableOfFile = GameFinder.GetDrawable(stickyNote);
+                            surfaceOfFile = GameFinder.GetDrawableSurface(stickyNote);
                             new StickyNoteSpawnNetAction(drawableConfig).Execute();
                         }
-                        Restore(drawableOfFile, drawableConfig);
+                        Restore(surfaceOfFile, drawableConfig);
                     }
                     memento.Configs = configs;
                     CurrentState = IReversibleAction.Progress.Completed;
@@ -271,11 +269,11 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Restores all the <see cref="DrawableType"/> objects of the configuration.
         /// </summary>
-        /// <param name="drawable">The drawable on which the configuration should restore.</param>
+        /// <param name="surface">The drawable surface on which the configuration should restore.</param>
         /// <param name="config">The configuration that holds the drawable type configuration to restore.</param>
-        private void Restore(GameObject drawable, DrawableConfig config)
+        private void Restore(GameObject surface, DrawableConfig config)
         {
-            GameObject attachedObject = GameFinder.GetAttachedObjectsObject(drawable);
+            GameObject attachedObject = GameFinder.GetAttachedObjectsObject(surface);
             if (attachedObject != null)
             {
                 GameMindMap.RenameMindMap(config, attachedObject);
@@ -286,7 +284,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     CheckAndChangeID(type, attachedObject, DrawableType.GetPrefix(type));
                 }
-                DrawableType.Restore(type, drawable);
+                DrawableType.Restore(type, surface);
             }
         }
 
@@ -319,15 +317,15 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (attachedObjects != null)
             {
-                GameObject drawable = GameFinder.GetDrawable(attachedObjects);
-                string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+                GameObject surface = GameFinder.GetDrawableSurface(attachedObjects);
+                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
                 foreach (DrawableType type in config.GetAllDrawableTypes())
                 {
                     GameObject typeObj = GameFinder.FindChild(attachedObjects, type.Id);
                     if (typeObj != null)
                     {
-                        new EraseNetAction(drawable.name, drawableParentName, typeObj.name).Execute();
+                        new EraseNetAction(surface.name, surfaceParentName, typeObj.name).Execute();
                         Destroyer.Destroy(typeObj);
                     }
                 }
@@ -344,7 +342,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 case LoadState.Specific:
                     GameObject attachedObjs = GameFinder.GetAttachedObjectsObject(
-                        memento.SpecificDrawable.GetDrawable());
+                        memento.SpecificSurface.GetDrawable());
                     foreach (DrawableConfig config in memento.Configs.Drawables)
                     {
                         DestroyLoadedObjects(attachedObjs, config);
@@ -354,18 +352,18 @@ namespace SEE.Controls.Actions.Drawable
                     foreach (DrawableConfig config in memento.Configs.Drawables)
                     {
                         /// Deletes the sticky note if it was created by the corresponding load action.
-                        if (memento.AddedDrawables.Contains(config))
+                        if (memento.AddedSurface.Contains(config))
                         {
-                            GameObject drawable = GameFinder.FindDrawable(config.ID,
+                            GameObject surface = GameFinder.FindDrawableSurface(config.ID,
                                 config.ParentID);
-                            new StickyNoteDeleterNetAction(GameFinder.GetHighestParent(drawable)
+                            new StickyNoteDeleterNetAction(GameFinder.GetHighestParent(surface)
                                 .name).Execute();
-                            Destroyer.Destroy(GameFinder.GetHighestParent(drawable));
+                            Destroyer.Destroy(GameFinder.GetHighestParent(surface));
                         }
                         else
                         {
-                            GameObject drawable = GameFinder.FindDrawable(config.ID, config.ParentID);
-                            GameObject attachedObj = GameFinder.GetAttachedObjectsObject(drawable);
+                            GameObject surface = GameFinder.FindDrawableSurface(config.ID, config.ParentID);
+                            GameObject attachedObj = GameFinder.GetAttachedObjectsObject(surface);
                             DestroyLoadedObjects(attachedObj, config);
                         }
                     }
@@ -382,23 +380,23 @@ namespace SEE.Controls.Actions.Drawable
             switch (memento.State)
             {
                 case LoadState.Specific:
-                    GameObject specificDrawable = memento.SpecificDrawable.GetDrawable();
+                    GameObject specificSurface = memento.SpecificSurface.GetDrawable();
                     foreach (DrawableConfig config in memento.Configs.Drawables)
                     {
-                        Restore(specificDrawable, config);
+                        Restore(specificSurface, config);
                     }
                     break;
                 case LoadState.Regular:
                     foreach (DrawableConfig config in memento.Configs.Drawables)
                     {
-                        GameObject drawable = GameFinder.FindDrawable(config.ID, config.ParentID);
+                        GameObject surface = GameFinder.FindDrawableSurface(config.ID, config.ParentID);
                         /// Spawns the sticky note if the drawable can't be found.
-                        if (drawable == null)
+                        if (surface == null)
                         {
-                            drawable = GameFinder.GetDrawable(GameStickyNoteManager.Spawn(config));
+                            surface = GameFinder.GetDrawableSurface(GameStickyNoteManager.Spawn(config));
                             new StickyNoteSpawnNetAction(config).Execute();
                         }
-                        Restore(drawable, config);
+                        Restore(surface, config);
                     }
                     break;
             }
@@ -460,7 +458,7 @@ namespace SEE.Controls.Actions.Drawable
                     }
                 } else
                 {
-                    changedObjects.Add(memento.SpecificDrawable.ID);
+                    changedObjects.Add(memento.SpecificSurface.ID);
                     foreach (DrawableConfig config in memento.Configs.Drawables)
                     {
                         foreach (DrawableType type in config.GetAllDrawableTypes())

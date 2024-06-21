@@ -79,8 +79,8 @@ namespace SEE.UI.Menu.Drawable
                 parentSelector.CreateNewItem(node.GetComponentInChildren<TextMeshPro>().text);
             }
 
-            GameObject drawable = GameFinder.GetDrawable(attachedObjects);
-            string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+            GameObject surface = GameFinder.GetDrawableSurface(attachedObjects);
+            string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
             /// Adds a handler to the parent selector so that the selected node is set as the chosen node.
             parentSelector.selectorEvent.AddListener(index =>
@@ -187,21 +187,21 @@ namespace SEE.UI.Menu.Drawable
                 /// If the index can't be found, take the default index 0.
                 index = index < 0 ? 0 : index;
 
-                GameObject drawable = GameFinder.GetDrawable(addedNode);
-                string drawableParent = GameFinder.GetDrawableParentName(drawable);
+                GameObject surface = GameFinder.GetDrawableSurface(addedNode);
+                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
                 /// If the node has no parent branch line, initially create a branch line to the index.
                 if (addedNode.GetComponent<MMNodeValueHolder>().GetParentBranchLine() == null)
                 {
                     chosenObject = nodes[index];
-                    ChangeParent(addedNode, newConf, drawable);
+                    ChangeParent(addedNode, newConf, surface);
                 }
 
                 /// Adds the handler for changing the parent to the parent selector.
                 parentSelector.selectorEvent.AddListener(index =>
                 {
                     chosenObject = nodes[index];
-                    ChangeParent(addedNode, newConf, drawable);
+                    ChangeParent(addedNode, newConf, surface);
                 });
                 parentSelector.defaultIndex = index;
 
@@ -229,12 +229,12 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="addedNode">The selected node.</param>
         /// <param name="newConf">The configuration that holds the changes.</param>
-        /// <param name="drawable">The drawable on which the node is placed.</param>
-        private static void ChangeParent(GameObject addedNode, MindMapNodeConf newConf, GameObject drawable)
+        /// <param name="surface">The drawable surface on which the node is placed.</param>
+        private static void ChangeParent(GameObject addedNode, MindMapNodeConf newConf, GameObject surface)
         {
             GameMindMap.ChangeParent(addedNode, chosenObject);
             newConf.ParentNode = chosenObject.name;
-            new MindMapChangeParentNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
+            new MindMapChangeParentNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
                 newConf).Execute();
         }
 

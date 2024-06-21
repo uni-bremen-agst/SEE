@@ -37,9 +37,9 @@ namespace SEE.Controls.Actions.Drawable
             /// </summary>
             public readonly LineConf OriginalLine;
             /// <summary>
-            /// Is the drawable on which the lines are displayed.
+            /// Is the drawable surface on which the lines are displayed.
             /// </summary>
-            public readonly DrawableConfig Drawable;
+            public readonly DrawableConfig Surface;
             /// <summary>
             /// The list of lines that resulted from modify the original line.
             /// </summary>
@@ -49,12 +49,12 @@ namespace SEE.Controls.Actions.Drawable
             /// The constructor.
             /// </summary>
             /// <param name="originalLine">Is the configuration of line before it was modified.</param>
-            /// <param name="drawable">The drawable where the lines are displayed</param>
+            /// <param name="surface">The drawable surface where the lines are displayed</param>
             /// <param name="lines">The list of lines that resulted from modify the original line</param>
-            public Memento(GameObject originalLine, GameObject drawable, List<LineConf> lines)
+            public Memento(GameObject originalLine, GameObject surface, List<LineConf> lines)
             {
                 OriginalLine = LineConf.GetLine(originalLine);
-                Drawable = DrawableConfigManager.GetDrawableConfig(drawable);
+                Surface = DrawableConfigManager.GetDrawableConfig(surface);
                 Lines = lines;
             }
         }
@@ -75,7 +75,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// Multiple line points may overlap, so it works with a list of nearest points.
                 /// The line is split at the found points, and sublines are created,
                 /// with their starting and ending points corresponding to the splitting point.
-                if (Selector.SelectQueryHasDrawable(out RaycastHit raycastHit)
+                if (Selector.SelectQueryHasDrawableSurface(out RaycastHit raycastHit)
                     && !isActive)
                 {
                     isActive = true;
@@ -87,11 +87,11 @@ namespace SEE.Controls.Actions.Drawable
                         List<LineConf> lines = new();
                         NearestPoints.GetNearestPoints(hitObject, raycastHit.point,
                             out List<Vector3> positionsList, out List<int> matchedIndices);
-                        GameLineSplit.EraseLinePointConnection(GameFinder.GetDrawable(hitObject), originLine,
+                        GameLineSplit.EraseLinePointConnection(GameFinder.GetDrawableSurface(hitObject), originLine,
                             matchedIndices, positionsList, lines);
 
-                        memento = new Memento(hitObject, GameFinder.GetDrawable(hitObject), lines);
-                        new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID,
+                        memento = new Memento(hitObject, GameFinder.GetDrawableSurface(hitObject), lines);
+                        new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
                             memento.OriginalLine.Id).Execute();
                         Destroyer.Destroy(hitObject);
                     }
@@ -112,14 +112,14 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo();
-            GameObject drawable = memento.Drawable.GetDrawable();
-            GameDrawer.ReDrawLine(drawable, memento.OriginalLine);
-            new DrawNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.OriginalLine).Execute();
+            GameObject surface = memento.Surface.GetDrawable();
+            GameDrawer.ReDrawLine(surface, memento.OriginalLine);
+            new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.OriginalLine).Execute();
 
             foreach (LineConf line in memento.Lines)
             {
-                GameObject lineObj = GameFinder.FindChild(drawable, line.Id);
-                new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID, line.Id).Execute();
+                GameObject lineObj = GameFinder.FindChild(surface, line.Id);
+                new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, line.Id).Execute();
                 Destroyer.Destroy(lineObj);
             }
         }
@@ -130,15 +130,15 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            GameObject drawable = memento.Drawable.GetDrawable();
-            GameObject originObj = GameFinder.FindChild(drawable, memento.OriginalLine.Id);
-            new EraseNetAction(memento.Drawable.ID, memento.Drawable.ParentID, memento.OriginalLine.Id).Execute();
+            GameObject surface = memento.Surface.GetDrawable();
+            GameObject originObj = GameFinder.FindChild(surface, memento.OriginalLine.Id);
+            new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.OriginalLine.Id).Execute();
             Destroyer.Destroy(originObj);
 
             foreach (LineConf line in memento.Lines)
             {
-                GameDrawer.ReDrawLine(drawable, line);
-                new DrawNetAction(memento.Drawable.ID, memento.Drawable.ParentID, line).Execute();
+                GameDrawer.ReDrawLine(surface, line);
+                new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, line).Execute();
             }
         }
 
@@ -178,7 +178,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>the id of the line that was splitted.</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            if (memento.Drawable == null)
+            if (memento.Surface == null)
             {
                 return new();
             }

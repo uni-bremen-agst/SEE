@@ -43,13 +43,13 @@ namespace SEE.Game.Drawable
         /// The box collider of the node will be calculated on the border size.
         /// Additionally, the node receives an <see cref="MMNodeValueHolder"/> component.
         /// </summary>
-        /// <param name="drawable">The drawable on which the node should be displayed.</param>
+        /// <param name="surface">The drawable surface on which the node should be displayed.</param>
         /// <param name="name">The id of the node</param>
         /// <param name="prefix">The id prefix.</param>
         /// <param name="writtenText">The displayed text of the node</param>
         /// <param name="position">The position for the node</param>
         /// <param name="node">The created node.</param>
-        private static void Setup(GameObject drawable, string name, string prefix, string writtenText,
+        private static void Setup(GameObject surface, string name, string prefix, string writtenText,
             Vector3 position, out GameObject node)
         {
             /// If the object has been created earlier, it already has a name,
@@ -67,7 +67,7 @@ namespace SEE.Game.Drawable
 
                 name = prefix + node.GetInstanceID() + RandomStrings.GetRandomString(4);
                 /// Check if the name is already in use. If so, generate a new name.
-                while (GameFinder.FindChild(drawable, name) != null)
+                while (GameFinder.FindChild(surface, name) != null)
                 {
                     name = prefix + node.GetInstanceID() + RandomStrings.GetRandomString(4);
                 }
@@ -75,7 +75,7 @@ namespace SEE.Game.Drawable
             }
 
             /// Sets up the drawable holder <see cref="DrawableSetupManager"/>.
-            DrawableSetupManager.Setup(drawable, out GameObject _, out GameObject attachedObjects);
+            DrawableSetupManager.Setup(surface, out GameObject _, out GameObject attachedObjects);
 
             /// Assign the mind map node tag to the node object.
             node.tag = Tags.MindMapNode;
@@ -88,9 +88,9 @@ namespace SEE.Game.Drawable
             node.transform.position = position;
 
             /// Creates the text for the mind map node.
-            GameObject text = CreateText(drawable, position, writtenText, prefix);
+            GameObject text = CreateText(surface, position, writtenText, prefix);
             /// Creates the border for the mind map node.
-            GameObject border = CreateMindMapBorder(drawable, position, text, prefix);
+            GameObject border = CreateMindMapBorder(surface, position, text, prefix);
 
             /// Sets the text and border as child of the node.
             text.transform.SetParent(node.transform);
@@ -126,12 +126,12 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Creates the text for the mind map node (description).
         /// </summary>
-        /// <param name="drawable">The drawable on which the node should be displayed.</param>
+        /// <param name="surface">The drawable surface on which the node should be displayed.</param>
         /// <param name="position">The position for the text.</param>
         /// <param name="writtenText">The text (description) for the node</param>
         /// <param name="prefix">The id prefix, necessary for the font size.</param>
         /// <returns>The created text.</returns>
-        private static GameObject CreateText(GameObject drawable, Vector3 position, string writtenText, string prefix)
+        private static GameObject CreateText(GameObject surface, Vector3 position, string writtenText, string prefix)
         {
             /// Style for Subthemes and Leaves
             FontStyles fontStyles = FontStyles.Normal;
@@ -152,7 +152,7 @@ namespace SEE.Game.Drawable
             }
 
             /// Create the text. The initial color is black. It can be changed with the <see cref="EditAction"/>.
-            GameObject text = GameTexter.WriteText(drawable, writtenText, position, Color.black, Color.clear, false,
+            GameObject text = GameTexter.WriteText(surface, writtenText, position, Color.black, Color.clear, false,
                 ValueHolder.StandardTextOutlineThickness, fontSize, 0, fontStyles);
 
             return text;
@@ -162,12 +162,12 @@ namespace SEE.Game.Drawable
         /// Creates the border of the mind map node.
         /// Themes receive an ellipse shape, sub-themes a rectangle, and leaves receive an invisible ellipse shape.
         /// </summary>
-        /// <param name="drawable">The drawable on which the node should be displayed.</param>
+        /// <param name="surface">The drawable surface on which the node should be displayed.</param>
         /// <param name="position">The position for the border.</param>
         /// <param name="text">The text object, necessary for the width/height calculation</param>
         /// <param name="prefix">The id prefix</param>
         /// <returns>The created border</returns>
-        private static GameObject CreateMindMapBorder(GameObject drawable, Vector3 position, GameObject text, string prefix)
+        private static GameObject CreateMindMapBorder(GameObject surface, Vector3 position, GameObject text, string prefix)
         {
             GameObject shape;
             /// Themes and Subthemes are solid.
@@ -189,11 +189,11 @@ namespace SEE.Game.Drawable
                     break;
             }
             /// Convert the hit point to a local position of the drawable.
-            Vector3 convertedHitPoint = GetConvertedPosition(drawable, position);
+            Vector3 convertedHitPoint = GetConvertedPosition(surface, position);
             /// Gets the shape positions.
             Vector3[] positions = GetBorderPositions(ellipse, convertedHitPoint, text);
             /// Draws the border.
-            shape = DrawLine(drawable, "", positions, ColorKind.Monochrome,
+            shape = DrawLine(surface, "", positions, ColorKind.Monochrome,
                         lineColor, ValueHolder.CurrentSecondaryColor, ValueHolder.StandardLineThickness, true,
                         lineKind, ValueHolder.StandardLineTiling, false);
             /// Sets the pivot to the middle.
@@ -320,14 +320,14 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Creates a mind map node.
         /// </summary>
-        /// <param name="drawable">The drawable on which the node should be displayed.</param>
+        /// <param name="surface">The drawable surface on which the node should be displayed.</param>
         /// <param name="prefix">The id prefix for the node.</param>
         /// <param name="writtenText">The text (description) of the node.</param>
         /// <param name="position">The position for the node.</param>
         /// <returns>The created node.</returns>
-        public static GameObject Create(GameObject drawable, string prefix, string writtenText, Vector3 position)
+        public static GameObject Create(GameObject surface, string prefix, string writtenText, Vector3 position)
         {
-            Setup(drawable, "", prefix, writtenText, position, out GameObject node);
+            Setup(surface, "", prefix, writtenText, position, out GameObject node);
             return node;
         }
 
@@ -371,14 +371,14 @@ namespace SEE.Game.Drawable
             /// Convert the positions to local space.
             GameFinder.GetHighestParent(child).transform.InverseTransformPoints(positions);
 
-            GameObject drawable = GameFinder.GetDrawable(child);
+            GameObject surface = GameFinder.GetDrawableSurface(child);
             /// If no name was chosen, use <see cref="ValueHolder.MindMapBranchLine"/> - ParentID - NodeID.
             if (name == "")
             {
                 name = ValueHolder.MindMapBranchLine + "-" + GetIDofName(parent.name) + "-" + GetIDofName(child.name);
             }
             /// Creates the branch line.
-            GameObject branchLine = DrawLine(drawable, name, positions, ColorKind.Monochrome,
+            GameObject branchLine = DrawLine(surface, name, positions, ColorKind.Monochrome,
                         Color.black, ValueHolder.CurrentSecondaryColor, ValueHolder.StandardLineThickness, true,
                         LineKind.Solid, ValueHolder.StandardLineTiling, false);
 
@@ -762,7 +762,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Re-creates a mind map node
         /// </summary>
-        /// <param name="drawable">The drawable on which the node should be displayed.</param>
+        /// <param name="surface">The drawable surface on which the node should be displayed.</param>
         /// <param name="parent">The parent mind map node</param>
         /// <param name="name">The id of the node</param>
         /// <param name="textConf">The text configuration for the text (description) of the node</param>
@@ -774,7 +774,7 @@ namespace SEE.Game.Drawable
         /// <param name="nodeKind">The node kind for the node</param>
         /// <param name="branchToParentName">The branch line name</param>
         /// <returns>The created mind map node.</returns>
-        private static GameObject ReCreate(GameObject drawable, GameObject parent, string name,
+        private static GameObject ReCreate(GameObject surface, GameObject parent, string name,
             TextConf textConf, LineConf borderConf, Vector3 position, Vector3 scale,
             Vector3 eulerAngles, int order, NodeKind nodeKind, string branchToParentName)
         {
@@ -787,15 +787,15 @@ namespace SEE.Game.Drawable
             GameObject createdNode;
 
             /// Try to find the node.
-            if (GameFinder.FindChild(drawable, name) != null)
+            if (GameFinder.FindChild(surface, name) != null)
             {
-                createdNode = GameFinder.FindChild(drawable, name);
+                createdNode = GameFinder.FindChild(surface, name);
             }
             else
             {
                 /// Creates the node.
-                Setup(drawable, name, GetPrefix(nodeKind), textConf.Text,
-                    drawable.transform.TransformPoint(position), out GameObject node);
+                Setup(surface, name, GetPrefix(nodeKind), textConf.Text,
+                    surface.transform.TransformPoint(position), out GameObject node);
                 /// Destroyes the text and border, because the originals will be restored below.
                 Destroyer.Destroy(GameFinder.FindChildWithTag(node, Tags.Line));
                 Destroyer.Destroy(GameFinder.FindChildWithTag(node, Tags.DText));
@@ -803,11 +803,11 @@ namespace SEE.Game.Drawable
             }
 
             /// Restores the border.
-            GameObject border = ReDrawLine(drawable, borderConf);
+            GameObject border = ReDrawLine(surface, borderConf);
 
             /// Restores the text and sets the order.
             textConf.OrderInLayer = order;
-            GameObject text = GameTexter.ReWriteText(drawable, textConf);
+            GameObject text = GameTexter.ReWriteText(surface, textConf);
             text.GetComponent<OrderInLayerValueHolder>().OrderInLayer = 0;
 
             /// Assigns the border and the text to the node.
@@ -843,21 +843,21 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Recreates a mind map node based on <paramref name="conf"/>.
         /// </summary>
-        /// <param name="drawable">The drawable on which the node should be displayed.</param>
+        /// <param name="surface">The drawable surface on which the node should be displayed.</param>
         /// <param name="conf">The node configuration for restore.</param>
         /// <returns>The mind map node.</returns>
-        public static GameObject ReCreate(GameObject drawable, MindMapNodeConf conf)
+        public static GameObject ReCreate(GameObject surface, MindMapNodeConf conf)
         {
             GameObject parent = null;
 
             /// Try to find the parent of the configuration.
-            if (GameFinder.GetAttachedObjectsObject(drawable) != null)
+            if (GameFinder.GetAttachedObjectsObject(surface) != null)
             {
-                parent = GameFinder.FindChild(GameFinder.GetAttachedObjectsObject(drawable),
+                parent = GameFinder.FindChild(GameFinder.GetAttachedObjectsObject(surface),
                     conf.ParentNode);
             }
 
-            return ReCreate(drawable,
+            return ReCreate(surface,
                 parent,
                 conf.Id,
                 conf.TextConf,
@@ -987,7 +987,7 @@ namespace SEE.Game.Drawable
         {
             if (node.CompareTag(Tags.MindMapNode))
             {
-                DrawableConfig conf = DrawableConfigManager.GetDrawableConfig(GameFinder.GetDrawable(node));
+                DrawableConfig conf = DrawableConfigManager.GetDrawableConfig(GameFinder.GetDrawableSurface(node));
                 conf.TextConfigs.Clear();
                 conf.ImageConfigs.Clear();
                 List<LineConf> selectedBranchLines = new();

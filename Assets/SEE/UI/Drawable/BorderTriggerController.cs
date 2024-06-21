@@ -25,8 +25,8 @@ namespace SEE.UI.Drawable
                 && GameFinder.GetHighestParent(gameObject)
                     .Equals(GameFinder.GetHighestParent(other.gameObject)))
             {
-                GameObject drawable = GameFinder.GetDrawable(other.gameObject);
-                string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+                GameObject surface = GameFinder.GetDrawableSurface(other.gameObject);
+                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
                 /// Block for Mind Map Nodes, they could include children, 
                 /// which is why they are considered particularly.
@@ -42,13 +42,13 @@ namespace SEE.UI.Drawable
                             || valueHolder.GetAllChildren().ContainsKey(body.gameObject)
                             || valueHolder.GetAllParentAncestors().Contains(body.gameObject))
                         {
-                            MoveBack(body.gameObject, drawable, drawableParentName);
+                            MoveBack(body.gameObject, surface, surfaceParentName);
                         }
                     }
                 }
                 else
                 { /// For all other <see cref="DrawableType"/> move the object back into the drawable area.
-                    MoveBack(other.gameObject, drawable, drawableParentName);
+                    MoveBack(other.gameObject, surface, surfaceParentName);
                 }
             }
         }
@@ -57,9 +57,9 @@ namespace SEE.UI.Drawable
         /// This method moves the object back.
         /// </summary>
         /// <param name="objToMove">The object to move</param>
-        /// <param name="drawable">The drawable of the object.</param>
-        /// <param name="drawableParentName">The parent name of the drawable.</param>
-        private void MoveBack(GameObject objToMove, GameObject drawable, string drawableParentName)
+        /// <param name="surface">The drawable surface of the object.</param>
+        /// <param name="surfaceParentName">The parent name of the drawable surface.</param>
+        private void MoveBack(GameObject objToMove, GameObject surface, string surfaceParentName)
         {
             Transform transform = objToMove.transform;
             /// This is needed to ensure that the correct axes are being moved. A rotation changes the axis position.
@@ -94,7 +94,7 @@ namespace SEE.UI.Drawable
 
             /// Sets the new position.
             GameMoveRotator.SetPosition(objToMove, newPosition, false);
-            new MoveNetAction(drawable.name, drawableParentName, objToMove.name, newPosition, false).Execute();
+            new MoveNetAction(surface.name, surfaceParentName, objToMove.name, newPosition, false).Execute();
         }
     }
 }

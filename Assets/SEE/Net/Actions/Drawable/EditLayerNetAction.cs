@@ -50,7 +50,7 @@ namespace SEE.Net.Actions.Drawable
                 }
                 else
                 {
-                    GameStickyNoteManager.ChangeLayer(GameFinder.GetHighestParent(Drawable), OrderInLayer);
+                    GameStickyNoteManager.ChangeLayer(GameFinder.GetHighestParent(Surface), OrderInLayer);
                 }
             }
         }

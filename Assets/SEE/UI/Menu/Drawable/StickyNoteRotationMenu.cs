@@ -63,14 +63,14 @@ namespace SEE.UI.Menu.Drawable
         {
             xRotationMenu = PrefabInstantiator.InstantiatePrefab(xRotationMenuPrefab,
                 GameObject.Find("UI Canvas").transform, false);
-            GameObject drawable = GameFinder.GetDrawable(stickyNoteHolder);
-            string drawableParentID = GameFinder.GetDrawableParentName(drawable);
+            GameObject surface = GameFinder.GetDrawableSurface(stickyNoteHolder);
+            string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
             /// Initialize the button for laying.
-            LayingButton(stickyNoteHolder, hitObject, drawable, drawableParentID);
+            LayingButton(stickyNoteHolder, hitObject, surface, surfaceParentName);
 
             /// Initialize the button for haning.
-            HangingButton(stickyNoteHolder, hitObject, drawable, drawableParentID);
+            HangingButton(stickyNoteHolder, hitObject, surface, surfaceParentName);
 
             /// Initialize the next button, it opens the menu for the Y-rotation.
             GameFinder.FindChild(xRotationMenu, "Next").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
@@ -89,10 +89,10 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="stickyNoteHolder">The sticky note holder to be rotated.</param>
         /// <param name="hitObject">The hit object, is only in the spawn mode != null.</param>
-        /// <param name="drawable">The drawable of the sticky note holder</param>
-        /// <param name="drawableParentID">The id of the sticky note</param>
+        /// <param name="surface">The drawable surface of the sticky note holder</param>
+        /// <param name="surfaceParentName">The id of the sticky note parent</param>
         private static void LayingButton(GameObject stickyNoteHolder, GameObject hitObject,
-            GameObject drawable, string drawableParentID)
+            GameObject surface, string surfaceParentName)
         {
             GameFinder.FindChild(xRotationMenu, "Laying").GetComponent<ButtonManagerBasic>()
                 .clickEvent.AddListener(() =>
@@ -105,7 +105,7 @@ namespace SEE.UI.Menu.Drawable
                     else
                     {
                         GameStickyNoteManager.SetRotateX(stickyNoteHolder, 90);
-                        new StickyNoteRotateXNetAction(drawable.name, drawableParentID, 90).Execute();
+                        new StickyNoteRotateXNetAction(surface.name, surfaceParentName, 90).Execute();
                     }
                 });
         }
@@ -116,17 +116,17 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="stickyNoteHolder">The sticky note holder to be rotated.</param>
         /// <param name="hitObject">The hit object, is only in the spawn mode != null.</param>
-        /// <param name="drawable">The drawable of the sticky note holder</param>
-        /// <param name="drawableParentID">The id of the sticky note</param>
+        /// <param name="surface">The drawable surface of the sticky note holder</param>
+        /// <param name="surfaceParentName">The id of the sticky note parent</param>
         private static void HangingButton(GameObject stickyNoteHolder, GameObject hitObject,
-            GameObject drawable, string drawableParentID)
+            GameObject surface, string surfaceParentName)
         {
             GameFinder.FindChild(xRotationMenu, "Hanging").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GameStickyNoteManager.SetRotateX(stickyNoteHolder, 0);
                 if (hitObject == null)
                 {
-                    new StickyNoteRotateXNetAction(drawable.name, drawableParentID, 0).Execute();
+                    new StickyNoteRotateXNetAction(surface.name, surfaceParentName, 0).Execute();
                 }
             });
         }
@@ -159,17 +159,17 @@ namespace SEE.UI.Menu.Drawable
                 GameObject.Find("UI Canvas").transform, false);
             RotationSliderController slider = yRotationMenu.GetComponentInChildren<RotationSliderController>();
             SliderListener(slider, stickyNoteHolder, spawnMode);
-            GameObject drawable = GameFinder.GetDrawable(stickyNoteHolder);
-            string drawableParentID = GameFinder.GetDrawableParentName(drawable);
+            GameObject surface = GameFinder.GetDrawableSurface(stickyNoteHolder);
+            string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
             /// Initialize or disables the return button.
             YReturnButton(returnCall);
 
             /// Initialize the different degrees button
-            Zero(stickyNoteHolder, slider, spawnMode, drawable, drawableParentID);
-            Ninety(stickyNoteHolder, slider, spawnMode, drawable, drawableParentID);
-            OneHundredEighty(stickyNoteHolder, slider, spawnMode, drawable, drawableParentID);
-            TwoHundredSeventy(stickyNoteHolder, slider, spawnMode, drawable, drawableParentID);
+            Zero(stickyNoteHolder, slider, spawnMode, surface, surfaceParentName);
+            Ninety(stickyNoteHolder, slider, spawnMode, surface, surfaceParentName);
+            OneHundredEighty(stickyNoteHolder, slider, spawnMode, surface, surfaceParentName);
+            TwoHundredSeventy(stickyNoteHolder, slider, spawnMode, surface, surfaceParentName);
 
             /// Initialize the back button, it returns to the xRotation menu.
             GameFinder.FindChild(yRotationMenu, "Back").GetComponent<ButtonManagerBasic>()
@@ -197,10 +197,10 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="stickyNoteHolder">The sticky note holder to be rotated.</param>
         /// <param name="slider">The rotation slider.</param>
         /// <param name="spawnMode">if the menu was called from spawn action.</param>
-        /// <param name="drawable">The drawable of the sticky note holder.</param>
-        /// <param name="drawableParentID">The sticky note id.</param>
+        /// <param name="surface">The drawable surface of the sticky note holder.</param>
+        /// <param name="surfaceParentName">The sticky note id.</param>
         private static void Zero(GameObject stickyNoteHolder, RotationSliderController slider,
-            bool spawnMode, GameObject drawable, string drawableParentID)
+            bool spawnMode, GameObject surface, string surfaceParentName)
         {
             GameFinder.FindChild(yRotationMenu, "0").GetComponent<ButtonManagerBasic>()
                 .clickEvent.AddListener(() =>
@@ -209,7 +209,7 @@ namespace SEE.UI.Menu.Drawable
                 GameStickyNoteManager.SetRotateY(stickyNoteHolder, 0);
                 if (!spawnMode)
                 {
-                    new StickyNoteRoateYNetAction(drawable.name, drawableParentID, 0,
+                    new StickyNoteRoateYNetAction(surface.name, surfaceParentName, 0,
                                stickyNoteHolder.transform.position).Execute();
                 }
             });
@@ -222,10 +222,10 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="stickyNoteHolder">The sticky note holder to be rotated.</param>
         /// <param name="slider">The rotation slider.</param>
         /// <param name="spawnMode">if the menu was called from spawn action.</param>
-        /// <param name="drawable">The drawable of the sticky note holder.</param>
-        /// <param name="drawableParentID">The sticky note id.</param>
+        /// <param name="surface">The drawable surface of the sticky note holder.</param>
+        /// <param name="surfaceParentName">The sticky note id.</param>
         private static void Ninety(GameObject stickyNoteHolder, RotationSliderController slider,
-            bool spawnMode, GameObject drawable, string drawableParentID)
+            bool spawnMode, GameObject surface, string surfaceParentName)
         {
             GameFinder.FindChild(yRotationMenu, "90").GetComponent<ButtonManagerBasic>()
                 .clickEvent.AddListener(() =>
@@ -234,7 +234,7 @@ namespace SEE.UI.Menu.Drawable
                     GameStickyNoteManager.SetRotateY(stickyNoteHolder, 90);
                     if (!spawnMode)
                     {
-                        new StickyNoteRoateYNetAction(drawable.name, drawableParentID, 90,
+                        new StickyNoteRoateYNetAction(surface.name, surfaceParentName, 90,
                                        stickyNoteHolder.transform.position).Execute();
                     }
                 });
@@ -247,10 +247,10 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="stickyNoteHolder">The sticky note holder to be rotated.</param>
         /// <param name="slider">The rotation slider.</param>
         /// <param name="spawnMode">if the menu was called from spawn action.</param>
-        /// <param name="drawable">The drawable of the sticky note holder.</param>
-        /// <param name="drawableParentID">The sticky note id.</param>
+        /// <param name="surface">The drawable surface of the sticky note holder.</param>
+        /// <param name="surfaceParentName">The sticky note id.</param>
         private static void OneHundredEighty(GameObject stickyNoteHolder, RotationSliderController slider,
-            bool spawnMode, GameObject drawable, string drawableParentID)
+            bool spawnMode, GameObject surface, string surfaceParentName)
         {
             GameFinder.FindChild(yRotationMenu, "180").GetComponent<ButtonManagerBasic>()
                 .clickEvent.AddListener(() =>
@@ -259,7 +259,7 @@ namespace SEE.UI.Menu.Drawable
                     GameStickyNoteManager.SetRotateY(stickyNoteHolder, 180);
                     if (!spawnMode)
                     {
-                        new StickyNoteRoateYNetAction(drawable.name, drawableParentID, 180,
+                        new StickyNoteRoateYNetAction(surface.name, surfaceParentName, 180,
                             stickyNoteHolder.transform.position).Execute();
                     }
                 });
@@ -272,10 +272,10 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="stickyNoteHolder">The sticky note holder to be rotated.</param>
         /// <param name="slider">The rotation slider.</param>
         /// <param name="spawnMode">if the menu was called from spawn action.</param>
-        /// <param name="drawable">The drawable of the sticky note holder.</param>
-        /// <param name="drawableParentID">The sticky note id.</param>
+        /// <param name="surface">The drawable surface of the sticky note holder.</param>
+        /// <param name="surfaceParentName">The sticky note id.</param>
         private static void TwoHundredSeventy(GameObject stickyNoteHolder, RotationSliderController slider,
-            bool spawnMode, GameObject drawable, string drawableParentID)
+            bool spawnMode, GameObject surface, string surfaceParentName)
         {
             GameFinder.FindChild(yRotationMenu, "270").GetComponent<ButtonManagerBasic>()
                 .clickEvent.AddListener(() =>
@@ -284,7 +284,7 @@ namespace SEE.UI.Menu.Drawable
                     GameStickyNoteManager.SetRotateY(stickyNoteHolder, 270);
                     if (!spawnMode)
                     {
-                        new StickyNoteRoateYNetAction(drawable.name, drawableParentID, 270,
+                        new StickyNoteRoateYNetAction(surface.name, surfaceParentName, 270,
                             stickyNoteHolder.transform.position).Execute();
                     }
                 });
@@ -316,8 +316,8 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="spawnMode">true, if the menu was called from the sticky note spawn action.</param>
         private static void SliderListener(RotationSliderController slider, GameObject stickyNote, bool spawnMode)
         {
-            GameObject drawable = GameFinder.GetDrawable(stickyNote);
-            string drawableParentID = GameFinder.GetDrawableParentName(drawable);
+            GameObject surface = GameFinder.GetDrawableSurface(stickyNote);
+            string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
             Transform transform = stickyNote.transform;
 
@@ -327,7 +327,7 @@ namespace SEE.UI.Menu.Drawable
                 GameStickyNoteManager.SetRotateY(stickyNote, degree);
                 if (!spawnMode)
                 {
-                    new StickyNoteRoateYNetAction(drawable.name, drawableParentID, degree, stickyNote.transform.position).Execute();
+                    new StickyNoteRoateYNetAction(surface.name, surfaceParentName, degree, stickyNote.transform.position).Execute();
                 }
             });
         }
