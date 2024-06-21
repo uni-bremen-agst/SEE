@@ -18,10 +18,10 @@ import de.unibremen.swt.see.manager.service.UserService;
 
 @SpringBootApplication
 @Slf4j
-public class SeeApplication {
+public class SeeManagerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(SeeApplication.class, args);
+        SpringApplication.run(SeeManagerApplication.class, args);
     }
 
     @Bean

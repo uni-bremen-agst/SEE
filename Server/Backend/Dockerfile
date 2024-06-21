@@ -24,3 +24,4 @@ ENV PATH $PATH:$JAVA_HOME/bin
 EXPOSE 8080
 COPY --from=build app/target/see-backend.jar see-backend.jar
 ENTRYPOINT ["java","-jar","/see-backend.jar"]
+VOLUME /see

@@ -5,28 +5,6 @@
 
 version: '3'
 services:
-  db:
-    image: mysql:latest
-    container_name: db
-    environment:
-      MYSQL_ROOT_PASSWORD: my_secret_password
-      MYSQL_DATABASE: app_db
-      MYSQL_USER: db_user
-      MYSQL_PASSWORD: db_user_pass
-    ports:
-      - "3306:3306"
-  phpmyadmin:
-    image: phpmyadmin:latest
-    container_name: pma
-    links:
-      - db
-    environment:
-      PMA_HOST: db
-      PMA_PORT: 3306
-      PMA_ARBITRARY: 1
-    restart: always
-    ports:
-      - 8081:80
   minio:
     image: docker.io/bitnami/minio:latest
     container_name: minio

@@ -1,10 +1,19 @@
 # SEE Managed Server
 
 This is the management server for SEE, consisting of a backend and a frontend project.
-Both projects have their own README file in their respective subfolders, which comes with additional information.
 
 The management server can be used to configure, run, and stop SEE game server instances.
 Additionally, it provides an API to store and retrieve files for the use in multiple connected SEE clients.
+
+
+--------------------------------------------------------------------------------
+## Documentation
+
+Both subprojects have their own README file in their respective subfolders, which comes with additional information.
+
+Keep the information collected here and in the READMEs of the subprojects up-to-date, and update them in a timely fashion, at the latest before merging the development branch back into the main branch.
+
+Please feel free to add additional info whenever you change anything that is covered in this document, or whenever you overcome hurdles and would have liked to have found the information here in the first place.
 
 
 --------------------------------------------------------------------------------
