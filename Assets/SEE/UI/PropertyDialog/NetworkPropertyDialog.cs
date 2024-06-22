@@ -200,9 +200,7 @@ namespace SEE.UI.PropertyDialog
                 }
                 else
                 {
-                    ShowNotification.Error
-                       ("IPv4 Syntax Error",
-                        "IPv4 addresses must have syntax number.number.number.number where number is a value in between 0 and 255.");
+                    ShowNotification.Error("IPv4 Syntax Error", "IPv4 addresses must have syntax number.number.number.number where number is a value in between 0 and 255.");
                     errorOccurred = true;
                 }
             }

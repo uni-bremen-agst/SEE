@@ -13,8 +13,8 @@ using Network = SEE.Net.Network;
 namespace SEE.UI
 {
     /// <summary>
-    /// Implements the behaviour of the in-game menu for the selection of the networking
-    /// configuration (host, server, client, settings) that is shown at the start up.
+    /// Implements the behaviour of the in-game menu for the selection of the general
+    /// configuration (host, server, client, network and user-settings) that is shown at the start up.
     /// </summary>
     internal class OpeningDialog : MonoBehaviour
     {
@@ -30,12 +30,12 @@ namespace SEE.UI
         /// <returns>the newly created action menu component.</returns>
         private SimpleListMenu CreateMenu()
         {
-            GameObject actionMenuGO = new() { name = "Network Menu" };
+            GameObject actionMenuGO = new() { name = "Start Menu" };
             IList<MenuEntry> entries = SelectionEntries();
             SimpleListMenu actionMenu = actionMenuGO.AddComponent<SimpleListMenu>();
             actionMenu.AllowNoSelection = false; // the menu cannot be closed; user must make a decision
-            actionMenu.Title = "Network Configuration";
-            actionMenu.Description = "Please select the network configuration you want to activate.";
+            actionMenu.Title = "Configuration";
+            actionMenu.Description = "Please select the configuration you want to activate.";
             entries.ForEach(actionMenu.AddEntry);
             // We will handle the closing of the menu ourselves: we need to wait until a network
             // connection can be established.
@@ -80,12 +80,19 @@ namespace SEE.UI
                 //                    description: "Starts a dedicated server without local client.",
                 //                    entryColor: NextColor(),
                 //                    icon: Resources.Load<Sprite>("Icons/Server")),
-                new(selectAction: Settings,
+                new(selectAction: NetworkSettings,
                     unselectAction: null,
-                    title: "Settings",
+                    title: "Network settings",
                     description: "Allows to set additional network settings.",
                     entryColor: Color.gray,
                     icon: Resources.Load<Sprite>("Icons/Settings")),
+
+                new(selectAction: UserSettings,
+                    unselectAction: null,
+                    title: "User settings",
+                    description: "Allows to set additional user settings.",
+                    entryColor: Color.gray,
+                    icon: Resources.Load<Sprite>("Icons/Settings"))
             };
 
             Color NextColor()
@@ -189,13 +196,26 @@ namespace SEE.UI
         /// <summary>
         /// Opens the dialog to configure the network settings.
         /// </summary>
-        private void Settings()
+        private void NetworkSettings()
         {
             /// Note: We arrive here because the user pressed one of the buttons of the
             /// menu, which - in turn - will call menu.ShowMenuAsync(false). Thus
             /// at this time, menu is no longer visible. When the following dialog
             /// is finished, <see cref="Reactivate"/> will be called to turn the menu on again.
             NetworkPropertyDialog dialog = new(network, Reactivate);
+            dialog.Open();
+        }
+
+        /// <summary>
+        /// Opens the dialog to configure the user settings.
+        /// </summary>
+        private void UserSettings()
+        {
+            /// Note: We arrive here because the user pressed one of the buttons of the
+            /// menu, which - in turn - will call menu.ShowMenuAsync(false). Thus
+            /// at this time, menu is no longer visible. When the following dialog
+            /// is finished, <see cref="Reactivate"/> will be called to turn the menu on again.
+            UserPropertyDialog dialog = new(network, Reactivate);
             dialog.Open();
         }
 
