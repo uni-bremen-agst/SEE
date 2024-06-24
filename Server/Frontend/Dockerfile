@@ -1,4 +1,4 @@
-FROM node:21-alpine3.19 AS base
+FROM node:21-alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
@@ -14,6 +14,9 @@ RUN pnpm install
 RUN pnpm run build
 
 FROM nginx:alpine
+RUN sed -i /etc/nginx/conf.d/default.conf \
+        -e 's|\(listen.*\)80\(.*\)|\18080\2|g;'
 WORKDIR /usr/share/nginx/html
 COPY --from=build /app/dist .
 CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 8080

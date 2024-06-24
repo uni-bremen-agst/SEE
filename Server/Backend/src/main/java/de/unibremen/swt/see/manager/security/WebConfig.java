@@ -12,11 +12,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebMvc
 public class WebConfig {
 
-    @Value("${see.app.domain}")
-    private String domain;
-
-    @Value("${see.app.domain.port}")
-    private String port;
+    @Value("${see.app.frontend.url}")
+    private String frontendUrl;
 
     @Bean
     public WebMvcConfigurer getCorsConfiguration() {
@@ -24,7 +21,7 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://" + domain)
+                        .allowedOrigins(frontendUrl)
                         .allowedMethods("*")
                         .allowCredentials(true)
                         .allowedHeaders("*");

@@ -17,7 +17,7 @@ services:
       server-network:
         ipv4_address: 172.18.0.6
     ports:
-      - "80:80"
+      - "80:8080"
 
   backend-server:
     privileged: true
@@ -40,8 +40,7 @@ services:
       MINIO_DEFAULT_BUCKETS: test
       MINIO_ROOT_PASSWORD: your_password
       MINIO_ROOT_USER: your_username
-      DOMAIN: localhost
-      DOMAIN_PORT: 80
+      FRONTEND_URL: http://localhost
       JWT_SECRET: 1RNG9ja6MtadMuLsRC5ci3fy53KcQJmdEWWrp3hV5dnukvW5SQ
 
   storage-server:

@@ -1,7 +1,6 @@
 package de.unibremen.swt.see.manager.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,19 +18,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import de.unibremen.swt.see.manager.security.jwt.AuthEntryPointJwt;
 import de.unibremen.swt.see.manager.security.jwt.AuthTokenFilter;
 import de.unibremen.swt.see.manager.security.services.UserDetailsServiceImpl;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 @Configuration
-//@EnableWebSecurity
+@EnableWebSecurity
 @EnableMethodSecurity
 //(securedEnabled = true,
 //jsr250Enabled = true,
 //prePostEnabled = true) // by default
-public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig {
 
     @Autowired
     UserDetailsServiceImpl userDetailsService;
-    @Value("${spring.h2.console.path}")
-    private String h2ConsolePath;
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
 

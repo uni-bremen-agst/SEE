@@ -1,0 +1,10 @@
+# Minimal Docker Compose file to start the frontend during development.
+
+version: "3.8"
+
+services:
+  frontend-server:
+    build: .
+    container_name: frontend
+    ports:
+      - "8082:8080"
