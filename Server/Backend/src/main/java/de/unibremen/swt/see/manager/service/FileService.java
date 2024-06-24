@@ -1,13 +1,7 @@
 package de.unibremen.swt.see.manager.service;
 
-import io.minio.GetObjectArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
-import io.minio.RemoveObjectArgs;
-import io.minio.errors.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,8 +14,10 @@ import de.unibremen.swt.see.manager.repo.FileRepo;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import java.nio.file.Files;
+import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,24 +30,8 @@ public class FileService {
 
     private final FileRepo fileRepo;
 
-    @Value("${see.app.minio.url}")
-    private String url;
-
-    @Value("${see.app.minio.bucket}")
-    private String bucket;
-
-    @Value("${see.app.minio.user}")
-    private String user;
-
-    @Value("${see.app.minio.password}")
-    private String password;
-
-    private MinioClient createClient() {
-        return MinioClient.builder()
-                .endpoint(url)
-                .credentials(user, password)
-                .build();
-    }
+    @Value("${see.app.filestorage.dir}")
+    private String fileStorageRoot;
 
     public File createFile(MultipartFile multipartFile) {
         if (multipartFile.isEmpty()) {
@@ -60,83 +40,55 @@ public class FileService {
         File file = new File();
         file.setContentType(multipartFile.getContentType());
         file.setOriginalFileName(multipartFile.getOriginalFilename());
-        file.setPath(String.valueOf(file.getId()));
-        fileRepo.save(file);
+        File savedFile = fileRepo.save(file);
 
         try {
-            upload(file.getId().toString(), multipartFile);
-        } catch (Exception e) {
-            throw new IllegalStateException("The file cannot be upload on the internal storage. Please retry later", e);
+            storeFile(savedFile.getId().toString(), multipartFile);
+        } catch (IOException e) {
+            fileRepo.delete(savedFile);
+            throw new IllegalStateException("Error persisting file.", e);
         }
-        return file;
+        return savedFile;
     }
 
-    public void upload(String name, MultipartFile file) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        MinioClient minioClient = createClient();
+    private void storeFile(String fileName, MultipartFile multipartFile) throws IOException {
+        if (fileName == null || fileName.isEmpty()) {
+            throw new IOException("File name must not be empty!");
+        }
 
-        minioClient.putObject(PutObjectArgs
-                .builder()
-                .bucket(bucket)
-                .object(name)
-                .stream(file.getInputStream(), file.getSize(), -1)
-                .build());
+        Path filePath = getUploadPath().resolve(fileName);
+        if (Files.exists(filePath)) {
+            throw new IOException("File already exists: " + filePath.toString());
+        }
+        
+        try (InputStream inputStream = multipartFile.getInputStream()) {
+            Files.copy(inputStream, filePath);
+        } catch (IOException e) {
+            throw new IOException("Unable to save file: " + fileName, e);
+        }
     }
 
-
-    public PayloadFile getFile(UUID fileID) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public PayloadFile getFile(UUID fileId) throws IOException {
         PayloadFile payloadFile = new PayloadFile();
-        Optional<File> file = fileRepo.findById(fileID);
+        Optional<File> file = fileRepo.findById(fileId);
         if (file.isEmpty()) {
-            log.error("Cant fetch file {}", fileID);
+            log.error("File not found in db: {}", fileId);
             return null;
         }
-        MinioClient minioClient = createClient();
-
-        InputStream stream =
-                minioClient.getObject(
-                        GetObjectArgs
-                                .builder()
-                                .bucket("test")
-                                .object(fileID.toString())
-                                .build());
-
-        payloadFile.setContent(IOUtils.toByteArray(stream));
-        payloadFile.setId(fileID.toString());
-        payloadFile.setOriginalFileName(file.get().getOriginalFileName());
-        payloadFile.setContentType(file.get().getContentType());
-        payloadFile.setCreationTime(file.get().getCreationTime());
-
-        log.info("Fetching file {}", fileID);
-        return payloadFile;
-    }
-
-    public PayloadFile getFileByServerAndFileType(Server server, FileType fileType) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        PayloadFile payloadFile = new PayloadFile();
-        if (server == null || fileType == null){
+        
+        String fileIdStr = fileId.toString();
+        Path filePath = getUploadPath().resolve(fileIdStr);
+        if (!Files.exists(filePath)) {
+            log.error("File not found on filesystem: {}", fileIdStr);
             return null;
         }
-        Optional<File> file = fileRepo.findFileByServerAndFileType(server, fileType);
-        if (file.isEmpty()) {
-            log.error("Cant fetch file for server {} with type {}", server.getId(), fileType);
-            return null;
-        }
-        MinioClient minioClient = createClient();
+        
+        // FIXME Do not copy whole file into memory!
+        payloadFile.setContent(Files.readAllBytes(filePath));
+        payloadFile.setId(fileIdStr);
 
-        InputStream stream =
-                minioClient.getObject(
-                        GetObjectArgs
-                                .builder()
-                                .bucket("test")
-                                .object(file.get().getId().toString())
-                                .build());
-
-        payloadFile.setContent(IOUtils.toByteArray(stream));
-        payloadFile.setId(file.get().getId().toString());
-
-
-        payloadFile.setOriginalFileName(file.get().getOriginalFileName());
-
-        switch (fileType) {
+        // TODO This overrides the original file name. Should we store the intended file name in db instead?
+        switch (file.get().getFileType()) {
             case CSV -> payloadFile.setOriginalFileName("multiplayer.csv");
             case CONFIG -> payloadFile.setOriginalFileName("multiplayer.cfg");
             case GXL -> payloadFile.setOriginalFileName("multiplayer.gxl");
@@ -144,33 +96,48 @@ public class FileService {
                     payloadFile.setOriginalFileName("solution." + file.get().getOriginalFileName().split("\\.")[file.get().getOriginalFileName().split("\\.").length - 1]);
             case SOURCE -> payloadFile.setOriginalFileName("src.zip");
         }
+//        payloadFile.setOriginalFileName(file.get().getOriginalFileName());
 
         payloadFile.setContentType(file.get().getContentType());
         payloadFile.setCreationTime(file.get().getCreationTime());
 
-        log.info("Fetching file {}", file.get().getId().toString());
+        log.info("Fetched file {}", fileId);
         return payloadFile;
     }
 
-    public boolean deleteFile(UUID fileID) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public PayloadFile getFileByServerAndFileType(Server server, FileType fileType) throws IOException {
+        log.info("Fetching file for server {} and type {}", server, fileType);
 
-        Optional<File> file = fileRepo.findById(fileID);
+        Optional<File> file = fileRepo.findFileByServerAndFileType(server, fileType);
         if (file.isEmpty()) {
-            log.error("Cant remove file {}", fileID);
+            log.error("File not found in db for server {} with type {}", server.getId(), fileType);
+            return null;
+        }
+        
+        return getFile(file.get().getId());
+    }
+
+    public boolean deleteFile(UUID fileId) throws IOException {
+        log.info("Removing file {}", fileId);
+        
+        Optional<File> file = fileRepo.findById(fileId);
+        if (file.isEmpty()) {
+            log.error("File not found in db: {}", fileId);
             return false;
         }
-
-        MinioClient minioClient = createClient();
-
-        minioClient.removeObject(
-                RemoveObjectArgs
-                        .builder()
-                        .bucket(bucket)
-                        .object(fileID.toString())
-                        .build());
-
+        
+        Path filePath = getUploadPath().resolve(fileId.toString());
+        if (!Files.exists(filePath)) {
+            log.warn("File already deleted: {}", fileId.toString());
+            return true;
+        }
+        if (!Files.isRegularFile(filePath)) {
+            log.error("Not a regular file: {}", fileId.toString());
+            return false;
+        }
+        Files.delete(filePath);
         fileRepo.delete(file.get());
-        log.info("Removing file {}", fileID);
+
         return true;
     }
 
@@ -189,6 +156,20 @@ public class FileService {
                 log.error("Cant delete file {}", file.getId());
             }
         }
-
+    }
+    
+    private Path getUploadPath() throws IOException {
+        Path uploadPath = Paths.get(fileStorageRoot);
+        if (!Files.exists(uploadPath)) {
+            try {
+                Files.createDirectories(uploadPath);
+            } catch (IOException e) {
+                throw new IOException("File Storage Path does not exist and could not be created: " + uploadPath.toString(), e);
+            }
+        }
+        if (!Files.isDirectory(uploadPath, NOFOLLOW_LINKS)){
+            throw new IOException("File Storage Path is not a directory!");
+        }
+        return uploadPath;
     }
 }

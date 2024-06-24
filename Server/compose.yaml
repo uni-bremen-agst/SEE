@@ -1,12 +1,5 @@
 version: "3.8"
 
-networks:
-  server-network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.18.0.0/16
-
 services:
   frontend-server:
     build: ./Frontend
@@ -25,7 +18,7 @@ services:
     container_name: backend
     restart: always
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - backend-data:/see
     depends_on:
       - storage-server
     networks:
@@ -34,22 +27,17 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SQLITE_DB_FILE: /see/database.db
-      MINIO_URL: 172.18.0.4  # IP-Adresse des Minio-Servers
-      MINIO_PORT: 9000
-      MINIO_DEFAULT_BUCKETS: test
-      MINIO_ROOT_PASSWORD: your_password
-      MINIO_ROOT_USER: your_username
       FRONTEND_URL: http://localhost
+      SQLITE_DB_FILE: /see/database.db
       JWT_SECRET: 1RNG9ja6MtadMuLsRC5ci3fy53KcQJmdEWWrp3hV5dnukvW5SQ
 
-  storage-server:
-    image: docker.io/bitnami/minio:latest
-    container_name: storage
-    networks:
-      server-network:
-        ipv4_address: 172.18.0.4
-    environment:
-      MINIO_ROOT_USER: your_username
-      MINIO_ROOT_PASSWORD: your_password
-      MINIO_DEFAULT_BUCKETS: test
+networks:
+  server-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16
+
+volumes:
+  backend-data:
+    driver: TODO

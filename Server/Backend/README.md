@@ -28,7 +28,7 @@ Manages SEE game server instances that are launched via Docker containers.
 
 ### File Service
 
-The file service allows for storing and retrieving files that are stored in MinIO buckets.
+The file service allows for storing and retrieving files that are required to render Code Cities in SEE clients.
 Metadata to identify and retrieve files are stored in the relational database.
 
 
@@ -37,7 +37,6 @@ Metadata to identify and retrieve files are stored in the relational database.
 
 This backend requires additional services during runtime:
 
-- MinIO data storage engine
 - Docker containerization framework
 
 The original authors intended these services to be run using Docker Compose.
