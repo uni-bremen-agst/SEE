@@ -1,17 +1,17 @@
-﻿using SEE.Game;
+﻿using Assets.SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
-using SEE.UI.Notification;
+using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Menu.Drawable;
+using SEE.UI.Notification;
 using SEE.Utils;
+using SEE.Utils.History;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using SEE.Utils.History;
-using Assets.SEE.Game.Drawable.ActionHelpers;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -72,6 +72,10 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private bool finishDrawingViaButton = false;
 
+        private Vector3 shapePreviewFixPosition;
+        private bool shapePreviewFix = false;
+        private bool shapePreview = false;
+
         /// <summary>
         /// Enables the shape menu.
         /// </summary>
@@ -98,7 +102,8 @@ namespace SEE.Controls.Actions.Drawable
         {
             base.Stop();
             ShapeMenu.Disable();
-            if (drawing && shape != null)
+            if (drawing && shape != null
+                || shape != null && (shapePreview ||shapePreviewFix))
             {
                 Destroyer.Destroy(shape);
             }
@@ -114,8 +119,22 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>Whether this action is finished</returns>
         public override bool Update()
         {
+            /// Offers a preview for a shape representation on a fixed chosen position.
+            ShapePreviewFixed();
             if (!Raycasting.IsMouseOverGUI())
             {
+                /// Offers a preview for shape representation.
+                ShapePreviewUnfixed();
+
+                if (Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit rh)
+                    && Queries.MouseDown(MouseButton.Right)) 
+                {
+                    shapePreviewFix = true;
+                    shapePreviewFixPosition = rh.point;
+                    Surface = GameFinder.GetDrawableSurface(rh.collider.gameObject);
+                    ShowNotification.Info("Fix position set.", "The fixed position for the shape preview has been set.");
+                }
+
                 /// Block for initiating shape drawing.
                 /// All shapes, except for straight lines, are also completed within this block.
                 if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit, true, true)
@@ -201,6 +220,7 @@ namespace SEE.Controls.Actions.Drawable
                     "The drawing of the shape art line has been canceled.");
                 new EraseNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), shape.name).Execute();
                 Destroyer.Destroy(shape);
+                ShapeMenu.DisablePartUndo();
                 positions = new Vector3[1];
                 drawing = false;
                 shape = null;
@@ -209,12 +229,13 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// Provides the option to remove the last added point.
-        /// Press the Tab key for this action.
+        /// Press the caps lock key for this action.
         /// If the line does not have enough points to remove, it will be deleted.
         /// </summary>
-        private void RemoveLastPoint()
+        /// <param name="ignorePartUndoButton">True if the key input should be ignored. Will used for the part undo button of the <see cref="ShapeMenu"/>.</param>
+        private void RemoveLastPoint(bool ignorePartUndoButton = false)
         {
-            if (drawing && SEEInput.PartUndo())
+            if (drawing && (SEEInput.PartUndo() || ignorePartUndoButton))
             {
                 if (shape.GetComponent<LineRenderer>().positionCount >= 3)
                 {
@@ -223,7 +244,8 @@ namespace SEE.Controls.Actions.Drawable
                     LineRenderer renderer = shape.GetComponent<LineRenderer>();
                     renderer.positionCount -= 2;
                     positions = positions.ToList().GetRange(0, positions.Length - 1).ToArray();
-                    renderer.SetPositions(positions);
+                    //renderer.SetPositions(positions);
+                    GameDrawer.Drawing(shape, positions);
                     new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(shape)).Execute();
                 }
                 else
@@ -232,6 +254,7 @@ namespace SEE.Controls.Actions.Drawable
                         "The drawing of the shape art line has been canceled.");
                     new EraseNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), shape.name).Execute();
                     Destroyer.Destroy(shape);
+                    ShapeMenu.DisablePartUndo();
                     positions = new Vector3[1];
                     drawing = false;
                     shape = null;
@@ -252,9 +275,15 @@ namespace SEE.Controls.Actions.Drawable
         {
             Surface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
             drawing = true;
-            Vector3 convertedHitPoint = GameDrawer.GetConvertedPosition(Surface, raycastHit.point);
-
-            GetSelectedShapePosition(convertedHitPoint, raycastHit.point);
+            Vector3 convertedHitPoint;
+            if (!shapePreviewFix)
+            {
+                convertedHitPoint = GameDrawer.GetConvertedPosition(Surface, raycastHit.point);
+                GetSelectedShapePosition(convertedHitPoint, raycastHit.point);
+            } else
+            {
+                convertedHitPoint = GameDrawer.GetConvertedPosition(Surface, shapePreviewFixPosition);
+            }
 
             /// This block draws and completes the action for all shapes except lines.
             if (ShapeMenu.GetSelectedShape() != ShapePointsCalculator.Shape.Line)
@@ -284,6 +313,7 @@ namespace SEE.Controls.Actions.Drawable
                         ValueHolder.CurrentThickness, ValueHolder.CurrentLineKind,
                         ValueHolder.CurrentTiling);
                     positions[0] = shape.transform.InverseTransformPoint(positions[0]) - ValueHolder.DistanceToDrawable;
+                    ShapeMenu.ActivatePartUndo(() => RemoveLastPoint(true));
                     break;
                 case ShapePointsCalculator.Shape.Square:
                     positions = ShapePointsCalculator.Square(convertedHitPoint, ShapeMenu.GetValue1());
@@ -339,11 +369,9 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (GameDrawer.DifferentPositionCounter(positions) > 1)
             {
-                shape = GameDrawer.DrawLine(Surface, "", positions, ValueHolder.CurrentColorKind,
-                    ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor, ValueHolder.CurrentThickness, false,
-                    ValueHolder.CurrentLineKind, ValueHolder.CurrentTiling);
-                shape.GetComponent<LineRenderer>().loop = false;
+                BlinkEffect.Deactivate(shape);
                 shape = GameDrawer.SetPivotShape(shape, convertedHitPoint);
+                shapePreview = shapePreviewFix = false;
                 LineConf currentShape = LineConf.GetLine(shape);
                 memento = new Memento(Surface, currentShape);
                 new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, currentShape).Execute();
@@ -357,6 +385,60 @@ namespace SEE.Controls.Actions.Drawable
                 drawing = false;
                 shape = null;
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Draws a shape preview.
+        /// </summary>
+        /// <param name="position">The position where the preview should be drawn.</param>
+        private void ShapePreview(Vector3 position)
+        {
+            Vector3 convertedHitPoint = GameDrawer.GetConvertedPosition(Surface, position);
+            GetSelectedShapePosition(convertedHitPoint, position);
+
+            if (shape == null)
+            {
+                shape = GameDrawer.DrawLine(Surface, "", positions, ValueHolder.CurrentColorKind,
+                    ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor, ValueHolder.CurrentThickness, false,
+                    ValueHolder.CurrentLineKind, ValueHolder.CurrentTiling);
+                shape.GetComponent<LineRenderer>().loop = false;
+                shape.AddOrGetComponent<BlinkEffect>();
+            }
+            else
+            {
+                GameDrawer.Drawing(shape, positions);
+            }
+        }
+
+        /// <summary>
+        /// Draws a shape preview that follows the pointer.
+        /// </summary>
+        private void ShapePreviewUnfixed()
+        {
+            if (!drawing && !Queries.LeftMouseInteraction()
+                && !shapePreviewFix
+                && Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit raycastHit)
+                && ShapeMenu.GetSelectedShape() != ShapePointsCalculator.Shape.Line)
+            {
+                shapePreview = true;
+                Surface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
+                ShapePreview(raycastHit.point);
+            }
+        }
+
+        /// <summary>
+        /// Draws a shape preview on a fix position.
+        /// The position must be chosen with a right mouse click.
+        /// </summary>
+        private void ShapePreviewFixed()
+        {
+            if (!drawing && !Queries.LeftMouseDown()
+                && shapePreviewFix
+                && ShapeMenu.GetSelectedShape() != ShapePointsCalculator.Shape.Line)
+            {
+                shapePreview = true;
+                ShapePreview(shapePreviewFixPosition);
             }
         }
 

@@ -1,6 +1,8 @@
 ﻿using Michsky.UI.ModernUIPack;
+using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.UI.Drawable;
+using SEE.UI.Notification;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
@@ -121,6 +123,14 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static ButtonManagerBasic finishBMB;
         /// <summary>
+        /// The instance for the part undo button.
+        /// </summary>
+        private static GameObject objPartUndo;
+        /// <summary>
+        /// The manager of the part undo button.
+        /// </summary>
+        private static ButtonManagerBasic partUndoBMB;
+        /// <summary>
         /// The instance for the layer for the switch.
         /// </summary>
         private static GameObject objLoop;
@@ -239,6 +249,7 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         public static void Disable()
         {
+            DisablePartUndo();
             shapeMenu.SetActive(false);
             LineMenu.DisableLineMenu();
             drawableSwitch.SetActive(false);
@@ -331,6 +342,12 @@ namespace SEE.UI.Menu.Drawable
             objFinish = GameFinder.FindChild(shapeMenu, "FinishBtn");
             finishBMB = objFinish.GetComponent<ButtonManagerBasic>();
 
+            /// Initialize the part undo button. Also only for <see cref="Shape.Line"/>.
+            objPartUndo = GameFinder.FindChild(shapeMenu, "PartUndoBtn");
+            partUndoBMB = objPartUndo.GetComponent<ButtonManagerBasic>();
+            objPartUndo.AddComponent<ButtonHoverTooltip>().SetMessage("Part Undo");
+            objPartUndo.SetActive(false);
+
             /// Sets the initial selected shape.
             SetSelectedShape(GetShapes()[0]);
         }
@@ -350,6 +367,27 @@ namespace SEE.UI.Menu.Drawable
             }
             /// Re-calculate the shape menu height.
             MenuHelper.CalculateHeight(shapeMenu);
+        }
+
+        /// <summary>
+        /// Activate the visibility of the part undo button and
+        /// assigns an action to it.
+        /// </summary>
+        /// <param name="action">The action that should be assigned</param>
+        public static void ActivatePartUndo(UnityAction action)
+        {
+            objPartUndo.SetActive(true);
+            partUndoBMB.clickEvent.RemoveAllListeners();
+            partUndoBMB.clickEvent.AddListener(action);
+        }
+
+
+        /// <summary>
+        /// Disable the visibility of the part undo button.
+        /// </summary>
+        public static void DisablePartUndo()
+        {
+            objPartUndo.SetActive(false);
         }
 
         /// <summary>
