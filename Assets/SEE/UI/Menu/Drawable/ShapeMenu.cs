@@ -138,6 +138,14 @@ namespace SEE.UI.Menu.Drawable
         /// The instance of the loop manager.
         /// </summary>
         private static SwitchManager loopManager;
+        /// <summary>
+        /// The instance for the layer of the dragger info button.
+        /// </summary>
+        private static GameObject draggerInfoObj;
+        /// <summary>
+        /// The instance for the dragger info button.
+        /// </summary>
+        private static ButtonManagerBasic draggerInfoBMB;
         #endregion
 
         /// The following block are the value holders for the chosen values:
@@ -347,6 +355,25 @@ namespace SEE.UI.Menu.Drawable
             partUndoBMB = objPartUndo.GetComponent<ButtonManagerBasic>();
             objPartUndo.AddComponent<ButtonHoverTooltip>().SetMessage("Part Undo");
             objPartUndo.SetActive(false);
+
+            /// Initialize the dragger info button.
+            draggerInfoObj = GameFinder.FindChild(shapeMenu, "DraggerInfo");
+            draggerInfoBMB = draggerInfoObj.GetComponent<ButtonManagerBasic>();
+            draggerInfoBMB.clickEvent.AddListener(() =>
+            {
+                if (selectedShape == Shape.Line)
+                {
+                    ShowNotification.Info("Control instructions", 
+                        "Left mouse button = Adds a point to the line.\n"
+                        + "Middle mouse button / mouse wheel click = Ends drawing the line without adding an additional point.\n"
+                        + "Left Ctrl key + left mouse button = Ends drawing and adds a final point.");
+                } else
+                {
+                    ShowNotification.Info("Control instructions",
+                        "Middle mouse button / mouse wheel click = Fixes a point for the shape preview.\n"
+                        + "Left Ctrl key + middle mouse button = Releases the fixed point.");
+                }
+            });
 
             /// Sets the initial selected shape.
             SetSelectedShape(GetShapes()[0]);
