@@ -10,7 +10,6 @@ import de.unibremen.swt.see.manager.model.File;
 import de.unibremen.swt.see.manager.model.Server;
 import de.unibremen.swt.see.manager.repo.ServerRepo;
 
-import java.io.FileOutputStream;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -39,20 +38,21 @@ public class ServerService {
         return serverRepo.save(server);
     }
 
-    public File addFileToServer(UUID id, String fileType, MultipartFile multipartFile) {
-        Optional<Server> server = serverRepo.findServerById(id);
-        if (server.isEmpty()) {
-            log.error("Cant add file to server {} (server is null)", id);
+    public File addFileToServer(UUID serverId, String fileTypeStr, MultipartFile multipartFile) {
+        Optional<Server> optServer = serverRepo.findServerById(serverId);
+        if (optServer.isEmpty()) {
+            log.error("Cant add file to server {} (server is null)", serverId);
             return null;
         }
-        File file = fileService.createFile(multipartFile);
+        Server server = optServer.get();
+        
+        FileType fileType = FileType.valueOf(fileTypeStr);
+        log.info("Adding file {} to server {}", multipartFile.getOriginalFilename(), server.getName());
+        File file = fileService.createFile(server, fileType, multipartFile);
         if (file == null) {
-            log.error("Cant add file to server {} (file is null)", id);
+            log.error("Unable to add file to server {}", serverId);
             return null;
         }
-        log.info("Adding file {} to server {}", file.getOriginalFileName(), server.get().getName());
-        file.setFileType(FileType.valueOf(fileType));
-        file.setServer(server.get());
         return file;
     }
 
@@ -79,48 +79,20 @@ public class ServerService {
     }
 
     public boolean startServer(UUID id) {
-        Optional<Server> server = serverRepo.findServerById(id);
-        if (server.isEmpty()) {
+        Optional<Server> optServer = serverRepo.findServerById(id);
+        if (optServer.isEmpty()) {
             log.error("Cant find server {}", id);
             return false;
         }
+        Server server = optServer.get();
 
-        server.get().setStopTime(null);
-        server.get().setStartTime(ZonedDateTime.now(ZoneId.of("UTC")));
+        server.setStopTime(null);
+        server.setStartTime(ZonedDateTime.now(ZoneId.of("UTC")));
 
-        List<File> files = getFilesForServer(server.get().getId());
-        List<java.io.File> realFiles = new ArrayList<>();
-
-        try {
-            for (File file : files) {
-                java.io.File outputFile = null;
-
-                switch (file.getFileType()){
-                    case CSV ->  outputFile = new java.io.File("multiplayer.csv");
-                    case CONFIG -> outputFile = new java.io.File("multiplayer.cfg");
-                    case GXL -> outputFile = new java.io.File("multiplayer.gxl");
-                    case SOLUTION -> outputFile = new java.io.File("solution." + file.getOriginalFileName().split("\\.")[file.getOriginalFileName().split("\\.").length-1]);
-                    case SOURCE -> outputFile = new java.io.File("src.zip");
-                }
-
-                try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
-                    outputStream.write(fileService.getFile(file.getId()).getContent());
-                }
-                realFiles.add(outputFile);
-            }
-        } catch (Exception e) {
-            log.error("Cant fetch files for server {}", server.get().getId());
-        }
-
-        boolean success = containerService.startContainer(server.get(), realFiles);
-
-        for (java.io.File file : realFiles) {
-            file.delete();
-        }
+        boolean success = containerService.startContainer(server);
 
         return success;
     }
-
 
     public boolean stopServer(UUID id) {
         Optional<Server> server = serverRepo.findServerById(id);

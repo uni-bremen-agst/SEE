@@ -25,7 +25,7 @@ public class File {
     private String originalFileName;
 
     @Setter
-    private String path;
+    private String name;
 
     @Setter
     private String contentType;
@@ -48,4 +48,5 @@ public class File {
     void generateTimeStamp() {
         creationTime = ZonedDateTime.now(ZoneId.of("UTC"));
     }
+
 }

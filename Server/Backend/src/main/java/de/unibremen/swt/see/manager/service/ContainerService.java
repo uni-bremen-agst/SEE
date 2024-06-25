@@ -1,5 +1,6 @@
 package de.unibremen.swt.see.manager.service;
 
+import de.unibremen.swt.see.manager.model.File;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +11,6 @@ import de.unibremen.swt.see.manager.model.Server;
 import de.unibremen.swt.see.manager.model.ServerConfig;
 import de.unibremen.swt.see.manager.repo.ServerConfigRepo;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -22,10 +22,11 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class ContainerService {
     private final ServerConfigRepo serverConfigRepo;
+    private final FileService fileService;
 
-    public boolean startContainer(@NotNull Server server, List<File> files) {
-        // Server Config laden
+    public boolean startContainer(@NotNull Server server) {
         Optional<ServerConfig> serverConfig = serverConfigRepo.findServerConfigById(1);
+        List<File> files = fileService.getFilesByServer(server);
 
         // Überprüfen, ob der Server gerade beschäftigt ist
         if (serverConfig.isEmpty()) {

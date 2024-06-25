@@ -1,18 +1,22 @@
 package de.unibremen.swt.see.manager.controller.file;
 
+import de.unibremen.swt.see.manager.model.File;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import de.unibremen.swt.see.manager.util.FileType;
-import de.unibremen.swt.see.manager.file.payload.PayloadFile;
 import de.unibremen.swt.see.manager.model.Server;
 import de.unibremen.swt.see.manager.service.FileService;
 import de.unibremen.swt.see.manager.service.ServerService;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import java.util.UUID;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 @RestController
 @RequestMapping("/file")
@@ -48,18 +52,9 @@ public class FileController {
         Server server = serverService.getServerByID(serverID);
         if (evalNot(server, roomPassword)) return ResponseEntity.badRequest().build();
         try {
-            PayloadFile payloadFile = fileService.getFileByServerAndFileType(server, FileType.GXL);
-
-            byte[] data = payloadFile.getContent();
-            ByteArrayResource resource = new ByteArrayResource(data);
-            return ResponseEntity
-                    .ok()
-                    .contentLength(data.length)
-                    .header("Content-type", payloadFile.getContentType())
-                    .header("Content-disposition", "attachment; filename=\"" + payloadFile.getOriginalFileName() + "\"")
-                    .body(resource);
-
-        } catch (Exception e) {
+            File file = fileService.getFileByServerAndFileType(server, FileType.GXL);
+            return buildResponseEntity(file);
+        } catch (IOException e) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -69,18 +64,9 @@ public class FileController {
         Server server = serverService.getServerByID(serverID);
         if (evalNot(server, roomPassword)) return ResponseEntity.badRequest().build();
         try {
-            PayloadFile payloadFile = fileService.getFileByServerAndFileType(server, FileType.SOLUTION);
-
-            byte[] data = payloadFile.getContent();
-            ByteArrayResource resource = new ByteArrayResource(data);
-            return ResponseEntity
-                    .ok()
-                    .contentLength(data.length)
-                    .header("Content-type", payloadFile.getContentType())
-                    .header("Content-disposition", "attachment; filename=\"" + payloadFile.getOriginalFileName() + "\"")
-                    .body(resource);
-
-        } catch (Exception e) {
+            File file = fileService.getFileByServerAndFileType(server, FileType.SOLUTION);
+            return buildResponseEntity(file);
+        } catch (IOException e) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -90,18 +76,9 @@ public class FileController {
         Server server = serverService.getServerByID(serverID);
         if (evalNot(server, roomPassword)) return ResponseEntity.badRequest().build();
         try {
-            PayloadFile payloadFile = fileService.getFileByServerAndFileType(server, FileType.SOURCE);
-
-            byte[] data = payloadFile.getContent();
-            ByteArrayResource resource = new ByteArrayResource(data);
-            return ResponseEntity
-                    .ok()
-                    .contentLength(data.length)
-                    .header("Content-type", payloadFile.getContentType())
-                    .header("Content-disposition", "attachment; filename=\"" + payloadFile.getOriginalFileName() + "\"")
-                    .body(resource);
-
-        } catch (Exception e) {
+            File file = fileService.getFileByServerAndFileType(server, FileType.SOURCE);
+            return buildResponseEntity(file);
+        } catch (IOException e) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -115,21 +92,9 @@ public class FileController {
         // Überprüfen, ob der Request mit dem richtigen Passwort gesendet wurde, und ob der server existiert
         if (evalNot(server, roomPassword)) return ResponseEntity.badRequest().build();
         try {
-
-            //Laden der Datei aus der Datenbank und Dateispeicher
-            PayloadFile payloadFile = fileService.getFileByServerAndFileType(server, FileType.CONFIG);
-
-            // Sendern der Datei an den Client
-            byte[] data = payloadFile.getContent();
-            ByteArrayResource resource = new ByteArrayResource(data);
-            return ResponseEntity
-                    .ok()
-                    .contentLength(data.length)
-                    .header("Content-type", payloadFile.getContentType())
-                    .header("Content-disposition", "attachment; filename=\"" + payloadFile.getOriginalFileName() + "\"")
-                    .body(resource);
-
-        } catch (Exception e) {
+            File file = fileService.getFileByServerAndFileType(server, FileType.CONFIG);
+            return buildResponseEntity(file);
+        } catch (IOException e) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -139,18 +104,9 @@ public class FileController {
         Server server = serverService.getServerByID(serverID);
         if (evalNot(server, roomPassword)) return ResponseEntity.badRequest().build();
         try {
-            PayloadFile payloadFile = fileService.getFileByServerAndFileType(server, FileType.CSV);
-
-            byte[] data = payloadFile.getContent();
-            ByteArrayResource resource = new ByteArrayResource(data);
-            return ResponseEntity
-                    .ok()
-                    .contentLength(data.length)
-                    .header("Content-type", payloadFile.getContentType())
-                    .header("Content-disposition", "attachment; filename=\"" + payloadFile.getOriginalFileName() + "\"")
-                    .body(resource);
-
-        } catch (Exception e) {
+            File file = fileService.getFileByServerAndFileType(server, FileType.CSV);
+            return buildResponseEntity(file);
+        } catch (IOException e) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -160,6 +116,23 @@ public class FileController {
         if (server == null) return true;
 
         return !(server.getServerPassword() == null || server.getServerPassword().isEmpty() || server.getServerPassword().equals(roomPassword));
+    }
+    
+    private ResponseEntity<StreamingResponseBody> buildResponseEntity(File file) throws IOException {
+        Path path = fileService.getFilePath(file);
+        long fileSize = Files.size(path);
+        StreamingResponseBody responseBody = outputStream -> {
+            try (InputStream inputStream = Files.newInputStream(path)) {
+                inputStream.transferTo(outputStream);
+            }
+        };
+        
+        return ResponseEntity
+                    .ok()
+                    .contentLength(fileSize)
+                    .header("Content-type", file.getContentType())
+                    .header("Content-disposition", "attachment; filename=\"" + file.getOriginalFileName() + "\"")
+                    .body(responseBody);
     }
 
 }

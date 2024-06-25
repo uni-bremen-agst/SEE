@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import de.unibremen.swt.see.manager.util.FileType;
-import de.unibremen.swt.see.manager.file.payload.PayloadFile;
 import de.unibremen.swt.see.manager.model.File;
 import de.unibremen.swt.see.manager.model.Server;
 import de.unibremen.swt.see.manager.repo.FileRepo;
+import static de.unibremen.swt.see.manager.util.FileType.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,34 +29,42 @@ import java.util.UUID;
 public class FileService {
 
     private final FileRepo fileRepo;
-
+    
     @Value("${see.app.filestorage.dir}")
     private String fileStorageRoot;
 
-    public File createFile(MultipartFile multipartFile) {
+    public File createFile(Server server, FileType type, MultipartFile multipartFile) {
         if (multipartFile.isEmpty()) {
             return null;
         }
+        
+        String originalFileName = multipartFile.getOriginalFilename();
+        String intendedFileName;
+        switch (type) {
+            case CSV      -> intendedFileName = "multiplayer.csv";
+            case CONFIG   -> intendedFileName = "multiplayer.cfg";
+            case GXL      -> intendedFileName = "multiplayer.gxl";
+            case SOLUTION -> intendedFileName = "solution." + getFileExtension(originalFileName);
+            case SOURCE   -> intendedFileName = "src.zip";
+            default       -> throw new RuntimeException("File name could not be derived from file type!");
+        }
+
         File file = new File();
         file.setContentType(multipartFile.getContentType());
-        file.setOriginalFileName(multipartFile.getOriginalFilename());
-        File savedFile = fileRepo.save(file);
+        file.setOriginalFileName(originalFileName);
+        file.setName(intendedFileName);
+        file.setServer(server);
 
         try {
-            storeFile(savedFile.getId().toString(), multipartFile);
+            storeFile(file, multipartFile);
         } catch (IOException e) {
-            fileRepo.delete(savedFile);
             throw new IllegalStateException("Error persisting file.", e);
         }
-        return savedFile;
+        return fileRepo.save(file);
     }
 
-    private void storeFile(String fileName, MultipartFile multipartFile) throws IOException {
-        if (fileName == null || fileName.isEmpty()) {
-            throw new IOException("File name must not be empty!");
-        }
-
-        Path filePath = getUploadPath().resolve(fileName);
+    private void storeFile(File file, MultipartFile multipartFile) throws IOException {
+        Path filePath = getFilePath(file);
         if (Files.exists(filePath)) {
             throw new IOException("File already exists: " + filePath.toString());
         }
@@ -64,81 +72,51 @@ public class FileService {
         try (InputStream inputStream = multipartFile.getInputStream()) {
             Files.copy(inputStream, filePath);
         } catch (IOException e) {
-            throw new IOException("Unable to save file: " + fileName, e);
+            throw new IOException("Unable to save file: " + file.getName(), e);
         }
     }
 
-    public PayloadFile getFile(UUID fileId) throws IOException {
-        PayloadFile payloadFile = new PayloadFile();
-        Optional<File> file = fileRepo.findById(fileId);
-        if (file.isEmpty()) {
+    public File getFile(UUID fileId) throws IOException {
+        log.info("Fetching file by id {}", fileId);
+        Optional<File> optFile = fileRepo.findById(fileId);
+        if (optFile.isEmpty()) {
             log.error("File not found in db: {}", fileId);
             return null;
         }
-        
-        String fileIdStr = fileId.toString();
-        Path filePath = getUploadPath().resolve(fileIdStr);
-        if (!Files.exists(filePath)) {
-            log.error("File not found on filesystem: {}", fileIdStr);
-            return null;
-        }
-        
-        // FIXME Do not copy whole file into memory!
-        payloadFile.setContent(Files.readAllBytes(filePath));
-        payloadFile.setId(fileIdStr);
-
-        // TODO This overrides the original file name. Should we store the intended file name in db instead?
-        switch (file.get().getFileType()) {
-            case CSV -> payloadFile.setOriginalFileName("multiplayer.csv");
-            case CONFIG -> payloadFile.setOriginalFileName("multiplayer.cfg");
-            case GXL -> payloadFile.setOriginalFileName("multiplayer.gxl");
-            case SOLUTION ->
-                    payloadFile.setOriginalFileName("solution." + file.get().getOriginalFileName().split("\\.")[file.get().getOriginalFileName().split("\\.").length - 1]);
-            case SOURCE -> payloadFile.setOriginalFileName("src.zip");
-        }
-//        payloadFile.setOriginalFileName(file.get().getOriginalFileName());
-
-        payloadFile.setContentType(file.get().getContentType());
-        payloadFile.setCreationTime(file.get().getCreationTime());
-
-        log.info("Fetched file {}", fileId);
-        return payloadFile;
+        return optFile.get();
     }
 
-    public PayloadFile getFileByServerAndFileType(Server server, FileType fileType) throws IOException {
+    public File getFileByServerAndFileType(Server server, FileType fileType) throws IOException {
         log.info("Fetching file for server {} and type {}", server, fileType);
 
-        Optional<File> file = fileRepo.findFileByServerAndFileType(server, fileType);
-        if (file.isEmpty()) {
+        Optional<File> optFile = fileRepo.findFileByServerAndFileType(server, fileType);
+        if (optFile.isEmpty()) {
             log.error("File not found in db for server {} with type {}", server.getId(), fileType);
             return null;
         }
-        
-        return getFile(file.get().getId());
+        return optFile.get();
     }
 
-    public boolean deleteFile(UUID fileId) throws IOException {
-        log.info("Removing file {}", fileId);
-        
-        Optional<File> file = fileRepo.findById(fileId);
-        if (file.isEmpty()) {
-            log.error("File not found in db: {}", fileId);
-            return false;
-        }
-        
-        Path filePath = getUploadPath().resolve(fileId.toString());
+    public boolean deleteFile(File file) throws IOException {
+        Path filePath = getFilePath(file);
+        log.info("Removing file {}", filePath);
+
         if (!Files.exists(filePath)) {
-            log.warn("File already deleted: {}", fileId.toString());
+            log.warn("File already deleted: {}", filePath);
             return true;
         }
         if (!Files.isRegularFile(filePath)) {
-            log.error("Not a regular file: {}", fileId.toString());
+            log.error("Not a regular file: {}", filePath);
             return false;
         }
         Files.delete(filePath);
-        fileRepo.delete(file.get());
+        fileRepo.delete(file);
 
         return true;
+    }
+    
+    public boolean deleteFile(UUID fileId) throws IOException {
+        return deleteFile(getFile(fileId));
     }
 
 
@@ -151,18 +129,19 @@ public class FileService {
 
         for (File file : files) {
             try {
-                deleteFile(file.getId());
-            } catch (Exception e) {
+                deleteFile(file);
+            } catch (IOException e) {
                 log.error("Cant delete file {}", file.getId());
             }
         }
     }
-    
-    private Path getUploadPath() throws IOException {
-        Path uploadPath = Paths.get(fileStorageRoot);
+
+    private Path getUploadRootPath(Server server) throws IOException {
+        Path basePath = Paths.get(fileStorageRoot);
+        Path uploadPath = basePath.resolve(server.getId().toString());
         if (!Files.exists(uploadPath)) {
             try {
-                Files.createDirectories(uploadPath);
+                return Files.createDirectories(uploadPath);
             } catch (IOException e) {
                 throw new IOException("File Storage Path does not exist and could not be created: " + uploadPath.toString(), e);
             }
@@ -171,5 +150,18 @@ public class FileService {
             throw new IOException("File Storage Path is not a directory!");
         }
         return uploadPath;
+    }
+
+    public Path getFilePath(File file) throws IOException {
+        String fileName = file.getName();
+        if (fileName == null || fileName.isEmpty()) {
+            throw new RuntimeException("File name must not be empty!");
+        }
+        return getUploadRootPath(file.getServer()).resolve(fileName);
+    }
+    
+    public static String getFileExtension(String fileName) {
+        int idx = fileName.lastIndexOf('.');
+        return (idx != -1) ? fileName.substring(idx + 1) : "";
     }
 }
