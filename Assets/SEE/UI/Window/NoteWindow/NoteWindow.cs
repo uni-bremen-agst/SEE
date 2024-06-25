@@ -25,7 +25,7 @@ namespace SEE.UI.Window.NoteWindow
 
         public TMP_InputField searchField;
 
-        //public GraphElement graphElement;
+        public GraphElement graphElement;
 
         private SwitchManager switchManager;
 
@@ -118,26 +118,26 @@ namespace SEE.UI.Window.NoteWindow
         {
             if (isPublic)
             {
-                string title = Title;
+                string graphID = graphElement.ID;
                 string content = searchField.text;
 
-                NoteManager.Instance.SaveNote(title, isPublic, content);
-                new NoteSaveNetAction(title, true, content).Execute();
+                NoteManager.Instance.SaveNote(graphID, isPublic, content);
+                new NoteSaveNetAction(graphID, true, content).Execute();
             }
             else
             {
-                string title = Title;
+                string graphID = graphElement.ID;
                 string content = searchField.text;
 
-                NoteManager.Instance.SaveNote(title, isPublic, content);
+                NoteManager.Instance.SaveNote(graphID, isPublic, content);
             }
         }
 
         public void LoadNote()
         {
-            string title = Title;
+            string graphID = graphElement.ID;
             bool isPublic = switchManager.isOn;
-            searchField.text = NoteManager.Instance.LoadNote(title, isPublic);
+            searchField.text = NoteManager.Instance.LoadNote(graphID, isPublic);
         }
 
         private void OnDestroy()
