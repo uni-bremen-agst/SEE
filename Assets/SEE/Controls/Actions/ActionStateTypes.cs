@@ -117,6 +117,11 @@ namespace SEE.Controls.Actions
                   Color.grey.Darker(), "Materials/ModernUIPack/Arrow Bold",
                   AcceptDivergenceAction.CreateReversibleAction);
 
+            Notes =
+              new("Notes", "Show Nodes and Edges that have Notes.",
+                  Color.blue, "Materials/ModernUIPack/Document",
+                  NoteAction.CreateReversibleAction);
+
             // Metric Board actions
             MetricBoard =
               new("Metric Board", "Manipulate a metric board",
@@ -307,6 +312,7 @@ namespace SEE.Controls.Actions
         public static readonly ActionStateType ShowCode;
         public static readonly ActionStateType Draw;
         public static readonly ActionStateType AcceptDivergence;
+        public static readonly ActionStateType Notes;
 
         public static readonly ActionStateTypeGroup MetricBoard;
         public static readonly ActionStateType AddBoard;

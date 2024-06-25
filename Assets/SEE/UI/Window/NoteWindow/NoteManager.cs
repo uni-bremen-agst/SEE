@@ -50,7 +50,7 @@ namespace SEE.UI.Window.NoteWindow
                     materialsArray.SetValue(noteMaterial, 2);
 
                     meshRenderer.materials = materialsArray;
-                    Debug.Log("MeshRenderer.Materials.Length:  " + meshRenderer.materials.Length);
+                    Debug.Log("MeshRenderer.Materials.Length: " + meshRenderer.materials.Length);
 
                 }
 
