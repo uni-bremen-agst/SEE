@@ -1,4 +1,5 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Assets.SEE.Game.Drawable.ValueHolders;
+using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Net.Actions.Drawable;
@@ -216,10 +217,12 @@ namespace SEE.Game.UI.Menu.Drawable
         private static void InitializeChangeOrderInLayer(GameObject node, MindMapNodeConf conf)
         {
             LayerSliderController layerSlider = instance.GetComponentInChildren<LayerSliderController>();
+            
             /// Assigns the current value to the slider.
             layerSlider.AssignValue(conf.OrderInLayer);
             GameObject surface = GameFinder.GetDrawableSurface(node);
             string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
+            layerSlider.AssignMaxOrder(surface.GetComponent<DrawableHolder>().OrderInLayer);
             /// Adds the handler for changing.
             layerSlider.onValueChanged.AddListener(layerOrder =>
             {

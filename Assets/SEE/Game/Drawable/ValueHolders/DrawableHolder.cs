@@ -10,7 +10,7 @@ namespace Assets.SEE.Game.Drawable.ValueHolders
         /// <summary>
         /// The current order in layer for this drawable surface.
         /// </summary>
-        private int orderInLayer = 0;
+        private int orderInLayer = 1;
 
         /// <summary>
         /// The order in layer property.
@@ -38,6 +38,20 @@ namespace Assets.SEE.Game.Drawable.ValueHolders
             {
                 orderInLayer--;
             }
+        }
+
+        /// <summary>
+        /// The description for this drawable surface.
+        /// </summary>
+        private string description = "";
+
+        /// <summary>
+        /// The description property.
+        /// </summary>
+        public string Description
+        {
+            get { return description; }
+            set { description = value; }
         }
     }
 }

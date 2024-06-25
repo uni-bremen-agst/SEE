@@ -52,7 +52,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// The current order in layer value.
         /// </summary>
-        public static int CurrentOrderInLayer { get; set; }
+        public static int MaxOrderInLayer { get; set; }
         #endregion
 
         #region prefixes
@@ -257,7 +257,7 @@ namespace SEE.Game.Drawable
             CurrentLineKind = GameDrawer.LineKind.Solid;
             CurrentColorKind = GameDrawer.ColorKind.Monochrome;
             CurrentTiling = 1f;
-            CurrentOrderInLayer = 1;
+            MaxOrderInLayer = 1;
         }
     }
 }

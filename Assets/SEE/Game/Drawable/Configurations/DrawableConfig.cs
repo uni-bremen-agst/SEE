@@ -53,6 +53,16 @@ namespace SEE.Game.Drawable.Configurations
         public bool Lightning;
 
         /// <summary>
+        /// The current order in layer of the drawable.
+        /// </summary>
+        public int OrderInLayer;
+
+        /// <summary>
+        /// The description of the drawable.
+        /// </summary>
+        public string Description;
+
+        /// <summary>
         /// All the lines that should be displayed on this drawable.
         /// </summary>
         public List<LineConf> LineConfigs = new();
@@ -137,6 +147,16 @@ namespace SEE.Game.Drawable.Configurations
         private const string LightningLabel = "Lightning";
 
         /// <summary>
+        /// The label for the order in layer of a drawable in the configuration file.
+        /// </summary>
+        private const string OrderInLayerLabel = "OrderInLayer";
+
+        /// <summary>
+        /// The label for the description of a drawable in the configuration file.
+        /// </summary>
+        private const string DescriptionLabel = "Description";
+
+        /// <summary>
         /// The label for the group of line configurations in the configuration file.
         /// </summary>
         private const string LineConfigsLabel = "LineConfigs";
@@ -170,6 +190,8 @@ namespace SEE.Game.Drawable.Configurations
             writer.Save(Color, ColorLabel);
             writer.Save(Order, OrderLabel);
             writer.Save(Lightning, LightningLabel);
+            writer.Save(OrderInLayer, OrderInLayerLabel);
+            writer.Save(Description, DescriptionLabel);
 
             if (LineConfigs != null && LineConfigs.Count > 0)
             {
@@ -303,6 +325,22 @@ namespace SEE.Game.Drawable.Configurations
             else
             {
                 Lightning = false;
+                errorFree = false;
+            }
+
+            /// Try to restore the order in layer.
+            if (!ConfigIO.Restore(attributes, OrderInLayerLabel, ref OrderInLayer))
+            {
+                errorFree = false;
+            }
+
+            /// Try to restore the description of the drawable.
+            if (attributes.TryGetValue(DescriptionLabel, out object description))
+            {
+                Description = (string)description;
+            }
+            else
+            {
                 errorFree = false;
             }
 

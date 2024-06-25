@@ -14,6 +14,7 @@ using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.GO;
 using Assets.SEE.Game.Drawable.ActionHelpers;
+using Assets.SEE.Game.Drawable.ValueHolders;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -234,8 +235,9 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (!string.IsNullOrWhiteSpace(filePath))
             {
+                DrawableHolder holder = Surface.GetComponent<DrawableHolder>();
                 imageObj = GameImage.PlaceImage(Surface, filePath, position,
-                    ValueHolder.CurrentOrderInLayer);
+                    holder.OrderInLayer);
                 new AddImageNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                     ImageConf.GetImageConf(imageObj)).Execute();
                 memento = new Memento(Surface, ImageConf.GetImageConf(imageObj));

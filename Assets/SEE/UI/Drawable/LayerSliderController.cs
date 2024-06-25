@@ -48,7 +48,7 @@ namespace SEE.UI.Drawable
         /// </summary>
         private void Start()
         {
-            manager.mainSlider.maxValue = ValueHolder.CurrentOrderInLayer;
+            manager.mainSlider.maxValue = ValueHolder.MaxOrderInLayer;
         }
 
         /// <summary>
@@ -73,11 +73,21 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Assigns a value to the slider and to the text.
         /// </summary>
-        /// <param name="value">the value that should be assigned</param>
+        /// <param name="value">the value that should be assigned.</param>
         public void AssignValue(int value)
         {
             tmpText.text = value.ToString();
             manager.mainSlider.value = value;
+        }
+
+        /// <summary>
+        /// Assigns a new max value to the slider.
+        /// </summary>
+        /// <param name="value">The new maximum value that should be assigned.</param>
+        public void AssignMaxOrder(int value)
+        {
+            manager.mainSlider.maxValue = value;
+            manager.UpdateUI();
         }
     }
 }

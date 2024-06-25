@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using SEE.Utils.History;
 using Assets.SEE.Game.Drawable.ActionHelpers;
+using Assets.SEE.Game.Drawable.ValueHolders;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -172,11 +173,12 @@ namespace SEE.Controls.Actions.Drawable
             {
                 if (textOut != null && textOut != "")
                 {
+                    DrawableHolder holder = Surface.GetComponent<DrawableHolder>();
                     textObj = GameTexter.WriteText(Surface, textOut, position,
                         ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor,
                         TextMenu.GetOutlineStatus(),
                         ValueHolder.CurrentOutlineThickness, ValueHolder.CurrentFontSize,
-                        ValueHolder.CurrentOrderInLayer, TextMenu.GetFontStyle());
+                        holder.OrderInLayer, TextMenu.GetFontStyle());
                     new WriteTextNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                         TextConf.GetText(textObj)).Execute();
                     memento = new Memento(Surface, TextConf.GetText(textObj));

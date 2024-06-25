@@ -1,4 +1,5 @@
-﻿using SEE.Game.Drawable.Configurations;
+﻿using Assets.SEE.Game.Drawable.ValueHolders;
+using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.Utils;
@@ -212,10 +213,12 @@ namespace SEE.Game.Drawable
         public static GameObject StartDrawing(GameObject surface, Vector3[] positions, ColorKind colorKind,
             Color primaryColor, Color secondaryColor, float thickness, LineKind lineKind, float tiling)
         {
+            DrawableHolder holder = surface.GetComponent<DrawableHolder>();
             Setup(surface, "", positions, colorKind, primaryColor, secondaryColor, thickness,
-                ValueHolder.CurrentOrderInLayer, lineKind, tiling,
+                holder.OrderInLayer, lineKind, tiling,
                 out GameObject line, out LineRenderer _, out MeshCollider _);
-            ValueHolder.CurrentOrderInLayer++;
+            holder.Inc();
+            ValueHolder.MaxOrderInLayer++;
 
             return line;
         }
@@ -298,14 +301,16 @@ namespace SEE.Game.Drawable
             else
             {
                 /// Block for creating a new line.
+                DrawableHolder holder = surface.GetComponent<DrawableHolder>();
                 Setup(surface, name, positions, colorKind, primaryColor, secondaryColor, thickness,
-                    ValueHolder.CurrentOrderInLayer, lineKind, tiling,
+                    holder.OrderInLayer, lineKind, tiling,
                     out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
                 lineObject = line;
                 renderer.SetPositions(positions);
                 if (increaseCurrentOrder)
                 {
-                    ValueHolder.CurrentOrderInLayer++;
+                    holder.Inc();
+                    ValueHolder.MaxOrderInLayer++;
                 }
                 FinishDrawing(line, loop);
             }
@@ -347,9 +352,14 @@ namespace SEE.Game.Drawable
 
             /// Adjusts the current order in the layer if the
             /// order in layer for the line is greater than or equal to it.
-            if (orderInLayer >= ValueHolder.CurrentOrderInLayer)
+            DrawableHolder holder = surface.GetComponent<DrawableHolder>();
+            if (orderInLayer >= holder.OrderInLayer)
             {
-                ValueHolder.CurrentOrderInLayer = orderInLayer + 1;
+                holder.OrderInLayer = orderInLayer + 1;
+            }
+            if (orderInLayer >= ValueHolder.MaxOrderInLayer)
+            {
+                ValueHolder.MaxOrderInLayer = orderInLayer + 1;
             }
 
             /// Block for update an existing line with the given name.

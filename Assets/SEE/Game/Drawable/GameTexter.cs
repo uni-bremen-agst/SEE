@@ -1,4 +1,5 @@
-﻿using SEE.Game.Drawable.Configurations;
+﻿using Assets.SEE.Game.Drawable.ValueHolders;
+using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using TMPro;
 using UnityEngine;
@@ -246,7 +247,8 @@ namespace SEE.Game.Drawable
         {
             Setup(surface, "", text, position, fontColor, outlineColor, outlineStatus, outlineThickness, fontSize,
                 order, styles, out GameObject textObj);
-            ValueHolder.CurrentOrderInLayer++;
+            surface.GetComponent<DrawableHolder>().Inc();
+            ValueHolder.MaxOrderInLayer++;
 
             /// Is needed to fix an issue in the <see cref="TextMeshPro"/> component.
             /// If the outline color is set to black during creation, it is strangely always set to white.
@@ -274,11 +276,16 @@ namespace SEE.Game.Drawable
             Vector3 scale, Vector3 eulerAngles, Color fontColor, Color outlineColor, bool outlineStatus,
             float outlineThickness, float fontSize, int order, FontStyles styles)
         {
+            DrawableHolder holder = surface.GetComponent<DrawableHolder>();
             /// Adjusts the current order in the layer if the
             /// order in layer for the line is greater than or equal to it.
-            if (order >= ValueHolder.CurrentOrderInLayer)
+            if (order >= holder.OrderInLayer)
             {
-                ValueHolder.CurrentOrderInLayer = order + 1;
+                holder.OrderInLayer = order + 1;
+            }
+            if (order >= ValueHolder.MaxOrderInLayer)
+            {
+                ValueHolder.MaxOrderInLayer = order + 1;
             }
 
             GameObject textObject;

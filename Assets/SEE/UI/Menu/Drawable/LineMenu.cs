@@ -1,4 +1,5 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Assets.SEE.Game.Drawable.ValueHolders;
+using Michsky.UI.ModernUIPack;
 using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
@@ -812,6 +813,7 @@ namespace SEE.UI.Menu.Drawable
             GameObject surface, string surfaceParentName)
         {
             LayerSliderController layerSlider = instance.GetComponentInChildren<LayerSliderController>();
+            layerSlider.AssignMaxOrder(surface.GetComponent<DrawableHolder>().OrderInLayer);
             /// Assigns the current value to the slider.
             layerSlider.AssignValue(lineHolder.OrderInLayer);
             /// Adds the handler for changing.

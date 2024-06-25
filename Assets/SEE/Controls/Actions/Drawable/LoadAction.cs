@@ -14,6 +14,7 @@ using UnityEngine.Events;
 using SEE.Utils.Paths;
 using SEE.Utils.History;
 using Assets.SEE.Game.Drawable.ActionHelpers;
+using Assets.SEE.Game.Drawable.ValueHolders;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -326,9 +327,20 @@ namespace SEE.Controls.Actions.Drawable
                     if (typeObj != null)
                     {
                         new EraseNetAction(surface.name, surfaceParentName, typeObj.name).Execute();
-                        Destroyer.Destroy(typeObj);
+                        Object.DestroyImmediate(typeObj);
                     }
                 }
+
+                int order = 1;
+                foreach (DrawableType type in DrawableConfigManager.GetDrawableConfig(surface).GetAllDrawableTypes() )
+                {
+                    if (type.OrderInLayer >= order)
+                    {
+                        order = type.OrderInLayer + 1;
+                    }
+                }
+                surface.GetComponent<DrawableHolder>().OrderInLayer = order;
+                new SynchronizeSurface(DrawableConfigManager.GetDrawableConfig(surface)).Execute();
             }
         }
 

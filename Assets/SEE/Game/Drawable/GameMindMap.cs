@@ -1,4 +1,5 @@
-﻿using SEE.Game.Drawable.ActionHelpers;
+﻿using Assets.SEE.Game.Drawable.ValueHolders;
+using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Utils;
@@ -780,9 +781,14 @@ namespace SEE.Game.Drawable
         {
             /// Adjusts the current order in the layer if the
             /// order in layer for the line is greater than or equal to it.
-            if (order >= ValueHolder.CurrentOrderInLayer)
+            DrawableHolder holder = surface.GetComponent<DrawableHolder>();
+            if (order >= holder.OrderInLayer)
             {
-                ValueHolder.CurrentOrderInLayer = order + 1;
+                holder.OrderInLayer = order + 1;
+            }
+            if (order >= ValueHolder.MaxOrderInLayer)
+            {
+                ValueHolder.MaxOrderInLayer = order + 1;
             }
             GameObject createdNode;
 

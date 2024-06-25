@@ -14,6 +14,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using TextConf = SEE.Game.Drawable.Configurations.TextConf;
+using Assets.SEE.Game.Drawable.ValueHolders;
 
 namespace SEE.UI.Menu.Drawable
 {
@@ -629,7 +630,7 @@ namespace SEE.UI.Menu.Drawable
 
                     writeTextDialog.Open(stringAction);
                 });
-
+                orderInLayerSlider.AssignMaxOrder(surface.GetComponent<DrawableHolder>().OrderInLayer);
                 /// Adds the handler to the order in layer slider.
                 /// Changes are saved in the configuration.
                 AssignOrderInLayer(order =>

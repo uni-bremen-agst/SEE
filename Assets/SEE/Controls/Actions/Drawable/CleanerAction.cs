@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using SEE.Utils.History;
 using Assets.SEE.Game.Drawable.ActionHelpers;
+using Assets.SEE.Game.Drawable.ValueHolders;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -79,6 +80,9 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (GameFinder.GetAttachedObjectsObject(surface) != null)
             {
+                DrawableHolder holder = surface.GetComponent<DrawableHolder>();
+                holder.OrderInLayer = 1;
+
                 List<DrawableType> allDrawableTypes = DrawableConfigManager.GetDrawableConfig(surface).
                     GetAllDrawableTypes();
                 if (allDrawableTypes.Count == 0)

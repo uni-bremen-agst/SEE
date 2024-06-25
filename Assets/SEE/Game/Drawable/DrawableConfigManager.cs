@@ -1,4 +1,5 @@
-﻿using SEE.Game.Drawable.Configurations;
+﻿using Assets.SEE.Game.Drawable.ValueHolders;
+using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.UI.Notification;
 using SEE.Utils;
@@ -203,6 +204,7 @@ namespace SEE.Game.Drawable
                 {
                     lightning = GameFinder.GetHighestParent(surface).transform.GetComponentInChildren<Light>().enabled;
                 }
+                DrawableHolder holder = surface.GetComponent<DrawableHolder>();
                 /// Creates the <see cref="DrawableConfig"/> with the corresponding values.
                 DrawableConfig config = new()
                 {
@@ -213,7 +215,9 @@ namespace SEE.Game.Drawable
                     Scale = transform.localScale,
                     Color = surface.GetComponent<MeshRenderer>().material.color,
                     Order = order,
-                    Lightning = lightning
+                    Lightning = lightning,
+                    OrderInLayer = holder.OrderInLayer,
+                    Description = holder.Description
                 };
 
                 /// Block for creating the <see cref="DrawableType"/> of the drawable.

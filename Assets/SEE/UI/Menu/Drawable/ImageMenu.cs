@@ -1,4 +1,5 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Assets.SEE.Game.Drawable.ValueHolders;
+using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Net.Actions.Drawable;
@@ -82,6 +83,8 @@ namespace SEE.UI.Menu.Drawable
                 Instantiate();
                 GameObject surface = GameFinder.GetDrawableSurface(imageObj);
                 string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
+
+                orderInLayerSlider.AssignMaxOrder(surface.GetComponent<DrawableHolder>().OrderInLayer);
 
                 /// Assigns an action to the slider that should be executed 
                 /// along with the current order in layer value

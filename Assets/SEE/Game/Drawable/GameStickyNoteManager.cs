@@ -43,7 +43,7 @@ namespace SEE.Game.Drawable
             }
 
             /// Adopt the position of the hit object, but preserve the distance.
-            stickyNote.transform.position = raycastHit.point - ValueHolder.CurrentOrderInLayer * ValueHolder.DistanceToDrawable.z * stickyNote.transform.forward;
+            stickyNote.transform.position = raycastHit.point - ValueHolder.MaxOrderInLayer * ValueHolder.DistanceToDrawable.z * stickyNote.transform.forward;
 
             /// Sets the initial scale for sticky notes
             stickyNote.transform.localScale = ValueHolder.StickyNoteScale;
@@ -54,9 +54,9 @@ namespace SEE.Game.Drawable
             /// Adds an order in layer value holder to the sticky note and sets the necessary values.
             OrderInLayerValueHolder holder = stickyNote.AddComponent<OrderInLayerValueHolder>();
             holder.OriginPosition = raycastHit.point;
-            holder.OrderInLayer = ValueHolder.CurrentOrderInLayer;
+            holder.OrderInLayer = ValueHolder.MaxOrderInLayer;
 
-            ValueHolder.CurrentOrderInLayer++;
+            ValueHolder.MaxOrderInLayer++;
             return stickyNote;
         }
 
@@ -69,9 +69,9 @@ namespace SEE.Game.Drawable
         {
             /// Adjusts the current order in the layer if the
             /// order in layer for the line is greater than or equal to it.
-            if (config.Order >= ValueHolder.CurrentOrderInLayer)
+            if (config.Order >= ValueHolder.MaxOrderInLayer)
             {
-                ValueHolder.CurrentOrderInLayer = config.Order + 1;
+                ValueHolder.MaxOrderInLayer = config.Order + 1;
             }
 
             /// Instantiates the sticky note.
@@ -186,7 +186,7 @@ namespace SEE.Game.Drawable
             {
                 /// Preserve the distance.
                 obj.transform.position = oldPos - obj.transform.forward
-                    * ValueHolder.DistanceToDrawable.z * ValueHolder.CurrentOrderInLayer;
+                    * ValueHolder.DistanceToDrawable.z * ValueHolder.MaxOrderInLayer;
             }
         }
 

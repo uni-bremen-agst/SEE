@@ -1,4 +1,5 @@
-﻿using SEE.Game.Drawable.Configurations;
+﻿using Assets.SEE.Game.Drawable.ValueHolders;
+using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.UI.Notification;
 using System;
@@ -48,7 +49,8 @@ namespace SEE.Game.Drawable
 
                 /// Block that is executed if the order number is not permitted.
                 /// Exceeds the maximum or is equal or less then minimum.
-                if (holder.OrderInLayer >= ValueHolder.CurrentOrderInLayer && state == LayerChangerStates.Increase)
+                DrawableHolder dHolder = GameFinder.GetDrawableSurface(obj).GetComponent<DrawableHolder>();
+                if (holder.OrderInLayer >= dHolder.OrderInLayer && state == LayerChangerStates.Increase)
                 {
                     if (showInformation)
                     {
