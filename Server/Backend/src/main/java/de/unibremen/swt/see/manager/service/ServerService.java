@@ -68,15 +68,15 @@ public class ServerService {
     }
 
     public boolean deleteServer(UUID id) {
+        log.info("Deleting server {}", id);
         stopServer(id);
         fileService.deleteFilesByServer(serverRepo.findServerById(id).orElse(null));
         serverRepo.deleteServerById(id);
 
         if (serverRepo.findServerById(id).isPresent()) {
-            log.error("Cant delete server {}. Server is null", id);
+            log.error("Server was not deleted: {}", id);
             return false;
         }
-        log.info("Deleting server {}", id);
         return true;
     }
 
