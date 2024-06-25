@@ -57,12 +57,14 @@ public class ServerService {
     }
 
     public List<File> getFilesForServer(UUID id) {
-        Optional<Server> server = serverRepo.findServerById(id);
-        if (server.isEmpty()) {
+        Optional<Server> optServer = serverRepo.findServerById(id);
+        if (optServer.isEmpty()) {
             return Collections.emptyList();
         }
+        Server server = optServer.get();
+
         log.info("Fetching files for server {}", id);
-        return fileService.getFilesByServer(server.get());
+        return fileService.getFilesByServer(server);
     }
 
     public boolean deleteServer(UUID id) {
@@ -95,13 +97,15 @@ public class ServerService {
     }
 
     public boolean stopServer(UUID id) {
-        Optional<Server> server = serverRepo.findServerById(id);
-        if (server.isEmpty()) {
+        Optional<Server> optServer = serverRepo.findServerById(id);
+        if (optServer.isEmpty()) {
             log.error("Cant find server {}", id);
             return false;
         }
-        server.get().setStartTime(null);
-        server.get().setStopTime(ZonedDateTime.now(ZoneId.of("UTC")));
-        return server.filter(containerService::stopContainer).isPresent();
+        Server server = optServer.get();
+        
+        server.setStartTime(null);
+        server.setStopTime(ZonedDateTime.now(ZoneId.of("UTC")));
+        return containerService.stopContainer(server);
     }
 }

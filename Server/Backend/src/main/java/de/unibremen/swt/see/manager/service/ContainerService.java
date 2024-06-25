@@ -25,14 +25,15 @@ public class ContainerService {
     private final FileService fileService;
 
     public boolean startContainer(@NotNull Server server) {
-        Optional<ServerConfig> serverConfig = serverConfigRepo.findServerConfigById(1);
-        List<File> files = fileService.getFilesByServer(server);
-
-        // Überprüfen, ob der Server gerade beschäftigt ist
-        if (serverConfig.isEmpty()) {
+        Optional<ServerConfig> optServerConfig = serverConfigRepo.findServerConfigById(1);
+        if (optServerConfig.isEmpty()) {
             log.error("Cant start server {}, cant find server config", server.getId());
             return false;
         }
+        ServerConfig serverConfig = optServerConfig.get();
+        List<File> files = fileService.getFilesByServer(server);
+        
+        // FIXME This looks like a race condition
         if (server.getServerStatusType().equals(ServerStatusType.ONLINE)
                 || server.getServerStatusType().equals(ServerStatusType.STARTING)
                 || server.getServerStatusType().equals(ServerStatusType.STOPPING)) {
@@ -41,7 +42,7 @@ public class ContainerService {
         }
 
         // Aussuchen eines zufälligen Ports
-        int port = getRandomNumberUsingNextInt(serverConfig.get().getMinContainerPort(), serverConfig.get().getMaxContainerPort());
+        int port = getRandomNumberUsingNextInt(serverConfig.getMinContainerPort(), serverConfig.getMaxContainerPort());
         String containerName = server.getName() + "-" + server.getId() + "-" + port;
 
         // Starten des Gameservers
@@ -49,7 +50,7 @@ public class ContainerService {
         try {
             log.info("Starting server {}", server.getId());
             // Befehl zum Starten eines Docker-Containers anpassen
-            String dockerCommand = "docker run -d --name " + containerName + " -p " + port + ":" + port + "/udp -e PASSWORD=\"" + server.getServerPassword() + "\" -e PORT=" + port + " -e SERVERID=" + server.getId() + " -e BACKENDDOMAIN=" + serverConfig.get().getDomain() + " see-gameserver:latest";
+            String dockerCommand = "docker run -d --name " + containerName + " -p " + port + ":" + port + "/udp -e PASSWORD=\"" + server.getServerPassword() + "\" -e PORT=" + port + " -e SERVERID=" + server.getId() + " -e BACKENDDOMAIN=" + serverConfig.getDomain() + " see-gameserver:latest";
 
             // Docker-Befehl ausführen
             Process process = new ProcessBuilder()
@@ -75,7 +76,7 @@ public class ContainerService {
             log.info("Adding files to server {}", server.getId());
             for (File file : files) {
 
-                String command = "docker cp " + "\"" + file.getAbsolutePath() + "\"" + " " + containerName + ":/app/gameserver_Data/StreamingAssets/Multiplayer/";
+                String command = "docker cp " + "\"" + fileService.getFilePath(file) + "\"" + " " + containerName + ":/app/gameserver_Data/StreamingAssets/Multiplayer/";
                 Process copyProcess = new ProcessBuilder()
                         .command("bash", "-c", command)
                         .inheritIO()
@@ -107,7 +108,7 @@ public class ContainerService {
             // Server in der Datenbank aktualisieren
             server.setContainerPort(port);
             server.setContainerName(containerName);
-            server.setContainerAddress(serverConfig.get().getDomain());
+            server.setContainerAddress(serverConfig.getDomain());
             server.setServerStatusType(ServerStatusType.ONLINE);
 
             return true;

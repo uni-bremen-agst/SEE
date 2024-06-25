@@ -37,47 +37,64 @@ public class UserService {
     }
 
     public User changeUsername(String oldUsername, String newUsername, String password) {
-        Optional<User> user = userRepo.findUserByUsername(oldUsername);
-        if (user.isPresent() && passwordEncoder.matches(password, user.get().getPassword())) {
-            log.info("Changing username form {} to {}", oldUsername, newUsername);
-            user.get().setUsername(newUsername);
-            return user.get();
+        Optional<User> optUser = userRepo.findUserByUsername(oldUsername);
+        if (optUser.isPresent()) {
+            log.error("Username to be changed not found: {}", oldUsername);
+            return null;
         }
-        log.error("Cant change username form {} to {}", oldUsername, newUsername);
+        User user = optUser.get();
+            
+        if (passwordEncoder.matches(password, user.getPassword())) {
+            log.info("Changing username form {} to {}", oldUsername, newUsername);
+            user.setUsername(newUsername);
+            return user;
+        }
+        log.error("Unauthorized username change requested: {} to {}", oldUsername, newUsername);
         return null;
     }
 
     public User addRoleToUser(String username, ERole eRole) {
         log.info("Adding role {} to {}", eRole, username);
-        Optional<User> user = userRepo.findUserByUsername(username);
-        if (user.isEmpty()) return null;
-        Optional<Role> role = roleRepository.findByName(eRole);
-        if (role.isEmpty()) return null;
+        Optional<User> optUser = userRepo.findUserByUsername(username);
+        if (optUser.isEmpty()) return null;
+        User user = optUser.get();
+        
+        Optional<Role> optRole = roleRepository.findByName(eRole);
+        if (optRole.isEmpty()) return null;
+        Role role = optRole.get();
 
-        user.get().getRoles().add(role.get());
-        return user.get();
+        user.getRoles().add(role);
+        return user;
     }
 
     public User removeRoleToUser(String username, ERole eRole) {
         log.info("Removing role {} to {}", eRole, username);
-        Optional<User> user = userRepo.findUserByUsername(username);
-        if (user.isEmpty()) return null;
-        Optional<Role> role = roleRepository.findByName(eRole);
-        if (role.isEmpty()) return null;
-        user.get().getRoles().remove(role.get());
-
-        return user.get();
+        Optional<User> optUser = userRepo.findUserByUsername(username);
+        if (optUser.isEmpty()) return null;
+        User user = optUser.get();
+        
+        Optional<Role> optRole = roleRepository.findByName(eRole);
+        if (optRole.isEmpty()) return null;
+        Role role = optRole.get();
+        
+        user.getRoles().remove(role);
+        return user;
     }
 
     public boolean changePassword(String username, String oldPassword, String newPassword) {
-
-        Optional<User> user = userRepo.findUserByUsername(username);
-        if (user.isPresent() && passwordEncoder.matches(oldPassword, user.get().getPassword())) {
-            user.get().setPassword(passwordEncoder.encode(newPassword));
-            log.info("A user changed his/her password");
+        Optional<User> optUser = userRepo.findUserByUsername(username);
+        if (optUser.isPresent()) {
+            log.error("A user tried to change their password with wrong username.");
+            return false;
+        }
+        User user = optUser.get();
+        
+        if (passwordEncoder.matches(oldPassword, user.getPassword())) {
+            user.setPassword(passwordEncoder.encode(newPassword));
+            log.info("A user changed their password.");
             return true;
         }
-        log.error("A user tried to change his/her password with wrong password");
+        log.error("A user tried to change their password with wrong password.");
         return false;
     }
 
