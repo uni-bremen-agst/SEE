@@ -19,6 +19,11 @@ namespace SEE.Controls.Actions
         Material noteMaterial = Resources.Load<Material>("Materials/Outliner_MAT");
 
         /// <summary>
+        /// The material to outline the nodes and edges.
+        /// </summary>
+        Material noteMaterialEdge = Resources.Load<Material>("Materials/OutlinerEdge_MAT");
+
+        /// <summary>
         /// Returns a new instance of <see cref="NoteAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="NoteAction"/></returns>
@@ -58,7 +63,7 @@ namespace SEE.Controls.Actions
             if (Input.GetMouseButtonDown(0))
             {
                 Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef graphElementRef);
-                GameObject elemGameObject = graphElementRef.Elem.GameObject(true);
+                GameObject elemGameObject = graphElementRef.gameObject;
                 if (noteManager.objectList.Contains(elemGameObject))
                 {
                     HideOrHightlight(elemGameObject);
@@ -91,24 +96,49 @@ namespace SEE.Controls.Actions
         /// <param name="gameObject">gameObject that </param>
         private void HideOrHightlight(GameObject gameObject)
         {
-            MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-
-            string oldMaterialName = meshRenderer.materials[meshRenderer.materials.Length - 1].name;
-            string newName = oldMaterialName.Replace(" (Instance)", "");
-            //GameObject has no outline
-            if (newName != noteMaterial.name)
+            if (gameObject.IsNode())
             {
-                Material[] materialsArray = new Material[meshRenderer.materials.Length + 1];
-                Array.Copy(meshRenderer.materials, materialsArray, meshRenderer.materials.Length);
-                materialsArray[meshRenderer.materials.Length] = noteMaterial;
-                meshRenderer.materials = materialsArray;
+                MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
+
+                string oldMaterialName = meshRenderer.materials[meshRenderer.materials.Length - 1].name;
+                string newName = oldMaterialName.Replace(" (Instance)", "");
+                //GameObject has no outline
+                if (newName != noteMaterial.name)
+                {
+                    Material[] materialsArray = new Material[meshRenderer.materials.Length + 1];
+                    Array.Copy(meshRenderer.materials, materialsArray, meshRenderer.materials.Length);
+                    materialsArray[meshRenderer.materials.Length] = noteMaterial;
+                    meshRenderer.materials = materialsArray;
+                }
+                //GameObject has outline
+                else
+                {
+                    Material[] gameObjects = new Material[meshRenderer.materials.Length - 1];
+                    Array.Copy(meshRenderer.materials, gameObjects, meshRenderer.materials.Length - 1);
+                    meshRenderer.materials = gameObjects;
+                }
             }
-            //GameObject has outline
             else
             {
-                Material[] gameObjects = new Material[meshRenderer.materials.Length - 1];
-                Array.Copy(meshRenderer.materials, gameObjects, meshRenderer.materials.Length - 1);
-                meshRenderer.materials = gameObjects;
+                MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
+
+                string oldMaterialName = meshRenderer.materials[meshRenderer.materials.Length - 1].name;
+                string newName = oldMaterialName.Replace(" (Instance)", "");
+                //GameObject has no outline
+                if (newName != noteMaterialEdge.name)
+                {
+                    Material[] materialsArray = new Material[meshRenderer.materials.Length + 1];
+                    Array.Copy(meshRenderer.materials, materialsArray, meshRenderer.materials.Length);
+                    materialsArray[meshRenderer.materials.Length] = noteMaterialEdge;
+                    meshRenderer.materials = materialsArray;
+                }
+                //GameObject has outline
+                else
+                {
+                    Material[] gameObjects = new Material[meshRenderer.materials.Length - 1];
+                    Array.Copy(meshRenderer.materials, gameObjects, meshRenderer.materials.Length - 1);
+                    meshRenderer.materials = gameObjects;
+                }
             }
         }
 

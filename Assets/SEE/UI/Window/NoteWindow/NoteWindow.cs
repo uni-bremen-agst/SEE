@@ -31,7 +31,7 @@ namespace SEE.UI.Window.NoteWindow
         /// <summary>
         /// The GraphElement for the depending Node/Edge
         /// </summary>
-        public GraphElement graphElement;
+        public GraphElementRef graphElementRef;
 
         private SwitchManager switchManager;
 
@@ -145,18 +145,15 @@ namespace SEE.UI.Window.NoteWindow
         {
             if (isPublic)
             {
-                string graphID = graphElement.ID;
                 string content = searchField.text;
 
-                NoteManager.Instance.SaveNote(graphElement, isPublic, content);
-                new NoteSaveNetAction(graphElement, true, content).Execute();
+                NoteManager.Instance.SaveNote(graphElementRef, isPublic, content);
+                new NoteSaveNetAction(graphElementRef, true, content).Execute();
             }
             else
             {
-                string graphID = graphElement.ID;
                 string content = searchField.text;
-
-                NoteManager.Instance.SaveNote(graphElement, isPublic, content);
+                NoteManager.Instance.SaveNote(graphElementRef, isPublic, content);
             }
         }
 
@@ -165,7 +162,7 @@ namespace SEE.UI.Window.NoteWindow
         /// </summary>
         public void LoadNote()
         {
-            string graphID = graphElement.ID;
+            string graphID = graphElementRef.Elem.ID;
             bool isPublic = switchManager.isOn;
             searchField.text = NoteManager.Instance.LoadNote(graphID, isPublic);
         }

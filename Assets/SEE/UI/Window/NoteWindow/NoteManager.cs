@@ -1,4 +1,5 @@
 using SEE.DataModel.DG;
+using SEE.GO;
 using SEE.Utils;
 using System;
 using System.Collections;
@@ -48,25 +49,39 @@ namespace SEE.UI.Window.NoteWindow
         /// And it marks it with an outliner.
         /// </summary>
         /// <param name="GraphID"></param>
-        private void FindGameObjects(GraphElement graphElement)
+        private void FindGameObjects(GraphElementRef graphElementRef)
         {
-            /*if ()
+            GameObject gameObject = graphElementRef.gameObject;
+            if (gameObject.IsNode())
             {
-
-            }*/
-            Debug.Log("graphElement.Type: " + graphElement.Type);
-            noteMaterial = Resources.Load<Material>("Materials/Outliner_MAT");
-            GameObject gameObject = graphElement.GameObject(true);
-            if (gameObject != null)
-            {
-                MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-                if(meshRenderer.materials[meshRenderer.materials.Length - 1].name != noteMaterial.name)
+                noteMaterial = Resources.Load<Material>("Materials/Outliner_MAT");
+                if (gameObject != null)
                 {
-                    objectList.Add(gameObject);
-                    Material[] materialsArray = new Material[meshRenderer.materials.Length + 1];
-                    Array.Copy(meshRenderer.materials, materialsArray, meshRenderer.materials.Length);
-                    materialsArray[meshRenderer.materials.Length] = noteMaterial;
-                    meshRenderer.materials = materialsArray;
+                    MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
+                    if (meshRenderer.materials[meshRenderer.materials.Length - 1].name != noteMaterial.name)
+                    {
+                        objectList.Add(gameObject);
+                        Material[] materialsArray = new Material[meshRenderer.materials.Length + 1];
+                        Array.Copy(meshRenderer.materials, materialsArray, meshRenderer.materials.Length);
+                        materialsArray[meshRenderer.materials.Length] = noteMaterial;
+                        meshRenderer.materials = materialsArray;
+                    }
+                }
+            }
+            else
+            {
+                noteMaterial = Resources.Load<Material>("Materials/OutlinerEdge_MAT");
+                if (gameObject != null)
+                {
+                    MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
+                    if (meshRenderer.materials[meshRenderer.materials.Length - 1].name != noteMaterial.name)
+                    {
+                        objectList.Add(gameObject);
+                        Material[] materialsArray = new Material[meshRenderer.materials.Length + 1];
+                        Array.Copy(meshRenderer.materials, materialsArray, meshRenderer.materials.Length);
+                        materialsArray[meshRenderer.materials.Length] = noteMaterial;
+                        meshRenderer.materials = materialsArray;
+                    }
                 }
             }
         }
@@ -77,13 +92,14 @@ namespace SEE.UI.Window.NoteWindow
         /// <param name="graphID">the node/edge to save</param>
         /// <param name="isPublic">flag whether it should be saved public or private</param>
         /// <param name="content">the content to save</param>
-        public void SaveNote(GraphElement graphElement, bool isPublic, string content)
+        public void SaveNote(GraphElementRef graphElementRef, bool isPublic, string content)
         {
+            GraphElement graphElement = graphElementRef.Elem;
             if (!string.IsNullOrEmpty(graphElement.ID))
             {
                 KeyValuePair<string, bool> keyPair = new KeyValuePair<string, bool>(graphElement.ID, isPublic);
                 notesDictionary[keyPair] = content;
-                FindGameObjects(graphElement);
+                FindGameObjects(graphElementRef);
             }
         }
 
