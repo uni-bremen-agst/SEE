@@ -33,7 +33,7 @@ public class FileService {
     @Value("${see.app.filestorage.dir}")
     private String fileStorageRoot;
 
-    public File createFile(Server server, FileType type, MultipartFile multipartFile) {
+    public File createFile(Server server, FileType type, MultipartFile multipartFile) throws IOException {
         if (multipartFile.isEmpty()) {
             return null;
         }
@@ -41,11 +41,11 @@ public class FileService {
         String originalFileName = multipartFile.getOriginalFilename();
         String intendedFileName;
         switch (type) {
+            case CFG      -> intendedFileName = "multiplayer.cfg";
             case CSV      -> intendedFileName = "multiplayer.csv";
-            case CONFIG   -> intendedFileName = "multiplayer.cfg";
             case GXL      -> intendedFileName = "multiplayer.gxl";
-            case SOLUTION -> intendedFileName = "solution." + getFileExtension(originalFileName);
             case SOURCE   -> intendedFileName = "src.zip";
+            case SOLUTION -> intendedFileName = "solution." + getFileExtension(originalFileName);
             default       -> throw new RuntimeException("File name could not be derived from file type!");
         }
 
@@ -58,7 +58,7 @@ public class FileService {
         try {
             storeFile(file, multipartFile);
         } catch (IOException e) {
-            throw new IllegalStateException("Error persisting file.", e);
+            throw new IOException("Error persisting file.", e);
         }
         return fileRepo.save(file);
     }

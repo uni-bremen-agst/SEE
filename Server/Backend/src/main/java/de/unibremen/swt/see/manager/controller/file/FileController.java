@@ -22,8 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
  * Handles HTTP requests for the /file endpoint.
  * <p>
  * This REST controller exposes various methods to perform CRUD operations on
- * file resources, specifically SEE multiplayer configurations and Code City
- * data.
+ * file resources, specifically SEE Code City data.
  */
 @RestController
 @RequestMapping("/file")
@@ -36,8 +35,6 @@ public class FileController {
 
     /**
      * Deletes the file with the specified ID.
-     * <p>
-     * Requires Role {@code ADMIN}.
      * 
      * @param id the ID of the file to delete
      * @return {@code 200 OK} if the file is successfully deleted,
@@ -57,8 +54,6 @@ public class FileController {
 
     /**
      * Retrieves the file with the specified ID.
-     * <p>
-     * Requires Role {@code ADMIN}, {@code MODERATOR}, or {@code USER}.
      * 
      * @param id the ID of the file to retrieve
      * @return {@code 200 OK} with the file content as payload if the file
@@ -68,7 +63,7 @@ public class FileController {
      *         or {@code 401 Unauthorized} if access cannot be granted.
      */
     @GetMapping("/get")
-    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> getFile(@RequestParam("id") UUID id) {
         try {
             return ResponseEntity.ok().body(fileService.getFile(id));
@@ -165,7 +160,7 @@ public class FileController {
         // Überprüfen, ob der Request mit dem richtigen Passwort gesendet wurde, und ob der server existiert
         if (!hasRoomAccess(server, roomPassword)) return ResponseEntity.badRequest().build();
         try {
-            File file = fileService.getFileByServerAndFileType(server, FileType.CONFIG);
+            File file = fileService.getFileByServerAndFileType(server, FileType.CFG);
             return buildResponseEntity(file);
         } catch (IOException e) {
             return ResponseEntity.badRequest().build();

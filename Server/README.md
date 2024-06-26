@@ -17,7 +17,62 @@ Please feel free to add additional info whenever you change anything that is cov
 
 
 --------------------------------------------------------------------------------
+## Dependencies
+
+The Management Server stack requires additional services during runtime:
+
+- Docker or Podman containerization framework
+
+The stack can be run using Podman/Docker Compose.
+A `compose.yaml` file is provided for this purpose.
+
+See section *Development Environment* for additional considerations.
+
+
+--------------------------------------------------------------------------------
+## Development Environment
+
+### Containers
+
+It is necessary to set up a container environment in order to:
+
+- run the Management stack via Compose
+- allow the Management backend to spawn SEE game server instances
+
+Before you install Docker or Docker Desktop, consider this:
+
+- Any user who has access to the Docker daemon will potentially have complete root/admin access to your machine.
+- Allowing your user to control Docker (e.g., by adding it to group `docker`) opens a large attack surface. Any program or script can instantly become root/admin on your system.
+
+To mitigate this, consider using Podman instead and [configure it to work in rootless mdoe](https://wiki.archlinux.org/title/Podman#Rootless_Podman).
+
+
+### Database
+
+SQLite database files can be inspected using [DB Browser for SQLite](https://sqlitebrowser.org/).
+
+
+--------------------------------------------------------------------------------
+## Production Environment
+
+At the current state, the management server is not optimized for production environments.
+
+As the backend – by default – has complete access to the Docker server it is running on, it can potentially manipulate anything on the server.
+
+This can be mitigated by either:
+
+- Running the complete stack in a VM.
+  - Use a reverse proxy (for HTTPs) outside the VM to keep key material safe.
+- Giving the backend access to a separate Docker instance.
+  - Set up a separate machine or VM for the game servers and configure the backend to use this instead.
+- Use Podman in rootless mode.
+  - This will usually prevent the frontend to open port 80, which should be no problem as a reverse proxy with HTTPs should be used, anyway.
+
+
+--------------------------------------------------------------------------------
 ## How to run:
+
+**TODO:** This is the original content of this file. It will be replaced soon.
 
 - Vorbereitung: 
 Um das Projekt zu starten, wird Docker benötigt. Docker kann unter Linux mit den meisten 

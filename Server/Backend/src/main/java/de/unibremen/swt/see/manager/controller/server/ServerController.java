@@ -28,8 +28,6 @@ public class ServerController {
 
     /**
      * Retrieves metadata of the server identified by the specified ID.
-     * <p>
-     * Requires Role {@code ADMIN}, or {@code USER}.
      *
      * @param id the ID of the server to retrieve
      * @return {@code 200 OK} with the server metadata as payload,
@@ -43,8 +41,6 @@ public class ServerController {
 
     /**
      * Retrieves the metadata of all available server resources.
-     * <p>
-     * Requires Role {@code ADMIN}, or {@code USER}.
      *
      * @return {@code 200 OK} with the server metadata as payload,
      *         or {@code 401 Unauthorized} if access cannot be granted.
@@ -57,11 +53,10 @@ public class ServerController {
 
     /**
      * Creates a new server.
-     * <p>
-     * Requires Role {@code ADMIN}.
      *
-     * @param server server metadata object to create new instance
-     * @return the created server
+     * @param server metadata object to create new server instance
+     * @return {@code 200 OK} with the server metadata object as payload,
+     *         or {@code 401 Unauthorized} if access cannot be granted.
      */
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
@@ -71,13 +66,14 @@ public class ServerController {
 
     /**
      * Adds a file to an existing server.
-     * <p>
-     * Requires Role {@code ADMIN}, or {@code USER}.
      *
      * @param serverId the ID of the server
      * @param fileType {@code String} representation of a {@code FileType} value
      * @param file     file content
-     * @return metadata of the created file
+     * @return {@code 200 OK} with the file metadata object as payload,
+     *         or {@code 500 Internal Server Error} if the file could not be
+     *         persisted,
+     *         or {@code 401 Unauthorized} if access cannot be granted.
      * @see de.unibremen.swt.see.manager.util.FileType
      */
     @PostMapping("/addFile")
@@ -86,7 +82,7 @@ public class ServerController {
                                              @RequestParam("fileType") String fileType,
                                              @RequestParam("file") MultipartFile file) {
         File responseFile = serverService.addFileToServer(serverId, fileType, file);
-        if (file == null)
+        if (responseFile == null)
             return ResponseEntity.internalServerError().build();
         return ResponseEntity.ok().body(responseFile);
     }
@@ -95,8 +91,6 @@ public class ServerController {
      * Deletes the server with the specified ID.
      * <p>
      * Deletes the server along with its files.
-     * <p>
-     * Requires Role {@code ADMIN}.
      *
      * @param id the ID of the server to delete
      * @return {@code 200 OK},
@@ -110,8 +104,6 @@ public class ServerController {
 
     /**
      * Start the server with the specified ID.
-     * <p>
-     * Requires Role {@code ADMIN}.
      * 
      * @param id the ID of the server to start
      * @return {@code 200 OK},
@@ -125,8 +117,6 @@ public class ServerController {
 
     /**
      * Stop the server with the specified ID.
-     * <p>
-     * Requires Role {@code ADMIN}.
      * 
      * @param id the ID of the server to stop
      * @return {@code 200 OK},
@@ -140,8 +130,6 @@ public class ServerController {
 
     /**
      * Retrieves the file list of the server with the specified ID.
-     * <p>
-     * Requires Role {@code ADMIN}, or {@code USER}.
      *
      * @param id the ID of the server
      * @return {@code 200 OK} with the file metadata as payload,
@@ -162,7 +150,7 @@ public class ServerController {
      * @param id       the ID of the server
      * @param password the password to access server data
      * @return {@code 200 OK} with the file metadata as payload,
-     *         or {@code 400 Bad Request} if the server does not exist
+     *         or {@code 400 Bad Request} if the server does not exist,
      *         or if the password is not correct.
      */
     @GetMapping("/getFilesForClient")

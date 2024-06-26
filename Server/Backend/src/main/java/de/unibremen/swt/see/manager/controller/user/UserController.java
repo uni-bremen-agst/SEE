@@ -20,10 +20,17 @@ import de.unibremen.swt.see.manager.controller.user.payload.request.LoginRequest
 import de.unibremen.swt.see.manager.controller.user.payload.request.SignupRequest;
 import de.unibremen.swt.see.manager.controller.user.payload.response.MessageResponse;
 import de.unibremen.swt.see.manager.model.ERole;
+import de.unibremen.swt.see.manager.model.User;
 import de.unibremen.swt.see.manager.security.jwt.JwtUtils;
 import de.unibremen.swt.see.manager.security.services.UserDetailsImpl;
 import de.unibremen.swt.see.manager.service.UserService;
 
+/**
+ * Handles HTTP requests for the /user endpoint.
+ * <p>
+ * This REST controller exposes various methods to perform CRUD operations on
+ * user resources.
+ */
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
@@ -34,24 +41,53 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
 
+    /**
+     * Retrieves user metadata of the authenticated user.
+     *
+     * @param userDetails are injected by Spring Security framework
+     * @return {@code 200 OK} with the user metadata object as payload,
+     *         or {@code 401 Unauthorized} if access cannot be granted.
+     */
     @GetMapping("/me")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> getUser(@AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok().body(userService.getUserByUsername(userDetails.getUsername()));
     }
 
+    /**
+     * Retrieves the metadata of all available user resources.
+     *
+     * @return {@code 200 OK} with the user metadata list as payload,
+     *         or {@code 401 Unauthorized} if access cannot be granted.
+     */
     @GetMapping("/all")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getUsers() {
         return ResponseEntity.ok().body(userService.getAllUser());
     }
 
+    /**
+     * Creates a new user.
+     *
+     * @param signupRequest metadata object to create new user instance
+     * @return {@code 200 OK} with the user metadata object as payload,
+     *         or {@code 401 Unauthorized} if access cannot be granted.
+     * @see de.unibremen.swt.see.manager.controller.user.payload.request.SignupRequest
+     */
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createUser(@RequestBody SignupRequest signupRequest) {
         return ResponseEntity.ok().body(userService.create(signupRequest.getUsername(), signupRequest.getPassword(), signupRequest.getRole()));
     }
 
+    /**
+     * Adds a role to an existing user.
+     *
+     * @param username name of the existing user
+     * @param role     new role to be added
+     * @return {@code 200 OK} with the updated user metadata object as payload,
+     *         or {@code 401 Unauthorized} if access cannot be granted.
+     */
     @PostMapping("/addRoleToUser")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> addRoleToUser(@RequestParam String username,
@@ -59,6 +95,14 @@ public class UserController {
         return ResponseEntity.ok().body(userService.addRoleToUser(username, role));
     }
 
+    /**
+     * Removes a role from an existing user.
+     *
+     * @param username name of the existing user
+     * @param role     role to be removed
+     * @return {@code 200 OK} with the updated user metadata object as payload,
+     *         or {@code 401 Unauthorized} if access cannot be granted.
+     */
     @DeleteMapping("/removeRoleFromUser")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> removeRoleToUSer(@RequestParam String username,
@@ -66,6 +110,13 @@ public class UserController {
         return ResponseEntity.ok().body(userService.removeRoleToUser(username, role));
     }
 
+    /**
+     * Deletes a user.
+     *
+     * @param username name of the user to delete
+     * @return {@code 200 OK},
+     *         or {@code 401 Unauthorized} if access cannot be granted.
+     */
     @DeleteMapping("/delete")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteUser(@RequestParam String username) {
@@ -73,22 +124,52 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Changes the name of the authenticated user.
+     * <p>
+     * Users can only change their own name.
+     *
+     * @param oldUserDetails        are injected by Spring Security framework
+     * @param changeUsernameRequest request data containing new username
+     * @return {@code 200 OK} with the updated user metadata object as payload
+     *         and new cookie with updated authentication token,
+     *         or {@code 400 Bad Request} if user name could not be changed,
+     *         or {@code 401 Unauthorized} if access cannot be granted.
+     * @see de.unibremen.swt.see.manager.controller.user.payload.request.ChangeUsernameRequest
+     */
     @PutMapping("/changeUsername")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> changeUsername(@AuthenticationPrincipal UserDetails oldUserDetails,
                                             @RequestBody ChangeUsernameRequest changeUsernameRequest) {
-        userService.changeUsername(oldUserDetails.getUsername(), changeUsernameRequest.getNewUsername(), changeUsernameRequest.getPassword());
-
+        // FIXME Parameter contains cleartext password!
+        User newUser = userService.changeUsername(oldUserDetails.getUsername(), changeUsernameRequest.getNewUsername(), changeUsernameRequest.getPassword());
+        
+        if (newUser == null) {
+            return ResponseEntity.badRequest().build();
+        }
 
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(changeUsernameRequest.getNewUsername(), changeUsernameRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
 
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .body(userService.getUserByUsername(userDetails.getUsername()));
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .body(newUser);
     }
 
+    /**
+     * Changes the name of the authenticated user.
+     * <p>
+     * Users can only change their own password.
+     *
+     * @param userDetails           are injected by Spring Security framework
+     * @param changePasswordRequest request data containing new password
+     * @return {@code 200 OK},
+     *         or {@code 400 Bad Request} if password could not be changed,
+     *         or {@code 401 Unauthorized} if access cannot be granted.
+     * @see de.unibremen.swt.see.manager.controller.user.payload.request.ChangePasswordRequest
+     */
     @PutMapping("/changePassword")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> changePassword(@AuthenticationPrincipal UserDetails userDetails,
@@ -100,21 +181,45 @@ public class UserController {
         return ResponseEntity.badRequest().build();
     }
 
+    /**
+     * Sign in to the app.
+     *
+     * @param loginRequest login metadata object
+     * @return {@code 200 OK} with the logged-in user metadata object as payload
+     *         and cookie with an authentication token,
+     *         or {@code 401 Unauthorized} if access cannot be granted.
+     * @see de.unibremen.swt.see.manager.controller.user.payload.request.LoginRequest
+     */
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+        // FIXME Parameter contains cleartext password!
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
 
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .body(userService.getUserByUsername(userDetails.getUsername()));
     }
 
+    /**
+     * Sign out off the app.
+     * <p>
+     * Currently, this only clears the cookie (if client complies).
+     * <p>
+     * <b>This does not invalidate the authentication token on server side!</b>
+     *
+     * @return {@code 200 OK} with a cookie to clear token on client,
+     *         or {@code 401 Unauthorized} if access cannot be granted.
+     * @see de.unibremen.swt.see.manager.controller.user.payload.request.LoginRequest
+     */
     @PostMapping("/signout")
     public ResponseEntity<?> logoutUser() {
+        // FIXME This does not invalidate the token on server side!
         ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(new MessageResponse("You've been signed out!"));
     }
 }

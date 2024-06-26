@@ -9,6 +9,7 @@ import de.unibremen.swt.see.manager.util.FileType;
 import de.unibremen.swt.see.manager.model.File;
 import de.unibremen.swt.see.manager.model.Server;
 import de.unibremen.swt.see.manager.repo.ServerRepo;
+import java.io.IOException;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -48,12 +49,13 @@ public class ServerService {
         
         FileType fileType = FileType.valueOf(fileTypeStr);
         log.info("Adding file {} to server {}", multipartFile.getOriginalFilename(), server.getName());
-        File file = fileService.createFile(server, fileType, multipartFile);
-        if (file == null) {
-            log.error("Unable to add file to server {}", serverId);
-            return null;
+
+        try {
+            return fileService.createFile(server, fileType, multipartFile);
+        } catch (IOException e) {
+            log.error("Unable to add file to server {}: ", serverId, e);
         }
-        return file;
+        return null;
     }
 
     public List<File> getFilesForServer(UUID id) {
