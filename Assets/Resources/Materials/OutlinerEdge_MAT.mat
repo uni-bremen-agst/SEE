@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Outliner_MAT
+  m_Name: OutlinerEdge_MAT
   m_Shader: {fileID: -6465566751694194690, guid: d51c742d3a575f7488ffd5d16364c9bf,
     type: 3}
   m_Parent: {fileID: 0}

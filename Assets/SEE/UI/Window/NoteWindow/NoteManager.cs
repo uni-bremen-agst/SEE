@@ -1,13 +1,22 @@
+using SEE.DataModel.DG;
+using SEE.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.UI.Window.NoteWindow
 {
+    /// <summary>
+    /// This class manages the notes. It saves and loads the notes-
+    /// </summary>
     public class NoteManager : MonoBehaviour
     {
         private static NoteManager instance;
 
+        /// <summary>
+        /// The material to outline nodes and edges.
+        /// </summary>
         private Material noteMaterial;
 
         public static NoteManager Instance
@@ -24,49 +33,66 @@ namespace SEE.UI.Window.NoteWindow
             }
         }
 
+        /// <summary>
+        /// This Dictionary saves the content of the notes.
+        /// </summary>
         public Dictionary<KeyValuePair<string, bool>, string> notesDictionary = new Dictionary<KeyValuePair<string, bool>, string>();
 
+        /// <summary>
+        /// List of GameObjects. It is used to check íf the GameObject is highlighted or not.
+        /// </summary>
         public List<GameObject> objectList = new List<GameObject>();
 
-        private void FindGameObjects()
+        /// <summary>
+        /// Finds the GameObject for the <see cref="graphElement"/>.
+        /// And it marks it with an outliner.
+        /// </summary>
+        /// <param name="GraphID"></param>
+        private void FindGameObjects(GraphElement graphElement)
         {
+            /*if ()
+            {
+
+            }*/
+            Debug.Log("graphElement.Type: " + graphElement.Type);
             noteMaterial = Resources.Load<Material>("Materials/Outliner_MAT");
-
-            foreach (KeyValuePair<KeyValuePair<string, bool>, string> kv in notesDictionary)
+            GameObject gameObject = graphElement.GameObject(true);
+            if (gameObject != null)
             {
-                GameObject gameObject = GameObject.Find(kv.Key.Key);
-                if(gameObject != null)
+                MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
+                if(meshRenderer.materials[meshRenderer.materials.Length - 1].name != noteMaterial.name)
                 {
-                    MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
                     objectList.Add(gameObject);
-
                     Material[] materialsArray = new Material[meshRenderer.materials.Length + 1];
-                    Debug.Log("materialsArray.Length: " + materialsArray.Length);
-
-                    for(int i = 0; i < meshRenderer.materials.Length; i++)
-                    {
-                        materialsArray.SetValue(meshRenderer.materials[i], i);
-                    }
-                    materialsArray.SetValue(noteMaterial, 2);
-
+                    Array.Copy(meshRenderer.materials, materialsArray, meshRenderer.materials.Length);
+                    materialsArray[meshRenderer.materials.Length] = noteMaterial;
                     meshRenderer.materials = materialsArray;
-                    Debug.Log("MeshRenderer.Materials.Length: " + meshRenderer.materials.Length);
-
                 }
-
             }
         }
 
-        public void SaveNote(string title, bool isPublic, string content)
+        /// <summary>
+        /// Saves the note by saving it into <see cref="notesDictionary"/>.
+        /// </summary>
+        /// <param name="graphID">the node/edge to save</param>
+        /// <param name="isPublic">flag whether it should be saved public or private</param>
+        /// <param name="content">the content to save</param>
+        public void SaveNote(GraphElement graphElement, bool isPublic, string content)
         {
-            if (!string.IsNullOrEmpty(title))
+            if (!string.IsNullOrEmpty(graphElement.ID))
             {
-                KeyValuePair<string, bool> keyPair = new KeyValuePair<string, bool>(title, isPublic);
+                KeyValuePair<string, bool> keyPair = new KeyValuePair<string, bool>(graphElement.ID, isPublic);
                 notesDictionary[keyPair] = content;
-                FindGameObjects();
+                FindGameObjects(graphElement);
             }
         }
 
+        /// <summary>
+        /// Loads the note.
+        /// </summary>
+        /// <param name="title">the node/edge to load</param>
+        /// <param name="isPublic">flag whether it should load the public or private note</param>
+        /// <returns>the content for the note</returns>
         public string LoadNote(string title, bool isPublic)
         {
             KeyValuePair<string, bool> keyPair = new KeyValuePair<string, bool>(title, isPublic);
@@ -77,9 +103,9 @@ namespace SEE.UI.Window.NoteWindow
             return "";
         }
 
-        private void OnApplicationQuit()
+        /*private void OnApplicationQuit()
         {
             Destroy(gameObject); // Löscht das GameObject und somit auch die Komponente
-        }
+        }*/
     }
 }

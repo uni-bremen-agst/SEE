@@ -23,8 +23,14 @@ namespace SEE.UI.Window.NoteWindow
         /// </summary>
         private static string WindowPrefab => UIPrefabFolder + "NoteWindow";
 
+        /// <summary>
+        /// The searchfield for <see cref="NoteWindow"/>.
+        /// </summary>
         public TMP_InputField searchField;
 
+        /// <summary>
+        /// The GraphElement for the depending Node/Edge
+        /// </summary>
         public GraphElement graphElement;
 
         private SwitchManager switchManager;
@@ -38,7 +44,9 @@ namespace SEE.UI.Window.NoteWindow
             CreateWindow();
         }
 
-        // Update is called once per frame
+        /// <summary>
+        /// Creates the <see cref="NoteWindow"/> and loads data if avaiable.
+        /// </summary>
         private void CreateWindow()
         {
             GameObject noteWindow = PrefabInstantiator.InstantiatePrefab(WindowPrefab, Window.transform.Find("Content"), false);
@@ -72,18 +80,27 @@ namespace SEE.UI.Window.NoteWindow
             LoadNote();
         }
 
+        /// <summary>
+        /// Make the note public.
+        /// </summary>
         private void onSwitch()
         {
             SaveNote(false);
             LoadNote();
         }
 
+        /// <summary>
+        /// Make the note private.
+        /// </summary>
         private void offSwitch()
         {
             SaveNote(true);
             LoadNote();
         }
 
+        /// <summary>
+        /// Saves the content into a file.
+        /// </summary>
         private void WriteToFile()
         {
             string path = EditorUtility.SaveFilePanel(
@@ -99,6 +116,9 @@ namespace SEE.UI.Window.NoteWindow
             }
         }
 
+        /// <summary>
+        /// Loads the content from a file.
+        /// </summary>
         private void LoadFromFile()
         {
             string path = EditorUtility.OpenFilePanel("Overwrite with txt", "", "");
@@ -109,11 +129,18 @@ namespace SEE.UI.Window.NoteWindow
             }
         }
 
+        /// <summary>
+        /// Deletes the content from the note.
+        /// </summary>
         private void DeleteFile()
         {
             searchField.text = "";
         }
 
+        /// <summary>
+        /// Saves the Note
+        /// </summary>
+        /// <param name="isPublic">should the note be saved to other clients</param>
         private void SaveNote(bool isPublic)
         {
             if (isPublic)
@@ -121,18 +148,21 @@ namespace SEE.UI.Window.NoteWindow
                 string graphID = graphElement.ID;
                 string content = searchField.text;
 
-                NoteManager.Instance.SaveNote(graphID, isPublic, content);
-                new NoteSaveNetAction(graphID, true, content).Execute();
+                NoteManager.Instance.SaveNote(graphElement, isPublic, content);
+                new NoteSaveNetAction(graphElement, true, content).Execute();
             }
             else
             {
                 string graphID = graphElement.ID;
                 string content = searchField.text;
 
-                NoteManager.Instance.SaveNote(graphID, isPublic, content);
+                NoteManager.Instance.SaveNote(graphElement, isPublic, content);
             }
         }
 
+        /// <summary>
+        /// Loads the content into the note.
+        /// </summary>
         public void LoadNote()
         {
             string graphID = graphElement.ID;
@@ -140,10 +170,6 @@ namespace SEE.UI.Window.NoteWindow
             searchField.text = NoteManager.Instance.LoadNote(graphID, isPublic);
         }
 
-        private void OnDestroy()
-        {
-            // Save the note content when the window is destroyed (closed) and mark the Node/Edge with a sticky note
-        }
 
         public override void RebuildLayout()
         {

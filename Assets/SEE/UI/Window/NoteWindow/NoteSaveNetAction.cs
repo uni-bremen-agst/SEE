@@ -1,3 +1,4 @@
+using SEE.DataModel.DG;
 using SEE.Net.Actions;
 using SEE.UI.Window.NoteWindow;
 using System;
@@ -9,15 +10,15 @@ namespace SEE.UI.Window.NoteWindow
 {
     public class NoteSaveNetAction : AbstractNetAction
     {
-        public string title;
+        public GraphElement graphElement;
 
         public bool isPublic;
 
         public string content;
 
-        public NoteSaveNetAction(string title, bool isPublic, string content)
+        public NoteSaveNetAction(GraphElement graphElement, bool isPublic, string content)
         {
-            this.title = title;
+            this.graphElement = graphElement;
             this.isPublic = isPublic;
             this.content = content;
         }
@@ -28,7 +29,7 @@ namespace SEE.UI.Window.NoteWindow
             if (!IsRequester())
             {
                 Debug.Log("SaveNetActionAfterIf");
-                NoteManager.Instance.SaveNote(title, isPublic, content);
+                NoteManager.Instance.SaveNote(graphElement, isPublic, content);
             }
         }
 

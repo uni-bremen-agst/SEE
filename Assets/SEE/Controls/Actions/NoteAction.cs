@@ -1,5 +1,8 @@
+using SEE.GO;
 using SEE.UI.Window.NoteWindow;
+using SEE.Utils;
 using SEE.Utils.History;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,12 +12,17 @@ namespace SEE.Controls.Actions
     internal class NoteAction : AbstractPlayerAction
     {
         private NoteManager noteManager;
+
+        /// <summary>
+        /// The material to outline the nodes and edges.
+        /// </summary>
+        Material noteMaterial = Resources.Load<Material>("Materials/Outliner_MAT");
+
         /// <summary>
         /// Returns a new instance of <see cref="NoteAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="NoteAction"/></returns>
         internal static IReversibleAction CreateReversibleAction() => new NoteAction();
-
 
         /// <summary>
         /// Returns a new instance of <see cref="NoteAction"/>.
@@ -40,23 +48,67 @@ namespace SEE.Controls.Actions
 
         public override bool Update()
         {
+            //Hide all Outlines when 'P' is pressed
             if (Input.GetKeyDown(KeyCode.P))
             {
                 HideAllNotes();
+                return true;
             }
-            return true;
+            //Hide or Show highlightes Nodes/Edges one by one
+            if (Input.GetMouseButtonDown(0))
+            {
+                Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef graphElementRef);
+                GameObject elemGameObject = graphElementRef.Elem.GameObject(true);
+                if (noteManager.objectList.Contains(elemGameObject))
+                {
+                    HideOrHightlight(elemGameObject);
+                    return true;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
+        /// <summary>
+        /// Hide or highlights every Node and Edge with a note.
+        /// </summary>
         private void HideAllNotes()
         {
             foreach (GameObject gameObject in noteManager.objectList)
             {
-                MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
+                HideOrHightlight(gameObject);
+            }
+        }
+
+        /// <summary>
+        /// Hides or highlights the GameObject depending if they have a note.
+        /// It hides them if they have an outline active.
+        /// It highlights the GameObject if they have a note but no outline active.
+        /// </summary>
+        /// <param name="gameObject">gameObject that </param>
+        private void HideOrHightlight(GameObject gameObject)
+        {
+            MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
+
+            string oldMaterialName = meshRenderer.materials[meshRenderer.materials.Length - 1].name;
+            string newName = oldMaterialName.Replace(" (Instance)", "");
+            //GameObject has no outline
+            if (newName != noteMaterial.name)
+            {
+                Material[] materialsArray = new Material[meshRenderer.materials.Length + 1];
+                Array.Copy(meshRenderer.materials, materialsArray, meshRenderer.materials.Length);
+                materialsArray[meshRenderer.materials.Length] = noteMaterial;
+                meshRenderer.materials = materialsArray;
+            }
+            //GameObject has outline
+            else
+            {
                 Material[] gameObjects = new Material[meshRenderer.materials.Length - 1];
-                for (int i = 0; i < meshRenderer.materials.Length - 1; i++)
-                {
-                    gameObjects[i] = meshRenderer.materials[i];
-                }
+                Array.Copy(meshRenderer.materials, gameObjects, meshRenderer.materials.Length - 1);
+                meshRenderer.materials = gameObjects;
             }
         }
 
