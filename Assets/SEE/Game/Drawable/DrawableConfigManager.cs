@@ -204,6 +204,9 @@ namespace SEE.Game.Drawable
                 {
                     lightning = GameFinder.GetHighestParent(surface).transform.GetComponentInChildren<Light>().enabled;
                 }
+                
+                bool visibility = GameFinder.GetHighestParent(surface).activeInHierarchy;
+                
                 DrawableHolder holder = surface.GetComponent<DrawableHolder>();
                 /// Creates the <see cref="DrawableConfig"/> with the corresponding values.
                 DrawableConfig config = new()
@@ -217,7 +220,8 @@ namespace SEE.Game.Drawable
                     Order = order,
                     Lightning = lightning,
                     OrderInLayer = holder.OrderInLayer,
-                    Description = holder.Description
+                    Description = holder.Description,
+                    Visibility = visibility
                 };
 
                 /// Block for creating the <see cref="DrawableType"/> of the drawable.

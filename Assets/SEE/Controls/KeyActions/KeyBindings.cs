@@ -248,6 +248,8 @@ namespace SEE.Controls.KeyActions
                      KeyActionCategory.Drawable, "Moves the object forward.");
             Register(KeyAction.MoveObjectBackward, KeyCode.Keypad3, "Move object backward",
                      KeyActionCategory.Drawable, "Moves the object backward.");
+            Register(KeyAction.DrawableManagerView, KeyCode.Keypad0, "Toggle drawable manager menu.",
+                     KeyActionCategory.Drawable, "Turns on/off the drawable manager menu.");
         }
 
         /// <summary>

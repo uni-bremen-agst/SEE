@@ -231,5 +231,9 @@
         /// Moves a drawable object backward.
         /// </summary>
         MoveObjectBackward,
+        /// <summary>
+        /// Opens/closes the drawable manager view.
+        /// </summary>
+        DrawableManagerView
     }
 }

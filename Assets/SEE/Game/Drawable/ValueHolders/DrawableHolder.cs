@@ -5,6 +5,7 @@ namespace Assets.SEE.Game.Drawable.ValueHolders
     /// <summary>
     /// This class represents a value holder component for the drawable surface.
     /// </summary>
+    /// <remarks>This component is meant to be attached to a drawable surface.</remarks>
     public class DrawableHolder : MonoBehaviour
     {
         /// <summary>

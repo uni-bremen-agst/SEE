@@ -129,7 +129,7 @@ GameObject:
   - component: {fileID: 1220350419575262073}
   m_Layer: 0
   m_Name: StickyNote
-  m_TagString: Untagged
+  m_TagString: Sticky Note
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -722,6 +722,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 095e58d9287da0a4da8c442421952aaf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  description: 
 --- !u!1 &8092367148460375394
 GameObject:
   m_ObjectHideFlags: 0

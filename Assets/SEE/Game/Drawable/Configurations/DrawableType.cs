@@ -225,6 +225,12 @@ namespace SEE.Game.Drawable.Configurations
             return createdObject;
         }
 
+        /// <summary>
+        /// Ensures that the configuration gets the name of the created object.
+        /// </summary>
+        /// <param name="type">The configuration.</param>
+        /// <param name="createdObject">The created object.</param>
+        /// <returns>The modified configuration.</returns>
         private static DrawableType EnsureValidity(DrawableType type, GameObject createdObject)
         {
             if (type.Id == "")

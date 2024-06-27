@@ -1,4 +1,5 @@
-﻿using Assets.SEE.Net.Actions.Drawable;
+﻿using Assets.SEE.Game.Drawable;
+using Assets.SEE.Net.Actions.Drawable;
 using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
@@ -102,14 +103,14 @@ namespace SEE.UI.Menu.Drawable
             lightningManager.OffEvents.AddListener(() =>
             {
                 newConfig.Lightning = false;
-                GameStickyNoteManager.ChangeLightning(stickyNote, false);
-                new StickyNoteChangeLightningNetAction(newConfig).Execute();
+                GameDrawableManager.ChangeLightning(stickyNote, false);
+                new DrawableChangeLightningNetAction(newConfig).Execute();
             });
             lightningManager.OnEvents.AddListener(() =>
             {
                 newConfig.Lightning = true;
-                GameStickyNoteManager.ChangeLightning(stickyNote, true);
-                new StickyNoteChangeLightningNetAction(newConfig).Execute();
+                GameDrawableManager.ChangeLightning(stickyNote, true);
+                new DrawableChangeLightningNetAction(newConfig).Execute();
             });
 
             /// Assigns the current status to the switch and updates the UI.
@@ -131,8 +132,8 @@ namespace SEE.UI.Menu.Drawable
             picker.onValueChanged.AddListener(color =>
             {
                 newConfig.Color = color;
-                GameStickyNoteManager.ChangeColor(stickyNote, color);
-                new StickyNoteChangeColorNetAction(newConfig).Execute();
+                GameDrawableManager.ChangeColor(stickyNote, color);
+                new DrawableChangeColorNetAction(newConfig).Execute();
             });
         }
 

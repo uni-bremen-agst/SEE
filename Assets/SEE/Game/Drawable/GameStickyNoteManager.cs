@@ -1,4 +1,6 @@
-﻿using SEE.Game.Drawable.Configurations;
+﻿using Assets.SEE.Game.Drawable;
+using Assets.SEE.Game.Drawable.ValueHolders;
+using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Utils;
 using UnityEngine;
@@ -13,7 +15,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// The prefab of the sticky note.
         /// </summary>
-        private const string stickyNotePrefabName = "Prefabs/Whiteboard/StickyNote";
+        private const string stickyNotePrefabName = "Prefabs/Drawable/StickyNote";
 
         /// <summary>
         /// Creates a new sticky note on the position of the raycast hit.
@@ -27,7 +29,7 @@ namespace SEE.Game.Drawable
             GameObject stickyNote = PrefabInstantiator.InstantiatePrefab(stickyNotePrefabName);
 
             /// Sets the name of the sticky note.
-            stickyNote.name = ValueHolder.StickyNotePrefix + "-" + RandomStrings.GetRandomString(8);
+            stickyNote.name = CreateUnusedName();//ValueHolder.StickyNotePrefix + "-" + RandomStrings.GetRandomString(8);
 
             /// Adopts the rotation of the hit object,
             /// unless it is a <see cref="DrawableType"/> object.
@@ -58,6 +60,21 @@ namespace SEE.Game.Drawable
 
             ValueHolder.MaxOrderInLayer++;
             return stickyNote;
+        }
+
+        /// <summary>
+        /// Creates an unused name for a sticky note.
+        /// </summary>
+        /// <returns>unused name</returns>
+        public static string CreateUnusedName()
+        {
+            string name = ValueHolder.StickyNotePrefix + "-" + RandomStrings.GetRandomString(8);
+            while (GameObject.Find(name) != null)
+            {
+                name = ValueHolder.StickyNotePrefix + "-" + RandomStrings.GetRandomString(8);
+                Debug.Log("Neuer name: " + name);
+            }
+            return name;
         }
 
         /// <summary>
@@ -203,6 +220,17 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
+        /// Sets the position of a drawable.
+        /// </summary>
+        /// <param name="obj">A part of the drawable.</param>
+        /// <param name="pos">The new position.</param>
+        public static void SetPosition(GameObject obj, Vector3 pos)
+        {
+            Transform transform = GameFinder.GetHighestParent(obj).transform;
+            transform.position = pos;
+        }
+
+        /// <summary>
         /// This method changes the order in layer of a sticky note.
         /// </summary>
         /// <param name="stickyNote">The sticky note whose order should be changed.</param>
@@ -233,29 +261,6 @@ namespace SEE.Game.Drawable
             }
         }
 
-        /// <summary>
-        /// Changes the color of a sticky note drawable.
-        /// </summary>
-        /// <param name="stickyNote">The sticky note which holds the drawable</param>
-        /// <param name="color">The new color for the drawable</param>
-        public static void ChangeColor(GameObject stickyNote, Color color)
-        {
-            if (GameFinder.GetDrawableSurface(stickyNote) != null
-                && GameFinder.GetDrawableSurface(stickyNote).GetComponent<MeshRenderer>() != null)
-            {
-                GameFinder.GetDrawableSurface(stickyNote).GetComponent<MeshRenderer>().material.color = color;
-            }
-        }
-
-        /// <summary>
-        /// Change the lighting of a sticky note.
-        /// </summary>
-        /// <param name="stickyNote">The sticky note.</param>
-        /// <param name="state">The state of the light. true = on; false = off.</param>
-        public static void ChangeLightning(GameObject stickyNote, bool state)
-        {
-            stickyNote.transform.GetComponentInChildren<Light>().enabled = state;
-        }
 
         /// <summary>
         /// Combines all edit method together.
@@ -265,14 +270,17 @@ namespace SEE.Game.Drawable
         public static void Change(GameObject stickyNote, DrawableConfig config)
         {
             GameObject root = GameFinder.GetHighestParent(stickyNote);
+            GameObject surface = GameFinder.GetDrawableSurface(stickyNote);
+            GameObject surfaceParent = surface.transform.parent.gameObject;
+
             if (root.name.Contains(ValueHolder.StickyNotePrefix))
             {
-                ChangeColor(stickyNote, config.Color);
+                GameDrawableManager.Change(surface, config);
                 ChangeLayer(root, config.Order);
-                ChangeLightning(stickyNote, config.Lightning);
                 SetRotateX(root, config.Rotation.x);
                 SetRotateY(root, config.Rotation.y);
-                GameScaler.SetScale(stickyNote, config.Scale);
+                GameScaler.SetScale(surfaceParent, config.Scale);
+                SetPosition(root, config.Position);
             }
         }
     }

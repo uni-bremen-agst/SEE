@@ -1,4 +1,7 @@
-﻿using SEE.Utils.Config;
+﻿using Assets.SEE.Game.Drawable;
+using Assets.SEE.Net.Actions.Drawable;
+using SEE.Net.Actions.Drawable;
+using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -63,6 +66,11 @@ namespace SEE.Game.Drawable.Configurations
         public string Description;
 
         /// <summary>
+        /// The visibility of the drawable.
+        /// </summary>
+        public bool Visibility;
+
+        /// <summary>
         /// All the lines that should be displayed on this drawable.
         /// </summary>
         public List<LineConf> LineConfigs = new();
@@ -102,6 +110,29 @@ namespace SEE.Game.Drawable.Configurations
             list.AddRange(ImageConfigs);
             list.AddRange(MindMapNodeConfigs);
             return list;
+        }
+
+        /// <summary>
+        /// Restores the changes of a configuration.
+        /// </summary>
+        /// <param name="surface">The surface to be changed.</param>
+        /// <param name="config">The configuration.</param>
+        /// <returns></returns>
+        public static GameObject Restore(GameObject surface, DrawableConfig config)
+        {
+            if (surface.CompareTag(Tags.Drawable))
+            {
+                if (GameFinder.IsStickyNote(surface))
+                {
+                    GameStickyNoteManager.Change(surface, config);
+                    new StickyNoteChangeNetAction(config).Execute();
+                } else
+                {
+                    GameDrawableManager.Change(surface, config);
+                    new DrawableChangeNetAction(config).Execute();
+                }
+            }
+            return surface;
         }
 
         #region Config I/O
@@ -157,6 +188,11 @@ namespace SEE.Game.Drawable.Configurations
         private const string DescriptionLabel = "Description";
 
         /// <summary>
+        /// The label for the visibility of a drawable in the configuration file.
+        /// </summary>
+        private const string VisibilityLabel = "Visibility";
+
+        /// <summary>
         /// The label for the group of line configurations in the configuration file.
         /// </summary>
         private const string LineConfigsLabel = "LineConfigs";
@@ -192,6 +228,7 @@ namespace SEE.Game.Drawable.Configurations
             writer.Save(Lightning, LightningLabel);
             writer.Save(OrderInLayer, OrderInLayerLabel);
             writer.Save(Description, DescriptionLabel);
+            writer.Save(Visibility, VisibilityLabel);
 
             if (LineConfigs != null && LineConfigs.Count > 0)
             {
@@ -341,6 +378,17 @@ namespace SEE.Game.Drawable.Configurations
             }
             else
             {
+                errorFree = false;
+            }
+
+            /// Try to restore the lightning status.
+            if (attributes.TryGetValue(VisibilityLabel, out object visibility))
+            {
+                Visibility = (bool)visibility;
+            }
+            else
+            {
+                Visibility = true;
                 errorFree = false;
             }
 

@@ -63,6 +63,10 @@ namespace SEE.Controls.Actions.Drawable
             /// Are the drawable surfaces that are created during the loading process.
             /// </summary>
             public List<DrawableConfig> AddedSurface;
+            /// <summary>
+            /// Holder for the old <see cref="DrawableConfig"/>.
+            /// </summary>
+            public Dictionary<GameObject,  DrawableConfig> OldConfig;
 
             /// <summary>
             /// The constructor, which simply assigns its only parameter to a field in this class.
@@ -74,6 +78,7 @@ namespace SEE.Controls.Actions.Drawable
                 SpecificSurface = null;
                 Configs = null;
                 AddedSurface = new();
+                OldConfig = new();
             }
         }
 
@@ -250,6 +255,11 @@ namespace SEE.Controls.Actions.Drawable
                     foreach (DrawableConfig drawableConfig in configs.Drawables)
                     {
                         GameObject surfaceOfFile = GameFinder.FindDrawableSurface(drawableConfig.ID, drawableConfig.ParentID);
+                        /// If the sticky note already exists, create a new one.
+                        if (surfaceOfFile != null && GameFinder.IsStickyNote(surfaceOfFile)) {
+                            surfaceOfFile = null;
+                            drawableConfig.ParentID = GameStickyNoteManager.CreateUnusedName();
+                        }
                         /// If the drawable does not exist it will be spawned as a sticky note.
                         if (surfaceOfFile == null)
                         {
@@ -257,8 +267,12 @@ namespace SEE.Controls.Actions.Drawable
                             GameObject stickyNote = GameStickyNoteManager.Spawn(drawableConfig);
                             surfaceOfFile = GameFinder.GetDrawableSurface(stickyNote);
                             new StickyNoteSpawnNetAction(drawableConfig).Execute();
+                        } else
+                        {
+                            memento.OldConfig.Add(surfaceOfFile, DrawableConfigManager.GetDrawableConfig(surfaceOfFile));
                         }
                         Restore(surfaceOfFile, drawableConfig);
+                        DrawableConfig.Restore(surfaceOfFile, drawableConfig);
                     }
                     memento.Configs = configs;
                     CurrentState = IReversibleAction.Progress.Completed;
@@ -379,6 +393,10 @@ namespace SEE.Controls.Actions.Drawable
                             DestroyLoadedObjects(attachedObj, config);
                         }
                     }
+                    foreach (KeyValuePair<GameObject, DrawableConfig> pair in memento.OldConfig)
+                    {
+                        DrawableConfig.Restore(pair.Key, pair.Value);
+                    }
                     break;
             }
         }
@@ -409,6 +427,7 @@ namespace SEE.Controls.Actions.Drawable
                             new StickyNoteSpawnNetAction(config).Execute();
                         }
                         Restore(surface, config);
+                        DrawableConfig.Restore(surface, config);
                     }
                     break;
             }

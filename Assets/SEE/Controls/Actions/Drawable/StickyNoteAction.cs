@@ -1,16 +1,15 @@
-﻿using HighlightPlus;
+﻿using Assets.SEE.Game.Drawable.ActionHelpers;
+using HighlightPlus;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Menu.Drawable;
+using SEE.UI.Notification;
 using SEE.Utils;
+using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
-using SEE.Utils.History;
-using UnityEngine.UIElements;
-using Assets.SEE.Game.Drawable.ActionHelpers;
 using MouseButton = Assets.SEE.Game.Drawable.ActionHelpers.MouseButton;
 
 namespace SEE.Controls.Actions.Drawable

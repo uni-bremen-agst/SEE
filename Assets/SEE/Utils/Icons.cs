@@ -42,5 +42,8 @@ namespace SEE.Utils
         public const char CircleCheckmark = '\uF058';
         public const char CircleQuestionMark = '\uF059';
         public const char CircleExclamationMark = '\uF06A';
+        public const char Whiteboard = '\uF51B';
+        public const char StickyNote = '\uF249';
+        public const char Palette = '\uF53f';
     }
 }

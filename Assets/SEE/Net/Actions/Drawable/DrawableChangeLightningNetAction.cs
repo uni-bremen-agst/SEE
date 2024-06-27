@@ -1,26 +1,25 @@
-﻿using SEE.Net.Actions;
-using System.Collections;
-using UnityEngine;
-using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable.Configurations;
+﻿using Assets.SEE.Game.Drawable;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
+using SEE.Net.Actions;
+using UnityEngine;
 
-namespace SEE.Net.Actions.Drawable
+namespace Assets.SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is reponsible for change the sticky note color on all clients.
+    /// This class is reponsible for change the drawable lightning on all clients.
     /// </summary>
-    public class StickyNoteChangeColorNetAction : AbstractNetAction
+    public class DrawableChangeLightningNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The sticky note that should be changed.
+        /// The drawable that should be changed.
         /// </summary>
         public DrawableConfig DrawableConf;
 
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        public StickyNoteChangeColorNetAction(DrawableConfig config)
+        public DrawableChangeLightningNetAction(DrawableConfig config)
         {
             this.DrawableConf = config;
         }
@@ -32,15 +31,16 @@ namespace SEE.Net.Actions.Drawable
         protected override void ExecuteOnServer()
         {
         }
+
         /// <summary>
-        /// Changes the color of the sticky note on each client.
+        /// Changes the lightning of the drawable on each client.
         /// </summary>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
             {
                 GameObject surface = GameFinder.FindDrawableSurface(DrawableConf.ID, DrawableConf.ParentID);
-                GameStickyNoteManager.ChangeColor(surface.transform.parent.gameObject, DrawableConf.Color);
+                GameDrawableManager.ChangeLightning(surface.transform.parent.gameObject, DrawableConf.Lightning);
             }
         }
     }

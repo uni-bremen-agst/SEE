@@ -691,6 +691,15 @@ namespace SEE.Controls
         {
             return KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyAction.MoveObjectBackward);
         }
+
+        /// <summary>
+        /// Toggles the drawable manager menu.
+        /// </summary>
+        /// <returns>True if the user wants to toggle the drawable manager menu.</returns>
+        internal static bool ToggleDrawableManagerView()
+        {
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.DrawableManagerView);
+        }
         #endregion
     }
 }

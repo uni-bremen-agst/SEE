@@ -24,7 +24,7 @@ namespace SEE.Game.Drawable
         {
             GameObject searchedSurface = null;
             List<GameObject> surfaces;
-            
+
             /// Selection of the list to be checked.
             if (!useFindWithTagList)
             {
@@ -273,6 +273,44 @@ namespace SEE.Game.Drawable
             {
                 return "";
             }
+        }
+
+        /// <summary>
+        /// Gets the parent object of the drawable surface.
+        /// </summary>
+        /// <param name="obj">An object of the drawable.</param>
+        /// <returns>The parent object, null if no parent exists.</returns>
+        public static GameObject GetDrawableSurfaceParent(GameObject obj)
+        {
+            GameObject surface = GetDrawableSurface(obj);
+            if (surface != null && HasParent(surface))
+            {
+                return surface.transform.parent.gameObject;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Checks if the drawable is a whiteboard.
+        /// </summary>
+        /// <param name="obj">An object of the drawable.</param>
+        /// <returns>True if an object with a <see cref="Tags.Whiteboard"/> exists in the object tree.</returns>
+        public static bool IsWhiteboard(GameObject obj)
+        {
+            return FindChildWithTag(GetHighestParent(obj), Tags.Whiteboard) != null;
+        }
+
+        /// <summary>
+        /// Checks if the drawable is a sticky note.
+        /// </summary>
+        /// <param name="obj">An object of the drawable.</param>
+        /// <returns>True if an object with a <see cref="Tags.StickyNote"/> exists in the object tree.</returns>
+        public static bool IsStickyNote(GameObject obj)
+        {
+            return FindChildWithTag(GetHighestParent(obj), Tags.StickyNote) != null;
         }
 
         /// <summary>

@@ -85,6 +85,16 @@ namespace SEE.Game
         public const string Drawable = "Drawable";
 
         /// <summary>
+        /// For the parent of a whiteboard surface.
+        /// </summary>
+        public const string Whiteboard = "Whiteboard";
+
+        /// <summary>
+        /// For the parent of a sticky note surface.
+        /// </summary>
+        public const string StickyNote = "Sticky Note";
+
+        /// <summary>
         /// For the drawable type object line.
         /// </summary>
         public const string Line = "Line";
@@ -135,7 +145,7 @@ namespace SEE.Game
         /// </summary>
         public static readonly string[] All = { Graph, Node, Edge, Text, Erosion, Decoration,
             Path, Runtime, FunctionCall, CullingPlane, ChartManager, MainCamera,
-            Drawable, Line, DText, Image, AttachedObjects, MindMapNode, Top, Bottom, Left, Right};
+            Drawable, Whiteboard, StickyNote, Line, DText, Image, AttachedObjects, MindMapNode, Top, Bottom, Left, Right};
 
         /// <summary>
         /// All existing <see cref="DrawableTypes"/> object tags in one.
