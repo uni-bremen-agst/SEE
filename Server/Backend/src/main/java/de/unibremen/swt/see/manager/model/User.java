@@ -11,40 +11,71 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Represents a user of the management system.
+ */
 @Entity
 @Getter
 @Setter
 @Table(name = "users",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = "username")
+                @UniqueConstraint(columnNames = "name")
         })
 public class User {
+    
+    /**
+     * ID of the user.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false)
     private UUID id;
 
+    /**
+     * The name of the user.
+     * <p>
+     * The name must be unique and less than 20 characters long.
+     */
     @NotBlank
     @Size(max = 20)
-    @Column(unique = true)
-    private String username;
+    @Column(name = "name", unique = true)
+    private String name;
 
+    /**
+     * The password of the user.
+     * <p>
+     * The password is usually stored as a salted hash value, e.g., using
+     * {@code bcrypt} algorithm (as of 2024).
+     */
     @NotBlank
     @JsonIgnore
     @Size(max = 120)
     private String password;
 
+    /**
+     * A list of roles associated to the user.
+     * <p>
+     * One user can assume multiple roles that are checked during API access.
+     */
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
-    public User() {
-    }
+    /**
+     * Constructs an empty {@code User}.
+     */
+    public User() {}
 
-    public User(String username, String password) {
-        this.username = username;
+    /**
+     * Constructs a {@code User} with {@code name} and {@code password}.
+     * 
+     * @param name     name of the new user
+     * @param password password hash of the new user
+     */
+    public User(String name, String password) {
+        this.name = name;
         this.password = password;
     }
 }

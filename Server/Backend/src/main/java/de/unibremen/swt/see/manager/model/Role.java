@@ -5,14 +5,12 @@ import jakarta.persistence.*;
 /**
  * Represents the data model of the different roles a user can assume.
  * <p>
- * This {@code enum} defines the roles that are used in the role-based access 
- * model implemented with the Spring Security framework.
- * 
- * @see de.unibremen.swt.see.manager.model.ERole
+ * Possible values are defined in related {@code enum} {@link RoleType}.
  */
 @Entity
 @Table(name = "roles")
 public class Role {
+
     /**
      * ID of the role.
      */
@@ -23,13 +21,12 @@ public class Role {
     /**
      * Name of the role.
      * <p>
-     * The name is converted from the {@code enum} value.
-     * 
-     * @see de.unibremen.swt.see.manager.model.ERole
+     * The name is persisted as a {@code String} converted from a value of
+     * {@code enum} {@link RoleType}.
      */
     @Enumerated(EnumType.STRING)
-    @Column(length = 20, unique = true)
-    private ERole name;
+    @Column(name = "name", length = 20, unique = true)
+    private RoleType name;
 
     /**
      * Constructs an empty {@code Role}.
@@ -41,7 +38,7 @@ public class Role {
      * 
      * @param name {@code enum} value of the role
      */
-    public Role(ERole name) {
+    public Role(RoleType name) {
         this.name = name;
     }
 
@@ -62,14 +59,14 @@ public class Role {
     /**
      * @return  role name
      */
-    public ERole getName() {
+    public RoleType getName() {
         return name;
     }
 
     /**
      * @param name new role name
      */
-    public void setName(ERole name) {
+    public void setName(RoleType name) {
         this.name = name;
     }
 }

@@ -1,4 +1,4 @@
-package de.unibremen.swt.see.manager.util;
+package de.unibremen.swt.see.manager.model;
 
 /**
  * Represents the different types of files that can be uploaded to the

@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import de.unibremen.swt.see.manager.util.FileType;
+import de.unibremen.swt.see.manager.model.FileType;
 import de.unibremen.swt.see.manager.model.File;
 import de.unibremen.swt.see.manager.model.Server;
 import de.unibremen.swt.see.manager.repo.FileRepo;
-import static de.unibremen.swt.see.manager.util.FileType.*;
+import static de.unibremen.swt.see.manager.model.FileType.*;
 
 import java.io.IOException;
 import java.io.InputStream;

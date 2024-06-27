@@ -5,14 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import de.unibremen.swt.see.manager.model.ERole;
+import de.unibremen.swt.see.manager.model.RoleType;
 import de.unibremen.swt.see.manager.model.Role;
 import de.unibremen.swt.see.manager.model.User;
-import de.unibremen.swt.see.manager.repo.RoleRepository;
 import de.unibremen.swt.see.manager.repo.UserRepo;
 
 import java.util.List;
 import java.util.Optional;
+import de.unibremen.swt.see.manager.repo.RoleRepo;
 
 @Service
 @Transactional
@@ -21,9 +21,9 @@ import java.util.Optional;
 public class UserService {
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
-    private final RoleRepository roleRepository;
+    private final RoleRepo roleRepo;
 
-    public User create(String username, String password, ERole eRole) {
+    public User create(String username, String password, RoleType eRole) {
         log.info("Creating new user {}", username);
         if (userRepo.findUserByUsername(username).isPresent()) {
             log.error("Username {} is already taken", username);
@@ -31,7 +31,7 @@ public class UserService {
         }
         User user = userRepo.save(new User(username, passwordEncoder.encode(password)));
 
-        addRoleToUser(user.getUsername(), eRole);
+        addRoleToUser(user.getName(), eRole);
 
         return user;
     }
@@ -46,20 +46,20 @@ public class UserService {
             
         if (passwordEncoder.matches(password, user.getPassword())) {
             log.info("Changing username form {} to {}", oldUsername, newUsername);
-            user.setUsername(newUsername);
+            user.setName(newUsername);
             return user;
         }
         log.error("Unauthorized username change requested: {} to {}", oldUsername, newUsername);
         return null;
     }
 
-    public User addRoleToUser(String username, ERole eRole) {
+    public User addRoleToUser(String username, RoleType eRole) {
         log.info("Adding role {} to {}", eRole, username);
         Optional<User> optUser = userRepo.findUserByUsername(username);
         if (optUser.isEmpty()) return null;
         User user = optUser.get();
         
-        Optional<Role> optRole = roleRepository.findByName(eRole);
+        Optional<Role> optRole = roleRepo.findByName(eRole);
         if (optRole.isEmpty()) return null;
         Role role = optRole.get();
 
@@ -67,13 +67,13 @@ public class UserService {
         return user;
     }
 
-    public User removeRoleToUser(String username, ERole eRole) {
+    public User removeRoleToUser(String username, RoleType eRole) {
         log.info("Removing role {} to {}", eRole, username);
         Optional<User> optUser = userRepo.findUserByUsername(username);
         if (optUser.isEmpty()) return null;
         User user = optUser.get();
         
-        Optional<Role> optRole = roleRepository.findByName(eRole);
+        Optional<Role> optRole = roleRepo.findByName(eRole);
         if (optRole.isEmpty()) return null;
         Role role = optRole.get();
         

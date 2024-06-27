@@ -8,7 +8,7 @@ package de.unibremen.swt.see.manager.model;
  * 
  * @see de.unibremen.swt.see.manager.model.Role
  */
-public enum ERole {
+public enum RoleType {
     /**
      * This role represents the application administrator.
      */

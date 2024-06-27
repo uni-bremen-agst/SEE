@@ -13,17 +13,20 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>SEE Manager Backend</name>
     <description>Back-end server of the SEE management tool</description>
+    
+    <properties>
+        <java.version>17</java.version>
+        <start-class>${project.groupId}.${project.artifactId}.SeeManagerApplication</start-class>
+    </properties>
+    
     <licenses>
         <license>
             <name>MIT License</name>
             <url>https://opensource.org/licenses/MIT</url>
             <distribution>repo</distribution>
         </license>
-  </licenses>
-    <properties>
-        <java.version>17</java.version>
-        <start-class>${project.groupId}.${project.artifactId}.SeeManagerApplication</start-class>
-    </properties>
+    </licenses>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -79,7 +82,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -102,6 +105,13 @@
                     <version>${lombok.version}</version>
                     </path>
                 </annotationProcessorPaths> -->
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <show>private</show>
                 </configuration>
             </plugin>
             <plugin>

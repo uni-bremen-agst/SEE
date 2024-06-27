@@ -19,7 +19,7 @@ import de.unibremen.swt.see.manager.controller.user.payload.request.ChangeUserna
 import de.unibremen.swt.see.manager.controller.user.payload.request.LoginRequest;
 import de.unibremen.swt.see.manager.controller.user.payload.request.SignupRequest;
 import de.unibremen.swt.see.manager.controller.user.payload.response.MessageResponse;
-import de.unibremen.swt.see.manager.model.ERole;
+import de.unibremen.swt.see.manager.model.RoleType;
 import de.unibremen.swt.see.manager.model.User;
 import de.unibremen.swt.see.manager.security.jwt.JwtUtils;
 import de.unibremen.swt.see.manager.security.services.UserDetailsImpl;
@@ -91,7 +91,7 @@ public class UserController {
     @PostMapping("/addRoleToUser")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> addRoleToUser(@RequestParam String username,
-                                           @RequestParam ERole role) {
+                                           @RequestParam RoleType role) {
         return ResponseEntity.ok().body(userService.addRoleToUser(username, role));
     }
 
@@ -106,7 +106,7 @@ public class UserController {
     @DeleteMapping("/removeRoleFromUser")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> removeRoleToUSer(@RequestParam String username,
-                                              @RequestParam ERole role) {
+                                              @RequestParam RoleType role) {
         return ResponseEntity.ok().body(userService.removeRoleToUser(username, role));
     }
 

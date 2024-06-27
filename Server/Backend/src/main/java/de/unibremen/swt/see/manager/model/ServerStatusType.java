@@ -1,4 +1,4 @@
-package de.unibremen.swt.see.manager.util;
+package de.unibremen.swt.see.manager.model;
 
 public enum ServerStatusType {
     ONLINE,

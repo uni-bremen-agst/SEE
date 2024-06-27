@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import de.unibremen.swt.see.manager.util.ServerStatusType;
+import de.unibremen.swt.see.manager.model.ServerStatusType;
 import de.unibremen.swt.see.manager.model.Server;
-import de.unibremen.swt.see.manager.model.ServerConfig;
-import de.unibremen.swt.see.manager.repo.ServerConfigRepo;
+import de.unibremen.swt.see.manager.model.Config;
+import de.unibremen.swt.see.manager.repo.ConfigRepo;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,16 +21,16 @@ import java.util.Random;
 @Slf4j
 @RequiredArgsConstructor
 public class ContainerService {
-    private final ServerConfigRepo serverConfigRepo;
+    private final ConfigRepo configRepo;
     private final FileService fileService;
 
     public boolean startContainer(@NotNull Server server) {
-        Optional<ServerConfig> optServerConfig = serverConfigRepo.findServerConfigById(1);
-        if (optServerConfig.isEmpty()) {
+        Optional<Config> optConfig = configRepo.findConfigById(1);
+        if (optConfig.isEmpty()) {
             log.error("Cant start server {}, cant find server config", server.getId());
             return false;
         }
-        ServerConfig serverConfig = optServerConfig.get();
+        Config config = optConfig.get();
         List<File> files = fileService.getFilesByServer(server);
         
         // FIXME This looks like a race condition
@@ -42,7 +42,7 @@ public class ContainerService {
         }
 
         // Aussuchen eines zufälligen Ports
-        int port = getRandomNumberUsingNextInt(serverConfig.getMinContainerPort(), serverConfig.getMaxContainerPort());
+        int port = getRandomNumberUsingNextInt(config.getMinContainerPort(), config.getMaxContainerPort());
         String containerName = server.getName() + "-" + server.getId() + "-" + port;
 
         // Starten des Gameservers
@@ -50,7 +50,7 @@ public class ContainerService {
         try {
             log.info("Starting server {}", server.getId());
             // Befehl zum Starten eines Docker-Containers anpassen
-            String dockerCommand = "docker run -d --name " + containerName + " -p " + port + ":" + port + "/udp -e PASSWORD=\"" + server.getServerPassword() + "\" -e PORT=" + port + " -e SERVERID=" + server.getId() + " -e BACKENDDOMAIN=" + serverConfig.getDomain() + " see-gameserver:latest";
+            String dockerCommand = "docker run -d --name " + containerName + " -p " + port + ":" + port + "/udp -e PASSWORD=\"" + server.getServerPassword() + "\" -e PORT=" + port + " -e SERVERID=" + server.getId() + " -e BACKENDDOMAIN=" + config.getDomain() + " see-gameserver:latest";
 
             // Docker-Befehl ausführen
             Process process = new ProcessBuilder()
@@ -108,7 +108,7 @@ public class ContainerService {
             // Server in der Datenbank aktualisieren
             server.setContainerPort(port);
             server.setContainerName(containerName);
-            server.setContainerAddress(serverConfig.getDomain());
+            server.setContainerAddress(config.getDomain());
             server.setServerStatusType(ServerStatusType.ONLINE);
 
             return true;

@@ -1,7 +1,7 @@
 package de.unibremen.swt.see.manager.repo;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
-import de.unibremen.swt.see.manager.util.FileType;
+import de.unibremen.swt.see.manager.model.FileType;
 import de.unibremen.swt.see.manager.model.File;
 import de.unibremen.swt.see.manager.model.Server;
 

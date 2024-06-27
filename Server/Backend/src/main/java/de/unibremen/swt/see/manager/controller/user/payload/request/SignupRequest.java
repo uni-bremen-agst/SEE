@@ -3,7 +3,7 @@ package de.unibremen.swt.see.manager.controller.user.payload.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import de.unibremen.swt.see.manager.model.ERole;
+import de.unibremen.swt.see.manager.model.RoleType;
 
 @Data
 public class SignupRequest {
@@ -11,7 +11,7 @@ public class SignupRequest {
     @Size(min = 3, max = 20)
     private String username;
 
-    private ERole role;
+    private RoleType role;
 
     @NotBlank
     @Size(min = 6, max = 40)

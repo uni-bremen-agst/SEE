@@ -74,7 +74,7 @@ public class ServerController {
      *         or {@code 500 Internal Server Error} if the file could not be
      *         persisted,
      *         or {@code 401 Unauthorized} if access cannot be granted.
-     * @see de.unibremen.swt.see.manager.util.FileType
+     * @see de.unibremen.swt.see.manager.model.FileType
      */
     @PostMapping("/addFile")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")

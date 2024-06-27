@@ -5,11 +5,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import de.unibremen.swt.see.manager.model.ERole;
+import de.unibremen.swt.see.manager.model.RoleType;
 import de.unibremen.swt.see.manager.model.Role;
-import de.unibremen.swt.see.manager.model.ServerConfig;
-import de.unibremen.swt.see.manager.repo.RoleRepository;
-import de.unibremen.swt.see.manager.repo.ServerConfigRepo;
+import de.unibremen.swt.see.manager.model.Config;
 import de.unibremen.swt.see.manager.repo.ServerRepo;
 import de.unibremen.swt.see.manager.repo.UserRepo;
 import de.unibremen.swt.see.manager.service.FileService;
@@ -17,6 +15,8 @@ import de.unibremen.swt.see.manager.service.ServerService;
 import de.unibremen.swt.see.manager.service.UserService;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
+import de.unibremen.swt.see.manager.repo.ConfigRepo;
+import de.unibremen.swt.see.manager.repo.RoleRepo;
 
 /**
  * SEE Manager is part of the Software Engineering Experience (SEE).
@@ -65,25 +65,25 @@ public class SeeManagerApplication {
             UserRepo userRepo, 
             UserService userService, 
             FileService fileService, 
-            RoleRepository roleRepository, 
-            ServerConfigRepo serverConfigRepo) {
+            RoleRepo roleRepo, 
+            ConfigRepo configRepo) {
         return args -> {
-            ServerConfig serverConfig = new ServerConfig();
-            serverConfig.setDomain(backendDomain);
-            serverConfig.setMinContainerPort(9100);
-            serverConfig.setMaxContainerPort(9300);
-            serverConfigRepo.save(serverConfig);
+            Config config = new Config();
+            config.setDomain(backendDomain);
+            config.setMinContainerPort(9100);
+            config.setMaxContainerPort(9300);
+            configRepo.save(config);
 
-            Optional<Role> optAdminRole = roleRepository.findByName(ERole.ROLE_ADMIN);
+            Optional<Role> optAdminRole = roleRepo.findByName(RoleType.ROLE_ADMIN);
             if (optAdminRole.isEmpty())
-                roleRepository.save(new Role(ERole.ROLE_ADMIN));
-            Optional<Role> optUserRole = roleRepository.findByName(ERole.ROLE_USER);
+                roleRepo.save(new Role(RoleType.ROLE_ADMIN));
+            Optional<Role> optUserRole = roleRepo.findByName(RoleType.ROLE_USER);
             if (optUserRole.isEmpty())
-                roleRepository.save(new Role(ERole.ROLE_USER));
+                roleRepo.save(new Role(RoleType.ROLE_USER));
 
             if (newAdminName != null && !newAdminName.isBlank() && newAdminPassword != null && !newAdminPassword.isBlank()) {
                 log.warn("ADDING ADMIN USER PASSED VIA ENVIRONMENT: {}", newAdminName);
-                userService.create(newAdminName, newAdminPassword, ERole.ROLE_ADMIN);
+                userService.create(newAdminName, newAdminPassword, RoleType.ROLE_ADMIN);
             }
         };
     }
