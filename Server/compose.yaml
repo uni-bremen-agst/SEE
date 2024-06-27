@@ -27,7 +27,8 @@ services:
     ports:
       - "8080:8080"
     environment:
-      FRONTEND_URL: http://localhost
+      FRONTEND_DOMAIN: localhost
+      FRONTEND_SCHEME: HTTP
       SQLITE_DB_FILE: /see/database.db
       JWT_SECRET: 1RNG9ja6MtadMuLsRC5ci3fy53KcQJmdEWWrp3hV5dnukvW5SQ
 

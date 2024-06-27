@@ -15,6 +15,8 @@ import de.unibremen.swt.see.manager.repo.UserRepo;
 import de.unibremen.swt.see.manager.service.FileService;
 import de.unibremen.swt.see.manager.service.ServerService;
 import de.unibremen.swt.see.manager.service.UserService;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * SEE Manager is part of the Software Engineering Experience (SEE).
@@ -29,6 +31,16 @@ import de.unibremen.swt.see.manager.service.UserService;
 @SpringBootApplication
 @Slf4j
 public class SeeManagerApplication {
+    
+    @Value("${see.app.backend.domain}")
+    private String backendDomain;
+    
+    @Value("${see.app.admin.add.name}")
+    private String newAdminName;
+    
+    // FIXME This is not a secure way to handle passwords.
+    @Value("${see.app.admin.add.password}")
+    private String newAdminPassword;
 
     /**
      * The main method to run the Spring Boot application.
@@ -57,13 +69,22 @@ public class SeeManagerApplication {
             ServerConfigRepo serverConfigRepo) {
         return args -> {
             ServerConfig serverConfig = new ServerConfig();
-            serverConfig.setDomain("localhost:8080");
+            serverConfig.setDomain(backendDomain);
             serverConfig.setMinContainerPort(9100);
             serverConfig.setMaxContainerPort(9300);
             serverConfigRepo.save(serverConfig);
-            roleRepository.save(new Role(ERole.ROLE_ADMIN));
-            roleRepository.save(new Role(ERole.ROLE_USER));
-            userService.create("thorsten", "password", ERole.ROLE_ADMIN);
+
+            Optional<Role> optAdminRole = roleRepository.findByName(ERole.ROLE_ADMIN);
+            if (optAdminRole.isEmpty())
+                roleRepository.save(new Role(ERole.ROLE_ADMIN));
+            Optional<Role> optUserRole = roleRepository.findByName(ERole.ROLE_USER);
+            if (optUserRole.isEmpty())
+                roleRepository.save(new Role(ERole.ROLE_USER));
+
+            if (newAdminName != null && !newAdminName.isBlank() && newAdminPassword != null && !newAdminPassword.isBlank()) {
+                log.warn("ADDING ADMIN USER PASSED VIA ENVIRONMENT: {}", newAdminName);
+                userService.create(newAdminName, newAdminPassword, ERole.ROLE_ADMIN);
+            }
         };
     }
 }
