@@ -90,7 +90,7 @@ namespace SEE.GraphProviders.Evolution
 
         /// <summary>
         /// Calculates and returns the actual graph series.
-        /// 
+        ///
         /// </summary>
         /// <param name="graph">The input graph series</param>
         /// <param name="changePercentage"></param>
@@ -180,7 +180,7 @@ namespace SEE.GraphProviders.Evolution
             g.StringAttributes.Add("CommitId", currentCommit.Sha);
 
 
-            GitFileMetricRepository metricRepository = new(repo, GitRepository.PathGlobbing);
+            GitFileMetricRepository metricRepository = new(repo, GitRepository.PathGlobbing, new List<string>());
 
             foreach (var commitInBetween in commitsInBetween)
             {

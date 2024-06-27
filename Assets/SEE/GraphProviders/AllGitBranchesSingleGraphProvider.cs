@@ -45,7 +45,7 @@ namespace SEE.GraphProviders
         //  ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository"), RuntimeTab("Data")]
         // public GitRepository RepositoryData = new();
 
-        
+
         /// <summary>
         /// The List of filetypes that get included/excluded.
         /// </summary>
@@ -57,7 +57,7 @@ namespace SEE.GraphProviders
         {
             { "**/*", true }
         };
-        
+
         /// <summary>
         /// This option fill simplify the graph with <see cref="GitFileMetricsGraphGenerator.DoSimplyfiGraph"/> and combine directories.
         /// </summary>
@@ -121,7 +121,7 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// Returns or adds the <see cref="GitPoller"/> component to the current gameobject/code city <paramref name="city"/>. 
+        /// Returns or adds the <see cref="GitPoller"/> component to the current gameobject/code city <paramref name="city"/>.
         /// </summary>
         /// <param name="city">The code city where the <see cref="GitPoller"/> component should be attached.</param>
         /// <returns>The <see cref="GitPoller"/> component</returns>
@@ -140,7 +140,7 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// Provides the graph of the git history 
+        /// Provides the graph of the git history
         /// </summary>
         /// <param name="graph">The graph of the previous provider</param>
         /// <param name="city">The city where the graph should be displayed</param>
@@ -182,7 +182,7 @@ namespace SEE.GraphProviders
 
         /// <summary>
         /// Calculates and returns the actual graph.
-        /// 
+        ///
         /// This method will collect all commit from all branches which are not older than <see cref="Date"/>.
         /// Then from all these commits the metrics are calculated with <see cref="GitFileMetricRepository.ProcessCommit(LibGit2Sharp.Commit,LibGit2Sharp.Patch)"/>
         /// </summary>
@@ -199,17 +199,28 @@ namespace SEE.GraphProviders
 
             GraphUtils.NewNode(graph, repositoryName, GraphUtils.RepositoryTypeName, pathSegments[^1]);
 
-            // Assuming that CheckAttributes() was already executed so that the date string is not empty nor malformed.  
+            // Assuming that CheckAttributes() was already executed so that the date string is not empty nor malformed.
             DateTime timeLimit = DateTime.ParseExact(branchCity.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-            
+
             using (var repo = new Repository(graph.BasePath))
             {
+                CommitFilter filter;
+
+                filter = new CommitFilter { IncludeReachableFrom = repo.Branches };
+
                 IEnumerable<Commit> commitList = repo.Commits
-                    .QueryBy(new CommitFilter { IncludeReachableFrom = repo.Branches })
-                    .Where(commit => DateTime.Compare(commit.Author.When.Date, timeLimit) > 0)
+                    .QueryBy(filter)
+                    .Where(commit =>
+                        DateTime.Compare(commit.Author.When.Date, timeLimit) > 0)
                     // Filter out merge commits
                     .Where(commit => commit.Parents.Count() <= 1);
-                GitFileMetricRepository metricRepository = new(repo, PathGlobbing);
+
+                // select all files of this repo
+                var files = repo.Branches
+                    .SelectMany(x => VCSGraphProvider.ListTree(x.Tip.Tree))
+                    .Distinct();
+                //files = new List<string>();
+                GitFileMetricRepository metricRepository = new(repo, PathGlobbing, files);
 
                 int counter = 0;
                 int commitLength = commitList.Count();
@@ -248,7 +259,7 @@ namespace SEE.GraphProviders
             //       ? null
             //     : RepositoryData.PathGlobbing;
             // RepositoryData.RepositoryPath.Save(writer, pathLabel);
-            // writer.Save(pathGlobbing, pathGlobbingLabel);
+            writer.Save(PathGlobbing, pathGlobbingLabel);
             //  writer.Save(Date, dataLabel);
             writer.Save(SimplifyGraph, simplifyGraphLabel);
             writer.Save(AutoFetch, autoFetchLabel);

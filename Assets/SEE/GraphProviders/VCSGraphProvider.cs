@@ -292,7 +292,7 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="tree">The tree of the given commit.</param>
         /// <returns>a list of paths.</returns>
-        private static List<string> ListTree(LibGit2Sharp.Tree tree)
+        public static List<string> ListTree(LibGit2Sharp.Tree tree)
         {
             List<string> fileList = new();
 
