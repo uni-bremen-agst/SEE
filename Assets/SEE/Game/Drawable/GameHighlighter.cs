@@ -37,7 +37,7 @@ namespace SEE.Game.Drawable
         /// <returns>The created highlight effect.</returns>
         public static HighlightEffect EnableGlowOverlay(GameObject obj)
         {
-            HighlightEffect effect = obj.AddComponent<HighlightEffect>();
+            HighlightEffect effect = obj.AddOrGetComponent<HighlightEffect>();
             effect.highlighted = true;
             effect.previewInEditor = false;
             effect.outline = 0;

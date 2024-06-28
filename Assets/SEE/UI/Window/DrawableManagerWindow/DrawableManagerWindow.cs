@@ -1,4 +1,5 @@
 ﻿using SEE.Game.Drawable;
+using SEE.UI.Menu.Drawable;
 using SEE.UI.Window;
 using SEE.Utils;
 using System;
@@ -63,12 +64,16 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
             //subscription = 
             base.Start();
         }
-        /*
+        
         private void OnDestroy()
         {
-            subscription.Dispose(); 
+            //subscription.Dispose();
+            if (SurfaceColorMenu.IsOpen())
+            {
+                SurfaceColorMenu.Disable();
+            }
         }
-        */
+        
 
 
         #region BaseWindow

@@ -1,15 +1,20 @@
 ﻿using Assets.SEE.Game.Drawable;
 using Assets.SEE.Net.Actions.Drawable;
 using Dissonance.Audio;
+using HighlightPlus;
 using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.GO;
+using SEE.UI.Menu.Drawable;
+using SEE.UI.PropertyDialog.Drawable;
 using SEE.Utils;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace Assets.SEE.UI.Window.DrawableManagerWindow
@@ -58,7 +63,7 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
             scrollRect = root.gameObject.MustGetComponent<ScrollRect>();
 
             /// TODO: SEARCH ETC
-            
+
             Rebuild();
         }
 
@@ -89,10 +94,34 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
             ButtonManagerBasic descriptionBtn = foreground.Find("DescriptionBtn").gameObject.MustGetComponent<ButtonManagerBasic>();
             TextMeshProUGUI descriptionMesh = foreground.Find("Description").gameObject.MustGetComponent<TextMeshProUGUI>();
             descriptionMesh.text = config.Description;
+            descriptionBtn.clickEvent.AddListener(() =>
+            {
+                WriteEditTextDialog writeTextDialog = new();
+                writeTextDialog.SetStringInit(config.Description);
+                UnityAction<string> stringAction = textOut =>
+                {
+                    GameDrawableManager.ChangeDescription(surface, textOut);
+                    new DrawableChangeDescriptionNetAction(DrawableConfigManager.GetDrawableConfig(surface)).Execute();
+                    descriptionMesh.text = textOut;
+                };
+
+                writeTextDialog.Open(stringAction);
+            });
 
             ButtonManagerBasic colorBtn = foreground.Find("ColorBtn").gameObject.MustGetComponent<ButtonManagerBasic>();
             TextMeshProUGUI colorMesh = foreground.Find("ColorBtn").gameObject.GetComponentInChildren<TextMeshProUGUI>();
             colorMesh.color = config.Color;
+            colorBtn.clickEvent.AddListener(() =>
+            {
+                if (!SurfaceColorMenu.IsOpen())
+                {
+                    UnityAction<Color> colorAction = colorOut =>
+                    {
+                        colorMesh.color = colorOut;
+                    };
+                    SurfaceColorMenu.Enable(surface, colorAction);
+                }
+            });
 
             ButtonManagerBasic lightningBtn = foreground.Find("LightningBtn").gameObject.MustGetComponent<ButtonManagerBasic>();
             TextMeshProUGUI lightMesh = foreground.Find("LightningBtn").gameObject.GetComponentInChildren<TextMeshProUGUI>();
@@ -119,21 +148,34 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
             });
 
             //ColorItem();
+            RegisterClickHandler();
             return;
 
             string GetVisibilityText(bool state)
             {
-                return state? Icons.Show.ToString() : Icons.Hide.ToString();
+                return state ? Icons.Show.ToString() : Icons.Hide.ToString();
             }
 
             Color GetVisibilityColor(bool state)
             {
-                return state? Color.white : Color.red;
+                return state ? Color.white : Color.red;
             }
 
             Color GetLightColor(bool state)
             {
                 return state ? Color.yellow : Color.white;
+            }
+
+            void RegisterClickHandler()
+            {
+                if (item.TryGetComponentOrLog(out PointerHelper pointerHelper))
+                {
+                    pointerHelper.ClickEvent.AddListener(e =>
+                    {
+                        GameHighlighter.EnableGlowOverlay(GameFinder.GetHighestParent(surface));
+                        Destroy(GameFinder.GetHighestParent(surface).GetComponent<HighlightEffect>(), 3.0f);
+                    });
+                }
             }
         }
     }
