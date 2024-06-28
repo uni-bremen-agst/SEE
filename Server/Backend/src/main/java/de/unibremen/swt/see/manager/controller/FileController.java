@@ -1,4 +1,4 @@
-package de.unibremen.swt.see.manager.controller.file;
+package de.unibremen.swt.see.manager.controller;
 
 import de.unibremen.swt.see.manager.model.File;
 import lombok.RequiredArgsConstructor;

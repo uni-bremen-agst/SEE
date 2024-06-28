@@ -1,4 +1,4 @@
-package de.unibremen.swt.see.manager.repo;
+package de.unibremen.swt.see.manager.repository;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 import de.unibremen.swt.see.manager.model.Server;
@@ -6,8 +6,10 @@ import de.unibremen.swt.see.manager.model.Server;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.stereotype.Repository;
 
-public interface ServerRepo extends PagingAndSortingRepository<Server, UUID> {
+@Repository
+public interface ServerRepository extends PagingAndSortingRepository<Server, UUID> {
     Optional<Server> findServerById(UUID id);
 
     Server save(Server server);

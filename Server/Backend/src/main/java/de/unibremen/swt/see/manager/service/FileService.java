@@ -9,7 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 import de.unibremen.swt.see.manager.model.FileType;
 import de.unibremen.swt.see.manager.model.File;
 import de.unibremen.swt.see.manager.model.Server;
-import de.unibremen.swt.see.manager.repo.FileRepo;
 import static de.unibremen.swt.see.manager.model.FileType.*;
 
 import java.io.IOException;
@@ -21,6 +20,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import de.unibremen.swt.see.manager.repository.FileRepository;
 
 @Service
 @Transactional
@@ -28,7 +28,7 @@ import java.util.UUID;
 @Slf4j
 public class FileService {
 
-    private final FileRepo fileRepo;
+    private final FileRepository fileRepo;
     
     @Value("${see.app.filestorage.dir}")
     private String fileStorageRoot;

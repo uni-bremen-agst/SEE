@@ -1,4 +1,4 @@
-package de.unibremen.swt.see.manager.security.services;
+package de.unibremen.swt.see.manager.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;

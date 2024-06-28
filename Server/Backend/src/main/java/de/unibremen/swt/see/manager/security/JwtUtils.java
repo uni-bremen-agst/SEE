@@ -1,4 +1,4 @@
-package de.unibremen.swt.see.manager.security.jwt;
+package de.unibremen.swt.see.manager.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
-import de.unibremen.swt.see.manager.security.services.UserDetailsImpl;
+import de.unibremen.swt.see.manager.security.UserDetailsImpl;
 
 import java.security.Key;
 import java.util.Date;

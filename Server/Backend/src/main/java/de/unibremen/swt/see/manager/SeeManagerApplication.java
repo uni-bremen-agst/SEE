@@ -8,15 +8,15 @@ import org.springframework.context.annotation.Bean;
 import de.unibremen.swt.see.manager.model.RoleType;
 import de.unibremen.swt.see.manager.model.Role;
 import de.unibremen.swt.see.manager.model.Config;
-import de.unibremen.swt.see.manager.repo.ServerRepo;
-import de.unibremen.swt.see.manager.repo.UserRepo;
 import de.unibremen.swt.see.manager.service.FileService;
 import de.unibremen.swt.see.manager.service.ServerService;
 import de.unibremen.swt.see.manager.service.UserService;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
-import de.unibremen.swt.see.manager.repo.ConfigRepo;
-import de.unibremen.swt.see.manager.repo.RoleRepo;
+import de.unibremen.swt.see.manager.repository.ConfigRepository;
+import de.unibremen.swt.see.manager.repository.RoleRepository;
+import de.unibremen.swt.see.manager.repository.ServerRepository;
+import de.unibremen.swt.see.manager.repository.UserRepository;
 
 /**
  * SEE Manager is part of the Software Engineering Experience (SEE).
@@ -60,13 +60,13 @@ public class SeeManagerApplication {
      */
     @Bean
     CommandLineRunner cliRunner(
-            ServerRepo serverRepo, 
+            ServerRepository serverRepo, 
             ServerService serverService, 
-            UserRepo userRepo, 
+            UserRepository userRepo, 
             UserService userService, 
             FileService fileService, 
-            RoleRepo roleRepo, 
-            ConfigRepo configRepo) {
+            RoleRepository roleRepo, 
+            ConfigRepository configRepo) {
         return args -> {
             Config config = new Config();
             config.setDomain(backendDomain);

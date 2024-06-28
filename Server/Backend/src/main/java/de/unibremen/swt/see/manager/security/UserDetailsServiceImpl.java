@@ -1,5 +1,6 @@
-package de.unibremen.swt.see.manager.security.services;
+package de.unibremen.swt.see.manager.security;
 
+import de.unibremen.swt.see.manager.security.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -7,12 +8,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import de.unibremen.swt.see.manager.model.User;
-import de.unibremen.swt.see.manager.repo.UserRepo;
+import de.unibremen.swt.see.manager.repository.UserRepository;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
-    UserRepo userRepository;
+    UserRepository userRepository;
 
     @Override
     @Transactional

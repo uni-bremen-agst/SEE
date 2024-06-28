@@ -1,5 +1,6 @@
-package de.unibremen.swt.see.manager.security;
+package de.unibremen.swt.see.manager.config;
 
+import de.unibremen.swt.see.manager.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,9 +16,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import de.unibremen.swt.see.manager.security.jwt.AuthEntryPointJwt;
-import de.unibremen.swt.see.manager.security.jwt.AuthTokenFilter;
-import de.unibremen.swt.see.manager.security.services.UserDetailsServiceImpl;
+import de.unibremen.swt.see.manager.security.AuthEntryPointJwt;
+import de.unibremen.swt.see.manager.security.AuthTokenFilter;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 @Configuration

@@ -9,19 +9,19 @@ import org.springframework.transaction.annotation.Transactional;
 import de.unibremen.swt.see.manager.model.ServerStatusType;
 import de.unibremen.swt.see.manager.model.Server;
 import de.unibremen.swt.see.manager.model.Config;
-import de.unibremen.swt.see.manager.repo.ConfigRepo;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import de.unibremen.swt.see.manager.repository.ConfigRepository;
 
 @Service
 @Transactional
 @Slf4j
 @RequiredArgsConstructor
 public class ContainerService {
-    private final ConfigRepo configRepo;
+    private final ConfigRepository configRepo;
     private final FileService fileService;
 
     public boolean startContainer(@NotNull Server server) {

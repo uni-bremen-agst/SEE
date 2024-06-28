@@ -8,20 +8,20 @@ import org.springframework.transaction.annotation.Transactional;
 import de.unibremen.swt.see.manager.model.RoleType;
 import de.unibremen.swt.see.manager.model.Role;
 import de.unibremen.swt.see.manager.model.User;
-import de.unibremen.swt.see.manager.repo.UserRepo;
 
 import java.util.List;
 import java.util.Optional;
-import de.unibremen.swt.see.manager.repo.RoleRepo;
+import de.unibremen.swt.see.manager.repository.RoleRepository;
+import de.unibremen.swt.see.manager.repository.UserRepository;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
-    private final UserRepo userRepo;
+    private final UserRepository userRepo;
     private final PasswordEncoder passwordEncoder;
-    private final RoleRepo roleRepo;
+    private final RoleRepository roleRepo;
 
     public User create(String username, String password, RoleType eRole) {
         log.info("Creating new user {}", username);

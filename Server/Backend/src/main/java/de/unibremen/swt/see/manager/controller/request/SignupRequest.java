@@ -1,4 +1,4 @@
-package de.unibremen.swt.see.manager.controller.user.payload.request;
+package de.unibremen.swt.see.manager.controller.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

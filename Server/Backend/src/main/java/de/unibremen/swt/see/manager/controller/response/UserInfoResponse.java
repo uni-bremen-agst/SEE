@@ -1,4 +1,4 @@
-package de.unibremen.swt.see.manager.controller.user.payload.response;
+package de.unibremen.swt.see.manager.controller.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -8,19 +8,19 @@ import org.springframework.web.multipart.MultipartFile;
 import de.unibremen.swt.see.manager.model.FileType;
 import de.unibremen.swt.see.manager.model.File;
 import de.unibremen.swt.see.manager.model.Server;
-import de.unibremen.swt.see.manager.repo.ServerRepo;
 import java.io.IOException;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
+import de.unibremen.swt.see.manager.repository.ServerRepository;
 
 @Service
 @Transactional
 @Slf4j
 @RequiredArgsConstructor
 public class ServerService {
-    private final ServerRepo serverRepo;
+    private final ServerRepository serverRepo;
     private final FileService fileService;
     private final ContainerService containerService;
 

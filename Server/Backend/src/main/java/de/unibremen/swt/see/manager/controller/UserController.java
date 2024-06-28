@@ -1,4 +1,4 @@
-package de.unibremen.swt.see.manager.controller.user;
+package de.unibremen.swt.see.manager.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,15 +14,15 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import de.unibremen.swt.see.manager.controller.user.payload.request.ChangePasswordRequest;
-import de.unibremen.swt.see.manager.controller.user.payload.request.ChangeUsernameRequest;
-import de.unibremen.swt.see.manager.controller.user.payload.request.LoginRequest;
-import de.unibremen.swt.see.manager.controller.user.payload.request.SignupRequest;
-import de.unibremen.swt.see.manager.controller.user.payload.response.MessageResponse;
+import de.unibremen.swt.see.manager.controller.request.ChangePasswordRequest;
+import de.unibremen.swt.see.manager.controller.request.ChangeUsernameRequest;
+import de.unibremen.swt.see.manager.controller.request.LoginRequest;
+import de.unibremen.swt.see.manager.controller.request.SignupRequest;
+import de.unibremen.swt.see.manager.controller.response.MessageResponse;
 import de.unibremen.swt.see.manager.model.RoleType;
 import de.unibremen.swt.see.manager.model.User;
-import de.unibremen.swt.see.manager.security.jwt.JwtUtils;
-import de.unibremen.swt.see.manager.security.services.UserDetailsImpl;
+import de.unibremen.swt.see.manager.security.JwtUtils;
+import de.unibremen.swt.see.manager.security.UserDetailsImpl;
 import de.unibremen.swt.see.manager.service.UserService;
 
 /**
@@ -72,7 +72,7 @@ public class UserController {
      * @param signupRequest metadata object to create new user instance
      * @return {@code 200 OK} with the user metadata object as payload,
      *         or {@code 401 Unauthorized} if access cannot be granted.
-     * @see de.unibremen.swt.see.manager.controller.user.payload.request.SignupRequest
+     * @see de.unibremen.swt.see.manager.controller.request.SignupRequest
      */
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
@@ -135,7 +135,7 @@ public class UserController {
      *         and new cookie with updated authentication token,
      *         or {@code 400 Bad Request} if user name could not be changed,
      *         or {@code 401 Unauthorized} if access cannot be granted.
-     * @see de.unibremen.swt.see.manager.controller.user.payload.request.ChangeUsernameRequest
+     * @see de.unibremen.swt.see.manager.controller.request.ChangeUsernameRequest
      */
     @PutMapping("/changeUsername")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
@@ -168,7 +168,7 @@ public class UserController {
      * @return {@code 200 OK},
      *         or {@code 400 Bad Request} if password could not be changed,
      *         or {@code 401 Unauthorized} if access cannot be granted.
-     * @see de.unibremen.swt.see.manager.controller.user.payload.request.ChangePasswordRequest
+     * @see de.unibremen.swt.see.manager.controller.request.ChangePasswordRequest
      */
     @PutMapping("/changePassword")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
@@ -188,7 +188,7 @@ public class UserController {
      * @return {@code 200 OK} with the logged-in user metadata object as payload
      *         and cookie with an authentication token,
      *         or {@code 401 Unauthorized} if access cannot be granted.
-     * @see de.unibremen.swt.see.manager.controller.user.payload.request.LoginRequest
+     * @see de.unibremen.swt.see.manager.controller.request.LoginRequest
      */
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -212,7 +212,7 @@ public class UserController {
      *
      * @return {@code 200 OK} with a cookie to clear token on client,
      *         or {@code 401 Unauthorized} if access cannot be granted.
-     * @see de.unibremen.swt.see.manager.controller.user.payload.request.LoginRequest
+     * @see de.unibremen.swt.see.manager.controller.request.LoginRequest
      */
     @PostMapping("/signout")
     public ResponseEntity<?> logoutUser() {

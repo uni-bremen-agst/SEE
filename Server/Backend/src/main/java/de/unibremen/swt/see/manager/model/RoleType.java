@@ -6,7 +6,7 @@ package de.unibremen.swt.see.manager.model;
  * This {@code enum} defines the roles that are used in the role-based access 
  * model implemented with the Spring Security framework.
  * 
- * @see de.unibremen.swt.see.manager.model.Role
+ * @see Role
  */
 public enum RoleType {
     /**

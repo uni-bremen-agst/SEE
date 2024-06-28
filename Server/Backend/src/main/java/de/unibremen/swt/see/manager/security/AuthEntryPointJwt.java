@@ -1,4 +1,4 @@
-package de.unibremen.swt.see.manager.security.jwt;
+package de.unibremen.swt.see.manager.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;

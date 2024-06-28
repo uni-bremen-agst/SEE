@@ -1,4 +1,4 @@
-package de.unibremen.swt.see.manager.security;
+package de.unibremen.swt.see.manager.config;
 
 import java.net.MalformedURLException;
 import java.net.URL;

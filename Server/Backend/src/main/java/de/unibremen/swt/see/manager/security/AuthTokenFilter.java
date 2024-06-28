@@ -1,4 +1,4 @@
-package de.unibremen.swt.see.manager.security.jwt;
+package de.unibremen.swt.see.manager.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -11,7 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
-import de.unibremen.swt.see.manager.security.services.UserDetailsServiceImpl;
+import de.unibremen.swt.see.manager.security.UserDetailsServiceImpl;
 
 import java.io.IOException;
 

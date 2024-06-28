@@ -1,4 +1,4 @@
-package de.unibremen.swt.see.manager.controller.server;
+package de.unibremen.swt.see.manager.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
