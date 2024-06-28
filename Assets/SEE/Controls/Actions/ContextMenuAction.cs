@@ -205,8 +205,6 @@ namespace SEE.Controls.Actions
                 noteWindow.Title = "Notes for " + graphElementRef.Elem.ToShortString();
                 noteWindow.graphElementRef = graphElementRef;
             }
-            GameObject gameObject = GameObject.Find("UI Canvas").transform.Find("NoteButtonWindow(Clone)").gameObject;
-            gameObject.SetActive(true);
 
             return noteWindow;
         }

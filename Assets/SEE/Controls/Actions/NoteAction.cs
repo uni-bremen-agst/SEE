@@ -1,4 +1,5 @@
 using SEE.GO;
+using SEE.UI.Window;
 using SEE.UI.Window.NoteWindow;
 using SEE.Utils;
 using SEE.Utils.History;
@@ -46,8 +47,11 @@ namespace SEE.Controls.Actions
 
         public override void Start()
         {
-            noteManager = GameObject.Find("NoteManager").GetComponent<NoteManager>();
+            NoteButtonWindow noteButtonWindow = new();
+            //noteManager = GameObject.Find("NoteManager").GetComponent<NoteManager>();
             OpenDialog();
+            noteButtonWindow.OpenWindow();
+            
         }
 
 
@@ -60,7 +64,7 @@ namespace SEE.Controls.Actions
                 return true;
             }
             //Hide or Show highlightes Nodes/Edges one by one
-            if (Input.GetMouseButtonDown(0))
+            /*if (Input.GetMouseButtonDown(0))
             {
                 Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef graphElementRef);
                 GameObject elemGameObject = graphElementRef.gameObject;
@@ -73,8 +77,8 @@ namespace SEE.Controls.Actions
                 {
                     return true;
                 }
-            }
-            return false;
+             }*/
+             return false;
         }
 
         /// <summary>
