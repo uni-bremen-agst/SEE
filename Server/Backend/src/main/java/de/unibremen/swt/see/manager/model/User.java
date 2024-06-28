@@ -31,14 +31,14 @@ public class User {
     private UUID id;
 
     /**
-     * The name of the user.
+     * The username of the user.
      * <p>
-     * The name must be unique and less than 20 characters long.
+     * The username must be unique and up to 20 characters long.
      */
     @NotBlank
     @Size(max = 20)
-    @Column(name = "name", unique = true)
-    private String name;
+    @Column(name = "username", unique = true)
+    private String username;
 
     /**
      * The password of the user.
@@ -68,13 +68,13 @@ public class User {
     public User() {}
 
     /**
-     * Constructs a {@code User} with {@code name} and {@code password}.
-     * 
-     * @param name     name of the new user
+     * Constructs a {@code User} with name and password.
+       * 
+     * @param username username of the new user
      * @param password password hash of the new user
      */
-    public User(String name, String password) {
-        this.name = name;
+    public User(String username, String password) {
+        this.username = username;
         this.password = password;
     }
 }

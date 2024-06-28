@@ -51,7 +51,7 @@ public class UserController {
     @GetMapping("/me")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> getUser(@AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok().body(userService.getUserByUsername(userDetails.getUsername()));
+        return ResponseEntity.ok().body(userService.getByUsername(userDetails.getUsername()));
     }
 
     /**
@@ -70,14 +70,22 @@ public class UserController {
      * Creates a new user.
      *
      * @param signupRequest metadata object to create new user instance
-     * @return {@code 200 OK} with the user metadata object as payload,
-     *         or {@code 401 Unauthorized} if access cannot be granted.
+     * @return {@code 200 OK} with the user metadata object as payload, or
+     * {@code 400 Bad Request} if a user with given name already exists or role
+     * could not be assigned, or {@code 401 Unauthorized} if access cannot be
+     * granted.
      * @see de.unibremen.swt.see.manager.controller.request.SignupRequest
      */
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createUser(@RequestBody SignupRequest signupRequest) {
-        return ResponseEntity.ok().body(userService.create(signupRequest.getUsername(), signupRequest.getPassword(), signupRequest.getRole()));
+        User user = userService.create(signupRequest.getUsername(), signupRequest.getPassword(), signupRequest.getRole());
+
+        if (user == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok().body(user);
     }
 
     /**
@@ -86,13 +94,20 @@ public class UserController {
      * @param username name of the existing user
      * @param role     new role to be added
      * @return {@code 200 OK} with the updated user metadata object as payload,
-     *         or {@code 401 Unauthorized} if access cannot be granted.
+     * or {@code 400 Bad Request} if a user with given name could not be found,
+     * or {@code 401 Unauthorized} if access cannot be granted.
      */
     @PostMapping("/addRoleToUser")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> addRoleToUser(@RequestParam String username,
-                                           @RequestParam RoleType role) {
-        return ResponseEntity.ok().body(userService.addRoleToUser(username, role));
+            @RequestParam RoleType role) {
+        User user = userService.addRole(username, role);
+
+        if (user == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok().body(user);
     }
 
     /**
@@ -107,7 +122,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> removeRoleToUSer(@RequestParam String username,
                                               @RequestParam RoleType role) {
-        return ResponseEntity.ok().body(userService.removeRoleToUser(username, role));
+        return ResponseEntity.ok().body(userService.removeRoleFromUser(username, role));
     }
 
     /**
@@ -120,7 +135,7 @@ public class UserController {
     @DeleteMapping("/delete")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteUser(@RequestParam String username) {
-        userService.deleteUserByUsername(username);
+        userService.deleteByUsername(username);
         return ResponseEntity.ok().build();
     }
 
@@ -200,7 +215,7 @@ public class UserController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .body(userService.getUserByUsername(userDetails.getUsername()));
+                .body(userService.getByUsername(userDetails.getUsername()));
     }
 
     /**

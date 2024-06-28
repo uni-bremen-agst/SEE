@@ -20,13 +20,14 @@ import org.springframework.context.annotation.Bean;
 
 /**
  * SEE Manager is part of the Software Engineering Experience (SEE).
- * 
+ * <p>
  * This is the back-end application that exposes a REST API for creating and
  * managing SEE game server instances.
  * It also exposes an API to store and retrieve multiplayer configurations
  * and Code City data to be used by multiple SEE clients.
- * 
- * @see <a href="https://see.uni-bremen.de/">SEE Website</a>
+ * <p>
+ * See also:<br>
+ * <a href="https://see.uni-bremen.de/">SEE website</a>
  */
 @SpringBootApplication
 @Slf4j
