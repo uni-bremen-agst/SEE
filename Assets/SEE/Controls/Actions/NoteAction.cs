@@ -56,52 +56,59 @@ namespace SEE.Controls.Actions
         {
             manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
             noteButtonWindow = new();
-            NoteWindow activeWin = manager.ActiveWindow.gameObject.MustGetComponent<NoteWindow>();
-            noteManager = NoteManager.Instance;
-            UnityAction saveButton = () =>
+            NoteWindow activeWin;
+            if (manager.Windows.Count > 0)
             {
-                noteButtonWindow.contentText = activeWin.searchField.text;
-                string content = noteButtonWindow.contentText;
-                string path = EditorUtility.SaveFilePanel(
-                "Save Note",
-                "",
-                "Note",
-                "");
-                if (path.Length != 0)
+
+                noteManager = NoteManager.Instance;
+                UnityAction saveButton = () =>
                 {
-                    if (content != null)
-                        File.WriteAllText(path, content);
-                }
-            };
+                    manager.ActiveWindow.gameObject.TryGetComponent<NoteWindow>(out activeWin);
+                    noteButtonWindow.contentText = activeWin.searchField.text;
+                    string content = noteButtonWindow.contentText;
+                    string path = EditorUtility.SaveFilePanel(
+                    "Save Note",
+                    "",
+                    "Note",
+                    "");
+                    if (path.Length != 0)
+                    {
+                        if (content != null)
+                            File.WriteAllText(path, content);
+                    }
+                };
 
-            UnityAction loadButton = () =>
-            {
-                string path = EditorUtility.OpenFilePanel("Overwrite with txt", "", "");
-                if (path.Length != 0)
+                UnityAction loadButton = () =>
                 {
-                    string fileContent = File.ReadAllText(path);
-                    activeWin.searchField.text = fileContent;
-                }
-            };
+                    manager.ActiveWindow.gameObject.TryGetComponent<NoteWindow>(out activeWin);
+                    string path = EditorUtility.OpenFilePanel("Overwrite with txt", "", "");
+                    if (path.Length != 0)
+                    {
+                        string fileContent = File.ReadAllText(path);
+                        activeWin.searchField.text = fileContent;
+                    }
+                };
 
-            UnityAction deleteButton = () =>
-            {
-                activeWin.searchField.text = "";
-                GameObject removeGO = manager.ActiveWindow.gameObject;
-                RemoveOutline(removeGO);
-                KeyValuePair<string, bool> kv = new KeyValuePair<string, bool>(activeWin.graphElementRef.Elem.ID, false);
-                noteManager.notesDictionary.Remove(kv);
-                noteManager.objectList.Remove(removeGO);
-            };
+                UnityAction deleteButton = () =>
+                {
+                    manager.ActiveWindow.gameObject.TryGetComponent<NoteWindow>(out activeWin);
+                    activeWin.searchField.text = "";
+                    GameObject removeGO = manager.ActiveWindow.gameObject;
+                    RemoveOutline(removeGO);
+                    noteManager.objectList.Remove(removeGO);
+                };
 
-            UnityAction refreshButton = () =>
-            {
-                Debug.Log("Hello world refresh");
-            };
+                UnityAction refreshButton = () =>
+                {
+                    manager.ActiveWindow.gameObject.TryGetComponent<NoteWindow>(out activeWin);
+                    string graphID = activeWin.graphElementRef.Elem.ID;
+                    bool isPublic = true;
+                    activeWin.searchField.text = NoteManager.Instance.LoadNote(graphID, isPublic);
+                };
 
 
-            noteButtonWindow.OpenWindow(saveButton, loadButton, deleteButton, refreshButton);
-
+                noteButtonWindow.OpenWindow(saveButton, loadButton, deleteButton, refreshButton);
+            }
         }
 
         public override void Stop()
@@ -119,19 +126,22 @@ namespace SEE.Controls.Actions
                 return true;
             }
             //Hide or Show highlightes Nodes/Edges one by one
-            if (Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI() && Raycasting.RaycastGraphElement(out RaycastHit _, out GraphElementRef _) == HitGraphElement.Node
-                || Raycasting.RaycastGraphElement(out RaycastHit _, out GraphElementRef _) == HitGraphElement.Edge)
+            if (Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI())
             {
-                Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef graphElementRef);
-                GameObject elemGameObject = graphElementRef.gameObject;
-                if (noteManager.objectList.Contains(elemGameObject))
+                var hitElement = Raycasting.RaycastGraphElement(out RaycastHit _, out GraphElementRef _);
+                if (hitElement == HitGraphElement.Node || hitElement == HitGraphElement.Edge)
                 {
-                    HideOrHightlight(elemGameObject);
-                    return true;
-                }
-                else
-                {
-                    return true;
+                    Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef graphElementRef);
+                    GameObject elemGameObject = graphElementRef.gameObject;
+                    if (noteManager.objectList.Contains(elemGameObject))
+                    {
+                        HideOrHightlight(elemGameObject);
+                        return true;
+                    }
+                    else
+                    {
+                        return true;
+                    }
                 }
              }
              return false;
