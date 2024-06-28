@@ -6,7 +6,7 @@ package de.unibremen.swt.see.manager.model;
  * @see Server
  */
 public enum ServerStatusType {
-    
+
     /**
      * The server is running and accepting connections.
      */

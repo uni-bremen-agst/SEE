@@ -1,11 +1,6 @@
 package de.unibremen.swt.see.manager.controller;
 
 import de.unibremen.swt.see.manager.model.File;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
 import de.unibremen.swt.see.manager.model.FileType;
 import de.unibremen.swt.see.manager.model.Server;
 import de.unibremen.swt.see.manager.service.FileService;
@@ -14,8 +9,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 /**

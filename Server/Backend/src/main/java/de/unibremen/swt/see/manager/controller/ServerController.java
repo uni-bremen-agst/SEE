@@ -1,16 +1,15 @@
 package de.unibremen.swt.see.manager.controller;
 
+import de.unibremen.swt.see.manager.model.File;
+import de.unibremen.swt.see.manager.model.Server;
+import de.unibremen.swt.see.manager.service.ServerService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import de.unibremen.swt.see.manager.model.File;
-import de.unibremen.swt.see.manager.model.Server;
-import de.unibremen.swt.see.manager.service.ServerService;
-
-import java.util.UUID;
 
 /**
  * Handles HTTP requests for the /server endpoint.

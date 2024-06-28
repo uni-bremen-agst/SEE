@@ -1,9 +1,9 @@
 package de.unibremen.swt.see.manager.controller.request;
 
+import de.unibremen.swt.see.manager.model.RoleType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import de.unibremen.swt.see.manager.model.RoleType;
 
 @Data
 public class SignupRequest {

@@ -1,13 +1,12 @@
 package de.unibremen.swt.see.manager.repository;
 
-import org.springframework.data.repository.PagingAndSortingRepository;
-import de.unibremen.swt.see.manager.model.FileType;
 import de.unibremen.swt.see.manager.model.File;
+import de.unibremen.swt.see.manager.model.FileType;
 import de.unibremen.swt.see.manager.model.Server;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository

@@ -1,20 +1,19 @@
 package de.unibremen.swt.see.manager.service;
 
-import de.unibremen.swt.see.manager.model.File;
-import jakarta.validation.constraints.NotNull;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import de.unibremen.swt.see.manager.model.ServerStatusType;
-import de.unibremen.swt.see.manager.model.Server;
 import de.unibremen.swt.see.manager.model.Config;
-
+import de.unibremen.swt.see.manager.model.File;
+import de.unibremen.swt.see.manager.model.Server;
+import de.unibremen.swt.see.manager.model.ServerStatusType;
+import de.unibremen.swt.see.manager.repository.ConfigRepository;
+import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import de.unibremen.swt.see.manager.repository.ConfigRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional

@@ -1,18 +1,17 @@
 package de.unibremen.swt.see.manager.service;
 
+import de.unibremen.swt.see.manager.model.Role;
+import de.unibremen.swt.see.manager.model.RoleType;
+import de.unibremen.swt.see.manager.model.User;
+import de.unibremen.swt.see.manager.repository.RoleRepository;
+import de.unibremen.swt.see.manager.repository.UserRepository;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import de.unibremen.swt.see.manager.model.RoleType;
-import de.unibremen.swt.see.manager.model.Role;
-import de.unibremen.swt.see.manager.model.User;
-
-import java.util.List;
-import java.util.Optional;
-import de.unibremen.swt.see.manager.repository.RoleRepository;
-import de.unibremen.swt.see.manager.repository.UserRepository;
 
 @Service
 @Transactional

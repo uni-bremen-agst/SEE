@@ -1,5 +1,15 @@
 package de.unibremen.swt.see.manager.controller;
 
+import de.unibremen.swt.see.manager.controller.request.ChangePasswordRequest;
+import de.unibremen.swt.see.manager.controller.request.ChangeUsernameRequest;
+import de.unibremen.swt.see.manager.controller.request.LoginRequest;
+import de.unibremen.swt.see.manager.controller.request.SignupRequest;
+import de.unibremen.swt.see.manager.controller.response.MessageResponse;
+import de.unibremen.swt.see.manager.model.RoleType;
+import de.unibremen.swt.see.manager.model.User;
+import de.unibremen.swt.see.manager.security.JwtUtils;
+import de.unibremen.swt.see.manager.security.UserDetailsImpl;
+import de.unibremen.swt.see.manager.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,16 +24,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import de.unibremen.swt.see.manager.controller.request.ChangePasswordRequest;
-import de.unibremen.swt.see.manager.controller.request.ChangeUsernameRequest;
-import de.unibremen.swt.see.manager.controller.request.LoginRequest;
-import de.unibremen.swt.see.manager.controller.request.SignupRequest;
-import de.unibremen.swt.see.manager.controller.response.MessageResponse;
-import de.unibremen.swt.see.manager.model.RoleType;
-import de.unibremen.swt.see.manager.model.User;
-import de.unibremen.swt.see.manager.security.JwtUtils;
-import de.unibremen.swt.see.manager.security.UserDetailsImpl;
-import de.unibremen.swt.see.manager.service.UserService;
 
 /**
  * Handles HTTP requests for the /user endpoint.

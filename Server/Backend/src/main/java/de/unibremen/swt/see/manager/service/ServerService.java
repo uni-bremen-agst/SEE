@@ -1,19 +1,18 @@
 package de.unibremen.swt.see.manager.service;
 
+import de.unibremen.swt.see.manager.model.File;
+import de.unibremen.swt.see.manager.model.FileType;
+import de.unibremen.swt.see.manager.model.Server;
+import de.unibremen.swt.see.manager.repository.ServerRepository;
+import java.io.IOException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import de.unibremen.swt.see.manager.model.FileType;
-import de.unibremen.swt.see.manager.model.File;
-import de.unibremen.swt.see.manager.model.Server;
-import java.io.IOException;
-
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.*;
-import de.unibremen.swt.see.manager.repository.ServerRepository;
 
 @Service
 @Transactional

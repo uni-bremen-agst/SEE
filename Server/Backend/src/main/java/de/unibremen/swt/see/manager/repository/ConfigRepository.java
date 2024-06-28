@@ -1,9 +1,8 @@
 package de.unibremen.swt.see.manager.repository;
 
-import org.springframework.data.repository.PagingAndSortingRepository;
 import de.unibremen.swt.see.manager.model.Config;
-
 import java.util.Optional;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository

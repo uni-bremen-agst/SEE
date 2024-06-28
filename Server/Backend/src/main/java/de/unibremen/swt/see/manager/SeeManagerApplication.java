@@ -1,22 +1,22 @@
 package de.unibremen.swt.see.manager;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import de.unibremen.swt.see.manager.model.RoleType;
-import de.unibremen.swt.see.manager.model.Role;
 import de.unibremen.swt.see.manager.model.Config;
-import de.unibremen.swt.see.manager.service.FileService;
-import de.unibremen.swt.see.manager.service.ServerService;
-import de.unibremen.swt.see.manager.service.UserService;
-import java.util.Optional;
-import org.springframework.beans.factory.annotation.Value;
+import de.unibremen.swt.see.manager.model.Role;
+import de.unibremen.swt.see.manager.model.RoleType;
 import de.unibremen.swt.see.manager.repository.ConfigRepository;
 import de.unibremen.swt.see.manager.repository.RoleRepository;
 import de.unibremen.swt.see.manager.repository.ServerRepository;
 import de.unibremen.swt.see.manager.repository.UserRepository;
+import de.unibremen.swt.see.manager.service.FileService;
+import de.unibremen.swt.see.manager.service.ServerService;
+import de.unibremen.swt.see.manager.service.UserService;
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
 /**
  * SEE Manager is part of the Software Engineering Experience (SEE).
