@@ -130,7 +130,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             LoadMenu.Disable();
 
-            if (selectedDrawable != null 
+            if (selectedDrawable != null
                 && selectedDrawable.GetComponent<HighlightEffect>() != null)
             {
                 Destroyer.Destroy(selectedDrawable.GetComponent<HighlightEffect>());
@@ -139,8 +139,8 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.Load"/>.
-        /// It provides the user with two loading options. 
-        /// One is to load onto the original drawable, 
+        /// It provides the user with two loading options.
+        /// One is to load onto the original drawable,
         /// and the other is to load onto a specific selected drawable.
         /// </summary>
         /// <returns>Whether this Action is finished</returns>
@@ -151,12 +151,12 @@ namespace SEE.Controls.Actions.Drawable
 
             if (!Raycasting.IsMouseOverGUI())
             {
-                /// This block marks the selected drawable. 
+                /// This block marks the selected drawable.
                 /// If it has already been selected, the marking is cleared.
                 /// For execution, no open file browser should exist.
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
                     && !clicked && Raycasting.RaycastAnything(out RaycastHit hit) &&
-                    (GameFinder.hasDrawable(hit.collider.gameObject) 
+                    (GameFinder.hasDrawable(hit.collider.gameObject)
                         || hit.collider.gameObject.CompareTag(Tags.Drawable))
                     && (browser == null || (browser != null && !browser.IsOpen())))
                 {
@@ -177,7 +177,7 @@ namespace SEE.Controls.Actions.Drawable
                 if (browser != null && browser.TryGetFilePath(out string filePath) && memento != null)
                 {
                     Load(ref result, filePath);
-                } 
+                }
             }
             return result;
         }
@@ -199,9 +199,9 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Manages the highlight effect for drawables. 
-        /// Only one drawable can be highlighted at a time. 
-        /// When a new selection is made, the highlight of the previous drawable is cleared. 
+        /// Manages the highlight effect for drawables.
+        /// Only one drawable can be highlighted at a time.
+        /// When a new selection is made, the highlight of the previous drawable is cleared.
         /// Additionally, the option to deselect the drawable is provided.
         /// </summary>
         /// <param name="drawable">The drawable to be highlighted</param>
@@ -232,9 +232,9 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Executes the corresponding loading option based on the user's choice 
-        /// (load onto the original drawable / load onto a specific drawable). 
-        /// Additionally, when loading onto the original drawable, 
+        /// Executes the corresponding loading option based on the user's choice
+        /// (load onto the original drawable / load onto a specific drawable).
+        /// Additionally, when loading onto the original drawable,
         /// sticky notes are spawned if the drawable does not yet exist in the game world.
         /// </summary>
         /// <param name="result">The referenced bool Result variable from Update to represent the success of the action.</param>
@@ -309,7 +309,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <param name="prefix">The prefix for the drawable type object.</param>
         private void CheckAndChangeID (DrawableType conf, GameObject attachedObjects, string prefix)
         {
-            if (GameFinder.FindChild(attachedObjects, conf.id) != null 
+            if (GameFinder.FindChild(attachedObjects, conf.id) != null
                 && !conf.id.Contains(ValueHolder.MindMapBranchLine))
             {
                 string newName = prefix + "-" + DrawableHolder.GetRandomString(8);
@@ -368,7 +368,7 @@ namespace SEE.Controls.Actions.Drawable
                         /// Deletes the sticky note if it was created by the corresponding load action.
                         if (memento.addedDrawables.Contains(config))
                         {
-                            GameObject drawable = GameFinder.FindDrawable(config.ID, 
+                            GameObject drawable = GameFinder.FindDrawable(config.ID,
                                 config.ParentID);
                             new StickyNoteDeleterNetAction(GameFinder.GetHighestParent(drawable)
                                 .name).Execute();
@@ -448,7 +448,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
-        /// Because this action does not actually change any game object, 
+        /// Because this action does not actually change any game object,
         /// an empty set is always returned.
         /// </summary>
         /// <returns>an empty set</returns>

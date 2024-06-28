@@ -8,6 +8,7 @@ using System.IO;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SEE.UI.Window
 {
@@ -15,28 +16,24 @@ namespace SEE.UI.Window
     {
         private string windowPrefab => UIPrefabFolder + "NoteButtonWindow";
         private GameObject noteButtonWindow;
-        public TMP_InputField contentField;
+        public string contentText;
         private WindowSpace manager;
 
-        public void OpenWindow()
+        public void OpenWindow(UnityAction saveButtonAction, UnityAction loadButtonAction, UnityAction deleteButtonAction, UnityAction refreshButtonAction)
         {
             noteButtonWindow = PrefabInstantiator.InstantiatePrefab(windowPrefab, Canvas.transform, false);
-            noteButtonWindow.name = "NoteButtonWindowlol";
-            manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
-            Debug.Log("manager.Length:" + manager.Windows.Count);
 
             ButtonManagerBasic saveButton = noteButtonWindow.transform.Find("Content/SaveButton").gameObject.MustGetComponent<ButtonManagerBasic>();
-            Debug.Log("SaveButton: " + saveButton);
-            saveButton.clickEvent.AddListener(WriteToFile);
+            saveButton.clickEvent.AddListener(saveButtonAction);
 
             ButtonManagerBasic loadButton = noteButtonWindow.transform.Find("Content/LoadButton").gameObject.MustGetComponent<ButtonManagerBasic>();
-            loadButton.clickEvent.AddListener(LoadFromFile);
+            loadButton.clickEvent.AddListener(loadButtonAction);
 
             ButtonManagerBasic deleteButton = noteButtonWindow.transform.Find("Content/DeleteButton").gameObject.MustGetComponent<ButtonManagerBasic>();
-            deleteButton.clickEvent.AddListener(DeleteFile);
+            deleteButton.clickEvent.AddListener(deleteButtonAction);
 
             ButtonManagerBasic refreshButton = noteButtonWindow.transform.Find("Content/RefreshButton").gameObject.MustGetComponent<ButtonManagerBasic>();
-            //refreshButton.clickEvent.AddListener(LoadNote);
+            refreshButton.clickEvent.AddListener(refreshButtonAction);
 
             /*switchManager = noteButtonWindow.transform.Find("ScrollView/Viewport/Content/Switch").gameObject.MustGetComponent<SwitchManager>();
             switchManager.OnEvents.AddListener(onSwitch);
@@ -47,69 +44,9 @@ namespace SEE.UI.Window
             //contentField.onDeselect.AddListener(_ => SaveNote(switchManager.isOn));
         }
 
-        /// <summary>
-        /// Make the note public.
-        /// </summary>
-        private void onSwitch()
+        public void DestroyWindow()
         {
-            //SaveNote(false);
-            //LoadNote();
-        }
-
-        /// <summary>
-        /// Make the note private.
-        /// </summary>
-        private void offSwitch()
-        {
-            //SaveNote(true);
-            //LoadNote();
-        }
-
-        /// <summary>
-        /// Saves the content into a file.
-        /// </summary>
-        private void WriteToFile()
-        {
-            Debug.Log("Pressed on SaveButton");
-            Debug.Log("manager.Length:" + manager.Windows.Count);
-            BaseWindow activeWindow = manager.ActiveWindow;
-            //string content = activeWindow;
-            Debug.Log("activeWindow.name: " + activeWindow.name);
-            Debug.Log("activeWindow:" + activeWindow);
-            Debug.Log("activeWindow.Window: " + activeWindow.Window);
-
-            /*string path = EditorUtility.SaveFilePanel(
-            "Save Note",
-            "",
-            "Note",
-            "");
-            if (path.Length != 0)
-            {
-                content = contentField.text;
-                if (content != null)
-                    File.WriteAllText(path, content);
-            }*/
-        }
-
-        /// <summary>
-        /// Loads the content from a file.
-        /// </summary>
-        private void LoadFromFile()
-        {
-            string path = EditorUtility.OpenFilePanel("Overwrite with txt", "", "");
-            if (path.Length != 0)
-            {
-                string fileContent = File.ReadAllText(path);
-                contentField.text = fileContent;
-            }
-        }
-
-        /// <summary>
-        /// Deletes the content from the note.
-        /// </summary>
-        private void DeleteFile()
-        {
-            contentField.text = "";
+            Destroyer.Destroy(noteButtonWindow);
         }
     }
 }

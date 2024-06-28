@@ -57,18 +57,6 @@ namespace SEE.UI.Window.NoteWindow
             searchField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
             searchField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
 
-            ButtonManagerBasic saveButton = noteWindow.transform.Find("ScrollView/Viewport/Content/SaveButton").gameObject.MustGetComponent<ButtonManagerBasic>();
-            saveButton.clickEvent.AddListener(WriteToFile);
-
-            ButtonManagerBasic loadButton = noteWindow.transform.Find("ScrollView/Viewport/Content/LoadButton").gameObject.MustGetComponent<ButtonManagerBasic>();
-            loadButton.clickEvent.AddListener(LoadFromFile);
-
-            ButtonManagerBasic deleteButton = noteWindow.transform.Find("ScrollView/Viewport/Content/DeleteButton").gameObject.MustGetComponent<ButtonManagerBasic>();
-            deleteButton.clickEvent.AddListener(DeleteFile);
-
-            ButtonManagerBasic refreshButton = noteWindow.transform.Find("ScrollView/Viewport/Content/RefreshButton").gameObject.MustGetComponent<ButtonManagerBasic>();
-            refreshButton.clickEvent.AddListener(LoadNote);
-
             switchManager = noteWindow.transform.Find("ScrollView/Viewport/Content/Switch").gameObject.MustGetComponent<SwitchManager>();
             switchManager.OnEvents.AddListener(onSwitch);
             switchManager.OffEvents.AddListener(offSwitch);
@@ -96,45 +84,6 @@ namespace SEE.UI.Window.NoteWindow
         {
             SaveNote(true);
             LoadNote();
-        }
-
-        /// <summary>
-        /// Saves the content into a file.
-        /// </summary>
-        private void WriteToFile()
-        {
-            string path = EditorUtility.SaveFilePanel(
-            "Save Note",
-            "",
-            "Note",
-            "");
-            if (path.Length != 0)
-            {
-                string stringData = searchField.text;
-                if (stringData != null)
-                    File.WriteAllText(path, stringData);
-            }
-        }
-
-        /// <summary>
-        /// Loads the content from a file.
-        /// </summary>
-        private void LoadFromFile()
-        {
-            string path = EditorUtility.OpenFilePanel("Overwrite with txt", "", "");
-            if (path.Length != 0)
-            {
-                string fileContent = File.ReadAllText(path);
-                searchField.text = fileContent;
-            }
-        }
-
-        /// <summary>
-        /// Deletes the content from the note.
-        /// </summary>
-        private void DeleteFile()
-        {
-            searchField.text = "";
         }
 
         /// <summary>
