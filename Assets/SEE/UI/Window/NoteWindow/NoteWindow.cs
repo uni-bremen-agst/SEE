@@ -167,6 +167,16 @@ namespace SEE.UI.Window.NoteWindow
             searchField.text = NoteManager.Instance.LoadNote(graphID, isPublic);
         }
 
+        public void OnDestroy()
+        {
+            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+            if (manager.Windows.Count == 0)
+            {
+                GameObject gameObject = GameObject.Find("UI Canvas").transform.Find("NoteButtonWindow(Clone)").gameObject;
+                gameObject.SetActive(false);
+            }
+        }
+
 
         public override void RebuildLayout()
         {

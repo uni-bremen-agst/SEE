@@ -9,12 +9,21 @@ using UnityEngine;
 
 namespace SEE.UI.Window.NoteWindow
 {
+    /// <summary>
+    /// Saves the note through the network on each client.
+    /// </summary>
     public class NoteSaveNetAction : AbstractNetAction
     {
+        /// <summary>
+        /// The GraphElementRef 
+        /// </summary>
         public GraphElementRef graphElementRef;
 
         public bool isPublic;
 
+        /// <summary>
+        /// The content to save from the note.
+        /// </summary>
         public string content;
 
         public NoteSaveNetAction(GraphElementRef graphElementRef, bool isPublic, string content)
@@ -26,10 +35,8 @@ namespace SEE.UI.Window.NoteWindow
 
         protected override void ExecuteOnClient()
         {
-            Debug.Log("SaveNetBeforeIf");
             if (!IsRequester())
             {
-                Debug.Log("SaveNetActionAfterIf");
                 NoteManager.Instance.SaveNote(graphElementRef, isPublic, content);
             }
         }

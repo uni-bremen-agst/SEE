@@ -9,7 +9,7 @@ using UnityEngine;
 namespace SEE.UI.Window.NoteWindow
 {
     /// <summary>
-    /// This class manages the notes. It saves and loads the notes-
+    /// This class manages to save and load the notes.
     /// </summary>
     public class NoteManager : MonoBehaviour
     {
@@ -20,6 +20,9 @@ namespace SEE.UI.Window.NoteWindow
         /// </summary>
         private Material noteMaterial;
 
+        /// <summary>
+        /// Provides a instance of the <see cref="NoteManager"/> class.
+        /// </summary>
         public static NoteManager Instance
         {
             get
@@ -52,44 +55,25 @@ namespace SEE.UI.Window.NoteWindow
         private void FindGameObjects(GraphElementRef graphElementRef)
         {
             GameObject gameObject = graphElementRef.gameObject;
-            if (gameObject.IsNode())
+            if (gameObject != null)
             {
-                noteMaterial = Resources.Load<Material>("Materials/Outliner_MAT");
-                if (gameObject != null)
+                noteMaterial = Resources.Load<Material>(gameObject.IsNode() ? "Materials/Outliner_MAT" : "Materials/OutlinerEdge_MAT");
+                MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
+                if (meshRenderer.materials[meshRenderer.materials.Length - 1].name != noteMaterial.name)
                 {
-                    MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-                    if (meshRenderer.materials[meshRenderer.materials.Length - 1].name != noteMaterial.name)
-                    {
-                        objectList.Add(gameObject);
-                        Material[] materialsArray = new Material[meshRenderer.materials.Length + 1];
-                        Array.Copy(meshRenderer.materials, materialsArray, meshRenderer.materials.Length);
-                        materialsArray[meshRenderer.materials.Length] = noteMaterial;
-                        meshRenderer.materials = materialsArray;
-                    }
-                }
-            }
-            else
-            {
-                noteMaterial = Resources.Load<Material>("Materials/OutlinerEdge_MAT");
-                if (gameObject != null)
-                {
-                    MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-                    if (meshRenderer.materials[meshRenderer.materials.Length - 1].name != noteMaterial.name)
-                    {
-                        objectList.Add(gameObject);
-                        Material[] materialsArray = new Material[meshRenderer.materials.Length + 1];
-                        Array.Copy(meshRenderer.materials, materialsArray, meshRenderer.materials.Length);
-                        materialsArray[meshRenderer.materials.Length] = noteMaterial;
-                        meshRenderer.materials = materialsArray;
-                    }
+                    objectList.Add(gameObject);
+                    Material[] materialsArray = new Material[meshRenderer.materials.Length + 1];
+                    Array.Copy(meshRenderer.materials, materialsArray, meshRenderer.materials.Length);
+                    materialsArray[meshRenderer.materials.Length] = noteMaterial;
+                    meshRenderer.materials = materialsArray;
                 }
             }
         }
 
         /// <summary>
-        /// Saves the note by saving it into <see cref="notesDictionary"/>.
+        /// Saves the note by putting it into <see cref="notesDictionary"/>.
         /// </summary>
-        /// <param name="graphID">the node/edge to save</param>
+        /// <param name="graphElementRef">the node/edge to save</param>
         /// <param name="isPublic">flag whether it should be saved public or private</param>
         /// <param name="content">the content to save</param>
         public void SaveNote(GraphElementRef graphElementRef, bool isPublic, string content)
@@ -118,10 +102,5 @@ namespace SEE.UI.Window.NoteWindow
             }
             return "";
         }
-
-        /*private void OnApplicationQuit()
-        {
-            Destroy(gameObject); // Löscht das GameObject und somit auch die Komponente
-        }*/
     }
 }

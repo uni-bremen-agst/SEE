@@ -191,6 +191,11 @@ namespace SEE.Controls.Actions
             return metricMenu;
         }
 
+        /// <summary>
+        /// Returns a <see cref="NoteWindow"/> where notes can be saved and loaded of <paramref name="graphElementRef"/>.
+        /// </summary>
+        /// <param name="graphElementRef">The graph element to store the note</param>
+        /// <returns>The <see cref="NoteWindow"/> object showing the notes</returns>
         private static NoteWindow CreateNoteWindow(GraphElementRef graphElementRef)
         {
             // Create new window for active selection, or use existing one
@@ -200,6 +205,9 @@ namespace SEE.Controls.Actions
                 noteWindow.Title = "Notes for " + graphElementRef.Elem.ToShortString();
                 noteWindow.graphElementRef = graphElementRef;
             }
+            GameObject gameObject = GameObject.Find("UI Canvas").transform.Find("NoteButtonWindow(Clone)").gameObject;
+            gameObject.SetActive(true);
+
             return noteWindow;
         }
 
