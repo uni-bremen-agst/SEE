@@ -9,6 +9,7 @@ using SEE.Utils;
 using UnityEngine;
 using SEE.DataModel.DG;
 using System;
+using Cysharp.Threading.Tasks;
 using SEE.UI.Window;
 using SEE.Utils.History;
 using SEE.Game.City;
@@ -254,36 +255,38 @@ namespace SEE.Controls.Actions
         public static CodeWindow ShowCode(GraphElementRef graphElementRef)
         {
             GraphElement graphElement = graphElementRef.Elem;
-            CodeWindow codeWindow;
-            if (graphElement.TryGetCommitID(out string commitID))
-            {
-                codeWindow = GetOrCreateCodeWindow(graphElementRef, graphElement.Filename);
-                if (!graphElement.TryGetRepositoryPath(out string repositoryPath))
-                {
-                    string message = $"Selected {GetName(graphElement)} has no repository path.";
-                    ShowNotification.Error("No repository path", message, log: false);
-                    throw new InvalidOperationException(message);
-                }
-                IVersionControl vcs = VersionControlFactory.GetVersionControl(VCSKind.Git, repositoryPath);
-                string[] fileContent = vcs.Show(graphElement.ID, commitID).
-                    Split("\\n", StringSplitOptions.RemoveEmptyEntries);
-                codeWindow.EnterFromText(fileContent);
-            }
-            else
-            {
-                (string filename, string absolutePlatformPath) = GetPath(graphElement);
-                codeWindow = GetOrCreateCodeWindow(graphElementRef, filename);
-                // File name of source code file to read from it
-                codeWindow.EnterFromFile(absolutePlatformPath);
-            }
-
-            // Pass line number to automatically scroll to it, if it exists
-            if (graphElement.SourceLine is { } line)
-            {
-                codeWindow.ScrolledVisibleLine = line;
-            }
-
+            CodeWindow codeWindow = GetOrCreateCodeWindow(graphElementRef, graphElement.Filename);
+            EnterWindowContent().Forget();  // This can happen in the background.
             return codeWindow;
+
+            async UniTaskVoid EnterWindowContent()
+            {
+                // We have to differentiate between a file-based and a VCS-based code city.
+                if (graphElement.TryGetCommitID(out string commitID))
+                {
+                    if (!graphElement.TryGetRepositoryPath(out string repositoryPath))
+                    {
+                        string message = $"Selected {GetName(graphElement)} has no repository path.";
+                        ShowNotification.Error("No repository path", message, log: false);
+                        throw new InvalidOperationException(message);
+                    }
+                    IVersionControl vcs = VersionControlFactory.GetVersionControl(VCSKind.Git, repositoryPath);
+                    string[] fileContent = vcs.Show(graphElement.ID, commitID).
+                        Split("\\n", StringSplitOptions.RemoveEmptyEntries);
+                    codeWindow.EnterFromText(fileContent);
+                }
+                else
+                {
+                    await codeWindow.EnterFromFileAsync(GetPath(graphElement).absolutePlatformPath);
+                }
+
+                // Pass line number to automatically scroll to it, if it exists
+                if (graphElement.SourceLine is { } line)
+                {
+                    codeWindow.ScrolledVisibleLine = line;
+                }
+            }
+
         }
 
         public override bool Update()
@@ -299,6 +302,13 @@ namespace SEE.Controls.Actions
                     return false;
                 }
 
+                ShowCodeWindow();
+            }
+
+            return false;
+
+            void ShowCodeWindow()
+            {
                 // Edges of type Clone will be handled differently. For these, we will be
                 // showing a unified diff.
                 CodeWindow codeWindow = graphElementRef is EdgeRef { Value: { Type: "Clone" } } edgeRef
@@ -313,8 +323,6 @@ namespace SEE.Controls.Actions
                 manager.ActiveWindow = codeWindow;
                 // TODO (#669): Set font size etc in settings (maybe, or maybe that's too much)
             }
-
-            return false;
         }
     }
 }

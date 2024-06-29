@@ -39,7 +39,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         public IssueState State;
 
         /// <summary>
-        /// Whether or not the issue is suppressed or disabled via a control comment.
+        /// Whether the issue is suppressed or disabled via a control comment.
         /// </summary>
         /// <remarks>
         /// This column is only available for projects where importing of suppressed issues is configured

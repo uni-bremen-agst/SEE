@@ -11,6 +11,9 @@ using SEE.UI.Notification;
 using SEE.Net.Dashboard;
 using SEE.Net.Dashboard.Model.Issues;
 using SEE.Scanner;
+using SEE.Scanner.Antlr;
+using SEE.Scanner.LSP;
+using SEE.Tools.LSP;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -68,8 +71,7 @@ namespace SEE.UI.Window.CodeWindow
 
             // Avoid multiple enumeration in case iteration over the data source is expensive.
             tokenList = tokens.ToList();
-            TokenLanguage language = tokenList.FirstOrDefault()?.Language;
-            if (language == null)
+            if (!tokenList.Any())
             {
                 text = "<i>This file is empty.</i>";
                 return;
@@ -77,8 +79,8 @@ namespace SEE.UI.Window.CodeWindow
 
             // Unsurprisingly, each newline token corresponds to a new line.
             // However, we need to also add "hidden" newlines contained in other tokens, e.g. block comments.
-            int assumedLines = tokenList.Count(x => x.TokenType.Equals(SEEToken.Type.Newline))
-                + tokenList.Where(x => !x.TokenType.Equals(SEEToken.Type.Newline))
+            int assumedLines = tokenList.Count(x => x.TokenType.Equals(TokenType.Newline))
+                + tokenList.Where(x => !x.TokenType.Equals(TokenType.Newline))
                            .Aggregate(0, (_, token) => token.Text.Count(x => x == '\n'));
             // Needed padding is the number of lines, because the line number will be at most this long.
             neededPadding = assumedLines.ToString().Length;
@@ -90,16 +92,11 @@ namespace SEE.UI.Window.CodeWindow
 
             foreach (SEEToken token in tokenList)
             {
-                if (token.TokenType == SEEToken.Type.Unknown)
-                {
-                    Debug.LogError($"Unknown token encountered for text '{token.Text}'.\n");
-                }
-
-                if (token.TokenType == SEEToken.Type.Newline)
+                if (token.TokenType == TokenType.Newline)
                 {
                     AppendNewline(ref lineNumber, ref text, neededPadding, token);
                 }
-                else if (token.TokenType != SEEToken.Type.EOF) // Skip EOF token completely.
+                else if (token.TokenType != TokenType.EOF) // Skip EOF token completely.
                 {
                     lineNumber = HandleToken(token);
                 }
@@ -183,15 +180,28 @@ namespace SEE.UI.Window.CodeWindow
                         }
                     }
 
-                    if (token.TokenType == SEEToken.Type.Whitespace)
+                    if (token.TokenType == TokenType.Whitespace)
                     {
                         // We just copy the whitespace verbatim, no need to even color it.
                         // Note: We have to assume that whitespace will not interfere with TMP's XML syntax.
-                        text += line.Replace("\t", new string(' ', language.TabWidth));
+                        text += line.Replace("\t", new string(' ', token.Language.TabWidth));
                     }
                     else
                     {
-                        text += $"<color=#{token.TokenType.Color}><noparse>{line.Replace("/noparse", "")}</noparse></color>";
+                        List<string> tags = token.Modifiers.AsEnumerable().Select(x => x.ToRichTextTag())
+                                                 .Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
+                        foreach (string textTag in tags)
+                        {
+                            text += $"<{textTag}>";
+                        }
+                        text += $"<color=#{token.TokenType.Color}>";
+                        text += $"<noparse>{line.Replace("/noparse", "")}</noparse>";
+                        text += "</color>";
+                        tags.Reverse();
+                        foreach (string textTag in tags)
+                        {
+                            text += $"</{textTag}>";
+                        }
                     }
 
                     // Close any potential issue marking
@@ -220,7 +230,7 @@ namespace SEE.UI.Window.CodeWindow
                     // to determine whether the entity will arrive in this line or not.
                     IList<SEEToken> lineTokens =
                         tokenList.SkipWhile(x => x != currentToken).Skip(1)
-                                 .TakeWhile(x => x.TokenType != SEEToken.Type.Newline
+                                 .TakeWhile(x => x.TokenType != TokenType.Newline
                                                 && !x.Text.Intersect(newlineCharacters).Any()).ToList();
                     string line = lineTokens.Aggregate("", (s, t) => s + t.Text);
                     MatchCollection matches = Regex.Matches(line, Regex.Escape(entityContent));
@@ -326,14 +336,12 @@ namespace SEE.UI.Window.CodeWindow
         }
 
         /// <summary>
-        /// Populates the code window with the contents of the given file.
+        /// Populates the code window with the syntax-highlighted contents of the given file.
         /// This will overwrite any existing text.
+        /// Syntax-highlighting will be done using the LSP, or Antlr if LSP is not configured for this code city.
         /// </summary>
         /// <param name="filename">The platform-specific filename for the file to read.</param>
-        /// <param name="syntaxHighlighting">Whether syntax highlighting shall be enabled.
-        /// The language will be detected by looking at the file extension.
-        /// If the language is not supported, an ArgumentException will be thrown.</param>
-        public void EnterFromFile(string filename, bool syntaxHighlighting = true)
+        public async UniTask EnterFromFileAsync(string filename)
         {
             FilePath = filename;
 
@@ -345,41 +353,68 @@ namespace SEE.UI.Window.CodeWindow
                 return;
             }
 
-            try
+            text = "<color=\"orange\">Loading code window text...</color>";
+            lines = 1;
+
+            // TODO (#250): Maybe disable syntax highlighting for huge files, as it may impact performance badly.
+            using (LoadingSpinner.ShowIndeterminate($"Loading {Path.GetFileName(filename)}..."))
             {
-                // TODO (#250): Maybe disable syntax highlighting for huge files, as it may impact performance badly.
-                if (syntaxHighlighting)
+                GameObject go = SceneQueries.GetCodeCity(transform).gameObject;
+                IEnumerable<SEEToken> tokens;
+                try
                 {
-                    try
+                    // Usage of LSP in code windows must be configured in the LSPHandler,
+                    // the language server must support semantic tokens, and the language of the file
+                    // (inferred from the file extension) must be supported by the server.
+                    if (go.TryGetComponent(out lspHandler) && lspHandler.UseInCodeWindows
+                        && lspHandler.ServerCapabilities.SemanticTokensProvider != null
+                        && TryGetLanguageOrLog(lspHandler, out LSPLanguage language))
                     {
-                        EnterFromTokens(SEEToken.FromFile(filename));
-                        GameObject go = SceneQueries.GetCodeCity(transform)?.gameObject;
-                        if (go && go.TryGetComponentOrLog(out AbstractSEECity city)
-                            && city.ErosionSettings.ShowIssuesInCodeWindow)
-                        {
-                            MarkIssuesAsync(filename).Forget(); // initiate issue search
-                        }
-                        else if (HasStarted)
-                        {
-                            textMesh.SetText(text);
-                            SetupBreakpoints();
-                        }
+                        lspHandler.enabled = true;
+                        lspHandler.OpenDocument(filename);
+                        tokens = await LSPToken.FromFileAsync(filename, lspHandler, language);
                     }
-                    catch (ArgumentException e)
+                    else
                     {
-                        // In case the filetype is not supported, we render the text normally.
-                        Debug.LogError($"Encountered an exception, disabling syntax highlighting: {e}");
+                        lspHandler = null;
+                        tokens = await AntlrToken.FromFileAsync(filename);
                     }
                 }
-                else
+                catch (IOException exception)
                 {
-                    EnterFromText(File.ReadAllLines(filename));
+                    ShowNotification.Error("File access error", $"Couldn't access file {filename}: {exception}");
+                    Destroyer.Destroy(this);
+                    return;
+                }
+                EnterFromTokens(tokens);
+
+                if (HasStarted)
+                {
+                    textMesh.SetText(text);
+                    await UniTask.Yield(); // Wait one frame for the text meshes to be updated.
+                    SetupBreakpoints();
+                }
+
+                if (go.TryGetComponentOrLog(out AbstractSEECity city) && city.ErosionSettings.ShowIssuesInCodeWindow)
+                {
+                    MarkIssuesAsync(filename).Forget(); // initiate issue search in background
                 }
             }
-            catch (IOException exception)
+            return;
+
+            // Returns true iff the language for the given filename is supported by the LSP server.
+            bool TryGetLanguageOrLog(LSPHandler handler, out LSPLanguage language)
             {
-                ShowNotification.Error("File access error", $"Couldn't access file {filename}: {exception}");
-                Destroyer.Destroy(this);
+                string extension = Path.GetExtension(filename).TrimStart('.');
+                language = handler.Server.Languages.FirstOrDefault(x => x.FileExtensions.Contains(extension));
+                if (language == null)
+                {
+                    ShowNotification.Warn("Unsupported LSP language",
+                                          $"Language for extension '{extension}' not supported by the configured LSP server. "
+                                          + "Falling back to Antlr for syntax highlighting, LSP capabilities will not be available.");
+                    return false;
+                }
+                return true;
             }
         }
 

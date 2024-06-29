@@ -13,7 +13,6 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
-using Michsky.UI.ModernUIPack;
 using SEE.Controls;
 using SEE.UI.DebugAdapterProtocol;
 
@@ -223,6 +222,10 @@ namespace SEE.UI.Window.CodeWindow
         {
             DebugBreakpointManager.OnBreakpointAdded -= OnBreakpointAdded;
             DebugBreakpointManager.OnBreakpointRemoved -= OnBreakpointRemoved;
+            if (lspHandler != null)
+            {
+                lspHandler.CloseDocument(FilePath);
+            }
         }
 
         /// <summary>

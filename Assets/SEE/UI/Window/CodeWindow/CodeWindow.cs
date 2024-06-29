@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using SEE.Tools.LSP;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
@@ -51,6 +53,13 @@ namespace SEE.UI.Window.CodeWindow
         /// Number of lines within the file.
         /// </summary>
         private int lines;
+
+        /// <summary>
+        /// The LSP handler for this code window.
+        ///
+        /// Will only be set if the LSP feature is enabled and active for this code window.
+        /// </summary>
+        private LSPHandler lspHandler;
 
         /// <summary>
         /// Path to the code window content prefab.
@@ -225,17 +234,17 @@ namespace SEE.UI.Window.CodeWindow
 
             if (codeValues.Path != null)
             {
-                EnterFromFile(codeValues.Path);
+                EnterFromFileAsync(codeValues.Path).ContinueWith(() => ScrolledVisibleLine = codeValues.VisibleLine).Forget();
             }
             else if (codeValues.Text != null)
             {
                 EnterFromText(codeValues.Text.Split('\n'));
+                ScrolledVisibleLine = codeValues.VisibleLine;
             }
             else
             {
                 throw new ArgumentException("Invalid value object. Either FilePath or Text must not be null.");
             }
-            ScrolledVisibleLine = codeValues.VisibleLine;
         }
 
         public override void UpdateFromNetworkValueObject(WindowValues valueObject)
