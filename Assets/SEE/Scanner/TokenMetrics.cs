@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using SEE.Scanner.Antlr;
 using UnityEngine;
 
 namespace SEE.Scanner
@@ -14,12 +15,12 @@ namespace SEE.Scanner
         /// </summary>
         /// <param name="tokens">The tokens used for which the complexity should be calculated.</param>
         /// <returns>Returns the McCabe cyclomatic complexity.</returns>
-        public static int CalculateMcCabeComplexity(IEnumerable<SEEToken> tokens)
+        public static int CalculateMcCabeComplexity(IEnumerable<AntlrToken> tokens)
         {
             int complexity = 1; // Starting complexity for a single method or function.
 
             // Count decision points (branches).
-            complexity += tokens.Count(t => t.TokenType == SEEToken.Type.BranchKeyword);
+            complexity += tokens.Count(t => t.TokenType == AntlrTokenType.BranchKeyword);
 
             return complexity;
         }
@@ -59,33 +60,33 @@ namespace SEE.Scanner
         /// </summary>
         /// <param name="tokens">The tokens for which the metrics should be calculated.</param>
         /// <returns>Returns the Halstead metrics.</returns>
-        public static HalsteadMetrics CalculateHalsteadMetrics(IEnumerable<SEEToken> tokens)
+        public static HalsteadMetrics CalculateHalsteadMetrics(ICollection<AntlrToken> tokens)
         {
             // Set of token types which are operands.
-            HashSet<SEEToken.Type> operandTypes = new()
+            HashSet<AntlrTokenType> operandTypes = new()
             {
-                SEEToken.Type.Identifier,
-                SEEToken.Type.Keyword,
-                SEEToken.Type.BranchKeyword,
-                SEEToken.Type.NumberLiteral,
-                SEEToken.Type.StringLiteral
+                AntlrTokenType.Identifier,
+                AntlrTokenType.Keyword,
+                AntlrTokenType.BranchKeyword,
+                AntlrTokenType.NumberLiteral,
+                AntlrTokenType.StringLiteral
             };
 
             // Identify operands.
             HashSet<string> operands = new(tokens.Where(t => operandTypes.Contains(t.TokenType)).Select(t => t.Text));
 
             // Identify operators.
-            HashSet<string> operators = new(tokens.Where(t => t.TokenType == SEEToken.Type.Punctuation).Select(t => t.Text));
+            HashSet<string> operators = new(tokens.Where(t => t.TokenType == AntlrTokenType.Punctuation).Select(t => t.Text));
 
             // Count the total number of operands and operators.
             int totalOperands = tokens.Count(t => operandTypes.Contains(t.TokenType));
-            int totalOperators = tokens.Count(t => t.TokenType == SEEToken.Type.Punctuation);
+            int totalOperators = tokens.Count(t => t.TokenType == AntlrTokenType.Punctuation);
 
             // Derivative Halstead metrics.
             int programVocabulary = operators.Count + operands.Count;
             int programLength = totalOperators + totalOperands;
-            float estimatedProgramLength = operators.Count == 0 ? 0 : (float)((operators.Count * Mathf.Log(operators.Count, 2) + operands.Count * Mathf.Log(operands.Count, 2)));
-            float volume = programVocabulary == 0 ? 0 : (float)(programLength * Mathf.Log(programVocabulary, 2));
+            float estimatedProgramLength = operators.Count == 0 ? 0 : operators.Count * Mathf.Log(operators.Count, 2) + operands.Count * Mathf.Log(operands.Count, 2);
+            float volume = programVocabulary == 0 ? 0 : programLength * Mathf.Log(programVocabulary, 2);
             float difficulty = operands.Count == 0 ? 0 : operators.Count / 2.0f * (totalOperands / (float)operands.Count);
             float effort = difficulty * volume;
             float timeRequiredToProgram = effort / 18.0f; // Formula: Time T = effort E / S, where S = Stroud's number of psychological 'moments' per second; typically a figure of 18 is used in Software Science.
@@ -112,25 +113,25 @@ namespace SEE.Scanner
         /// </summary>
         /// <param name="tokens">The tokens for which the lines of code should be counted.</param>
         /// <returns>Returns the number of lines of code.</returns>
-        public static int CalculateLinesOfCode(IEnumerable<SEEToken> tokens)
+        public static int CalculateLinesOfCode(IEnumerable<AntlrToken> tokens)
         {
             int linesOfCode = 0;
             bool comment = false;
 
-            foreach (SEEToken token in tokens)
+            foreach (AntlrToken token in tokens)
             {
-                if (token.TokenType == SEEToken.Type.Newline)
+                if (token.TokenType == TokenType.Newline)
                 {
                     if (!comment)
                     {
                         linesOfCode++;
                     }
                 }
-                else if (token.TokenType == SEEToken.Type.Comment)
+                else if (token.TokenType == AntlrTokenType.Comment)
                 {
                     comment = true;
                 }
-                else if (token.TokenType != SEEToken.Type.Whitespace)
+                else if (token.TokenType != TokenType.Whitespace)
                 {
                     comment = false;
                 }

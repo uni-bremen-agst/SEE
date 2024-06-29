@@ -53,7 +53,7 @@ namespace SEE.Utils
             {
                 if (throwOnTimeout)
                 {
-                    throw new TimeoutException($"Task did not complete within {timeout}.");
+                    throw new TimeoutException($"Task did not complete within {timeout}. (This may also be due to an exception that can't be caught here.)");
                 }
                 else
                 {

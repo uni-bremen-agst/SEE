@@ -185,7 +185,7 @@ namespace SEE.DataModel.DG.IO
                                        CancellationToken token = default)
         {
             // Query all documents whose file extension is supported by the language server.
-            List<string> relevantExtensions = Handler.Server.Languages.SelectMany(x => x.Extensions).ToList();
+            List<string> relevantExtensions = Handler.Server.Languages.SelectMany(x => x.FileExtensions).ToList();
             List<string> relevantDocuments = SourcePaths.SelectMany(RelevantDocumentsForPath)
                                                         .Where(x => ExcludedPaths.All(y => !x.StartsWith(y)))
                                                         .Distinct().ToList();

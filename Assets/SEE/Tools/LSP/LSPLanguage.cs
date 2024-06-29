@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Scanner;
 
 namespace SEE.Tools.LSP
 {
@@ -8,18 +9,8 @@ namespace SEE.Tools.LSP
     /// A programming language supported by a language server.
     /// </summary>
     /// <seealso cref="LSPServer"/>
-    public record LSPLanguage
+    public class LSPLanguage: TokenLanguage
     {
-        /// <summary>
-        /// The name of the language.
-        /// </summary>
-        public string Name { get; }
-
-        /// <summary>
-        /// The file extensions associated with this language.
-        /// </summary>
-        public ISet<string> Extensions { get; }
-
         /// <summary>
         /// A mapping from file extensions to LSP language IDs.
         ///
@@ -33,16 +24,13 @@ namespace SEE.Tools.LSP
         /// <param name="name">The name of the language.</param>
         /// <param name="extensions">The file extensions associated with this language.</param>
         /// <param name="languageIds">A mapping from file extensions to LSP language IDs.</param>
-        private LSPLanguage(string name, ISet<string> extensions, IDictionary<string, string> languageIds = null)
+        private LSPLanguage(string name, ISet<string> extensions, IDictionary<string, string> languageIds = null): base(name, extensions)
         {
             if (name.Contains('/'))
             {
                 throw new ArgumentException("Language name must not contain slashes!");
             }
-            Name = name;
-            Extensions = extensions;
             LanguageIds = languageIds ?? new Dictionary<string, string>();
-            All.Add(this);
         }
 
         /// <summary>
@@ -63,7 +51,7 @@ namespace SEE.Tools.LSP
         /// <returns>The language with the given <paramref name="name"/>.</returns>
         public static LSPLanguage GetByName(string name)
         {
-            return All.First(language => language.Name == name);
+            return AllLspLanguages.First(language => language.Name == name);
         }
 
         public override string ToString()
@@ -71,10 +59,6 @@ namespace SEE.Tools.LSP
             return Name;
         }
 
-        // NOTE: All servers below have been tested first. Before adding a language server to this list,
-        //       please make sure that it actually works in SEE, since we have some special requirements
-        //       (e.g., we require a documentSymbol provider that returns hierarchic `DocumentSymbol` objects).
-        public static readonly IList<LSPLanguage> All = new List<LSPLanguage>();
         public static readonly LSPLanguage C = new("C", new HashSet<string> { "c", "h" }, "c");
         public static readonly LSPLanguage CPP = new("C++", new HashSet<string>
         {
@@ -111,5 +95,10 @@ namespace SEE.Tools.LSP
         }, "typescript");
         public static readonly LSPLanguage XML = new("XML", new HashSet<string> { "xml", "gxl" }, "xml");
         public static readonly LSPLanguage Zig = new("Zig", new HashSet<string> { "zig" }, "zig");
+
+        /// <summary>
+        /// A list of all supported LSP languages.
+        /// </summary>
+        public static readonly IList<LSPLanguage> AllLspLanguages = AllTokenLanguages.OfType<LSPLanguage>().ToList();
     }
 }

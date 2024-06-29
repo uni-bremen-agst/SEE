@@ -76,7 +76,13 @@ namespace SEE.Tools.LSP
         /// Whether to log the communication between the language server and SEE to a temporary file.
         /// </summary>
         [field: SerializeField, HideInInspector]
-        public bool LogLSP { get; set; }
+        public bool LogLSP { get; set; } = true;
+
+        /// <summary>
+        /// Whether to use LSP capabilities in code windows.
+        /// </summary>
+        [field: SerializeField, HideInInspector]
+        public bool UseInCodeWindows { get; set; }
 
         /// <summary>
         /// The language client that is used to communicate with the language server.
@@ -160,7 +166,62 @@ namespace SEE.Tools.LSP
                     LabelSupport = false
                 },
                 Diagnostic = new DiagnosticClientCapabilities(),
-                PublishDiagnostics = new PublishDiagnosticsCapability()
+                PublishDiagnostics = new PublishDiagnosticsCapability(),
+                SemanticTokens = new SemanticTokensCapability()
+                {
+                    Requests = new SemanticTokensCapabilityRequests()
+                    {
+                        Full = new Supports<SemanticTokensCapabilityRequestFull>()
+                    },
+                    Formats = new[]
+                    {
+                        SemanticTokenFormat.Relative
+                    },
+                    TokenModifiers = new[]
+                    {
+                        SemanticTokenModifier.Deprecated,
+                        SemanticTokenModifier.Static,
+                        SemanticTokenModifier.Abstract,
+                        SemanticTokenModifier.Readonly,
+                        SemanticTokenModifier.Async,
+                        SemanticTokenModifier.Declaration,
+                        SemanticTokenModifier.Definition,
+                        SemanticTokenModifier.Documentation,
+                        SemanticTokenModifier.Modification,
+                        SemanticTokenModifier.DefaultLibrary
+                    },
+                    TokenTypes = new[]
+                    {
+                        SemanticTokenType.Comment,
+                        SemanticTokenType.Keyword,
+                        SemanticTokenType.String,
+                        SemanticTokenType.Number,
+                        SemanticTokenType.Regexp,
+                        SemanticTokenType.Operator,
+                        SemanticTokenType.Namespace,
+                        SemanticTokenType.Type,
+                        SemanticTokenType.Struct,
+                        SemanticTokenType.Class,
+                        SemanticTokenType.Interface,
+                        SemanticTokenType.Enum,
+                        SemanticTokenType.TypeParameter,
+                        SemanticTokenType.Function,
+                        SemanticTokenType.Method,
+                        SemanticTokenType.Property,
+                        SemanticTokenType.Macro,
+                        SemanticTokenType.Variable,
+                        SemanticTokenType.Parameter,
+                        SemanticTokenType.Label,
+                        SemanticTokenType.Modifier,
+                        SemanticTokenType.Event,
+                        SemanticTokenType.EnumMember,
+                        SemanticTokenType.Decorator
+                    },
+                    OverlappingTokenSupport = false,
+                    MultilineTokenSupport = false,
+                    ServerCancelSupport = false,
+                    AugmentsSyntaxTokens = false
+                }
             },
             Window = new WindowClientCapabilities
             {
@@ -305,12 +366,12 @@ namespace SEE.Tools.LSP
                 }
             }
 
-            async UniTaskVoid MonitorInitialWorkDoneProgress(ProgressToken token)
+            async UniTaskVoid MonitorInitialWorkDoneProgress(ProgressToken progressToken)
             {
-                await foreach (WorkDoneProgress _ in Client.WorkDoneManager.Monitor(token).ToUniTaskAsyncEnumerable()
+                await foreach (WorkDoneProgress _ in Client.WorkDoneManager.Monitor(progressToken).ToUniTaskAsyncEnumerable()
                                                            .Where(x => x.Kind == WorkDoneProgressKind.End))
                 {
-                    initialWork.Remove(token);
+                    initialWork.Remove(progressToken);
                 }
             }
         }
@@ -636,6 +697,22 @@ namespace SEE.Tools.LSP
                 Position = new Position(line, character),
             };
             return AsyncUtils.ObserveUntilTimeout(t => lspFunction(parameters, t), TimeoutSpan);
+        }
+
+        /// <summary>
+        /// Retrieves semantic tokens for the document at the given <paramref name="path"/>.
+        ///
+        /// Note that the returned semantic tokens may be empty if the document has not been fully analyzed yet.
+        /// </summary>
+        /// <param name="path">The path to the document.</param>
+        /// <returns>The semantic tokens for the document at the given path.</returns>
+        public async UniTask<SemanticTokens> GetSemanticTokensAsync(string path)
+        {
+            SemanticTokensParams parameters = new()
+            {
+                TextDocument = new TextDocumentIdentifier(path)
+            };
+            return await Client.RequestSemanticTokensFull(parameters);
         }
 
         /// <summary>
