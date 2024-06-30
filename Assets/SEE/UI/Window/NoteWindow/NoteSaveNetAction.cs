@@ -15,7 +15,7 @@ namespace SEE.UI.Window.NoteWindow
     public class NoteSaveNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The GraphElementRef 
+        /// The GraphElementRef
         /// </summary>
         public GraphElementRef graphElementRef;
 
@@ -35,8 +35,10 @@ namespace SEE.UI.Window.NoteWindow
 
         protected override void ExecuteOnClient()
         {
+            Debug.Log("BeforeIf");
             if (!IsRequester())
             {
+                Debug.Log("AfterIf");
                 NoteManager.Instance.SaveNote(graphElementRef, isPublic, content);
             }
         }

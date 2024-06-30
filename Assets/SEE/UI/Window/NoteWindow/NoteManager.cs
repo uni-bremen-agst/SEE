@@ -85,6 +85,8 @@ namespace SEE.UI.Window.NoteWindow
                 notesDictionary[keyPair] = content;
                 FindGameObjects(graphElementRef);
             }
+            //Debug.Log("graphRef + isPublic + content " + graphElementRef + isPublic +content);
+            //Debug.Log("notesDictionary.length: " + notesDictionary.Count);
         }
 
         /// <summary>

@@ -9,19 +9,41 @@ using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 namespace SEE.UI.Window
 {
-    public class NoteButtonWindow : PlatformDependentComponent
+    public class NoteButtonWindow : MonoBehaviour
     {
-        private string windowPrefab => UIPrefabFolder + "NoteButtonWindow";
+        private static NoteButtonWindow instance;
+
+        public static NoteButtonWindow Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = FindObjectOfType<NoteButtonWindow>();
+                    if (instance == null)
+                    {
+                        GameObject go = GameObject.Find("NoteManager");
+                        instance = go.AddComponent<NoteButtonWindow>();
+                    }
+                }
+                return instance;
+            }
+        }
+
+        private string windowPrefab = "Prefabs/UI/NoteButtonWindow";
         private GameObject noteButtonWindow;
         public string contentText;
-        private WindowSpace manager;
+        public Toggle publicToggle;
+        public bool flag = false;
 
-        public void OpenWindow(UnityAction saveButtonAction, UnityAction loadButtonAction, UnityAction deleteButtonAction, UnityAction refreshButtonAction)
+        public void OpenWindow(UnityAction saveButtonAction, UnityAction loadButtonAction, UnityAction deleteButtonAction, UnityAction refreshButtonAction,
+            UnityAction<bool> publicToggleAction)
         {
-            noteButtonWindow = PrefabInstantiator.InstantiatePrefab(windowPrefab, Canvas.transform, false);
+            noteButtonWindow = PrefabInstantiator.InstantiatePrefab(windowPrefab, GameObject.Find("UI Canvas").transform, false);
 
             ButtonManagerBasic saveButton = noteButtonWindow.transform.Find("Content/SaveButton").gameObject.MustGetComponent<ButtonManagerBasic>();
             saveButton.clickEvent.AddListener(saveButtonAction);
@@ -35,13 +57,10 @@ namespace SEE.UI.Window
             ButtonManagerBasic refreshButton = noteButtonWindow.transform.Find("Content/RefreshButton").gameObject.MustGetComponent<ButtonManagerBasic>();
             refreshButton.clickEvent.AddListener(refreshButtonAction);
 
-            /*switchManager = noteButtonWindow.transform.Find("ScrollView/Viewport/Content/Switch").gameObject.MustGetComponent<SwitchManager>();
-            switchManager.OnEvents.AddListener(onSwitch);
-            switchManager.OffEvents.AddListener(offSwitch);
+            publicToggle = noteButtonWindow.transform.Find("Content/PublicToggle").gameObject.MustGetComponent<Toggle>();
+            publicToggle.onValueChanged.AddListener(publicToggleAction);
 
-            noteManager = NoteManager.Instance;*/
-
-            //contentField.onDeselect.AddListener(_ => SaveNote(switchManager.isOn));
+            flag = true;
         }
 
         public void DestroyWindow()

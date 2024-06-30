@@ -54,61 +54,12 @@ namespace SEE.Controls.Actions
 
         public override void Start()
         {
+            noteManager = NoteManager.Instance;
+            //noteButtonWindow = new();
+            //GameObject.Find("NoteManager").AddComponent<NoteButtonWindow>();
+
             manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
-            noteButtonWindow = new();
-            NoteWindow activeWin;
-            if (manager.Windows.Count > 0)
-            {
 
-                noteManager = NoteManager.Instance;
-                UnityAction saveButton = () =>
-                {
-                    manager.ActiveWindow.gameObject.TryGetComponent<NoteWindow>(out activeWin);
-                    noteButtonWindow.contentText = activeWin.searchField.text;
-                    string content = noteButtonWindow.contentText;
-                    string path = EditorUtility.SaveFilePanel(
-                    "Save Note",
-                    "",
-                    "Note",
-                    "");
-                    if (path.Length != 0)
-                    {
-                        if (content != null)
-                            File.WriteAllText(path, content);
-                    }
-                };
-
-                UnityAction loadButton = () =>
-                {
-                    manager.ActiveWindow.gameObject.TryGetComponent<NoteWindow>(out activeWin);
-                    string path = EditorUtility.OpenFilePanel("Overwrite with txt", "", "");
-                    if (path.Length != 0)
-                    {
-                        string fileContent = File.ReadAllText(path);
-                        activeWin.searchField.text = fileContent;
-                    }
-                };
-
-                UnityAction deleteButton = () =>
-                {
-                    manager.ActiveWindow.gameObject.TryGetComponent<NoteWindow>(out activeWin);
-                    activeWin.searchField.text = "";
-                    GameObject removeGO = manager.ActiveWindow.gameObject;
-                    RemoveOutline(removeGO);
-                    noteManager.objectList.Remove(removeGO);
-                };
-
-                UnityAction refreshButton = () =>
-                {
-                    manager.ActiveWindow.gameObject.TryGetComponent<NoteWindow>(out activeWin);
-                    string graphID = activeWin.graphElementRef.Elem.ID;
-                    bool isPublic = true;
-                    activeWin.searchField.text = NoteManager.Instance.LoadNote(graphID, isPublic);
-                };
-
-
-                noteButtonWindow.OpenWindow(saveButton, loadButton, deleteButton, refreshButton);
-            }
         }
 
         public override void Stop()
@@ -128,7 +79,7 @@ namespace SEE.Controls.Actions
             //Hide or Show highlightes Nodes/Edges one by one
             if (Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI())
             {
-                var hitElement = Raycasting.RaycastGraphElement(out RaycastHit _, out GraphElementRef _);
+                HitGraphElement hitElement = Raycasting.RaycastGraphElement(out RaycastHit _, out GraphElementRef _);
                 if (hitElement == HitGraphElement.Node || hitElement == HitGraphElement.Edge)
                 {
                     Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef graphElementRef);
@@ -212,8 +163,9 @@ namespace SEE.Controls.Actions
             }
         }
 
-        private void RemoveOutline(GameObject gameObject)
+        public void RemoveOutline(GameObject gameObject)
         {
+            Material noteMaterial = Resources.Load<Material>("Materials/Outliner_MAT");
             MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
             string oldMaterialName = meshRenderer.materials[meshRenderer.materials.Length - 1].name;
             string newName = oldMaterialName.Replace(" (Instance)", "");

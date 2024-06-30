@@ -12,6 +12,7 @@ using System.IO;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace SEE.UI.Window.NoteWindow
@@ -33,9 +34,11 @@ namespace SEE.UI.Window.NoteWindow
         /// </summary>
         public GraphElementRef graphElementRef;
 
-        private SwitchManager switchManager;
+        private NoteButtonWindow noteButtonWindow;
 
         private NoteManager noteManager;
+
+        private WindowSpace manager;
 
         // Start is called before the first frame update
         protected override void StartDesktop()
@@ -49,6 +52,9 @@ namespace SEE.UI.Window.NoteWindow
         /// </summary>
         private void CreateWindow()
         {
+            noteManager = NoteManager.Instance;
+            manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+
             GameObject noteWindow = PrefabInstantiator.InstantiatePrefab(WindowPrefab, Window.transform.Find("Content"), false);
             noteWindow.name = "Note Window";
 
@@ -57,33 +63,96 @@ namespace SEE.UI.Window.NoteWindow
             searchField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
             searchField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
 
-            switchManager = noteWindow.transform.Find("ScrollView/Viewport/Content/Switch").gameObject.MustGetComponent<SwitchManager>();
-            switchManager.OnEvents.AddListener(onSwitch);
-            switchManager.OffEvents.AddListener(offSwitch);
+            // Create Instance of NoteButtonWindow
+            UnityAction saveButton = () =>
+            {
+                noteButtonWindow.contentText = this.searchField.text;
+                string content = noteButtonWindow.contentText;
+                string path = EditorUtility.SaveFilePanel(
+                "Save Note",
+                "",
+                "Note",
+                "");
+                if (path.Length != 0)
+                {
+                    if (content != null)
+                        File.WriteAllText(path, content);
+                }
+            };
 
-            noteManager = NoteManager.Instance;
+            UnityAction loadButton = () =>
+            {
+                string path = EditorUtility.OpenFilePanel("Overwrite with txt", "", "");
+                if (path.Length != 0)
+                {
+                    string fileContent = File.ReadAllText(path);
+                    this.searchField.text = fileContent;
+                }
+            };
 
-            searchField.onDeselect.AddListener(_ => SaveNote(switchManager.isOn));
+            UnityAction deleteButton = () =>
+            {
+                manager.ActiveWindow.gameObject.TryGetComponent<NoteWindow>(out NoteWindow activeWin);
+                activeWin.searchField.text = "";
+                GameObject removeGO = manager.ActiveWindow.gameObject;
+                RemoveOutline(removeGO);
+                noteManager.objectList.Remove(removeGO);
+            };
+
+            UnityAction refreshButton = () =>
+            {
+                string graphID = this.graphElementRef.Elem.ID;
+                bool isPublic = true;
+                this.searchField.text = NoteManager.Instance.LoadNote(graphID, isPublic);
+            };
+
+            UnityAction<bool> publicToggle = (bool isPublic) =>
+            {
+                manager.ActiveWindow.gameObject.TryGetComponent<NoteWindow>(out NoteWindow activeWin);
+                string content = activeWin.searchField.text;
+                string graphID = activeWin.graphElementRef.Elem.ID;
+
+                if (!isPublic)
+                {
+                    NoteManager.Instance.SaveNote(activeWin.graphElementRef, !isPublic, content);
+                    new NoteSaveNetAction(activeWin.graphElementRef, !isPublic, content).Execute();
+                }
+                else
+                {
+                    NoteManager.Instance.SaveNote(activeWin.graphElementRef, !isPublic, content);
+                }
+                //Load Notes
+                activeWin.searchField.text = NoteManager.Instance.LoadNote(graphID, isPublic);
+                //Debug.Log("activeWin.Text: " + content);
+            };
+
+            noteButtonWindow = NoteButtonWindow.Instance;
+
+            if (noteButtonWindow.flag != true)
+            {
+                noteButtonWindow.OpenWindow(saveButton, loadButton, deleteButton, refreshButton, publicToggle);
+            }
+
+            searchField.onDeselect.AddListener(_ => SaveNote(noteButtonWindow.publicToggle.isOn));
 
             LoadNote();
+
+
         }
 
-        /// <summary>
-        /// Make the note public.
-        /// </summary>
-        private void onSwitch()
-        {
-            SaveNote(false);
-            LoadNote();
-        }
 
-        /// <summary>
-        /// Make the note private.
-        /// </summary>
-        private void offSwitch()
+        private void RemoveOutline(GameObject gameObject)
         {
-            SaveNote(true);
-            LoadNote();
+            Material noteMaterial = Resources.Load<Material>("Materials/Outliner_MAT");
+            MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
+            string oldMaterialName = meshRenderer.materials[meshRenderer.materials.Length - 1].name;
+            string newName = oldMaterialName.Replace(" (Instance)", "");
+            if (newName == noteMaterial.name)
+            {
+                Material[] gameObjects = new Material[meshRenderer.materials.Length - 1];
+                Array.Copy(meshRenderer.materials, gameObjects, meshRenderer.materials.Length - 1);
+                meshRenderer.materials = gameObjects;
+            }
         }
 
         /// <summary>
@@ -112,20 +181,30 @@ namespace SEE.UI.Window.NoteWindow
         public void LoadNote()
         {
             string graphID = graphElementRef.Elem.ID;
-            bool isPublic = switchManager.isOn;
+            bool isPublic = false;
             searchField.text = NoteManager.Instance.LoadNote(graphID, isPublic);
         }
 
         public void OnDestroy()
         {
-            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
-            if (manager.Windows.Count == 0)
+            if (!ContainsNoteWindow())
             {
-                GameObject gameObject = GameObject.Find("UI Canvas").transform.Find("NoteButtonWindow(Clone)").gameObject;
-                gameObject.SetActive(false);
+                noteButtonWindow.DestroyWindow();
             }
         }
 
+        private bool ContainsNoteWindow()
+        {
+            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+            foreach (BaseWindow baseWindow in manager.Windows)
+            {
+                if (baseWindow.gameObject.GetComponent<NoteWindow>())
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         public override void RebuildLayout()
         {
