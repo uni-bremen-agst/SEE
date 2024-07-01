@@ -66,8 +66,8 @@ namespace SEE.UI.Menu.Drawable
             /// Initialize the edit scale button.
             Scale(stickyNote, callback);
 
-            /// Initialize the lightning switch manager.
-            Lightning(stickyNote, newConfig);
+            /// Initialize the lighting switch manager.
+            Lighting(stickyNote, newConfig);
         }
 
         /// <summary>
@@ -91,31 +91,31 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the lightning switch manager and adds the required handler.
-        /// The handler executes the <see cref="GameStickyNoteManager.ChangeLightning"/>
-        /// and saves the new lightning state in the configuration.
+        /// Initializes the lighting switch manager and adds the required handler.
+        /// The handler executes the <see cref="GameStickyNoteManager.ChangeLighting"/>
+        /// and saves the new lighting state in the configuration.
         /// </summary>
-        /// <param name="stickyNote">The sticky note which lightning should be changed.</param>
+        /// <param name="stickyNote">The sticky note which lighting should be changed.</param>
         /// <param name="newConfig">The configuration which holds the new values.</param>
-        private static void Lightning(GameObject stickyNote, DrawableConfig newConfig)
+        private static void Lighting(GameObject stickyNote, DrawableConfig newConfig)
         {
-            SwitchManager lightningManager = instance.GetComponentInChildren<SwitchManager>();
-            lightningManager.OffEvents.AddListener(() =>
+            SwitchManager lightingManager = instance.GetComponentInChildren<SwitchManager>();
+            lightingManager.OffEvents.AddListener(() =>
             {
-                newConfig.Lightning = false;
-                GameDrawableManager.ChangeLightning(stickyNote, false);
-                new DrawableChangeLightningNetAction(newConfig).Execute();
+                newConfig.Lighting = false;
+                GameDrawableManager.ChangeLighting(stickyNote, false);
+                new DrawableChangeLightingNetAction(newConfig).Execute();
             });
-            lightningManager.OnEvents.AddListener(() =>
+            lightingManager.OnEvents.AddListener(() =>
             {
-                newConfig.Lightning = true;
-                GameDrawableManager.ChangeLightning(stickyNote, true);
-                new DrawableChangeLightningNetAction(newConfig).Execute();
+                newConfig.Lighting = true;
+                GameDrawableManager.ChangeLighting(stickyNote, true);
+                new DrawableChangeLightingNetAction(newConfig).Execute();
             });
 
             /// Assigns the current status to the switch and updates the UI.
-            lightningManager.isOn = newConfig.Lightning;
-            lightningManager.UpdateUI();
+            lightingManager.isOn = newConfig.Lighting;
+            lightingManager.UpdateUI();
         }
 
         /// <summary>

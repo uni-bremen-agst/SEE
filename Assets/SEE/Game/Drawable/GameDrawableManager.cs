@@ -27,7 +27,7 @@ namespace Assets.SEE.Game.Drawable
         /// </summary>
         /// <param name="obj">An object of the drawable.</param>
         /// <param name="state">The state of the light. true = on; false = off.</param>
-        public static void ChangeLightning(GameObject obj, bool state)
+        public static void ChangeLighting(GameObject obj, bool state)
         {
             Transform transform = GameFinder.GetDrawableSurfaceParent(obj).transform;
             transform.GetComponentInChildren<Light>().enabled = state;
@@ -79,11 +79,42 @@ namespace Assets.SEE.Game.Drawable
             if (surface != null && surface.CompareTag(Tags.Drawable))
             { 
                 ChangeColor(surface, config.Color);
-                ChangeLightning(surfaceParent, config.Lightning);
+                ChangeLighting(surfaceParent, config.Lighting);
                 ChangeOrderInLayer(surface, config.OrderInLayer);
                 ChangeDescription(surface, config.Description);
                 ChangeVisibility(surface, config.Visibility);
             }
+        }
+
+        /// <summary>
+        /// Query to check if the drawable surface have a description.
+        /// </summary>
+        /// <param name="obj">An object of the drawable.</param>
+        /// <returns>True if the surface have a description.</returns>
+        public static bool HasDescription(GameObject obj)
+        {
+            DrawableConfig config = DrawableConfigManager.GetDrawableConfig(GameFinder.GetDrawableSurface(obj));
+            return !string.IsNullOrWhiteSpace(config.Description) && !string.IsNullOrEmpty(config.Description);
+        }
+
+        /// <summary>
+        /// Query to check if the drawable surface have an active lighting.
+        /// </summary>
+        /// <param name="obj">An object of the drawable.</param>
+        /// <returns>True if the surface have an active lighting.</returns>
+        public static bool IsLighting(GameObject obj)
+        {
+            return DrawableConfigManager.GetDrawableConfig(GameFinder.GetDrawableSurface(obj)).Lighting;
+        }
+
+        /// <summary>
+        /// Query to check if the drawable is visible.
+        /// </summary>
+        /// <param name="obj">An object of the drawable.</param>
+        /// <returns>True if the surface is visible.</returns>
+        public static bool IsVisible(GameObject obj)
+        {
+            return DrawableConfigManager.GetDrawableConfig(GameFinder.GetDrawableSurface(obj)).Visibility;
         }
     }
 }

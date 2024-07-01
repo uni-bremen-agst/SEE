@@ -7,9 +7,9 @@ using UnityEngine;
 namespace Assets.SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is reponsible for change the drawable lightning on all clients.
+    /// This class is reponsible for change the drawable lighting on all clients.
     /// </summary>
-    public class DrawableChangeLightningNetAction : AbstractNetAction
+    public class DrawableChangeLightingNetAction : AbstractNetAction
     {
         /// <summary>
         /// The drawable that should be changed.
@@ -19,7 +19,7 @@ namespace Assets.SEE.Net.Actions.Drawable
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        public DrawableChangeLightningNetAction(DrawableConfig config)
+        public DrawableChangeLightingNetAction(DrawableConfig config)
         {
             this.DrawableConf = config;
         }
@@ -33,14 +33,14 @@ namespace Assets.SEE.Net.Actions.Drawable
         }
 
         /// <summary>
-        /// Changes the lightning of the drawable on each client.
+        /// Changes the lighting of the drawable on each client.
         /// </summary>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
             {
                 GameObject surface = GameFinder.FindDrawableSurface(DrawableConf.ID, DrawableConf.ParentID);
-                GameDrawableManager.ChangeLightning(surface.transform.parent.gameObject, DrawableConf.Lightning);
+                GameDrawableManager.ChangeLighting(surface.transform.parent.gameObject, DrawableConf.Lighting);
             }
         }
     }

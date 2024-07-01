@@ -1,9 +1,12 @@
-﻿using SEE.Game.Drawable;
+﻿using SEE.Game;
+using SEE.Game.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.Window;
+using SEE.UI.Window.TreeWindow;
 using SEE.Utils;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.SEE.UI.Window.DrawableManagerWindow
@@ -30,6 +33,11 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
         private RectTransform items;
 
         /// <summary>
+        /// The context menu that is displayed when the user uses the filter, group or sort buttons.
+        /// </summary>
+        private DrawableWindowContextMenu contextMenu;
+
+        /// <summary>
         /// TODO: BRauchen wir?
         /// </summary>
         private IDisposable subscription;
@@ -37,11 +45,25 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
         /// <summary>
         /// Adds the drawable surfaces of the visualization to the drawable manager view.
         /// </summary>
-        private void AddDrawableSurfaces()
+        /// <param name="surfaces">The surfaces to be added, if it is not set all surfaces of the scene will be added.</param>
+        private void AddDrawableSurfaces(List<GameObject> surfaces = null)
         {
-            foreach (GameObject surface in ValueHolder.DrawableSurfaces)
+            if (surfaces != null)
             {
-                AddItem(surface);
+                foreach (GameObject surface in surfaces)
+                {
+                    if (surface.CompareTag(Tags.Drawable))
+                    {
+                        AddItem(surface);
+                    }
+                }
+            }
+            else
+            {
+                foreach (GameObject surface in ValueHolder.DrawableSurfaces)
+                {
+                    AddItem(surface);
+                }
             }
         }
 

@@ -893,7 +893,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             return original.Scale.Equals(changed.Scale) && original.Color.Equals(changed.Color) 
                 && original.Rotation.Equals(changed.Rotation) && original.Order.Equals(changed.Order)
-                && original.Lightning.Equals(changed.Lightning);
+                && original.Lighting.Equals(changed.Lighting);
         }
 
         /// <summary>

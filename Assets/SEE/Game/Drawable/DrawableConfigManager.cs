@@ -199,10 +199,10 @@ namespace SEE.Game.Drawable
                 {
                     order = transform.GetComponentInParent<OrderInLayerValueHolder>().OrderInLayer;
                 }
-                bool lightning = false;
+                bool lighting = false;
                 if (GameFinder.GetHighestParent(surface).transform.GetComponentInChildren<Light>() != null)
                 {
-                    lightning = GameFinder.GetHighestParent(surface).transform.GetComponentInChildren<Light>().enabled;
+                    lighting = GameFinder.GetHighestParent(surface).transform.GetComponentInChildren<Light>().enabled;
                 }
                 
                 bool visibility = GameFinder.GetHighestParent(surface).activeInHierarchy;
@@ -218,7 +218,7 @@ namespace SEE.Game.Drawable
                     Scale = transform.localScale,
                     Color = surface.GetComponent<MeshRenderer>().material.color,
                     Order = order,
-                    Lightning = lightning,
+                    Lighting = lighting,
                     OrderInLayer = holder.OrderInLayer,
                     Description = holder.Description,
                     Visibility = visibility

@@ -100,7 +100,7 @@ namespace SEE.Game.Drawable
             stickyNote.name = config.ParentID;
             stickyNote.transform.localScale = config.Scale;
             GameFinder.GetDrawableSurface(stickyNote).GetComponent<MeshRenderer>().material.color = config.Color;
-            stickyNote.transform.GetComponentInChildren<Light>().enabled = config.Lightning;
+            stickyNote.transform.GetComponentInChildren<Light>().enabled = config.Lighting;
 
             /// Adds an order in layer value holder to the sticky note and sets the necessary values.
             OrderInLayerValueHolder holder = stickyNote.AddComponent<OrderInLayerValueHolder>();

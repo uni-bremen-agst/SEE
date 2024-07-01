@@ -51,9 +51,9 @@ namespace SEE.Game.Drawable.Configurations
         public int Order;
 
         /// <summary>
-        /// The lightning state of the drawable.
+        /// The lighting state of the drawable.
         /// </summary>
-        public bool Lightning;
+        public bool Lighting;
 
         /// <summary>
         /// The current order in layer of the drawable.
@@ -173,9 +173,9 @@ namespace SEE.Game.Drawable.Configurations
         private const string OrderLabel = "Order";
 
         /// <summary>
-        /// The label for the lightning of a drawable in the configuration file.
+        /// The label for the lighting of a drawable in the configuration file.
         /// </summary>
-        private const string LightningLabel = "Lightning";
+        private const string LightingLabel = "Lighting";
 
         /// <summary>
         /// The label for the order in layer of a drawable in the configuration file.
@@ -225,7 +225,7 @@ namespace SEE.Game.Drawable.Configurations
             writer.Save(Scale, ScaleLabel);
             writer.Save(Color, ColorLabel);
             writer.Save(Order, OrderLabel);
-            writer.Save(Lightning, LightningLabel);
+            writer.Save(Lighting, LightingLabel);
             writer.Save(OrderInLayer, OrderInLayerLabel);
             writer.Save(Description, DescriptionLabel);
             writer.Save(Visibility, VisibilityLabel);
@@ -354,14 +354,14 @@ namespace SEE.Game.Drawable.Configurations
                 errorFree = false;
             }
 
-            /// Try to restore the lightning status.
-            if (attributes.TryGetValue(LightningLabel, out object status))
+            /// Try to restore the lighting status.
+            if (attributes.TryGetValue(LightingLabel, out object status))
             {
-                Lightning = (bool)status;
+                Lighting = (bool)status;
             }
             else
             {
-                Lightning = false;
+                Lighting = false;
                 errorFree = false;
             }
 
@@ -381,7 +381,7 @@ namespace SEE.Game.Drawable.Configurations
                 errorFree = false;
             }
 
-            /// Try to restore the lightning status.
+            /// Try to restore the lighting status.
             if (attributes.TryGetValue(VisibilityLabel, out object visibility))
             {
                 Visibility = (bool)visibility;

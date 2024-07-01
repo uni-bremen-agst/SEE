@@ -143,7 +143,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     browser = Canvas.AddOrGetComponent<DrawableFileBrowser>();
                     browser.SaveDrawableConfiguration(SaveState.All);
-                    List<GameObject> drawables = new(GameObject.FindGameObjectsWithTag(Tags.Drawable));
+                    List<GameObject> drawables = ValueHolder.DrawableSurfaces;//new(GameObject.FindGameObjectsWithTag(Tags.Drawable));
                     DrawableConfig[] configs = new DrawableConfig[drawables.Count];
                     for (int i = 0; i < configs.Length; i++)
                     {
