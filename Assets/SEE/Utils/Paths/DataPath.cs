@@ -299,7 +299,7 @@ namespace SEE.Utils.Paths
                     {
                         // The path relates to our server.
                         AbsolutePath = string.Empty;
-                        AbsolutePath = path.Replace(Network.ClientRestAPI, string.Empty);
+                        RelativePath = path.Replace(Network.ClientRestAPI, string.Empty);
                     }
                     else
                     {
