@@ -11,6 +11,11 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System.Collections.Generic;
+using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
+using Michsky.UI.ModernUIPack;
+using SEE.Controls;
+using SEE.UI.DebugAdapterProtocol;
 
 namespace SEE.UI.Window.CodeWindow
 {
@@ -19,6 +24,16 @@ namespace SEE.UI.Window.CodeWindow
     /// </summary>
     public partial class CodeWindow
     {
+        /// <summary>
+        /// The scroll area.
+        /// </summary>
+        private GameObject scrollable;
+
+        /// <summary>
+        /// The container for breakpoints.
+        /// </summary>
+        private GameObject breakpoints;
+
         /// <summary>
         /// Scrollbar which controls the currently visible area of the code window.
         /// </summary>
@@ -34,7 +49,7 @@ namespace SEE.UI.Window.CodeWindow
 
             base.StartDesktop();
 
-            GameObject scrollable = PrefabInstantiator.InstantiatePrefab(codeWindowPrefab, Window.transform.Find("Content"), false);
+            scrollable = PrefabInstantiator.InstantiatePrefab(codeWindowPrefab, Window.transform.Find("Content"), false);
             scrollable.name = "Scrollable";
 
             // Set text and preferred font size
@@ -45,7 +60,12 @@ namespace SEE.UI.Window.CodeWindow
                 textMesh.text = text;
             }
 
-            if (SceneQueries.GetCodeCity(transform).gameObject.TryGetComponentOrLog(out AbstractSEECity city)) {
+            breakpoints = code.transform.Find("Breakpoints").gameObject;
+            DebugBreakpointManager.OnBreakpointAdded += OnBreakpointAdded;
+            DebugBreakpointManager.OnBreakpointRemoved += OnBreakpointRemoved;
+
+            Transform temp = SceneQueries.GetCodeCity(transform);
+            if (temp && temp.gameObject.TryGetComponentOrLog(out AbstractSEECity city)) {
                 // Get button for IDE interaction and register events.
                 Window.transform.Find("Dragger/IDEButton").gameObject.GetComponent<Button>()
                       .onClick.AddListener(() =>
@@ -84,12 +104,55 @@ namespace SEE.UI.Window.CodeWindow
 
             // Animate scrollbar to scroll to desired line
             ScrolledVisibleLine = Mathf.Clamp(Mathf.FloorToInt(preStartLine), 1, lines);
+
+            SetupBreakpoints();
         }
 
         /// <summary>
-        /// Tooltip containing all issue descriptions.
+        /// Sets up the breakpoints.
         /// </summary>
-        private Tooltip.Tooltip issueTooltip;
+        private void SetupBreakpoints()
+        {
+            bool needsBreakpoints = FilePath != null;
+
+            // destroys previous breakpoints
+            foreach (Transform child in breakpoints.transform)
+            {
+                Destroyer.Destroy(child.gameObject);
+            }
+
+            // disables container (not absolutely necessary, but indicates whether it works correctly)
+            breakpoints.SetActive(needsBreakpoints);
+
+            // updates indentation of code depending on breakpoints
+            float width = textMesh.textInfo.lineInfo[0].lineHeight;
+            Vector4 margin = textMesh.margin;
+            margin.x = needsBreakpoints ? width : 0;
+            textMesh.margin = margin;
+
+            // doesn't need breakpoints without file path
+            if (!needsBreakpoints)
+            {
+                return;
+            }
+
+            Dictionary<int, SourceBreakpoint> fileBreakpoints = DebugBreakpointManager.Breakpoints.GetValueOrDefault(FilePath.Replace("/", "\\"));
+            for (int i = 0; i <= lines; i++)
+            {
+                int line = i + 1;
+
+                float height = textMesh.textInfo.lineInfo[i].lineHeight;
+
+                GameObject breakpoint = PrefabInstantiator.InstantiatePrefab(breakpointPrefab, breakpoints.transform, false);
+                ((RectTransform)breakpoint.transform).sizeDelta = new Vector2(width, height);
+
+                TextMeshProUGUI buttonMesh = breakpoint.MustGetComponent<TextMeshProUGUI>();
+                buttonMesh.color = fileBreakpoints != null && fileBreakpoints.ContainsKey(line) ? breakpointColorActive : breakpointColorInactive;
+
+                Button button = breakpoint.MustGetComponent<Button>();
+                button.onClick.AddListener(() => DebugBreakpointManager.ToggleBreakpoint(FilePath.Replace("/", "\\"), line));
+            }
+        }
 
         protected override void UpdateDesktop()
         {
@@ -101,22 +164,32 @@ namespace SEE.UI.Window.CodeWindow
                 if (link != -1)
                 {
                     char linkId = textMesh.textInfo.linkInfo[link].GetLinkID()[0];
-                    issueTooltip ??= gameObject.AddComponent<Tooltip.Tooltip>();
                     // Display tooltip containing all issue descriptions
                     UniTask.WhenAll(issueDictionary[linkId].Select(x => x.ToDisplayStringAsync()))
-                           .ContinueWith(x => issueTooltip.Show(string.Join("\n", x), 0f))
+                           .ContinueWith(x => Tooltip.ActivateWith(string.Join("\n", x), Tooltip.AfterShownBehavior.HideUntilActivated))
                            .Forget();
                 }
-                else if (issueTooltip != null)
-                {
-                    // Hide tooltip by clicking somewhere else
-                    issueTooltip.Hide();
-                }
             }
-            else if (issueDictionary.Count != 0 && Input.GetMouseButtonDown(1) && issueTooltip != null)
+
+            if (WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer].ActiveWindow == this)
             {
-                // Hide tooltip by right-clicking
-                issueTooltip.Hide();
+                // detecting word hovers
+                int index = TMP_TextUtilities.FindIntersectingWord(textMesh, Input.mousePosition, null);
+                TMP_WordInfo? hoveredWord = index >= 0 && index < textMesh.textInfo.wordCount ? textMesh.textInfo.wordInfo[index] : null;
+                if (lastHoveredWord is null && hoveredWord is not null)
+                {
+                    OnWordHoverBegin?.Invoke(this, (TMP_WordInfo)hoveredWord);
+                }
+                else if (lastHoveredWord is not null && hoveredWord is null)
+                {
+                    OnWordHoverEnd?.Invoke(this, (TMP_WordInfo)lastHoveredWord);
+                }
+                else if (!lastHoveredWord.Equals(hoveredWord))
+                {
+                    OnWordHoverEnd?.Invoke(this, (TMP_WordInfo)lastHoveredWord);
+                    OnWordHoverBegin?.Invoke(this, (TMP_WordInfo)hoveredWord);
+                }
+                lastHoveredWord = hoveredWord;
             }
         }
 
@@ -140,6 +213,47 @@ namespace SEE.UI.Window.CodeWindow
             if (lines > 0 && Window.transform.Find("Content/Scrollable").gameObject.TryGetComponentOrLog(out RectTransform rect))
             {
                 excessLines = Mathf.CeilToInt(rect.rect.height / textMesh.textInfo.lineInfo[0].lineHeight) - 2;
+            }
+        }
+
+        /// <summary>
+        /// Removes listeners.
+        /// </summary>
+        private void OnDestroy()
+        {
+            DebugBreakpointManager.OnBreakpointAdded -= OnBreakpointAdded;
+            DebugBreakpointManager.OnBreakpointRemoved -= OnBreakpointRemoved;
+        }
+
+        /// <summary>
+        /// Sets the color for added breakpoints.
+        /// </summary>
+        /// <param name="path">The file path.</param>
+        /// <param name="line">The source code line.</param>
+        private void OnBreakpointAdded(string path, int line)
+        {
+            if (path == FilePath.Replace("/", "\\"))
+            {
+                GameObject breakpoint = scrollable.transform.Find("Code/Breakpoints").GetChild(line - 1).gameObject;
+
+                TextMeshProUGUI buttonMesh = breakpoint.MustGetComponent<TextMeshProUGUI>();
+                buttonMesh.color = breakpointColorActive;
+            }
+        }
+
+        /// <summary>
+        /// Sets the color for removed breakpoints.
+        /// </summary>
+        /// <param name="path">The file path.</param>
+        /// <param name="line">The source code line.</param>
+        private void OnBreakpointRemoved(string path, int line)
+        {
+            if (path == FilePath)
+            {
+                GameObject breakpoint = scrollable.transform.Find("Code/Breakpoints").GetChild(line - 1).gameObject;
+
+                TextMeshProUGUI buttonMesh = breakpoint.MustGetComponent<TextMeshProUGUI>();
+                buttonMesh.color = breakpointColorInactive;
             }
         }
     }

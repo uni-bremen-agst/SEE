@@ -66,6 +66,26 @@ namespace SEE.Utils.Paths
         }
 
         /// <summary>
+        /// Default constructor for a new data path. The path will be empty.
+        /// </summary>
+        public DataPath()
+        {
+        }
+
+        /// <summary>
+        /// Constructor for a new data path with the given <paramref name="path"/>.
+        ///
+        /// The <paramref name="path"/> can be anything, a URL, a file path, or a
+        /// directory path. This constructor is equivalent to setting the <see cref="Path"/>
+        /// to <paramref name="path"/>
+        /// </summary>
+        /// <param name="path">the path</param>
+        public DataPath(string path)
+        {
+           Path = path;
+        }
+
+        /// <summary>
         /// Defines how the stored path is to be interpreted.
         /// </summary>
         [SerializeField] public RootKind Root = RootKind.AssetsFolder;
@@ -279,7 +299,7 @@ namespace SEE.Utils.Paths
                     {
                         // The path relates to our server.
                         AbsolutePath = string.Empty;
-                        AbsolutePath = path.Replace(Network.ClientRestAPI, string.Empty);
+                        RelativePath = path.Replace(Network.ClientRestAPI, string.Empty);
                     }
                     else
                     {

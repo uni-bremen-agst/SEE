@@ -163,22 +163,54 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Here we only test whether data can be read from a URL. The nodes in the
         /// referenced file are not actually in the graph. So we expect error
-        /// messages. But these are indication that the download and processing as
-        /// such work.
+        /// messages. Yet, we will add one package node to the graph that we
+        /// know is contained in the JaCoCo XML file. We will then check whether
+        /// the metrics are set correctly. There are more nodes in the file, but
+        /// we will ignore these.
         /// </summary>
         [Test]
-        public void TestLoadAsyncMethod()
+        public async Task TestLoadAsyncMethodAsync()
         {
+            // Note: LogAssert.Expect(LogType.Error, new Regex(".*No node found for.*"))
+            // does not work as expected in combination with awaiting an asynchronous
+            // message. So we have to ignore all error messages.
+            LogAssert.ignoreFailingMessages = true;
+
             DataPath path = new()
             {
                 Root = DataPath.RootKind.Url,
                 Path = "https://raw.githubusercontent.com/vokal/jacoco-parse/master/test/assets/sample.xml"
             };
-            UniTask.ToCoroutine(async () =>
+
+            // We know this package node exists in the JaCoCo XML file.
+            Node nodeToTest = new()
             {
-                await JaCoCoImporter.LoadAsync(graph, path);
-                LogAssert.Expect(LogType.Error, new Regex(@".*No node found for.*"));
-            });
+                // Note: In the graph, the separator for qualified names is a dot, whereas a / is used in the
+                // JaCoCo XML file.
+                ID = "com.wmbest.myapplicationtest",
+                Type = "package"
+            };
+            graph.AddNode(nodeToTest);
+
+            await JaCoCoImporter.LoadAsync(graph, path);
+
+            Assert.AreEqual(30, nodeToTest.GetInt(JaCoCo.InstructionMissed));
+            Assert.AreEqual(10, nodeToTest.GetInt(JaCoCo.InstructionCovered));
+
+            Assert.AreEqual(3, nodeToTest.GetInt(JaCoCo.BranchMissed));
+            Assert.AreEqual(1, nodeToTest.GetInt(JaCoCo.BranchCovered));
+
+            Assert.AreEqual(10, nodeToTest.GetInt(JaCoCo.LineMissed));
+            Assert.AreEqual(3, nodeToTest.GetInt(JaCoCo.LineCovered));
+
+            Assert.AreEqual(6, nodeToTest.GetInt(JaCoCo.ComplexityMissed));
+            Assert.AreEqual(1, nodeToTest.GetInt(JaCoCo.ComplexityCovered));
+
+            Assert.AreEqual(4, nodeToTest.GetInt(JaCoCo.MethodMissed));
+            Assert.AreEqual(1, nodeToTest.GetInt(JaCoCo.MethodCovered));
+
+            Assert.AreEqual(0, nodeToTest.GetInt(JaCoCo.ClassMissed));
+            Assert.AreEqual(1, nodeToTest.GetInt(JaCoCo.ClassCovered));
         }
     }
 }
