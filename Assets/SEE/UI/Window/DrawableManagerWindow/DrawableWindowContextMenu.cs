@@ -6,6 +6,7 @@ using UnityEngine;
 using SEE.Utils;
 using UnityEngine.Events;
 using SEE.Game.Drawable;
+using SEE.UI.Window.TreeWindow;
 
 namespace Assets.SEE.UI.Window.DrawableManagerWindow
 {
@@ -65,12 +66,12 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
 
             ResetFilter();
             //ResetSort();
-            //ResetGrouping();
+            ResetGrouping();
             this.filterButton.clickEvent.AddListener(ShowFilterMenu);
             //this.sortButton.clickEvent.AddListener(ShowSortMenu);
-            //this.groupButton.clickEvent.AddListener(ShowGroupMenu);
+            this.groupButton.clickEvent.AddListener(ShowGroupMenu);
         }
-
+        #region Filter menu
         /// <summary>
         /// Displays the filter menu.
         /// </summary>
@@ -80,6 +81,9 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
             contextMenu.ShowWith(position: filterButton.transform.position);
         }
 
+        /// <summary>
+        /// Updates the filter menu entries.
+        /// </summary>
         private void UpdateFilterMenuEntries()
         {
             List<PopupMenuEntry> entries = new()
@@ -158,5 +162,60 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
         {
             filter.Reset();
         }
+        #endregion
+
+        #region Group menu
+        /// <summary>
+        /// Displays the group menu.
+        /// </summary>
+        private void ShowGroupMenu()
+        {
+            UpdateGroupMenuEntries();
+            contextMenu.ShowWith(position: groupButton.transform.position);
+        }
+
+        /// <summary>
+        /// Updates the group menu entries.
+        /// </summary>
+        private void UpdateGroupMenuEntries()
+        {
+            //ISet<DrawableWindowGroup> currentGroups = grouper.AllGroups.ToHashSet();
+            List<PopupMenuEntry> entries = new()
+            {
+                new PopupMenuAction("None", () =>
+                {
+                    ResetGrouping();
+                    rebuild.Invoke(filter.GetFilteredSurfaces());
+                }, Radio(true/*!grouper.IsActive*/), CloseAfterClick: false),
+                new PopupMenuAction("Surface Type", () =>
+                {
+                    //TODO
+                }, Radio(false), CloseAfterClick: false)
+            };
+            contextMenu.ClearEntries();
+            contextMenu.AddEntries(entries);
+            return;
+
+            /// Returns the group action for the given 
+            ///TODO
+            //PopupMenuAction GroupActionFor(string name, )
+        }
+
+        /// <summary>
+        /// Returns a radio button icon for the given <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">Whether the radio button is checked.</param>
+        /// <returns>A radio button icon for the given <paramref name="value"/>.</returns>
+        private static char Radio(bool value) => value ? Icons.CheckedRadio : Icons.EmptyRadio;
+
+        private void ResetGrouping()
+        {
+            // TODO Reset
+        }
+        #endregion
+
+        #region Sort menu
+
+        #endregion
     }
 }
