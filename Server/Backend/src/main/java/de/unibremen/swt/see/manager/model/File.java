@@ -29,10 +29,11 @@ public class File {
     private UUID id;
 
     /**
-     * The original name of the uploaded file.
+     * The original name of the uploaded file from the client.
      */
     @Setter
-    private String originalFileName;
+    @Column(name = "original_name")
+    private String originalName;
 
     /**
      * The intended name of the uploaded file.
@@ -40,6 +41,7 @@ public class File {
      * This is usually set during upload to match the use case.
      */
     @Setter
+    @Column(name = "name")
     private String name;
 
     /**
@@ -49,7 +51,18 @@ public class File {
      * and set by the client during upload.
      */
     @Setter
+    @Column(name = "content_type")
     private String contentType;
+
+    /**
+     * The size of the actual file.
+     * <p>
+     * This must be set by the file service to allow the controller to send a
+     * `Content-Length` header.
+     */
+    @Setter
+    @Column(name = "size")
+    private long size;
 
     /**
      * The intended purpose of the file.

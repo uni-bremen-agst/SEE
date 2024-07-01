@@ -37,8 +37,19 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class UserController {
 
+    /**
+     * Handle user-related operations and business logic.
+     */
     private final UserService userService;
+
+    /**
+     * Manages authentication tasks.
+     */
     private final AuthenticationManager authenticationManager;
+
+    /**
+     * Provides JWT utilities.
+     */
     private final JwtUtils jwtUtils;
 
     /**
@@ -63,7 +74,7 @@ public class UserController {
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getUsers() {
-        return ResponseEntity.ok().body(userService.getAllUser());
+        return ResponseEntity.ok().body(userService.getAll());
     }
 
     /**

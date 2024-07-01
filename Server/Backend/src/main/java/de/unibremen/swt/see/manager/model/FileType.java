@@ -7,7 +7,8 @@ package de.unibremen.swt.see.manager.model;
  * This {@code enum} defines the file types that are used by the SEE game server
  * to configure multiplayer scenarios and Code Cities.
  * 
- * @see de.unibremen.swt.see.manager.service.FileService#createFile(Server, FileType, MultipartFile)
+ * @see de.unibremen.swt.see.manager.service.FileService#create(Server,
+ * FileType, MultipartFile)
  */
 public enum FileType {
 

@@ -11,7 +11,8 @@ import org.springframework.stereotype.Repository;
  * Repository interface for managing {@link Server} entities.
  * <p>
  * This interface extends {@link PagingAndSortingRepository} to provide CRUD
- * operations as well as pagination and sorting capabilities for User entities.
+ * operations as well as pagination and sorting capabilities for {@link Server}
+ * entities.
  * <p>
  * See also:<br>
  * <a href="https://docs.spring.io/spring-data/commons/docs/current/api/org/springframework/data/repository/PagingAndSortingRepository.html">PagingAndSortingRepository</a>

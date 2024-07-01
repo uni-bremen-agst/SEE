@@ -32,16 +32,16 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 @Slf4j
 public class SeeManagerApplication {
-    
+
+    /**
+     * Contains the domain name, or IP address, and port of this back-end
+     * application server.
+     * <p>
+     * The value is configured in the application properties and gets injected
+     * during class initialization.
+     */
     @Value("${see.app.backend.domain}")
     private String backendDomain;
-    
-    @Value("${see.app.admin.add.name}")
-    private String newAdminName;
-    
-    // FIXME This is not a secure way to handle passwords.
-    @Value("${see.app.admin.add.password}")
-    private String newAdminPassword;
 
     /**
      * The main method to run the Spring Boot application.
@@ -53,14 +53,28 @@ public class SeeManagerApplication {
 
     /**
      * Configures and returns a CommandLineRunner bean.
-     * 
+     * <p>
      * This runner performs necessary initialization tasks or setup operations
      * at application startup.
-     * 
+     * <p>
      * Required dependencies are listed in the parameters.
+     *
+     * @param newAdminName username of an admin user that should be created
+     * during startup
+     * @param newAdminPassword plain-text password of an admin user that should
+     * @param serverRepo server repository dependency
+     * @param serverService server service dependency
+     * @param userRepo user repository dependency
+     * @param userService user service dependency
+     * @param fileService file service dependency
+     * @param roleRepo role repository dependency
+     * @param configRepo configuration repository dependency
+     * @return the configured {@link CommandLineRunner}
      */
     @Bean
     CommandLineRunner cliRunner(
+            @Value("${see.app.admin.add.name}") String newAdminName,
+            @Value("${see.app.admin.add.password}") String newAdminPassword,
             ServerRepository serverRepo, 
             ServerService serverService, 
             UserRepository userRepo, 

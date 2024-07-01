@@ -10,20 +10,53 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-
+/**
+ * Web configuration class for the SEE Manager back-end application.
+ * <p>
+ * This class configures web-related components for SEE Manager.
+ */
 @Configuration
 @EnableWebMvc
 @Slf4j
 public class WebConfig {
 
+    /**
+     * Contains the domain name, or IP address, and port of the front-end
+     * application.
+     * <p>
+     * The value is configured in the application properties and gets injected
+     * during class initialization.
+     */
     @Value("${see.app.frontend.domain}")
     private String frontendDomain;
-    
+
+    /**
+     * Contains the URL scheme of the front-end application.
+     * <p>
+     * The value is configured in the application properties and gets injected
+     * during class initialization.
+     */
     @Value("${see.app.frontend.scheme}")
     private String frontendScheme;
 
+    /**
+     * Creates and configures a {@code WebMvcConfigurer} for Cross-Origin
+     * Resource Sharing (CORS) settings.
+     * <p>
+     * This method sets up CORS configuration for the application, allowing
+     * controlled access to resources from different origins. It defines which
+     * origins, HTTP methods, and headers are allowed in cross-origin
+     * requests.
+     * <p>
+     * This configuration is applied globally to all endpoints in the
+     * application.
+     *
+     * @return A {@link WebMvcConfigurer} instance with the CORS configuration
+     * @see org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+     * @see org.springframework.web.servlet.config.annotation.CorsRegistry
+     */
     @Bean
-    public WebMvcConfigurer getCorsConfiguration() {
+    public WebMvcConfigurer createCorsConfiguration() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {

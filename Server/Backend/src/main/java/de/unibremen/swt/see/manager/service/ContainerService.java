@@ -15,14 +15,44 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Service class for managing container-related operations.
+ * <p>
+ * This service provides high-level operations for container management,
+ * including creating, retrieving, updating, and deleting containers. It
+ * encapsulates the business logic and acts as an intermediary between the
+ * controller layer and the data access layer.
+ * <p>
+ * Container instances are managed by the {@link ServerService}.
+ *
+ * @see ServerService
+ */
 @Service
 @Transactional
 @Slf4j
 @RequiredArgsConstructor
 public class ContainerService {
+
+    /**
+     * Used to access the backend configuration.
+     */
     private final ConfigRepository configRepo;
+    /**
+     * Used to access server files.
+     */
     private final FileService fileService;
 
+    /**
+     * Used for the random port generation.
+     */
+    private final Random random = new Random();
+
+    /**
+     * Starts a container for the given server.
+     *
+     * @param server the server configuration
+     * @return {@code true} if the container was started, else {@code false}
+     */
     public boolean startContainer(@NotNull Server server) {
         Optional<Config> optConfig = configRepo.findConfigById(1);
         if (optConfig.isEmpty()) {
@@ -30,7 +60,7 @@ public class ContainerService {
             return false;
         }
         Config config = optConfig.get();
-        List<File> files = fileService.getFilesByServer(server);
+        List<File> files = fileService.getByServer(server);
         
         // FIXME This looks like a race condition
         if (server.getServerStatusType().equals(ServerStatusType.ONLINE)
@@ -41,7 +71,7 @@ public class ContainerService {
         }
 
         // Aussuchen eines zufälligen Ports
-        int port = getRandomNumberUsingNextInt(config.getMinContainerPort(), config.getMaxContainerPort());
+        int port = getRandomPort(config.getMinContainerPort(), config.getMaxContainerPort());
         String containerName = server.getName() + "-" + server.getId() + "-" + port;
 
         // Starten des Gameservers
@@ -75,7 +105,7 @@ public class ContainerService {
             log.info("Adding files to server {}", server.getId());
             for (File file : files) {
 
-                String command = "docker cp " + "\"" + fileService.getFilePath(file) + "\"" + " " + containerName + ":/app/gameserver_Data/StreamingAssets/Multiplayer/";
+                String command = "docker cp " + "\"" + fileService.getPath(file) + "\"" + " " + containerName + ":/app/gameserver_Data/StreamingAssets/Multiplayer/";
                 Process copyProcess = new ProcessBuilder()
                         .command("bash", "-c", command)
                         .inheritIO()
@@ -119,6 +149,12 @@ public class ContainerService {
         return false;
     }
 
+    /**
+     * Stops the container for the given server.
+     *
+     * @param server the server configuration
+     * @return {@code true} if the container was stopped, else {@code false}
+     */
     public boolean stopContainer(@NotNull Server server) {
         if (server.getServerStatusType().equals(ServerStatusType.OFFLINE)
                 || server.getServerStatusType().equals(ServerStatusType.STARTING)
@@ -165,8 +201,26 @@ public class ContainerService {
         return false;
     }
 
-    public int getRandomNumberUsingNextInt(int min, int max) {
-        Random random = new Random();
+    /**
+     * Generates a random port in the defined range.
+     *
+     * @param min lower bound of the port range
+     * @param max upper bound of the port range
+     * @return random port number
+     */
+    public int getRandomPort(int min, int max) {
         return random.nextInt(max - min) + min;
+    }
+
+    /**
+     * Checks if a container is running for given server.
+     *
+     * @param server the server configuration
+     * @return {@code true} if a container is running for the server, else
+     * {@code false}.
+     */
+    public boolean isRunning(Server server) {
+        // FIXME implement me
+        throw new RuntimeException("Not implemented.");
     }
 }

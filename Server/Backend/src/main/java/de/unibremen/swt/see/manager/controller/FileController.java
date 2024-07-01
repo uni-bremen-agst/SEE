@@ -7,8 +7,6 @@ import de.unibremen.swt.see.manager.service.FileService;
 import de.unibremen.swt.see.manager.service.ServerService;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +27,14 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 @Slf4j
 public class FileController {
 
+    /**
+     * Handle file-related operations and business logic.
+     */
     private final FileService fileService;
+
+    /**
+     * Handle server-related operations and business logic.
+     */
     private final ServerService serverService;
 
     /**
@@ -45,7 +50,7 @@ public class FileController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteFile(@RequestParam("id") UUID id) {
         try {
-            return ResponseEntity.ok().body(fileService.deleteFile(id));
+            return ResponseEntity.ok().body(fileService.delete(id));
         } catch (IOException e) {
             return ResponseEntity.badRequest().build();
         }
@@ -64,11 +69,7 @@ public class FileController {
     @GetMapping("/get")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> getFile(@RequestParam("id") UUID id) {
-        try {
-            return ResponseEntity.ok().body(fileService.getFile(id));
-        } catch (IOException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.ok().body(fileService.get(id));
     }
 
     /**
@@ -83,10 +84,10 @@ public class FileController {
      */
     @GetMapping("/client/gxl")
     public ResponseEntity<?> getGxl(@RequestParam("serverId") UUID serverID, @RequestParam("roomPassword") String roomPassword) {
-        Server server = serverService.getServerByID(serverID);
+        Server server = serverService.get(serverID);
         if (!hasRoomAccess(server, roomPassword)) return ResponseEntity.badRequest().build();
         try {
-            File file = fileService.getFileByServerAndFileType(server, FileType.GXL);
+            File file = fileService.getByServerAndFileType(server, FileType.GXL);
             return buildResponseEntity(file);
         } catch (IOException e) {
             return ResponseEntity.badRequest().build();
@@ -105,10 +106,10 @@ public class FileController {
      */
     @GetMapping("/client/solution")
     public ResponseEntity<?> getSolution(@RequestParam("serverId") UUID serverID, @RequestParam("roomPassword") String roomPassword) {
-        Server server = serverService.getServerByID(serverID);
+        Server server = serverService.get(serverID);
         if (!hasRoomAccess(server, roomPassword)) return ResponseEntity.badRequest().build();
         try {
-            File file = fileService.getFileByServerAndFileType(server, FileType.SOLUTION);
+            File file = fileService.getByServerAndFileType(server, FileType.SOLUTION);
             return buildResponseEntity(file);
         } catch (IOException e) {
             return ResponseEntity.badRequest().build();
@@ -130,10 +131,10 @@ public class FileController {
      */
     @GetMapping("/client/source")
     public ResponseEntity<?> getSource(@RequestParam("serverId") UUID serverID, @RequestParam("roomPassword") String roomPassword) {
-        Server server = serverService.getServerByID(serverID);
+        Server server = serverService.get(serverID);
         if (!hasRoomAccess(server, roomPassword)) return ResponseEntity.badRequest().build();
         try {
-            File file = fileService.getFileByServerAndFileType(server, FileType.SOURCE);
+            File file = fileService.getByServerAndFileType(server, FileType.SOURCE);
             return buildResponseEntity(file);
         } catch (IOException e) {
             return ResponseEntity.badRequest().build();
@@ -154,12 +155,12 @@ public class FileController {
     @GetMapping("/client/config")
     public ResponseEntity<?> getConfig(@RequestParam("serverId") UUID serverID, @RequestParam("roomPassword") String roomPassword) {
         //Laden des Servers aus der Datenbank
-        Server server = serverService.getServerByID(serverID);
+        Server server = serverService.get(serverID);
 
         // Überprüfen, ob der Request mit dem richtigen Passwort gesendet wurde, und ob der server existiert
         if (!hasRoomAccess(server, roomPassword)) return ResponseEntity.badRequest().build();
         try {
-            File file = fileService.getFileByServerAndFileType(server, FileType.CFG);
+            File file = fileService.getByServerAndFileType(server, FileType.CFG);
             return buildResponseEntity(file);
         } catch (IOException e) {
             return ResponseEntity.badRequest().build();
@@ -178,10 +179,10 @@ public class FileController {
      */
     @GetMapping("/client/csv")
     public ResponseEntity<?> getCsv(@RequestParam("serverId") UUID serverID, @RequestParam("roomPassword") String roomPassword) {
-        Server server = serverService.getServerByID(serverID);
+        Server server = serverService.get(serverID);
         if (!hasRoomAccess(server, roomPassword)) return ResponseEntity.badRequest().build();
         try {
-            File file = fileService.getFileByServerAndFileType(server, FileType.CSV);
+            File file = fileService.getByServerAndFileType(server, FileType.CSV);
             return buildResponseEntity(file);
         } catch (IOException e) {
             return ResponseEntity.badRequest().build();
@@ -211,20 +212,19 @@ public class FileController {
      * @throws IOException if the file is missing or cannot be accessed
      */
     private ResponseEntity<StreamingResponseBody> buildResponseEntity(File file) throws IOException {
-        Path path = fileService.getFilePath(file);
-        long fileSize = Files.size(path);
+        InputStream fileInputStream = fileService.getInputStream(file);
         StreamingResponseBody responseBody = outputStream -> {
-            try (InputStream inputStream = Files.newInputStream(path)) {
+            try (InputStream inputStream = fileInputStream) {
                 inputStream.transferTo(outputStream);
             }
         };
         
         return ResponseEntity
-                    .ok()
-                    .contentLength(fileSize)
-                    .header("Content-type", file.getContentType())
-                    .header("Content-disposition", "attachment; filename=\"" + file.getOriginalFileName() + "\"")
-                    .body(responseBody);
+                .ok()
+                .contentLength(file.getSize())
+                .header("Content-type", file.getContentType())
+                .header("Content-disposition", "attachment; filename=\"" + file.getName() + "\"")
+                .body(responseBody);
     }
 
 }

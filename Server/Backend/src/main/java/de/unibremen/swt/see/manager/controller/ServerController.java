@@ -23,6 +23,9 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class ServerController {
 
+    /**
+     * Handle server-related operations and business logic.
+     */
     private final ServerService serverService;
 
     /**
@@ -35,7 +38,7 @@ public class ServerController {
     @GetMapping("/")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> getServer(@RequestParam("id") UUID id) {
-        return ResponseEntity.ok().body(serverService.getServerByID(id));
+        return ResponseEntity.ok().body(serverService.get(id));
     }
 
     /**
@@ -47,20 +50,20 @@ public class ServerController {
     @GetMapping("/all")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> getServers() {
-        return ResponseEntity.ok().body(serverService.getAllServer());
+        return ResponseEntity.ok().body(serverService.getAll());
     }
 
     /**
      * Creates a new server.
      *
-     * @param server metadata object to create new server instance
+     * @param server metadata object to save new server instance
      * @return {@code 200 OK} with the server metadata object as payload,
      *         or {@code 401 Unauthorized} if access cannot be granted.
      */
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createServers(@RequestBody Server server) {
-        return ResponseEntity.ok().body(serverService.saveServer(server));
+        return ResponseEntity.ok().body(serverService.save(server));
     }
 
     /**
@@ -111,7 +114,7 @@ public class ServerController {
     @PutMapping("/startServer")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> startGameServer(@RequestParam("id") UUID id) {
-        return ResponseEntity.ok().body(serverService.startServer(id));
+        return ResponseEntity.ok().body(serverService.start(id));
     }
 
     /**
@@ -124,7 +127,7 @@ public class ServerController {
     @PutMapping("/stopServer")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> stopGameServer(@RequestParam("id") UUID id) {
-        return ResponseEntity.ok().body(serverService.stopServer(id));
+        return ResponseEntity.ok().body(serverService.stop(id));
     }
 
     /**
@@ -154,7 +157,7 @@ public class ServerController {
      */
     @GetMapping("/getFilesForClient")
     public ResponseEntity<?> getFiles(@RequestParam("id") UUID id, @RequestParam("roomPassword") String password) {
-        Server server = serverService.getServerByID(id);
+        Server server = serverService.get(id);
         if (server == null){
             return ResponseEntity.badRequest().build();
         }

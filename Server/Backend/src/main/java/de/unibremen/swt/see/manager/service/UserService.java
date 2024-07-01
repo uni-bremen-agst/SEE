@@ -29,9 +29,20 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
-    private final UserRepository userRepo;
-    private final PasswordEncoder passwordEncoder;
+
+    /**
+     * Provides access to role data for user management operations.
+     */
     private final RoleRepository roleRepo;
+    /**
+     * Enables user data persistence and retrieval for this service.
+     */
+    private final UserRepository userRepo;
+
+    /**
+     * Handles password encryption for user authentication.
+     */
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * Creates a new user from the provided attributes.
@@ -163,7 +174,12 @@ public class UserService {
         return false;
     }
 
-    public List<User> getAllUser() {
+    /**
+     * Retrieves all users.
+     *
+     * @return a list containing all users
+     */
+    public List<User> getAll() {
         log.info("Fetching all users");
         return userRepo.findAll();
     }
@@ -172,8 +188,7 @@ public class UserService {
      * Retrieves a user by their username.
      *
      * @param username the username of the user to retrieve
-     * @return an Optional containing the user if found, or an empty Optional if
-     * not found
+     * @return the user if found, or {@code null} if not found
      */
     public User getByUsername(String username) {
         log.info("Fetching user {}", username);

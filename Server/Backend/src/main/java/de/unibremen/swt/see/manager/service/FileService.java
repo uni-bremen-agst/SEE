@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -21,61 +22,92 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Service class for managing file-related operations.
+ * <p>
+ * This service provides high-level operations for file management, including
+ * creating, retrieving, updating, and deleting files. It encapsulates the
+ * business logic and acts as an intermediary between the controller layer and
+ * the data access layer.
+ *
+ * @see FileRepository
+ * @see de.unibremen.swt.see.manager.controller.FileController
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor
 @Slf4j
 public class FileService {
 
+    /**
+     * Enables file data persistence and retrieval for this service.
+     */
     private final FileRepository fileRepo;
-    
+
+    /**
+     * Contains the file storage path on the local file system.
+     * <p>
+     * The value is configured in the application properties and gets injected
+     * during class initialization.
+     */
     @Value("${see.app.filestorage.dir}")
     private String fileStorageRoot;
 
-    public File createFile(Server server, FileType type, MultipartFile multipartFile) throws IOException {
+    /**
+     * Creates a new file from the provided attributes.
+     * <p>
+     * The file metadata is stored in the database and the content is stored on
+     * the local file system. A reference to the associated server and file type
+     * is stored in the metadata.
+     *
+     * @param server the server instance this file belongs to
+     * @param type the type of the file type
+     * @param multipartFile the file content from the API request
+     * @return the created file, or {@code null} if the file content is empty.
+     * @throws java.io.IOException if there was an I/O error while storing the
+     * file
+     */
+    public File create(Server server, FileType type, MultipartFile multipartFile) throws IOException {
         if (multipartFile.isEmpty()) {
             return null;
         }
         
-        String originalFileName = multipartFile.getOriginalFilename();
+        String originalFilename = multipartFile.getOriginalFilename();
         String intendedFileName;
         switch (type) {
             case CFG      -> intendedFileName = "multiplayer.cfg";
             case CSV      -> intendedFileName = "multiplayer.csv";
             case GXL      -> intendedFileName = "multiplayer.gxl";
             case SOURCE   -> intendedFileName = "src.zip";
-            case SOLUTION -> intendedFileName = "solution." + getFileExtension(originalFileName);
+            case SOLUTION ->
+                intendedFileName = "solution." + getFileExtension(originalFilename);
             default       -> throw new RuntimeException("File name could not be derived from file type!");
         }
 
         File file = new File();
         file.setContentType(multipartFile.getContentType());
-        file.setOriginalFileName(originalFileName);
+        file.setOriginalName(originalFilename);
         file.setName(intendedFileName);
         file.setServer(server);
 
+        Path path;
         try {
-            storeFile(file, multipartFile);
+            path = storeFile(file, multipartFile);
         } catch (IOException e) {
             throw new IOException("Error persisting file.", e);
         }
+        file.setSize(Files.size(path));
+
         return fileRepo.save(file);
     }
 
-    private void storeFile(File file, MultipartFile multipartFile) throws IOException {
-        Path filePath = getFilePath(file);
-        if (Files.exists(filePath)) {
-            throw new IOException("File already exists: " + filePath.toString());
-        }
-        
-        try (InputStream inputStream = multipartFile.getInputStream()) {
-            Files.copy(inputStream, filePath);
-        } catch (IOException e) {
-            throw new IOException("Unable to save file: " + file.getName(), e);
-        }
-    }
-
-    public File getFile(UUID fileId) throws IOException {
+    /**
+     * Retrieves a file by its ID.
+     *
+     * @param fileId the ID of the file to retrieve
+     * @return the file if found, or {@code null} if not found
+     */
+    public File get(UUID fileId) {
         log.info("Fetching file by id {}", fileId);
         Optional<File> optFile = fileRepo.findById(fileId);
         if (optFile.isEmpty()) {
@@ -85,57 +117,151 @@ public class FileService {
         return optFile.get();
     }
 
-    public File getFileByServerAndFileType(Server server, FileType fileType) throws IOException {
-        log.info("Fetching file for server {} and type {}", server, fileType);
+    /**
+     * Retrieves a file by its associated server and file type.
+     *
+     * @param server the server instance this file belongs to
+     * @param type the type of the file type
+     * @return file if found, or {@code null} if not found
+     */
+    public File getByServerAndFileType(Server server, FileType type) {
+        log.info("Fetching file for server {} and type {}", server, type);
 
-        Optional<File> optFile = fileRepo.findFileByServerAndFileType(server, fileType);
+        Optional<File> optFile = fileRepo.findFileByServerAndFileType(server, type);
         if (optFile.isEmpty()) {
-            log.error("File not found in db for server {} with type {}", server.getId(), fileType);
+            log.error("File not found in db for server {} with type {}", server.getId(), type);
             return null;
         }
         return optFile.get();
     }
 
-    public boolean deleteFile(File file) throws IOException {
-        Path filePath = getFilePath(file);
+    /**
+     * Deletes a file.
+     * <p>
+     * Deletes the file from local file system and the file metadata object from
+     * database.
+     *
+     * @param file the file to be deleted
+     * @return {@code true} if the file was deleted, else {@code false}
+     * @throws java.io.IOException if there was an I/O error while deleting the
+     * file
+     */
+    public boolean delete(File file) throws IOException {
+        Path filePath = getPath(file);
         log.info("Removing file {}", filePath);
 
-        if (!Files.exists(filePath)) {
-            log.warn("File already deleted: {}", filePath);
-            return true;
-        }
-        if (!Files.isRegularFile(filePath)) {
-            log.error("Not a regular file: {}", filePath);
+        if (Files.exists(filePath) && !Files.isRegularFile(filePath)) {
+            log.error("File to delete is not a regular file: {}", filePath);
             return false;
         }
-        Files.delete(filePath);
-        fileRepo.delete(file);
 
+        try {
+            Files.delete(filePath);
+        } catch (NoSuchFileException e) {
+            log.warn("File to delete does not exist: {}", filePath);
+        }
+        fileRepo.delete(file);
         return true;
     }
-    
-    public boolean deleteFile(UUID fileId) throws IOException {
-        return deleteFile(getFile(fileId));
+
+    /**
+     * Convenience function to delete a file by its ID.
+     * <p>
+     * The file is retrieved by its ID and then deleted.
+     *
+     * @param fileId ID of the file to be deleted
+     * @return {@code true} if the file was deleted, or {@code false} if the
+     * file does not exist or was not deleted
+     * @throws java.io.IOException if {@link #delete(File)} throws one
+     * @see #get(UUID)
+     * @see #delete(File)
+     */
+    public boolean delete(UUID fileId) throws IOException {
+        File file = get(fileId);
+        if (file == null) {
+            return false;
+        }
+        return delete(file);
     }
 
-
-    public List<File> getFilesByServer(Server server) {
+    /**
+     * Retrieves all files of a server.
+     *
+     * @param server the server that the files belong to
+     * @return a list containing all files of the given server
+     */
+    public List<File> getByServer(Server server) {
         return fileRepo.findFilesByServer(server);
     }
 
-    public void deleteFilesByServer(Server server) {
-        List<File> files = getFilesByServer(server);
+    /**
+     * Deletes all files of a server.
+     *
+     * @param server the server to delete files for
+     * @return {@code true} if all files of the server were deleted, else
+     * {@code false}
+     */
+    public boolean deleteFilesByServer(Server server) {
+        List<File> files = getByServer(server);
 
+        boolean success = true;
         for (File file : files) {
             try {
-                deleteFile(file);
+                delete(file);
             } catch (IOException e) {
-                log.error("Cant delete file {}", file.getId());
+                success = false;
             }
         }
+        return success;
     }
 
-    private Path getUploadRootPath(Server server) throws IOException {
+
+    /**
+     * Stores given file on local file system.
+     *
+     * @param file the prepared file metadata
+     * @param multipartFile the file content
+     * @return the path to where the file was stored
+     * @throws IOException if there was an I/O error while storing the file
+     */
+    private Path storeFile(File file, MultipartFile multipartFile) throws IOException {
+        Path filePath = getPath(file);
+        if (Files.exists(filePath)) {
+            throw new IOException("File already exists: " + filePath.toString());
+        }
+
+        try (InputStream inputStream = multipartFile.getInputStream()) {
+            Files.copy(inputStream, filePath);
+        } catch (IOException e) {
+            throw new IOException("Unable to save file: " + file.getName(), e);
+        }
+        return filePath;
+    }
+
+    /**
+     * Generates an {@code InputStream} that can be used to access file content.
+     *
+     * @param file the file to be accessed
+     * @return {@code InputStream} of the file to be accessed
+     * @throws IOException if an I/O error occurs during file access
+     */
+    public InputStream getInputStream(File file) throws IOException {
+        return Files.newInputStream(getPath(file));
+    }
+
+    /**
+     * Generates the file system path of the directory where all files of a
+     * specific server are stored.
+     * <p>
+     * Tries to create the directory if it does not yet exist. Server ID must
+     * not be {@code null}.
+     *
+     * @param server the server that the upload path belongs to
+     * @return the path where all files of given server are stored
+     * @throws IOException if there is a problem accessing or creating the
+     * directory, or if the path is not a directory
+     */
+    private Path getUploadPath(Server server) throws IOException {
         Path basePath = Paths.get(fileStorageRoot);
         Path uploadPath = basePath.resolve(server.getId().toString());
         if (!Files.exists(uploadPath)) {
@@ -145,22 +271,41 @@ public class FileService {
                 throw new IOException("File Storage Path does not exist and could not be created: " + uploadPath.toString(), e);
             }
         }
-        if (!Files.isDirectory(uploadPath, NOFOLLOW_LINKS)){
+        if (!Files.isDirectory(uploadPath, NOFOLLOW_LINKS)) {
             throw new IOException("File Storage Path is not a directory!");
         }
         return uploadPath;
     }
 
-    public Path getFilePath(File file) throws IOException {
+    /**
+     * Generates the file system path for a file.
+     * <p>
+     * Gets the server path and appends the file name. File name and server must
+     * not be {@code null}.
+     *
+     * @param file the file to which the path should be assembled
+     * @return file system path for the given file
+     * @throws IOException if one is thrown by {@link #getUploadPath(Server)}
+     * @see #getUploadPath(Server)
+     */
+    protected Path getPath(File file) throws IOException {
         String fileName = file.getName();
         if (fileName == null || fileName.isEmpty()) {
             throw new RuntimeException("File name must not be empty!");
         }
-        return getUploadRootPath(file.getServer()).resolve(fileName);
+        return getUploadPath(file.getServer()).resolve(fileName);
     }
-    
-    public static String getFileExtension(String fileName) {
+
+    /**
+     * Extracts the file extension from given file name.
+     *
+     * @param fileName file name to extract the extension from
+     * @return extension of the given file if existent, or else empty
+     * {@code String}
+     */
+    private static String getFileExtension(String fileName) {
         int idx = fileName.lastIndexOf('.');
         return (idx != -1) ? fileName.substring(idx + 1) : "";
     }
+
 }
