@@ -26,10 +26,7 @@ namespace SEE.GraphProviders
             SingleGraphProvider provider = new GXLSingleGraphProvider()
             { Path = new DataPath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
 
-            GameObject go = new();
-            SEECity city = go.AddComponent<SEECity>();
-
-            Graph loaded = await provider.ProvideAsync(new Graph(""), city);
+            Graph loaded = await provider.ProvideAsync(new Graph(""), NewCity());
             Assert.IsNotNull(loaded);
             Assert.IsTrue(loaded.NodeCount > 0);
             Assert.IsTrue(loaded.EdgeCount > 0);
@@ -38,9 +35,6 @@ namespace SEE.GraphProviders
         [Test]
         public async Task TestCSVJaCoCoGXLGraphProviderAsync()
         {
-            GameObject go = new();
-            SEECity city = go.AddComponent<SEECity>();
-
             SingleGraphPipelineProvider graphPipeline = new();
 
             {
@@ -60,7 +54,7 @@ namespace SEE.GraphProviders
                 graphPipeline.Add(provider);
             }
 
-            Graph loaded = await graphPipeline.ProvideAsync(new Graph(""), city);
+            Graph loaded = await graphPipeline.ProvideAsync(new Graph(""), NewCity());
             Assert.IsNotNull(loaded);
             Assert.IsTrue(loaded.NodeCount > 0);
             Assert.IsTrue(loaded.EdgeCount > 0);
@@ -82,15 +76,12 @@ namespace SEE.GraphProviders
         [Test]
         public async Task TestMergeDiffGraphProviderAsync()
         {
-            GameObject go = new();
-            SEECity city = go.AddComponent<SEECity>();
-
             // Newer graph
             Graph graph;
             {
                 SingleGraphProvider provider = new GXLSingleGraphProvider()
                 { Path = new DataPath(Application.streamingAssetsPath + "/mini-evolution/CodeFacts-5.gxl") };
-                graph = await provider.ProvideAsync(new Graph(""), city);
+                graph = await provider.ProvideAsync(new Graph(""), NewCity());
             }
 
             {
@@ -103,7 +94,7 @@ namespace SEE.GraphProviders
                     OldGraph = provider
                 };
 
-                Graph diffGraph = await mergeDiffProvider.ProvideAsync(graph, city);
+                Graph diffGraph = await mergeDiffProvider.ProvideAsync(graph, NewCity());
 
                 Assert.IsNotNull(diffGraph);
                 Assert.IsTrue(diffGraph.NodeCount > 0);
@@ -231,8 +222,6 @@ namespace SEE.GraphProviders
         /// <returns>graph consisting of all C# files in folder Assets/SEE/GraphProviders</returns>
         private static async Task<Graph> GetVCSGraphAsync()
         {
-            SEECity city = NewCity();
-
             Dictionary<string, bool> pathGlobbing = new()
                 {
                     { "Assets/SEE/GraphProviders/**/*.cs", true }
@@ -246,9 +235,13 @@ namespace SEE.GraphProviders
                 PathGlobbing = pathGlobbing
             };
 
-            return await provider.ProvideAsync(new Graph(""), city);
+            return await provider.ProvideAsync(new Graph(""), NewCity());
         }
 
+        /// <summary>
+        /// Returns a new <see cref="SEECity"/> instance.
+        /// </summary>
+        /// <returns></returns>
         private static SEECity NewCity()
         {
             GameObject go = new();
