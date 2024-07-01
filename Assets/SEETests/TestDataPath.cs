@@ -42,10 +42,15 @@ namespace SEE.Utils.Paths
         /// Test for downloading a file from our own data backend server based on a URL.
         /// </summary>
         /// <returns>enumerator to continue</returns>
+        /// <remarks>This test can only be run when our backend server is running.</remarks>
         [UnityTest]
+        [Category("NonDeterministic")]
         public IEnumerator LoadFromOurBackend() =>
             UniTask.ToCoroutine(async () =>
             {
+                const string backendNotRunning = "Apparently, our backend server is not running. This test cannot be run then.\n";
+                LogAssert.Expect(LogType.Error, backendNotRunning);
+
                 const string filename = "solution.sln";
                 DataPath dataPath = new()
                 {
@@ -53,15 +58,22 @@ namespace SEE.Utils.Paths
                     Path = "http://localhost/api/v1/file/client/solution/serverId=&roomPassword=password"
                 };
                 Assert.AreEqual(DataPath.RootKind.Url, dataPath.Root);
-                using Stream stream = await dataPath.LoadAsync();
-                Debug.Log($"Content length in bytes: {stream.Length}\n");
-                using (FileStream fileStream = File.Create(filename))
+                try
                 {
-                    stream.Seek(0, SeekOrigin.Begin);
-                    Debug.Log($"Saving to {filename}.\n");
-                    await stream.CopyToAsync(fileStream);
+                    using Stream stream = await dataPath.LoadAsync();
+                    Debug.Log($"Content length in bytes: {stream.Length}\n");
+                    using (FileStream fileStream = File.Create(filename))
+                    {
+                        stream.Seek(0, SeekOrigin.Begin);
+                        Debug.Log($"Saving to {filename}.\n");
+                        await stream.CopyToAsync(fileStream);
+                    }
+                    FileIO.DeleteIfExists(filename);
                 }
-                FileIO.DeleteIfExists(filename);
+                catch (System.Net.Http.HttpRequestException _)
+                {
+                    Debug.LogError(backendNotRunning);
+                }
             });
 
         /// <summary>
