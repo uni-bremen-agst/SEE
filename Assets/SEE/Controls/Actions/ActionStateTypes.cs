@@ -118,7 +118,7 @@ namespace SEE.Controls.Actions
                   AcceptDivergenceAction.CreateReversibleAction);
 
             Notes =
-              new("Notes", "Show Nodes and Edges that have Notes.",
+              new("Notes", "Hide or highlight notes",
                   Color.blue, "Materials/ModernUIPack/Document",
                   NoteAction.CreateReversibleAction);
 

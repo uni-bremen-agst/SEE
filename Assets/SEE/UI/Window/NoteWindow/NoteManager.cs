@@ -9,7 +9,8 @@ using UnityEngine;
 namespace SEE.UI.Window.NoteWindow
 {
     /// <summary>
-    /// This class manages to save and load the notes.
+    /// Manages notes, including storage, and retrieval.
+    /// This class also handles the outlining of nodes and edges in the game.
     /// </summary>
     public class NoteManager : MonoBehaviour
     {
@@ -48,11 +49,11 @@ namespace SEE.UI.Window.NoteWindow
         public List<GameObject> objectList = new List<GameObject>();
 
         /// <summary>
-        /// Finds the GameObject for the <see cref="graphElement"/>.
-        /// And it marks it with an outliner.
+        /// Finds the <see cref="GameObject"/> associated with the specified <paramref name="graphElementRef"/>
+        /// and marks it with an outline.
         /// </summary>
-        /// <param name="GraphID"></param>
-        private void FindGameObjects(GraphElementRef graphElementRef)
+        /// <param name="graphElementRef">Reference to the graph element.</param>
+        private void OutlineGameObject(GraphElementRef graphElementRef)
         {
             GameObject gameObject = graphElementRef.gameObject;
             if (gameObject != null)
@@ -71,11 +72,11 @@ namespace SEE.UI.Window.NoteWindow
         }
 
         /// <summary>
-        /// Saves the note by putting it into <see cref="notesDictionary"/>.
+        /// Saves a note in the <see cref="notesDictionary"/>.
         /// </summary>
-        /// <param name="graphElementRef">the node/edge to save</param>
-        /// <param name="isPublic">flag whether it should be saved public or private</param>
-        /// <param name="content">the content to save</param>
+        /// <param name="graphElementRef">Reference to the graph element (node/edge).</param>
+        /// <param name="isPublic">Specifies whether the note is public or private.</param>
+        /// <param name="content">Content of the note to save.</param>
         public void SaveNote(GraphElementRef graphElementRef, bool isPublic, string content)
         {
             GraphElement graphElement = graphElementRef.Elem;
@@ -83,18 +84,18 @@ namespace SEE.UI.Window.NoteWindow
             {
                 KeyValuePair<string, bool> keyPair = new KeyValuePair<string, bool>(graphElement.ID, isPublic);
                 notesDictionary[keyPair] = content;
-                FindGameObjects(graphElementRef);
+                OutlineGameObject(graphElementRef);
             }
             //Debug.Log("graphRef + isPublic + content " + graphElementRef + isPublic +content);
             //Debug.Log("notesDictionary.length: " + notesDictionary.Count);
         }
 
         /// <summary>
-        /// Loads the note.
+        /// Loads a note from the <see cref="notesDictionary"/>.
         /// </summary>
-        /// <param name="title">the node/edge to load</param>
-        /// <param name="isPublic">flag whether it should load the public or private note</param>
-        /// <returns>the content for the note</returns>
+        /// <param name="title">Identifier of the node/edge.</param>
+        /// <param name="isPublic">Specifies whether to load the public or private note.</param>
+        /// <returns>Content of the loaded note.</returns>
         public string LoadNote(string title, bool isPublic)
         {
             KeyValuePair<string, bool> keyPair = new KeyValuePair<string, bool>(title, isPublic);

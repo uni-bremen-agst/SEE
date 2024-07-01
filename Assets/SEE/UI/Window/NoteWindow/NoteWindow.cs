@@ -17,6 +17,9 @@ using UnityEngine.UI;
 
 namespace SEE.UI.Window.NoteWindow
 {
+    /// <summary>
+    /// Manages the note window, providing UI elements and functionality for creating, loading, saving, and deleting notes.
+    /// </summary>
     public class NoteWindow : BaseWindow
     {
         /// <summary>
@@ -25,19 +28,28 @@ namespace SEE.UI.Window.NoteWindow
         private static string WindowPrefab => UIPrefabFolder + "NoteWindow";
 
         /// <summary>
-        /// The searchfield for <see cref="NoteWindow"/>.
+        /// Input field for searching within the <see cref="NoteWindow"/>.
         /// </summary>
         public TMP_InputField searchField;
 
         /// <summary>
-        /// The GraphElement for the depending Node/Edge
+        ///Reference to the graph element(node/edge) associated with this window.
         /// </summary>
         public GraphElementRef graphElementRef;
 
+        /// <summary>
+        /// An instance of the <see cref="NoteButtonWindow"/> used to manage the note buttons and their interactions.
+        /// </summary>
         private NoteButtonWindow noteButtonWindow;
 
+        /// <summary>
+        /// An instance of the <see cref="NoteManager"/> used to manage the notes.
+        /// </summary>
         private NoteManager noteManager;
 
+        /// <summary>
+        /// An instance of the <see cref="WindowSpace"/> used to manage the window space and its components.
+        /// </summary>
         private WindowSpace manager;
 
         // Start is called before the first frame update
@@ -48,7 +60,7 @@ namespace SEE.UI.Window.NoteWindow
         }
 
         /// <summary>
-        /// Creates the <see cref="NoteWindow"/> and loads data if avaiable.
+        /// Creates the <see cref="NoteWindow"/> and loads data if available.
         /// </summary>
         private void CreateWindow()
         {
@@ -63,7 +75,6 @@ namespace SEE.UI.Window.NoteWindow
             searchField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
             searchField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
 
-            // Create Instance of NoteButtonWindow
             UnityAction saveButton = () =>
             {
                 noteButtonWindow.contentText = this.searchField.text;
@@ -121,14 +132,12 @@ namespace SEE.UI.Window.NoteWindow
                 {
                     NoteManager.Instance.SaveNote(activeWin.graphElementRef, !isPublic, content);
                 }
-                //Load Notes
                 activeWin.searchField.text = NoteManager.Instance.LoadNote(graphID, isPublic);
-                //Debug.Log("activeWin.Text: " + content);
             };
 
             noteButtonWindow = NoteButtonWindow.Instance;
 
-            if (noteButtonWindow.flag != true)
+            if (noteButtonWindow.isOpen != true)
             {
                 noteButtonWindow.OpenWindow(saveButton, loadButton, deleteButton, refreshButton, publicToggle);
             }
@@ -140,7 +149,10 @@ namespace SEE.UI.Window.NoteWindow
 
         }
 
-
+        /// <summary>
+        /// Removes the outline from the specified <paramref name="gameObject"/>.
+        /// </summary>
+        /// <param name="gameObject">The game object to remove the outline from.</param>
         private void RemoveOutline(GameObject gameObject)
         {
             Material noteMaterial = Resources.Load<Material>("Materials/Outliner_MAT");
@@ -156,9 +168,9 @@ namespace SEE.UI.Window.NoteWindow
         }
 
         /// <summary>
-        /// Saves the Note
+        /// Saves the current note content for the specified <see cref="GraphElementRef"/>.
         /// </summary>
-        /// <param name="isPublic">should the note be saved to other clients</param>
+        /// <param name="isPublic">Indicates whether the note should be saved as public or private.</param>
         private void SaveNote(bool isPublic)
         {
             if (isPublic)
@@ -185,6 +197,10 @@ namespace SEE.UI.Window.NoteWindow
             searchField.text = NoteManager.Instance.LoadNote(graphID, isPublic);
         }
 
+        /// <summary>
+        /// Called when the object is destroyed.
+        /// If there are no instances of <see cref="NoteWindow"/> present, it destroys the <see cref="NoteButtonWindow"/>.
+        /// </summary>
         public void OnDestroy()
         {
             if (!ContainsNoteWindow())
@@ -193,6 +209,10 @@ namespace SEE.UI.Window.NoteWindow
             }
         }
 
+        /// <summary>
+        /// Checks if there are any instances of <see cref="NoteWindow"/> in the current window space.
+        /// </summary>
+        /// <returns>True if a <see cref="NoteWindow"/> is found, otherwise false.</returns>
         private bool ContainsNoteWindow()
         {
             WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];

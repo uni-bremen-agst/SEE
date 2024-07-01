@@ -13,12 +13,19 @@ using UnityEngine.Events;
 
 namespace SEE.Controls.Actions
 {
+    /// <summary>
+    /// Manages actions related to notes, including highlighting and hiding nodes and edges with notes.
+    /// </summary>
     internal class NoteAction : AbstractPlayerAction
     {
+        /// <summary>
+        /// Instance of the <see cref="NoteManager"/> class.
+        /// </summary>
         private NoteManager noteManager;
 
-        private WindowSpace manager;
-
+        /// <summary>
+        /// Window for handling note buttons.
+        /// </summary>
         private NoteButtonWindow noteButtonWindow;
 
         /// <summary>
@@ -52,22 +59,27 @@ namespace SEE.Controls.Actions
             return ActionStateTypes.Notes;
         }
 
+        /// <summary>
+        /// Initializes the note action, setting up necessary references.
+        /// </summary>
         public override void Start()
         {
             noteManager = NoteManager.Instance;
-            //noteButtonWindow = new();
-            //GameObject.Find("NoteManager").AddComponent<NoteButtonWindow>();
-
-            manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
-
         }
 
+        /// <summary>
+        /// Cleans up when the note action is stopped.
+        /// </summary>
         public override void Stop()
         {
             base.Stop();
             noteButtonWindow.DestroyWindow();
         }
 
+        /// <summary>
+        /// Updates the state of the note action, handling user inputs for hiding and highlighting notes.
+        /// </summary>
+        /// <returns>True if an action was performed, otherwise false.</returns>
         public override bool Update()
         {
             //Hide all Outlines when 'P' is pressed
@@ -114,66 +126,43 @@ namespace SEE.Controls.Actions
         /// It hides them if they have an outline active.
         /// It highlights the GameObject if they have a note but no outline active.
         /// </summary>
-        /// <param name="gameObject">gameObject that </param>
+        /// <param name="gameObject">The game object to toggle the outline for.</param>
         private void HideOrHightlight(GameObject gameObject)
         {
+            MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
+
             if (gameObject.IsNode())
             {
-                MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-
-                string oldMaterialName = meshRenderer.materials[meshRenderer.materials.Length - 1].name;
-                string newName = oldMaterialName.Replace(" (Instance)", "");
-                //GameObject has no outline
-                if (newName != noteMaterial.name)
-                {
-                    Material[] materialsArray = new Material[meshRenderer.materials.Length + 1];
-                    Array.Copy(meshRenderer.materials, materialsArray, meshRenderer.materials.Length);
-                    materialsArray[meshRenderer.materials.Length] = noteMaterial;
-                    meshRenderer.materials = materialsArray;
-                }
-                //GameObject has outline
-                else
-                {
-                    Material[] gameObjects = new Material[meshRenderer.materials.Length - 1];
-                    Array.Copy(meshRenderer.materials, gameObjects, meshRenderer.materials.Length - 1);
-                    meshRenderer.materials = gameObjects;
-                }
+                ToggleOutline(meshRenderer, noteMaterial);
             }
             else
             {
-                MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-
-                string oldMaterialName = meshRenderer.materials[meshRenderer.materials.Length - 1].name;
-                string newName = oldMaterialName.Replace(" (Instance)", "");
-                //GameObject has no outline
-                if (newName != noteMaterialEdge.name)
-                {
-                    Material[] materialsArray = new Material[meshRenderer.materials.Length + 1];
-                    Array.Copy(meshRenderer.materials, materialsArray, meshRenderer.materials.Length);
-                    materialsArray[meshRenderer.materials.Length] = noteMaterialEdge;
-                    meshRenderer.materials = materialsArray;
-                }
-                //GameObject has outline
-                else
-                {
-                    Material[] gameObjects = new Material[meshRenderer.materials.Length - 1];
-                    Array.Copy(meshRenderer.materials, gameObjects, meshRenderer.materials.Length - 1);
-                    meshRenderer.materials = gameObjects;
-                }
+                ToggleOutline(meshRenderer, noteMaterialEdge);
             }
         }
 
-        public void RemoveOutline(GameObject gameObject)
+        /// <summary>
+        /// Toggles the outline material for the specified mesh renderer.
+        /// </summary>
+        /// <param name="meshRenderer">The mesh renderer to toggle the outline for.</param>
+        /// <param name="outlineMaterial">The outline material to use.</param>
+        private void ToggleOutline(MeshRenderer meshRenderer, Material outlineMaterial)
         {
-            Material noteMaterial = Resources.Load<Material>("Materials/Outliner_MAT");
-            MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
             string oldMaterialName = meshRenderer.materials[meshRenderer.materials.Length - 1].name;
             string newName = oldMaterialName.Replace(" (Instance)", "");
-            if (newName == noteMaterial.name)
+
+            if (newName != outlineMaterial.name)
             {
-                Material[] gameObjects = new Material[meshRenderer.materials.Length - 1];
-                Array.Copy(meshRenderer.materials, gameObjects, meshRenderer.materials.Length - 1);
-                meshRenderer.materials = gameObjects;
+                Material[] materialsArray = new Material[meshRenderer.materials.Length + 1];
+                Array.Copy(meshRenderer.materials, materialsArray, meshRenderer.materials.Length);
+                materialsArray[meshRenderer.materials.Length] = outlineMaterial;
+                meshRenderer.materials = materialsArray;
+            }
+            else
+            {
+                Material[] materialsArray = new Material[meshRenderer.materials.Length - 1];
+                Array.Copy(meshRenderer.materials, materialsArray, meshRenderer.materials.Length - 1);
+                meshRenderer.materials = materialsArray;
             }
         }
 
