@@ -1,140 +1,131 @@
-﻿using Cysharp.Threading.Tasks;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Utils.Paths;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.TestTools;
 
 namespace SEE.GraphProviders
 {
     /// <summary>
     /// Test cases for concrete subclasses of <see cref="GraphProvider"/>.
     /// </summary>
+    /// <remarks>We do want to use the UnityTest attribute for the test methods
+    /// listed in this class because otherwise they would be run asynchronously
+    /// in which case they may interfere with each other regarding the
+    /// logging output. I saw a test run in which <see cref="TestGXLGraphProviderAsync"/>
+    /// picked up the error messages of another test case.</remarks>
     internal class TestGraphProviders
     {
-        [UnityTest]
-        public IEnumerator TestGXLGraphProvider() =>
-            UniTask.ToCoroutine(async () =>
+        [Test]
+        public async Task TestGXLGraphProviderAsync()
+        {
+            SingleGraphProvider provider = new GXLSingleGraphProvider()
+            { Path = new DataPath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
+
+            GameObject go = new();
+            SEECity city = go.AddComponent<SEECity>();
+
+            Graph loaded = await provider.ProvideAsync(new Graph(""), city);
+            Assert.IsNotNull(loaded);
+            Assert.IsTrue(loaded.NodeCount > 0);
+            Assert.IsTrue(loaded.EdgeCount > 0);
+        }
+
+        [Test]
+        public async Task TestCSVJaCoCoGXLGraphProviderAsync()
+        {
+            GameObject go = new();
+            SEECity city = go.AddComponent<SEECity>();
+
+            SingleGraphPipelineProvider graphPipeline = new();
+
             {
                 SingleGraphProvider provider = new GXLSingleGraphProvider()
                 { Path = new DataPath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
-
-                GameObject go = new();
-                SEECity city = go.AddComponent<SEECity>();
-
-                Graph loaded = await provider.ProvideAsync(new Graph(""), city);
-                Assert.IsNotNull(loaded);
-                Assert.IsTrue(loaded.NodeCount > 0);
-                Assert.IsTrue(loaded.EdgeCount > 0);
-            });
-
-        private static DataPath NewDataPath(string filename)
-        {
-            return new DataPath()
+                graphPipeline.Add(provider);
+            }
             {
-                Path = Application.streamingAssetsPath + "/" + filename
-            };
-        }
-
-        [UnityTest]
-        public IEnumerator TestCSVJaCoCoGXLGraphProvider() =>
-            UniTask.ToCoroutine(async () =>
-            {
-                GameObject go = new();
-                SEECity city = go.AddComponent<SEECity>();
-
-                SingleGraphPipelineProvider graphPipeline = new();
-
-                {
-                    SingleGraphProvider provider = new GXLSingleGraphProvider()
-                    { Path = new DataPath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
-                    graphPipeline.Add(provider);
-                }
-                {
-                    SingleGraphProvider provider = new JaCoCoGraphProvider()
-                    { Path = new DataPath(Application.streamingAssetsPath + "/JLGExample/jacoco.xml") };
-                    graphPipeline.Add(provider);
-                }
-
-                {
-                    SingleGraphProvider provider = new CSVGraphProvider()
-                    { Path = new DataPath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.csv") };
-                    graphPipeline.Add(provider);
+                SingleGraphProvider provider = new JaCoCoGraphProvider()
+                { Path = new DataPath(Application.streamingAssetsPath + "/JLGExample/jacoco.xml") };
+                graphPipeline.Add(provider);
             }
 
-                Graph loaded = await graphPipeline.ProvideAsync(new Graph(""), city);
-                Assert.IsNotNull(loaded);
-                Assert.IsTrue(loaded.NodeCount > 0);
-                Assert.IsTrue(loaded.EdgeCount > 0);
+            {
+                SingleGraphProvider provider = new CSVGraphProvider()
+                { Path = new DataPath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.csv") };
+                graphPipeline.Add(provider);
+            }
 
-                Assert.IsTrue(loaded.TryGetNode("counter.CountToAThousand.countWithFibbonaci(I;)", out Node node));
+            Graph loaded = await graphPipeline.ProvideAsync(new Graph(""), city);
+            Assert.IsNotNull(loaded);
+            Assert.IsTrue(loaded.NodeCount > 0);
+            Assert.IsTrue(loaded.EdgeCount > 0);
 
-                // Metric from JaCoCo report.
+            Assert.IsTrue(loaded.TryGetNode("counter.CountToAThousand.countWithFibbonaci(I;)", out Node node));
+
+            // Metric from JaCoCo report.
+            {
+                Assert.IsTrue(node.TryGetInt(JaCoCo.BranchCovered, out int value));
+                Assert.AreEqual(5, value);
+            }
+            // Metric from CSV import.
+            {
+                Assert.IsTrue(node.TryGetInt(Metrics.Prefix + "Developers", out int value));
+                Assert.AreEqual(3, value);
+            }
+        }
+
+        [Test]
+        public async Task TestMergeDiffGraphProviderAsync()
+        {
+            GameObject go = new();
+            SEECity city = go.AddComponent<SEECity>();
+
+            // Newer graph
+            Graph graph;
+            {
+                SingleGraphProvider provider = new GXLSingleGraphProvider()
+                { Path = new DataPath(Application.streamingAssetsPath + "/mini-evolution/CodeFacts-5.gxl") };
+                graph = await provider.ProvideAsync(new Graph(""), city);
+            }
+
+            {
+                // Older graph
+                SingleGraphProvider provider = new GXLSingleGraphProvider()
+                { Path = new DataPath(Application.streamingAssetsPath + "/mini-evolution/CodeFacts-1.gxl") };
+
+                MergeDiffGraphProvider mergeDiffProvider = new()
                 {
-                    Assert.IsTrue(node.TryGetInt(JaCoCo.BranchCovered, out int value));
-                    Assert.AreEqual(5, value);
+                    OldGraph = provider
+                };
+
+                Graph diffGraph = await mergeDiffProvider.ProvideAsync(graph, city);
+
+                Assert.IsNotNull(diffGraph);
+                Assert.IsTrue(diffGraph.NodeCount > 0);
+                Assert.IsTrue(diffGraph.EdgeCount > 0);
+
+                // Just a few checks. The underlying Diff-Merge algorithm is tested in more depth elsewhere.
+                {
+                    Assert.IsTrue(diffGraph.TryGetNode("p1.c1", out Node node));
+                    Assert.IsTrue(node.HasToggle(ChangeMarkers.IsChanged));
                 }
-                // Metric from CSV import.
+
                 {
-                    Assert.IsTrue(node.TryGetInt(Metrics.Prefix + "Developers", out int value));
-                    Assert.AreEqual(3, value);
+                    Assert.IsTrue(diffGraph.TryGetNode("p1.c2", out Node node));
+                    Assert.IsTrue(node.HasToggle(ChangeMarkers.IsNew));
                 }
-            });
 
-        [UnityTest]
-        public IEnumerator TestMergeDiffGraphProvider() =>
-                UniTask.ToCoroutine(async () =>
                 {
-                    GameObject go = new();
-                    SEECity city = go.AddComponent<SEECity>();
-
-                    // Newer graph
-                    Graph graph;
-                    {
-                        SingleGraphProvider provider = new GXLSingleGraphProvider()
-                        { Path = new DataPath(Application.streamingAssetsPath + "/mini-evolution/CodeFacts-5.gxl") };
-                        graph = await provider.ProvideAsync(new Graph(""), city);
-                    }
-
-                    {
-                        // Older graph
-                        SingleGraphProvider provider = new GXLSingleGraphProvider()
-                        { Path = new DataPath(Application.streamingAssetsPath + "/mini-evolution/CodeFacts-1.gxl") };
-
-                        MergeDiffGraphProvider mergeDiffProvider = new()
-                        {
-                            OldGraph = provider
-                        };
-
-                        Graph diffGraph = await mergeDiffProvider.ProvideAsync(graph, city);
-
-                        Assert.IsNotNull(diffGraph);
-                        Assert.IsTrue(diffGraph.NodeCount > 0);
-                        Assert.IsTrue(diffGraph.EdgeCount > 0);
-
-                        // Just a few checks. The underlying Diff-Merge algorithm is tested in more depth elsewhere.
-                        {
-                            Assert.IsTrue(diffGraph.TryGetNode("p1.c1", out Node node));
-                            Assert.IsTrue(node.HasToggle(ChangeMarkers.IsChanged));
-                        }
-
-                        {
-                            Assert.IsTrue(diffGraph.TryGetNode("p1.c2", out Node node));
-                            Assert.IsTrue(node.HasToggle(ChangeMarkers.IsNew));
-                        }
-
-                        {
-                            Assert.IsTrue(diffGraph.TryGetEdge("Call#p1.c1#p1.c4", out Edge edge));
-                            Assert.IsTrue(edge.HasToggle(ChangeMarkers.IsDeleted));
-                        }
-                    }
-                });
+                    Assert.IsTrue(diffGraph.TryGetEdge("Call#p1.c1#p1.c4", out Edge edge));
+                    Assert.IsTrue(edge.HasToggle(ChangeMarkers.IsDeleted));
+                }
+            }
+        }
 
         [Test]
         public async Task TestVCSGraphProviderAsync()
@@ -207,33 +198,32 @@ namespace SEE.GraphProviders
             Assert.IsTrue(node.TryGetFloat(Halstead.NumberOfDeliveredBugs, out float _));
         }
 
-        [UnityTest]
-        public IEnumerator TestVCSMetrics() =>
-            UniTask.ToCoroutine(async () =>
+        [Test]
+        public async Task TestVCSMetricsAsync()
+        {
+            Graph graph = await GetVCSGraphAsync();
+            Assert.IsNotNull(graph);
+            Assert.IsTrue(graph.NodeCount > 0);
+
+            Assert.IsTrue(graph.TryGetNode("Assets/SEE/GraphProviders/VCSGraphProvider.cs", out Node node));
+
             {
-                Graph graph = await GetVCSGraphAsync();
-                Assert.IsNotNull(graph);
-                Assert.IsTrue(graph.NodeCount > 0);
-
-                Assert.IsTrue(graph.TryGetNode("Assets/SEE/GraphProviders/VCSGraphProvider.cs", out Node node));
-
-                {
-                    Assert.IsTrue(node.TryGetInt(DataModel.DG.VCS.LinesAdded, out int value));
-                    Assert.AreEqual(157, value);
-                }
-                {
-                    Assert.IsTrue(node.TryGetInt(DataModel.DG.VCS.LinesDeleted, out int value));
-                    Assert.AreEqual(193, value);
-                }
-                {
-                    Assert.IsTrue(node.TryGetInt(DataModel.DG.VCS.NumberOfDevelopers, out int value));
-                    Assert.AreEqual(4, value);
-                }
-                {
-                    Assert.IsTrue(node.TryGetInt(DataModel.DG.VCS.CommitFrequency, out int value));
-                    Assert.AreEqual(12, value);
-                }
-            });
+                Assert.IsTrue(node.TryGetInt(DataModel.DG.VCS.LinesAdded, out int value));
+                Assert.AreEqual(157, value);
+            }
+            {
+                Assert.IsTrue(node.TryGetInt(DataModel.DG.VCS.LinesDeleted, out int value));
+                Assert.AreEqual(193, value);
+            }
+            {
+                Assert.IsTrue(node.TryGetInt(DataModel.DG.VCS.NumberOfDevelopers, out int value));
+                Assert.AreEqual(4, value);
+            }
+            {
+                Assert.IsTrue(node.TryGetInt(DataModel.DG.VCS.CommitFrequency, out int value));
+                Assert.AreEqual(12, value);
+            }
+        }
 
         /// <summary>
         /// The graph consisting of all C# files in folder Assets/SEE/GraphProviders.
@@ -241,8 +231,7 @@ namespace SEE.GraphProviders
         /// <returns>graph consisting of all C# files in folder Assets/SEE/GraphProviders</returns>
         private static async Task<Graph> GetVCSGraphAsync()
         {
-            GameObject go = new();
-            SEECity city = go.AddComponent<SEECity>();
+            SEECity city = NewCity();
 
             Dictionary<string, bool> pathGlobbing = new()
                 {
@@ -258,6 +247,13 @@ namespace SEE.GraphProviders
             };
 
             return await provider.ProvideAsync(new Graph(""), city);
+        }
+
+        private static SEECity NewCity()
+        {
+            GameObject go = new();
+            SEECity city = go.AddComponent<SEECity>();
+            return city;
         }
     }
 }
