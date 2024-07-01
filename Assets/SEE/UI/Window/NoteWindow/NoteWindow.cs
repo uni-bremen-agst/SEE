@@ -52,7 +52,11 @@ namespace SEE.UI.Window.NoteWindow
         /// </summary>
         private WindowSpace manager;
 
-        // Start is called before the first frame update
+        private Toggle publicToggle;
+
+        /// <summary>
+        /// Creates and configures the <see cref="NoteWindow"/>.
+        /// </summary>
         protected override void StartDesktop()
         {
             base.StartDesktop();
@@ -60,64 +64,133 @@ namespace SEE.UI.Window.NoteWindow
         }
 
         /// <summary>
-        /// Creates the <see cref="NoteWindow"/> and loads data if available.
+        /// Creates and configures the note window, including setting up the UI elements and their associated actions.
         /// </summary>
         private void CreateWindow()
         {
             noteManager = NoteManager.Instance;
             manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+            noteButtonWindow = NoteButtonWindow.Instance;
 
             GameObject noteWindow = PrefabInstantiator.InstantiatePrefab(WindowPrefab, Window.transform.Find("Content"), false);
             noteWindow.name = "Note Window";
 
             searchField = noteWindow.transform.Find("ScrollView/Viewport/Content/InputField").gameObject.MustGetComponent<TMP_InputField>();
-
             searchField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
             searchField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
+            searchField.onDeselect.AddListener(_ => SaveNote(publicToggle.isOn));
 
-            UnityAction saveButton = () =>
+            // Set up button actions
+            SetUpButton(noteWindow, "Content/SaveButton", CreateSaveButtonAction());
+            SetUpButton(noteWindow, "Content/LoadButton", CreateLoadButtonAction());
+            SetUpButton(noteWindow, "Content/DeleteButton", CreateDeleteButtonAction());
+            SetUpButton(noteWindow, "Content/RefreshButton", CreateRefreshButtonAction());
+
+            publicToggle = noteWindow.transform.Find("Content/PublicToggle").gameObject.MustGetComponent<Toggle>();
+            publicToggle.onValueChanged.AddListener(CreatePublicToggleAction());
+
+            if (!noteButtonWindow.isOpen)
             {
-                noteButtonWindow.contentText = this.searchField.text;
+                noteButtonWindow.OpenWindow(CreateSaveButtonAction(), CreateLoadButtonAction(), CreateDeleteButtonAction(), CreateRefreshButtonAction(), CreatePublicToggleAction());
+            }
+
+            LoadNote();
+        }
+
+        /// <summary>
+        /// Sets up a button with the specified path and action.
+        /// </summary>
+        /// <param name="noteWindow">The note window GameObject.</param>
+        /// <param name="path">The path to the button within the note window.</param>
+        /// <param name="action">The action to assign to the button.</param>
+        private void SetUpButton(GameObject noteWindow, string path, UnityAction action)
+        {
+            ButtonManagerBasic button = noteWindow.transform.Find(path).gameObject.MustGetComponent<ButtonManagerBasic>();
+            button.clickEvent.AddListener(action);
+        }
+
+        /// <summary>
+        /// Creates the save button action. It saves the content from the <see cref="NoteWindow"/> into a file.</param>
+        /// </summary>
+        /// <returns>The UnityAction for the save button.</returns>
+        private UnityAction CreateSaveButtonAction()
+        {
+            return () =>
+            {
+                manager.ActiveWindow.gameObject.TryGetComponent<NoteWindow>(out NoteWindow activeWin);
+                noteButtonWindow.contentText = activeWin.searchField.text;
                 string content = noteButtonWindow.contentText;
-                string path = EditorUtility.SaveFilePanel(
-                "Save Note",
-                "",
-                "Note",
-                "");
-                if (path.Length != 0)
+                string path = EditorUtility.SaveFilePanel("Save Note", "", "Note", "");
+                if (!string.IsNullOrEmpty(path))
                 {
-                    if (content != null)
+                    if (!string.IsNullOrEmpty(content))
                         File.WriteAllText(path, content);
                 }
             };
+        }
 
-            UnityAction loadButton = () =>
+        /// <summary>
+        /// Creates the load button action. It loads the content from a file to the <see cref="NoteWindow"/>.
+        /// </summary>
+        /// <returns>The UnityAction for the load button.</returns>
+        private UnityAction CreateLoadButtonAction()
+        {
+            return () =>
             {
+                manager.ActiveWindow.gameObject.TryGetComponent<NoteWindow>(out NoteWindow activeWin);
                 string path = EditorUtility.OpenFilePanel("Overwrite with txt", "", "");
-                if (path.Length != 0)
+                if (!string.IsNullOrEmpty(path))
                 {
                     string fileContent = File.ReadAllText(path);
-                    this.searchField.text = fileContent;
+                    activeWin.searchField.text = fileContent;
                 }
             };
+        }
 
-            UnityAction deleteButton = () =>
+        /// <summary>
+        /// Creates the delete button action. It deletes the content and outline if the Node or Edge has no note.
+        /// </summary>
+        /// <returns>The UnityAction for the delete button.</returns>
+        private UnityAction CreateDeleteButtonAction()
+        {
+            return () =>
             {
                 manager.ActiveWindow.gameObject.TryGetComponent<NoteWindow>(out NoteWindow activeWin);
                 activeWin.searchField.text = "";
                 GameObject removeGO = manager.ActiveWindow.gameObject;
-                RemoveOutline(removeGO);
-                noteManager.objectList.Remove(removeGO);
+                KeyValuePair<string, bool> kv = new KeyValuePair<string, bool>(activeWin.graphElementRef.Elem.ID, publicToggle.isOn);
+                noteManager.notesDictionary.Remove(kv);
+                KeyValuePair<string, bool> kv2 = new KeyValuePair<string, bool>(activeWin.graphElementRef.Elem.ID, !publicToggle.isOn);
+                if (!noteManager.notesDictionary.ContainsKey(kv2))
+                {
+                    RemoveOutline(removeGO);
+                    noteManager.objectList.Remove(removeGO);
+                }
             };
+        }
 
-            UnityAction refreshButton = () =>
+        /// <summary>
+        /// Creates the refresh button action. It loads the new content to <see cref="NoteWindow"/>.
+        /// </summary>
+        /// <returns>The UnityAction for the refresh button.</returns>
+        private UnityAction CreateRefreshButtonAction()
+        {
+            return () =>
             {
-                string graphID = this.graphElementRef.Elem.ID;
-                bool isPublic = true;
-                this.searchField.text = NoteManager.Instance.LoadNote(graphID, isPublic);
+                manager.ActiveWindow.gameObject.TryGetComponent<NoteWindow>(out NoteWindow activeWin);
+                string graphID = activeWin.graphElementRef.Elem.ID;
+                bool isPublic = publicToggle.isOn;
+                activeWin.searchField.text = NoteManager.Instance.LoadNote(graphID, isPublic);
             };
+        }
 
-            UnityAction<bool> publicToggle = (bool isPublic) =>
+        /// <summary>
+        /// Creates the public toggle action.
+        /// </summary>
+        /// <returns>The UnityAction for the public toggle.</returns>
+        private UnityAction<bool> CreatePublicToggleAction()
+        {
+            return (bool isPublic) =>
             {
                 manager.ActiveWindow.gameObject.TryGetComponent<NoteWindow>(out NoteWindow activeWin);
                 string content = activeWin.searchField.text;
@@ -125,28 +198,15 @@ namespace SEE.UI.Window.NoteWindow
 
                 if (!isPublic)
                 {
-                    NoteManager.Instance.SaveNote(activeWin.graphElementRef, !isPublic, content);
-                    new NoteSaveNetAction(activeWin.graphElementRef, !isPublic, content).Execute();
+                    NoteManager.Instance.SaveNote(activeWin.graphElementRef.Elem.ID, !isPublic, content);
+                    new NoteSaveNetAction(activeWin.graphElementRef.Elem.ID, !isPublic, content).Execute();
                 }
                 else
                 {
-                    NoteManager.Instance.SaveNote(activeWin.graphElementRef, !isPublic, content);
+                    NoteManager.Instance.SaveNote(activeWin.graphElementRef.Elem.ID, !isPublic, content);
                 }
                 activeWin.searchField.text = NoteManager.Instance.LoadNote(graphID, isPublic);
             };
-
-            noteButtonWindow = NoteButtonWindow.Instance;
-
-            if (noteButtonWindow.isOpen != true)
-            {
-                noteButtonWindow.OpenWindow(saveButton, loadButton, deleteButton, refreshButton, publicToggle);
-            }
-
-            searchField.onDeselect.AddListener(_ => SaveNote(noteButtonWindow.publicToggle.isOn));
-
-            LoadNote();
-
-
         }
 
         /// <summary>
@@ -173,17 +233,21 @@ namespace SEE.UI.Window.NoteWindow
         /// <param name="isPublic">Indicates whether the note should be saved as public or private.</param>
         private void SaveNote(bool isPublic)
         {
-            if (isPublic)
+            if (!string.IsNullOrEmpty(searchField.text))
             {
-                string content = searchField.text;
+                string graphElement = graphElementRef.Elem.ID;
+                if (isPublic)
+                {
+                    string content = searchField.text;
 
-                NoteManager.Instance.SaveNote(graphElementRef, isPublic, content);
-                new NoteSaveNetAction(graphElementRef, true, content).Execute();
-            }
-            else
-            {
-                string content = searchField.text;
-                NoteManager.Instance.SaveNote(graphElementRef, isPublic, content);
+                    NoteManager.Instance.SaveNote(graphElement, isPublic, content);
+                    new NoteSaveNetAction(graphElement, true, content).Execute();
+                }
+                else
+                {
+                    string content = searchField.text;
+                    NoteManager.Instance.SaveNote(graphElement, isPublic, content);
+                }
             }
         }
 

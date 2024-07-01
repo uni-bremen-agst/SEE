@@ -15,10 +15,13 @@ namespace SEE.UI.Window.NoteWindow
     public class NoteSaveNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The GraphElementRef
+        /// The ID of the graph element in which to add the note.
         /// </summary>
-        public GraphElementRef graphElementRef;
+        public string graphElementID;
 
+        /// <summary>
+        /// Indicates whether the note is public or private.
+        /// </summary>
         public bool isPublic;
 
         /// <summary>
@@ -26,23 +29,34 @@ namespace SEE.UI.Window.NoteWindow
         /// </summary>
         public string content;
 
-        public NoteSaveNetAction(GraphElementRef graphElementRef, bool isPublic, string content)
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="graphElementID">The ID of the graph element in which to add the note.</param>
+        /// <param name="isPublic">Indicates whether the note is public or private.</param>
+        /// <param name="content">The content of the note to be saved.</param>
+        public NoteSaveNetAction(string graphElementID, bool isPublic, string content)
         {
-            this.graphElementRef = graphElementRef;
+            this.graphElementID = graphElementID;
             this.isPublic = isPublic;
             this.content = content;
         }
 
+        /// <summary>
+        /// Creates a new Note on each client.
+        /// </summary>
         protected override void ExecuteOnClient()
         {
-            Debug.Log("BeforeIf");
             if (!IsRequester())
             {
-                Debug.Log("AfterIf");
-                NoteManager.Instance.SaveNote(graphElementRef, isPublic, content);
+                NoteManager.Instance.SaveNote(graphElementID, isPublic, content);
             }
         }
 
+        /// <summary>
+        /// Things to execute on the server (none for this class). Necessary because it is abstract
+        /// in the superclass.
+        /// </summary>
         protected override void ExecuteOnServer()
         {
             //Intentionally left blank

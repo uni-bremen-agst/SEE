@@ -1,6 +1,7 @@
 using Michsky.UI.ModernUIPack;
 using SEE.Controls;
 using SEE.GO;
+using SEE.UI.Window.NoteWindow;
 using SEE.Utils;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,10 +19,13 @@ namespace SEE.UI.Window
     /// </summary>
     public class NoteButtonWindow : MonoBehaviour
     {
+        /// <summary>
+        /// The instance of the <see cref="NoteButtonWindow"/> class.
+        /// </summary>
         private static NoteButtonWindow instance;
 
         /// <summary>
-        /// Gets the singleton instance of the <see cref="NoteButtonWindow"/> class.
+        /// Gets instance of the <see cref="NoteButtonWindow"/> class.
         /// </summary>
         public static NoteButtonWindow Instance
         {
@@ -61,7 +65,7 @@ namespace SEE.UI.Window
         public Toggle publicToggle;
 
         /// <summary>
-        /// Flag indicating whether the NoteButtonWindow is open.
+        /// Flag indicating whether the <see cref="NoteButtonWindow"/> is open or not.
         /// </summary>
         public bool isOpen = false;
 
@@ -101,7 +105,9 @@ namespace SEE.UI.Window
         /// </summary>
         public void DestroyWindow()
         {
+            NoteButtonWindow buttonWindow = GameObject.Find("NoteManager").GetComponent<NoteButtonWindow>();
             Destroyer.Destroy(noteButtonWindow);
+            Destroy(buttonWindow);
         }
     }
 }

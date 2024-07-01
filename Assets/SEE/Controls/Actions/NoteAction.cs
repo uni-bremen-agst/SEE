@@ -29,6 +29,11 @@ namespace SEE.Controls.Actions
         private NoteButtonWindow noteButtonWindow;
 
         /// <summary>
+        /// A set of IDs representing all game objects that have been changed by this action.
+        /// </summary>
+        private HashSet<string> idHashSet;
+
+        /// <summary>
         /// The material to outline the nodes and edges.
         /// </summary>
         Material noteMaterial = Resources.Load<Material>("Materials/Outliner_MAT");
@@ -82,8 +87,8 @@ namespace SEE.Controls.Actions
         /// <returns>True if an action was performed, otherwise false.</returns>
         public override bool Update()
         {
-            //Hide all Outlines when 'P' is pressed
-            if (Input.GetKeyDown(KeyCode.P))
+            //Hide all Outlines when middle Mousebutton is pressed
+            if (Input.GetKeyDown(KeyCode.Mouse2))
             {
                 HideAllNotes();
                 return true;
@@ -99,10 +104,6 @@ namespace SEE.Controls.Actions
                     if (noteManager.objectList.Contains(elemGameObject))
                     {
                         HideOrHightlight(elemGameObject);
-                        return true;
-                    }
-                    else
-                    {
                         return true;
                     }
                 }
@@ -130,7 +131,7 @@ namespace SEE.Controls.Actions
         private void HideOrHightlight(GameObject gameObject)
         {
             MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-
+            idHashSet.Add(gameObject.ID());
             if (gameObject.IsNode())
             {
                 ToggleOutline(meshRenderer, noteMaterial);
@@ -166,9 +167,14 @@ namespace SEE.Controls.Actions
             }
         }
 
+        /// <summary>
+        /// Returns the set of IDs of all game objects changed by this action.
+        /// <see cref="IReversibleAction.GetChangedObjects"/>
+        /// </summary>
+        /// <returns>Returns the ID of the gameObject that either has an outline or has its outline removed.</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new HashSet<string>();
+            return idHashSet;
         }
     }
 }
