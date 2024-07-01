@@ -3772,8 +3772,12 @@ MonoBehaviour:
       Data: 68|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
-      Entry: 9
-      Data: 3
+      Entry: 7
+      Data: 69|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 12
       Data: 0
@@ -3785,11 +3789,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 69|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 70|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 69
     - Name: 
       Entry: 12
       Data: 0
@@ -3801,11 +3805,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 70|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+      Data: 71|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 69
     - Name: 
       Entry: 12
       Data: 0
@@ -3817,11 +3821,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 71|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 72|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 69
     - Name: 
       Entry: 12
       Data: 0
@@ -3842,20 +3846,20 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 72|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
+      Data: 73|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 73|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
+      Data: 74|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 74|SEE.GraphProviders.GXLSingleGraphProvider, SEE
+      Data: 75|SEE.GraphProviders.GXLSingleGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 75|SEE.Utils.Paths.DataPath, SEE
+      Data: 76|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -3873,10 +3877,10 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 76|SEE.GraphProviders.JaCoCoGraphProvider, SEE
+      Data: 77|SEE.GraphProviders.JaCoCoGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 77|SEE.Utils.Paths.DataPath, SEE
+      Data: 78|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -7444,8 +7448,12 @@ MonoBehaviour:
       Data: 104|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
-      Entry: 9
-      Data: 3
+      Entry: 7
+      Data: 105|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 12
       Data: 0
@@ -7457,11 +7465,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 105|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 106|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 105
     - Name: 
       Entry: 12
       Data: 0
@@ -7473,11 +7481,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 106|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+      Data: 107|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 105
     - Name: 
       Entry: 12
       Data: 0
@@ -7489,11 +7497,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 107|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 108|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 105
     - Name: 
       Entry: 12
       Data: 0
@@ -7514,20 +7522,20 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 108|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
+      Data: 109|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 109|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
+      Data: 110|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 110|SEE.GraphProviders.GXLSingleGraphProvider, SEE
+      Data: 111|SEE.GraphProviders.GXLSingleGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 111|SEE.Utils.Paths.DataPath, SEE
+      Data: 112|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -13021,8 +13029,12 @@ MonoBehaviour:
       Data: 116|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
-      Entry: 9
-      Data: 3
+      Entry: 7
+      Data: 117|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 12
       Data: 0
@@ -13034,11 +13046,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 117|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 118|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 117
     - Name: 
       Entry: 12
       Data: 0
@@ -13050,11 +13062,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 118|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+      Data: 119|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 117
     - Name: 
       Entry: 12
       Data: 0
@@ -13066,11 +13078,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 119|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 120|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 117
     - Name: 
       Entry: 12
       Data: 0
@@ -13091,20 +13103,20 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 120|SEE.GraphProviders.MultiGraphPipelineProvider, SEE
+      Data: 121|SEE.GraphProviders.MultiGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 121|System.Collections.Generic.List`1[[SEE.GraphProviders.MultiGraphProvider,
+      Data: 122|System.Collections.Generic.List`1[[SEE.GraphProviders.MultiGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 122|SEE.GraphProviders.GXLEvolutionGraphProvider, SEE
+      Data: 123|SEE.GraphProviders.GXLEvolutionGraphProvider, SEE
     - Name: GXLDirectory
       Entry: 7
-      Data: 123|SEE.Utils.Paths.DataPath, SEE
+      Data: 124|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -25518,8 +25530,12 @@ MonoBehaviour:
       Data: 62|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
-      Entry: 9
-      Data: 3
+      Entry: 7
+      Data: 63|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 12
       Data: 0
@@ -25531,11 +25547,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 63|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 64|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 63
     - Name: 
       Entry: 12
       Data: 0
@@ -25547,11 +25563,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 64|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+      Data: 65|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 63
     - Name: 
       Entry: 12
       Data: 0
@@ -25563,11 +25579,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 65|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 66|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 63
     - Name: 
       Entry: 12
       Data: 0
@@ -25588,20 +25604,20 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 66|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
+      Data: 67|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 67|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
+      Data: 68|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 68|SEE.GraphProviders.GXLSingleGraphProvider, SEE
+      Data: 69|SEE.GraphProviders.GXLSingleGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 69|SEE.Utils.Paths.DataPath, SEE
+      Data: 70|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -25619,23 +25635,23 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 70|SEE.GraphProviders.MergeDiffGraphProvider, SEE
+      Data: 71|SEE.GraphProviders.MergeDiffGraphProvider, SEE
     - Name: OldGraph
       Entry: 7
-      Data: 71|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
+      Data: 72|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 72|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
+      Data: 73|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 73|SEE.GraphProviders.GXLSingleGraphProvider, SEE
+      Data: 74|SEE.GraphProviders.GXLSingleGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 74|SEE.Utils.Paths.DataPath, SEE
+      Data: 75|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -39477,8 +39493,12 @@ MonoBehaviour:
       Data: 68|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
-      Entry: 9
-      Data: 3
+      Entry: 7
+      Data: 69|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 12
       Data: 0
@@ -39490,11 +39510,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 69|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 70|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 69
     - Name: 
       Entry: 12
       Data: 0
@@ -39506,11 +39526,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 70|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+      Data: 71|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 69
     - Name: 
       Entry: 12
       Data: 0
@@ -39522,11 +39542,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 71|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 72|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 69
     - Name: 
       Entry: 12
       Data: 0
@@ -39547,20 +39567,20 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 72|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
+      Data: 73|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 73|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
+      Data: 74|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 74|SEE.GraphProviders.ReflexionGraphProvider, SEE
+      Data: 75|SEE.GraphProviders.ReflexionGraphProvider, SEE
     - Name: Architecture
       Entry: 7
-      Data: 75|SEE.Utils.Paths.DataPath, SEE
+      Data: 76|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -39575,7 +39595,7 @@ MonoBehaviour:
       Data: 
     - Name: Implementation
       Entry: 7
-      Data: 76|SEE.Utils.Paths.DataPath, SEE
+      Data: 77|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -39590,7 +39610,7 @@ MonoBehaviour:
       Data: 
     - Name: Mapping
       Entry: 7
-      Data: 77|SEE.Utils.Paths.DataPath, SEE
+      Data: 78|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
