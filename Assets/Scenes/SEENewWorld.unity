@@ -18241,7 +18241,7 @@ MonoBehaviour:
   OpenAiApiKey: 
   GrammarFilePath:
     Root: 3
-    RelativePath: 
+    RelativePath: /PersonalAssistantGrammar.grxml
     AbsolutePath: 
 --- !u!114 &1166896208
 MonoBehaviour:
@@ -20373,7 +20373,7 @@ MonoBehaviour:
   randomHoldDurationMax: 0.5
   configReady: 1
   warnOnNullRefs: 1
-  inspSalsaLinked: 0
+  inspSalsaLinked: 1
   inspStateFoldoutProcessing: 0
   inspStateFoldoutSettings: 0
   inspStateFoldoutEmotes: 0
