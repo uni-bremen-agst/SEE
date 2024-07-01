@@ -7,7 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.UI.Window.NoteWindow
+namespace SEE.Net.Actions
 {
     /// <summary>
     /// Saves the note through the network on each client.

@@ -12,7 +12,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace SEE.UI.Window
+namespace SEE.UI.Window.NoteWindow
 {
     /// <summary>
     /// Manages the note button window, allowing for display and interaction with note-related UI elements.
@@ -82,22 +82,28 @@ namespace SEE.UI.Window
         {
             noteButtonWindow = PrefabInstantiator.InstantiatePrefab(windowPrefab, GameObject.Find("UI Canvas").transform, false);
 
-            ButtonManagerBasic saveButton = noteButtonWindow.transform.Find("Content/SaveButton").gameObject.MustGetComponent<ButtonManagerBasic>();
-            saveButton.clickEvent.AddListener(saveButtonAction);
-
-            ButtonManagerBasic loadButton = noteButtonWindow.transform.Find("Content/LoadButton").gameObject.MustGetComponent<ButtonManagerBasic>();
-            loadButton.clickEvent.AddListener(loadButtonAction);
-
-            ButtonManagerBasic deleteButton = noteButtonWindow.transform.Find("Content/DeleteButton").gameObject.MustGetComponent<ButtonManagerBasic>();
-            deleteButton.clickEvent.AddListener(deleteButtonAction);
-
-            ButtonManagerBasic refreshButton = noteButtonWindow.transform.Find("Content/RefreshButton").gameObject.MustGetComponent<ButtonManagerBasic>();
-            refreshButton.clickEvent.AddListener(refreshButtonAction);
+            // Set up button actions
+            SetUpButton(noteButtonWindow, "Content/SaveButton", saveButtonAction);
+            SetUpButton(noteButtonWindow, "Content/LoadButton", loadButtonAction);
+            SetUpButton(noteButtonWindow, "Content/DeleteButton", deleteButtonAction);
+            SetUpButton(noteButtonWindow, "Content/RefreshButton", refreshButtonAction);
 
             publicToggle = noteButtonWindow.transform.Find("Content/PublicToggle").gameObject.MustGetComponent<Toggle>();
             publicToggle.onValueChanged.AddListener(publicToggleAction);
 
             isOpen = true;
+        }
+
+        /// <summary>
+        /// Sets up a button with the specified path and action.
+        /// </summary>
+        /// <param name="noteWindow">The note window GameObject.</param>
+        /// <param name="path">The path to the button within the note window.</param>
+        /// <param name="action">The action to assign to the button.</param>
+        private void SetUpButton(GameObject noteWindow, string path, UnityAction action)
+        {
+            ButtonManagerBasic button = noteWindow.transform.Find(path).gameObject.MustGetComponent<ButtonManagerBasic>();
+            button.clickEvent.AddListener(action);
         }
 
         /// <summary>

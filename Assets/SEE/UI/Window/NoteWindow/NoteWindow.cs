@@ -4,6 +4,7 @@ using SEE.Controls.Actions.Drawable;
 using SEE.DataModel.DG;
 using SEE.Game.Drawable;
 using SEE.GO;
+using SEE.Net.Actions;
 using SEE.Utils;
 using System;
 using System.Collections;
@@ -52,8 +53,6 @@ namespace SEE.UI.Window.NoteWindow
         /// </summary>
         private WindowSpace manager;
 
-        private Toggle publicToggle;
-
         /// <summary>
         /// Creates and configures the <see cref="NoteWindow"/>.
         /// </summary>
@@ -78,35 +77,14 @@ namespace SEE.UI.Window.NoteWindow
             searchField = noteWindow.transform.Find("ScrollView/Viewport/Content/InputField").gameObject.MustGetComponent<TMP_InputField>();
             searchField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
             searchField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
-            searchField.onDeselect.AddListener(_ => SaveNote(publicToggle.isOn));
-
-            // Set up button actions
-            SetUpButton(noteWindow, "Content/SaveButton", CreateSaveButtonAction());
-            SetUpButton(noteWindow, "Content/LoadButton", CreateLoadButtonAction());
-            SetUpButton(noteWindow, "Content/DeleteButton", CreateDeleteButtonAction());
-            SetUpButton(noteWindow, "Content/RefreshButton", CreateRefreshButtonAction());
-
-            publicToggle = noteWindow.transform.Find("Content/PublicToggle").gameObject.MustGetComponent<Toggle>();
-            publicToggle.onValueChanged.AddListener(CreatePublicToggleAction());
 
             if (!noteButtonWindow.isOpen)
             {
                 noteButtonWindow.OpenWindow(CreateSaveButtonAction(), CreateLoadButtonAction(), CreateDeleteButtonAction(), CreateRefreshButtonAction(), CreatePublicToggleAction());
             }
 
+            searchField.onDeselect.AddListener(_ => SaveNote(noteButtonWindow.publicToggle.isOn));
             LoadNote();
-        }
-
-        /// <summary>
-        /// Sets up a button with the specified path and action.
-        /// </summary>
-        /// <param name="noteWindow">The note window GameObject.</param>
-        /// <param name="path">The path to the button within the note window.</param>
-        /// <param name="action">The action to assign to the button.</param>
-        private void SetUpButton(GameObject noteWindow, string path, UnityAction action)
-        {
-            ButtonManagerBasic button = noteWindow.transform.Find(path).gameObject.MustGetComponent<ButtonManagerBasic>();
-            button.clickEvent.AddListener(action);
         }
 
         /// <summary>
@@ -158,13 +136,13 @@ namespace SEE.UI.Window.NoteWindow
                 manager.ActiveWindow.gameObject.TryGetComponent<NoteWindow>(out NoteWindow activeWin);
                 activeWin.searchField.text = "";
                 GameObject removeGO = manager.ActiveWindow.gameObject;
-                KeyValuePair<string, bool> kv = new KeyValuePair<string, bool>(activeWin.graphElementRef.Elem.ID, publicToggle.isOn);
-                noteManager.notesDictionary.Remove(kv);
-                KeyValuePair<string, bool> kv2 = new KeyValuePair<string, bool>(activeWin.graphElementRef.Elem.ID, !publicToggle.isOn);
-                if (!noteManager.notesDictionary.ContainsKey(kv2))
+                noteManager.objectList.Remove(removeGO);
+                KeyValuePair<string, bool> currentNoteKey = new KeyValuePair<string, bool>(activeWin.graphElementRef.Elem.ID, noteButtonWindow.publicToggle.isOn);
+                noteManager.notesDictionary.Remove(currentNoteKey);
+                KeyValuePair<string, bool> oppositeNoteKey = new KeyValuePair<string, bool>(activeWin.graphElementRef.Elem.ID, !noteButtonWindow.publicToggle.isOn);
+                if (!noteManager.notesDictionary.ContainsKey(oppositeNoteKey))
                 {
                     RemoveOutline(removeGO);
-                    noteManager.objectList.Remove(removeGO);
                 }
             };
         }
@@ -179,7 +157,7 @@ namespace SEE.UI.Window.NoteWindow
             {
                 manager.ActiveWindow.gameObject.TryGetComponent<NoteWindow>(out NoteWindow activeWin);
                 string graphID = activeWin.graphElementRef.Elem.ID;
-                bool isPublic = publicToggle.isOn;
+                bool isPublic = noteButtonWindow.publicToggle.isOn;
                 activeWin.searchField.text = NoteManager.Instance.LoadNote(graphID, isPublic);
             };
         }
@@ -215,16 +193,10 @@ namespace SEE.UI.Window.NoteWindow
         /// <param name="gameObject">The game object to remove the outline from.</param>
         private void RemoveOutline(GameObject gameObject)
         {
-            Material noteMaterial = Resources.Load<Material>("Materials/Outliner_MAT");
             MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-            string oldMaterialName = meshRenderer.materials[meshRenderer.materials.Length - 1].name;
-            string newName = oldMaterialName.Replace(" (Instance)", "");
-            if (newName == noteMaterial.name)
-            {
-                Material[] gameObjects = new Material[meshRenderer.materials.Length - 1];
-                Array.Copy(meshRenderer.materials, gameObjects, meshRenderer.materials.Length - 1);
-                meshRenderer.materials = gameObjects;
-            }
+            Material[] gameObjects = new Material[meshRenderer.materials.Length - 1];
+            Array.Copy(meshRenderer.materials, gameObjects, meshRenderer.materials.Length - 1);
+            meshRenderer.materials = gameObjects;
         }
 
         /// <summary>
@@ -295,71 +267,23 @@ namespace SEE.UI.Window.NoteWindow
             // Nothing needs to be done.
         }
 
+
         protected override void InitializeFromValueObject(WindowValues valueObject)
         {
-            if (valueObject is not NoteWindowValues noteValues)
-            {
-                throw new UnsupportedTypeException(typeof(NoteWindowValues), valueObject.GetType());
-            }
-            if (noteValues.Text != null)
-            {
-                // Nothings needs to be done
-            }
+            //Nothing need to be done since multiplayer is already implemented for NoteWindow
+            throw new NotImplementedException();
         }
 
         public override void UpdateFromNetworkValueObject(WindowValues valueObject)
         {
-            if(valueObject is not NoteWindowValues noteValues)
-            {
-                throw new UnsupportedTypeException(typeof(NoteWindowValues), valueObject.GetType());
-            }
+            //Nothing need to be done since multiplayer is already implemented for NoteWindow
+            throw new NotImplementedException();
         }
 
         public override WindowValues ToValueObject()
         {
-            string attachedTo = gameObject.name;
-            return new NoteWindowValues(Title, attachedTo, searchField.text);
-        }
-    }
-
-    /// <summary>
-    /// Represents the values of a code window needed to re-create its content.
-    /// Used for serialization when sending a <see cref="CodeWindow"/> over the network.
-    /// </summary>
-    [Serializable]
-    public class NoteWindowValues : WindowValues
-    {
-        /// <summary>
-        /// Text of the note window. May be <c>null</c> or <c>empty</c>, in which case <see cref="Path"/> is not <c>null</c>.
-        /// </summary>
-        [field: SerializeField]
-        public string Text { get; private set; }
-
-
-        /// <summary>
-        /// The line number which is currently visible in / at the top of the code window.
-        /// </summary>
-        //[field: SerializeField]
-        //public int VisibleLine { get; private set; }
-
-        /// <summary>
-        /// Creates a new CodeWindowValues object from the given parameters.
-        /// Note that either <paramref name="text"/> or <paramref name="title"/> must not be <c>null</c>.
-        /// </summary>
-        /// <param name="title">The title of the code window.</param>
-        /// <param name="attachedTo">Name of the game object the note window is attached to.</param>
-        /// <param name="text">The text of the code window. May be <c>null</c>, in which case
-        /// May be <c>null</c>, in which case <paramref name="text"/> may not.</param>
-        /// <exception cref="ArgumentException">Thrown when both <paramref name="path"/> and
-        /// <paramref name="text"/> are <c>null</c>.</exception>
-        internal NoteWindowValues(string title, string attachedTo = null, string text = null) : base(title, attachedTo)
-        {
-            if (text == null)
-            {
-                throw new ArgumentException("Either text or filename must not be null!");
-            }
-
-            Text = text;
+            //Nothing need to be done since multiplayer is already implemented for NoteWindow
+            throw new NotImplementedException();
         }
     }
 }
