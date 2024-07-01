@@ -13,14 +13,14 @@ namespace SEE.Game.City
     public class ErosionAttributes : VisualAttributes
     {
         /// <summary>
-        /// Whether erosions should be visible above inner node blocks.
+        /// Whether inner erosions should be visible above node blocks.
         /// </summary>
-        public bool ShowInnerErosions = false;
+        public bool ShowInnerErosions;
 
         /// <summary>
-        /// Whether erosions should be visible above leaf node blocks.
+        /// Whether leaf erosions should be visible above node blocks.
         /// </summary>
-        public bool ShowLeafErosions = false;
+        public bool ShowLeafErosions;
 
         /// <summary>
         /// The maximal value for <see cref="ErosionScalingFactor"/>.
@@ -66,6 +66,23 @@ namespace SEE.Game.City
         /// The attribute name of the metric representing other kinds of violations.
         /// </summary>
         public string UniversalIssue = NumericAttributeNames.Universal.Name(); // serialized by Unity
+
+        /// <summary>
+        /// The attribute name of the metric representing LSP hints.
+        /// </summary>
+        public string LspHint = NumericAttributeNames.LspHint.Name(); // serialized by Unity
+        /// <summary>
+        /// The attribute name of the metric representing LSP infos.
+        /// </summary>
+        public string LspInfo = NumericAttributeNames.LspInfo.Name(); // serialized by Unity
+        /// <summary>
+        /// The attribute name of the metric representing LSP warnings.
+        /// </summary>
+        public string LspWarning = NumericAttributeNames.LspWarning.Name(); // serialized by Unity
+        /// <summary>
+        /// The attribute name of the metric representing LSP errors.
+        /// </summary>
+        public string LspError = NumericAttributeNames.LspError.Name(); // serialized by Unity
 
         //-----------------------------------------------------------------------
         // Software erosion issues shown as icons on Donut charts for inner nodes
@@ -122,6 +139,10 @@ namespace SEE.Game.City
             writer.Save(CycleIssue, cycleIssueLabel);
             writer.Save(CloneIssue, cloneIssueLabel);
             writer.Save(ArchitectureIssue, architectureIssueLabel);
+            writer.Save(LspHint, lspHintLabel);
+            writer.Save(LspInfo, lspInfoLabel);
+            writer.Save(LspWarning, lspWarningLabel);
+            writer.Save(LspError, lspErrorLabel);
 
             writer.Save(StyleIssueSum, styleIssueSumLabel);
             writer.Save(UniversalIssueSum, universalIssueSumLabel);
@@ -151,6 +172,10 @@ namespace SEE.Game.City
                 ConfigIO.Restore(values, cycleIssueLabel, ref CycleIssue);
                 ConfigIO.Restore(values, cloneIssueLabel, ref CloneIssue);
                 ConfigIO.Restore(values, architectureIssueLabel, ref ArchitectureIssue);
+                ConfigIO.Restore(values, lspHintLabel, ref LspHint);
+                ConfigIO.Restore(values, lspInfoLabel, ref LspInfo);
+                ConfigIO.Restore(values, lspWarningLabel, ref LspWarning);
+                ConfigIO.Restore(values, lspErrorLabel, ref LspError);
 
                 ConfigIO.Restore(values, styleIssueSumLabel, ref StyleIssueSum);
                 ConfigIO.Restore(values, universalIssueSumLabel, ref UniversalIssueSum);
@@ -174,6 +199,10 @@ namespace SEE.Game.City
         private const string cycleIssueLabel = "CycleIssue";
         private const string cloneIssueLabel = "CloneIssue";
         private const string architectureIssueLabel = "ArchitectureIssue";
+        private const string lspHintLabel = "LspHint";
+        private const string lspInfoLabel = "LspInfo";
+        private const string lspWarningLabel = "LspWarning";
+        private const string lspErrorLabel = "LspError";
 
         private const string styleIssueSumLabel = "StyleIssue_SUM";
         private const string universalIssueSumLabel = "UniversalIssue_SUM";

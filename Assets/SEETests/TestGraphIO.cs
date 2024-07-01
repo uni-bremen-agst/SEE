@@ -107,8 +107,8 @@ namespace SEE.DataModel.DG.IO
             Constraint innerNodesConstraint = new("File", 3, "imports", 0.01f);
             List<RandomAttributeDescriptor> attributeConstraints = new()
             {
-                new RandomAttributeDescriptor("Metric.LOC", 200, 50, -10, 100),
-                new RandomAttributeDescriptor("Metric.Clone_Rate", 0.5f, 0.1f, -0.5f, 1.3f),
+                new RandomAttributeDescriptor(Metrics.Prefix + "LOC", 200, 50, -10, 100),
+                new RandomAttributeDescriptor(Metrics.Prefix + "Clone_Rate", 0.5f, 0.1f, -0.5f, 1.3f),
             };
             const string basename = "random";
 
@@ -216,8 +216,8 @@ namespace SEE.DataModel.DG.IO
             };
             result.SetToggle("Linkage.Is_Definition");
             result.SetString("stringAttribute", "somestring");
-            result.SetFloat("Metric.Halstead.Volume", 49.546f);
-            result.SetInt("Metric.LOC", 10);
+            result.SetFloat(Halstead.Volume, 49.546f);
+            result.SetInt(Metrics.Prefix + "LOC", 10);
             graph.AddNode(result);
             return result;
         }

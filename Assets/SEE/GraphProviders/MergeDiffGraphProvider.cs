@@ -12,7 +12,7 @@ namespace SEE.GraphProviders
     /// <summary>
     /// A graph provider that merges the difference between two graphs.
     /// </summary>
-    internal class MergeDiffGraphProvider : GraphProvider
+    internal class MergeDiffGraphProvider : SingleGraphProvider
     {
         /// <summary>
         /// The list of providers that should be merged into the input graph
@@ -20,11 +20,11 @@ namespace SEE.GraphProviders
         /// These will be merged successively from first to last.
         /// </summary>
         [HideReferenceObjectPicker]
-        public GraphProvider OldGraph = new PipelineGraphProvider();
+        public SingleGraphProvider OldGraph = new SingleGraphPipelineProvider();
 
-        public override GraphProviderKind GetKind()
+        public override SingleGraphProviderKind GetKind()
         {
-            return GraphProviderKind.MergeDiff;
+            return SingleGraphProviderKind.MergeDiff;
         }
 
         /// <summary>

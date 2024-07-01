@@ -136,7 +136,7 @@ namespace SEE.UI.Menu
             nestedEntry.InnerEntries.ForEach(AddEntry);
             KeywordListener.Unregister(HandleKeyword);
             KeywordListener.Register(HandleKeyword);
-            MenuTooltip.Hide();
+            Tooltip.Deactivate();
         }
 
         /// <summary>
@@ -167,7 +167,7 @@ namespace SEE.UI.Menu
             {
                 ShowMenu = false;
             }
-            MenuTooltip.Hide();
+            Tooltip.Deactivate();
         }
 
         /// <summary>

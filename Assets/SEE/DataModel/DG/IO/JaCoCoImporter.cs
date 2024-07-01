@@ -338,7 +338,7 @@ namespace SEE.DataModel.DG.IO
                 int missed = int.Parse(xmlReader.GetAttribute("missed")!, CultureInfo.InvariantCulture.NumberFormat);
                 int covered = int.Parse(xmlReader.GetAttribute("covered")!, CultureInfo.InvariantCulture.NumberFormat);
 
-                string metricNamePrefix = JaCoCo.Prefix + "." + xmlReader.GetAttribute("type");
+                string metricNamePrefix = JaCoCo.Prefix + xmlReader.GetAttribute("type");
 
                 nodeToAddMetrics.SetInt(metricNamePrefix + "_missed", missed);
                 nodeToAddMetrics.SetInt(metricNamePrefix + "_covered", covered);

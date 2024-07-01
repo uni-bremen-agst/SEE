@@ -22,7 +22,7 @@ namespace SEE.GraphProviders
     /// <summary>
     /// A graph provider that uses a language server to create a graph.
     /// </summary>
-    public class LSPGraphProvider : GraphProvider
+    public class LSPGraphProvider : SingleGraphProvider
     {
         /// <summary>
         /// The path to the software project for which the graph shall be generated.
@@ -97,6 +97,13 @@ namespace SEE.GraphProviders
         [Title("Node types"), Tooltip("The node types to be included in the graph."), HideLabel]
         [EnumToggleButtons, FoldoutGroup("Import Settings")]
         public NodeKind IncludedNodeTypes = NodeKind.All;
+
+        /// <summary>
+        /// The diagnostic levels to be included.
+        /// </summary>
+        [Title("Diagnostic levels"), Tooltip("The diagnostic levels to be included."), HideLabel]
+        [EnumToggleButtons, FoldoutGroup("Import Settings")]
+        public DiagnosticKind IncludedDiagnosticLevels = DiagnosticKind.All;
 
         /// <summary>
         /// If true, the communication between the language server and SEE will be logged.
@@ -199,9 +206,9 @@ namespace SEE.GraphProviders
         /// </summary>
         private void SetLSPServerPath() => ServerPath = GetExecutablePath();
 
-        public override GraphProviderKind GetKind()
+        public override SingleGraphProviderKind GetKind()
         {
-            return GraphProviderKind.LSP;
+            return SingleGraphProviderKind.LSP;
         }
 
         public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
@@ -256,7 +263,8 @@ namespace SEE.GraphProviders
 
             try
             {
-                LSPImporter importer = new(handler, SourcePaths, ExcludedSourcePaths, IncludedNodeTypes,
+                LSPImporter importer = new(handler, SourcePaths, ExcludedSourcePaths ?? Array.Empty<string>(),
+                                           IncludedNodeTypes, IncludedDiagnosticLevels,
                                            IncludedEdgeTypes, AvoidSelfReferences, AvoidParentReferences);
                 using (LoadingSpinner.ShowDeterminate("Creating graph using LSP...", out Action<float> updateProgress))
                 {

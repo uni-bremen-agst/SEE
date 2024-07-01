@@ -181,6 +181,8 @@ namespace SEE.Utils
         /// <p>
         /// <b>Important:</b> This method should only be used if the caller is running on the thread pool.
         /// Additionally, be aware that switching between threads can be very expensive.
+        /// If you're using this from inside a MonoBehaviour, it's recommended to use a ConcurrentQueue of Actions
+        /// instead, which you can then run on the main thread in <see cref="MonoBehaviour.Update"/>.
         /// </p>
         /// </summary>
         /// <param name="action">The action to run on the main thread.</param>
