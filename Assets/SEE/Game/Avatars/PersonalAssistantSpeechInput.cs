@@ -133,7 +133,7 @@ namespace SEE.Game.Avatars
 
             if (!File.Exists(GrammarFilePath.Path))
             {
-                Debug.LogError($"Grammar file {GrammarFilePath} for speech recognition does not exist.\n");
+                Debug.LogError($"Grammar file {GrammarFilePath.Path} for speech recognition does not exist.\n");
                 return false;
             }
 
