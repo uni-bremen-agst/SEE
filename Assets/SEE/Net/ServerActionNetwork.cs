@@ -24,9 +24,8 @@ namespace SEE.Net
                 Debug.LogError($"There is no {nameof(NetworkClient)} for the client {client}.\n");
                 return;
             }
-            if (!networkClient.PlayerObject.TryGetComponent(out ClientActionNetwork clientNetwork))
+            if (!networkClient.PlayerObject.TryGetComponentOrLog(out ClientActionNetwork clientNetwork))
             {
-                Debug.LogError($"The player object does not have a {nameof(ClientActionNetwork)} component.\n");
                 return;
             }
 
