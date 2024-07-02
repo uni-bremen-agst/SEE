@@ -70,7 +70,7 @@ namespace SEE.DataModel.DG.IO
 
         /// <summary>
         /// Adds the nodes and edges in the GXL data provided in the <paramref name="gxl"/> stream and
-        /// and adds an artificial root node if there is no unique root node. The node levels will be
+        /// adds an artificial root node if there is no unique root node. The node levels will be
         /// calculated, too.
         /// </summary>
         /// <param name="gxl">Stream containing GXL data that shall be processed</param>
