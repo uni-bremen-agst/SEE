@@ -87,7 +87,7 @@ namespace SEE.GraphProviders
         /// and <see cref="AbstractSEECity.SourceCodeDirectory"/> will be retrieved</param>
         /// <param name="token">token with which the loading can be cancelled</param>
         /// <returns>loaded graph</returns>
-        /// <exception cref="ArgumentException">thrown if <paramref name="path"/> is null</exception>
+        /// <exception cref="ArgumentNullException">thrown if <paramref name="path"/> is null</exception>
         private async UniTask<Graph> LoadGraphAsync(DataPath path, AbstractSEECity city, CancellationToken token = default)
         {
             if (path == null)
