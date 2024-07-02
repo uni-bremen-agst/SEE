@@ -5,8 +5,6 @@ using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using SEE.DataModel.DG;
 using UnityEngine;
 
 namespace SEE.GraphProviders
