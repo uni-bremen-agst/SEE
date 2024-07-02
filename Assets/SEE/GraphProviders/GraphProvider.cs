@@ -38,14 +38,22 @@ namespace SEE.GraphProviders
         /// <param name="token">cancellation token</param>
         /// <returns>provided graph based on <paramref name="graph"/></returns>
         public abstract UniTask<T> ProvideAsync(T graph, AbstractSEECity city,
-            Action<float> changePercentage = null,
-            CancellationToken token = default);
+                                                Action<float> changePercentage = null,
+                                                CancellationToken token = default);
 
         /// <summary>
         /// The fold out group for the graph provider in the runtime configuration
         /// of a code city.
         /// </summary>
         protected const string GraphProviderFoldoutGroup = "Data";
+
+        /// <summary>
+        /// Returns the kind of graph provider.
+        /// </summary>
+        /// <returns>kind of graph provider</returns>
+        public abstract K GetKind();
+
+        #region Config I/O
 
         /// <summary>
         /// Saves the settings in the configuration file.
@@ -78,13 +86,6 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// Returns the kind of graph provider.
-        /// </summary>
-        /// <returns>kind of graph provider</returns>
-        public abstract K GetKind();
-
-        #region Config I/O
-        /// <summary>
         /// Subclasses must implement this so save their attributes. This class takes
         /// care only to begin and end the grouping and to emit the key-value pair
         /// for the 'kind'.
@@ -103,6 +104,6 @@ namespace SEE.GraphProviders
         /// </summary>
         protected const string kindLabel = "kind";
 
-        #endregion
+#endregion
     }
 }

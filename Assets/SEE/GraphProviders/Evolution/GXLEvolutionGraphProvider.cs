@@ -22,7 +22,7 @@ namespace SEE.GraphProviders
         /// The directory where the GXL file are stored.
         /// </summary>
         [ShowInInspector, Tooltip("Path to the directory containing the GXL files."), HideReferenceObjectPicker]
-        public DirectoryPath GXLDirectory = new();
+        public DataPath GXLDirectory = new();
 
         /// <summary>
         /// Sets the maximum number of revisions to load.

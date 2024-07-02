@@ -32,7 +32,7 @@ namespace SEE.Game.City
         /// </summary>
         [ShowInInspector, Tooltip("VCS path"),
             TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
-        public DirectoryPath VCSPath = new();
+        public DataPath VCSPath = new();
 
         /// <summary>
         /// The VCS identifier for the revision that constitutes the baseline of the

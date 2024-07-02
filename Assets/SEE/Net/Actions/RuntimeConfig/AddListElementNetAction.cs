@@ -10,12 +10,9 @@ namespace SEE.Net.Actions.RuntimeConfig
         /// <summary>
         /// Triggers 'SyncAddListElement' on <see cref="RuntimeTabMenu"/>.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                RuntimeConfigMenu.GetMenuForCity(CityIndex).SyncAddListElement?.Invoke(WidgetPath);
-            }
+            RuntimeConfigMenu.GetMenuForCity(CityIndex).SyncAddListElement?.Invoke(WidgetPath);
         }
     }
 }

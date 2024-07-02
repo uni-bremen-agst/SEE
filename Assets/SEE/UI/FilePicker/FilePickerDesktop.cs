@@ -135,7 +135,7 @@ namespace SEE.UI.FilePicker
                                            allowMultiSelection: false,
                                            pickMode: FileBrowser.PickMode.FilesAndFolders,
                                            title: "Pick a file/folder",
-                                           initialPath: DataPathInstance.RootPath);
+                                           initialPath: DataPathInstance.RootFileSystemPath);
 
                 // Find the newly opened file browser and optimize it for VR.
                 GameObject fileBrowser = GameObject.FindWithTag("FileBrowser");
@@ -207,7 +207,7 @@ namespace SEE.UI.FilePicker
                 throw new Exception("Received no paths from file browser.");
             }
             // There should only be a single path since multiple selections are forbidden.
-            DataPathInstance.Set(paths[0]);
+            DataPathInstance.Path = paths[0];
             UpdateDropdown();
             OnChangedDropdown?.Invoke();
             UpdateInput();

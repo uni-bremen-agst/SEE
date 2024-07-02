@@ -524,7 +524,7 @@ namespace SEE.GO
             if (!gameObject.TryGetComponent(out component))
             {
                 Debug.LogError($"Couldn't find component '{typeof(T).GetNiceName()}' "
-                               + $"on game object '{gameObject.name}'.\n");
+                               + $"on game object '{gameObject.FullName()}'.\n");
                 return false;
             }
 

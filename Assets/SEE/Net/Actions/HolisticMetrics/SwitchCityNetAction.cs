@@ -29,7 +29,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         /// <summary>
         /// This method does nothing.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank
         }
@@ -38,12 +38,9 @@ namespace SEE.Net.Actions.HolisticMetrics
         /// This method executes the action on all clients except the requester which means it calls the method of the
         /// metric board with the given name that will change the selection.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                FindWidgetsManager(BoardName).SwitchCity(CityName);
-            }
+            FindWidgetsManager(BoardName).SwitchCity(CityName);
         }
     }
 }

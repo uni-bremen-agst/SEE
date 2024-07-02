@@ -214,7 +214,7 @@ namespace SEE.UI
             if (!AsyncUtils.IsRunningOnMainThread)
             {
                 // If the game is not running, we'll just use a simple log message.
-                Debug.Log($"Running: {processMessage}");
+                Debug.Log($"Running: {processMessage}.\n");
             }
 
             determinateProcesses[processMessage] = 0;
@@ -271,7 +271,7 @@ namespace SEE.UI
             if (!AsyncUtils.IsRunningOnMainThread)
             {
                 // If the game is not running, we'll just use a simple log message.
-                Debug.Log($"Finished: {processMessage}");
+                Debug.Log($"Finished: {processMessage}.\n");
             }
 
             if ((!determinateProcesses.Remove(processMessage) && !indeterminateProcesses.Remove(processMessage))

@@ -1,12 +1,13 @@
+﻿using Cysharp.Threading.Tasks;
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using UnityEngine;
+using SEE.Utils.Paths;
 
 namespace SEE.Tools.Architecture
 {
@@ -86,24 +87,21 @@ namespace SEE.Tools.Architecture
 
         private async UniTask<Graph> LoadAsync(string path)
         {
-            string platformPath = Filenames.OnCurrentPlatform(path);
-            Debug.LogFormat("Loading graph from {0}...\n", platformPath);
-            GraphReader graphCreator = new(platformPath, HierarchicalEdges, basePath: "", rootID: "", logger);
-            await graphCreator.LoadAsync();
-            Graph result = graphCreator.GetGraph();
+            DataPath platformPath =new(Filenames.OnCurrentPlatform(path));
+            Debug.Log($"Loading graph from {platformPath.Path}...\n");;
+            Graph result = await GraphReader.LoadAsync(platformPath, HierarchicalEdges, basePath: "", logger: logger);
             Assert.That(result, !Is.Null);
-            Debug.LogFormat("Loaded {0} nodes and {1} edges.\n", result.NodeCount, result.EdgeCount);
+            Debug.Log($"Loaded {result.NodeCount} nodes and {result.EdgeCount} edges.\n");
             //result.DumpTree();
             return result;
         }
-
         private async UniTask<(Graph impl, Graph arch, Graph mapping)> LoadAllAsync(string folderName)
         {
             string path = $"{Application.streamingAssetsPath}/reflexion/{folderName}/";
             Performance p = Performance.Begin("Loading graphs");
-            Graph impl = await LoadAsync($"{path}CodeFacts.gxl.xz");
-            Graph arch = await LoadAsync($"{path}Architecture.gxl");
-            Graph mapping = await LoadAsync($"{path}Mapping.gxl");
+            Graph impl = await LoadAsync(new($"{path}CodeFacts.gxl.xz"));
+            Graph arch = await LoadAsync(new($"{path}Architecture.gxl"));
+            Graph mapping = await LoadAsync(new($"{path}Mapping.gxl"));
             p.End();
             return (impl, arch, mapping);
         }

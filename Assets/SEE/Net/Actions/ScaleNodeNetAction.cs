@@ -42,7 +42,7 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Things to execute on the server (none for this class).
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank
         }
@@ -50,12 +50,9 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Finds the GameObject on the Client and sets its scale.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                Find(GameObjectID).NodeOperator().ScaleTo(LocalScale, AnimationFactor);
-            }
+            Find(GameObjectID).NodeOperator().ScaleTo(LocalScale, AnimationFactor);
         }
     }
 }
