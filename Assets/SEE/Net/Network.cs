@@ -41,7 +41,7 @@ namespace SEE.Net
         private const int maxServerPort = 65535;
 
         /// <summary>
-        /// The id of the server to fetch files from backend
+        /// The ID of the server to fetch files from.
         /// </summary>
         public static string ServerId;
 
