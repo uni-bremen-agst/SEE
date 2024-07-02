@@ -43,7 +43,6 @@ namespace SEE.Game.CityRendering
                     .Distinct()
                     .ToList();
 
-            Renderer parentRenderer = parent.GetComponent<Renderer>();
             IList<GameObject> gameSpheresObjects = RenderSpheres(authors, parent);
 
             // Drawing edges
@@ -83,11 +82,7 @@ namespace SEE.Game.CityRendering
 
                 foreach (var nodeOfAuthor in nodesOfAuthor)
                 {
-                    //var bSpline = SplineEdgeLayout.CreateSpline(sphere.transform.position,
-                    //    nodeOfAuthor.Value.transform.position,
-                    //   above: true, offset);
-
-                    BSpline bSpline = CreateSpline(sphere.transform.position, nodeOfAuthor.Value.transform.position);
+                    BSpline bSpline = CreateSpline(sphere.transform.position, nodeOfAuthor.Value.GetRoofCenter());
                     var churn = nodeOfAuthor.Key.IntAttributes["Metric.File.Churn" + ":" + authorName];
 
                     GameObject gameEdge = new()
@@ -103,21 +98,25 @@ namespace SEE.Game.CityRendering
                     // editor. The line renderer will be replaced with a mesh
                     // renderer at runtime (i.e., when starting the application).
                     LineRenderer line = gameEdge.AddComponent<LineRenderer>();
-                    //gameEdge.AddComponent<MeshRenderer>();
                     // Use sharedMaterial if changes to the original material
                     // should affect all objects using this material;
                     // renderer.material instead will create a copy of the
                     // material and will not be affected by changes of the
                     // original material.
                     Color edgeColor = sphere.GetComponent<Renderer>().sharedMaterial.color;
-                    line.sharedMaterial = Materials.New(Materials.ShaderType.Opaque, edgeColor);
+                    //edgeColor.a = 0.7f;
+                    Material material = Materials.New(Materials.ShaderType.Opaque, edgeColor);
+                    material.shader = Shader.Find("Standard");
+                    line.sharedMaterial = material;
+                    //line.sharedMaterial.shader = Shader.Find("Standard");
 
 
                     LineFactory.SetDefaults(line);
-                    var width = Mathf.Clamp(churn / maximalChurn, Settings.EdgeLayoutSettings.EdgeWidth * 0.5f,
+                    var width = Mathf.Clamp((float)churn / maximalChurn, Settings.EdgeLayoutSettings.EdgeWidth * 0.439f,
                         Settings.EdgeLayoutSettings.EdgeWidth);
+
                     LineFactory.SetWidth(line, width);
-                    LineFactory.SetColor(line, edgeColor);
+                    //LineFactory.SetColor(line, edgeColor);
 
                     // If enabled, the lines are defined in world space. This
                     // means the object's position is ignored and the lines are
@@ -137,8 +136,10 @@ namespace SEE.Game.CityRendering
                     AddLOD(gameEdge);
 
                     AuthorRef authorRef = nodeOfAuthor.Value.AddOrGetComponent<AuthorRef>();
-                    authorRef.AuthorSphere = sphere;
-                    authorRef.Edges.Add(gameEdge);
+                    authorRef.AuthorSpheres.Add(sphere);
+                    authorRef.Edges.Add((gameEdge, churn));
+
+                    authorSphere.Edges.Add((gameEdge, churn));
                 }
             }
         }
@@ -155,7 +156,7 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// This method renders all spheres for the authors specified in <paramref name="authors"/> 
+        /// This method renders all spheres for the authors specified in <paramref name="authors"/>
         /// </summary>
         /// <param name="authors">The authors to create the spheres for</param>
         /// <param name="parent">The parent <see cref="GameObject"/> to add the to</param>
@@ -206,7 +207,6 @@ namespace SEE.Game.CityRendering
                     author.Author = authors[counter];
 
                     gameObject.AddComponent<InteractableObject>();
-                    //var op = gameObject.AddComponent<NodeOperator>();
                     gameObject.AddComponent<ShowHovering>();
 
                     Vector3 startLabelPosition = gameObject.GetTop();
@@ -226,6 +226,7 @@ namespace SEE.Game.CityRendering
                     tm.alignment = TextAlignmentOptions.Center;
 
                     nodeLabel.name = "Label:" + authors[counter];
+                    nodeLabel.AddComponent<FaceCamera>();
                     nodeLabel.transform.SetParent(gameObject.transform);
 
                     AddLOD(gameObject);
@@ -235,14 +236,14 @@ namespace SEE.Game.CityRendering
                     // Override shader
                     mat.shader = Shader.Find("Standard");
                     renderer.sharedMaterial = mat;
-                    gameObject.transform.parent = parent.transform;
+                    gameObject.transform.SetParent(parent.transform);
                     gameObject.transform.transform.localScale *= 0.25f;
 
                     // Calculate the position of the sphere
                     float xPos = (i * spacingX - (parentRenderer.bounds.size.x / 2));
                     float zPos = (j * spacingZ - (parentRenderer.bounds.size.z / 2));
 
-                    Vector3 spherePosition = new Vector3(xPos, parentRenderer.bounds.size.y + 0.9f, zPos) +
+                    Vector3 spherePosition = new Vector3(xPos, parentRenderer.bounds.size.y + 1.2f, zPos) +
                                              parent.transform.position;
                     gameObject.transform.position = spherePosition;
 
