@@ -150,7 +150,7 @@ namespace SEE.UI
             try
             {
                 // Hide menu while the network is about to be started so that the user
-                // user select any menu entry while this process is running. We do
+                // cannot select any menu entry while this process is running. We do
                 // not want the user to start any other network setting until this
                 // process has come to an end.
                 menu.ShowMenu = false;

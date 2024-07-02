@@ -10,6 +10,7 @@ using System.Threading;
 using Dissonance;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
@@ -258,28 +259,29 @@ namespace SEE.Net
         /// <summary>
         /// Name of command-line argument for room password <see cref="RoomPassword"/>.
         /// </summary>
-        private const string passwordArgument = "-password";
+        private const string passwordArgument = "--password";
 
         /// <summary>
         /// Name of command-line argument for UDP port <see cref="ServerPort"/>.
         /// </summary>
-        private const string portArgument = "-port";
+        private const string portArgument = "--port";
         /// <summary>
         /// Name of command-line argument for backend domain URL  <see cref="BackendDomain"/>.
         /// </summary>
-        private const string domainArgument = "-domain";
+        private const string domainArgument = "--host";
         /// <summary>
         /// Name of command-line argument for the server id  <see cref="ServerId"/>.
         /// </summary>
-        private const string serverIdArgument = "-id";
+        private const string serverIdArgument = "--id";
         /// <summary>
         /// Name of command-line argument for launching this Unity instance
         /// as a dedicated server.
         /// </summary>
-        private const string launchAsServerArgument = "-launch-as-server";
+        private const string launchAsServerArgument = "--launch-as-server";
 
         /// <summary>
-        /// Makes sure that we have only one <see cref="Instance"/> and check command line arguments.
+        /// Makes sure that we have only one <see cref="Instance"/> and checks
+        /// command-line arguments.
         /// </summary>
         private void Start()
         {
@@ -309,6 +311,8 @@ namespace SEE.Net
         private void ProcessCommandLineArguments()
         {
             string[] arguments = Environment.GetCommandLineArgs();
+
+            bool launchAsServer = false;
 
             // Check command line arguments
             // The first element in the array contains the file name of the executing program.
@@ -341,13 +345,22 @@ namespace SEE.Net
                 }
                 else if (arguments[i] == launchAsServerArgument)
                 {
-                    StartServer(null);
+                    // This argument does not have a value. It works as a flag.
+                    launchAsServer = true;
+                    i++;
                 }
                 else
                 {
                     Debug.LogWarning($"Unknown command-line parameter {arguments[i]} will be ignored.\n");
                 }
             }
+
+            if (launchAsServer)
+            {
+                StartServer(null);
+            }
+
+            return;
 
             static void CheckArgumentValue(string[] arguments, int i, string argument)
             {
@@ -595,7 +608,7 @@ namespace SEE.Net
                 // developing and debugging you might sometimes test local client instances
                 // on the same system and sometimes test client instances running on external
                 // systems.
-                ServerIP4Address = "0.0.0.0"; //FIXME: Why this assignment?
+                ServerIP4Address = "0.0.0.0";
                 Debug.Log($"Server is starting to listen at {ServerAddress}...\n");
                 try
                 {
@@ -608,7 +621,7 @@ namespace SEE.Net
                     }
                     else
                     {
-                        throw new CannotStartServer($"Could not start host {ServerAddress}.");
+                        throw new CannotStartServer($"Could not start server {ServerAddress}.");
                     }
                 }
                 catch (Exception exception)
@@ -627,7 +640,7 @@ namespace SEE.Net
         /// <param name="client">the ID of the client</param>
         private void OnClientConnectedCallbackForServer(ulong client)
         {
-            Debug.Log($"Client {client} has connected.\n");
+            ShowNotification.Info("Connection", $"Client {client} has connected.");
         }
 
         /// <summary>
@@ -637,7 +650,7 @@ namespace SEE.Net
         /// <param name="client">the ID of the client</param>
         private void OnClientDisconnectCallbackForServer(ulong client)
         {
-            Debug.Log($"Client {client} has disconnected.\n");
+            ShowNotification.Info("Connection", $"Client {client} has disconnected.");
         }
 
         /// The IP4 address, port, and protocol.
@@ -685,13 +698,15 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Checks whether a specific client is authorised to establish a connection to the server.
+        /// Checks whether a specific client is authorized to establish a connection to the server.
         /// The client sends the server a request with a password to join the room,
-        /// the server sends a corresponding response depending on whether the sent password matches the set password.
-        /// The <paramref name="request"/> contains the password
-        /// The <paramref name="response"/> contains the answer of the server.
+        /// the server sends a corresponding response depending on whether the sent password matches
+        /// the set password.
+        /// <param name="request">contains the password</param>
+        /// <param name="response">contains the answer of the server</param>
         /// </summary>
-        private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+        private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request,
+                                   NetworkManager.ConnectionApprovalResponse response)
         {
             if (RoomPassword == Encoding.ASCII.GetString(request.Payload))
             {
@@ -766,7 +781,7 @@ namespace SEE.Net
         /// The maximal waiting time in seconds a client is willing to wait until a connection
         /// can be established.
         /// </summary>
-        private const float maxWaitingTime = 5 * 60;
+        private const float maxWaitingTimeInSeconds = 5 * 60;
 
         /// <summary>
         /// A delegate that will be called in <see cref="ShutdownNetwork(OnShutdownFinished)"/> when

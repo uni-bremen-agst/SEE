@@ -14,6 +14,11 @@ namespace SEE.Net
     /// </summary>
     public class ClientActionNetwork : NetworkBehaviour
     {
+        // TODO(#749): This file makes heavy use of coroutines to deal with asynchronous code.
+        // We should consider refactoring it to use async via UniTask instead, to make it
+        // consistent with the rest of SEE and gain improved efficiency. This would also
+        // simplify some code (e.g., in GetAllData).
+
         /// <summary>
         /// Where files are stored locally on the server side (relative directory).
         /// </summary>
@@ -27,6 +32,26 @@ namespace SEE.Net
         /// The name of the zip file containing the source code.
         /// </summary>
         private const string zippedSourcesFilename = "src.zip";
+
+        /// <summary>
+        /// The name of the GXL file containing the city graph from the backend.
+        /// </summary>
+        private const string gxlFile = "multiplayer.gxl";
+
+        /// <summary>
+        /// The name of the configuration file from the backend.
+        /// </summary>
+        private const string configFile = "multiplayer.cfg";
+
+        /// <summary>
+        /// The name of Microsoft Visual Studio solution file from the backend.
+        /// </summary>
+        private const string solutionFile = "multiplayer.sln";
+
+        /// <summary>
+        /// The name of the CSV file containing the metrics from the backend.
+        /// </summary>
+        private const string metricFile = "multiplayer.csv";
 
         /// <summary>
         /// Fetches the multiplayer city files from the backend and syncs the current
@@ -81,12 +106,15 @@ namespace SEE.Net
         {
             Network.ServerId = serverId;
             Network.BackendDomain = backendDomain;
+            /*
+             * We do not want to delete the server content directory altogether.
+             * Who knows what other files are in there that we might need.
             if (Directory.Exists(AbsoluteServerContentDirectory))
             {
-                // FIXME: Isn't that a bit dangerous? All content will be deleted.
                 Directory.Delete(AbsoluteServerContentDirectory, true);
                 Directory.CreateDirectory(AbsoluteServerContentDirectory);
             }
+            */
             StartCoroutine(GetAllData());
         }
 
@@ -155,7 +183,7 @@ namespace SEE.Net
         /// </summary>
         private IEnumerator GetGxl()
         {
-            return GetFile("gxl", "multiplayer.gxl");
+            return GetFile("gxl", gxlFile);
         }
 
         /// <summary>
@@ -163,7 +191,7 @@ namespace SEE.Net
         /// </summary>
         private IEnumerator GetConfig()
         {
-            return GetFile("config", "multiplayer.cfg");
+            return GetFile("config", configFile);
         }
 
         /// <summary>
@@ -171,7 +199,7 @@ namespace SEE.Net
         /// </summary>
         private IEnumerator GetSolution()
         {
-            return GetFile("solution", "multiplayer.sln");
+            return GetFile("solution", solutionFile);
         }
 
         /// <summary>
@@ -179,7 +207,7 @@ namespace SEE.Net
         /// </summary>
         private IEnumerator GetCsv()
         {
-            return GetFile("csv", "multiplayer.csv");
+            return GetFile("csv", metricFile);
         }
 
         /// <summary>
@@ -187,14 +215,14 @@ namespace SEE.Net
         /// </summary>
         /// <param name="dataType">the type of file</param>
         /// <param name="filename">the name of the file</param>
-        /// <returns></returns>
+        /// <returns>enumerator to continue the execution</returns>
         private IEnumerator GetFile(string dataType, string filename)
         {
             if (string.IsNullOrEmpty(Network.ServerId))
             {
-                Debug.LogError("Server ID is not set.\n");
+                throw new Exception("Server ID is not set.");
             }
-            // FIXME: The room password is submitted in plain text if http and not https is used.
+            // FIXME(#750): The room password is submitted in plain text if http and not https is used.
             string url = Network.ClientRestAPI + dataType + "?serverId=" + Network.ServerId
                          + "&roomPassword=" + Network.Instance.RoomPassword;
 
@@ -206,8 +234,7 @@ namespace SEE.Net
 
             if (webRequest.result != UnityWebRequest.Result.Success)
             {
-                // FIXME: The url contains the room password. We should not log it.
-                Debug.LogError($"Error fetching {filename} from backend via {url}: {webRequest.error}.\n");
+                Debug.LogError($"Error fetching {filename} from backend: {webRequest.error}.\n");
             }
         }
     }

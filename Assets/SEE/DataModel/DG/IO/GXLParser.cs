@@ -184,9 +184,7 @@ namespace SEE.DataModel.DG.IO
                 CloseInput = true,
                 IgnoreWhitespace = true,
                 IgnoreComments = true,
-                Async = true,
-                // TODO: Apparently enabling the below has security implications due to the URL being resolved.
-                DtdProcessing = DtdProcessing.Parse
+                Async = true
             };
             Reader = XmlReader.Create(gxl, settings);
 
