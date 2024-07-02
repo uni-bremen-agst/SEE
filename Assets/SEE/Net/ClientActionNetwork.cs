@@ -56,7 +56,7 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Executes an action on the client
+        /// Executes an action on the client.
         /// </summary>
         [ClientRpc]
         public void ExecuteActionClientRpc(string serializedAction)
