@@ -86,7 +86,7 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Saves the password used to enter a meeting room.
+        /// The password used to enter a meeting room.
         /// </summary>
         public string RoomPassword = "";
 
