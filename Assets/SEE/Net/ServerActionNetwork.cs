@@ -56,7 +56,7 @@ namespace SEE.Net
             {
                 if (recipients == null || recipients.Contains(client.ClientId))
                 {
-                    ClientActionNetwork clientNetwork = client.PlayerObject.GetComponent<ClientActionNetwork>();
+                    ClientActionNetwork clientNetwork = client.PlayerObject.MustGetComponent<ClientActionNetwork>();
                     clientNetwork.ExecuteActionClientRpc(serializedAction);
                 }
             }
