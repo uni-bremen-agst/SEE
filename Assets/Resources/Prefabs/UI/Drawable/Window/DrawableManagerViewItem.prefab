@@ -691,7 +691,7 @@ GameObject:
   - component: {fileID: 2199809644763914611}
   - component: {fileID: 7103568542192475490}
   m_Layer: 5
-  m_Name: LightningBtn
+  m_Name: LightingBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
