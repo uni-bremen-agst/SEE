@@ -90,7 +90,6 @@ namespace SEE.Net
         /// </summary>
         public string RoomPassword = "";
 
-
         /// <summary>
         /// Used to tell the caller whether the routine has been completed.
         /// </summary>
@@ -299,6 +298,14 @@ namespace SEE.Net
             ProcessCommandLineArguments();
         }
 
+        /// <summary>
+        /// Processes and determines the values of the command-line arguments
+        /// <see cref="ServerPort"/>, <see cref="RoomPassword"/>, <see cref="BackendDomain"/>,
+        /// <see cref="ServerId"/>, and starts the server if the command-line argument
+        /// <see cref="launchAsServerArgument"/> is present.
+        /// </summary>
+        /// <exception cref="ArgumentException">thrown if an option requiring a value does
+        /// not have one</exception>
         private void ProcessCommandLineArguments()
         {
             string[] arguments = Environment.GetCommandLineArgs();
@@ -456,7 +463,7 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Shuts down the server and the client.
+        /// Shuts down the server and the clients.
         /// This method is called only when this component is destroyed, which
         /// may be at the very end of the game.
         /// </summary>
@@ -465,6 +472,9 @@ namespace SEE.Net
             ShutdownNetwork();
         }
 
+        /// <summary>
+        /// Shuts down the network (server and clients).
+        /// </summary>
         private void ShutdownNetwork()
         {
             // FIXME there must be a better way to stop the logging spam!
@@ -610,14 +620,24 @@ namespace SEE.Net
             }
         }
 
-        private void OnClientConnectedCallbackForServer(ulong owner)
+        /// <summary>
+        /// Callback called when a client has connected to the server.
+        /// Emits a user message.
+        /// </summary>
+        /// <param name="client">the ID of the client</param>
+        private void OnClientConnectedCallbackForServer(ulong client)
         {
-            Debug.Log($"Client {owner} has connected.\n");
+            Debug.Log($"Client {client} has connected.\n");
         }
 
-        private void OnClientDisconnectCallbackForServer(ulong owner)
+        /// <summary>
+        /// Callback called when a client has disconnected from the server.
+        /// Emits a user message.
+        /// </summary>
+        /// <param name="client">the ID of the client</param>
+        private void OnClientDisconnectCallbackForServer(ulong client)
         {
-            Debug.Log($"Client {owner} has disconnected.\n");
+            Debug.Log($"Client {client} has disconnected.\n");
         }
 
         /// The IP4 address, port, and protocol.
@@ -692,7 +712,7 @@ namespace SEE.Net
         /// because the connection was successfully established.
         /// The <paramref name="owner"/> is not used.
         /// </summary>
-        /// <param name="owner">ID of the owner</param>
+        /// <param name="owner">ID of the owner (ignored)</param>
         private void OnClientConnectedCallback(ulong owner)
         {
             callbackToMenu?.Invoke(true, $"You are connected to {ServerAddress}.\n");
@@ -700,9 +720,11 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Sends the client back to the main menu because the connection could not be established
+        /// Sends the client back to the main menu because the connection could not
+        /// be established.
         /// The <paramref name="owner"/> is not used.
         /// </summary>
+        /// <param name="owner">ID of the owner (ignored)</param>
         private void OnClientDisconnectCallback(ulong owner)
         {
             callbackToMenu?.Invoke(false,
