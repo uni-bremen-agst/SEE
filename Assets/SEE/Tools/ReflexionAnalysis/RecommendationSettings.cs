@@ -16,11 +16,22 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         [SerializeField]
         private int iterations = 1;
 
+        [SerializeField]
+        private string experimentName = "experiment";
+
+        public string ExperimentName { get => experimentName; set => experimentName = value; }
+
         /// <summary>
         /// 
         /// </summary>
         [SerializeField]
         public int Delta { get; private set; }
+
+        [SerializeField]
+        public bool syncExperimentWithView { get; set; }
+
+        [SerializeField]
+        public bool IgnoreTieBreakers { get; set; }
 
         public int Iterations { get => iterations; set => iterations = value; }
 
@@ -30,7 +41,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         public int MasterSeed { get => masterSeed; set => masterSeed = value; }
 
         [SerializeField]
-        private double initialMappingPercentage = 0.5;
+        private double initialMappingPercentage = 0.9;
 
         public double InitialMappingPercentage { get => initialMappingPercentage; set => initialMappingPercentage = value; }
 

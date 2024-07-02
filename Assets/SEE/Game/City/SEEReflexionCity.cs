@@ -74,7 +74,6 @@ namespace SEE.Game.City
                 }
 
 	            LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, UpdateProgress, cancellationTokenSource.Token);
-                Graph oracleMapping = null;
 	            if(OracleMappingProvider != null)
 	            {
 	                oracleMapping = await OracleMappingProvider.ProvideAsync(new Graph(""), this, UpdateProgress, cancellationTokenSource.Token);
@@ -99,6 +98,7 @@ namespace SEE.Game.City
         }
         protected override void Restore(Dictionary<string, object> attributes)
         {
+            UnityEngine.Debug.Log($"Restore: attributes.ContainsKey(oracleProviderPathLabel)={attributes.ContainsKey(oracleProviderPathLabel)} ");
             base.Restore(attributes);
             if (attributes.ContainsKey(oracleProviderPathLabel))
             {
@@ -115,23 +115,6 @@ namespace SEE.Game.City
 
         private CandidateRecommendationViz candidateRecommendationViz;
 
-        private void UpdateRecommendationSettings(ReflexionGraph loadedGraph, RecommendationSettings recommendationSettings, Graph oracleMapping)
-        {
-            candidateRecommendationViz = gameObject.AddOrGetComponent<CandidateRecommendationViz>();
-            if (candidateRecommendationViz != null)
-            {
-                loadedGraph.Subscribe(candidateRecommendationViz);
-                candidateRecommendationViz.UpdateConfiguration(loadedGraph, recommendationSettings, oracleMapping);
-            }
-        }
-
-        /// <summary>
-        /// The name of the group for the Inspector buttons managing the candidate recommendation.
-        /// </summary>
-        protected const string RecommendationsButtonsGroup = "RecommendationsButtonsGroup";
-
-        protected const string RecommendationsFoldoutGroup = "Recommendations";
-
         /// <summary>
         /// TODO:
         /// </summary>
@@ -142,8 +125,27 @@ namespace SEE.Game.City
         [PropertyOrder(2)]
         public RecommendationSettings recommendationSettings = new RecommendationSettings();
 
-        [Button("Update Recommendation Settings", ButtonSizes.Small)]
-        [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Update Recommendation")]
+        private void UpdateRecommendationSettings(ReflexionGraph loadedGraph, RecommendationSettings recommendationSettings, Graph oracleMapping)
+        {
+            candidateRecommendationViz = gameObject.AddOrGetComponent<CandidateRecommendationViz>();
+            if (candidateRecommendationViz != null)
+            {
+                loadedGraph.Subscribe(candidateRecommendationViz);
+                candidateRecommendationViz.UpdateConfiguration(loadedGraph, recommendationSettings, oracleMapping);
+            }
+        }
+
+        #region CandidateRecommendationButtons
+
+        /// <summary>
+        /// The name of the group for the Inspector buttons managing the candidate recommendation.
+        /// </summary>
+        protected const string RecommendationsButtonsGroup = "RecommendationsButtonsGroup";
+
+        protected const string RecommendationsFoldoutGroup = "Recommendations";
+
+        [Button("Update MappingChoice Settings", ButtonSizes.Small)]
+        [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Update Attract function")]
         // TODO: Property order?
         // necessary regarding disabling enabling?
         [PropertyOrder(2)]
@@ -158,21 +160,25 @@ namespace SEE.Game.City
         // necessary regarding disabling enabling?
         // TODO: Make this call async?
         [PropertyOrder(3)]
-        public void ResetMapping()
+        public async UniTask ResetMappingAsync()
         {
-            if(VisualizedSubGraph != null)
+            using (LoadingSpinner.ShowDeterminate($"reset mapping...",
+                                       out Action<float> reportProgress))
             {
-                ((ReflexionGraph)VisualizedSubGraph).ResetMapping();
-            }
-            else
-            {
-                ShowNotification.Warn("Cannot reset Mapping.", "Cannot reset Mapping. No Graph has been loaded.");
+                if (VisualizedSubGraph != null)
+                {
+                    await this.candidateRecommendationViz.ResetMappingAsync();
+                }
+                else
+                {
+                    ShowNotification.Warn("Cannot reset Mapping.", "Cannot reset Mapping. No Graph has been loaded.");
+                } 
             }
         }
 
         [Button("Generate initial mapping", ButtonSizes.Small)]
         [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Generate initial mapping")]
-        public async UniTask GenerateInitialOracleMapping()
+        public async UniTask GenerateInitialMappingAsync()
         {
             using (LoadingSpinner.ShowDeterminate($"Generate initial mapping...",
                                        out Action<float> reportProgress))
@@ -185,17 +191,35 @@ namespace SEE.Game.City
 
                 if (candidateRecommendationViz != null)
                 {
-                    if (candidateRecommendationViz.OracleGraphLoaded)
-                    {
-                        await candidateRecommendationViz.CreateInitialMapping(recommendationSettings);
-                    }
-                    else
-                    {
-                        ShowNotification.Warn("Cannot generate initial mapping", "No Oracle Graph loaded. Cannot generate inital mapping.");
-                    }
+                    await candidateRecommendationViz.CreateInitialMappingAsync(recommendationSettings.InitialMappingPercentage, 
+                                                                               recommendationSettings.MasterSeed);
                 }
             }
         }
+
+        [Button("Start automated mapping", ButtonSizes.Small)]
+        [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Start automated mapping")]
+        public async UniTask StartAutomatedMappingAsync()
+        {
+            using (LoadingSpinner.ShowDeterminate($"automate mapping...",
+                                       out Action<float> reportProgress))
+            {
+                await candidateRecommendationViz.StartAutomatedMappingAsync(null,
+                                                                    syncWithView: true,
+                                                                    ignoreTieBreakers: recommendationSettings.IgnoreTieBreakers,
+                                                                    new System.Random(recommendationSettings.MasterSeed)); 
+            }
+        }
+
+        [Button("Run Experiment", ButtonSizes.Small)]
+        [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Run Experiment")]
+        public async void RunMappingExperiment()
+        {
+            await candidateRecommendationViz.RunExperimentAsync(this.recommendationSettings, oracleMapping);
+        }
+
+        #endregion
+
         #endregion
     }
 }

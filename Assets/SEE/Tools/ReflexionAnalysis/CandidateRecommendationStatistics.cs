@@ -8,79 +8,78 @@ using System.Linq;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis
 {
+    /// <summary>
+    /// This class provides operations to record the mapping process 
+    /// to data objects.
+    /// </summary>
     public class CandidateRecommendationStatistics
     {
         /// <summary>
-        /// 
+        /// Threshold defining after how many mapping operations recorded data 
+        /// will be flushed to a file.
         /// </summary>
         private readonly static int FLUSH_TRESHOLD = 50000;
 
         /// <summary>
-        /// 
+        /// Current mapping step of the current recording
         /// </summary>
         private int mappingStep = 0;
 
         /// <summary>
-        /// 
+        /// Total number of mapped pairs.
         /// </summary>
         private int numberMappedPairs;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        private int seed;
-
         ///// <summary>
-        ///// 
+        ///// Csv File the recorded data is written to.
         ///// </summary>
-        private string CsvFile { get; set; }
+        public string csvFile { get; private set; }
 
         /// <summary>
-        /// 
+        /// List containing a list of current attraction values represented as mapping pairs for each mapping step
         /// </summary>
         List<List<MappingPair>> mappingProcess;
 
         /// <summary>
-        /// 
+        /// Associated candidate recommendation object
         /// </summary>
         public CandidateRecommendation CandidateRecommendation { get; private set; }
 
         /// <summary>
-        /// 
+        /// Is set to true if the recording is currently active
         /// </summary>
         public bool Active { get; set; }
 
         /// <summary>
-        /// 
+        /// Result object managing the statistical data and objects to calculate results
         /// </summary>
         private MappingExperimentResult mappingResult;
 
+        /// <summary>
+        /// Recommendation settings used while recording.
+        /// </summary>
         RecommendationSettings config;
 
         /// <summary>
-        /// 
+        /// Determines if all mapping pairs should be recorded during each 
+        /// mapping step or only the mapped one.
         /// </summary>
         private bool recordAllMappingPairs;
 
         /// <summary>
-        /// 
+        /// Construction initializes a new instance of <see cref="CandidateRecommendationStatistics"/>
         /// </summary>
-        /// <param name="oracleMappingPath"></param>
-        public CandidateRecommendationStatistics()
+        /// <param name="recommendation">recommendation object associated with recording the data</param>
+        public CandidateRecommendationStatistics(CandidateRecommendation recommendation)
         {
+            CandidateRecommendation = recommendation;
             mappingResult = new MappingExperimentResult();
         }
 
         /// <summary>
-        /// 
+        /// Sets the recommendation settings used during recording.
         /// </summary>
-        /// <param name="candidateRecommendation"></param>
-        public void SetCandidateRecommendation(CandidateRecommendation candidateRecommendation)
-        {
-            this.CandidateRecommendation = candidateRecommendation;
-            Reset();
-        }
-
+        /// <param name="config">Given recommendation settings</param>
         public void SetConfigInformation(RecommendationSettings config)
         {
             this.mappingResult.AddConfigInformation(config);
@@ -88,6 +87,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             this.recordAllMappingPairs = config.measurePercentileRanks;
         }
 
+        /// <summary>
+        /// Resets this object, so <see cref="StartRecording"/>() 
+        /// can be called again.
+        /// </summary>
         public void Reset()
         {
             mappingStep = 0;
@@ -96,9 +99,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 new List<MappingPair>()
             };
             mappingResult = new MappingExperimentResult();
+
+            // TODO: Set configuration here?
             mappingResult.AddConfigInformation(config);
         }
 
+        /// <summary>
+        /// Records a given list of mapping pairs for the current mapping step.
+        /// </summary>
+        /// <param name="mappingPairs">Given list of mapping pairs</param>
         public void RecordMappingPairs(IEnumerable<MappingPair> mappingPairs)
         {
             if (recordAllMappingPairs)
@@ -107,9 +116,18 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
         }
 
+        /// <summary>
+        /// Records the changed mapping pair during the mapping process.
+        /// After this call the current mapping stepp will be incremented.
+        /// 
+        /// This chosen mapping pair is add to the beginning of the 
+        /// current list in <see cref="mappingProcess"/>.
+        /// 
+        /// </summary>
+        /// <param name="chosenMappingPair"></param>
         public void RecordChosenMappingPair(MappingPair chosenMappingPair)
         {
-            // Add chosen pair to the start of the list, so the chosenMappingPair should be contained twice
+            // Adds chosen pair to the start of the list, so the chosenMappingPair should be contained twice
             chosenMappingPair.ChosenAt = DateTime.UtcNow;
             mappingProcess[mappingStep].Insert(0, chosenMappingPair);
             numberMappedPairs += mappingProcess[mappingStep].Count;
@@ -121,6 +139,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             mappingProcess.Add(new List<MappingPair>());
         }
 
+        /// <summary>
+        /// Flushes all currently recorded mapping pairs to the specified 
+        /// <see cref="csvFile"/>.
+        /// </summary>
         public void Flush()
         {
             string csv = string.Empty;
@@ -140,36 +162,41 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             mappingStep = 0;
             numberMappedPairs = 0;
 
-            File.AppendAllText(CsvFile, csv);
+            File.AppendAllText(csvFile, csv);
         }
 
-        public void ProcessMappingData(string csvFile, string xmlFile)
+        /// <summary>
+        /// Reads the mapping process from a given csv file, processes 
+        /// the data and writes the results to a given xml file.
+        /// </summary>
+        /// <param name="csvFile"></param>
+        /// <param name="xmlFile"></param>
+        public void WriteResultsToXml(string csvFile, string xmlFile)
         {
-            if (!File.Exists(csvFile))
-            {
-                // TODO: Inform User here?
-                UnityEngine.Debug.LogWarning($"No Data found to be processed. File {csvFile} is not existing.");
-                return;
-            }
-
             MappingExperimentResult result = CalculateResults(csvFile);
             result.CreateXml().Save(new FileStream(xmlFile, FileMode.Create));
         }
 
-        public MappingExperimentResult ProcessMappingData(string csvFile)
+        /// <summary>
+        /// Calculates the results given an csv file containing the mapping process, 
+        /// represented as recorded mapping pairs per mapping step.
+        /// 
+        /// To resolve data the <see cref="CandidateRecommendation"/> object within 
+        /// this class is used.
+        /// 
+        /// </summary>
+        /// <param name="csvFile">Given .csv file containing the recorded mapping process.</param>
+        /// <returns></returns>
+        /// <exception cref="Exception">Throws if the csv file is not found.</exception>
+        public MappingExperimentResult CalculateResults(string csvFile)
         {
             if (!File.Exists(csvFile))
             {
                 throw new Exception($"No Data found to be processed. File {csvFile} is not existing.");
             }
 
-            return CalculateResults(csvFile);            
-        }
-
-        private MappingExperimentResult CalculateResults(string csvFile)
-        {
             Dictionary<string, List<double>> percentileRanks = new Dictionary<string, List<double>>();
-           
+            
             try
             {
                 int mappingStep = 0;
@@ -185,7 +212,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                         MappingPair chosenMappingPair = mappingPairs[0];
 
                         // Calculate statistical Results for the chosen candidate
-                        CandidateStatisticResult candidateStatisticResult = mappingResult.GetCandidateStatisticResult(chosenMappingPair.CandidateID);
+                        CandidateStatistic candidateStatisticResult = mappingResult.GetCandidateStatisticResult(chosenMappingPair.CandidateID);
 
                         // TODO: move into MappingExperimentResult?
                         candidateStatisticResult.AttractionValue = chosenMappingPair.AttractionValue;
@@ -229,23 +256,39 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
         }
 
+        /// <summary>
+        /// Starts the recording of mapping pairs and writes them
+        /// to the set <see cref="csvFile"/>
+        /// </summary>
         public void StartRecording()
         {
-            this.StartRecording(this.CsvFile);
+            this.StartRecording(this.csvFile);
         }
 
+        /// <summary>
+        /// Starts the recording of mapping pairs and writes them
+        /// to the set <see cref="csvFile"/>
+        /// 
+        /// Initializes all <see cref="CandidateStatistic"/> objects for 
+        /// the current mapping constellation.
+        /// 
+        /// </summary>
+        /// <param name="csvFile">given csvFile</param>
         public void StartRecording(string csvFile)
         {
-            if (Active) return;
+            if (Active)
+            {
+                return;
+            }
 
             this.Reset();
 
-            if(this.CandidateRecommendation.OracleGraph == null)
-            {
-                // TODO: Is it really necessary to have the Oracle Graph selected during starting?
-                UnityEngine.Debug.LogWarning("No OracleGraph loaded. No Data will be saved.");
-                return;
-            }
+            // TODO: Is it really necessary to have the Oracle Graph selected during starting?
+            //if(this.CandidateRecommendation.OracleGraph == null)
+            //{
+            //    UnityEngine.Debug.LogWarning("No OracleGraph loaded. No Data will be saved.");
+            //    return;
+            //}
 
             try
             {
@@ -261,21 +304,21 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 return;
             }
 
-            this.CsvFile = csvFile;
+            this.csvFile = csvFile;
 
             IEnumerable<Node> candidates = CandidateRecommendation.GetCandidates();
-            UnityEngine.Debug.Log($"Add results for {candidates.Count()} candidates.");
 
             foreach (Node node in candidates)
             {
                 mappingResult.AddCandidateStatisticResult(node, CandidateRecommendation);
             }
 
-            // UnityEngine.Debug.Log($"Active Results: {this.mappingResult.ActiveResultsCount} Finished Results: {this.mappingResult.FinishedResultsCount}");
-
             Active = true;
         }
 
+        /// <summary>
+        /// Stops the recording process and flushes all data to the <see cref="csvFile"/>.
+        /// </summary>
         public void StopRecording()
         {
             if (Active)

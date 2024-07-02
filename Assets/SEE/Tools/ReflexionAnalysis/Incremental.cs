@@ -359,18 +359,20 @@ namespace SEE.Tools.ReflexionAnalysis
 
         /// <summary>
         /// Removes all explicitly mapped nodes from the mapping mapping graph.
-        /// Postcondition: MapsTo() should return null for every node contained
-        /// within the implementation graph
+        /// Postcondition: MapsTo() should return null for every contained node
+        /// within the implementation graph.
+        /// <returns>All nodes which were mapped before</returns>
         /// </summary>
-        public void ResetMapping(bool useCaching = false)
+        public IEnumerable<Node> ResetMapping(bool useCaching = false)
         {
-            List<Node> nodes = this.explicitMapsToTable.Values.ToList();
+            List<Node> resettedNodes = new List<Node>();
             Node node;
             IEnumerable<string> nodeIds = this.explicitMapsToTable.Keys.ToList();
             foreach (string nodeId in nodeIds)
             {
                 node = this.GetNode(nodeId);
-                if(node != null)
+                resettedNodes.Add(node);
+                if (node != null)
                 {
                     if(useCaching)
                     {
@@ -385,6 +387,7 @@ namespace SEE.Tools.ReflexionAnalysis
                     }
                 }
             }
+            return resettedNodes;
         }
 
         /// <summary>
@@ -968,7 +971,7 @@ namespace SEE.Tools.ReflexionAnalysis
             AssertOrThrow(notInImpl == null, () => new NotInSubgraphException(Implementation, notInImpl));
             AssertOrThrow(subtree.All(x => MapsTo(x) == newTarget),
                           () => new CorruptStateException("Mapping failed: " +
-                                                          $"nodes in subtree were not all mapped to {newTarget}!"));
+                                                          $"resettedNodes in subtree were not all mapped to {newTarget}!"));
             HandleMappedSubtree(subtree, newTarget, IncreaseAndLift);
         }
 

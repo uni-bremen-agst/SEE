@@ -184,7 +184,7 @@ namespace SEE.DataModel.DG
             if (nodes.Remove(node.ID))
             {
                 // We need to send out this event here, before the node is modified but after it has been removed.
-                Notify(new NodeEvent(Version, node, ChangeType.Removal));
+                Notify(new NodeEvent(Version, node, ChangeType.Removal, orphansBecomeRoots: orphansBecomeRoots));
 
                 // The edges of node are stored in the node's data structure as well as
                 // in the node's neighbor's data structure.

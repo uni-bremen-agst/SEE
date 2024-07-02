@@ -4,12 +4,26 @@ using UnityEngine;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
+    /// <summary>
+    /// Default Class used by the <see cref="LanguageAttract"/> function object to read source code regions from nodes.
+    /// </summary>
     public class NodeReader : INodeReader
     {
+        /// <summary>
+        /// Attribute used to retrieve the start line of a source code region
+        /// </summary>
         private static readonly string SourceStartLine = "SourceRange_StartLine";
-        
+
+        /// <summary>
+        /// Attribute used to retrieve the end line of a source code region
+        /// </summary>
         private static readonly string SourceStartLength = "SourceRange_EndLine";
 
+        /// <summary>
+        /// Reads the source code region from a Node .
+        /// </summary>
+        /// <param name="node">Given node</param>
+        /// <returns>Source code region as a string</returns>
         public string ReadRegion(Node node)
         {
             string fileName;

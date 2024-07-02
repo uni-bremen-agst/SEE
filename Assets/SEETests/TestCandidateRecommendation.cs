@@ -6,7 +6,6 @@ using System.Linq;
 using Assets.SEE.Tools.ReflexionAnalysis;
 using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
 using SEE.Tools.ReflexionAnalysis;
-using System.Globalization;
 
 namespace SEE.Tools.Architecture
 {

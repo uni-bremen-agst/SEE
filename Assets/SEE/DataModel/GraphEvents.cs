@@ -113,13 +113,17 @@ namespace SEE.DataModel
         /// </summary>
         public readonly Node Node;
 
-        public NodeEvent(Guid version, Node node, ChangeType change, ReflexionSubgraphs? affectedGraph = null) : base(version, affectedGraph ?? node.GetSubgraph(), change)
+        public readonly bool OrphansBecomeRoots;
+
+        public NodeEvent(Guid version, Node node, 
+                        ChangeType change, ReflexionSubgraphs? affectedGraph = null, 
+                        bool orphansBecomeRoots = false) : base(version, affectedGraph ?? node.GetSubgraph(), change)
         {
             if (affectedGraph == ReflexionSubgraphs.Mapping || affectedGraph == ReflexionSubgraphs.FullReflexion)
             {
                 throw new ArgumentException("Nodes can only be added to architecture or implementation!");
             }
-
+            OrphansBecomeRoots = orphansBecomeRoots;
             Node = node;
         }
 

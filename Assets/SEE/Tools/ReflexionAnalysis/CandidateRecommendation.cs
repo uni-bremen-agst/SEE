@@ -2,85 +2,109 @@
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
-using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Debug = UnityEngine.Debug;
 using Node = SEE.DataModel.DG.Node;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis
 {
+    /// <summary>
+    /// This object provides the operations to calculate candidate recommendations. 
+    /// It sets up a attract function, manages the attraction value matrix and determines 
+    /// which nodes are cluster and candidates regarding a given <see cref="RecommendationSettings"/>
+    /// object. The configuration of this object can also be updated with different <see cref="RecommendationSettings"/>
+    /// objects. This object registers itself to the event system of a given reflexion graph
+    /// and receives and processes events of the graph and forwards it a <see cref="AttractFunction"/> object.
+    /// </summary>
     public class CandidateRecommendation : IObserver<ChangeEvent>
     {
         /// <summary>
-        /// 
-        /// </summary>
-        public static double ATTRACTION_VALUE_DELTA = 0.001;
-
-        /// <summary>
-        /// 
+        /// The reflexion graph that is used to calculate the recommendations and containing
+        /// all candidates and clusters.
         /// </summary>
         public ReflexionGraph ReflexionGraph { get; private set; }
 
         /// <summary>
-        /// 
+        /// The reflexion graph that is used as the oracle graph and providing information 
+        /// about the expected mapping.
         /// </summary>
         public ReflexionGraph OracleGraph { get; private set; }
 
         /// <summary>
-        /// 
+        /// Property set to true if a oracle reflexion graph is loaded. False otherwise.
         /// </summary>
         public bool OracleGraphLoaded { get => OracleGraph != null; }
 
         /// <summary>
-        /// Object representing the attractFunction
+        /// <see cref="AttractFunction"/> object that is currently used.
+        /// </summary>
+        public AttractFunction AttractFunction { get => attractFunction; }
+        /// <summary>
+        /// Object representing the currently used attractFunction.
         /// </summary>
         private AttractFunction attractFunction;
 
         /// <summary>
-        /// 
+        /// RecommendedNodes object representing the attraction value matrix.
         /// </summary>
-        private string recommendationEdgeType = "Recommended With";
+        RecommendationFiltering recommendedNodes = new RecommendationFiltering();
 
         /// <summary>
-        /// 
-        /// </summary>
-        RecommendedNodes recommendedNodes = new RecommendedNodes();
-
-        /// <summary>
-        /// 
+        /// List of <see cref="MappingPair"/> objects representing all currently calculated attraction values between the 
+        /// corresponding node pairs.
         /// </summary>
         public IEnumerable<MappingPair> MappingPairs { get { return recommendedNodes.MappingPairs; } }
 
         /// <summary>
-        /// 
+        /// Set of Nodes containing the unmapped candidates
         /// </summary>
         public HashSet<string> UnmappedCandidates { get; private set; }
 
         /// <summary>
-        /// 
-        /// </summary>
-        public AttractFunction AttractFunction { get => attractFunction; }
-
-        /// <summary>
-        /// 
+        /// Subscription returned when registering to a reflexion graph.
         /// </summary>
         private IDisposable subscription;
 
+        /// <summary>
+        /// Object used to record information about mapping process.
+        /// </summary>
         public CandidateRecommendationStatistics Statistics { get; private set; }
 
+        /// <summary>
+        /// Edge type for the edges used in the tree view graph representing the recommendations for a node.
+        /// </summary>
+        private string recommendationEdgeType = "Recommended With";
+
+        /// <summary>
+        /// Delta used to compare attraction values. If the difference of two attraction values is not bigger than the delta
+        /// the values are treated as being the same.
+        /// </summary>
+        public static double ATTRACTION_VALUE_DELTA = 0.001;
+
+        /// <summary>
+        /// Construction initializes a new instance of <see cref="CandidateRecommendation"/>
+        /// </summary>
         public CandidateRecommendation()
         {
-            Statistics = new CandidateRecommendationStatistics();
+            Statistics = new CandidateRecommendationStatistics(this);
         }
 
+        /// <summary>
+        /// Returns all MappingPair objects which have currently the highest attraction,
+        /// </summary>
+        /// <returns>IEnumerable object containing the mapping pairs.</returns>
         public IEnumerable<MappingPair> GetRecommendations()
         {
             return this.recommendedNodes.Recommendations;
         }
 
+        /// <summary>
+        /// Returns all MappingPair objects which have currently the highest attraction for a given Node.
+        /// </summary>
+        /// <param name="node">Given Node</param>
+        /// <returns>IEnumerable object containing the mapping pairs.</returns>
         public IEnumerable<MappingPair> GetRecommendations(Node node)
         {
             if(IsCandidate(node))
@@ -95,15 +119,90 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             return new List<MappingPair>();
         }
 
-        // TODO: this interface needs work(Make it async)
         /// <summary>
+        /// This method updates this object with the given settings and a given reflexion graph.
+        /// After the call the attraction function for the given attract function type is initialized 
+        /// and the reflexion analysis is rerun for the given graph to calculate the recommendations.
+        /// </summary>
+        /// <param name="reflexionGraph">Reflexion graph recommendations are calculated for.</param>
+        /// <param name="recommendationSettings">setting object containing necessary information to setup the recommendations</param>
+        /// <param name="oracleMapping">Optional graph containing a mapping used to construct the <see cref="OracleGraph"/></param>
+        public void UpdateConfiguration(ReflexionGraph reflexionGraph,
+                                        RecommendationSettings recommendationSettings,
+                                        Graph oracleMapping = null)
+        {
+            if (reflexionGraph == null)
+            {
+                throw new Exception("Could not update configuration. Reflexion graph is null.");
+            }
+
+            ReflexionGraph = reflexionGraph;
+
+            if (recommendationSettings.AttractFunctionConfig == null)
+            {
+                throw new Exception("Could not update configuration. Attract function recommendationSettings is null");
+            }
+
+            if (oracleMapping != null)
+            {
+                (Graph implementation, Graph architecture, _) = ReflexionGraph.Disassemble();
+                OracleGraph = new ReflexionGraph(implementation, architecture, oracleMapping);
+                OracleGraph.RunAnalysis();
+            }
+            else
+            {
+                OracleGraph = null;
+            }
+
+            attractFunction = AttractFunction.Create(recommendationSettings.AttractFunctionConfig, this, reflexionGraph);
+
+            // TODO: Handle node reader initialization differently?
+            //(This set operation is only necessary for the test cases)
+            if (attractFunction is LanguageAttract && recommendationSettings.NodeReader != null)
+            {
+                ((LanguageAttract)attractFunction).SetNodeReader(recommendationSettings.NodeReader);
+            }
+
+            subscription?.Dispose();
+            subscription = reflexionGraph.Subscribe(this);
+
+            // Stop and reset the recording
+            bool wasActive = Statistics.Active;
+            Statistics.Reset();
+
+            Statistics.SetConfigInformation(recommendationSettings);
+            recommendedNodes.Reset();
+            this.UnmappedCandidates = this.GetUnmappedCandidates().Select(n => n.ID).ToHashSet();
+
+            this.attractFunction.AddAllClusterToUpdate();
+
+            ReflexionGraph.RunAnalysis();
+
+            // Restart after the analysis was run, so initially/already
+            // mapped candidates will not recorded twice
+            if (wasActive)
+            {
+                Statistics.StartRecording();
+            }
+            this.UpdateRecommendations();
+        }
+
+
+        /// <summary>
+        /// This method constructs a graph representing the recommendations for a given Node. 
+        /// The graph is used to be visualized within the tree view window. The given Node 
+        /// is the root of the graph and the edges pointing to the root represent the attraction 
+        /// of other nodes towards the root.
+        /// 
+        /// TODO: this interface needs work(Make it async)
+        /// TODO: Consider HugMeMethod? Currently all nodes are add to the view no matter the attraction value
         /// 
         /// </summary>
-        /// <param name="examinedNode"></param>
-        /// <returns></returns>
+        /// <param name="examinedNode">node that will be root of the graph. This usually is the node clicked within the scene.</param>
+        /// <returns>Graph representing the attraction of all other nodes to the <paramref name="examinedNode"/></returns>
         public Graph GetRecommendationTree(Node examinedNode)
         {
-            List<Node> relatedNodes = examinedNode.IsInArchitecture() ? this.GetCandidates() : this.GetCluster();
+            List<Node> candidates = examinedNode.IsInArchitecture() ? this.GetCandidates() : this.GetCluster();
 
             Graph graph = new Graph("", "Recommendations");
 
@@ -119,16 +218,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 return graph;
             }
 
-            foreach (Node relatedNode in relatedNodes)
+            foreach (Node candidate in candidates)
             {
                 // skip mapped implementation nodes
-                if (relatedNode.IsInImplementation() && this.ReflexionGraph.MapsTo(relatedNode) != null)
+                if (candidate.IsInImplementation() && this.ReflexionGraph.MapsTo(candidate) != null)
                 {
                     continue;
                 }
+
                 MappingPair mappingPair = examinedNode.IsInArchitecture() ? 
-                            recommendedNodes.GetMappingPair(relatedNode.ID,examinedNode.ID)
-                          : recommendedNodes.GetMappingPair(examinedNode.ID, relatedNode.ID);
+                            recommendedNodes.GetMappingPair(candidate.ID,examinedNode.ID)
+                          : recommendedNodes.GetMappingPair(examinedNode.ID, candidate.ID);
 
                 if (mappingPair.AttractionValue > 0)
                 {
@@ -157,147 +257,93 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             return graph;
         }
 
+        #region eventHandling
+
         /// <summary>
-        /// 
+        /// Completion callback called by the event system.
+        /// TODO: any handling necessary?
         /// </summary>
-        /// <param name="reflexionGraph"></param>
-        /// <param name="config"></param>
-        /// <param name="oracleMapping"></param>
-        public void UpdateConfiguration(ReflexionGraph reflexionGraph, 
-                                        RecommendationSettings config,
-                                        Graph oracleMapping = null)
-        {
-            if (reflexionGraph == null)
-            {
-                throw new Exception("Could not update configuration. Reflexion graph is null.");
-            }
-
-            ReflexionGraph = reflexionGraph;
-
-            if (config.AttractFunctionConfig == null)
-            {
-                throw new Exception("Could not update configuration. Attract function config is null");
-            }
-
-            if (oracleMapping != null)
-            {
-                (Graph implementation, Graph architecture, _) = ReflexionGraph.Disassemble();
-                OracleGraph = new ReflexionGraph(implementation, architecture, oracleMapping);
-                OracleGraph.RunAnalysis();
-            }
-            else
-            {
-                OracleGraph = null;
-            }
-
-            attractFunction = AttractFunction.Create(config.AttractFunctionConfig, this, reflexionGraph);
-
-            // TODO: Handle node reader initialization differently?
-            //(This set operation is only necessary for the test cases)
-            if(attractFunction is LanguageAttract && config.NodeReader != null)
-            {
-                ((LanguageAttract)attractFunction).SetNodeReader(config.NodeReader);
-            }
-
-            subscription?.Dispose();
-            subscription = reflexionGraph.Subscribe(this);
-
-            // Stop and reset the recording
-            bool wasActive = Statistics.Active;
-            Statistics.Reset();
-            Statistics.SetCandidateRecommendation(this);
-            Statistics.SetConfigInformation(config);
-            recommendedNodes.Reset();
-            this.UnmappedCandidates = this.GetUnmappedCandidates().Select(n => n.ID).ToHashSet();
-
-            foreach(Node cluster in this.GetCluster())
-            {
-                this.attractFunction.AddClusterToUpdate(cluster.ID);
-            }
-
-            ReflexionGraph.RunAnalysis();
-
-            // Restart after the analysis was run, so initially/already
-            // mapped candidates will not recorded twice
-            if (wasActive)
-            {
-                Statistics.StartRecording();
-            }
-            this.UpdateRecommendations();
-        }
-
         public void OnCompleted()
         {
             Debug.Log("OnCompleted() from recommendation.");
         }
 
+        /// <summary>
+        /// Error callback called by the event system.
+        /// TODO: any handling necessary?
+        /// </summary>
+        /// <param name="error"></param>
         public void OnError(Exception error)
         {
             Debug.Log("OnError() from recommendation.");
         }
 
-        public void OnNext(ChangeEvent value)
+        /// <summary>
+        /// Receives the change event of the reflexion graph within this object.
+        /// 
+        /// This call processes the events and forwards the necessary information to the attract function.
+        /// 
+        /// </summary>
+        /// <param name="changeEvent">change event object</param>
+        public void OnNext(ChangeEvent changeEvent)
         {
-            // UnityEngine.Debug.Log($"Received event {value.ToString()}");
-
-            if(!this.ReflexionGraph.AnalysisInitialized)
+            if (!this.ReflexionGraph.AnalysisInitialized)
             {
                 return;
             }
 
-            // TODO: Use switch cast
-            if(value is MapsToChange mapsToEvent)
+            switch (changeEvent)
             {
-                OnNextMapsToChange(mapsToEvent);
-                return;
-            }
-
-            if (value is EdgeChange edgeChangeEvent)
-            {
-                AttractFunction.HandleChangedState(edgeChangeEvent);
-                return;
-            }
-
-            if (value is EdgeEvent edgeEvent)
-            {
-                if (edgeEvent.Affected == ReflexionSubgraphs.Architecture)
-                {
-                    // UnityEngine.Debug.Log("TODO: Architecture might have changed. Edge State cache in attract function needs to be invalidated.");
-                    if (ReflexionGraph.IsSpecified(edgeEvent.Edge))
+                case MapsToChange mapsToEvent:
+                    OnNextMapsToChange(mapsToEvent);
+                    return;
+                case EdgeChange edgeChangeEvent:
+                    AttractFunction.HandleChangedState(edgeChangeEvent);
+                    return;
+                case EdgeEvent edgeEvent:
+                    if (edgeEvent.Affected == ReflexionSubgraphs.Architecture)
                     {
-                        if (edgeEvent.Change == ChangeType.Addition)
+                        if (ReflexionGraph.IsSpecified(edgeEvent.Edge))
                         {
-                            this.AttractFunction.HandleAddArchEdge(edgeEvent.Edge);
-                        }
-                        else if (edgeEvent.Change == ChangeType.Removal)
-                        {
-                            this.AttractFunction.HandleRemovedArchEdge(edgeEvent.Edge);
+                            if (edgeEvent.Change == ChangeType.Addition)
+                            {
+                                this.AttractFunction.HandleAddArchEdge(edgeEvent.Edge);
+                            }
+                            else if (edgeEvent.Change == ChangeType.Removal)
+                            {
+                                this.AttractFunction.HandleRemovedArchEdge(edgeEvent.Edge);
+                            }
                         }
                     }
-                }
-                return;
-            }
-
-            if (value is NodeEvent nodeEvent)
-            {
-                if (nodeEvent.Node.IsInArchitecture())
-                {
-                    if (nodeEvent.Change == ChangeType.Addition)
+                    return;
+                case NodeEvent nodeEvent:
+                    if (nodeEvent.Node.IsInArchitecture())
                     {
-                        this.AttractFunction.HandleAddCluster(nodeEvent.Node);
+                        if (nodeEvent.Change == ChangeType.Addition)
+                        {
+                            this.AttractFunction.HandleAddCluster(nodeEvent.Node);
+                        }
+                        else if (nodeEvent.Change == ChangeType.Removal)
+                        {
+                            this.AttractFunction.HandleRemovedCluster(nodeEvent.Node);
+                            this.recommendedNodes.RemoveCluster(nodeEvent.Node.ID);
+                        }
                     }
-                    else if (nodeEvent.Change == ChangeType.Removal)
-                    {
-                        this.AttractFunction.HandleRemovedCluster(nodeEvent.Node);
-                        this.recommendedNodes.RemoveCluster(nodeEvent.Node.ID);
-                    }
-                }
+                    return;
+                default:
+                    break;
             }
         }
 
+        /// <summary>
+        /// Receives and forwards the maps to change event to the attract function.
+        /// Updates the candidate set and records the chosen choice if recording is 
+        /// active.
+        /// 
+        /// </summary>
+        /// <param name="mapsToChange">received event</param>
         private void OnNextMapsToChange(MapsToChange mapsToChange)
         {
-            // Debug.Log($"mapsToEvent.Source={mapsToChange.Source.ID} mapsToEvent.Target={mapsToChange.Target.ID} change={mapsToChange.Change} isSourceCandidate={IsCandidate(mapsToChange.Source, this.AttractFunction.CandidateType)}");
             if (!IsCandidate(mapsToChange.Source, this.AttractFunction.CandidateType))
             {
                 return;
@@ -309,7 +355,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             {
                 MappingPair chosenMappingPair = recommendedNodes.GetMappingPair(mapsToChange.Source.ID, mapsToChange.Target.ID);
 
-                // TODO: move this into recommendation class?
                 if (chosenMappingPair == null)
                 {
                     // For the very first mapped node, nodes removed from the mapping, and already mapped childs
@@ -323,7 +368,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 AttractFunction.HandleChangedCandidate(mapsToChange.Target, mapsToChange.Source, (ChangeType)mapsToChange.Change);
                 UpdateRecommendations();
                 chosenMappingPair.ChangeType = (ChangeType)mapsToChange.Change;
-                // Debug.Log($"Record chosen mapping Pair:{chosenMappingPair.CandidateID} -'{chosenMappingPair.AttractionValue}'-> {chosenMappingPair.ClusterID}");
                 Statistics.RecordChosenMappingPair(chosenMappingPair);
             }
             else
@@ -331,8 +375,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 recommendedNodes.RemoveCandidate(mapsToChange.Source.ID);
                 AttractFunction.HandleChangedCandidate(mapsToChange.Target, mapsToChange.Source, (ChangeType)mapsToChange.Change);
             }
-        }
+        } 
+        #endregion
 
+        /// <summary>
+        /// Updates the set of unmapped candidates given a node id and the type of change.
+        /// </summary>
+        /// <param name="candidateId">Candidate id that will be add or removed from the set of unmapped candidates</param>
+        /// <param name="change">changetype</param>
         private void UpdateCandidateSet(string candidateId, ChangeType? change)
         {
             if (change == ChangeType.Removal)
@@ -343,31 +393,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             {
                 this.UnmappedCandidates.Remove(candidateId);
             }
-            else
-            {
-                throw new Exception("Unkown Changetype in ChangeEvent. Can not process ChangeEvent when calculating recommendations.");
-            }
         }
 
-        private void GetImplicitlyMappedCandidates(List<Node> implicitlyMappedChilds, Node node, ReflexionGraph graph)
-        {
-            List<Node> childs = new List<Node>();
-
-            if (this.IsCandidate(node))
-            {
-                implicitlyMappedChilds.Add(node);
-            }
-
-            foreach (Node child in node.Children())
-            {
-                if(!graph.IsExplicitlyMapped(child))
-                {
-                    GetImplicitlyMappedCandidates(implicitlyMappedChilds, child, graph);
-                }
-            }
-            return;
-        }
-
+        /// <summary>
+        /// Iterates all cluster which should be updated and recalculates the attraction values 
+        /// between the candidates and the cluster to update.
+        /// </summary>
         public void UpdateRecommendations()
         {
             foreach (string clusterId in this.AttractFunction.ClusterToUpdate)
@@ -376,7 +407,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
                 if (cluster == null)
                 {
-                    throw new Exception($"No node found for the cluster id {clusterId}.");
+                    this.AttractFunction.RemoveClusterToUpdate(clusterId);
+                    recommendedNodes.RemoveCluster(clusterId);
+                    UnityEngine.Debug.LogWarning($"Cluster {clusterId} could not be found within the graph.");
+                    continue;
                 }
 
                 foreach (string candidateId in this.UnmappedCandidates)
@@ -392,7 +426,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     else
                     {
                         double attractionValue = AttractFunction.GetAttractionValue(candidate, cluster);
-                        // Debug.Log($"Candidate {candidate.ID} attracted to cluster {cluster.ID} with attraction value {attractionValue}");
                         MappingPair mappingPair = new MappingPair(candidate: candidate, cluster: cluster, attractionValue: attractionValue);
                         recommendedNodes.UpdateMappingPair(mappingPair);
                     }
@@ -402,21 +435,33 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             if (Statistics?.Active ?? false)
             {
-                // Keep track of all attractions for statistical purposes
+                // Keep track of all attraction values for statistical purposes
                 Statistics.RecordMappingPairs(MappingPairs);
             }
         }
 
-        private /*static*/ Dictionary<Node, HashSet<Node>> CreateInitialMapping(double percentage,
+        /// <summary>
+        /// Creates mappings pairs that can be used to create an initial mapping based on the given parameters.
+        /// 
+        /// TODO: change return type to IEnumerable<MappingPair>
+        /// 
+        /// </summary>
+        /// <param name="percentage">percentage describing how many candidates shall be contained in the mapping.</param>
+        /// <param name="seed">seed to deriving the randomness to choose the mapped candidates</param>
+        /// <param name="reflexionGraph">Reflexiongraph for which the mapping is constructed.</param>
+        /// <param name="oracleGraph">Oracle reflexion graph containing used to choose the expected cluster.</param>
+        /// <returns>Datastructure describing the mapping</returns>
+        /// <exception cref="Exception">Throws if the percentage is not between 0 and 1. Throws if the given parameter objects are null</exception>
+        private Dictionary<Node, HashSet<Node>> CreateInitialMapping(double percentage,
                                                                             int seed,
-                                                                            string candidateType,
                                                                             ReflexionGraph reflexionGraph,
                                                                             ReflexionGraph oracleGraph)
         {
             Dictionary<Node, HashSet<Node>> initialMapping = new Dictionary<Node, HashSet<Node>>();
+
             if (percentage > 1 || percentage < 0)
             {
-                throw new Exception("Parameter percentage have to be a double value between 0.0 and 1.0");
+                throw new Exception("Parameter percentage have to be a double changeEvent between 0.0 and 1.0");
             }
             if (oracleGraph == null)
             {
@@ -427,7 +472,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 throw new Exception("ReflexionGraph is null. Cannot generate initial mapping.");
             }
 
-            List<Node> candidates = GetCandidates(reflexionGraph, candidateType);
+            List<Node> candidates = GetCandidates(reflexionGraph);
 
             UnityEngine.Debug.Log($"Generate initial mapping with seed {seed} for {candidates.Count}");
             System.Random rand = new System.Random(seed);
@@ -472,7 +517,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 }
 
                 currentPercentage = (artificallyMappedNodes + alreadyMappedNodesCount) / candidatesCount;
-                // UnityEngine.Debug.Log($"Node={node.ID} currentPercentage={currentPercentage} artificallyMappedNodes={artificallyMappedNodes} alreadyMappedNodesCount={alreadyMappedNodesCount} candidatesCount={candidatesCount}");
                 i++;
             }
 
@@ -490,19 +534,39 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
         }
 
+        /// <summary>
+        /// Creates mappings pairs that can be used to create an initial mapping based on the given parameters.
+        /// </summary>
+        /// <param name="percentage">percentage describing how many candidates shall be mapped.</param>
+        /// <param name="seed">seed to deriving the randomness to choose the mapped candidates</param>
+        /// <param name="reflexionGraph">Reflexiongraph for which the mapping is constructed.</param>
+        /// <returns></returns>
         public Dictionary<Node, HashSet<Node>> CreateInitialMapping(double percentage,
                                                                     int seed,
                                                                     ReflexionGraph graph)
         {
-            return CreateInitialMapping(percentage, seed, AttractFunction.CandidateType, graph, OracleGraph);
+            return CreateInitialMapping(percentage, seed, graph, OracleGraph);
         }
 
+        /// <summary>
+        /// Creates mappings pairs that can be used to create an initial mapping based on the given parameters.
+        /// </summary>
+        /// <param name="percentage">percentage describing how many candidates shall be mapped.</param>
+        /// <param name="seed">seed to deriving the randomness to choose the mapped candidates</param>
+        /// <returns></returns>
         public Dictionary<Node, HashSet<Node>> CreateInitialMapping(double percentage,
                                                             int seed)
         {
-            return CreateInitialMapping(percentage, seed, AttractFunction.CandidateType, ReflexionGraph, OracleGraph);
+            return CreateInitialMapping(percentage, seed, ReflexionGraph, OracleGraph);
         }
 
+        /// <summary>
+        /// Returns if a mapping of a candidate to a cluster would be a hit.
+        /// </summary>
+        /// <param name="candidateID">given candidate id</param>
+        /// <param name="clusterID">given cluster id</param>
+        /// <param name="oracleGraph">reflexion graph used as a oracle</param>
+        /// <returns></returns>
         public static bool IsHit(string candidateID, string clusterID, ReflexionGraph oracleGraph)
         {
             HashSet<string> candidateAscendants = oracleGraph.GetNode(candidateID).Ascendants().Select(n => n.ID).ToHashSet();
@@ -512,6 +576,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                                                 && clusterAscendants.Contains(e.Target.ID));
         }
 
+        /// <summary>
+        /// Returns if a mapping of a candidate to a cluster would be a hit.
+        /// 
+        /// Uses the oracle reflexion graph loaded in this object.
+        /// </summary>
+        /// <param name="candidateID">given candidate id</param>
+        /// <param name="clusterID">given cluster id</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public bool IsHit(string candidateID, string clusterID)
         {
             if (OracleGraph == null)
@@ -522,11 +595,25 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             return IsHit(candidateID, clusterID, OracleGraph);
         }
 
+        /// <summary>
+        /// Returns the expected cluster given an oracle graph and a candidate id.
+        /// </summary>
+        /// <param name="oracleGraph">reflexion graph used as a oracle</param>
+        /// <param name="candidateID">given candidate id</param>
+        /// <returns></returns>
         public static string GetExpectedClusterID(ReflexionGraph oracleGraph, string candidateID)
         {
             return oracleGraph.MapsTo(oracleGraph.GetNode(candidateID))?.ID;
         }
 
+        /// <summary>
+        /// Returns the expected cluster given a candidate id.
+        /// 
+        /// Uses the oracle reflexion graph loaded in this object.
+        /// </summary>
+        /// <param name="candidateID"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public string GetExpectedClusterID(string candidateID)
         {
             if (OracleGraph == null)
@@ -537,98 +624,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             return GetExpectedClusterID(OracleGraph, candidateID);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public static ReflexionGraph GenerateOracleMapping(Graph implementation, string oracleInstructions)
-        {
-            string currentMode = string.Empty;
-
-            Graph architecture = new Graph(implementation.BasePath, "Architecture");
-            Graph oracleMapping = new Graph(implementation.BasePath, "OracleMapping");
-
-            // Open the file for reading using StreamReader
-            using (StreamReader sr = new StreamReader(oracleInstructions))
-            {
-                string line;
-                // Read and display lines from the file until the end of the file is reached
-                while ((line = sr.ReadLine()) != null)
-                {
-                    line = line.Replace(" ", "");
-                    
-                    if(line.IsNullOrWhitespace())
-                    {
-                        break;
-                    }
-                    
-                    if(line.Contains(":"))
-                    {
-                        currentMode = line;
-                        continue;
-                    }
-
-                    switch(currentMode)
-                    {
-                        case "cluster:":
-                            AddCluster(architecture, line);
-                        break;
-                        case "relations:":
-                            AddClusterRelation(architecture, line);
-                        break;
-                        case "mapping:":
-                            AddOracleRelation(implementation, architecture, oracleMapping, line);
-                        break;
-                        default:
-                            throw new Exception($"Unknown instruction mode when processing oracle instructions: {currentMode}");
-
-                    }
-                }
-            }
-            
-            ReflexionGraph oracleGraph = new ReflexionGraph(implementation: implementation,
-                                          architecture: architecture,
-                                          mapping: oracleMapping);
-
-            return oracleGraph; 
-
-            void AddCluster(Graph arch, string line) 
-            {
-                UnityEngine.Debug.Log($"line='{line}'");
-                Node cluster = new Node();
-                cluster.ID = line;
-                cluster.Type = "Cluster";
-                arch.AddNode(cluster);
-            }
-
-            void AddClusterRelation(Graph arch, string line)
-            {
-                string[] nodes = line.Split(',');
-                Node source = arch.GetNode(nodes[0]);
-                Node target = arch.GetNode(nodes[1]);
-                Edge edge = new Edge(source, target, "Source_Dependency");
-                arch.AddEdge(edge);
-            }
-
-            void AddOracleRelation(Graph impl, Graph arch, Graph oracle, string line) 
-            {
-                string[] nodes = line.Split(',');
-
-                Node implNode = impl.GetNode(nodes[0]);
-                Node archNode = arch.GetNode(nodes[1]);
-
-                Node source = new Node();
-                source.ID = implNode.ID;
-                Node target = new Node();
-                target.ID = archNode.ID;
-
-                oracle.AddNode(source);
-                oracle.AddNode(target);
-                Edge edge = new Edge(source, target, "Maps_To");
-                oracle.AddEdge(edge);
-            }
-        }
-
+    
         /// <summary>
         /// Returns the mapping edge within the oracle graph which determines the expected cluster 
         /// for the node corresponding to the given node ID.
@@ -642,16 +638,24 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             List<Edge> oracleEdges = this.OracleGraph.Edges().Where(
             (e) => e.IsInMapping() && e.Source.PostOrderDescendants().Any(n => string.Equals(n.ID, candidateID))).ToList();
 
-            if (oracleEdges.Count > 1) throw new Exception("Oracle Mapping is Ambigous.");
+            if (oracleEdges.Count > 1)
+            {
+                throw new Exception("Oracle Mapping is Ambigous.");
+            }
             if (oracleEdges.Count == 0)
             {
-                // UnityEngine.Debug.LogWarning($"Oracle Mapping is Incomplete. There is no information about the node {candidateID}");
                 throw new Exception($"Oracle Mapping is Incomplete. There is no information about the node {candidateID}");
             }
 
             return oracleEdges[0];
         }
 
+        /// <summary>
+        /// Calculates the rank for a given candidate id within a list of mapping pairs.
+        /// </summary>
+        /// <param name="candidateID"></param>
+        /// <param name="mappingPairs"></param>
+        /// <returns></returns>
         public double CalculatePercentileRank(string candidateID,
                                               List<MappingPair> mappingPairs)
         {
@@ -660,7 +664,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             return CalculatePercentileRank(candidateID, mappingPairs, oracleEdge);
         }
 
-        /// <summary>
+        /// <summary> 
+        /// Calculates the rank for a given candidate id within a list of mapping pairs
+        /// regarding an oracle edge. 
+        /// 
         /// precondition: oracleEdge describes the mapsto relation for the given candidateID
         /// 
         /// </summary>
@@ -705,51 +712,72 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             return percentileRank;
         }
 
-        public /*static*/ List<Node> GetCandidates(ReflexionGraph graph, string candidateType)
+        /// <summary>
+        /// Returns all nodes considered to be candidates within a given reflexion graph.
+        /// </summary>
+        /// <param name="graph">given reflexio graph</param>
+        /// <returns>List containing the candidates</returns>
+        public List<Node> GetCandidates(ReflexionGraph graph)
         {
             return graph.Nodes().Where(n => this.IsCandidate(n)).ToList();
         }
 
+        /// <summary>
+        /// Returns all nodes considered to be candidates within the loaded reflexion graph.
+        /// </summary>
+        /// <returns>List containing the candidates</returns>
         public List<Node> GetCandidates() 
         {
-            return GetCandidates(ReflexionGraph, attractFunction.CandidateType);
+            return GetCandidates(ReflexionGraph);
         }
 
+        /// <summary>
+        /// Returns all nodes considered to be clusters given a reflexion graph.
+        /// </summary>
+        /// <param name="graph">given reflexio graph</param>
+        /// <param name="clusterType"></param>
+        /// <returns>List containing the clusters</returns>
         public static List<Node> GetCluster(ReflexionGraph graph, string clusterType)
         {
             return graph.Nodes().Where(n => n.Type.Equals(clusterType) && n.IsInArchitecture()).ToList();
         }
 
+        /// <summary>
+        /// Returns all nodes considered to be clusters within the loaded reflexion graph.
+        /// </summary>
+        /// <returns>List containing the cluster</returns>
         public List<Node> GetCluster()
         {
             return GetCluster(ReflexionGraph, attractFunction.ClusterType);
         }
 
-        public /*static*/ List<Node> GetUnmappedCandidates(ReflexionGraph graph, string candidateType)
-        {
-            return GetCandidates(graph, candidateType).Where(c => graph.MapsTo(c) == null).ToList();
-        }
-
+        /// <summary>
+        ///  Returns all nodes considered to be candidates within the loaded reflexion graph 
+        ///  which are currently unmpapped.
+        /// </summary>
+        /// <returns></returns>
         public List<Node> GetUnmappedCandidates()
         {
-            return GetUnmappedCandidates(ReflexionGraph, attractFunction.CandidateType);
+            return GetCandidates(ReflexionGraph).Where(c => ReflexionGraph.MapsTo(c) == null).ToList();
         }
 
-        public /*static*/ List<Node> GetMappedCandidates(ReflexionGraph graph, string candidateType)
+        /// <summary>
+        /// Returns if a given node is considered to be a cluster.
+        /// </summary>
+        /// <param name="node">given node</param>
+        /// <returns>if node is considered to be a cluster</returns>
+        public bool IsCluster(Node node)
         {
-            return GetCandidates(graph, candidateType).Where(c => graph.MapsTo(c) != null).ToList();
+            return node.Type.Equals(this.AttractFunction.ClusterType) && node.IsInArchitecture();
         }
 
-        public List<Node> GetMappedCandidates()
-        {
-            return GetMappedCandidates(ReflexionGraph, attractFunction.CandidateType);
-        }
-
-        private static bool IsCluster(Node node, string clusterType)
-        {
-            return node.Type.Equals(clusterType);
-        }
-
+        /// <summary>
+        /// Returns if a given node is considered to be a candidate regarding a given candidate type.
+        /// </summary>
+        /// <param name="node">given node</param>
+        /// <param name="candidateType">given candidate type</param>
+        /// <returns>if node is considered to be a candidate</returns>
+        /// <returns>true if the node is considered to be a candidate</returns>
         public static bool IsCandidate(Node node, string candidateType)
         {
             return node.Type.Equals(candidateType)
@@ -758,24 +786,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     && !node.ToggleAttributes.Contains("Element.Is_Anonymous");
         }
 
-        public static bool IsUnmappedCandidate(Node node, string candidateType, ReflexionGraph oracleGraph, ReflexionGraph graph)
-        {
-            return IsCandidate(node, candidateType) && graph.MapsTo(node) == null;
-        }
-
+        /// <summary>
+        /// Returns if a given node is considered to be a candidate.
+        /// </summary>
+        /// <param name="node">given node</param>
+        /// <returns>true if the node is considered to be a candidate</returns>
         public bool IsCandidate(Node node)
         {
             return IsCandidate(node, this.AttractFunction.CandidateType);
-        }
-
-        public bool IsCluster(Node node)
-        {
-            return IsCluster(node, this.AttractFunction.ClusterType);
-        }
-
-        public bool IsUnmappedCandidate(Node node)
-        {
-            return IsCandidate(node) && this.ReflexionGraph.MapsTo(node) == null;
         }
     }
 }
