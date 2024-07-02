@@ -36,7 +36,7 @@ namespace SEE.DataModel.DG.IO
                 }
                 catch (System.IO.IOException ex)
                 {
-                    Assert.AreEqual("First header column in CSV data is not ID.", ex.Message);
+                    Assert.AreEqual($"First header column in {path.Path} is not ID.", ex.Message);
                     // This is expected.
                     // Note: I couldn't use the following:
                     // Assert.ThrowsAsync<IOException>(async () => await MetricImporter.LoadCsvAsync(new Graph(""), path));

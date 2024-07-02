@@ -49,30 +49,7 @@ namespace SEE.DataModel.DG.IO
                 throw new ArgumentException("Data path must neither be null nor empty.");
             }
             Stream stream = await path.LoadAsync();
-            LoadAsync(graph, stream, path.Path);
-        }
-
-        /// <summary>
-        /// Loads a JaCoCo test report from the given JaCoCo XML <paramref name="jaCoCoFilename"/>.
-        /// The retrieved coverage metrics will be added to nodes of <paramref name="graph"/>.
-        /// </summary>
-        /// <param name="graph">Graph where to add the metrics</param>
-        /// <param name="jaCoCoFilename">Path of the JaCoCo XML file</param>
-        /// <exception cref="ArgumentNullException">if <paramref name="graph"/> is null</exception>
-        /// <exception cref="ArgumentException">if <paramref name="jaCoCoFilename"/> is null or empty</exception>
-        public static async UniTask LoadAsync(Graph graph, string jaCoCoFilename)
-        {
-            if (!File.Exists(jaCoCoFilename))
-            {
-                Debug.LogError($"The JaCoCo XML file named {jaCoCoFilename} does not exist.\n");
-                return;
-            }
-            if (string.IsNullOrEmpty(jaCoCoFilename))
-            {
-                throw new ArgumentException("Filename must neither be null nor empty.");
-            }
-            using Stream stream = File.OpenRead(jaCoCoFilename);
-            await LoadAsync(graph, stream, jaCoCoFilename);
+            await LoadAsync(graph, stream, path.Path);
         }
 
         /// <summary>
