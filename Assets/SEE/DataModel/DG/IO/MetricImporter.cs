@@ -169,7 +169,7 @@ namespace SEE.DataModel.DG.IO
         {
             Stream stream = await path.LoadAsync();
             using StreamReader reader = new(stream);
-            return await LoadCsvAsync(graph, separator, reader, "", token);
+            return await LoadCsvAsync(graph, separator, reader, path.Path, token);
         }
 
         /// <summary>
@@ -196,6 +196,7 @@ namespace SEE.DataModel.DG.IO
         /// <param name="separator">used to separate column entries</param>
         /// <param name="token">token to cancel the operation</param>
         /// <returns>the number of errors</returns>
+        [Obsolete("Use LoadCsvAsync(Graph, DataPath, char, CancellationToken) instead.")]
         public static async UniTask<int> LoadCsvAsync(Graph graph, string filename, char separator = ';',
                                                       CancellationToken token = default)
         {
