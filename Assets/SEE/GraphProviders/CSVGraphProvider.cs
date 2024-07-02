@@ -33,7 +33,7 @@ namespace SEE.GraphProviders
                                                           CancellationToken token = default)
         {
             CheckArguments(city);
-            int numberOfErrors = await MetricImporter.LoadCsvAsync(graph, Path.Path, token: token);
+            int numberOfErrors = await MetricImporter.LoadCsvAsync(graph, Path, token: token);
             if (numberOfErrors > 0)
             {
                 Debug.LogWarning($"CSV file {Path.Path} has {numberOfErrors} many errors.\n");
