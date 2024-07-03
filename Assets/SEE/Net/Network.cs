@@ -368,6 +368,10 @@ namespace SEE.Net
                 {
                     throw new ArgumentException($"Argument value for {argument} is missing.");
                 }
+                if (string.IsNullOrWhiteSpace(arguments[i + 1]))
+                {
+                    throw new ArgumentException($"Argument value for {argument} is missing.");
+                }
             }
         }
 
