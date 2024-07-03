@@ -376,30 +376,26 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// The <see cref="ServerActionNetwork"/> component attached to the server game object.
-        /// </summary>
-        private static ServerActionNetwork serverNetwork;
-        /// <summary>
         /// The gateway to the server.
         /// </summary>
-        public static ServerActionNetwork ServerNetwork
+        public static readonly Lazy<ServerActionNetwork> ServerNetwork = new(InitServerNetwork);
+
+        /// <summary>
+        /// Yields the <see cref="ServerActionNetwork"/> component attached to the Server game object.
+        /// </summary>
+        private static ServerActionNetwork InitServerNetwork()
         {
-            get
+            const string serverName = "Server";
+            GameObject server = GameObject.Find(serverName);
+            if (server != null)
             {
-                if (serverNetwork == null)
-                {
-                    const string serverName = "Server";
-                    GameObject server = GameObject.Find(serverName);
-                    if (server != null)
-                    {
-                        server.TryGetComponentOrLog(out serverNetwork);
-                    }
-                    else
-                    {
-                        Debug.LogError($"There is no game object named {serverName} in the scene.\n");
-                    }
-                }
+                server.TryGetComponentOrLog(out ServerActionNetwork serverNetwork);
                 return serverNetwork;
+            }
+            else
+            {
+                Debug.LogError($"There is no game object named {serverName} in the scene.\n");
+                return null;
             }
         }
 
@@ -410,7 +406,7 @@ namespace SEE.Net
         /// <param name="recipients">List of recipients to broadcast to, will broadcast to all if this is null.</param>
         public static void BroadcastAction(String serializedAction, ulong[] recipients)
         {
-            ServerNetwork?.BroadcastActionServerRpc(serializedAction, recipients);
+            ServerNetwork.Value?.BroadcastActionServerRpc(serializedAction, recipients);
         }
 
         /// <summary>

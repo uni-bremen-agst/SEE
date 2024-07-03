@@ -61,7 +61,7 @@ namespace SEE.Net
         {
             if (!IsServer && !IsHost)
             {
-                Network.ServerNetwork?.SyncFilesServerRpc();
+                Network.ServerNetwork.Value?.SyncFilesServerRpc();
             }
         }
 
@@ -115,7 +115,10 @@ namespace SEE.Net
                 Directory.CreateDirectory(AbsoluteServerContentDirectory);
             }
             */
-            StartCoroutine(GetAllData());
+
+            // For the time being, we will not download the data.
+            // This must be re-enabled once the backend is ready.
+            // StartCoroutine(GetAllData());
         }
 
 
@@ -143,7 +146,7 @@ namespace SEE.Net
 
             UnzipSources();
 
-            Network.ServerNetwork?.SyncClientServerRpc(NetworkManager.Singleton.LocalClientId);
+            Network.ServerNetwork.Value?.SyncClientServerRpc(NetworkManager.Singleton.LocalClientId);
         }
 
         /// <summary>
