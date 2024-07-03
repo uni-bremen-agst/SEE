@@ -364,7 +364,7 @@ namespace SEE.Game.CityRendering
             // need to start listening for change events from that graph.
             BoardsManager.OnGraphDraw();
 
-            if (Settings is DiffCity)
+            if (Settings is BranchCity)
             {
                 DrawAuthorSpheres(nodeMap, rootGameNode);
             }
@@ -382,7 +382,7 @@ namespace SEE.Game.CityRendering
                 }
             }
         }
-        
+
 
         /// <summary>
         /// The <paramref name="layoutNodes"/> are put just above the <paramref name="plane"/> w.r.t. the y axis.

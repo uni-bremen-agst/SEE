@@ -4,7 +4,6 @@ using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.Game.Operator;
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.Utils;
@@ -22,7 +21,9 @@ namespace SEE.Game.CityRendering
     /// </summary>
     public partial class GraphRenderer
     {
-        private string AuthorAttributeName = "Metric.File.Authors";
+        private const string AuthorAttributeName = "Metric.File.Authors";
+
+        private const string ChurnAttributeName = "Metric.File.Churn";
 
         /// <summary>
         /// Draws author spheres for the rendered graph and should be executed after the graph was rendered.
@@ -50,14 +51,17 @@ namespace SEE.Game.CityRendering
         }
 
 
+        /// <summary>
+        /// Renders the edges connecting author spheres with the files the author has edited.
+        /// </summary>
+        /// <param name="nodeMap"></param>
+        /// <param name="gameSpheresObjects"></param>
+        /// <param name="parent"></param>
         private void RenderEdgesForSpheres(IDictionary<Node, GameObject> nodeMap,
             IEnumerable<GameObject> gameSpheresObjects, GameObject parent)
         {
-            var maxHeight = nodeMap.Values.Max(x => x.transform.position.y);
-            float offset = Mathf.Max(2.5f * Settings.EdgeLayoutSettings.EdgeWidth, 0.2f * maxHeight);
-
             IEnumerable<Node> nodesWithChurn = nodeMap.Keys
-                .Where(x => x.IntAttributes.ContainsKey("Metric.File.Churn"));
+                .Where(x => x.IntAttributes.ContainsKey(ChurnAttributeName));
 
             if (!nodesWithChurn.Any())
             {
@@ -65,7 +69,7 @@ namespace SEE.Game.CityRendering
             }
 
             int maximalChurn = nodesWithChurn
-                .Max(x => x.IntAttributes["Metric.File.Churn"]);
+                .Max(x => x.IntAttributes[ChurnAttributeName]);
 
 
             foreach (var sphere in gameSpheresObjects)
@@ -74,16 +78,16 @@ namespace SEE.Game.CityRendering
                 var authorName = authorSphere.Author;
 
                 var nodesOfAuthor = nodeMap
-                    .Where(x => x.Key.StringAttributes.ContainsKey("Metric.File.Authors"))
+                    .Where(x => x.Key.StringAttributes.ContainsKey(AuthorAttributeName))
                     .Where(x =>
-                        x.Key.StringAttributes["Metric.File.Authors"]
+                        x.Key.StringAttributes[AuthorAttributeName]
                             .Split(',')
                             .Contains(authorName));
 
                 foreach (var nodeOfAuthor in nodesOfAuthor)
                 {
                     BSpline bSpline = CreateSpline(sphere.transform.position, nodeOfAuthor.Value.GetRoofCenter());
-                    var churn = nodeOfAuthor.Key.IntAttributes["Metric.File.Churn" + ":" + authorName];
+                    var churn = nodeOfAuthor.Key.IntAttributes[ChurnAttributeName + ":" + authorName];
 
                     GameObject gameEdge = new()
                     {
@@ -104,11 +108,9 @@ namespace SEE.Game.CityRendering
                     // material and will not be affected by changes of the
                     // original material.
                     Color edgeColor = sphere.GetComponent<Renderer>().sharedMaterial.color;
-                    //edgeColor.a = 0.7f;
                     Material material = Materials.New(Materials.ShaderType.Opaque, edgeColor);
                     material.shader = Shader.Find("Standard");
                     line.sharedMaterial = material;
-                    //line.sharedMaterial.shader = Shader.Find("Standard");
 
 
                     LineFactory.SetDefaults(line);
@@ -116,7 +118,6 @@ namespace SEE.Game.CityRendering
                         Settings.EdgeLayoutSettings.EdgeWidth);
 
                     LineFactory.SetWidth(line, width);
-                    //LineFactory.SetColor(line, edgeColor);
 
                     // If enabled, the lines are defined in world space. This
                     // means the object's position is ignored and the lines are
@@ -160,7 +161,7 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="authors">The authors to create the spheres for</param>
         /// <param name="parent">The parent <see cref="GameObject"/> to add the to</param>
-        /// <returns></returns>
+        /// <returns>A list of the generated sphere game objects</returns>
         private IList<GameObject> RenderSpheres(IList<string> authors, GameObject parent)
         {
             IList<GameObject> result = new List<GameObject>();
@@ -172,11 +173,12 @@ namespace SEE.Game.CityRendering
             float spacingZ = (parentRenderer.bounds.size.z / (columns - 1));
             float spacingX = (parentRenderer.bounds.size.x / (rows - 1));
 
+            // When we only have one row
             if (float.IsInfinity(spacingX) || float.IsNaN(spacingX))
             {
                 spacingX = parentRenderer.bounds.size.x;
             }
-
+            // When we only have one column
             if (float.IsInfinity(spacingZ) || float.IsNaN(spacingZ))
             {
                 spacingZ = parentRenderer.bounds.size.z;

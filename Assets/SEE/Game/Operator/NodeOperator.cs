@@ -286,7 +286,8 @@ namespace SEE.Game.Operator
                             {
                                 foreach (var edge in authorRef.Edges)
                                 {
-                                    SEESpline seeSpline = edge.GetComponent<SEESpline>();
+                                    SEESpline seeSpline = edge.Item1.GetComponent<SEESpline>();
+
                                     seeSpline.UpdateEndPosition(gameObject.transform.position);
                                 }
                             }
@@ -297,7 +298,7 @@ namespace SEE.Game.Operator
                                 foreach (var child in children)
                                 {
                                     child.Edges.ForEach(x =>
-                                        x.GetComponent<SEESpline>()
+                                        x.Item1.GetComponent<SEESpline>()
                                             .UpdateEndPosition(child.gameObject.transform.position));
                                 }
                             }

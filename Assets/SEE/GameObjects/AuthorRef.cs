@@ -6,8 +6,8 @@ namespace SEE.GameObjects
 {
     public class AuthorRef : SerializedMonoBehaviour
     {
-        public GameObject AuthorSphere;
+        public ISet<GameObject> AuthorSpheres = new HashSet<GameObject>();
 
-        public IList<GameObject> Edges = new List<GameObject>();
+        public IList<(GameObject, int)> Edges = new List<(GameObject, int)>();
     }
 }
