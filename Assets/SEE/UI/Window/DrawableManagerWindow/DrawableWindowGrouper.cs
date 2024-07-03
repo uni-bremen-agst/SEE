@@ -1,10 +1,5 @@
 ﻿using SEE.Game.Drawable;
-using SEE.UI.Window.TreeWindow;
-using SEE.Utils;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Assets.SEE.UI.Window.DrawableManagerWindow

@@ -58,13 +58,19 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
         /// <param name="surfaces">The surfaces to be added, if it is not set all surfaces of the scene will be added.</param>
         private void AddDrawableSurfaces(List<GameObject> surfaces = null)
         {
+            /// Case group is active.
             if (contextMenu.grouper.IsActive)
             {
-                AddGroup("Whiteboards", Icons.Whiteboard, OrderList(contextMenu.grouper.GetWhiteboards(contextMenu.filter)), WhiteboardColor);
-                AddGroup("Sticky Notes", Icons.StickyNote, OrderList(contextMenu.grouper.GetStickyNotes(contextMenu.filter)), StickyNoteColor);
+                AddGroup("Whiteboards", Icons.Whiteboard, 
+                    OrderList(contextMenu.grouper.GetWhiteboards(contextMenu.filter)), 
+                    WhiteboardColor);
+                AddGroup("Sticky Notes", Icons.StickyNote, 
+                    OrderList(contextMenu.grouper.GetStickyNotes(contextMenu.filter)), 
+                    StickyNoteColor);
             }
-            else
+            else /// Group is not active.
             {
+                /// Case a filter is active.
                 if (surfaces != null)
                 {
                     foreach (GameObject surface in OrderList(surfaces))
@@ -77,6 +83,7 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
                 }
                 else
                 {
+                    /// Case no filter is active. Use all drawable surfaces.
                     foreach (GameObject surface in OrderList(ValueHolder.DrawableSurfaces))
                     {
                         AddItem(surface);

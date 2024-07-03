@@ -325,16 +325,6 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
                     GameDrawableManager.ChangeDescription(surface, textOut);
                     new DrawableChangeDescriptionNetAction(DrawableConfigManager.GetDrawableConfig(surface)).Execute();
                     Rebuild(contextMenu.filter.GetFilteredSurfaces());
-                    /*
-                    descriptionMesh.text = textOut;
-
-                    if ((!string.IsNullOrEmpty(textOut) && !string.IsNullOrWhiteSpace(textOut)
-                        && !contextMenu.filter.IncludeHaveDescription)
-                    || ((string.IsNullOrEmpty(textOut) || string.IsNullOrWhiteSpace(textOut))
-                        && !contextMenu.filter.IncludeHaveNoDescription))
-                    {
-                        RemoveItem(item);
-                    }*/
                 };
 
                 writeTextDialog.Open(stringAction);
@@ -399,21 +389,25 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
             AnimateIn();
             return item;
 
+            /// Get the icon for the visibility mesh.
             string GetVisibilityText(bool state)
             {
                 return state ? Icons.Show.ToString() : Icons.Hide.ToString();
             }
 
+            /// Get the color for the visibility icon.
             Color GetVisibilityColor(bool state)
             {
                 return state ? Color.white : Color.red.Darker();
             }
 
+            /// Get the color for the lighting icon.
             Color GetLightColor(bool state)
             {
                 return state ? Color.yellow : Color.white;
             }
 
+            /// Changes the item color.
             void ColorItem()
             {
                 if (gradient == null)
@@ -422,7 +416,7 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
                 }
                 background.GetComponent<UIGradient>().EffectGradient.SetKeys(gradient.ToGradientColorKeys().ToArray(), alphaKeys);
 
-                // We also need to set the text color to a color that is readable on the background color.
+                /// We also need to set the text color to a color that is readable on the background color.
                 Color foregroundColor = gradient.Aggregate((x, y) => (x + y) / 2).IdealTextColor();
                 textMesh.color = foregroundColor;
                 iconMesh.color = foregroundColor;
