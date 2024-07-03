@@ -51,6 +51,11 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
         public readonly DrawableWindowGrouper grouper;
 
         /// <summary>
+        /// The drawable surface sorter.
+        /// </summary>
+        public readonly DrawableSurfaceSorter sorter;
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="contextMenu">The context menu that this class manages.</param>
@@ -69,12 +74,13 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
             this.groupButton = groupButton;
             filter = new DrawableSurfaceFilter();
             grouper = new DrawableWindowGrouper();
+            sorter = new DrawableSurfaceSorter();
 
             ResetFilter();
-            //ResetSort();
+            ResetSort();
             ResetGrouping();
             this.filterButton.clickEvent.AddListener(ShowFilterMenu);
-            //this.sortButton.clickEvent.AddListener(ShowSortMenu);
+            this.sortButton.clickEvent.AddListener(ShowSortMenu);
             this.groupButton.clickEvent.AddListener(ShowGroupMenu);
         }
         #region Filter menu
@@ -219,7 +225,109 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
         #endregion
 
         #region Sort menu
+        /// <summary>
+        /// Displays the sort menu.
+        /// </summary>
+        private void ShowSortMenu()
+        {
+            UpdateSortMenuEntries();
+            contextMenu.ShowWith(position: sortButton.transform.position);
+        }
 
+        /// <summary>
+        /// Updates the sort menu entries.
+        /// </summary>
+        private void UpdateSortMenuEntries()
+        {
+            List<PopupMenuEntry> entries = new()
+            {
+                new PopupMenuAction("Reset", () =>
+                {
+                    ResetSort();
+                    UpdateSortMenuEntries();
+                    rebuild.Invoke(filter.GetFilteredSurfaces());
+                }, Icons.ArrowRotateLeft, CloseAfterClick: false)
+            };
+            if (grouper.IsActive)
+            {
+                entries.Add(new PopupMenuHeading("Grouping is active!"));
+                entries.Add(new PopupMenuHeading("Items ordered by group count."));
+            } else
+            {
+                entries.Add(new PopupMenuAction("Surface Type", () =>
+                {
+                    ToggleSortAction("Type", x => x);
+                }, SortIcon(false, sorter.IsAttributeDescending("Type")), CloseAfterClick: false));
+
+                entries.Add(new PopupMenuAction("Description", () =>
+                {
+                    ToggleSortAction("Description", x => x);
+                }, SortIcon(false, sorter.IsAttributeDescending("Description")), CloseAfterClick: false));
+
+                entries.Add(new PopupMenuAction("Lighting", () =>
+                {
+                    ToggleSortAction("Lighting", x => x);
+                }, SortIcon(false, sorter.IsAttributeDescending("Lighting")), CloseAfterClick: false));
+
+                entries.Add(new PopupMenuAction("Visibility", () =>
+                {
+                    ToggleSortAction("Visibility", x => x);
+                }, SortIcon(false, sorter.IsAttributeDescending("Visibility")), CloseAfterClick: false));
+            }
+
+            contextMenu.ClearEntries();
+            contextMenu.AddEntries(entries);
+            return;
+
+            /// Switch from ascending->descending->none->ascending.
+            void ToggleSortAction(string name, Func<GameObject, object> key)
+            {
+                switch (sorter.IsAttributeDescending(name))
+                {
+                    case null:
+                        sorter.AddSortAttribute(name, key, false);
+                        break;
+                    case false:
+                        sorter.RemoveSortAttribute(name);
+                        sorter.AddSortAttribute(name, key, true);
+                        break;
+                    default:
+                        sorter.RemoveSortAttribute(name);
+                        break;
+                }
+                UpdateSortMenuEntries();
+                rebuild.Invoke(filter.GetFilteredSurfaces());
+            }
+
+        }
+
+        /// <summary>
+        /// Returns the sort icon depending on whether the attribute is
+        /// <paramref name="numeric"/> and whether it is sorted in <paramref name="descending"/> order.
+        /// </summary>
+        /// <param name="numeric">Whether the attribute is numeric.</param>
+        /// <param name="descending">Whether the attribute is sorted in descending order.</param>
+        /// <returns>The sort icon depending on the given parameters.</returns>
+        private static char SortIcon(bool numeric, bool? descending)
+        {
+            return (numeric, descending) switch
+            {
+                (true, null) => Icons.Hashtag,
+                (false, null) => Icons.Text,
+                (true, true) => Icons.SortNumericDown,
+                (true, false) => Icons.SortNumericUp,
+                (false, true) => Icons.SortAlphabeticalDown,
+                (false, false) => Icons.SortAlphabeticalUp
+            };
+        }
+
+        /// <summary>
+        /// Resets the sort to its default state.
+        /// </summary>
+        private void ResetSort()
+        {
+            sorter.Reset();
+        }
         #endregion
     }
 }
