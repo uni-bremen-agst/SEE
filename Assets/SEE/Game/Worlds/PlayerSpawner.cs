@@ -99,6 +99,10 @@ namespace SEE.Game.Worlds
         /// <remarks>This code can be executed only on the server.</remarks>
         private void Spawn(ulong owner)
         {
+            if (owner == NetworkManager.Singleton.LocalClientId && NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost)
+            {
+                return;
+            }
             int index = numberOfSpawnedPlayers % playerSpawns.Count;
             GameObject player = Instantiate(playerSpawns[index].PlayerPrefab,
                                             playerSpawns[index].Position,

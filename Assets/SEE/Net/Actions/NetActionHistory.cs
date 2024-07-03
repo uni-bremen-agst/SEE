@@ -81,7 +81,7 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Stuff to execute on the server. Nothing to be done here.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank.
         }
@@ -89,25 +89,23 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Syncs the GlobalActionHistory on each client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            switch (Mode)
             {
-                switch(Mode){
-                    case ModeKind.Push:
-                        GlobalActionHistory.Push(new GlobalHistoryEntry(false, Type, ActionId, new HashSet<string>(NewChangedObjects)));
-                        break;
-                    case ModeKind.Delete:
-                        GlobalActionHistory.RemoveAction(ActionId);
-                        break;
-                    case ModeKind.Replace:
-                        GlobalActionHistory.Replace(new GlobalHistoryEntry(false, OldItemType, ID, new HashSet<string>(OldChangedObjects)),
-                                                    new GlobalHistoryEntry(false, NewItemType, ID, new HashSet<string>(NewChangedObjects)),
-                                                    true);
-                        break;
-                }
-                Mode = ModeKind.Init;
+                case ModeKind.Push:
+                    GlobalActionHistory.Push(new GlobalHistoryEntry(false, Type, ActionId, new HashSet<string>(NewChangedObjects)));
+                    break;
+                case ModeKind.Delete:
+                    GlobalActionHistory.RemoveAction(ActionId);
+                    break;
+                case ModeKind.Replace:
+                    GlobalActionHistory.Replace(new GlobalHistoryEntry(false, OldItemType, ID, new HashSet<string>(OldChangedObjects)),
+                                                new GlobalHistoryEntry(false, NewItemType, ID, new HashSet<string>(NewChangedObjects)),
+                                                true);
+                    break;
             }
+            Mode = ModeKind.Init;
         }
 
         /// <summary>

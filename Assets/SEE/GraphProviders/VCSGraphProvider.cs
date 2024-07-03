@@ -33,7 +33,7 @@ namespace SEE.GraphProviders
         /// The path to the git repository.
         /// </summary>
         [ShowInInspector, Tooltip("Path to the version control repository."), HideReferenceObjectPicker]
-        public DirectoryPath RepositoryPath = new();
+        public DataPath RepositoryPath = new();
 
         /// <summary>
         /// The commit id.

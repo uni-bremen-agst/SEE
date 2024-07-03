@@ -28,7 +28,7 @@ namespace SEE.GraphProviders
         /// The path to the software project for which the graph shall be generated.
         /// </summary>
         [Tooltip("Root path of the project to be analyzed."), RuntimeTab(GraphProviderFoldoutGroup), HideReferenceObjectPicker]
-        public DirectoryPath ProjectPath = new();
+        public DataPath ProjectPath = new();
 
         /// <summary>
         /// The name of the language server to be used for the analysis.

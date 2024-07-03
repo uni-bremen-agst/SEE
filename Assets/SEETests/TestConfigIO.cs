@@ -467,7 +467,10 @@ namespace SEE.Utils
                 // First save a new city with all its default values.
                 DiffCity savedCity = NewVanillaSEECity<DiffCity>();
                 savedCity.VersionControlSystem = VCS.VCSKind.Git;
-                savedCity.VCSPath = new(vcsPath);
+                savedCity.VCSPath = new()
+                {
+                    Path = vcsPath
+                };
                 savedCity.OldRevision = "old revision";
                 savedCity.NewRevision = "new revision";
                 savedCity.Save(filename);
@@ -837,7 +840,7 @@ namespace SEE.Utils
         {
             WipeOutSEECityAttributes(city);
             city.VersionControlSystem = VCS.VCSKind.None;
-            city.VCSPath.Set("C:/MyAbsoluteDirectory/MyVCSDirectory");
+            city.VCSPath.Path = "C:/MyAbsoluteDirectory/MyVCSDirectory";
             city.OldRevision = "XXX";
             city.NewRevision = "YYY";
         }
@@ -863,7 +866,10 @@ namespace SEE.Utils
         private void WipeOutSEEJlgCityAttributes(SEEJlgCity city)
         {
             WipeOutSEECityAttributes(city);
-            city.JLGPath = new FilePath("C:/MyAbsoluteDirectory/MyAbsoluteFile.jlg");
+            city.JLGPath = new()
+            {
+                Path = "C:/MyAbsoluteDirectory/MyAbsoluteFile.jlg"
+            };
         }
 
         /// <summary>
@@ -1047,7 +1053,7 @@ namespace SEE.Utils
         private static void WipeOutNodeLayoutSettings(AbstractSEECity city)
         {
             city.NodeLayoutSettings.Kind = NodeLayoutKind.CompoundSpringEmbedder;
-            city.NodeLayoutSettings.LayoutPath.Set("no path found");
+            city.NodeLayoutSettings.LayoutPath.Path = "no path found";
         }
 
         private static void AreEqualNodeLayoutSettings(NodeLayoutAttributes expected, NodeLayoutAttributes actual)
@@ -1112,9 +1118,9 @@ namespace SEE.Utils
             city.LODCulling++;
             city.HierarchicalEdges = new HashSet<string>() { "Nonsense", "Whatever" };
             city.NodeTypes = new NodeTypeVisualsMap();
-            city.ConfigurationPath.Set("C:/MyAbsoluteDirectory/config.cfg");
-            city.SourceCodeDirectory.Set("C:/MyAbsoluteDirectory");
-            city.SolutionPath.Set("C:/MyAbsoluteDirectory/mysolution.sln");
+            city.ConfigurationPath.Path = "C:/MyAbsoluteDirectory/config.cfg";
+            city.SourceCodeDirectory.Path = "C:/MyAbsoluteDirectory";
+            city.SolutionPath.Path = "C:/MyAbsoluteDirectory/mysolution.sln";
             city.ZScoreScale = !city.ZScoreScale;
             city.ScaleOnlyLeafMetrics = !city.ScaleOnlyLeafMetrics;
         }

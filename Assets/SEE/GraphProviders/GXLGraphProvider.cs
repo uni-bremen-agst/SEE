@@ -1,7 +1,6 @@
 ﻿using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.City;
-using SEE.Utils;
 using System;
 using System.IO;
 using System.Threading;
@@ -36,15 +35,11 @@ namespace SEE.GraphProviders
         /// <exception cref="NotImplementedException">thrown if <paramref name="graph"/>
         /// has nodes; this case is currently not yet handled</exception>
         public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
-                                                    Action<float> changePercentage = null,
-                                                    CancellationToken token = default)
+                                                          Action<float> changePercentage = null,
+                                                          CancellationToken token = default)
         {
             CheckArguments(city);
-            GraphReader graphCreator = new(Path.Path, city.HierarchicalEdges,
-                                           basePath: city.SourceCodeDirectory.Path,
-                                           logger: new SEELogger());
-            await graphCreator.LoadAsync(token);
-            return graphCreator.GetGraph();
+            return await GraphReader.LoadAsync(Path, city.HierarchicalEdges, city.SourceCodeDirectory.Path, token);
         }
 
         public override SingleGraphProviderKind GetKind()

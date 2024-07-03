@@ -50,7 +50,6 @@ ExportedObj/
 *.mdb
 *.opendb
 *.VC.db
-.vsconfig
 
 # Java class files
 **/*.class
@@ -116,6 +115,16 @@ Error*.txt
 ManagedThreadPoolCallBackError*.txt
 PacketHandlerErrorGlobal*.txt
 GlobalConnectionShutdownDelegate*.txt
+
+# MacOS
+.DS_Store
+._.DS_Store
+**/.DS_Store
+**/._.DS_Store
+
+# VSCode
+.vscode
+.vsconfig
 
 # Custom entries
 LinuxPlayer_s.debug

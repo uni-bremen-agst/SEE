@@ -54,28 +54,26 @@ namespace SEE.Net.Actions
             }
         }
 
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
+            // Intentionally left blank.
         }
 
         /// <summary>
         /// Updates position, rotation and potentially local scale of the interactable
         /// object of given id.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            InteractableObject interactable = InteractableObject.Get(ID);
+            if (interactable)
             {
-                InteractableObject interactable = InteractableObject.Get(ID);
-                if (interactable)
+                interactable.InteractableSynchronizer?.NotifyJustReceivedUpdate();
+                interactable.transform.position = Position;
+                interactable.transform.rotation = Rotation;
+                if (LocalScale.HasValue)
                 {
-                    interactable.InteractableSynchronizer?.NotifyJustReceivedUpdate();
-                    interactable.transform.position = Position;
-                    interactable.transform.rotation = Rotation;
-                    if (LocalScale.HasValue)
-                    {
-                        interactable.transform.localScale = LocalScale.Value;
-                    }
+                    interactable.transform.localScale = LocalScale.Value;
                 }
             }
         }

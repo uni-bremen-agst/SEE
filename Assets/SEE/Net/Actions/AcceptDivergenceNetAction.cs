@@ -58,7 +58,7 @@ namespace SEE.Net.Actions
         /// class). Necessary because it is abstract in the
         /// superclass.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank.
         }
@@ -66,12 +66,9 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Creates a new GameObject on each client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                AcceptDivergence.Accept(Find(FromId), Find(ToId), Type, EdgeId);
-            }
+            AcceptDivergence.Accept(Find(FromId), Find(ToId), Type, EdgeId);
         }
     }
 }

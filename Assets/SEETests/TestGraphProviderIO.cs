@@ -122,7 +122,7 @@ namespace SEE.GraphProviders
         {
             return new GXLSingleGraphProvider()
             {
-                Path = new Utils.Paths.FilePath("mydir/myfile.gxl")
+                Path = new DataPath("mydir/myfile.gxl")
             };
         }
 
@@ -130,7 +130,7 @@ namespace SEE.GraphProviders
         {
             return new GXLEvolutionGraphProvider()
             {
-                GXLDirectory = new DirectoryPath() { Path = "/path/to/gxl/files" }
+                GXLDirectory = new DataPath("/path/to/gxl/files")
             };
         }
         private static void AreEqualGXLProviders(GXLSingleGraphProvider saved, SingleGraphProvider loaded)
@@ -156,7 +156,7 @@ namespace SEE.GraphProviders
         {
             return new CSVGraphProvider()
             {
-                Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mydir/myfile.csv")
+                Path = new DataPath(Application.streamingAssetsPath + "/mydir/myfile.csv")
             };
         }
 
@@ -183,7 +183,7 @@ namespace SEE.GraphProviders
         {
             return new JaCoCoGraphProvider()
             {
-                Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
+                Path = new DataPath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
             };
         }
 
@@ -274,9 +274,10 @@ namespace SEE.GraphProviders
         {
             GXLEvolutionGraphProvider saved = new()
             {
-                GXLDirectory = new("/path/to/file.gxl"),
+                GXLDirectory = new(),
                 MaxRevisionsToLoad = 42
             };
+            saved.GXLDirectory.Path = "/path/to/file.gxl";
             Save(saved);
             AreEqual(saved, LoadMultiGraph());
         }
@@ -298,9 +299,9 @@ namespace SEE.GraphProviders
         {
             return new ReflexionGraphProvider()
             {
-                Architecture = new Utils.Paths.FilePath("mydir/Architecture.gxl"),
-                Implementation = new Utils.Paths.FilePath("mydir/Implementation.gxl"),
-                Mapping = new Utils.Paths.FilePath("mydir/Mapping.gxl"),
+                Architecture = new DataPath("mydir/Architecture.gxl"),
+                Implementation = new DataPath("mydir/Implementation.gxl"),
+                Mapping = new DataPath("mydir/Mapping.gxl"),
             };
         }
 
@@ -331,7 +332,7 @@ namespace SEE.GraphProviders
             {
                 OldGraph = new JaCoCoGraphProvider()
                 {
-                    Path = new FilePath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
+                    Path = new DataPath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
                 }
             };
         }
@@ -383,11 +384,13 @@ namespace SEE.GraphProviders
 
             return new VCSGraphProvider()
             {
-                RepositoryPath = new DirectoryPath(Path.GetDirectoryName(Application.dataPath)),
+                RepositoryPath = new DataPath()
+                {
+                    Path = Path.GetDirectoryName(Application.dataPath)
+                },
                 CommitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461",
                 BaselineCommitID = "5efa95913a6e894e5340f07fab26c9958b5c1096",
                 PathGlobbing = pathGlobbing
-
             };
         }
 
