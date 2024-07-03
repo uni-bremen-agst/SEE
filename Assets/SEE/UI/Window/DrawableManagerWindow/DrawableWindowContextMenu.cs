@@ -46,6 +46,11 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
         public readonly DrawableSurfaceFilter filter;
 
         /// <summary>
+        /// The drawable surface grouper.
+        /// </summary>
+        public readonly DrawableWindowGrouper grouper;
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="contextMenu">The context menu that this class manages.</param>
@@ -63,6 +68,7 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
             this.sortButton = sortButton;
             this.groupButton = groupButton;
             filter = new DrawableSurfaceFilter();
+            grouper = new DrawableWindowGrouper();
 
             ResetFilter();
             //ResetSort();
@@ -179,26 +185,24 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
         /// </summary>
         private void UpdateGroupMenuEntries()
         {
-            //ISet<DrawableWindowGroup> currentGroups = grouper.AllGroups.ToHashSet();
             List<PopupMenuEntry> entries = new()
             {
                 new PopupMenuAction("None", () =>
                 {
                     ResetGrouping();
+                    UpdateGroupMenuEntries();
                     rebuild.Invoke(filter.GetFilteredSurfaces());
-                }, Radio(true/*!grouper.IsActive*/), CloseAfterClick: false),
+                }, Radio(!grouper.IsActive), CloseAfterClick: false),
                 new PopupMenuAction("Surface Type", () =>
                 {
-                    //TODO
-                }, Radio(false), CloseAfterClick: false)
+                    grouper.IsActive = true;
+                    UpdateGroupMenuEntries();
+                    rebuild.Invoke(filter.GetFilteredSurfaces());
+                }, Radio(grouper.IsActive), CloseAfterClick: false)
             };
             contextMenu.ClearEntries();
             contextMenu.AddEntries(entries);
             return;
-
-            /// Returns the group action for the given 
-            ///TODO
-            //PopupMenuAction GroupActionFor(string name, )
         }
 
         /// <summary>
@@ -210,7 +214,7 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
 
         private void ResetGrouping()
         {
-            // TODO Reset
+            grouper.Reset();
         }
         #endregion
 

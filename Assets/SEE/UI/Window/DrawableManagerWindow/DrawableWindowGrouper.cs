@@ -1,17 +1,50 @@
-﻿using System.Collections;
+﻿using SEE.Game.Drawable;
+using SEE.UI.Window.TreeWindow;
+using SEE.Utils;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Assets.SEE.UI.Window.DrawableManagerWindow
 {
     /// <summary>
-    /// A group of drawable surfaces in the drawable manager window.
+    /// Manages the grouping of drawable surface elements in the drawable manager window.
     /// </summary>
-    /// <param name="Text">The text to display for the group.</param>
-    /// <param name="IconGlyph">The icon to display for this group.</param>
-    /// <param name="StartColor">The start color of the gradient to use for this group.</param>
-    /// <param name="EndColor">The end color of the gradient to use for this group.</param>
-    public record DrawableWindowGroup(string Text, char IconGlyph, Color StartColor, Color EndColor)
+    public class DrawableWindowGrouper
     {
-        public Color[] Gradient => new[] { StartColor, EndColor };
+        /// <summary>
+        /// Whether the group is active or not. 
+        /// </summary>
+        public bool IsActive = false;
+
+        /// <summary>
+        /// Resets the grouper.
+        /// </summary>
+        public void Reset()
+        {
+            IsActive = false;
+        }
+
+        /// <summary>
+        /// Gets all whiteboards depending on the current filter.
+        /// </summary>
+        /// <param name="filter">The filter of the drawable manager window.</param>
+        /// <returns>A list of the whiteboards depending on the filter.</returns>
+        public List<GameObject> GetWhiteboards(DrawableSurfaceFilter filter)
+        {
+            return filter.GetFilteredSurfaces().FindAll(GameFinder.IsWhiteboard);
+        }
+
+        /// <summary>
+        /// Gets all sticky notes depending on the current filter.
+        /// </summary>
+        /// <param name="filter">The filter of the drawable manger window.</param>
+        /// <returns>A list of the sticky notes depending on the filter.</returns>
+        public List<GameObject> GetStickyNotes(DrawableSurfaceFilter filter) 
+        {
+            return filter.GetFilteredSurfaces().FindAll(GameFinder.IsStickyNote);
+        }
     }
 }

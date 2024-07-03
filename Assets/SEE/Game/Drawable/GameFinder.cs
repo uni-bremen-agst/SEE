@@ -276,6 +276,17 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
+        /// Gets the unique ID of a drawable surface.
+        /// </summary>
+        /// <param name="surface">The drawable surface.</param>
+        /// <returns>The unique ID.</returns>
+        public static string GetUniqueID(GameObject surface)
+        {
+            return !string.IsNullOrEmpty(GetDrawableSurfaceParentName(surface))? 
+                GetDrawableSurfaceParentName(surface): surface.name;
+        }
+
+        /// <summary>
         /// Gets the parent object of the drawable surface.
         /// </summary>
         /// <param name="obj">An object of the drawable.</param>

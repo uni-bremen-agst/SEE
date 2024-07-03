@@ -1,12 +1,12 @@
-﻿using SEE.Game;
+﻿using Markdig.Helpers;
+using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.Window;
-using SEE.UI.Window.TreeWindow;
 using SEE.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Assets.SEE.UI.Window.DrawableManagerWindow
@@ -26,6 +26,16 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
         /// Path to the drawable manager window item prefab.
         /// </summary>
         private const string dmItemPrefab = "Prefabs/UI/Drawable/Window/DrawableManagerViewItem";
+
+        /// <summary>
+        /// Path to the drawable manager window item without description prefab.
+        /// </summary>
+        private const string dmwdItemPrefab = "Prefabs/UI/Drawable/Window/DrawableManagerViewItemWithoutDescription";
+
+        /// <summary>
+        /// Path to the drawable manager window group item prefab.
+        /// </summary>
+        private const string groupItemPrefab = "Prefabs/UI/Drawable/Window/GroupViewItem";
 
         /// <summary>
         /// Transform of the object containing the items of the drawable manager window.
@@ -48,23 +58,44 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
         /// <param name="surfaces">The surfaces to be added, if it is not set all surfaces of the scene will be added.</param>
         private void AddDrawableSurfaces(List<GameObject> surfaces = null)
         {
-            if (surfaces != null)
+            if (contextMenu.grouper.IsActive)
             {
-                foreach (GameObject surface in surfaces)
+                AddGroup("Whiteboards", Icons.Whiteboard, OrderList(contextMenu.grouper.GetWhiteboards(contextMenu.filter)), WhiteboardColor);
+                AddGroup("Sticky Notes", Icons.StickyNote, OrderList(contextMenu.grouper.GetStickyNotes(contextMenu.filter)), StickyNoteColor);
+            }
+            else
+            {
+                if (surfaces != null)
                 {
-                    if (surface.CompareTag(Tags.Drawable))
+                    foreach (GameObject surface in OrderList(surfaces))
+                    {
+                        if (surface.CompareTag(Tags.Drawable))
+                        {
+                            AddItem(surface);
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (GameObject surface in OrderList(ValueHolder.DrawableSurfaces))
                     {
                         AddItem(surface);
                     }
                 }
             }
-            else
-            {
-                foreach (GameObject surface in ValueHolder.DrawableSurfaces)
-                {
-                    AddItem(surface);
-                }
-            }
+        }
+
+        /// <summary>
+        /// Orders a list by type of surface and then by the unqiue id.
+        /// </summary>
+        /// <param name="surfaces">The list of surfaces.</param>
+        /// <returns>An ordered list.</returns>
+        private List<GameObject> OrderList(List<GameObject> surfaces)
+        {
+            return surfaces.OrderBy(surface => GameFinder.IsWhiteboard(surface) ? 
+                    0 : GameFinder.IsStickyNote(surface) ? 1 : 2)
+                .ThenBy(surface => GameFinder.GetUniqueID(surface))
+                .ToList();
         }
 
         /// <summary>
