@@ -184,6 +184,7 @@ namespace SEE.DataModel.DG.IO
                 CloseInput = true,
                 IgnoreWhitespace = true,
                 IgnoreComments = true,
+                DtdProcessing = DtdProcessing.Ignore,
                 Async = true
             };
             Reader = XmlReader.Create(gxl, settings);
