@@ -12,6 +12,7 @@ using SEE.Utils;
 using UnityEngine;
 using Node = SEE.DataModel.DG.Node;
 using SEE.Utils.History;
+using Cysharp.Threading.Tasks;
 
 namespace SEE.Controls.Actions
 {
@@ -102,6 +103,11 @@ namespace SEE.Controls.Actions
                         // Beginning to drag to, e.g., create a new mapping should lead to a new version,
                         // because then changes will be highlighted relative to the state before moving.
                         NewVersion(gameObject);
+                        SEEReflexionCity reflexionCity = gameObject.ContainingCity<SEEReflexionCity>();
+                        if (gameObject.TryGetNode(out Node node))
+                        {
+                            reflexionCity.ShowRecommendations(node).Forget();
+                        }
                     }
                 }
                 else

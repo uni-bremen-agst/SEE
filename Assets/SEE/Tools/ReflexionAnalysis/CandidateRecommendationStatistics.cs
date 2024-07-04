@@ -197,63 +197,55 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             Dictionary<string, List<double>> percentileRanks = new Dictionary<string, List<double>>();
             
-            try
-            {
-                int mappingStep = 0;
-                string currentLine;
+            int mappingStep = 0;
+            string currentLine;
 
-                using (StreamReader reader = new StreamReader(csvFile))
+            using (StreamReader reader = new StreamReader(csvFile))
+            {
+                while ((currentLine = reader.ReadLine()) != null)
                 {
-                    while ((currentLine = reader.ReadLine()) != null)
+                    List<MappingPair> mappingPairs = currentLine.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(s => JsonConvert.DeserializeObject<MappingPair>(s)).ToList();
+
+                    // first mappingPair within the line, was the chosen mappingPair
+                    MappingPair chosenMappingPair = mappingPairs[0];
+
+                    // Calculate statistical Results for the chosen candidate
+                    CandidateStatistic candidateStatisticResult = mappingResult.GetCandidateStatisticResult(chosenMappingPair.CandidateID);
+
+                    // TODO: move into MappingExperimentResult?
+                    candidateStatisticResult.AttractionValue = chosenMappingPair.AttractionValue;
+                    candidateStatisticResult.MappedClusterID = chosenMappingPair.ClusterID;
+                    candidateStatisticResult.MappedAtMappingStep = mappingStep;
+                    candidateStatisticResult.Hit = CandidateRecommendation.IsHit(candidateStatisticResult.CandidateID, 
+                                                                                    candidateStatisticResult.MappedClusterID);
+
+                    candidateStatisticResult.ExpectedClusterID = CandidateRecommendation.GetExpectedClusterID(candidateStatisticResult.CandidateID);
+
+                    // only use remaining mappingPairs without chosen mapping
+                    mappingPairs = mappingPairs.GetRange(1, mappingPairs.Count - 1);
+
+                    if (recordAllMappingPairs)
                     {
-                        List<MappingPair> mappingPairs = currentLine.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(s => JsonConvert.DeserializeObject<MappingPair>(s)).ToList();
-
-                        // first mappingPair within the line, was the chosen mappingPair
-                        MappingPair chosenMappingPair = mappingPairs[0];
-
-                        // Calculate statistical Results for the chosen candidate
-                        CandidateStatistic candidateStatisticResult = mappingResult.GetCandidateStatisticResult(chosenMappingPair.CandidateID);
-
-                        // TODO: move into MappingExperimentResult?
-                        candidateStatisticResult.AttractionValue = chosenMappingPair.AttractionValue;
-                        candidateStatisticResult.MappedClusterID = chosenMappingPair.ClusterID;
-                        candidateStatisticResult.MappedAtMappingStep = mappingStep;
-                        candidateStatisticResult.Hit = CandidateRecommendation.IsHit(candidateStatisticResult.CandidateID, 
-                                                                                     candidateStatisticResult.MappedClusterID);
-
-                        candidateStatisticResult.ExpectedClusterID = CandidateRecommendation.GetExpectedClusterID(candidateStatisticResult.CandidateID);
-
-                        // only use remaining mappingPairs without chosen mapping
-                        mappingPairs = mappingPairs.GetRange(1, mappingPairs.Count - 1);
-
-                        if (recordAllMappingPairs)
+                        List<Node> candidates = CandidateRecommendation.GetCandidates();
+                        foreach (Node candidate in candidates)
                         {
-                            List<Node> candidates = CandidateRecommendation.GetCandidates();
-                            foreach (Node candidate in candidates)
+                            if (mappingResult.ContainsCandidateStatisticResult(candidate.ID))
                             {
-                                if (mappingResult.ContainsCandidateStatisticResult(candidate.ID))
-                                {
-                                    double percentileRank = CandidateRecommendation.CalculatePercentileRank(candidate.ID, mappingPairs);
-                                    mappingResult.GetCandidateStatisticResult(candidate.ID).AddPercentileRank(percentileRank);
-                                }
-                            } 
-                        }
-
-                        mappingResult.FinishCandidateStatisticResult(candidateStatisticResult.CandidateID);
-
-                        mappingStep++;
+                                double percentileRank = CandidateRecommendation.CalculatePercentileRank(candidate.ID, mappingPairs);
+                                mappingResult.GetCandidateStatisticResult(candidate.ID).AddPercentileRank(percentileRank);
+                            }
+                        } 
                     }
-                }
 
-                mappingResult.FinishCandidateStatisticResults();
-                mappingResult.CalculateResults();
-                return mappingResult;
+                    mappingResult.FinishCandidateStatisticResult(candidateStatisticResult.CandidateID);
+
+                    mappingStep++;
+                }
             }
-            catch (Exception e)
-            {
-                UnityEngine.Debug.Log(e.ToString());
-                throw e;
-            }
+
+            mappingResult.FinishCandidateStatisticResults();
+            mappingResult.CalculateResults();
+            return mappingResult;
         }
 
         /// <summary>

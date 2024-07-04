@@ -113,6 +113,9 @@ namespace SEE.Game.City
 
         #region CandidateRecommendation
 
+        /// <summary>
+        /// 
+        /// </summary>
         private CandidateRecommendationViz candidateRecommendationViz;
 
         /// <summary>
@@ -134,6 +137,19 @@ namespace SEE.Game.City
                 candidateRecommendationViz.UpdateConfiguration(loadedGraph, recommendationSettings, oracleMapping);
             }
         }
+
+        #region Interfaces
+
+        public async UniTask ShowRecommendations(Node node)
+        {
+            if(candidateRecommendationViz != null)
+            {
+                await this.candidateRecommendationViz.ShowRecommendations(node);
+            }
+        }
+
+        #endregion
+
 
         #region CandidateRecommendationButtons
 

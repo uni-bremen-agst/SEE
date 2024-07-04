@@ -49,13 +49,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// RecommendedNodes object representing the attraction value matrix.
         /// </summary>
-        RecommendationFiltering recommendedNodes = new RecommendationFiltering();
+        RecommendationFiltering recommendationFilter = new RecommendationFiltering();
 
         /// <summary>
         /// List of <see cref="MappingPair"/> objects representing all currently calculated attraction values between the 
         /// corresponding node pairs.
         /// </summary>
-        public IEnumerable<MappingPair> MappingPairs { get { return recommendedNodes.MappingPairs; } }
+        public IEnumerable<MappingPair> MappingPairs { get { return recommendationFilter.MappingPairs; } }
 
         /// <summary>
         /// Set of Nodes containing the unmapped candidates
@@ -97,7 +97,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <returns>IEnumerable object containing the mapping pairs.</returns>
         public IEnumerable<MappingPair> GetRecommendations()
         {
-            return this.recommendedNodes.Recommendations;
+            return this.recommendationFilter.Recommendations;
         }
 
         /// <summary>
@@ -109,11 +109,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         {
             if(IsCandidate(node))
             {
-                return this.recommendedNodes.GetRecommendationsForCandidate(node.ID);
+                return this.recommendationFilter.GetRecommendationsForCandidate(node.ID);
             } 
             else if(IsCluster(node))
             {
-                return this.recommendedNodes.GetRecommendationsForCluster(node.ID);
+                return this.recommendationFilter.GetRecommendationsForCluster(node.ID);
             }
 
             return new List<MappingPair>();
@@ -171,7 +171,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             Statistics.Reset();
 
             Statistics.SetConfigInformation(recommendationSettings);
-            recommendedNodes.Reset();
+            recommendationFilter.Reset();
             this.UnmappedCandidates = this.GetUnmappedCandidates().Select(n => n.ID).ToHashSet();
 
             this.attractFunction.AddAllClusterToUpdate();
@@ -227,8 +227,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 }
 
                 MappingPair mappingPair = examinedNode.IsInArchitecture() ? 
-                            recommendedNodes.GetMappingPair(candidate.ID,examinedNode.ID)
-                          : recommendedNodes.GetMappingPair(examinedNode.ID, candidate.ID);
+                            recommendationFilter.GetMappingPair(candidate.ID,examinedNode.ID)
+                          : recommendationFilter.GetMappingPair(examinedNode.ID, candidate.ID);
 
                 if (mappingPair.AttractionValue > 0)
                 {
@@ -314,7 +314,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                                 this.AttractFunction.HandleRemovedArchEdge(edgeEvent.Edge);
                             }
                         }
-                    }
+                    } 
+                    else if(edgeEvent.Affected == ReflexionSubgraphs.Implementation)
+                    {
+                      // TODO: New implementation edges also need to be handled in the future
+                    } 
                     return;
                 case NodeEvent nodeEvent:
                     if (nodeEvent.Node.IsInArchitecture())
@@ -326,7 +330,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                         else if (nodeEvent.Change == ChangeType.Removal)
                         {
                             this.AttractFunction.HandleRemovedCluster(nodeEvent.Node);
-                            this.recommendedNodes.RemoveCluster(nodeEvent.Node.ID);
+                            this.recommendationFilter.RemoveCluster(nodeEvent.Node.ID);
                         }
                     }
                     return;
@@ -353,7 +357,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             if (Statistics.Active)
             {
-                MappingPair chosenMappingPair = recommendedNodes.GetMappingPair(mapsToChange.Source.ID, mapsToChange.Target.ID);
+                MappingPair chosenMappingPair = recommendationFilter.GetMappingPair(mapsToChange.Source.ID, mapsToChange.Target.ID);
 
                 if (chosenMappingPair == null)
                 {
@@ -364,7 +368,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     chosenMappingPair = new MappingPair(mapsToChange.Source, mapsToChange.Target, -1.0d);
                 }
 
-                recommendedNodes.RemoveCandidate(mapsToChange.Source.ID);
+                recommendationFilter.RemoveCandidate(mapsToChange.Source.ID);
                 AttractFunction.HandleChangedCandidate(mapsToChange.Target, mapsToChange.Source, (ChangeType)mapsToChange.Change);
                 UpdateRecommendations();
                 chosenMappingPair.ChangeType = (ChangeType)mapsToChange.Change;
@@ -372,7 +376,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
             else
             {
-                recommendedNodes.RemoveCandidate(mapsToChange.Source.ID);
+                recommendationFilter.RemoveCandidate(mapsToChange.Source.ID);
                 AttractFunction.HandleChangedCandidate(mapsToChange.Target, mapsToChange.Source, (ChangeType)mapsToChange.Change);
             }
         } 
@@ -408,7 +412,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 if (cluster == null)
                 {
                     this.AttractFunction.RemoveClusterToUpdate(clusterId);
-                    recommendedNodes.RemoveCluster(clusterId);
+                    recommendationFilter.RemoveCluster(clusterId);
                     UnityEngine.Debug.LogWarning($"Cluster {clusterId} could not be found within the graph.");
                     continue;
                 }
@@ -421,13 +425,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     // because its parent might was mapped, but the corresponding event was not received yet 
                     if (ReflexionGraph.MapsTo(candidate) != null)
                     {
-                        recommendedNodes.RemoveCandidate(candidateId);
+                        recommendationFilter.RemoveCandidate(candidateId);
                     } 
                     else
                     {
                         double attractionValue = AttractFunction.GetAttractionValue(candidate, cluster);
                         MappingPair mappingPair = new MappingPair(candidate: candidate, cluster: cluster, attractionValue: attractionValue);
-                        recommendedNodes.UpdateMappingPair(mappingPair);
+                        recommendationFilter.UpdateMappingPair(mappingPair);
                     }
                 }
                 this.AttractFunction.RemoveClusterToUpdate(clusterId);

@@ -833,6 +833,27 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
         }
 
+        /// <summary>
+        /// Starts the blink effect for a given node and its recommendations. 
+        /// If no recommendations can be found for the given node or the node 
+        /// is either a current candidate or cluster, nothing will happen.
+        /// </summary>
+        /// <param name="node">Given node</param>
+        /// <returns>Awaitable unitask</returns>
+        public async UniTask ShowRecommendations(Node node)
+        {
+            await UniTask.WaitWhile(() => ProcessingEvents);
+            IEnumerable<MappingPair> recommendations = this.CandidateRecommendation.GetRecommendations(node);
+            IEnumerable<Node> recommendedNodes = recommendations.Select(m => node.IsInImplementation() ? m.Cluster : m.Candidate);
+            List<NodeOperator> nodeOperators = new List<NodeOperator>();
+            recommendedNodes.ForEach(n => nodeOperators.Add(n.GameObject().AddOrGetComponent<NodeOperator>()));
+            if (recommendedNodes.Count() > 0)
+            {
+                nodeOperators.Add(node.GameObject().AddOrGetComponent<NodeOperator>()); 
+            }
+            await StartBlinkEffect(nodeOperators);
+        }
+
         private IEnumerator StartBlinkEffect(List<NodeOperator> nodeOperators)
         {
             // Wait for the delay duration
