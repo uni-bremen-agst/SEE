@@ -98,6 +98,17 @@ namespace Assets.SEE.Game.Drawable
         }
 
         /// <summary>
+        /// Gets the description of a drawable surface.
+        /// </summary>
+        /// <param name="obj">An object of the drawable.</param>
+        /// <returns>The description of the drawable.</returns>
+        public static string GetDescription(GameObject obj)
+        {
+            DrawableConfig config = DrawableConfigManager.GetDrawableConfig(GameFinder.GetDrawableSurface(obj));
+            return config.Description;
+        }
+
+        /// <summary>
         /// Query to check if the drawable surface have an active lighting.
         /// </summary>
         /// <param name="obj">An object of the drawable.</param>

@@ -7,6 +7,7 @@ using SEE.Utils;
 using UnityEngine.Events;
 using SEE.Game.Drawable;
 using SEE.UI.Window.TreeWindow;
+using Assets.SEE.Game.Drawable;
 
 namespace Assets.SEE.UI.Window.DrawableManagerWindow
 {
@@ -256,22 +257,27 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
             {
                 entries.Add(new PopupMenuAction("Surface Type", () =>
                 {
-                    ToggleSortAction("Type", x => x);
+                    ToggleSortAction("Type", x => GameFinder.IsStickyNote(x)? 0 : GameFinder.IsWhiteboard(x)? 1 : 2);
                 }, SortIcon(false, sorter.IsAttributeDescending("Type")), CloseAfterClick: false));
+
+                entries.Add(new PopupMenuAction("Name", () =>
+                {
+                    ToggleSortAction("Name", x => GameFinder.GetUniqueID(x));
+                }, SortIcon(false, sorter.IsAttributeDescending("Name")), CloseAfterClick: false));
 
                 entries.Add(new PopupMenuAction("Description", () =>
                 {
-                    ToggleSortAction("Description", x => x);
+                    ToggleSortAction("Description", x => GameDrawableManager.GetDescription(x));
                 }, SortIcon(false, sorter.IsAttributeDescending("Description")), CloseAfterClick: false));
 
                 entries.Add(new PopupMenuAction("Lighting", () =>
                 {
-                    ToggleSortAction("Lighting", x => x);
+                    ToggleSortAction("Lighting", x => GameDrawableManager.IsLighting(x));
                 }, SortIcon(false, sorter.IsAttributeDescending("Lighting")), CloseAfterClick: false));
 
                 entries.Add(new PopupMenuAction("Visibility", () =>
                 {
-                    ToggleSortAction("Visibility", x => x);
+                    ToggleSortAction("Visibility", x => GameDrawableManager.IsVisible(x));
                 }, SortIcon(false, sorter.IsAttributeDescending("Visibility")), CloseAfterClick: false));
             }
 

@@ -34,8 +34,32 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
             sortAttributes.RemoveAll(a => a.Name == attributeName);
         }
 
-        // TODO Anwendung
-        //public IEnumerable<T> Apply<T>()
+        /// <summary>
+        /// Applies the sort.
+        /// </summary>
+        /// <param name="list">The list to be sorted.</param>
+        /// <returns>A sorted IEnumerable.</returns>
+        private IEnumerable<GameObject> Apply(List<GameObject> list)
+        {
+            return sortAttributes.Count == 0 ? list :
+                sortAttributes.Aggregate(list.OrderBy(_ => 0), 
+                (current, sortAttribute) =>
+                {
+                    (_, Func<GameObject, object> getKey, bool descending) = sortAttribute;
+                    return descending? current.ThenByDescending(x => getKey(x))
+                        : current.ThenBy(x => getKey(x));
+                });
+        }
+
+        /// <summary>
+        /// Applies the sort and transform it to a list.
+        /// </summary>
+        /// <param name="list">The list to be sorted.</param>
+        /// <returns>The sorted list.</returns>
+        public List<GameObject> ApplySort(List<GameObject> list)
+        {
+            return new List<GameObject>(Apply(list));
+        }
 
         /// <summary>
         /// Whether the given attribute is sorted descending.

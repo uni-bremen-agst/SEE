@@ -243,5 +243,25 @@ namespace SEE.GO.Menu
                 }
             }
         }
+
+        /// <summary>
+        /// Updates the menu depending on the current selected action in <see cref="GlobalActionHistory"/>.
+        /// It changes the current selected menu entry in PlayerMenu and
+        /// it changes also the depending indicator.
+        /// </summary>
+        internal void UpdateActiveEntry()
+        {
+            ActionStateType currentAction = GlobalActionHistory.Current();
+            SetPlayerMenu(currentAction.Name);
+            indicator.ChangeActionState(currentAction);
+            
+            foreach (MenuEntry entry in modeMenu.Entries)
+            {
+                if (entry.Title.Equals(currentAction.Name))
+                {
+                    modeMenu.SelectEntry(entry);
+                }
+            }
+        }
     }
 }

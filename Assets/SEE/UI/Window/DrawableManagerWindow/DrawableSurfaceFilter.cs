@@ -70,7 +70,7 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
         /// Query if all filter includes are active.
         /// </summary>
         /// <returns>True if all filter includes are active.</returns>
-        private bool AllActive()
+        public bool AllActive()
         {
             return IncludeWhiteboards 
                 && IncludeStickyNotes 
