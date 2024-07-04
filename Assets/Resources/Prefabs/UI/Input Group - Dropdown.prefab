@@ -32,11 +32,11 @@ RectTransform:
   - {fileID: 1991858569316184210}
   - {fileID: 5694451467127894266}
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 304.04007, y: 0}
+  m_AnchoredPosition: {x: 304.04007, y: -37.503937}
   m_SizeDelta: {x: 548.08014, y: 75.00785}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1991858568271024277
@@ -190,19 +190,8 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 3
     m_TransformParent: {fileID: 1991858568271024275}
     m_Modifications:
-    - target: {fileID: 634646095899154665, guid: 2f308d46a99f4fa45ac6475f1ffbd3ff,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5917292132061231202, guid: 2f308d46a99f4fa45ac6475f1ffbd3ff,
-        type: 3}
-      propertyPath: m_Size
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5917292132061231202, guid: 2f308d46a99f4fa45ac6475f1ffbd3ff,
         type: 3}
       propertyPath: m_Value
@@ -216,11 +205,6 @@ PrefabInstance:
     - target: {fileID: 6358681816360360522, guid: 2f308d46a99f4fa45ac6475f1ffbd3ff,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6358681816360360522, guid: 2f308d46a99f4fa45ac6475f1ffbd3ff,
-        type: 3}
-      propertyPath: m_AnchorMin.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7464359842575645076, guid: 2f308d46a99f4fa45ac6475f1ffbd3ff,
@@ -363,19 +347,7 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7851307473279866743, guid: 2f308d46a99f4fa45ac6475f1ffbd3ff,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 7464359843720816594, guid: 2f308d46a99f4fa45ac6475f1ffbd3ff,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8631178431559902199}
   m_SourcePrefab: {fileID: 100100000, guid: 2f308d46a99f4fa45ac6475f1ffbd3ff, type: 3}
 --- !u!1 &5694451465966205363 stripped
 GameObject:

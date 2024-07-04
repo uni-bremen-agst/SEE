@@ -1,5 +1,4 @@
 ﻿using Dissonance;
-using SEE.Game.Drawable;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections;
@@ -149,10 +148,6 @@ namespace SEE.Game.Worlds
                 }
 #endif
 #endif
-                if (numberOfSpawnedPlayers > 1)
-                {
-                    DrawableSynchronizer.Synchronize();
-                }
             }
             else
             {

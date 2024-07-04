@@ -104,7 +104,6 @@ namespace SEE.Utils
         public static bool RaycastAnything(out RaycastHit raycastHit, float maxDistance = float.PositiveInfinity)
         {
             raycastHit = new RaycastHit();
-            Physics.queriesHitBackfaces = true;
             return !IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out raycastHit, maxDistance);
         }
 
