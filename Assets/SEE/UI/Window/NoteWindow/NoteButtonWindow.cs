@@ -100,13 +100,13 @@ namespace SEE.UI.Window.NoteWindow
         }
 
         /// <summary>
-        /// Destroys the note button window.
+        /// Destroys the note button window and the component in <see cref="NoteManager"/>.
         /// </summary>
         public void DestroyWindow()
         {
             NoteButtonWindow buttonWindow = GameObject.Find("NoteManager").GetComponent<NoteButtonWindow>();
             Destroyer.Destroy(noteButtonWindow);
-            Destroy(buttonWindow);
+            Destroyer.Destroy(buttonWindow);
         }
     }
 }
