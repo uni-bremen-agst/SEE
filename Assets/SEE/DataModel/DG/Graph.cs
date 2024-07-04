@@ -938,7 +938,7 @@ namespace SEE.DataModel.DG
         /// The name of a node metric that reflects the node's depth within the node hierarchy.
         /// It is equivalent to the node attribute <see cref="Level"/>.
         /// </summary>
-        public const string MetricLevel = "Metric.Level";
+        public const string MetricLevel = Metrics.Prefix + "Level";
 
         /// <summary>
         /// Sets the metric <see cref="MetricLevel"/> of each node to its Level.
@@ -1019,7 +1019,7 @@ namespace SEE.DataModel.DG
                         targetNode.SetInt(attribute.Key, attribute.Value);
                     }
                     // Level may change when merging two graphs into one
-                    else if (value != attribute.Value && attribute.Key != "Metric.Level")
+                    else if (value != attribute.Value && attribute.Key != Metrics.Prefix + "Level")
                     {
                         throw new InvalidOperationException($"Node attribute {attribute.Key} differs in nodes "
                                                             + $"{targetNode} and {sourceNode}");

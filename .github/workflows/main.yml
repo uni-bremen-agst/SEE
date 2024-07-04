@@ -148,7 +148,7 @@ jobs:
       - name: Restore NuGet packages
         run: /home/see/.dotnet/tools/nugetforunity restore .
       - uses: game-ci/unity-test-runner@v4.1.1
-        timeout-minutes: 45
+        timeout-minutes: 60
         name: Run Tests
         id: tests
         env:
@@ -223,7 +223,7 @@ jobs:
       - name: Restore NuGet packages
         run: /home/see/.dotnet/tools/nugetforunity restore .
       - uses: game-ci/unity-builder@v4
-        timeout-minutes: 45
+        timeout-minutes: 90
         name: Build project
         id: build
         env:

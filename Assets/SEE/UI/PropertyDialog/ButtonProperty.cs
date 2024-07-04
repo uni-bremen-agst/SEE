@@ -66,12 +66,6 @@ namespace SEE.UI.PropertyDialog
         private GameObject parent;
 
         /// <summary>
-        /// The tooltip containing the <see cref="description"/> of this <see cref="Property"/>, which will
-        /// be displayed when hovering above it.
-        /// </summary>
-        private Tooltip.Tooltip tooltip;
-
-        /// <summary>
         /// Sets <see cref="button"/> as an instantiation of prefab <see cref="buttonPrefab"/>.
         /// Sets the label and value of the field.
         /// </summary>
@@ -110,8 +104,8 @@ namespace SEE.UI.PropertyDialog
 
                 buttonManager.buttonText = Name;
                 buttonManager.clickEvent.AddListener(Clicked);
-                pointerHelper.EnterEvent.AddListener(_ => tooltip.Show(Description));
-                pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
+                pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith(Description));
+                pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
             }
 
             void Clicked()
@@ -126,12 +120,11 @@ namespace SEE.UI.PropertyDialog
         /// <param name="button">The object to which the tooltip is to be attached</param>
         private void SetupTooltip()
         {
-            tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
             if (button.TryGetComponentOrLog(out PointerHelper pointerHelper))
             {
                 // Register listeners on entry and exit events, respectively
-                pointerHelper.EnterEvent.AddListener(_ => tooltip.Show(Description));
-                pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
+                pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith(Description));
+                pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
             }
         }
 

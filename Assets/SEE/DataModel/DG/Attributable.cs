@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SEE.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -30,7 +31,14 @@ namespace SEE.DataModel.DG
     /// </summary>
     public abstract class Attributable : Observable<ChangeEvent>, ICloneable
     {
-        public static readonly HashSet<string> NumericAttributeNames = new();
+        /// <summary>
+        /// The names of all numeric attributes (int and float) of any <see cref="Attributable"/>.
+        /// Note that this set is shared among all instances of <see cref="Attributable"/>.
+        /// Note also that it may contain names of attributes that are no longer present in any
+        /// <see cref="Attributable"/> instance. This can happen if an attribute is removed from
+        /// all instances. In this case, the name will remain in this set.
+        /// </summary>
+        public static readonly ThreadSafeHashSet<string> NumericAttributeNames = new();
 
         //----------------------------------
         // Toggle attributes

@@ -2506,7 +2506,7 @@ MonoBehaviour:
       Data: 0.9622642
     - Name: 
       Entry: 4
-      Data: 0.0771627054
+      Data: 0.07716271
     - Name: 
       Entry: 4
       Data: 1
@@ -2752,10 +2752,10 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.856840432
+      Data: 0.8568404
     - Name: 
       Entry: 4
-      Data: 0.306470275
+      Data: 0.3064703
     - Name: 
       Entry: 4
       Data: 0.9150943
@@ -3846,27 +3846,27 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 73|SEE.GraphProviders.PipelineGraphProvider, SEE
+      Data: 73|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 74|System.Collections.Generic.List`1[[SEE.GraphProviders.GraphProvider,
+      Data: 74|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 75|SEE.GraphProviders.GXLGraphProvider, SEE
+      Data: 75|SEE.GraphProviders.GXLSingleGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 76|SEE.Utils.Paths.FilePath, SEE
+      Data: 76|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
-    - Name: relativePath
+    - Name: RelativePath
       Entry: 1
       Data: /JLGExample/CodeFacts.gxl.xz
-    - Name: absolutePath
+    - Name: AbsolutePath
       Entry: 1
       Data: 
     - Name: 
@@ -3880,14 +3880,14 @@ MonoBehaviour:
       Data: 77|SEE.GraphProviders.JaCoCoGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 78|SEE.Utils.Paths.FilePath, SEE
+      Data: 78|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
-    - Name: relativePath
+    - Name: RelativePath
       Entry: 1
       Data: /JLGExample/jacoco.xml
-    - Name: absolutePath
+    - Name: AbsolutePath
       Entry: 1
       Data: 
     - Name: 
@@ -3908,16 +3908,16 @@ MonoBehaviour:
   LODCulling: 0.001
   ConfigurationPath:
     Root: 3
-    relativePath: /JLGExample/CodeFacts.cfg
-    absolutePath: 
+    RelativePath: /JLGExample/CodeFacts.cfg
+    AbsolutePath: 
   sourceCodeDirectory:
     Root: 3
-    relativePath: /JLGExample
-    absolutePath: 
+    RelativePath: /JLGExample
+    AbsolutePath: 
   SolutionPath:
     Root: 2
-    relativePath: 
-    absolutePath: 
+    RelativePath: 
+    AbsolutePath: 
   IgnoreSelfLoopsInLifting: 0
   MaximalAntennaSegmentHeight: 0.5
   AntennaWidth: 0.1
@@ -3935,8 +3935,8 @@ MonoBehaviour:
       GradientDescentPrecision: -4
     LayoutPath:
       Root: 2
-      relativePath: 
-      absolutePath: 
+      RelativePath: 
+      AbsolutePath: 
   EdgeLayoutSettings:
     Kind: 0
     AnimationKind: 2
@@ -3961,6 +3961,10 @@ MonoBehaviour:
     MetricIssue: Metric.Metric
     StyleIssue: Metric.Style
     UniversalIssue: Metric.Universal
+    LspHint: Metric.LSP_Hint
+    LspInfo: Metric.LSP_Info
+    LspWarning: Metric.LSP_Warning
+    LspError: Metric.LSP_Error
     ArchitectureIssueSum: Metric.Architecture_Violations_SUM
     CloneIssueSum: Metric.Clone_SUM
     CycleIssueSum: Metric.Cycle_SUM
@@ -3972,12 +3976,12 @@ MonoBehaviour:
     LoadBoardOnStartup: 0
     BoardPath:
       Root: 2
-      relativePath: 
-      absolutePath: 
+      RelativePath: 
+      AbsolutePath: 
   JLGPath:
     Root: 3
-    relativePath: /JLGExample/CodeFacts.jlg
-    absolutePath: 
+    RelativePath: /JLGExample/CodeFacts.jlg
+    AbsolutePath: 
   BreakpointClass: classname
   BreakpointLine: 0
   DistanceAboveCity: 0.3
@@ -4008,7 +4012,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HeightOffset: 0.0010153651
+  HeightOffset: 0.0010186434
 --- !u!65 &264006616
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5119,13 +5123,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.215686277
+      Data: 0.2156863
     - Name: 
       Entry: 4
-      Data: 0.215686277
+      Data: 0.2156863
     - Name: 
       Entry: 4
-      Data: 0.215686277
+      Data: 0.2156863
     - Name: 
       Entry: 4
       Data: 1
@@ -7090,7 +7094,7 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.858823538
+      Data: 0.8588235
     - Name: 
       Entry: 4
       Data: 1
@@ -7147,7 +7151,7 @@ MonoBehaviour:
       Data: 0.9425198
     - Name: 
       Entry: 4
-      Data: 0.362095058
+      Data: 0.3620951
     - Name: 
       Entry: 4
       Data: 0.9716981
@@ -7198,7 +7202,7 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.224679589
+      Data: 0.2246796
     - Name: 
       Entry: 4
       Data: 0.7557063
@@ -7219,7 +7223,7 @@ MonoBehaviour:
       Data: 0.09531862
     - Name: 
       Entry: 4
-      Data: 0.741935432
+      Data: 0.7419354
     - Name: 
       Entry: 4
       Data: 0.9622642
@@ -7518,27 +7522,27 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 109|SEE.GraphProviders.PipelineGraphProvider, SEE
+      Data: 109|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 110|System.Collections.Generic.List`1[[SEE.GraphProviders.GraphProvider,
+      Data: 110|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 111|SEE.GraphProviders.GXLGraphProvider, SEE
+      Data: 111|SEE.GraphProviders.GXLSingleGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 112|SEE.Utils.Paths.FilePath, SEE
+      Data: 112|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
-    - Name: relativePath
+    - Name: RelativePath
       Entry: 1
       Data: /SEE/CodeFacts.gxl.xz
-    - Name: absolutePath
+    - Name: AbsolutePath
       Entry: 1
       Data: 
     - Name: 
@@ -7559,16 +7563,16 @@ MonoBehaviour:
   LODCulling: 0.001
   ConfigurationPath:
     Root: 3
-    relativePath: /SEE/SEE.cfg
-    absolutePath: 
+    RelativePath: /SEE/SEE.cfg
+    AbsolutePath: 
   sourceCodeDirectory:
     Root: 2
-    relativePath: 
-    absolutePath: 
+    RelativePath: 
+    AbsolutePath: 
   SolutionPath:
     Root: 1
-    relativePath: 
-    absolutePath: 
+    RelativePath: 
+    AbsolutePath: 
   IgnoreSelfLoopsInLifting: 1
   MaximalAntennaSegmentHeight: 0.1
   AntennaWidth: 0.01
@@ -7586,8 +7590,8 @@ MonoBehaviour:
       GradientDescentPrecision: -4
     LayoutPath:
       Root: 2
-      relativePath: 
-      absolutePath: 
+      RelativePath: 
+      AbsolutePath: 
   EdgeLayoutSettings:
     Kind: 0
     AnimationKind: 0
@@ -7612,6 +7616,10 @@ MonoBehaviour:
     MetricIssue: Metric.Metric
     StyleIssue: Metric.Style
     UniversalIssue: Metric.Universal
+    LspHint: Metric.LSP_Hint
+    LspInfo: Metric.LSP_Info
+    LspWarning: Metric.LSP_Warning
+    LspError: Metric.LSP_Error
     ArchitectureIssueSum: Metric.Architecture_Violations_SUM
     CloneIssueSum: Metric.Clone_SUM
     CycleIssueSum: Metric.Cycle_SUM
@@ -7623,8 +7631,8 @@ MonoBehaviour:
     LoadBoardOnStartup: 0
     BoardPath:
       Root: 3
-      relativePath: /reflexion/compiler/ReflexionBoard.cfg
-      absolutePath: 
+      RelativePath: /reflexion/compiler/ReflexionBoard.cfg
+      AbsolutePath: 
 --- !u!114 &326121977
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13093,19 +13101,62 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: DataProvider
+      Entry: 7
+      Data: 121|SEE.GraphProviders.MultiGraphPipelineProvider, SEE
+    - Name: Pipeline
+      Entry: 7
+      Data: 122|System.Collections.Generic.List`1[[SEE.GraphProviders.MultiGraphProvider,
+        SEE]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 123|SEE.GraphProviders.GXLEvolutionGraphProvider, SEE
+    - Name: GXLDirectory
+      Entry: 7
+      Data: 124|SEE.Utils.Paths.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 3
+    - Name: RelativePath
+      Entry: 1
+      Data: /animation-clones-SEE
+    - Name: AbsolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MaxRevisionsToLoad
+      Entry: 3
+      Data: 500
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   LODCulling: 0.001
   ConfigurationPath:
     Root: 3
-    relativePath: /animation-clones-SEE/clones.cfg
-    absolutePath: 
+    RelativePath: /animation-clones-SEE/clones.cfg
+    AbsolutePath: 
   sourceCodeDirectory:
     Root: 1
-    relativePath: 
-    absolutePath: 
+    RelativePath: 
+    AbsolutePath: 
   SolutionPath:
     Root: 1
-    relativePath: 
-    absolutePath: 
+    RelativePath: 
+    AbsolutePath: 
   IgnoreSelfLoopsInLifting: 1
   MaximalAntennaSegmentHeight: 0.1
   AntennaWidth: 0.01
@@ -13123,8 +13174,8 @@ MonoBehaviour:
       GradientDescentPrecision: -4
     LayoutPath:
       Root: 2
-      relativePath: 
-      absolutePath: 
+      RelativePath: 
+      AbsolutePath: 
   EdgeLayoutSettings:
     Kind: 3
     AnimationKind: 0
@@ -13149,6 +13200,10 @@ MonoBehaviour:
     MetricIssue: Metric.Metric
     StyleIssue: Metric.Style
     UniversalIssue: Metric.Universal
+    LspHint: Metric.LSP_Hint
+    LspInfo: Metric.LSP_Info
+    LspWarning: Metric.LSP_Warning
+    LspError: Metric.LSP_Error
     ArchitectureIssueSum: Metric.Architecture_Violations_SUM
     CloneIssueSum: Metric.Clone_SUM
     CycleIssueSum: Metric.Cycle_SUM
@@ -13160,13 +13215,8 @@ MonoBehaviour:
     LoadBoardOnStartup: 0
     BoardPath:
       Root: 3
-      relativePath: /reflexion/compiler/ReflexionBoard.cfg
-      absolutePath: 
-  MaxRevisionsToLoad: 500
-  GXLDirectory:
-    Root: 3
-    relativePath: /animation-clones-SEE
-    absolutePath: 
+      RelativePath: /reflexion/compiler/ReflexionBoard.cfg
+      AbsolutePath: 
 --- !u!114 &551406257
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18191,8 +18241,8 @@ MonoBehaviour:
   OpenAiApiKey: 
   GrammarFilePath:
     Root: 3
-    relativePath: /PersonalAssistantGrammar.grxml
-    absolutePath: 
+    RelativePath: /PersonalAssistantGrammar.grxml
+    AbsolutePath: 
 --- !u!114 &1166896208
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20323,7 +20373,7 @@ MonoBehaviour:
   randomHoldDurationMax: 0.5
   configReady: 1
   warnOnNullRefs: 1
-  inspSalsaLinked: 0
+  inspSalsaLinked: 1
   inspStateFoldoutProcessing: 0
   inspStateFoldoutSettings: 0
   inspStateFoldoutEmotes: 0
@@ -25554,29 +25604,29 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 67|SEE.GraphProviders.PipelineGraphProvider, SEE
+      Data: 67|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 68|System.Collections.Generic.List`1[[SEE.GraphProviders.GraphProvider,
+      Data: 68|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
-      Data: 3
+      Data: 2
     - Name: 
       Entry: 7
-      Data: 69|SEE.GraphProviders.GXLGraphProvider, SEE
+      Data: 69|SEE.GraphProviders.GXLSingleGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 70|SEE.Utils.Paths.FilePath, SEE
+      Data: 70|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
-    - Name: relativePath
+    - Name: RelativePath
       Entry: 1
       Data: /jacoco/jacoco-2-f5c5b1f831903c9c2f771e467916ce9664aedb1b.gxl.xz
-    - Name: absolutePath
+    - Name: AbsolutePath
       Entry: 1
-      Data: C:/Users/koschke/develop/jacoco/SEE/jacoco-3-f5c5b1f831903c9c2f771e467916ce9664aedb1b.gxl
+      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -25588,29 +25638,29 @@ MonoBehaviour:
       Data: 71|SEE.GraphProviders.MergeDiffGraphProvider, SEE
     - Name: OldGraph
       Entry: 7
-      Data: 72|SEE.GraphProviders.PipelineGraphProvider, SEE
+      Data: 72|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 73|System.Collections.Generic.List`1[[SEE.GraphProviders.GraphProvider,
+      Data: 73|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 74|SEE.GraphProviders.GXLGraphProvider, SEE
+      Data: 74|SEE.GraphProviders.GXLSingleGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 75|SEE.Utils.Paths.FilePath, SEE
+      Data: 75|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
-    - Name: relativePath
+    - Name: RelativePath
       Entry: 1
       Data: /jacoco/jacoco-1-a50585b9e0770c363c56d887a8f639dc05411073.gxl.xz
-    - Name: absolutePath
+    - Name: AbsolutePath
       Entry: 1
-      Data: C:/Users/koschke/develop/jacoco/SEE/jacoco-1-a50585b9e0770c363c56d887a8f639dc05411073.gxl
+      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -25623,27 +25673,6 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 76|SEE.GraphProviders.JaCoCoGraphProvider, SEE
-    - Name: Path
-      Entry: 7
-      Data: 77|SEE.Utils.Paths.FilePath, SEE
-    - Name: Root
-      Entry: 3
-      Data: 3
-    - Name: relativePath
-      Entry: 1
-      Data: /jacoco/jacoco-2-f5c5b1f831903c9c2f771e467916ce9664aedb1b.xml
-    - Name: absolutePath
-      Entry: 1
-      Data: C:/Users/koschke/develop/jacoco/SEE/jacoco-3-f5c5b1f831903c9c2f771e467916ce9664aedb1b.xml
     - Name: 
       Entry: 8
       Data: 
@@ -25662,16 +25691,16 @@ MonoBehaviour:
   LODCulling: 0.001
   ConfigurationPath:
     Root: 3
-    relativePath: /jacoco/jacoco.cfg
-    absolutePath: C:/Users/koschke/develop/jacoco/SEE/jacoco.cfg
+    RelativePath: /jacoco/jacoco.cfg
+    AbsolutePath: C:/Users/koschke/develop/jacoco/SEE/jacoco.cfg
   sourceCodeDirectory:
     Root: 0
-    relativePath: 
-    absolutePath: C:/Users/koschke/develop/jacoco
+    RelativePath: 
+    AbsolutePath: C:/Users/koschke/develop/jacoco
   SolutionPath:
     Root: 2
-    relativePath: 
-    absolutePath: 
+    RelativePath: 
+    AbsolutePath: 
   IgnoreSelfLoopsInLifting: 0
   MaximalAntennaSegmentHeight: 0.5
   AntennaWidth: 0.1
@@ -25689,8 +25718,8 @@ MonoBehaviour:
       GradientDescentPrecision: -4
     LayoutPath:
       Root: 2
-      relativePath: 
-      absolutePath: 
+      RelativePath: 
+      AbsolutePath: 
   EdgeLayoutSettings:
     Kind: 0
     AnimationKind: 2
@@ -25715,6 +25744,10 @@ MonoBehaviour:
     MetricIssue: Metric.Metric
     StyleIssue: Metric.Style
     UniversalIssue: Metric.Universal
+    LspHint: Metric.LSP_Hint
+    LspInfo: Metric.LSP_Info
+    LspWarning: Metric.LSP_Warning
+    LspError: Metric.LSP_Error
     ArchitectureIssueSum: Metric.Architecture_Violations_SUM
     CloneIssueSum: Metric.Clone_SUM
     CycleIssueSum: Metric.Cycle_SUM
@@ -25726,12 +25759,12 @@ MonoBehaviour:
     LoadBoardOnStartup: 0
     BoardPath:
       Root: 2
-      relativePath: 
-      absolutePath: 
+      RelativePath: 
+      AbsolutePath: 
   VCSPath:
     Root: 0
-    relativePath: 
-    absolutePath: C:/Users/koschke/develop/jacoco
+    RelativePath: 
+    AbsolutePath: C:/Users/koschke/develop/jacoco
   OldRevision: 35f352a95551f532da9013f3587e2591cdcef6ec
   NewRevision: f5c5b1f831903c9c2f771e467916ce9664aedb1b
 --- !u!1001 &1229256984
@@ -26242,6 +26275,72 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1979636771}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1334775384
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1334775387}
+  - component: {fileID: 1334775386}
+  - component: {fileID: 1334775385}
+  m_Layer: 0
+  m_Name: Server
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1334775385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1334775384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45c0c906c008b5f4184014340339e5c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1334775386
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1334775384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3805298196
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+--- !u!4 &1334775387
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1334775384}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -31, y: 1.3999999, z: 0.13}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1336523151
 GameObject:
   m_ObjectHideFlags: 0
@@ -37942,7 +38041,7 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.613575935
+      Data: 0.6135759
     - Name: 
       Entry: 4
       Data: 0.9433962
@@ -38320,10 +38419,10 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.88886404
+      Data: 0.888864
     - Name: 
       Entry: 4
-      Data: 0.0327073857
+      Data: 0.03270739
     - Name: 
       Entry: 4
       Data: 0.990566
@@ -39468,10 +39567,10 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 73|SEE.GraphProviders.PipelineGraphProvider, SEE
+      Data: 73|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 74|System.Collections.Generic.List`1[[SEE.GraphProviders.GraphProvider,
+      Data: 74|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
@@ -39481,14 +39580,14 @@ MonoBehaviour:
       Data: 75|SEE.GraphProviders.ReflexionGraphProvider, SEE
     - Name: Architecture
       Entry: 7
-      Data: 76|SEE.Utils.Paths.FilePath, SEE
+      Data: 76|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
-    - Name: relativePath
+    - Name: RelativePath
       Entry: 1
       Data: /reflexion/compiler/Architecture.gxl
-    - Name: absolutePath
+    - Name: AbsolutePath
       Entry: 1
       Data: 
     - Name: 
@@ -39496,14 +39595,14 @@ MonoBehaviour:
       Data: 
     - Name: Implementation
       Entry: 7
-      Data: 77|SEE.Utils.Paths.FilePath, SEE
+      Data: 77|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
-    - Name: relativePath
+    - Name: RelativePath
       Entry: 1
       Data: /reflexion/compiler/CodeFacts.gxl.xz
-    - Name: absolutePath
+    - Name: AbsolutePath
       Entry: 1
       Data: 
     - Name: 
@@ -39511,14 +39610,14 @@ MonoBehaviour:
       Data: 
     - Name: Mapping
       Entry: 7
-      Data: 78|SEE.Utils.Paths.FilePath, SEE
+      Data: 78|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
-    - Name: relativePath
+    - Name: RelativePath
       Entry: 1
       Data: /reflexion/compiler/EmptyMapping.gxl
-    - Name: absolutePath
+    - Name: AbsolutePath
       Entry: 1
       Data: 
     - Name: 
@@ -39542,16 +39641,16 @@ MonoBehaviour:
   LODCulling: 0.001
   ConfigurationPath:
     Root: 3
-    relativePath: /reflexion/compiler/Reflexion.cfg
-    absolutePath: 
+    RelativePath: /reflexion/compiler/Reflexion.cfg
+    AbsolutePath: 
   sourceCodeDirectory:
-    Root: 2
-    relativePath: 
-    absolutePath: 
+    Root: 3
+    RelativePath: /reflexion/compiler/minilax
+    AbsolutePath: 
   SolutionPath:
     Root: 2
-    relativePath: 
-    absolutePath: 
+    RelativePath: 
+    AbsolutePath: 
   IgnoreSelfLoopsInLifting: 0
   MaximalAntennaSegmentHeight: 0.1
   AntennaWidth: 0.01
@@ -39569,8 +39668,8 @@ MonoBehaviour:
       GradientDescentPrecision: -4
     LayoutPath:
       Root: 2
-      relativePath: 
-      absolutePath: 
+      RelativePath: 
+      AbsolutePath: 
   EdgeLayoutSettings:
     Kind: 3
     AnimationKind: 0
@@ -39595,6 +39694,10 @@ MonoBehaviour:
     MetricIssue: Metric.Metric
     StyleIssue: Metric.Style
     UniversalIssue: Metric.Universal
+    LspHint: Metric.LSP_Hint
+    LspInfo: Metric.LSP_Info
+    LspWarning: Metric.LSP_Warning
+    LspError: Metric.LSP_Error
     ArchitectureIssueSum: Metric.Architecture_Violations_SUM
     CloneIssueSum: Metric.Clone_SUM
     CycleIssueSum: Metric.Cycle_SUM
@@ -39606,8 +39709,8 @@ MonoBehaviour:
     LoadBoardOnStartup: 0
     BoardPath:
       Root: 3
-      relativePath: /reflexion/compiler/ReflexionBoard.cfg
-      absolutePath: 
+      RelativePath: /reflexion/compiler/ReflexionBoard.cfg
+      AbsolutePath: 
 --- !u!114 &2147363515
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -40440,9 +40543,10 @@ SceneRoots:
   - {fileID: 442716585}
   - {fileID: 1003946421}
   - {fileID: 2034689789}
+  - {fileID: 1166896206}
+  - {fileID: 1334775387}
   - {fileID: 1462978785}
   - {fileID: 2134247849}
   - {fileID: 365534681}
   - {fileID: 387723966}
   - {fileID: 1706202779}
-  - {fileID: 1166896206}

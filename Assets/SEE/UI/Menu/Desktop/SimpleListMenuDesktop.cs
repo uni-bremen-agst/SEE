@@ -116,8 +116,8 @@ namespace SEE.UI.Menu
 
             // hover listeners
             PointerHelper pointerHelper = button.GetComponent<PointerHelper>();
-            pointerHelper.EnterEvent.AddListener(_ => MenuTooltip.Show(entry.Description));
-            pointerHelper.ExitEvent.AddListener(_ => MenuTooltip.Hide());
+            pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith(entry.Description));
+            pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
 
             // adds clickEvent listener or show that button is disabled
             if (entry.Enabled)
