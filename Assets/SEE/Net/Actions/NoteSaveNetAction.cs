@@ -45,19 +45,16 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Creates a new Note on each client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                NoteManager.Instance.SaveNote(graphElementID, isPublic, content);
-            }
+            NoteManager.Instance.SaveNote(graphElementID, isPublic, content);
         }
 
         /// <summary>
         /// Things to execute on the server (none for this class). Necessary because it is abstract
         /// in the superclass.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             //Intentionally left blank
         }
