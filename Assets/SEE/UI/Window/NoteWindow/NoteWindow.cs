@@ -1,18 +1,14 @@
-using Michsky.UI.ModernUIPack;
 using SEE.Controls;
-using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 
 namespace SEE.UI.Window.NoteWindow
 {

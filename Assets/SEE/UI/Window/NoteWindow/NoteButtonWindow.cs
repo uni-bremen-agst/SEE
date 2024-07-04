@@ -1,13 +1,6 @@
 using Michsky.UI.ModernUIPack;
-using SEE.Controls;
 using SEE.GO;
-using SEE.UI.Window.NoteWindow;
 using SEE.Utils;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;

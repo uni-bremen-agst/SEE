@@ -1,15 +1,10 @@
 using SEE.GO;
-using SEE.UI.Window;
 using SEE.UI.Window.NoteWindow;
 using SEE.Utils;
 using SEE.Utils.History;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace SEE.Controls.Actions
 {

@@ -1,11 +1,4 @@
-using SEE.DataModel.DG;
-using SEE.GO;
-using SEE.Net.Actions;
 using SEE.UI.Window.NoteWindow;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace SEE.Net.Actions
 {
