@@ -1,8 +1,6 @@
 using Michsky.UI.ModernUIPack;
 using SEE.Controls;
-using SEE.Controls.Actions.Drawable;
 using SEE.DataModel.DG;
-using SEE.Game.Drawable;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
@@ -34,7 +32,7 @@ namespace SEE.UI.Window.NoteWindow
         public TMP_InputField searchField;
 
         /// <summary>
-        ///Reference to the graph element(node/edge) associated with this window.
+        /// Reference to the graph element(node/edge) associated with this window.
         /// </summary>
         public GraphElementRef graphElementRef;
 
@@ -270,19 +268,19 @@ namespace SEE.UI.Window.NoteWindow
 
         protected override void InitializeFromValueObject(WindowValues valueObject)
         {
-            //Nothing need to be done since multiplayer is already implemented for NoteWindow
+            //Nothing needs to be done since multiplayer is already implemented for NoteWindow
             throw new NotImplementedException();
         }
 
         public override void UpdateFromNetworkValueObject(WindowValues valueObject)
         {
-            //Nothing need to be done since multiplayer is already implemented for NoteWindow
+            //Nothing needs to be done since multiplayer is already implemented for NoteWindow
             throw new NotImplementedException();
         }
 
         public override WindowValues ToValueObject()
         {
-            //Nothing need to be done since multiplayer is already implemented for NoteWindow
+            //Nothing needs to be done since multiplayer is already implemented for NoteWindow
             throw new NotImplementedException();
         }
     }
