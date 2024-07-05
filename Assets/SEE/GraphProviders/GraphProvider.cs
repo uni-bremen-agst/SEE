@@ -38,15 +38,14 @@ namespace SEE.GraphProviders
         /// <param name="token">cancellation token</param>
         /// <returns>provided graph based on <paramref name="graph"/></returns>
         public abstract UniTask<T> ProvideAsync(T graph, AbstractSEECity city,
-            Action<float> changePercentage = null,
-            CancellationToken token = default);
+                                                Action<float> changePercentage = null,
+                                                CancellationToken token = default);
 
         /// <summary>
         /// The fold out group for the graph provider in the runtime configuration
         /// of a code city.
         /// </summary>
         protected const string GraphProviderFoldoutGroup = "Data";
-
 
         /// <summary>
         /// Returns the kind of graph provider.

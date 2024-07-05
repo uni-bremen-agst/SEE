@@ -119,13 +119,9 @@ namespace SEE.Game.Avatars
             {
                 aimIK.solver.target.gameObject.SetActive(IsPointing);
             }
-            if (IsLocallyControlled)
+            if (IsLocallyControlled && gameObject.TryGetComponentOrLog(out networkObject))
             {
-                if (gameObject.TryGetComponentOrLog(out networkObject))
-                {
-                    //FIXME: TogglePointingNetAction.ExecuteOnClient calls SetPointing which causes an infinite loop, is this intended?
-                    new TogglePointingNetAction(networkObject.NetworkObjectId, IsPointing).Execute(); 
-                }
+                new TogglePointingNetAction(networkObject.NetworkObjectId, IsPointing).Execute();
             }
         }
 

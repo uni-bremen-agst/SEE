@@ -163,13 +163,15 @@ namespace SEE.DataModel.DG.IO
         /// <param name="graph">graph for which node metrics are to be imported</param>
         /// <param name="path">path to a data file containing CSV data from which to import node metrics</param>
         /// <param name="separator">used to separate column entries</param>
+        /// <param name="token">the token to cancel the loading</param>
+        /// <returns>the number of errors that occurred</returns>
         /// <returns>the number of errors</returns>
         public static async UniTask<int> LoadCsvAsync(Graph graph, DataPath path, char separator = ';',
                                                       CancellationToken token = default)
         {
             Stream stream = await path.LoadAsync();
             using StreamReader reader = new(stream);
-            return await LoadCsvAsync(graph, separator, reader, "", token);
+            return await LoadCsvAsync(graph, separator, reader, path.Path, token);
         }
 
         /// <summary>
@@ -196,6 +198,7 @@ namespace SEE.DataModel.DG.IO
         /// <param name="separator">used to separate column entries</param>
         /// <param name="token">token to cancel the operation</param>
         /// <returns>the number of errors</returns>
+        [Obsolete("Use LoadCsvAsync(Graph, DataPath, char, CancellationToken) instead.")]
         public static async UniTask<int> LoadCsvAsync(Graph graph, string filename, char separator = ';',
                                                       CancellationToken token = default)
         {
@@ -217,8 +220,10 @@ namespace SEE.DataModel.DG.IO
         /// <param name="reader">a reader yielding the CSV data</param>
         /// <param name="filename">the name of the CSV; will be used only for
         /// error messages; can be empty</param>
-        /// <returns></returns>
-        /// <exception cref="IOException"></exception>
+        /// <param name="token">the token to cancel the loading</param>
+        /// <returns>the number of errors that occurred</returns>
+        /// <exception cref="IOException">if the file is malformed, i.e., does not conform
+        /// to the expected CSV format</exception>
         private static async UniTask<int> LoadCsvAsync(Graph graph, char separator, StreamReader reader,
                                                        string filename, CancellationToken token)
         {

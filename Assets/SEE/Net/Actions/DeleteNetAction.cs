@@ -41,15 +41,8 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameObject gameObject = GraphElementIDMap.Find(GameObjectID);
-            if (gameObject != null)
-            {
-                GameElementDeleter.Delete(gameObject);
-            }
-            else
-            {
-                throw new System.Exception($"There is no game object with the ID {GameObjectID}.");
-            }
+            GameObject gameObject = GraphElementIDMap.Find(GameObjectID, mustFindElement: true);
+            GameElementDeleter.Delete(gameObject);
         }
     }
 }

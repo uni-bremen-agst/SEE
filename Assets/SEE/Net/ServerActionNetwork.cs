@@ -21,7 +21,7 @@ namespace SEE.Net
                                                 ((connectedClient) => connectedClient.ClientId == client);
             if (networkClient == null)
             {
-                Debug.LogError($"There is no {nameof(NetworkClient)}.\n");
+                Debug.LogError($"There is no {nameof(NetworkClient)} for the client {client}.\n");
                 return;
             }
             if (!networkClient.PlayerObject.TryGetComponent(out ClientActionNetwork clientNetwork))

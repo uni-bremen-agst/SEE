@@ -22,13 +22,13 @@ namespace SEE.DataModel.DG
         private const string hierarchicalEdgeType = "Enclosing";
 
         /// <summary>
-        /// Load Graph from GXL file <paramref name="filename"/>.
+        /// Load Graph from GXL file <paramref name="path"/>.
         /// </summary>
-        /// <param name="filename">GXL file</param>
+        /// <param name="path">data path of GXL file</param>
         /// <returns>loaded graph</returns>
-        private static async UniTask<Graph> LoadGraphAsync(string filename)
+        private static async UniTask<Graph> LoadGraphAsync(DataPath path)
         {
-            return await GraphReader.LoadAsync(filename, new HashSet<string> { hierarchicalEdgeType }, basePath: "");
+            return await GraphReader.LoadAsync(path, new HashSet<string> { hierarchicalEdgeType }, basePath: "");
         }
 
         /// <summary>
@@ -39,8 +39,8 @@ namespace SEE.DataModel.DG
         [SetUp]
         public async Task SetUpAsync()
         {
-            string gxlPath = Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz";
-            string xmlPath = Application.streamingAssetsPath + "/JLGExample/jacoco.xml";
+            DataPath gxlPath = new(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz");
+            DataPath xmlPath = new(Application.streamingAssetsPath + "/JLGExample/jacoco.xml");
 
             graph = await LoadGraphAsync(gxlPath);
             await JaCoCoImporter.LoadAsync(graph, xmlPath);

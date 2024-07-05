@@ -10,6 +10,7 @@ using System.Threading;
 using Dissonance;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
@@ -41,7 +42,7 @@ namespace SEE.Net
         private const int maxServerPort = 65535;
 
         /// <summary>
-        /// The id of the server to fetch files from backend
+        /// The ID of the server to fetch files from.
         /// </summary>
         public static string ServerId;
 
@@ -86,10 +87,9 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Saves the password used to enter a meeting room.
+        /// The password used to enter a meeting room.
         /// </summary>
         public string RoomPassword = "";
-
 
         /// <summary>
         /// Used to tell the caller whether the routine has been completed.
@@ -259,28 +259,29 @@ namespace SEE.Net
         /// <summary>
         /// Name of command-line argument for room password <see cref="RoomPassword"/>.
         /// </summary>
-        private const string passwordArgument = "-password";
+        private const string passwordArgument = "--password";
 
         /// <summary>
         /// Name of command-line argument for UDP port <see cref="ServerPort"/>.
         /// </summary>
-        private const string portArgument = "-port";
+        private const string portArgument = "--port";
         /// <summary>
         /// Name of command-line argument for backend domain URL  <see cref="BackendDomain"/>.
         /// </summary>
-        private const string domainArgument = "-domain";
+        private const string domainArgument = "--host";
         /// <summary>
         /// Name of command-line argument for the server id  <see cref="ServerId"/>.
         /// </summary>
-        private const string serverIdArgument = "-id";
+        private const string serverIdArgument = "--id";
         /// <summary>
         /// Name of command-line argument for launching this Unity instance
         /// as a dedicated server.
         /// </summary>
-        private const string launchAsServerArgument = "-launch-as-server";
+        private const string launchAsServerArgument = "--launch-as-server";
 
         /// <summary>
-        /// Makes sure that we have only one <see cref="Instance"/> and check command line arguments.
+        /// Makes sure that we have only one <see cref="Instance"/> and checks
+        /// command-line arguments.
         /// </summary>
         private void Start()
         {
@@ -299,9 +300,19 @@ namespace SEE.Net
             ProcessCommandLineArguments();
         }
 
+        /// <summary>
+        /// Processes and determines the values of the command-line arguments
+        /// <see cref="ServerPort"/>, <see cref="RoomPassword"/>, <see cref="BackendDomain"/>,
+        /// <see cref="ServerId"/>, and starts the server if the command-line argument
+        /// <see cref="launchAsServerArgument"/> is present.
+        /// </summary>
+        /// <exception cref="ArgumentException">thrown if an option requiring a value does
+        /// not have one</exception>
         private void ProcessCommandLineArguments()
         {
             string[] arguments = Environment.GetCommandLineArgs();
+
+            bool launchAsServer = false;
 
             // Check command line arguments
             // The first element in the array contains the file name of the executing program.
@@ -334,7 +345,9 @@ namespace SEE.Net
                 }
                 else if (arguments[i] == launchAsServerArgument)
                 {
-                    StartServer(null);
+                    // This argument does not have a value. It works as a flag.
+                    launchAsServer = true;
+                    i++;
                 }
                 else
                 {
@@ -342,9 +355,20 @@ namespace SEE.Net
                 }
             }
 
+            if (launchAsServer)
+            {
+                StartServer(null);
+            }
+
+            return;
+
             static void CheckArgumentValue(string[] arguments, int i, string argument)
             {
                 if (i + 1 >= arguments.Length)
+                {
+                    throw new ArgumentException($"Argument value for {argument} is missing.");
+                }
+                if (string.IsNullOrWhiteSpace(arguments[i + 1]))
                 {
                     throw new ArgumentException($"Argument value for {argument} is missing.");
                 }
@@ -352,30 +376,26 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// The <see cref="ServerActionNetwork"/> component attached to the server game object.
-        /// </summary>
-        private static ServerActionNetwork serverNetwork;
-        /// <summary>
         /// The gateway to the server.
         /// </summary>
-        public static ServerActionNetwork ServerNetwork
+        public static readonly Lazy<ServerActionNetwork> ServerNetwork = new(InitServerNetwork);
+
+        /// <summary>
+        /// Yields the <see cref="ServerActionNetwork"/> component attached to the Server game object.
+        /// </summary>
+        private static ServerActionNetwork InitServerNetwork()
         {
-            get
+            const string serverName = "Server";
+            GameObject server = GameObject.Find(serverName);
+            if (server != null)
             {
-                if (serverNetwork == null)
-                {
-                    const string serverName = "Server";
-                    GameObject server = GameObject.Find(serverName);
-                    if (server != null)
-                    {
-                        server.TryGetComponentOrLog(out serverNetwork);
-                    }
-                    else
-                    {
-                        Debug.LogError($"There is no game object named {serverName} in the scene.\n");
-                    }
-                }
+                server.TryGetComponentOrLog(out ServerActionNetwork serverNetwork);
                 return serverNetwork;
+            }
+            else
+            {
+                Debug.LogError($"There is no game object named {serverName} in the scene.\n");
+                return null;
             }
         }
 
@@ -386,7 +406,7 @@ namespace SEE.Net
         /// <param name="recipients">List of recipients to broadcast to, will broadcast to all if this is null.</param>
         public static void BroadcastAction(String serializedAction, ulong[] recipients)
         {
-            ServerNetwork?.BroadcastActionServerRpc(serializedAction, recipients);
+            ServerNetwork.Value?.BroadcastActionServerRpc(serializedAction, recipients);
         }
 
         /// <summary>
@@ -456,7 +476,7 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Shuts down the server and the client.
+        /// Shuts down the server and the clients.
         /// This method is called only when this component is destroyed, which
         /// may be at the very end of the game.
         /// </summary>
@@ -465,6 +485,9 @@ namespace SEE.Net
             ShutdownNetwork();
         }
 
+        /// <summary>
+        /// Shuts down the network (server and clients).
+        /// </summary>
         private void ShutdownNetwork()
         {
             // FIXME there must be a better way to stop the logging spam!
@@ -585,7 +608,7 @@ namespace SEE.Net
                 // developing and debugging you might sometimes test local client instances
                 // on the same system and sometimes test client instances running on external
                 // systems.
-                ServerIP4Address = "0.0.0.0"; //FIXME: Why this assignment?
+                ServerIP4Address = "0.0.0.0";
                 Debug.Log($"Server is starting to listen at {ServerAddress}...\n");
                 try
                 {
@@ -598,7 +621,7 @@ namespace SEE.Net
                     }
                     else
                     {
-                        throw new CannotStartServer($"Could not start host {ServerAddress}.");
+                        throw new CannotStartServer($"Could not start server {ServerAddress}.");
                     }
                 }
                 catch (Exception exception)
@@ -610,14 +633,24 @@ namespace SEE.Net
             }
         }
 
-        private void OnClientConnectedCallbackForServer(ulong owner)
+        /// <summary>
+        /// Callback called when a client has connected to the server.
+        /// Emits a user message.
+        /// </summary>
+        /// <param name="client">the ID of the client</param>
+        private void OnClientConnectedCallbackForServer(ulong client)
         {
-            Debug.Log($"Client {owner} has connected.\n");
+            ShowNotification.Info("Connection", $"Client {client} has connected.");
         }
 
-        private void OnClientDisconnectCallbackForServer(ulong owner)
+        /// <summary>
+        /// Callback called when a client has disconnected from the server.
+        /// Emits a user message.
+        /// </summary>
+        /// <param name="client">the ID of the client</param>
+        private void OnClientDisconnectCallbackForServer(ulong client)
         {
-            Debug.Log($"Client {owner} has disconnected.\n");
+            ShowNotification.Info("Connection", $"Client {client} has disconnected.");
         }
 
         /// The IP4 address, port, and protocol.
@@ -665,13 +698,15 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Checks whether a specific client is authorised to establish a connection to the server.
+        /// Checks whether a specific client is authorized to establish a connection to the server.
         /// The client sends the server a request with a password to join the room,
-        /// the server sends a corresponding response depending on whether the sent password matches the set password.
-        /// The <paramref name="request"/> contains the password
-        /// The <paramref name="response"/> contains the answer of the server.
+        /// the server sends a corresponding response depending on whether the sent password matches
+        /// the set password.
+        /// <param name="request">contains the password</param>
+        /// <param name="response">contains the answer of the server</param>
         /// </summary>
-        private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+        private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request,
+                                   NetworkManager.ConnectionApprovalResponse response)
         {
             if (RoomPassword == Encoding.ASCII.GetString(request.Payload))
             {
@@ -692,7 +727,7 @@ namespace SEE.Net
         /// because the connection was successfully established.
         /// The <paramref name="owner"/> is not used.
         /// </summary>
-        /// <param name="owner">ID of the owner</param>
+        /// <param name="owner">ID of the owner (ignored)</param>
         private void OnClientConnectedCallback(ulong owner)
         {
             callbackToMenu?.Invoke(true, $"You are connected to {ServerAddress}.\n");
@@ -700,9 +735,11 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Sends the client back to the main menu because the connection could not be established
+        /// Sends the client back to the main menu because the connection could not
+        /// be established.
         /// The <paramref name="owner"/> is not used.
         /// </summary>
+        /// <param name="owner">ID of the owner (ignored)</param>
         private void OnClientDisconnectCallback(ulong owner)
         {
             callbackToMenu?.Invoke(false,
@@ -744,7 +781,7 @@ namespace SEE.Net
         /// The maximal waiting time in seconds a client is willing to wait until a connection
         /// can be established.
         /// </summary>
-        private const float maxWaitingTime = 5 * 60;
+        private const float maxWaitingTimeInSeconds = 5 * 60;
 
         /// <summary>
         /// A delegate that will be called in <see cref="ShutdownNetwork(OnShutdownFinished)"/> when

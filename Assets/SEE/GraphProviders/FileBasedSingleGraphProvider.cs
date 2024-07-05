@@ -5,8 +5,6 @@ using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using SEE.DataModel.DG;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -33,7 +31,7 @@ namespace SEE.GraphProviders
         /// is undefined or does not exist or <paramref name="city"/> is null</exception>
         protected void CheckArguments(AbstractSEECity city)
         {
-            if (Path == null || string.IsNullOrWhiteSpace(Path.Path))
+            if (string.IsNullOrWhiteSpace(Path?.Path))
             {
                 throw new ArgumentException("Undefined data path.\n");
             }

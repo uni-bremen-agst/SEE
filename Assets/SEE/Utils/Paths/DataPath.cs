@@ -1,18 +1,18 @@
-﻿using SEE.Utils.Config;
+﻿using Cysharp.Threading.Tasks;
+using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using UnityEngine;
 using Network = SEE.Net.Network;
 
 namespace SEE.Utils.Paths
 {
     /// <summary>
-    /// A representation of URL or local disk paths of files and directories containing data.
+    /// A representation of URLs or local disk paths of files and directories containing data.
     /// Files and directories can be set absolute in the file system or relative to one of
     /// Unity's standard folders such as Assets, Project, etc. URLs can be relative to
     /// our server at <see cref="Network.ClientRestAPI"/> or relate to other servers.
@@ -60,7 +60,7 @@ namespace SEE.Utils.Paths
             /// </summary>
             TemporaryCache,
             /// <summary>
-            /// The path is a universal resource identifier (URI).
+            /// The path is a universal resource locator (URL).
             /// </summary>
             Url
         }
@@ -231,7 +231,7 @@ namespace SEE.Utils.Paths
         /// <returns>absolute path</returns>
         private string Get()
         {
-            if (Root == RootKind.Url)
+            if (Root is RootKind.Url)
             {
                 // absolutePath is set only for foreign servers, in which case relativePath
                 // will be empty. If the absolutePath is empty, the relativePath is interpreted relative
@@ -240,7 +240,7 @@ namespace SEE.Utils.Paths
                 Uri relativeUri = new(RelativePath, UriKind.Relative);
                 return new Uri(baseUri, relativeUri).ToString();
             }
-            else if (Root == RootKind.Absolute)
+            else if (Root is RootKind.Absolute)
             {
                 return AbsolutePath;
             }
@@ -359,7 +359,7 @@ namespace SEE.Utils.Paths
         /// </summary>
         /// <returns>stream containing the data</returns>
         /// <exception cref="IOException">in case the data cannot be loaded</exception>
-        public async Task<Stream> LoadAsync()
+        public async UniTask<Stream> LoadAsync()
         {
             string path = Path;
             if (string.IsNullOrWhiteSpace(path))
@@ -389,7 +389,7 @@ namespace SEE.Utils.Paths
         /// <param name="url">URL of the file to be downloaded</param>
         /// <returns>a stream containing the downloaded data</returns>
         /// <exception cref="IOException">if file cannot be downloaded</exception>
-        private static async Task<Stream> LoadFromServerAsync(string url)
+        private static async UniTask<Stream> LoadFromServerAsync(string url)
         {
             Uri uri = new(url);
             HttpClient client = new();

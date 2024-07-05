@@ -58,21 +58,6 @@ namespace SEE.DataModel.DG.IO
         }
 
         /// <summary>
-        /// Loads and returns a graph from the given <paramref name="filename"/> assumed to contain GXL data.
-        /// </summary>
-        /// <param name="filename">path of the GXL data</param>
-        /// <param name="hierarchicalEdgeTypes">edge types forming the node hierarchy</param>
-        /// <param name="basePath">the base path of the graph</param>
-        /// <param name="logger">logger to log the output</param>
-        /// <returns>loaded graph</returns>
-        public static async UniTask<Graph> LoadAsync(string filename, HashSet<string> hierarchicalEdgeTypes,
-                                                     string basePath, Utils.ILogger logger = null)
-        {
-            DataPath path = new() { Path = filename };
-            return await LoadAsync(path, hierarchicalEdgeTypes, basePath, logger: logger);
-        }
-
-        /// <summary>
         /// The value for the Source.Name, Linkage.Name, and Type of the artificial root if
         /// one is to be created at all.
         /// </summary>
@@ -85,7 +70,7 @@ namespace SEE.DataModel.DG.IO
 
         /// <summary>
         /// Adds the nodes and edges in the GXL data provided in the <paramref name="gxl"/> stream and
-        /// and adds an artificial root node if there is no unique root node. The node levels will be
+        /// adds an artificial root node if there is no unique root node. The node levels will be
         /// calculated, too.
         /// </summary>
         /// <param name="gxl">Stream containing GXL data that shall be processed</param>
