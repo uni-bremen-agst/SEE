@@ -178,9 +178,10 @@ public class ServerService {
      * conditions.
      *
      * @param id the ID of the server to be started
+     * @throws java.io.IOException if there is an error accessing server files
      * @throws IllegalStateException if the server is busy or already online
      */
-    public void start(UUID id) {
+    public void start(UUID id) throws IOException {
         log.info("Starting server {}", id);
         // Get the server entity and lock access to prevent race conditions
         final Server server = entityManager.find(Server.class, id, LockModeType.PESSIMISTIC_WRITE);

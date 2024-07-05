@@ -41,10 +41,22 @@ It is necessary to set up a container environment in order to:
 
 Before you install Docker or Docker Desktop, consider this:
 
-- Any user who has access to the Docker daemon will potentially have complete root/admin access to your machine.
-- Allowing your user to control Docker (e.g., by adding it to group `docker`) opens a large attack surface. Any program or script can instantly become root/admin on your system.
+- Any user who has access to the Docker daemon will potentially have **complete root/admin access** to your machine.
+- Allowing your user to control Docker (e.g., by adding it to group `docker`) opens a large attack surface. **Any program or script can instantly become root/admin on your system.**
 
-To mitigate this, consider using Podman instead and [configure it to work in rootless mdoe](https://wiki.archlinux.org/title/Podman#Rootless_Podman).
+To mitigate this, consider using Podman instead and [configure it to work in rootless mode](https://wiki.archlinux.org/title/Podman#Rootless_Podman).
+
+To make Podman available via socket, it is necessary to enable the SystemD User Unit:
+
+```
+systemctl --user enable podman.socket
+systemctl --user start podman.socket
+```
+
+It should automatically propagate the socket via environment.
+Check using `echo "$DOCKER_HOST"` if unsure. Also check that the `.sock` file exists.
+
+**Heads up:** This means, the backend will automatically find your Podman instance and use it to spawn containers.
 
 
 ### Database

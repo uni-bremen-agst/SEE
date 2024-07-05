@@ -255,8 +255,8 @@ public class FileService {
      * @throws IOException if there is a problem accessing or creating the
      * directory, or if the path is not a directory
      */
-    private Path getUploadPath(Server server) throws IOException {
-        Path basePath = Paths.get(fileStorageRoot);
+    public Path getUploadPath(Server server) throws IOException {
+        Path basePath = Paths.get(fileStorageRoot).toAbsolutePath();
         Path uploadPath = basePath.resolve(server.getId().toString());
         if (!Files.exists(uploadPath)) {
             try {

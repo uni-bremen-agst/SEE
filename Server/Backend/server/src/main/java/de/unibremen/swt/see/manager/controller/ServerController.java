@@ -129,6 +129,8 @@ public class ServerController {
             serverService.start(id);
         } catch (IllegalStateException e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
+        } catch (IOException ex) {
+            return ResponseEntity.internalServerError().body("Error accessing server files!");
         }
 
         return ResponseEntity.ok().build();

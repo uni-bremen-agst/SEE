@@ -2,7 +2,9 @@ package de.unibremen.swt.see.manager.service;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
+import com.github.dockerjava.api.command.CreateVolumeResponse;
 import com.github.dockerjava.api.command.InspectContainerResponse;
+import com.github.dockerjava.api.command.InspectVolumeResponse;
 import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.ExposedPort;
@@ -16,7 +18,6 @@ import com.github.dockerjava.core.DockerClientImpl;
 import com.github.dockerjava.transport.DockerHttpClient;
 import com.github.dockerjava.zerodep.ZerodepDockerHttpClient;
 import de.unibremen.swt.see.manager.model.Config;
-import de.unibremen.swt.see.manager.model.File;
 import de.unibremen.swt.see.manager.model.Server;
 import de.unibremen.swt.see.manager.model.ServerStatusType;
 import static de.unibremen.swt.see.manager.model.ServerStatusType.ERROR;
@@ -25,9 +26,11 @@ import static de.unibremen.swt.see.manager.model.ServerStatusType.STARTING;
 import static de.unibremen.swt.see.manager.model.ServerStatusType.STOPPING;
 import de.unibremen.swt.see.manager.repository.ConfigRepository;
 import jakarta.annotation.PostConstruct;
+import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.time.Duration;
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
@@ -83,7 +86,7 @@ public class ContainerService {
     private String dockerHost;
 
     final static String CONTAINER_VOLUME_PATH = "/app/gameserver_Data/StreamingAssets/Multiplayer/";
-    final static int CONTAINER_PORT = 123; // TODO
+    final static int CONTAINER_PORT = 55555;
 
     /**
      * Does custom initialization after the service has been constructed.
@@ -114,6 +117,7 @@ public class ContainerService {
 
         try {
             dockerClient.pingCmd().exec();
+            log.info("Successfully connected to Docker at: {}", dockerHost);
         } catch (Exception e) {
             log.warn("Connection to Docker failed with URI: {}", dockerHost);
         }
@@ -123,12 +127,11 @@ public class ContainerService {
      * Starts a container for the given server.
      *
      * @param server the server configuration
+     * @throws java.io.IOException if the uploaded files for given server cannot
+     * be accessed
      * @throws IllegalStateException if the server is busy or already running
      */
-    public void startContainer(Server server) {
-        final Config config = resolveConfig();
-        List<File> files = fileService.getByServer(server);
-
+    public void startContainer(Server server) throws IOException {
         switch (server.getServerStatusType()) {
             case ONLINE ->
                 throw new IllegalStateException("Server is already running!");
@@ -140,39 +143,28 @@ public class ContainerService {
                 throw new IllegalStateException("Server is in ERROR state!");
         }
 
+        final Config config = resolveConfig();
         final String containerName = "see-" + server.getId();
         final String volumeName = "see-data-" + server.getId();
-        final int port = getRandomPort(config.getMinContainerPort(), config.getMaxContainerPort());
+        Integer port = server.getContainerPort();
+        if (port == null) {
+            port = getRandomPort(config.getMinContainerPort(), config.getMaxContainerPort());
+        }
+        String containerId = server.getContainerId();
 
-        // TODO Check if container exists and start it, else create new
+        if (containerId != null && containerExists(containerId)) {
+            dockerClient.startContainerCmd(containerId).exec();
+            log.info("Started existing container: {}", containerName);
+        } else {
+            if (!volumeExists(volumeName)) {
+                createVolume(server, volumeName);
+                log.debug("Created new volume: {}", volumeName);
+            }
+            CreateContainerResponse containerResponse = createContainer(containerName, volumeName, port);
+            containerId = containerResponse.getId();
+            log.info("Created new container: {}", containerName);
+        }
 
-        // TODO Prepare volume with Code City files
-        // Check if volume exists
-        //for (File file : files) { … }
-        // TODO: Handle ZIP file in container
-        dockerClient.createVolumeCmd()
-                .withName(volumeName)
-                .exec();
-
-        ExposedPort exposedPort = ExposedPort.tcp(CONTAINER_PORT);
-        PortBinding portBinding = new PortBinding(Ports.Binding.bindPort(port), exposedPort);
-
-        // TODO Specify server container image
-        CreateContainerResponse container = dockerClient.createContainerCmd("alpine")
-                .withName(containerName)
-                .withHostConfig(HostConfig.newHostConfig()
-                        .withBinds(new Bind(volumeName, new Volume(CONTAINER_VOLUME_PATH)))
-                        .withPortBindings(portBinding)
-                )
-                .withExposedPorts(exposedPort)
-                // TODO Specify server configuration
-                .withEnv("MY_ENV_VAR=value")
-                .withCmd("echo", "hello world")
-                .exec();
-        final String containerId = container.getId();
-        log.info("Started container with ID {}", containerId);
-
-        // Update database entry
         server.setContainerPort(port);
         server.setContainerId(containerId);
         server.setContainerVolume(volumeName);
@@ -283,8 +275,92 @@ public class ContainerService {
     private Config resolveConfig() {
         final Optional<Config> optConfig = configRepo.findConfigById(1);
         if (optConfig.isEmpty()) {
-            throw new RuntimeException("Server config could not be found!");
+            throw new RuntimeException("Server configuration could not be found!");
         }
         return optConfig.get();
+    }
+
+    /**
+     * Creates and starts a new SEE container.
+     *
+     * @param containerName the name that the container should be started under
+     * @param volumeName the name of an existing volume with the shared files
+     * for a SEE Code City
+     * @param port the port number that should be exposed on the container host
+     * @return response metadata object
+     */
+    private CreateContainerResponse createContainer(final String containerName, final String volumeName, final int port) {
+        ExposedPort exposedPort = ExposedPort.tcp(CONTAINER_PORT);
+        PortBinding portBinding = new PortBinding(Ports.Binding.bindPort(port), exposedPort);
+
+        // TODO Specify server container image
+        return dockerClient.createContainerCmd("alpine")
+                .withName(containerName)
+                .withHostConfig(HostConfig.newHostConfig()
+                        .withBinds(new Bind(volumeName, new Volume(CONTAINER_VOLUME_PATH)))
+                        .withPortBindings(portBinding)
+                )
+                .withExposedPorts(exposedPort)
+                // TODO Specify server configuration
+                .withEnv("MY_ENV_VAR=value")
+                .withCmd("echo", "hello world from container")
+                .exec();
+    }
+
+    /**
+     * Checks if a container with given ID exists.
+     *
+     * @param containerId the ID of the container
+     * @return {@code true} if the container exists, else {@code false}
+     */
+    private boolean containerExists(final String containerId) {
+        try {
+            InspectContainerResponse containerResponse = dockerClient.inspectContainerCmd(containerId).exec();
+            return containerResponse != null;
+        } catch (NotFoundException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Prepares a container volume for given server instance.
+     * <p>
+     * Creates a new container volume under given name with the Code City files
+     * from given server instance. This uses the files from the upload directory
+     * directly but keeps them read-only so that they are managed from outside
+     * the container.
+     *
+     * @param server the server that the volume should be created for
+     * @param volumeName the name under which the volume should be created
+     * @throws IOException if there is a problem accessing the server's upload
+     * directory
+     */
+    private CreateVolumeResponse createVolume(Server server, final String volumeName) throws IOException {
+        log.debug("Creating new volume: {}", volumeName);
+        Path uploadDir = fileService.getUploadPath(server);
+        return dockerClient.createVolumeCmd()
+                .withName(volumeName)
+                .withDriver("local")
+                .withDriverOpts(Map.of(
+                        "type", "none",
+                        "device", uploadDir.toString(),
+                        "o", "bind,ro"
+                ))
+                .exec();
+    }
+
+    /**
+     * Checks if a container volume with given name exists.
+     *
+     * @param volumeName the name of the container volume
+     * @return {@code true} if the volume exists, else {@code false}
+     */
+    private boolean volumeExists(final String volumeName) {
+        try {
+            InspectVolumeResponse volumeResponse = dockerClient.inspectVolumeCmd(volumeName).exec();
+            return volumeResponse != null;
+        } catch (NotFoundException e) {
+            return false;
+        }
     }
 }
