@@ -1,7 +1,5 @@
-﻿using Accord.Math.Comparers;
-using MathNet.Numerics.Financial;
+﻿using MathNet.Numerics.Statistics;
 using SEE.DataModel.DG;
-using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,15 +43,31 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         private double HitRateAll { get; set; }
 
         /// <summary>
+        /// Standard deviation of Hit rate refering to correctly mapped candidates per all considered candidates 
+        /// </summary>
+        private double HitRateAllStd { get; set; } = -1.0;
+
+        /// <summary>
         /// Hit rate refering to correctly mapped candidates per actually mapped candidates 
         /// </summary>
-        private double HitRateMapped { get; set; }
+        private double HitRateMapped { get; set; } 
+
+        /// <summary>
+        /// Standard deviation of Hit rate refering to correctly mapped candidates per actually mapped candidates 
+        /// </summary>
+        private double HitRateMappedStd { get; set; } = -1.0;
 
         /// <summary>
         /// Mapping rate refering to the number of mapped candidates per all considered candidates 
         /// </summary>
 
         private double MappingRate { get; set; }
+
+        /// <summary>
+        /// Standard deviation of Mapping rate refering to the number of mapped candidates per all considered candidates 
+        /// </summary>
+
+        private double MappingRateStd { get; set; } = -1.0;
 
         /// <summary>
         /// Total hits within the experiment run.
@@ -189,7 +203,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// Sets the <see cref="CandidateStatistic.MappedAtMappingStep"/> to 
         /// <see cref="int.MaxValue"/> for unmapped candidates. 
         /// </summary>
-        public void FinishCandidateStatisticResults()
+        public void FinishUnmappedCandidates()
         {
             IEnumerable<string> candidateIds = results.Keys.ToList();
             foreach (string candidateID in candidateIds)
@@ -199,6 +213,32 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     // TODO: find a better way mark the value for unmapped nodes.
                     results[candidateID].MappedAtMappingStep = int.MaxValue;
                     this.FinishCandidateStatisticResult(candidateID);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Finishes all remaining active <see cref="CandidateStatistic"/> objects.
+        /// 
+        /// Sets the <see cref="CandidateStatistic.MappedAtMappingStep"/> to 
+        /// <see cref="int.MaxValue"/> for unmapped candidates.
+        /// <param name="idQueue">stack containing the candidate ids that were mapped last to 
+        /// maintain the mapping order within the result file.</param>
+        /// </summary>
+        public void FinishMappedCandidates(List<string> idQueue)
+        {
+            int mappingStep = 0;
+            while (idQueue.Count > 0)
+            {
+                string candidateID = idQueue[idQueue.Count-1];
+                idQueue.RemoveAt(idQueue.Count-1);
+                if (results.ContainsKey(candidateID))
+                {
+                    // TODO: find a better way mark the value for unmapped nodes.
+                    // results[candidateID].MappedAtMappingStep = int.MaxValue;
+                    results[candidateID].MappedAtMappingStep = mappingStep;
+                    this.FinishCandidateStatisticResult(candidateID);
+                    mappingStep++;
                 }
             }
         }
@@ -243,12 +283,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             XElement mappingStatisticXml = new XElement("MappingStatistic",
                 new XAttribute(XNamespace.Xmlns + "xlink", "http://www.w3.org/1999/xlink"),
-                new XElement("MasterSeed", MasterSeed),
+                new XElement("RootSeed", MasterSeed),
                 new XElement("CurrentSeed", CurrentSeed),
                 new XElement("Iterations", Iterations),
                 new XElement("MappingRate", MappingRate),
+                new XElement("MappingRateStd", MappingRateStd),
                 new XElement("HitRateAll", HitRateAll),
+                new XElement("HitRateAllStd", HitRateAllStd),
                 new XElement("HitRateMapped", HitRateMapped),
+                new XElement("HitRateMappedStd", HitRateMappedStd),
                 new XElement("InitiallyMapped", InitiallyMapped),
                 new XElement("CandidatesConsidered", CandidatesConsidered),
                 new XElement("TotalHits", TotalHits),
@@ -322,9 +365,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             averageResult.TotalFails = results.Select(r => r.TotalFails).Sum();
             averageResult.InitiallyMapped = results.Select(r => r.InitiallyMapped).Sum();
 
+            // Average values
             averageResult.MappingRate = results.Select(r => r.MappingRate).Average();
+            averageResult.MappingRateStd = results.Select(r => r.MappingRate).StandardDeviation();
             averageResult.HitRateAll = results.Select(r => r.HitRateAll).Average();
+            averageResult.HitRateAllStd = results.Select(r => r.HitRateAll).StandardDeviation();
             averageResult.HitRateMapped = results.Select(r => r.HitRateMapped).Average();
+            averageResult.HitRateMappedStd = results.Select(r => r.HitRateMapped).StandardDeviation();
 
             averageResult.AddConfigInformation(config);
             averageResult.CalculateResults();

@@ -1,6 +1,4 @@
-﻿using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
-using SEE.DataModel.DG;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

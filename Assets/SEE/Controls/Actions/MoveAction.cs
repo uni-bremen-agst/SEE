@@ -508,6 +508,47 @@ namespace SEE.Controls.Actions
         /// </summary>
         private float distanceToUser;
 
+        #region Movement blocking
+        // TODO: Refactor, deleting or move movement blocking when merging the branch?
+        
+        /// <summary>
+        /// Sets containing node ids which are currently blocked for grabbing and movement.
+        /// </summary>
+        private static HashSet<string> blockedNodeIds = new HashSet<string>();
+
+        /// <summary>
+        /// Blocks the movement for a given node id.
+        /// </summary>
+        /// <param name="nodeId">Given node id</param>
+        public static void BlockMovement(string nodeId)
+        {
+            if (!blockedNodeIds.Contains(nodeId))
+            {
+                blockedNodeIds.Add(nodeId);
+            }
+        }
+
+        /// <summary>
+        /// Unblocks the movement for a given node id.
+        /// </summary>
+        /// <param name="nodeId">Given node id</param>
+        public static void UnblockMovement(string nodeId)
+        {
+            if (!blockedNodeIds.Contains(nodeId))
+            {
+                blockedNodeIds.Add(nodeId);
+            }
+        }
+
+        /// <summary>
+        /// Unblocks the movement for all currently blocked node ids.
+        /// </summary>
+        public static void UnblockMovement()
+        {
+            blockedNodeIds.Clear();
+        } 
+        #endregion
+
         /// <summary>
         /// Reacts to the user interactions. An object can be grabbed and moved
         /// around. If it is put onto another node, it will be re-parented onto this
@@ -529,7 +570,7 @@ namespace SEE.Controls.Actions
                     // User is starting dragging the currently hovered object.
                     InteractableObject hoveredObject = InteractableObject.HoveredObjectWithWorldFlag;
                     // An object to be grabbed must be representing a node that is not the root.
-                    if (hoveredObject && hoveredObject.gameObject.TryGetNode(out Node node) && !node.IsRoot())
+                    if (hoveredObject && hoveredObject.gameObject.TryGetNode(out Node node) && !node.IsRoot() && !blockedNodeIds.Contains(node.ID))
                     {
                         grabbedObject.Grab(hoveredObject.gameObject);
                         AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PickupSound, hoveredObject.gameObject);

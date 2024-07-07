@@ -24,7 +24,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// The terms of the source or target node will either be merged by using the intersection
         /// or union.
         /// </summary>
-        public DocumentMergingType MergingType { get => mergingType; private set => mergingType = value; }
+        public DocumentMergingType MergingType { get => mergingType; set => mergingType = value; }
 
         /// <summary>
         /// This constructor initializes a new instance of <see cref="ADCAttractConfig"/>.

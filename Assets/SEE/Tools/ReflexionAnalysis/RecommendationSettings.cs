@@ -38,7 +38,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         [SerializeField]
         private int masterSeed = 593946;
 
-        public int MasterSeed { get => masterSeed; set => masterSeed = value; }
+        public int RootSeed { get => masterSeed; set => masterSeed = value; }
 
         [SerializeField]
         private double initialMappingPercentage = 0.9;

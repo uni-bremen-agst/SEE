@@ -140,7 +140,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             if (recommendationSettings.AttractFunctionConfig == null)
             {
-                throw new Exception("Could not update configuration. Attract function recommendationSettings is null");
+                throw new Exception("Could not update configuration. Attract function config in recommendation settings is null");
             }
 
             if (oracleMapping != null)
@@ -763,6 +763,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         public List<Node> GetUnmappedCandidates()
         {
             return GetCandidates(ReflexionGraph).Where(c => ReflexionGraph.MapsTo(c) == null).ToList();
+        }
+
+        /// <summary>
+        /// Returns if there a candidates left, which are unmapped.
+        /// </summary>
+        /// <returns>Returns wether there are unmapped candidates.</returns>
+        public bool UnmappedCandidatesLeft()
+        {
+            return GetUnmappedCandidates().Count > 0;
         }
 
         /// <summary>

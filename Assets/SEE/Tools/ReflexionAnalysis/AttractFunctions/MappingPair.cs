@@ -75,7 +75,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// Change type determining if this mapping pair was mapped or unmapped during 
         /// the mappign process.
         /// 
-        /// Used for statistical recording purposes. //TODO: Check if necessary
+        /// Used for statistical recording purposes.
         /// 
         /// </summary>
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
@@ -84,7 +84,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <summary>
         /// Datetime of the moment this MappingPair was mapped.
         /// 
-        /// Used for statistical recording purposes. //TODO: Check if necessary
+        /// Used for statistical recording purposes.
         /// 
         /// </summary>
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]

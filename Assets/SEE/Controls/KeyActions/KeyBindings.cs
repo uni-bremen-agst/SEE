@@ -245,6 +245,13 @@ namespace SEE.Controls.KeyActions
                      KeyActionCategory.CameraPaths, "Saves the current position when recording paths.");
             Register(KeyAction.TogglePathPlaying, KeyCode.F12, "Toggle path playing",
                      KeyActionCategory.CameraPaths, "Starts/stops the automated camera movement along a path.");
+
+            // Candidate recommendation
+            Register(KeyAction.ContinueMappingExperiment, KeyCode.F6, "Continues/Stop Experiment.",
+                KeyActionCategory.Architecture, "Continues or Stops mapping Experiment.");
+			//TODO: Delete before merging the branch?
+            Register(KeyAction.FinishStudyIteration, KeyCode.F7, "Finishes run of the mapping study",
+                KeyActionCategory.Architecture, "Finishes current run within the candidate recommendation study.");
         }
 
         /// <summary>

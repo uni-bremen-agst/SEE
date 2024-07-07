@@ -69,6 +69,27 @@ namespace SEE.Controls
         }
 
         /// <summary>
+        /// Continues the current mapping experiment within the reflexion city.
+        /// </summary>
+        /// <returns></returns>
+        public static bool ContinueMappingExperiment()
+        {
+            return KeyboardShortcutsEnabled 
+                && KeyBindings.IsDown(KeyAction.ContinueMappingExperiment);
+        }
+
+        /// <summary>
+        /// TODO: Delete when branch is merged?
+        /// Finishs the current run of the user study for mapping experiments
+        /// </summary>
+        /// <returns></returns>
+        public static bool FinishStudyIteration()
+        {
+            return KeyboardShortcutsEnabled 
+                && KeyBindings.IsDown(KeyAction.FinishStudyIteration);
+        }
+
+        /// <summary>
         /// Turns on/off the settings menu.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>

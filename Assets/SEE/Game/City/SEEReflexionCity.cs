@@ -12,6 +12,7 @@ using SEE.GraphProviders;
 using System.Collections.Generic;
 using Sirenix.Serialization;
 using SEE.UI.Notification;
+using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
 
 namespace SEE.Game.City
 {
@@ -78,7 +79,7 @@ namespace SEE.Game.City
 	            {
 	                oracleMapping = await OracleMappingProvider.ProvideAsync(new Graph(""), this, UpdateProgress, cancellationTokenSource.Token);
 	            }
-            	UpdateRecommendationSettings();
+            	await UpdateRecommendationSettings();
             }
 
             visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
@@ -126,16 +127,21 @@ namespace SEE.Game.City
         TabGroup(RecommendationsFoldoutGroup), RuntimeTab(RecommendationsFoldoutGroup),
         HideReferenceObjectPicker]
         [PropertyOrder(2)]
-        public RecommendationSettings recommendationSettings = new RecommendationSettings();
+        public RecommendationSettings RecommendationSettings = new RecommendationSettings();
 
-        private void UpdateRecommendationSettings(ReflexionGraph loadedGraph, RecommendationSettings recommendationSettings, Graph oracleMapping)
+        private async UniTask UpdateRecommendationSettings(ReflexionGraph loadedGraph, RecommendationSettings recommendationSettings, Graph oracleMapping)
         {
             candidateRecommendationViz = gameObject.AddOrGetComponent<CandidateRecommendationViz>();
             if (candidateRecommendationViz != null)
             {
                 loadedGraph.Subscribe(candidateRecommendationViz);
-                candidateRecommendationViz.UpdateConfiguration(loadedGraph, recommendationSettings, oracleMapping);
+                await candidateRecommendationViz.UpdateConfiguration(loadedGraph, recommendationSettings, oracleMapping);
             }
+        }
+
+        public async UniTask UpdateRecommendationSettings(RecommendationSettings recommendationSettings)
+        {
+            await UpdateRecommendationSettings(VisualizedSubGraph as ReflexionGraph, recommendationSettings, oracleMapping);
         }
 
         #region Interfaces
@@ -165,9 +171,9 @@ namespace SEE.Game.City
         // TODO: Property order?
         // necessary regarding disabling enabling?
         [PropertyOrder(2)]
-        public void UpdateRecommendationSettings()
+        public async UniTask UpdateRecommendationSettings()
         {
-            UpdateRecommendationSettings(VisualizedSubGraph as ReflexionGraph, recommendationSettings, oracleMapping);
+            await UpdateRecommendationSettings(VisualizedSubGraph as ReflexionGraph, RecommendationSettings, oracleMapping);
         }
 
         [Button("Reset Mapping", ButtonSizes.Small)]
@@ -207,8 +213,8 @@ namespace SEE.Game.City
 
                 if (candidateRecommendationViz != null)
                 {
-                    await candidateRecommendationViz.CreateInitialMappingAsync(recommendationSettings.InitialMappingPercentage, 
-                                                                               recommendationSettings.MasterSeed);
+                    await candidateRecommendationViz.CreateInitialMappingAsync(RecommendationSettings.InitialMappingPercentage, 
+                                                                               RecommendationSettings.RootSeed);
                 }
             }
         }
@@ -222,8 +228,8 @@ namespace SEE.Game.City
             {
                 await candidateRecommendationViz.StartAutomatedMappingAsync(null,
                                                                     syncWithView: true,
-                                                                    ignoreTieBreakers: recommendationSettings.IgnoreTieBreakers,
-                                                                    new System.Random(recommendationSettings.MasterSeed)); 
+                                                                    ignoreTieBreakers: RecommendationSettings.IgnoreTieBreakers,
+                                                                    new System.Random(RecommendationSettings.RootSeed)); 
             }
         }
 
@@ -231,11 +237,39 @@ namespace SEE.Game.City
         [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Run Experiment")]
         public async void RunMappingExperiment()
         {
-            await candidateRecommendationViz.RunExperimentAsync(this.recommendationSettings, oracleMapping);
+            await candidateRecommendationViz.RunExperimentAsync(this.RecommendationSettings, oracleMapping);
         }
 
         #endregion
 
+        #region UserStudy
+
+        private bool studyStarted;
+
+        [Button("Start Study", ButtonSizes.Small)]
+        [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Start Study")]
+        public async UniTask StartStudy()
+        {
+            if(studyStarted)
+            {
+                return;
+            }
+
+            studyStarted = true;
+
+            UserStudy userStudy = gameObject.AddOrGetComponent<UserStudy>();
+            if (userStudy != null)
+            {
+                await userStudy.StartStudy(this, candidateRecommendationViz);
+            } 
+            else
+            {
+                ShowNotification.Warn("Couldn't start Userstudy.", "Couldn't start Userstudy.");
+            }
+        }
         #endregion
+
+        #endregion
+
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
 using Newtonsoft.Json;
+using SEE.DataModel;
 using SEE.DataModel.DG;
 using System;
 using System.Collections.Generic;
@@ -200,6 +201,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             int mappingStep = 0;
             string currentLine;
 
+            List<string> idQueue = new();
+
             using (StreamReader reader = new StreamReader(csvFile))
             {
                 while ((currentLine = reader.ReadLine()) != null)
@@ -215,7 +218,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     // TODO: move into MappingExperimentResult?
                     candidateStatisticResult.AttractionValue = chosenMappingPair.AttractionValue;
                     candidateStatisticResult.MappedClusterID = chosenMappingPair.ClusterID;
-                    candidateStatisticResult.MappedAtMappingStep = mappingStep;
                     candidateStatisticResult.Hit = CandidateRecommendation.IsHit(candidateStatisticResult.CandidateID, 
                                                                                     candidateStatisticResult.MappedClusterID);
 
@@ -237,13 +239,19 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                         } 
                     }
 
-                    mappingResult.FinishCandidateStatisticResult(candidateStatisticResult.CandidateID);
-
-                    mappingStep++;
+                    if (chosenMappingPair.ChangeType == ChangeType.Addition)
+                    {
+                        idQueue.Add(candidateStatisticResult.CandidateID); 
+                    } 
+                    else if(chosenMappingPair.ChangeType == ChangeType.Removal)
+                    {
+                        idQueue.Remove(candidateStatisticResult.CandidateID);
+                    }
                 }
             }
 
-            mappingResult.FinishCandidateStatisticResults();
+            mappingResult.FinishMappedCandidates(idQueue);
+            mappingResult.FinishUnmappedCandidates();
             mappingResult.CalculateResults();
             return mappingResult;
         }

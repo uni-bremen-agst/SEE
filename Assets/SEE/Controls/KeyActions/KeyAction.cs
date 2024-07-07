@@ -202,5 +202,14 @@
         /// Toggles the menu for holistic code metrics.
         /// </summary>
         ToggleHolisticMetricsMenu,
+        /// <summary>
+        /// Continues a running mapping experiment within the reflexion city
+        /// </summary>
+        ContinueMappingExperiment,
+        /// <summary>
+        /// Finsihes an iteration of the mapping experiment user study
+        /// TODO: Delete before merging the branch?
+        /// </summary>
+        FinishStudyIteration,
     }
 }

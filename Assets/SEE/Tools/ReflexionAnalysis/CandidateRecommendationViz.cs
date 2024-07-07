@@ -56,6 +56,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         private ReflexionGraph reflexionGraphViz;
 
         /// <summary>
+        /// Reflexion graph visualized by the reflexion city.
+        /// </summary>
+        public ReflexionGraph ReflexionGraphVisualized { get => reflexionGraphViz; }
+
+        /// <summary>
         /// Cloned reflexion graph which is used to calculate recommendations for 
         /// the visualized reflexion graph. The graph should be detached from all previous 
         /// event listener and should not be associated with any game objects. 
@@ -100,21 +105,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// TODO: Not Necessary if processing data will be deleted. 
         /// </summary>
         private bool Processing { get => ProcessingEvents || ProcessingData; } 
-        #endregion
-
-        #region blink effect
-
-        /// <summary>
-        /// A delay passed before the blink effect for candidates is triggered.
-        /// TODO: Necessary???
-        /// </summary>
-        private static float BLINK_EFFECT_DELAY = 0.1f;
-
-        /// <summary>
-        /// Started couroutine which executes the blink effect for candidates.
-        /// </summary>
-        private Coroutine blinkEffectCoroutine;
-
         #endregion
 
         #region button labels
@@ -248,6 +238,16 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                         reflexionGraphCalc.RemoveNode(nodeToRemove, nodeEvent.OrphansBecomeRoots);
                     }
                     break;
+                case MapsToChange mapsToChange:
+                    if(mapsToChange.Change == ChangeType.Addition)
+                    {
+                        reflexionGraphCalc.AddToMapping(mapsToChange.Source, mapsToChange.Target, overrideMapping: true);
+                    } 
+                    else if (mapsToChange.Change == ChangeType.Removal)
+                    {
+                        reflexionGraphCalc.RemoveFromMapping(mapsToChange.Source, ignoreUnmapped: true);
+                    }
+                    break;
                 case EdgeEvent edgeEvent:
 
                     if (value.Change == ChangeType.Addition)
@@ -280,8 +280,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                         && (!edgeEvent.Edge.IsInArchitecture() || ReflexionGraph.IsSpecified(edgeEvent.Edge)))
                     {
                         Edge edgeToRemove = reflexionGraphCalc.GetEdge(edgeEvent.Edge.ID);
-                        if (edgeToRemove == null) throw new Exception($"Edge {edgeEvent.Edge.ID} not found in calculation reflexion graph" +
+                        if (edgeToRemove == null)
+                        {
+                            throw new Exception($"Edge {edgeEvent.Edge.ID} not found in calculation reflexion graph" +
                                                                       $" when trying to synchronize with visualization reflexion graph.");
+                        }
                         reflexionGraphCalc.RemoveEdge(edgeToRemove);
                     }
                     break;
@@ -316,6 +319,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
         }
         #endregion
+
+        /// <summary>
+        /// Returns all nodes which are currently unmapped.
+        /// </summary>
+        /// <returns>IEnumerable object containing currently unmapped nodes.</returns>
+        public IEnumerable<Node> GetUnmappedCandidates()
+        {
+            return CandidateRecommendation.GetUnmappedCandidates().Select(n => reflexionGraphViz.GetNode(n.ID));
+        }
 
         /// <summary>
         /// This operations updates the candidate recommendation object with the given recommendation settings. 
@@ -408,10 +420,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="initialMappingPercentage">percentage of the candidates nodes that should be mapped after this operation.</param>
         /// <param name="seed">Seed determined pseudo randomness to select the initially mapped candidates.</param>
+        /// <param name="delay">Delay which is waited after a mapping was animated.</param>
         /// <param name="reportProgress">Callback action to report progress.</param>
         /// <returns>Awaitable UniTask</returns>
         public async UniTask CreateInitialMappingAsync(double initialMappingPercentage,
                                                        int seed,
+                                                       bool syncWithView = true,
+                                                       int delay = 500,
                                                        Action<float> reportProgress = null)
         {
             if (!this.OracleGraphLoaded)
@@ -423,19 +438,25 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             // TODO: use reportProgress parameter
             // TODO: change datatype to mapping pair list
             Dictionary<Node, HashSet<Node>> initialMapping;
-            UnityEngine.Debug.Log($"Create Initial mapping with seed {initialMappingPercentage}");
             lock (visualizedReflexionGraphLock)
             {
                 initialMapping = this.CandidateRecommendation.CreateInitialMapping(initialMappingPercentage,
                                                                                    seed,
                                                                                    reflexionGraphViz);
             }
-            foreach (Node cluster in initialMapping.Keys)
+            try
             {
-                foreach (Node candidate in initialMapping[cluster])
+                foreach (Node cluster in initialMapping.Keys)
                 {
-                    await MapRecommendationInVizAsync(candidate, cluster);
+                    foreach (Node candidate in initialMapping[cluster])
+                    {
+                        await MapRecommendationInVizAsync(candidate, cluster, syncWithView);
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.LogException(e);
             }
         }
 
@@ -493,7 +514,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                                         Graph oracleMapping)
         {
             bool syncWithView = recommendationSettings.syncExperimentWithView;
-            System.Random rand = new System.Random(recommendationSettings.MasterSeed);
+            System.Random rand = new System.Random(recommendationSettings.RootSeed);
             int currentSeed = rand.Next(int.MaxValue);
             double initialMappingPercentage = recommendationSettings.InitialMappingPercentage;
             string experimentName = recommendationSettings.ExperimentName;
@@ -595,7 +616,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 // 6. Process Data and keep result object
                 MappingExperimentResult result = recommendations.Statistics.CalculateResults(csvFile);
                 result.CurrentSeed = currentSeed;
-                result.MasterSeed = recommendationSettings.MasterSeed;
+                result.MasterSeed = recommendationSettings.RootSeed;
                 results.Add(result);
                 string xmlFile = Path.Combine(recommendationSettings.OutputPath.Path, $"{experimentName}_output_{currentSeed}.xml");
                 stream = new FileStream(xmlFile, FileMode.Create);
@@ -638,13 +659,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             // 9. save Average Results
             MappingExperimentResult averageResult = MappingExperimentResult.AverageResults(results, recommendationSettings);
-            averageResult.MasterSeed = recommendationSettings.MasterSeed;
+            averageResult.MasterSeed = recommendationSettings.RootSeed;
             averageResult.Iterations = recommendationSettings.Iterations;
             string resultXml = Path.Combine(recommendationSettings.OutputPath.Path, $"{experimentName}_result.xml");
             stream = new FileStream(resultXml, FileMode.Create);
             averageResult.CreateXml().Save(stream);
             stream.Close();
-            UnityEngine.Debug.Log($"Finished Experiment for seed {recommendationSettings.MasterSeed}. Saved averaged result to {resultXml}");
+            UnityEngine.Debug.Log($"Finished Experiment for seed {recommendationSettings.RootSeed}. Saved averaged result to {resultXml}");
         }
 
         /// <summary>
@@ -720,7 +741,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <param name="cluster">Cluster to which the cancidate should be mapped.</param>
         /// <param name="delay">Delay waited after the execution to let the animation finish.</param>
         /// <returns>Awaitable UniTask</returns>
-        private async UniTask MapRecommendationInVizAsync(Node candidate, Node cluster, int delay = 500)
+        private async UniTask MapRecommendationInVizAsync(Node candidate, Node cluster, bool syncWithView = true, int delay = 500)
         {
             await UniTask.WaitWhile(() => ProcessingEvents);
             await UniTask.SwitchToMainThread();
@@ -741,10 +762,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     return;
                 }
 
-                GameNodeMover.MoveTo(candidateInViz.GameObject(), clusterInViz.GameObject().GetGroundCenter(), 1.0f);
-
-                new MoveNetAction(candidateInViz.GameObject().name, clusterInViz.GameObject().GetGroundCenter(), 1.0f).Execute();
-                reflexionGraphViz.AddToMapping(candidateInViz, clusterInViz);
+                if (syncWithView)
+                {
+                    GameNodeMover.MoveTo(candidateInViz.GameObject(), clusterInViz.GameObject().GetGroundCenter(), 1.0f);
+                    new MoveNetAction(candidateInViz.GameObject().name, clusterInViz.GameObject().GetGroundCenter(), 1.0f).Execute(); 
+                }
+                ReflexionMapper.SetParent(candidateInViz.GameObject(), clusterInViz.GameObject());
             }
             await UniTask.Delay(delay);
         }
@@ -795,7 +818,51 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         #endregion
 
-        #region blinkeffect
+        #region visualFeedback
+
+        /// <summary>
+        /// A delay passed before the blink effect for candidates is triggered.
+        /// TODO: Necessary???
+        /// </summary>
+        private static float BLINK_EFFECT_DELAY = 0.1f;
+
+        /// <summary>
+        /// Started couroutine which executes the blink effect for candidates.
+        /// </summary>
+        private Coroutine blinkEffectCoroutine;
+
+        /// <summary>
+        /// Changes the color if all unmapped Candidates to a given color.
+        /// </summary>
+        /// <param name="color">Given color</param>
+        public void ColorUnmappedCandidates(Color color)
+        {
+            IEnumerable<string> ids = this.CandidateRecommendation.GetUnmappedCandidates().Select(n => n.ID);
+            List<Node> nodes = new();
+            foreach(string id in ids) 
+            {
+                Node node = reflexionGraphViz.GetNode(id);
+                if (node != null)
+                {
+                    try
+                    {
+                        UnityEngine.Debug.Log($"try to change color of node {node.ID}");
+                        NodeOperator nodeOperator = node.GameObject().AddOrGetComponent<NodeOperator>();
+                        Color currentColor = nodeOperator.TargetColor;
+                        nodeOperator.ChangeColorsTo(color, 1);
+                    }
+                    catch (Exception e)
+                    {
+                        UnityEngine.Debug.LogException(e);
+                    }
+                }
+                else 
+                {
+                    UnityEngine.Debug.LogWarning($"Couldn't retrieve node id {id} from visualized graph.");
+                }
+            }
+        }
+
         /// <summary>
         /// Starts a blink effect for the current recommendations. 
         /// All recommended candidates and clusters start to blink. 
@@ -906,10 +973,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         [ButtonGroup(statisticButtonGroup)]
         public void CalculateResults()
         {
-            string csvFile = Path.Combine(this.RecommendationSettings.OutputPath.Path, this.RecommendationSettings.ExperimentName + ".csv");
-            string xmlFile = Path.Combine(this.RecommendationSettings.OutputPath.Path, this.RecommendationSettings.ExperimentName + ".xml");
-            CandidateRecommendation.Statistics.StopRecording();
-            CandidateRecommendation.Statistics.WriteResultsToXml(csvFile, xmlFile);
+            try
+            {
+                string csvFile = Path.Combine(this.RecommendationSettings.OutputPath.Path, this.RecommendationSettings.ExperimentName + ".csv");
+                string xmlFile = Path.Combine(this.RecommendationSettings.OutputPath.Path, this.RecommendationSettings.ExperimentName + ".xml");
+                CandidateRecommendation.Statistics.StopRecording();
+                CandidateRecommendation.Statistics.WriteResultsToXml(csvFile, xmlFile);
+            }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.LogException(e);
+            }
         }
 
         [Button(showRecommendationLabel, ButtonSizes.Small)]
