@@ -91,15 +91,15 @@ function CreateServerView() {
         solutionResponse = await axiosInstance.post("/server/addFile", form)
       }
 
-      if(
-        !(code && !codeResponse 
-          || gxl && !gxlRespose 
-          || csv && !csvRespose 
-          || configuration && !configurationResponse 
-          || solution && !solutionResponse)
-      ) {
-        axiosInstance.put("/server/startServer", {}, {params: {id: createServerResponse.data.id}})
-      }
+      // if(
+      //   !(code && !codeResponse 
+      //     || gxl && !gxlRespose 
+      //     || csv && !csvRespose 
+      //     || configuration && !configurationResponse 
+      //     || solution && !solutionResponse)
+      // ) {
+      //   axiosInstance.put("/server/startServer", {}, {params: {id: createServerResponse.data.id}})
+      // }
       navigate('/', {replace: true});
     }
 
@@ -109,15 +109,20 @@ function CreateServerView() {
         <Card sx={{marginTop: "2em", borderRadius: "25px", height: "calc(100% - 100px)", overflow: "auto"}}>
           <CardContent sx={{height: "calc(100% - 3em)"}}>
             <Stack direction="column" spacing={2} height={"100%"}>
-              <Typography variant="h4"><Box display={"inline"} sx={{"&:hover" : {cursor: "pointer"}}}><FontAwesomeIcon icon={faArrowLeft} onClick={() => navigate(-1)}/></Box> Gameserver erstellen</Typography>
+              <Typography variant="h4">
+                <Box display={"inline"} sx={{"&:hover" : {cursor: "pointer"}}}>
+                  <FontAwesomeIcon icon={faArrowLeft} onClick={() => navigate(-1)}/>&nbsp;
+                </Box>
+                New Game Server
+              </Typography>
               <Stack direction="row" spacing={2}>
                 <Stack direction="column" flexGrow={1}>
-                  <Typography variant="h6">Gameservereinstellungen:</Typography>
-                  <TextField error={!!errors.get("name")} helperText={errors.get("name")} value={name} onChange={(e) => setName(e.target.value)} label="Name" variant="standard"/>
-                  <TextField value={serverPassword} onChange={(e) => setServerPassword(e.target.value)} label="Serverpasswort" variant="standard"/>
+                  <Typography variant="h6">Game Server Settings</Typography>
+                  <TextField error={!!errors.get("name")} helperText={errors.get("name")} value={name} onChange={(e) => setName(e.target.value)} label="Server Name" variant="standard"/>
+                  <TextField value={serverPassword} onChange={(e) => setServerPassword(e.target.value)} label="Server Password" variant="standard"/>
                 </Stack>
                 <Stack direction="column" >
-                  <Typography variant="h6">Server-Bild:</Typography>
+                  {/* <Typography variant="h6">Server Icon:</Typography> */}
                   <Box width={140} height={140} paddingTop="1.5em">
                         <Card sx={{width: "100%", height: "100%"}}>
                           <CardActionArea onMouseEnter={() => setDisplayReloadIcon(true)} onMouseLeave={() => setDisplayReloadIcon(false)} onClick={() => {setAvatarSeed(getRandomSeed()); setAvatarColor(getRandomColor());}}>
@@ -141,17 +146,17 @@ function CreateServerView() {
                 </Stack>
                 
               </Stack>
-              <Typography variant="h6">Dateien:</Typography>
+              <Typography variant="h6">Files</Typography>
               <Card sx={{borderRadius: "0px", flexGrow: 1, overflow: "auto", minHeight: "100px"}} elevation={0}>
-                <MuiFileInput label="Code" placeholder="Code hochladen.." variant="standard" fullWidth value={code} onChange={(value) => setCode(value)} clearIconButtonProps={{title: "Entfernen", children: <FontAwesomeIcon icon={faX}/>}} inputProps={{accept: '.zip'}}/>
-                <MuiFileInput label="GXL" placeholder="GXL hochladen.." variant="standard" fullWidth value={gxl} onChange={(value) => setGxl(value)} clearIconButtonProps={{title: "Entfernen", children: <FontAwesomeIcon icon={faX}/>}} inputProps={{accept: '.gxl'}}/>
-                <MuiFileInput label="CSV" placeholder="CSV hochladen.." variant="standard" fullWidth value={csv} onChange={(value) => setCsv(value)} clearIconButtonProps={{title: "Entfernen", children: <FontAwesomeIcon icon={faX}/>}} inputProps={{accept: '.csv'}}/>
-                <MuiFileInput label="Config" placeholder="Config hochladen.." variant="standard" fullWidth value={configuration} onChange={(value) => setConfiguration(value)} clearIconButtonProps={{title: "Entfernen", children: <FontAwesomeIcon icon={faX}/>}} inputProps={{accept: '.cfg'}}/>
-                <MuiFileInput label="Solution" placeholder="Solution hochladen.." variant="standard" fullWidth value={solution} onChange={(value) => setSolution(value)} clearIconButtonProps={{title: "Entfernen", children: <FontAwesomeIcon icon={faX}/>}}/>
+                <MuiFileInput label="Code" placeholder="Upload code…" variant="standard" fullWidth value={code} onChange={(value) => setCode(value)} clearIconButtonProps={{title: "Entfernen", children: <FontAwesomeIcon icon={faX}/>}} inputProps={{accept: '.zip'}}/>
+                <MuiFileInput label="GXL" placeholder="Upload GXL…" variant="standard" fullWidth value={gxl} onChange={(value) => setGxl(value)} clearIconButtonProps={{title: "Entfernen", children: <FontAwesomeIcon icon={faX}/>}} inputProps={{accept: '.gxl'}}/>
+                <MuiFileInput label="CSV" placeholder="Upload CSV…" variant="standard" fullWidth value={csv} onChange={(value) => setCsv(value)} clearIconButtonProps={{title: "Entfernen", children: <FontAwesomeIcon icon={faX}/>}} inputProps={{accept: '.csv'}}/>
+                <MuiFileInput label="Config" placeholder="Upload configuration…" variant="standard" fullWidth value={configuration} onChange={(value) => setConfiguration(value)} clearIconButtonProps={{title: "Entfernen", children: <FontAwesomeIcon icon={faX}/>}} inputProps={{accept: '.cfg'}}/>
+                <MuiFileInput label="Solution" placeholder="Upload solution…" variant="standard" fullWidth value={solution} onChange={(value) => setSolution(value)} clearIconButtonProps={{title: "Entfernen", children: <FontAwesomeIcon icon={faX}/>}}/>
               </Card> 
               <Stack justifyContent="end" direction="row" spacing={2}>
                 <Button variant="contained" color="secondary" sx={{borderRadius:"25px"}} onClick={() => navigate('/')}>
-                    Abbrechen
+                    Cancel
                 </Button>
                 <Button variant="contained" sx={{borderRadius:"25px"}} onClick={() => {
                   setErrors(new Map<string, string>());
@@ -165,7 +170,7 @@ function CreateServerView() {
                     createServer()
                   }
                 }}>
-                    Erstellen
+                    Create
                 </Button>
               </Stack>
             </Stack>

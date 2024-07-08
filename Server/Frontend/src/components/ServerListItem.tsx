@@ -1,6 +1,6 @@
 import {Alert, Box, Card, CardActionArea, CardContent, Chip, Grid, IconButton, Snackbar, Stack, Typography} from "@mui/material";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faShare } from '@fortawesome/free-solid-svg-icons'
+import { faClipboard } from '@fortawesome/free-solid-svg-icons'
 import { useNavigate } from "react-router";
 import Avatar from "./Avatar";
 import Server from "../types/Server";
@@ -32,7 +32,7 @@ function ServerListItem(props: {server: Server}) {
         <Box width={"100%"}>
             <Snackbar open={showLinkCopiedMessage} autoHideDuration={5000} onClose={() => setShowLinkCopiedMessage(false)}>
               <Alert onClose={() => setShowLinkCopiedMessage(false)} severity="success" sx={{width: "100%", borderRadius: "25px"}}>
-                Link in Zwischenablage kopiert.
+                Address was copied to clipboard.
               </Alert>
             </Snackbar>
             <Card sx={{borderRadius:"25px"}}> 
@@ -53,8 +53,8 @@ function ServerListItem(props: {server: Server}) {
                       <Stack direction="column" spacing={1}>
                         <Typography variant="h6">{server.name}</Typography>
                         {server.serverStatusType == "ONLINE" ? 
-                          <Typography>Online seit: {new Date(server.startTime*1000).toLocaleDateString()} {new Date(server.startTime*1000).toLocaleTimeString()}</Typography>
-                          : <Typography>Offline seit: 
+                          <Typography>Online since: {new Date(server.startTime*1000).toLocaleDateString()} {new Date(server.startTime*1000).toLocaleTimeString()}</Typography>
+                          : <Typography>Offline since: 
                             {
                                server.stopTime?
                                   ` ${new Date(server.stopTime*1000).toLocaleDateString()} ${new Date(server.stopTime*1000).toLocaleTimeString()}`
@@ -71,7 +71,7 @@ function ServerListItem(props: {server: Server}) {
                        
                         <Box display="flex" height="100%">
                           <IconButton 
-                                aria-label="IP teilen" 
+                                aria-label="Copy IP Address"
                                 size="large" 
                                 sx={{display: "flex", flexDirection: "column"}} 
                                 onMouseDown={(e) => {e.stopPropagation()}} 
@@ -80,8 +80,8 @@ function ServerListItem(props: {server: Server}) {
                                                 navigator.clipboard.writeText(`${server.containerAddress}:${server.containerPort}`);
                                                 setShowLinkCopiedMessage(true);
                             }}> 
-                              <FontAwesomeIcon icon={faShare}/>
-                              <Typography variant="button">IP teilen</Typography>
+                              <FontAwesomeIcon icon={faClipboard}/>
+                              <Typography variant="button">Copy IP Address</Typography>
                           </IconButton>
                         </Box>
                       </Stack>

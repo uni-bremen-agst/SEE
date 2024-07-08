@@ -1,7 +1,7 @@
 import { Alert, Box, Button, Card, CardContent, Chip, CircularProgress, Container, Grid, IconButton, List, ListItem, ListItemText, Modal, Snackbar, Stack, Typography } from "@mui/material";
 import Header from "../components/Header";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faDownload, faEye, faPlay, faShare, faStop, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faDownload, faEye, faPlay, faStop, faClipboard, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { grey } from "@mui/material/colors";
 import Avatar from "../components/Avatar";
 import { useContext, useEffect, useState } from "react";
@@ -20,10 +20,10 @@ function getServerStatus(serverStatusType: string){
     return <Chip color="error" label="Offline"/>;
   }
   if(serverStatusType == "STARTING"){
-    return <Chip color="warning" label="Startet"/>;
+    return <Chip color="warning" label="Starting"/>;
   }
   if(serverStatusType == "STOPPING"){
-    return <Chip color="warning" label="Stoppt"/>;    
+    return <Chip color="warning" label="Stopping"/>;    
   }
 }
 
@@ -156,7 +156,7 @@ function ServerView() {
                 </Stack>
                 <Stack direction="row">
                   <IconButton 
-                        aria-label="start"
+                        aria-label="Start"
                         disabled = {server.serverStatusType == "ONLINE"}
                         onMouseDown={(e) => {e.stopPropagation()}} 
                         onClick={(e) => {e.stopPropagation();
@@ -166,7 +166,7 @@ function ServerView() {
                       <FontAwesomeIcon icon={faPlay}/>
                   </IconButton>
                   <IconButton 
-                        aria-label="stop"
+                        aria-label="Stop"
                         disabled = {server.serverStatusType == "OFFLINE"}
                         onMouseDown={(e) => {e.stopPropagation()}} 
                         onClick={(e) => {e.stopPropagation();
@@ -176,7 +176,7 @@ function ServerView() {
                       <FontAwesomeIcon icon={faStop}/>
                   </IconButton>
                   <IconButton
-                        aria-label="delete"
+                        aria-label="Delete"
                         onMouseDown={(e) => {e.stopPropagation()}} 
                         onClick={(e) => {e.stopPropagation();
                                         e.preventDefault();
@@ -203,8 +203,8 @@ function ServerView() {
                   <Stack direction="column" spacing={1}>
                     <Typography variant="h6">Status</Typography>
                     {server.serverStatusType == "ONLINE" ? 
-                      <Typography>Online seit: {new Date(server.startTime*1000).toLocaleDateString()} {new Date(server.startTime*1000).toLocaleTimeString()}</Typography>
-                      : <Typography>Offline seit:
+                      <Typography>Online since: {new Date(server.startTime*1000).toLocaleDateString()} {new Date(server.startTime*1000).toLocaleTimeString()}</Typography>
+                      : <Typography>Offline since:
                         {
                            server.stopTime?
                               ` ${new Date(server.stopTime*1000).toLocaleDateString()} ${new Date(server.stopTime*1000).toLocaleTimeString()}`
@@ -215,7 +215,8 @@ function ServerView() {
                     }
                     { server.serverPassword ? 
                       <Stack direction="row">
-                        <Typography sx={{lineHeight: "38px"}}>{showPassword ? server.serverPassword : server.serverPassword.replace(/./g, "\u25CF")}</Typography>
+                        <Typography sx={{lineHeight: "38px"}}>Password:&nbsp;</Typography>
+                        <Typography sx={{lineHeight: "38px", fontFamily: "monospace"}}>{showPassword ? server.serverPassword : server.serverPassword.replace(/./g, "\u25CF")}</Typography>
                         <IconButton onClick={() => setShowPassword(!showPassword)}>
                           <FontAwesomeIcon icon={faEye} />
                         </IconButton>
@@ -227,7 +228,7 @@ function ServerView() {
                   <Stack direction="column" justifyContent="center">
                     <Box display="flex">
                       <IconButton 
-                            aria-label="IP teilen" 
+                            aria-label="Copy IP Address" 
                             size="large" 
                             sx={{display: "flex", flexDirection: "column"}} 
                             onMouseDown={(e) => {e.stopPropagation()}} 
@@ -237,15 +238,15 @@ function ServerView() {
                               navigator.clipboard.writeText(`${server.containerAddress}:${server.containerPort}`);
                               setShowLinkCopiedMessage(true);
                       }}>
-                          <FontAwesomeIcon icon={faShare}/>
-                          <Typography variant="button">IP teilen</Typography>
+                          <FontAwesomeIcon icon={faClipboard}/>
+                          <Typography variant="button">Copy IP Address</Typography>
                       </IconButton>
                     </Box>
                   </Stack>
                 </Grid>
               </Grid>
               <Stack direction="row" sx={{justifyContent: 'space-between'}}>
-                <Typography variant="h6">Projektdaten:</Typography>
+                <Typography variant="h6">Project Data</Typography>
                 <IconButton 
                             onMouseDown={(e) => {e.stopPropagation()}} 
                             onClick={(e) => {e.stopPropagation();

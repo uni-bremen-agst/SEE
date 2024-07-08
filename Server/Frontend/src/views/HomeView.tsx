@@ -10,7 +10,7 @@ function HomeView() {
       <Container sx={{padding: "3em", height:"100vh"}}>
         <Header/>
         <ServerList/>
-        <Button onClick={() => navigate('/createServer')} sx={{width:"100%", borderRadius: "15px"}} variant="contained">Hinzufügen</Button>
+        <Button onClick={() => navigate('/createServer')} sx={{width:"100%", borderRadius: "15px"}} variant="contained">New Server</Button>
       </Container>
     )
   }

@@ -1,6 +1,6 @@
-import { Button, Card, CardContent, CardMedia, Divider, FormControl, FormHelperText, TextField } from "@mui/material";
+import { Button, Card, CardContent, CardMedia, Divider, FormControl, FormHelperText, Input, InputLabel, TextField } from "@mui/material";
 import  seeLogo from "../img/see-logo.png";
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 
 function LoginForm() {
@@ -9,6 +9,8 @@ function LoginForm() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(false);
+
+    const passwordInputRef = useRef<HTMLInputElement>(null);
 
     async function authenticate(){
       if(!username && !password)
@@ -21,10 +23,26 @@ function LoginForm() {
         setUser(getUserResponse.data);
       } catch (e) {
         setError(true);
-
+        if (passwordInputRef.current) {
+          passwordInputRef.current.select();
+        }
       }
     }
-      
+
+    const handleUsernameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        if (passwordInputRef.current) {
+          passwordInputRef.current.focus();
+          passwordInputRef.current.select();
+        }
+      }
+    };
+
+    const handlePasswordKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        authenticate();
+      }
+    };
 
     return (
       <Card sx={{borderRadius: "25px"}}>
@@ -39,25 +57,35 @@ function LoginForm() {
         <CardContent>
           <FormControl sx={{width: "100%"}} error={error}>
             <TextField 
-              label="Benutzername" 
+              label="Username" 
               type="text" 
               sx={{width: "100%", marginBottom:"1em"}} 
               InputProps={{sx: {borderRadius: "15px"}}} 
               variant="standard"
               value={username} 
-              onChange={(e) => setUsername(e.target.value)} 
+              onChange={(e) => {setError(false); setUsername(e.target.value)}} 
+              onKeyDown={handleUsernameKeyDown}
+              autoFocus
             />
             <TextField 
-              label="Passwort" 
+              label="Password" 
               type="password" 
               sx={{width: "100%", marginBottom:"1em"}}
               InputProps={{sx: {borderRadius: "15px"}}} 
               variant="standard"
               value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
+              onChange={(e) => {setError(false); setPassword(e.target.value)}}
+              onKeyDown={handlePasswordKeyDown}
+              inputRef={passwordInputRef}
             />
-            <FormHelperText hidden={!error}>E-Mail und Passwort stimmen nicht überein, oder Benutzer existiert nicht.</FormHelperText>
-            <Button variant="contained" sx={{width:"100%", borderRadius: "15px", marginTop: "1em"}} onClick={() => authenticate()}>Anmelden</Button>
+            <FormHelperText hidden={!error}>Authentication failed.</FormHelperText>
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{width:"100%", borderRadius: "15px", marginTop: "1em"}}
+              onClick={() => authenticate()}>
+                Log In
+            </Button>
           </FormControl>
         </CardContent>
       </Card>

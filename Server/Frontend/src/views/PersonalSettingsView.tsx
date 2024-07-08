@@ -60,27 +60,32 @@ function PersonalSettingsView() {
       <Container sx={{padding: "3em", height:"100vh"}}>
         <Snackbar open={showChangedPassword} autoHideDuration={5000} onClose={() => setShowChangedPassword(false)}>
           <Alert onClose={() => setShowChangedPassword(false)} severity="success" sx={{width: "100%", borderRadius: "25px"}}>
-            Passwort aktualisiert.
+            Password updated.
           </Alert>
         </Snackbar>
         <Snackbar open={showChangedUsername} autoHideDuration={5000} onClose={() => setShowChangedUsername(false)}>
           <Alert onClose={() => setShowChangedUsername(false)} severity="success" sx={{width: "100%", borderRadius: "25px"}}>
-            Benutzername aktualisiert.
+            Username updated.
           </Alert>
         </Snackbar>
         <Header/>
         <Card sx={{marginTop: "2em", borderRadius: "25px", height: "calc(100% - 100px)", overflow: "auto"}}>
           <CardContent sx={{height: "calc(100% - 3em)"}}>
             <Stack direction="column" spacing={2} height={"100%"}>
-              <Typography variant="h4"><Box display={"inline"} sx={{"&:hover" : {cursor: "pointer"}}}><FontAwesomeIcon icon={faArrowLeft} onClick={() => navigate(-1)}/></Box> Benutzereinstellungen</Typography>              
-              <Typography variant="h6">Benutzername ändern:</Typography>
+              <Typography variant="h4">
+                <Box display={"inline"} sx={{"&:hover" : {cursor: "pointer"}}}>
+                  <FontAwesomeIcon icon={faArrowLeft} onClick={() => navigate(-1)}/>&nbsp;
+                </Box>
+                User Settings
+              </Typography>
+              <Typography variant="h6">Change Username</Typography>
               <TextField 
-                label="Neuer Benutzername" 
+                label="New username" 
                 variant="standard" value={newUsername} 
                 onChange={(e) => setNewUsername(e.target.value)}
               />
               <TextField 
-                label="Aktuelles Passwort" 
+                label="Current password" 
                 variant="standard" 
                 type="password"
                 error={!!changeUserNameErrors.get("changeUsernamePassword")}
@@ -90,28 +95,12 @@ function PersonalSettingsView() {
               />
               <Stack justifyContent="end" direction="row" spacing={2}>
                 <Button variant="contained" sx={{borderRadius:"25px"}} onClick={() => updateUsername()}>
-                    Speichern
+                    Save
                 </Button>
               </Stack>
-              <Typography variant="h6">Passwort ändern:</Typography>
+              <Typography variant="h6">Change Password</Typography>
               <TextField 
-                label="Neues Passwort" 
-                variant="standard" 
-                type="password"
-                value={newPassword} 
-                onChange={(e) => setNewPassword(e.target.value)}
-              />
-              <TextField 
-                label="Neues Passwort wiederholen" 
-                variant="standard" 
-                type="password"
-                value={newPasswordRepeat} 
-                error={!!changePasswordErrors.get("newPasswordRepeat")}
-                helperText={changePasswordErrors.get("newPasswordRepeat")}
-                onChange={(e) => setNewPasswordRepeat(e.target.value)}
-              />
-              <TextField 
-                label="Aktuelles Passwort" 
+                label="Current password" 
                 variant="standard" 
                 type="password"
                 value={changePasswordPassword} 
@@ -119,9 +108,25 @@ function PersonalSettingsView() {
                 helperText={changePasswordErrors.get("changePasswordPassword")}
                 onChange={(e) => setChangePasswordPassword(e.target.value)}
               />
+              <TextField 
+                label="New password" 
+                variant="standard" 
+                type="password"
+                value={newPassword} 
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+              <TextField 
+                label="Repeat new password" 
+                variant="standard" 
+                type="password"
+                value={newPasswordRepeat} 
+                error={!!changePasswordErrors.get("newPasswordRepeat")}
+                helperText={changePasswordErrors.get("newPasswordRepeat")}
+                onChange={(e) => setNewPasswordRepeat(e.target.value)}
+              />
               <Stack justifyContent="end" direction="row" spacing={2}>
                 <Button variant="contained" sx={{borderRadius:"25px"}} onClick={() => updatePassword()}>
-                    Speichern
+                    Save
                 </Button>
               </Stack>
             </Stack>

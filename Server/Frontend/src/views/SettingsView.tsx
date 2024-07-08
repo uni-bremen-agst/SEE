@@ -117,17 +117,17 @@ function SettingsView() {
           aria-labelledby="add-user-modal-title">
             <Box sx={modalStyle}>
                 <Typography id="add-user-modal-title" variant="h6">
-                  Benutzer hinzufügen
+                  Create User
                 </Typography>
                 <Stack direction="column" spacing={2}>
                   <TextField 
-                    label="Benutzername" 
+                    label="Username" 
                     variant="standard"
                     value={addUserUsername}
                     onChange={(e) => setAddUserUsername(e.target.value)}
                   />
                   <TextField 
-                    label="Passwort" 
+                    label="Password" 
                     variant="standard"
                     value={addUserPassword}
                     onChange={(e) => setAddUserPassword(e.target.value)}
@@ -152,17 +152,17 @@ function SettingsView() {
             aria-describedby="remove-user-modal-description">
               <Box sx={modalStyle}>
                   <Typography id="remove-user-modal-title" variant="h6">
-                    Benutzer entfernen
+                    Delete User
                   </Typography>
                   <Typography id="remove-user-modal-description" sx={{marginTop: "2em"}}>
-                    Sind Sie sich sicher, dass Sie den Benutzer <b>{selectedUser? selectedUser.username : ""}</b> entfernen möchten?
+                    Are you sure that you want to delete user <b>{selectedUser? selectedUser.username : ""}</b>?
                   </Typography>
                   <Stack justifyContent="end" direction="row" spacing={2} sx={{marginTop: "2em"}}>
                     <Button variant="contained" color="secondary" sx={{borderRadius:"25px"}} onClick={() => setRemoveUserModalOpen(false)}>
-                        Abbrechen
+                        Cancel
                     </Button>
                     <Button variant="contained" color="error" sx={{borderRadius:"25px"}} onClick={() => removeUser()}>
-                        Entfernen
+                        Delete
                     </Button>
                   </Stack>
               </Box>
@@ -174,17 +174,17 @@ function SettingsView() {
             aria-describedby="promote-demote-modal-description">
               <Box sx={modalStyle}>
                   <Typography id="promote-demote-modal-title" variant="h6">
-                    Benutzer {selectedUser?.roles.some((item) => item.name == "ROLE_ADMIN") ? "herabstufen" : "befördern"}
+                    {selectedUser?.roles.some((item) => item.name == "ROLE_ADMIN") ? "Demote" : "Promote"} User
                   </Typography>
                   <Typography id="promote-demote-modal-description" sx={{marginTop: "2em"}}>
-                    Sind Sie sich sicher, dass Sie den Benutzer <b>{selectedUser? selectedUser.username : ""}</b> {selectedUser?.roles.some((item) => item.name == "ROLE_ADMIN") ? "zum Benutzer herabstufen" : "zum Admin befördern"} möchten?
+                    Are you sure that you want to {selectedUser?.roles.some((item) => item.name == "ROLE_ADMIN") ? "demote" : "promote"} <b>{selectedUser? selectedUser.username : ""}</b> to {selectedUser?.roles.some((item) => item.name == "ROLE_ADMIN") ? "user" : "admin"}?
                   </Typography>
                   <Stack justifyContent="end" direction="row" spacing={2} sx={{marginTop: "2em"}}>
                     <Button variant="contained" color="secondary" sx={{borderRadius:"25px"}} onClick={() => setPromoteDemoteUserModalOpen(false)}>
-                        Abbrechen
+                        Cancel
                     </Button>
                     <Button variant="contained" sx={{borderRadius:"25px"}} onClick={() => {if(selectedUser?.roles.some((item) => item.name == "ROLE_ADMIN")){demoteUser()} else {promoteUser()}}}>
-                      {selectedUser?.roles.some((item) => item.name == "ROLE_ADMIN") ? "Herabstufen" : "Befördern"}
+                      {selectedUser?.roles.some((item) => item.name == "ROLE_ADMIN") ? "Demote" : "Promote"}
                     </Button>
                   </Stack>
               </Box>
@@ -193,8 +193,13 @@ function SettingsView() {
         <Card sx={{marginTop: "2em", borderRadius: "25px", height: "calc(100% - 100px)", overflow: "auto"}}>
           <CardContent sx={{height: "calc(100% - 3em)"}}>
             <Stack direction="column" spacing={2} height={"100%"}>
-              <Typography variant="h4"><Box display={"inline"} sx={{"&:hover" : {cursor: "pointer"}}}><FontAwesomeIcon icon={faArrowLeft} onClick={() => navigate(-1)}/></Box> Einstellungen</Typography>              
-              <Typography variant="h6">Benutzerverwaltung:</Typography>
+              <Typography variant="h4">
+                <Box display={"inline"} sx={{"&:hover" : {cursor: "pointer"}}}>
+                  <FontAwesomeIcon icon={faArrowLeft} onClick={() => navigate(-1)}/>&nbsp;
+                </Box>
+                Settings
+              </Typography>
+              <Typography variant="h6">User Management</Typography>
               <Card sx={{borderRadius: "25px", backgroundColor: grey[200], flexGrow: 1, overflow: "auto", minHeight: "100px", maxHeight: "100%"}}>
                 <CardContent>
                   <List>
@@ -227,7 +232,7 @@ function SettingsView() {
               </Card>
               <Stack justifyContent="end" direction="row" spacing={2}>
                 <Button variant="contained" sx={{borderRadius:"25px"}} onClick={() => setAddUserModalOpen(true)}>
-                    Benutzer hinzufügen
+                    New User
                 </Button>
               </Stack>
             </Stack>
