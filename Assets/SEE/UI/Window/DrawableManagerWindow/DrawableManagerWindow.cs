@@ -1,13 +1,20 @@
-﻿using Markdig.Helpers;
+﻿using Assets.SEE.Controls.Actions.Drawable;
+using Assets.SEE.DataModel.Drawable;
+using Assets.SEE.Game;
+using Assets.SEE.Game.Drawable;
+using Assets.SEE.GameObjects;
+using Cysharp.Threading.Tasks;
 using SEE.DataModel;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.UI.Menu.Drawable;
+using SEE.UI.Notification;
 using SEE.UI.Window;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 
 namespace Assets.SEE.UI.Window.DrawableManagerWindow
@@ -49,9 +56,9 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
         private DrawableWindowContextMenu contextMenu;
 
         /// <summary>
-        /// TODO: BRauchen wir?
+        /// 
         /// </summary>
-        private IDisposable subscription;
+        private List<IDisposable> subscriptions = new();
 
         /// <summary>
         /// Adds the drawable surfaces of the visualization to the drawable manager view.
@@ -118,24 +125,43 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
                     Destroyer.Destroy(child.gameObject);
                 }
             }
+            surfaceItems.Clear();
         }
 
+        /// <summary>
+        /// Register the observer.
+        /// First, an observer ti detect when surfaces are added or removed.
+        /// Then, an observer for each existing surface. 
+        /// </summary>
         protected override void Start()
         {
-            //subscription = 
+            if (LocalPlayer.TryGetDrawableSurfaces(out DrawableSurfaces surfaces))
+            {
+                subscriptions.Add(surfaces.Subscribe(this));
+            }
+            foreach(GameObject surface in ValueHolder.DrawableSurfaces)
+            {
+                subscriptions.Add(surface.GetComponent<DrawableSurfaceRef>().Value.Subscribe(this));
+            }
             base.Start();
         }
 
+        /// <summary>
+        /// If the menu is destroyed, dispose the observers and close any open <see cref="SurfaceColorMenu"/>
+        /// if necessary.
+        /// </summary>
         private void OnDestroy()
         {
-            //subscription.Dispose();
+            foreach (IDisposable subscription in subscriptions) 
+            {
+                subscription.Dispose();
+            } 
+           
             if (SurfaceColorMenu.IsOpen())
             {
                 SurfaceColorMenu.Disable();
             }
         }
-
-
 
         #region BaseWindow & Observer
         public override void RebuildLayout()
@@ -169,16 +195,98 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
             throw error;
         }
 
+        /// <summary>
+        /// Responds to an event.
+        /// </summary>
+        /// <param name="value">The event.</param>
         public void OnNext(ChangeEvent value)
         {
-            /// Rebuild tree when surface changes.
             switch(value)
             {
-                default:
-                    Rebuild();
+                case DescriptionChangeEvent:
+                    Rebuild(contextMenu.filter.GetFilteredSurfaces());
+                    break;
+                case ColorChangeEvent e:
+                    if (surfaceItems.TryGetValue(GameFinder.GetUniqueID(e.Surface.CurrentObject), out GameObject item))
+                    {
+                        Transform foreground = item.transform.Find("Foreground");
+                        TextMeshProUGUI colorMesh = foreground.Find("ColorBtn").gameObject.GetComponentInChildren<TextMeshProUGUI>();
+                        colorMesh.color = e.Surface.Color;
+                    }
+                    break;
+                case LightingChangeEvent e:
+                    if (surfaceItems.TryGetValue(GameFinder.GetUniqueID(e.Surface.CurrentObject), out GameObject itemObj))
+                    {
+                        Transform foreground = itemObj.transform.Find("Foreground");
+                        TextMeshProUGUI lightMesh = foreground.Find("LightingBtn").gameObject.GetComponentInChildren<TextMeshProUGUI>();
+                        lightMesh.color = GetLightColor(e.Surface.Lighting);
+
+                        if (e.Surface.Lighting && !contextMenu.filter.IncludeHaveLighting
+                        || !e.Surface.Lighting && !contextMenu.filter.IncludeHaveNoLighting)
+                        {
+                            RemoveItem(itemObj);
+                        }
+                    }
+                    break;
+                case VisibilityChangeEvent e:
+                    if (surfaceItems.TryGetValue(GameFinder.GetUniqueID(e.Surface.CurrentObject), out GameObject itemV))
+                    {
+                        Transform foreground = itemV.transform.Find("Foreground");
+                        TextMeshProUGUI visibilityMesh = foreground.Find("VisibilityBtn").gameObject.GetComponentInChildren<TextMeshProUGUI>();
+                        visibilityMesh.text = GetVisibilityText(e.Surface.Visibility);
+                        visibilityMesh.color = GetVisibilityColor(e.Surface.Visibility);
+
+                        if (e.Surface.Visibility && !contextMenu.filter.IncludeIsVisible
+                        || !e.Surface.Visibility && !contextMenu.filter.IncludeIsInvisibile)
+                        {
+                            RemoveItem(itemV);
+                        }
+                    }
+                    break;
+                case AddSurfaceEvent e:
+                    if (!e.Surface.InitFinishIndicator)
+                    {
+                        WaitForInitAsync(e.Surface).Forget();
+                    }
+                    else
+                    {
+                        if (!subscriptions.Contains(e.Surface.Subscribe(this)))
+                        {
+                            subscriptions.Add(e.Surface.Subscribe(this));
+                        }
+                        Rebuild();
+                    }
+                    break;
+                case RemoveSurfaceEvent e:
+                    if (surfaceItems.TryGetValue(GameFinder.GetUniqueID(e.Surface.CurrentObject), out GameObject toDelete))
+                    {
+                        RemoveItem(toDelete);
+                    }
                     break;
             }
         }
+
+        /// <summary>
+        /// Waits for the complete instantiation of a <see cref="DrawableSurface"> before adding the surface to the window. 
+        /// This prevents incorrect display and other resulting errors.
+        /// </summary>
+        /// <param name="surface">The surface to be displayed.</param>
+        /// <returns>Nothing, it waits until the surface is instantiated.</returns>
+        private async UniTask WaitForInitAsync(DrawableSurface surface)
+        {
+            while (!surface.InitFinishIndicator)
+            {
+                await UniTask.Yield();
+            }
+            if (!subscriptions.Contains(surface.Subscribe(this)))
+            {
+                subscriptions.Add(surface.Subscribe(this));
+            }
+            Rebuild();
+            GameObject UICanvas = GameObject.Find("UI Canvas");
+            UICanvas.SetActive(false);
+            UICanvas.SetActive(true);
+        } 
         #endregion
     }
 }

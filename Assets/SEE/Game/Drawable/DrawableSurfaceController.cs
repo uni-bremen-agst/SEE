@@ -1,5 +1,9 @@
-﻿using SEE.Game;
+﻿using Assets.SEE.DataModel.Drawable;
+using Assets.SEE.GameObjects;
+using LibGit2Sharp;
+using SEE.Game;
 using SEE.Game.Drawable;
+using SEE.GO;
 using UnityEngine;
 
 namespace Assets.SEE.Game.Drawable
@@ -12,6 +16,11 @@ namespace Assets.SEE.Game.Drawable
     public class DrawableSurfaceController : MonoBehaviour
     {
         /// <summary>
+        /// Status indicating whether the instantiation of the <see cref="LocalPlayer.Instance"> needs to be awaited.
+        /// </summary>
+        bool mustWaitForPlayerInstantiate = false;
+
+        /// <summary>
         /// With this method, the surface is added to the list as soon as it is created.
         /// </summary>
         void Awake()
@@ -20,7 +29,32 @@ namespace Assets.SEE.Game.Drawable
                 && gameObject.CompareTag(Tags.Drawable)) 
             {
                 ValueHolder.DrawableSurfaces.Add(gameObject);
+
+                DrawableSurfaceRef reference = gameObject.AddComponent<DrawableSurfaceRef>();
+                reference.Value = new DrawableSurface(gameObject);
+                if (LocalPlayer.Instance != null && LocalPlayer.TryGetDrawableSurfaces(out DrawableSurfaces surfaces))
+                {
+                    surfaces.Add(reference.Value);
+                } else
+                {
+                    mustWaitForPlayerInstantiate = true;
+                }
             }        
+        }
+
+        /// <summary>
+        /// At the start of the visualization, the <see cref="LocalPlayer.Instance"/> is not yet set, so it is necessary to wait until it is set to avoid an error.
+        /// </summary>
+        void Update()
+        {
+            if (mustWaitForPlayerInstantiate 
+                && LocalPlayer.Instance != null 
+                && LocalPlayer.TryGetDrawableSurfaces(out DrawableSurfaces surfaces))
+            {
+                DrawableSurfaceRef reference = gameObject.GetComponent<DrawableSurfaceRef>();
+                surfaces.Add(reference.Value);
+                mustWaitForPlayerInstantiate = false;
+            }
         }
 
         /// <summary>
@@ -29,6 +63,10 @@ namespace Assets.SEE.Game.Drawable
         void OnDestroy()
         {
             ValueHolder.DrawableSurfaces.Remove(gameObject);
+            if (LocalPlayer.Instance != null && LocalPlayer.TryGetDrawableSurfaces(out DrawableSurfaces surfaces))
+            {
+                surfaces.Remove(gameObject.GetComponent<DrawableSurfaceRef>().Value);
+            }
         }
     }
 }

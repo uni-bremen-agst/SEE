@@ -1,7 +1,10 @@
-﻿using Assets.SEE.Game.Drawable.ValueHolders;
+﻿using Assets.SEE.DataModel.Drawable;
+using Assets.SEE.Game.Drawable.ValueHolders;
+using Assets.SEE.GameObjects;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.GO;
 using UnityEngine;
 
 namespace Assets.SEE.Game.Drawable
@@ -15,10 +18,15 @@ namespace Assets.SEE.Game.Drawable
         /// <param name="color">The new color for the drawable</param>
         public static void ChangeColor(GameObject obj, Color color)
         {
-            if (GameFinder.GetDrawableSurface(obj) != null
-                && GameFinder.GetDrawableSurface(obj).GetComponent<MeshRenderer>() != null)
+            GameObject surfaceObj = GameFinder.GetDrawableSurface(obj);
+            if (surfaceObj != null
+                && surfaceObj.GetComponent<MeshRenderer>() != null)
             {
-                GameFinder.GetDrawableSurface(obj).GetComponent<MeshRenderer>().material.color = color;
+                surfaceObj.GetComponent<MeshRenderer>().material.color = color;
+                if (surfaceObj.TryGetDrawableSurface(out DrawableSurface surface))
+                {
+                    surface.Color = color;
+                }
             }
         }
 
@@ -31,6 +39,10 @@ namespace Assets.SEE.Game.Drawable
         {
             Transform transform = GameFinder.GetDrawableSurfaceParent(obj).transform;
             transform.GetComponentInChildren<Light>().enabled = state;
+            if (GameFinder.GetDrawableSurface(obj).TryGetDrawableSurface(out DrawableSurface surface))
+            {
+                surface.Lighting = state;
+            }
         }
 
         /// <summary>
@@ -51,6 +63,10 @@ namespace Assets.SEE.Game.Drawable
         public static void ChangeDescription(GameObject obj, string description)
         {
             GameFinder.GetDrawableSurface(obj).GetComponent<DrawableHolder>().Description = description;
+            if (GameFinder.GetDrawableSurface(obj).TryGetDrawableSurface(out DrawableSurface surface))
+            {
+                surface.Description = description;
+            }
         }
 
         /// <summary>
@@ -64,6 +80,10 @@ namespace Assets.SEE.Game.Drawable
         public static void ChangeVisibility(GameObject obj, bool visibility)
         {
             GameFinder.GetHighestParent(obj).SetActive(visibility);
+            if (GameFinder.GetDrawableSurface(obj).TryGetDrawableSurface(out DrawableSurface surface))
+            {
+                surface.Visibility = visibility;
+            }
         }
 
         /// <summary>

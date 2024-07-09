@@ -72,7 +72,6 @@ namespace SEE.Game.Drawable
             while (GameObject.Find(name) != null)
             {
                 name = ValueHolder.StickyNotePrefix + "-" + RandomStrings.GetRandomString(8);
-                Debug.Log("Neuer name: " + name);
             }
             return name;
         }
@@ -106,6 +105,10 @@ namespace SEE.Game.Drawable
             OrderInLayerValueHolder holder = stickyNote.AddComponent<OrderInLayerValueHolder>();
             holder.OriginPosition = config.Position + config.Order * ValueHolder.DistanceToDrawable.z * stickyNote.transform.forward;
             holder.OrderInLayer = config.Order;
+
+            DrawableHolder drawableHolder = stickyNote.GetComponentInChildren<DrawableHolder>();
+            drawableHolder.OrderInLayer = config.OrderInLayer;
+            drawableHolder.Description = config.Description;
             return stickyNote;
         }
 

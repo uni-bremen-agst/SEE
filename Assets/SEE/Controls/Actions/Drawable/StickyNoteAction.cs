@@ -870,7 +870,7 @@ namespace SEE.Controls.Actions.Drawable
                 if (GameFinder.GetDrawableSurfaceParentName(surface).Contains(ValueHolder.StickyNotePrefix))
                 {
                     memento = new(DrawableConfigManager.GetDrawableConfig(surface), selectedAction);
-                    new StickyNoteDeleterNetAction(GameFinder.GetHighestParent(surface).name).Execute();
+                    new StickyNoteDeleterNetAction(DrawableConfigManager.GetDrawableConfig(surface)).Execute();
                     Destroyer.Destroy(GameFinder.GetHighestParent(surface));
                     CurrentState = IReversibleAction.Progress.Completed;
                     return true;
@@ -918,10 +918,10 @@ namespace SEE.Controls.Actions.Drawable
             switch (memento.Action)
             {
                 case Operation.Spawn:
-                    GameObject toDelete = GameFinder.GetHighestParent(
-                        GameFinder.FindDrawableSurface(memento.OriginalConfig.ID, memento.OriginalConfig.ParentID));
-                    new StickyNoteDeleterNetAction(toDelete.name).Execute();
-                    Destroyer.Destroy(toDelete);
+                    GameObject toDeleteSurface = GameFinder.FindDrawableSurface(memento.OriginalConfig.ID, 
+                        memento.OriginalConfig.ParentID);
+                    new StickyNoteDeleterNetAction(DrawableConfigManager.GetDrawableConfig(toDeleteSurface)).Execute();
+                    Destroyer.Destroy(GameFinder.GetHighestParent(toDeleteSurface));
                     break;
                 case Operation.Move:
                     GameObject stickyHolder = GameFinder.GetHighestParent(
@@ -981,10 +981,10 @@ namespace SEE.Controls.Actions.Drawable
                     new StickyNoteChangeNetAction(memento.ChangedConfig).Execute();
                     break;
                 case Operation.Delete:
-                    GameObject toDelete = GameFinder.GetHighestParent(GameFinder.FindDrawableSurface(memento.OriginalConfig.ID,
-                        memento.OriginalConfig.ParentID));
-                    new StickyNoteDeleterNetAction(toDelete.name).Execute();
-                    Destroyer.Destroy(toDelete);
+                    GameObject toDeleteSurface = GameFinder.FindDrawableSurface(memento.OriginalConfig.ID,
+                        memento.OriginalConfig.ParentID);
+                    new StickyNoteDeleterNetAction(DrawableConfigManager.GetDrawableConfig(toDeleteSurface)).Execute();
+                    Destroyer.Destroy(GameFinder.GetHighestParent(toDeleteSurface));
                     break;
             }
         }

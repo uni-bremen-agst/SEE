@@ -45,6 +45,11 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
         private readonly ISet<string> expandedItems = new HashSet<string>();
 
         /// <summary>
+        /// This dictionary holds the item for a surface name.
+        /// </summary>
+        private readonly Dictionary<string, GameObject> surfaceItems = new();
+
+        /// <summary>
         /// The amount by which the text of an item is indented per level.
         /// </summary>
         private const int indentShift = 22;
@@ -153,6 +158,8 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
         private void RemoveItem(GameObject item)
         {
             Destroyer.Destroy(item);
+            string key = surfaceItems.FirstOrDefault(x=>x.Value == item).Key;
+            surfaceItems.Remove(key);
         }
 
         /// <summary>
@@ -387,25 +394,9 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
             ColorItem();
             RegisterClickHandler();
             AnimateIn();
+
+            surfaceItems.Add(GameFinder.GetUniqueID(surface), item);
             return item;
-
-            /// Get the icon for the visibility mesh.
-            string GetVisibilityText(bool state)
-            {
-                return state ? Icons.Show.ToString() : Icons.Hide.ToString();
-            }
-
-            /// Get the color for the visibility icon.
-            Color GetVisibilityColor(bool state)
-            {
-                return state ? Color.white : Color.red.Darker();
-            }
-
-            /// Get the color for the lighting icon.
-            Color GetLightColor(bool state)
-            {
-                return state ? Color.yellow : Color.white;
-            }
 
             /// Changes the item color.
             void ColorItem()
@@ -447,6 +438,24 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
                     });
                 }
             }
+        }
+
+        /// Get the icon for the visibility mesh.
+        string GetVisibilityText(bool state)
+        {
+            return state ? Icons.Show.ToString() : Icons.Hide.ToString();
+        }
+
+        /// Get the color for the visibility icon.
+        Color GetVisibilityColor(bool state)
+        {
+            return state ? Color.white : Color.red.Darker();
+        }
+
+        /// Get the color for the lighting icon.
+        Color GetLightColor(bool state)
+        {
+            return state ? Color.yellow : Color.white;
         }
     }
 }

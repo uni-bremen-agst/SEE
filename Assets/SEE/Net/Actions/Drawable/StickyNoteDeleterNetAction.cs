@@ -1,4 +1,6 @@
 ﻿using SEE.Controls.Actions.Drawable;
+using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
 using SEE.Utils;
 using UnityEngine;
 
@@ -7,19 +9,19 @@ namespace SEE.Net.Actions.Drawable
     /// <summary>
     /// This class is reponsible for delete <see cref="StickyNoteAction"/> a sticky note on all clients.
     /// </summary>
-    public class StickyNoteDeleterNetAction : AbstractNetAction
+    public class StickyNoteDeleterNetAction : DrawableNetAction
     {
         /// <summary>
         /// The sticky note that should be delete.
         /// </summary>
-        public string StickyNoteID;
+        public DrawableConfig Conf;
 
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        public StickyNoteDeleterNetAction(string stickyNoteID)
+        public StickyNoteDeleterNetAction(DrawableConfig conf) : base(conf.ID, conf.ParentID)
         {
-            this.StickyNoteID = stickyNoteID;
+            this.Conf = conf;
         }
 
         /// <summary>
@@ -37,7 +39,8 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                Destroyer.Destroy(GameObject.Find(StickyNoteID));
+                base.ExecuteOnClient();
+                Destroyer.Destroy(GameFinder.GetHighestParent(Surface));
             }
         }
     }

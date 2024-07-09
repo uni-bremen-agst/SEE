@@ -382,8 +382,7 @@ namespace SEE.Controls.Actions.Drawable
                         {
                             GameObject surface = GameFinder.FindDrawableSurface(config.ID,
                                 config.ParentID);
-                            new StickyNoteDeleterNetAction(GameFinder.GetHighestParent(surface)
-                                .name).Execute();
+                            new StickyNoteDeleterNetAction(DrawableConfigManager.GetDrawableConfig(surface)).Execute();
                             Destroyer.Destroy(GameFinder.GetHighestParent(surface));
                         }
                         else
