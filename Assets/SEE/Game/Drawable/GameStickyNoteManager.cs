@@ -1,5 +1,6 @@
 ﻿using Assets.SEE.Game.Drawable;
 using Assets.SEE.Game.Drawable.ValueHolders;
+using Cysharp.Threading.Tasks;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Utils;
@@ -109,7 +110,32 @@ namespace SEE.Game.Drawable
             DrawableHolder drawableHolder = stickyNote.GetComponentInChildren<DrawableHolder>();
             drawableHolder.OrderInLayer = config.OrderInLayer;
             drawableHolder.Description = config.Description;
+
+            if (config.GetAllDrawableTypes().Count > 0)
+            {
+                ChangeVisibilityAfterLoadDrawablesAsync(stickyNote, config).Forget();
+            } else
+            {
+                GameDrawableManager.ChangeVisibility(stickyNote, config.Visibility);
+            }
             return stickyNote;
+        }
+
+        /// <summary>
+        /// Visibility restoration can only occur after the drawables have been restored, 
+        /// as the parent object DrawableHolder and its associated AttachedObject object do not exist yet. 
+        /// Failure to wait here would result in altering the visibility of the wrong object.
+        /// </summary>
+        /// <param name="stickyNote">The sticky note to be restored.</param>
+        /// <param name="config">The depending config to restore.</param>
+        /// <returns>Nothing, it waits until the sticky note has been converted.</returns>
+        private static async UniTask ChangeVisibilityAfterLoadDrawablesAsync(GameObject stickyNote, DrawableConfig config)
+        {
+            while (!GameFinder.GetHighestParent(stickyNote).name.Contains(ValueHolder.DrawableHolderPrefix))
+            {
+                await UniTask.Yield();
+            }
+            GameDrawableManager.ChangeVisibility(stickyNote, config.Visibility);
         }
 
         /// <summary>

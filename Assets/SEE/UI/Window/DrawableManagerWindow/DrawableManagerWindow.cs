@@ -2,6 +2,7 @@
 using Assets.SEE.DataModel.Drawable;
 using Assets.SEE.Game;
 using Assets.SEE.Game.Drawable;
+using Assets.SEE.Game.Drawable.ActionHelpers;
 using Assets.SEE.GameObjects;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel;
@@ -283,10 +284,9 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
                 subscriptions.Add(surface.Subscribe(this));
             }
             Rebuild();
-            GameObject UICanvas = GameObject.Find("UI Canvas");
-            UICanvas.SetActive(false);
-            UICanvas.SetActive(true);
-        } 
+            Refresher.UICanvas();
+        }
+
         #endregion
     }
 }

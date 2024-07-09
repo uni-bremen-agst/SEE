@@ -1,4 +1,5 @@
-﻿using SEE.Controls;
+﻿using Assets.SEE.Game.Drawable.ActionHelpers;
+using SEE.Controls;
 using SEE.Game.Drawable;
 using SEE.Utils;
 using SimpleFileBrowser;
@@ -88,7 +89,7 @@ namespace SEE.UI.Drawable
             }
 
             /// Refreshes the UI canvas to prevent display issues.
-            RefreshUICanvas();
+            Refresher.UICanvas();
         }
 
         /// <summary>
@@ -149,7 +150,7 @@ namespace SEE.UI.Drawable
             }
 
             /// Refreshes the UI canvas to prevent display issues.
-            RefreshUICanvas();
+            Refresher.UICanvas();
         }
 
         /// <summary>
@@ -187,7 +188,7 @@ namespace SEE.UI.Drawable
             }
 
             /// Refreshes the UI canvas to prevent display issues.
-            RefreshUICanvas();
+            Refresher.UICanvas();
         }
 
         /// <summary>
@@ -227,17 +228,6 @@ namespace SEE.UI.Drawable
 
             filePath = "";
             return false;
-        }
-
-        /// <summary>
-        /// The UI canvas needs to be refreshed after the file browser has been opened, 
-        /// as otherwise, the inputs will not be processed correctly.
-        /// </summary>
-        private void RefreshUICanvas()
-        {
-            GameObject UICanvas = GameObject.Find("UI Canvas");
-            UICanvas.SetActive(false);
-            UICanvas.SetActive(true);
         }
     }
 }

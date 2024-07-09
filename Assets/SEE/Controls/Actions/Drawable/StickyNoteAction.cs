@@ -85,7 +85,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The original configuration of the sticky note.
             /// </summary>
-            public readonly DrawableConfig OriginalConfig;
+            public DrawableConfig OriginalConfig;
 
             /// <summary>
             /// The changed configuration of the sticky note.
@@ -983,6 +983,8 @@ namespace SEE.Controls.Actions.Drawable
                 case Operation.Delete:
                     GameObject toDeleteSurface = GameFinder.FindDrawableSurface(memento.OriginalConfig.ID,
                         memento.OriginalConfig.ParentID);
+                    /// Save the current state of the Sticky Note; another user may have made changes.
+                    memento.OriginalConfig = DrawableConfigManager.GetDrawableConfig(toDeleteSurface);
                     new StickyNoteDeleterNetAction(DrawableConfigManager.GetDrawableConfig(toDeleteSurface)).Execute();
                     Destroyer.Destroy(GameFinder.GetHighestParent(toDeleteSurface));
                     break;
