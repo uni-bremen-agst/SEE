@@ -1,9 +1,11 @@
 package de.unibremen.swt.see.manager.service;
 
+import de.unibremen.swt.see.manager.model.Config;
 import de.unibremen.swt.see.manager.model.File;
 import de.unibremen.swt.see.manager.model.FileType;
 import de.unibremen.swt.see.manager.model.Server;
 import de.unibremen.swt.see.manager.model.ServerStatusType;
+import de.unibremen.swt.see.manager.repository.ConfigRepository;
 import de.unibremen.swt.see.manager.repository.ServerRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -15,6 +17,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,6 +43,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class ServerService {
 
     /**
+     * Used to access the back-end configuration.
+     */
+    private final ConfigRepository configRepo;
+
+    /**
      * Enables server data persistence and retrieval for this service.
      */
     private final ServerRepository serverRepo;
@@ -60,6 +68,20 @@ public class ServerService {
      */
     @PersistenceContext
     private EntityManager entityManager;
+
+    /**
+     * The external address of the Docker server.
+     * <p>
+     * This is the address that any game server instance running in a container
+     * is accessible by.
+     */
+    @Value("${see.app.docker.host.external}")
+    private String externalDockerHost;
+
+    /**
+     * Used for the random port generation.
+     */
+    private final Random random = new Random();
 
     /**
      * Retrieves a server by its ID (read-only).
@@ -85,17 +107,35 @@ public class ServerService {
     }
 
     /**
-     * Saves or updates the given server in the database.
+     * Creates a new server with the given data.
      * <p>
-     * If the entity has no ID, it will be inserted as a new record. If the
-     * entity has an ID, it will update the existing record.
+     * Attributes {@code containerAddress} and {@code containerPort} will be set
+     * automatically. A unique random port number will be generated. If port
+     * assignment fails after several tries, the server cannot be created. If
+     * that happens regularly, it might be a good idea to configure a larger
+     * port range.
      *
-     * @param server the server to be saved or updated
-     * @return the saved server containing an ID
+     * @param server the server to be created
+     * @return the newly created server, or {@code null}
      */
-    public Server save(Server server) {
+    public Server create(Server server) {
         log.info("Saving server {}", server.getName());
-        return serverRepo.save(server);
+        server.setContainerAddress(externalDockerHost);
+
+        UUID serverId = server.getId();
+        if (serverId != null && serverRepo.findServerById(serverId).isPresent()) {
+            throw new RuntimeException("The server is already present in the database!");
+        }
+
+        Integer port = generateRandomPort();
+        if (port == null) {
+            log.error("Not able to assign unique port after several tries!");
+            return null;
+        }
+
+        server.setContainerPort(port);
+        server = serverRepo.save(server);
+        return server;
     }
 
     /**
@@ -224,6 +264,48 @@ public class ServerService {
             throw new EntityNotFoundException("No entity found with ID " + serverId);
         }
         return (server.getServerPassword() == null || server.getServerPassword().isEmpty() || server.getServerPassword().equals(roomPassword));
+    }
+
+    /**
+     * Generates a random port in the range defined in the server settings.
+     * <p>
+     * Checks if the port is already used and tries several times to assign a
+     * new random port.
+     * <p>
+     * This might still clash in some edge cases if the database is not locked
+     * during creation (race condition).
+     *
+     * @return random port number
+     */
+    private Integer generateRandomPort() {
+        final Config config = resolveConfig();
+        final int min = config.getMinContainerPort();
+        final int max = config.getMaxContainerPort();
+
+        Integer port = null;
+        for (int tries = 10; tries > 0; tries--) {
+            final int newPort = random.nextInt(max - min) + min;
+            if (serverRepo.findServerByContainerPort(newPort).isEmpty()) {
+                port = newPort;
+                break;
+            }
+        }
+
+        return port;
+    }
+
+    /**
+     * Resolves the configuration.
+     *
+     * @return the configuration
+     * @throws RuntimeException if the configuration could not be found
+     */
+    private Config resolveConfig() {
+        final Optional<Config> optConfig = configRepo.findConfigById(1);
+        if (optConfig.isEmpty()) {
+            throw new RuntimeException("Server configuration could not be found!");
+        }
+        return optConfig.get();
     }
 
 }

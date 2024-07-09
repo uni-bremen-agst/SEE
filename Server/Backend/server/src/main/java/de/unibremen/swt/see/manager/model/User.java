@@ -18,7 +18,7 @@ import lombok.Setter;
 @Setter
 @Table(name = "users",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = "name")
+            @UniqueConstraint(columnNames = {"username"})
         })
 public class User {
     

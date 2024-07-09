@@ -1,0 +1,7 @@
+# Game server files
+/bin/
+
+# Misplaced game server files
+*.so
+*.x86_64
+*_Data

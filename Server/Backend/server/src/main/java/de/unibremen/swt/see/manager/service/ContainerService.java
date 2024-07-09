@@ -17,22 +17,18 @@ import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.core.DockerClientImpl;
 import com.github.dockerjava.transport.DockerHttpClient;
 import com.github.dockerjava.zerodep.ZerodepDockerHttpClient;
-import de.unibremen.swt.see.manager.model.Config;
 import de.unibremen.swt.see.manager.model.Server;
 import de.unibremen.swt.see.manager.model.ServerStatusType;
 import static de.unibremen.swt.see.manager.model.ServerStatusType.ERROR;
 import static de.unibremen.swt.see.manager.model.ServerStatusType.ONLINE;
 import static de.unibremen.swt.see.manager.model.ServerStatusType.STARTING;
 import static de.unibremen.swt.see.manager.model.ServerStatusType.STOPPING;
-import de.unibremen.swt.see.manager.repository.ConfigRepository;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,18 +54,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class ContainerService {
 
     /**
-     * Used to access the back-end configuration.
-     */
-    private final ConfigRepository configRepo;
-    /**
      * Used to access server files.
      */
     private final FileService fileService;
-
-    /**
-     * Used for the random port generation.
-     */
-    private final Random random = new Random();
 
     /**
      * Used to spawn and control containers.
@@ -86,7 +73,7 @@ public class ContainerService {
     private String dockerHost;
 
     final static String CONTAINER_VOLUME_PATH = "/app/gameserver_Data/StreamingAssets/Multiplayer/";
-    final static int CONTAINER_PORT = 55555;
+    final static int CONTAINER_PORT = 7777;
 
     /**
      * Does custom initialization after the service has been constructed.
@@ -143,13 +130,9 @@ public class ContainerService {
                 throw new IllegalStateException("Server is in ERROR state!");
         }
 
-        final Config config = resolveConfig();
         final String containerName = "see-" + server.getId();
         final String volumeName = "see-data-" + server.getId();
         Integer port = server.getContainerPort();
-        if (port == null) {
-            port = getRandomPort(config.getMinContainerPort(), config.getMaxContainerPort());
-        }
         String containerId = server.getContainerId();
 
         if (containerId != null && containerExists(containerId)) {
@@ -214,17 +197,6 @@ public class ContainerService {
     }
 
     /**
-     * Generates a random port in the defined range.
-     *
-     * @param min lower bound of the port range
-     * @param max upper bound of the port range
-     * @return random port number
-     */
-    private int getRandomPort(int min, int max) {
-        return random.nextInt(max - min) + min;
-    }
-
-    /**
      * Checks if a container is running for given server.
      *
      * @param server the server configuration
@@ -264,20 +236,6 @@ public class ContainerService {
         } catch (NotFoundException e) {
             return null;
         }
-    }
-
-    /**
-     * Resolves the configuration.
-     *
-     * @return the configuration
-     * @throws RuntimeException if the configuration could not be found
-     */
-    private Config resolveConfig() {
-        final Optional<Config> optConfig = configRepo.findConfigById(1);
-        if (optConfig.isEmpty()) {
-            throw new RuntimeException("Server configuration could not be found!");
-        }
-        return optConfig.get();
     }
 
     /**

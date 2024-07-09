@@ -16,7 +16,10 @@ import lombok.Setter;
  */
 @Getter
 @Entity
-@Table(name = "servers")
+@Table(name = "servers",
+        uniqueConstraints = {
+            @UniqueConstraint(columnNames = {"container_port"})
+        })
 @RequiredArgsConstructor
 public class Server {
     
@@ -78,10 +81,17 @@ public class Server {
     private String containerVolume;
 
     /**
+     * The external address of the container host to access the game server.
+     */
+    @Setter
+    @Column(name = "container_address")
+    private String containerAddress;
+
+    /**
      * The port on the container host that should be bound to the container's.
      */
     @Setter
-    @Column(name = "container_port")
+    @Column(name = "container_port", unique = true)
     private Integer containerPort;
 
     /**

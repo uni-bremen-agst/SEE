@@ -57,14 +57,19 @@ public class ServerController {
     /**
      * Creates a new server.
      *
-     * @param server metadata object to save new server instance
-     * @return {@code 200 OK} with the server metadata object as payload,
-     *         or {@code 401 Unauthorized} if access cannot be granted.
+     * @param server metadata object to create new server instance
+     * @return {@code 200 OK} with the server metadata object as payload, or
+     * {@code 500 Internal Server Error} if the server could not be persisted,
+     * or {@code 401 Unauthorized} if access cannot be granted.
      */
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> createServers(@RequestBody Server server) {
-        return ResponseEntity.ok().body(serverService.save(server));
+    public ResponseEntity<?> createServer(@RequestBody Server server) {
+        server = serverService.create(server);
+        if (server == null) {
+            return ResponseEntity.internalServerError().build();
+        }
+        return ResponseEntity.ok().body(server);
     }
 
     /**

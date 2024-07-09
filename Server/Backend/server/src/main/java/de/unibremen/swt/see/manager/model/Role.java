@@ -8,7 +8,10 @@ import jakarta.persistence.*;
  * Possible values are defined in related {@code enum} {@link RoleType}.
  */
 @Entity
-@Table(name = "roles")
+@Table(name = "roles",
+        uniqueConstraints = {
+            @UniqueConstraint(columnNames = {"name"})
+        })
 public class Role {
 
     /**

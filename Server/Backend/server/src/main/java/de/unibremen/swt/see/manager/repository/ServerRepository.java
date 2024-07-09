@@ -36,6 +36,15 @@ public interface ServerRepository extends PagingAndSortingRepository<Server, UUI
     Optional<Server> findServerById(UUID id);
 
     /**
+     * Retrieves a server by unique container port attribute.
+     *
+     * @param port the container port of the server to be found
+     * @return an {@link Optional} containing the server if existent, or an
+     * empty {@code Optional} if no server exists with the given container port
+     */
+    Optional<Server> findServerByContainerPort(int port);
+
+    /**
      * Saves a given server entity in the database.
      * <p>
      * If the server is new (i.e., has no ID), it will be inserted. If the

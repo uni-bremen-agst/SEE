@@ -228,10 +228,10 @@ function ServerView() {
                   <Stack direction="column" justifyContent="center">
                     <Box display="flex">
                       <IconButton 
-                            aria-label="Copy IP Address" 
-                            size="large" 
-                            sx={{display: "flex", flexDirection: "column"}} 
-                            onMouseDown={(e) => {e.stopPropagation()}} 
+                            aria-label="Copy Address"
+                            size="large"
+                            sx={{display: "flex", flexDirection: "column"}}
+                            onMouseDown={(e) => {e.stopPropagation()}}
                             onClick={(e) => {
                               e.stopPropagation();
                               e.preventDefault();
@@ -239,7 +239,7 @@ function ServerView() {
                               setShowLinkCopiedMessage(true);
                       }}>
                           <FontAwesomeIcon icon={faClipboard}/>
-                          <Typography variant="button">Copy IP Address</Typography>
+                          <Typography variant="button">Copy Address</Typography>
                       </IconButton>
                     </Box>
                   </Stack>
@@ -262,7 +262,16 @@ function ServerView() {
                     {
                       files?.map((projectFile) => 
                         <ListItem sx={{backgroundColor: "white", borderRadius:"25px", marginBottom:"1em"}} key={projectFile.id}>
-                          <ListItemText> <Typography variant="subtitle2">{projectFile.originalFileName}</Typography> </ListItemText>
+                          <ListItemText>
+                            <Typography variant="subtitle2">{projectFile.name}</Typography>
+                          </ListItemText>
+                          <ListItemText>
+                          <Typography fontStyle="italic">{projectFile.originalName}</Typography>
+                          </ListItemText>
+                          <ListItemText>
+                            <Typography>{Number(projectFile.size / 1024 / 1024).toFixed(2)} MiB</Typography>
+                          </ListItemText>
+                          {/* TODO Show original file name as well? */}
                         </ListItem>
                       )
                     }

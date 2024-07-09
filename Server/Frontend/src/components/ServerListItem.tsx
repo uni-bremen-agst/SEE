@@ -71,7 +71,7 @@ function ServerListItem(props: {server: Server}) {
                        
                         <Box display="flex" height="100%">
                           <IconButton 
-                                aria-label="Copy IP Address"
+                                aria-label="Copy Address"
                                 size="large" 
                                 sx={{display: "flex", flexDirection: "column"}} 
                                 onMouseDown={(e) => {e.stopPropagation()}} 
@@ -81,7 +81,7 @@ function ServerListItem(props: {server: Server}) {
                                                 setShowLinkCopiedMessage(true);
                             }}> 
                               <FontAwesomeIcon icon={faClipboard}/>
-                              <Typography variant="button">Copy IP Address</Typography>
+                              <Typography variant="button">Copy Address</Typography>
                           </IconButton>
                         </Box>
                       </Stack>
