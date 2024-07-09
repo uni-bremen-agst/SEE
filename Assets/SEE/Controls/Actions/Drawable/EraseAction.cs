@@ -167,12 +167,9 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            Debug.Log("Erase Redo");
             foreach (Memento mem in mementoList)
             {
                 GameObject toDelete = GameFinder.FindChild(mem.Surface.GetDrawableSurface(), mem.DrawableType.Id);
-                Debug.Log("Search for: " + mem.DrawableType.Id + " on " + GameFinder.GetUniqueID(mem.Surface.GetDrawableSurface()));
-                Debug.Log("Found: " + toDelete != null);
                 if (mem.DrawableType is MindMapNodeConf conf)
                 {
                     MMNodeValueHolder valueHolder = toDelete.GetComponent<MMNodeValueHolder>();
