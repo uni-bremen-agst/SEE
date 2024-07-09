@@ -543,6 +543,7 @@ MonoBehaviour:
   _purkinjeAmount: 1
   _purkinjeLuminanceThreshold: 0.15
   _tonemap: 0
+  _tonemapGamma: 2.5
   _tonemapExposurePre: 1
   _tonemapBrightnessPost: 1
   _sunFlares: 0
