@@ -110,7 +110,7 @@ namespace SEE.UI.Window.NoteWindow
             return () =>
             {
                 manager.ActiveWindow.gameObject.TryGetComponent<NoteWindow>(out NoteWindow activeWin);
-                string path = EditorUtility.OpenFilePanel("Overwrite with txt", "", "");
+                string path = EditorUtility.OpenFilePanel("Load Note", "", "");
                 if (!string.IsNullOrEmpty(path))
                 {
                     string fileContent = File.ReadAllText(path);
