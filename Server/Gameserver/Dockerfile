@@ -1,18 +1,24 @@
-FROM --platform=linux/amd64 ubuntu:24.04
+FROM --platform=linux/amd64 docker.io/ubuntu:24.04
 
-ENV PASSWORD=
-ENV SERVERID=
-ENV BACKEND_DOMAIN=localhost:8080
+ENV SEE_BACKEND_DOMAIN=localhost:8080
+ENV SEE_SERVER_ID=
+ENV SEE_SERVER_PASSWORD=
 
-RUN apt-get update  &&\
-    apt-get upgrade -y  &&\
-    apt-get install -y --no-install-recommends unzip  &&\
-    rm -rf /var/lib/apt/lists/*
+COPY run.sh /
+COPY bin /app
 
-COPY . /app/
+RUN  \
+  apt-get update  &&\
+  apt-get upgrade -y  &&\
+  apt-get install -y --no-install-recommends unzip  &&\
+  rm -rf /var/lib/apt/lists/*  &&\
+  #
+  chmod 555 /run.sh
 
 WORKDIR /app
 
 EXPOSE 7777
 
-CMD ./server.x86_64 -port 7777 -password ${PASSWORD} -id ${SERVERID} -domain ${BACKEND_DOMAIN} -launch-as-server -batchmode
+VOLUME /multiplayer_data
+
+CMD /run.sh

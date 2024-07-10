@@ -6,6 +6,7 @@ import com.github.dockerjava.api.command.CreateVolumeResponse;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.command.InspectVolumeResponse;
 import com.github.dockerjava.api.exception.NotFoundException;
+import com.github.dockerjava.api.exception.NotModifiedException;
 import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.HostConfig;
@@ -72,7 +73,32 @@ public class ContainerService {
     @Value("${see.app.docker.host}")
     private String dockerHost;
 
-    final static String CONTAINER_VOLUME_PATH = "/app/gameserver_Data/StreamingAssets/Multiplayer/";
+    /**
+     * Contains the domain name, or IP address, and port of this back-end
+     * application server.
+     */
+    @Value("${see.app.backend.domain}")
+    private String backendDomain;
+
+    /**
+     * The name of the container image that should be used to run game server
+     * instances.
+     */
+    @Value("${see.app.docker.image.gameserver}")
+    private String containerImageName;
+
+    /**
+     * The path where the multiplayer data are mounted in a game server
+     * container.
+     */
+    final static String CONTAINER_VOLUME_PATH = "/multiplayer_data/";
+
+    /**
+     * The port that the game server exposes inside the container.
+     * <p>
+     * This port will be mapped to the server's external port on the container
+     * host.
+     */
     final static int CONTAINER_PORT = 7777;
 
     /**
@@ -132,23 +158,25 @@ public class ContainerService {
 
         final String containerName = "see-" + server.getId();
         final String volumeName = "see-data-" + server.getId();
-        Integer port = server.getContainerPort();
         String containerId = server.getContainerId();
 
-        if (containerId != null && containerExists(containerId)) {
-            dockerClient.startContainerCmd(containerId).exec();
-            log.info("Started existing container: {}", containerName);
-        } else {
+        if (containerId == null || !containerExists(containerId)) {
             if (!volumeExists(volumeName)) {
                 createVolume(server, volumeName);
                 log.debug("Created new volume: {}", volumeName);
             }
-            CreateContainerResponse containerResponse = createContainer(containerName, volumeName, port);
+            CreateContainerResponse containerResponse = createContainer(containerName, volumeName, server.getContainerPort(), server.getId().toString(), server.getServerPassword());
             containerId = containerResponse.getId();
             log.info("Created new container: {}", containerName);
         }
 
-        server.setContainerPort(port);
+        try {
+            dockerClient.startContainerCmd(containerId).exec();
+            log.info("Started existing container: {}", containerName);
+        } catch (NotModifiedException e) {
+            log.warn("Container already running: {}", containerName);
+        }
+
         server.setContainerId(containerId);
         server.setContainerVolume(volumeName);
         server.setServerStatusType(ServerStatusType.ONLINE);
@@ -173,7 +201,12 @@ public class ContainerService {
         }
 
         server.setServerStatusType(ServerStatusType.STOPPING);
-        dockerClient.stopContainerCmd(server.getContainerId());
+        try {
+            dockerClient.stopContainerCmd(server.getContainerId()).exec();
+        } catch (NotFoundException e) {
+            log.warn("Container to stop does not exist for server {}", server.getId());
+            server.setContainerId(null);
+        }
 
         server.setServerStatusType(ServerStatusType.OFFLINE);
     }
@@ -185,11 +218,15 @@ public class ContainerService {
      * @throws IllegalStateException if the server is busy or running
      */
     public void deleteContainer(Server server) {
-        dockerClient.stopContainerCmd(server.getContainerId()).exec();
-        dockerClient.removeContainerCmd("container_id")
-                .withForce(true)
-                .exec();
-        dockerClient.removeVolumeCmd(server.getContainerVolume()).exec();
+        try {
+            dockerClient.stopContainerCmd(server.getContainerId()).exec();
+            dockerClient.removeContainerCmd("container_id")
+                    .withForce(true)
+                    .exec();
+            dockerClient.removeVolumeCmd(server.getContainerVolume()).exec();
+        } catch (NotFoundException e) {
+            log.warn("Container to delete does not exist for server {}", server.getId());
+        }
 
         server.setContainerPort(null);
         server.setContainerId(null);
@@ -247,21 +284,20 @@ public class ContainerService {
      * @param port the port number that should be exposed on the container host
      * @return response metadata object
      */
-    private CreateContainerResponse createContainer(final String containerName, final String volumeName, final int port) {
+    private CreateContainerResponse createContainer(final String containerName, final String volumeName, final int port, final String serverId, final String password) {
         ExposedPort exposedPort = ExposedPort.tcp(CONTAINER_PORT);
         PortBinding portBinding = new PortBinding(Ports.Binding.bindPort(port), exposedPort);
 
-        // TODO Specify server container image
-        return dockerClient.createContainerCmd("alpine")
+        return dockerClient.createContainerCmd(containerImageName)
                 .withName(containerName)
                 .withHostConfig(HostConfig.newHostConfig()
                         .withBinds(new Bind(volumeName, new Volume(CONTAINER_VOLUME_PATH)))
                         .withPortBindings(portBinding)
                 )
                 .withExposedPorts(exposedPort)
-                // TODO Specify server configuration
-                .withEnv("MY_ENV_VAR=value")
-                .withCmd("echo", "hello world from container")
+                .withEnv("SEE_BACKEND_DOMAIN=" + backendDomain)
+                .withEnv("SEE_SERVER_ID=" + serverId)
+                .withEnv("SEE_SERVER_PASSWORD=" + password)
                 .exec();
     }
 

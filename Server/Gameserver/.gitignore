@@ -1,7 +1,6 @@
-# Game server files
-/bin/
+# Ignore all subdirectories
+/*/
 
-# Misplaced game server files
+# Ignore misplaced game server files
 *.so
 *.x86_64
-*_Data
