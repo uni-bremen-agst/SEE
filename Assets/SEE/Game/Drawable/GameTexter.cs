@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Game.Drawable.ValueHolders;
-using SEE.Game.Drawable.Configurations;
+﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using TMPro;
 using UnityEngine;
@@ -152,10 +151,11 @@ namespace SEE.Game.Drawable
         /// <param name="fontSize">The chosen font size of the text.</param>
         /// <param name="order">The current order in layer.</param>
         /// <param name="styles">The chosen font styles for the text.</param>
+        /// <param name="associatedPage">The assoiated surface page for this object.</param>
         /// <param name="textObj">The created drawable text object.</param>
         private static void Setup(GameObject surface, string name, string text, Vector3 position,
             Color fontColor, Color outlineColor, bool outlineStatus, float outlineThickness,
-            float fontSize, int order, FontStyles styles,
+            float fontSize, int order, FontStyles styles, int associatedPage,
             out GameObject textObj)
         {
             /// If the object has been created earlier, it already has a name,
@@ -220,6 +220,14 @@ namespace SEE.Game.Drawable
             /// The Text Mesh Pro needs also the order.
             tmp.sortingOrder = order;
 
+            /// Adds a <see cref="AssociatedPageHolder"/> component.
+            /// And sets the associated page to the used page.
+            textObj.AddComponent<AssociatedPageHolder>().AssociatedPage = associatedPage;
+            if (associatedPage != surface.GetComponent<DrawableHolder>().CurrentPage)
+            {
+                textObj.SetActive(false);
+            }
+
             /// Is needed to fix an issue in the <see cref="TextMeshPro"/> component.
             /// If the outline color is set to black during creation; it is strangely always set to white.
             tmp.outlineColor = tmp.outlineColor;
@@ -246,7 +254,7 @@ namespace SEE.Game.Drawable
             Color fontColor, Color outlineColor, bool outlineStatus, float outlineThickness, float fontSize, int order, FontStyles styles)
         {
             Setup(surface, "", text, position, fontColor, outlineColor, outlineStatus, outlineThickness, fontSize,
-                order, styles, out GameObject textObj);
+                order, styles, surface.GetComponent<DrawableHolder>().CurrentPage, out GameObject textObj);
             surface.GetComponent<DrawableHolder>().Inc();
             ValueHolder.MaxOrderInLayer++;
 
@@ -274,12 +282,12 @@ namespace SEE.Game.Drawable
         /// <returns>The created drawable text object</returns>
         private static GameObject ReWriteText(GameObject surface, string id, string text, Vector3 position,
             Vector3 scale, Vector3 eulerAngles, Color fontColor, Color outlineColor, bool outlineStatus,
-            float outlineThickness, float fontSize, int order, FontStyles styles)
+            float outlineThickness, float fontSize, int order, FontStyles styles, int associatedPage)
         {
             DrawableHolder holder = surface.GetComponent<DrawableHolder>();
             /// Adjusts the current order in the layer if the
             /// order in layer for the line is greater than or equal to it.
-            if (order >= holder.OrderInLayer)
+            if (order >= holder.OrderInLayer && associatedPage == holder.CurrentPage)
             {
                 holder.OrderInLayer = order + 1;
             }
@@ -300,7 +308,7 @@ namespace SEE.Game.Drawable
             {
                 /// Creates the text object.
                 Setup(surface, id, text, position, fontColor, outlineColor, outlineStatus, outlineThickness, fontSize, order,
-                    styles, out GameObject textObj);
+                    styles, associatedPage, out GameObject textObj);
                 textObject = textObj;
 
             }
@@ -310,6 +318,7 @@ namespace SEE.Game.Drawable
             textObject.transform.localEulerAngles = eulerAngles;
             textObject.transform.localPosition = position;
             textObject.GetComponent<OrderInLayerValueHolder>().OrderInLayer = order;
+            textObject.GetComponent<AssociatedPageHolder>().AssociatedPage = associatedPage;
 
             /// Is needed to fix an issue in the <see cref="TextMeshPro"/> component.
             /// If the outline color is set to black during creation; it is strangely always set to white.
@@ -338,7 +347,8 @@ namespace SEE.Game.Drawable
                 text.OutlineThickness,
                 text.FontSize,
                 text.OrderInLayer,
-                text.FontStyles);
+                text.FontStyles,
+                text.AssociatedPage);
         }
 
         /// <summary>

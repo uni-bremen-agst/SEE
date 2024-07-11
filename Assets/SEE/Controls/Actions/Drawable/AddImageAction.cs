@@ -13,8 +13,7 @@ using SEE.UI.PropertyDialog.Drawable;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.GO;
-using Assets.SEE.Game.Drawable.ActionHelpers;
-using Assets.SEE.Game.Drawable.ValueHolders;
+using SEE.Game.Drawable.ValueHolders;
 
 namespace SEE.Controls.Actions.Drawable
 {

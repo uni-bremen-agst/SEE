@@ -12,7 +12,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Utils.History;
-using Assets.SEE.Game.Drawable.ActionHelpers;
+using SEE.Game.Drawable.ActionHelpers;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -449,6 +449,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             DrawableType conf = DrawableType.Get(selectedObj);
             conf.Id = "";
+            conf.AssociatedPage = newSurface.GetComponent<DrawableHolder>().CurrentPage;
             newObject = DrawableType.Restore(conf, newSurface);
             MoveWithWorldPosition(newPosition);
         }
@@ -487,6 +488,7 @@ namespace SEE.Controls.Actions.Drawable
 
             foreach (DrawableType type in newNodesBranchLineHolder.GetAllDrawableTypes())
             {
+                type.AssociatedPage = newSurface.GetComponent<DrawableHolder>().CurrentPage;
                 DrawableType.Restore(type, newSurface);
             }
 

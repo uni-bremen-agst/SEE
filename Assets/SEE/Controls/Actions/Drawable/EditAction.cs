@@ -12,7 +12,7 @@ using UnityEngine;
 using TextConf = SEE.Game.Drawable.Configurations.TextConf;
 using SEE.Utils.History;
 using Michsky.UI.ModernUIPack;
-using Assets.SEE.Game.Drawable.ActionHelpers;
+using SEE.Game.Drawable.ActionHelpers;
 
 namespace SEE.Controls.Actions.Drawable
 {

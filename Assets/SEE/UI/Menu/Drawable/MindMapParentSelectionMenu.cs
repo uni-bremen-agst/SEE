@@ -140,7 +140,7 @@ namespace SEE.UI.Menu.Drawable
                     .GetComponent<HorizontalSelector>();
 
                 /// Gets all Mind Map Nodes of the given attached object - object.
-                IList<GameObject> allNodes = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.MindMapNode);
+                IList<GameObject> allNodes = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.MindMapNode, false);
 
                 /// Collect all Mind Map Nodes with the <see cref="GameMindMap.NodeKind"/>:
                 /// <see cref="GameMindMap.NodeKind.Theme"/> or <see cref="GameMindMap.NodeKind.Subtheme"/>

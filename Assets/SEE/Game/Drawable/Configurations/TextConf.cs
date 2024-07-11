@@ -63,6 +63,7 @@ namespace SEE.Game.Drawable.Configurations
                 text = new()
                 {
                     Id = textObject.name,
+                    AssociatedPage = textObject.GetComponent<AssociatedPageHolder>().AssociatedPage,
                     Position = textObject.transform.localPosition,
                     EulerAngles = textObject.transform.localEulerAngles,
                     Scale = textObject.transform.localScale,
@@ -89,6 +90,7 @@ namespace SEE.Game.Drawable.Configurations
             return new TextConf
             {
                 Id = this.Id,
+                AssociatedPage = this.AssociatedPage,
                 Position = this.Position,
                 EulerAngles = this.EulerAngles,
                 Scale = this.Scale,

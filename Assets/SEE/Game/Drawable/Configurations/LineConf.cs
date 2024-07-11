@@ -72,6 +72,7 @@ namespace SEE.Game.Drawable.Configurations
                 line = new()
                 {
                     Id = lineGameObject.name,
+                    AssociatedPage = lineGameObject.GetComponent<AssociatedPageHolder>().AssociatedPage,
                     Position = lineGameObject.transform.localPosition,
                     Scale = lineGameObject.transform.localScale,
                     OrderInLayer = lineGameObject.GetComponent<OrderInLayerValueHolder>().OrderInLayer,
@@ -112,6 +113,7 @@ namespace SEE.Game.Drawable.Configurations
             return new LineConf
             {
                 Id = this.Id,
+                AssociatedPage = this.AssociatedPage,
                 Position = this.Position,
                 RendererPositions = this.RendererPositions,
                 Loop = this.Loop,

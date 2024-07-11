@@ -1,4 +1,4 @@
-﻿using Assets.SEE.DataModel.Drawable;
+﻿using SEE.DataModel.Drawable;
 using SEE.Tools.ReflexionAnalysis;
 using System;
 
@@ -112,5 +112,20 @@ namespace SEE.DataModel
         }
         protected override string Description() =>
             $"{Surface.Visibility} has been changed.";
+    }
+
+    /// <summary>
+    /// Event indicating the page of a drawable surface changes.
+    /// </summary>
+    public class PageChangeEvent : DrawableSurfaceEvent
+    {
+        public PageChangeEvent(Guid versionId, DrawableSurface surface,
+            ReflexionSubgraphs? affectedGraph = null, ChangeType? change = null)
+            : base(versionId, surface, affectedGraph, change)
+        {
+        }
+
+        protected override string Description() =>
+            $"{Surface.CurrentPage} has been changed.";
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-namespace Assets.SEE.Game.Drawable.ActionHelpers
+namespace SEE.Game.Drawable.ActionHelpers
 {
     /// <summary>
     /// This class provides a method to refresh the UI Canvas it can be necessary to prevent

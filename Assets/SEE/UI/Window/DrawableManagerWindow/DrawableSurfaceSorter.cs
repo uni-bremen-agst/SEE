@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Assets.SEE.UI.Window.DrawableManagerWindow
+namespace SEE.UI.Window.DrawableManagerWindow
 {
     public class DrawableSurfaceSorter
     {
@@ -42,11 +42,11 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
         private IEnumerable<GameObject> Apply(List<GameObject> list)
         {
             return sortAttributes.Count == 0 ? list :
-                sortAttributes.Aggregate(list.OrderBy(_ => 0), 
+                sortAttributes.Aggregate(list.OrderBy(_ => 0),
                 (current, sortAttribute) =>
                 {
                     (_, Func<GameObject, object> getKey, bool descending) = sortAttribute;
-                    return descending? current.ThenByDescending(x => getKey(x))
+                    return descending ? current.ThenByDescending(x => getKey(x))
                         : current.ThenBy(x => getKey(x));
                 });
         }

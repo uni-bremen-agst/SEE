@@ -4,7 +4,7 @@ using SEE.UI.Menu.Drawable;
 using System.Collections;
 using UnityEngine;
 
-namespace Assets.SEE.UI.Drawable
+namespace SEE.UI.Drawable
 {
     /// <summary>
     /// This class resolves a display issue with the <see cref="HorizontalSelector"/>.

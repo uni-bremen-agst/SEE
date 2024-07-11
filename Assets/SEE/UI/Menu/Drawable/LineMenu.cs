@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Game.Drawable.ValueHolders;
-using Michsky.UI.ModernUIPack;
+﻿using Michsky.UI.ModernUIPack;
 using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;

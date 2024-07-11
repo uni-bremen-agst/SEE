@@ -1,10 +1,9 @@
-﻿using Assets.SEE.Game.Drawable;
-using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Net.Actions;
 using UnityEngine;
 
-namespace Assets.SEE.Net.Actions.Drawable
+namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
     /// This class is reponsible for change the drawable description on all clients.
@@ -21,7 +20,7 @@ namespace Assets.SEE.Net.Actions.Drawable
         /// </summary>
         public DrawableChangeDescriptionNetAction(DrawableConfig config)
         {
-            this.DrawableConf = config;
+            DrawableConf = config;
         }
 
         /// <summary>

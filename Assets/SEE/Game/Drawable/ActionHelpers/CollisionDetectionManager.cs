@@ -3,7 +3,7 @@ using SEE.UI.Drawable;
 using SEE.Utils;
 using UnityEngine;
 
-namespace Assets.SEE.Game.Drawable.ActionHelpers
+namespace SEE.Game.Drawable.ActionHelpers
 {
     /// <summary>
     /// This class provides methods to enable the collision detection and disable them.  
@@ -24,7 +24,7 @@ namespace Assets.SEE.Game.Drawable.ActionHelpers
         /// Disables collision detection for the given object.
         /// </summary>
         /// <param name="obj">The object for which collision detection should be deactivated.</param>
-        public static void Disable(GameObject obj) 
+        public static void Disable(GameObject obj)
         {
             if (obj != null)
             {

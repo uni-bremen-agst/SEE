@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Game.Drawable.ValueHolders;
-using SEE.Game.Drawable.Configurations;
+﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.Utils;
@@ -82,12 +81,13 @@ namespace SEE.Game.Drawable
         /// <param name="order">The order in layer for the line.</param>
         /// <param name="lineKind">The line kind of the line.</param>
         /// <param name="tiling">The tiling for a dashed line kind.</param>
+        /// <param name="associatedPage">The assoiated surface page for this object.</param>
         /// <param name="line">The created line object</param>
         /// <param name="renderer">The line renderer of the line.</param>
         /// <param name="meshCollider">The mesh collider of the line.</param>
         private static void Setup(GameObject surface, string name, Vector3[] positions,
             ColorKind colorKind, Color primaryColor, Color secondaryColor, float thickness,
-            int order, LineKind lineKind, float tiling,
+            int order, LineKind lineKind, float tiling, int associatedPage,
             out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider)
         {
             /// If the object has been created earlier, it already has a name,
@@ -169,6 +169,13 @@ namespace SEE.Game.Drawable
             line.AddComponent<OrderInLayerValueHolder>().OrderInLayer = order;
             /// Sets the line kind in the line value holder.
             line.GetComponent<LineValueHolder>().LineKind = lineKind;
+            /// Adds a <see cref="AssociatedPageHolder"/> component.
+            /// And sets the associated page to the used page.
+            line.AddComponent<AssociatedPageHolder>().AssociatedPage = associatedPage;
+            if (associatedPage != surface.GetComponent<DrawableHolder>().CurrentPage)
+            {
+                line.SetActive(false);
+            }
         }
 
         /// <summary>
@@ -215,7 +222,7 @@ namespace SEE.Game.Drawable
         {
             DrawableHolder holder = surface.GetComponent<DrawableHolder>();
             Setup(surface, "", positions, colorKind, primaryColor, secondaryColor, thickness,
-                holder.OrderInLayer, lineKind, tiling,
+                holder.OrderInLayer, lineKind, tiling, holder.CurrentPage,
                 out GameObject line, out LineRenderer _, out MeshCollider _);
             holder.Inc();
             ValueHolder.MaxOrderInLayer++;
@@ -303,7 +310,7 @@ namespace SEE.Game.Drawable
                 /// Block for creating a new line.
                 DrawableHolder holder = surface.GetComponent<DrawableHolder>();
                 Setup(surface, name, positions, colorKind, primaryColor, secondaryColor, thickness,
-                    holder.OrderInLayer, lineKind, tiling,
+                    holder.OrderInLayer, lineKind, tiling, holder.CurrentPage,
                     out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
                 lineObject = line;
                 renderer.SetPositions(positions);
@@ -345,7 +352,7 @@ namespace SEE.Game.Drawable
         public static GameObject ReDrawLine(GameObject surface, string name, Vector3[] positions,
             ColorKind colorKind, Color primaryColor, Color secondaryColor, float thickness,
             int orderInLayer, Vector3 position, Vector3 eulerAngles, Vector3 scale, bool loop,
-            LineKind lineKind, float tiling)
+            LineKind lineKind, float tiling, int associatedPage)
         {
             /// Updates the z axis values of the positions to 0.
             UpdateZPositions(ref positions);
@@ -353,7 +360,7 @@ namespace SEE.Game.Drawable
             /// Adjusts the current order in the layer if the
             /// order in layer for the line is greater than or equal to it.
             DrawableHolder holder = surface.GetComponent<DrawableHolder>();
-            if (orderInLayer >= holder.OrderInLayer)
+            if (orderInLayer >= holder.OrderInLayer && associatedPage == holder.CurrentPage)
             {
                 holder.OrderInLayer = orderInLayer + 1;
             }
@@ -370,6 +377,7 @@ namespace SEE.Game.Drawable
                 line.transform.localEulerAngles = eulerAngles;
                 line.transform.localPosition = position;
                 line.GetComponent<OrderInLayerValueHolder>().OrderInLayer = orderInLayer;
+                line.GetComponent<AssociatedPageHolder>().AssociatedPage = associatedPage;
                 Drawing(line, positions);
                 FinishDrawing(line, loop);
 
@@ -379,7 +387,7 @@ namespace SEE.Game.Drawable
             {
                 /// Block for creating of a new line.
                 Setup(surface, name, positions, colorKind, primaryColor, secondaryColor, thickness,
-                    orderInLayer, lineKind, tiling,
+                    orderInLayer, lineKind, tiling, associatedPage,
                     out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
                 line.transform.localScale = scale;
                 line.transform.localEulerAngles = eulerAngles;
@@ -415,7 +423,8 @@ namespace SEE.Game.Drawable
                  lineToRedraw.Scale,
                  lineToRedraw.Loop,
                  lineToRedraw.LineKind,
-                 lineToRedraw.Tiling);
+                 lineToRedraw.Tiling,
+                 lineToRedraw.AssociatedPage);
             return line;
         }
 
@@ -777,7 +786,7 @@ namespace SEE.Game.Drawable
         {
             Vector3 convertedPosition;
             Setup(surface, "", new Vector3[] { position }, ColorKind.Monochrome, ValueHolder.CurrentPrimaryColor,
-                Color.clear, ValueHolder.CurrentThickness, 0, ValueHolder.CurrentLineKind, 1,
+                Color.clear, ValueHolder.CurrentThickness, 0, ValueHolder.CurrentLineKind, 1, 0,
                 out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
             convertedPosition = line.transform.InverseTransformPoint(position) - ValueHolder.DistanceToDrawable;
             Destroyer.Destroy(line);

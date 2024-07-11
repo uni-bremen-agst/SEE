@@ -73,8 +73,9 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="parent">Must be an object of the drawable holder.</param>
         /// <param name="childName">The id of the searched child.</param>
+        /// <param name="includeInactive">whether the inactive objects should be included.</param>
         /// <returns>The searched child, if found. Otherwise, null</returns>
-        public static GameObject FindChild(GameObject parent, string childName)
+        public static GameObject FindChild(GameObject parent, string childName, bool includeInactive = true)
         {
             Transform[] allChildren;
             if (parent.CompareTag(Tags.Drawable))
@@ -82,16 +83,16 @@ namespace SEE.Game.Drawable
                 GameObject attachedObjects = FindChildWithTag(GetHighestParent(parent), Tags.AttachedObjects);
                 if (attachedObjects != null)
                 {
-                    allChildren = attachedObjects.GetComponentsInChildren<Transform>();
+                    allChildren = attachedObjects.GetComponentsInChildren<Transform>(includeInactive);
                 }
                 else
                 {
-                    allChildren = parent.GetComponentsInChildren<Transform>();
+                    allChildren = parent.GetComponentsInChildren<Transform>(includeInactive);
                 }
             }
             else
             {
-                allChildren = parent.GetComponentsInChildren<Transform>();
+                allChildren = parent.GetComponentsInChildren<Transform>(includeInactive);
             }
             foreach (Transform child in allChildren)
             {
@@ -158,10 +159,11 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="parent">The parent of the children.</param>
         /// <param name="tag">The tag to be searched.</param>
+        /// <param name="includeInactive">whether the inactive objects should be included.</param>
         /// <returns>the first found child with the searched tag.</returns>
-        public static GameObject FindChildWithTag(GameObject parent, string tag)
+        public static GameObject FindChildWithTag(GameObject parent, string tag, bool includeInactive = true)
         {
-            Transform[] allChildren = parent.GetComponentsInChildren<Transform>();
+            Transform[] allChildren = parent.GetComponentsInChildren<Transform>(includeInactive);
             foreach (Transform childTransform in allChildren)
             {
                 if (childTransform.gameObject.CompareTag(tag))
@@ -177,11 +179,12 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="parent">The parent of the children</param>
         /// <param name="tag">The tag to be searched</param>
+        /// <param name="includeInactive">whether the inactive objects should be included.</param>
         /// <returns>All children with the searched tag.</returns>
-        public static IList<GameObject> FindAllChildrenWithTag(GameObject parent, string tag)
+        public static IList<GameObject> FindAllChildrenWithTag(GameObject parent, string tag, bool includeInactive = true)
         {
             List<GameObject> gameObjects = new();
-            Transform[] allChildren = parent.GetComponentsInChildren<Transform>();
+            Transform[] allChildren = parent.GetComponentsInChildren<Transform>(includeInactive);
             foreach (Transform childTransform in allChildren)
             {
                 if (childTransform.gameObject.CompareTag(tag))
@@ -200,12 +203,13 @@ namespace SEE.Game.Drawable
         /// <param name="parent">The parent of the children</param>
         /// <param name="childTag">The tag to be searched</param>
         /// <param name="parentTag">The execpt tag</param>
+        /// <param name="includeInactive">whether the inactive objects should be included.</param>
         /// <returns>All children with the searched tag, except those whose parent has the specific tag.</returns>
         public static List<GameObject> FindAllChildrenWithTagExceptParentHasTag(GameObject parent,
-            string childTag, string parentTag)
+            string childTag, string parentTag, bool includeInactive = true)
         {
             List<GameObject> gameObjects = new();
-            Transform[] allChildren = parent.GetComponentsInChildren<Transform>();
+            Transform[] allChildren = parent.GetComponentsInChildren<Transform>(includeInactive);
             foreach (Transform childTransform in allChildren)
             {
                 if (childTransform.gameObject.CompareTag(childTag)

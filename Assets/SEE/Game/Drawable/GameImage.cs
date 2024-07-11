@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Game.Drawable.ValueHolders;
-using SEE.Game.Drawable.Configurations;
+﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.UI.Notification;
 using SEE.Utils;
@@ -36,9 +35,10 @@ namespace SEE.Game.Drawable
         /// <param name="data">the file data of the image.</param>
         /// <param name="position">the position where the image should be</param>
         /// <param name="order">the order in layer for the image</param>
+        /// <param name="associatedPage">The assoiated surface page for this object.</param>
         /// <param name="image">the output image game object.</param>
         private static void Setup(GameObject surface, string name, string imageFilePath,
-            byte[] data, Vector3 position, int order,
+            byte[] data, Vector3 position, int order, int associatedPage,
             out GameObject image)
         {
             /// If the object has been created earlier, it already has a name,
@@ -119,6 +119,14 @@ namespace SEE.Game.Drawable
             image.transform.position = position - image.transform.forward * ValueHolder.DistanceToDrawable.z * order;
             /// Adds the order in layer value holder component to the line object and sets the order.
             image.AddComponent<OrderInLayerValueHolder>().OrderInLayer = order;
+
+            /// Adds a <see cref="AssociatedPageHolder"/> component.
+            /// And sets the associated page to the used page.
+            image.AddComponent<AssociatedPageHolder>().AssociatedPage = associatedPage;
+            if (associatedPage != surface.GetComponent<DrawableHolder>().CurrentPage)
+            {
+                image.SetActive(false);
+            }
         }
 
         /// <summary>
@@ -132,7 +140,7 @@ namespace SEE.Game.Drawable
         /// <returns>The created image game object.</returns>
         public static GameObject PlaceImage(GameObject surface, string imageFilePath, Vector3 position, int order)
         {
-            Setup(surface, "", imageFilePath, null, position, order, out GameObject image);
+            Setup(surface, "", imageFilePath, null, position, order, surface.GetComponent<DrawableHolder>().CurrentPage, out GameObject image);
             surface.GetComponent<DrawableHolder>().Inc();
             ValueHolder.MaxOrderInLayer++;
             return image;
@@ -152,12 +160,12 @@ namespace SEE.Game.Drawable
         /// <param name="fileName">The file name of the image</param>
         /// <returns>The created image game object.</returns>
         public static GameObject RePlaceImage(GameObject surface, string name, byte[] fileData, Vector3 position,
-            Vector3 scale, Vector3 eulerAngles, int order, Color imageColor, string fileName)
+            Vector3 scale, Vector3 eulerAngles, int order, Color imageColor, string fileName, int associatedPage)
         {
             /// Adjusts the current order in the layer if the
             /// order in layer for the line is greater than or equal to it.
             DrawableHolder holder = surface.GetComponent<DrawableHolder>();
-            if (order >= holder.OrderInLayer)
+            if (order >= holder.OrderInLayer && associatedPage == holder.CurrentPage)
             {
                 holder.OrderInLayer = order + 1;
             }
@@ -176,7 +184,7 @@ namespace SEE.Game.Drawable
             else
             {
                 /// Block to create a new image.
-                Setup(surface, name, "", fileData, position, order, out GameObject image);
+                Setup(surface, name, "", fileData, position, order, associatedPage, out GameObject image);
                 imageObj = image;
             }
             /// Saves the loaded image to the app data folder.
@@ -187,6 +195,7 @@ namespace SEE.Game.Drawable
             imageObj.transform.localPosition = position;
             imageObj.GetComponent<Image>().color = imageColor;
             imageObj.GetComponent<OrderInLayerValueHolder>().OrderInLayer = order;
+            imageObj.GetComponent<AssociatedPageHolder>().AssociatedPage = associatedPage;
 
             return imageObj;
         }
@@ -210,7 +219,8 @@ namespace SEE.Game.Drawable
                 conf.EulerAngles,
                 conf.OrderInLayer,
                 conf.ImageColor,
-                fileName
+                fileName,
+                conf.AssociatedPage
                 );
         }
 

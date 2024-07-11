@@ -2,12 +2,11 @@
 using SEE.Controls.Actions;
 using SEE.Game;
 using SEE.GO.Menu;
-using SEE.UI.Drawable;
 using SEE.Utils;
 using SEE.Game.Drawable;
 using UnityEngine;
 
-namespace Assets.SEE.UI.Drawable
+namespace SEE.UI.Drawable
 {
     /// <summary>
     /// Creates the drawable action bar if the user opens a drawable action. 
@@ -18,7 +17,7 @@ namespace Assets.SEE.UI.Drawable
         /// The action bar.
         /// </summary>
         private const string actionBarPrefab = "Prefabs/UI/Drawable/DrawableActionBar";
-        
+
         /// <summary>
         /// The instance of the action bar.
         /// </summary>
@@ -44,7 +43,8 @@ namespace Assets.SEE.UI.Drawable
             if (GlobalActionHistory.Current().Parent == ActionStateTypes.Drawable)
             {
                 instance.SetActive(true);
-            } else
+            }
+            else
             {
                 instance.SetActive(false);
             }
@@ -74,7 +74,7 @@ namespace Assets.SEE.UI.Drawable
 
             GameObject drawShape = GameFinder.FindChild(instance, "DrawShape");
             drawShape.AddComponent<ButtonHoverTooltip>().SetMessage("Draw Shape");
-            drawShape.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() => 
+            drawShape.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.DrawShapes);
                 menu.UpdateActiveEntry();

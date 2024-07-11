@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Game.Drawable.ValueHolders;
-using SEE.Game.Drawable.ActionHelpers;
+﻿using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Utils;
@@ -49,9 +48,10 @@ namespace SEE.Game.Drawable
         /// <param name="prefix">The id prefix.</param>
         /// <param name="writtenText">The displayed text of the node</param>
         /// <param name="position">The position for the node</param>
+        /// <param name="associatedPage">The assoiated surface page for this object.</param>
         /// <param name="node">The created node.</param>
         private static void Setup(GameObject surface, string name, string prefix, string writtenText,
-            Vector3 position, out GameObject node)
+            Vector3 position, int associatedPage, out GameObject node)
         {
             /// If the object has been created earlier, it already has a name,
             /// and this name is taken from the parameters <paramref name="name"/>.
@@ -122,6 +122,10 @@ namespace SEE.Game.Drawable
             /// Adds a <see cref="MMNodeValueHolder"/> component.
             /// It is needed to manage necessary Mind Map Node data.
             node.AddComponent<MMNodeValueHolder>();
+
+            /// Adds a <see cref="AssociatedPageHolder"/> component.
+            /// And sets the associated page to the used page of the surface.
+            node.AddComponent<AssociatedPageHolder>().AssociatedPage = associatedPage;
         }
 
         /// <summary>
@@ -328,7 +332,7 @@ namespace SEE.Game.Drawable
         /// <returns>The created node.</returns>
         public static GameObject Create(GameObject surface, string prefix, string writtenText, Vector3 position)
         {
-            Setup(surface, "", prefix, writtenText, position, out GameObject node);
+            Setup(surface, "", prefix, writtenText, position, surface.GetComponent<DrawableHolder>().CurrentPage, out GameObject node);
             return node;
         }
 
@@ -777,12 +781,12 @@ namespace SEE.Game.Drawable
         /// <returns>The created mind map node.</returns>
         private static GameObject ReCreate(GameObject surface, GameObject parent, string name,
             TextConf textConf, LineConf borderConf, Vector3 position, Vector3 scale,
-            Vector3 eulerAngles, int order, NodeKind nodeKind, string branchToParentName)
+            Vector3 eulerAngles, int order, NodeKind nodeKind, string branchToParentName, int associatedPage)
         {
             /// Adjusts the current order in the layer if the
             /// order in layer for the line is greater than or equal to it.
             DrawableHolder holder = surface.GetComponent<DrawableHolder>();
-            if (order >= holder.OrderInLayer)
+            if (order >= holder.OrderInLayer && associatedPage == holder.CurrentPage)
             {
                 holder.OrderInLayer = order + 1;
             }
@@ -801,7 +805,7 @@ namespace SEE.Game.Drawable
             {
                 /// Creates the node.
                 Setup(surface, name, GetPrefix(nodeKind), textConf.Text,
-                    surface.transform.TransformPoint(position), out GameObject node);
+                    surface.transform.TransformPoint(position), associatedPage, out GameObject node);
                 /// Destroyes the text and border, because the originals will be restored below.
                 Destroyer.Destroy(GameFinder.FindChildWithTag(node, Tags.Line));
                 Destroyer.Destroy(GameFinder.FindChildWithTag(node, Tags.DText));
@@ -836,7 +840,16 @@ namespace SEE.Game.Drawable
             createdNode.transform.localScale = scale;
             createdNode.transform.localEulerAngles = eulerAngles;
             createdNode.transform.localPosition = position;
-            createdNode.GetComponent<OrderInLayerValueHolder>().OrderInLayer =order;
+            createdNode.GetComponent<OrderInLayerValueHolder>().OrderInLayer = order;
+
+            createdNode.GetComponent<AssociatedPageHolder>().AssociatedPage = associatedPage;
+            border.GetComponent<AssociatedPageHolder>().AssociatedPage = associatedPage;
+            text.GetComponent<AssociatedPageHolder>().AssociatedPage = associatedPage;
+
+            if (associatedPage != surface.GetComponent<DrawableHolder>().CurrentPage)
+            {
+                createdNode.SetActive(false);
+            }
 
             /// Create the branch line, if the node has a parent.
             if (parent != null)
@@ -873,7 +886,8 @@ namespace SEE.Game.Drawable
                 conf.EulerAngles,
                 conf.OrderInLayer,
                 conf.NodeKind,
-                conf.BranchLineToParent);
+                conf.BranchLineToParent,
+                conf.AssociatedPage);
         }
 
         /// <summary>

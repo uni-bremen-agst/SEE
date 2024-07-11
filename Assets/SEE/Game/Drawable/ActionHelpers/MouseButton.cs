@@ -1,4 +1,4 @@
-﻿namespace Assets.SEE.Game.Drawable.ActionHelpers
+﻿namespace SEE.Game.Drawable.ActionHelpers
 {
     /// <summary>
     /// Enum that holds the different mouse buttons.

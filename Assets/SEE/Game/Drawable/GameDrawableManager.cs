@@ -1,13 +1,13 @@
-﻿using Assets.SEE.DataModel.Drawable;
-using Assets.SEE.Game.Drawable.ValueHolders;
-using Assets.SEE.GameObjects;
-using SEE.Game;
-using SEE.Game.Drawable;
+﻿using SEE.DataModel.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
+using SEE.UI.Drawable;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-namespace Assets.SEE.Game.Drawable
+namespace SEE.Game.Drawable
 {
     public static class GameDrawableManager
     {
@@ -70,6 +70,64 @@ namespace Assets.SEE.Game.Drawable
         }
 
         /// <summary>
+        /// Change the current selected page of a surface.
+        /// </summary>
+        /// <param name="obj">An object of the drawable.</param>
+        /// <param name="page">The page to switch to.</param>
+        public static void ChangeCurrentPage(GameObject obj, int page)
+        {
+            GameObject surface = GameFinder.GetDrawableSurface(obj);
+            DrawableHolder holder = surface.GetComponent<DrawableHolder>();
+            if (holder.CurrentPage != page)
+            {
+                holder.CurrentPage = page;
+                foreach (DrawableType type in DrawableConfigManager.GetDrawableConfig(surface).GetAllDrawableTypes())
+                {
+                    GameObject typeObj = GameFinder.FindChild(surface, type.Id);
+                    if (typeObj.GetComponent<AssociatedPageHolder>().AssociatedPage == page)
+                    {
+                        typeObj.SetActive(true);
+                    }
+                    else
+                    {
+                        typeObj.SetActive(false);
+                    };
+                }
+                holder.OrderInLayer = GetMaximumPageOrderInLayer(GameFinder.GetAttachedObjectsObject(surface));
+            }
+            if (GameFinder.GetDrawableSurface(obj).TryGetDrawableSurface(out DrawableSurface surf))
+            {
+                surf.CurrentPage = page;
+            }
+            if (GameFinder.GetHighestParent(obj).GetComponentInChildren<SurfacePageController>() != null)
+            {
+                GameFinder.GetHighestParent(obj).GetComponentInChildren<SurfacePageController>().UpdatePage();
+            }
+        }
+
+        private static int GetMaximumPageOrderInLayer(GameObject attachedObject)
+        {
+            int max = 1;
+            if (attachedObject != null)
+            {
+                OrderInLayerValueHolder[] holders = attachedObject.GetComponentsInChildren<OrderInLayerValueHolder>();
+                max = holders.Count() > 0 ?
+                    max = holders.Aggregate((t1, t2) => t1.OrderInLayer > t2.OrderInLayer ? t1 : t2).OrderInLayer + 1 : 1;
+            }
+            return max;
+        }
+
+        /// <summary>
+        /// Change the maximum page size of a surface.
+        /// </summary>
+        /// <param name="obj">An object of the drawable.</param>
+        /// <param name="maxPage">The new maximum page size.</param>
+        public static void ChangeMaxPage(GameObject obj, int maxPage)
+        {
+            GameFinder.GetDrawableSurface(obj).GetComponent<DrawableHolder>().MaxPageSize = maxPage;
+        }
+
+        /// <summary>
         /// Change the visibility of a drawable.
         /// </summary>
         /// <param name="obj">An object of the drawable.</param>
@@ -97,12 +155,14 @@ namespace Assets.SEE.Game.Drawable
             GameObject surfaceParent = GameFinder.GetDrawableSurfaceParent(surface);
 
             if (surface != null && surface.CompareTag(Tags.Drawable))
-            { 
+            {
                 ChangeColor(surface, config.Color);
                 ChangeLighting(surfaceParent, config.Lighting);
                 ChangeOrderInLayer(surface, config.OrderInLayer);
                 ChangeDescription(surface, config.Description);
                 ChangeVisibility(surface, config.Visibility);
+                ChangeCurrentPage(surface, config.CurrentPage);
+                ChangeMaxPage(surface, config.MaxPageSize);
             }
         }
 

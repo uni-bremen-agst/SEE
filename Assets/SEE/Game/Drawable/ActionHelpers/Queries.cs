@@ -2,7 +2,7 @@
 using SEE.Game;
 using UnityEngine;
 
-namespace Assets.SEE.Game.Drawable.ActionHelpers
+namespace SEE.Game.Drawable.ActionHelpers
 {
     /// <summary>
     /// This class provides various reused queries for the drawable actions.
@@ -15,14 +15,14 @@ namespace Assets.SEE.Game.Drawable.ActionHelpers
         /// <returns>true if the user uses the left mouse button.</returns>
         public static bool LeftMouseInteraction()
         {
-            return (Input.GetMouseButton(0) || Input.GetMouseButtonDown(0));
+            return Input.GetMouseButton(0) || Input.GetMouseButtonDown(0);
         }
 
         /// <summary>
         /// Registers the users left mouse down input.
         /// </summary>
         /// <returns>True if the user uses left mouse down.</returns>
-        public static bool LeftMouseDown() 
+        public static bool LeftMouseDown()
         {
             return Input.GetMouseButtonDown(0);
         }
@@ -33,7 +33,7 @@ namespace Assets.SEE.Game.Drawable.ActionHelpers
         /// <returns>true if the user uses the left mouse button.</returns>
         public static bool RightMouseInteraction()
         {
-            return (Input.GetMouseButton(1) || Input.GetMouseButtonDown(1));
+            return Input.GetMouseButton(1) || Input.GetMouseButtonDown(1);
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace Assets.SEE.Game.Drawable.ActionHelpers
         /// <returns>True if the drawable surface is the same as the other object.</returns>
         public static bool SameDrawableSurface(GameObject surface, GameObject other)
         {
-           return surface != null && GameFinder.GetDrawableSurface(other).Equals(surface);
+            return surface != null && GameFinder.GetDrawableSurface(other).Equals(surface);
         }
 
         /// <summary>

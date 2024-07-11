@@ -1,31 +1,24 @@
-﻿using Assets.SEE.Game.Drawable;
-using Assets.SEE.Net.Actions.Drawable;
-using Crosstales.RTVoice.UI;
-using DG.Tweening;
+﻿using DG.Tweening;
 using HighlightPlus;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls;
-using SEE.Controls.Actions;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.GO;
+using SEE.Net.Actions.Drawable;
+using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
-using SEE.UI.PopupMenu;
 using SEE.UI.PropertyDialog.Drawable;
-using SEE.UI.Window.TreeWindow;
 using SEE.Utils;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
 using Image = UnityEngine.UI.Image;
 
-namespace Assets.SEE.UI.Window.DrawableManagerWindow
+namespace SEE.UI.Window.DrawableManagerWindow
 {
     /// <summary>
     /// Parts of the drawable manager window that are specific to the desktop UI.
@@ -105,7 +98,7 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
             filterButton = root.Find("Search/Filter").gameObject.MustGetComponent<ButtonManagerBasic>();
             sortButton = root.Find("Search/Sort").gameObject.MustGetComponent<ButtonManagerBasic>();
             groupButton = root.Find("Search/Group").gameObject.MustGetComponent<ButtonManagerBasic>();
-            PopupMenu popupMenu = gameObject.AddComponent<PopupMenu>();
+            PopupMenu.PopupMenu popupMenu = gameObject.AddComponent<PopupMenu.PopupMenu>();
             UnityEvent<List<GameObject>> rebuild = new();
             rebuild.AddListener(list => { Rebuild(list); });
             contextMenu = new DrawableWindowContextMenu(popupMenu, rebuild,
@@ -352,6 +345,14 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
                     SurfaceColorMenu.Enable(surface, colorAction);
                 }
             });
+
+            ButtonManagerBasic pageBtn = foreground.Find("PageBtn").gameObject.MustGetComponent<ButtonManagerBasic>();
+            TextMeshProUGUI pageBtnMesh = foreground.Find("PageBtn").gameObject.GetComponentInChildren<TextMeshProUGUI>();
+            pageBtn.buttonText = config.CurrentPage.ToString();
+            pageBtnMesh.text = config.CurrentPage.ToString();
+            GUIClickController pageClickController = foreground.Find("PageBtn").gameObject.MustGetComponent<GUIClickController>();
+            pageClickController.onLeft.AddListener(() => contextMenu.ShowSelectionAddPageMenu(surface, pageBtn.transform.position));
+            pageClickController.onRight.AddListener(() => contextMenu.ShowRemovePageMenu(surface, pageBtn.transform.position));
 
             ButtonManagerBasic lightingBtn = foreground.Find("LightingBtn").gameObject.MustGetComponent<ButtonManagerBasic>();
             Image lightingImage = foreground.Find("LightingBtn").gameObject.GetComponent<Image>();

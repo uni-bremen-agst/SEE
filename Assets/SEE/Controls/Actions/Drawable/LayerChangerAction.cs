@@ -10,7 +10,7 @@ using UnityEngine;
 using SEE.Utils.History;
 using SEE.GO;
 using System;
-using Assets.SEE.Game.Drawable.ActionHelpers;
+using SEE.Game.Drawable.ActionHelpers;
 
 namespace SEE.Controls.Actions.Drawable
 {

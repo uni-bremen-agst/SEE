@@ -6,10 +6,15 @@ using UnityEngine;
 using SEE.Utils;
 using UnityEngine.Events;
 using SEE.Game.Drawable;
-using SEE.UI.Window.TreeWindow;
-using Assets.SEE.Game.Drawable;
+using Assets.SEE.UI.Window.DrawableManagerWindow;
+using SEE.Game.Drawable.ValueHolders;
+using RTG;
+using SEE.Game.Drawable.ActionHelpers;
+using SEE.Net.Actions.Drawable;
+using SEE.UI.Notification;
+using System.Linq;
 
-namespace Assets.SEE.UI.Window.DrawableManagerWindow
+namespace SEE.UI.Window.DrawableManagerWindow
 {
     /// <summary>
     /// Manages the context menu for the drawable manager view.
@@ -19,7 +24,7 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
         /// <summary>
         /// The context menu that this class manages.
         /// </summary>
-        private readonly PopupMenu contextMenu;
+        private readonly PopupMenu.PopupMenu contextMenu;
 
         /// <summary>
         /// The function to call to rebuild the tree window.
@@ -64,7 +69,7 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
         /// <param name="filterButton">The button that opens the filter menu.</param>
         /// <param name="sortButton">The button that opens the sort menu.</param>
         /// <param name="groupButton">The button that opens the group menu.</param>
-        public DrawableWindowContextMenu(PopupMenu contextMenu,
+        public DrawableWindowContextMenu(PopupMenu.PopupMenu contextMenu,
                                      UnityEvent<List<GameObject>> rebuild, ButtonManagerBasic filterButton, ButtonManagerBasic sortButton,
                                      ButtonManagerBasic groupButton)
         {
@@ -253,11 +258,12 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
             {
                 entries.Add(new PopupMenuHeading("Grouping is active!"));
                 entries.Add(new PopupMenuHeading("Items ordered by group count."));
-            } else
+            }
+            else
             {
                 entries.Add(new PopupMenuAction("Surface Type", () =>
                 {
-                    ToggleSortAction("Type", x => GameFinder.IsStickyNote(x)? 0 : GameFinder.IsWhiteboard(x)? 1 : 2);
+                    ToggleSortAction("Type", x => GameFinder.IsStickyNote(x) ? 0 : GameFinder.IsWhiteboard(x) ? 1 : 2);
                 }, SortIcon(false, sorter.IsAttributeDescending("Type")), CloseAfterClick: false));
 
                 entries.Add(new PopupMenuAction("Name", () =>
@@ -333,6 +339,114 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
         private void ResetSort()
         {
             sorter.Reset();
+        }
+        #endregion
+
+        #region Page
+        /// <summary>
+        /// Displays the selection and add page menu.
+        /// </summary>
+        /// <param name="surface">The surface whose pages are to be managed.</param>
+        /// <param name="position">The position where the popup menu should be displayed.</param>
+        public void ShowSelectionAddPageMenu(GameObject surface, Vector3 position) 
+        {
+            UpdatePageMenuEntries(surface);
+            contextMenu.ShowWith(position: position);
+        }
+
+
+        /// <summary>
+        /// Displays the remove page menu.
+        /// </summary>
+        /// <param name="surface">The surface whose pages are to be managed.</param>
+        /// <param name="position">The position where the popup menu should be displayed.</param>
+        public void ShowRemovePageMenu(GameObject surface, Vector3 position)
+        {
+            UpdatePageMenuEntries(surface, true);
+            contextMenu.ShowWith(position: position);
+        }
+
+        /// <summary>
+        /// Updates the selection and add menu entries.
+        /// </summary>
+        /// <param name="surface">The surface whose pages are to be managed.</param>
+        /// <param name="removeIndicator">Wheter the remove option should be displayed.</param>
+        private void UpdatePageMenuEntries(GameObject surface, bool removeIndicator = false)
+        {
+            DrawableHolder holder = surface.GetComponent<DrawableHolder>();
+            List<PopupMenuEntry> entries = new();
+
+            List<int> pages = new();
+            for (int i = 0; i < holder.MaxPageSize; i++)
+            {
+                pages.Add(i);
+            }
+            PopupMenuHeading header = removeIndicator ?
+                new PopupMenuHeading("Remove") : new PopupMenuHeading("Select / Add");
+            entries.Add(header);
+            entries.AddRange(pages.Select(CreatePopupEntries));
+
+            if (!removeIndicator)
+            {
+                entries.Add(new PopupMenuAction("+", () =>
+                {
+                    holder.MaxPageSize++;
+                    new SynchronizeSurface(DrawableConfigManager.GetDrawableConfig(surface)).Execute();
+                    UpdatePageMenuEntries(surface);
+                }, ' ', CloseAfterClick: false));
+            }
+            contextMenu.ClearEntries();
+            contextMenu.AddEntries(entries);
+
+            return;
+
+            /// <summary>
+            /// Creates a <see cref="PopupMenuAction"/> for each page.
+            /// </summary>
+            /// <param name="pageNumber">The page number</param>
+            /// <returns>The created <see cref="PopupMenuAction"/> for the page number entry.</returns>
+            PopupMenuAction CreatePopupEntries(int pageNumber)
+            {
+                return new PopupMenuAction(pageNumber.ToString(),
+                    () => 
+                    {
+                        if (removeIndicator) 
+                        {
+                            RemovePage(pageNumber);
+                        } else 
+                        { 
+                            SetPage(pageNumber); 
+                        } 
+                    }, 
+                    GetIcon(pageNumber), CloseAfterClick: true);;
+            }
+
+            /// <summary>
+            /// Gets the depending icon for the entry.
+            /// </summary>
+            /// <param name="i">The entry number.</param>
+            /// <returns>The corresponding icon.</returns>
+            char GetIcon(int i)
+            {
+                return removeIndicator? Icons.Trash : i == holder.CurrentPage ? Icons.CheckedRadio : Icons.EmptyRadio;
+            }
+
+            /// Sets the page.
+            void SetPage(int page)
+            {
+                GameDrawableManager.ChangeCurrentPage(surface, page);
+                new SynchronizeSurface(DrawableConfigManager.GetDrawableConfig(surface)).Execute();
+            }
+
+            /// Removes the page.
+            void RemovePage(int page)
+            {
+                Debug.Log("Remove page " + page);
+                // TODO Remove Logic -> Wechsel wenn currentpage gelöscht. + alle objekte der seite löschen.
+                // Meldung das Seiten neu nummeriert werden. -> neu nummerieren -> folgende pages runterreduzieren.
+                // Abfrage ob maxpage > 1 sonst nicht löschen. (mindestens eine Seite)
+                // TODO Network -> Remove Page and Clear it!
+            }
         }
         #endregion
     }

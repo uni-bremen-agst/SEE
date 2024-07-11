@@ -1,5 +1,6 @@
-﻿using Assets.SEE.Game.Drawable.ValueHolders;
+﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.ValueHolders;
 
 namespace SEE.Net.Actions.Drawable
 {/// <summary>
@@ -32,6 +33,8 @@ namespace SEE.Net.Actions.Drawable
                 DrawableHolder holder = Surface.GetComponent<DrawableHolder>();
                 holder.OrderInLayer = Config.OrderInLayer;
                 holder.Description = Config.Description;
+                holder.MaxPageSize = Config.MaxPageSize;
+                GameDrawableManager.ChangeCurrentPage(Surface, Config.CurrentPage);
             }
         }
     }

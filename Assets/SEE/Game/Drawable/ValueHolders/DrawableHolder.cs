@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Assets.SEE.Game.Drawable.ValueHolders
+namespace SEE.Game.Drawable.ValueHolders
 {
     /// <summary>
     /// This class represents a value holder component for the drawable surface.
@@ -53,6 +53,34 @@ namespace Assets.SEE.Game.Drawable.ValueHolders
         {
             get { return description; }
             set { description = value; }
+        }
+
+        /// <summary>
+        /// The current selected page.
+        /// </summary>
+        private int currentPage = 0;
+
+        /// <summary>
+        /// The current page property.
+        /// </summary>
+        public int CurrentPage
+        {
+            get { return currentPage; }
+            set { currentPage = value; }
+        }
+
+        /// <summary>
+        /// The maximum page size.
+        /// </summary>
+        private int maxPageSize = 1;
+
+        /// <summary>
+        /// The maximum page size property.
+        /// </summary>
+        public int MaxPageSize
+        {
+            get { return maxPageSize; }
+            set { maxPageSize = value; }
         }
     }
 }

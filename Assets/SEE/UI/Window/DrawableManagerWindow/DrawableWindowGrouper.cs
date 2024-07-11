@@ -1,8 +1,9 @@
-﻿using SEE.Game.Drawable;
+﻿using Assets.SEE.UI.Window.DrawableManagerWindow;
+using SEE.Game.Drawable;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.SEE.UI.Window.DrawableManagerWindow
+namespace SEE.UI.Window.DrawableManagerWindow
 {
     /// <summary>
     /// Manages the grouping of drawable surface elements in the drawable manager window.
@@ -37,7 +38,7 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
         /// </summary>
         /// <param name="filter">The filter of the drawable manger window.</param>
         /// <returns>A list of the sticky notes depending on the filter.</returns>
-        public List<GameObject> GetStickyNotes(DrawableSurfaceFilter filter) 
+        public List<GameObject> GetStickyNotes(DrawableSurfaceFilter filter)
         {
             return filter.GetFilteredSurfaces().FindAll(GameFinder.IsStickyNote);
         }

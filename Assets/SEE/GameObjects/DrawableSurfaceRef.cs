@@ -1,8 +1,8 @@
-﻿using Assets.SEE.DataModel.Drawable;
+﻿using SEE.DataModel.Drawable;
 using System.Collections;
 using UnityEngine;
 
-namespace Assets.SEE.GameObjects
+namespace SEE.GO
 {
     /// <summary>
     /// A reference to a drawable surface that can be attached to a game object as a component.

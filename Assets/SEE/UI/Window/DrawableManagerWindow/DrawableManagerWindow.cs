@@ -1,16 +1,13 @@
-﻿using Assets.SEE.Controls.Actions.Drawable;
-using Assets.SEE.DataModel.Drawable;
-using Assets.SEE.Game;
-using Assets.SEE.Game.Drawable;
-using Assets.SEE.Game.Drawable.ActionHelpers;
-using Assets.SEE.GameObjects;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using SEE.DataModel;
+using SEE.DataModel.Drawable;
 using SEE.Game;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.ActionHelpers;
+using SEE.GO;
 using SEE.UI.Menu.Drawable;
-using SEE.UI.Notification;
 using SEE.UI.Window;
+using SEE.UI.Window.DrawableManagerWindow;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -18,7 +15,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 
-namespace Assets.SEE.UI.Window.DrawableManagerWindow
+namespace SEE.UI.Window.DrawableManagerWindow
 {
     /// <summary>
     /// A window that represents a manager for managing drawable surfaces. 
@@ -242,6 +239,14 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
                         {
                             RemoveItem(itemV);
                         }
+                    }
+                    break;
+                case PageChangeEvent e:
+                    if (surfaceItems.TryGetValue(GameFinder.GetUniqueID(e.Surface.CurrentObject), out GameObject itemP))
+                    {
+                        Transform foreground = itemP.transform.Find("Foreground");
+                        TextMeshProUGUI pageMesh = foreground.Find("PageBtn").gameObject.GetComponentInChildren<TextMeshProUGUI>();
+                        pageMesh.text = e.Surface.CurrentPage.ToString();
                     }
                     break;
                 case AddSurfaceEvent e:

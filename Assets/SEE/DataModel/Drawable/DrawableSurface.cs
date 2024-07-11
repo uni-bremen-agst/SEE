@@ -1,12 +1,12 @@
-﻿using Cysharp.Threading.Tasks;
-using SEE.DataModel;
+﻿using Assets.SEE.UI.Window.DrawableManagerWindow;
+using Cysharp.Threading.Tasks;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using System;
 using UnityEngine;
 
-namespace Assets.SEE.DataModel.Drawable
+namespace SEE.DataModel.Drawable
 {
     /// <summary>
     /// Class used by the <see cref="DrawableManagerWindow"> to detect changes to a drawable surface.
@@ -31,7 +31,7 @@ namespace Assets.SEE.DataModel.Drawable
         /// <returns>Nothing, it waits until the created <paramref name="surface"/> is properly instantiated.</returns>
         private async UniTaskVoid InitAsync(GameObject surface)
         {
-            while (GameFinder.GetUniqueID(surface).Contains("Clone")) 
+            while (GameFinder.GetUniqueID(surface).Contains("Clone"))
             {
                 await UniTask.Yield();
             }
@@ -55,7 +55,7 @@ namespace Assets.SEE.DataModel.Drawable
         /// </summary>
         public bool InitFinishIndicator
         {
-            get { return initFinishIndicator;}
+            get { return initFinishIndicator; }
         }
 
         /// <summary>
@@ -91,8 +91,8 @@ namespace Assets.SEE.DataModel.Drawable
         public string Description
         {
             get => description;
-            set 
-            { 
+            set
+            {
                 description = value;
                 Notify(new DescriptionChangeEvent(id, this));
             }
@@ -109,7 +109,7 @@ namespace Assets.SEE.DataModel.Drawable
         public Color Color
         {
             get => color;
-            set 
+            set
             {
                 color = value;
                 Notify(new ColorChangeEvent(id, this));
@@ -149,6 +149,24 @@ namespace Assets.SEE.DataModel.Drawable
             {
                 visibility = value;
                 Notify(new VisibilityChangeEvent(id, this));
+            }
+        }
+
+        /// <summary>
+        /// Attribute for the current selected page.
+        /// </summary>
+        private int currentPage;
+
+        /// <summary>
+        /// Current selected page property.
+        /// </summary>
+        public int CurrentPage
+        {
+            get => currentPage;
+            set
+            {
+                currentPage = value;
+                Notify(new PageChangeEvent(id, this));
             }
         }
     }

@@ -1,11 +1,10 @@
-﻿using Assets.SEE.UI.Window.DrawableManagerWindow;
-using Cysharp.Threading.Tasks;
-using SEE.Controls;
+﻿using Cysharp.Threading.Tasks;
 using SEE.GO;
 using SEE.UI.Window;
+using SEE.UI.Window.DrawableManagerWindow;
 using UnityEngine;
 
-namespace Assets.SEE.Controls.Actions.Drawable
+namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
     /// 
@@ -17,7 +16,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
         /// The local player's window space.
         /// </summary>
         private WindowSpace space;
-        
+
         /// <summary>
         /// Status indicating the state of the view (open/closed).
         /// </summary>
@@ -54,7 +53,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
         {
             isOpen = false;
             bool wasClosed = space.CloseWindow(window);
-            if (!wasClosed) 
+            if (!wasClosed)
             {
                 ShowDrawableManagerView();
             }
@@ -67,7 +66,8 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 if (!isOpen)
                 {
                     ShowDrawableManagerView();
-                } else
+                }
+                else
                 {
                     HideDrawableManagerView();
                 }

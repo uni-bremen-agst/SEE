@@ -14,7 +14,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// The message to be displayed when the button is hovered over. 
         /// </summary>
-        private string message;
+        public string message;
 
         /// <summary>
         /// The time to wait before displaying the message when hovering over the button.

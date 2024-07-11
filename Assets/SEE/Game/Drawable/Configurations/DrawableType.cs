@@ -38,6 +38,11 @@ namespace SEE.Game.Drawable.Configurations
         public int OrderInLayer;
 
         /// <summary>
+        /// The associated surface page for this drawable type object.
+        /// </summary>
+        public int AssociatedPage;
+
+        /// <summary>
         /// Gets the drawable type of the given object.
         /// </summary>
         /// <param name="obj">The object from which the drawable type is to be determined.</param>
@@ -159,29 +164,34 @@ namespace SEE.Game.Drawable.Configurations
         #region Config I/O
 
         /// <summary>
-        /// Label in the configuration file for the id of a line.
+        /// Label in the configuration file for the id.
         /// </summary>
         private const string idLabel = "IDLabel";
 
         /// <summary>
-        /// Label in the configuration file for the position of a line.
+        /// Label in the configuration file for the position.
         /// </summary>
         private const string positionLabel = "PositionLabel";
 
         /// <summary>
-        /// Label in the configuration file for the scale of a line.
+        /// Label in the configuration file for the scale.
         /// </summary>
         private const string scaleLabel = "ScaleLabel";
 
         /// <summary>
-        /// Label in the configuration file for the order in layer of a line.
+        /// Label in the configuration file for the order in layer.
         /// </summary>
         private const string orderInLayerLabel = "OrderInLayerLabel";
 
         /// <summary>
-        /// Label in the configuration file for the euler angles of a line.
+        /// Label in the configuration file for the euler angles.
         /// </summary>
         private const string eulerAnglesLabel = "EulerAnglesLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the associated surface page.
+        /// </summary>
+        private const string associatedPageLabel = "AssociatedPageLabel";
 
         /// <summary>
         /// Restores the object to the given drawable type configuration.
@@ -248,6 +258,7 @@ namespace SEE.Game.Drawable.Configurations
         {
             writer.BeginGroup();
             writer.Save(Id, idLabel);
+            writer.Save(AssociatedPage, associatedPageLabel);
             writer.Save(Position, positionLabel);
             writer.Save(EulerAngles, eulerAnglesLabel);
             writer.Save(Scale, scaleLabel);
@@ -283,6 +294,12 @@ namespace SEE.Game.Drawable.Configurations
                 Id = (string)name;
             }
             else
+            {
+                errors = true;
+            }
+
+            /// Try to restore the associated page.
+            if (!ConfigIO.Restore(attributes, associatedPageLabel, ref AssociatedPage))
             {
                 errors = true;
             }

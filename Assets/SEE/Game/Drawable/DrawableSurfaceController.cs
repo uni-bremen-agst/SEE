@@ -1,12 +1,10 @@
-﻿using Assets.SEE.DataModel.Drawable;
-using Assets.SEE.GameObjects;
+﻿using SEE.DataModel.Drawable;
 using LibGit2Sharp;
 using SEE.Game;
-using SEE.Game.Drawable;
 using SEE.GO;
 using UnityEngine;
 
-namespace Assets.SEE.Game.Drawable
+namespace SEE.Game.Drawable
 {
     /// <summary>
     /// This component must be assigned to a drawable surface.
@@ -26,7 +24,7 @@ namespace Assets.SEE.Game.Drawable
         void Awake()
         {
             if (!ValueHolder.DrawableSurfaces.Contains(gameObject)
-                && gameObject.CompareTag(Tags.Drawable)) 
+                && gameObject.CompareTag(Tags.Drawable))
             {
                 ValueHolder.DrawableSurfaces.Add(gameObject);
 
@@ -35,11 +33,12 @@ namespace Assets.SEE.Game.Drawable
                 if (LocalPlayer.Instance != null && LocalPlayer.TryGetDrawableSurfaces(out DrawableSurfaces surfaces))
                 {
                     surfaces.Add(reference.Value);
-                } else
+                }
+                else
                 {
                     mustWaitForPlayerInstantiate = true;
                 }
-            }        
+            }
         }
 
         /// <summary>
@@ -47,8 +46,8 @@ namespace Assets.SEE.Game.Drawable
         /// </summary>
         void Update()
         {
-            if (mustWaitForPlayerInstantiate 
-                && LocalPlayer.Instance != null 
+            if (mustWaitForPlayerInstantiate
+                && LocalPlayer.Instance != null
                 && LocalPlayer.TryGetDrawableSurfaces(out DrawableSurfaces surfaces))
             {
                 DrawableSurfaceRef reference = gameObject.GetComponent<DrawableSurfaceRef>();

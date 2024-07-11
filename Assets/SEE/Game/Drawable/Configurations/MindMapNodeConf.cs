@@ -71,6 +71,7 @@ namespace SEE.Game.Drawable.Configurations
                 conf = new()
                 {
                     Id = obj.name,
+                    AssociatedPage = obj.GetComponent<AssociatedPageHolder>().AssociatedPage,
                     Position = obj.transform.localPosition,
                     Scale = obj.transform.localScale,
                     EulerAngles = obj.transform.localEulerAngles,
@@ -113,6 +114,7 @@ namespace SEE.Game.Drawable.Configurations
             return new MindMapNodeConf
             {
                 Id = this.Id,
+                AssociatedPage = this.AssociatedPage,
                 Position = this.Position,
                 Scale = this.Scale,
                 EulerAngles = this.EulerAngles,

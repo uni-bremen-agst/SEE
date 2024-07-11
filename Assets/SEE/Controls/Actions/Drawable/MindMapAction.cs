@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using static SEE.UI.Menu.Drawable.MindMapMenu;
 using SEE.Utils.History;
-using Assets.SEE.Game.Drawable.ActionHelpers;
 
 namespace SEE.Controls.Actions.Drawable
 {

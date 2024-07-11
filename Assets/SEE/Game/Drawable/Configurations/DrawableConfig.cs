@@ -1,6 +1,4 @@
-﻿using Assets.SEE.Game.Drawable;
-using Assets.SEE.Net.Actions.Drawable;
-using SEE.Net.Actions.Drawable;
+﻿using SEE.Net.Actions.Drawable;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
@@ -69,6 +67,16 @@ namespace SEE.Game.Drawable.Configurations
         /// The visibility of the drawable.
         /// </summary>
         public bool Visibility;
+
+        /// <summary>
+        /// The current page of the drawable.
+        /// </summary>
+        public int CurrentPage;
+
+        /// <summary>
+        /// The maximum page size.
+        /// </summary>
+        public int MaxPageSize;
 
         /// <summary>
         /// All the lines that should be displayed on this drawable.
@@ -193,6 +201,16 @@ namespace SEE.Game.Drawable.Configurations
         private const string VisibilityLabel = "Visibility";
 
         /// <summary>
+        /// The label for the current selected page of a drawable in the configuration file.
+        /// </summary>
+        private const string CurrentPageLabel = "CurrentPage";
+
+        /// <summary>
+        /// The label for the maximum page size of a drawable in the configuration file.
+        /// </summary>
+        private const string MaxPageSizeLabel = "MaxPageSize";
+
+        /// <summary>
         /// The label for the group of line configurations in the configuration file.
         /// </summary>
         private const string LineConfigsLabel = "LineConfigs";
@@ -229,6 +247,8 @@ namespace SEE.Game.Drawable.Configurations
             writer.Save(OrderInLayer, OrderInLayerLabel);
             writer.Save(Description, DescriptionLabel);
             writer.Save(Visibility, VisibilityLabel);
+            writer.Save(CurrentPage, CurrentPageLabel);
+            writer.Save(MaxPageSize, MaxPageSizeLabel);
 
             if (LineConfigs != null && LineConfigs.Count > 0)
             {
@@ -389,6 +409,18 @@ namespace SEE.Game.Drawable.Configurations
             else
             {
                 Visibility = true;
+                errorFree = false;
+            }
+
+            /// Try to restore the current selected page.
+            if (!ConfigIO.Restore(attributes, CurrentPageLabel, ref CurrentPage))
+            {
+                errorFree = false;
+            }
+
+            /// Try to restore the maximum page size.
+            if (!ConfigIO.Restore(attributes, MaxPageSizeLabel, ref MaxPageSize))
+            {
                 errorFree = false;
             }
 

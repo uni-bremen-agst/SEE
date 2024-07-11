@@ -7,7 +7,7 @@ using SEE.UI.Drawable;
 using SEE.Utils;
 using UnityEngine;
 
-namespace Assets.SEE.Game.Drawable.ActionHelpers
+namespace SEE.Game.Drawable.ActionHelpers
 {
     /// <summary>
     /// This class provides a function for selecting <see cref="DrawableType"/> objects.
@@ -27,19 +27,19 @@ namespace Assets.SEE.Game.Drawable.ActionHelpers
         /// <param name="action">The action to be taken if data needs to be reset after an action change.</param>
         /// <param name="setOldObject">Status indicating whether the previously selected object should be set.</param>
         /// <returns>Status indicating whether the selection was successful or not.</returns>
-        public static bool SelectObject(ref GameObject selectedObj, ref GameObject oldSelectedObj, ref bool mouseWasReleased, GameObject Surface, 
+        public static bool SelectObject(ref GameObject selectedObj, ref GameObject oldSelectedObj, ref bool mouseWasReleased, GameObject Surface,
             bool hasDrawable, bool isDrawableType, bool collisionDetection = false, ActionStateType action = null, bool setOldObject = true)
         {
             if (Queries.LeftMouseInteraction()
                 && selectedObj == null
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit)
-                && (oldSelectedObj == null 
+                && (oldSelectedObj == null
                     || oldSelectedObj != raycastHit.collider.gameObject
-                    || (oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased))
-                && (!hasDrawable 
-                    || (hasDrawable && GameFinder.HasDrawableSurface(raycastHit.collider.gameObject)))
+                    || oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased)
+                && (!hasDrawable
+                    || hasDrawable && GameFinder.HasDrawableSurface(raycastHit.collider.gameObject))
                 && (!isDrawableType
-                    || (isDrawableType && Tags.DrawableTypes.Contains(raycastHit.collider.gameObject.tag))))
+                    || isDrawableType && Tags.DrawableTypes.Contains(raycastHit.collider.gameObject.tag)))
             {
                 selectedObj = raycastHit.collider.gameObject;
                 if (setOldObject)
@@ -74,7 +74,7 @@ namespace Assets.SEE.Game.Drawable.ActionHelpers
         {
             if (Queries.LeftMouseInteraction()
                 && Raycasting.RaycastAnything(out RaycastHit hit)
-                && GameFinder.HasDrawableSurface(hit.collider.gameObject)) 
+                && GameFinder.HasDrawableSurface(hit.collider.gameObject))
             {
                 raycastHit = hit;
                 return true;

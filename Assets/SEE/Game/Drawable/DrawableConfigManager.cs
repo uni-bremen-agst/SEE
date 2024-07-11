@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Game.Drawable.ValueHolders;
-using SEE.Game.Drawable.Configurations;
+﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.UI.Notification;
 using SEE.Utils;
@@ -208,6 +207,7 @@ namespace SEE.Game.Drawable
                 bool visibility = GameFinder.GetHighestParent(surface).activeInHierarchy;
                 
                 DrawableHolder holder = surface.GetComponent<DrawableHolder>();
+
                 /// Creates the <see cref="DrawableConfig"/> with the corresponding values.
                 DrawableConfig config = new()
                 {
@@ -221,7 +221,9 @@ namespace SEE.Game.Drawable
                     Lighting = lighting,
                     OrderInLayer = holder.OrderInLayer,
                     Description = holder.Description,
-                    Visibility = visibility
+                    Visibility = visibility,
+                    CurrentPage = holder.CurrentPage,
+                    MaxPageSize = holder.MaxPageSize,
                 };
 
                 /// Block for creating the <see cref="DrawableType"/> of the drawable.

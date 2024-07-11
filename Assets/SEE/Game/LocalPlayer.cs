@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Game;
-using Assets.SEE.GameObjects;
+﻿using SEE.GO;
 using SEE.GO.Menu;
 using UnityEngine;
 

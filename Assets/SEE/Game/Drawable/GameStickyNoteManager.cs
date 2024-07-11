@@ -1,6 +1,4 @@
-﻿using Assets.SEE.Game.Drawable;
-using Assets.SEE.Game.Drawable.ValueHolders;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Utils;
@@ -110,6 +108,8 @@ namespace SEE.Game.Drawable
             DrawableHolder drawableHolder = stickyNote.GetComponentInChildren<DrawableHolder>();
             drawableHolder.OrderInLayer = config.OrderInLayer;
             drawableHolder.Description = config.Description;
+            drawableHolder.CurrentPage = config.CurrentPage;
+            drawableHolder.MaxPageSize = config.MaxPageSize;
 
             if (config.GetAllDrawableTypes().Count > 0)
             {

@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Game.Drawable;
-using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;

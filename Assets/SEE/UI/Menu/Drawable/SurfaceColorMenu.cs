@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Game.Drawable;
-using Michsky.UI.ModernUIPack;
+﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;

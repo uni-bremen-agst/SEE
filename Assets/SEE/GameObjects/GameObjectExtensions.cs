@@ -9,8 +9,7 @@ using SEE.Utils;
 using UnityEngine;
 using static SEE.Game.Portal.IncludeDescendants;
 using Sirenix.Utilities;
-using Assets.SEE.DataModel.Drawable;
-using Assets.SEE.GameObjects;
+using SEE.DataModel.Drawable;
 
 namespace SEE.GO
 {

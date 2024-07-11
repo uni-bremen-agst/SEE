@@ -1,7 +1,7 @@
-﻿using Assets.SEE.Game.Drawable.ActionHelpers;
-using HighlightPlus;
+﻿using HighlightPlus;
 using SEE.Game;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Menu.Drawable;
@@ -10,7 +10,7 @@ using SEE.Utils;
 using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
-using MouseButton = Assets.SEE.Game.Drawable.ActionHelpers.MouseButton;
+using MouseButton = SEE.Game.Drawable.ActionHelpers.MouseButton;
 
 namespace SEE.Controls.Actions.Drawable
 {

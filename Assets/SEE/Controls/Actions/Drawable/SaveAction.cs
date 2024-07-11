@@ -12,7 +12,7 @@ using UnityEngine.Events;
 using SEE.UI.Menu.Drawable;
 using SEE.Utils.Paths;
 using SEE.Utils.History;
-using Assets.SEE.Game.Drawable.ActionHelpers;
+using SEE.Game.Drawable.ActionHelpers;
 
 namespace SEE.Controls.Actions.Drawable
 {

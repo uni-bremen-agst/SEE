@@ -1,8 +1,9 @@
-﻿using Assets.SEE.DataModel.Drawable;
-using SEE.DataModel;
+﻿using SEE.DataModel;
+using SEE.DataModel.Drawable;
+using Assets.SEE.UI.Window.DrawableManagerWindow;
 using System.Collections.Generic;
 
-namespace Assets.SEE.Game
+namespace SEE.Game
 {
     /// <summary>
     /// Class used by the <see cref="DrawableManagerWindow"> to detect added or removed drawable surfaces.

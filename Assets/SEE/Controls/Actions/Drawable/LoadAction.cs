@@ -13,8 +13,9 @@ using UnityEngine;
 using UnityEngine.Events;
 using SEE.Utils.Paths;
 using SEE.Utils.History;
-using Assets.SEE.Game.Drawable.ActionHelpers;
-using Assets.SEE.Game.Drawable.ValueHolders;
+using SEE.Game.Drawable.ValueHolders;
+using SEE.Game.Drawable.ActionHelpers;
+using System.Linq;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -244,6 +245,10 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         Restore(memento.SpecificSurface.GetDrawableSurface(), drawableConfig);
                     }
+                    GameDrawableManager.ChangeCurrentPage(memento.SpecificSurface.GetDrawableSurface(), 0);
+                    int max = DrawableConfigManager.GetDrawableConfig(selectedSurface).GetAllDrawableTypes()
+                        .Aggregate((t1, t2) => t1.AssociatedPage > t2.AssociatedPage ? t1 : t2).AssociatedPage;
+                    GameDrawableManager.ChangeMaxPage(memento.SpecificSurface.GetDrawableSurface(), max + 1);
                     memento.Configs = configsSpecific;
                     CurrentState = IReversibleAction.Progress.Completed;
                     result = true;
