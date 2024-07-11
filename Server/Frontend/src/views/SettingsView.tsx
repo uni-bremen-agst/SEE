@@ -110,7 +110,7 @@ function SettingsView() {
       return <Navigate to="/"/>
     } 
     else return (
-      <Container sx={{padding: "3em", height:"100vh"}}>
+      <Container sx={{padding: "3em"}}>
         <Modal
           open={addUserModalOpen}
           onClose={() => setAddUserModalOpen(false)}
@@ -135,10 +135,10 @@ function SettingsView() {
                   />
                   <Stack justifyContent="end" direction="row" spacing={2}>
                     <Button variant="contained" color="secondary" sx={{borderRadius:"25px"}} onClick={() => {setAddUserModalOpen(false); setAddUserUsername(""); setAddUserPassword("");}}>
-                        Abbrechen
+                        Cancel
                     </Button>
                     <Button variant="contained" sx={{borderRadius:"25px"}} onClick={() => addUser()}>
-                        Hinzufügen
+                        Create
                     </Button>
                   </Stack>
                 </Stack>
@@ -167,38 +167,39 @@ function SettingsView() {
                   </Stack>
               </Box>
             </Modal>
-          <Modal
-            open={promoteDemoteUserModalOpen}
-            onClose={() => setPromoteDemoteUserModalOpen(false)}
-            aria-labelledby="promote-demote-user-modal-title"
-            aria-describedby="promote-demote-modal-description">
-              <Box sx={modalStyle}>
-                  <Typography id="promote-demote-modal-title" variant="h6">
-                    {selectedUser?.roles.some((item) => item.name == "ROLE_ADMIN") ? "Demote" : "Promote"} User
-                  </Typography>
-                  <Typography id="promote-demote-modal-description" sx={{marginTop: "2em"}}>
-                    Are you sure that you want to {selectedUser?.roles.some((item) => item.name == "ROLE_ADMIN") ? "demote" : "promote"} <b>{selectedUser? selectedUser.username : ""}</b> to {selectedUser?.roles.some((item) => item.name == "ROLE_ADMIN") ? "user" : "admin"}?
-                  </Typography>
-                  <Stack justifyContent="end" direction="row" spacing={2} sx={{marginTop: "2em"}}>
-                    <Button variant="contained" color="secondary" sx={{borderRadius:"25px"}} onClick={() => setPromoteDemoteUserModalOpen(false)}>
-                        Cancel
-                    </Button>
-                    <Button variant="contained" sx={{borderRadius:"25px"}} onClick={() => {if(selectedUser?.roles.some((item) => item.name == "ROLE_ADMIN")){demoteUser()} else {promoteUser()}}}>
-                      {selectedUser?.roles.some((item) => item.name == "ROLE_ADMIN") ? "Demote" : "Promote"}
-                    </Button>
-                  </Stack>
-              </Box>
-          </Modal>
-        <Header/>
-        <Card sx={{marginTop: "2em", borderRadius: "25px", height: "calc(100% - 100px)", overflow: "auto"}}>
-          <CardContent sx={{height: "calc(100% - 3em)"}}>
-            <Stack direction="column" spacing={2} height={"100%"}>
-              <Typography variant="h4">
-                <Box display={"inline"} sx={{"&:hover" : {cursor: "pointer"}}}>
-                  <FontAwesomeIcon icon={faArrowLeft} onClick={() => navigate(-1)}/>&nbsp;
+            <Modal
+              open={promoteDemoteUserModalOpen}
+              onClose={() => setPromoteDemoteUserModalOpen(false)}
+              aria-labelledby="promote-demote-user-modal-title"
+              aria-describedby="promote-demote-modal-description">
+                <Box sx={modalStyle}>
+                    <Typography id="promote-demote-modal-title" variant="h6">
+                      {selectedUser?.roles.some((item) => item.name == "ROLE_ADMIN") ? "Demote" : "Promote"} User
+                    </Typography>
+                    <Typography id="promote-demote-modal-description" sx={{marginTop: "2em"}}>
+                      Are you sure that you want to {selectedUser?.roles.some((item) => item.name == "ROLE_ADMIN") ? "demote" : "promote"} <b>{selectedUser? selectedUser.username : ""}</b> to {selectedUser?.roles.some((item) => item.name == "ROLE_ADMIN") ? "user" : "admin"}?
+                    </Typography>
+                    <Stack justifyContent="end" direction="row" spacing={2} sx={{marginTop: "2em"}}>
+                      <Button variant="contained" color="secondary" sx={{borderRadius:"25px"}} onClick={() => setPromoteDemoteUserModalOpen(false)}>
+                          Cancel
+                      </Button>
+                      <Button variant="contained" sx={{borderRadius:"25px"}} onClick={() => {if(selectedUser?.roles.some((item) => item.name == "ROLE_ADMIN")){demoteUser()} else {promoteUser()}}}>
+                        {selectedUser?.roles.some((item) => item.name == "ROLE_ADMIN") ? "Demote" : "Promote"}
+                      </Button>
+                    </Stack>
                 </Box>
-                Settings
-              </Typography>
+            </Modal>
+
+        <Header/>
+        <Typography variant="h4">
+          <Box display={"inline"} sx={{"&:hover" : {cursor: "pointer"}}}>
+            <FontAwesomeIcon icon={faArrowLeft} onClick={() => navigate(-1)}/>&nbsp;
+          </Box>
+          Settings
+        </Typography>
+        <Card sx={{marginTop: "2em", borderRadius: "25px", overflow: "auto"}}>
+          <CardContent>
+            <Stack direction="column" spacing={2} height={"100%"}>
               <Typography variant="h6">User Management</Typography>
               <Card sx={{borderRadius: "25px", backgroundColor: grey[200], flexGrow: 1, overflow: "auto", minHeight: "100px", maxHeight: "100%"}}>
                 <CardContent>

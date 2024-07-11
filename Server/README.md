@@ -69,43 +69,26 @@ SQLite database files can be inspected using [DB Browser for SQLite](https://sql
 
 At the current state, the management server is not optimized for production environments.
 
-As the backend – by default – has complete access to the Docker server it is running on, it can potentially manipulate anything on the server.
+Please refer to the *Security Considerations* in the backend README for additional information.
+
+
+### HTTPS
+
+The management server as provided here does not implement HTTPS.
+You are strongly advised to set up a reverse proxy and only provide TLS-secured access.
+
+
+### Containerization
+
+The backend – by default – has complete access to the Docker server it is running on.
+Being able to launch any container means, it can potentially manipulate anything on the server.
+If the backend itself is compromised, the complete server is also.
 
 This can be mitigated by either:
 
-- Running the complete stack in a VM.
-  - Use a reverse proxy (for HTTPs) outside the VM to keep key material safe.
+- Running the backend or the complete stack in a VM.
 - Giving the backend access to a separate Docker instance.
-  - Set up a separate machine or VM for the game servers and configure the backend to use this instead.
+  - Set up a separate machine or VM to provide a Docker host for the game servers and configure the backend to use this instead.
 - Use Podman in rootless mode.
   - This will usually prevent the frontend to open port 80, which should be no problem as a reverse proxy with HTTPs should be used, anyway.
-
-
---------------------------------------------------------------------------------
-## How to run:
-
-**TODO:** This is the original content of this file. It will be replaced soon.
-
-- Vorbereitung: 
-Um das Projekt zu starten, wird Docker benötigt. Docker kann unter Linux mit den meisten 
-Paketmanagern heruntergeladen werden, unter Windows kann man Docker über 
-https://www.docker.com/ herunterladen und installieren.
-
-- Nachdem Docker installiert ist, muss man in den Ordner Gameserver-Linux über das Terminal 
-navigieren und dort den Befehl ```docker build -t see-gameserver .``` ausführen.
-
-- Nachdem der Befehl ausgeführt wurde, kann man über das Terminal zurück in den übergeordneten 
-Ordner wechseln (in dem auch das ```compose.yaml``` liegt) und dort den Befehl 
-```docker-compose up --build``` ausführen. Damit sollen alle Dienste für den Betrieb gestartet 
-werden.
-
-- Sobald alle Dienste gestartet sind, kann man über den Webbrowser mit dem Link 
-http://localhost/ auf die Verwaltungsübersicht zugreifen.
-
-- Hier kann man sich nun mit dem Benutzernamen "thorsten" und dem Passwort "password" anmelden.
-
-- Bei verbinden mit einem Server, kann der aktuelle Port mithilfe des "IP Teilen" Knopfes 
-gefunden werden.
-
-- Dieser muss beim Starten von SEE in das Feld "Server UDP Port" eingefügt werden.
-
+  - See above for additional information on how to achieve this.

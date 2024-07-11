@@ -46,8 +46,10 @@ public enum FileType {
      * <p>
      * Visual Studio can be connected to SEE using a Visual Studio Solution –
      * a container for one or more projects.
-     * 
-     * @see <a href="https://learn.microsoft.com/en-us/visualstudio/ide/solutions-and-projects-in-visual-studio?">What are Visual Studio solutions &amp; projects?</a>
+     * <p>
+     * See also:
+     * <a href="https://learn.microsoft.com/en-us/visualstudio/ide/solutions-and-projects-in-visual-studio?">
+     * What are Visual Studio solutions &amp; projects?</a>
      */
     SOLUTION,
 }

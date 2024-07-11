@@ -4,7 +4,7 @@ import HomeView from './views/HomeView'
 import ServerView from './views/ServerView'
 import CreateServerView from './views/CreateServerView'
 import SettingsView from './views/SettingsView'
-import PersonalSettingsView from './views/PersonalSettingsView'
+import UserSettingsView from './views/UserSettingsView'
 import { BrowserRouter } from 'react-router-dom'
 import { useContext } from 'react'
 import { AuthContext } from './contexts/AuthContext'
@@ -34,7 +34,7 @@ function PrivateRoutes() {
         <Route path="/server" element={<ServerView/>}/> 
         <Route path="/createServer" element={<CreateServerView/>}/> 
         <Route path="/settings" element={<SettingsView/>}/> 
-        <Route path="/personalSettings" element={<PersonalSettingsView/>}/> 
+        <Route path="/userSettings" element={<UserSettingsView/>}/> 
       </Routes> 
   )
 }

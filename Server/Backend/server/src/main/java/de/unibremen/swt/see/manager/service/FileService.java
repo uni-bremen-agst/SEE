@@ -2,7 +2,6 @@ package de.unibremen.swt.see.manager.service;
 
 import de.unibremen.swt.see.manager.model.File;
 import de.unibremen.swt.see.manager.model.FileType;
-import static de.unibremen.swt.see.manager.model.FileType.*;
 import de.unibremen.swt.see.manager.model.Server;
 import de.unibremen.swt.see.manager.repository.FileRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -72,23 +71,10 @@ public class FileService {
         if (multipartFile.isEmpty()) {
             return null;
         }
-        
-        String originalFilename = multipartFile.getOriginalFilename();
-        String intendedFileName;
-        switch (type) {
-            case CFG      -> intendedFileName = "multiplayer.cfg";
-            case CSV      -> intendedFileName = "multiplayer.csv";
-            case GXL      -> intendedFileName = "multiplayer.gxl";
-            case SOURCE   -> intendedFileName = "src.zip";
-            case SOLUTION ->
-                intendedFileName = "solution." + getFileExtension(originalFilename);
-            default       -> throw new RuntimeException("File name could not be derived from file type!");
-        }
 
         File file = new File();
         file.setContentType(multipartFile.getContentType());
-        file.setOriginalName(originalFilename);
-        file.setName(intendedFileName);
+        file.setName(multipartFile.getOriginalFilename());
         file.setServer(server);
 
         Path path;
@@ -207,6 +193,8 @@ public class FileService {
         for (File file : files) {
             delete(file);
         }
+
+        Files.delete(getUploadPath(server));
     }
 
 

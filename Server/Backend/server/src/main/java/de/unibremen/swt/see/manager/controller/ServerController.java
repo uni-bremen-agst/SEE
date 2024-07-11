@@ -86,10 +86,11 @@ public class ServerController {
      */
     @PostMapping("/addFile")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<?> addFileToServer(@RequestParam("id") UUID serverId,
-                                             @RequestParam("fileType") String fileType,
-                                             @RequestParam("file") MultipartFile file) {
-        File responseFile = serverService.addFileToServer(serverId, fileType, file);
+    public ResponseEntity<?> addFile(
+            @RequestParam("id") UUID serverId,
+            @RequestParam("fileType") String fileType,
+            @RequestParam("file") MultipartFile file) {
+        File responseFile = serverService.addFile(serverId, fileType, file);
         if (responseFile == null)
             return ResponseEntity.internalServerError().build();
         return ResponseEntity.ok().body(responseFile);

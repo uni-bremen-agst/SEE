@@ -6,7 +6,7 @@ import { useNavigate } from "react-router";
 import { useContext, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 
-function PersonalSettingsView() {
+function UserSettingsView() {
     const {axiosInstance, user, setUser} = useContext(AuthContext);
     const navigate = useNavigate();
 
@@ -69,15 +69,15 @@ function PersonalSettingsView() {
           </Alert>
         </Snackbar>
         <Header/>
-        <Card sx={{marginTop: "2em", borderRadius: "25px", height: "calc(100% - 100px)", overflow: "auto"}}>
-          <CardContent sx={{height: "calc(100% - 3em)"}}>
-            <Stack direction="column" spacing={2} height={"100%"}>
-              <Typography variant="h4">
-                <Box display={"inline"} sx={{"&:hover" : {cursor: "pointer"}}}>
-                  <FontAwesomeIcon icon={faArrowLeft} onClick={() => navigate(-1)}/>&nbsp;
-                </Box>
-                User Settings
-              </Typography>
+        <Typography variant="h4">
+          <Box display={"inline"} sx={{"&:hover" : {cursor: "pointer"}}}>
+            <FontAwesomeIcon icon={faArrowLeft} onClick={() => navigate(-1)}/>&nbsp;
+          </Box>
+          User Settings
+        </Typography>
+        <Card sx={{marginTop: "2em", borderRadius: "25px", overflow: "auto"}}>
+          <CardContent>
+            <Stack direction="column" spacing={2}>
               <Typography variant="h6">Change Username</Typography>
               <TextField 
                 label="New username" 
@@ -98,6 +98,13 @@ function PersonalSettingsView() {
                     Save
                 </Button>
               </Stack>
+            </Stack>
+          </CardContent>
+        </Card>
+
+        <Card sx={{marginTop: "2em", borderRadius: "25px", overflow: "auto"}}>
+          <CardContent>
+            <Stack direction="column" spacing={2}>
               <Typography variant="h6">Change Password</Typography>
               <TextField 
                 label="Current password" 
@@ -136,4 +143,4 @@ function PersonalSettingsView() {
     )
   }
 
-  export default PersonalSettingsView;
+  export default UserSettingsView;

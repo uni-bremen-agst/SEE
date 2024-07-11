@@ -29,16 +29,9 @@ public class File {
     private UUID id;
 
     /**
-     * The original name of the uploaded file from the client.
-     */
-    @Setter
-    @Column(name = "original_name")
-    private String originalName;
-
-    /**
-     * The intended name of the uploaded file.
+     * The name of the uploaded file (filename).
      * <p>
-     * This is usually set during upload to match the use case.
+     * The original name of the uploaded file from the client.
      */
     @Setter
     @Column(name = "name")

@@ -12,6 +12,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -84,6 +85,21 @@ public class ServerService {
     private final Random random = new Random();
 
     /**
+     * Used for room password generation.
+     */
+    private final SecureRandom secureRandom = new SecureRandom();
+
+    /**
+     * Characters used for room password generation.
+     */
+    private final static String PASSWORD_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+
+    /**
+     * Length of generated room passwords.
+     */
+    private final static int PASSWORD_LENGTH = 24;
+
+    /**
      * Retrieves a server by its ID (read-only).
      *
      * @param id the ID of the server
@@ -127,13 +143,14 @@ public class ServerService {
             throw new RuntimeException("The server is already present in the database!");
         }
 
-        Integer port = generateRandomPort();
+        Integer port = generatePort();
         if (port == null) {
             log.error("Not able to assign unique port after several tries!");
             return null;
         }
-
         server.setContainerPort(port);
+
+        server.setServerPassword(generatePassword(PASSWORD_LENGTH));
         server = serverRepo.save(server);
         return server;
     }
@@ -149,7 +166,7 @@ public class ServerService {
      * @return the created file, or {@code null} if the server was not found or
      * an error occurred while storing the file
      */
-    public File addFileToServer(UUID serverId, String fileTypeStr, MultipartFile multipartFile) {
+    public File addFile(UUID serverId, String fileTypeStr, MultipartFile multipartFile) {
         Optional<Server> optServer = serverRepo.findServerById(serverId);
         if (optServer.isEmpty()) {
             log.error("Server not found with ID: {}", serverId);
@@ -267,7 +284,8 @@ public class ServerService {
     }
 
     /**
-     * Generates a random port in the range defined in the server settings.
+     * Generates a pseudo-random port in the range defined in the server
+     * settings.
      * <p>
      * Checks if the port is already used and tries several times to assign a
      * new random port.
@@ -277,7 +295,7 @@ public class ServerService {
      *
      * @return random port number
      */
-    private Integer generateRandomPort() {
+    private Integer generatePort() {
         final Config config = resolveConfig();
         final int min = config.getMinContainerPort();
         final int max = config.getMaxContainerPort();
@@ -292,6 +310,21 @@ public class ServerService {
         }
 
         return port;
+    }
+
+    /**
+     * Generates a pseudo-random string for use as server/room password.
+     * <p>
+     * This is a simple password generator that is not optimized to match high
+     * security standards.
+     *
+     * @return generated password
+     */
+    private String generatePassword(final int length) {
+        return secureRandom.ints(length, 0, PASSWORD_CHARS.length())
+                .mapToObj(PASSWORD_CHARS::charAt)
+                .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
+                .toString();
     }
 
     /**

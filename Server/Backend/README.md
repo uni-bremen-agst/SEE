@@ -95,3 +95,55 @@ The process should boil down to this:
 4. Quit and open Eclipse again. Don't use the restart option.
 
 **Note:** This did not make it work after all. Please update this section if you can resolve the issue!
+
+
+--------------------------------------------------------------------------------
+## Security Considerations
+
+There are a few things to keep in mind while using the app.
+In this section you will find a non-exhaustive list of security considerations.
+
+Please also read the parent README for additional information.
+
+
+### Passwords
+
+**Passwords get transmitted in plaintext.**
+
+There are two types of passwords at the time of writing:
+
+1. Passwords for users registered in the backend application:
+
+Passwords are transmitted in plaintext during registration and sign-in.
+After logging in to the backend (usually using the frontend), a token (JWT) is transmitted to the client that is henceforth used for authentication of requests (see below).
+
+User passwords are stored in the database as a salted bCrypt hashes, which is a state-of-the-art method to secure passwords at rest.
+
+2. *Room* or *server passwords*:
+
+These passwords are auto-generated when a server instance is created.
+The passwords are transmitted in plaintext during any request from the SEE client to the backend to retrieve files.
+They are also stored in the database as plaintext.
+This is much less secure than how user passwords are handled.
+
+Rationale:
+- Server instances are frequently created and destroyed, thus passwords are usually only used for a short time.
+- Room passwords are only used on certain API end-points and do not grant access to control the backend.
+- Passwords are auto-generated: no user-defined secrets are leaked.
+- Passwords are displayed in the front-end for convenience: Users can access the passwords at any time during server life-time for their convenience.
+
+However:
+- Room passwords are used to secure access to user-provided Code City configurations, optionally including source code and potentially other data that is not intended for the public.
+
+
+### JSON Web Token (JWT)
+
+As mentioned above, JWTs are used to authenticate users while accessing the API after log-in.
+However, this does not (yet) apply to the file requests made by the SEE clients, which operate using plaintext passwords (see above).
+
+JWT rely on a secret configured by the server. If this secret is uncovered, the security measures are completely useless.
+Remember to configure an individual secret for your server instance and take measures to keep it a secret.
+
+At the time of writing, tokens are never invalidated.
+While they are generated with a TTL (max age) of 24 hours during log-in, they are not invalidated on log-out.
+They are merely removed from the client by replacing the cookie with an empty one.

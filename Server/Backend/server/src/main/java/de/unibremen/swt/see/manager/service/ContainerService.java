@@ -218,9 +218,18 @@ public class ContainerService {
      * @throws IllegalStateException if the server is busy or running
      */
     public void deleteContainer(Server server) {
+        String containerId = server.getContainerId();
+        if (containerId == null) {
+            return;
+        }
+
         try {
-            dockerClient.stopContainerCmd(server.getContainerId()).exec();
-            dockerClient.removeContainerCmd("container_id")
+            try {
+                dockerClient.stopContainerCmd(containerId).exec();
+            } catch (NotModifiedException e) {
+                // Server already stopped
+            }
+            dockerClient.removeContainerCmd(containerId)
                     .withForce(true)
                     .exec();
             dockerClient.removeVolumeCmd(server.getContainerVolume()).exec();
@@ -308,6 +317,10 @@ public class ContainerService {
      * @return {@code true} if the container exists, else {@code false}
      */
     private boolean containerExists(final String containerId) {
+        if (containerId == null) {
+            return false;
+        }
+
         try {
             InspectContainerResponse containerResponse = dockerClient.inspectContainerCmd(containerId).exec();
             return containerResponse != null;

@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Card, CardContent, Chip, CircularProgress, Container, Grid, IconButton, List, ListItem, ListItemText, Modal, Snackbar, Stack, Typography } from "@mui/material";
+import { Alert, Box, Button, Card, CardContent, Chip, CircularProgress, Container, Grid, IconButton, List, ListItem, ListItemText, Modal, Snackbar, Stack, Switch, Typography } from "@mui/material";
 import Header from "../components/Header";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faDownload, faEye, faPlay, faStop, faClipboard, faTrash } from "@fortawesome/free-solid-svg-icons";
@@ -8,22 +8,21 @@ import { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import Server from "../types/Server";
 import { AuthContext } from "../contexts/AuthContext";
-import DummyFile from "../types/File";
+import SeeFile from "../types/SeeFile";
 import { saveAs } from 'file-saver';
 import { base64StringToBlob } from 'blob-util';
+import FileType from "../types/FileType";
 
-function getServerStatus(serverStatusType: string){
-  if(serverStatusType == "ONLINE"){
-    return <Chip color="success" label="Online"/>;
-  }
-  if(serverStatusType == "OFFLINE"){
-    return <Chip color="error" label="Offline"/>;
-  }
-  if(serverStatusType == "STARTING"){
-    return <Chip color="warning" label="Starting"/>;
-  }
-  if(serverStatusType == "STOPPING"){
-    return <Chip color="warning" label="Stopping"/>;    
+function getServerStatus(serverStatusType: string) {
+  switch (serverStatusType) {
+    case "ONLINE":
+      return <Chip color="success" label="Online"/>;
+    case "OFFLINE":
+      return <Chip color="error" label="Offline"/>;
+    case "STARTING":
+      return <Chip color="warning" label="Starting"/>;
+    case "STOPPING":
+      return <Chip color="warning" label="Stopping"/>;
   }
 }
 
@@ -47,7 +46,7 @@ function ServerView() {
     const navigate = useNavigate();
 
     const [server, setServer] = useState<Server|undefined>(undefined);
-    const [files, setFiles] = useState<DummyFile[] | undefined>(undefined);
+    const [files, setFiles] = useState<SeeFile[] | undefined>(undefined);
     const [showDeleteServerModal, setShowDeleteServerModal] = useState(false);
     const [showLinkCopiedMessage, setShowLinkCopiedMessage] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -71,6 +70,7 @@ function ServerView() {
     }
 
     function downloadFiles () {
+      // TODO Fix or remove "downlaod all files"
       if(files){
         for(const file of files){
           axiosInstance.get("/file/get", {params: {id: file.id}}).then(
@@ -117,10 +117,10 @@ function ServerView() {
       return <CircularProgress/>
     }
     return (
-      <Container sx={{padding: "3em", height:"100vh"}}>
+      <Container sx={{padding: "3em"}}>
         <Snackbar open={showLinkCopiedMessage} autoHideDuration={5000} onClose={() => setShowLinkCopiedMessage(false)}>
           <Alert onClose={() => setShowLinkCopiedMessage(false)} severity="success" sx={{width: "100%", borderRadius: "25px"}}>
-            Link in Zwischenablage kopiert.
+            Copied address to clipboard.
           </Alert>
         </Snackbar>
         <Modal
@@ -130,154 +130,172 @@ function ServerView() {
           aria-describedby="delete-server-modal-description">
             <Box sx={modalStyle}>
                 <Typography id="delete-server-modal-title" variant="h6">
-                  Server löschen
+                  Delete Server
                 </Typography>
                 <Typography id="delete-server-modal-description" sx={{marginTop: "2em"}}>
-                  Sind Sie sich sicher, dass Sie den Server <b>{server? server.name : ""}</b> löschen möchten?
+                  Are you sure you want to delete server <b>{server? server.name : ""}</b>?
                 </Typography>
                 <Stack justifyContent="end" direction="row" spacing={2} sx={{marginTop: "2em"}}>
                   <Button variant="contained" color="secondary" sx={{borderRadius:"25px"}} onClick={() => setShowDeleteServerModal(false)}>
-                    Abbrechen
+                    Cancel
                   </Button>
                   <Button variant="contained" color="error" sx={{borderRadius:"25px"}} onClick={() => 
                   axiosInstance.delete("/server/delete", {params: {id: server.id}}).then(() => navigate("/", {replace: true}))}>
-                    Löschen
+                    Delete
                   </Button>
                 </Stack>
             </Box>
         </Modal>
-        <Header/>
+        <Header />
+        <Typography variant="h4">
+          <Box display={"inline"} sx={{"&:hover" : {cursor: "pointer"}}}>
+            <FontAwesomeIcon icon={faArrowLeft} onClick={() => navigate(-1)}/>&nbsp;
+          </Box>
+          Server Details
+        </Typography>
         <Card sx={{marginTop: "2em", borderRadius: "25px", height: "calc(100% - 100px)", overflow: "auto"}}>
           <CardContent sx={{height: "calc(100% - 3em)"}}>
             <Stack direction="column" spacing={2} height={"100%"}>
-              <Stack direction="row" sx={{justifyContent: 'space-between'}}>
-                <Stack direction="row">
-                  <Typography variant="h4"><Box display={"inline"} sx={{"&:hover" : {cursor: "pointer"}}}><FontAwesomeIcon icon={faArrowLeft} onClick={() => navigate(-1)}/></Box> {server.name}</Typography>
-                </Stack>
-                <Stack direction="row">
-                  <IconButton 
-                        aria-label="Start"
-                        disabled = {server.serverStatusType == "ONLINE"}
-                        onMouseDown={(e) => {e.stopPropagation()}} 
-                        onClick={(e) => {e.stopPropagation();
-                                        e.preventDefault();
-                                        startServer();
-                    }}>
-                      <FontAwesomeIcon icon={faPlay}/>
-                  </IconButton>
-                  <IconButton 
-                        aria-label="Stop"
-                        disabled = {server.serverStatusType == "OFFLINE"}
-                        onMouseDown={(e) => {e.stopPropagation()}} 
-                        onClick={(e) => {e.stopPropagation();
-                                        e.preventDefault();
-                                        stopServer();
-                    }}>
-                      <FontAwesomeIcon icon={faStop}/>
-                  </IconButton>
-                  <IconButton
-                        aria-label="Delete"
-                        onMouseDown={(e) => {e.stopPropagation()}} 
-                        onClick={(e) => {e.stopPropagation();
-                                        e.preventDefault();
-                                        setShowDeleteServerModal(true);
-                    }}>
-                      <FontAwesomeIcon icon={faTrash}/>
-                  </IconButton>
-                  <Stack direction="column" sx={{justifyContent: "center", marginLeft: "1em"}}>
-                    {getServerStatus(server.serverStatusType)}
-                  </Stack>
-                </Stack>
-              </Stack>
-              <Grid container spacing={2} sx={{paddingRight: "32px"}}>
-                <Grid item md={2} xs={12}>
-                  <Stack direction="column" spacing={1}>
+              <Stack direction="row" spacing={2}>
                     <Box width={140} height={140}>
                       <Card sx={{width: "100%", height: "100%"}}>
                         <Avatar width={140} height={140} avatarSeed={server.avatarSeed} avatarColor={server.avatarColor}/>
                       </Card>
                     </Box>
-                  </Stack>
-                </Grid>
-                <Grid item md={8} xs={12}>
                   <Stack direction="column" spacing={1}>
-                    <Typography variant="h6">Status</Typography>
-                    {server.serverStatusType == "ONLINE" ? 
-                      <Typography>Online since: {new Date(server.startTime*1000).toLocaleDateString()} {new Date(server.startTime*1000).toLocaleTimeString()}</Typography>
+                    <Typography variant="h6">{server.name}</Typography>
+                    {server.serverStatusType == "ONLINE"
+                      ? <Typography>Online since: {new Date(server.startTime*1000).toLocaleDateString()} {new Date(server.startTime*1000).toLocaleTimeString()}</Typography>
                       : <Typography>Offline since:
                         {
-                           server.stopTime?
-                              ` ${new Date(server.stopTime*1000).toLocaleDateString()} ${new Date(server.stopTime*1000).toLocaleTimeString()}`
-                            :
-                              ` ${new Date(server.creationTime*1000).toLocaleDateString()} ${new Date(server.creationTime*1000).toLocaleTimeString()}`
+                          server.stopTime
+                            ? ` ${new Date(server.stopTime*1000).toLocaleDateString()} ${new Date(server.stopTime*1000).toLocaleTimeString()}`
+                            : ` ${new Date(server.creationTime*1000).toLocaleDateString()} ${new Date(server.creationTime*1000).toLocaleTimeString()}`
                         }
                       </Typography>
                     }
-                    { server.serverPassword ? 
+                    <Stack direction="row">
+                      <Typography>Address:&nbsp;</Typography>
+                      <Typography sx={{fontFamily: "monospace"}}>{server.containerAddress}:{server.containerPort}</Typography>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            navigator.clipboard.writeText(`${server.containerAddress}:${server.containerPort}`);
+                            setShowLinkCopiedMessage(true);
+                          }}>
+                        <FontAwesomeIcon icon={faClipboard} />
+                      </IconButton>
+                    </Stack>
+                    { server.serverPassword &&
                       <Stack direction="row">
-                        <Typography sx={{lineHeight: "38px"}}>Password:&nbsp;</Typography>
-                        <Typography sx={{lineHeight: "38px", fontFamily: "monospace"}}>{showPassword ? server.serverPassword : server.serverPassword.replace(/./g, "\u25CF")}</Typography>
-                        <IconButton onClick={() => setShowPassword(!showPassword)}>
+                        <Typography>Password:&nbsp;</Typography>
+                        <Typography sx={{fontFamily: "monospace"}}>{showPassword ? server.serverPassword : server.serverPassword.replace(/./g, "\u25CF")}</Typography>
+                        <IconButton size="small" onClick={() => setShowPassword(!showPassword)}>
                           <FontAwesomeIcon icon={faEye} />
                         </IconButton>
-                      </Stack> : <></>
+                      </Stack>
                     }
                   </Stack>
-                </Grid>
-                <Grid item md={2} textAlign="end" display="flex" justifyContent="end" alignContent="end">
-                  <Stack direction="column" justifyContent="center">
-                    <Box display="flex">
+                <Stack direction="column">
+                  {getServerStatus(server.serverStatusType)}
+                  <Stack direction="row">
+                    { server.serverStatusType !== "ONLINE" &&
                       <IconButton 
-                            aria-label="Copy Address"
-                            size="large"
-                            sx={{display: "flex", flexDirection: "column"}}
-                            onMouseDown={(e) => {e.stopPropagation()}}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              e.preventDefault();
-                              navigator.clipboard.writeText(`${server.containerAddress}:${server.containerPort}`);
-                              setShowLinkCopiedMessage(true);
-                      }}>
-                          <FontAwesomeIcon icon={faClipboard}/>
-                          <Typography variant="button">Copy Address</Typography>
+                          aria-label="Start"
+                          onMouseDown={(e) => { e.stopPropagation() }} 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            startServer();
+                          }}>
+                        <FontAwesomeIcon icon={faPlay}/>
                       </IconButton>
-                    </Box>
-                  </Stack>
-                </Grid>
-              </Grid>
-              <Stack direction="row" sx={{justifyContent: 'space-between'}}>
-                <Typography variant="h6">Project Data</Typography>
-                <IconButton 
-                            onMouseDown={(e) => {e.stopPropagation()}} 
-                            onClick={(e) => {e.stopPropagation();
-                                            e.preventDefault();
-                                            downloadFiles();
-                        }}>
-                          <FontAwesomeIcon icon={faDownload}/>
-                      </IconButton>
-              </Stack>
-              <Card sx={{borderRadius: "25px", backgroundColor: grey[200], flexGrow: 1, overflow: "auto", minHeight: "100px"}}>
-                <CardContent>
-                  <List>
-                    {
-                      files?.map((projectFile) => 
-                        <ListItem sx={{backgroundColor: "white", borderRadius:"25px", marginBottom:"1em"}} key={projectFile.id}>
-                          <ListItemText>
-                            <Typography variant="subtitle2">{projectFile.name}</Typography>
-                          </ListItemText>
-                          <ListItemText>
-                          <Typography fontStyle="italic">{projectFile.originalName}</Typography>
-                          </ListItemText>
-                          <ListItemText>
-                            <Typography>{Number(projectFile.size / 1024 / 1024).toFixed(2)} MiB</Typography>
-                          </ListItemText>
-                          {/* TODO Show original file name as well? */}
-                        </ListItem>
-                      )
                     }
-                  </List>
-                </CardContent>
-              </Card>
+                    { server.serverStatusType === "ONLINE" &&
+                      <IconButton 
+                          aria-label="Stop"
+                          onMouseDown={(e) => {e.stopPropagation()}} 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            stopServer();
+                          }}>
+                        <FontAwesomeIcon icon={faStop}/>
+                      </IconButton>
+                    }
+                    <IconButton
+                          aria-label="Delete"
+                          onMouseDown={(e) => {e.stopPropagation()}} 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            setShowDeleteServerModal(true);
+                        }}>
+                      <FontAwesomeIcon icon={faTrash}/>
+                    </IconButton>
+                  </Stack>
+                </Stack>
+              </Stack>
+              { files && files.length > 0 &&
+                <div>
+                  <Stack direction="row" sx={{justifyContent: 'space-between'}}>
+                    <Typography variant="h6">Project Files</Typography>
+                    <IconButton 
+                                onMouseDown={(e) => {e.stopPropagation()}} 
+                                onClick={(e) => {e.stopPropagation();
+                                                e.preventDefault();
+                                                downloadFiles();
+                            }}>
+                              <FontAwesomeIcon icon={faDownload}/>
+                          </IconButton>
+                  </Stack>
+                  <Card sx={{borderRadius: "25px", backgroundColor: grey[200], flexGrow: 1, overflow: "auto", minHeight: "100px"}}>
+                    <CardContent>
+                      <List>
+                        {
+                          files?.map((projectFile) => 
+                            <ListItem sx={{backgroundColor: "white", borderRadius:"25px", marginBottom:"1em"}} key={projectFile.id}>
+                              <Grid container>
+                                <Grid item xs={7}>
+                                  <ListItemText>
+                                    <Typography variant="subtitle2">{projectFile.name}</Typography>
+                                  </ListItemText>
+                                </Grid>
+                                <Grid item xs={2} sx={{textAlign: "center"}}>
+                                  <ListItemText>
+                                    <Typography fontStyle="italic">{FileType.getLabel(projectFile.fileType)}</Typography>
+                                  </ListItemText>
+                                </Grid>
+                                <Grid item xs={2} sx={{textAlign: "center"}}>
+                                  <ListItemText>
+                                    <Typography>{Number(projectFile.size / 1024 / 1024).toFixed(2)} MiB</Typography>
+                                  </ListItemText>
+                                </Grid>
+                                <Grid item xs={1} sx={{textAlign: "right"}}>
+                                  <ListItemText>
+                                    <IconButton
+                                        onMouseDown={(e) => {e.stopPropagation()}}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            e.preventDefault();
+                                            // TODO Download single file
+                                            alert("File download not yet implemented!");
+                                        }}>
+                                      <FontAwesomeIcon icon={faDownload}/>
+                                  </IconButton>
+                                  </ListItemText>
+                                </Grid>
+                              </Grid>
+                            </ListItem>
+                          )
+                        }
+                      </List>
+                    </CardContent>
+                  </Card>
+                </div>
+              }
             </Stack>
           </CardContent>
         </Card>
