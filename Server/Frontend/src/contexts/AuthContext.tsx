@@ -14,7 +14,7 @@ interface IAuthContext {
   axiosInstance: AxiosInstance;
 }
 
-const initialValue: any = {
+const initialValue: IAuthContext = {
   user: null,
   setUser: () => {},
   axiosInstance: axiosInstance

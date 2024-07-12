@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Card, CardContent, Chip, CircularProgress, Container, Grid, IconButton, List, ListItem, ListItemText, Modal, Snackbar, Stack, Switch, Typography } from "@mui/material";
+import { Alert, Box, Button, Card, CardContent, Chip, CircularProgress, Container, Grid, IconButton, List, ListItem, ListItemText, Modal, Snackbar, Stack, Typography } from "@mui/material";
 import Header from "../components/Header";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faDownload, faEye, faPlay, faStop, faClipboard, faTrash } from "@fortawesome/free-solid-svg-icons";
@@ -9,7 +9,7 @@ import { useLocation, useNavigate } from "react-router";
 import Server from "../types/Server";
 import { AuthContext } from "../contexts/AuthContext";
 import SeeFile from "../types/SeeFile";
-import FileType from "../types/FileType";
+import { FileTypeUtils } from "../types/FileType";
 
 function getServerStatus(serverStatusType: string) {
   switch (serverStatusType) {
@@ -47,6 +47,7 @@ function ServerView() {
     const [files, setFiles] = useState<SeeFile[] | undefined>(undefined);
     const [showDeleteServerModal, setShowDeleteServerModal] = useState(false);
     const [showLinkCopiedMessage, setShowLinkCopiedMessage] = useState(false);
+    const [showPasswordCopiedMessage, setShowPasswordCopiedMessage] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
     async function startServer() {
@@ -54,7 +55,9 @@ function ServerView() {
         await axiosInstance.put("/server/startServer", {}, {params: {id: server.id}})
         axiosInstance.get(`/server/`, {params: {id: server.id}}).then(
           (response) => setServer(response.data)
-        )  
+        ).catch(() => {
+            // TODO display error
+        });
       }
     }
 
@@ -63,7 +66,9 @@ function ServerView() {
         await axiosInstance.put("/server/stopServer", {}, {params: {id: server?.id}})
         axiosInstance.get(`/server/`, {params: {id: server.id}}).then(
           (response) => setServer(response.data)
-        )  
+        ).catch(() => {
+          // TODO display error
+        });
       }
     }
 
@@ -104,8 +109,13 @@ function ServerView() {
     return (
       <Container sx={{padding: "3em"}}>
         <Snackbar open={showLinkCopiedMessage} autoHideDuration={5000} onClose={() => setShowLinkCopiedMessage(false)}>
-          <Alert onClose={() => setShowLinkCopiedMessage(false)} severity="success" sx={{width: "100%", borderRadius: "25px"}}>
+          <Alert onClose={() => setShowLinkCopiedMessage(false)} severity="info" sx={{width: "100%", borderRadius: "25px"}}>
             Copied address to clipboard.
+          </Alert>
+        </Snackbar>
+        <Snackbar open={showPasswordCopiedMessage} autoHideDuration={5000} onClose={() => setShowPasswordCopiedMessage(false)}>
+          <Alert onClose={() => setShowPasswordCopiedMessage(false)} severity="info" sx={{width: "100%", borderRadius: "25px"}}>
+            Copied password to clipboard.
           </Alert>
         </Snackbar>
         <Modal
@@ -180,6 +190,16 @@ function ServerView() {
                         <IconButton size="small" onClick={() => setShowPassword(!showPassword)}>
                           <FontAwesomeIcon icon={faEye} />
                         </IconButton>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
+                              navigator.clipboard.writeText(`${server.serverPassword}`);
+                              setShowPasswordCopiedMessage(true);
+                            }}>
+                          <FontAwesomeIcon icon={faClipboard} />
+                        </IconButton>
                       </Stack>
                     }
                   </Stack>
@@ -240,7 +260,7 @@ function ServerView() {
                                 </Grid>
                                 <Grid item xs={4}>
                                   <ListItemText>
-                                    <Typography sx={{fontStyle: "italic"}}>{FileType.getLabel(projectFile.fileType)}</Typography>
+                                    <Typography sx={{fontStyle: "italic"}}>{FileTypeUtils.getLabel(projectFile.fileType)}</Typography>
                                   </ListItemText>
                                 </Grid>
                                 <Grid item xs={2} sx={{textAlign: "right"}}>
@@ -250,7 +270,7 @@ function ServerView() {
                                 </Grid>
                                 <Grid item xs={1} sx={{textAlign: "right"}}>
                                   <ListItemText>
-                                    <a href={axiosInstance.getUri() + "file/download?id=" + projectFile.id} download={projectFile.name} rel="noopener" target="_blank" style={{ textDecoration: 'none' }}>
+                                    <a href={axiosInstance.getUri() + "file/download?id=" + projectFile.id} download={projectFile.name} rel="noopener noreferrer" target="_blank" style={{ textDecoration: 'none' }}>
                                       <IconButton
                                           size="small">
                                         <FontAwesomeIcon icon={faDownload}/>

@@ -91,8 +91,9 @@ public class ServerController {
             @RequestParam("fileType") String fileType,
             @RequestParam("file") MultipartFile file) {
         File responseFile = serverService.addFile(serverId, fileType, file);
-        if (responseFile == null)
+        if (responseFile == null) {
             return ResponseEntity.internalServerError().build();
+        }
         return ResponseEntity.ok().body(responseFile);
     }
 

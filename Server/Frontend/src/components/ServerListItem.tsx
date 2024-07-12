@@ -68,7 +68,7 @@ function ServerListItem(props: {server: Server}) {
                     </Grid>
                     <Grid item md={2} textAlign="end" display="flex" justifyContent="end" alignContent="end">
                       <Stack direction="column" spacing={1}>
-                       
+                       {/* TODO This button is problematic and produces errors on browser console */}
                         <Box display="flex" height="100%">
                           <IconButton 
                                 aria-label="Copy Address"

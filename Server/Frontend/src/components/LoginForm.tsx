@@ -1,4 +1,4 @@
-import { Button, Card, CardContent, CardMedia, Divider, FormControl, FormHelperText, Input, InputLabel, TextField } from "@mui/material";
+import { Button, Card, CardContent, CardMedia, Divider, FormControl, FormHelperText, TextField } from "@mui/material";
 import  seeLogo from "../img/see-logo.png";
 import { useContext, useRef, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";

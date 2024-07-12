@@ -8,7 +8,7 @@ import { faArrowLeft, faRemove, faRepeat, faX } from "@fortawesome/free-solid-sv
 import { useContext, useState } from "react";
 import { MuiFileInput } from 'mui-file-input';
 import { AuthContext } from "../contexts/AuthContext";
-import FileType from "../types/FileType";
+import { FileTypeUtils } from "../types/FileType";
 import SeeFile from "../types/SeeFile";
 
 const modalStyle = {
@@ -46,7 +46,8 @@ function CreateServerView() {
     const navigate = useNavigate();
 
     const [fileTypeModalOpen, setFileTypeModalOpen] = useState(false);
-    const [uploadProblemMessageDisplayed, setUploadProblemMessageDisplayed] = useState(false);
+    const [uploadErrorMessageVisible, setUploadErrorMessageVisible] = useState(false);
+    const [createServerFailedMessageVisible, setCreateServerFailedMessageVisible] = useState(false);
 
     const [name, setName] = useState<string>("");
     const [files, setFiles] = useState<SeeFile[]>([]);
@@ -58,7 +59,10 @@ function CreateServerView() {
     const [errors, setErrors] = useState(new Map<string, string>());
 
     async function createServer() {
-      const createServerResponse = await axiosInstance.post("/server/create", {name: name, avatarSeed: avatarSeed, avatarColor: avatarColor});
+      const createServerResponse = await axiosInstance.post("/server/create", {name: name, avatarSeed: avatarSeed, avatarColor: avatarColor}).catch( () => {
+        setCreateServerFailedMessageVisible(true);
+        return;
+      });
       if(!createServerResponse) { return; }
 
       let success = true;
@@ -68,7 +72,7 @@ function CreateServerView() {
         form.append("id", createServerResponse.data.id);
         form.append("fileType", projectFile.fileType);
         form.append("file", projectFile._localfile);
-        await axiosInstance.post("/server/addFile", form).catch(_ => {
+        await axiosInstance.post("/server/addFile", form).catch(() => {
           success = false;
         });
       }
@@ -77,14 +81,19 @@ function CreateServerView() {
         axiosInstance.put("/server/startServer", {}, {params: {id: createServerResponse.data.id}});
         navigate('/', {replace: true});
       } else {
-        setUploadProblemMessageDisplayed(true);
+        setUploadErrorMessageVisible(true);
       }
     }
 
     return (
       <Container sx={{padding: "3em"}}>
-        <Snackbar open={uploadProblemMessageDisplayed} autoHideDuration={5000} onClose={() => setUploadProblemMessageDisplayed(false)}>
-          <Alert onClose={() => setUploadProblemMessageDisplayed(false)} severity="error" sx={{width: "100%", borderRadius: "25px"}}>
+        <Snackbar open={createServerFailedMessageVisible} autoHideDuration={5000} onClose={() => setCreateServerFailedMessageVisible(false)}>
+          <Alert onClose={() => setCreateServerFailedMessageVisible(false)} severity="error" sx={{width: "100%", borderRadius: "25px"}}>
+            Error creating server!
+          </Alert>
+        </Snackbar>
+        <Snackbar open={uploadErrorMessageVisible} autoHideDuration={5000} onClose={() => setUploadErrorMessageVisible(false)}>
+          <Alert onClose={() => setUploadErrorMessageVisible(false)} severity="error" sx={{width: "100%", borderRadius: "25px"}}>
             Error during file upload!
           </Alert>
         </Snackbar>
@@ -98,9 +107,9 @@ function CreateServerView() {
               Select File Type
             </Typography>
             <Stack direction="column" spacing={1}>
-              { FileType.asList().map((fileType) =>
-                <Button variant="contained" color="primary" sx={{borderRadius: "25px", width: "100%"}} onClick={() => { setFileTypeModalOpen(false); setFiles((files) => [...files, {fileType: fileType} as SeeFile]); }}>
-                        {FileType.getLabel(fileType)}
+              { FileTypeUtils.getAll().map((fileType) =>
+                <Button key={fileType} variant="contained" color="primary" sx={{borderRadius: "25px", width: "100%"}} onClick={() => { setFileTypeModalOpen(false); setFiles((files) => [...files, {fileType: fileType} as SeeFile]); }}>
+                        {FileTypeUtils.getLabel(fileType)}
                 </Button>
               )}
             </Stack>
@@ -133,16 +142,16 @@ function CreateServerView() {
                   <Card sx={{borderRadius: "0px", flexGrow: 1, overflow: "auto", minHeight: "100px"}} elevation={0}>
                     <Stack direction="column" spacing={1}>
                       { files.map((projectFile, idx) =>
-                          <Stack direction="row">
+                          <Stack key={idx} direction="row">
                             <MuiFileInput
-                              label={FileType.getLabel(projectFile.fileType)}
+                              label={FileTypeUtils.getLabel(projectFile.fileType)}
                               placeholder="Click to choose file…"
                               variant="standard"
                               fullWidth
                               value={projectFile._localfile}
                               onChange={(value) => { setFiles((files) => files.map((item, itemIdx) => itemIdx === idx ? {...item, _localfile: value} as SeeFile : item)) }}
                               clearIconButtonProps={{title: "Remove", children: <FontAwesomeIcon icon={faX}/>}}
-                              inputProps={{accept: FileType.getFileExtension(projectFile.fileType)}}/>
+                              inputProps={{accept: FileTypeUtils.getFileExtension(projectFile.fileType)}}/>
                               <IconButton
                                   size="small"
                                   onClick={() => { setFiles((files) => files.filter((_, itemIdx) => itemIdx !== idx)) }}>
@@ -189,7 +198,7 @@ function CreateServerView() {
                     sx={{borderRadius:"25px"}}
                     onClick={() => {
                       setErrors(new Map<string, string>());
-                      let tempErrorsList = new Map<string, string>();
+                      const tempErrorsList = new Map<string, string>();
                       if(!name){
                         tempErrorsList.set('name', "Please enter a name for the server.");
                       }
