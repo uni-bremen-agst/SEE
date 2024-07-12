@@ -197,9 +197,9 @@ namespace SEE.Game.Drawable
                 AssociatedPageHolder[] holders = attached.GetComponentsInChildren<AssociatedPageHolder>(true);
                 foreach (AssociatedPageHolder holder in holders)
                 {
-                    if (holder.associatedPage > page)
+                    if (holder.AssociatedPage > page)
                     {
-                        holder.associatedPage -= 1;
+                        holder.AssociatedPage -= 1;
                     }
                 }
             }
