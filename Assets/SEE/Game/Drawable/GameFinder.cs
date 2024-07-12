@@ -1,4 +1,5 @@
 ﻿using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.ValueHolders;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -355,6 +356,30 @@ namespace SEE.Game.Drawable
         public static GameObject GetAttachedObjectsObject(GameObject obj)
         {
             return FindChildWithTag(GetHighestParent(obj), Tags.AttachedObjects);
+        }
+
+        /// <summary>
+        /// Gets a list with all <see cref="DrawableType"/> game objects of a the given <paramref name="page"/>.
+        /// </summary>
+        /// <param name="obj">An object of the drawable.</param>
+        /// <param name="page">The page whose <see cref="DrawableType"/> objects are to be determined.</param>
+        /// <returns>A list with all <see cref="DrawableType"/> game objects of the chosen page.</returns>
+        public static List<GameObject> GetDrawableTypesOfPage(GameObject obj, int page)
+        {
+            List<GameObject> typesOfPage = new();
+            GameObject attached = GetAttachedObjectsObject(obj);
+            if (attached != null)
+            {
+                foreach (Transform typeTransform in attached.GetComponentInChildren<Transform>(true))
+                {
+                    if (typeTransform.GetComponent<AssociatedPageHolder>() != null
+                        && typeTransform.GetComponent<AssociatedPageHolder>().AssociatedPage == page)
+                    {
+                        typesOfPage.Add(typeTransform.gameObject);
+                    }
+                }
+            }
+            return typesOfPage;
         }
     }
 }

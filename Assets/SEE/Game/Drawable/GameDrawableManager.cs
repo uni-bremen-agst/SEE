@@ -3,6 +3,7 @@ using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.UI.Drawable;
+using SEE.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -74,11 +75,12 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="obj">An object of the drawable.</param>
         /// <param name="page">The page to switch to.</param>
-        public static void ChangeCurrentPage(GameObject obj, int page)
+        /// <param name="forceChange">Whether the page should also change, even if it is already the current page.</param>
+        public static void ChangeCurrentPage(GameObject obj, int page, bool forceChange = false)
         {
             GameObject surface = GameFinder.GetDrawableSurface(obj);
             DrawableHolder holder = surface.GetComponent<DrawableHolder>();
-            if (holder.CurrentPage != page)
+            if (holder.CurrentPage != page || forceChange)
             {
                 holder.CurrentPage = page;
                 foreach (DrawableType type in DrawableConfigManager.GetDrawableConfig(surface).GetAllDrawableTypes())
@@ -105,6 +107,12 @@ namespace SEE.Game.Drawable
             }
         }
 
+        /// <summary>
+        /// Gets the current maximum order in layer of the current page.
+        /// </summary>
+        /// <param name="attachedObject">The object that contains the drawable type objects.
+        /// Only the objects of the current page are active and considered through the GetComponentsInChildren method.</param>
+        /// <returns>The maximum order in layer.</returns>
         private static int GetMaximumPageOrderInLayer(GameObject attachedObject)
         {
             int max = 1;
@@ -125,6 +133,76 @@ namespace SEE.Game.Drawable
         public static void ChangeMaxPage(GameObject obj, int maxPage)
         {
             GameFinder.GetDrawableSurface(obj).GetComponent<DrawableHolder>().MaxPageSize = maxPage;
+        }
+
+        /// <summary>
+        /// Removes the given page from a surface.
+        /// The following pages will be renumbered to ensure there are no gaps between the page numbers.
+        /// If the currently selected page is deleted, it will switch to the initial page.
+        /// </summary>
+        /// <param name="surface"></param>
+        /// <param name="page"></param>
+        public static void RemovePage(GameObject surface, int page)
+        {
+            if (!surface.CompareTag(Tags.Drawable))
+            {
+                surface = GameFinder.GetDrawableSurface(surface);
+            }
+            DrawableHolder holder = surface.GetComponent<DrawableHolder>();
+            bool equalChange = page == holder.CurrentPage? true : false;
+            bool numberChange = page < holder.CurrentPage? true : false;
+            DeleteTypesFromPage(surface, page);
+            if (holder.MaxPageSize > 1)
+            {
+                holder.MaxPageSize--;
+            }
+
+            ChangePageNumbering(surface, page);
+
+            if (numberChange)
+            {
+                ChangeCurrentPage(surface, holder.CurrentPage-1);
+            }
+
+            if (equalChange)
+            {
+                ChangeCurrentPage(surface, 0, true);
+            }
+        }
+
+        /// <summary>
+        /// Destroys all <see cref="DrawableType"/> game objects from a given <paramref name="page"/>
+        /// of the chosen <paramref name="surface"/>.
+        /// </summary>
+        /// <param name="surface">The surface which page should be cleared.</param>
+        /// <param name="page">The page which should be cleared.</param>
+        public static void DeleteTypesFromPage(GameObject surface, int page)
+        {
+            foreach (GameObject dt in GameFinder.GetDrawableTypesOfPage(surface, page))
+            {
+                Destroyer.Destroy(dt);
+            }
+        }
+
+        /// <summary>
+        /// Changes the numbering of the subsequent pages after the given <paramref name="page"/>.
+        /// </summary>
+        /// <param name="surface">The surface whose pages are to be renumbered.</param>
+        /// <param name="page">The removed page from which the renumbering should start.</param>
+        private static void ChangePageNumbering(GameObject surface, int page)
+        {
+            GameObject attached = GameFinder.GetAttachedObjectsObject(surface);
+            if (attached != null) 
+            {
+                AssociatedPageHolder[] holders = attached.GetComponentsInChildren<AssociatedPageHolder>(true);
+                foreach (AssociatedPageHolder holder in holders)
+                {
+                    if (holder.associatedPage > page)
+                    {
+                        holder.associatedPage -= 1;
+                    }
+                }
+            }
         }
 
         /// <summary>

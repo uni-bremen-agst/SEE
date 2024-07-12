@@ -13,6 +13,10 @@ using SEE.Game.Drawable.ActionHelpers;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Notification;
 using System.Linq;
+using SEE.Game;
+using SEE.GO.Menu;
+using SEE.Controls.Actions;
+using SEE.Controls.Actions.Drawable;
 
 namespace SEE.UI.Window.DrawableManagerWindow
 {
@@ -441,11 +445,9 @@ namespace SEE.UI.Window.DrawableManagerWindow
             /// Removes the page.
             void RemovePage(int page)
             {
-                Debug.Log("Remove page " + page);
-                // TODO Remove Logic -> Wechsel wenn currentpage gelöscht. + alle objekte der seite löschen.
-                // Meldung das Seiten neu nummeriert werden. -> neu nummerieren -> folgende pages runterreduzieren.
-                // Abfrage ob maxpage > 1 sonst nicht löschen. (mindestens eine Seite)
-                // TODO Network -> Remove Page and Clear it!
+                // Zu eigener Aktion wechseln und nach dem Abschluss zur vorherigen Wechseln, um Undo / Redo zu ermöglichen?
+                GameDrawableManager.RemovePage(surface, page);
+                new SurfaceRemovePageNetAction(DrawableConfigManager.GetDrawableConfig(surface), page).Execute();
             }
         }
         #endregion
