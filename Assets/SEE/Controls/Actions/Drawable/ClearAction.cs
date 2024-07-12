@@ -13,9 +13,9 @@ using SEE.Game.Drawable.ActionHelpers;
 namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
-    /// This class provides an action to clean a whole drawable.
+    /// This class provides an action to clear a whole drawable.
     /// </summary>
-    public class CleanerAction : DrawableAction
+    public class ClearAction : DrawableAction
     {
         /// <summary>
         /// Saves all the information needed to revert or repeat
@@ -25,7 +25,7 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// This class can store all the information needed to
-        /// revert or repeat a <see cref="CleanerAction"/>.
+        /// revert or repeat a <see cref="ClearAction"/>.
         /// </summary>
         private readonly struct Memento
         {
@@ -137,20 +137,20 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// A new instance of <see cref="CleanerAction"/>.
+        /// A new instance of <see cref="ClearAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="CleanerAction"/></returns>
+        /// <returns>new instance of <see cref="ClearAction"/></returns>
         public static IReversibleAction CreateReversibleAction()
         {
-            return new CleanerAction();
+            return new ClearAction();
         }
 
         /// <summary>
-        /// A new instance of <see cref="CleanerAction"/>.
+        /// A new instance of <see cref="ClearAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="CleanerAction"/></returns>
+        /// <returns>new instance of <see cref="ClearAction"/></returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -162,7 +162,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns><see cref="ActionStateType.Cleaner"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateTypes.Cleaner;
+            return ActionStateTypes.Clear;
         }
 
         /// <summary>

@@ -445,7 +445,6 @@ namespace SEE.UI.Window.DrawableManagerWindow
             /// Removes the page.
             void RemovePage(int page)
             {
-                // Zu eigener Aktion wechseln und nach dem Abschluss zur vorherigen Wechseln, um Undo / Redo zu ermöglichen?
                 GameDrawableManager.RemovePage(surface, page);
                 new SurfaceRemovePageNetAction(DrawableConfigManager.GetDrawableConfig(surface), page).Execute();
             }

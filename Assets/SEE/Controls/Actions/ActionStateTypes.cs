@@ -282,10 +282,10 @@ namespace SEE.Controls.Actions
                     EraseAction.CreateReversibleAction,
                     parent: Drawable);
 
-            Cleaner =
-                new("Cleaner", "Cleans a complete drawable.",
+            Clear =
+                new("Clear", "Clears a drawable surface (whiteboard / sticky note).",
                     Color.red.Darker(), "Materials/ModernUIPack/Trash",
-                    CleanerAction.CreateReversibleAction,
+                    ClearAction.CreateReversibleAction,
                     parent: Drawable);
 
             StickyNote =
@@ -337,7 +337,7 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType Erase;
         public readonly static ActionStateType LinePointErase;
         public readonly static ActionStateType LineConnectionErase;
-        public readonly static ActionStateType Cleaner;
+        public readonly static ActionStateType Clear;
         public readonly static ActionStateType StickyNote;
 
         #endregion

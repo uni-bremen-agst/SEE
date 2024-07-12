@@ -208,11 +208,11 @@ namespace SEE.UI.Drawable
                 menu.UpdateActiveEntry();
             });
 
-            GameObject cleaner = GameFinder.FindChild(instance, "Cleaner");
-            cleaner.AddComponent<ButtonHoverTooltip>().SetMessage("Cleaner");
+            GameObject cleaner = GameFinder.FindChild(instance, "Clear");
+            cleaner.AddComponent<ButtonHoverTooltip>().SetMessage("Clear");
             cleaner.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
-                GlobalActionHistory.Execute(ActionStateTypes.Cleaner);
+                GlobalActionHistory.Execute(ActionStateTypes.Clear);
                 menu.UpdateActiveEntry();
             });
 
