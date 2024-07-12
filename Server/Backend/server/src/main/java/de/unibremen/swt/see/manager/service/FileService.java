@@ -73,9 +73,10 @@ public class FileService {
         }
 
         File file = new File();
-        file.setContentType(multipartFile.getContentType());
         file.setName(multipartFile.getOriginalFilename());
+        file.setContentType(multipartFile.getContentType());
         file.setServer(server);
+        file.setFileType(type);
 
         Path path;
         try {
@@ -221,17 +222,6 @@ public class FileService {
     }
 
     /**
-     * Generates an {@code InputStream} that can be used to access file content.
-     *
-     * @param file the file to be accessed
-     * @return {@code InputStream} of the file to be accessed
-     * @throws IOException if an I/O error occurs during file access
-     */
-    public InputStream getInputStream(File file) throws IOException {
-        return Files.newInputStream(getPath(file));
-    }
-
-    /**
      * Generates the file system path of the directory where all files of a
      * specific server are stored.
      * <p>
@@ -270,7 +260,7 @@ public class FileService {
      * @throws IOException if one is thrown by {@link #getUploadPath(Server)}
      * @see #getUploadPath(Server)
      */
-    protected Path getPath(File file) throws IOException {
+    public Path getPath(File file) throws IOException {
         String fileName = file.getName();
         if (fileName == null || fileName.isEmpty()) {
             throw new RuntimeException("File name must not be empty!");

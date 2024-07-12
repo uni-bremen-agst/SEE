@@ -9,8 +9,6 @@ import { useLocation, useNavigate } from "react-router";
 import Server from "../types/Server";
 import { AuthContext } from "../contexts/AuthContext";
 import SeeFile from "../types/SeeFile";
-import { saveAs } from 'file-saver';
-import { base64StringToBlob } from 'blob-util';
 import FileType from "../types/FileType";
 
 function getServerStatus(serverStatusType: string) {
@@ -66,19 +64,6 @@ function ServerView() {
         axiosInstance.get(`/server/`, {params: {id: server.id}}).then(
           (response) => setServer(response.data)
         )  
-      }
-    }
-
-    function downloadFiles () {
-      // TODO Fix or remove "downlaod all files"
-      if(files){
-        for(const file of files){
-          axiosInstance.get("/file/get", {params: {id: file.id}}).then(
-            (response) => {
-              saveAs(base64StringToBlob(response.data.content, response.data.contentType), response.data.originalFileName);
-            }
-          )
-        }
       }
     }
 
@@ -240,17 +225,7 @@ function ServerView() {
               </Stack>
               { files && files.length > 0 &&
                 <div>
-                  <Stack direction="row" sx={{justifyContent: 'space-between'}}>
-                    <Typography variant="h6">Project Files</Typography>
-                    <IconButton 
-                                onMouseDown={(e) => {e.stopPropagation()}} 
-                                onClick={(e) => {e.stopPropagation();
-                                                e.preventDefault();
-                                                downloadFiles();
-                            }}>
-                              <FontAwesomeIcon icon={faDownload}/>
-                          </IconButton>
-                  </Stack>
+                  <Typography variant="h6" sx={{marginBottom: "6pt", marginTop: "6pt"}}>Project Files</Typography>
                   <Card sx={{borderRadius: "25px", backgroundColor: grey[200], flexGrow: 1, overflow: "auto", minHeight: "100px"}}>
                     <CardContent>
                       <List>
@@ -258,33 +233,29 @@ function ServerView() {
                           files?.map((projectFile) => 
                             <ListItem sx={{backgroundColor: "white", borderRadius:"25px", marginBottom:"1em"}} key={projectFile.id}>
                               <Grid container>
-                                <Grid item xs={7}>
+                                <Grid item xs={5}>
                                   <ListItemText>
-                                    <Typography variant="subtitle2">{projectFile.name}</Typography>
+                                    <Typography sx={{fontWeight: "bold", marginLeft: "2pt"}}>{projectFile.name}</Typography>
                                   </ListItemText>
                                 </Grid>
-                                <Grid item xs={2} sx={{textAlign: "center"}}>
+                                <Grid item xs={4}>
                                   <ListItemText>
-                                    <Typography fontStyle="italic">{FileType.getLabel(projectFile.fileType)}</Typography>
+                                    <Typography sx={{fontStyle: "italic"}}>{FileType.getLabel(projectFile.fileType)}</Typography>
                                   </ListItemText>
                                 </Grid>
-                                <Grid item xs={2} sx={{textAlign: "center"}}>
+                                <Grid item xs={2} sx={{textAlign: "right"}}>
                                   <ListItemText>
                                     <Typography>{Number(projectFile.size / 1024 / 1024).toFixed(2)} MiB</Typography>
                                   </ListItemText>
                                 </Grid>
                                 <Grid item xs={1} sx={{textAlign: "right"}}>
                                   <ListItemText>
-                                    <IconButton
-                                        onMouseDown={(e) => {e.stopPropagation()}}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            e.preventDefault();
-                                            // TODO Download single file
-                                            alert("File download not yet implemented!");
-                                        }}>
-                                      <FontAwesomeIcon icon={faDownload}/>
-                                  </IconButton>
+                                    <a href={axiosInstance.getUri() + "file/download?id=" + projectFile.id} download={projectFile.name} rel="noopener" target="_blank" style={{ textDecoration: 'none' }}>
+                                      <IconButton
+                                          size="small">
+                                        <FontAwesomeIcon icon={faDownload}/>
+                                      </IconButton>
+                                    </a>
                                   </ListItemText>
                                 </Grid>
                               </Grid>

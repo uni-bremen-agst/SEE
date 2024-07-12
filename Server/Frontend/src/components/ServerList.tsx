@@ -33,10 +33,10 @@ function ServerList() {
     <CardContent>
       <Stack direction="column" spacing={2}>
           {
-            servers && servers.length && servers.map(
+            servers && servers.length ? servers.map(
               (server) => <ServerListItem server={server} key={server.id}/>
-            )
-          }
+            ) : <></>
+          } 
       </Stack>
     </CardContent>
     </Card>

@@ -1,10 +1,10 @@
-import { Box, Button, Card, CardActionArea, CardContent, Container, Modal, Stack, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Card, CardActionArea, CardContent, Container, IconButton, Modal, Snackbar, Stack, TextField, Typography } from "@mui/material";
 import Header from "../components/Header";
 import { grey } from "@mui/material/colors";
 import { useNavigate } from "react-router";
 import Avatar from "../components/Avatar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faRepeat, faX } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faRemove, faRepeat, faX } from "@fortawesome/free-solid-svg-icons";
 import { useContext, useState } from "react";
 import { MuiFileInput } from 'mui-file-input';
 import { AuthContext } from "../contexts/AuthContext";
@@ -46,6 +46,7 @@ function CreateServerView() {
     const navigate = useNavigate();
 
     const [fileTypeModalOpen, setFileTypeModalOpen] = useState(false);
+    const [uploadProblemMessageDisplayed, setUploadProblemMessageDisplayed] = useState(false);
 
     const [name, setName] = useState<string>("");
     const [files, setFiles] = useState<SeeFile[]>([]);
@@ -60,34 +61,33 @@ function CreateServerView() {
       const createServerResponse = await axiosInstance.post("/server/create", {name: name, avatarSeed: avatarSeed, avatarColor: avatarColor});
       if(!createServerResponse) { return; }
 
-      let uploadResponses = [];
-
+      let success = true;
       for (let i = 0; i < files.length; i++) {
         const projectFile : SeeFile = files[i];
         const form = new FormData();
         form.append("id", createServerResponse.data.id);
         form.append("fileType", projectFile.fileType);
         form.append("file", projectFile._localfile);
-        uploadResponses.push(await axiosInstance.post("/server/addFile", form));
-      }
-
-      let success = true;
-      for (let i = 0; i < uploadResponses.length; i++) {
-        if (uploadResponses[i].status != 400) {
+        await axiosInstance.post("/server/addFile", form).catch(_ => {
           success = false;
-          // TODO Notify user
-        }
+        });
       }
 
       if (success) {
         axiosInstance.put("/server/startServer", {}, {params: {id: createServerResponse.data.id}});
+        navigate('/', {replace: true});
+      } else {
+        setUploadProblemMessageDisplayed(true);
       }
-
-      navigate('/', {replace: true});
     }
 
     return (
       <Container sx={{padding: "3em"}}>
+        <Snackbar open={uploadProblemMessageDisplayed} autoHideDuration={5000} onClose={() => setUploadProblemMessageDisplayed(false)}>
+          <Alert onClose={() => setUploadProblemMessageDisplayed(false)} severity="error" sx={{width: "100%", borderRadius: "25px"}}>
+            Error during file upload!
+          </Alert>
+        </Snackbar>
         <Modal
             open={fileTypeModalOpen}
             onClose={() => setFileTypeModalOpen(false)}
@@ -133,7 +133,7 @@ function CreateServerView() {
                   <Card sx={{borderRadius: "0px", flexGrow: 1, overflow: "auto", minHeight: "100px"}} elevation={0}>
                     <Stack direction="column" spacing={1}>
                       { files.map((projectFile, idx) =>
-                          <li key={idx}>
+                          <Stack direction="row">
                             <MuiFileInput
                               label={FileType.getLabel(projectFile.fileType)}
                               placeholder="Click to choose file…"
@@ -143,7 +143,12 @@ function CreateServerView() {
                               onChange={(value) => { setFiles((files) => files.map((item, itemIdx) => itemIdx === idx ? {...item, _localfile: value} as SeeFile : item)) }}
                               clearIconButtonProps={{title: "Remove", children: <FontAwesomeIcon icon={faX}/>}}
                               inputProps={{accept: FileType.getFileExtension(projectFile.fileType)}}/>
-                          </li>
+                              <IconButton
+                                  size="small"
+                                  onClick={() => { setFiles((files) => files.filter((_, itemIdx) => itemIdx !== idx)) }}>
+                                <FontAwesomeIcon icon={faRemove}/>
+                              </IconButton>
+                          </Stack>
                         )
                       }
                     </Stack>
@@ -186,7 +191,7 @@ function CreateServerView() {
                       setErrors(new Map<string, string>());
                       let tempErrorsList = new Map<string, string>();
                       if(!name){
-                        tempErrorsList.set('name', "Name muss angegeben werden.");
+                        tempErrorsList.set('name', "Please enter a name for the server.");
                       }
                       if(tempErrorsList.size > 0){
                         setErrors(tempErrorsList);
