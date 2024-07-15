@@ -74,6 +74,15 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
+        /// Destroys the menu.
+        /// </summary>
+        public override void Stop()
+        {
+            base.Stop();
+            menu.Disable();
+        }
+
+        /// <summary>
         /// This method manages the player's interaction with the action <see cref="ActionStateType.Cleaner"/>.
         /// It cleans a complete drawable. In other words: it deletes all drawable types that are on a selected drawable.
         /// </summary>
