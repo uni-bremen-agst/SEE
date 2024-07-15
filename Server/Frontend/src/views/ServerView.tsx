@@ -74,8 +74,8 @@ function ServerView() {
 
     useEffect(() => {
       let isApiSubscribed = true;
+      const serverID = location.hash.slice(1);
       const fetchServer = setInterval(() => {
-        const serverID = location.state.serverID; 
         if(serverID){
           axiosInstance.get(`/server/`, {params: {id: serverID}}).then(
             (response) => setServer(response.data)
@@ -83,16 +83,15 @@ function ServerView() {
         }
       }, 30000);
 
-      if(isApiSubscribed && !server && location.state.serverID){
-        const serverID = location.state.serverID; 
+      if(isApiSubscribed && !server && serverID){
         if(serverID){
           axiosInstance.get(`/server/`, {params: {id: serverID}}).then(
             (response) => setServer(response.data)
           )  
         }
       }
-      if(isApiSubscribed && location.state.serverID){
-        axiosInstance.get(`/server/files`, {params: {id: location.state.serverID}}).then(
+      if(isApiSubscribed && serverID){
+        axiosInstance.get(`/server/files`, {params: {id: serverID}}).then(
           (response) => setFiles(response.data)
         )  
       }
@@ -104,7 +103,7 @@ function ServerView() {
     }, [location.state]);
     
     if(!server){
-      return <CircularProgress/>
+      return <Typography>Invalid server ID.</Typography>
     }
     return (
       <Container sx={{padding: "3em"}}>

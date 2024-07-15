@@ -36,7 +36,7 @@ function ServerListItem(props: {server: Server}) {
               </Alert>
             </Snackbar>
             <Card sx={{borderRadius:"25px"}}> 
-              <CardActionArea onClick={() => navigate('/server', {state: {serverID : server.id}})}>
+              <CardActionArea onClick={() => navigate('/server#' + server.id)}>
                 <CardContent>
                   <Grid container spacing={2}>
                     <Grid item md={2} xs={12}>
