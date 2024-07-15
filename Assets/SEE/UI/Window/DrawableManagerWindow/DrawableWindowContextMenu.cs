@@ -17,6 +17,9 @@ using SEE.Game;
 using SEE.GO.Menu;
 using SEE.Controls.Actions;
 using SEE.Controls.Actions.Drawable;
+using SEE.UI.PropertyDialog.Drawable;
+using Cysharp.Threading.Tasks;
+using SEE.UI.Menu.Drawable;
 
 namespace SEE.UI.Window.DrawableManagerWindow
 {
@@ -352,7 +355,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
         /// </summary>
         /// <param name="surface">The surface whose pages are to be managed.</param>
         /// <param name="position">The position where the popup menu should be displayed.</param>
-        public void ShowSelectionAddPageMenu(GameObject surface, Vector3 position) 
+        public void ShowSelectionAddPageMenu(GameObject surface, Vector3 position)
         {
             UpdatePageMenuEntries(surface);
             contextMenu.ShowWith(position: position);
@@ -412,17 +415,18 @@ namespace SEE.UI.Window.DrawableManagerWindow
             PopupMenuAction CreatePopupEntries(int pageNumber)
             {
                 return new PopupMenuAction(pageNumber.ToString(),
-                    () => 
+                    () =>
                     {
-                        if (removeIndicator) 
+                        if (removeIndicator)
                         {
                             RemovePage(pageNumber);
-                        } else 
-                        { 
-                            SetPage(pageNumber); 
-                        } 
-                    }, 
-                    GetIcon(pageNumber), CloseAfterClick: true);;
+                        }
+                        else
+                        {
+                            SetPage(pageNumber);
+                        }
+                    },
+                    GetIcon(pageNumber), CloseAfterClick: true); ;
             }
 
             /// <summary>
@@ -432,7 +436,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
             /// <returns>The corresponding icon.</returns>
             char GetIcon(int i)
             {
-                return removeIndicator? Icons.Trash : i == holder.CurrentPage ? Icons.CheckedRadio : Icons.EmptyRadio;
+                return removeIndicator ? Icons.Trash : i == holder.CurrentPage ? Icons.CheckedRadio : Icons.EmptyRadio;
             }
 
             /// Sets the page.
@@ -445,8 +449,32 @@ namespace SEE.UI.Window.DrawableManagerWindow
             /// Removes the page.
             void RemovePage(int page)
             {
-                GameDrawableManager.RemovePage(surface, page);
-                new SurfaceRemovePageNetAction(DrawableConfigManager.GetDrawableConfig(surface), page).Execute();
+                if (GameFinder.GetDrawableTypesOfPage(surface, page).Count > 0)
+                {
+                    ConfirmDialogMenu confirm = new();
+                    confirm.Enable($"Do you really want to delete the page {page}?\r\nThis action cannot be undone.");
+                    WaitForConfirm(confirm, page).Forget();
+                }
+                else
+                {
+                    GameDrawableManager.RemovePage(surface, page);
+                    new SurfaceRemovePageNetAction(DrawableConfigManager.GetDrawableConfig(surface), page).Execute();
+                }
+
+            }
+
+            /// Waits for the user input of the confirm dialog menu.
+            async UniTask WaitForConfirm(ConfirmDialogMenu confirm, int page)
+            {
+                while (confirm.IsOpen())
+                {
+                    await UniTask.Yield();
+                }
+                if (confirm.WasConfirmed() && !confirm.WasCanceled())
+                {
+                    GameDrawableManager.RemovePage(surface, page);
+                    new SurfaceRemovePageNetAction(DrawableConfigManager.GetDrawableConfig(surface), page).Execute();
+                }
             }
         }
         #endregion
