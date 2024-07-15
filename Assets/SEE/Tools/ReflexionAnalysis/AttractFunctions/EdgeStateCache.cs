@@ -53,13 +53,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// 
         /// </summary>
         /// <param name="clusterId">Cluster node id the candidate node is potentially mapped to.</param>
-        /// <param name="candidateId">Candidate node id of the node that is potentially mapped to.</param>
+        /// <param name="candidateInSubtreeId">Candidate node id of the node that is potentially mapped to.</param>
         /// <param name="edgeId">Id of the edge of which the potential state should be retrieved.</param>
         /// <param name="outgoing">Wether the edge is outgoing from the or incoming to the the candidate subtree.</param>
         /// <returns>The state the given edge would be in, if the candidate is mapped to the cluster.</returns>
-        public State GetFromCache(string clusterId, string candidateId, string edgeId, bool outgoing)
+        public State GetFromCache(string clusterId, string candidateInSubtreeId, string edgeId, bool outgoing)
         {
-            Node candidate = reflexionGraph.GetNode(candidateId);
+            Node candidateInSubtree = reflexionGraph.GetNode(candidateInSubtreeId);
             Edge edge = reflexionGraph.GetEdge(edgeId);
             Node subtreeNeighbor = outgoing ? edge.Target : edge.Source;
 
@@ -72,7 +72,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 return State.Unmapped;
             }
 
-            if (candidateId.Equals(subtreeNeighbor.ID) && !clusterId.Equals(neighborCluster.ID))
+            if (candidateInSubtreeId.Equals(subtreeNeighbor.ID) && !clusterId.Equals(neighborCluster.ID))
             {
                 // TODO: When can this case happen?
                 return State.Undefined;
@@ -80,10 +80,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             string neighborClusterID = neighborCluster.ID;
 
-            string key = $"{candidateId}#{clusterId}#{subtreeNeighbor.ID}#{neighborClusterID}#{edgeId}";
+            // TODO: new keys beachten, outgoing verwenden
+            string key = $"{candidateInSubtreeId}#{clusterId}#{subtreeNeighbor.ID}#{neighborClusterID}#{edgeId}";
             if(!this.cache.ContainsKey(key))
             {
-                UpdateCache(candidate, cluster);
+                UpdateCache(candidateInSubtree, cluster);
             } 
 
             return this.cache[key];
@@ -138,6 +139,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
                 if (neighborCluster != null)
                 {
+                    // TODO: add origin and target comparison?
                     string key = $"{candidate.ID}#{cluster.ID}#{neighborOfSubtree.ID}#{neighborCluster.ID}#{edge.ID}";
                     this.cache[key] = edge.State();
                 }

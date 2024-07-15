@@ -2,6 +2,7 @@
 using Assets.SEE.UI.PropertyDialog;
 using Cysharp.Threading.Tasks;
 using SEE.Controls;
+using SEE.Controls.Actions;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
@@ -113,9 +114,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         private const string startRecordingLabel = "Start Recording";
         private const string stopRecordingLabel = "Stop Recording";
         private const string calculateResultsLabel = "Calculate Results";
-        private const string dumbTrainingDataLabel = "Dumb Training Data";
+        private const string dumbTrainingDataLabel = "Dump Training Data";
         private const string debugScenarioLabel = "Debug Scenario";
-        private const string testOracleLabel = "Test Oracle";
+        private const string dumpOracleLabel = "Dump Oracle";
         private const string generateOracleMappingLabel = "Generate Oracle";
 
         private const string statisticButtonGroup = "statisticButtonsGroup";
@@ -329,6 +330,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             return CandidateRecommendation.GetUnmappedCandidates().Select(n => reflexionGraphViz.GetNode(n.ID));
         }
 
+        SEEReflexionCity city;
+
         /// <summary>
         /// This operations updates the candidate recommendation object with the given recommendation settings. 
         /// Before updating the attract function it copies the given <param name="visualizedGraph"> to instantiate
@@ -346,9 +349,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <exception cref="Exception">Throws if the <param name="visualizedGraph"> or <param name="recommendationSettings"> are null.</exception>
         public async UniTask UpdateConfiguration(ReflexionGraph visualizedGraph,
                                        RecommendationSettings recommendationSettings,
+                                       SEEReflexionCity city,
                                        Graph oracleMapping = null)
         {
             await UniTask.WaitWhile(() => Processing);
+            this.city = city;
             ProcessingEvents = false;
             ProcessingData = false;
             changeEventQueue.Clear();
@@ -764,7 +769,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
                 if (syncWithView)
                 {
-                    GameNodeMover.MoveTo(candidateInViz.GameObject(), clusterInViz.GameObject().GetGroundCenter(), 1.0f);
+                    // GameNodeMover.MoveTo(candidateInViz.GameObject(), clusterInViz.GameObject().GetGroundCenter(), 1.0f);
+                    GameNodeMover.PutOn(candidateInViz.GameObject().transform, clusterInViz.GameObject(), true);
+                    // GameNodeMover.PutOnAndFit(candidateInViz.GameObject().transform, clusterInViz.GameObject(), candidateInViz.Parent.GameObject() , candidateInViz.GameObject().transform.localScale);
+                    // GameNodeMover.PutOn2(candidateInViz.GameObject().transform, clusterInViz.GameObject(), true);
+                    // city.ReDrawGraph();
+                    
                     new MoveNetAction(candidateInViz.GameObject().name, clusterInViz.GameObject().GetGroundCenter(), 1.0f).Execute(); 
                 }
                 ReflexionMapper.SetParent(candidateInViz.GameObject(), clusterInViz.GameObject());
@@ -1005,19 +1015,16 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         [Button(generateOracleMappingLabel, ButtonSizes.Small)]
         [ButtonGroup(debugButtonGroup)]
         public void GenerateOracleMapping()
-        {            
-            GameObject codeCityObject = SceneQueries.GetCodeCity(this.transform)?.gameObject;
-
-            if (codeCityObject == null)
-            {
-                throw new Exception("Could not get Reflexion city when loading oracle instructions.");
-            }
-
-            codeCityObject.TryGetComponent(out AbstractSEECity city);
-
-            string configPath = Path.GetDirectoryName(city.ConfigurationPath.Path);
+        {
+            string configPath = GetConfigPath();
 
             string instructions = Path.Combine(configPath, "oracleInstructions.txt");
+
+            if(this.reflexionGraphViz == null)
+            {
+                UnityEngine.Debug.LogWarning("Reflexiongraph is null. Cannot generate an oracle mapping.");
+                return;
+            }
 
             (Graph implementation, _, _) = this.reflexionGraphViz.Disassemble();
             ReflexionGraph oracleGraph = GenerateOracleMapping(implementation, instructions);
@@ -1028,6 +1035,25 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             GraphWriter.Save(architectureGxl, architecture, AbstractSEECity.HierarchicalEdgeTypes().First());
             UnityEngine.Debug.Log($"Saved oracle mapping to {oracleMappingGxl}");
             UnityEngine.Debug.Log($"Saved architecture to {architectureGxl}");
+        }
+
+        /// <summary>
+        /// Gets the path where the loaded Reflexion.cfg is located.
+        /// </summary>
+        /// <returns>The location of the loaded Reflexion.cfg</returns>
+        /// <exception cref="Exception">Throws if the city could not be qeueried.</exception>
+        private string GetConfigPath()
+        {
+            GameObject codeCityObject = SceneQueries.GetCodeCity(this.transform)?.gameObject;
+
+            if (codeCityObject == null)
+            {
+                throw new Exception("Could not get Reflexion city when loading oracle instructions.");
+            }
+
+            codeCityObject.TryGetComponent(out AbstractSEECity city);
+
+            return Path.GetDirectoryName(city.ConfigurationPath.Path);
         }
 
         /// <summary>
@@ -1132,7 +1158,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 target.ID = archNode.ID;
 
                 oracle.AddNode(source);
-                oracle.AddNode(target);
+
+                if (oracle.GetNode(target.ID) == null)
+                {
+                    oracle.AddNode(target); 
+                } 
+                else
+                {
+                    target = oracle.GetNode(target.ID);
+                }
                 Edge edge = new Edge(source, target, "Maps_To");
                 oracle.AddEdge(edge);
             }
@@ -1143,9 +1177,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// with their expected cluster regarding the loaded oracle graph. The file can be used 
         /// to check if the oracle mapping is complete or other debug purposes.
         /// </summary>
-        [Button(testOracleLabel, ButtonSizes.Small)]
+        [Button(dumpOracleLabel, ButtonSizes.Small)]
         [ButtonGroup(debugButtonGroup)]
-        public void TestOracle()
+        public void DumpOracle()
         {
             ReflexionGraph graph = CandidateRecommendation.ReflexionGraph;
             ReflexionGraph oracleGraph = CandidateRecommendation.OracleGraph;
@@ -1158,7 +1192,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             StringBuilder sb = new StringBuilder();
 
-            IEnumerable<Node> nodes = graph.Nodes().Where(n => this.CandidateRecommendation.IsCandidate(n));
+            IEnumerable<Node> nodes = graph.Nodes().Where(n => n.IsInImplementation());/*.Where(n => this.CandidateRecommendation.IsCandidate(n));*/
 
             foreach (Node node in nodes)
             {
@@ -1175,7 +1209,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
 
             string output = sb.ToString();
-            string outputFile = Path.Combine(this.RecommendationSettings.OutputPath.Path, "oracle.txt");
+            string configPath = GetConfigPath();
+            string outputFile = Path.Combine(configPath, "oracle.txt");
+            UnityEngine.Debug.Log($"Saved oracle dump to {outputFile}");
 
             File.WriteAllText(outputFile, output);
         }

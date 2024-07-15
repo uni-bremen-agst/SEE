@@ -60,7 +60,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 MoveAction.UnblockMovement();
                 await candidateRecommendation.CreateInitialMappingAsync(run.Settings.InitialMappingPercentage,
                                                                         run.Settings.RootSeed, 
-                                                                        syncWithView: false,
+                                                                        syncWithView: true,
                                                                         delay: 0);
                 BlockUnnecessaryMovement();
                 candidateRecommendation.ColorUnmappedCandidates(Color.white);

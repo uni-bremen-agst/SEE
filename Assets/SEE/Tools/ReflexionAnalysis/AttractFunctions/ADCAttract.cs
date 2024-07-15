@@ -128,7 +128,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
                 // Get the state of the current implementation edge if the candidate would be mapped to the cluster 
                 State edgeState = this.edgeStateCache.GetFromCache(clusterId: cluster.ID,
-                                                                    candidateId: candidate.ID,
+                                                                    candidateInSubtreeId: candidate.ID,
                                                                     edgeId: edge.ID,
                                                                     outgoing: isDescendantSource);
 

@@ -74,7 +74,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// </summary>
         /// <param name="clazz">Given class name</param>
         /// <exception cref="NullReferenceException">Throws if the given class name is null.</exception>
-        private void EnsureClass(string clazz)
+        public void EnsureClass(string clazz)
         {
             if (clazz == null)
             {
@@ -112,7 +112,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <param name="document">Given document object</param>
         /// <exception cref="NullReferenceException">Throws if the given class name is null.</exception>
         /// <exception cref="ArgumentException">Throws if the given class name is unknown.</exception>
-        public void DeleteDocument(string clazz, IDocument document)
+        public void RemoveDocument(string clazz, IDocument document)
         {
             if (clazz == null)
             {
@@ -369,17 +369,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             /// <returns>alpha smoothed probability this word belongs to this class.</returns>
             public double GetWordProbability(string word, double alphaSmoothing)
             {
-                double wordFrequency = classifier.Alpha;
-      
+                double wordFrequencyInClass = classifier.Alpha;
+
                 if (wordFrequencies.ContainsKey(word))
                 {
-                    wordFrequency += wordFrequencies[word];
+                    wordFrequencyInClass += wordFrequencies[word];
                 }
 
                 // Total words in class plus alpha smoothing for all seen and unknown words
-                double totalWordsAlphaSmoothed = totalWordsInClass + alphaSmoothing;
+                double knownWordsAlphaSmoothed = totalWordsInClass + alphaSmoothing;
                 
-                double wordProbability = wordFrequency / totalWordsAlphaSmoothed;
+                double wordProbability = wordFrequencyInClass / knownWordsAlphaSmoothed;
                 return wordProbability;
             }
 
@@ -446,10 +446,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             /// <summary>
             /// Calculates the prior probability a given document 
-            /// belongs to this class based on the documents
+            /// belonging to this class based on the documents
             /// which were add to this class and and add globally.
             /// </summary>
-            /// <returns>The prior probability a document belongs to this class</returns>
+            /// <returns>The prior probability a document belonging to this class</returns>
             public double GetPriorProbability()
             {
                 return (double)this.documentCount / (double)classifier.DocumentCountGlobal;

@@ -30,7 +30,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// </summary>
         /// <param name="clazz">Given class</param>
         /// <param name="document">Given document object</param>
-        void DeleteDocument(string clazz, IDocument document);
+        void RemoveDocument(string clazz, IDocument document);
 
         /// <summary>
         /// Removes a given clazz from this classifier. 

@@ -135,7 +135,7 @@ namespace SEE.Game.City
             if (candidateRecommendationViz != null)
             {
                 loadedGraph.Subscribe(candidateRecommendationViz);
-                await candidateRecommendationViz.UpdateConfiguration(loadedGraph, recommendationSettings, oracleMapping);
+                await candidateRecommendationViz.UpdateConfiguration(loadedGraph, recommendationSettings, this, oracleMapping);
             }
         }
 

@@ -793,6 +793,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <returns>true if the node is considered to be a candidate</returns>
         public static bool IsCandidate(Node node, string candidateType)
         {
+            // UnityEngine.Debug.Log($"Is node candidate? node.Type={node.Type} candidateType={candidateType} isInImplementation={node.IsInImplementation()} Element.Is_Artificial={node.ToggleAttributes.Contains("Element.Is_Artificial")} Element.Is_Anonymous={node.ToggleAttributes.Contains("Element.Is_Anonymous")}");
             return node.Type.Equals(candidateType)
                     && node.IsInImplementation()
                     && !node.ToggleAttributes.Contains("Element.Is_Artificial")

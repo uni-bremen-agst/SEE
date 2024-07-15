@@ -117,15 +117,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             Dictionary<string, IDocument> docCdaTerms = new Dictionary<string, IDocument>();
 
-            if (this.useCDA)
-            {
-                this.CreateCdaTerms(cluster, candidate, docCdaTerms);    
+            //if (this.useCDA)
+            //{
+            //    this.CreateCdaTerms(cluster, candidate, docCdaTerms);    
 
-                if (docCdaTerms.Count > 0)
-                {
-                    doc.AddWords(docCdaTerms[cluster.ID]); 
-                }
-            }
+            //    if (docCdaTerms.Count > 0)
+            //    {
+            //        doc.AddWords(docCdaTerms[cluster.ID]); 
+            //    }
+            //}
 
             // TODO : check and formulate cda problems
             // add cda terms to naiveBayes classifier
@@ -177,13 +177,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 this.AddStandardTerms(nodeChangedInMapping, docStandardTerms);
             }
 
-            Dictionary<string, IDocument> docCdaTerms = new Dictionary<string, IDocument>();
+            // Dictionary<string, IDocument> docCdaTerms = new Dictionary<string, IDocument>();
 
-            if (this.useCDA)
-            {
-                this.CreateCdaTerms(cluster, nodeChangedInMapping, docCdaTerms);
-                UpdateCdaDocuments(docCdaTerms, changeType);
-            }
+            //if (this.useCDA)
+            //{
+            //    this.CreateCdaTerms(cluster, nodeChangedInMapping, docCdaTerms);
+            //    UpdateCdaDocuments(docCdaTerms, changeType);
+            //}
 
             if (changeType == ChangeType.Addition)
             {
@@ -191,7 +191,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             }
             else if(changeType == ChangeType.Removal) 
             {
-                naiveBayes.DeleteDocument(cluster.ID, docStandardTerms);
+                naiveBayes.RemoveDocument(cluster.ID, docStandardTerms);
             }
         }
 
@@ -208,7 +208,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 {
                     if (this.cdaDocuments[clusterID].WordCount > 0)
                     {
-                        naiveBayes.DeleteDocument(clusterID, this.cdaDocuments[clusterID]);
+                        naiveBayes.RemoveDocument(clusterID, this.cdaDocuments[clusterID]);
                     }
                     if (changeType == ChangeType.Addition)
                     {
