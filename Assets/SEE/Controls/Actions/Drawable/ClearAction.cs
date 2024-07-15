@@ -9,6 +9,8 @@ using UnityEngine;
 using SEE.Utils.History;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Game.Drawable.ActionHelpers;
+using SEE.UI.Menu.Drawable;
+using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -24,6 +26,11 @@ namespace SEE.Controls.Actions.Drawable
         private Memento memento;
 
         /// <summary>
+        /// The menu for this action.
+        /// </summary>
+        private ClearMenu menu;
+
+        /// <summary>
         /// This class can store all the information needed to
         /// revert or repeat a <see cref="ClearAction"/>.
         /// </summary>
@@ -35,13 +42,35 @@ namespace SEE.Controls.Actions.Drawable
             public readonly DrawableConfig Surface;
 
             /// <summary>
+            /// The executed clear type.
+            /// </summary>
+            public readonly ClearMenu.Type ClearType;
+
+            /// <summary>
+            /// Whether the pages are also deleted.
+            /// </summary>
+            public readonly bool DeletePage;
+
+            /// <summary>
             /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
             /// <param name="surface">The drawable surface on which the drawable type is displayed</param>
-            public Memento(GameObject surface)
+            /// <param name="clearType">The type of the clearing action.</param>
+            /// <param name="deletePage">Whether the pages should also be deleted.</param>
+            public Memento(GameObject surface, ClearMenu.Type clearType, bool deletePage)
             {
                 Surface = DrawableConfigManager.GetDrawableConfig(surface);
+                ClearType = clearType;
+                DeletePage = deletePage;
             }
+        }
+
+        /// <summary>
+        /// Creates the menu.
+        /// </summary>
+        public override void Awake()
+        {
+            menu = new();
         }
 
         /// <summary>
@@ -58,12 +87,12 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     GameObject hitObject = raycastHit.collider.gameObject;
 
-                    if (hitObject.CompareTag(Tags.Drawable))
+                    if (menu.CurrentType == ClearMenu.Type.Current)
                     {
-                        return DeleteDrawableChilds(hitObject);
-                    } else if (GameFinder.HasDrawableSurface(hitObject))
+                        return DeleteCurrentDrawableChilds(GameFinder.GetDrawableSurface(hitObject));
+                    } else
                     {
-                        return DeleteDrawableChilds(GameFinder.GetDrawableSurface(hitObject));
+                        return DeleteAllDrawableChilds(GameFinder.GetDrawableSurface(hitObject));
                     }
                 }
                 return false;
@@ -72,33 +101,80 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
+        /// Deletes all objects of the current selected page.
+        /// And depending on the configuration of the menu the page will deleted.
+        /// </summary>
+        /// <param name="surface">The surface which current page should be cleared.</param>
+        /// <returns>true if the page was successfully cleared, false if the page was already cleared.</returns>
+        private bool DeleteCurrentDrawableChilds(GameObject surface)
+        {
+            DrawableHolder holder = surface.GetComponent<DrawableHolder>();
+            if (GameFinder.GetAttachedObjectsObject(surface) != null
+                && GameFinder.HaveChildren(GameFinder.GetAttachedObjectsObject(surface), false)
+                || (holder.MaxPageSize > 1 && menu.ShouldDeletePage))
+            {
+                memento = new Memento(surface, menu.CurrentType, menu.ShouldDeletePage);
+                if (!menu.ShouldDeletePage)
+                {
+                    ClearCurrent(surface, holder.CurrentPage); 
+                }
+                else
+                {
+                    DeleteCurrent(surface, holder.CurrentPage);
+                }
+                CurrentState = IReversibleAction.Progress.Completed;
+                return true;
+            }
+            else
+            {
+                ShowNotification.Info("Page is empty.", "There are no objects to clear.");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Clears the current surface page.
+        /// </summary>
+        /// <param name="surface">The surface which current page should be cleared.</param>
+        /// <param name="page">The page to be cleared.</param>
+        private void ClearCurrent(GameObject surface, int page)
+        {
+            GameDrawableManager.DeleteTypesFromPage(surface, page);
+            new SurfaceClearPageNetAction(DrawableConfigManager.GetDrawableConfig(surface), page).Execute();
+        }
+
+        /// <summary>
+        /// Deletes the current surface page.
+        /// </summary>
+        /// <param name="surface">The surface which current page should be deleted.</param>
+        /// <param name="page">The page to be deleted.</param>
+        private void DeleteCurrent(GameObject surface, int page)
+        {
+            
+            GameDrawableManager.RemovePage(surface, page);
+            new SurfaceRemovePageNetAction(DrawableConfigManager.GetDrawableConfig(surface), page).Execute();
+        }
+
+        /// <summary>
         /// This method finds and deletes all drawable types that are placed on the given drawable.
         /// </summary>
         /// <param name="surface">is the drawable surface which should be cleaned.</param>
         /// <returns>true if the drawable was successfully cleaned, false if the drawable was already cleaned.</returns>
-        private bool DeleteDrawableChilds(GameObject surface)
+        private bool DeleteAllDrawableChilds(GameObject surface)
         {
-            if (GameFinder.GetAttachedObjectsObject(surface) != null)
+            DrawableHolder holder = surface.GetComponent<DrawableHolder>();
+            if (GameFinder.GetAttachedObjectsObject(surface) != null
+                && GameFinder.HaveChildren(GameFinder.GetAttachedObjectsObject(surface), false)
+                || (holder.MaxPageSize > 1 && menu.ShouldDeletePage))
             {
-                DrawableHolder holder = surface.GetComponent<DrawableHolder>();
-                holder.OrderInLayer = 1;
-
-                List<DrawableType> allDrawableTypes = DrawableConfigManager.GetDrawableConfig(surface).
-                    GetAllDrawableTypes();
-                if (allDrawableTypes.Count == 0)
+                memento = new Memento(surface, menu.CurrentType, menu.ShouldDeletePage);
+                if (!menu.ShouldDeletePage)
                 {
-                    return false;
-                }
-
-                foreach (DrawableType type in allDrawableTypes)
+                    ClearAll(surface);
+                } else
                 {
-                    GameObject child = GameFinder.FindChild(surface, type.Id);
-                    new EraseNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
-                        child.name).Execute();
-                    Destroyer.Destroy(child);
+                    DeleteAll(surface);
                 }
-
-                memento = new Memento(surface);
                 CurrentState = IReversibleAction.Progress.Completed;
                 return true;
             } else
@@ -109,30 +185,81 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
+        /// Clears the drawable without deleting the pages.
+        /// </summary>
+        /// <param name="surface">The drawable to be cleared.</param>
+        private void ClearAll(GameObject surface)
+        {
+            DrawableHolder holder = surface.GetComponent<DrawableHolder>();
+            holder.OrderInLayer = 1;
+            List<DrawableType> allDrawableTypes = DrawableConfigManager.GetDrawableConfig(surface).
+                        GetAllDrawableTypes();
+
+            foreach (DrawableType type in allDrawableTypes)
+            {
+                GameObject child = GameFinder.FindChild(surface, type.Id);
+                new EraseNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
+                    child.name).Execute();
+                Destroyer.Destroy(child);
+            }
+        }
+
+        /// <summary>
+        /// Clears the drawable with deleting all pages. 
+        /// </summary>
+        /// <param name="surface">The drawable to be cleared.</param>
+        private void DeleteAll(GameObject surface)
+        {
+            DrawableHolder holder = surface.GetComponent<DrawableHolder>();
+            holder.OrderInLayer = 1;
+            for (int i = holder.MaxPageSize - 1; i >= 0; i--)
+            {
+                GameDrawableManager.RemovePage(surface, i);
+                new SurfaceRemovePageNetAction(DrawableConfigManager.GetDrawableConfig(surface), i).Execute();
+            }
+        }
+
+        /// <summary>
         /// Reverts this action, i.e., restores the deleted drawable elements of the selected drawable.
         /// </summary>
         public override void Undo()
         {
             base.Undo();
-            foreach(DrawableType type in memento.Surface.GetAllDrawableTypes())
+            GameObject surface = memento.Surface.GetDrawableSurface();
+            foreach (DrawableType type in memento.Surface.GetAllDrawableTypes())
             {
-                GameObject surface = memento.Surface.GetDrawableSurface();
                 DrawableType.Restore(type, surface);
             }
+            GameDrawableManager.ChangeCurrentPage(surface, memento.Surface.CurrentPage, true);
+            GameDrawableManager.ChangeMaxPage(surface, memento.Surface.MaxPageSize);
+            new SynchronizeSurface(DrawableConfigManager.GetDrawableConfig(surface), true).Execute();
         }
 
         /// <summary>
-        /// Repeats this action, i.e., deletes again all the drawable elements that are placed on the
-        /// selected drawable.
+        /// Repeats this action, i.e., deletes again the objects.
         /// </summary>
         public override void Redo()
         {
             base.Redo();
-            foreach (DrawableType type in memento.Surface.GetAllDrawableTypes())
+            GameObject surface = memento.Surface.GetDrawableSurface();
+            if (memento.ClearType == ClearMenu.Type.Current)
             {
-                GameObject toDelete = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), type.Id); ;
-                new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, type.Id).Execute();
-                Destroyer.Destroy(toDelete);
+                if (!memento.DeletePage)
+                {
+                    ClearCurrent(surface, memento.Surface.CurrentPage);
+                } else
+                {
+                    DeleteCurrent(surface, memento.Surface.CurrentPage);
+                }
+            } else
+            {
+                if (!memento.DeletePage)
+                {
+                    ClearAll(surface);
+                } else
+                {
+                    DeleteAll(surface);
+                }
             }
         }
 

@@ -85,7 +85,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8254236187852692191}
   m_Layer: 5
-  m_Name: Remove
+  m_Name: Delete
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -122,7 +122,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4985421093549351610}
   m_Layer: 5
-  m_Name: Clear
+  m_Name: ClearMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -919,7 +919,7 @@ GameObject:
   - component: {fileID: 5309214632737686749}
   - component: {fileID: 4510291716925455742}
   m_Layer: 5
-  m_Name: RemoveSwitch
+  m_Name: DeleteSwitch
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1968,7 +1968,7 @@ GameObject:
   - component: {fileID: 2240688694047893941}
   - component: {fileID: 4653216090498982297}
   m_Layer: 5
-  m_Name: RemoveText
+  m_Name: DeleteText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

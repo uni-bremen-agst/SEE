@@ -4,9 +4,9 @@ using SEE.Game.Drawable.ValueHolders;
 
 namespace SEE.Net.Actions.Drawable
 {/// <summary>
- /// This class is responsible for synchronize a drawable on all clients.
+ /// This class is responsible for clear a page of a drawable on all clients.
  /// </summary>
-    public class SynchronizeSurface : DrawableNetAction
+    public class SurfaceClearPageNetAction : DrawableNetAction
     {
         /// <summary>
         /// The config of the drawable that should be synchronized.
@@ -14,18 +14,19 @@ namespace SEE.Net.Actions.Drawable
         public DrawableConfig Config;
 
         /// <summary>
-        /// Whether the current page change should be forced.
+        /// The page to be cleared.
         /// </summary>
-        public bool ForceChange;
+        public int Page;
 
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        /// <param name="orderInLayer">The current order in layer of the host.</param>
-        public SynchronizeSurface(DrawableConfig config, bool forceChange = false) : base(config.ID, config.ParentID)
+        /// <param name="config">The current <see cref="DrawableConfig"/>.</param>
+        /// <param name="page">The page to be removed.</param>
+        public SurfaceClearPageNetAction(DrawableConfig config, int page) : base(config.ID, config.ParentID)
         {
             Config = config;
-            ForceChange = forceChange;
+            Page = page;
         }
 
         /// <summary>
@@ -36,11 +37,7 @@ namespace SEE.Net.Actions.Drawable
             if (!IsRequester())
             {
                 base.ExecuteOnClient();
-                DrawableHolder holder = Surface.GetComponent<DrawableHolder>();
-                holder.OrderInLayer = Config.OrderInLayer;
-                holder.Description = Config.Description;
-                holder.MaxPageSize = Config.MaxPageSize;
-                GameDrawableManager.ChangeCurrentPage(Surface, Config.CurrentPage, ForceChange);
+                GameDrawableManager.DeleteTypesFromPage(Surface, Page);
             }
         }
     }

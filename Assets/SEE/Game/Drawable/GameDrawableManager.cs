@@ -166,7 +166,13 @@ namespace SEE.Game.Drawable
 
             if (equalChange)
             {
-                ChangeCurrentPage(surface, 0, true);
+                if (holder.MaxPageSize > holder.CurrentPage)
+                {
+                    ChangeCurrentPage(surface, holder.CurrentPage, true);
+                } else
+                {
+                    ChangeCurrentPage(surface, 0, true);
+                }
             }
         }
 

@@ -291,6 +291,10 @@ namespace SEE.Game.Drawable
             {
                 holder.OrderInLayer = order + 1;
             }
+            if (associatedPage >= holder.MaxPageSize)
+            {
+                holder.MaxPageSize = associatedPage + 1;
+            }
             if (order >= ValueHolder.MaxOrderInLayer)
             {
                 ValueHolder.MaxOrderInLayer = order + 1;

@@ -223,6 +223,18 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
+        /// Query to check if a game object have children.
+        /// Greater than 1 because the transform of the parent is included.
+        /// </summary>
+        /// <param name="parent">The parent object.</param>
+        /// <param name="includeInactive">Whether inactive children should be considered.</param>
+        /// <returns>True if the object have children.</returns>
+        public static bool HaveChildren(GameObject parent, bool includeInactive = false)
+        {
+            return parent.GetComponentsInChildren<Transform>(includeInactive).Length > 1;
+        }
+
+        /// <summary>
         /// Query whether the parent has a child with the searched tag.
         /// </summary>
         /// <param name="parent">The parent</param>
