@@ -175,6 +175,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             this.UnmappedCandidates = this.GetUnmappedCandidates().Select(n => n.ID).ToHashSet();
 
             this.attractFunction.AddAllClusterToUpdate();
+            this.attractFunction.AddAllCandidatesToUpdate();
 
             ReflexionGraph.RunAnalysis();
 
@@ -417,8 +418,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     continue;
                 }
 
-                foreach (string candidateId in this.UnmappedCandidates)
+                foreach (string candidateId in this.AttractFunction.CandidatesToUpdate)
                 {
+                    UnityEngine.Debug.Log($"update candidate {clusterId} for {clusterId}...");
                     Node candidate = this.ReflexionGraph.GetNode(candidateId);
 
                     // A check if an 'unmapped' candidate might have been already mapped is still required 

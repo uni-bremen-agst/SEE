@@ -4,6 +4,7 @@ using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
@@ -140,13 +141,19 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             }
 
             this.AddClusterToUpdate(cluster.ID);
+            this.AddClusterToUpdate(cluster.Incomings.Where(e => e.IsInArchitecture()).Select(e => e.Source.ID));
+            this.AddClusterToUpdate(cluster.Outgoings.Where(e => e.IsInArchitecture()).Select(e => e.Target.ID));
+
+            if(changeType == ChangeType.Removal)
+            {
+                this.AddCandidateToUpdate(changedNode.ID);
+            }
 
             List<Edge> implementationEdges = changedNode.GetImplementationEdges();
 
             foreach (Edge edge in implementationEdges)
             {
                 Node neighborOfChangedNode = edge.Source.ID.Equals(changedNode.ID) ? edge.Target : edge.Source;
-
                 UpdateOverallTable(neighborOfChangedNode, edge, changeType);
             }
         }
@@ -177,9 +184,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             Node neighborCluster = reflexionGraph.MapsTo(NeighborOfChangedNode);
 
-            if (neighborCluster != null)
+            if (neighborCluster != null && this.CandidateRecommendation.IsCandidate(NeighborOfChangedNode))
             {
-                this.AddClusterToUpdate(neighborCluster.ID);
+                this.AddCandidateToUpdate(NeighborOfChangedNode.ID);
             }
         }
 
@@ -236,7 +243,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <param name="cluster">given cluster node</param>
         public override void HandleAddCluster(Node cluster)
         {
-            base.HandleAddCluster(cluster); 
+            base.HandleAddCluster(cluster);
+            this.AddAllCandidatesToUpdate();
         }
 
         /// <summary>
@@ -259,6 +267,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             base.HandleAddArchEdge(archEdge);
             this.AddClusterToUpdate(archEdge.Source.ID);
             this.AddClusterToUpdate(archEdge.Target.ID);
+            this.AddAllCandidatesToUpdate();
         }
 
         /// <summary>
@@ -279,6 +288,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             {
                 this.AddClusterToUpdate(archEdge.Target.ID);
             }
+            this.AddAllCandidatesToUpdate();
         }
 
         /// <summary>

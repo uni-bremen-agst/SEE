@@ -53,7 +53,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// Set of cluster ids for which the candidate attraction values need to be updated.
         /// The concrete implementation of the attract function is responsible to manage this Set.
         /// </summary>
-        private HashSet<string> clustersToUpdate;
+        private HashSet<string> clusterToUpdate;
+
+        /// <summary>
+        /// Set of candidate ids for which the candidate attraction values need to be updated.
+        /// The concrete implementation of the attract function is responsible to manage this Set.
+        /// </summary>
+        private HashSet<string> candidatesToUpdate;
 
         /// <summary>
         /// Current candidates which are mapped and were handled by the attract function.
@@ -68,7 +74,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <summary>
         /// Set of cluster ids for which the candidate attraction values need to be updated.
         /// </summary>
-        public HashSet<string> ClusterToUpdate { get => new HashSet<string>(clustersToUpdate); }
+        public HashSet<string> ClusterToUpdate { get => new HashSet<string>(clusterToUpdate); }
+
+        /// <summary>
+        /// Set of candidate ids for which the candidate attraction values need to be updated.
+        /// </summary>
+        public HashSet<string> CandidatesToUpdate { get => new HashSet<string>(candidatesToUpdate); }
 
         /// <summary>
         /// <see cref="CandidateRecommendation"/> object used to retrieve necessary information
@@ -91,7 +102,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             this.ClusterType = config.ClusterType;
             this.edgeWeights = config.EdgeWeights != null ? new(config.EdgeWeights) : new();
             this.edgeStateCache = new EdgeStateCache(this.reflexionGraph);
-            this.clustersToUpdate = new HashSet<string>();
+            this.clusterToUpdate = new HashSet<string>();
+            this.candidatesToUpdate = new HashSet<string>();
             this.handledCandidates = new HashSet<string>();
         }
 
@@ -152,15 +164,59 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         }
 
         /// <summary>
+        /// Adds all candidates within the reflexion graph to the set of cluster for which attraction 
+        /// values need to be updated.
+        /// </summary>
+        public void AddAllCandidatesToUpdate()
+        {
+            foreach (Node candidate in CandidateRecommendation.GetUnmappedCandidates())
+            {
+                this.AddCandidateToUpdate(candidate.ID);
+            }
+        }
+
+        /// <summary>
         /// Adds a cluster id of the reflexion graph to the set of cluster for which attraction 
         /// values need to be updated.
         /// </summary>
         /// <param name="clusterId">given cluster id</param>
         protected void AddClusterToUpdate(string clusterId)
         {
-            if (clusterId != null && !this.ClusterToUpdate.Contains(clusterId))
+            if (clusterId != null && !this.clusterToUpdate.Contains(clusterId))
             {
-                clustersToUpdate.Add(clusterId);
+                clusterToUpdate.Add(clusterId);
+            }
+        }
+
+        /// <summary>
+        /// Adds a list of cluster ids of the reflexion graph to the set of cluster for which attraction 
+        /// values need to be updated.
+        /// </summary>
+        /// <param name="clusterId">given cluster id</param>
+        protected void AddClusterToUpdate(IEnumerable<string> clusterIds)
+        {
+            foreach (var clusterId in clusterIds)
+            {
+                if (clusterId != null && !this.clusterToUpdate.Contains(clusterId))
+                {
+                    clusterToUpdate.Add(clusterId);
+                } 
+            }
+        }
+
+        /// <summary>
+        /// Adds a list of cluster ids of the reflexion graph to the set of cluster for which attraction 
+        /// values need to be updated.
+        /// </summary>
+        /// <param name="clusterId">given cluster id</param>
+        protected void AddCandidatesToUpdate(IEnumerable<string> candidateIds)
+        {
+            foreach (var candidateId in candidateIds)
+            {
+                if (candidateId != null && !this.candidatesToUpdate.Contains(candidateId))
+                {
+                    candidatesToUpdate.Add(candidateId);
+                }
             }
         }
 
@@ -173,7 +229,33 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         {
             if (this.ClusterToUpdate.Contains(clusterId))
             {
-                clustersToUpdate.Remove(clusterId);
+                clusterToUpdate.Remove(clusterId);
+            }
+        }
+
+        /// <summary>
+        /// Adds a candidate id of the reflexion graph to the set of cluster for which attraction 
+        /// values need to be updated.
+        /// </summary>
+        /// <param name="clusterId">given cluster id</param>
+        protected void AddCandidateToUpdate(string candidateId)
+        {
+            if (candidateId != null && !this.candidatesToUpdate.Contains(candidateId))
+            {
+                candidatesToUpdate.Add(candidateId);
+            }
+        }
+
+        /// <summary>
+        /// Removes a candidate id of the reflexion graph from the set of cluster for which attraction 
+        /// values need to be updated. 
+        /// </summary>
+        /// <param name="clusterId">given cluster id</param>
+        public void RemoveCandidateToUpdate(string candidateId)
+        {
+            if (this.candidatesToUpdate.Contains(candidateId))
+            {
+                candidatesToUpdate.Remove(candidateId);
             }
         }
 

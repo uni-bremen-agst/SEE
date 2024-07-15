@@ -86,7 +86,7 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Removes the toggle attribute with <paramref name="attributeName"/> if not
+        /// Sets the toggle attribute with <paramref name="attributeName"/> if not
         /// already set. All listeners will be notified of this change.
         /// If the attribute is set already, nothing happens.
         /// </summary>

@@ -5,6 +5,7 @@ using SEE.Tools.ReflexionAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using DocumentMergingType = Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions.Document.DocumentMergingType;
 
@@ -164,14 +165,23 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <param name="cluster">Cluster node from which the changedNode was add or removed.</param>
         /// <param name="changedNode">Candidate node which was add or removed from the cluster</param>
         /// <param name="changeType">given change type</param>
-        public override void HandleChangedCandidate(Node cluster, Node nodeChangedInMapping, ChangeType changeType)
+        public override void HandleChangedCandidate(Node cluster, Node changedNode, ChangeType changeType)
         {
-            if(!HandlingRequired(nodeChangedInMapping.ID, changeType, updateHandling: true))
+            if(!HandlingRequired(changedNode.ID, changeType, updateHandling: true))
             {
                 return;
-            } 
+            }
 
             this.AddClusterToUpdate(cluster.ID);
+            this.AddClusterToUpdate(cluster.Incomings.Where(e => e.IsInArchitecture()).Select(e => e.Source.ID));
+            this.AddClusterToUpdate(cluster.Outgoings.Where(e => e.IsInArchitecture()).Select(e => e.Target.ID));
+            this.AddCandidatesToUpdate(changedNode.Incomings.Where(e => e.IsInImplementation()).Select(e => e.Source.ID));
+            this.AddCandidatesToUpdate(changedNode.Outgoings.Where(e => e.IsInImplementation()).Select(e => e.Target.ID));
+
+            if (changeType == ChangeType.Removal)
+            {
+                this.AddCandidateToUpdate(changedNode.ID);
+            }
         }
 
         /// <summary>
@@ -194,9 +204,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 Node mapsToSource = this.reflexionGraph.MapsTo(implEdge.Source);
                 Node mapsToTarget = this.reflexionGraph.MapsTo(implEdge.Target);
 
-                this.AddClusterToUpdate(mapsToSource.ID);
-                this.AddClusterToUpdate(mapsToTarget.ID);
-
                 Edge architectureEdge = AllowedBy(implEdge, edgeState);
 
                 if(architectureEdge == null)
@@ -204,6 +211,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                     throw new Exception($"No matching architecture edge was found for {mapsToSource.ID} -{implEdge.Type}-> {mapsToTarget.ID}." +
                                           $" Expected by implementation Edge {implEdge.ToShortString()} in edgeState {edgeState}");
                 }
+
+                this.FindNodesToUpdateOnChangedArchEdge(architectureEdge);
 
                 this.allowedByDependency[implEdge.ID] = architectureEdge;
 
@@ -270,6 +279,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 // created after b was already add. We create a corresponding architecure edge ourself, so we do not have 
                 // to depend on the lifecycle of artificial self loop architecture edges created by the reflexion analysis.
                 architectureEdge = new Edge(sourceCluster, targetCluster, type);
+                architectureEdge.SetToggle(ReflexionSubgraphs.Architecture.GetLabel());
             }
             else
             {
@@ -305,12 +315,46 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
                 if (architectureEdge != null)
                 {
-                    this.AddClusterToUpdate(architectureEdge.Source.ID);
-                    this.AddClusterToUpdate(architectureEdge.Target.ID);
+                    FindNodesToUpdateOnChangedArchEdge(architectureEdge);
                 }
                 else
                 {
                     UnityEngine.Debug.LogWarning($"Architecture edge {architectureEdge.ID} is no longer contained within the graph. Attraction values may not be updated completely.");
+                }
+            }
+        }
+
+        public void FindNodesToUpdateOnChangedArchEdge(Edge edge)
+        {
+            if(!edge.IsInArchitecture())
+            {
+                throw new Exception($"Given edge is not part of the architecture. {edge.ToShortString()}");
+            }
+
+            Node ClusterSource = edge.Source;
+            Node ClusterTarget = edge.Target;
+
+            this.AddClusterToUpdate(edge.Source.ID);
+            this.AddClusterToUpdate(edge.Target.ID);
+
+            IEnumerable<Edge> neighborsOfNodesPointingToSourceCluster = 
+                ClusterSource.Incomings.Where(e => e.IsInMapping()).SelectMany(e => e.Source.GetImplementationEdges());
+            IEnumerable<Edge> neighborsOfNodesPointingToTargetCluster = 
+                ClusterTarget.Incomings.Where(e => e.IsInMapping()).SelectMany(e => e.Source.GetImplementationEdges());
+
+            neighborsOfNodesPointingToSourceCluster.ForEach(e => UpdateImplementationEdge(e));
+            neighborsOfNodesPointingToTargetCluster.ForEach(e => UpdateImplementationEdge(e));
+
+            void UpdateImplementationEdge(Edge e)
+            {
+                if (this.reflexionGraph.MapsTo(e.Source) == null)
+                {
+                    this.AddCandidateToUpdate(e.Source.ID);
+                }
+
+                if (this.reflexionGraph.MapsTo(e.Target) == null)
+                {
+                    this.AddCandidateToUpdate(e.Target.ID);
                 }
             }
         }
@@ -352,6 +396,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         public override void HandleAddCluster(Node cluster)
         {
             base.HandleAddCluster(cluster);
+            this.AddAllCandidatesToUpdate();
         }
 
         /// <summary>
@@ -372,6 +417,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         public override void HandleAddArchEdge(Edge archEdge)
         {
             base.HandleAddArchEdge(archEdge);
+            this.AddAllCandidatesToUpdate();
         }
 
         /// <summary>
@@ -420,6 +466,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             {
                 this.allowedByDependency.Remove(key);
             }
+            this.AddAllCandidatesToUpdate();
         }
 
         /// <summary>

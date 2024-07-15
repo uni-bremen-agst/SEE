@@ -168,8 +168,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 return;
             }
 
-            this.AddAllClusterToUpdate();
-
             Document docStandardTerms = new Document();
 
             if (this.useStandardTerms)
@@ -193,46 +191,49 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             {
                 naiveBayes.RemoveDocument(cluster.ID, docStandardTerms);
             }
+
+            this.AddAllClusterToUpdate();
+            this.AddAllCandidatesToUpdate();
         }
 
-        /// <summary>
-        /// TODO: cda is currently not working properly 
-        /// </summary>
-        /// <param name="changedCdaTerms"></param>
-        /// <param name="changeType"></param>
-        private void UpdateCdaDocuments(Dictionary<string, IDocument> changedCdaTerms, ChangeType changeType)
-        {
-            foreach (string clusterID in changedCdaTerms.Keys)
-            {
-                if (!this.cdaDocuments.TryAdd(clusterID, changedCdaTerms[clusterID]))
-                {
-                    if (this.cdaDocuments[clusterID].WordCount > 0)
-                    {
-                        naiveBayes.RemoveDocument(clusterID, this.cdaDocuments[clusterID]);
-                    }
-                    if (changeType == ChangeType.Addition)
-                    {
-                        this.cdaDocuments[clusterID].AddWords(changedCdaTerms[clusterID]);
-                    }
-                    else if (changeType == ChangeType.Removal)
-                    {
-                        this.cdaDocuments[clusterID].RemoveWords(changedCdaTerms[clusterID]);
-                    }
-                    if (this.cdaDocuments[clusterID].WordCount > 0)
-                    {
-                        naiveBayes.AddDocument(clusterID, this.cdaDocuments[clusterID]);
-                    }
-                }
-                else if (changeType == ChangeType.Addition)
-                {
-                    this.cdaDocuments[clusterID] = changedCdaTerms[clusterID];
-                    if (this.cdaDocuments[clusterID].WordCount > 0)
-                    {
-                        naiveBayes.AddDocument(clusterID, this.cdaDocuments[clusterID]);
-                    }
-                }
-            }
-        }
+        ///// <summary>
+        ///// TODO: cda is currently not working properly 
+        ///// </summary>
+        ///// <param name="changedCdaTerms"></param>
+        ///// <param name="changeType"></param>
+        //private void UpdateCdaDocuments(Dictionary<string, IDocument> changedCdaTerms, ChangeType changeType)
+        //{
+        //    foreach (string clusterID in changedCdaTerms.Keys)
+        //    {
+        //        if (!this.cdaDocuments.TryAdd(clusterID, changedCdaTerms[clusterID]))
+        //        {
+        //            if (this.cdaDocuments[clusterID].WordCount > 0)
+        //            {
+        //                naiveBayes.RemoveDocument(clusterID, this.cdaDocuments[clusterID]);
+        //            }
+        //            if (changeType == ChangeType.Addition)
+        //            {
+        //                this.cdaDocuments[clusterID].AddWords(changedCdaTerms[clusterID]);
+        //            }
+        //            else if (changeType == ChangeType.Removal)
+        //            {
+        //                this.cdaDocuments[clusterID].RemoveWords(changedCdaTerms[clusterID]);
+        //            }
+        //            if (this.cdaDocuments[clusterID].WordCount > 0)
+        //            {
+        //                naiveBayes.AddDocument(clusterID, this.cdaDocuments[clusterID]);
+        //            }
+        //        }
+        //        else if (changeType == ChangeType.Addition)
+        //        {
+        //            this.cdaDocuments[clusterID] = changedCdaTerms[clusterID];
+        //            if (this.cdaDocuments[clusterID].WordCount > 0)
+        //            {
+        //                naiveBayes.AddDocument(clusterID, this.cdaDocuments[clusterID]);
+        //            }
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// Resets the attract function,
