@@ -67,7 +67,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             }
 
             double attraction = 0;
-            candidate.PostOrderDescendants().ForEach(d => attraction += GetOverallLocal(d) - GetToOthersLocal(candidate, descendant: d, cluster));
+            candidate.PostOrderDescendants().ForEach(d => attraction += GetOverallLocal(d) - GetToOthersLocal(descendant: d, cluster));
 
             return attraction;
         }
@@ -94,7 +94,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <param name="descendant">Descendant within the subtree of the candidate. Can be the candidate as well.</param>
         /// <param name="cluster">Given cluster</param>
         /// <returns>Local ToOthers value</returns>
-        private double GetToOthersLocal(Node candidate, Node descendant, Node cluster)
+        private double GetToOthersLocal(Node descendant, Node cluster)
         {
             List<Edge> implementationEdges = descendant.GetImplementationEdges();
             double toOthers = 0;
@@ -112,7 +112,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
                 double weight = GetEdgeWeight(edge);
 
-                State edgeState = this.edgeStateCache.GetFromCache(cluster.ID, candidate.ID, edge.ID, outgoing: isDescendantSource);
+                State edgeState = this.edgeStateCache.GetFromCache(cluster, descendant, edge);
 
                 if (edgeState == State.Allowed || edgeState == State.ImplicitlyAllowed)
                 {

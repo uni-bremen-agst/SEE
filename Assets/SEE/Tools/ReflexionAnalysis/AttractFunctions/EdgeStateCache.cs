@@ -53,41 +53,40 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// 
         /// </summary>
         /// <param name="clusterId">Cluster node id the candidate node is potentially mapped to.</param>
-        /// <param name="candidateInSubtreeId">Candidate node id of the node that is potentially mapped to.</param>
+        /// <param name="implNodeId">node id of the node that is potentially mapped to the cluster.</param>
         /// <param name="edgeId">Id of the edge of which the potential state should be retrieved.</param>
         /// <param name="outgoing">Wether the edge is outgoing from the or incoming to the the candidate subtree.</param>
         /// <returns>The state the given edge would be in, if the candidate is mapped to the cluster.</returns>
-        public State GetFromCache(string clusterId, string candidateInSubtreeId, string edgeId, bool outgoing)
+        public State GetFromCache(Node cluster, Node implNode, Edge edge)
         {
-            Node candidateInSubtree = reflexionGraph.GetNode(candidateInSubtreeId);
-            Edge edge = reflexionGraph.GetEdge(edgeId);
-            Node subtreeNeighbor = outgoing ? edge.Target : edge.Source;
+            bool outgoing = edge.Source.ID.Equals(implNode.ID);
+            Node neighbor = outgoing ? edge.Target : edge.Source;
 
-            Node cluster = reflexionGraph.GetNode(clusterId ?? string.Empty);
-
-            Node neighborCluster = reflexionGraph.MapsTo(subtreeNeighbor);
+            Node neighborCluster = reflexionGraph.MapsTo(neighbor);
 
             if(neighborCluster == null)
             {
                 return State.Unmapped;
             }
 
-            if (candidateInSubtreeId.Equals(subtreeNeighbor.ID) && !clusterId.Equals(neighborCluster.ID))
+            if (implNode.ID.Equals(neighbor.ID) && !cluster.ID.Equals(neighborCluster.ID))
             {
                 // TODO: When can this case happen?
                 return State.Undefined;
             }
 
-            string neighborClusterID = neighborCluster.ID;
+            string originNodeId = outgoing ? implNode.ID : neighbor.ID;
+            string targetNodeId = outgoing ? neighbor.ID : implNode.ID;
+            string originClusterId = outgoing ? cluster.ID : neighborCluster.ID;
+            string targetClusterId = outgoing ? neighborCluster.ID : cluster.ID;
+            string edgeType = edge.Type;
 
-            // TODO: new keys beachten, outgoing verwenden
-            string key = $"{candidateInSubtreeId}#{clusterId}#{subtreeNeighbor.ID}#{neighborClusterID}#{edgeId}";
-            if(!this.cache.ContainsKey(key))
+            string key = $"{originNodeId}#{originClusterId}#{targetNodeId}#{targetClusterId}#{edgeType}";
+            if (!this.cache.ContainsKey(key))
             {
-                UpdateCache(candidateInSubtree, cluster);
-            } 
-
-            return this.cache[key];
+                UpdateCache(implNode, cluster);
+            }
+            return this.cache[key]; 
         }
 
         /// <summary>
@@ -102,15 +101,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// key = "{candidate.ID}#{cluster.ID}#{neighborOfSubtree.ID}#{neighborCluster.ID}#{edge.ID}"
         /// 
         /// </summary>
-        /// <param name="candidate">Given candidate node</param>
+        /// <param name="descendantOfCandidate">Given candidate node</param>
         /// <param name="cluster">Given cluster node</param>
-        private void UpdateCache(Node candidate, Node cluster)
+        private void UpdateCache(Node descendantOfCandidate, Node cluster)
         {
-            Node mapsTo = reflexionGraph.MapsTo(candidate);
+            Node mapsTo = reflexionGraph.MapsTo(descendantOfCandidate);
 
             bool mappingChangeRequired = mapsTo != cluster && mapsTo != null;
 
-            Node explicitlyMappedNode = candidate;
+            Node explicitlyMappedNode = descendantOfCandidate;
 
             if (mappingChangeRequired)
             {
@@ -122,30 +121,29 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 reflexionGraph.RemoveFromMappingSilent(explicitlyMappedNode);
             }
 
-            reflexionGraph.AddToMappingSilent(cluster, candidate);
+            reflexionGraph.AddToMappingSilent(cluster, descendantOfCandidate);
 
             List<Edge> subtreeEdgesIncoming = new List<Edge>();
             List<Edge> subtreeEdgesOutgoing = new List<Edge>();
-            IList<Node> subtreeNodes = candidate.PostOrderDescendants();
+            IList<Node> subtreeNodes = descendantOfCandidate.PostOrderDescendants();
             subtreeNodes.ForEach(d => subtreeEdgesIncoming.AddRange(d.Incomings.Where(x => x.IsInImplementation())));
             subtreeNodes.ForEach(d => subtreeEdgesOutgoing.AddRange(d.Outgoings.Where(x => x.IsInImplementation())));
 
-            subtreeEdgesIncoming.ForEach(e => WriteToCache(e, e.Source));
-            subtreeEdgesOutgoing.ForEach(e => WriteToCache(e, e.Target));
+            subtreeEdgesIncoming.ForEach(e => WriteToCache(e));
+            subtreeEdgesOutgoing.ForEach(e => WriteToCache(e));
 
-            void WriteToCache(Edge edge, Node neighborOfSubtree)
+            void WriteToCache(Edge edge)
             {
-                Node neighborCluster = reflexionGraph.MapsTo(neighborOfSubtree);
-
-                if (neighborCluster != null)
+                Node neighborCluster = reflexionGraph.MapsTo(edge.Target);
+                Node sourceCluster = reflexionGraph.MapsTo(edge.Source);
+                if (neighborCluster != null && sourceCluster != null)
                 {
-                    // TODO: add origin and target comparison?
-                    string key = $"{candidate.ID}#{cluster.ID}#{neighborOfSubtree.ID}#{neighborCluster.ID}#{edge.ID}";
+                    string key = $"{edge.Source.ID}#{sourceCluster.ID}#{edge.Target.ID}#{neighborCluster.ID}#{edge.Type}";
                     this.cache[key] = edge.State();
                 }
             }
 
-            reflexionGraph.RemoveFromMappingSilent(candidate);
+            reflexionGraph.RemoveFromMappingSilent(descendantOfCandidate);
 
             if (mappingChangeRequired)
             {
