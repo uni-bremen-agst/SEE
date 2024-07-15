@@ -1,5 +1,8 @@
 package de.unibremen.swt.see.manager.security;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -7,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -73,7 +77,28 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         try {
             final String jwt = jwtUtils.getJwtFromCookies(request);
-            if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
+            boolean authorized = false;
+            try {
+                jwtUtils.validateJwtToken(jwt);
+                authorized = true;
+            } catch (ExpiredJwtException e) {
+                log.debug("JWT token is expired: {}", e.getMessage());
+                request.setAttribute(ValidationError.TOKEN_EXPIRED.toString(), e.getMessage());
+            } catch (UnsupportedJwtException e) {
+                log.debug("JWT token is invalid: {}", e.getMessage());
+                request.setAttribute(ValidationError.TOKEN_UNSUPPORTED.toString(), e.getMessage());
+            } catch (MalformedJwtException e) {
+                log.debug("JWT token is malformed: {}", e.getMessage());
+                request.setAttribute(ValidationError.TOKEN_MALFORMED.toString(), e.getMessage());
+            } catch (SecurityException e) {
+                log.debug("JWT token signature invalid: {}", e.getMessage());
+                request.setAttribute(ValidationError.TOKEN_SIGNATURE_INVALID.toString(), e.getMessage());
+            } catch (IllegalArgumentException e) {
+                log.debug("JWT token is empty: {}", e.getMessage());
+                request.setAttribute(ValidationError.TOKEN_EMPTY.toString(), e.getMessage());
+            }
+            
+            if (authorized) {
                 final String username = jwtUtils.getUserNameFromJwtToken(jwt);
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);

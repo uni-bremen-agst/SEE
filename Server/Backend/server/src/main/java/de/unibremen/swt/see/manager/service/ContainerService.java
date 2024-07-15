@@ -291,9 +291,16 @@ public class ContainerService {
      * @param volumeName the name of an existing volume with the shared files
      * for a SEE Code City
      * @param port the port number that should be exposed on the container host
+     * @param serverId ID of the server that is handed over to the game server
+     * @param password room password that is handed over to the game server
      * @return response metadata object
      */
-    private CreateContainerResponse createContainer(final String containerName, final String volumeName, final int port, final String serverId, final String password) {
+    private CreateContainerResponse createContainer(
+            final String containerName,
+            final String volumeName,
+            final int port,
+            final String serverId,
+            final String password) {
         ExposedPort exposedPort = ExposedPort.tcp(CONTAINER_PORT);
         PortBinding portBinding = new PortBinding(Ports.Binding.bindPort(port), exposedPort);
 
@@ -339,6 +346,7 @@ public class ContainerService {
      *
      * @param server the server that the volume should be created for
      * @param volumeName the name under which the volume should be created
+     * @return docker library's response
      * @throws IOException if there is a problem accessing the server's upload
      * directory
      */

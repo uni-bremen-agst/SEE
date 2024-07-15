@@ -61,15 +61,29 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException, ServletException {
-        log.error("Unauthorized error: {}", authException.getMessage());
-
+        
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+        String message = authException.getMessage();
+        if (request.getAttribute(ValidationError.TOKEN_EXPIRED.toString()) != null) {
+            message = "Token has expired!";
+        } else if (request.getAttribute(ValidationError.TOKEN_UNSUPPORTED.toString()) != null) {
+            message = "Token is unsupported!";
+        } else if (request.getAttribute(ValidationError.TOKEN_MALFORMED.toString()) != null) {
+            message = "Token is malformed!";
+        } else if (request.getAttribute(ValidationError.TOKEN_SIGNATURE_INVALID.toString()) != null) {
+            message = "Token signature is invalid!";
+        } else if (request.getAttribute(ValidationError.TOKEN_EMPTY.toString()) != null) {
+            message = "Token is empty!";
+        }
+
+        log.warn("Unauthorized error: {}", message);
 
         final Map<String, Object> body = new HashMap<>();
         body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
         body.put("error", "Unauthorized");
-        body.put("message", authException.getMessage());
+        body.put("message", message);
         body.put("path", request.getServletPath());
 
         final ObjectMapper mapper = new ObjectMapper();

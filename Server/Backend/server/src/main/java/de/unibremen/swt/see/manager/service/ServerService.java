@@ -318,6 +318,7 @@ public class ServerService {
      * This is a simple password generator that is not optimized to match high
      * security standards.
      *
+     * @param length password length
      * @return generated password
      */
     private String generatePassword(final int length) {

@@ -10,6 +10,7 @@ import java.security.Key;
 import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.server.Cookie.SameSite;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
@@ -34,6 +35,13 @@ public class JwtUtils {
     private String jwtCookie;
 
     /**
+     * Contains the domain name, or IP address, and port of this back-end
+     * application server.
+     */
+    @Value("${see.app.backend.domain}")
+    private String backendDomain;
+    
+    /**
      * Context path of the application's servlet container.
      */
     @Value("${server.servlet.context-path}")
@@ -43,6 +51,11 @@ public class JwtUtils {
      * The secret key used for signing and verifying JWT.
      */
     private final Key key;
+    
+    /**
+     * The parser used for JWT related operations.
+     */
+    private final JwtParser jwtParser;
 
     /**
      * Constructs a new {@code JwtUtils} instance and generates the secret key.
@@ -57,6 +70,7 @@ public class JwtUtils {
     public JwtUtils(@Value("${see.app.jwtSecret}") String jwtSecret) throws WeakKeyException {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
         this.key = Keys.hmacShaKeyFor(keyBytes);
+        this.jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
     }
 
     /**
@@ -89,9 +103,11 @@ public class JwtUtils {
         String jwt = generateToken(userPrincipal.getUsername());
         ResponseCookie cookie = ResponseCookie
                 .from(jwtCookie, jwt)
+                .domain(backendDomain.split(":")[0])
                 .path(contextPath)
                 .maxAge(24 * 60 * 60)
                 .httpOnly(true)
+                .sameSite(SameSite.STRICT.attributeValue())
                 .build();
         return cookie;
     }
@@ -123,8 +139,7 @@ public class JwtUtils {
      * @return the username extracted from the JWT
      */
     public String getUserNameFromJwtToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build()
-                .parseClaimsJws(token).getBody().getSubject();
+        return jwtParser.parseClaimsJws(token).getBody().getSubject();
     }
 
     /**
@@ -135,22 +150,19 @@ public class JwtUtils {
      * if the JWT has not expired.
      *
      * @param authToken the JWT to validate
-     * @return {@code true} if the JWT is valid, else {@code false}
+     * @throws ExpiredJwtException if the token is expired
+     * @throws UnsupportedJwtException  if given token is not a signed claims token
+     * @throws MalformedJwtException if the token is malformed
+     * @throws SecurityException if signature validation fails
+     * @throws IllegalArgumentException if the token is null or blank
      */
-    public boolean validateJwtToken(String authToken) {
-        try {
-            Jwts.parserBuilder().setSigningKey(key).build().parse(authToken);
-            return true;
-        } catch (MalformedJwtException e) {
-            log.error("Invalid JWT token: {}", e.getMessage());
-        } catch (ExpiredJwtException e) {
-            log.error("JWT token is expired: {}", e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            log.error("JWT token is unsupported: {}", e.getMessage());
-        } catch (IllegalArgumentException e) {
-            log.error("JWT claims string is empty: {}", e.getMessage());
-        }
-        return false;
+    public void validateJwtToken(String authToken) 
+                throws ExpiredJwtException,
+                       UnsupportedJwtException,
+                       MalformedJwtException,
+                       SecurityException,
+                       IllegalArgumentException {
+        jwtParser.parseClaimsJws(authToken);
     }
 
     /**

@@ -77,6 +77,13 @@ Please refer to the *Security Considerations* in the backend README for addition
 The management server as provided here does not implement HTTPS.
 You are strongly advised to set up a reverse proxy and only provide TLS-secured access.
 
+Add `secure` flag to cookies so that they are only transferred over HTTPS.
+Using nginx `proxy_pass`, you would add something like this:
+
+```
+proxy_cookie_flags ~ secure;
+```
+
 
 ### Containerization
 
