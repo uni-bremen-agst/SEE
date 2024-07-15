@@ -26,7 +26,7 @@ The Management Server stack requires additional services during runtime:
 The stack can be run using Podman/Docker Compose.
 A `compose.yaml` file is provided for this purpose.
 
-See section *Development Environment* for additional considerations.
+Read sections *Development Environment* and *Production Environment* for additional information.
 
 
 --------------------------------------------------------------------------------
@@ -92,3 +92,35 @@ This can be mitigated by either:
 - Use Podman in rootless mode.
   - This will usually prevent the frontend to open port 80, which should be no problem as a reverse proxy with HTTPs should be used, anyway.
   - See above for additional information on how to achieve this.
+
+
+### Deployment
+
+Deployment is intended to be done using Podman or Docker.
+
+Please read the `compose.yaml` carefully and adapt the configuration for your needs,
+especially for public/production setups!
+
+The container stack can be run from `Server` directory using `podman-compose` or `docker-compose`.  
+
+To build the containers, you can use:
+
+```
+podman-compose build
+```
+
+Use `--no-cache` parameter to force a rebuild.
+
+To run the container, use:
+
+```
+podman-compose up
+```
+
+Use `-d` parameter to run in detached mode.
+
+The following command stops and cleans up the container setup:
+
+```
+podman-compose down
+```

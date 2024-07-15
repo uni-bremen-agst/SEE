@@ -20,21 +20,23 @@ To install dependencies, run:
 
 `pnpm install`
 
-[The following command](https://pnpm.io/cli/run) will run the front-end application in *development mode*:
+The following command will run the front-end application in *development mode*:
 
 `pnpm run dev`
 
-To build the application for deployment, use the [following command](https://pnpm.io/cli/run):
+To build the application for deployment, use the following command:
 
 `pnpm run build`
 
 The run scripts are defined in the `package.json` file along with the package dependencies.
 
+[See here](https://pnpm.io/cli/run) for `pnpm run` documentation.
+
 
 ### Dependency Management
 
 It is vital to keep dependencies up-to-date to fix bugs including known security flaws.
-[The following command](https://pnpm.io/cli/update) will bump version numbers:
+The following command will bump version numbers:
 
 ```
 pnpm up
@@ -43,28 +45,4 @@ pnpm up
 Using parameter `--latest` will update versions more rigorously and the app might break.
 It is, however, important to check if the used versions are still maintained and receive security fixes.
 
-
-### Deployment
-
-Deployment is done using Podman or Docker.
-
-The front-end container alone can be run from frontend directory using `podman-compose` or `docker-compose`.  
-See parent README for information on how to deploy the whole stack.
-
-To build the frontend container, you can use:
-
-```
-podman-compose build --no-cache
-```
-
-To run the container, use:
-
-```
-podman-compose up
-```
-
-The following command cleans up the container setup:
-
-```
-podman-compose down
-```
+[See here](https://pnpm.io/cli/update) for `pnpm update` documentation.
