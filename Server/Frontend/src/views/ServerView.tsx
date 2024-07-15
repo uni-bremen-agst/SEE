@@ -151,11 +151,11 @@ function ServerView() {
           <CardContent sx={{height: "calc(100% - 3em)"}}>
             <Stack direction="column" spacing={2} height={"100%"}>
               <Stack direction="row" spacing={2}>
-                    <Box width={140} height={140}>
-                      <Card sx={{width: "100%", height: "100%"}}>
-                        <Avatar width={140} height={140} avatarSeed={server.avatarSeed} avatarColor={server.avatarColor}/>
-                      </Card>
-                    </Box>
+                  <Box width={140} height={140}>
+                    <Card sx={{width: "100%", height: "100%"}}>
+                      <Avatar width={140} height={140} avatarSeed={server.avatarSeed} avatarColor={server.avatarColor}/>
+                    </Card>
+                  </Box>
                   <Stack direction="column" spacing={1}>
                     <Typography variant="h6">{server.name}</Typography>
                     {server.serverStatusType == "ONLINE"

@@ -1,4 +1,4 @@
-import {Card, CardContent, Stack } from "@mui/material";
+import {Card, CardContent, Grid } from "@mui/material";
 import ServerListItem from "./ServerListItem";
 import { useContext, useEffect, useState } from "react";
 import Server from "../types/Server";
@@ -31,13 +31,15 @@ function ServerList() {
   return (
     <Card elevation={0} sx={{margin: "2em 0 1em 0", maxHeight: "calc(100% - 150px)", overflow: "auto"}}>
     <CardContent>
-      <Stack direction="column" spacing={2}>
+      <Grid container spacing={2}>
           {
-            servers && servers.length ? servers.map(
-              (server) => <ServerListItem server={server} key={server.id}/>
+            servers && servers.length ? servers.map( (server) =>
+              <Grid key={server.id} item xs={12} sm={12} md={6} lg={6}>
+                <ServerListItem server={server} key={server.id}/>
+              </Grid>
             ) : <></>
           } 
-      </Stack>
+      </Grid>
     </CardContent>
     </Card>
   )
