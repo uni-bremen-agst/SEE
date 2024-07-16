@@ -14,28 +14,28 @@ function Router() {
 
   return (
     <BrowserRouter>
-      {user ? <PrivateRoutes/> : <PublicRoutes/>}
+      {user ? <PrivateRoutes /> : <PublicRoutes />}
     </BrowserRouter>
   )
 }
 
 function PublicRoutes() {
-  return(
+  return (
     <Routes>
-        <Route path="*" element={<LoginView/>}/> 
-    </Routes> 
+      <Route path="*" element={<LoginView />} />
+    </Routes>
   )
 }
 
 function PrivateRoutes() {
-  return(
+  return (
     <Routes>
-        <Route path="/" element={<HomeView/>}/> 
-        <Route path="/server" element={<ServerView/>}/> 
-        <Route path="/createServer" element={<CreateServerView/>}/> 
-        <Route path="/settings" element={<SettingsView/>}/> 
-        <Route path="/userSettings" element={<UserSettingsView/>}/> 
-      </Routes> 
+      <Route path="/" element={<HomeView />} />
+      <Route path="/server" element={<ServerView />} />
+      <Route path="/createServer" element={<CreateServerView />} />
+      <Route path="/settings" element={<SettingsView />} />
+      <Route path="/userSettings" element={<UserSettingsView />} />
+    </Routes>
   )
 }
 

@@ -24,7 +24,7 @@ const modalStyle = {
   p: 4,
 };
 
-function getRandomColor(){
+function getRandomColor() {
   const red = (Math.floor(Math.random() * 150) + 100).toString();
   const green = (Math.floor(Math.random() * 150) + 100).toString();
   const blue = (Math.floor(Math.random() * 150) + 100).toString();
@@ -32,190 +32,190 @@ function getRandomColor(){
   return `rgb(${red}, ${green}, ${blue})`;
 }
 
-function getRandomSeed(){
+function getRandomSeed() {
   let avatarSeed = "";
-  for(let i = 0; i < 18; i++){
-      avatarSeed = avatarSeed + Math.round(Math.random()).toString();
+  for (let i = 0; i < 18; i++) {
+    avatarSeed = avatarSeed + Math.round(Math.random()).toString();
   }
   return avatarSeed;
 }
 
 function CreateServerView() {
-    const {axiosInstance} = useContext(AuthContext);
+  const { axiosInstance } = useContext(AuthContext);
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const [fileTypeModalOpen, setFileTypeModalOpen] = useState(false);
-    const [uploadErrorMessageVisible, setUploadErrorMessageVisible] = useState(false);
-    const [createServerFailedMessageVisible, setCreateServerFailedMessageVisible] = useState(false);
+  const [fileTypeModalOpen, setFileTypeModalOpen] = useState(false);
+  const [uploadErrorMessageVisible, setUploadErrorMessageVisible] = useState(false);
+  const [createServerFailedMessageVisible, setCreateServerFailedMessageVisible] = useState(false);
 
-    const [name, setName] = useState<string>("");
-    const [files, setFiles] = useState<SeeFile[]>([]);
+  const [name, setName] = useState<string>("");
+  const [files, setFiles] = useState<SeeFile[]>([]);
 
-    const [avatarSeed, setAvatarSeed] = useState(getRandomSeed());
-    const [avatarColor, setAvatarColor] = useState(getRandomColor());
-    const [displayReloadIcon, setDisplayReloadIcon] = useState(false);
+  const [avatarSeed, setAvatarSeed] = useState(getRandomSeed());
+  const [avatarColor, setAvatarColor] = useState(getRandomColor());
+  const [displayReloadIcon, setDisplayReloadIcon] = useState(false);
 
-    const [errors, setErrors] = useState(new Map<string, string>());
+  const [errors, setErrors] = useState(new Map<string, string>());
 
-    async function createServer() {
-      const createServerResponse = await axiosInstance.post("/server/create", {name: name, avatarSeed: avatarSeed, avatarColor: avatarColor}).catch( () => {
-        setCreateServerFailedMessageVisible(true);
-        return;
+  async function createServer() {
+    const createServerResponse = await axiosInstance.post("/server/create", { name: name, avatarSeed: avatarSeed, avatarColor: avatarColor }).catch(() => {
+      setCreateServerFailedMessageVisible(true);
+      return;
+    });
+    if (!createServerResponse) { return; }
+
+    let success = true;
+    for (let i = 0; i < files.length; i++) {
+      const projectFile: SeeFile = files[i];
+      const form = new FormData();
+      form.append("id", createServerResponse.data.id);
+      form.append("fileType", projectFile.fileType);
+      form.append("file", projectFile._localfile);
+      await axiosInstance.post("/server/addFile", form).catch(() => {
+        success = false;
       });
-      if(!createServerResponse) { return; }
-
-      let success = true;
-      for (let i = 0; i < files.length; i++) {
-        const projectFile : SeeFile = files[i];
-        const form = new FormData();
-        form.append("id", createServerResponse.data.id);
-        form.append("fileType", projectFile.fileType);
-        form.append("file", projectFile._localfile);
-        await axiosInstance.post("/server/addFile", form).catch(() => {
-          success = false;
-        });
-      }
-
-      if (success) {
-        axiosInstance.put("/server/startServer", {}, {params: {id: createServerResponse.data.id}});
-        navigate('/', {replace: true});
-      } else {
-        setUploadErrorMessageVisible(true);
-      }
     }
 
-    return (
-      <Container sx={{padding: "3em"}}>
-        <Snackbar open={createServerFailedMessageVisible} autoHideDuration={5000} onClose={() => setCreateServerFailedMessageVisible(false)}>
-          <Alert onClose={() => setCreateServerFailedMessageVisible(false)} severity="error" sx={{width: "100%", borderRadius: "25px"}}>
-            Error creating server!
-          </Alert>
-        </Snackbar>
-        <Snackbar open={uploadErrorMessageVisible} autoHideDuration={5000} onClose={() => setUploadErrorMessageVisible(false)}>
-          <Alert onClose={() => setUploadErrorMessageVisible(false)} severity="error" sx={{width: "100%", borderRadius: "25px"}}>
-            Error during file upload!
-          </Alert>
-        </Snackbar>
-        <Modal
-            open={fileTypeModalOpen}
-            onClose={() => setFileTypeModalOpen(false)}
-            aria-labelledby="remove-user-modal-title"
-            aria-describedby="remove-user-modal-description">
-          <Box sx={modalStyle}>
-            <Typography id="modal-title" variant="h6" sx={{marginBottom: "6pt"}}>
-              Select File Type
-            </Typography>
-            <Stack direction="column" spacing={1}>
-              { FileTypeUtils.getAll().map((fileType) =>
-                <Button key={fileType} variant="contained" color="primary" sx={{borderRadius: "25px", width: "100%"}} onClick={() => { setFileTypeModalOpen(false); setFiles((files) => [...files, {fileType: fileType} as SeeFile]); }}>
-                        {FileTypeUtils.getLabel(fileType)}
-                </Button>
-              )}
-            </Stack>
-              <Stack justifyContent="end" direction="row" spacing={2} sx={{marginTop: "2em"}}>
-                <Button variant="contained" color="secondary" sx={{borderRadius:"25px"}} onClick={() => setFileTypeModalOpen(false)}>
-                    Cancel
-                </Button>
-              </Stack>
-          </Box>
-        </Modal>
-
-        <Header/>
-        <Typography variant="h4">
-          <Box display={"inline"} sx={{"&:hover" : {cursor: "pointer"}}}>
-            <FontAwesomeIcon icon={faArrowLeft} onClick={() => navigate(-1)}/>&nbsp;
-          </Box>
-          New Game Server
-        </Typography>
-        <Card sx={{marginTop: "2em", borderRadius: "25px", height: "calc(100% - 100px)", overflow: "auto"}}>
-          <CardContent sx={{height: "calc(100% - 3em)"}}>
-            <Stack direction="column" spacing={2}>
-              <Stack direction="row" spacing={2}>
-                <Stack direction="column" spacing={2} width={"100%"}>
-                  <Stack direction="column" flexGrow={1}>
-                    <Typography variant="h6">Details</Typography>
-                    <TextField error={!!errors.get("name")} helperText={errors.get("name")} value={name} onChange={(e) => setName(e.target.value)} label="Server Name" variant="standard"/>
-                  </Stack>
-
-                  <Typography variant="h6">Files</Typography>
-                  <Card sx={{borderRadius: "0px", flexGrow: 1, overflow: "auto", minHeight: "100px"}} elevation={0}>
-                    <Stack direction="column" spacing={1}>
-                      { files.map((projectFile, idx) =>
-                          <Stack key={idx} direction="row">
-                            <MuiFileInput
-                              label={FileTypeUtils.getLabel(projectFile.fileType)}
-                              placeholder="Click to choose file…"
-                              variant="standard"
-                              fullWidth
-                              value={projectFile._localfile}
-                              onChange={(value) => { setFiles((files) => files.map((item, itemIdx) => itemIdx === idx ? {...item, _localfile: value} as SeeFile : item)) }}
-                              clearIconButtonProps={{title: "Remove", children: <FontAwesomeIcon icon={faX}/>}}
-                              inputProps={{accept: FileTypeUtils.getFileExtension(projectFile.fileType)}}/>
-                              <IconButton
-                                  size="small"
-                                  onClick={() => { setFiles((files) => files.filter((_, itemIdx) => itemIdx !== idx)) }}>
-                                <FontAwesomeIcon icon={faRemove}/>
-                              </IconButton>
-                          </Stack>
-                        )
-                      }
-                    </Stack>
-                    <Button variant="contained" color="primary" sx={{borderRadius:"25px", marginTop: "6pt"}} onClick={() => setFileTypeModalOpen(true)}>
-                      Add File
-                    </Button>
-                  </Card>
-                </Stack>
-
-                {/* Avatar */}
-                <Box width={140} height={140}>
-                  <Card sx={{width: "100%", height: "100%"}}>
-                    <CardActionArea onMouseEnter={() => setDisplayReloadIcon(true)} onMouseLeave={() => setDisplayReloadIcon(false)} onClick={() => {setAvatarSeed(getRandomSeed()); setAvatarColor(getRandomColor());}}>
-                      <Box 
-                          visibility={displayReloadIcon? "visible" : "hidden"} 
-                          position="absolute" color={grey[500]} 
-                          display="flex" 
-                          width={140}
-                          height={140} 
-                          justifyContent="center"
-                          sx={{mixBlendMode : "difference"}}>
-                        <Stack direction="column" justifyContent="center">
-                          <FontAwesomeIcon icon={faRepeat} size="4x"/>
-                        </Stack>
-                      </Box>
-                      <Avatar width={140} height={140} avatarSeed={avatarSeed} avatarColor={avatarColor}/>
-                    </CardActionArea>
-                  </Card>
-                </Box>
-              </Stack>
-
-              <Stack justifyContent="end" direction="row" spacing={2}>
-                <Button variant="contained" color="secondary" sx={{borderRadius:"25px"}} onClick={() => navigate('/')}>
-                    Cancel
-                </Button>
-                <Button
-                    variant="contained"
-                    sx={{borderRadius:"25px"}}
-                    onClick={() => {
-                      setErrors(new Map<string, string>());
-                      const tempErrorsList = new Map<string, string>();
-                      if(!name){
-                        tempErrorsList.set('name', "Please enter a name for the server.");
-                      }
-                      if(tempErrorsList.size > 0){
-                        setErrors(tempErrorsList);
-                      } else {
-                        createServer()
-                      }
-                    }}>
-                  Create
-                </Button>
-              </Stack>
-            </Stack>
-          </CardContent>
-        </Card>
-      </Container>
-    )
+    if (success) {
+      axiosInstance.put("/server/startServer", {}, { params: { id: createServerResponse.data.id } });
+      navigate('/', { replace: true });
+    } else {
+      setUploadErrorMessageVisible(true);
+    }
   }
 
-  export default CreateServerView;
+  return (
+    <Container sx={{ padding: "3em" }}>
+      <Snackbar open={createServerFailedMessageVisible} autoHideDuration={5000} onClose={() => setCreateServerFailedMessageVisible(false)}>
+        <Alert onClose={() => setCreateServerFailedMessageVisible(false)} severity="error" sx={{ width: "100%", borderRadius: "25px" }}>
+          Error creating server!
+        </Alert>
+      </Snackbar>
+      <Snackbar open={uploadErrorMessageVisible} autoHideDuration={5000} onClose={() => setUploadErrorMessageVisible(false)}>
+        <Alert onClose={() => setUploadErrorMessageVisible(false)} severity="error" sx={{ width: "100%", borderRadius: "25px" }}>
+          Error during file upload!
+        </Alert>
+      </Snackbar>
+      <Modal
+        open={fileTypeModalOpen}
+        onClose={() => setFileTypeModalOpen(false)}
+        aria-labelledby="remove-user-modal-title"
+        aria-describedby="remove-user-modal-description">
+        <Box sx={modalStyle}>
+          <Typography id="modal-title" variant="h6" sx={{ marginBottom: "6pt" }}>
+            Select File Type
+          </Typography>
+          <Stack direction="column" spacing={1}>
+            {FileTypeUtils.getAll().map((fileType) =>
+              <Button key={fileType} variant="contained" color="primary" sx={{ borderRadius: "25px", width: "100%" }} onClick={() => { setFileTypeModalOpen(false); setFiles((files) => [...files, { fileType: fileType } as SeeFile]); }}>
+                {FileTypeUtils.getLabel(fileType)}
+              </Button>
+            )}
+          </Stack>
+          <Stack justifyContent="end" direction="row" spacing={2} sx={{ marginTop: "2em" }}>
+            <Button variant="contained" color="secondary" sx={{ borderRadius: "25px" }} onClick={() => setFileTypeModalOpen(false)}>
+              Cancel
+            </Button>
+          </Stack>
+        </Box>
+      </Modal>
+
+      <Header />
+      <Typography variant="h4">
+        <Box display={"inline"} sx={{ "&:hover": { cursor: "pointer" } }}>
+          <FontAwesomeIcon icon={faArrowLeft} onClick={() => navigate(-1)} />&nbsp;
+        </Box>
+        New Game Server
+      </Typography>
+      <Card sx={{ marginTop: "2em", borderRadius: "25px", height: "calc(100% - 100px)", overflow: "auto" }}>
+        <CardContent sx={{ height: "calc(100% - 3em)" }}>
+          <Stack direction="column" spacing={2}>
+            <Stack direction="row" spacing={2}>
+              <Stack direction="column" spacing={2} width={"100%"}>
+                <Stack direction="column" flexGrow={1}>
+                  <Typography variant="h6">Details</Typography>
+                  <TextField error={!!errors.get("name")} helperText={errors.get("name")} value={name} onChange={(e) => setName(e.target.value)} label="Server Name" variant="standard" />
+                </Stack>
+
+                <Typography variant="h6">Files</Typography>
+                <Card sx={{ borderRadius: "0px", flexGrow: 1, overflow: "auto", minHeight: "100px" }} elevation={0}>
+                  <Stack direction="column" spacing={1}>
+                    {files.map((projectFile, idx) =>
+                      <Stack key={idx} direction="row">
+                        <MuiFileInput
+                          label={FileTypeUtils.getLabel(projectFile.fileType)}
+                          placeholder="Click to choose file…"
+                          variant="standard"
+                          fullWidth
+                          value={projectFile._localfile}
+                          onChange={(value) => { setFiles((files) => files.map((item, itemIdx) => itemIdx === idx ? { ...item, _localfile: value } as SeeFile : item)) }}
+                          clearIconButtonProps={{ title: "Remove", children: <FontAwesomeIcon icon={faX} /> }}
+                          inputProps={{ accept: FileTypeUtils.getFileExtension(projectFile.fileType) }} />
+                        <IconButton
+                          size="small"
+                          onClick={() => { setFiles((files) => files.filter((_, itemIdx) => itemIdx !== idx)) }}>
+                          <FontAwesomeIcon icon={faRemove} />
+                        </IconButton>
+                      </Stack>
+                    )
+                    }
+                  </Stack>
+                  <Button variant="contained" color="primary" sx={{ borderRadius: "25px", marginTop: "6pt" }} onClick={() => setFileTypeModalOpen(true)}>
+                    Add File
+                  </Button>
+                </Card>
+              </Stack>
+
+              {/* Avatar */}
+              <Box width={140} height={140}>
+                <Card sx={{ width: "100%", height: "100%" }}>
+                  <CardActionArea onMouseEnter={() => setDisplayReloadIcon(true)} onMouseLeave={() => setDisplayReloadIcon(false)} onClick={() => { setAvatarSeed(getRandomSeed()); setAvatarColor(getRandomColor()); }}>
+                    <Box
+                      visibility={displayReloadIcon ? "visible" : "hidden"}
+                      position="absolute" color={grey[500]}
+                      display="flex"
+                      width={140}
+                      height={140}
+                      justifyContent="center"
+                      sx={{ mixBlendMode: "difference" }}>
+                      <Stack direction="column" justifyContent="center">
+                        <FontAwesomeIcon icon={faRepeat} size="4x" />
+                      </Stack>
+                    </Box>
+                    <Avatar width={140} height={140} avatarSeed={avatarSeed} avatarColor={avatarColor} />
+                  </CardActionArea>
+                </Card>
+              </Box>
+            </Stack>
+
+            <Stack justifyContent="end" direction="row" spacing={2}>
+              <Button variant="contained" color="secondary" sx={{ borderRadius: "25px" }} onClick={() => navigate('/')}>
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                sx={{ borderRadius: "25px" }}
+                onClick={() => {
+                  setErrors(new Map<string, string>());
+                  const tempErrorsList = new Map<string, string>();
+                  if (!name) {
+                    tempErrorsList.set('name', "Please enter a name for the server.");
+                  }
+                  if (tempErrorsList.size > 0) {
+                    setErrors(tempErrorsList);
+                  } else {
+                    createServer()
+                  }
+                }}>
+                Create
+              </Button>
+            </Stack>
+          </Stack>
+        </CardContent>
+      </Card>
+    </Container>
+  )
+}
+
+export default CreateServerView;

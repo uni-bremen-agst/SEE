@@ -7,11 +7,11 @@ export enum FileType {
 }
 
 export class FileTypeUtils {
-  static getAll() : FileType[] {
+  static getAll(): FileType[] {
     return Object.values(FileType).filter((value) => typeof value === 'string').map((value) => value as FileType);
   }
 
-  static getFileExtension(ft: FileType) : string {
+  static getFileExtension(ft: FileType): string {
     switch (ft) {
       case FileType.CFG: return ".cfg";
       case FileType.CSV: return ".csv";
@@ -22,7 +22,7 @@ export class FileTypeUtils {
     }
   }
 
-  static getLabel(ft: FileType) : string {
+  static getLabel(ft: FileType): string {
     switch (ft) {
       case FileType.CFG: return "Configuration (CFG)";
       case FileType.CSV: return "CSV Data Provider";
@@ -35,4 +35,3 @@ export class FileTypeUtils {
 }
 
 export default FileType;
-// export const FileTypeModule = { FileType, FileTypeUtils };

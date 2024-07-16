@@ -20,7 +20,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <AuthProvider>
-        <Router/>
+        <Router />
       </AuthProvider>
     </ThemeProvider>
   )

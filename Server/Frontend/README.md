@@ -7,10 +7,14 @@ This is the front-end application to control the SEE management backend.
 
 The front-end application is developed in [TypeScript](https://www.typescriptlang.org/) using [NodeJS](https://nodejs.org/en/download) and [`pnpm`](https://pnpm.io/pnpm-cli).
 
+A configuration for [VS Code](https://vscodium.com/) is provided to enable auto-formatting in the front-end project.
+Note that this ([as of July 2024](https://github.com/Microsoft/vscode/issues/32693)) requires you to open the front-end project directly (*Open Folder*/*Add Folder to Workspace*) and not one of the parent directories.
+Please try not to reformat files in a different manner.
+
 
 ### Frameworks
 
-- [React](https://react.dev/) 
+- [React](https://react.dev/)
 - [Material UI](https://mui.com/material-ui/all-components/)
 
 

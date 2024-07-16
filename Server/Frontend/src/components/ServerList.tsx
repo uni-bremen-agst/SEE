@@ -1,11 +1,11 @@
-import {Card, CardContent, Grid } from "@mui/material";
+import { Card, CardContent, Grid } from "@mui/material";
 import ServerListItem from "./ServerListItem";
 import { useContext, useEffect, useState } from "react";
 import Server from "../types/Server";
 import { AuthContext } from "../contexts/AuthContext";
 
 function ServerList() {
-  const {axiosInstance} = useContext(AuthContext);
+  const { axiosInstance } = useContext(AuthContext);
 
   const [servers, setServers] = useState<Server[]>([]);
 
@@ -17,7 +17,7 @@ function ServerList() {
       )
     }, 30000);
 
-    if(isApiSubscribed){
+    if (isApiSubscribed) {
       axiosInstance.get("/server/all").then(
         (response) => setServers(response.data)
       )
@@ -27,20 +27,20 @@ function ServerList() {
       clearInterval(fetchServers);
     }
   }, [])
-  
+
   return (
-    <Card elevation={0} sx={{margin: "2em 0 1em 0", maxHeight: "calc(100% - 150px)", overflow: "auto"}}>
-    <CardContent>
-      <Grid container spacing={2}>
+    <Card elevation={0} sx={{ margin: "2em 0 1em 0", maxHeight: "calc(100% - 150px)", overflow: "auto" }}>
+      <CardContent>
+        <Grid container spacing={2}>
           {
-            servers && servers.length ? servers.map( (server) =>
+            servers && servers.length ? servers.map((server) =>
               <Grid key={server.id} item xs={12} sm={12} md={6} lg={6}>
-                <ServerListItem server={server} key={server.id}/>
+                <ServerListItem server={server} key={server.id} />
               </Grid>
             ) : <></>
-          } 
-      </Grid>
-    </CardContent>
+          }
+        </Grid>
+      </CardContent>
     </Card>
   )
 }
