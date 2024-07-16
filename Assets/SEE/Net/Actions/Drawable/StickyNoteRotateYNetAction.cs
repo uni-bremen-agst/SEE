@@ -20,30 +20,20 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        public StickyNoteRoateYNetAction(string drawableID, string parentDrawableID, float degree, Vector3 oldPosition) 
+        public StickyNoteRoateYNetAction(string drawableID, string parentDrawableID, float degree, Vector3 oldPosition)
             : base(drawableID, parentDrawableID)
         {
-            this.Degree = degree;
-            this.ObjectPosition = oldPosition;
+            Degree = degree;
+            ObjectPosition = oldPosition;
         }
 
         /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
-        }
-        /// <summary>
         /// Change the y rotation of a sticky note on each client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                base.ExecuteOnClient();
-                GameStickyNoteManager.SetRotateY(GameFinder.GetHighestParent(Surface), Degree);
-            }
+            base.ExecuteOnClient();
+            GameStickyNoteManager.SetRotateY(GameFinder.GetHighestParent(Surface), Degree);
         }
     }
 }

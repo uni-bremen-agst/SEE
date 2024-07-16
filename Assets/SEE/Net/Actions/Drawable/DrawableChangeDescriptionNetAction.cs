@@ -1,6 +1,5 @@
 ﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.Net.Actions;
 using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
@@ -24,23 +23,12 @@ namespace SEE.Net.Actions.Drawable
         }
 
         /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
-        }
-
-        /// <summary>
         /// Changes the description of the drawable on each client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                GameObject surface = GameFinder.FindDrawableSurface(DrawableConf.ID, DrawableConf.ParentID);
-                GameDrawableManager.ChangeDescription(surface.transform.parent.gameObject, DrawableConf.Description);
-            }
+            GameObject surface = GameFinder.FindDrawableSurface(DrawableConf.ID, DrawableConf.ParentID);
+            GameDrawableManager.ChangeDescription(surface.transform.parent.gameObject, DrawableConf.Description);
         }
     }
 }

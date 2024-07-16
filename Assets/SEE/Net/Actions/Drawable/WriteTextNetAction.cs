@@ -1,7 +1,6 @@
 ﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -21,29 +20,26 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="drawableID">The id of the drawable on which the text should be written.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="text">The text that should be written.</param>
-        public WriteTextNetAction(string drawableID, string parentDrawableID, TextConf text) 
+        public WriteTextNetAction(string drawableID, string parentDrawableID, TextConf text)
             : base (drawableID, parentDrawableID)
         {
-            this.Text = text;
+            Text = text;
         }
 
         /// <summary>
         /// Writes the text on each client.
         /// </summary>
         /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="Text"/> don't exists.</exception>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            base.ExecuteOnClient();
+            if (Text != null && Text.Id != "")
             {
-                base.ExecuteOnClient();
-                if (Text != null && Text.Id != "")
-                {
-                    GameTexter.ReWriteText(Surface, Text);
-                }
-                else
-                {
-                    throw new System.Exception($"There is no text to write.");
-                }
+                GameTexter.ReWriteText(Surface, Text);
+            }
+            else
+            {
+                throw new System.Exception($"There is no text to write.");
             }
         }
     }

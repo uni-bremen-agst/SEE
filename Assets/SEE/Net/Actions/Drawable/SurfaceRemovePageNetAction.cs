@@ -1,6 +1,5 @@
 ﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.Game.Drawable.ValueHolders;
 
 namespace SEE.Net.Actions.Drawable
 {/// <summary>
@@ -32,13 +31,10 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Synchronize the current order in layer of the host on each client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                base.ExecuteOnClient();
-                GameDrawableManager.RemovePage(Surface, Page);
-            }
+            base.ExecuteOnClient();
+            GameDrawableManager.RemovePage(Surface, Page);
         }
     }
 }

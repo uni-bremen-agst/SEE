@@ -20,7 +20,7 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="drawableID">The id of the drawable on which the node is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="conf">The configuration that contains the values to change the associated game object.</param>
-        public EditMMNodeNetAction(string drawableID, string parentDrawableID, MindMapNodeConf conf) 
+        public EditMMNodeNetAction(string drawableID, string parentDrawableID, MindMapNodeConf conf)
             : base(drawableID, parentDrawableID)
         {
             Conf = conf;
@@ -30,15 +30,12 @@ namespace SEE.Net.Actions.Drawable
         /// Changes the values of the given mind map node configuration on each client.
         /// </summary>
         /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="Conf"/> don't exists.</exception>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            base.ExecuteOnClient();
+            if (FindChild(Conf.BorderConf.Id).transform.parent.gameObject != null)
             {
-                base.ExecuteOnClient();
-                if (FindChild(Conf.BorderConf.Id).transform.parent.gameObject != null)
-                {
-                    GameEdit.ChangeMindMapNode(FindChild(Conf.BorderConf.Id).transform.parent.gameObject, Conf);
-                }
+                GameEdit.ChangeMindMapNode(FindChild(Conf.BorderConf.Id).transform.parent.gameObject, Conf);
             }
         }
     }

@@ -23,22 +23,12 @@ namespace SEE.Net.Actions.Drawable
         }
 
         /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
-        }
-        /// <summary>
         /// Changes the color of the drawable surface on each client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                GameObject surface = GameFinder.FindDrawableSurface(DrawableConf.ID, DrawableConf.ParentID);
-                GameDrawableManager.ChangeColor(surface.transform.parent.gameObject, DrawableConf.Color);
-            }
+            GameObject surface = GameFinder.FindDrawableSurface(DrawableConf.ID, DrawableConf.ParentID);
+            GameDrawableManager.ChangeColor(surface.transform.parent.gameObject, DrawableConf.Color);
         }
     }
 }

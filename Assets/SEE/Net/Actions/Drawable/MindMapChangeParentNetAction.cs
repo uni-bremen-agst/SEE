@@ -23,26 +23,23 @@ namespace SEE.Net.Actions.Drawable
         public MindMapChangeParentNetAction(string drawableID, string parentDrawableID, MindMapNodeConf node)
             : base(drawableID, parentDrawableID)
         {
-            this.Node = node;
+            Node = node;
         }
 
         /// <summary>
         /// Change the parent of a node on each client.
         /// </summary>
         /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="Node"/> don't exists.</exception>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            base.ExecuteOnClient();
+            if (Node != null && Node.Id != "")
             {
-                base.ExecuteOnClient();
-                if (Node != null && Node.Id != "")
-                {
-                    GameMindMap.ChangeParent(FindChild(Node.BorderConf.Id).transform.parent.gameObject, FindChild(Node.ParentNode));
-                }
-                else
-                {
-                    throw new System.Exception($"The node with the ID {Node.Id} or the parent node with the ID {Node.ParentNode} dont exists.");
-                }
+                GameMindMap.ChangeParent(FindChild(Node.BorderConf.Id).transform.parent.gameObject, FindChild(Node.ParentNode));
+            }
+            else
+            {
+                throw new System.Exception($"The node with the ID {Node.Id} or the parent node with the ID {Node.ParentNode} dont exists.");
             }
         }
     }

@@ -1,7 +1,6 @@
 ﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -40,13 +39,10 @@ namespace SEE.Net.Actions.Drawable
         /// Changes the color kind of the given line on each client.
         /// </summary>
         /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="Line.id"/> don't exists.</exception>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                base.ExecuteOnClient();
-                GameDrawer.ChangeColorKind(FindChild(Line.Id), ColorKind, Line);
-            }
+            base.ExecuteOnClient();
+            GameDrawer.ChangeColorKind(FindChild(Line.Id), ColorKind, Line);
         }
     }
 }

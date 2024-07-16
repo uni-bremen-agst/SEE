@@ -31,17 +31,14 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Synchronize the current order in layer of the host on each client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                base.ExecuteOnClient();
-                DrawableHolder holder = Surface.GetComponent<DrawableHolder>();
-                holder.OrderInLayer = Config.OrderInLayer;
-                holder.Description = Config.Description;
-                holder.MaxPageSize = Config.MaxPageSize;
-                GameDrawableManager.ChangeCurrentPage(Surface, Config.CurrentPage, ForceChange);
-            }
+            base.ExecuteOnClient();
+            DrawableHolder holder = Surface.GetComponent<DrawableHolder>();
+            holder.OrderInLayer = Config.OrderInLayer;
+            holder.Description = Config.Description;
+            holder.MaxPageSize = Config.MaxPageSize;
+            GameDrawableManager.ChangeCurrentPage(Surface, Config.CurrentPage, ForceChange);
         }
     }
 }

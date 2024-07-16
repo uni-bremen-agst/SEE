@@ -22,26 +22,23 @@ namespace SEE.Net.Actions.Drawable
         public MindMapRefreshBranchLinesNetAction(string drawableID, string parentDrawableID, MindMapNodeConf node)
             : base(drawableID, parentDrawableID)
         {
-            this.Node = node;
+            Node = node;
         }
 
         /// <summary>
         /// Refreshs the branch lines of a node on each client.
         /// </summary>
         /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="Node"/> don't exists.</exception>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            base.ExecuteOnClient();
+            if (Node != null && Node.Id != "")
             {
-                base.ExecuteOnClient();
-                if (Node != null && Node.Id != "")
-                {
-                    GameMindMap.ReDrawBranchLines(FindChild(Node.BorderConf.Id).transform.parent.gameObject);
-                }
-                else
-                {
-                    throw new System.Exception($"The node with the ID {Node.Id} dont exists.");
-                }
+                GameMindMap.ReDrawBranchLines(FindChild(Node.BorderConf.Id).transform.parent.gameObject);
+            }
+            else
+            {
+                throw new System.Exception($"The node with the ID {Node.Id} dont exists.");
             }
         }
     }

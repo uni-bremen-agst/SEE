@@ -25,7 +25,7 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="objectName">The id of the object that should be changed.</param>
         /// <param name="scale">The scale that should be set.</param>
-        public ScaleNetAction(string drawableID, string parentDrawableID, string objectName, Vector3 scale) 
+        public ScaleNetAction(string drawableID, string parentDrawableID, string objectName, Vector3 scale)
             : base(drawableID, parentDrawableID)
         {
             ObjectName = objectName;
@@ -36,18 +36,16 @@ namespace SEE.Net.Actions.Drawable
         /// Changes the scale of the given object on each client.
         /// </summary>
         /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="ObjectName"/> don't exists.</exception>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            base.ExecuteOnClient();
+            if (TryFindChild(ObjectName, out GameObject child))
             {
-                base.ExecuteOnClient();
-                if (TryFindChild(ObjectName, out GameObject child))
-                {
-                    GameScaler.SetScale(GameFinder.FindChild(Surface, ObjectName), Scale);
-                } else
-                {
-                    GameScaler.SetScale(Surface.transform.parent.gameObject, Scale);
-                }
+                GameScaler.SetScale(GameFinder.FindChild(Surface, ObjectName), Scale);
+            }
+            else
+            {
+                GameScaler.SetScale(Surface.transform.parent.gameObject, Scale);
             }
         }
     }

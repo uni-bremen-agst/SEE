@@ -50,7 +50,7 @@ namespace SEE.Net.Actions.Drawable
 
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
-        /// Used for undo / redo of <see cref="MoveRotateAction"/> 
+        /// Used for undo / redo of <see cref="MoveRotateAction"/>
         /// </summary>
         /// <param name="drawableID">The id of the drawable on which the object is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
@@ -70,20 +70,17 @@ namespace SEE.Net.Actions.Drawable
         /// Changes the rotation of the given object on each client.
         /// </summary>
         /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="ObjectName"/> don't exists.</exception>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            base.ExecuteOnClient();
+            GameObject child = FindChild(ObjectName);
+            if (Direction != Vector3.zero)
             {
-                base.ExecuteOnClient();
-                GameObject child = FindChild(ObjectName);
-                if (Direction != Vector3.zero)
-                {
-                    GameMoveRotator.RotateObject(child, Direction, Degree, IncludeChildren);
-                }
-                else
-                {
-                    GameMoveRotator.SetRotate(child, Degree, IncludeChildren);
-                }
+                GameMoveRotator.RotateObject(child, Direction, Degree, IncludeChildren);
+            }
+            else
+            {
+                GameMoveRotator.SetRotate(child, Degree, IncludeChildren);
             }
         }
     }

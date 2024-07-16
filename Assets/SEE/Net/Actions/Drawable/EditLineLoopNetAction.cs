@@ -37,13 +37,10 @@ namespace SEE.Net.Actions.Drawable
         /// </summary>
         /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/>
         /// or <see cref="LineName"/> don't exists.</exception>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                base.ExecuteOnClient();
-                GameEdit.ChangeLoop(FindChild(LineName), Loop);
-            }
+            base.ExecuteOnClient();
+            GameEdit.ChangeLoop(FindChild(LineName), Loop);
         }
     }
 }

@@ -23,20 +23,17 @@ namespace SEE.Net.Actions.Drawable
         public StickyNoteMoveNetAction(string drawableID, string parentDrawableID, Vector3 position, Vector3 rotation)
             : base(drawableID, parentDrawableID)
         {
-            this.Position = position;
-            this.Rotation = rotation;
+            Position = position;
+            Rotation = rotation;
         }
 
         /// <summary>
         /// Changes the position of a sticky note on each client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                base.ExecuteOnClient();
-                GameStickyNoteManager.Move(GameFinder.GetHighestParent(Surface), Position, Rotation);
-            }
+            base.ExecuteOnClient();
+            GameStickyNoteManager.Move(GameFinder.GetHighestParent(Surface), Position, Rotation);
         }
     }
 }

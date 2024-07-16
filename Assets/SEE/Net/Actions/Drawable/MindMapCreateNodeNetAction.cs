@@ -1,8 +1,5 @@
-﻿using System.Collections;
-using UnityEngine;
-using SEE.Controls.Actions.Drawable;
+﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.Game;
 using SEE.Game.Drawable;
 
 namespace SEE.Net.Actions.Drawable
@@ -26,26 +23,23 @@ namespace SEE.Net.Actions.Drawable
         public MindMapCreateNodeNetAction(string drawableID, string parentDrawableID, MindMapNodeConf node)
             : base(drawableID, parentDrawableID)
         {
-            this.Node = node;
+            Node = node;
         }
 
         /// <summary>
         /// Creates the node on each client.
         /// </summary>
         /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="Node"/> don't exists.</exception>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            base.ExecuteOnClient();
+            if (Node != null && Node.Id != "")
             {
-                base.ExecuteOnClient();
-                if (Node != null && Node.Id != "")
-                {
-                    GameMindMap.ReCreate(Surface, Node);
-                }
-                else
-                {
-                    throw new System.Exception($"There is no node to create.");
-                }
+                GameMindMap.ReCreate(Surface, Node);
+            }
+            else
+            {
+                throw new System.Exception($"There is no node to create.");
             }
         }
     }

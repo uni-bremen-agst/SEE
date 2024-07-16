@@ -2,7 +2,6 @@
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Utils;
-using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -21,27 +20,17 @@ namespace SEE.Net.Actions.Drawable
         /// </summary>
         public StickyNoteDeleterNetAction(DrawableConfig conf) : base(conf.ID, conf.ParentID)
         {
-            this.Conf = conf;
+            Conf = conf;
         }
 
-        /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
-        }
         /// <summary>
         /// Deletes the sticky note on each client.
         /// </summary>
         /// <exception cref="System.Exception">will be thrown, if the <see cref="StickyNoteID"/> don't exists.</exception>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                base.ExecuteOnClient();
-                Destroyer.Destroy(GameFinder.GetHighestParent(Surface));
-            }
+            base.ExecuteOnClient();
+            Destroyer.Destroy(GameFinder.GetHighestParent(Surface));
         }
     }
 }

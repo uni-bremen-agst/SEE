@@ -1,6 +1,5 @@
 ﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
-using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -30,7 +29,7 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="objectName">The id of the object that should be changed.</param>
         /// <param name="state">The state of layer change</param>
         /// <param name="order">The order in layer that should be set.</param>
-        public LayerChangerNetAction(string drawableID, string parentDrawableID, string objectName, GameLayerChanger.LayerChangerStates state, int order) 
+        public LayerChangerNetAction(string drawableID, string parentDrawableID, string objectName, GameLayerChanger.LayerChangerStates state, int order)
             : base(drawableID, parentDrawableID)
         {
             ObjectName = objectName;
@@ -42,13 +41,10 @@ namespace SEE.Net.Actions.Drawable
         /// Changes the order in layer of the given object on each client.
         /// </summary>
         /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="ObjectName"/> don't exists.</exception>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                base.ExecuteOnClient();
-                GameLayerChanger.ChangeOrderInLayer(FindChild(ObjectName), Order, State, false);
-            }
+            base.ExecuteOnClient();
+            GameLayerChanger.ChangeOrderInLayer(FindChild(ObjectName), Order, State, false);
         }
     }
 }

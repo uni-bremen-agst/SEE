@@ -17,7 +17,7 @@ namespace SEE.Net.Actions.Drawable
         /// </summary>
         /// <param name="drawableID">The id of the drawable.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
-        public RbAndCCDestroyerNetAction(string drawableID, string parentDrawableID, string nodeID) 
+        public RbAndCCDestroyerNetAction(string drawableID, string parentDrawableID, string nodeID)
             : base(drawableID, parentDrawableID)
         {
             NodeID = nodeID;
@@ -27,13 +27,10 @@ namespace SEE.Net.Actions.Drawable
         /// Destroys all rigid bodies and collision controller of all drawable types object of the given drawable on each client.
         /// </summary>
         /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="NodeID"/> don't exists.</exception>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                base.ExecuteOnClient();
-                GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(FindChild(NodeID));
-            }
+            base.ExecuteOnClient();
+            GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(FindChild(NodeID));
         }
     }
 }

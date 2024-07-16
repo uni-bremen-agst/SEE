@@ -19,33 +19,23 @@ namespace SEE.Net.Actions.Drawable
         /// </summary>
         public StickyNoteChangeNetAction(DrawableConfig config)
         {
-            this.DrawableConf = config;
-        }
-
-        /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
+            DrawableConf = config;
         }
 
         /// <summary>
         /// Changes the values of the sticky note on each client.
         /// </summary>
         /// /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableConf"/> don't exists.</exception>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            if (DrawableConf != null && GameFinder.FindDrawableSurface(DrawableConf.ID, DrawableConf.ParentID) != null)
             {
-                if (DrawableConf != null && GameFinder.FindDrawableSurface(DrawableConf.ID, DrawableConf.ParentID) != null)
-                {
-                    GameObject surface = GameFinder.FindDrawableSurface(DrawableConf.ID, DrawableConf.ParentID);
-                    GameStickyNoteManager.Change(surface, DrawableConf);
-                } else
-                {
-                    throw new System.Exception($"There is no drawable with the ID {DrawableConf.ID}.");
-                }
+                GameObject surface = GameFinder.FindDrawableSurface(DrawableConf.ID, DrawableConf.ParentID);
+                GameStickyNoteManager.Change(surface, DrawableConf);
+            }
+            else
+            {
+                throw new System.Exception($"There is no drawable with the ID {DrawableConf.ID}.");
             }
         }
     }

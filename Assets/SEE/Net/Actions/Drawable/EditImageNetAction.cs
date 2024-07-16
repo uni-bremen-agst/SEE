@@ -31,13 +31,10 @@ namespace SEE.Net.Actions.Drawable
         /// Changes the values of the given image configuration on each client.
         /// </summary>
         /// <exception cref="System.Exception">will be thrown, if the drawable or if image don't exists.</exception>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                base.ExecuteOnClient();
-                GameEdit.ChangeImage(FindChild(Image.Id), Image);
-            }
+            base.ExecuteOnClient();
+            GameEdit.ChangeImage(FindChild(Image.Id), Image);
         }
     }
 }

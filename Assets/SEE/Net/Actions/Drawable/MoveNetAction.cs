@@ -30,25 +30,22 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="objectName">The id of the object that should be changed.</param>
         /// <param name="position">The new position to which the object should be set.</param>
-        public MoveNetAction(string drawableID, string parentDrawableID, string objectName, Vector3 position, bool includeChildren) 
+        public MoveNetAction(string drawableID, string parentDrawableID, string objectName, Vector3 position, bool includeChildren)
             : base(drawableID, parentDrawableID)
         {
             ObjectName = objectName;
-            this.Position = position;
-            this.IncludeChildren = includeChildren;
+            Position = position;
+            IncludeChildren = includeChildren;
         }
 
         /// <summary>
         /// Changes the position of the given object on each client.
         /// </summary>
         /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="ObjectName"/> don't exists.</exception>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                base.ExecuteOnClient();
-                GameMoveRotator.SetPosition(FindChild(ObjectName), Position, IncludeChildren);
-            }
+            base.ExecuteOnClient();
+            GameMoveRotator.SetPosition(FindChild(ObjectName), Position, IncludeChildren);
         }
     }
 }

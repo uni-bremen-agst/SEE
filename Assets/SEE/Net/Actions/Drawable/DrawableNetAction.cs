@@ -85,15 +85,7 @@ namespace SEE.Net.Actions.Drawable
             return child != null;
         }
 
-        /// <summary>
-        /// Things to execute on the server (none for this class and its subclasses).
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
-            // Nothing to do here.
-        }
-
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
             Surface = Find(SurfaceID, SurfaceParentID);
         }

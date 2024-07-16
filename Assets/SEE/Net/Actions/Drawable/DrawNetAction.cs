@@ -33,19 +33,16 @@ namespace SEE.Net.Actions.Drawable
         /// Draws the line on each client.
         /// </summary>
         /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="Line"/> don't exists.</exception>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            base.ExecuteOnClient();
+            if (Line != null && Line.Id != "")
             {
-                base.ExecuteOnClient();
-                if (Line != null && Line.Id != "")
-                {
-                    GameDrawer.ReDrawLine(Surface, Line);
-                }
-                else
-                {
-                    throw new System.Exception($"There is no line to draw.");
-                }
+                GameDrawer.ReDrawLine(Surface, Line);
+            }
+            else
+            {
+                throw new System.Exception($"There is no line to draw.");
             }
         }
     }

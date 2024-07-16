@@ -1,5 +1,4 @@
-﻿using SEE.Game.Drawable;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -24,7 +23,7 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="objectName">The id of the object that should be deleted.</param>
         /// <param name="time">The time that should be waited until the object is deleted.</param>
-        public EraseAfterTimeNetAction(string drawableID, string parentDrawableID, string objectName, float time) 
+        public EraseAfterTimeNetAction(string drawableID, string parentDrawableID, string objectName, float time)
             : base(drawableID, parentDrawableID)
         {
             ObjectName = objectName;
@@ -35,13 +34,10 @@ namespace SEE.Net.Actions.Drawable
         /// Deletes the object on each client.
         /// </summary>
         /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="ObjectName"/> don't exists.</exception>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                base.ExecuteOnClient();
-                Object.Destroy(FindChild(ObjectName), Time);
-            }
+            base.ExecuteOnClient();
+            Object.Destroy(FindChild(ObjectName), Time);
         }
     }
 }

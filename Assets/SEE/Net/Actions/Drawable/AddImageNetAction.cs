@@ -1,7 +1,6 @@
 ﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -31,19 +30,16 @@ namespace SEE.Net.Actions.Drawable
         /// Adds the image on each client.
         /// </summary>
         /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="Conf.id"/> don't exists.</exception>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            base.ExecuteOnClient();
+            if (Conf != null && Conf.Id != "")
             {
-                base.ExecuteOnClient();
-                if (Conf != null && Conf.Id != "")
-                {
-                    GameImage.RePlaceImage(Surface, Conf);
-                }
-                else
-                {
-                    throw new System.Exception($"There is no image to add.");
-                }
+                GameImage.RePlaceImage(Surface, Conf);
+            }
+            else
+            {
+                throw new System.Exception($"There is no image to add.");
             }
         }
     }

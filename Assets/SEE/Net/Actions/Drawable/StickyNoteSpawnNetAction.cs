@@ -19,27 +19,17 @@ namespace SEE.Net.Actions.Drawable
         /// </summary>
         public StickyNoteSpawnNetAction(DrawableConfig config)
         {
-            this.DrawableConf = config;
+            DrawableConf = config;
         }
 
         /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
-        }
-        /// <summary>
         /// Spawn the sticky note on each client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            if (GameFinder.FindDrawableSurface(DrawableConf.ID, DrawableConf.ParentID) == null)
             {
-                if (GameFinder.FindDrawableSurface(DrawableConf.ID, DrawableConf.ParentID) == null)
-                {
-                    GameStickyNoteManager.Spawn(DrawableConf);
-                }
+                GameStickyNoteManager.Spawn(DrawableConf);
             }
         }
     }

@@ -23,26 +23,23 @@ namespace SEE.Net.Actions.Drawable
         public MindMapRemoveChildNetAction(string drawableID, string parentDrawableID, MindMapNodeConf child)
             : base(drawableID, parentDrawableID)
         {
-            this.ChildNode = child;
+            ChildNode = child;
         }
 
         /// <summary>
         /// Removes the node from old parent's children list on each client.
         /// </summary>
         /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="ChildNode"/> don't exists.</exception>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            base.ExecuteOnClient();
+            if (ChildNode != null && ChildNode.Id != "" && ChildNode.ParentNode != "")
             {
-                base.ExecuteOnClient();
-                if (ChildNode != null && ChildNode.Id != "" && ChildNode.ParentNode != "")
-                {
-                    FindChild(ChildNode.ParentNode).GetComponent<MMNodeValueHolder>().RemoveChild(FindChild(ChildNode.Id));
-                }
-                else
-                {
-                    throw new System.Exception($"The node with the ID {ChildNode.Id} or the parent node with the ID {ChildNode.ParentNode} dont exists.");
-                }
+                FindChild(ChildNode.ParentNode).GetComponent<MMNodeValueHolder>().RemoveChild(FindChild(ChildNode.Id));
+            }
+            else
+            {
+                throw new System.Exception($"The node with the ID {ChildNode.Id} or the parent node with the ID {ChildNode.ParentNode} dont exists.");
             }
         }
     }

@@ -29,28 +29,25 @@ namespace SEE.Net.Actions.Drawable
         public MindMapChangeNodeKindNetAction(string drawableID, string parentDrawableID, MindMapNodeConf node, GameMindMap.NodeKind nodeKind)
             : base (drawableID, parentDrawableID)
         {
-            this.Node = node;
-            this.NodeKind = nodeKind;
+            Node = node;
+            NodeKind = nodeKind;
         }
 
         /// <summary>
         /// Changes the node kind of a node on each client.
         /// </summary>
         /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="MindMapNodeConf.Id"/> don't exists.</exception>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            base.ExecuteOnClient();
+            if (Node != null && Node.Id != "")
             {
-                base.ExecuteOnClient();
-                if (Node != null && Node.Id != "")
-                {
-                    GameMindMap.ChangeNodeKind(FindChild(Node.BorderConf.Id).transform.parent.gameObject, 
-                        NodeKind, Node.BorderConf);
-                }
-                else
-                {
-                    throw new System.Exception($"The node with the ID {Node.Id} or the parent node with the ID {Node.ParentNode} dont exists.");
-                }
+                GameMindMap.ChangeNodeKind(FindChild(Node.BorderConf.Id).transform.parent.gameObject,
+                    NodeKind, Node.BorderConf);
+            }
+            else
+            {
+                throw new System.Exception($"The node with the ID {Node.Id} or the parent node with the ID {Node.ParentNode} dont exists.");
             }
         }
     }

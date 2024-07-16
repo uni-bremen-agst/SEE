@@ -23,20 +23,9 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Synchronize the current order in layer of the host on each client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                ValueHolder.MaxOrderInLayer = OrderInLayer;
-            }
-        }
-
-        /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
+            ValueHolder.MaxOrderInLayer = OrderInLayer;
         }
     }
 }

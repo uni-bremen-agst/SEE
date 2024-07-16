@@ -1,7 +1,6 @@
 ﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -21,7 +20,7 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="drawableID">The id of the drawable on which the object is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="text">The text that contains the values to change the associated game object.</param>
-        public EditTextNetAction(string drawableID, string parentDrawableID, TextConf text) 
+        public EditTextNetAction(string drawableID, string parentDrawableID, TextConf text)
             : base(drawableID, parentDrawableID)
         {
             Text = text;
@@ -31,13 +30,10 @@ namespace SEE.Net.Actions.Drawable
         /// Changes the values of the given text on each client.
         /// </summary>
         /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="Text"/> don't exists.</exception>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                base.ExecuteOnClient();
-                GameEdit.ChangeText(FindChild(Text.Id), Text);
-            }
+            base.ExecuteOnClient();
+            GameEdit.ChangeText(FindChild(Text.Id), Text);
         }
     }
 }
