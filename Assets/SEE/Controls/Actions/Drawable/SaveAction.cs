@@ -44,7 +44,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The path of the file in which the drawable's config has been written.
             /// </summary>
-            internal FilePath FilePath;
+            internal DataPath FilePath;
 
             /// <summary>
             /// The drawable surfaces that should be saved.
@@ -240,7 +240,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <param name="result">The action state result.</param>
         private void Save(string filePath, ref bool result)
         {
-            memento.FilePath = new FilePath(filePath);
+            memento.FilePath = new DataPath(filePath);
             GameObject[] surfaces = new GameObject[memento.Surfaces.Length];
             for (int i = 0; i < surfaces.Length; i++)
             {

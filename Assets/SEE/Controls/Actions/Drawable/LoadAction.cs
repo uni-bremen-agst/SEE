@@ -240,7 +240,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// This block loads one drawable onto the specific chosen drawable.
                 case LoadState.Specific:
                     memento.SpecificSurface = DrawableConfigManager.GetDrawableConfig(selectedSurface);
-                    DrawablesConfigs configsSpecific = DrawableConfigManager.LoadDrawables(new FilePath(filePath));
+                    DrawablesConfigs configsSpecific = DrawableConfigManager.LoadDrawables(new DataPath(filePath));
                     foreach (DrawableConfig drawableConfig in configsSpecific.Drawables)
                     {
                         Restore(memento.SpecificSurface.GetDrawableSurface(), drawableConfig);
@@ -256,7 +256,7 @@ namespace SEE.Controls.Actions.Drawable
 
                 /// This block loads one or more drawables onto the drawables of the configuration.
                 case LoadState.Regular:
-                    DrawablesConfigs configs = DrawableConfigManager.LoadDrawables(new FilePath(filePath));
+                    DrawablesConfigs configs = DrawableConfigManager.LoadDrawables(new DataPath(filePath));
                     foreach (DrawableConfig drawableConfig in configs.Drawables)
                     {
                         GameObject surfaceOfFile = GameFinder.FindDrawableSurface(drawableConfig.ID, drawableConfig.ParentID);
@@ -504,7 +504,7 @@ namespace SEE.Controls.Actions.Drawable
                 }
                 return changedObjects;
             }
-            
+
         }
     }
 }

@@ -50,7 +50,7 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="path">The path of the file which shall be loaded</param>
         /// <returns>The drawable configuration of the loaded file.</returns>
-        internal static DrawableConfig LoadDrawable(FilePath path)
+        internal static DrawableConfig LoadDrawable(DataPath path)
         {
             DrawableConfig config = new();
             try
@@ -78,7 +78,7 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="path">The path to the file which shall be loaded</param>
         /// <returns>A configuration that contains all drawable configurations of the file</returns>
-        internal static DrawablesConfigs LoadDrawables(FilePath path)
+        internal static DrawablesConfigs LoadDrawables(DataPath path)
         {
             DrawablesConfigs config = new();
             try
@@ -117,7 +117,7 @@ namespace SEE.Game.Drawable
         internal static DrawableConfig LoadDrawable(string fileName)
         {
             EnsureDrawableDirectoryExists(singleConfPath);
-            return LoadDrawable(new FilePath(singleConfPath + fileName + Filenames.ConfigExtension));
+            return LoadDrawable(new DataPath(singleConfPath + fileName + Filenames.ConfigExtension));
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace SEE.Game.Drawable
         internal static DrawablesConfigs LoadDrawables(string fileName)
         {
             EnsureDrawableDirectoryExists(multipleConfPath);
-            return LoadDrawables(new FilePath(multipleConfPath + fileName + Filenames.ConfigExtension));
+            return LoadDrawables(new DataPath(multipleConfPath + fileName + Filenames.ConfigExtension));
         }
 
         /// <summary>
@@ -139,12 +139,12 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="drawables">The drawables that should be saved.</param>
         /// <param name="filePath">The file path where the save file should be placed.</param>
-        internal static void SaveDrawables(GameObject[] drawables, FilePath filePath)
+        internal static void SaveDrawables(GameObject[] drawables, DataPath filePath)
         {
-            EnsureDrawableDirectoryExists(filePath.RootPath);
+            EnsureDrawableDirectoryExists(Path.GetDirectoryName(filePath.Path));
             if (!Path.HasExtension(filePath.Path))
             {
-                filePath = new FilePath(filePath.Path + Filenames.ConfigExtension);
+                filePath = new DataPath(filePath.Path + Filenames.ConfigExtension);
             }
             else if (Path.GetExtension(filePath.Path) != Filenames.ConfigExtension)
             {
@@ -167,7 +167,7 @@ namespace SEE.Game.Drawable
         /// Deletes the <see cref="DrawableConfig"/> or <see cref="DrawablesConfigs"/> file with the given <paramref name="path"/>.
         /// </summary>
         /// <param name="path">The path of the file to delete</param>
-        internal static void DeleteDrawables(FilePath path)
+        internal static void DeleteDrawables(DataPath path)
         {
             FileIO.DeleteIfExists(path.Path);
         }
@@ -203,9 +203,9 @@ namespace SEE.Game.Drawable
                 {
                     lighting = GameFinder.GetHighestParent(surface).transform.GetComponentInChildren<Light>().enabled;
                 }
-                
+
                 bool visibility = GameFinder.GetHighestParent(surface).activeInHierarchy;
-                
+
                 DrawableHolder holder = surface.GetComponent<DrawableHolder>();
 
                 /// Creates the <see cref="DrawableConfig"/> with the corresponding values.
