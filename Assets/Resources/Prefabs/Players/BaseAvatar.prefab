@@ -225,6 +225,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4295300675c15c140a195eca006cefd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UseUnreliableDeltas: 0
   SyncPositionX: 1
   SyncPositionY: 1
   SyncPositionZ: 1
@@ -629,7 +630,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 951099334
+  GlobalObjectIdHash: 1325537791
+  InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -673,6 +675,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4295300675c15c140a195eca006cefd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UseUnreliableDeltas: 0
   SyncPositionX: 1
   SyncPositionY: 1
   SyncPositionZ: 1
@@ -10779,6 +10782,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: FaceCam
+      objectReference: {fileID: 0}
+    - target: {fileID: 7436555913008548301, guid: 79fdfce9bfebc62439ecae0fddc018e4,
+        type: 3}
+      propertyPath: networkFPS
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 7436555913008548302, guid: 79fdfce9bfebc62439ecae0fddc018e4,
         type: 3}

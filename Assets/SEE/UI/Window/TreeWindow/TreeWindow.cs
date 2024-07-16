@@ -37,9 +37,12 @@ namespace SEE.UI.Window.TreeWindow
         public Graph Graph;
 
         /// <summary>
-        /// The search helper used to search for elements in the graph.
-        /// We also use this to keep track of the current filter, sort, and group settings.
+        /// Whether the window is the main tree window, i.e., the one that contains the whole graph
+        /// and is opened by default.
+        /// For example, a tree window showing only a certain node's references would not be the main tree window.
         /// </summary>
+        public bool MainWindow = true;
+
         private GraphSearch searcher;
 
         /// <summary>

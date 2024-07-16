@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Joveler.Compression.XZ;
-using SEE.Utils;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+using SEE.Utils.Paths;
 using UnityEngine;
 
 namespace SEE.DataModel.DG.IO
@@ -16,9 +11,6 @@ namespace SEE.DataModel.DG.IO
     /// <summary>
     /// Reads a graph from a GXL file and returns it as a graph.
     /// </summary>
-#if UNITY_EDITOR
-    [InitializeOnLoad]
-#endif
     public class GraphReader : GXLParser
     {
         /// <summary>
@@ -37,13 +29,12 @@ namespace SEE.DataModel.DG.IO
         ///
         /// Precondition: <paramref name="rootID"/> must be unique.
         /// </summary>
-        /// <param name="filename">the name of the GXL file</param>
         /// <param name="hierarchicalEdgeTypes">the set of edge-type names for edges considered to represent nesting</param>
         /// <param name="basePath">the base path of the graph</param>
         /// <param name="rootID">unique ID of the artificial root node if required</param>
         /// <param name="logger">the logger used for messages; if null, no messages are emitted</param>
-        public GraphReader(string filename, HashSet<string> hierarchicalEdgeTypes, string basePath, string rootID = "", Utils.ILogger logger = null)
-            : base(OpenFile(filename), filename, logger)
+        public GraphReader(HashSet<string> hierarchicalEdgeTypes, string basePath, string rootID = "", Utils.ILogger logger = null)
+            : base(logger)
         {
             this.hierarchicalEdgeTypes = hierarchicalEdgeTypes;
             this.rootName = string.IsNullOrEmpty(rootID) ? "" : rootID;
@@ -51,185 +42,19 @@ namespace SEE.DataModel.DG.IO
         }
 
         /// <summary>
-        /// This static constructor is used to initialize the liblzma library.
-        /// It needn't be called explicitly, Unity does this automatically once via the <c>InitializeOnLoad</c>
-        /// attribute assigned to this class.
+        /// Loads and returns a graph from the given <paramref name="path"/> assumed to contain GXL data.
         /// </summary>
-        static GraphReader()
+        /// <param name="path">path of the GXL data</param>
+        /// <param name="hierarchicalEdgeTypes">edge types forming the node hierarchy</param>
+        /// <param name="basePath">the base path of the graph</param>
+        /// <param name="token">token with which the loading can be cancelled</param>
+        /// <param name="logger">logger to log the output</param>
+        /// <returns>loaded graph</returns>
+        public static async UniTask<Graph> LoadAsync(DataPath path, HashSet<string> hierarchicalEdgeTypes, string basePath,                                                       CancellationToken token = default, Utils.ILogger logger = null)
         {
-            try
-            {
-                XZInit.GlobalInit(GetLiblzmaPath());
-            }
-            catch (InvalidOperationException e) when (e.Message.Contains(" is already initialized"))
-            {
-                // Already loaded. We can ignore this.
-            }
-        }
-
-        /// <summary>
-        /// Returns the platform-dependent path to the liblzma native library.
-        /// </summary>
-        /// <returns>Path to the liblzma library</returns>
-        /// <exception cref="PlatformNotSupportedException">If the system platform is not supported</exception>
-        private static string GetLiblzmaPath()
-        {
-            // The library liblzma.dll is located in Assets/Plugins/Native/LZMA/<arch>/native/liblzma.dll
-            // where <arch> specifies the operating system the Unity editor is currently running on
-            // and the hardware architecture (e.g., win-x64).
-            //
-            // If SEE is started from the Unity editor, the library will be looked up
-            // under this path.
-            // In a build application of SEE (i.e., an executable running independently
-            // from the Unity editor), the library is located in
-            // SEE_Data/Plugins/<arch>/liblzma.dll instead, where <arch> specifies
-            // the hardware architecture (e.g., x86_64; see also
-            // https://docs.unity3d.com/Manual/PluginInspector.html).
-
-            string libDir = Application.isEditor
-                ? Path.Combine(Path.GetFullPath(Application.dataPath), "Plugins", "Native", "LZMA")
-                : Path.Combine(Path.GetFullPath(Application.dataPath), "Plugins");
-
-            if (Application.isEditor)
-            {
-                // In the editor, the <arch> specifier is a combination of the OS and the process
-                // architecture. We will first handle the OS.
-                OSPlatform platform = GetOSPlatform();
-                if (platform == OSPlatform.Windows)
-                {
-                    libDir = Path.Combine(libDir, "win");
-                }
-                else if (platform == OSPlatform.Linux)
-                {
-                    libDir = Path.Combine(libDir, "linux");
-                }
-                else if (platform == OSPlatform.OSX)
-                {
-                    libDir = Path.Combine(libDir, "osx");
-                }
-
-                // Now follows the process architecture.
-                switch (RuntimeInformation.ProcessArchitecture)
-                {
-                    case Architecture.X86:
-                        libDir += "-x86";
-                        break;
-                    case Architecture.X64:
-                        libDir += "-x64";
-                        break;
-                    case Architecture.Arm when platform == OSPlatform.Windows:
-                        libDir += "10-arm";
-                        break;
-                    case Architecture.Arm64 when platform == OSPlatform.Windows:
-                        libDir += "10-arm64";
-                        break;
-                    case Architecture.Arm:
-                        libDir += "-arm";
-                        break;
-                    case Architecture.Arm64:
-                        libDir += "-arm64";
-                        break;
-                    default: throw new PlatformNotSupportedException($"Unknown architecture {RuntimeInformation.ProcessArchitecture}");
-                }
-
-                libDir = Path.Combine(libDir, "native");
-            }
-            else
-            {
-                // In a deployed application, only the process architecture matters.
-                string arch = RuntimeInformation.ProcessArchitecture switch
-                {
-                    Architecture.X86 or Architecture.Arm => "x86",
-                    Architecture.X64 or Architecture.Arm64 => "x86_64",
-                    _ => throw new PlatformNotSupportedException($"Unknown architecture {RuntimeInformation.ProcessArchitecture}"),
-                };
-                libDir = Path.Combine(libDir, arch);
-            }
-
-            string libPath = null;
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                libPath = Path.Combine(libDir, "liblzma.dll");
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                if (Application.isEditor)
-                {
-                    libPath = Path.Combine(libDir, "liblzma.so");
-                }
-                // Under Linux native plugins aren't stored inside a architecture subdir (e.g. x86_64).
-                // They are stored directly in the Plugins dir.
-                // So under Linux when constructing the path, it is necessary to omit this subdirectory specifically for Linux builds.
-                else
-                {
-                    libPath = Path.Combine(Path.Combine(Path.GetFullPath(Application.dataPath), "Plugins"), "liblzma.so");
-                }
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                libPath = Path.Combine(libDir, "liblzma.dylib");
-            }
-
-            if (libPath == null)
-            {
-                throw new PlatformNotSupportedException("Unable to find native library.");
-            }
-
-            if (!File.Exists(libPath))
-            {
-                throw new PlatformNotSupportedException($"Unable to find native library [{libPath}].");
-            }
-
-            return libPath;
-
-            // Returns the type of operating system. If other than Windows, Linux,
-            // or OSX, an exception is thrown.
-            static OSPlatform GetOSPlatform()
-            {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    return OSPlatform.Windows;
-                }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                {
-                    return OSPlatform.Linux;
-                }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                {
-                    return OSPlatform.OSX;
-                }
-                else
-                {
-                    throw new PlatformNotSupportedException("Only Windows, Linux, and OSX are supported operating systems.");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Opens the file with given <paramref name="filename"/> and returns it as a <see cref="Stream"/>.
-        /// If <paramref name="filename"/> has the filename extension
-        /// <see cref="Filenames.CompressedGXLExtension"/>, the stream will be the
-        /// uncompressed content of the open file; otherwise it will be the content
-        /// of the file as is.
-        /// </summary>
-        /// <param name="filename">name of the file to be opened</param>
-        /// <returns>stream of the (possibly uncompressed) content of the opened file</returns>
-        private static Stream OpenFile(string filename)
-        {
-            FileStream stream = File.OpenRead(filename);
-            if (filename.ToLower().EndsWith(Filenames.CompressedGXLExtension))
-            {
-                // Handle compressed LZMA2 file.
-                XZDecompressOptions options = new()
-                {
-                    LeaveOpen = false
-                };
-                return new XZStream(stream, options);
-            }
-            else
-            {
-                return stream;
-            }
+            GraphReader graphReader = new(hierarchicalEdgeTypes, basePath, logger: logger);
+            await graphReader.LoadAsync(await path.LoadAsync(), path.Path, token);
+            return graphReader.GetGraph();
         }
 
         /// <summary>
@@ -244,13 +69,16 @@ namespace SEE.DataModel.DG.IO
         private readonly string basePath;
 
         /// <summary>
-        /// Loads the graph from the GXL file and adds an artificial root node if requested
-        /// (see constructor). The node levels will be calculated, too.
+        /// Adds the nodes and edges in the GXL data provided in the <paramref name="gxl"/> stream and
+        /// adds an artificial root node if there is no unique root node. The node levels will be
+        /// calculated, too.
         /// </summary>
+        /// <param name="gxl">Stream containing GXL data that shall be processed</param>
+        /// <param name="name">Name of the GXL data stream. Only used for display purposes in log messages</param>
         /// <param name="token">token with which the loading can be cancelled</param>
-        public override async UniTask LoadAsync(CancellationToken token = default)
+        public override async UniTask LoadAsync(Stream gxl, string name = "[unknown]", CancellationToken token = default)
         {
-            await base.LoadAsync(token);
+            await base.LoadAsync(gxl, name, token);
             graph.BasePath = basePath;
             if (!string.IsNullOrWhiteSpace(rootName))
             {
@@ -326,6 +154,7 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         protected override void StartGraph()
         {
+            nodes.Clear();
             // We don't know the base path yet, hence, we use the empty string.
             graph = new Graph("")
             {
@@ -362,7 +191,10 @@ namespace SEE.DataModel.DG.IO
                 {
                     if (Reader.Name == "id")
                     {
-                        nodes.Add(Reader.Value, (Node)current);
+                        if (!nodes.TryAdd(Reader.Value, (Node)current))
+                        {
+                            LogError($"Node ID {Reader.Value} is not unique.");
+                        }
                         break;
                     }
                 }

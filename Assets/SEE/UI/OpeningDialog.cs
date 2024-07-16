@@ -59,12 +59,14 @@ namespace SEE.UI
                     description: "Starts a server and local client process.",
                     entryColor: NextColor(),
                     icon: Resources.Load<Sprite>("Icons/Host")),
+
                 new(selectAction: StartClient,
                     unselectAction: null,
                     title: "Client",
                     description: "Starts a local client connection to a server.",
                     entryColor: NextColor(),
                     icon: Resources.Load<Sprite>("Icons/Client")),
+
 #if ENABLE_VR
                 new(selectAction: ToggleEnvironment,
                     unselectAction: null,
@@ -73,13 +75,6 @@ namespace SEE.UI
                     entryColor: NextColor(),
                     icon: Resources.Load<Sprite>("Icons/Client")),
 #endif
-                // FIXME: Running only a server is currently not working.
-                //new (               entryAction: StartServer,
-                //                    exitAction: null,
-                //                    title: "Server",
-                //                    description: "Starts a dedicated server without local client.",
-                //                    entryColor: NextColor(),
-                //                    icon: Resources.Load<Sprite>("Icons/Server")),
                 new(selectAction: Settings,
                     unselectAction: null,
                     title: "Settings",
@@ -150,24 +145,25 @@ namespace SEE.UI
         /// <summary>
         /// Starts a dedicated server on this machine (only server, no client).
         /// </summary>
-        //private void StartServer()
-        //{
-        //    try
-        //    {
-        //        // Hide menu while the network is about to be started so that the user
-        //        // user select any menu entry while this process is running. We do
-        //        // not want the user to start any other network setting until this
-        //        // process has come to an end.
-        //        menu.ShowMenuAsync(false);
-        //        SceneSettings.InputType = inputType;
-        //        network.StartServer(NetworkCallBack);
-        //    }
-        //    catch (Exception exception)
-        //    {
-        //        menu.ShowMenuAsync(true);
-        //        ShowNotification.Error("Server cannot be started", exception.Message);
-        //    }
-        //}
+        private void StartServer()
+        {
+            try
+            {
+                // Hide menu while the network is about to be started so that the user
+                // cannot select any menu entry while this process is running. We do
+                // not want the user to start any other network setting until this
+                // process has come to an end.
+                menu.ShowMenu = false;
+                SceneSettings.InputType = PlayerInputType.None;
+                network.StartServer(NetworkCallBack);
+            }
+            catch (Exception exception)
+            {
+                menu.ShowMenu = true;
+                ShowNotification.Error("Server cannot be started", exception.Message);
+                throw;
+            }
+        }
 
         /// <summary>
         /// If <paramref name="success"/>, the <see cref="menu"/> is turned off.

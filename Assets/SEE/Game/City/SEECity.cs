@@ -39,7 +39,7 @@ namespace SEE.Game.City
          Tooltip("A graph provider yielding the data to be visualized as a code city."),
          TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup),
          HideReferenceObjectPicker]
-        public PipelineGraphProvider DataProvider = new();
+        public SingleGraphPipelineProvider DataProvider = new();
 
         /// <summary>
         /// The graph that is visualized in the scene and whose visualization settings are
@@ -305,7 +305,7 @@ namespace SEE.Game.City
             {
                 try
                 {
-                    using (LoadingSpinner.ShowDeterminate($"Loading city \"{gameObject.name}\"...",
+                    using (LoadingSpinner.ShowDeterminate($"Loading city \"{gameObject.name}\"...\n",
                                                           out Action<float> reportProgress))
                     {
                         void ReportProgress(float x)
@@ -561,7 +561,8 @@ namespace SEE.Game.City
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
-            DataProvider = GraphProvider.Restore(attributes, dataProviderPathLabel) as PipelineGraphProvider;
+            DataProvider =
+                SingleGraphProvider.Restore(attributes, dataProviderPathLabel) as SingleGraphPipelineProvider;
         }
 
         #endregion

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Net;
 using SEE.Controls;
 using UnityEngine.Assertions;
 
@@ -15,8 +14,12 @@ namespace SEE.Net.Actions
         /// Every hovered object of the end point of every client. This is only used by
         /// the server.
         /// </summary>
-        internal static readonly Dictionary<IPEndPoint, HashSet<InteractableObject>> HoveredObjects
-            = new ();
+        internal static readonly Dictionary<ulong, HashSet<InteractableObject>> HoveredObjects = new();
+
+        /// <summary>
+        /// Should not be sent to newly connecting clients
+        /// </summary>
+        public override bool ShouldBeSentToNewClient { get => false; }
 
         /// <summary>
         /// The id of the interactable.
@@ -45,14 +48,14 @@ namespace SEE.Net.Actions
         /// Adds/removes the interactable objects of given id to
         /// <see cref="HoveredObjects"/>.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             if (HoverFlags != 0)
             {
                 InteractableObject interactable = InteractableObject.Get(ID);
                 if (interactable)
                 {
-                    IPEndPoint requester = GetRequester();
+                    ulong requester = Requester;
                     if (!HoveredObjects.TryGetValue(requester, out HashSet<InteractableObject> interactables))
                     {
                         interactables = new HashSet<InteractableObject>();
@@ -66,7 +69,7 @@ namespace SEE.Net.Actions
                 InteractableObject interactable = InteractableObject.Get(ID);
                 if (interactable)
                 {
-                    IPEndPoint requester = GetRequester();
+                    ulong requester = Requester;
                     if (HoveredObjects.TryGetValue(requester, out HashSet<InteractableObject> interactables))
                     {
                         interactables.Remove(interactable);
@@ -82,15 +85,12 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Sets the hover value for the interactable object of given id.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            InteractableObject interactable = InteractableObject.Get(ID);
+            if (interactable)
             {
-                InteractableObject interactable = InteractableObject.Get(ID);
-                if (interactable)
-                {
-                    interactable.SetHoverFlags(HoverFlags, false);
-                }
+                interactable.SetHoverFlags(HoverFlags, false);
             }
         }
     }

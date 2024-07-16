@@ -2,13 +2,11 @@
 using SEE.DataModel.DG.IO;
 using SEE.Game.City;
 using SEE.Tools.ReflexionAnalysis;
-using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -20,25 +18,25 @@ namespace SEE.GraphProviders
     /// implementation, mapping).
     /// </summary>
     [Serializable]
-    public class ReflexionGraphProvider : GraphProvider
+    public class ReflexionGraphProvider : SingleGraphProvider
     {
         /// <summary>
         /// The path to the GXL file containing the architecture.
         /// </summary>
         [Tooltip("Path to the GXL file containing the architecture."), HideReferenceObjectPicker]
-        public FilePath Architecture = new();
+        public DataPath Architecture = new();
 
         /// <summary>
         /// The path to the GXL file containing the implementation.
         /// </summary>
         [Tooltip("Path to the GXL file containing the implementation."), HideReferenceObjectPicker]
-        public FilePath Implementation = new();
+        public DataPath Implementation = new();
 
         /// <summary>
         /// The path to the GXL file containing the mapping.
         /// </summary>
         [Tooltip("Path to the GXL file containing the mapping. Can be left undefined."), HideReferenceObjectPicker]
-        public FilePath Mapping = new();
+        public DataPath Mapping = new();
 
         /// <summary>
         /// Name of resulting reflexion city.
@@ -46,9 +44,9 @@ namespace SEE.GraphProviders
         [Tooltip("The name of the resulting reflexion city.")]
         public string CityName = "Reflexion Analysis";
 
-        public override GraphProviderKind GetKind()
+        public override SingleGraphProviderKind GetKind()
         {
-            return GraphProviderKind.Reflexion;
+            return SingleGraphProviderKind.Reflexion;
         }
 
         public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
@@ -59,9 +57,9 @@ namespace SEE.GraphProviders
             {
                 throw new ArgumentException("The given city is null.\n");
             }
-            Graph architectureGraph = await LoadGraphAsync(Architecture.Path, city, token);
+            Graph architectureGraph = await LoadGraphAsync(Architecture, city, token);
             changePercentage?.Invoke(0.33f);
-            Graph implementationGraph = await LoadGraphAsync(Implementation.Path, city, token);
+            Graph implementationGraph = await LoadGraphAsync(Implementation, city, token);
             changePercentage?.Invoke(0.66f);
             Graph mappingGraph;
             if (string.IsNullOrEmpty(Mapping.Path))
@@ -74,7 +72,7 @@ namespace SEE.GraphProviders
             }
             else
             {
-                mappingGraph = await LoadGraphAsync(Mapping.Path, city, token);
+                mappingGraph = await LoadGraphAsync(Mapping, city, token);
                 changePercentage?.Invoke(1.0f);
             }
 
@@ -89,23 +87,14 @@ namespace SEE.GraphProviders
         /// and <see cref="AbstractSEECity.SourceCodeDirectory"/> will be retrieved</param>
         /// <param name="token">token with which the loading can be cancelled</param>
         /// <returns>loaded graph</returns>
-        /// <exception cref="ArgumentException">thrown if <paramref name="path"/> is null or empty
-        /// or does not exist</exception>
-        private async UniTask<Graph> LoadGraphAsync(string path, AbstractSEECity city, CancellationToken token = default)
+        /// <exception cref="ArgumentNullException">thrown if <paramref name="path"/> is null</exception>
+        private async UniTask<Graph> LoadGraphAsync(DataPath path, AbstractSEECity city, CancellationToken token = default)
         {
-            if (string.IsNullOrEmpty(path))
+            if (path == null)
             {
-                throw new ArgumentException("Empty GXL path.\n");
+                throw new ArgumentNullException(nameof(path));
             }
-            if (!File.Exists(path))
-            {
-                throw new ArgumentException($"File {path} does not exist.\n");
-            }
-            GraphReader graphCreator = new(path, city.HierarchicalEdges,
-                                           basePath: city.SourceCodeDirectory.Path,
-                                           logger: new SEELogger());
-            await graphCreator.LoadAsync(token);
-            return graphCreator.GetGraph();
+            return await GraphReader.LoadAsync(path, city.HierarchicalEdges, city.SourceCodeDirectory.Path);
         }
 
         #region Configuration file input/output
