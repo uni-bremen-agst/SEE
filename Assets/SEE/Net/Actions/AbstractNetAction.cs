@@ -67,7 +67,10 @@ namespace SEE.Net.Actions
         /// The implementation of the action for the server. This method will be called
         /// only for the server.
         /// </summary>
-        public abstract void ExecuteOnServer();
+        public virtual void ExecuteOnServer()
+        {
+            // The default implementation does nothing.
+        }
 
         /// <summary>
         /// The implementation of the action for the client. This method will be called
