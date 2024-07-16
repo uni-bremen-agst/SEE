@@ -182,7 +182,7 @@ namespace SEE.Controls.Actions
                     parent: Drawable);
 
             DrawShapes =
-                new("Draw Shape", "Draws different shapes on a drawable.",
+                new("Draw Shape", "Draws various shapes on a drawable.",
                     Color.magenta.Darker(), "Materials/ModernUIPack/Crop",
                     DrawShapesAction.CreateReversibleAction,
                     parent: Drawable);
@@ -200,7 +200,7 @@ namespace SEE.Controls.Actions
                     parent: Drawable);
 
             MindMap =
-                new("Mind Map", "Adds and control mind-map components.",
+                new("Mind Map", "Adds and controls mind-map components.",
                     Color.magenta.Darker(), "Materials/Charts/TreeIcon",
                     MindMapAction.CreateReversibleAction,
                     parent: Drawable);
@@ -212,7 +212,7 @@ namespace SEE.Controls.Actions
                     parent: Drawable);
 
             Edit =
-                new("Edit", "Edits a drawable type.",
+                new("Edit", "Edits a drawable.",
                     Color.green.Darker(), "Materials/Drawable/Edit",
                     EditAction.CreateReversibleAction,
                     parent: Drawable);
@@ -224,18 +224,18 @@ namespace SEE.Controls.Actions
                     parent: Drawable);
 
             Scale =
-                new("Scale", "Scales a drawable type. Mouse wheel up to scale up, mouse wheel down to scale down.",
+                new("Scale", "Scales a drawable. Mouse wheel up to scale up, mouse wheel down to scale down.",
                     Color.green.Darker(), "Materials/Drawable/Scale",
                     ScaleAction.CreateReversibleAction,
                     parent: Drawable);
 
             LayerChanger =
-                new("Change The Sorting Layer", "Left mouse click to increase, right mouse click to decrease.",
+                new("Change The Sorting Layer", "Left mouse click to increase, right mouse click to decrease the layer.",
                     Color.green.Darker(), "Materials/Drawable/Layer",
                     LayerChangerAction.CreateReversibleAction,
                     parent: Drawable);
 
-            CutCopyPaste = new("Cut, Copy, Paste", "Cuts or copies a drawable type and pastes it on the selected position.",
+            CutCopyPaste = new("Cut, Copy, Paste", "Cuts or copies a drawable and pastes it on the selected position.",
                     Color.green.Darker(), "Materials/Drawable/CutCopyPaste",
                     CutCopyPasteAction.CreateReversibleAction,
                     parent: Drawable);
@@ -277,7 +277,7 @@ namespace SEE.Controls.Actions
                     parent: Drawable);
 
             Erase =
-                new("Erase", "Erase a complete object on a drawable.",
+                new("Erase", "Erases a complete object on a drawable.",
                     Color.red.Darker(), "Materials/Drawable/Erase",
                     EraseAction.CreateReversibleAction,
                     parent: Drawable);
@@ -294,7 +294,6 @@ namespace SEE.Controls.Actions
                     StickyNoteAction.CreateReversibleAction,
                     parent: Drawable);
         }
-
 
         public static readonly ActionStateType Move;
         public static readonly ActionStateType Rotate;
