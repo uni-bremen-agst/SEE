@@ -1,5 +1,4 @@
-﻿using Cysharp.Threading.Tasks.Triggers;
-using SEE.GO;
+﻿using SEE.GO;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -12,7 +11,7 @@ namespace SEE.UI.Drawable
     public class ButtonHoverTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
     {
         /// <summary>
-        /// The message to be displayed when the button is hovered over. 
+        /// The message to be displayed when the button is hovered over.
         /// </summary>
         public string message;
 
@@ -38,10 +37,7 @@ namespace SEE.UI.Drawable
         public void OnPointerExit(PointerEventData eventData)
         {
             StopAllCoroutines();
-            if (gameObject.GetComponent<Tooltip.Tooltip>() != null)
-            {
-                gameObject.GetComponent<Tooltip.Tooltip>().Hide();
-            }
+            Tooltip.Deactivate();
         }
 
         /// <summary>
@@ -51,10 +47,7 @@ namespace SEE.UI.Drawable
         public void OnPointerDown(PointerEventData eventData)
         {
             StopAllCoroutines();
-            if (gameObject.GetComponent<Tooltip.Tooltip>() != null)
-            {
-                gameObject.GetComponent<Tooltip.Tooltip>().Hide();
-            }
+            Tooltip.Deactivate();
         }
 
         /// <summary>
@@ -62,11 +55,11 @@ namespace SEE.UI.Drawable
         /// </summary>
         private void ShowMessage()
         {
-            gameObject.AddOrGetComponent<Tooltip.Tooltip>().Show(message);
+            Tooltip.ActivateWith(message);
         }
 
         /// <summary>
-        /// The coroutine that is started waits for the specified time and then displays the message 
+        /// The coroutine that is started waits for the specified time and then displays the message
         /// with a <see cref="Tooltip.Tooltip"/>.
         /// </summary>
         /// <returns></returns>
