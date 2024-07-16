@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Card, CardActionArea, CardContent, Container, IconButton, Modal, Snackbar, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CardActionArea, CardContent, Container, IconButton, Modal, Stack, TextField, Typography } from "@mui/material";
 import Header from "../components/Header";
 import { grey } from "@mui/material/colors";
 import { useNavigate } from "react-router";
@@ -10,6 +10,7 @@ import { MuiFileInput } from 'mui-file-input';
 import { AuthContext } from "../contexts/AuthContext";
 import { FileTypeUtils } from "../types/FileType";
 import SeeFile from "../types/SeeFile";
+import AppUtils from "../utils/AppUtils";
 
 const modalStyle = {
   position: 'absolute',
@@ -46,8 +47,6 @@ function CreateServerView() {
   const navigate = useNavigate();
 
   const [fileTypeModalOpen, setFileTypeModalOpen] = useState(false);
-  const [uploadErrorMessageVisible, setUploadErrorMessageVisible] = useState(false);
-  const [createServerFailedMessageVisible, setCreateServerFailedMessageVisible] = useState(false);
 
   const [name, setName] = useState<string>("");
   const [files, setFiles] = useState<SeeFile[]>([]);
@@ -59,8 +58,8 @@ function CreateServerView() {
   const [errors, setErrors] = useState(new Map<string, string>());
 
   async function createServer() {
-    const createServerResponse = await axiosInstance.post("/server/create", { name: name, avatarSeed: avatarSeed, avatarColor: avatarColor }).catch(() => {
-      setCreateServerFailedMessageVisible(true);
+    const createServerResponse = await axiosInstance.post("/server/create", { name: name, avatarSeed: avatarSeed, avatarColor: avatarColor }).catch((error) => {
+      AppUtils.notifyAxiosError(error, "Error Creating Server");
       return;
     });
     if (!createServerResponse) { return; }
@@ -72,31 +71,22 @@ function CreateServerView() {
       form.append("id", createServerResponse.data.id);
       form.append("fileType", projectFile.fileType);
       form.append("file", projectFile._localfile);
-      await axiosInstance.post("/server/addFile", form).catch(() => {
+      await axiosInstance.post("/server/addFile", form).catch((error) => {
         success = false;
+        AppUtils.notifyAxiosError(error, "Error Uploading File");
       });
     }
 
     if (success) {
-      axiosInstance.put("/server/startServer", {}, { params: { id: createServerResponse.data.id } });
+      axiosInstance.put("/server/startServer", {}, { params: { id: createServerResponse.data.id } }).catch(
+        (error) => AppUtils.notifyAxiosError(error, "Error Starting Server")
+      );
       navigate('/', { replace: true });
-    } else {
-      setUploadErrorMessageVisible(true);
     }
   }
 
   return (
     <Container sx={{ padding: "3em" }}>
-      <Snackbar open={createServerFailedMessageVisible} autoHideDuration={5000} onClose={() => setCreateServerFailedMessageVisible(false)}>
-        <Alert onClose={() => setCreateServerFailedMessageVisible(false)} severity="error" sx={{ width: "100%", borderRadius: "25px" }}>
-          Error creating server!
-        </Alert>
-      </Snackbar>
-      <Snackbar open={uploadErrorMessageVisible} autoHideDuration={5000} onClose={() => setUploadErrorMessageVisible(false)}>
-        <Alert onClose={() => setUploadErrorMessageVisible(false)} severity="error" sx={{ width: "100%", borderRadius: "25px" }}>
-          Error during file upload!
-        </Alert>
-      </Snackbar>
       <Modal
         open={fileTypeModalOpen}
         onClose={() => setFileTypeModalOpen(false)}

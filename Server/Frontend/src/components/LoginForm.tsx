@@ -2,6 +2,7 @@ import { Button, Card, CardContent, CardMedia, Divider, FormControl, FormHelperT
 import seeLogo from "../img/see-logo.png";
 import { useContext, useRef, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
+import AppUtils from "../utils/AppUtils";
 
 function LoginForm() {
   const { setUser, axiosInstance } = useContext(AuthContext);
@@ -16,16 +17,21 @@ function LoginForm() {
     if (!username && !password) {
       return;
     }
-    try {
-      const getUserResponse = await axiosInstance.post("/user/signin", { username: username, password: password });
-      sessionStorage.setItem('username', getUserResponse.data.username);
-      setUser(getUserResponse.data);
-    } catch (e) {
-      setError(true);
-      if (passwordInputRef.current) {
-        passwordInputRef.current.select();
+
+    await axiosInstance.post("/user/signin", { username: username, password: password }).then(
+      (response) => {
+        sessionStorage.setItem('username', response.data.username);
+        setUser(response.data);
       }
-    }
+    ).catch(
+      (error) => {
+        setError(true);
+        AppUtils.notifyAxiosError(error, "Error During Sign-In");
+        if (passwordInputRef.current) {
+          passwordInputRef.current.select();
+        }
+      }
+    );
   }
 
   const handleUsernameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

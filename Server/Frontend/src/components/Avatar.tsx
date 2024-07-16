@@ -12,7 +12,8 @@ function Avatar(props: Readonly<{ width: number, height: number, avatarSeed: str
     if (ctx) {
       ctx.clearRect(0, 0, props.width, props.height);
       ctx.fillStyle = props.avatarColor;
-      ctx.globalCompositeOperation = "lighter"; //Fix gegen weiße Ränder um Kacheln
+      // Prevents white outline around the tiles
+      ctx.globalCompositeOperation = "lighter";
 
       for (let i = 0; i < props.avatarSeed.length; i++) {
         const char = props.avatarSeed.charAt(i);

@@ -1,6 +1,7 @@
 import { createContext, ReactNode, useEffect, useState } from 'react'
 import User from '../types/User';
 import axios, { AxiosInstance } from 'axios';
+import AppUtils from '../utils/AppUtils';
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_APP_API_URL,
@@ -26,13 +27,14 @@ const AuthProvider = ({ children }: { children?: ReactNode }) => {
   const [user, setUser] = useState<User | null>(initialValue.user);
 
   useEffect(() => {
-    let isApiSubscribed = true;
-
-    if (!user && isApiSubscribed && sessionStorage.getItem('username')) {
-      axiosInstance.get(`/user/me`).then((response) => setUser(response.data));
+    if (!user && sessionStorage.getItem('username')) {
+      axiosInstance.get(`/user/me`).then(
+        (response) => setUser(response.data)
+      ).catch(
+        (error) => AppUtils.notifyAxiosError(error, "Error Fetching User Data")
+      );
     }
     return () => {
-      isApiSubscribed = false;
     }
   }, [user])
 

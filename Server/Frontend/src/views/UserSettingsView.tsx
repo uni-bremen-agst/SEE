@@ -1,17 +1,16 @@
-import { Alert, Box, Button, Card, CardContent, Container, Snackbar, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, Container, Stack, TextField, Typography } from "@mui/material";
 import Header from "../components/Header";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router";
 import { useContext, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
+import { enqueueSnackbar } from "notistack";
+import AppUtils from "../utils/AppUtils";
 
 function UserSettingsView() {
   const { axiosInstance, user, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
-
-  const [showChangedPassword, setShowChangedPassword] = useState(false);
-  const [showChangedUsername, setShowChangedUsername] = useState(false);
 
   const [newUsername, setNewUsername] = useState("");
   const [changeUsernamePassword, setChangeUsernamePassword] = useState("");
@@ -22,52 +21,40 @@ function UserSettingsView() {
   const [changePasswordErrors, setChangePasswordErrors] = useState<Map<string, string>>(new Map<string, string>());
 
   async function updateUsername() {
-    if (!newUsername || !changeUsernamePassword) {
-      return;
-    }
-    try {
-      const changeUserNameResponse = await axiosInstance.put('/user/changeUsername', { oldUsername: user!.username, newUsername: newUsername, password: changeUsernamePassword })
-      if (changeUserNameResponse) {
-        setUser(changeUserNameResponse.data);
-        setShowChangedUsername(true);
+    if (!newUsername || !changeUsernamePassword) return;
+    await axiosInstance.put('/user/changeUsername', { oldUsername: user!.username, newUsername: newUsername, password: changeUsernamePassword }).then(
+      (response) => {
+        setUser(response.data);
+        enqueueSnackbar("Username was updated.", { variant: "success" });
       }
-    } catch {
-      setChangeUserNameErrors(new Map(changePasswordErrors.set('changeUsernamePassword', 'Angegebenes Passwort stimmt nicht mit gespeichertem überein.')));
-    }
+    ).catch(
+      (error) => {
+        setChangeUserNameErrors(new Map(changePasswordErrors.set('changeUsernamePassword', 'Current password is not correct.')));
+        AppUtils.notifyAxiosError(error, "Username Not Changed");
+      }
+    );
   }
 
   async function updatePassword() {
-    if (!newPassword || !newPasswordRepeat || !changePasswordPassword) {
+    if (!newPassword || !newPasswordRepeat || !changePasswordPassword) return;
+    if (newPassword != newPasswordRepeat) {
+      setChangePasswordErrors(new Map(changePasswordErrors.set('newPasswordRepeat', 'Passwords are not equal.')));
       return;
     }
-    if (newPassword != newPasswordRepeat) {
-      setChangePasswordErrors(new Map(changePasswordErrors.set('newPasswordRepeat', 'Passwörter stimmen nicht überein.')));
-    } else {
-      setChangePasswordErrors(new Map(changePasswordErrors.set('newPasswordRepeat', '')));
-      try {
-        const changePasswordResponse = await axiosInstance.put('/user/changePassword', { username: user!.username, oldPassword: changePasswordPassword, newPassword: newPassword })
-        if (changePasswordResponse) {
-          setShowChangedPassword(true);
-        }
-      } catch {
-        setChangePasswordErrors(new Map(changePasswordErrors.set('changePasswordPassword', 'Angegebenes Passwort stimmt nicht mit gespeichertem überein.')));
+    setChangePasswordErrors(new Map(changePasswordErrors.set('newPasswordRepeat', '')));
+    await axiosInstance.put('/user/changePassword', { username: user!.username, oldPassword: changePasswordPassword, newPassword: newPassword }).then(
+      () => enqueueSnackbar("Password was updated.", { variant: "success" })
+    ).catch(
+      (error) => {
+        setChangePasswordErrors(new Map(changePasswordErrors.set('changePasswordPassword', 'Current password is not correct.')));
+        AppUtils.notifyAxiosError(error, "Password Not Changed");
       }
-    }
+    );
   }
 
 
   return (
     <Container sx={{ padding: "3em", height: "100vh" }}>
-      <Snackbar open={showChangedPassword} autoHideDuration={5000} onClose={() => setShowChangedPassword(false)}>
-        <Alert onClose={() => setShowChangedPassword(false)} severity="success" sx={{ width: "100%", borderRadius: "25px" }}>
-          Password updated.
-        </Alert>
-      </Snackbar>
-      <Snackbar open={showChangedUsername} autoHideDuration={5000} onClose={() => setShowChangedUsername(false)}>
-        <Alert onClose={() => setShowChangedUsername(false)} severity="success" sx={{ width: "100%", borderRadius: "25px" }}>
-          Username updated.
-        </Alert>
-      </Snackbar>
       <Header />
       <Typography variant="h4">
         <Box display={"inline"} sx={{ "&:hover": { cursor: "pointer" } }}>

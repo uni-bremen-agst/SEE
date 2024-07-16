@@ -7,6 +7,7 @@ import { useContext, useEffect, useState } from "react";
 import User from "../types/User";
 import { Navigate, useNavigate } from "react-router";
 import { AuthContext } from "../contexts/AuthContext";
+import AppUtils from "../utils/AppUtils";
 
 const modalStyle = {
   position: 'absolute',
@@ -43,66 +44,78 @@ function SettingsView() {
   const [addUserPassword, setAddUserPassword] = useState("");
 
   async function addUser() {
-    if (!addUserUsername || !addUserPassword) {
-      return;
-    }
-    const addUserResponse = await axiosInstance.post('/user/create', { username: addUserUsername, password: addUserPassword, role: 'ROLE_USER' });
-    if (addUserResponse) {
-      setAddUserModalOpen(false);
-      axiosInstance.get("/user/all").then(
-        (response) => setUsers(response.data)
-      )
-    }
+    if (!addUserUsername || !addUserPassword) return;
+    await axiosInstance.post('/user/create', { username: addUserUsername, password: addUserPassword, role: 'ROLE_USER' }).then(
+      () => {
+        setAddUserModalOpen(false);
+        return axiosInstance.get("/user/all");
+      }
+    ).then(
+      (response) => setUsers(response.data)
+    ).catch(
+      (error) => AppUtils.notifyAxiosError(error, "Error Adding User")
+    );
   }
 
   async function removeUser() {
-    if (!selectedUser) {
-      return;
-    }
-    const addUserResponse = await axiosInstance.delete('/user/delete', { params: { username: selectedUser.username } });
-    if (addUserResponse) {
-      setRemoveUserModalOpen(false);
-      axiosInstance.get("/user/all").then(
-        (response) => setUsers(response.data)
-      )
-    }
+    if (!selectedUser) return;
+    await axiosInstance.delete('/user/delete', { params: { username: selectedUser.username } }).then(
+      () => {
+        setRemoveUserModalOpen(false);
+        return axiosInstance.get("/user/all");
+      }
+    ).then(
+      (response) => setUsers(response.data)
+    ).catch(
+      (error) => AppUtils.notifyAxiosError(error, "Error Removing User")
+    );
   }
 
   async function promoteUser() {
-    if (!selectedUser) {
-      return;
-    }
-    const promoteUserResponse = await axiosInstance.post('/user/addRoleToUser', {}, { params: { username: selectedUser.username, role: "ROLE_ADMIN" } });
-    if (promoteUserResponse) {
-      setPromoteDemoteUserModalOpen(false);
-      axiosInstance.get("/user/all").then(
-        (response) => setUsers(response.data)
-      )
-    }
+    if (!selectedUser) return;
+    await axiosInstance.post('/user/addRoleToUser', {}, { params: { username: selectedUser.username, role: "ROLE_ADMIN" } }).then(
+      () => {
+        setPromoteDemoteUserModalOpen(false);
+        return axiosInstance.get("/user/all");
+      }
+    ).then(
+      (response) => setUsers(response.data)
+    ).catch(
+      (error) => AppUtils.notifyAxiosError(error, "Error Promoting User")
+    );
+
   }
 
   async function demoteUser() {
-    if (!selectedUser) {
-      return;
-    }
-    const demoteUserResponse = await axiosInstance.delete('/user/removeRoleFromUser', { params: { username: selectedUser.username, role: "ROLE_ADMIN" } });
-    if (demoteUserResponse) {
-      setPromoteDemoteUserModalOpen(false);
-      axiosInstance.get("/user/all").then(
-        (response) => setUsers(response.data)
-      )
-    }
+    if (!selectedUser) return;
+    await axiosInstance.delete('/user/removeRoleFromUser', { params: { username: selectedUser.username, role: "ROLE_ADMIN" } }).then(
+      () => {
+        setPromoteDemoteUserModalOpen(false);
+        return axiosInstance.get("/user/all");
+      }
+    ).then(
+      (response) => setUsers(response.data)
+    ).catch(
+      (error) => AppUtils.notifyAxiosError(error, "Error Demoting User")
+    );
+  }
+
+  async function refreshData() {
+    await axiosInstance.get("/user/all").then(
+      (response) => {
+        setUsers(response.data);
+        AppUtils.notifyOnline();
+      }
+    ).catch(
+      () => AppUtils.notifyOffline()
+    );
   }
 
   useEffect(() => {
-    let isApiSubscribed = true;
-    if (isApiSubscribed) {
-      axiosInstance.get("/user/all").then(
-        (response) => setUsers(response.data)
-      )
-    }
+    refreshData();
+    const refreshInterval = setInterval(() => refreshData(), 10000);
     return () => {
-      isApiSubscribed = false;
+      clearInterval(refreshInterval);
     }
   }, [])
 

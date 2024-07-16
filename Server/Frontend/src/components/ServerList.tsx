@@ -3,28 +3,29 @@ import ServerListItem from "./ServerListItem";
 import { useContext, useEffect, useState } from "react";
 import Server from "../types/Server";
 import { AuthContext } from "../contexts/AuthContext";
+import AppUtils from "../utils/AppUtils";
 
 function ServerList() {
   const { axiosInstance } = useContext(AuthContext);
 
   const [servers, setServers] = useState<Server[]>([]);
 
-  useEffect(() => {
-    let isApiSubscribed = true;
-    const fetchServers = setInterval(() => {
-      axiosInstance.get("/server/all").then(
-        (response) => setServers(response.data)
-      )
-    }, 30000);
+  async function refreshData() {
+    await axiosInstance.get("/server/all").then(
+      (response) => {
+        setServers(response.data)
+        AppUtils.notifyOnline();
+      }
+    ).catch(
+      () => AppUtils.notifyOffline()
+    );
+  }
 
-    if (isApiSubscribed) {
-      axiosInstance.get("/server/all").then(
-        (response) => setServers(response.data)
-      )
-    }
+  useEffect(() => {
+    refreshData();
+    const refreshInterval = setInterval(() => refreshData(), 10000);
     return () => {
-      isApiSubscribed = false;
-      clearInterval(fetchServers);
+      clearInterval(refreshInterval);
     }
   }, [])
 

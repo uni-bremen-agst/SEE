@@ -5,14 +5,21 @@ import { faCog, faRightFromBracket, faUser } from '@fortawesome/free-solid-svg-i
 import { useNavigate } from "react-router";
 import { useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
+import AppUtils from "../utils/AppUtils";
 
 function Header() {
   const { axiosInstance, user, setUser } = useContext(AuthContext);
 
-  function logout() {
-    axiosInstance.post("/user/signout");
-    setUser(null);
-    sessionStorage.setItem("username", "")
+  async function logout() {
+    await axiosInstance.post("/user/signout").then(
+      () => {
+        setUser(null);
+        sessionStorage.setItem("username", "");
+      }
+    ).catch(
+      (error) => AppUtils.notifyAxiosError(error, "Error During Sign-Out")
+    );
+
   }
 
   const navigate = useNavigate();

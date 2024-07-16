@@ -1,10 +1,10 @@
-import { Alert, Box, Card, CardActionArea, CardContent, Chip, IconButton, Snackbar, Stack, Typography } from "@mui/material";
+import { Box, Card, CardActionArea, CardContent, Chip, IconButton, Stack, Typography } from "@mui/material";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faClipboard } from '@fortawesome/free-solid-svg-icons'
 import { useNavigate } from "react-router";
 import Avatar from "./Avatar";
 import Server from "../types/Server";
-import { useState } from "react";
+import { enqueueSnackbar } from "notistack";
 
 function getServerStatus(serverStatusType: string) {
   if (serverStatusType == "ONLINE") {
@@ -24,20 +24,11 @@ function getServerStatus(serverStatusType: string) {
 function ServerListItem(props: { server: Server }) {
   const navigate = useNavigate();
 
-  const [showLinkCopiedMessage, setShowLinkCopiedMessage] = useState(false);
-
   const server = props.server;
 
   return (
     <Box width={"100%"}>
-      <Snackbar open={showLinkCopiedMessage} autoHideDuration={5000} onClose={() => setShowLinkCopiedMessage(false)}>
-        <Alert onClose={() => setShowLinkCopiedMessage(false)} severity="success" sx={{ width: "100%", borderRadius: "25px" }}>
-          Address was copied to clipboard.
-        </Alert>
-      </Snackbar>
-      <Card
-        sx={{ cursor: "pointer", borderRadius: "25px" }}
-        onClick={() => navigate('/server#' + server.id)}>
+      <Card sx={{ cursor: "pointer", borderRadius: "25px" }}>
         <CardActionArea onClick={() => navigate('/server#' + server.id)}>
           <CardContent>
             <Stack direction="row" spacing={2}>
@@ -73,7 +64,7 @@ function ServerListItem(props: { server: Server }) {
                       e.stopPropagation();
                       e.preventDefault();
                       navigator.clipboard.writeText(`${server.containerAddress}:${server.containerPort}`);
-                      setShowLinkCopiedMessage(true);
+                      enqueueSnackbar("Address was copied to clipboard.", { variant: "info" });
                     }}>
                     <FontAwesomeIcon icon={faClipboard} />
                   </IconButton>
