@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
+using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.GraphProviders;
@@ -466,7 +467,10 @@ namespace SEE.Utils
                 // First save a new city with all its default values.
                 DiffCity savedCity = NewVanillaSEECity<DiffCity>();
                 savedCity.VersionControlSystem = VCS.VCSKind.Git;
-                savedCity.VCSPath = new(vcsPath);
+                savedCity.VCSPath = new()
+                {
+                    Path = vcsPath
+                };
                 savedCity.OldRevision = "old revision";
                 savedCity.NewRevision = "new revision";
                 savedCity.Save(filename);
@@ -685,22 +689,7 @@ namespace SEE.Utils
         private static void SEEEvolutionCityAttributesAreEqual(SEECityEvolution expected, SEECityEvolution actual)
         {
             AbstractSEECityAttributesAreEqual(expected, actual);
-            AreEqual(expected.GXLDirectory, actual.GXLDirectory);
-            Assert.AreEqual(expected.MaxRevisionsToLoad, actual.MaxRevisionsToLoad);
-        }
-
-        /// <summary>
-        /// Checks whether <paramref name="actual"/> has the same values as <paramref name="expected"/>.
-        /// </summary>
-        /// <param name="expected">expected values</param>
-        /// <param name="actual">actual values</param>
-        private static void AreEqual(MarkerAttributes expected, MarkerAttributes actual)
-        {
-            Assert.AreEqual(expected.MarkerHeight, actual.MarkerHeight);
-            Assert.AreEqual(expected.MarkerWidth, actual.MarkerWidth);
-            AreEqual(expected.AdditionBeamColor, actual.AdditionBeamColor);
-            AreEqual(expected.ChangeBeamColor, actual.ChangeBeamColor);
-            AreEqual(expected.DeletionBeamColor, actual.DeletionBeamColor);
+            TestGraphProviderIO.AreEqual(expected.DataProvider, actual.DataProvider);
         }
 
         /// <summary>
@@ -720,6 +709,21 @@ namespace SEE.Utils
             AreEqualEdgeSelectionSettings(expected.EdgeSelectionSettings, actual.EdgeSelectionSettings);
             AreEqualErosionSettings(expected.ErosionSettings, actual.ErosionSettings);
             AreEqualCoseGraphSettings(expected.CoseGraphSettings, actual.CoseGraphSettings);
+            AreEqual(expected.MarkerAttributes, actual.MarkerAttributes);
+        }
+
+        /// <summary>
+        /// Checks whether <paramref name="actual"/> has the same values as <paramref name="expected"/>.
+        /// </summary>
+        /// <param name="expected">expected values</param>
+        /// <param name="actual">actual values</param>
+        private static void AreEqual(MarkerAttributes expected, MarkerAttributes actual)
+        {
+            Assert.AreEqual(expected.MarkerHeight, actual.MarkerHeight);
+            Assert.AreEqual(expected.MarkerWidth, actual.MarkerWidth);
+            AreEqual(expected.AdditionBeamColor, actual.AdditionBeamColor);
+            AreEqual(expected.ChangeBeamColor, actual.ChangeBeamColor);
+            AreEqual(expected.DeletionBeamColor, actual.DeletionBeamColor);
         }
 
         /// <summary>
@@ -811,7 +815,7 @@ namespace SEE.Utils
         private static void WipeOutSEECityAttributes(SEECity city)
         {
             WipeOutAbstractSEECityAttributes(city);
-            city.DataProvider = new PipelineGraphProvider();
+            city.DataProvider = new SingleGraphPipelineProvider();
         }
 
         /// <summary>
@@ -836,7 +840,7 @@ namespace SEE.Utils
         {
             WipeOutSEECityAttributes(city);
             city.VersionControlSystem = VCS.VCSKind.None;
-            city.VCSPath.Set("C:/MyAbsoluteDirectory/MyVCSDirectory");
+            city.VCSPath.Path = "C:/MyAbsoluteDirectory/MyVCSDirectory";
             city.OldRevision = "XXX";
             city.NewRevision = "YYY";
         }
@@ -862,7 +866,10 @@ namespace SEE.Utils
         private void WipeOutSEEJlgCityAttributes(SEEJlgCity city)
         {
             WipeOutSEECityAttributes(city);
-            city.JLGPath = new FilePath("C:/MyAbsoluteDirectory/MyAbsoluteFile.jlg");
+            city.JLGPath = new()
+            {
+                Path = "C:/MyAbsoluteDirectory/MyAbsoluteFile.jlg"
+            };
         }
 
         /// <summary>
@@ -873,8 +880,6 @@ namespace SEE.Utils
         private static void WipeOutSEEEvolutionCityAttributes(SEECityEvolution city)
         {
             WipeOutAbstractSEECityAttributes(city);
-            city.GXLDirectory.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gxl");
-            city.MaxRevisionsToLoad++;
         }
 
         /// <summary>
@@ -971,6 +976,10 @@ namespace SEE.Utils
             city.ErosionSettings.CycleIssue = "X";
             city.ErosionSettings.CloneIssue = "X";
             city.ErosionSettings.ArchitectureIssue = "X";
+            city.ErosionSettings.LspHint = "X";
+            city.ErosionSettings.LspInfo = "X";
+            city.ErosionSettings.LspWarning = "X";
+            city.ErosionSettings.LspError = "X";
 
             city.ErosionSettings.StyleIssueSum = "X";
             city.ErosionSettings.UniversalIssueSum = "X";
@@ -995,6 +1004,10 @@ namespace SEE.Utils
             Assert.AreEqual(expected.CycleIssue, actual.CycleIssue);
             Assert.AreEqual(expected.CloneIssue, actual.CloneIssue);
             Assert.AreEqual(expected.ArchitectureIssue, actual.ArchitectureIssue);
+            Assert.AreEqual(expected.LspHint, actual.LspHint);
+            Assert.AreEqual(expected.LspInfo, actual.LspInfo);
+            Assert.AreEqual(expected.LspWarning, actual.LspWarning);
+            Assert.AreEqual(expected.LspError, actual.LspError);
 
             Assert.AreEqual(expected.StyleIssueSum, actual.StyleIssueSum);
             Assert.AreEqual(expected.UniversalIssueSum, actual.UniversalIssueSum);
@@ -1040,7 +1053,7 @@ namespace SEE.Utils
         private static void WipeOutNodeLayoutSettings(AbstractSEECity city)
         {
             city.NodeLayoutSettings.Kind = NodeLayoutKind.CompoundSpringEmbedder;
-            city.NodeLayoutSettings.LayoutPath.Set("no path found");
+            city.NodeLayoutSettings.LayoutPath.Path = "no path found";
         }
 
         private static void AreEqualNodeLayoutSettings(NodeLayoutAttributes expected, NodeLayoutAttributes actual)
@@ -1053,7 +1066,7 @@ namespace SEE.Utils
         {
             settings.Shape = NodeShapes.Blocks;
             settings.IsRelevant = false;
-            settings.MetricToLength = new List<string> { "0.001", "Metric.LOC" };
+            settings.MetricToLength = new List<string> { "0.001", SEE.DataModel.DG.Metrics.Prefix + "LOC" };
             settings.ColorProperty.ColorMetric = "X";
             settings.MinimalBlockLength = 90000;
             settings.MaximalBlockLength = 1000000;
@@ -1105,9 +1118,9 @@ namespace SEE.Utils
             city.LODCulling++;
             city.HierarchicalEdges = new HashSet<string>() { "Nonsense", "Whatever" };
             city.NodeTypes = new NodeTypeVisualsMap();
-            city.ConfigurationPath.Set("C:/MyAbsoluteDirectory/config.cfg");
-            city.SourceCodeDirectory.Set("C:/MyAbsoluteDirectory");
-            city.SolutionPath.Set("C:/MyAbsoluteDirectory/mysolution.sln");
+            city.ConfigurationPath.Path = "C:/MyAbsoluteDirectory/config.cfg";
+            city.SourceCodeDirectory.Path = "C:/MyAbsoluteDirectory";
+            city.SolutionPath.Path = "C:/MyAbsoluteDirectory/mysolution.sln";
             city.ZScoreScale = !city.ZScoreScale;
             city.ScaleOnlyLeafMetrics = !city.ScaleOnlyLeafMetrics;
         }

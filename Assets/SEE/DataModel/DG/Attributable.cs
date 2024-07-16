@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SEE.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -30,7 +31,14 @@ namespace SEE.DataModel.DG
     /// </summary>
     public abstract class Attributable : Observable<ChangeEvent>, ICloneable
     {
-        public static readonly HashSet<string> NumericAttributeNames = new();
+        /// <summary>
+        /// The names of all numeric attributes (int and float) of any <see cref="Attributable"/>.
+        /// Note that this set is shared among all instances of <see cref="Attributable"/>.
+        /// Note also that it may contain names of attributes that are no longer present in any
+        /// <see cref="Attributable"/> instance. This can happen if an attribute is removed from
+        /// all instances. In this case, the name will remain in this set.
+        /// </summary>
+        public static readonly ThreadSafeHashSet<string> NumericAttributeNames = new();
 
         //----------------------------------
         // Toggle attributes
@@ -636,6 +644,20 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// Returns a shallow clone of this attributable. Shallow means that
+        /// only the immediate list of attributes of this attributable
+        /// (i.e., <see cref="ToggleAttributes"/>, <see cref="StringAttributes"/>,
+        /// <see cref="FloatAttributes"/>, and <see cref="IntAttributes"/>) are copied, too.
+        /// </summary>
+        /// <returns>shallow clone</returns>
+        public virtual object CloneAttributes()
+        {
+            Attributable clone = (Attributable)Activator.CreateInstance(GetType());
+            CopyAttributes(clone);
+            return clone;
+        }
+
+        /// <summary>
         /// Returns a deep clone of this attributable. Deep means that the list
         /// of attributes of this attributable are copied, too.
         /// </summary>
@@ -661,6 +683,17 @@ namespace SEE.DataModel.DG
             // original attributable.
             // Because the keys and values are primitive types, the following are deep copies of the
             // attributes.
+            CopyAttributes(target);
+        }
+
+        /// <summary>
+        /// Copies <see cref="ToggleAttributes"/>, <see cref="StringAttributes"/>,
+        /// <see cref="FloatAttributes"/>, and <see cref="IntAttributes"/>) from this
+        /// attributable to <paramref name="target"/>.
+        /// </summary>
+        /// <param name="target">receiver of the copied attributes</param>
+        private void CopyAttributes(Attributable target)
+        {
             target.toggleAttributes = new HashSet<string>(toggleAttributes);
             target.StringAttributes = new Dictionary<string, string>(StringAttributes);
             target.FloatAttributes = new Dictionary<string, float>(FloatAttributes);

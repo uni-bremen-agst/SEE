@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.GO;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game
@@ -41,6 +45,7 @@ namespace SEE.Game
             if (gameObject.HasNodeRef())
             {
                 gameObject.AddComponentIfNecessary<ShowLabel>();
+                gameObject.AddComponentIfNecessary<ShowHoverInfo>();
                 gameObject.AddComponentIfNecessary<ShowEdges>();
                 gameObject.AddComponentIfNecessary<HighlightErosion>();
             }
@@ -79,11 +84,21 @@ namespace SEE.Game
         /// or edge.
         /// </summary>
         /// <param name="gameObjects">game objects where the components are to be added to</param>
-        public static void PrepareForInteraction(IEnumerable<GameObject> gameObjects)
+        /// <param name="updateProgress">action that updates the progress of the preparation</param>
+        /// <param name="token">token with which to cancel the preparation</param>
+        public static async UniTask PrepareForInteractionAsync(ICollection<GameObject> gameObjects,
+                                                               Action<float> updateProgress,
+                                                               CancellationToken token = default)
         {
-            foreach (GameObject go in gameObjects)
+            int totalGameObjects = gameObjects.Count;
+            // The batch size controls the compromise between FPS and processing speed.
+            // In the editor, requirements for FPS are significantly lower than in-game.
+            int batchSize = Application.isPlaying ? 200 : 1000;
+            float i = 0;
+            await foreach (GameObject go in gameObjects.BatchPerFrame(batchSize, cancellationToken: token))
             {
                 PrepareForInteraction(go);
+                updateProgress(++i / totalGameObjects);
             }
         }
     }

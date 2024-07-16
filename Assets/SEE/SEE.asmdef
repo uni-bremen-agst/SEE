@@ -55,7 +55,6 @@
         "MathNet.Numerics.dll",
         "Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.dll",
         "Newtonsoft.Json.dll",
-        "NetworkCommsDotNet.dll",
         "LibGit2Sharp.dll",
         "CsvHelper.dll",
         "OmniSharp.Extensions.LanguageClient.dll",
@@ -65,7 +64,9 @@
         "System.IO.Pipelines.dll",
         "Supercluster.KDTree.Standard.dll",
         "Markdig.dll",
-        "System.Collections.Immutable.dll"
+        "System.Collections.Immutable.dll",
+        "MoreLinq.dll",
+        "Microsoft.Extensions.FileSystemGlobbing.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

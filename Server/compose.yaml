@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  frontend-server:
+    build: ./Frontend
+    container_name: frontend
+    depends_on:
+      - backend-server
+    networks:
+      server-network:
+        ipv4_address: 172.18.0.6
+    ports:
+      - "80:8080"
+
+  backend-server:
+    privileged: true
+    build: ./Backend
+    container_name: backend
+    restart: always
+    volumes:
+      - backend-data:/see
+    depends_on:
+      - storage-server
+    networks:
+      server-network:
+        ipv4_address: 172.18.0.2
+    ports:
+      - "8080:8080"
+    environment:
+      FRONTEND_DOMAIN: localhost
+      FRONTEND_SCHEME: HTTP
+      SQLITE_DB_FILE: /see/database.db
+      JWT_SECRET: 1RNG9ja6MtadMuLsRC5ci3fy53KcQJmdEWWrp3hV5dnukvW5SQ
+
+networks:
+  server-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16
+
+volumes:
+  backend-data:
+    driver: TODO

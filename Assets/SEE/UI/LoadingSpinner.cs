@@ -81,9 +81,14 @@ namespace SEE.UI
         private static GameObject indeterminateSpinner;
 
         /// <summary>
-        /// The image containing the determinate spinner.
+        /// The game object containing the determinate spinner.
         /// </summary>
-        private static Image determinateSpinner;
+        private static GameObject determinateSpinner;
+
+        /// <summary>
+        /// The image containing the determinate spinner's progress circle.
+        /// </summary>
+        private static Image determinateSpinnerProgress;
 
         /// <summary>
         /// The TextMeshPro containing the number of active loading processes.
@@ -118,7 +123,8 @@ namespace SEE.UI
             processCountText = loadingSpinner.transform.Find("Counter").gameObject.MustGetComponent<TextMeshProUGUI>();
             processInfoText = loadingSpinner.transform.Find("Info").gameObject.MustGetComponent<TextMeshProUGUI>();
             indeterminateSpinner = loadingSpinner.transform.Find("Indeterminate").gameObject;
-            determinateSpinner = loadingSpinner.transform.Find("Determinate").gameObject.MustGetComponent<Image>();
+            determinateSpinner = loadingSpinner.transform.Find("Determinate").gameObject;
+            determinateSpinnerProgress = determinateSpinner.transform.Find("Progress").gameObject.MustGetComponent<Image>();
 
             loadingSpinner.SetActive(indeterminateProcesses.Count + determinateProcesses.Count > 0);
             UpdateLoadingText();
@@ -181,8 +187,8 @@ namespace SEE.UI
                 if (determinateProcesses.Count == 0)
                 {
                     // Determinate spinner is not shown, so we'll show the indeterminate spinner.
-                    determinateSpinner.gameObject.SetActive(false);
-                    indeterminateSpinner.gameObject.SetActive(true);
+                    determinateSpinner.SetActive(false);
+                    indeterminateSpinner.SetActive(true);
                 }
             }
             return new LoadingSpinnerDisposable(processMessage);
@@ -208,7 +214,7 @@ namespace SEE.UI
             if (!AsyncUtils.IsRunningOnMainThread)
             {
                 // If the game is not running, we'll just use a simple log message.
-                Debug.Log($"Running: {processMessage}");
+                Debug.Log($"Running: {processMessage}.\n");
             }
 
             determinateProcesses[processMessage] = 0;
@@ -218,10 +224,10 @@ namespace SEE.UI
                 UpdateLoadingText();
                 // Determinate spinner takes precedence over indeterminate spinner.
                 indeterminateSpinner.gameObject.SetActive(false);
-                determinateSpinner.gameObject.SetActive(true);
+                determinateSpinner.SetActive(true);
 
-                determinateSpinner.fillAmount = 0;
-                determinateSpinner.color = initialDeterminateColor;
+                determinateSpinnerProgress.fillAmount = 0;
+                determinateSpinnerProgress.color = initialDeterminateColor;
             }
 
             updateProgress = progress => UpdateProgressAsync(processMessage, progress).Forget();
@@ -247,8 +253,8 @@ namespace SEE.UI
             // The update method may be called from outside the main thread, so we need to switch to the main thread.
             await AsyncUtils.RunOnMainThreadAsync(() =>
             {
-                determinateSpinner.DOFillAmount(determinateProcesses[processMessage], determinateChangeDuration).Play();
-                determinateSpinner.DOColor(Color.Lerp(initialDeterminateColor, finalDeterminateColor,
+                determinateSpinnerProgress.DOFillAmount(determinateProcesses[processMessage], determinateChangeDuration).Play();
+                determinateSpinnerProgress.DOColor(Color.Lerp(initialDeterminateColor, finalDeterminateColor,
                                                       determinateProcesses[processMessage]), determinateChangeDuration).Play();
                 UpdateLoadingText();
             });
@@ -265,7 +271,7 @@ namespace SEE.UI
             if (!AsyncUtils.IsRunningOnMainThread)
             {
                 // If the game is not running, we'll just use a simple log message.
-                Debug.Log($"Finished: {processMessage}");
+                Debug.Log($"Finished: {processMessage}.\n");
             }
 
             if ((!determinateProcesses.Remove(processMessage) && !indeterminateProcesses.Remove(processMessage))
@@ -281,12 +287,12 @@ namespace SEE.UI
             }
             else if (determinateProcesses.Count == 0)
             {
-                determinateSpinner.gameObject.SetActive(false);
+                determinateSpinner.SetActive(false);
             }
             else
             {
                 // Determinate spinner takes precedence over indeterminate spinner.
-                indeterminateSpinner.gameObject.SetActive(false);
+                indeterminateSpinner.SetActive(false);
             }
         }
 

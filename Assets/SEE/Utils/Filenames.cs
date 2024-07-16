@@ -71,9 +71,9 @@ namespace SEE.Utils
         public const string SolutionExtension = ".sln";
 
         /// <summary>
-        /// File extension for LZMA compressed GXL files.
+        /// File extension for LZMA compressed data streams/files.
         /// </summary>
-        public const string CompressedGXLExtension = GXLExtension + ".xz";
+        public const string CompressedExtension = ".xz";
 
         /// <summary>
         /// File extension of PNG filenames.
@@ -166,7 +166,7 @@ namespace SEE.Utils
         public static IEnumerable<string> GXLFilenames(string directory)
         {
             return FilenamesInDirectory(directory, Globbing(GXLExtension))
-                .Concat(FilenamesInDirectory(directory, Globbing(CompressedGXLExtension)));
+                .Concat(FilenamesInDirectory(directory, Globbing(GXLExtension + CompressedExtension)));
         }
 
         /// <summary>
@@ -179,7 +179,7 @@ namespace SEE.Utils
         /// <returns>sorted list of CSV filenames</returns>
         public static IEnumerable<string> CSVFilenames(string directory)
         {
-            return FilenamesInDirectory(directory, Globbing(CSVExtension));
+            return FilenamesInDirectory(directory, Globbing(CSVExtension + CompressedExtension));
         }
 
         /// <summary>

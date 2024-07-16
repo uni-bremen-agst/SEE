@@ -82,6 +82,11 @@ namespace SEE.UI.PropertyDialog
         private StringProperty serverActionPort;
 
         /// <summary>
+        /// The password to protect the server from unauthorised clients
+        /// </summary>
+        private StringProperty roomPassword;
+
+        /// <summary>
         /// The selector for the voice chat system.
         /// </summary>
         private SelectionProperty voiceChatSelector;
@@ -118,11 +123,11 @@ namespace SEE.UI.PropertyDialog
                 group.AddProperty(serverPort);
             }
             {
-                serverActionPort = dialog.AddComponent<StringProperty>();
-                serverActionPort.Name = "Server Action TCP Port";
-                serverActionPort.Value = networkConfig.ServerActionPort.ToString();
-                serverActionPort.Description = "Server TCP port for SEE actions";
-                group.AddProperty(serverActionPort);
+                roomPassword = dialog.AddComponent<StringProperty>();
+                roomPassword.Name = "Room Password";
+                roomPassword.Value = networkConfig.RoomPassword.ToString();
+                roomPassword.Description = "Password for a meeting room";
+                group.AddProperty(roomPassword);
             }
             {
                 voiceChatSelector = dialog.AddComponent<SelectionProperty>();
@@ -220,17 +225,9 @@ namespace SEE.UI.PropertyDialog
                 }
             }
             {
-                // Server Action Port Number
-                if (Int32.TryParse(serverActionPort.Value.Trim(), out int serverActionPortNumber)
-                    && 0 <= serverActionPortNumber && serverActionPortNumber <= maximalPortNumber)
-                {
-                    networkConfig.ServerActionPort = serverActionPortNumber;
-                }
-                else
-                {
-                    ShowPortError("Server Action");
-                    errorOccurred = true;
-                }
+                // Room Password
+                networkConfig.RoomPassword = roomPassword.Value.ToString();
+                ShowNotification.Info("Password Set", $"You have set the password to {roomPassword.Value}.");
             }
             {
                 // Voice Chat
@@ -241,7 +238,7 @@ namespace SEE.UI.PropertyDialog
                 }
                 else
                 {
-                    ShowNotification.Error("Invalid Voice Chat", "Your choice of a voice chat is not available");
+                    ShowNotification.Error("Invalid Voice Chat", "Your choice of a voice chat is not available.");
                     errorOccurred = true;
                 }
             }

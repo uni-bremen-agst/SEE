@@ -12,7 +12,7 @@ namespace SEE.GraphProviders
     /// <summary>
     /// A graph provider that merges the difference between two graphs.
     /// </summary>
-    internal class MergeDiffGraphProvider : GraphProvider
+    internal class MergeDiffGraphProvider : SingleGraphProvider
     {
         /// <summary>
         /// The list of providers that should be merged into the input graph
@@ -20,11 +20,11 @@ namespace SEE.GraphProviders
         /// These will be merged successively from first to last.
         /// </summary>
         [HideReferenceObjectPicker]
-        public GraphProvider OldGraph = new PipelineGraphProvider();
+        public SingleGraphProvider OldGraph = new SingleGraphPipelineProvider();
 
-        public override GraphProviderKind GetKind()
+        public override SingleGraphProviderKind GetKind()
         {
-            return GraphProviderKind.MergeDiff;
+            return SingleGraphProviderKind.MergeDiff;
         }
 
         /// <summary>
@@ -36,7 +36,6 @@ namespace SEE.GraphProviders
         /// <param name="token">can be used to cancel the operation</param>
         /// <returns>the resulting graph where changes between <paramref name="graph"/>
         /// and <see cref="OldGraph"/> have been merged into</returns>
-        /// <exception cref="NotImplementedException"></exception>
         public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
                                                           Action<float> changePercentage = null,
                                                           CancellationToken token = default)
@@ -48,7 +47,9 @@ namespace SEE.GraphProviders
             }
 
             Graph oldGraph = await OldGraph.ProvideAsync(new Graph(graph.BasePath), city, token: token);
+            await UniTask.SwitchToThreadPool();
             graph.MergeDiff(oldGraph);
+            await UniTask.SwitchToMainThread();
             return graph;
         }
 

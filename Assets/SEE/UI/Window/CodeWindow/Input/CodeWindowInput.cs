@@ -10,6 +10,7 @@ using SEE.GO;
 using SEE.UI.Notification;
 using SEE.Net.Dashboard;
 using SEE.Net.Dashboard.Model.Issues;
+using SEE.Scanner;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -352,10 +353,16 @@ namespace SEE.UI.Window.CodeWindow
                     try
                     {
                         EnterFromTokens(SEEToken.FromFile(filename));
-                        if (SceneQueries.GetCodeCity(transform).gameObject.TryGetComponentOrLog(out AbstractSEECity city)
+                        GameObject go = SceneQueries.GetCodeCity(transform)?.gameObject;
+                        if (go && go.TryGetComponentOrLog(out AbstractSEECity city)
                             && city.ErosionSettings.ShowIssuesInCodeWindow)
                         {
                             MarkIssuesAsync(filename).Forget(); // initiate issue search
+                        }
+                        else if (HasStarted)
+                        {
+                            textMesh.SetText(text);
+                            SetupBreakpoints();
                         }
                     }
                     catch (ArgumentException e)
@@ -431,6 +438,7 @@ namespace SEE.UI.Window.CodeWindow
                 {
                     textMesh.text = text;
                     textMesh.ForceMeshUpdate();
+                    SetupBreakpoints();
                 }
                 catch (IndexOutOfRangeException)
                 {

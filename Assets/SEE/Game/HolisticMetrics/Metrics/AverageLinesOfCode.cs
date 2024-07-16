@@ -12,7 +12,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
         /// <summary>
         /// This const contains the name of the attribute we will try to get for each node, the lines of code metric.
         /// </summary>
-        private const string attributeName = "Metric.Lines.LOC";
+        private const string attributeName = SEE.DataModel.DG.Metrics.Prefix + "Lines.LOC";
 
         /// <summary>
         /// Calculates the average lines of code for the nodes of the given <paramref name="city"/>.

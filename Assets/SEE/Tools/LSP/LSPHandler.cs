@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -108,6 +109,11 @@ namespace SEE.Tools.LSP
         public IServerCapabilities ServerCapabilities => Client?.ServerSettings.Capabilities;
 
         /// <summary>
+        /// The server-published diagnostics that have not been handled yet.
+        /// </summary>
+        private readonly ConcurrentQueue<PublishDiagnosticsParams> unhandledDiagnostics = new();
+
+        /// <summary>
         /// The capabilities of the language client.
         /// </summary>
         private static readonly ClientCapabilities ClientCapabilities = new()
@@ -152,7 +158,9 @@ namespace SEE.Tools.LSP
                         ValueSet = Container.From(SymbolTag.Deprecated)
                     },
                     LabelSupport = false
-                }
+                },
+                Diagnostic = new DiagnosticClientCapabilities(),
+                PublishDiagnostics = new PublishDiagnosticsCapability()
             },
             Window = new WindowClientCapabilities
             {
@@ -250,6 +258,7 @@ namespace SEE.Tools.LSP
                                                           .WithInitializationOptions(Server.InitOptions)
                                                           .DisableProgressTokens()
                                                           .WithWorkspaceFolder(ProjectPath, "Main")
+                                                          .OnPublishDiagnostics(HandleDiagnostics)
                                                           .OnLogMessage(LogMessage)
                                                           .OnShowMessage(ShowMessage)
                                                           .OnWorkDoneProgressCreate(HandleInitialWorkDoneProgress));
@@ -298,6 +307,16 @@ namespace SEE.Tools.LSP
                     initialWork.Remove(token);
                 }
             }
+        }
+
+        /// <summary>
+        /// Handles the diagnostics published by the language server by storing them
+        /// in the <see cref="unhandledDiagnostics"/> queue.
+        /// </summary>
+        /// <param name="diagnosticsParams">The parameters of the diagnostics.</param>
+        private void HandleDiagnostics(PublishDiagnosticsParams diagnosticsParams)
+        {
+            unhandledDiagnostics.Enqueue(diagnosticsParams);
         }
 
         /// <summary>
@@ -416,6 +435,41 @@ namespace SEE.Tools.LSP
                 Position = new Position(line, character)
             };
             return await AsyncUtils.RunWithTimeoutAsync(t => Client.RequestHover(hoverParams, t).AsUniTask(false), TimeoutSpan, throwOnTimeout: false);
+        }
+
+        /// <summary>
+        /// Requests diagnostics for the document at the given <paramref name="path"/>.
+        /// If the diagnostics are not available, or the diagnostics for the given document are unchanged
+        /// compared to the last call, the method returns <c>null</c>.
+        ///
+        /// Note that this is a very new feature (LSP 3.17) and not all language servers support it.
+        /// An alternative is to use the <see cref="GetPublishedDiagnostics"/> method to
+        /// retrieve the diagnostics that have been published by the language server.
+        /// </summary>
+        /// <param name="path">The path to the document.</param>
+        /// <returns>The diagnostics for the document at the given path,
+        /// or <c>null</c> if the diagnostics are unchanged/unavailable.</returns>
+        public async UniTask<IEnumerable<Diagnostic>> PullDocumentDiagnosticsAsync(string path)
+        {
+            DocumentDiagnosticParams diagnosticsParams = new()
+            {
+                TextDocument = new TextDocumentIdentifier(path)
+            };
+            RelatedDocumentDiagnosticReport report = await Client.RequestDocumentDiagnostic(diagnosticsParams).AsTask();
+            DocumentDiagnosticReport diagnostics = report?.RelatedDocuments?[diagnosticsParams.TextDocument.Uri];
+            return (diagnostics as FullDocumentDiagnosticReport)?.Items;
+        }
+
+        /// <summary>
+        /// Retrieves the unhandled diagnostics that have been published by the language server.
+        /// </summary>
+        /// <returns>An enumerable of the published diagnostics.</returns>
+        public IEnumerable<PublishDiagnosticsParams> GetPublishedDiagnostics()
+        {
+            while (unhandledDiagnostics.TryDequeue(out PublishDiagnosticsParams diagnostics))
+            {
+                yield return diagnostics;
+            }
         }
 
         /// <summary>

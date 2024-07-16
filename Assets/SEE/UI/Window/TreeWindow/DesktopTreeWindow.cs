@@ -259,7 +259,7 @@ namespace SEE.UI.Window.TreeWindow
         private void AddNode(Node node, TreeWindowGroup inGroup = null)
         {
             GameObject nodeGameObject = GraphElementIDMap.Find(node.ID);
-            int children = node.NumberOfChildren() + node.Edges.Count;
+            int children = node.Children().Count(x => ShouldBeDisplayed(x, inGroup)) + node.Edges.Count(x => ShouldBeDisplayed(x, inGroup));
 
             if (ShouldBeDisplayed(node, inGroup))
             {
@@ -704,6 +704,27 @@ namespace SEE.UI.Window.TreeWindow
         }
 
         /// <summary>
+        /// Displays only the given <paramref name="nodes"/> in the tree window.
+        /// All other nodes will be hidden, and cannot be added back by the user.
+        /// Hence, this method can be useful to create specialized views of the graph when combined
+        /// with a custom title for the tree window.
+        /// </summary>
+        /// <param name="nodes">The nodes to be displayed in the tree window.</param>
+        public async UniTaskVoid ConstrainToAsync(ICollection<Node> nodes)
+        {
+            searcher.Filter.IncludeElements.Clear();
+            searcher.Filter.ExcludeElements.Clear();
+            searcher.Filter.IncludeElements.UnionWith(nodes);
+
+            ClearTree();
+            foreach (Node node in nodes)
+            {
+                ExpandPathFor(node);
+            }
+            await AddRootsAsync();
+        }
+
+        /// <summary>
         /// Makes the given <paramref name="element"/> visible in the tree window by expanding all its parents
         /// and scrolling to it.
         /// If an edge is given, the source/target node will be made visible instead,
@@ -720,7 +741,7 @@ namespace SEE.UI.Window.TreeWindow
                 // This case may occur when the method is called from the outside.
                 await UniTask.WaitUntil(() => searchField != null);
             }
-            if (!ShouldBeDisplayed(element) || (group == null && grouper != null && grouper.IsActive))
+            if (!ShouldBeDisplayed(element) || (group == null && grouper is { IsActive: true }))
             {
                 ShowNotification.Warn("Element filtered out",
                                       "Element is not included in the current filter or group and thus can't be shown.");
@@ -747,19 +768,7 @@ namespace SEE.UI.Window.TreeWindow
                 transformID += $"#{ElementId(element, group)}";
             }
 
-            // We need to find a path from the root to the node, which we do by working our way up the hierarchy.
-            // We then expand all nodes on the path.
-            while (current.Parent != null)
-            {
-                current = current.Parent;
-                expandedItems.Add(ElementId(current, group));
-            }
-
-            // Finally, if the element is in a group, we need to expand the group.
-            if (group != null)
-            {
-                expandedItems.Add(CleanupID(group.Text));
-            }
+            ExpandPathFor(current);
 
             // We need to wait until the transform actually exists, hence the await.
             await AddRootsAsync();
@@ -783,6 +792,29 @@ namespace SEE.UI.Window.TreeWindow
                    .SetLoops(6, LoopType.Yoyo).Play();
         }
 
+        /// <summary>
+        /// Expands the path from the given <paramref name="node"/> to the root of the tree,
+        /// such that the node becomes visible.
+        /// </summary>
+        /// <param name="node">The node to be made visible.</param>
+        private void ExpandPathFor(Node node)
+        {
+            TreeWindowGroup group = grouper?.GetGroupFor(node);
+            // We need to find a path from the root to the node, which we do by working our way up the hierarchy.
+            // We then expand all nodes on the path.
+            while (node.Parent != null)
+            {
+                node = node.Parent;
+                expandedItems.Add(ElementId(node, group));
+            }
+
+            // Finally, if the element is in a group, we need to expand the group.
+            if (group != null)
+            {
+                expandedItems.Add(CleanupID(group.Text));
+            }
+        }
+
         protected override void StartDesktop()
         {
             if (Graph == null)
@@ -791,7 +823,20 @@ namespace SEE.UI.Window.TreeWindow
                 return;
             }
 
-            Title = $"{Graph.Name} – Tree View";
+            string graphName;
+            if (!string.IsNullOrEmpty(Graph.Name))
+            {
+                graphName = Graph.Name;
+            }
+            else if (!string.IsNullOrEmpty(Graph.GetRoots().FirstOrDefault()?.SourceName))
+            {
+                graphName = Graph.GetRoots().First().SourceName;
+            }
+            else
+            {
+                graphName = "City Graph";
+            }
+            Title ??= $"{graphName} (Tree)";
             base.StartDesktop();
             Transform root = PrefabInstantiator.InstantiatePrefab(treeWindowPrefab, Window.transform.Find("Content"), false).transform;
             items = (RectTransform)root.Find("Content/Items");

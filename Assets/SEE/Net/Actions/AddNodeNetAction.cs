@@ -56,7 +56,7 @@ namespace SEE.Net.Actions
         /// Things to execute on the server (none for this class). Necessary because it is abstract
         /// in the superclass.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank.
         }
@@ -64,12 +64,9 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Creates a new GameObject on each client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                GameNodeAdder.AddChild(Find(ParentID), Position, Scale, NewNodeID);
-            }
+            GameNodeAdder.AddChild(Find(ParentID), Position, Scale, NewNodeID);
         }
     }
 }
