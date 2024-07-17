@@ -310,12 +310,12 @@ namespace SEE.Net.Dashboard
         public Color GetIssueColor(Issue issue) =>
             issue switch
             {
-                ArchitectureViolationIssue _ => ArchitectureViolationIssueColor,
-                CloneIssue _ => CloneIssueColor,
-                CycleIssue _ => CycleIssueColor,
-                DeadEntityIssue _ => DeadEntityIssueColor,
-                MetricViolationIssue _ => MetricViolationIssueColor,
-                StyleViolationIssue _ => StyleViolationIssueColor,
+                ArchitectureViolationIssue => ArchitectureViolationIssueColor,
+                CloneIssue => CloneIssueColor,
+                CycleIssue => CycleIssueColor,
+                DeadEntityIssue => DeadEntityIssueColor,
+                MetricViolationIssue => MetricViolationIssueColor,
+                StyleViolationIssue => StyleViolationIssueColor,
                 _ => throw new ArgumentOutOfRangeException(nameof(issue), issue, "Unknown issue kind!")
             };
 

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Cysharp.Threading.Tasks;
 using SEE.Game;
 using SEE.Game.City;
@@ -33,7 +32,7 @@ namespace SEE.UI.Window.CodeWindow
         /// <summary>
         /// A dictionary mapping each link ID to its issues.
         /// </summary>
-        private readonly Dictionary<char, List<Issue>> issueDictionary = new();
+        private readonly Dictionary<char, HashSet<IDisplayableIssue>> issueDictionary = new();
 
         /// <summary>
         /// Counter which represents the lowest unfilled position in the <see cref="issueDictionary"/>.
@@ -61,8 +60,7 @@ namespace SEE.UI.Window.CodeWindow
         /// If you wish to use such issues, split the entities up into one per line (see <see cref="MarkIssuesAsync"/>).
         /// </param>
         /// <exception cref="ArgumentNullException">If <paramref name="tokens"/> is <c>null</c>.</exception>
-        public void EnterFromTokens(IEnumerable<SEEToken> tokens,
-                                    IDictionary<int, List<(SourceCodeEntity entity, Issue issue)>> issues = null)
+        private void EnterFromTokens(IEnumerable<SEEToken> tokens, IDictionary<int, List<IDisplayableIssue>> issues = null)
         {
             if (tokens == null)
             {
@@ -87,8 +85,10 @@ namespace SEE.UI.Window.CodeWindow
 
             text = $"<color=#CCCCCC>{string.Join("", Enumerable.Repeat(" ", neededPadding - 1))}1</color> ";
             int lineNumber = 2; // Line number we'll write down next
-            bool currentlyMarking = false;
-            Dictionary<SEEToken, ISet<Issue>> issueTokens = new();
+            // The issue that we're currently marking, if any.
+            IDisplayableIssue currentlyMarking = null;
+            // We need reference equality here.
+            Dictionary<SEEToken, ISet<IDisplayableIssue>> issueTokens = new(ReferenceEqualityComparer.Instance);
 
             foreach (SEEToken token in tokenList)
             {
@@ -102,6 +102,9 @@ namespace SEE.UI.Window.CodeWindow
                 }
             }
 
+            // End any issue marking that may still be open.
+            EndIssueSegment();
+
             // Lines are equal to number of newlines, including the initial newline.
             lines = text.Count(x => x.Equals('\n')); // No more weird CRLF shenanigans are present at this point.
             text = text.TrimStart('\n'); // Remove leading newline.
@@ -113,29 +116,18 @@ namespace SEE.UI.Window.CodeWindow
             void AppendNewline(ref int theLineNumber, ref string text, int padding, SEEToken token)
             {
                 // Close an issue marking here if necessary
-                if (currentlyMarking)
-                {
-                    text += "</mark></link>";
-                    currentlyMarking = false;
-                }
+                EndIssueSegment();
 
                 // First, of course, the newline.
                 text += "\n";
-                // Add whitespace next to line number so it's consistent.
+                // Add whitespace next to line number, so it's consistent.
                 text += string.Join("", Enumerable.Repeat(" ", padding - $"{theLineNumber}".Length));
                 // Line number will be typeset in grey to distinguish it from the rest.
                 text += $"<color=#CCCCCC>{theLineNumber}</color> ";
 
                 if (issues?.ContainsKey(theLineNumber) ?? false)
                 {
-                    // If all issues in this line are content-based, we try to find the content within the line
-                    if (issues[theLineNumber].Exists(x => x.entity.Content == null)
-                        || !HandleContentBasedIssue(theLineNumber, token))
-                    {
-                        // Otherwise, start new issue marking here if an issue in the line is line-based (has no content)
-                        // or if we couldn't do the content-based issue marking for any reason.
-                        HandleLineBasedIssue(theLineNumber, ref text);
-                    }
+                    HandleIssuesInLine(theLineNumber, token);
                 }
 
                 theLineNumber++;
@@ -164,20 +156,32 @@ namespace SEE.UI.Window.CodeWindow
                     // Mark any potential issue
                     if (issueTokens.ContainsKey(token) && issueTokens[token].Count > 0)
                     {
-                        if (currentlyMarking)
+                        if (currentlyMarking != null)
                         {
-                            // If this line is already fully marked, we just add our issue to the corresponding link
+                            // We're already marking something.
                             Assert.IsNotNull(issueDictionary[linkCounter], "Entry must exist when we are currently marking!");
-                            issueDictionary[linkCounter].AddRange(issueTokens[token]);
+                            if (issueTokens[token].Intersect(issueDictionary[linkCounter]).Any())
+                            {
+                                // If this token contains the same issue, we just need to add any new issues to the current segment.
+                                issueDictionary[linkCounter].UnionWith(issueTokens[token]);
+                            }
+                            else
+                            {
+                                // If it doesn't, we close the current segment and start a new one.
+                                EndIssueSegment();
+                                StartIssueSegment(token);
+                            }
                         }
                         else
                         {
-                            Color issueColor = DashboardRetriever.Instance.GetIssueColor(issueTokens[token].First());
-                            string issueColorString = ColorUtility.ToHtmlStringRGB(issueColor);
-                            IncreaseLinkCounter();
-                            issueDictionary[linkCounter] = issueTokens[token].ToList();
-                            text += $"<link=\"{linkCounter.ToString()}\"><mark=#{issueColorString}33>";
+                            // We're not marking anything, so we can start a new segment.
+                            StartIssueSegment(token);
                         }
+                    }
+                    else
+                    {
+                        // No issue is being marked. We should stop marking if we were marking something.
+                        EndIssueSegment();
                     }
 
                     if (token.TokenType == TokenType.Whitespace)
@@ -194,20 +198,20 @@ namespace SEE.UI.Window.CodeWindow
                         {
                             text += $"<{textTag}>";
                         }
-                        text += $"<color=#{token.TokenType.Color}>";
+                        if (currentlyMarking is not { HasColorTags: true })
+                        {
+                            text += $"<color=#{token.TokenType.Color}>";
+                        }
                         text += $"<noparse>{line.Replace("/noparse", "")}</noparse>";
-                        text += "</color>";
+                        if (currentlyMarking is not { HasColorTags: true })
+                        {
+                            text += "</color>";
+                        }
                         tags.Reverse();
                         foreach (string textTag in tags)
                         {
                             text += $"</{textTag}>";
                         }
-                    }
-
-                    // Close any potential issue marking
-                    if (issueTokens.ContainsKey(token) && !currentlyMarking)
-                    {
-                        text += "</mark></link>";
                     }
 
                     firstRun = false;
@@ -216,30 +220,51 @@ namespace SEE.UI.Window.CodeWindow
                 return lineNumber;
             }
 
-            // Returns true iff the content based issue could correctly be inserted
-            bool HandleContentBasedIssue(int theLineNumber, SEEToken currentToken)
+            // Begins marking a new issue segment starting with the given token.
+            void StartIssueSegment(SEEToken token)
             {
-                // Note: If there are any performance issues, I suspect the following loop body to be a major
-                // contender for optimization. The easiest fix at the loss of functionality would be
-                // to simply not mark the issues by content, but instead only use line-based markings.
-                foreach ((SourceCodeEntity entity, Issue issue) in issues[theLineNumber])
+                Assert.IsNull(currentlyMarking, "We must not start a new marking segment while we're already marking!");
+                IncreaseLinkCounter();
+                issueDictionary[linkCounter] = issueTokens[token].ToHashSet();
+                currentlyMarking = issueTokens[token].First();
+                text += $"<link=\"{linkCounter.ToString()}\">{currentlyMarking.OpeningRichTags}";
+            }
+
+            // Ends marking the current issue segment, if there is any.
+            void EndIssueSegment()
+            {
+                if (currentlyMarking != null)
                 {
-                    string entityContent = entity.Content;
-                    // We now have to determine whether this token is part of an issue entity.
-                    // In order to do this, we look ahead in the token stream and construct the line we're on
-                    // to determine whether the entity will arrive in this line or not.
-                    IList<SEEToken> lineTokens =
-                        tokenList.SkipWhile(x => x != currentToken).Skip(1)
-                                 .TakeWhile(x => x.TokenType != TokenType.Newline
-                                                && !x.Text.Intersect(newlineCharacters).Any()).ToList();
-                    string line = lineTokens.Aggregate("", (s, t) => s + t.Text);
-                    MatchCollection matches = Regex.Matches(line, Regex.Escape(entityContent));
-                    if (matches.Count != 1)
+                    text += $"{currentlyMarking.ClosingRichTags}</link>";
+                }
+                currentlyMarking = null;
+            }
+
+            // Prepares issueTokens for the line number, assuming the current token is the newline token
+            // delineating the beginning of this line.
+            void HandleIssuesInLine(int theLineNumber, SEEToken currentToken)
+            {
+                // We have to determine whether a given token is part of an issue entity.
+                // In order to do this, we look ahead in the token stream and construct the line we're on
+                // to determine whether the entity will arrive in this line or not.
+                IList<SEEToken> lineTokens =
+                    tokenList.SkipWhile(x => !ReferenceEquals(x, currentToken)).Skip(1)
+                             .TakeWhile(x => x.TokenType != TokenType.Newline
+                                            && !x.Text.Intersect(newlineCharacters).Any()).ToList();
+                string line = lineTokens.Aggregate(string.Empty, (s, t) => s + t.Text);
+
+                foreach (IDisplayableIssue issue in issues[theLineNumber])
+                {
+                    (int startCharacter, int endCharacter)? characterRange = issue.GetCharacterRangeForLine(FilePath, theLineNumber, line);
+                    if (!characterRange.HasValue)
                     {
                         // Switch to line-based marking instead.
-                        // We do this if we found more than one occurence too, because in that case
-                        // we have no way to determine which of the occurrences is the right one.
-                        return false;
+                        IEnumerable<SEEToken> matchTokens = lineTokens.SkipWhile(t => t.TokenType == TokenType.Whitespace);
+                        foreach (SEEToken matchToken in matchTokens)
+                        {
+                            issueTokens.GetOrAdd(matchToken, () => new HashSet<IDisplayableIssue>()).UnionWith(issues[theLineNumber]);
+                        }
+                        return;
                     }
                     else
                     {
@@ -247,44 +272,23 @@ namespace SEE.UI.Window.CodeWindow
                         // Note that this implies that we assume an entity will always encompass only whole
                         // tokens, never just parts of tokens. If this doesn't hold, the whole token will be
                         // highlighted anyway.
-                        // TODO: It is possible to implement an algorithm which can also handle that,
-                        // but that won't be done here, since it's out of scope.
 
                         // We first create a list of character-wise parts of the tokens, then match
-                        // using the regex's index and length.
-                        IList<SEEToken> matchTokens = lineTokens.SelectMany(t => t.Text.Select(_ => t))
-                                                                .Skip(matches[0].Index)
-                                                                .Take(entityContent.Length).ToList();
-                        foreach (SEEToken matchToken in matchTokens.ToList())
+                        // using the result's index and length.
+                        IEnumerable<SEEToken> matchTokens = lineTokens
+                                                            .SelectMany(t => Enumerable.Repeat(t, t.Text.Length))
+                                                            .Skip(characterRange.Value.startCharacter)
+                                                            // Exclusive end character.
+                                                            .Take(characterRange.Value.endCharacter - characterRange.Value.startCharacter - 1);
+                        foreach (SEEToken matchToken in matchTokens)
                         {
-                            if (!issueTokens.ContainsKey(matchToken))
-                            {
-                                issueTokens[matchToken] = new HashSet<Issue>();
-                            }
-
-                            issueTokens[matchToken].Add(issue);
+                            issueTokens.GetOrAdd(matchToken, () => new HashSet<IDisplayableIssue>()).Add(issue);
                         }
-
-                        Assert.IsTrue(matchTokens.Count > 0); // Regex Match necessitates at least 1 occurence!
                     }
                 }
-
-                return true;
             }
 
-            // Returns the last line number which is part of the issue starting in this line
-            void HandleLineBasedIssue(int theLineNumber, ref string text)
-            {
-                // Limitation: We can only use the color of the first issue, because we can't reliably detect the
-                // order of the entities within a single line. Details for all issues are shown on hover.
-                string issueColor = ColorUtility.ToHtmlStringRGB(DashboardRetriever.Instance.GetIssueColor(issues[theLineNumber][0].issue));
-                IncreaseLinkCounter();
-                issueDictionary[linkCounter] = issues[theLineNumber].Select(x => x.issue).ToList();
-                text += $"<link=\"{linkCounter.ToString()}\"><mark=#{issueColor}33>"; //Transparency value of 0x33
-                currentlyMarking = true;
-            }
-
-            // Increases the link counter to its next value
+            // Increases the link counter to its next value.
             void IncreaseLinkCounter()
             {
                 Assert.IsTrue(linkCounter < char.MaxValue);
@@ -395,9 +399,11 @@ namespace SEE.UI.Window.CodeWindow
                     SetupBreakpoints();
                 }
 
-                if (go.TryGetComponentOrLog(out AbstractSEECity city) && city.ErosionSettings.ShowIssuesInCodeWindow)
+                if (go.TryGetComponentOrLog(out AbstractSEECity city))
                 {
-                    MarkIssuesAsync(filename).Forget(); // initiate issue search in background
+                    bool useDashboardIssues = city.ErosionSettings.ShowDashboardIssuesInCodeWindow;
+                    bool useLspIssues = lspHandler != null && lspHandler.UseInCodeWindows;
+                    MarkIssuesAsync(filename, useDashboardIssues, useLspIssues).Forget(); // initiate issue search in background
                 }
             }
             return;
@@ -423,49 +429,47 @@ namespace SEE.UI.Window.CodeWindow
         /// with the collected tokens while marking all detected issues.
         /// </summary>
         /// <param name="path">The path to the file whose issues shall be marked.</param>
-        private async UniTaskVoid MarkIssuesAsync(string path)
+        /// <param name="useDashboardIssues">Whether to use issues from the Axivion Dashboard.</param>
+        /// <param name="useLspIssues">Whether to use issues from the LSP server.</param>
+        private async UniTaskVoid MarkIssuesAsync(string path, bool useDashboardIssues, bool useLspIssues)
         {
+            if (!useDashboardIssues && !useLspIssues)
+            {
+                return;
+            }
             using (LoadingSpinner.ShowIndeterminate($"Loading issues for {Title}..."))
             {
-                string queryPath = Path.GetFileName(path);
-                List<Issue> allIssues;
-                try
+                List<IDisplayableIssue> allIssues = new();
+
+                if (useDashboardIssues)
                 {
-                    allIssues = new List<Issue>(await DashboardRetriever.Instance.GetConfiguredIssuesAsync(fileFilter: $"\"*{queryPath}\""));
+                    allIssues.AddRange(await GetDashboardIssuesAsync(path));
                 }
-                catch (DashboardException e)
+                if (useLspIssues)
                 {
-                    ShowNotification.Error("Couldn't load issues", e.Message);
+                    allIssues.AddRange(GetLspIssues(path));
+                }
+
+                if (allIssues.Count == 0)
+                {
+                    Debug.Log($"No issues found for {path}");
                     return;
                 }
 
                 await UniTask.SwitchToThreadPool(); // don't interrupt main UI thread
-                if (allIssues.Count == 0)
-                {
-                    return;
-                }
 
-                const char pathSeparator = '/';
-                // When there are different paths in the issue table, this implies that there are some files
-                // which aren't actually the one we're looking for (because we've only matched by filename so far).
-                // In this case, we'll gradually refine our results until this isn't the case anymore.
-                for (int skippedParts = path.Count(x => x == pathSeparator) - 2; !MatchingPaths(allIssues); skippedParts--)
-                {
-                    Assert.IsTrue(path.Contains(pathSeparator));
-                    // Skip the first <c>skippedParts</c> parts, so that we query progressively larger parts.
-                    queryPath = string.Join(pathSeparator.ToString(), path.Split(pathSeparator).Skip(skippedParts));
-                    allIssues.RemoveAll(x => !x.Entities.Select(e => e.Path).Any(p => p.EndsWith(queryPath)));
-                }
-
+                string queryPath = Path.GetFileName(path);
                 // Mapping from each line to the entities and issues contained therein.
                 // Important: When an entity spans over multiple lines, it's split up into one entity per line.
-                Dictionary<int, List<(SourceCodeEntity entity, Issue issue)>> entities =
-                    allIssues.SelectMany(x => x.Entities.SelectMany(SplitUpIntoLines).Select(e => (entity: e, issue: x)))
-                             .Where(x => x.entity.Path.EndsWith(queryPath))
-                             .OrderBy(x => x.entity.Line).GroupBy(x => x.entity.Line)
-                             .ToDictionary(x => x.Key, x => x.ToList());
+                IDictionary<int, List<IDisplayableIssue>> issues =
+                    allIssues.SelectMany(issue => issue.Occurrences
+                                                       .SelectMany(e => e.Range.SplitIntoLines()
+                                                                         .Select(range => (path, range, issue))))
+                             .Where(x => x.path.EndsWith(queryPath))
+                             .OrderBy(x => x.range.StartLine).GroupBy(x => x.range.StartLine)
+                             .ToDictionary(x => x.Key, x => x.Select(y => y.issue).ToList());
 
-                EnterFromTokens(tokenList, entities);
+                EnterFromTokens(tokenList, issues);
 
                 await UniTask.SwitchToMainThread();
 
@@ -481,23 +485,64 @@ namespace SEE.UI.Window.CodeWindow
                     ShowNotification.Error("File too big", "This file is too big to be displayed correctly.");
                 }
             }
-            return;
+        }
 
-            // Returns true iff all issues are on the same path.
-            static bool MatchingPaths(ICollection<Issue> issues)
+        /// <summary>
+        /// Retrieves all issues for the given <paramref name="path"/> from the LSP server.
+        /// </summary>
+        /// <param name="path">The path of the file to get issues for.</param>
+        /// <returns>A list of all issues for the given path.</returns>
+        private List<LSPIssue> GetLspIssues(string path) =>
+            lspHandler.GetPublishedDiagnosticsForPath(path)
+                      .SelectMany(x => x.Diagnostics)
+                      .Select(x => new LSPIssue(path, x))
+                      .ToList();
+
+        /// <summary>
+        /// Retrieves all issues for the given <paramref name="path"/> from the Axivion Dashboard.
+        /// </summary>
+        /// <param name="path">The path of the file to get issues for.</param>
+        /// <returns>A list of all issues for the given path.</returns>
+        private static async UniTask<List<Issue>> GetDashboardIssuesAsync(string path)
+        {
+            string queryPath = Path.GetFileName(path);
+            List<Issue> allIssues;
+            try
             {
-                // Every path in the first issue could be the "right" path, so we try them all.
-                // If every issue has at least one path which matches that one, we can return true.
-                return issues.First().Entities.Select(e => e.Path)
-                             .Any(path => issues.All(x => x.Entities.Any(e => e.Path == path)));
+                allIssues = new List<Issue>(await DashboardRetriever.Instance.GetConfiguredIssuesAsync(fileFilter: $"\"*{queryPath}\""));
+            }
+            catch (DashboardException e)
+            {
+                ShowNotification.Error("Couldn't load issues", e.Message);
+                return new List<Issue>();
             }
 
-            // Splits up a SourceCodeEntity into one entity per line it is set on (ranging from line to endLine).
-            // Each new entity will have a line attribute of the line it is split on and an endLine of null.
-            // If the input parameter has no endLine, an enumerable with this entity as its only value will be returned.
-            static IEnumerable<SourceCodeEntity> SplitUpIntoLines(SourceCodeEntity entity)
-                => Enumerable.Range(entity.Line, entity.EndLine - entity.Line + 1 ?? 1)
-                             .Select(l => new SourceCodeEntity(entity.Path, l, null, entity.Content));
+            const char pathSeparator = '/';
+            // When there are different paths in the issue table, this implies that there are some files
+            // which aren't actually the one we're looking for (because we've only matched by filename so far).
+            // In this case, we'll gradually refine our results until this isn't the case anymore.
+            for (int skippedParts = path.Count(x => x == pathSeparator) - 2; !AllMatchingPaths(allIssues); skippedParts--)
+            {
+                Assert.IsTrue(path.Contains(pathSeparator));
+                // Skip the first <c>skippedParts</c> parts, so that we query progressively larger parts.
+                queryPath = string.Join(pathSeparator.ToString(), path.Split(pathSeparator).Skip(skippedParts));
+                allIssues.RemoveAll(x => !x.Occurrences.Any(e => e.Path.EndsWith(queryPath)));
+            }
+
+            return allIssues;
+
+            // Returns true iff all issues are on the same path.
+            static bool AllMatchingPaths(ICollection<Issue> issues)
+            {
+                if (!issues.Any())
+                {
+                    return true;
+                }
+                // Every path in the first issue could be the "right" path, so we try them all.
+                // If every issue has at least one path which matches that one, we can return true.
+                return issues.First().Occurrences.Select(e => e.Path)
+                             .Any(path => issues.All(x => x.Occurrences.Any(e => e.Path == path)));
+            }
         }
     }
 }

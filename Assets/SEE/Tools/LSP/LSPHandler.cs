@@ -120,6 +120,11 @@ namespace SEE.Tools.LSP
         private readonly ConcurrentQueue<PublishDiagnosticsParams> unhandledDiagnostics = new();
 
         /// <summary>
+        /// A dictionary mapping from file paths to the diagnostics that have been published for that file.
+        /// </summary>
+        private readonly Dictionary<string, List<PublishDiagnosticsParams>> savedDiagnostics = new();
+
+        /// <summary>
         /// The capabilities of the language client.
         /// </summary>
         private static readonly ClientCapabilities ClientCapabilities = new()
@@ -165,8 +170,19 @@ namespace SEE.Tools.LSP
                     },
                     LabelSupport = false
                 },
-                Diagnostic = new DiagnosticClientCapabilities(),
-                PublishDiagnostics = new PublishDiagnosticsCapability(),
+                Diagnostic = new DiagnosticClientCapabilities
+                {
+                    RelatedDocumentSupport = true
+                },
+                PublishDiagnostics = new PublishDiagnosticsCapability
+                {
+                    RelatedInformation = true,
+                    VersionSupport = false,
+                    TagSupport = new Supports<PublishDiagnosticsTagSupportCapabilityOptions>(new PublishDiagnosticsTagSupportCapabilityOptions
+                    {
+                        ValueSet = Container.From(DiagnosticTag.Unnecessary, DiagnosticTag.Deprecated)
+                    })
+                },
                 SemanticTokens = new SemanticTokensCapability()
                 {
                     Requests = new SemanticTokensCapabilityRequests()
@@ -258,6 +274,8 @@ namespace SEE.Tools.LSP
                 return;
             }
 
+            savedDiagnostics.Clear();
+            unhandledDiagnostics.Clear();
             HashSet<ProgressToken> initialWork = new();
             IDisposable spinner = LoadingSpinner.ShowIndeterminate("Starting language server...");
             try
@@ -378,12 +396,14 @@ namespace SEE.Tools.LSP
 
         /// <summary>
         /// Handles the diagnostics published by the language server by storing them
-        /// in the <see cref="unhandledDiagnostics"/> queue.
+        /// in the <see cref="unhandledDiagnostics"/> queue, as well as
+        /// in the <see cref="savedDiagnostics"/> dictionary.
         /// </summary>
         /// <param name="diagnosticsParams">The parameters of the diagnostics.</param>
         private void HandleDiagnostics(PublishDiagnosticsParams diagnosticsParams)
         {
             unhandledDiagnostics.Enqueue(diagnosticsParams);
+            savedDiagnostics.GetOrAdd(diagnosticsParams.Uri.GetFileSystemPath(), () => new()).Add(diagnosticsParams);
         }
 
         /// <summary>
@@ -510,7 +530,7 @@ namespace SEE.Tools.LSP
         /// compared to the last call, the method returns <c>null</c>.
         ///
         /// Note that this is a very new feature (LSP 3.17) and not all language servers support it.
-        /// An alternative is to use the <see cref="GetPublishedDiagnostics"/> method to
+        /// An alternative is to use the <see cref="GetUnhandledPublishedDiagnostics"/> method to
         /// retrieve the diagnostics that have been published by the language server.
         /// </summary>
         /// <param name="path">The path to the document.</param>
@@ -530,13 +550,25 @@ namespace SEE.Tools.LSP
         /// <summary>
         /// Retrieves the unhandled diagnostics that have been published by the language server.
         /// </summary>
-        /// <returns>An enumerable of the published diagnostics.</returns>
-        public IEnumerable<PublishDiagnosticsParams> GetPublishedDiagnostics()
+        /// <returns>An enumerable of the unhandled published diagnostics.</returns>
+        public IEnumerable<PublishDiagnosticsParams> GetUnhandledPublishedDiagnostics()
         {
             while (unhandledDiagnostics.TryDequeue(out PublishDiagnosticsParams diagnostics))
             {
                 yield return diagnostics;
             }
+        }
+
+        /// <summary>
+        /// Returns the diagnostics that were saved for the given <paramref name="path"/>.
+        /// Note that this may not include every diagnostic the language server would have sent,
+        /// as we only listen to published diagnostics for a certain timeframe (see <see cref="LSPImporter"/>).
+        /// </summary>
+        /// <param name="path">The path for which to retrieve the diagnostics.</param>
+        /// <returns>The published diagnostics for the given path.</returns>
+        public IEnumerable<PublishDiagnosticsParams> GetPublishedDiagnosticsForPath(string path)
+        {
+            return savedDiagnostics.GetValueOrDefault(path) ?? Enumerable.Empty<PublishDiagnosticsParams>();
         }
 
         /// <summary>

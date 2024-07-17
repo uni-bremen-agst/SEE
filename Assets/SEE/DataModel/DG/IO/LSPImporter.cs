@@ -325,8 +325,8 @@ namespace SEE.DataModel.DG.IO
             {
                 // In this case, we will wait one additional second to give the server at least some time to emit diagnostics.
                 // TODO (#746): Collect diagnostics in background, or find a better way to handle this.
-                await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: token);
-                foreach (PublishDiagnosticsParams diagnosticsParams in Handler.GetPublishedDiagnostics())
+                await UniTask.Delay(Handler.TimeoutSpan, cancellationToken: token);
+                foreach (PublishDiagnosticsParams diagnosticsParams in Handler.GetUnhandledPublishedDiagnostics())
                 {
                     HandleDiagnostics(diagnosticsParams.Diagnostics, diagnosticsParams.Uri.Path);
                 }

@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using SEE.Controls;
 using SEE.UI.DebugAdapterProtocol;
+using UnityEngine.Assertions;
 
 namespace SEE.UI.Window.CodeWindow
 {
@@ -155,23 +156,24 @@ namespace SEE.UI.Window.CodeWindow
 
         protected override void UpdateDesktop()
         {
-            // Show issue info on click (on hover would be too expensive)
-            if (issueDictionary.Count != 0 && Input.GetMouseButtonDown(0))
-            {
-                // Passing camera as null causes the screen space rather than world space camera to be used
-                int link = TMP_TextUtilities.FindIntersectingLink(textMesh, Input.mousePosition, null);
-                if (link != -1)
-                {
-                    char linkId = textMesh.textInfo.linkInfo[link].GetLinkID()[0];
-                    // Display tooltip containing all issue descriptions
-                    UniTask.WhenAll(issueDictionary[linkId].Select(x => x.ToDisplayStringAsync()))
-                           .ContinueWith(x => Tooltip.ActivateWith(string.Join("\n", x), Tooltip.AfterShownBehavior.HideUntilActivated))
-                           .Forget();
-                }
-            }
-
             if (WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer].ActiveWindow == this)
             {
+                // Show issue info on click (on hover would be too expensive)
+                if (issueDictionary.Count != 0)
+                {
+                    // Passing camera as null causes the screen space rather than world space camera to be used
+                    int link = TMP_TextUtilities.FindIntersectingLink(textMesh, Input.mousePosition, null);
+                    if (link != -1)
+                    {
+                        char linkId = textMesh.textInfo.linkInfo[link].GetLinkID()[0];
+                        // Display tooltip containing all issue descriptions
+                        UniTask.WhenAll(issueDictionary[linkId].Select(x => x.ToCodeWindowStringAsync()))
+                               .ContinueWith(x => Tooltip.ActivateWith(string.Join('\n', x), Tooltip.AfterShownBehavior.HideUntilActivated))
+                               .Forget();
+                    }
+                    return;
+                }
+
                 // detecting word hovers
                 int index = TMP_TextUtilities.FindIntersectingWord(textMesh, Input.mousePosition, null);
                 TMP_WordInfo? hoveredWord = index >= 0 && index < textMesh.textInfo.wordCount ? textMesh.textInfo.wordInfo[index] : null;
@@ -185,6 +187,9 @@ namespace SEE.UI.Window.CodeWindow
                 }
                 else if (!lastHoveredWord.Equals(hoveredWord))
                 {
+                    Assert.IsTrue(hoveredWord != null);
+                    Assert.IsTrue(lastHoveredWord != null);
+
                     OnWordHoverEnd?.Invoke(this, (TMP_WordInfo)lastHoveredWord);
                     OnWordHoverBegin?.Invoke(this, (TMP_WordInfo)hoveredWord);
                 }
