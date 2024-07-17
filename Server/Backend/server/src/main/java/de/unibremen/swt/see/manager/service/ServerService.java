@@ -1,5 +1,8 @@
 package de.unibremen.swt.see.manager.service;
 
+import com.github.dockerjava.api.exception.InternalServerErrorException;
+import com.github.dockerjava.api.exception.NotFoundException;
+import com.github.dockerjava.api.exception.NotModifiedException;
 import de.unibremen.swt.see.manager.model.Config;
 import de.unibremen.swt.see.manager.model.File;
 import de.unibremen.swt.see.manager.model.FileType;
@@ -100,7 +103,10 @@ public class ServerService {
     private final static int PASSWORD_LENGTH = 24;
 
     /**
-     * Retrieves a server by its ID (read-only).
+     * Retrieves a server by its ID.
+     * <p>
+     * This function retrieves the data read-only so that locked entries can be
+     * retrieved as well.
      *
      * @param id the ID of the server
      * @return server if found, or {@code null} if not found
@@ -112,7 +118,10 @@ public class ServerService {
     }
 
     /**
-     * Retrieves all servers read-only.
+     * Retrieves all servers.
+     * <p>
+     * This function retrieves the data read-only so that locked entries can be
+     * retrieved as well.
      *
      * @return a list containing all servers
      */
@@ -173,7 +182,7 @@ public class ServerService {
             return null;
         }
         Server server = optServer.get();
-        
+
         FileType fileType = FileType.valueOf(fileTypeStr);
         log.info("Adding file {} to server {}", multipartFile.getOriginalFilename(), server.getName());
 
@@ -211,19 +220,21 @@ public class ServerService {
      * @param id the ID of the server to be deleted
      * @throws IOException if there is an error during file deletion
      * @throws IllegalStateException if the server is busy
-     * @throws RuntimeException if there is an error during server deletion
      */
     public void delete(UUID id) throws IOException {
         log.info("Deleting server {}", id);
-
         // Get the server entity and lock access to prevent race conditions
         final Server server = entityManager.find(Server.class, id, LockModeType.PESSIMISTIC_WRITE);
 
-        if (server == null || !server.getServerStatusType().equals(ServerStatusType.OFFLINE)) {
-            throw new IllegalStateException("Server is running!");
+        try {
+            containerService.deleteContainer(server);
+        } catch (NotFoundException e) {
+            // Ignore
+        } catch (Exception e) {
+            // TODO A broken pipe can occur during this process.
+            throw new IllegalStateException("Try again later.", e);
         }
 
-        containerService.deleteContainer(server);
         fileService.deleteFilesByServer(server);
         entityManager.remove(server);
     }
@@ -238,11 +249,17 @@ public class ServerService {
      * @throws java.io.IOException if there is an error accessing server files
      * @throws IllegalStateException if the server is busy or already online
      */
-    public void start(UUID id) throws IOException {
+    public void start(UUID id) throws IOException, IllegalStateException {
         log.info("Starting server {}", id);
         // Get the server entity and lock access to prevent race conditions
         final Server server = entityManager.find(Server.class, id, LockModeType.PESSIMISTIC_WRITE);
-        containerService.startContainer(server);
+        try {
+            containerService.startContainer(server);
+        } catch (NotModifiedException e) {
+            throw new IllegalStateException("The container is already running!", e);
+        } catch (InternalServerErrorException e) {
+            throw new IllegalStateException("Internal server error!", e);
+        }
         server.setStopTime(null);
         server.setStartTime(ZonedDateTime.now(ZoneId.of("UTC")));
     }
@@ -256,12 +273,23 @@ public class ServerService {
      * @param id the ID of the server to be stopped
      * @throws IllegalStateException if the server is busy or already stopped
      */
-    public void stop(UUID id) {
+    public void stop(UUID id) throws IllegalStateException {
         log.info("Stopping server {}", id);
         // Get the server entity and lock access to prevent race conditions
         final Server server = entityManager.find(Server.class, id, LockModeType.PESSIMISTIC_WRITE);
 
-        containerService.stopContainer(server);
+        try {
+            containerService.stopContainer(server);
+        } catch (NotFoundException e) {
+            throw new IllegalStateException("The container to be stopped does not exist!", e);
+        } catch (NotModifiedException e) {
+            server.setServerStatusType(ServerStatusType.OFFLINE);
+            throw new IllegalStateException("The container is already stopped!", e);
+        } catch (Exception e) {
+            // TODO A broken pipe can occur during this process.
+            throw new IllegalStateException("Try again later.", e);
+        }
+        server.setServerStatusType(ServerStatusType.OFFLINE);
         server.setStartTime(null);
         server.setStopTime(ZonedDateTime.now(ZoneId.of("UTC")));
     }

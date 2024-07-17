@@ -33,24 +33,24 @@ public class ServerController {
      * Retrieves metadata of the server identified by the specified ID.
      *
      * @param id the ID of the server to retrieve
-     * @return {@code 200 OK} with the server metadata as payload,
-     *         or {@code 401 Unauthorized} if access cannot be granted.
+     * @return {@code 200 OK} with the server metadata as payload, or
+     * {@code 401 Unauthorized} if access cannot be granted.
      */
     @GetMapping("/")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<?> getServer(@RequestParam("id") UUID id) {
+    public ResponseEntity<?> get(@RequestParam("id") UUID id) {
         return ResponseEntity.ok().body(serverService.get(id));
     }
 
     /**
      * Retrieves the metadata of all available server resources.
      *
-     * @return {@code 200 OK} with the server metadata as payload,
-     *         or {@code 401 Unauthorized} if access cannot be granted.
+     * @return {@code 200 OK} with the server metadata as payload, or
+     * {@code 401 Unauthorized} if access cannot be granted.
      */
     @GetMapping("/all")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<?> getServers() {
+    public ResponseEntity<?> getAll() {
         return ResponseEntity.ok().body(serverService.getAll());
     }
 
@@ -64,7 +64,7 @@ public class ServerController {
      */
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> createServer(@RequestBody Server server) {
+    public ResponseEntity<?> create(@RequestBody Server server) {
         server = serverService.create(server);
         if (server == null) {
             return ResponseEntity.internalServerError().build();
@@ -77,11 +77,10 @@ public class ServerController {
      *
      * @param serverId the ID of the server
      * @param fileType {@code String} representation of a {@code FileType} value
-     * @param file     file content
-     * @return {@code 200 OK} with the file metadata object as payload,
-     *         or {@code 500 Internal Server Error} if the file could not be
-     *         persisted,
-     *         or {@code 401 Unauthorized} if access cannot be granted.
+     * @param file file content
+     * @return {@code 200 OK} with the file metadata object as payload, or
+     * {@code 500 Internal Server Error} if the file could not be persisted, or
+     * {@code 401 Unauthorized} if access cannot be granted.
      * @see de.unibremen.swt.see.manager.model.FileType
      */
     @PostMapping("/addFile")
@@ -109,13 +108,13 @@ public class ServerController {
      */
     @DeleteMapping("/delete")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteServer(@RequestParam("id") UUID id) {
+    public ResponseEntity<?> delete(@RequestParam("id") UUID id) {
         try {
             serverService.delete(id);
         } catch (IllegalStateException e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
+            return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage(e.getMessage()));
         } catch (IOException ex) {
-            return ResponseEntity.internalServerError().body("Error during file deletion!");
+            return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage("Error during file deletion!"));
         }
 
         return ResponseEntity.ok().build();
@@ -123,21 +122,21 @@ public class ServerController {
 
     /**
      * Start the server with the specified ID.
-     * 
+     *
      * @param id the ID of the server to start
      * @return {@code 200 OK}, or {@code 500 Internal Server Error} if the
      * server is busy or already online, or {@code 401 Unauthorized} if access
      * cannot be granted.
      */
-    @PutMapping("/startServer")
+    @PostMapping("/start")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> startGameServer(@RequestParam("id") UUID id) {
+    public ResponseEntity<?> start(@RequestParam("id") UUID id) {
         try {
             serverService.start(id);
         } catch (IllegalStateException e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
+            return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage(e.getMessage()));
         } catch (IOException ex) {
-            return ResponseEntity.internalServerError().body("Error accessing server files!");
+            return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage("Error accessing server files!"));
         }
 
         return ResponseEntity.ok().build();
@@ -145,19 +144,19 @@ public class ServerController {
 
     /**
      * Stop the server with the specified ID.
-     * 
+     *
      * @param id the ID of the server to stop
      * @return {@code 200 OK}, or {@code 500 Internal Server Error} if the
      * server is busy or already stopped, or {@code 401 Unauthorized} if access
      * cannot be granted.
      */
-    @PutMapping("/stopServer")
+    @PostMapping("/stop")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> stopGameServer(@RequestParam("id") UUID id) {
+    public ResponseEntity<?> stop(@RequestParam("id") UUID id) {
         try {
             serverService.stop(id);
         } catch (IllegalStateException e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
+            return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage(e.getMessage()));
         }
 
         return ResponseEntity.ok().build();
@@ -167,8 +166,8 @@ public class ServerController {
      * Retrieves the file list of the server with the specified ID.
      *
      * @param id the ID of the server
-     * @return {@code 200 OK} with the file metadata as payload,
-     *         or {@code 401 Unauthorized} if access cannot be granted.
+     * @return {@code 200 OK} with the file metadata as payload, or
+     * {@code 401 Unauthorized} if access cannot be granted.
      */
     @GetMapping("/files")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
@@ -182,19 +181,19 @@ public class ServerController {
      * This endpoint uses a simple authentication and is intended to be used by
      * SEE clients.
      *
-     * @param id       the ID of the server
+     * @param id the ID of the server
      * @param password the password to access server data
-     * @return {@code 200 OK} with the file metadata as payload,
-     *         or {@code 400 Bad Request} if the server does not exist,
-     *         or if the password is not correct.
+     * @return {@code 200 OK} with the file metadata as payload, or
+     * {@code 400 Bad Request} if the server does not exist, or if the password
+     * is not correct.
      */
     @GetMapping("/getFilesForClient")
     public ResponseEntity<?> getFiles(@RequestParam("id") UUID id, @RequestParam("roomPassword") String password) {
         Server server = serverService.get(id);
-        if (server == null){
+        if (server == null) {
             return ResponseEntity.badRequest().build();
         }
-        if (server.getServerPassword() == null  || server.getServerPassword().isEmpty() || server.getServerPassword().equals(password)) {
+        if (server.getServerPassword() == null || server.getServerPassword().isEmpty() || server.getServerPassword().equals(password)) {
             return ResponseEntity.ok().body(serverService.getFilesForServer(id));
         }
         return ResponseEntity.badRequest().build();

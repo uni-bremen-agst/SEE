@@ -78,10 +78,7 @@ function CreateServerView() {
     }
 
     if (success) {
-      axiosInstance.put("/server/startServer", {}, { params: { id: createServerResponse.data.id } }).catch(
-        (error) => AppUtils.notifyAxiosError(error, "Error Starting Server")
-      );
-      navigate('/', { replace: true });
+      navigate('/server#' + createServerResponse.data.id, { replace: true });
     }
   }
 

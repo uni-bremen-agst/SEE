@@ -5,6 +5,7 @@ import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.CreateVolumeResponse;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.command.InspectVolumeResponse;
+import com.github.dockerjava.api.exception.InternalServerErrorException;
 import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.exception.NotModifiedException;
 import com.github.dockerjava.api.model.Bind;
@@ -20,16 +21,13 @@ import com.github.dockerjava.transport.DockerHttpClient;
 import com.github.dockerjava.zerodep.ZerodepDockerHttpClient;
 import de.unibremen.swt.see.manager.model.Server;
 import de.unibremen.swt.see.manager.model.ServerStatusType;
-import static de.unibremen.swt.see.manager.model.ServerStatusType.ERROR;
-import static de.unibremen.swt.see.manager.model.ServerStatusType.ONLINE;
-import static de.unibremen.swt.see.manager.model.ServerStatusType.STARTING;
-import static de.unibremen.swt.see.manager.model.ServerStatusType.STOPPING;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Map;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -138,24 +136,16 @@ public class ContainerService {
 
     /**
      * Starts a container for the given server.
+     * <p>
+     * A new container will be created if it does not exist.
      *
      * @param server the server configuration
      * @throws java.io.IOException if the uploaded files for given server cannot
      * be accessed
-     * @throws IllegalStateException if the server is busy or already running
+     * @throws NotModifiedException if the container is already running
+     * @throws InternalServerErrorException e.g., if the port is already bound
      */
-    public void startContainer(Server server) throws IOException {
-        switch (server.getServerStatusType()) {
-            case ONLINE ->
-                throw new IllegalStateException("Server is already running!");
-            case STARTING ->
-                throw new IllegalStateException("Server is already starting!");
-            case STOPPING ->
-                throw new IllegalStateException("Server is stopping!");
-            case ERROR ->
-                throw new IllegalStateException("Server is in ERROR state!");
-        }
-
+    public void startContainer(Server server) throws IOException, NotModifiedException, InternalServerErrorException {
         final String containerName = "see-" + server.getId();
         final String volumeName = "see-data-" + server.getId();
         String containerId = server.getContainerId();
@@ -173,8 +163,13 @@ public class ContainerService {
         try {
             dockerClient.startContainerCmd(containerId).exec();
             log.info("Started existing container: {}", containerName);
+        } catch (NotFoundException e) {
+            // This should not happen except due to external influence or 
+            // concurrent requests, as the container is created above if missing.
+            log.error("Container does not exist: {}", containerName);
         } catch (NotModifiedException e) {
-            log.warn("Container already running: {}", containerName);
+            server.setServerStatusType(ServerStatusType.ONLINE);
+            throw e;
         }
 
         server.setContainerId(containerId);
@@ -186,60 +181,39 @@ public class ContainerService {
      * Stops the container for the given server.
      *
      * @param server the server configuration
-     * @throws IllegalStateException if the server is busy or already stopped
+     * @throws NotFoundException if the container does not exist
+     * @throws NotModifiedException if the container is already stopped
      */
-    public void stopContainer(Server server) {
-        switch (server.getServerStatusType()) {
-            case OFFLINE ->
-                throw new IllegalStateException("Server is already stopped!");
-            case STARTING ->
-                throw new IllegalStateException("Server is starting!");
-            case STOPPING ->
-                throw new IllegalStateException("Server is already stopping!");
-            case ERROR ->
-                throw new IllegalStateException("Server is in ERROR state!");
-        }
-
-        server.setServerStatusType(ServerStatusType.STOPPING);
-        try {
-            dockerClient.stopContainerCmd(server.getContainerId()).exec();
-        } catch (NotFoundException e) {
-            log.warn("Container to stop does not exist for server {}", server.getId());
-            server.setContainerId(null);
-        }
-
-        server.setServerStatusType(ServerStatusType.OFFLINE);
+    public void stopContainer(Server server) throws NotFoundException, NotModifiedException {
+        dockerClient.stopContainerCmd(server.getContainerId()).exec();
     }
 
     /**
      * Deletes a container and its volume.
      *
      * @param server the server configuration
-     * @throws IllegalStateException if the server is busy or running
+     * @throws NotFoundException if the container does not exist
      */
-    public void deleteContainer(Server server) {
+    public void deleteContainer(Server server) throws NotFoundException, NotModifiedException {
         String containerId = server.getContainerId();
         if (containerId == null) {
             return;
         }
 
         try {
-            try {
-                dockerClient.stopContainerCmd(containerId).exec();
-            } catch (NotModifiedException e) {
-                // Server already stopped
-            }
-            dockerClient.removeContainerCmd(containerId)
-                    .withForce(true)
-                    .exec();
+            dockerClient.stopContainerCmd(containerId).exec();
+        } catch (NotModifiedException e) {
+            // Server already stopped
+        }
+        dockerClient.removeContainerCmd(containerId)
+                .withForce(true)
+                .exec();
+
+        try {
             dockerClient.removeVolumeCmd(server.getContainerVolume()).exec();
         } catch (NotFoundException e) {
-            log.warn("Container to delete does not exist for server {}", server.getId());
+            // Container volume does not exist
         }
-
-        server.setContainerPort(null);
-        server.setContainerId(null);
-        server.setContainerVolume(null);
     }
 
     /**

@@ -7,17 +7,13 @@ import Server from "../types/Server";
 import { enqueueSnackbar } from "notistack";
 
 function getServerStatus(serverStatusType: string) {
-  if (serverStatusType == "ONLINE") {
-    return <Chip color="success" label="Online" />;
-  }
-  if (serverStatusType == "OFFLINE") {
-    return <Chip color="error" label="Offline" />;
-  }
-  if (serverStatusType == "STARTING") {
-    return <Chip color="warning" label="Startet" />;
-  }
-  if (serverStatusType == "STOPPING") {
-    return <Chip color="warning" label="Stoppt" />;
+  switch (serverStatusType) {
+    case "ONLINE":
+      return <Chip color="success" label="Online" />;
+    case "OFFLINE":
+      return <Chip color="error" label="Offline" />;
+    case "ERROR":
+      return <Chip color="error" label="ERROR" />;
   }
 }
 

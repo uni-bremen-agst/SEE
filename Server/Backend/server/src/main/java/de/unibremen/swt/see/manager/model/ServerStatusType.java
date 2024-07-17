@@ -11,24 +11,12 @@ public enum ServerStatusType {
      * The server is running and accepting connections.
      */
     ONLINE,
-    
+
     /**
      * The server is offline.
      */
     OFFLINE,
-    
-    /**
-     * The server is starting and likely to be {@code ONLINE} soon.
-     */
-    STARTING,
-    
-    /**
-     * The server is stopping and should no longer be accessed.
-     * <p>
-     * The server is likely to be {@code OFFLINE} soon.
-     */
-    STOPPING,
-    
+
     /**
      * An error occurred during server management.
      * <p>

@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, Chip, Container, Grid, IconButton, List, ListItem, ListItemText, Modal, Stack, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, Chip, CircularProgress, Container, Grid, IconButton, List, ListItem, ListItemText, Modal, Stack, Typography } from "@mui/material";
 import Header from "../components/Header";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faDownload, faEye, faPlay, faStop, faClipboard, faTrash } from "@fortawesome/free-solid-svg-icons";
@@ -20,10 +20,8 @@ function getServerStatus(serverStatusType: string) {
       return <Chip color="success" label="Online" />;
     case "OFFLINE":
       return <Chip color="error" label="Offline" />;
-    case "STARTING":
-      return <Chip color="warning" label="Starting" />;
-    case "STOPPING":
-      return <Chip color="warning" label="Stopping" />;
+    case "ERROR":
+      return <Chip color="error" label="ERROR" />;
   }
 }
 
@@ -49,29 +47,32 @@ function ServerView() {
 
   const [server, setServer] = useState<Server | undefined>(undefined);
   const [files, setFiles] = useState<SeeFile[] | undefined>(undefined);
+  const [isBusy, setIsBusy] = useState(false);
   const [showDeleteServerModal, setShowDeleteServerModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   async function startServer() {
     if (!server) return;
-    await axiosInstance.put("/server/startServer", {}, { params: { id: server.id } }).then(
+    setIsBusy(true);
+    await axiosInstance.post("/server/start", {}, { params: { id: server.id }, timeout: 30000 }).then(
       () => axiosInstance.get(`/server/`, { params: { id: server.id } })
     ).then(
       (response) => setServer(response.data)
     ).catch(
       (error) => AppUtils.notifyAxiosError(error, "Error Starting Server")
-    );
+    ).finally(() => setIsBusy(false));
   }
 
   async function stopServer() {
     if (!server) return;
-    await axiosInstance.put("/server/stopServer", {}, { params: { id: server?.id } }).then(
+    setIsBusy(true);
+    await axiosInstance.post("/server/stop", {}, { params: { id: server?.id }, timeout: 30000 }).then(
       () => axiosInstance.get(`/server/`, { params: { id: server.id } })
     ).then(
       (response) => setServer(response.data)
     ).catch(
       (error) => AppUtils.notifyAxiosError(error as AxiosError, "Error Stopping Server")
-    );
+    ).finally(() => setIsBusy(false));
   }
 
   async function deleteServer() {
@@ -197,7 +198,7 @@ function ServerView() {
                 <Stack direction="column">
                   {getServerStatus(server.serverStatusType)}
                   <Stack direction="row">
-                    {server.serverStatusType !== "ONLINE" &&
+                    {!isBusy && server.serverStatusType !== "ONLINE" &&
                       <IconButton
                         aria-label="Start"
                         onMouseDown={(e) => { e.stopPropagation() }}
@@ -209,7 +210,7 @@ function ServerView() {
                         <FontAwesomeIcon icon={faPlay} />
                       </IconButton>
                     }
-                    {server.serverStatusType === "ONLINE" &&
+                    {!isBusy && server.serverStatusType === "ONLINE" &&
                       <IconButton
                         aria-label="Stop"
                         onMouseDown={(e) => { e.stopPropagation() }}
@@ -221,7 +222,8 @@ function ServerView() {
                         <FontAwesomeIcon icon={faStop} />
                       </IconButton>
                     }
-                    <IconButton
+                    {isBusy && <CircularProgress />}
+                    {!isBusy && <IconButton
                       aria-label="Delete"
                       onMouseDown={(e) => { e.stopPropagation() }}
                       onClick={(e) => {
@@ -230,7 +232,7 @@ function ServerView() {
                         setShowDeleteServerModal(true);
                       }}>
                       <FontAwesomeIcon icon={faTrash} />
-                    </IconButton>
+                    </IconButton>}
                   </Stack>
                 </Stack>
               </Stack>

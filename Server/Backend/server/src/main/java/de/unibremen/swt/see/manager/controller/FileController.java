@@ -56,9 +56,9 @@ public class FileController {
             fileService.delete(id);
             return ResponseEntity.ok().build();
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.badRequest().body("File not found.");
+            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("File not found."));
         } catch (IOException e) {
-            return ResponseEntity.badRequest().body("File could not be deleted.");
+            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("File could not be deleted."));
         }
     }
 
@@ -77,7 +77,7 @@ public class FileController {
         //       While this does not contain the actual file, metadata can be leaked.
         File file = fileService.get(id);
         if (file == null) {
-            return ResponseEntity.badRequest().body("File with specified ID does not exist!");
+            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("File with specified ID does not exist!"));
         }
         return ResponseEntity.ok().body(file);
     }
@@ -97,13 +97,13 @@ public class FileController {
     public ResponseEntity<?> downloadFile(@RequestParam("id") UUID id) {
         File file = fileService.get(id);
         if (file == null) {
-            return ResponseEntity.badRequest().body("File with specified ID does not exist!");
+            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("File with specified ID does not exist!"));
         }
 
         try {
             return buildResponseEntity(file, true);
         } catch (IOException e) {
-            return ResponseEntity.internalServerError().body("Error reading file.");
+            return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage("Error reading file."));
         }
     }
 
@@ -120,15 +120,15 @@ public class FileController {
     @GetMapping("/client/gxl")
     public ResponseEntity<?> getGxl(@RequestParam("serverId") UUID serverId, @RequestParam("roomPassword") String roomPassword) {
         if (!serverService.validateAccess(serverId, roomPassword)) {
-            return ResponseEntity.badRequest().body("Authorization failed.");
+            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("Authorization failed."));
         }
         try {
             File file = fileService.getByServerAndFileType(serverId, FileType.GXL);
             return buildResponseEntity(file, false);
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage(e.getMessage()));
         } catch (IOException e) {
-            return ResponseEntity.internalServerError().body("Error reading file.");
+            return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage("Error reading file."));
         }
     }
 
@@ -145,15 +145,15 @@ public class FileController {
     @GetMapping("/client/solution")
     public ResponseEntity<?> getSolution(@RequestParam("serverId") UUID serverId, @RequestParam("roomPassword") String roomPassword) {
         if (!serverService.validateAccess(serverId, roomPassword)) {
-            return ResponseEntity.badRequest().body("Authorization failed.");
+            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("Authorization failed."));
         }
         try {
             File file = fileService.getByServerAndFileType(serverId, FileType.SOLUTION);
             return buildResponseEntity(file, false);
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage(e.getMessage()));
         } catch (IOException e) {
-            return ResponseEntity.internalServerError().body("Error reading file.");
+            return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage("Error reading file."));
         }
     }
 
@@ -173,15 +173,15 @@ public class FileController {
     @GetMapping("/client/source")
     public ResponseEntity<?> getSource(@RequestParam("serverId") UUID serverId, @RequestParam("roomPassword") String roomPassword) {
         if (!serverService.validateAccess(serverId, roomPassword)) {
-            return ResponseEntity.badRequest().body("Authorization failed.");
+            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("Authorization failed."));
         }
         try {
             File file = fileService.getByServerAndFileType(serverId, FileType.SOURCE);
             return buildResponseEntity(file, false);
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage(e.getMessage()));
         } catch (IOException e) {
-            return ResponseEntity.internalServerError().body("Error reading file.");
+            return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage("Error reading file."));
         }
     }
 
@@ -198,15 +198,15 @@ public class FileController {
     @GetMapping("/client/config")
     public ResponseEntity<?> getConfig(@RequestParam("serverId") UUID serverId, @RequestParam("roomPassword") String roomPassword) {
         if (!serverService.validateAccess(serverId, roomPassword)) {
-            return ResponseEntity.badRequest().body("Authorization failed.");
+            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("Authorization failed."));
         }
         try {
             File file = fileService.getByServerAndFileType(serverId, FileType.CFG);
             return buildResponseEntity(file, false);
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage(e.getMessage()));
         } catch (IOException e) {
-            return ResponseEntity.internalServerError().body("Error reading file.");
+            return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage("Error reading file."));
         }
     }
 
@@ -223,15 +223,15 @@ public class FileController {
     @GetMapping("/client/csv")
     public ResponseEntity<?> getCsv(@RequestParam("serverId") UUID serverId, @RequestParam("roomPassword") String roomPassword) {
         if (!serverService.validateAccess(serverId, roomPassword)) {
-            return ResponseEntity.badRequest().body("Authorization failed.");
+            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("Authorization failed."));
         }
         try {
             File file = fileService.getByServerAndFileType(serverId, FileType.CSV);
             return buildResponseEntity(file, false);
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage(e.getMessage()));
         } catch (IOException e) {
-            return ResponseEntity.internalServerError().body("Error reading file.");
+            return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage("Error reading file."));
         }
     }
 

@@ -40,7 +40,7 @@ public class JwtUtils {
      */
     @Value("${see.app.backend.domain}")
     private String backendDomain;
-    
+
     /**
      * Context path of the application's servlet container.
      */
@@ -51,7 +51,7 @@ public class JwtUtils {
      * The secret key used for signing and verifying JWT.
      */
     private final Key key;
-    
+
     /**
      * The parser used for JWT related operations.
      */
@@ -151,17 +151,18 @@ public class JwtUtils {
      *
      * @param authToken the JWT to validate
      * @throws ExpiredJwtException if the token is expired
-     * @throws UnsupportedJwtException  if given token is not a signed claims token
+     * @throws UnsupportedJwtException if given token is not a signed claims
+     * token
      * @throws MalformedJwtException if the token is malformed
      * @throws SecurityException if signature validation fails
      * @throws IllegalArgumentException if the token is null or blank
      */
-    public void validateJwtToken(String authToken) 
-                throws ExpiredJwtException,
-                       UnsupportedJwtException,
-                       MalformedJwtException,
-                       SecurityException,
-                       IllegalArgumentException {
+    public void validateJwtToken(String authToken)
+            throws ExpiredJwtException,
+            UnsupportedJwtException,
+            MalformedJwtException,
+            SecurityException,
+            IllegalArgumentException {
         jwtParser.parseClaimsJws(authToken);
     }
 
