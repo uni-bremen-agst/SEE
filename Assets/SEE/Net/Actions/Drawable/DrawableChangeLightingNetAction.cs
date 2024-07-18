@@ -1,4 +1,5 @@
-﻿using SEE.Game.Drawable;
+﻿using Assets.SEE.Net.Actions.Drawable;
+using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ namespace SEE.Net.Actions.Drawable
     /// <summary>
     /// This class is reponsible for change the drawable lighting on all clients.
     /// </summary>
-    public class DrawableChangeLightingNetAction : AbstractNetAction
+    public class DrawableChangeLightingNetAction : SurfaceNetAction
     {
         /// <summary>
         /// The drawable that should be changed.
@@ -17,7 +18,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        public DrawableChangeLightingNetAction(DrawableConfig config)
+        public DrawableChangeLightingNetAction(DrawableConfig config) : base(config)
         {
             DrawableConf = config;
         }
@@ -27,8 +28,8 @@ namespace SEE.Net.Actions.Drawable
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameObject surface = GameFinder.FindDrawableSurface(DrawableConf.ID, DrawableConf.ParentID);
-            GameDrawableManager.ChangeLighting(surface.transform.parent.gameObject, DrawableConf.Lighting);
+            base.ExecuteOnClient();
+            GameDrawableManager.ChangeLighting(Surface, DrawableConf.Lighting);
         }
     }
 }

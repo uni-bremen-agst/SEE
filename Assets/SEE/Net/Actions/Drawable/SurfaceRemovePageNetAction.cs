@@ -1,11 +1,12 @@
-﻿using SEE.Game.Drawable;
+﻿using Assets.SEE.Net.Actions.Drawable;
+using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 
 namespace SEE.Net.Actions.Drawable
 {/// <summary>
- /// This class is responsible for synchronize a drawable on all clients.
+ /// This class is responsible for remove a page of a drawable on all clients.
  /// </summary>
-    public class SurfaceRemovePageNetAction : DrawableNetAction
+    public class SurfaceRemovePageNetAction : SurfaceNetAction
     {
         /// <summary>
         /// The config of the drawable that should be synchronized.
@@ -22,7 +23,7 @@ namespace SEE.Net.Actions.Drawable
         /// </summary>
         /// <param name="config">The current <see cref="DrawableConfig"/>.</param>
         /// <param name="page">The page to be removed.</param>
-        public SurfaceRemovePageNetAction(DrawableConfig config, int page) : base(config.ID, config.ParentID)
+        public SurfaceRemovePageNetAction(DrawableConfig config, int page) : base(config)
         {
             Config = config;
             Page = page;

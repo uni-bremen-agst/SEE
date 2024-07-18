@@ -1,4 +1,5 @@
-﻿using SEE.Game.Drawable;
+﻿using Assets.SEE.Net.Actions.Drawable;
+using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 
@@ -6,7 +7,7 @@ namespace SEE.Net.Actions.Drawable
 {/// <summary>
  /// This class is responsible for synchronize a drawable on all clients.
  /// </summary>
-    public class SynchronizeSurface : DrawableNetAction
+    public class SynchronizeSurface : SurfaceNetAction
     {
         /// <summary>
         /// The config of the drawable that should be synchronized.
@@ -22,7 +23,7 @@ namespace SEE.Net.Actions.Drawable
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
         /// <param name="orderInLayer">The current order in layer of the host.</param>
-        public SynchronizeSurface(DrawableConfig config, bool forceChange = false) : base(config.ID, config.ParentID)
+        public SynchronizeSurface(DrawableConfig config, bool forceChange = false) : base(config)
         {
             Config = config;
             ForceChange = forceChange;
