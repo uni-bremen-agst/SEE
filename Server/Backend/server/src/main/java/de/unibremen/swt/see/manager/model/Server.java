@@ -98,9 +98,9 @@ public class Server {
      * The momentary status of the game server container.
      */
     @Setter
-    @Column(name = "server_status")
+    @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private ServerStatusType serverStatusType = ServerStatusType.OFFLINE;
+    private ServerStatusType status = ServerStatusType.OFFLINE;
 
     /**
      * The files associated with the game server.

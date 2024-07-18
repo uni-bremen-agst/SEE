@@ -6,8 +6,8 @@ import Avatar from "./Avatar";
 import Server from "../types/Server";
 import { enqueueSnackbar } from "notistack";
 
-function getServerStatus(serverStatusType: string) {
-  switch (serverStatusType) {
+function getServerStatus(serverStatus: string) {
+  switch (serverStatus) {
     case "ONLINE":
       return <Chip color="success" label="Online" />;
     case "OFFLINE":
@@ -38,9 +38,9 @@ function ServerListItem(props: { server: Server }) {
               <Stack direction="column" spacing={1}>
                 <Stack direction="row" spacing={1}>
                   <Typography variant="h6">{server.name}</Typography>
-                  {getServerStatus(server.serverStatusType)}
+                  {getServerStatus(server.status)}
                 </Stack>
-                {server.serverStatusType == "ONLINE"
+                {server.status == "ONLINE"
                   ? <Typography>Online since: {new Date(server.startTime * 1000).toLocaleString()}</Typography>
                   : <Typography>Offline since:
                     {server.stopTime

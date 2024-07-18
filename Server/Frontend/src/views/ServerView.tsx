@@ -14,8 +14,8 @@ import { enqueueSnackbar } from "notistack";
 import { AxiosError } from "axios";
 import AppUtils from "../utils/AppUtils";
 
-function getServerStatus(serverStatusType: string) {
-  switch (serverStatusType) {
+function getServerStatus(serverStatus: string) {
+  switch (serverStatus) {
     case "ONLINE":
       return <Chip color="success" label="Online" />;
     case "OFFLINE":
@@ -151,7 +151,7 @@ function ServerView() {
                 </Box>
                 <Stack direction="column" spacing={1}>
                   <Typography variant="h6">{server.name}</Typography>
-                  {server.serverStatusType == "ONLINE"
+                  {server.status == "ONLINE"
                     ? <Typography>Online since: {new Date(server.startTime * 1000).toLocaleDateString()} {new Date(server.startTime * 1000).toLocaleTimeString()}</Typography>
                     : <Typography>Offline since:
                       {
@@ -196,9 +196,9 @@ function ServerView() {
                   }
                 </Stack>
                 <Stack direction="column">
-                  {getServerStatus(server.serverStatusType)}
+                  {getServerStatus(server.status)}
                   <Stack direction="row">
-                    {!isBusy && server.serverStatusType !== "ONLINE" &&
+                    {!isBusy && server.status !== "ONLINE" &&
                       <IconButton
                         aria-label="Start"
                         onMouseDown={(e) => { e.stopPropagation() }}
@@ -210,7 +210,7 @@ function ServerView() {
                         <FontAwesomeIcon icon={faPlay} />
                       </IconButton>
                     }
-                    {!isBusy && server.serverStatusType === "ONLINE" &&
+                    {!isBusy && server.status === "ONLINE" &&
                       <IconButton
                         aria-label="Stop"
                         onMouseDown={(e) => { e.stopPropagation() }}

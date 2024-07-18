@@ -27,7 +27,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Map;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -168,13 +167,13 @@ public class ContainerService {
             // concurrent requests, as the container is created above if missing.
             log.error("Container does not exist: {}", containerName);
         } catch (NotModifiedException e) {
-            server.setServerStatusType(ServerStatusType.ONLINE);
+            server.setStatus(ServerStatusType.ONLINE);
             throw e;
         }
 
         server.setContainerId(containerId);
         server.setContainerVolume(volumeName);
-        server.setServerStatusType(ServerStatusType.ONLINE);
+        server.setStatus(ServerStatusType.ONLINE);
     }
 
     /**
@@ -230,6 +229,9 @@ public class ContainerService {
 
     /**
      * Checks if a container exists for given server.
+     * <p>
+     * Use {@link #isRunning(Server)} directly if you want to know if it exists
+     * and running.
      *
      * @param server the server configuration
      * @return {@code true} if a container exists for the server, else

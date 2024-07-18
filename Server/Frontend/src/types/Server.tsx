@@ -9,7 +9,7 @@ type Server = {
   startTime: number;
   stopTime: number;
   serverPassword: string;
-  serverStatusType: string;
+  status: string;
 }
 
 export default Server

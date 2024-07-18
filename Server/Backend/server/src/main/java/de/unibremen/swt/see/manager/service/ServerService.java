@@ -283,15 +283,36 @@ public class ServerService {
         } catch (NotFoundException e) {
             throw new IllegalStateException("The container to be stopped does not exist!", e);
         } catch (NotModifiedException e) {
-            server.setServerStatusType(ServerStatusType.OFFLINE);
+            server.setStatus(ServerStatusType.OFFLINE);
             throw new IllegalStateException("The container is already stopped!", e);
         } catch (Exception e) {
             // TODO A broken pipe can occur during this process.
             throw new IllegalStateException("Try again later.", e);
         }
-        server.setServerStatusType(ServerStatusType.OFFLINE);
+        server.setStatus(ServerStatusType.OFFLINE);
         server.setStartTime(null);
         server.setStopTime(ZonedDateTime.now(ZoneId.of("UTC")));
+    }
+
+    /**
+     * Update the server status based on its container state.
+     *
+     * @param server the server to update the status for
+     */
+    public void updateStatus(Server server) {
+        server.setStatus(containerService.isRunning(server)
+                ? ServerStatusType.ONLINE
+                : ServerStatusType.OFFLINE
+        );
+    }
+
+    /**
+     * Convenience function to update all server status.
+     */
+    public void updateStatus() {
+        for (Server server : getAll()) {
+            updateStatus(server);
+        }
     }
 
     /**

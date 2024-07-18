@@ -11,12 +11,15 @@ import de.unibremen.swt.see.manager.service.FileService;
 import de.unibremen.swt.see.manager.service.ServerService;
 import de.unibremen.swt.see.manager.service.UserService;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
 /**
  * SEE Manager is part of the Software Engineering Experience (SEE).
@@ -30,6 +33,8 @@ import org.springframework.context.annotation.Bean;
  * <a href="https://see.uni-bremen.de/">SEE website</a>
  */
 @SpringBootApplication
+@RequiredArgsConstructor
+@EnableScheduling
 @Slf4j
 public class SeeManagerApplication {
 
@@ -42,6 +47,11 @@ public class SeeManagerApplication {
      */
     @Value("${see.app.backend.domain}")
     private String backendDomain;
+
+    /**
+     * Handle server-related operations and business logic.
+     */
+    private final ServerService serverService;
 
     /**
      * The main method to run the Spring Boot application.
@@ -63,7 +73,6 @@ public class SeeManagerApplication {
      * during startup
      * @param newAdminPassword plain-text password of an admin user that should
      * @param serverRepo server repository dependency
-     * @param serverService server service dependency
      * @param userRepo user repository dependency
      * @param userService user service dependency
      * @param fileService file service dependency
@@ -75,8 +84,7 @@ public class SeeManagerApplication {
     CommandLineRunner cliRunner(
             @Value("${see.app.admin.add.name}") String newAdminName,
             @Value("${see.app.admin.add.password}") String newAdminPassword,
-            ServerRepository serverRepo, 
-            ServerService serverService, 
+            ServerRepository serverRepo,
             UserRepository userRepo, 
             UserService userService, 
             FileService fileService, 
@@ -101,5 +109,17 @@ public class SeeManagerApplication {
                 userService.create(newAdminName, newAdminPassword, RoleType.ROLE_ADMIN);
             }
         };
+    }
+
+    /**
+     * Updates all server status on a fixed interval.
+     */
+    @Scheduled(fixedRate = 60000)
+    public void scheduledServerStatusUpdate() {
+        if (serverService == null) {
+            return;
+        }
+        log.info("Updating server status...");
+        serverService.updateStatus();
     }
 }
