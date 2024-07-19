@@ -122,7 +122,7 @@ function CreateServerView() {
               <Stack direction="column" spacing={2} width={"100%"}>
                 <Stack direction="column" flexGrow={1}>
                   <Typography variant="h6">Details</Typography>
-                  <TextField error={!!errors.get("name")} helperText={errors.get("name")} value={name} onChange={(e) => setName(e.target.value)} label="Server Name" variant="standard" />
+                  <TextField error={!!errors.get("name")} helperText={errors.get("name")} value={name} onChange={(e) => setName(e.target.value)} label="Server Name" variant="standard" autoFocus />
                 </Stack>
 
                 <Typography variant="h6">Files</Typography>

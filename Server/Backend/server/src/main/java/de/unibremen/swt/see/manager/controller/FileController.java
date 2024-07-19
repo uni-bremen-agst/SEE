@@ -119,10 +119,10 @@ public class FileController {
      */
     @GetMapping("/client/gxl")
     public ResponseEntity<?> getGxl(@RequestParam("serverId") UUID serverId, @RequestParam("roomPassword") String roomPassword) {
-        if (!serverService.validateAccess(serverId, roomPassword)) {
-            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("Authorization failed."));
-        }
         try {
+            if (!serverService.validateAccess(serverId, roomPassword)) {
+                return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("Authorization failed."));
+            }
             File file = fileService.getByServerAndFileType(serverId, FileType.GXL);
             return buildResponseEntity(file, false);
         } catch (EntityNotFoundException e) {
@@ -144,10 +144,10 @@ public class FileController {
      */
     @GetMapping("/client/solution")
     public ResponseEntity<?> getSolution(@RequestParam("serverId") UUID serverId, @RequestParam("roomPassword") String roomPassword) {
-        if (!serverService.validateAccess(serverId, roomPassword)) {
-            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("Authorization failed."));
-        }
         try {
+            if (!serverService.validateAccess(serverId, roomPassword)) {
+                return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("Authorization failed."));
+            }
             File file = fileService.getByServerAndFileType(serverId, FileType.SOLUTION);
             return buildResponseEntity(file, false);
         } catch (EntityNotFoundException e) {
@@ -172,10 +172,10 @@ public class FileController {
      */
     @GetMapping("/client/source")
     public ResponseEntity<?> getSource(@RequestParam("serverId") UUID serverId, @RequestParam("roomPassword") String roomPassword) {
-        if (!serverService.validateAccess(serverId, roomPassword)) {
-            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("Authorization failed."));
-        }
         try {
+            if (!serverService.validateAccess(serverId, roomPassword)) {
+                return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("Authorization failed."));
+            }
             File file = fileService.getByServerAndFileType(serverId, FileType.SOURCE);
             return buildResponseEntity(file, false);
         } catch (EntityNotFoundException e) {
@@ -197,10 +197,10 @@ public class FileController {
      */
     @GetMapping("/client/config")
     public ResponseEntity<?> getConfig(@RequestParam("serverId") UUID serverId, @RequestParam("roomPassword") String roomPassword) {
-        if (!serverService.validateAccess(serverId, roomPassword)) {
-            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("Authorization failed."));
-        }
         try {
+            if (!serverService.validateAccess(serverId, roomPassword)) {
+                return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("Authorization failed."));
+            }
             File file = fileService.getByServerAndFileType(serverId, FileType.CFG);
             return buildResponseEntity(file, false);
         } catch (EntityNotFoundException e) {
@@ -222,10 +222,10 @@ public class FileController {
      */
     @GetMapping("/client/csv")
     public ResponseEntity<?> getCsv(@RequestParam("serverId") UUID serverId, @RequestParam("roomPassword") String roomPassword) {
-        if (!serverService.validateAccess(serverId, roomPassword)) {
-            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("Authorization failed."));
-        }
         try {
+            if (!serverService.validateAccess(serverId, roomPassword)) {
+                return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("Authorization failed."));
+            }
             File file = fileService.getByServerAndFileType(serverId, FileType.CSV);
             return buildResponseEntity(file, false);
         } catch (EntityNotFoundException e) {

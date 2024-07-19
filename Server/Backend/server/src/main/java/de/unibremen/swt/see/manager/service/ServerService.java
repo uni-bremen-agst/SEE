@@ -10,15 +10,15 @@ import de.unibremen.swt.see.manager.model.Server;
 import de.unibremen.swt.see.manager.model.ServerStatusType;
 import de.unibremen.swt.see.manager.repository.ConfigRepository;
 import de.unibremen.swt.see.manager.repository.ServerRepository;
-import jakarta.persistence.EntityManager;
+import de.unibremen.swt.see.manager.util.ServerLockManager;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.LockModeType;
-import jakarta.persistence.PersistenceContext;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +47,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class ServerService {
 
     /**
+     * Timeout in seconds that is waited to acquire a lock on write operations.
+     */
+    private final static int LOCK_TIMEOUT = 15;
+
+    /**
      * Used to access the back-end configuration.
      */
     private final ConfigRepository configRepo;
@@ -67,13 +72,6 @@ public class ServerService {
     private final ContainerService containerService;
 
     /**
-     * Used for entity access with locking to prevent race conditions in server
-     * operations.
-     */
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    /**
      * The external address of the Docker server.
      * <p>
      * This is the address that any game server instance running in a container
@@ -81,6 +79,11 @@ public class ServerService {
      */
     @Value("${see.app.docker.host.external}")
     private String externalDockerHost;
+
+    /**
+     * The lock manager for concurrent writes.
+     */
+    private final ServerLockManager lockManager = ServerLockManager.getInstance();
 
     /**
      * Used for the random port generation.
@@ -214,81 +217,140 @@ public class ServerService {
     /**
      * Deletes a server and its files.
      * <p>
-     * This method will lock access to the {@link Server} object to prevent race
-     * conditions.
+     * This method acquires a write lock on the server entity to synchronize
+     * write operations.
      *
      * @param id the ID of the server to be deleted
+     * @throws EntityNotFoundException if the server does not exist
      * @throws IOException if there is an error during file deletion
      * @throws IllegalStateException if the server is busy
      */
-    public void delete(UUID id) throws IOException {
-        log.info("Deleting server {}", id);
-        // Get the server entity and lock access to prevent race conditions
-        final Server server = entityManager.find(Server.class, id, LockModeType.PESSIMISTIC_WRITE);
-
-        try {
-            containerService.deleteContainer(server);
-        } catch (NotFoundException e) {
-            // Ignore
-        } catch (Exception e) {
-            // TODO A broken pipe can occur during this process.
-            throw new IllegalStateException("Try again later.", e);
+    public void delete(UUID id) throws EntityNotFoundException, IOException, IllegalStateException {
+        final Server server = serverRepo.findServerById(id).orElse(null);
+        if (server == null) {
+            throw new EntityNotFoundException("No server found with ID " + id);
         }
 
-        fileService.deleteFilesByServer(server);
-        entityManager.remove(server);
+        final Lock lock = lockManager.getLock(id);
+        try {
+            if (lock.tryLock(LOCK_TIMEOUT, TimeUnit.SECONDS)) {
+                log.debug("Lock acquired: {}", server.getId());
+            } else {
+                log.debug("Timeout while waiting for lock: {}", id);
+                throw new IllegalStateException("Try again later.");
+            }
+        } catch (InterruptedException ex) {
+            log.debug("Interrupted while waiting for lock: {}", id);
+            throw new IllegalStateException("The process was interrupted.");
+        }
+
+        try {
+            log.info("Deleting server {}", id);
+            try {
+                containerService.deleteContainer(server);
+            } catch (NotFoundException e) {
+                // Ignore missing container
+            }
+
+            fileService.deleteFilesByServer(server);
+            serverRepo.deleteServerById(id);
+            lockManager.removeLock(id);
+        } finally {
+            lock.unlock();
+            log.debug("Lock released: {}", id);
+        }
     }
 
     /**
      * Start a server by its ID.
      * <p>
-     * This method will lock access to the {@link Server} object to prevent race
-     * conditions.
+     * This method acquires a write lock on the server entity to synchronize
+     * write operations.
      *
      * @param id the ID of the server to be started
-     * @throws java.io.IOException if there is an error accessing server files
+     * @throws EntityNotFoundException if the server does not exist
+     * @throws IOException if there is an error accessing server files
      * @throws IllegalStateException if the server is busy or already online
      */
-    public void start(UUID id) throws IOException, IllegalStateException {
-        log.info("Starting server {}", id);
-        // Get the server entity and lock access to prevent race conditions
-        final Server server = entityManager.find(Server.class, id, LockModeType.PESSIMISTIC_WRITE);
-        try {
-            containerService.startContainer(server);
-        } catch (NotModifiedException e) {
-            throw new IllegalStateException("The container is already running!", e);
-        } catch (InternalServerErrorException e) {
-            throw new IllegalStateException("Internal server error!", e);
+    public void start(UUID id) throws EntityNotFoundException, IOException, IllegalStateException {
+        final Server server = serverRepo.findServerById(id).orElse(null);
+        if (server == null) {
+            throw new EntityNotFoundException("No server found with ID " + id);
         }
-        server.setStopTime(null);
-        server.setStartTime(ZonedDateTime.now(ZoneId.of("UTC")));
+
+        final Lock lock = lockManager.getLock(id);
+        try {
+            if (lock.tryLock(LOCK_TIMEOUT, TimeUnit.SECONDS)) {
+                log.debug("Lock acquired: {}", server.getId());
+            } else {
+                log.debug("Timeout while waiting for lock: {}", id);
+                throw new IllegalStateException("Try again later.");
+            }
+        } catch (InterruptedException ex) {
+            log.debug("Interrupted while waiting for lock: {}", id);
+            throw new IllegalStateException("The process was interrupted.");
+        }
+
+        try {
+            log.info("Starting server {}", id);
+
+            try {
+                containerService.startContainer(server);
+            } catch (NotModifiedException e) {
+                throw new IllegalStateException("The container is already running!", e);
+            } catch (InternalServerErrorException e) {
+                throw new IllegalStateException("Internal server error!", e);
+            }
+            server.setStopTime(null);
+            server.setStartTime(ZonedDateTime.now(ZoneId.of("UTC")));
+        } finally {
+            lock.unlock();
+            log.debug("Lock released: {}", id);
+        }
     }
 
     /**
      * Stop a server by its ID.
      * <p>
-     * This method will lock access to the {@link Server} object to prevent race
-     * conditions.
+     * This method acquires a write lock on the server entity to synchronize
+     * write operations.
      *
      * @param id the ID of the server to be stopped
+     * @throws EntityNotFoundException if the server does not exist
      * @throws IllegalStateException if the server is busy or already stopped
      */
-    public void stop(UUID id) throws IllegalStateException {
-        log.info("Stopping server {}", id);
-        // Get the server entity and lock access to prevent race conditions
-        final Server server = entityManager.find(Server.class, id, LockModeType.PESSIMISTIC_WRITE);
+    public void stop(UUID id) throws EntityNotFoundException, IllegalStateException {
+        final Server server = serverRepo.findServerById(id).orElse(null);
+        if (server == null) {
+            throw new EntityNotFoundException("No server found with ID " + id);
+        }
+
+        final Lock lock = lockManager.getLock(server);
+        try {
+            if (lock.tryLock(LOCK_TIMEOUT, TimeUnit.SECONDS)) {
+                log.debug("Lock acquired: {}", server.getId());
+            } else {
+                log.debug("Timeout while waiting for lock: {}", id);
+                throw new IllegalStateException("Try again later.");
+            }
+        } catch (InterruptedException ex) {
+            log.debug("Interrupted while waiting for lock: {}", server.getId());
+            throw new IllegalStateException("The process was interrupted.");
+        }
 
         try {
+            log.info("Stopping server {}", id);
             containerService.stopContainer(server);
         } catch (NotFoundException e) {
             throw new IllegalStateException("The container to be stopped does not exist!", e);
         } catch (NotModifiedException e) {
             server.setStatus(ServerStatusType.OFFLINE);
             throw new IllegalStateException("The container is already stopped!", e);
-        } catch (Exception e) {
-            // TODO A broken pipe can occur during this process.
-            throw new IllegalStateException("Try again later.", e);
+        } finally {
+            lock.unlock();
+            log.debug("Lock released: {}", id);
         }
+
         server.setStatus(ServerStatusType.OFFLINE);
         server.setStartTime(null);
         server.setStopTime(ZonedDateTime.now(ZoneId.of("UTC")));
@@ -296,14 +358,41 @@ public class ServerService {
 
     /**
      * Update the server status based on its container state.
+     * <p>
+     * This method acquires a write lock on the server entity to synchronize
+     * write operations if the state has changed. The acquisition timeout is set
+     * to 0 to prevent outdated status updates.
      *
      * @param server the server to update the status for
      */
     public void updateStatus(Server server) {
-        server.setStatus(containerService.isRunning(server)
+        ServerStatusType newStatus = containerService.isRunning(server)
                 ? ServerStatusType.ONLINE
-                : ServerStatusType.OFFLINE
-        );
+                : ServerStatusType.OFFLINE;
+        if (server.getStatus() == newStatus) {
+            return;
+        }
+
+        final Lock lock = lockManager.getLock(server);
+        try {
+            if (lock.tryLock(0, TimeUnit.SECONDS)) {
+                log.debug("Lock acquired: {}", server.getId());
+            } else {
+                log.debug("Timeout while waiting for lock: {}", server.getId());
+                return;
+            }
+        } catch (InterruptedException ex) {
+            log.debug("Interrupted while waiting for lock: {}", server.getId());
+            return;
+        }
+
+        try {
+            server.setStatus(newStatus);
+
+        } finally {
+            lock.unlock();
+            log.debug("Lock released: {}", server.getId());
+        }
     }
 
     /**
@@ -324,10 +413,10 @@ public class ServerService {
      * given server, {@code false} if access cannot be granted.
      * @throws EntityNotFoundException if the server does not exist
      */
-    public boolean validateAccess(UUID serverId, String roomPassword) {
+    public boolean validateAccess(UUID serverId, String roomPassword) throws EntityNotFoundException {
         final Server server = serverRepo.findServerById(serverId).orElse(null);
         if (server == null) {
-            throw new EntityNotFoundException("No entity found with ID " + serverId);
+            throw new EntityNotFoundException("No server found with ID " + serverId);
         }
         return (server.getServerPassword() == null || server.getServerPassword().isEmpty() || server.getServerPassword().equals(roomPassword));
     }
@@ -344,7 +433,7 @@ public class ServerService {
      *
      * @return random port number
      */
-    private Integer generatePort() {
+    private synchronized Integer generatePort() {
         final Config config = resolveConfig();
         final int min = config.getMinContainerPort();
         final int max = config.getMaxContainerPort();
@@ -370,7 +459,7 @@ public class ServerService {
      * @param length password length
      * @return generated password
      */
-    private String generatePassword(final int length) {
+    private synchronized String generatePassword(final int length) {
         return secureRandom.ints(length, 0, PASSWORD_CHARS.length())
                 .mapToObj(PASSWORD_CHARS::charAt)
                 .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)

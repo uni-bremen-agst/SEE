@@ -3,6 +3,7 @@ package de.unibremen.swt.see.manager.controller;
 import de.unibremen.swt.see.manager.model.File;
 import de.unibremen.swt.see.manager.model.Server;
 import de.unibremen.swt.see.manager.service.ServerService;
+import jakarta.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -102,15 +103,18 @@ public class ServerController {
      * Deletes the server along with its files.
      *
      * @param id the ID of the server to delete
-     * @return {@code 200 OK}, or {@code 500 Internal Server Error} if the
-     * server is busy or could not be deleted, or {@code 401 Unauthorized} if
-     * access cannot be granted.
+     * @return {@code 200 OK}, or {@code 404 Not Found} if the server does not
+     * exist, or {@code 500 Internal Server Error} if the server is busy or
+     * could not be deleted, or {@code 401 Unauthorized} access cannot be
+     * granted.
      */
     @DeleteMapping("/delete")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> delete(@RequestParam("id") UUID id) {
         try {
             serverService.delete(id);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
         } catch (IllegalStateException e) {
             return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage(e.getMessage()));
         } catch (IOException ex) {
@@ -124,15 +128,17 @@ public class ServerController {
      * Start the server with the specified ID.
      *
      * @param id the ID of the server to start
-     * @return {@code 200 OK}, or {@code 500 Internal Server Error} if the
-     * server is busy or already online, or {@code 401 Unauthorized} if access
-     * cannot be granted.
+     * @return {@code 200 OK}, or {@code 404 Not Found} if the server does not
+     * exist, or {@code 500 Internal Server Error} if the server is busy or
+     * already online, or {@code 401 Unauthorized} if access cannot be granted.
      */
     @PostMapping("/start")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> start(@RequestParam("id") UUID id) {
         try {
             serverService.start(id);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
         } catch (IllegalStateException e) {
             return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage(e.getMessage()));
         } catch (IOException ex) {
@@ -146,15 +152,17 @@ public class ServerController {
      * Stop the server with the specified ID.
      *
      * @param id the ID of the server to stop
-     * @return {@code 200 OK}, or {@code 500 Internal Server Error} if the
-     * server is busy or already stopped, or {@code 401 Unauthorized} if access
-     * cannot be granted.
+     * @return {@code 200 OK}, or {@code 404 Not Found} if the server does not
+     * exist, or {@code 500 Internal Server Error} if the server is busy or
+     * already stopped, or {@code 401 Unauthorized} if access cannot be granted.
      */
     @PostMapping("/stop")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> stop(@RequestParam("id") UUID id) {
         try {
             serverService.stop(id);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
         } catch (IllegalStateException e) {
             return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage(e.getMessage()));
         }

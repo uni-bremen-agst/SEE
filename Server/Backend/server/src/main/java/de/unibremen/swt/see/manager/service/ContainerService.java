@@ -5,6 +5,7 @@ import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.CreateVolumeResponse;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.command.InspectVolumeResponse;
+import com.github.dockerjava.api.exception.ConflictException;
 import com.github.dockerjava.api.exception.InternalServerErrorException;
 import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.exception.NotModifiedException;
@@ -184,7 +185,13 @@ public class ContainerService {
      * @throws NotModifiedException if the container is already stopped
      */
     public void stopContainer(Server server) throws NotFoundException, NotModifiedException {
-        dockerClient.stopContainerCmd(server.getContainerId()).exec();
+        // SEE server will (currently) not shutdown gracefully, anyway, so we
+        // can simply kill it.
+        try {
+            dockerClient.killContainerCmd(server.getContainerId()).exec();
+        } catch (ConflictException e) {
+            throw new NotModifiedException(e);
+        }
     }
 
     /**
@@ -198,13 +205,14 @@ public class ContainerService {
         if (containerId == null) {
             return;
         }
-
+        
         try {
-            dockerClient.stopContainerCmd(containerId).exec();
-        } catch (NotModifiedException e) {
+            dockerClient.killContainerCmd(containerId).exec();
+        } catch (NotModifiedException | ConflictException e) {
             // Server already stopped
         }
         dockerClient.removeContainerCmd(containerId)
+                .withRemoveVolumes(true)
                 .withForce(true)
                 .exec();
 
