@@ -46,6 +46,14 @@ namespace SEE.UI.Window.CodeWindow
         private List<SEEToken> tokenList;
 
         /// <summary>
+        /// A list of starting offsets of each line in the code window (without rich tags), sorted in ascending order.
+        ///
+        /// In other words, this contains the character indices of newlines in the rendered text (the text without
+        /// the rich tags in them, but with the line numbers at the beginning of each line).
+        /// </summary>
+        private List<int> CodeWindowOffsets { get; } = new();
+
+        /// <summary>
         /// Characters representing newlines.
         /// Note that newlines may also consist of aggregations of this set (e.g. "\r\n").
         /// </summary>
@@ -60,7 +68,8 @@ namespace SEE.UI.Window.CodeWindow
         /// If you wish to use such issues, split the entities up into one per line (see <see cref="MarkIssuesAsync"/>).
         /// </param>
         /// <exception cref="ArgumentNullException">If <paramref name="tokens"/> is <c>null</c>.</exception>
-        private void EnterFromTokens(IEnumerable<SEEToken> tokens, IDictionary<int, List<IDisplayableIssue>> issues = null)
+        private void EnterFromTokens(IEnumerable<SEEToken> tokens,
+                                     IDictionary<int, List<IDisplayableIssue>> issues = null)
         {
             if (tokens == null)
             {
@@ -82,9 +91,16 @@ namespace SEE.UI.Window.CodeWindow
                            .Aggregate(0, (_, token) => token.Text.Count(x => x == '\n'));
             // Needed padding is the number of lines, because the line number will be at most this long.
             neededPadding = assumedLines.ToString().Length;
-
             text = $"<color=#CCCCCC>{string.Join("", Enumerable.Repeat(" ", neededPadding - 1))}1</color> ";
-            int lineNumber = 2; // Line number we'll write down next
+
+            CodeWindowOffsets.Clear();
+             // The first line starts at the beginning of the text after the line number.
+            CodeWindowOffsets.Add(0);
+
+             // Line number we'll write down next
+            int lineNumber = 2;
+             // Offset of the current character in the text (excluding rich tags)
+            int characterOffset = neededPadding + 1; // + 1 for the space after the line number
             // The issue that we're currently marking, if any.
             IDisplayableIssue currentlyMarking = null;
             // We need reference equality here.
@@ -94,11 +110,11 @@ namespace SEE.UI.Window.CodeWindow
             {
                 if (token.TokenType == TokenType.Newline)
                 {
-                    AppendNewline(ref lineNumber, ref text, neededPadding, token);
+                    AppendNewline(ref lineNumber, ref text, token);
                 }
                 else if (token.TokenType != TokenType.EOF) // Skip EOF token completely.
                 {
-                    lineNumber = HandleToken(token);
+                    HandleToken(token);
                 }
             }
 
@@ -113,17 +129,22 @@ namespace SEE.UI.Window.CodeWindow
 
             // Appends a newline to the text, assuming we're at theLineNumber and need the given padding.
             // Note that newlines MUST be added in this method, not anywhere else, else issue highlighting will break!
-            void AppendNewline(ref int theLineNumber, ref string text, int padding, SEEToken token)
+            void AppendNewline(ref int theLineNumber, ref string text, SEEToken token)
             {
                 // Close an issue marking here if necessary
                 EndIssueSegment();
 
                 // First, of course, the newline.
                 text += "\n";
+                // At this point, we need to remember the offset of this new line.
+                Assert.AreEqual(CodeWindowOffsets.Count, theLineNumber-1);
+                // + 1 for the newline
+                CodeWindowOffsets.Add(++characterOffset);
                 // Add whitespace next to line number, so it's consistent.
-                text += string.Join("", Enumerable.Repeat(" ", padding - $"{theLineNumber}".Length));
+                text += string.Join("", Enumerable.Repeat(' ', neededPadding - $"{theLineNumber}".Length));
                 // Line number will be typeset in grey to distinguish it from the rest.
                 text += $"<color=#CCCCCC>{theLineNumber}</color> ";
+                characterOffset += neededPadding + 1;
 
                 if (issues?.ContainsKey(theLineNumber) ?? false)
                 {
@@ -134,8 +155,7 @@ namespace SEE.UI.Window.CodeWindow
             }
 
             // Handles a token which may contain newlines and adds its syntax-highlighted content to the code window.
-            // Returns the new line number.
-            int HandleToken(SEEToken token)
+            void HandleToken(SEEToken token)
             {
                 string[] newlineStrings = newlineCharacters.Select(x => x.ToString()).Concat(new[]
                 {
@@ -150,7 +170,7 @@ namespace SEE.UI.Window.CodeWindow
                     // Any entry after the first is on a separate line.
                     if (!firstRun)
                     {
-                        AppendNewline(ref lineNumber, ref text, neededPadding, token);
+                        AppendNewline(ref lineNumber, ref text, token);
                     }
 
                     // Mark any potential issue
@@ -188,7 +208,9 @@ namespace SEE.UI.Window.CodeWindow
                     {
                         // We just copy the whitespace verbatim, no need to even color it.
                         // Note: We have to assume that whitespace will not interfere with TMP's XML syntax.
-                        text += line.Replace("\t", new string(' ', token.Language.TabWidth));
+                        string replaced = line.Replace("\t", new string(' ', token.Language.TabWidth));
+                        text += replaced;
+                        characterOffset += replaced.Length;
                     }
                     else
                     {
@@ -202,7 +224,9 @@ namespace SEE.UI.Window.CodeWindow
                         {
                             text += $"<color=#{token.TokenType.Color}>";
                         }
-                        text += $"<noparse>{line.Replace("/noparse", "")}</noparse>";
+                        string replaced = line.Replace("</noparse>", @"<\noparse>");
+                        text += $"<noparse>{replaced}</noparse>";
+                        characterOffset += replaced.Length;
                         if (currentlyMarking is not { HasColorTags: true })
                         {
                             text += "</color>";
@@ -216,8 +240,6 @@ namespace SEE.UI.Window.CodeWindow
 
                     firstRun = false;
                 }
-
-                return lineNumber;
             }
 
             // Begins marking a new issue segment starting with the given token.

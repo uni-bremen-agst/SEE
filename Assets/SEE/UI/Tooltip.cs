@@ -222,6 +222,12 @@ namespace SEE.UI
         }
 
         /// <summary>
+        /// Whether the tooltip is currently active.
+        /// Note that "active" does not necessarily mean that the tooltip is currently visible.
+        /// </summary>
+        public static bool IsActivated => Instance.text != null;
+
+        /// <summary>
         /// Will hide the tooltip by fading it out if it's currently visible.
         /// If <see cref="FadeIn"/> has been called prior to this and is active, it will be halted.
         /// </summary>

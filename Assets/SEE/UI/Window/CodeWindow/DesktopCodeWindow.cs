@@ -13,6 +13,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
+using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using SEE.Controls;
 using SEE.UI.DebugAdapterProtocol;
 using UnityEngine.Assertions;
@@ -65,7 +66,8 @@ namespace SEE.UI.Window.CodeWindow
             DebugBreakpointManager.OnBreakpointRemoved += OnBreakpointRemoved;
 
             Transform temp = SceneQueries.GetCodeCity(transform);
-            if (temp && temp.gameObject.TryGetComponentOrLog(out AbstractSEECity city)) {
+            if (temp && temp.gameObject.TryGetComponentOrLog(out AbstractSEECity city))
+            {
                 // Get button for IDE interaction and register events.
                 Window.transform.Find("Dragger/IDEButton").gameObject.GetComponent<Button>()
                       .onClick.AddListener(() =>
@@ -79,6 +81,7 @@ namespace SEE.UI.Window.CodeWindow
             // OnEndDrag and OnScroll.
             if (scrollable.TryGetComponentOrLog(out scrollRect))
             {
+                scrollRect.horizontalNormalizedPosition = 0;
                 if (scrollRect.gameObject.TryGetComponentOrLog(out EventTrigger trigger))
                 {
                     trigger.triggers.ForEach(x => x.callback.AddListener(_ => ScrollEvent.Invoke()));
@@ -171,29 +174,56 @@ namespace SEE.UI.Window.CodeWindow
                                .ContinueWith(x => Tooltip.ActivateWith(string.Join('\n', x), Tooltip.AfterShownBehavior.HideUntilActivated))
                                .Forget();
                     }
-                    return;
                 }
 
-                // detecting word hovers
+                // Detect hovering over words
                 int index = TMP_TextUtilities.FindIntersectingWord(textMesh, Input.mousePosition, null);
                 TMP_WordInfo? hoveredWord = index >= 0 && index < textMesh.textInfo.wordCount ? textMesh.textInfo.wordInfo[index] : null;
-                if (lastHoveredWord is null && hoveredWord is not null)
+                if (!lastHoveredWord.Equals(hoveredWord))
                 {
-                    OnWordHoverBegin?.Invoke(this, (TMP_WordInfo)hoveredWord);
-                }
-                else if (lastHoveredWord is not null && hoveredWord is null)
-                {
-                    OnWordHoverEnd?.Invoke(this, (TMP_WordInfo)lastHoveredWord);
-                }
-                else if (!lastHoveredWord.Equals(hoveredWord))
-                {
-                    Assert.IsTrue(hoveredWord != null);
-                    Assert.IsTrue(lastHoveredWord != null);
+                    if (lspHandler != null)
+                    {
+                        TriggerLspHoverAsync(hoveredWord).Forget();
+                    }
 
-                    OnWordHoverEnd?.Invoke(this, (TMP_WordInfo)lastHoveredWord);
-                    OnWordHoverBegin?.Invoke(this, (TMP_WordInfo)hoveredWord);
+                    if (lastHoveredWord != null)
+                    {
+                        OnWordHoverEnd?.Invoke(this, lastHoveredWord.Value);
+                    }
+                    if (hoveredWord != null)
+                    {
+                        OnWordHoverBegin?.Invoke(this, hoveredWord.Value);
+                    }
                 }
                 lastHoveredWord = hoveredWord;
+            }
+        }
+
+        /// <summary>
+        /// Triggers the hover event for the Language Server Protocol.
+        /// Should only be called when the <paramref name="hoveredWord"/> changes.
+        /// </summary>
+        /// <param name="hoveredWord">The word that is currently hovered over.</param>
+        private async UniTaskVoid TriggerLspHoverAsync(TMP_WordInfo? hoveredWord)
+        {
+            Assert.IsNotNull(lspHandler);
+
+            // TODO: Handle conflicts between LSP Hover and Debug Hover / Issue Hover
+            if (hoveredWord == null)
+            {
+                Tooltip.Deactivate();
+            }
+            else
+            {
+                (int line, int column) = GetSourcePosition(hoveredWord.Value.firstCharacterIndex);
+                if (column > 0)
+                {
+                    Hover hoverInfo = await lspHandler.HoverAsync(FilePath, line - 1, column - 1);
+                    if (hoverInfo?.Contents != null && lastHoveredWord != null)
+                    {
+                        Tooltip.ActivateWith(hoverInfo.Contents.ToRichText(), Tooltip.AfterShownBehavior.HideUntilActivated);
+                    }
+                }
             }
         }
 
@@ -231,6 +261,21 @@ namespace SEE.UI.Window.CodeWindow
             {
                 lspHandler.CloseDocument(FilePath);
             }
+        }
+
+        /// <summary>
+        /// Returns the line and column of the source code position of the given <paramref name="characterIndex"/>.
+        /// This will be the line and column as they would be displayed in a text editor (i.e., 1-based, and
+        /// with neither rich tags nor line numbers being counted).
+        /// </summary>
+        /// <param name="characterIndex">The character index within the code window's TextMeshPro
+        /// to get the source position for.</param>
+        /// <returns>The line and column of the source code position of the given <paramref name="characterIndex"/>.</returns>
+        private (int line, int column) GetSourcePosition(int characterIndex)
+        {
+            int line = textMesh.textInfo.characterInfo[characterIndex].lineNumber;
+            int column = characterIndex - CodeWindowOffsets[line] - neededPadding;
+            return (line + 1, column);
         }
 
         /// <summary>

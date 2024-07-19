@@ -6,7 +6,6 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Markdig;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
-using OmniSharp.Extensions.LanguageServer.Server;
 using SEE.Tools;
 using SEE.Tools.LSP;
 using SEE.Utils;
@@ -394,7 +393,11 @@ namespace SEE.DataModel.DG.IO
                 {
                     throw new OperationCanceledException();
                 }
-                Node targetNode = FindNodesByLocation(item.Uri.Path, Range.FromLspRange(item.Range)).First();
+                Node targetNode = FindNodesByLocation(item.Uri.Path, Range.FromLspRange(item.Range)).FirstOrDefault();
+                if (targetNode == null)
+                {
+                    continue;
+                }
                 Edge edge = AddEdge(node, targetNode, LSP.Call, false, graph);
                 edge.SetRange(SelectionRangeAttribute, Range.FromLspRange(item.SelectionRange));
             }
@@ -422,7 +425,11 @@ namespace SEE.DataModel.DG.IO
                 {
                     throw new OperationCanceledException();
                 }
-                Node targetNode = FindNodesByLocation(item.Uri.Path, Range.FromLspRange(item.Range)).First();
+                Node targetNode = FindNodesByLocation(item.Uri.Path, Range.FromLspRange(item.Range)).FirstOrDefault();
+                if (targetNode == null)
+                {
+                    continue;
+                }
                 Edge edge = AddEdge(node, targetNode, LSP.Extend, false, graph);
                 edge.SetRange(SelectionRangeAttribute, Range.FromLspRange(item.SelectionRange));
             }
@@ -494,7 +501,7 @@ namespace SEE.DataModel.DG.IO
                         Hover hover = await Handler.HoverAsync(path, node.SourceLine - 1 ?? 0, node.SourceColumn - 1 ?? 0);
                         if (hover != null)
                         {
-                            node.SetString("HoverText", MarkupToRichText(hover.Contents));
+                            node.SetString("HoverText", hover.Contents.ToRichText());
                         }
                     }
 
@@ -522,50 +529,6 @@ namespace SEE.DataModel.DG.IO
             {
                 await AddSymbolNodeAsync(child, path, graph, childParent, token);
             }
-        }
-
-        /// <summary>
-        /// Converts the given <paramref name="content"/> to TextMeshPro-compatible rich text.
-        /// </summary>
-        /// <param name="content">The content to convert.</param>
-        /// <returns>The converted rich text.</returns>
-        private static string MarkupToRichText(MarkedStringsOrMarkupContent content)
-        {
-            string markdown;
-            if (content.HasMarkupContent)
-            {
-                MarkupContent markup = content.MarkupContent!;
-                switch (markup.Kind)
-                {
-                    case MarkupKind.PlainText: return $"<noparse>{markup.Value}</noparse>";
-                    case MarkupKind.Markdown:
-                        markdown = markup.Value;
-                        break;
-                    default:
-                        Debug.LogError($"Unsupported markup kind: {markup.Kind}");
-                        return string.Empty;
-                }
-            }
-            else
-            {
-                // This is technically deprecated, but we still need to support it,
-                // since some language servers still use it.
-                Container<MarkedString> strings = content.MarkedStrings!;
-                markdown = string.Join("\n", strings.Select(x =>
-                {
-                    if (x.Language != null)
-                    {
-                        return $"```{x.Language}\n{x.Value}\n```";
-                    }
-                    else
-                    {
-                        return x.Value;
-                    }
-                }));
-            }
-
-            // TODO (#728): Parse markdown to TextMeshPro rich text (custom MarkDig parser).
-            return Markdown.ToPlainText(markdown);
         }
 
         /// <summary>

@@ -211,6 +211,7 @@ namespace SEE.UI.Window.CodeWindow
                 else
                 {
                     scrollRect.verticalNormalizedPosition = 1 - value / (lines - 1 - excessLines);
+                    scrollRect.horizontalNormalizedPosition = 0;
                 }
             }
         }
