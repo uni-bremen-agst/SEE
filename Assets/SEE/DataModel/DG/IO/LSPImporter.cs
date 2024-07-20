@@ -9,6 +9,7 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using SEE.Tools;
 using SEE.Tools.LSP;
 using SEE.Utils;
+using SEE.Utils.Markdown;
 using UnityEngine;
 using UnityEngine.Assertions;
 

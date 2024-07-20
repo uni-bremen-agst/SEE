@@ -1,9 +1,9 @@
+using System.IO;
 using System.Linq;
-using Markdig;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using UnityEngine;
 
-namespace SEE.Utils
+namespace SEE.Utils.Markdown
 {
     public static class MarkdownConverter
     {
@@ -47,7 +47,7 @@ namespace SEE.Utils
                 }));
             }
 
-            return $"<noparse>{MarkupTextToRichText(markdown)}</noparse>";
+            return MarkupTextToRichText(markdown);
         }
 
         /// <summary>
@@ -57,8 +57,9 @@ namespace SEE.Utils
         /// <returns>The converted rich text.</returns>
         public static string MarkupTextToRichText(string markdownText)
         {
-            // TODO (#728): Parse markdown to TextMeshPro rich text (custom MarkDig parser).
-            return Markdown.ToPlainText(markdownText);
+            StringWriter writer = new();
+            Markdig.Markdown.Convert(markdownText, new RichTagsMarkdownRenderer(writer));
+            return writer.ToString();
         }
     }
 }

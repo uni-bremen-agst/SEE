@@ -16,6 +16,7 @@ using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using SEE.Controls;
 using SEE.UI.DebugAdapterProtocol;
+using SEE.Utils.Markdown;
 using UnityEngine.Assertions;
 
 namespace SEE.UI.Window.CodeWindow

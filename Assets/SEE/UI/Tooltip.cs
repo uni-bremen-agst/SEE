@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
@@ -292,8 +293,7 @@ namespace SEE.UI
                 tooltipManager.allowUpdating = true;
                 // Move tooltip to front of layer hierarchy
                 tooltipManager.gameObject.transform.SetAsLastSibling();
-                // tooltipObject only has 1 child, and will never have more than that
-                if (tooltipManager.tooltipObject.transform.GetChild(0).gameObject.TryGetComponentOrLog(out canvasGroup))
+                if (tooltipManager.tooltipObject.transform.Find("Anchor/Content").gameObject.TryGetComponentOrLog(out canvasGroup))
                 {
                     // Get the actual text object
                     TextMeshProUGUI[] texts = tooltipManager.tooltipContent.GetComponentsInChildren<TextMeshProUGUI>();
