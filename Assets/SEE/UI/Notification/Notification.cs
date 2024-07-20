@@ -228,6 +228,11 @@ namespace SEE.UI.Notification
             }
         }
 
+        protected override void StartVR()
+        {
+            StartDesktop();
+        }
+
         protected override void UpdateDesktop()
         {
             // We only perform this expensive comparison once every 50 frames, if necessary
@@ -237,6 +242,11 @@ namespace SEE.UI.Notification
                 // We finally destroy ourselves once we're done
                 Destroyer.Destroy(gameObject);
             }
+        }
+
+        protected override void UpdateVR()
+        {
+            UpdateDesktop();
         }
     }
 }

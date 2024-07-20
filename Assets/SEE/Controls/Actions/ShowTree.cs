@@ -95,15 +95,17 @@ namespace SEE.Controls.Actions
 
         private void Update()
         {
-            if (SEEInput.ToggleTreeView())
+            if (SEEInput.ToggleTreeView() || XRSEEActions.ContextMenu)
             {
                 if (treeWindows.Count == 0)
                 {
                     ShowTreeView();
+                    XRSEEActions.ContextMenu = false;
                 }
                 else
                 {
                     HideTreeView();
+                    XRSEEActions.ContextMenu = false;
                 }
             }
         }

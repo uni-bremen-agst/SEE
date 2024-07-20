@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
 using DynamicPanels;
+using SEE.Controls;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit.UI;
 
 namespace SEE.UI.Window
 {
@@ -33,6 +35,17 @@ namespace SEE.UI.Window
                 space.name = WindowSpaceName;
             }
             space.SetActive(true);
+        }
+
+        protected override void StartVR()
+        {
+            Canvas.MustGetComponent<Canvas>().renderMode = RenderMode.WorldSpace;
+            Canvas.transform.SetParent(GameObject.Find("XRTabletCanvas").transform, false);
+            Canvas.AddComponent<TrackedDeviceGraphicRaycaster>();
+            Canvas.GetComponent<RectTransform>().localScale = new Vector3(0.001f, 0.001f, 0.001f);
+            Canvas.GetComponent<RectTransform>().localRotation = Quaternion.Euler(0, -90, 0);
+            Canvas.GetComponent<RectTransform>().localPosition = new Vector3(0.9f, 0, 0);
+            StartDesktop();
         }
 
         /// <summary>
@@ -147,7 +160,10 @@ namespace SEE.UI.Window
 
                 // Rebuild layout
                 panelsCanvas.ForceRebuildLayoutImmediate();
-                window.RebuildLayout();
+                if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+                {
+                    window.RebuildLayout();
+                }
             }
 
             void CloseTab(PanelTab panelTab)
@@ -167,6 +183,11 @@ namespace SEE.UI.Window
                     }
                 }
             }
+        }
+
+        protected override void UpdateVR()
+        {
+            UpdateDesktop();
         }
 
         /// <summary>

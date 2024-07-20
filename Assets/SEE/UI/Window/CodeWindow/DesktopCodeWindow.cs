@@ -108,6 +108,11 @@ namespace SEE.UI.Window.CodeWindow
             SetupBreakpoints();
         }
 
+        protected override void StartVR()
+        {
+            StartDesktop();
+        }
+
         /// <summary>
         /// Sets up the breakpoints.
         /// </summary>
@@ -191,6 +196,11 @@ namespace SEE.UI.Window.CodeWindow
                 }
                 lastHoveredWord = hoveredWord;
             }
+        }
+
+        protected override void UpdateVR()
+        {
+            UpdateDesktop();
         }
 
         /// <summary>

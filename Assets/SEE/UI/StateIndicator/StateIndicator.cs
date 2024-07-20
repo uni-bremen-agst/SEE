@@ -21,5 +21,10 @@
         {
             StartDesktopInit();
         }
+
+        protected override void StartVR()
+        {
+            StartDesktop();
+        }
     }
 }

@@ -278,9 +278,19 @@ namespace SEE.Utils
         {
             // FIXME: We need to an interaction for VR, too.
             Camera mainCamera = MainCamera.Camera;
-            return mainCamera != null
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            {
+                XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit);
+                return mainCamera != null
+                ? mainCamera.ScreenPointToRay(mainCamera.WorldToScreenPoint(hit.point))
+                : new Ray(origin: Vector3.zero, direction: Vector3.zero);
+            }
+            else
+            {
+                return mainCamera != null
                 ? mainCamera.ScreenPointToRay(Input.mousePosition)
                 : new Ray(origin: Vector3.zero, direction: Vector3.zero);
+            }
         }
     }
 }

@@ -288,33 +288,58 @@ namespace SEE.Controls.Actions
 
         public override bool Update()
         {
-            // Only allow local player to open new code windows
-            if (spaceManager.CurrentPlayer == WindowSpaceManager.LocalPlayer
-                && SEEInput.Select()
-                && Raycasting.RaycastGraphElement(out RaycastHit _, out GraphElementRef graphElementRef) != HitGraphElement.None)
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
             {
-                // If nothing is selected, there's nothing more we need to do
-                if (graphElementRef == null)
+                if (XRSEEActions.Selected)
                 {
-                    return false;
-                }
-
-                // Edges of type Clone will be handled differently. For these, we will be
-                // showing a unified diff.
-                CodeWindow codeWindow = graphElementRef is EdgeRef { Value: { Type: "Clone" } } edgeRef
+                    if (!XRSEEActions.hoveredGameObject.HasNodeRef())
+                    {
+                        return false;
+                    }
+                    XRSEEActions.hoveredGameObject.TryGetComponent(out NodeRef nodeRef);
+                    GraphElementRef elementRef = nodeRef;
+                    CodeWindow codeWindow = elementRef is EdgeRef { Value: { Type: "Clone" } } edgeRef
                     ? ShowUnifiedDiff(edgeRef)
-                    : ShowCode(graphElementRef);
-                // Add code window to our space of code window, if it isn't in there yet
-                WindowSpace manager = spaceManager[WindowSpaceManager.LocalPlayer];
-                if (!manager.Windows.Contains(codeWindow))
-                {
-                    manager.AddWindow(codeWindow);
+                    : ShowCode(elementRef);
+                    // Add code window to our space of code window, if it isn't in there yet
+                    WindowSpace manager = spaceManager[WindowSpaceManager.LocalPlayer];
+                    if (!manager.Windows.Contains(codeWindow))
+                    {
+                        manager.AddWindow(codeWindow);
+                    }
+                    manager.ActiveWindow = codeWindow;
                 }
-                manager.ActiveWindow = codeWindow;
-                // TODO (#669): Set font size etc in settings (maybe, or maybe that's too much)
+                return false;
             }
+            else
+            {
+                // Only allow local player to open new code windows
+                if (spaceManager.CurrentPlayer == WindowSpaceManager.LocalPlayer
+                    && SEEInput.Select()
+                    && Raycasting.RaycastGraphElement(out RaycastHit _, out GraphElementRef graphElementRef) != HitGraphElement.None)
+                {
+                    // If nothing is selected, there's nothing more we need to do
+                    if (graphElementRef == null)
+                    {
+                        return false;
+                    }
 
-            return false;
+                    // Edges of type Clone will be handled differently. For these, we will be
+                    // showing a unified diff.
+                    CodeWindow codeWindow = graphElementRef is EdgeRef { Value: { Type: "Clone" } } edgeRef
+                        ? ShowUnifiedDiff(edgeRef)
+                        : ShowCode(graphElementRef);
+                    // Add code window to our space of code window, if it isn't in there yet
+                    WindowSpace manager = spaceManager[WindowSpaceManager.LocalPlayer];
+                    if (!manager.Windows.Contains(codeWindow))
+                    {
+                        manager.AddWindow(codeWindow);
+                    }
+                    manager.ActiveWindow = codeWindow;
+                    // TODO (#669): Set font size etc in settings (maybe, or maybe that's too much)
+                }
+                return false;
+            }
         }
     }
 }

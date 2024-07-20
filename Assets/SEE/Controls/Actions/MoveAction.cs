@@ -84,7 +84,14 @@ namespace SEE.Controls.Actions
                 if (gameObject != null)
                 {
                     GrabbedGameObject = gameObject;
-                    originalParent = gameObject.transform.parent;
+                    if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+                    {
+                        originalParent = XRSEEActions.oldParent;
+                    }
+                    else
+                    {
+                        originalParent = gameObject.transform.parent;
+                    }
                     originalLocalScale = gameObject.transform.localScale;
                     originalWorldPosition = gameObject.transform.position;
                     IsGrabbed = true;
@@ -516,49 +523,91 @@ namespace SEE.Controls.Actions
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            if (UserIsGrabbing()) // start to grab the object or continue to move the grabbed object
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
             {
-                if (!grabbedObject.IsGrabbed)
+                if (XRSEEActions.Selected)
                 {
-                    // User is starting dragging the currently hovered object.
-                    InteractableObject hoveredObject = InteractableObject.HoveredObjectWithWorldFlag;
-                    // An object to be grabbed must be representing a node that is not the root.
-                    if (hoveredObject && hoveredObject.gameObject.TryGetNode(out Node node) && !node.IsRoot())
+                    if (!grabbedObject.IsGrabbed)
                     {
-                        grabbedObject.Grab(hoveredObject.gameObject);
-                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PickupSound, hoveredObject.gameObject);
-                        // Remember the current distance from the pointing device to the grabbed object.
-                        distanceToUser = Vector3.Distance(Raycasting.UserPointsTo().origin, grabbedObject.Position);
-                        CurrentState = IReversibleAction.Progress.InProgress;
+                        InteractableObject hoveredObject = InteractableObject.HoveredObjectWithWorldFlag;
+                        if (hoveredObject && hoveredObject.gameObject.TryGetNode(out Node node) && !node.IsRoot())
+                        {
+                            grabbedObject.Grab(hoveredObject.gameObject);
+                            AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PickupSound, hoveredObject.gameObject);
+                            Vector3 origin;
+                            XRSEEActions.RayInteractor.GetLineOriginAndDirection(out origin, out _);
+                            distanceToUser = Vector3.Distance(origin, grabbedObject.Position);
+                            CurrentState = IReversibleAction.Progress.InProgress;
+                        }
+                        else
+                        {
+                            Vector3 origin;
+                            XRSEEActions.RayInteractor.GetLineOriginAndDirection(out origin, out Vector3 direction);
+                            grabbedObject.MoveTo(origin + distanceToUser * direction);
+                        }
+                        UpdateHierarchy();
                     }
                 }
-                else // continue moving the grabbed object
+                else if (grabbedObject.IsGrabbed) // dragging has ended
                 {
-                    // The grabbed object will be moved on the surface of a sphere with
-                    // radius distanceToUser in the direction the user is pointing to.
-                    Ray ray = Raycasting.UserPointsTo();
-                    grabbedObject.MoveTo(ray.origin + distanceToUser * ray.direction);
+                    // Finalize the action with the grabbed object.
+                    if (grabbedObject.GrabbedGameObject != null)
+                    {
+                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, grabbedObject.GrabbedGameObject);
+                    }
+                    grabbedObject.UnGrab();
+                    // Action is finished.
+                    CurrentState = IReversibleAction.Progress.Completed;
+                    return true;
                 }
-
-                // The grabbed node is not yet at its final destination. The user is still moving
-                // it. We will run a what-if reflexion analysis to give immediate feedback on the
-                // consequences if the user were putting the grabbed node onto the node the user
-                // is currently aiming at.
-                UpdateHierarchy();
+                return false;
             }
-            else if (grabbedObject.IsGrabbed) // dragging has ended
+            else
             {
-                // Finalize the action with the grabbed object.
-                if (grabbedObject.GrabbedGameObject != null)
+                if (UserIsGrabbing()) // start to grab the object or continue to move the grabbed object
                 {
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, grabbedObject.GrabbedGameObject);
+                    if (!grabbedObject.IsGrabbed)
+                    {
+                        // User is starting dragging the currently hovered object.
+                        InteractableObject hoveredObject = InteractableObject.HoveredObjectWithWorldFlag;
+                        // An object to be grabbed must be representing a node that is not the root.
+                        if (hoveredObject && hoveredObject.gameObject.TryGetNode(out Node node) && !node.IsRoot())
+                        {
+                            grabbedObject.Grab(hoveredObject.gameObject);
+                            AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PickupSound, hoveredObject.gameObject);
+                            // Remember the current distance from the pointing device to the grabbed object.
+                            distanceToUser = Vector3.Distance(Raycasting.UserPointsTo().origin, grabbedObject.Position);
+                            CurrentState = IReversibleAction.Progress.InProgress;
+                        }
+                    }
+                    else // continue moving the grabbed object
+                    {
+                        // The grabbed object will be moved on the surface of a sphere with
+                        // radius distanceToUser in the direction the user is pointing to.
+                        Ray ray = Raycasting.UserPointsTo();
+                        grabbedObject.MoveTo(ray.origin + distanceToUser * ray.direction);
+                    }
+
+                    // The grabbed node is not yet at its final destination. The user is still moving
+                    // it. We will run a what-if reflexion analysis to give immediate feedback on the
+                    // consequences if the user were putting the grabbed node onto the node the user
+                    // is currently aiming at.
+                    UpdateHierarchy();
                 }
-                grabbedObject.UnGrab();
-                // Action is finished.
-                CurrentState = IReversibleAction.Progress.Completed;
-                return true;
+                else if (grabbedObject.IsGrabbed) // dragging has ended
+                {
+                    // Finalize the action with the grabbed object.
+                    if (grabbedObject.GrabbedGameObject != null)
+                    {
+                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, grabbedObject.GrabbedGameObject);
+                    }
+                    grabbedObject.UnGrab();
+                    // Action is finished.
+                    CurrentState = IReversibleAction.Progress.Completed;
+                    return true;
+                }
+                return false;
             }
-            return false;
         }
 
         /// <summary>

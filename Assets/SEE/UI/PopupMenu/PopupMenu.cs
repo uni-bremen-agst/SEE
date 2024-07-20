@@ -108,6 +108,11 @@ namespace SEE.UI.PopupMenu
             menu.gameObject.SetActive(false);
         }
 
+        protected override void StartVR()
+        {
+            StartDesktop();
+        }
+
         /// <summary>
         /// Adds a new <paramref name="entry"/> to the menu.
         /// </summary>
