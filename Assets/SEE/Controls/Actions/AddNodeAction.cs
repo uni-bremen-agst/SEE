@@ -23,7 +23,24 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
             bool result = false;
-
+            if (XRSEEActions.hoveredGameObject != null && XRSEEActions.Delete && XRSEEActions.hoveredGameObject.HasNodeRef() &&
+                XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit res))
+            {
+                GameObject parent = XRSEEActions.hoveredGameObject;
+                addedGameNode = GameNodeAdder.AddChild(parent);
+                // addedGameNode has the scale and position of parent.
+                // The position at which the parent was hit will be the center point of the addedGameNode.
+                addedGameNode.transform.position = res.point;
+                // PutOn makes sure addedGameNode fits into parent.
+                GameNodeMover.PutOn(child: addedGameNode.transform, parent: parent, true);
+                memento = new Memento(child: addedGameNode, parent: parent);
+                memento.NodeID = addedGameNode.name;
+                new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
+                result = true;
+                CurrentState = IReversibleAction.Progress.Completed;
+                XRSEEActions.Delete = false;
+                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewNodeSound, parent);
+            }
             // FIXME: Needs adaptation for VR where no mouse is available.
             if (Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)

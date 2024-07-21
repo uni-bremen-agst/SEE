@@ -133,22 +133,44 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
             bool result = false;
-
             // Assigning the game objects to be connected.
             // Checking whether the two game objects are not null and whether they are
             // actually nodes.
             // FIXME: We need an interaction for VR, too.
-            if (HoveredObject != null && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI() && HoveredObject.HasNodeRef())
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
             {
-                if (from == null)
+                if (XRSEEActions.hoveredGameObject != null && XRSEEActions.Delete && XRSEEActions.hoveredGameObject.HasNodeRef())
                 {
-                    // No source selected yet; this interaction is meant to set the source.
-                    from = HoveredObject;
+                    Debug.Log("nice");
+                    if (from == null)
+                    {
+                        from = XRSEEActions.hoveredGameObject;
+                        XRSEEActions.Delete = false;
+                        Debug.Log(from.name);
+                    }
+                    else if (to == null)
+                    {
+                        to = XRSEEActions.hoveredGameObject;
+                        XRSEEActions.Delete = false;
+                        Debug.Log(to.name);
+                    }
                 }
-                else if (to == null)
+            }
+            else
+            {
+                if (HoveredObject != null && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI() && HoveredObject.HasNodeRef())
                 {
-                    // Source is already set; this interaction is meant to set the target.
-                    to = HoveredObject;
+                    Debug.Log("nice");
+                    if (from == null)
+                    {
+                        // No source selected yet; this interaction is meant to set the source.
+                        from = HoveredObject;
+                    }
+                    else if (to == null)
+                    {
+                        // Source is already set; this interaction is meant to set the target.
+                        to = HoveredObject;
+                    }
                 }
             }
             // Note: from == to may be possible.

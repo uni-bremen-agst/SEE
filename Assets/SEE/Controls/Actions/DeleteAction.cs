@@ -115,23 +115,46 @@ namespace SEE.Controls.Actions
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            // FIXME: Needs adaptation for VR where no mouse is available.
-            if (Input.GetMouseButtonDown(0)
-                && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.None)
+            Debug.Log(XRSEEActions.Delete);
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
             {
-                // the hit object is the one to be deleted
-                hitGraphElement = raycastHit.collider.gameObject;
-                Assert.IsTrue(hitGraphElement.HasNodeRef() || hitGraphElement.HasEdgeRef());
-                InteractableObject.UnselectAll(true);
-                (_, deletedGameObjects) = GameElementDeleter.Delete(hitGraphElement);
-                new DeleteNetAction(hitGraphElement.name).Execute();
-                CurrentState = IReversibleAction.Progress.Completed;
-                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
-                return true; // the selected objects are deleted and this action is done now
+                if (XRSEEActions.Delete)
+                {
+                    GameObject DeleteGameObject = XRSEEActions.hoveredGameObject;
+                    Assert.IsTrue(DeleteGameObject.HasNodeRef() || DeleteGameObject.HasEdgeRef());
+                    InteractableObject.UnselectAll(true);
+                    (_, deletedGameObjects) = GameElementDeleter.Delete(DeleteGameObject);
+                    new DeleteNetAction(DeleteGameObject.name).Execute();
+                    CurrentState = IReversibleAction.Progress.Completed;
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
+                    XRSEEActions.Delete = false;
+                    return true; // the selected objects are deleted and this action is done now
+                }
+                else
+                {
+                    return false;
+                }
             }
             else
             {
-                return false;
+                // FIXME: Needs adaptation for VR where no mouse is available.
+                if (Input.GetMouseButtonDown(0)
+                    && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.None)
+                {
+                    // the hit object is the one to be deleted
+                    hitGraphElement = raycastHit.collider.gameObject;
+                    Assert.IsTrue(hitGraphElement.HasNodeRef() || hitGraphElement.HasEdgeRef());
+                    InteractableObject.UnselectAll(true);
+                    (_, deletedGameObjects) = GameElementDeleter.Delete(hitGraphElement);
+                    new DeleteNetAction(hitGraphElement.name).Execute();
+                    CurrentState = IReversibleAction.Progress.Completed;
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
+                    return true; // the selected objects are deleted and this action is done now
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
 
