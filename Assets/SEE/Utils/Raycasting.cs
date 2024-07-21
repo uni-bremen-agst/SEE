@@ -178,19 +178,40 @@ namespace SEE.Utils
 
             raycastHit = new RaycastHit();
             obj = null;
-            if (!IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out RaycastHit hit))
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
             {
-                raycastHit = hit;
-                if (hit.transform.TryGetComponent(out InteractableObject io))
+                if (XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit ray))
                 {
-                    result = io.GraphElemRef.Elem switch
+                    raycastHit = ray;
+                    if (ray.transform.TryGetComponent(out InteractableObject io))
                     {
-                        null => HitGraphElement.None,
-                        Node => HitGraphElement.Node,
-                        Edge => HitGraphElement.Edge,
-                        _ => throw new System.ArgumentOutOfRangeException()
-                    };
-                    obj = io;
+                        result = io.GraphElemRef.Elem switch
+                        {
+                            null => HitGraphElement.None,
+                            Node => HitGraphElement.Node,
+                            Edge => HitGraphElement.Edge,
+                            _ => throw new System.ArgumentOutOfRangeException()
+                        };
+                        obj = io;
+                    }
+                }
+            }
+            else
+            {
+                if (!IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out RaycastHit hit))
+                {
+                    raycastHit = hit;
+                    if (hit.transform.TryGetComponent(out InteractableObject io))
+                    {
+                        result = io.GraphElemRef.Elem switch
+                        {
+                            null => HitGraphElement.None,
+                            Node => HitGraphElement.Node,
+                            Edge => HitGraphElement.Edge,
+                            _ => throw new System.ArgumentOutOfRangeException()
+                        };
+                        obj = io;
+                    }
                 }
             }
             return result;

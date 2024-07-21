@@ -395,7 +395,7 @@ namespace SEE.UI.Window.TreeWindow
                     // Right click opens the context menu, left/middle click expands/collapses the item.
                     pointerHelper.ClickEvent.AddListener(e =>
                     {
-                        if (e.button == PointerEventData.InputButton.Right)
+                        if (e.button == PointerEventData.InputButton.Right || XRSEEActions.ContextMenu)
                         {
                             if (representedGraphElement == null)
                             {
@@ -855,6 +855,11 @@ namespace SEE.UI.Window.TreeWindow
                                                     filterButton, sortButton, groupButton);
 
             Rebuild();
+        }
+
+        protected override void StartVR()
+        {
+            StartDesktop();
         }
 
         /// <summary>
