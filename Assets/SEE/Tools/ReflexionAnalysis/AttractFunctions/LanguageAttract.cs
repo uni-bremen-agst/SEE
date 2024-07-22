@@ -33,6 +33,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         private INodeReader nodeReader;
 
         /// <summary>
+        /// Determines if the created documents by this attract function should be used as
+        /// a set rather than a vector
+        /// </summary>
+        protected bool useDocumentsAsSet;
+
+        /// <summary>
         /// Constructor for Attract functions deriving from LanguageAttract.
         /// 
         /// Reads the TokenLanguage from the given configuration file.
@@ -43,10 +49,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <param name="config">Configuration objects containing parameters to configure this attraction function</param>
         protected LanguageAttract(ReflexionGraph reflexionGraph,
                                   CandidateRecommendation candidateRecommendation,
-                                  LanguageAttractConfig config) : base(reflexionGraph, candidateRecommendation, config)
+                                  LanguageAttractConfig config,
+                                  bool useDocumentsAsSet = false) : base(reflexionGraph, candidateRecommendation, config)
         {
             TokenLanguage = TokenLanguage.GetTokenLanguageByType(config.TokenLanguageType);
             nodeReader = new NodeReader();
+            this.useDocumentsAsSet = useDocumentsAsSet;
         }
 
         /// <summary>
@@ -55,56 +63,56 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <param name="cluster"></param>
         /// <param name="node"></param>
         /// <param name="documents"></param>
-        protected void CreateCdaTerms(Node cluster, Node node, Dictionary<string, IDocument> documents)
-        {
-            // UnityEngine.Debug.Log($"Try to create CDA Terms for {nodeChangedInMapping.ID} and cluster {cluster.ID}...");
+        //protected void CreateCdaTerms(Node cluster, Node node, Dictionary<string, IDocument> documents)
+        //{
+        //    // UnityEngine.Debug.Log($"Try to create CDA Terms for {nodeChangedInMapping.ID} and cluster {cluster.ID}...");
 
-            // TODO: Consider whole subtree here?
-            List<Edge> edges = node.GetImplementationEdges();
+        //    // TODO: Consider whole subtree here?
+        //    List<Edge> edges = node.GetImplementationEdges();
 
-            IDocument clusterDocument = new Document();
+        //    IDocument clusterDocument = new Document();
 
-            foreach (Edge edge in edges)
-            {
-                bool edgeIsOutgoing = edge.Source.ID.Equals(node.ID);
+        //    foreach (Edge edge in edges)
+        //    {
+        //        bool edgeIsOutgoing = edge.Source.ID.Equals(node.ID);
 
-                Node neighbor = edgeIsOutgoing ? edge.Target : edge.Source;
+        //        Node neighbor = edgeIsOutgoing ? edge.Target : edge.Source;
 
-                Node neighborCluster = this.reflexionGraph.MapsTo(neighbor);
+        //        Node neighborCluster = this.reflexionGraph.MapsTo(neighbor);
 
-                if (neighborCluster == null)
-                {
-                    continue;
-                } 
-                else
-                {
-                    // create cda term
-                    string term = edgeIsOutgoing ? $"{cluster.ID} -{edge.Type}- {neighborCluster.ID}"
-                                                       : $"{neighborCluster.ID} -{edge.Type}- {cluster.ID}";
+        //        if (neighborCluster == null)
+        //        {
+        //            continue;
+        //        } 
+        //        else
+        //        {
+        //            // create cda term
+        //            string term = edgeIsOutgoing ? $"{cluster.ID} -{edge.Type}- {neighborCluster.ID}"
+        //                                               : $"{neighborCluster.ID} -{edge.Type}- {cluster.ID}";
 
-                    // UnityEngine.Debug.Log($"Created term {term}.");
+        //            // UnityEngine.Debug.Log($"Created term {term}.");
 
-                    // add for current changed cluster
-                    clusterDocument.AddWord(term);
+        //            // add for current changed cluster
+        //            clusterDocument.AddWord(term);
 
-                    // add cda terms for self loops only to the cluster document
-                    if (!neighborCluster.ID.Equals(cluster.ID))
-                    {
-                        if (!documents.TryGetValue(neighborCluster.ID, out IDocument neighborDocument))
-                        {
-                            neighborDocument = new Document();
-                            documents[neighborCluster.ID] = neighborDocument;
-                        }
-                        neighborDocument.AddWord(term); 
-                    }
-                }
-            }
+        //            // add cda terms for self loops only to the cluster document
+        //            if (!neighborCluster.ID.Equals(cluster.ID))
+        //            {
+        //                if (!documents.TryGetValue(neighborCluster.ID, out IDocument neighborDocument))
+        //                {
+        //                    neighborDocument = new Document();
+        //                    documents[neighborCluster.ID] = neighborDocument;
+        //                }
+        //                neighborDocument.AddWord(term); 
+        //            }
+        //        }
+        //    }
 
-            if (clusterDocument.WordCount > 0)
-            {
-                documents.Add(cluster.ID, clusterDocument); 
-            }
-        }
+        //    if (clusterDocument.WordCount > 0)
+        //    {
+        //        documents.Add(cluster.ID, clusterDocument); 
+        //    }
+        //}
 
         /// <summary>
         /// This methods adds package paths and name spaces
@@ -177,6 +185,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 Document document1 = this.GetStandardDocument(node1);
                 Document document2 = this.GetStandardDocument(node2);
                 Document mergedDocument = Document.MergeDocuments(document1, document2, mergingType);
+                mergedDocument.UseAsSet = useDocumentsAsSet;
                 cachedDocuments[mergedDocId] = mergedDocument;
             }
             return cachedDocuments[mergedDocId].Clone();
@@ -196,6 +205,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             else
             {
                 Document doc = new Document();
+                doc.UseAsSet = useDocumentsAsSet;
                 this.AddStandardTerms(node, doc);
                 return doc;
             }
@@ -258,6 +268,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             Document cachedDocument = new Document();
             cachedDocument.AddWords(words);
             document.AddWords(cachedDocument);
+            cachedDocument.UseAsSet = useDocumentsAsSet;
             cachedDocuments.Add(node.ID, cachedDocument);
         }
 

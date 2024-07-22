@@ -75,6 +75,21 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 return State.Undefined;
             }
 
+            // TODO: good handling?
+            //if (reflexionGraph.MapsTo(implNode) != null)
+            //{
+            //    if(reflexionGraph.MapsTo(implNode).ID.Equals(cluster.ID))
+            //    {
+            //        return edge.State();
+            //    } 
+            //    else
+            //    {
+            //        // child will be mapped due to a mapped parent but also is compared to another cluster
+            //        // which makes no sense
+            //        return State.Undefined;
+            //    }
+            //}
+
             string originNodeId = outgoing ? implNode.ID : neighbor.ID;
             string targetNodeId = outgoing ? neighbor.ID : implNode.ID;
             string originClusterId = outgoing ? cluster.ID : neighborCluster.ID;
@@ -86,6 +101,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             {
                 UpdateCache(implNode, cluster);
             }
+
+            if (!this.cache.ContainsKey(key))
+            {
+                return State.Undefined;
+            }
+
             return this.cache[key]; 
         }
 
@@ -105,23 +126,24 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <param name="cluster">Given cluster node</param>
         private void UpdateCache(Node descendantOfCandidate, Node cluster)
         {
-            Node mapsTo = reflexionGraph.MapsTo(descendantOfCandidate);
+            Node currentMapsTo = reflexionGraph.MapsTo(descendantOfCandidate);
 
-            bool mappingChangeRequired = mapsTo != cluster && mapsTo != null;
+            // TODO: how to handle parent relationships properly
+            //bool mappingChangeRequired = mapsTo != cluster && mapsTo != null;
 
-            Node explicitlyMappedNode = descendantOfCandidate;
+            //Node explicitlyMappedNode = descendantOfCandidate;
 
-            if (mappingChangeRequired)
-            {
-                while (explicitlyMappedNode != null && !reflexionGraph.IsExplicitlyMapped(explicitlyMappedNode))
-                {
-                    explicitlyMappedNode = explicitlyMappedNode.Parent;
-                }
+            //if (mappingChangeRequired)
+            //{
+            //    while (explicitlyMappedNode != null && !reflexionGraph.IsExplicitlyMapped(explicitlyMappedNode))
+            //    {
+            //        explicitlyMappedNode = explicitlyMappedNode.Parent;
+            //    }
 
-                reflexionGraph.RemoveFromMappingSilent(explicitlyMappedNode);
-            }
+            //    reflexionGraph.RemoveFromMappingSilent(explicitlyMappedNode);
+            //}
 
-            reflexionGraph.AddToMappingSilent(cluster, descendantOfCandidate);
+            reflexionGraph.AddToMappingSilent(cluster, descendantOfCandidate, overrideMapping: currentMapsTo != null);
 
             List<Edge> subtreeEdgesIncoming = new List<Edge>();
             List<Edge> subtreeEdgesOutgoing = new List<Edge>();
@@ -136,18 +158,20 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             {
                 Node neighborCluster = reflexionGraph.MapsTo(edge.Target);
                 Node sourceCluster = reflexionGraph.MapsTo(edge.Source);
+                string key = string.Empty;
                 if (neighborCluster != null && sourceCluster != null)
                 {
-                    string key = $"{edge.Source.ID}#{sourceCluster.ID}#{edge.Target.ID}#{neighborCluster.ID}#{edge.Type}";
+                    key = $"{edge.Source.ID}#{sourceCluster.ID}#{edge.Target.ID}#{neighborCluster.ID}#{edge.Type}";
                     this.cache[key] = edge.State();
                 }
+                // UnityEngine.Debug.Log($"try updating cache... edge={edge?.ToShortString()} neighborCluster={neighborCluster?.ID} neighborCluster={sourceCluster?.ID} key={key}");
             }
 
             reflexionGraph.RemoveFromMappingSilent(descendantOfCandidate);
 
-            if (mappingChangeRequired)
+            if (currentMapsTo != null)
             {
-                reflexionGraph.AddToMappingSilent(mapsTo, explicitlyMappedNode);
+                reflexionGraph.AddToMappingSilent(currentMapsTo, descendantOfCandidate);
             }
         }
 

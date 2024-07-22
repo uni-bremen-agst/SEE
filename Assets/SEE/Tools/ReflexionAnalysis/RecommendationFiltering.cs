@@ -9,7 +9,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
     /// This class provides automatic sorting and filtering for 
     /// add mapping pairs to find recommendations and candidate sets.
     /// </summary>
-    public class RecommendationFiltering
+    public class RecommendationFiltering : IRecommendationFilter
     {
         /// <summary>
         /// Currently the highest attraction value
@@ -62,11 +62,31 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         public IEnumerable<MappingPair> MappingPairs { get => mappingPairs.Values.ToList(); }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public IEnumerable<MappingPair> GetRecommendations()
+        {
+            return this.Recommendations;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public IEnumerable<MappingPair> GetMappingPairs()
+        {
+            return this.MappingPairs;
+        }
+
+        /// <summary>
         /// Returns the all recommended mapping pairs for a given cluster node id.
         /// </summary>
         /// <param name="clusterId">Given cluster node id.</param>
         /// <returns><see cref="IEnumerable"/> object containing the recommened mapping pairs</returns>
-        public IEnumerable<MappingPair> GetRecommendationsForCluster(string clusterId)
+        public IEnumerable<MappingPair> GetRecommendationForCluster(string clusterId)
         {
             IList<MappingPair> recommendationsForCluster = new List<MappingPair>();
             foreach (string candidateId in candidatesInRecommendations.Keys)
@@ -86,7 +106,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="candidateId">Given canddiate node id.</param>
         /// <returns><see cref="IEnumerable"/> object containing the recommened mapping pairs</returns>
-        public IEnumerable<MappingPair> GetRecommendationsForCandidate(string candidateId)
+        public IEnumerable<MappingPair> GetRecommendationForCandidate(string candidateId)
         {
             IList<MappingPair> recommendationsForCandidate = new List<MappingPair>();
             foreach (string clusterId in clusterInRecommendations.Keys)

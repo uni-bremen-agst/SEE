@@ -249,6 +249,7 @@ namespace SEE.Controls.KeyActions
             // Candidate recommendation
             Register(KeyAction.ContinueMappingExperiment, KeyCode.F6, "Continues/Stop Experiment.",
                 KeyActionCategory.Architecture, "Continues or Stops mapping Experiment.");
+
 			//TODO: Delete before merging the branch?
             Register(KeyAction.FinishStudyIteration, KeyCode.F7, "Finishes run of the mapping study",
                 KeyActionCategory.Architecture, "Finishes current run within the candidate recommendation study.");

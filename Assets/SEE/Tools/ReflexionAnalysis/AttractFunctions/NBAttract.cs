@@ -47,7 +47,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <param name="config">Configuration objects containing parameters to configure this attraction function</param>
         public NBAttract(ReflexionGraph reflexionGraph, 
                CandidateRecommendation candidateRecommendation, 
-               NBAttractConfig config) : base(reflexionGraph, candidateRecommendation, config)
+               NBAttractConfig config) : base(reflexionGraph, candidateRecommendation, config, useDocumentsAsSet: true)
         {
             this.useCDA = config.UseCDA;
             this.useStandardTerms = config.UseStandardTerms;
@@ -108,6 +108,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         public override double GetAttractionValue(Node candidate, Node cluster)
         {
             Document doc = new Document();
+            doc.UseAsSet = this.useDocumentsAsSet;
 
             if (this.useStandardTerms)
             {
@@ -115,7 +116,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 this.AddWordsOfAscendants(candidate, doc);
             }
 
-            Dictionary<string, IDocument> docCdaTerms = new Dictionary<string, IDocument>();
+            // Dictionary<string, IDocument> docCdaTerms = new Dictionary<string, IDocument>();
 
             //if (this.useCDA)
             //{

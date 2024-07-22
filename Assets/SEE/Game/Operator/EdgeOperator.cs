@@ -217,6 +217,11 @@ namespace SEE.Game.Operator
 
         protected override Tween[] BlinkAction(int count, float duration)
         {
+            if (Color == null || spline == null)
+            {
+                return new Tween[] { };
+            }
+
             // If we're interrupting another blinking, we need to make sure the color still has the correct value.
             spline.GradientColors = Color.TargetValue;
 

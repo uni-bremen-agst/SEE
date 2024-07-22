@@ -32,6 +32,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             Intersection
         }
 
+        public bool UseAsSet = false;
+
         /// <summary>
         /// Current word frequencies
         /// </summary>
@@ -58,7 +60,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <returns>A clone of this object.</returns>
         public Document Clone()
         {
-            return new Document(new Dictionary<string, int>(this.wordFrequencies));
+            Document clone = new Document(new Dictionary<string, int>(this.wordFrequencies));
+            clone.UseAsSet = this.UseAsSet;
+            return clone;
+        }
+
+        IDocument IDocument.Clone()
+        {
+            return this.Clone();
         }
 
         /// <summary>
@@ -170,7 +179,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             int oldVal = wordFrequencies[word];
             wordFrequencies[word] += count;
-            // UpdateSquareSum(oldVal, wordFrequencies[word]);
         }
 
         /// <summary>
@@ -197,7 +205,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             int oldVal = wordFrequencies[word];
             wordFrequencies[word]-= count;
-            // UpdateSquareSum(oldVal, wordFrequencies[word]);
 
             if (wordFrequencies[word] < 0)
             {
@@ -220,7 +227,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         {
             if (wordFrequencies.ContainsKey(word))
             {
-                return wordFrequencies[word];
+                if (UseAsSet)
+                {
+                    return 1;
+                } 
+                else
+                {
+                    return wordFrequencies[word]; 
+                }
             }
             return 0;
         }
@@ -279,7 +293,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             foreach (string word in wordsMerged)
             {
-                mergedDocument.AddWord(word, doc2.GetFrequency(word) + doc1.GetFrequency(word));
+                doc2.wordFrequencies.TryGetValue(word, out int freq2);
+                doc1.wordFrequencies.TryGetValue(word, out int freq1);
+                mergedDocument.AddWord(word, freq1 + freq2);
             }
 
             return mergedDocument;
@@ -454,10 +470,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// Method to clone this document.
         /// </summary>
         /// <returns>A clone of this object.</returns>
-        IDocument IDocument.Clone()
-        {
-            return this.Clone();
-        }
 
         /// <summary>
         /// Updates the square sum of this document incremental.

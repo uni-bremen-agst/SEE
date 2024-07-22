@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using Sirenix.Serialization;
 using SEE.UI.Notification;
 using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
+using System.IO;
 
 namespace SEE.Game.City
 {
@@ -110,6 +111,7 @@ namespace SEE.Game.City
                 // TODO: Maybe a provider returning an empty graph would be the better approach
                 OracleMappingProvider = null;
             }
+            RecommendationSettings.OutputPath.Path = Path.GetDirectoryName(ConfigurationPath.Path);
         }
 
         #region CandidateRecommendation
@@ -132,6 +134,7 @@ namespace SEE.Game.City
         private async UniTask UpdateRecommendationSettings(ReflexionGraph loadedGraph, RecommendationSettings recommendationSettings, Graph oracleMapping)
         {
             candidateRecommendationViz = gameObject.AddOrGetComponent<CandidateRecommendationViz>();
+            this.RecommendationSettings = recommendationSettings;
             if (candidateRecommendationViz != null)
             {
                 loadedGraph.Subscribe(candidateRecommendationViz);
@@ -235,9 +238,23 @@ namespace SEE.Game.City
 
         [Button("Run Experiment", ButtonSizes.Small)]
         [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Run Experiment")]
-        public async void RunMappingExperiment()
+        public async UniTaskVoid RunMappingExperiment()
         {
             await candidateRecommendationViz.RunExperimentAsync(this.RecommendationSettings, oracleMapping);
+        }
+
+        [Button("Evaluation", ButtonSizes.Small)]
+        [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Evaluation")]
+        public async UniTaskVoid Evaluation()
+        {
+            await candidateRecommendationViz.Evaluation();
+        }
+
+        [Button("Dump Tree", ButtonSizes.Small)]
+        [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Dump Tree")]
+        public async void DumpGraph()
+        {
+            this.ReflexionGraph?.DumpTree();
         }
 
         #endregion
@@ -250,7 +267,7 @@ namespace SEE.Game.City
         [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Start Study")]
         public async UniTask StartStudy()
         {
-            if(studyStarted)
+            if(studyStarted || candidateRecommendationViz == null)
             {
                 return;
             }

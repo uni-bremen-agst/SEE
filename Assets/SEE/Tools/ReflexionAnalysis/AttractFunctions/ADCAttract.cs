@@ -27,12 +27,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// This dictionary contains a document for architecture dependecies which cumulate 
         /// all words of the edges which are allowed through them.
         /// </summary>
-        private Dictionary<string, Document> wordsPerDependency = new Dictionary<string, Document>();
+        private Dictionary<string, Document> wordsPerArchEdge = new Dictionary<string, Document>();
 
         /// <summary>
-        /// This dictionary contains for ids of implementation edges by which architecture dependency they are allowed.
+        /// This dictionary contains for ids of implementation edges by which architecture dependency they are allowed by.
         /// </summary>
-        private Dictionary<string, Edge> allowedByDependency = new Dictionary<string, Edge>();
+        private Dictionary<string, Edge> allowedByArchEdge = new Dictionary<string, Edge>();
 
         /// <summary>
         /// merging type used to merge documents for edges
@@ -64,7 +64,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         {
             StringBuilder sb = new StringBuilder();
             sb.Append($"Words per abstract dependency:{Environment.NewLine}");
-            foreach (string edgeID in wordsPerDependency.Keys)
+            foreach (string edgeID in wordsPerArchEdge.Keys)
             {
                 Edge edge = reflexionGraph.GetEdge(edgeID);
                 if (edge != null)
@@ -75,7 +75,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 {
                     sb.Append(edgeID);
                 }
-                sb.Append($" :{Environment.NewLine}{wordsPerDependency[edgeID]}{Environment.NewLine}");
+                sb.Append($" :{Environment.NewLine}{wordsPerArchEdge[edgeID]}{Environment.NewLine}");
             }
             return sb.ToString();
         }
@@ -145,9 +145,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                         throw new Exception($"No specifying architecture dependency was found for the edge {edge.ID} in edgeState {edgeState}.");
                     }
 
-                    if (this.wordsPerDependency.ContainsKey(architectureEdge.ID))
+                    if (this.wordsPerArchEdge.ContainsKey(architectureEdge.ID))
                     {
-                        Document architectureEdgeDoc = this.wordsPerDependency[architectureEdge.ID];
+                        Document architectureEdgeDoc = this.wordsPerArchEdge[architectureEdge.ID];
                         Document mergedDocument = this.GetMergedTerms(edge.Source, edge.Target, MergingType);
                         double similarity = Document.OverlapCoefficient(mergedDocument, architectureEdgeDoc);
                         attraction += similarity;
@@ -198,7 +198,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             State edgeState = implEdge.State();
 
             if ((edgeState == State.Allowed || edgeState == State.ImplicitlyAllowed) 
-                 && !this.allowedByDependency.ContainsKey(implEdge.ID))
+                 && !this.allowedByArchEdge.ContainsKey(implEdge.ID))
             {
                 Node mapsToSource = this.reflexionGraph.MapsTo(implEdge.Source);
                 Node mapsToTarget = this.reflexionGraph.MapsTo(implEdge.Target);
@@ -213,17 +213,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
                 this.FindNodesToUpdateOnChangedArchEdge(architectureEdge);
 
-                this.allowedByDependency[implEdge.ID] = architectureEdge;
+                this.allowedByArchEdge[implEdge.ID] = architectureEdge;
 
                 Document mergedDocument = this.GetMergedTerms(implEdge.Source, implEdge.Target, MergingType);
 
-                if (!wordsPerDependency.ContainsKey(architectureEdge.ID))
+                if (!wordsPerArchEdge.ContainsKey(architectureEdge.ID))
                 {
-                    wordsPerDependency.Add(architectureEdge.ID, mergedDocument.Clone());
+                    wordsPerArchEdge.Add(architectureEdge.ID, mergedDocument.Clone());
                 }
                 else
                 {
-                    wordsPerDependency[architectureEdge.ID].AddWords(mergedDocument);
+                    wordsPerArchEdge[architectureEdge.ID].AddWords(mergedDocument);
                 }
             } 
         }
@@ -282,7 +282,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             }
             else
             {
-                throw new Exception("State must be allowed or implicitly allowed to find allowing architecture dependency.");
+                throw new Exception($"State must be allowed or implicitly allowed to find allowing architecture dependency. given state={state} sourceCluster={sourceCluster.ID} targetCluster={targetCluster.ID}");
             }
 
             return architectureEdge;
@@ -293,23 +293,23 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// given implementation edge, retrieves the architecture edges which previously allowed
         /// the implementation edge and removes the words of the merged document from the 
         /// document of the architecture edge. To retrieve the previously allowing architecture edge
-        /// the datastructure <see cref="allowedByDependency"/> is used. The given implementation 
+        /// the datastructure <see cref="allowedByArchEdge"/> is used. The given implementation 
         /// edge is removed from this datastructure after the call. 
         /// </summary>
         /// <param name="implEdge">Given implementation edge</param>
         private void DeleteDocumentsFromAllowingDependency(Edge implEdge)
         {
-            if(this.allowedByDependency.ContainsKey(implEdge.ID))
+            if(this.allowedByArchEdge.ContainsKey(implEdge.ID))
             {
-                Edge architectureEdge = this.allowedByDependency[implEdge.ID];
+                Edge architectureEdge = this.allowedByArchEdge[implEdge.ID];
 
-                this.allowedByDependency.Remove(implEdge.ID);
+                this.allowedByArchEdge.Remove(implEdge.ID);
 
                 Document mergedDocument = this.GetMergedTerms(implEdge.Source, implEdge.Target, MergingType);
 
-                if (wordsPerDependency.ContainsKey(architectureEdge.ID))
+                if (wordsPerArchEdge.ContainsKey(architectureEdge.ID))
                 {
-                    wordsPerDependency[architectureEdge.ID].RemoveWords(mergedDocument);
+                    wordsPerArchEdge[architectureEdge.ID].RemoveWords(mergedDocument);
                 }
 
                 if (architectureEdge != null)
@@ -336,26 +336,30 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             this.AddClusterToUpdate(edge.Source.ID);
             this.AddClusterToUpdate(edge.Target.ID);
 
-            IEnumerable<Edge> neighborsOfNodesPointingToSourceCluster = 
-                ClusterSource.Incomings.Where(e => e.IsInMapping()).SelectMany(e => e.Source.GetImplementationEdges());
-            IEnumerable<Edge> neighborsOfNodesPointingToTargetCluster = 
-                ClusterTarget.Incomings.Where(e => e.IsInMapping()).SelectMany(e => e.Source.GetImplementationEdges());
+            this.AddAllCandidatesToUpdate();
 
-            neighborsOfNodesPointingToSourceCluster.ForEach(e => UpdateImplementationEdge(e));
-            neighborsOfNodesPointingToTargetCluster.ForEach(e => UpdateImplementationEdge(e));
+            // TODO: This updating should work locally but seems to be slower
+            // Than just update all candidates, this might be due to a bug
+            // or heavy iteration of edges
+            //IEnumerable<Edge> neighborsOfNodesPointingToSourceCluster =
+            //    ClusterSource.Incomings.Where(e => e.IsInMapping()).SelectMany(e => e.Source.GetImplementationEdges());
+            //IEnumerable<Edge> neighborsOfNodesPointingToTargetCluster =
+            //    ClusterTarget.Incomings.Where(e => e.IsInMapping()).SelectMany(e => e.Source.GetImplementationEdges());
 
-            void UpdateImplementationEdge(Edge e)
-            {
-                if (this.reflexionGraph.MapsTo(e.Source) == null)
-                {
-                    this.AddCandidateToUpdate(e.Source.ID);
-                }
+            //neighborsOfNodesPointingToSourceCluster.ForEach(e => UpdateImplementationEdge(e));
+            //neighborsOfNodesPointingToTargetCluster.ForEach(e => UpdateImplementationEdge(e));
 
-                if (this.reflexionGraph.MapsTo(e.Target) == null)
-                {
-                    this.AddCandidateToUpdate(e.Target.ID);
-                }
-            }
+            //void UpdateImplementationEdge(Edge e)
+            //{
+            //    if (this.reflexionGraph.MapsTo(e.Source) == null)
+            //    {
+            //        this.AddCandidateToUpdate(e.Source.ID);
+            //    } 
+            //    else if (this.reflexionGraph.MapsTo(e.Target) == null)
+            //    {
+            //        this.AddCandidateToUpdate(e.Target.ID);
+            //    }
+            //}
         }
 
         /// <summary>
@@ -365,9 +369,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// False otherwise.</returns>
         public override bool EmptyTrainingData()
         {
-            foreach (string id in wordsPerDependency.Keys)
+            foreach (string id in wordsPerArchEdge.Keys)
             {
-                if (wordsPerDependency[id].WordCount > 0)
+                if (wordsPerArchEdge[id].WordCount > 0)
                 {
                     return false;
                 }
@@ -383,8 +387,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         {
             this.edgeStateCache.ClearCache();
             this.ClearDocumentCache();
-            this.wordsPerDependency.Clear();
-            this.allowedByDependency.Clear();
+            this.wordsPerArchEdge.Clear();
+            this.allowedByArchEdge.Clear();
         }
 
         /// <summary>
@@ -425,8 +429,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// Add the source node and the target cluster node 
         /// to cluster to update if they are considered to be cluster.
         /// 
-        /// Removed the edge from the datastructures <see cref="allowedByDependency"/>
-        /// and <see cref="wordsPerDependency"/>.
+        /// Removed the edge from the datastructures <see cref="allowedByArchEdge"/>
+        /// and <see cref="wordsPerArchEdge"/>.
         /// 
         /// </summary>
         /// <param name="archEdge">Given architecture edge</param>
@@ -446,16 +450,16 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 this.AddClusterToUpdate(archEdge.Target.ID);
             }
 
-            if (this.wordsPerDependency.ContainsKey(archEdge.ID))
+            if (this.wordsPerArchEdge.ContainsKey(archEdge.ID))
             {
-                this.wordsPerDependency.Remove(archEdge.ID); 
+                this.wordsPerArchEdge.Remove(archEdge.ID); 
             }
 
             IList<string> keysToDelete = new List<string>();
 
-            foreach (string implEdgeId in this.allowedByDependency.Keys)
+            foreach (string implEdgeId in this.allowedByArchEdge.Keys)
             {
-                if (this.allowedByDependency[implEdgeId].ID.Equals(archEdge.ID))
+                if (this.allowedByArchEdge[implEdgeId].ID.Equals(archEdge.ID))
                 {
                     keysToDelete.Add(implEdgeId);
                 }
@@ -463,7 +467,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             foreach (string key in keysToDelete)
             {
-                this.allowedByDependency.Remove(key);
+                this.allowedByArchEdge.Remove(key);
             }
             this.AddAllCandidatesToUpdate();
         }

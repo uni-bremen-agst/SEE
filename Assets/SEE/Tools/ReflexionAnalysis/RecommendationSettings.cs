@@ -2,6 +2,7 @@
 using SEE.Utils.Paths;
 using System;
 using UnityEngine;
+using static Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions.AttractFunction;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis
 {
@@ -70,6 +71,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         private NBAttractConfig nbAttractConfig = new NBAttractConfig();
         public NBAttractConfig NBAttractConfig { get => nbAttractConfig; set => nbAttractConfig = value; }
 
+        public NoAttractConfig noAttractConfig = new NoAttractConfig();
+
         public AttractFunctionConfig AttractFunctionConfig 
         {
             get
@@ -82,10 +85,33 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                         return this.NBAttractConfig;
                     case AttractFunction.AttractFunctionType.ADCAttract:
                         return this.ADCAttractConfig;
+                    case AttractFunctionType.NoAttract:
+                        return noAttractConfig;
                 }
                 throw new Exception("Unknown attract function type within recommendation settings.");
             }
         } 
         
+        public static RecommendationSettings CreateGroup(int n, 
+                                                        double initialMapping, 
+                                                        string name, 
+                                                        AttractFunctionType attractFunction,
+                                                        float phi = 1.0f)
+        {
+            RecommendationSettings settings = new RecommendationSettings();
+            settings.iterations = n;
+            settings.IgnoreTieBreakers = true;
+            settings.syncExperimentWithView = false;
+            settings.RootSeed = 258506098;
+            settings.initialMappingPercentage = initialMapping;
+            settings.attractFunctionType = attractFunction;
+            settings.CountAttractConfig.Phi = phi;
+            settings.AttractFunctionConfig.CandidateType = "Class";
+            settings.AttractFunctionConfig.ClusterType = "Cluster";
+            settings.OutputPath = new DirectoryPath();
+            settings.ExperimentName = name;
+            return settings;
+        }
+
     }
 }

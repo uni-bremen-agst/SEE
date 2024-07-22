@@ -330,6 +330,18 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             return CandidateRecommendation.GetUnmappedCandidates().Select(n => reflexionGraphViz.GetNode(n.ID));
         }
 
+        public bool IsCandidate(string candidateId)
+        {
+            if(reflexionGraphCalc.ContainsNodeID(candidateId))
+            {
+                return CandidateRecommendation.IsCandidate(reflexionGraphCalc.GetNode(candidateId));
+            } 
+            else
+            {
+                return false;
+            } 
+        }
+
         SEEReflexionCity city;
 
         /// <summary>
@@ -419,6 +431,64 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         #region experiment
 
+        public async UniTask Evaluation()
+        {
+            GameObject gameobject = SceneQueries.GetCodeCity(this.transform)?.gameObject;
+
+            if (gameobject == null)
+            {
+                throw new Exception("Could not get Reflexion city when loading oracle instructions.");
+            }
+
+            gameobject.TryGetComponent(out SEEReflexionCity city);
+
+            HashSet<string> systems = new HashSet<string>()
+            {
+                @"C:\masterarbeit-data\Systems\SpringPetClinicFramework\Reflexion.cfg"
+                //@"C:\masterarbeit-data\Systems\SweetHome3D\Reflexion.cfg"
+                //@"C:\masterarbeit-data\Systems\JabRef\Reflexion.cfg",
+                //@"C:\masterarbeit-data\Systems\compiler\Reflexion.cfg"
+                //@"C:/masterarbeit-data/Systems/CommonsImaging/Reflexion.cfg"
+            };
+
+            // systems.Add(GetConfigPath());
+
+            int n = 250;
+            double initialMapping = 0.5;
+
+            List<RecommendationSettings> settings = new()
+            {
+                //RecommendationSettings.CreateGroup(n, 0.3, "CAAttract_Zero_03", AttractFunction.AttractFunctionType.CountAttract, 0.0f),
+                //RecommendationSettings.CreateGroup(n, 0.3, "CAAttract_One_03", AttractFunction.AttractFunctionType.CountAttract, 1.0f),
+                //RecommendationSettings.CreateGroup(n, 0.3, "ADCAttract_03", AttractFunction.AttractFunctionType.ADCAttract),
+                //RecommendationSettings.CreateGroup(n, 0.3, "NBAttract_03", AttractFunction.AttractFunctionType.NBAttract),
+                //RecommendationSettings.CreateGroup(n, 0.5, "CAAttract_Zero_05", AttractFunction.AttractFunctionType.CountAttract, 0.0f),
+                //RecommendationSettings.CreateGroup(n, 0.5, "CAAttract_One_05", AttractFunction.AttractFunctionType.CountAttract, 1.0f),
+                //RecommendationSettings.CreateGroup(n, 0.5, "ADCAttract_05", AttractFunction.AttractFunctionType.ADCAttract),
+                //RecommendationSettings.CreateGroup(n, 0.5, "NBAttract_05", AttractFunction.AttractFunctionType.NBAttract),
+                RecommendationSettings.CreateGroup(n, 0.8, "CAAttract_Zero_07", AttractFunction.AttractFunctionType.CountAttract, 0.0f),
+                RecommendationSettings.CreateGroup(n, 0.8, "CAAttract_One_07", AttractFunction.AttractFunctionType.CountAttract, 1.0f),
+                RecommendationSettings.CreateGroup(n, 0.8, "ADCAttract_07", AttractFunction.AttractFunctionType.ADCAttract),
+                RecommendationSettings.CreateGroup(n, 0.8, "NBAttract_07", AttractFunction.AttractFunctionType.NBAttract)
+            };
+
+            foreach (string system in systems)
+            {
+                city.Reset();
+                city.Load(system);
+                await city.LoadDataAsync();
+
+                foreach(RecommendationSettings setting in settings)
+                {
+                    setting.Iterations = n;
+                    await city.UpdateRecommendationSettings(setting);
+                    city.RecommendationSettings = setting;
+                    setting.OutputPath.Path = Path.Combine(Path.Combine(GetConfigPath(), "Results"), setting.ExperimentName);
+                    city.RunMappingExperiment();
+                }
+            }
+        }
+
         /// <summary>
         /// Constructs an initial mapping for the visualized reflexion graph based on the loaded oracle graph. 
         /// The construction of the mapping is synchronized with the view.
@@ -446,8 +516,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             lock (visualizedReflexionGraphLock)
             {
                 initialMapping = this.CandidateRecommendation.CreateInitialMapping(initialMappingPercentage,
-                                                                                   seed,
-                                                                                   reflexionGraphViz);
+                                                                                   seed);
             }
             try
             {
@@ -526,6 +595,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             CandidateRecommendation recommendations;
 
+            recommendationSettings.OutputPath.Path = Path.Combine(this.GetConfigPath(), "Results");
+
             if (syncWithView)
             {
                 // Calculate experiment in the foreground and sync with view
@@ -546,7 +617,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 recommendations.UpdateConfiguration(graph, recommendationSettings, oracleMapping);
             }
 
-            Debug.Log($"Start Experiment {experimentName} for graph {recommendations.ReflexionGraph.Name}({recommendations.ReflexionGraph.Nodes().Count} nodes, {recommendations.ReflexionGraph.Edges().Count} edges)");
+            Debug.Log($"Start Experiment {experimentName} for graph {recommendations.ReflexionGraph.Name}({recommendations.ReflexionGraph.Nodes().Count} nodes, candidates={recommendations.ReflexionGraph.Nodes().Where(n => recommendations.IsCandidate(n))} {recommendations.ReflexionGraph.Edges().Count} edges)");
 
             if (!syncWithView)
             {
@@ -559,6 +630,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             FileStream stream;
             List<MappingExperimentResult> results = new List<MappingExperimentResult>();
+
+            Directory.CreateDirectory(recommendationSettings.OutputPath.Path);
 
             for (int i = 0; i < recommendationSettings.Iterations; ++i)
             {
@@ -593,10 +666,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     }
                 }
 
-                string trainingData = recommendations.AttractFunction.DumpTrainingData();
-                UnityEngine.Debug.Log($"Initial mapping:" + System.Environment.NewLine + trainingData);
-                string trainingDataFile = Path.Combine(recommendationSettings.OutputPath.Path, $"{experimentName}_trainingData_{currentSeed}.txt");
-                File.WriteAllText(trainingDataFile, trainingData);
+                //string trainingData = recommendations.AttractFunction.DumpTrainingData();
+                //UnityEngine.Debug.Log($"Initial mapping:" + System.Environment.NewLine + trainingData);
+                //string trainingDataFile = Path.Combine(recommendationSettings.OutputPath.Path, $"{experimentName}_trainingData_{currentSeed}.txt");
+                //File.WriteAllText(trainingDataFile, trainingData);
 
                 // 2. Generate csv file based on seed name/output path
                 string csvFile = Path.Combine(recommendationSettings.OutputPath.Path, $"{experimentName}_output_{currentSeed}.csv");
@@ -612,8 +685,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 // case 4.2 sync not with viz
                 bool ignoreTieBreakers = !syncWithView || recommendationSettings.IgnoreTieBreakers;
                 await StartAutomatedMappingAsync(recommendations, syncWithView, ignoreTieBreakers, new System.Random(currentSeed));
-                trainingData = recommendations.AttractFunction.DumpTrainingData();
-                UnityEngine.Debug.Log($"After automated mapping:" + System.Environment.NewLine + trainingData);
+                
+                //trainingData = recommendations.AttractFunction.DumpTrainingData();
+                //UnityEngine.Debug.Log($"After automated mapping:" + System.Environment.NewLine + trainingData);
 
                 // 5. Stop Recording
                 recommendations.Statistics.StopRecording();
@@ -645,8 +719,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     await this.ResetMappingAsync();
                 }
 
-                trainingData = recommendations.AttractFunction.DumpTrainingData();
-                UnityEngine.Debug.Log($"After Reset:" + System.Environment.NewLine + trainingData);
+                //trainingData = recommendations.AttractFunction.DumpTrainingData();
+                //UnityEngine.Debug.Log($"After Reset:" + System.Environment.NewLine + trainingData);
 
                 if (!recommendations.AttractFunction.EmptyTrainingData())
                 {
@@ -769,6 +843,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
                 if (syncWithView)
                 {
+                    Debug.Log($"move candidate {candidate.ID} Into cluster {cluster.ID}");
                     // GameNodeMover.MoveTo(candidateInViz.GameObject(), clusterInViz.GameObject().GetGroundCenter(), 1.0f);
                     GameNodeMover.PutOn(candidateInViz.GameObject().transform, clusterInViz.GameObject(), true);
                     // GameNodeMover.PutOnAndFit(candidateInViz.GameObject().transform, clusterInViz.GameObject(), candidateInViz.Parent.GameObject() , candidateInViz.GameObject().transform.localScale);
@@ -880,34 +955,36 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <returns>UniTaskVoid</returns>
         public async UniTaskVoid TriggerBlinkAnimation()
         {
-            IEnumerable<MappingPair> recommendations = await this.GetRecommendationsAsync();
-            await UniTask.SwitchToMainThread();
+            // TODO: the blink animation is not used this way anymore.
 
-            List<NodeOperator> nodeOperators = new List<NodeOperator>();
+            //IEnumerable<MappingPair> recommendations = await this.GetRecommendationsAsync();
+            //await UniTask.SwitchToMainThread();
 
-            // TODO: Distinction between different clusters is required(different color intensity)
-            foreach (MappingPair mappingPair in recommendations)
-            {
-                // sync node objects
-                Node cluster = this.reflexionGraphViz.GetNode(mappingPair.ClusterID);
-                Node candidate = this.reflexionGraphViz.GetNode(mappingPair.CandidateID);
+            //List<NodeOperator> nodeOperators = new List<NodeOperator>();
 
-                if(cluster != null && candidate != null)
-                {
-                    nodeOperators.Add(cluster.GameObject().AddOrGetComponent<NodeOperator>());
-                    nodeOperators.Add(candidate.GameObject().AddOrGetComponent<NodeOperator>());
-                }
-            }
+            //// TODO: Distinction between different clusters is required(different color intensity)
+            //foreach (MappingPair mappingPair in recommendations)
+            //{
+            //    // sync node objects
+            //    Node cluster = this.reflexionGraphViz.GetNode(mappingPair.ClusterID);
+            //    Node candidate = this.reflexionGraphViz.GetNode(mappingPair.CandidateID);
 
-            if (!ProcessingEvents && nodeOperators.Count > 0)
-            {
-                // blink effect
-                if (blinkEffectCoroutine != null)
-                {
-                    StopCoroutine(blinkEffectCoroutine);
-                }
-                blinkEffectCoroutine = StartCoroutine(StartBlinkEffect(nodeOperators));
-            }
+            //    if(cluster != null && candidate != null)
+            //    {
+            //        nodeOperators.Add(cluster.GameObject().AddOrGetComponent<NodeOperator>());
+            //        nodeOperators.Add(candidate.GameObject().AddOrGetComponent<NodeOperator>());
+            //    }
+            //}
+
+            //if (!ProcessingEvents && nodeOperators.Count > 0)
+            //{
+            //    // blink effect
+            //    if (blinkEffectCoroutine != null)
+            //    {
+            //        StopCoroutine(blinkEffectCoroutine);
+            //    }
+            //    blinkEffectCoroutine = StartCoroutine(StartBlinkEffect(nodeOperators));
+            //}
         }
 
         /// <summary>
@@ -964,6 +1041,31 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             CandidateRecommendation.Statistics.StartRecording(csvFile);
         }
 
+        // TODO: Does this button work? Use DumpOracle instead.
+        [Button("Check Oracle Mapping", ButtonSizes.Small)]
+        [ButtonGroup(debugButtonGroup)]
+        private void CheckOracleMapping()
+        {
+            Dictionary<Node, HashSet<Node>> initialMapping = new Dictionary<Node, HashSet<Node>>();
+
+            List<Node> candidates = CandidateRecommendation.GetCandidates();
+
+            int unknownCandidates = 0;
+            foreach(Node candidate in candidates)
+            {
+                string oracleMapsTo = CandidateRecommendation.GetExpectedClusterID(candidate.ID);
+
+                if (oracleMapsTo == null)
+                {
+                    Debug.LogWarning($"There is no information where to map node {candidate.ID} " +
+                                     $"within the oracle graph {Environment.NewLine}{candidate}");
+                    unknownCandidates++;
+                }
+            }
+
+            UnityEngine.Debug.Log($"There are {unknownCandidates} unknown candidates of {candidates.Count} candidates.");          
+        }
+
         /// <summary>
         /// Stops the recording of the mapping process.
         /// TODO: Keep as a Button?
@@ -985,9 +1087,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         {
             try
             {
-                string csvFile = Path.Combine(this.RecommendationSettings.OutputPath.Path, this.RecommendationSettings.ExperimentName + ".csv");
+                string csvFile = CandidateRecommendation.Statistics.csvFile;
                 string xmlFile = Path.Combine(this.RecommendationSettings.OutputPath.Path, this.RecommendationSettings.ExperimentName + ".xml");
                 CandidateRecommendation.Statistics.StopRecording();
+                UnityEngine.Debug.Log($"Write results to {xmlFile}...");
                 CandidateRecommendation.Statistics.WriteResultsToXml(csvFile, xmlFile);
             }
             catch (Exception e)
@@ -1152,6 +1255,18 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 Node implNode = impl.GetNode(nodes[0]);
                 Node archNode = arch.GetNode(nodes[1]);
 
+                if(implNode == null)
+                {
+                    UnityEngine.Debug.LogWarning($"Node for id {nodes[0]} could not be found within Implementation. Skip the oracle relation: {line}");
+                    return;
+                }
+
+                if (archNode == null)
+                {
+                    UnityEngine.Debug.LogWarning($"Node for id {nodes[1]} could not be found within Implementation. Skip the oracle relation: {line}");
+                    return;
+                }
+
                 Node source = new Node();
                 source.ID = implNode.ID;
                 Node target = new Node();
@@ -1171,6 +1286,34 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 oracle.AddEdge(edge);
             }
         }
+
+        // TODO: Delete later only for debug purposes
+        [Button("Print Edge Types", ButtonSizes.Small)]
+        [ButtonGroup(debugButtonGroup)]
+        public void PrintEdgeTypeInformation()
+        {
+            HashSet<string> edgeTypes = this.reflexionGraphCalc.Edges().Where(e => e.IsInImplementation()).Select(e => e.Type).ToHashSet();
+
+            foreach (string edgeType in edgeTypes)
+            {
+                int count = this.reflexionGraphCalc.Edges().Where(e => e.Type.Equals(edgeType)).Count();
+                UnityEngine.Debug.Log($"There are {count} edges with type {edgeType} within implementation");
+            }
+        }
+
+        // TODO: Delete later only for debug purposes
+        [Button("Print Roots", ButtonSizes.Small)]
+        [ButtonGroup(debugButtonGroup)]
+        public void PrintRoots()
+        {
+            List<Node> rootNodes = this.reflexionGraphViz.Nodes().Where(n => n.IsRoot()).ToList();
+
+            foreach (Node rootNode in rootNodes)
+            {
+                UnityEngine.Debug.Log($"Node {rootNode.ID} is root.");
+            }
+        }
+
 
         /// <summary>
         /// Generates a text file containg a table showing the mapping of the current candidates 

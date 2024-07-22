@@ -697,7 +697,7 @@ namespace SEE.DataModel.DG
                 indentation += "-";
             }
 
-            Debug.Log(indentation + root.ID + "\n");
+            Debug.Log(indentation + root.ID + $"({root.Type})" + "\n");
             foreach (Node child in root.Children())
             {
                 DumpTree(child, level + 1);

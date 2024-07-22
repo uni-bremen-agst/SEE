@@ -126,7 +126,7 @@ namespace SEE.DataModel.DG.GraphSearch
         /// <returns>The string representation of the element.</returns>
         private static string ElementToString(Node element)
         {
-            return element.SourceName.ToLowerInvariant();
+            return element.SourceName?.ToLowerInvariant() ?? string.Empty;
         }
 
         /// <summary>

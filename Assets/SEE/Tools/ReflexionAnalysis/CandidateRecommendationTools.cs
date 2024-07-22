@@ -32,11 +32,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <param name="reflexionGraph">Given reflexion graph this method is operating on.</param>
         /// <param name="cluster">Given architecture node</param>
         /// <param name="candidate">Given implementation node</param>
-        public static void AddToMappingSilent(this ReflexionGraph reflexionGraph, Node cluster, Node candidate)
+        public static void AddToMappingSilent(this ReflexionGraph reflexionGraph, 
+                                              Node cluster, 
+                                              Node candidate,
+                                              bool overrideMapping = false)
         {
             bool suppressNotifications = reflexionGraph.SuppressNotifications;
             reflexionGraph.SuppressNotifications = true;
-            reflexionGraph.AddToMapping(candidate, cluster);
+            reflexionGraph.AddToMapping(candidate, cluster, overrideMapping);
             reflexionGraph.SuppressNotifications = suppressNotifications;
         }
 

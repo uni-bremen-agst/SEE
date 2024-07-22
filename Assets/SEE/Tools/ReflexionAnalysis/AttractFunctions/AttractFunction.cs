@@ -21,7 +21,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         {
             CountAttract,
             NBAttract,
-            ADCAttract
+            ADCAttract,
+            NoAttract
         }
 
         /// <summary>
@@ -129,6 +130,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                     
                 case AttractFunctionType.ADCAttract: 
                     return new ADCAttract(reflexionGraph, candidateRecommendation, (ADCAttractConfig)config);
+
+                case AttractFunctionType.NoAttract:
+                    return new NoAttract(reflexionGraph, candidateRecommendation, config);
             }
             throw new ArgumentException("Given attractFunctionType is currently not implemented");
         }
@@ -182,7 +186,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <param name="clusterId">given cluster id</param>
         protected void AddClusterToUpdate(string clusterId)
         {
-            if (clusterId != null && !this.clusterToUpdate.Contains(clusterId))
+            if (this.reflexionGraph.TryGetNode(clusterId, out Node cluster)
+                && CandidateRecommendation.IsCluster(cluster)
+                && clusterId != null 
+                && !this.clusterToUpdate.Contains(clusterId))
             {
                 clusterToUpdate.Add(clusterId);
             }
@@ -213,10 +220,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         {
             foreach (var candidateId in candidateIds)
             {
-                if (candidateId != null && !this.candidatesToUpdate.Contains(candidateId))
-                {
-                    candidatesToUpdate.Add(candidateId);
-                }
+                AddCandidateToUpdate(candidateId);
             }
         }
 
@@ -240,7 +244,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <param name="clusterId">given cluster id</param>
         protected void AddCandidateToUpdate(string candidateId)
         {
-            if (candidateId != null && !this.candidatesToUpdate.Contains(candidateId))
+            if (candidateId != null
+                && !this.candidatesToUpdate.Contains(candidateId)
+                && this.reflexionGraph.TryGetNode(candidateId, out Node candidate) 
+                && reflexionGraph.MapsTo(candidate) == null
+                && CandidateRecommendation.IsCandidate(candidate))
             {
                 candidatesToUpdate.Add(candidateId);
             }

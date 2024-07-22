@@ -47,15 +47,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         private AttractFunction attractFunction;
 
         /// <summary>
-        /// RecommendedNodes object representing the attraction value matrix.
+        /// object which calculates candidate sets and recommendations.
         /// </summary>
-        RecommendationFiltering recommendationFilter = new RecommendationFiltering();
+        IRecommendationFilter recommendationFilter = new HugMeFilter();
 
         /// <summary>
         /// List of <see cref="MappingPair"/> objects representing all currently calculated attraction values between the 
         /// corresponding node pairs.
         /// </summary>
-        public IEnumerable<MappingPair> MappingPairs { get { return recommendationFilter.MappingPairs; } }
+        public IEnumerable<MappingPair> MappingPairs { get { return recommendationFilter.GetMappingPairs(); } }
 
         /// <summary>
         /// Set of Nodes containing the unmapped candidates
@@ -97,7 +97,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <returns>IEnumerable object containing the mapping pairs.</returns>
         public IEnumerable<MappingPair> GetRecommendations()
         {
-            return this.recommendationFilter.Recommendations;
+            return this.recommendationFilter.GetRecommendations();
         }
 
         /// <summary>
@@ -109,11 +109,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         {
             if(IsCandidate(node))
             {
-                return this.recommendationFilter.GetRecommendationsForCandidate(node.ID);
+                return this.recommendationFilter.GetRecommendationForCandidate(node.ID);
             } 
             else if(IsCluster(node))
             {
-                return this.recommendationFilter.GetRecommendationsForCluster(node.ID);
+                return this.recommendationFilter.GetRecommendationForCluster(node.ID);
             }
 
             return new List<MappingPair>();
@@ -420,7 +420,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
                 foreach (string candidateId in this.AttractFunction.CandidatesToUpdate)
                 {
-                    UnityEngine.Debug.Log($"update candidate {clusterId} for {clusterId}...");
+                    // UnityEngine.Debug.Log($"update candidate {clusterId} for {clusterId}...");
                     Node candidate = this.ReflexionGraph.GetNode(candidateId);
 
                     // A check if an 'unmapped' candidate might have been already mapped is still required 
@@ -458,10 +458,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <param name="oracleGraph">Oracle reflexion graph containing used to choose the expected cluster.</param>
         /// <returns>Datastructure describing the mapping</returns>
         /// <exception cref="Exception">Throws if the percentage is not between 0 and 1. Throws if the given parameter objects are null</exception>
-        private Dictionary<Node, HashSet<Node>> CreateInitialMapping(double percentage,
-                                                                            int seed,
-                                                                            ReflexionGraph reflexionGraph,
-                                                                            ReflexionGraph oracleGraph)
+        public Dictionary<Node, HashSet<Node>> CreateInitialMapping(double percentage,
+                                                                            int seed)
         {
             Dictionary<Node, HashSet<Node>> initialMapping = new Dictionary<Node, HashSet<Node>>();
 
@@ -469,61 +467,78 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             {
                 throw new Exception("Parameter percentage have to be a double changeEvent between 0.0 and 1.0");
             }
-            if (oracleGraph == null)
+            if (OracleGraph == null)
             {
                 throw new Exception("OracleGraph is null. Cannot generate initial mapping.");
             }
-            if (reflexionGraph == null)
+            if (ReflexionGraph == null)
             {
                 throw new Exception("ReflexionGraph is null. Cannot generate initial mapping.");
             }
 
-            List<Node> candidates = GetCandidates(reflexionGraph);
+            List<Node> candidates = GetCandidates();
+
+            List<Node> mappedCandidates = GetMappedCandidates();
+            
+            List<Node> unmappedCandidates = GetUnmappedCandidates();
+
+            List<Node> oracleCluster = GetOracleCluster();
 
             UnityEngine.Debug.Log($"Generate initial mapping with seed {seed} for {candidates.Count}");
             System.Random rand = new System.Random(seed);
 
             int candidatesCount = candidates.Count;
-            HashSet<int> usedIndices = new HashSet<int>();
-            double alreadyMappedNodesCount = 0;
+            double alreadyMappedNodesCount = mappedCandidates.Count;
             double artificallyMappedNodes = 0;
             double currentPercentage = 0;
-            for (int i = 0; i < candidatesCount && currentPercentage < percentage;)
+
+            // Dictionary<string, List<Node>> expectedNodesForCluster = new();
+            Dictionary<string, List<Node>> expectedNodesForCluster = new();
+
+            //foreach (Node currentCluster in oracleCluster)
+            //{
+            //    IEnumerable<Node> allExpectedNodes = currentCluster.Incomings.Select(x => ReflexionGraph.GetNode(x.Source.ID));            
+            //    expectedNodesForCluster[currentCluster.ID] = allExpectedNodes.SelectMany(ex => unmappedCandidates.Where(unmapped => unmapped.Ascendants().Contains(ex))).ToList();
+            //}
+
+            foreach (Node currentCluster in oracleCluster)
             {
-                // manage next random index
-                int randomIndex = rand.Next(candidatesCount);
-                if (usedIndices.Contains(randomIndex)) continue;
-                Node node = candidates[randomIndex];
-                usedIndices.Add(randomIndex);
+                expectedNodesForCluster[currentCluster.ID] = new List<Node>();
+            }
 
-                // check if the current node is already mapped
-                Node mapsTo = reflexionGraph.MapsTo(node);
-                if (mapsTo == null)
+            foreach (Node unmappedCandidate in unmappedCandidates)
+            {
+                // TODO: can cause endless loops
+                if(GetExpectedClusterID(unmappedCandidate.ID) != null)
                 {
-                    Node oracleMapsTo = oracleGraph.MapsTo(node);
+                    expectedNodesForCluster[GetExpectedClusterID(unmappedCandidate.ID)].Add(unmappedCandidate); 
+                }
+            }
 
-                    if (oracleMapsTo == null)
-                    {                                       
-                        Debug.LogWarning($"There is no information where to map node {node.ID} " +
-                                         $"within the oracle graph {Environment.NewLine}{node}");
-                        i++;
-                        continue;
-                    }
-
-                    mapsTo = reflexionGraph.GetNode(oracleMapsTo.ID);
-                    if (mapsTo != null)
+            while (currentPercentage < percentage)
+            {
+                foreach (Node currentCluster in oracleCluster)
+                {
+                    int countUnmappedExpectedCandidates = expectedNodesForCluster[currentCluster.ID].Count();
+                    if (countUnmappedExpectedCandidates > 0)
                     {
-                        AddToInitialMapping(mapsTo, node);
+                        Node nodeToMap = expectedNodesForCluster[currentCluster.ID][rand.Next(countUnmappedExpectedCandidates)];
+
+                        if (OracleGraph.MapsTo(nodeToMap).ID != currentCluster.ID)
+                        {
+                            throw new Exception($"Chosen node for initial mapping is not assigned to the correct cluster. currentCluster.ID={currentCluster.ID} OracleGraph.MapsTo(nodeToMap).ID={OracleGraph.MapsTo(nodeToMap)?.ID}");
+                        }
+
+                        AddToInitialMapping(ReflexionGraph.GetNode(currentCluster.ID), nodeToMap);
+                        expectedNodesForCluster[currentCluster.ID].Remove(nodeToMap);
                         artificallyMappedNodes++;
                     }
+                    else
+                    {
+                        continue;
+                    }
                 }
-                else
-                {
-                    alreadyMappedNodesCount++;
-                }
-
                 currentPercentage = (artificallyMappedNodes + alreadyMappedNodesCount) / candidatesCount;
-                i++;
             }
 
             return initialMapping;
@@ -540,31 +555,31 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
         }
 
-        /// <summary>
-        /// Creates mappings pairs that can be used to create an initial mapping based on the given parameters.
-        /// </summary>
-        /// <param name="percentage">percentage describing how many candidates shall be mapped.</param>
-        /// <param name="seed">seed to deriving the randomness to choose the mapped candidates</param>
-        /// <param name="reflexionGraph">Reflexiongraph for which the mapping is constructed.</param>
-        /// <returns></returns>
-        public Dictionary<Node, HashSet<Node>> CreateInitialMapping(double percentage,
-                                                                    int seed,
-                                                                    ReflexionGraph graph)
-        {
-            return CreateInitialMapping(percentage, seed, graph, OracleGraph);
-        }
+        ///// <summary>
+        ///// Creates mappings pairs that can be used to create an initial mapping based on the given parameters.
+        ///// </summary>
+        ///// <param name="percentage">percentage describing how many candidates shall be mapped.</param>
+        ///// <param name="seed">seed to deriving the randomness to choose the mapped candidates</param>
+        ///// <param name="reflexionGraph">Reflexiongraph for which the mapping is constructed.</param>
+        ///// <returns></returns>
+        //public Dictionary<Node, HashSet<Node>> CreateInitialMapping(double percentage,
+        //                                                            int seed,
+        //                                                            ReflexionGraph graph)
+        //{
+        //    return CreateInitialMapping(percentage, seed, graph, OracleGraph);
+        //}
 
-        /// <summary>
-        /// Creates mappings pairs that can be used to create an initial mapping based on the given parameters.
-        /// </summary>
-        /// <param name="percentage">percentage describing how many candidates shall be mapped.</param>
-        /// <param name="seed">seed to deriving the randomness to choose the mapped candidates</param>
-        /// <returns></returns>
-        public Dictionary<Node, HashSet<Node>> CreateInitialMapping(double percentage,
-                                                            int seed)
-        {
-            return CreateInitialMapping(percentage, seed, ReflexionGraph, OracleGraph);
-        }
+        ///// <summary>
+        ///// Creates mappings pairs that can be used to create an initial mapping based on the given parameters.
+        ///// </summary>
+        ///// <param name="percentage">percentage describing how many candidates shall be mapped.</param>
+        ///// <param name="seed">seed to deriving the randomness to choose the mapped candidates</param>
+        ///// <returns></returns>
+        //public Dictionary<Node, HashSet<Node>> CreateInitialMapping(double percentage,
+        //                                                    int seed)
+        //{
+        //    return CreateInitialMapping(percentage, seed, ReflexionGraph, OracleGraph);
+        //}
 
         /// <summary>
         /// Returns if a mapping of a candidate to a cluster would be a hit.
@@ -618,7 +633,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// Uses the oracle reflexion graph loaded in this object.
         /// </summary>
         /// <param name="candidateID"></param>
-        /// <returns></returns>
+        /// <returns>Returns the id of the expected cluster. Null if the oracle graph does 
+        /// not hold information about the candidate.</returns>
         /// <exception cref="Exception"></exception>
         public string GetExpectedClusterID(string candidateID)
         {
@@ -743,7 +759,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <param name="graph">given reflexio graph</param>
         /// <param name="clusterType"></param>
         /// <returns>List containing the clusters</returns>
-        public static List<Node> GetCluster(ReflexionGraph graph, string clusterType)
+        private static List<Node> GetCluster(ReflexionGraph graph, string clusterType)
         {
             return graph.Nodes().Where(n => n.Type.Equals(clusterType) && n.IsInArchitecture()).ToList();
         }
@@ -757,6 +773,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             return GetCluster(ReflexionGraph, attractFunction.ClusterType);
         }
 
+        public List<Node> GetOracleCluster()
+        {
+            return GetCluster(OracleGraph, attractFunction.ClusterType);
+        }
+
         /// <summary>
         ///  Returns all nodes considered to be candidates within the loaded reflexion graph 
         ///  which are currently unmpapped.
@@ -765,6 +786,16 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         public List<Node> GetUnmappedCandidates()
         {
             return GetCandidates(ReflexionGraph).Where(c => ReflexionGraph.MapsTo(c) == null).ToList();
+        }
+
+        /// <summary>
+        ///  Returns all nodes considered to be candidates within the loaded reflexion graph 
+        ///  which are currently mpapped.
+        /// </summary>
+        /// <returns></returns>
+        public List<Node> GetMappedCandidates()
+        {
+            return GetCandidates(ReflexionGraph).Where(c => ReflexionGraph.MapsTo(c) != null).ToList();
         }
 
         /// <summary>
@@ -795,7 +826,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <returns>true if the node is considered to be a candidate</returns>
         public static bool IsCandidate(Node node, string candidateType)
         {
-            // UnityEngine.Debug.Log($"Is node candidate? node.Type={node.Type} candidateType={candidateType} isInImplementation={node.IsInImplementation()} Element.Is_Artificial={node.ToggleAttributes.Contains("Element.Is_Artificial")} Element.Is_Anonymous={node.ToggleAttributes.Contains("Element.Is_Anonymous")}");
+            //UnityEngine.Debug.Log($"Is node candidate? node.Type={node.Type} candidateType={candidateType} isInImplementation={node.IsInImplementation()} Element.Is_Artificial={node.ToggleAttributes.Contains("Element.Is_Artificial")} Element.Is_Anonymous={node.ToggleAttributes.Contains("Element.Is_Anonymous")}");
+            //UnityEngine.Debug.Log($"Is node candidate? {node.Type.Equals(candidateType) && node.IsInImplementation() && !node.ToggleAttributes.Contains("Element.Is_Artificial") && !node.ToggleAttributes.Contains("Element.Is_Anonymous")}");
+
             return node.Type.Equals(candidateType)
                     && node.IsInImplementation()
                     && !node.ToggleAttributes.Contains("Element.Is_Artificial")

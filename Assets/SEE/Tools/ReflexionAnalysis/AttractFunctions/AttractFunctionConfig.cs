@@ -16,7 +16,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// Node type determining which nodes are considered to be candidates
         /// </summary>
         [SerializeField]
-        private string candidateType = "File";
+        private string candidateType = "Class";
 
         /// <summary>
         /// Node type determining which nodes are considered to be candidates

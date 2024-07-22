@@ -24,6 +24,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         private UserStudyRun currentRun;
 
+        private string Group = "A";
+
         public async UniTask StartStudy(SEEReflexionCity city, CandidateRecommendationViz candidateRecommendation)
         {
             this.city = city;
@@ -38,14 +40,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
                 this.StartNextIteration();
 
-                if (!run.Automatic)
-                {
-                    await this.WaitForParticipant(); 
-                } else
-                {
-                    // TODO:
-                }
+                candidateRecommendation.StartRecording();
 
+                await this.WaitForParticipant();
+
+                UnityEngine.Debug.Log("Calculate results...");
                 candidateRecommendation.CalculateResults();
 
                 UnityEngine.Debug.Log("Finished Iteration.");
@@ -61,16 +60,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 await candidateRecommendation.CreateInitialMappingAsync(run.Settings.InitialMappingPercentage,
                                                                         run.Settings.RootSeed, 
                                                                         syncWithView: true,
-                                                                        delay: 0);
+                                                                        delay: 500);
                 BlockUnnecessaryMovement();
-                candidateRecommendation.ColorUnmappedCandidates(Color.white);
+                // candidateRecommendation.ColorUnmappedCandidates(Color.blue);
                 candidateRecommendation.StartRecording();
             }
 
             void BlockUnnecessaryMovement()
             {
-                IEnumerable<Node> unmappedCandidates = candidateRecommendation.GetUnmappedCandidates();
-                candidateRecommendation.ReflexionGraphVisualized.Nodes().Where(n => !unmappedCandidates.Contains(n)).ForEach(n => MoveAction.BlockMovement(n.ID));
+                candidateRecommendation.ReflexionGraphVisualized.Nodes().Where(n => !candidateRecommendation.IsCandidate(n.ID)).ForEach(n => MoveAction.BlockMovement(n.ID));
             }
         }
 
@@ -138,36 +136,27 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             userStudyRuns.Clear();
             
             // First Run
-            UserStudyRun run = new();
-            run.Automatic = false;
-            run.Settings = SetDefaultSettings();
-            run.Settings.AttractFunctionType = AttractFunction.AttractFunctionType.CountAttract;
-            run.Settings.ExperimentName = "Run_CA";
-            userStudyRuns.Add(run);
+            UserStudyRun run1 = new();
+            run1.Settings = SetDefaultSettings();
+            run1.Settings.AttractFunctionType = AttractFunction.AttractFunctionType.NBAttract;
+            run1.Settings.ExperimentName = "NBAttract";
 
-            // Second Run 
-            run = new();
-            run.Automatic = false;
-            run.Settings = SetDefaultSettings();
-            run.Settings.AttractFunctionType = AttractFunction.AttractFunctionType.NBAttract;
-            run.Settings.ExperimentName = "Run_NB";
-            userStudyRuns.Add(run);
+            UserStudyRun run2 = new();
+            run2.Settings = SetDefaultSettings();
+            run2.Settings.AttractFunctionType = AttractFunction.AttractFunctionType.NoAttract;
+            run2.Settings.ExperimentName = "NoAttract";
+            run2.Settings.RootSeed = 239637258;
 
-            //Third Run
-            run = new();
-            run.Automatic = false;
-            run.Settings = SetDefaultSettings();
-            run.Settings.AttractFunctionType = AttractFunction.AttractFunctionType.ADCAttract;
-            run.Settings.ExperimentName = "Run_ADC";
-            userStudyRuns.Add(run);
-
-            // Fourth Run
-            run = new();
-            run.Automatic = true;
-            run.Settings = SetDefaultSettings();
-            run.Settings.AttractFunctionType = AttractFunction.AttractFunctionType.CountAttract;
-            run.Settings.ExperimentName = "Run_CA";
-            userStudyRuns.Add(run);
+            if(Group.Equals("A"))
+            {
+                userStudyRuns.Add(run1);
+                userStudyRuns.Add(run2);
+            } 
+            else
+            {
+                userStudyRuns.Add(run2);
+                userStudyRuns.Add(run1);
+            }
 
             RecommendationSettings SetDefaultSettings()
             {
@@ -176,7 +165,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 settings.RootSeed = 5788925;
                 settings.syncExperimentWithView = true;
                 settings.IgnoreTieBreakers = false;
-                settings.InitialMappingPercentage = 0.96;
+                settings.InitialMappingPercentage = 0.80;
                 settings.ADCAttractConfig.MergingType = Document.DocumentMergingType.Intersection;
                 return settings;
             }
@@ -185,8 +174,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         private class UserStudyRun
         {
             public bool TestRun {  get; set; }
-
-            public bool Automatic { get; set; }
 
             public RecommendationSettings Settings { get; set; }
         }

@@ -389,7 +389,7 @@ namespace SEE.Game.Operator
         protected override Tween[] BlinkAction(int count, float duration)
         {
             // If we're interrupting another blinking, we need to make sure the color still has the correct value.
-            if (material == null)
+            if (material == null || Color == null)
             {
                 return new Tween[] { };
             }
