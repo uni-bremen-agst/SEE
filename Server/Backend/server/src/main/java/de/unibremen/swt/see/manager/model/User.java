@@ -36,7 +36,7 @@ public class User {
      * The username must be unique and up to 20 characters long.
      */
     @NotBlank
-    @Size(max = 20)
+    @Size(max = 36)
     @Column(name = "username", unique = true)
     private String username;
 
@@ -63,13 +63,25 @@ public class User {
     private Set<Role> roles = new HashSet<>();
 
     /**
+     * A list of servers associated to the user.
+     * <p>
+     * One user can be granted access to multiple servers.
+     */
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_servers",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "server_id"))
+    @JsonIgnore
+    private Set<Server> servers = new HashSet<>();
+
+    /**
      * Constructs an empty {@code User}.
      */
     public User() {}
 
     /**
      * Constructs a {@code User} with name and password.
-       * 
+     *
      * @param username username of the new user
      * @param password password hash of the new user
      */

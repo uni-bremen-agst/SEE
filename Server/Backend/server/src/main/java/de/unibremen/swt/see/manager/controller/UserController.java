@@ -154,6 +154,9 @@ public class UserController {
      * Changes the name of the authenticated user.
      * <p>
      * Users can only change their own name.
+     * <p>
+     * Currently, only admins are allowed to change their usernames as users are
+     * automatically created along with the server.
      *
      * @param oldUserDetails        are injected by Spring Security framework
      * @param changeUsernameRequest request data containing new username
@@ -164,10 +167,10 @@ public class UserController {
      * @see de.unibremen.swt.see.manager.controller.request.ChangeUsernameRequest
      */
     @PutMapping("/changeUsername")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<?> changeUsername(@AuthenticationPrincipal UserDetails oldUserDetails,
-                                            @RequestBody ChangeUsernameRequest changeUsernameRequest) {
-        // FIXME Parameter contains cleartext password!
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> changeUsername(
+            @AuthenticationPrincipal UserDetails oldUserDetails,
+            @RequestBody ChangeUsernameRequest changeUsernameRequest) {
         User newUser = userService.changeUsername(oldUserDetails.getUsername(), changeUsernameRequest.getNewUsername(), changeUsernameRequest.getPassword());
         
         if (newUser == null) {
@@ -188,6 +191,9 @@ public class UserController {
      * Changes the name of the authenticated user.
      * <p>
      * Users can only change their own password.
+     * <p>
+     * Currently, only admins are allowed to change their passwords as users are
+     * automatically created along with the server.
      *
      * @param userDetails           are injected by Spring Security framework
      * @param changePasswordRequest request data containing new password
@@ -197,10 +203,10 @@ public class UserController {
      * @see de.unibremen.swt.see.manager.controller.request.ChangePasswordRequest
      */
     @PutMapping("/changePassword")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<?> changePassword(@AuthenticationPrincipal UserDetails userDetails,
-                                            @RequestBody ChangePasswordRequest changePasswordRequest) {
-
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> changePassword(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody ChangePasswordRequest changePasswordRequest) {
         if (userService.changePassword(userDetails.getUsername(), changePasswordRequest.getOldPassword(), changePasswordRequest.getNewPassword()))
             return ResponseEntity.ok().build();
 
@@ -218,7 +224,6 @@ public class UserController {
      */
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        // FIXME Parameter contains cleartext password!
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();

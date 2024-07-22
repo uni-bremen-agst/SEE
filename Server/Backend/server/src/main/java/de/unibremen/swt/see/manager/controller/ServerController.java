@@ -1,8 +1,13 @@
 package de.unibremen.swt.see.manager.controller;
 
 import de.unibremen.swt.see.manager.model.File;
+import de.unibremen.swt.see.manager.model.RoleType;
 import de.unibremen.swt.see.manager.model.Server;
+import de.unibremen.swt.see.manager.model.User;
+import de.unibremen.swt.see.manager.security.UserDetailsImpl;
+import de.unibremen.swt.see.manager.service.AccessControlService;
 import de.unibremen.swt.see.manager.service.ServerService;
+import de.unibremen.swt.see.manager.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.util.UUID;
@@ -10,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,6 +37,19 @@ public class ServerController {
     private final ServerService serverService;
 
     /**
+     * Used to check if a user has access to a server.
+     * <p>
+     * This service is used in {@code @PreAuthorize} process and is likely not
+     * unused even if your IDE tells you so.
+     */
+    private final AccessControlService accessControlService;
+
+    /**
+     * Used to access user data.
+     */
+    private final UserService userService;
+
+    /**
      * Retrieves metadata of the server identified by the specified ID.
      *
      * @param id the ID of the server to retrieve
@@ -38,21 +57,31 @@ public class ServerController {
      * {@code 401 Unauthorized} if access cannot be granted.
      */
     @GetMapping("/")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER') and @accessControlService.canAccessServer(principal.id, #id)")
     public ResponseEntity<?> get(@RequestParam("id") UUID id) {
         return ResponseEntity.ok().body(serverService.get(id));
     }
 
     /**
-     * Retrieves the metadata of all available server resources.
+     * Retrieves the metadata of all accessible server resources.
+     * <p>
+     * If the client is authenticated as {@code ADMIN}, all available servers
+     * are returned.
      *
      * @return {@code 200 OK} with the server metadata as payload, or
      * {@code 401 Unauthorized} if access cannot be granted.
      */
     @GetMapping("/all")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public ResponseEntity<?> getAll() {
-        return ResponseEntity.ok().body(serverService.getAll());
+        final UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        final User user = userService.get(userDetails.getId());
+
+        if (userService.hasRole(user, RoleType.ROLE_ADMIN)) {
+            return ResponseEntity.ok().body(serverService.getAll());
+        }
+
+        return ResponseEntity.ok().body(user.getServers());
     }
 
     /**
@@ -85,7 +114,7 @@ public class ServerController {
      * @see de.unibremen.swt.see.manager.model.FileType
      */
     @PostMapping("/addFile")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> addFile(
             @RequestParam("id") UUID serverId,
             @RequestParam("fileType") String fileType,
@@ -178,33 +207,9 @@ public class ServerController {
      * {@code 401 Unauthorized} if access cannot be granted.
      */
     @GetMapping("/files")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER') and @accessControlService.canAccessServer(principal.id, #id)")
     public ResponseEntity<?> getFiles(@RequestParam("id") UUID id) {
         return ResponseEntity.ok().body(serverService.getFilesForServer(id));
-    }
-
-    /**
-     * Retrieves the file list of the server with the specified ID.
-     * <p>
-     * This endpoint uses a simple authentication and is intended to be used by
-     * SEE clients.
-     *
-     * @param id the ID of the server
-     * @param password the password to access server data
-     * @return {@code 200 OK} with the file metadata as payload, or
-     * {@code 400 Bad Request} if the server does not exist, or if the password
-     * is not correct.
-     */
-    @GetMapping("/getFilesForClient")
-    public ResponseEntity<?> getFiles(@RequestParam("id") UUID id, @RequestParam("roomPassword") String password) {
-        Server server = serverService.get(id);
-        if (server == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        if (server.getServerPassword() == null || server.getServerPassword().isEmpty() || server.getServerPassword().equals(password)) {
-            return ResponseEntity.ok().body(serverService.getFilesForServer(id));
-        }
-        return ResponseEntity.badRequest().build();
     }
 
 }

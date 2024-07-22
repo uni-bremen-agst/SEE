@@ -2,11 +2,14 @@ package de.unibremen.swt.see.manager.service;
 
 import de.unibremen.swt.see.manager.model.Role;
 import de.unibremen.swt.see.manager.model.RoleType;
+import de.unibremen.swt.see.manager.model.Server;
 import de.unibremen.swt.see.manager.model.User;
 import de.unibremen.swt.see.manager.repository.RoleRepository;
 import de.unibremen.swt.see.manager.repository.UserRepository;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -55,13 +58,24 @@ public class UserService {
      */
     public User create(String username, String password, RoleType roleType) {
         log.info("Creating new user {}", username);
-        if (userRepo.findUserByUsername(username).isPresent()) {
+        if (userRepo.findByUsername(username).isPresent()) {
             log.error("Username {} is already taken", username);
             return null;
         }
         User user = userRepo.save(new User(username, passwordEncoder.encode(password)));
 
-        return addRole(user.getUsername(), roleType);
+        return addRole(user, roleType);
+    }
+
+    /**
+     * Retrieves a user by its ID.
+     *
+     * @param id the ID of the user
+     * @return the user if found, or {@code null} if not found
+     */
+    @Transactional(readOnly = true)
+    public User get(UUID id) {
+        return userRepo.findById(id).orElse(null);
     }
 
     /**
@@ -92,19 +106,16 @@ public class UserService {
     /**
      * Adds a role to given user.
      *
-     * @param username username to identify the user
+     * @param user the user
      * @param roleType type of the role to be assigned to the user
      * @return updated user, or {@code null} if user or role is not found in
      * database
      */
-    public User addRole(String username, RoleType roleType) {
-        log.info("Adding role {} to {}", roleType, username);
-
-        User user = getByUsername(username);
+    public User addRole(User user, RoleType roleType) {
         if (user == null) {
-            log.warn("User for role update not found: {}", username);
             return null;
         }
+        log.info("Adding role {} to {}", roleType, user.getUsername());
         
         Optional<Role> optRole = roleRepo.findByName(roleType);
         if (optRole.isEmpty()) {
@@ -114,6 +125,40 @@ public class UserService {
         Role role = optRole.get();
 
         user.getRoles().add(role);
+        return user;
+    }
+
+    /**
+     * Adds a role to given user by its {@code username}.
+     *
+     * @param username username to identify the user
+     * @param roleType type of the role to be assigned to the user
+     * @return updated user, or {@code null} if user or role is not found in
+     * database
+     */
+    public User addRole(String username, RoleType roleType) {
+        final User user = getByUsername(username);
+        if (user == null) {
+            log.warn("User for role update not found: {}", username);
+            return null;
+        }
+        return addRole(user, roleType);
+    }
+
+    /**
+     * Adds a server to given user.
+     *
+     * @param user the user
+     * @param server the server
+     * @return the user, or {@code null} if either the user or the server is not
+     * set
+     */
+    public User addServer(User user, Server server) {
+        if (user == null || server == null) {
+            return null;
+        }
+        log.info("Adding server {} to {}", server.getId(), user.getUsername());
+        user.getServers().add(server);
         return user;
     }
 
@@ -158,7 +203,7 @@ public class UserService {
      * old password is not correct
      */
     public boolean changePassword(String username, String oldPassword, String newPassword) {
-        Optional<User> optUser = userRepo.findUserByUsername(username);
+        Optional<User> optUser = userRepo.findByUsername(username);
         if (optUser.isPresent()) {
             log.error("A user tried to change their password with wrong username.");
             return false;
@@ -192,7 +237,17 @@ public class UserService {
      */
     public User getByUsername(String username) {
         log.info("Fetching user {}", username);
-        return userRepo.findUserByUsername(username).orElse(null);
+        return userRepo.findByUsername(username).orElse(null);
+    }
+
+    /**
+     * Deletes a user by their ID.
+     *
+     * @param id the user ID
+     */
+    public void delete(UUID id) {
+        log.info("Deleting user by ID: {}", id);
+        userRepo.deleteById(id);
     }
 
     /**
@@ -201,8 +256,41 @@ public class UserService {
      * @param username the username of the user to delete
      */
     public void deleteByUsername(String username) {
-        log.info("Deleting user {}", username);
-        userRepo.deleteUserByUsername(username);
+        log.info("Deleting user by username: {}", username);
+        userRepo.deleteByUsername(username);
+    }
+
+    /**
+     * Checks if a user has given role.
+     *
+     * @param user the user
+     * @param expectedType the type of the role
+     * @return {@code true} if given user has a role with given type
+     */
+    public boolean hasRole(User user, RoleType expectedType) {
+        if (user == null) {
+            return false;
+        }
+
+        final Set<Role> roles = user.getRoles();
+        for (Role role : roles) {
+            if (role.getName() == expectedType) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if a user has access to given server.
+     *
+     * @param user the user
+     * @param server the server
+     * @return {@code true} if given user has access to given server
+     */
+    public boolean hasServer(User user, Server server) {
+        return user != null && server != null && user.getServers().contains(server);
     }
 
 }

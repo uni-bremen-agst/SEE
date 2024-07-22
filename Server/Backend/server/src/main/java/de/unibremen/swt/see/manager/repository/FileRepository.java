@@ -6,62 +6,19 @@ import de.unibremen.swt.see.manager.model.Server;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
  * Repository interface for managing {@link File} entities.
  * <p>
- * This interface extends {@link PagingAndSortingRepository} to provide CRUD
- * operations as well as pagination and sorting capabilities for {@link File}
- * entities.
- * <p>
- * See also:<br>
- * <a href="https://docs.spring.io/spring-data/commons/docs/current/api/org/springframework/data/repository/PagingAndSortingRepository.html">PagingAndSortingRepository</a>
+ * This interface extends {@link JpaRepository} to provide CRUD operations for
+ * {@link File} entities.
  *
  * @see File
- * @see UUID
  */
 @Repository
-public interface FileRepository extends PagingAndSortingRepository<File, UUID> {
-
-    /**
-     * Saves a given file entity in the database.
-     * <p>
-     * If the file is new (i.e., has no ID), it will be inserted. If the file
-     * already exists (i.e., has an ID), it will be updated.
-     *
-     * @param file the file entity to be saved
-     * @return the saved file entity
-     */
-    File save(File file);
-
-    /**
-     * Retrieves a file by their ID.
-     * <p>
-     * This method retrieves the file with the provided ID. If no file is found
-     * with the given ID, an empty {@code Optional} is returned.
-     *
-     * @param fileId the ID of the file
-     * @return an {@link Optional} containing the file if existent, or an empty
-     * {@code Optional} if no file exists with the given ID
-     */
-    Optional<File> findById(UUID fileId);
-
-    /**
-     * Checks if a file with the given ID exists in the database.
-     *
-     * @param fileId the ID of the file
-     * @return {@code true} if the file is existent, or else {@code false}
-     */
-    boolean existsById(UUID fileId);
-
-    /**
-     * Deletes a file from the database.
-     *
-     * @param file the file to be deleted
-     */
-    void delete(File file);
+public interface FileRepository extends JpaRepository<File, UUID> {
 
     /**
      * Retrieves all file entities from the database that are associated with
@@ -74,7 +31,7 @@ public interface FileRepository extends PagingAndSortingRepository<File, UUID> {
      * @return a list containing files associated to given server, or an empty
      * list if no such files exist
      */
-    List<File> findFilesByServer(Server server);
+    List<File> findByServer(Server server);
 
     /**
      * Retrieves a file by its type and server association.
@@ -88,7 +45,7 @@ public interface FileRepository extends PagingAndSortingRepository<File, UUID> {
      * @return an {@link Optional} containing the file if existent, or an empty
      * {@code Optional} if no such file exists
      */
-    Optional<File> findFileByServerIdAndFileType(UUID serverId, FileType fileType);
+    Optional<File> findByServerIdAndFileType(UUID serverId, FileType fileType);
 
     /**
      * Deletes all file entities from the database that are associated with the
@@ -96,5 +53,6 @@ public interface FileRepository extends PagingAndSortingRepository<File, UUID> {
      *
      * @param server the server that files should be deleted for
      */
-    void deleteFilesByServer(Server server);
+    void deleteByServer(Server server);
+
 }

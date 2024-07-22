@@ -8,6 +8,9 @@ import org.springframework.stereotype.Repository;
 
 /**
  * Repository interface for managing {@link Role} entities.
+ * <p>
+ * This interface extends {@link JpaRepository} to provide CRUD operations for
+ * {@link Role} entities.
  *
  * @see Role
  */

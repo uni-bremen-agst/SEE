@@ -28,8 +28,10 @@ function Header() {
     <AppBar position="relative" color="transparent" elevation={0}>
       <Container disableGutters>
         <Toolbar disableGutters>
-          <Box sx={{ flexGrow: 1, "&:hover": { cursor: "pointer" } }} onClick={() => navigate('/')}>
-            <img src={seeLogo} height="64" alt="SEE Logo" />
+          <Box sx={{ flexGrow: 1 }}>
+            <a href="/">
+              <img src={seeLogo} height="64" alt="SEE Logo" />
+            </a>
           </Box>
           {
             user?.roles.some((item) => item.name == "ROLE_ADMIN") ?

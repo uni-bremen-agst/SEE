@@ -45,15 +45,16 @@ function SettingsView() {
 
   async function addUser() {
     if (!addUserUsername || !addUserPassword) return;
-    await axiosInstance.post('/user/create', { username: addUserUsername, password: addUserPassword, role: 'ROLE_USER' }).then(
-      () => {
-        setAddUserModalOpen(false);
-        return axiosInstance.get("/user/all");
-      }
-    ).then(
+    await axiosInstance.post('/user/create', { username: addUserUsername, password: addUserPassword, role: 'ROLE_USER' }).then(() => {
+      setAddUserModalOpen(false);
+      setAddUserUsername("");
+      return axiosInstance.get("/user/all");
+    }).then(
       (response) => setUsers(response.data)
     ).catch(
       (error) => AppUtils.notifyAxiosError(error, "Error Adding User")
+    ).finally(
+      () => setAddUserPassword("")
     );
   }
 

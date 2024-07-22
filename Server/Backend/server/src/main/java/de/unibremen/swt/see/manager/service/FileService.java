@@ -116,7 +116,7 @@ public class FileService {
     public File getByServerAndFileType(UUID serverId, FileType type) {
         log.info("Fetching file for server {} and type {}", serverId, type);
 
-        Optional<File> optFile = fileRepo.findFileByServerIdAndFileType(serverId, type);
+        Optional<File> optFile = fileRepo.findByServerIdAndFileType(serverId, type);
         if (optFile.isEmpty()) {
             throw new EntityNotFoundException("File not found by type " + type);
         }
@@ -179,7 +179,7 @@ public class FileService {
      * @return a list containing all files of the given server
      */
     public List<File> getByServer(Server server) {
-        return fileRepo.findFilesByServer(server);
+        return fileRepo.findByServer(server);
     }
 
     /**

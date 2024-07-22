@@ -1,7 +1,6 @@
 package de.unibremen.swt.see.manager.controller;
 
 import de.unibremen.swt.see.manager.model.File;
-import de.unibremen.swt.see.manager.model.FileType;
 import de.unibremen.swt.see.manager.service.FileService;
 import de.unibremen.swt.see.manager.service.ServerService;
 import jakarta.persistence.EntityNotFoundException;
@@ -71,10 +70,8 @@ public class FileController {
      * {@code 401 Unauthorized} if access cannot be granted.
      */
     @GetMapping("/get")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER') and @accessControlService.canAccessFile(principal.id, #id)")
     public ResponseEntity<?> getFile(@RequestParam("id") UUID id) {
-        // FIXME Any user can access any files.
-        //       While this does not contain the actual file, metadata can be leaked.
         File file = fileService.get(id);
         if (file == null) {
             return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("File with specified ID does not exist!"));
@@ -93,7 +90,7 @@ public class FileController {
      * granted.
      */
     @GetMapping("/download")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER') and @accessControlService.canAccessFile(principal.id, #id)")
     public ResponseEntity<?> downloadFile(@RequestParam("id") UUID id) {
         File file = fileService.get(id);
         if (file == null) {
@@ -102,134 +99,6 @@ public class FileController {
 
         try {
             return buildResponseEntity(file, true);
-        } catch (IOException e) {
-            return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage("Error reading file."));
-        }
-    }
-
-    /**
-     * Retrieves the {@code GXL} file of the specified server.
-     * 
-     * @param serverId the ID of the server
-     * @param roomPassword the password to access server data
-     * @return {@code 200 OK} with the file content as payload if the file
-     * exists and can be accessed, or {@code 400 Bad Request} if server or file
-     * do not exist, or {@code 500 Internal Server Error} if there is an I/O
-     * error while accessing the file.
-     */
-    @GetMapping("/client/gxl")
-    public ResponseEntity<?> getGxl(@RequestParam("serverId") UUID serverId, @RequestParam("roomPassword") String roomPassword) {
-        try {
-            if (!serverService.validateAccess(serverId, roomPassword)) {
-                return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("Authorization failed."));
-            }
-            File file = fileService.getByServerAndFileType(serverId, FileType.GXL);
-            return buildResponseEntity(file, false);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage(e.getMessage()));
-        } catch (IOException e) {
-            return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage("Error reading file."));
-        }
-    }
-
-    /**
-     * Retrieves the {@code Solution} file of the specified server.
-     * 
-     * @param serverId the ID of the server
-     * @param roomPassword the password to access server data
-     * @return {@code 200 OK} with the file content as payload if the file
-     * exists and can be accessed, or {@code 400 Bad Request} if server or file
-     * do not exist, or {@code 500 Internal Server Error} if there is an I/O
-     * error while accessing the file.
-     */
-    @GetMapping("/client/solution")
-    public ResponseEntity<?> getSolution(@RequestParam("serverId") UUID serverId, @RequestParam("roomPassword") String roomPassword) {
-        try {
-            if (!serverService.validateAccess(serverId, roomPassword)) {
-                return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("Authorization failed."));
-            }
-            File file = fileService.getByServerAndFileType(serverId, FileType.SOLUTION);
-            return buildResponseEntity(file, false);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage(e.getMessage()));
-        } catch (IOException e) {
-            return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage("Error reading file."));
-        }
-    }
-
-    /**
-     * Retrieves the source code file of the specified server.
-     * <p>
-     * The source code of a Code City is usually stored in a {@code ZIP} file
-     * and will be extracted on the client machine.
-     * 
-     * @param serverId the ID of the server
-     * @param roomPassword the password to access server data
-     * @return {@code 200 OK} with the file content as payload if the file
-     * exists and can be accessed, or {@code 400 Bad Request} if server or file
-     * do not exist, or {@code 500 Internal Server Error} if there is an I/O
-     * error while accessing the file.
-     */
-    @GetMapping("/client/source")
-    public ResponseEntity<?> getSource(@RequestParam("serverId") UUID serverId, @RequestParam("roomPassword") String roomPassword) {
-        try {
-            if (!serverService.validateAccess(serverId, roomPassword)) {
-                return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("Authorization failed."));
-            }
-            File file = fileService.getByServerAndFileType(serverId, FileType.SOURCE);
-            return buildResponseEntity(file, false);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage(e.getMessage()));
-        } catch (IOException e) {
-            return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage("Error reading file."));
-        }
-    }
-
-    /**
-     * Retrieves the multiplayer configuration file of the specified server.
-     * 
-     * @param serverId the ID of the server
-     * @param roomPassword the password to access server data
-     * @return {@code 200 OK} with the file content as payload if the file
-     * exists and can be accessed, or {@code 400 Bad Request} if server or file
-     * do not exist, or {@code 500 Internal Server Error} if there is an I/O
-     * error while accessing the file.
-     */
-    @GetMapping("/client/config")
-    public ResponseEntity<?> getConfig(@RequestParam("serverId") UUID serverId, @RequestParam("roomPassword") String roomPassword) {
-        try {
-            if (!serverService.validateAccess(serverId, roomPassword)) {
-                return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("Authorization failed."));
-            }
-            File file = fileService.getByServerAndFileType(serverId, FileType.CFG);
-            return buildResponseEntity(file, false);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage(e.getMessage()));
-        } catch (IOException e) {
-            return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage("Error reading file."));
-        }
-    }
-
-    /**
-     * Retrieves the {@code CSV} file of the specified server.
-     * 
-     * @param serverId the ID of the server
-     * @param roomPassword the password to access server data
-     * @return {@code 200 OK} with the file content as payload if the file
-     * exists and can be accessed, or {@code 400 Bad Request} if server or file
-     * do not exist, or {@code 500 Internal Server Error} if there is an I/O
-     * error while accessing the file.
-     */
-    @GetMapping("/client/csv")
-    public ResponseEntity<?> getCsv(@RequestParam("serverId") UUID serverId, @RequestParam("roomPassword") String roomPassword) {
-        try {
-            if (!serverService.validateAccess(serverId, roomPassword)) {
-                return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage("Authorization failed."));
-            }
-            File file = fileService.getByServerAndFileType(serverId, FileType.CSV);
-            return buildResponseEntity(file, false);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.badRequest().body(ControllerUtils.wrapMessage(e.getMessage()));
         } catch (IOException e) {
             return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage("Error reading file."));
         }
@@ -257,10 +126,7 @@ public class FileController {
             headers.setContentDisposition(ContentDisposition.attachment().filename(file.getName()).build());
         }
 
-        return ResponseEntity
-                .ok()
-                .headers(headers)
-                .<Resource>body(resource);
+        return ResponseEntity.ok().headers(headers).<Resource>body(resource);
     }
 
 }

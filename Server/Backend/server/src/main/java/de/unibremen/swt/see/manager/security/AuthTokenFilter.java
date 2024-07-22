@@ -74,32 +74,32 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        final String jwt = jwtUtils.getJwtFromCookies(request);
+        boolean authorized = false;
         try {
-            final String jwt = jwtUtils.getJwtFromCookies(request);
-            boolean authorized = false;
+            jwtUtils.validateJwtToken(jwt);
+            authorized = true;
+        } catch (ExpiredJwtException e) {
+            log.debug("JWT token is expired: {}", e.getMessage());
+            request.setAttribute(ValidationError.TOKEN_EXPIRED.toString(), e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            log.debug("JWT token is invalid: {}", e.getMessage());
+            request.setAttribute(ValidationError.TOKEN_UNSUPPORTED.toString(), e.getMessage());
+        } catch (MalformedJwtException e) {
+            log.debug("JWT token is malformed: {}", e.getMessage());
+            request.setAttribute(ValidationError.TOKEN_MALFORMED.toString(), e.getMessage());
+        } catch (SecurityException e) {
+            log.debug("JWT token signature invalid: {}", e.getMessage());
+            request.setAttribute(ValidationError.TOKEN_SIGNATURE_INVALID.toString(), e.getMessage());
+        } catch (IllegalArgumentException e) {
+            log.debug("JWT token is empty: {}", e.getMessage());
+            request.setAttribute(ValidationError.TOKEN_EMPTY.toString(), e.getMessage());
+        }
+
+        if (authorized) {
+            final String username = jwtUtils.getUserNameFromJwtToken(jwt);
+
             try {
-                jwtUtils.validateJwtToken(jwt);
-                authorized = true;
-            } catch (ExpiredJwtException e) {
-                log.debug("JWT token is expired: {}", e.getMessage());
-                request.setAttribute(ValidationError.TOKEN_EXPIRED.toString(), e.getMessage());
-            } catch (UnsupportedJwtException e) {
-                log.debug("JWT token is invalid: {}", e.getMessage());
-                request.setAttribute(ValidationError.TOKEN_UNSUPPORTED.toString(), e.getMessage());
-            } catch (MalformedJwtException e) {
-                log.debug("JWT token is malformed: {}", e.getMessage());
-                request.setAttribute(ValidationError.TOKEN_MALFORMED.toString(), e.getMessage());
-            } catch (SecurityException e) {
-                log.debug("JWT token signature invalid: {}", e.getMessage());
-                request.setAttribute(ValidationError.TOKEN_SIGNATURE_INVALID.toString(), e.getMessage());
-            } catch (IllegalArgumentException e) {
-                log.debug("JWT token is empty: {}", e.getMessage());
-                request.setAttribute(ValidationError.TOKEN_EMPTY.toString(), e.getMessage());
-            }
-
-            if (authorized) {
-                final String username = jwtUtils.getUserNameFromJwtToken(jwt);
-
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
                 UsernamePasswordAuthenticationToken authentication
@@ -110,9 +110,10 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (UsernameNotFoundException e) {
+                // User has a valid token but username does not exist in database.
+                log.warn("Authenticated user not found in db: {}", username);
             }
-        } catch (UsernameNotFoundException e) {
-            log.error("Cannot set user authentication: {}", e);
         }
 
         filterChain.doFilter(request, response);

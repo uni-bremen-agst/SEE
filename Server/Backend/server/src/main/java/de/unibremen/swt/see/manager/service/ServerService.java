@@ -6,8 +6,10 @@ import com.github.dockerjava.api.exception.NotModifiedException;
 import de.unibremen.swt.see.manager.model.Config;
 import de.unibremen.swt.see.manager.model.File;
 import de.unibremen.swt.see.manager.model.FileType;
+import de.unibremen.swt.see.manager.model.RoleType;
 import de.unibremen.swt.see.manager.model.Server;
 import de.unibremen.swt.see.manager.model.ServerStatusType;
+import de.unibremen.swt.see.manager.model.User;
 import de.unibremen.swt.see.manager.repository.ConfigRepository;
 import de.unibremen.swt.see.manager.repository.ServerRepository;
 import de.unibremen.swt.see.manager.util.ServerLockManager;
@@ -72,6 +74,11 @@ public class ServerService {
     private final ContainerService containerService;
 
     /**
+     * Used to create/delete a user for a server.
+     */
+    private final UserService userService;
+
+    /**
      * The external address of the Docker server.
      * <p>
      * This is the address that any game server instance running in a container
@@ -107,17 +114,14 @@ public class ServerService {
 
     /**
      * Retrieves a server by its ID.
-     * <p>
-     * This function retrieves the data read-only so that locked entries can be
-     * retrieved as well.
      *
      * @param id the ID of the server
-     * @return server if found, or {@code null} if not found
+     * @return the server if found, or {@code null} if not found
      */
     @Transactional(readOnly = true)
     public Server get(UUID id) {
         log.info("Fetching server {}", id);
-        return serverRepo.findServerById(id).orElse(null);
+        return serverRepo.findById(id).orElse(null);
     }
 
     /**
@@ -142,6 +146,9 @@ public class ServerService {
      * assignment fails after several tries, the server cannot be created. If
      * that happens regularly, it might be a good idea to configure a larger
      * port range.
+     * <p>
+     * A user will be created with a random password to access data associated
+     * with the server.
      *
      * @param server the server to be created
      * @return the newly created server, or {@code null}
@@ -151,7 +158,7 @@ public class ServerService {
         server.setContainerAddress(externalDockerHost);
 
         UUID serverId = server.getId();
-        if (serverId != null && serverRepo.findServerById(serverId).isPresent()) {
+        if (serverId != null && serverRepo.findById(serverId).isPresent()) {
             throw new RuntimeException("The server is already present in the database!");
         }
 
@@ -162,8 +169,14 @@ public class ServerService {
         }
         server.setContainerPort(port);
 
-        server.setServerPassword(generatePassword(PASSWORD_LENGTH));
+        final String password = generatePassword(PASSWORD_LENGTH);
+        server.setServerPassword(password);
         server = serverRepo.save(server);
+        serverId = server.getId();
+
+        final User user = userService.create(serverId.toString(), password, RoleType.ROLE_USER);
+        userService.addServer(user, server);
+
         return server;
     }
 
@@ -179,7 +192,7 @@ public class ServerService {
      * an error occurred while storing the file
      */
     public File addFile(UUID serverId, String fileTypeStr, MultipartFile multipartFile) {
-        Optional<Server> optServer = serverRepo.findServerById(serverId);
+        Optional<Server> optServer = serverRepo.findById(serverId);
         if (optServer.isEmpty()) {
             log.error("Server not found with ID: {}", serverId);
             return null;
@@ -204,7 +217,7 @@ public class ServerService {
      * @return a list containing all files of the given server
      */
     public List<File> getFilesForServer(UUID id) {
-        Optional<Server> optServer = serverRepo.findServerById(id);
+        Optional<Server> optServer = serverRepo.findById(id);
         if (optServer.isEmpty()) {
             return Collections.emptyList();
         }
@@ -219,6 +232,8 @@ public class ServerService {
      * <p>
      * This method acquires a write lock on the server entity to synchronize
      * write operations.
+     * <p>
+     * The user that was created along with the server will be deleted as well.
      *
      * @param id the ID of the server to be deleted
      * @throws EntityNotFoundException if the server does not exist
@@ -226,7 +241,7 @@ public class ServerService {
      * @throws IllegalStateException if the server is busy
      */
     public void delete(UUID id) throws EntityNotFoundException, IOException, IllegalStateException {
-        final Server server = serverRepo.findServerById(id).orElse(null);
+        final Server server = serverRepo.findById(id).orElse(null);
         if (server == null) {
             throw new EntityNotFoundException("No server found with ID " + id);
         }
@@ -253,7 +268,8 @@ public class ServerService {
             }
 
             fileService.deleteFilesByServer(server);
-            serverRepo.deleteServerById(id);
+            serverRepo.deleteById(id);
+            userService.deleteByUsername(id.toString());
             lockManager.removeLock(id);
         } finally {
             lock.unlock();
@@ -273,7 +289,7 @@ public class ServerService {
      * @throws IllegalStateException if the server is busy or already online
      */
     public void start(UUID id) throws EntityNotFoundException, IOException, IllegalStateException {
-        final Server server = serverRepo.findServerById(id).orElse(null);
+        final Server server = serverRepo.findById(id).orElse(null);
         if (server == null) {
             throw new EntityNotFoundException("No server found with ID " + id);
         }
@@ -320,7 +336,7 @@ public class ServerService {
      * @throws IllegalStateException if the server is busy or already stopped
      */
     public void stop(UUID id) throws EntityNotFoundException, IllegalStateException {
-        final Server server = serverRepo.findServerById(id).orElse(null);
+        final Server server = serverRepo.findById(id).orElse(null);
         if (server == null) {
             throw new EntityNotFoundException("No server found with ID " + id);
         }
@@ -405,23 +421,6 @@ public class ServerService {
     }
 
     /**
-     * Evaluates if given server can be accessed with given password.
-     *
-     * @param serverId the ID of the server to be accessed
-     * @param roomPassword the password to access the server
-     * @return {@code true} if the password is correct or no password is set for
-     * given server, {@code false} if access cannot be granted.
-     * @throws EntityNotFoundException if the server does not exist
-     */
-    public boolean validateAccess(UUID serverId, String roomPassword) throws EntityNotFoundException {
-        final Server server = serverRepo.findServerById(serverId).orElse(null);
-        if (server == null) {
-            throw new EntityNotFoundException("No server found with ID " + serverId);
-        }
-        return (server.getServerPassword() == null || server.getServerPassword().isEmpty() || server.getServerPassword().equals(roomPassword));
-    }
-
-    /**
      * Generates a pseudo-random port in the range defined in the server
      * settings.
      * <p>
@@ -441,7 +440,7 @@ public class ServerService {
         Integer port = null;
         for (int tries = 10; tries > 0; tries--) {
             final int newPort = random.nextInt(max - min) + min;
-            if (serverRepo.findServerByContainerPort(newPort).isEmpty()) {
+            if (serverRepo.findByContainerPort(newPort).isEmpty()) {
                 port = newPort;
                 break;
             }
@@ -473,11 +472,11 @@ public class ServerService {
      * @throws RuntimeException if the configuration could not be found
      */
     private Config resolveConfig() {
-        final Optional<Config> optConfig = configRepo.findConfigById(1);
-        if (optConfig.isEmpty()) {
+        List<Config> configs = configRepo.findAll();
+        if (configs.isEmpty()) {
             throw new RuntimeException("Server configuration could not be found!");
         }
-        return optConfig.get();
+        return configs.get(0);
     }
 
 }
