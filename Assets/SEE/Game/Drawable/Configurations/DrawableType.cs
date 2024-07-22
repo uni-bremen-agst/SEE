@@ -75,7 +75,7 @@ namespace SEE.Game.Drawable.Configurations
             {
                 case LineConf line:
                     GameEdit.ChangeLine(objectToEdit, line);
-                    new EditLineNetAction(surface.name, surfaceParentName, line).Execute();
+                    new EditLineNetAction(surface.name, surfaceParentName, LineConf.GetLineWithoutRenderPos(objectToEdit)).Execute();
                     break;
                 case TextConf text:
                     GameEdit.ChangeText(objectToEdit, text);

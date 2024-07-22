@@ -1,4 +1,5 @@
-﻿using SEE.Game.Drawable;
+﻿using LibGit2Sharp;
+using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.GO;
@@ -179,8 +180,9 @@ namespace SEE.Controls.Actions.Drawable
                     positions = newPositions;
 
                     GameDrawer.Drawing(shape, positions);
-                    new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
-                        LineConf.GetLine(shape)).Execute();
+                    new DrawingNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), shape.name, newPosition, newPositions.Length - 1).Execute();
+                    //new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
+                    //    LineConf.GetLine(shape)).Execute();
                     FinishDrawing();
                     return true;
                 }
@@ -320,12 +322,15 @@ namespace SEE.Controls.Actions.Drawable
                         ValueHolder.CurrentTiling);
                     positions[0] = shape.transform.InverseTransformPoint(positions[0]) - ValueHolder.DistanceToDrawable;
                     ShapeMenu.ActivatePartUndo(() => RemoveLastPoint(true));
+                    LineConf conf = LineConf.GetLine(shape);
+                    conf.RendererPositions = positions;
+                    new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), conf).Execute();
                     break;
                 case ShapePointsCalculator.Shape.Square:
                     positions = ShapePointsCalculator.Square(convertedHitPoint, ShapeMenu.GetValue1());
                     break;
                 case ShapePointsCalculator.Shape.Rectangle:
-                    positions = ShapePointsCalculator.Rectanlge(convertedHitPoint, ShapeMenu.GetValue1(),
+                    positions = ShapePointsCalculator.Rectangle(convertedHitPoint, ShapeMenu.GetValue1(),
                         ShapeMenu.GetValue2());
                     break;
                 case ShapePointsCalculator.Shape.Rhombus:
@@ -518,7 +523,8 @@ namespace SEE.Controls.Actions.Drawable
                 Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
                 newPositions[^1] = newPosition;
                 GameDrawer.Drawing(shape, newPositions);
-                new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(shape)).Execute();
+                new DrawingNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), shape.name, newPosition, newPositions.Length - 1).Execute();
+                //new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(shape)).Execute();
             }
         }
 
@@ -543,7 +549,8 @@ namespace SEE.Controls.Actions.Drawable
                     positions = newPositions;
 
                     GameDrawer.Drawing(shape, positions);
-                    new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(shape)).Execute();
+                    new DrawingNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), shape.name, newPosition, newPositions.Length - 1).Execute();
+                    //new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(shape)).Execute();
                 }
             }
         }

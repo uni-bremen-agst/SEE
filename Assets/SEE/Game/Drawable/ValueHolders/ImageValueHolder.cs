@@ -34,5 +34,19 @@ namespace SEE.Game.Drawable.ValueHolders
             get { return path; } 
             set {  path = value; } 
         }
+
+        /// <summary>
+        /// The url of the image.
+        /// </summary>
+        private string url;
+
+        /// <summary>
+        /// The url property.
+        /// </summary>
+        public string URL
+        {
+            get { return url; }
+            set { url = value; }
+        }
     }
 }

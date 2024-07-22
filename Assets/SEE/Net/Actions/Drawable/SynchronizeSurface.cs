@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Net.Actions.Drawable;
-using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 
@@ -9,11 +8,6 @@ namespace SEE.Net.Actions.Drawable
  /// </summary>
     public class SynchronizeSurface : SurfaceNetAction
     {
-        /// <summary>
-        /// The config of the drawable that should be synchronized.
-        /// </summary>
-        public DrawableConfig Config;
-
         /// <summary>
         /// Whether the current page change should be forced.
         /// </summary>
@@ -25,7 +19,6 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="orderInLayer">The current order in layer of the host.</param>
         public SynchronizeSurface(DrawableConfig config, bool forceChange = false) : base(config)
         {
-            Config = config;
             ForceChange = forceChange;
         }
 
@@ -36,10 +29,10 @@ namespace SEE.Net.Actions.Drawable
         {
             base.ExecuteOnClient();
             DrawableHolder holder = Surface.GetComponent<DrawableHolder>();
-            holder.OrderInLayer = Config.OrderInLayer;
-            holder.Description = Config.Description;
-            holder.MaxPageSize = Config.MaxPageSize;
-            GameDrawableManager.ChangeCurrentPage(Surface, Config.CurrentPage, ForceChange);
+            holder.OrderInLayer = DrawableConf.OrderInLayer;
+            holder.Description = DrawableConf.Description;
+            holder.MaxPageSize = DrawableConf.MaxPageSize;
+            GameDrawableManager.ChangeCurrentPage(Surface, DrawableConf.CurrentPage, ForceChange);
         }
     }
 }

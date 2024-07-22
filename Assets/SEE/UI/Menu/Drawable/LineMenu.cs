@@ -634,7 +634,7 @@ namespace SEE.UI.Menu.Drawable
                         lineHolder.ColorKind = ColorKind.Monochrome;
                         ChangeColorKind(selectedLine, lineHolder.ColorKind, lineHolder);
                         new ChangeColorKindNetAction(surface.name, surfaceParentName,
-                            LineConf.GetLine(selectedLine), lineHolder.ColorKind).Execute();
+                            LineConf.GetLineWithoutRenderPos(selectedLine), lineHolder.ColorKind).Execute();
                     }
 
                     /// Apply the line kind change.
@@ -677,7 +677,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 lineHolder.ColorKind = GetColorKinds(true)[index];
                 ChangeColorKind(selectedLine, lineHolder.ColorKind, lineHolder);
-                new ChangeColorKindNetAction(surface.name, surfaceParentName, LineConf.GetLine(selectedLine),
+                new ChangeColorKindNetAction(surface.name, surfaceParentName, LineConf.GetLineWithoutRenderPos(selectedLine),
                     lineHolder.ColorKind).Execute();
 
                 /// Activates the primary color button, if it changes to <see cref="ColorKind.Monochrome"/>

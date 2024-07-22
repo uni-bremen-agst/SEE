@@ -3,6 +3,7 @@ using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -30,6 +31,11 @@ namespace SEE.Game.Drawable.Configurations
         public string Path;
 
         /// <summary>
+        /// The url of the image.
+        /// </summary>
+        public string URL;
+
+        /// <summary>
         /// Returns an image configuration for the given game object.
         /// Only works if the game object is a drawable image.
         /// If not, <c>null</c> is returned.
@@ -51,7 +57,8 @@ namespace SEE.Game.Drawable.Configurations
                     OrderInLayer = imageObject.GetComponent<OrderInLayerValueHolder>().OrderInLayer,
                     ImageColor = imageObject.GetComponent<Image>().color,
                     Path = imageObject.GetComponent<ImageValueHolder>().Path,
-                    FileData = imageObject.GetComponent<ImageValueHolder>().FileData
+                    FileData = imageObject.GetComponent<ImageValueHolder>().FileData,
+                    URL = imageObject.GetComponent<ImageValueHolder>().URL
                 };
             }
             return conf;
@@ -73,7 +80,8 @@ namespace SEE.Game.Drawable.Configurations
                 OrderInLayer = this.OrderInLayer,
                 ImageColor = this.ImageColor,
                 Path = this.Path,
-                FileData = this.FileData
+                FileData = this.FileData.ToArray(),
+                URL = this.URL
             };
         }
 
@@ -90,6 +98,11 @@ namespace SEE.Game.Drawable.Configurations
         private const string pathLabel = "PathLabel";
 
         /// <summary>
+        /// Label in the configuration file for the url of the image.
+        /// </summary>
+        private const string urlLabel = "UrlLabel";
+
+        /// <summary>
         /// Saves this instance's attributes using <see cref="ConfigWriter"/>.
         /// </summary>
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
@@ -97,6 +110,7 @@ namespace SEE.Game.Drawable.Configurations
         {
             writer.Save(ImageColor, colorLabel);
             writer.Save(Path, pathLabel);
+            writer.Save(URL, urlLabel);
         }
 
         /// <summary>
@@ -132,6 +146,16 @@ namespace SEE.Game.Drawable.Configurations
                 {
                     FileData = File.ReadAllBytes(Path);
                 }
+            }
+            else
+            {
+                errors = true;
+            }
+
+            /// Try to restore the image url.
+            if (attributes.TryGetValue(pathLabel, out object url))
+            {
+                URL = (string)url;
             }
             else
             {

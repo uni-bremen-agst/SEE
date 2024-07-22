@@ -1,5 +1,6 @@
 ﻿using SEE.Game.Drawable;
 using SEE.GO;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
@@ -85,9 +86,24 @@ namespace SEE.Net.Actions.Drawable
             return child != null;
         }
 
+        /// <summary>
+        /// Unifies the search for the Surface object for the subclasses.
+        /// </summary>
         public override void ExecuteOnClient()
         {
             Surface = Find(SurfaceID, SurfaceParentID);
+        }
+
+        /// <summary>
+        /// Ensures that the changes are also applied to the server, necessary for the <see cref="DrawableSynchronizer">.
+        /// </summary>
+        public override void ExecuteOnServer()
+        {
+            if (Requester != NetworkManager.Singleton.LocalClientId)
+            {
+                base.ExecuteOnServer();
+                ExecuteOnClient();
+            }
         }
     }
 }

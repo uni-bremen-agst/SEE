@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Net.Actions.Drawable;
-using SEE.Controls.Actions.Drawable;
+﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 
@@ -11,16 +10,10 @@ namespace SEE.Net.Actions.Drawable
     public class StickyNoteSpawnNetAction : SurfaceNetAction
     {
         /// <summary>
-        /// The sticky note that should be spawn.
-        /// </summary>
-        public DrawableConfig DrawableConf;
-
-        /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
         public StickyNoteSpawnNetAction(DrawableConfig config) : base(config)
         {
-            DrawableConf = config;
         }
 
         /// <summary>

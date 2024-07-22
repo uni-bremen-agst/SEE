@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Net.Actions.Drawable;
-using SEE.Controls.Actions.Drawable;
+﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Utils;
@@ -12,16 +11,10 @@ namespace SEE.Net.Actions.Drawable
     public class StickyNoteDeleterNetAction : SurfaceNetAction
     {
         /// <summary>
-        /// The sticky note that should be delete.
-        /// </summary>
-        public DrawableConfig Conf;
-
-        /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
         public StickyNoteDeleterNetAction(DrawableConfig conf) : base(conf)
         {
-            Conf = conf;
         }
 
         /// <summary>

@@ -406,7 +406,44 @@ namespace SEE.Net
         /// <param name="recipients">List of recipients to broadcast to, will broadcast to all if this is null.</param>
         public static void BroadcastAction(String serializedAction, ulong[] recipients)
         {
-            ServerNetwork.Value?.BroadcastActionServerRpc(serializedAction, recipients);
+            int maxPacketSize = 32000; /// TODO: Replace with the exact value.
+            if (serializedAction.Length < maxPacketSize)
+            {
+                ServerNetwork.Value?.BroadcastActionServerRpc(serializedAction, recipients);
+            } else
+            {
+                List<string> fragmentData = SplitString(serializedAction, maxPacketSize);
+                string id = Guid.NewGuid().ToString();
+                for (int i = 0; i < fragmentData.Count; i++)
+                {
+                    ServerNetwork.Value?.BroadcastActionServerRpc(id, fragmentData.Count, i, fragmentData[i], recipients);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Splitts a string after <paramref name="fragmentSize"/> chars.
+        /// </summary>
+        /// <param name="str">The string to be splitted</param>
+        /// <param name="fragmentSize">The size for the sub strings.</param>
+        /// <returns>A list with the splitted strings.</returns>
+        private static List<string> SplitString(string str, int fragmentSize)
+        {
+            List<string> fragments = new ();
+
+            for (int i = 0; i < str.Length; i += fragmentSize)
+            {
+                if (i + fragmentSize > str.Length)
+                {
+                    fragments.Add(str.Substring(i));
+                }
+                else
+                {
+                    fragments.Add(str.Substring(i, fragmentSize));
+                }
+            }
+
+            return fragments;
         }
 
         /// <summary>

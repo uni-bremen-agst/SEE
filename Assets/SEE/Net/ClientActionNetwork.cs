@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using SEE.Net.Actions;
 using Unity.Netcode;
 using UnityEngine;
@@ -53,6 +55,9 @@ namespace SEE.Net
         /// </summary>
         private const string metricFile = "multiplayer.csv";
 
+        /// Collect and preserve the fragments of packages.
+        public Dictionary<string, List<Fragment>> fragmentsGatherer = new();
+
         /// <summary>
         /// Fetches the multiplayer city files from the backend and syncs the current
         /// server state with this client.
@@ -94,6 +99,57 @@ namespace SEE.Net
             if (action.Requester != NetworkManager.Singleton.LocalClientId)
             {
                 action.ExecuteOnClient();
+            }
+        }
+
+        /// <summary>
+        /// Receives the fragments of a packet and performs the broadcast when all fragments of the packet are present.
+        /// </summary>
+        /// <param name="id">The packet id.</param>
+        /// <param name="packetSize">The size of fragments of the packet.</param>
+        /// <param name="currentFragment">The current fragment.</param>
+        /// <param name="data">The data of the fragment</param>
+        [ClientRpc]
+        public void BroadcastActionClientRpc(string id, int packetSize, int currentFragment, string data)
+        {
+            Fragment fragment = new(id, packetSize, currentFragment, data);
+            if (fragmentsGatherer.TryGetValue(fragment.PacketID, out List<Fragment> fragments))
+            {
+                fragments.Add(fragment);
+            }
+            else
+            {
+                List<Fragment> frags = new() { fragment };
+                fragmentsGatherer.Add(fragment.PacketID, frags);
+            }
+            if (fragmentsGatherer.TryGetValue(fragment.PacketID, out List<Fragment> f)
+                && Fragment.CombineFragments(f) != "")
+            {
+                BroadcastActClientRpc(fragment.PacketID);
+            }
+        }
+
+        /// <summary>
+        /// Performs the broadcast. First, the serialized string is assembled.
+        /// </summary>
+        /// <param name="key">The packet id.</param>
+        /// <param name="recipients">The recipients of the call.</param>
+        [ClientRpc]
+        private void BroadcastActClientRpc(string key)
+        {
+            if (IsHost || IsServer)
+            {
+                return;
+            }
+            if (fragmentsGatherer.TryGetValue(key, out List<Fragment> fragments))
+            {
+                string serializedAction = Fragment.CombineFragments(fragments);
+                AbstractNetAction action = ActionSerializer.Deserialize(serializedAction);
+                if (action.Requester != NetworkManager.Singleton.LocalClientId)
+                {
+                    action.ExecuteOnClient();
+                }
+                fragmentsGatherer.Remove(key);
             }
         }
 

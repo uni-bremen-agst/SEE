@@ -1,6 +1,11 @@
-﻿using SEE.Controls.Actions.Drawable;
+﻿using Cysharp.Threading.Tasks;
+using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.Utils;
+using System.IO;
+using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -15,6 +20,16 @@ namespace SEE.Net.Actions.Drawable
         public ImageConf Conf;
 
         /// <summary>
+        /// Whether if the image is a web image.
+        /// </summary>
+        public bool Web;
+
+        /// <summary>
+        /// The size of the file data.
+        /// </summary>
+        public long Size;
+
+        /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
         /// <param name="drawableID">The id of the drawable on which the object should be placed.</param>
@@ -23,7 +38,17 @@ namespace SEE.Net.Actions.Drawable
         public AddImageNetAction(string drawableID, string parentDrawableID, ImageConf imageConf)
             : base(drawableID, parentDrawableID)
         {
-            Conf = imageConf;
+            Conf = (ImageConf)imageConf.Clone();
+            if (!string.IsNullOrEmpty(Conf.URL))
+            {
+                Size = new FileInfo(Conf.Path).Length;
+                Conf.FileData = new byte[0];
+                Web = true;
+            }
+            else
+            {
+                Web = false;
+            }
         }
 
         /// <summary>
@@ -35,11 +60,44 @@ namespace SEE.Net.Actions.Drawable
             base.ExecuteOnClient();
             if (Conf != null && Conf.Id != "")
             {
-                GameImage.RePlaceImage(Surface, Conf);
+                if (!Web)
+                {
+                    GameImage.RePlaceImage(Surface, Conf);
+                }
+                else
+                {
+                    if (File.Exists(Conf.Path) && new FileInfo(Conf.Path).Length == Size)
+                    {
+                        Conf.FileData = File.ReadAllBytes(Conf.Path);
+                        GameImage.RePlaceImage(Surface, Conf);
+                    } else
+                    {
+                        DownloadAndAdd().Forget();
+                    }
+                }
             }
             else
             {
                 throw new System.Exception($"There is no image to add.");
+            }
+            return;
+
+            async UniTask DownloadAndAdd()
+            {
+                DownloadImage download = Surface.AddComponent<DownloadImage>();
+                download.Download(Conf.URL);
+
+                while (download != null && download.GetTexture() == null)
+                {
+                    await UniTask.Yield();
+                }
+
+                if (download != null && download.GetTexture() != null)
+                {
+                    Conf.FileData = download.GetTexture().EncodeToPNG();
+                    GameImage.RePlaceImage(Surface, Conf);
+                    Destroyer.Destroy(download);
+                }
             }
         }
     }

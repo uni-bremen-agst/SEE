@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Net.Actions.Drawable;
-using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using UnityEngine;
 
@@ -11,16 +10,10 @@ namespace SEE.Net.Actions.Drawable
     public class StickyNoteChangeNetAction : SurfaceNetAction
     {
         /// <summary>
-        /// The configuration which holds all data.
-        /// </summary>
-        public DrawableConfig DrawableConf;
-
-        /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
         public StickyNoteChangeNetAction(DrawableConfig config) : base(config)
         {
-            DrawableConf = config;
         }
 
         /// <summary>

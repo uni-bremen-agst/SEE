@@ -339,7 +339,6 @@ namespace SEE.Controls.Actions.Drawable
             {
                 GameObject surface = GameFinder.GetDrawableSurface(attachedObjects);
                 string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
-
                 foreach (DrawableType type in config.GetAllDrawableTypes())
                 {
                     GameObject typeObj = GameFinder.FindChild(attachedObjects, type.Id);

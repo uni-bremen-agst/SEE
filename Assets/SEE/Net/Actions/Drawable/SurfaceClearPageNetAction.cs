@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Net.Actions.Drawable;
-using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 
 namespace SEE.Net.Actions.Drawable
@@ -8,11 +7,6 @@ namespace SEE.Net.Actions.Drawable
  /// </summary>
     public class SurfaceClearPageNetAction : SurfaceNetAction
     {
-        /// <summary>
-        /// The config of the drawable that should be synchronized.
-        /// </summary>
-        public DrawableConfig Config;
-
         /// <summary>
         /// The page to be cleared.
         /// </summary>
@@ -25,7 +19,6 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="page">The page to be removed.</param>
         public SurfaceClearPageNetAction(DrawableConfig config, int page) : base(config)
         {
-            Config = config;
             Page = page;
         }
 

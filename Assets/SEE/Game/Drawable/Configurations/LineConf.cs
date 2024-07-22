@@ -105,6 +105,20 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
+        /// Gets a modified <see cref="LineConf"/> for the given object.
+        /// The render positions are empty.
+        /// It's needed to reduce the network resources.
+        /// </summary>
+        /// <param name="lineGameObject">The game object with the <see cref="LineRenderer"/> component.</param>
+        /// <returns>The created <see cref="LineConf"/> without the renderer positions.</returns>
+        public static LineConf GetLineWithoutRenderPos(GameObject lineGameObject)
+        {
+            LineConf conf = GetLine(lineGameObject);
+            conf.RendererPositions = new Vector3[0];
+            return conf;
+        }
+
+        /// <summary>
         /// Clones this line object.
         /// </summary>
         /// <returns>A copy of this line object.</returns>

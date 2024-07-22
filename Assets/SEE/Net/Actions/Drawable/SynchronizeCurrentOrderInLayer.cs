@@ -1,4 +1,5 @@
 ﻿using SEE.Game.Drawable;
+using Unity.Netcode;
 
 namespace SEE.Net.Actions.Drawable
 {/// <summary>
@@ -26,6 +27,18 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             ValueHolder.MaxOrderInLayer = OrderInLayer;
+        }
+
+        /// <summary>
+        /// Ensures that the changes are also applied to the server, necessary for the <see cref="DrawableSynchronizer">.
+        /// </summary>
+        public override void ExecuteOnServer()
+        {
+            if (Requester != NetworkManager.Singleton.LocalClientId)
+            {
+                base.ExecuteOnServer();
+                ExecuteOnClient();
+            }
         }
     }
 }

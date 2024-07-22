@@ -2,6 +2,7 @@
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game.Drawable.Configurations
@@ -10,7 +11,7 @@ namespace SEE.Game.Drawable.Configurations
     /// This class can hold all the information that is needed to configure a drawable.
     /// </summary>
     [Serializable]
-    public class DrawableConfig
+    public class DrawableConfig : ICloneable
     {
         /// <summary>
         /// The name of this drawable.
@@ -479,6 +480,34 @@ namespace SEE.Game.Drawable.Configurations
             }
 
             return errorFree;
+        }
+
+        /// <summary>
+        /// Returns a clone of this <see cref="DrawableConfig"/>.
+        /// </summary>
+        /// <returns>A new <see cref="DrawableConfig"/> with the values of this object.</returns>
+        public object Clone()
+        {
+            return new DrawableConfig
+            {
+                ID = this.ID,
+                ParentID = this.ParentID,
+                Position = this.Position,
+                Rotation = this.Rotation,
+                Scale = this.Scale,
+                Color = this.Color,
+                Order = this.Order,
+                Lighting = this.Lighting,
+                OrderInLayer = this.OrderInLayer,
+                Description = this.Description,
+                Visibility = this.Visibility,
+                CurrentPage = this.CurrentPage,
+                MaxPageSize = this.MaxPageSize,
+                LineConfigs = this.LineConfigs.ToList(),
+                TextConfigs = this.TextConfigs.ToList(),
+                ImageConfigs = this.ImageConfigs.ToList(),
+                MindMapNodeConfigs = this.MindMapNodeConfigs.ToList(),
+            };
         }
 
         #endregion

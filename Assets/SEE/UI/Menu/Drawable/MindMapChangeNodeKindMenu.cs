@@ -121,7 +121,7 @@ namespace SEE.UI.Menu.Drawable
                             GameObject pBranchLine = addedNode.GetComponent<MMNodeValueHolder>().GetParentBranchLine();
                             GameEdit.ChangeLine(pBranchLine, parentBranchLineConf);
                             new EditLineNetAction(surface.name, surfaceParentName,
-                                LineConf.GetLine(pBranchLine)).Execute();
+                                LineConf.GetLineWithoutRenderPos(pBranchLine)).Execute();
                         }
                     }
                     else

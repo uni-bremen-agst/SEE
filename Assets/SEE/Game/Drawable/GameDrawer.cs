@@ -245,6 +245,24 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
+        /// Adds a position to the <see cref="LineRenderer"/> of the <paramref name="line"/> on the given
+        /// <paramref name="index"/>.
+        /// </summary>
+        /// <param name="line">The line on which the position should be added.</param>
+        /// <param name="position">The position to be added.</param>
+        /// <param name="index">The index on which it should be added.</param>
+        public static void DrawPoint(GameObject line, Vector3 position, int index)
+        {
+            LineRenderer renderer = GetRenderer(line);
+            position.z = 0;
+            if (renderer.positionCount <= index)
+            {
+                renderer.positionCount = index + 1;
+            }
+            renderer.SetPosition(index, position);
+        }
+
+        /// <summary>
         /// Finishes drawing a line.
         /// Ensures that the mesh collider aligns with the renderer line points.
         /// However, the generated mesh must have at least three different points for this to work

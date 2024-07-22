@@ -181,6 +181,9 @@ namespace SEE.Controls.Actions.Drawable
             /// Transform the first position in local space.
             /// Beforehand, it's not possible because there is no line object on which 'InverseTransformPoint' can be applied.
             positions[0] = line.transform.InverseTransformPoint(positions[0]) - ValueHolder.DistanceToDrawable;
+            LineConf conf = LineConf.GetLine(line);
+            conf.RendererPositions = positions;
+            new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), conf).Execute();
         }
 
         /// <summary>
@@ -206,8 +209,7 @@ namespace SEE.Controls.Actions.Drawable
                 positions = newPositions;
 
                 GameDrawer.Drawing(line, positions);
-                new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
-                    LineConf.GetLine(line)).Execute();
+                new DrawingNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), line.name, newPosition, newPositions.Length - 1).Execute();
             }
         }
 
@@ -233,8 +235,7 @@ namespace SEE.Controls.Actions.Drawable
                     line = GameDrawer.SetPivot(line);
                     LineConf currentLine = LineConf.GetLine(line);
                     memento = new Memento(Surface, currentLine);
-                    new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID,
-                        currentLine).Execute();
+                    new DrawingFinishNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), line.name, currentLine.Loop).Execute();
                     CurrentState = IReversibleAction.Progress.Completed;
                     return true;
                 }

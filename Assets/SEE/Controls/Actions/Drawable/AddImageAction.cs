@@ -43,6 +43,11 @@ namespace SEE.Controls.Actions.Drawable
         private string fileName = "";
 
         /// <summary>
+        /// The url of the image.
+        /// </summary>
+        private string url = "";
+
+        /// <summary>
         /// The instance for the drawable file browser
         /// </summary>
         private DrawableFileBrowser browser;
@@ -185,11 +190,12 @@ namespace SEE.Controls.Actions.Drawable
                 isDialogOpen = false;
             }
 
-            if (webImageDialog != null && webImageDialog.GetUserInput(out string http, out string fileNameOut))
+            if (webImageDialog != null && webImageDialog.GetUserInput(out string url, out string fileNameOut))
             {
                 isDialogOpen = false;
                 download = Surface.AddComponent<DownloadImage>();
-                download.Download(http);
+                download.Download(url);
+                this.url = url;
                 fileName = fileNameOut;
             }
 
@@ -237,6 +243,7 @@ namespace SEE.Controls.Actions.Drawable
                 DrawableHolder holder = Surface.GetComponent<DrawableHolder>();
                 imageObj = GameImage.PlaceImage(Surface, filePath, position,
                     holder.OrderInLayer);
+                imageObj.GetComponent<ImageValueHolder>().URL = url;
                 new AddImageNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                     ImageConf.GetImageConf(imageObj)).Execute();
                 memento = new Memento(Surface, ImageConf.GetImageConf(imageObj));
