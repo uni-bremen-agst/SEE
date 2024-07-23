@@ -53,11 +53,11 @@ namespace SEE.Net
         /// <summary>
         /// Base URL of the backend server where the files are stored
         /// </summary>
-        public static string BackendDomain = "localhost";
+        public static string BackendDomain = "localhost:8080";
         /// <summary>
         /// REST resource path, i.e., the URL part identifying the client REST API.
         /// </summary>
-        public static string ClientAPI = "/api/v1/file/client/";
+        public static string ClientAPI = "/api/v1/";
         /// <summary>
         /// The complete URL of the Client REST API.
         /// </summary>

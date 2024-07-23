@@ -2,6 +2,7 @@
 using System.Collections;
 using System.IO;
 using System.IO.Compression;
+using Cysharp.Threading.Tasks;
 using SEE.Net.Actions;
 using Unity.Netcode;
 using UnityEngine;
@@ -14,44 +15,31 @@ namespace SEE.Net
     /// </summary>
     public class ClientActionNetwork : NetworkBehaviour
     {
-        // TODO(#749): This file makes heavy use of coroutines to deal with asynchronous code.
-        // We should consider refactoring it to use async via UniTask instead, to make it
-        // consistent with the rest of SEE and gain improved efficiency. This would also
-        // simplify some code (e.g., in GetAllData).
+        /// <summary>
+        /// Where multiplayer files are stored locally relative to the streaming assets.
+        /// </summary>
+        private const string ServerContentDirectory = "Multiplayer/";
 
         /// <summary>
-        /// Where files are stored locally on the server side (relative directory).
+        /// The data structure for loggint into the backend.
         /// </summary>
-        private const string RelativeServerContentDirectory = "/Multiplayer/";
-        /// <summary>
-        /// Where files are stored locally on the server side (absolute directory).
-        /// </summary>
-        private string AbsoluteServerContentDirectory => Application.streamingAssetsPath + RelativeServerContentDirectory;
+        [System.Serializable]
+        private struct LoginData
+        {
+            public string Username;
+            public string Password;
 
-        /// <summary>
-        /// The name of the zip file containing the source code.
-        /// </summary>
-        private const string zippedSourcesFilename = "src.zip";
+            public LoginData(string username, string password)
+            {
+                Username = username;
+                Password = password;
+            }
 
-        /// <summary>
-        /// The name of the GXL file containing the city graph from the backend.
-        /// </summary>
-        private const string gxlFile = "multiplayer.gxl";
-
-        /// <summary>
-        /// The name of the configuration file from the backend.
-        /// </summary>
-        private const string configFile = "multiplayer.cfg";
-
-        /// <summary>
-        /// The name of Microsoft Visual Studio solution file from the backend.
-        /// </summary>
-        private const string solutionFile = "multiplayer.sln";
-
-        /// <summary>
-        /// The name of the CSV file containing the metrics from the backend.
-        /// </summary>
-        private const string metricFile = "multiplayer.csv";
+            public string ToJson()
+            {
+                return JsonUtility.ToJson(this);
+            }
+        }
 
         /// <summary>
         /// Fetches the multiplayer city files from the backend and syncs the current
@@ -86,7 +74,7 @@ namespace SEE.Net
         [ClientRpc]
         public void ExecuteActionClientRpc(string serializedAction)
         {
-            if (IsHost  || IsServer)
+            if (IsHost || IsServer)
             {
                 return;
             }
@@ -118,126 +106,129 @@ namespace SEE.Net
 
             // For the time being, we will not download the data.
             // This must be re-enabled once the backend is ready.
-            // StartCoroutine(GetAllData());
+            // GetAllData();
         }
 
 
         /// <summary>
-        /// Retrieves all data files from the server. These are: (1) the source
-        /// code archived in a ZIP file, the GXL file, the configuration file,
-        /// the CSV file, and the solution file.
+        /// Retrieves all data files from the server.
         /// </summary>
-        /// <returns>coroutine enumerator</returns>
-        private IEnumerator GetAllData()
+        private async UniTask GetAllData()
         {
-            Debug.Log($"Server REST API is: {Network.ClientRestAPI}.\n");
+            Debug.Log($"Backend API URL is: {Network.ClientRestAPI}.\n");
 
-            Coroutine getSource = StartCoroutine(GetSource());
-            Coroutine getGXL = StartCoroutine(GetGxl());
-            Coroutine getConfig = StartCoroutine(GetConfig());
-            Coroutine getCSV = StartCoroutine(GetCsv());
-            Coroutine getSolution = StartCoroutine(GetSolution());
+            if (!await LogIn())
+            {
+                Debug.Log("Login was NOT successful!");
+                return;
+            }
 
-            yield return getSource;
-            yield return getGXL;
-            yield return getConfig;
-            yield return getCSV;
-            yield return getSolution;
+            // TODO download files to ServerContentDirectory
 
-            UnzipSources();
+            // TODO Unzip() ZIP files to ServerContentDirectory
 
             Network.ServerNetwork.Value?.SyncClientServerRpc(NetworkManager.Singleton.LocalClientId);
         }
 
         /// <summary>
-        /// Unzips the source-code ZIP archive if it exists.
+        /// Unzips a file if it exists.
+        /// Throws an <c>IOException</c> if the file does not exist in local storage.
+        /// Additionally, the exceptions raised by <c>ZipFile.ExtractToDirectory()</c> are not caught.
         /// </summary>
-        private void UnzipSources()
+        /// <param name="zipPath">The path of the ZIP file to be extracted.</param>
+        /// <param name="targetPath">The path of the target directory in which the file should be extracted.</param>
+        private void Unzip(string zipPath, string targetPath)
         {
-            string absoluteSourceArchiveFileName = AbsoluteServerContentDirectory + zippedSourcesFilename;
-            if (File.Exists(absoluteSourceArchiveFileName))
+            var filePath = System.IO.Path.Combine(Application.streamingAssetsPath, zipPath);
+            var dirPath = System.IO.Path.Combine(Application.streamingAssetsPath, targetPath);
+            if (!File.Exists(filePath))
             {
-                try
-                {
-                    ZipFile.ExtractToDirectory(absoluteSourceArchiveFileName,
-                                               AbsoluteServerContentDirectory + "src");
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError($"Error unzipping source-code zip file {absoluteSourceArchiveFileName}: {e.Message}.\n");
-                }
+                throw new IOException($"The file does not exist: '{filePath}'");
             }
-            else
-            {
-                Debug.LogError($"Source-code zip file {absoluteSourceArchiveFileName} was not downloaded.\n");
-            }
+
+            ZipFile.ExtractToDirectory(targetPath, dirPath);
         }
 
         /// <summary>
-        /// Fetches the source-code ZIP file from the backend.
+        /// Asynchronously retrieves a file from the backend using the specified file ID and path.
+        /// Throws an <c>InvalidOperationException</c> if the server ID is not set and an <c>IOException</c>
+        /// if the file already exists in local storage.
         /// </summary>
-        private IEnumerator GetSource()
-        {
-            return GetFile("source", zippedSourcesFilename);
-        }
-
-        /// <summary>
-        /// Fetches the GXL file from the backend.
-        /// </summary>
-        private IEnumerator GetGxl()
-        {
-            return GetFile("gxl", gxlFile);
-        }
-
-        /// <summary>
-        /// Fetches the configuration file from the backend.
-        /// </summary>
-        private IEnumerator GetConfig()
-        {
-            return GetFile("config", configFile);
-        }
-
-        /// <summary>
-        /// Fetches the solution file from the backend.
-        /// </summary>
-        private IEnumerator GetSolution()
-        {
-            return GetFile("solution", solutionFile);
-        }
-
-        /// <summary>
-        /// Fetches the CSV file from the backend.
-        /// </summary>
-        private IEnumerator GetCsv()
-        {
-            return GetFile("csv", metricFile);
-        }
-
-        /// <summary>
-        /// Fetches a file from the backend.
-        /// </summary>
-        /// <param name="dataType">the type of file</param>
-        /// <param name="filename">the name of the file</param>
-        /// <returns>enumerator to continue the execution</returns>
-        private IEnumerator GetFile(string dataType, string filename)
+        /// <param name="id">The unique identifier of the file to be retrieved.</param>
+        /// <param name="path">The path and filename of the file to be saved locally after retrieval.</param>
+        /// <returns>
+        /// A <see cref="UniTask{bool}"/> indicating whether the file retrieval was successful.
+        /// Returns <c>true</c> if the file is successfully retrieved and saved; otherwise, <c>false</c>.
+        /// </returns>
+        /// <remarks>
+        /// On successful retrieval, the file is stored with the specified path relative to the
+        /// <c>Application.streamingAssetsPath</c>.
+        /// </remarks>
+        private async UniTask<bool> GetFile(string id, string path)
         {
             if (string.IsNullOrEmpty(Network.ServerId))
             {
-                throw new Exception("Server ID is not set.");
+                throw new InvalidOperationException("Server ID is not set.");
             }
-            // FIXME(#750): The room password is submitted in plain text if http and not https is used.
-            string url = Network.ClientRestAPI + dataType + "?serverId=" + Network.ServerId
-                         + "&roomPassword=" + Network.Instance.RoomPassword;
-
-            using UnityWebRequest webRequest = UnityWebRequest.Get(url);
-            webRequest.downloadHandler = new DownloadHandlerFile(AbsoluteServerContentDirectory + filename);
-
-            // Request and wait for the desired page.
-            yield return webRequest.SendWebRequest();
-
-            if (webRequest.result != UnityWebRequest.Result.Success)
+            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(path))
             {
-                Debug.LogError($"Error fetching {filename} from backend: {webRequest.error}.\n");
+                Debug.LogWarning("Parameters must not be empty!");
+                return false;
+            }
+            var targetPath = System.IO.Path.Combine(Application.streamingAssetsPath, path);
+            if (File.Exists(targetPath))
+            {
+                throw new IOException($"The file already exists: '{targetPath}'");
+            }
+
+            string url = Network.ClientRestAPI + "file/download?id=" + id;
+            using (UnityWebRequest getRequest = UnityWebRequest.Get(url))
+            {
+
+                getRequest.downloadHandler = new DownloadHandlerFile(targetPath);
+                UnityWebRequestAsyncOperation asyncOp = getRequest.SendWebRequest();
+                await asyncOp.ToUniTask();
+                
+                if (getRequest.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogError(getRequest.error);
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously logs in to the backend by sending a POST request to the user/signin endpoint.
+        /// If the login is successful, the server responds with a cookie containing a JWT (JSON Web Token)
+        /// that is stored in Unity's cookie cache and used for subsequent API calls.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="UniTask{bool}"/> indicating whether the login was successful.
+        /// Returns <c>true</c> if the login is successful; otherwise, <c>false</c>.
+        /// </returns>
+        private async UniTask<bool> LogIn()
+        {
+            string url = Network.ClientRestAPI + "user/signin";
+            string postBody = new LoginData(Network.ServerId, Network.Instance.RoomPassword).ToJson();
+            UnityWebRequest.ClearCookieCache(new System.Uri(url));
+            using (UnityWebRequest signinRequest = UnityWebRequest.Post(url, postBody, "application/json"))
+            {
+                UnityWebRequestAsyncOperation asyncOp = signinRequest.SendWebRequest();
+                await asyncOp.ToUniTask();
+
+                if (signinRequest.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogError(signinRequest.error);
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
             }
         }
     }
