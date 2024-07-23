@@ -492,14 +492,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             double artificallyMappedNodes = 0;
             double currentPercentage = 0;
 
-            // Dictionary<string, List<Node>> expectedNodesForCluster = new();
             Dictionary<string, List<Node>> expectedNodesForCluster = new();
-
-            //foreach (Node currentCluster in oracleCluster)
-            //{
-            //    IEnumerable<Node> allExpectedNodes = currentCluster.Incomings.Select(x => ReflexionGraph.GetNode(x.Source.ID));            
-            //    expectedNodesForCluster[currentCluster.ID] = allExpectedNodes.SelectMany(ex => unmappedCandidates.Where(unmapped => unmapped.Ascendants().Contains(ex))).ToList();
-            //}
 
             foreach (Node currentCluster in oracleCluster)
             {

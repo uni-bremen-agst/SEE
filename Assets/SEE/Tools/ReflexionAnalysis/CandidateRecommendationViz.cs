@@ -434,6 +434,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         public async UniTask Evaluation()
         {
+            UnityEngine.Debug.Log("Start Evaluation...");
             GameObject gameobject = SceneQueries.GetCodeCity(this.transform)?.gameObject;
 
             if (gameobject == null)
@@ -466,12 +467,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             foreach(RecommendationSettings setting in settings)
             {
+                UnityEngine.Debug.Log($"iterate group {setting.ExperimentName}...");
                 setting.Iterations = n;
                 await city.UpdateRecommendationSettings(setting);
                 city.RecommendationSettings = setting;
                 setting.OutputPath.Path = Path.Combine(Path.Combine(GetConfigPath(), "Results"), setting.ExperimentName);
                 await city.RunMappingExperiment();
             }
+            UnityEngine.Debug.Log($"finish Evaluation...");
         }
 
         /// <summary>
@@ -588,12 +591,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             for (int i = 0; i < recommendationSettings.Iterations; ++i)
             {
+                UnityEngine.Debug.Log($"Experiment run={i}...");
                 // STEPS
                 // 1. Create initial mapping based on current seed
-                UnityEngine.Debug.Log("Create initial mapping...");
                 Dictionary<Node, HashSet<Node>> initialMapping = await UniTask.RunOnThreadPool(() => recommendations.CreateInitialMapping(initialMappingPercentage, currentSeed));
-
-                UnityEngine.Debug.Log($"Experiment run={i} initialMapping keys={initialMapping.Keys.Count} values={initialMapping.Values.Count}");
+                UnityEngine.Debug.Log("Create initial mapping...");
 
                 foreach (Node cluster in initialMapping.Keys)
                 {
@@ -637,6 +639,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 stream.Close();
                 Debug.Log($"Saved Result of Run to {xmlFile}");
 
+                UnityEngine.Debug.Log("reset mapping...");
                 await UniTask.RunOnThreadPool(() => recommendations.ReflexionGraph.ResetMapping(true));
 
                 if (!recommendations.AttractFunction.EmptyTrainingData())
@@ -871,7 +874,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 throw new Exception("No candidate recommendation object was given. This parameter is required if syncWithView is set to false.");
             }
 
-            UnityEngine.Debug.Log($"Start automated mapping: graph={candidateRecommendation.ReflexionGraph.Name} syncWithView={syncWithView} ignoreTieBreakers={ignoreTieBreakers}");
             List<MappingPair> recommendations = (syncWithView ? (await this.GetRecommendationsAsync()) : candidateRecommendation.GetRecommendations()).ToList();
 
             // PrintMappingsPairs(recommendations);
