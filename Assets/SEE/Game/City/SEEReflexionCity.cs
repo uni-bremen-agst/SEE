@@ -238,14 +238,28 @@ namespace SEE.Game.City
 
         [Button("Run Experiment", ButtonSizes.Small)]
         [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Run Experiment")]
-        public async UniTaskVoid RunMappingExperiment()
+        public async UniTask RunMappingExperiment()
         {
-            await candidateRecommendationViz.RunExperimentAsync(this.RecommendationSettings, oracleMapping);
+            try
+            {
+                if (!this.RecommendationSettings.syncExperimentWithView)
+                {
+                    await candidateRecommendationViz.RunExperimentInBackground(this.RecommendationSettings, oracleMapping);
+                }
+                else
+                {
+                    await candidateRecommendationViz.RunExperimentAsync(this.RecommendationSettings, oracleMapping);
+                }
+            }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.LogException(e);
+            }
         }
 
         [Button("Evaluation", ButtonSizes.Small)]
         [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Evaluation")]
-        public async UniTaskVoid Evaluation()
+        public async UniTask Evaluation()
         {
             await candidateRecommendationViz.Evaluation();
         }

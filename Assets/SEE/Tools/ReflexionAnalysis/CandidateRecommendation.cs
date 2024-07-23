@@ -465,15 +465,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             if (percentage > 1 || percentage < 0)
             {
-                throw new Exception("Parameter percentage have to be a double changeEvent between 0.0 and 1.0");
+                throw new ArgumentException("Parameter percentage have to be a double changeEvent between 0.0 and 1.0");
             }
             if (OracleGraph == null)
             {
-                throw new Exception("OracleGraph is null. Cannot generate initial mapping.");
+                throw new ArgumentException("OracleGraph is null. Cannot generate initial mapping.");
             }
             if (ReflexionGraph == null)
             {
-                throw new Exception("ReflexionGraph is null. Cannot generate initial mapping.");
+                throw new ArgumentException("ReflexionGraph is null. Cannot generate initial mapping.");
             }
 
             List<Node> candidates = GetCandidates();
@@ -506,16 +506,19 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 expectedNodesForCluster[currentCluster.ID] = new List<Node>();
             }
 
+            HashSet<string> candidatesAvailableToMap = new();
+
             foreach (Node unmappedCandidate in unmappedCandidates)
             {
                 // TODO: can cause endless loops
                 if(GetExpectedClusterID(unmappedCandidate.ID) != null)
                 {
-                    expectedNodesForCluster[GetExpectedClusterID(unmappedCandidate.ID)].Add(unmappedCandidate); 
+                    expectedNodesForCluster[GetExpectedClusterID(unmappedCandidate.ID)].Add(unmappedCandidate);
+                    candidatesAvailableToMap.Add(unmappedCandidate.ID);
                 }
             }
 
-            while (currentPercentage < percentage)
+            while (currentPercentage < percentage && candidatesAvailableToMap.Count > 0)
             {
                 foreach (Node currentCluster in oracleCluster)
                 {
@@ -531,6 +534,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
                         AddToInitialMapping(ReflexionGraph.GetNode(currentCluster.ID), nodeToMap);
                         expectedNodesForCluster[currentCluster.ID].Remove(nodeToMap);
+                        candidatesAvailableToMap.Remove(nodeToMap.ID);
                         artificallyMappedNodes++;
                     }
                     else

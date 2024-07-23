@@ -168,7 +168,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <returns>Description of this object</returns>
         public string ToShortString()
         {
-            return $"{candidateID} -{attractionValue}-> {clusterID}";
+            return $"{this.CandidateID} -{attractionValue}-> {this.ClusterID}";
         }
 
         /// <summary>
