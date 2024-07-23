@@ -118,7 +118,7 @@ podman-compose build
 
 Use `--no-cache` parameter to force a rebuild.
 
-To run the container, use:
+To run the container stack, use:
 
 ```
 podman-compose up
@@ -131,3 +131,13 @@ The following command stops and cleans up the container setup:
 ```
 podman-compose down
 ```
+
+#### Configuration
+
+You can edit the compose file to configure many options.
+
+At this point, you will have to use the same path both on the container host as well as in the backend container for the `FILESTORAGE_DIR`.
+This is the directory where the uploaded server files (code city configurations) will be stored.
+Mount your host-local directory at the same path in the container and configure the environment variable accordingly.
+
+Read the backend README for security considerations and change `JWT_SECRET` to a unique random secret.
