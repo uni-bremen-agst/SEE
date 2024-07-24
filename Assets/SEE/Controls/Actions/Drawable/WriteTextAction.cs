@@ -1,5 +1,4 @@
-﻿using SEE.Game;
-using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
@@ -23,7 +22,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// True if we are currently at the first start of this action.
         /// </summary>
-        public static bool firstStart = true;
+        private static bool firstStart = true;
 
         /// <summary>
         /// The game object that holds the TextMeshPro component.
@@ -230,7 +229,6 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             GameTexter.ReWriteText(memento.Surface.GetDrawableSurface(), memento.Text);
             new WriteTextNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Text).Execute();
-
         }
 
         /// <summary>

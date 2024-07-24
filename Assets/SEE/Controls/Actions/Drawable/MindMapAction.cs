@@ -161,9 +161,7 @@ namespace SEE.Controls.Actions.Drawable
                                 "First you need to select an operation from the menu.");
                         }
                         break;
-                    case Operation.Theme:
-                    case Operation.Subtheme:
-                    case Operation.Leaf:
+                    case Operation.Theme or Operation.Subtheme or Operation.Leaf:
                         return AdditionProcess();
                 }
             }
@@ -324,7 +322,7 @@ namespace SEE.Controls.Actions.Drawable
 
             /// This block is for the branch line preview.
             /// It draws the line from the origin of the node to the position of the mouse cursor.
-            if (!Queries.MouseHold(MouseButton.Left) 
+            if (!Queries.MouseHold(MouseButton.Left)
                 && Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit raycastHit)
                 && node != null)
             {
@@ -343,10 +341,10 @@ namespace SEE.Controls.Actions.Drawable
             {
                 /// A node can only be chosen as a parent node if it is a Theme or Subtheme Node.
                 /// Additionally, the node must not choose itself.
-                if (Raycasting.RaycastAnything(out RaycastHit hit) 
-                    && hit.collider.gameObject.CompareTag(Tags.MindMapNode) 
+                if (Raycasting.RaycastAnything(out RaycastHit hit)
+                    && hit.collider.gameObject.CompareTag(Tags.MindMapNode)
                     && (hit.collider.gameObject.name.StartsWith(ValueHolder.MindMapThemePrefix) ||
-                        hit.collider.gameObject.name.StartsWith(ValueHolder.MindMapSubthemePrefix)) 
+                        hit.collider.gameObject.name.StartsWith(ValueHolder.MindMapSubthemePrefix))
                     && hit.collider.gameObject != node
                     && GameFinder.GetDrawableSurface(hit.collider.gameObject).Equals(GameFinder.GetDrawableSurface(node)))
                 {
@@ -531,12 +529,12 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (memento.Surface != null)
             {
-                HashSet<string> changedObjects = new() 
+                HashSet<string> changedObjects = new()
                 {
                     memento.Surface.ID,
                     memento.Conf.Id
                 };
-                if (memento.Operation.Equals(Operation.Subtheme) 
+                if (memento.Operation.Equals(Operation.Subtheme)
                     || memento.Operation.Equals(Operation.Leaf))
                 {
                     changedObjects.Add(memento.Conf.BranchLineToParent);

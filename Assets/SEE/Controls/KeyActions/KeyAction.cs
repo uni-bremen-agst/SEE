@@ -204,7 +204,7 @@
         ToggleHolisticMetricsMenu,
         /// <summary>
         /// Undoes a part of the current running action.
-        /// Needed for draws a straight line.
+        /// Needed for drawing a straight line.
         /// </summary>
         PartUndo,
         /// <summary>

@@ -370,12 +370,9 @@ namespace SEE.Controls.Actions.Drawable
             }
 
             /// Finish the sticky note selection and starts the moving.
-            if (inProgress && !mouseWasReleased)
+            if (inProgress && !mouseWasReleased && Input.GetMouseButtonUp(0))
             {
-                if (Input.GetMouseButtonUp(0))
-                {
-                    mouseWasReleased = true;
-                }
+                mouseWasReleased = true;
             }
 
             /// If a sticky note was selected change the position.
@@ -428,8 +425,10 @@ namespace SEE.Controls.Actions.Drawable
                 if (GameFinder.GetDrawableSurfaceParentName(surface).Contains(ValueHolder.StickyNotePrefix))
                 {
                     inProgress = true;
-                    memento = new(DrawableConfigManager.GetDrawableConfig(surface), selectedAction);
-                    memento.ChangedConfig = DrawableConfigManager.GetDrawableConfig(surface);
+                    memento = new(DrawableConfigManager.GetDrawableConfig(surface), selectedAction)
+                    {
+                        ChangedConfig = DrawableConfigManager.GetDrawableConfig(surface)
+                    };
                     StickyNoteMenu.Disable();
                     surface.GetComponent<Collider>().enabled = false;
                     stickyNote = surface.transform.parent.gameObject;
@@ -443,7 +442,7 @@ namespace SEE.Controls.Actions.Drawable
                 }
                 else
                 {
-                    ShowNotification.Info("Wrong selection", "You don't selected a sticky note.");
+                    ShowNotification.Info("Wrong selection", "You did not selected a sticky note.");
                     return false;
                 }
             }
@@ -781,7 +780,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Calculates the value for the wheel interaction depending on the 
+        /// Calculates the value for the wheel interaction depending on the
         /// direction of the mouse wheel interaction.
         /// </summary>
         /// <param name="state">The action state. Rotate or Scale.</param>
@@ -891,7 +890,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns></returns>
         private bool CheckEquals(DrawableConfig original, DrawableConfig changed)
         {
-            return original.Scale.Equals(changed.Scale) && original.Color.Equals(changed.Color) 
+            return original.Scale.Equals(changed.Scale) && original.Color.Equals(changed.Color)
                 && original.Rotation.Equals(changed.Rotation) && original.Order.Equals(changed.Order)
                 && original.Lighting.Equals(changed.Lighting);
         }
@@ -918,7 +917,7 @@ namespace SEE.Controls.Actions.Drawable
             switch (memento.Action)
             {
                 case Operation.Spawn:
-                    GameObject toDeleteSurface = GameFinder.FindDrawableSurface(memento.OriginalConfig.ID, 
+                    GameObject toDeleteSurface = GameFinder.FindDrawableSurface(memento.OriginalConfig.ID,
                         memento.OriginalConfig.ParentID);
                     new StickyNoteDeleterNetAction(DrawableConfigManager.GetDrawableConfig(toDeleteSurface)).Execute();
                     Destroyer.Destroy(GameFinder.GetHighestParent(toDeleteSurface));

@@ -7,7 +7,7 @@ using UnityEngine;
 namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
-    /// 
+    /// Allows the user to show or hide the drawable manager view.
     /// </summary>
     /// <remarks>This component is meant to be attached to a player.</remarks>
     public class ShowDrawableManager : MonoBehaviour
@@ -59,6 +59,9 @@ namespace SEE.Controls.Actions.Drawable
             }
         }
 
+        /// <summary>
+        /// Based on the input, it shows or hides the drawable manager view.
+        /// </summary>
         private void Update()
         {
             if (SEEInput.ToggleDrawableManagerView())

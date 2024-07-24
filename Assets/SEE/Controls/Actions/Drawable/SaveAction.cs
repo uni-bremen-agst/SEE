@@ -1,5 +1,4 @@
 ﻿using HighlightPlus;
-using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.UI.Notification;
@@ -37,7 +36,7 @@ namespace SEE.Controls.Actions.Drawable
         private Memento memento;
 
         /// <summary>
-        /// This struct can store all the information needed to revert or repeat a <see cref="SaveAction"/>.
+        /// This class can store all the information needed to revert or repeat a <see cref="SaveAction"/>.
         /// </summary>
         private class Memento
         {

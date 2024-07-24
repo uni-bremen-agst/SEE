@@ -232,16 +232,16 @@ namespace SEE.Controls.KeyActions
 
             // Code Viewer
             Register(KeyAction.ShowWindowMenu, KeyCode.F1, "Show window menu",
-                     KeyActionCategory.CodeViewer, "Toggles the menu of the open windows.");         
+                     KeyActionCategory.CodeViewer, "Toggles the menu of the open windows.");
             // Chat
             Register(KeyAction.ToggleTextChat, KeyCode.F2, "Toggle text chat",
                      KeyActionCategory.Chat, "Toggles the text chat.");
             Register(KeyAction.ToggleVoiceChat, KeyCode.F5, "Toggle voice chat",
                      KeyActionCategory.Chat, "Toggles the voice chat.");
-	    
+
             // Drawable
             Register(KeyAction.PartUndo, KeyCode.CapsLock, "Part undo",
-                     KeyActionCategory.Drawable, "Undoes a part of the current running action.");
+                     KeyActionCategory.Drawable, "Undoes a part of the currently running action.");
             Register(KeyAction.MoveObjectUp, KeyCode.Keypad8, "Move object up",
                      KeyActionCategory.Drawable, "Moves the object up.");
             Register(KeyAction.MoveObjectDown, KeyCode.Keypad2, "Move object down",

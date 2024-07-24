@@ -207,7 +207,6 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>Whether this action is finished</returns>
         public override bool Update()
         {
-            /// Block for canceling the action.
             Cancel();
 
             if (!Raycasting.IsMouseOverGUI())
@@ -661,7 +660,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     if (executedOperation == ProgressState.Rotate)
                     {
-                        /// A block is needed because occasionally a trigger exit is not registered during rotation.
+                        /// This code is needed because occasionally a trigger exit is not registered during rotation.
                         /// This block attempts to set the isInCollision value of the Collision Controller to false.
                         /// However, if the object is still in a collision, it will be set back to true by its OnStayCollision method.
                         selectedObject.GetComponent<CollisionController>().TrySetCollisionToFalse();

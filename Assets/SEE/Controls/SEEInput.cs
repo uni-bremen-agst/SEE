@@ -644,9 +644,9 @@ namespace SEE.Controls
         #region Drawable
         /// <summary>
         /// Undoes a part of the current running action.
-        /// Needed for remove a point of drawing a straight line.
+        /// Needed for removing a point while drawing a straight line.
         /// </summary>
-        /// <returns>True if the user wants to undoes a part of the running action.</returns>
+        /// <returns>True if the user wants to undo a part of the running action.</returns>
         internal static bool PartUndo()
         {
             return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.PartUndo);

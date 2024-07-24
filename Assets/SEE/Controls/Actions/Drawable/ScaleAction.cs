@@ -150,7 +150,6 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>Whether this action is finished</returns>
         public override bool Update()
         {
-            /// Block for canceling the action.
             Cancel();
 
             if (!Raycasting.IsMouseOverGUI())
@@ -225,10 +224,10 @@ namespace SEE.Controls.Actions.Drawable
         private void SelectObject()
         {
             /// The selection
-            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, Canvas, 
+            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, Canvas,
                 true, false, true, GetActionStateType(), false))
             {
-                /// If an object was already selected, 
+                /// If an object was already selected,
                 /// the Rigidbody and Collision Controller are removed if they are still present.
                 if (selectedObj != oldSelectedObj)
                 {

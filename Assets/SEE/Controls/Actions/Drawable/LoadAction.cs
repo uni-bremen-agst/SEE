@@ -1,5 +1,4 @@
 ﻿using HighlightPlus;
-using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.UI.Notification;
@@ -20,7 +19,8 @@ using System.Linq;
 namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
-    /// Adds the <see cref="DrawableType"/> to the scene from one or more drawable configs saved in a file on the disk.
+    /// Adds the <see cref="DrawableType"/> to the scene from one or more drawable configs saved
+    /// in a file on the disk.
     /// </summary>
     public class LoadAction : DrawableAction
     {
@@ -84,7 +84,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Ensures that per click is only saved once.
+        /// Ensures that we save only once per click.
         /// </summary>
         private bool clicked = false;
 
@@ -477,7 +477,8 @@ namespace SEE.Controls.Actions.Drawable
             if (memento == null)
             {
                 return new();
-            } else
+            }
+            else
             {
                 HashSet<string> changedObjects = new();
                 if (memento.State == LoadState.Regular)
@@ -490,7 +491,8 @@ namespace SEE.Controls.Actions.Drawable
                             changedObjects.Add(type.Id);
                         }
                     }
-                } else
+                }
+                else
                 {
                     changedObjects.Add(memento.SpecificSurface.ID);
                     foreach (DrawableConfig config in memento.Configs.Drawables)
@@ -503,7 +505,6 @@ namespace SEE.Controls.Actions.Drawable
                 }
                 return changedObjects;
             }
-
         }
     }
 }

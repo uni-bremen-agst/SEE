@@ -116,7 +116,6 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>Whether this action is finished</returns>
         public override bool Update()
         {
-            /// Block for canceling the action.
             Cancel();
 
             if (!Raycasting.IsMouseOverGUI())
@@ -218,7 +217,7 @@ namespace SEE.Controls.Actions.Drawable
             }
             /// Left click when the desired point has been reached.
             /// Then the action will be completed in the next steps.
-            if (Queries.MouseUp(MouseButton.Left) 
+            if (Queries.MouseUp(MouseButton.Left)
                 && selectedLine.GetComponent<BlinkEffect>() == null)
             {
                 progressState = ProgressState.Finish;
