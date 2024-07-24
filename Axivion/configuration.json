@@ -101,14 +101,17 @@
         "C#-CSharpNoRefAndOutParameters": {
             "_active": false
         },
-        "C#-CSharpReferencedLabelInSameBlockAsGoto": {
+        "C#-DoNotMixLogicalOperators": {
             "_active": true
         },
         "C#-EnumeratorRequiresInitialization": {
-            "_active": false
+            "_active": true
         },
         "C#-FieldNotPrivateNorProtected": {
             "_active": false
+        },
+        "C#-FilenameNaming": {
+            "_active": true
         },
         "C#-ImportCompilerAndAnalyzerDiagnostics": {
             "_active": true
@@ -116,13 +119,40 @@
         "C#-InvalidDependencyPropertyDeclaration": {
             "_active": true
         },
+        "C#-MaxOneStmtPerLine": {
+            "_active": true
+        },
+        "C#-MaxParams": {
+            "_active": true
+        },
+        "C#-MaximumLineLength": {
+            "_active": true
+        },
         "C#-MethodShouldBeDeclaredStatic": {
+            "_active": true
+        },
+        "C#-NoBlankLinesAtBraces": {
             "_active": true
         },
         "C#-NoHidingOfBaseClassMethods": {
             "_active": true
         },
+        "C#-NoMagicNumbers": {
+            "_active": true
+        },
+        "C#-NoTabs": {
+            "_active": true
+        },
+        "C#-NoTrailingWhitespace": {
+            "_active": true
+        },
+        "C#-SourceFileNaming": {
+            "_active": true
+        },
         "C#-VirtualCallInConstructor": {
+            "_active": true
+        },
+        "CSharpCloneDetection": {
             "_active": true
         },
         "CloneDetection": {
@@ -153,10 +183,10 @@
             "_active": false
         },
         "CodingStyle-NoTabs": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-NoTrailingWhitespace": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-NoWhitespaceMemberSelection": {
             "_active": false
@@ -679,7 +709,7 @@
         },
         "SaveRFG": {
             "_active": true,
-            "rfg_file": null
+            "rfg_file": "SEE.rfg"
         },
         "SelectedRoutine": {
             "_active": true
@@ -702,9 +732,10 @@
                 "AxivionLinker",
                 "Command",
                 "MakeIntegration",
-                "MSBuildIntegration",
                 "PrintAMessage",
-                "AxivionC#Analysis"
+                "MSBuildIntegration",
+                "AxivionC#Analysis",
+                "PrintMessage"
             ]
         },
         "Git": {
@@ -721,10 +752,18 @@
             "project": "SEE.csproj"
         },
         "PrintAMessage": {
-            "_active": true
+            "_active": true,
+            "build_message": "Building SEE.",
+            "clean_message": "Cleaning SEE build."
+        },
+        "PrintMessage": {
+            "_active": false,
+            "_copy_from": "PrintAMessage",
+            "build_message": "Building SEE"
         },
         "Project-GlobalOptions": {
             "ci_mode": {
+                "clean_after": true,
                 "update_workspace": true
             },
             "directory": "$(SEEDIRECTORY)",
@@ -762,11 +801,10 @@
         }
     },
     "_Format": "1.0",
-    "_Version": "7.7.1",
     "_VersionNum": [
         7,
-        7,
-        1,
-        13682
+        8,
+        0,
+        15004
     ]
 }
