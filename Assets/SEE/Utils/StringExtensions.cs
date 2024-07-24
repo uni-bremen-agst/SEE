@@ -63,7 +63,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="input">The string to clean.</param>
         /// <returns>The string without any rich text tags.</returns>
-        public static string CleanRichText(this string input)
+        public static string WithoutRichTextTags(this string input)
         {
             StringBuilder builder = new();
             string[] segments = Regex.Split(input, "(</?noparse>)");
