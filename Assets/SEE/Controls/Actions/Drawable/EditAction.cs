@@ -3,15 +3,12 @@ using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.UI.Menu.Drawable;
 using SEE.UI.Notification;
-using SEE.GO;
-using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using TextConf = SEE.Game.Drawable.Configurations.TextConf;
 using SEE.Utils.History;
-using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable.ActionHelpers;
 
 namespace SEE.Controls.Actions.Drawable
@@ -86,6 +83,7 @@ namespace SEE.Controls.Actions.Drawable
                 Id = id;
             }
         }
+
         /// <summary>
         /// The selected drawable type object that should be edited.
         /// </summary>
@@ -173,11 +171,7 @@ namespace SEE.Controls.Actions.Drawable
             }
 
             /// This case will be needed for mind-map nodes.
-            if (oldHolder == null && newHolder == null)
-            {
-                return true;
-            }
-            return false;
+            return oldHolder == null && newHolder == null;
         }
 
         /// <summary>
@@ -313,7 +307,7 @@ namespace SEE.Controls.Actions.Drawable
                     }
                     break;
                 default:
-                    ShowNotification.Info("Object type not recognized", 
+                    ShowNotification.Info("Object type not recognized",
                         "The menu cannot be opened because the type of the object was not recognized.");
                     break;
             }
