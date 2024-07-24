@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.GO;
@@ -54,6 +55,11 @@ namespace SEE.UI.Window.CodeWindow
         private List<int> CodeWindowOffsets { get; } = new();
 
         /// <summary>
+        /// The graph associated with the code city this code window is in.
+        /// </summary>
+        private Graph AssociatedGraph;
+
+        /// <summary>
         /// Characters representing newlines.
         /// Note that newlines may also consist of aggregations of this set (e.g. "\r\n").
         /// </summary>
@@ -90,7 +96,7 @@ namespace SEE.UI.Window.CodeWindow
                 + tokenList.Where(x => !x.TokenType.Equals(TokenType.Newline))
                            .Aggregate(0, (_, token) => token.Text.Count(x => x == '\n'));
             // Needed padding is the number of lines, because the line number will be at most this long.
-            neededPadding = assumedLines.ToString().Length;
+            neededPadding = Mathf.FloorToInt(Mathf.Log10(assumedLines)) + 1;
             text = $"<color=#CCCCCC>{string.Join("", Enumerable.Repeat(" ", neededPadding - 1))}1</color> ";
 
             CodeWindowOffsets.Clear();
@@ -141,9 +147,9 @@ namespace SEE.UI.Window.CodeWindow
                 // + 1 for the newline
                 CodeWindowOffsets.Add(++characterOffset);
                 // Add whitespace next to line number, so it's consistent.
-                text += string.Join("", Enumerable.Repeat(' ', neededPadding - $"{theLineNumber}".Length));
+                int padding = neededPadding - (Mathf.FloorToInt(Mathf.Log10(theLineNumber)) + 1);
                 // Line number will be typeset in grey to distinguish it from the rest.
-                text += $"<color=#CCCCCC>{theLineNumber}</color> ";
+                text += $"<color=#CCCCCC>{string.Join(string.Empty, Enumerable.Repeat(' ', padding))}{theLineNumber}</color> ";
                 characterOffset += neededPadding + 1;
 
                 if (issues?.ContainsKey(theLineNumber) ?? false)
@@ -347,7 +353,7 @@ namespace SEE.UI.Window.CodeWindow
                 // Add whitespace next to line number so it's consistent.
                 this.text += string.Join("", Enumerable.Repeat(" ", neededPadding - $"{i + 1}".Length));
                 // Line number will be typeset in yellow to distinguish it from the rest.
-                this.text += $"<color=\"yellow\">{i + 1}</color> ";
+                this.text += $"<color=#CCCCCC>{i + 1}</color> ";
                 if (asIs)
                 {
                     this.text += text[i] + "\n";
@@ -423,6 +429,7 @@ namespace SEE.UI.Window.CodeWindow
 
                 if (go.TryGetComponentOrLog(out AbstractSEECity city))
                 {
+                    AssociatedGraph = city.LoadedGraph;
                     bool useDashboardIssues = city.ErosionSettings.ShowDashboardIssuesInCodeWindow;
                     bool useLspIssues = lspHandler != null && lspHandler.UseInCodeWindows;
                     MarkIssuesAsync(filename, useDashboardIssues, useLspIssues).Forget(); // initiate issue search in background
@@ -499,6 +506,8 @@ namespace SEE.UI.Window.CodeWindow
                 {
                     textMesh.text = text;
                     textMesh.ForceMeshUpdate();
+                    // Will need to be marked again after the text has been updated.
+                    MarkLine(ScrolledVisibleLine);
                     SetupBreakpoints();
                 }
                 catch (IndexOutOfRangeException)
