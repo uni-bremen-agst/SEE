@@ -388,6 +388,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 positions = new Vector3[1];
                 drawing = false;
+                Destroyer.Destroy(shape);
                 shape = null;
                 return false;
             }
