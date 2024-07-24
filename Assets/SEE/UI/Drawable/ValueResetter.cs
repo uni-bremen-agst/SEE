@@ -66,7 +66,7 @@ namespace SEE.UI.Drawable
 
             if (allowedState == ActionStateTypes.LayerChanger)
             {
-                LayerChangerAction.Reset();
+                LayerChangeAction.Reset();
             }
         }
     }

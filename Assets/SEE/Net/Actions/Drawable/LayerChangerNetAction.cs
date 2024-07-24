@@ -4,7 +4,7 @@ using SEE.Game.Drawable;
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is responsible for changing the order in layer (<see cref="LayerChangerAction"/>) of an object on all clients.
+    /// This class is responsible for changing the order in layer (<see cref="LayerChangeAction"/>) of an object on all clients.
     /// </summary>
     public class LayerChangerNetAction : DrawableNetAction
     {

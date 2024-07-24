@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using SEE.Utils.History;
 using SEE.GO;
-using System;
 using SEE.Game.Drawable.ActionHelpers;
 
 namespace SEE.Controls.Actions.Drawable
@@ -17,7 +16,7 @@ namespace SEE.Controls.Actions.Drawable
     /// <summary>
     /// This class is responsible for changing the layer order of a <see cref="DrawableType"/>
     /// </summary>
-    class LayerChangerAction : DrawableAction
+    class LayerChangeAction : DrawableAction
     {
         /// <summary>
         /// Saves all the information needed to revert or repeat this action.
@@ -35,7 +34,7 @@ namespace SEE.Controls.Actions.Drawable
         private static bool showInfo = false;
 
         /// <summary>
-        /// This struct can store all the information needed to revert or repeat a <see cref="LayerChangerAction"/>.
+        /// This struct can store all the information needed to revert or repeat a <see cref="LayerChangeAction"/>.
         /// </summary>
         private struct Memento
         {
@@ -200,20 +199,20 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// A new instance of <see cref="LayerChangerAction"/>.
+        /// A new instance of <see cref="LayerChangeAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="LayerChangerAction"/></returns>
+        /// <returns>new instance of <see cref="LayerChangeAction"/></returns>
         public static IReversibleAction CreateReversibleAction()
         {
-            return new LayerChangerAction();
+            return new LayerChangeAction();
         }
 
         /// <summary>
-        /// A new instance of <see cref="LayerChangerAction"/>.
+        /// A new instance of <see cref="LayerChangeAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="LayerChangerAction"/></returns>
+        /// <returns>new instance of <see cref="LayerChangeAction"/></returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();

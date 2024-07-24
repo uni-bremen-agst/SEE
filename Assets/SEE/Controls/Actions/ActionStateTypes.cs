@@ -232,7 +232,7 @@ namespace SEE.Controls.Actions
             LayerChanger =
                 new("Change The Sorting Layer", "Left mouse click to increase, right mouse click to decrease the layer.",
                     Color.green.Darker(), "Materials/Drawable/Layer",
-                    LayerChangerAction.CreateReversibleAction,
+                    LayerChangeAction.CreateReversibleAction,
                     parent: Drawable);
 
             CutCopyPaste = new("Cut, Copy, Paste", "Cuts or copies a drawable and pastes it on the selected position.",
