@@ -30,24 +30,8 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// The drawable surface on which the drawables are displayed.
-        /// </summary>
-        private GameObject surface;
-
-        /// <summary>
         /// The surface on which the drawables are displayed.
         /// </summary>
-        protected GameObject Surface
-        {
-            get
-            {
-                return surface;
-            }
-
-            set
-            {
-                surface = value;
-            }
-        }
+        protected GameObject Surface { get; set; }
     }
 }
