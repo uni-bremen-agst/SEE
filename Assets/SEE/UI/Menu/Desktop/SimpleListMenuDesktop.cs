@@ -1,4 +1,5 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using System.Linq;
+using Michsky.UI.ModernUIPack;
 using SEE.Utils;
 using Sirenix.Utilities;
 using UnityEngine;
@@ -52,7 +53,7 @@ namespace SEE.UI.Menu
         /// </summary>
         /// <param name="entry">The menu entry.</param>
         /// <returns>The game object of the entry.</returns>
-        public GameObject EntryGameObject(T entry) => EntryList.transform.Find(entry.Title)?.gameObject;
+        public GameObject EntryGameObject(T entry) => EntryList.transform.Cast<Transform>().FirstOrDefault(x => x.name == entry.Title)?.gameObject;
 
         /// <summary>
         /// Initializes the menu.
@@ -116,8 +117,11 @@ namespace SEE.UI.Menu
 
             // hover listeners
             PointerHelper pointerHelper = button.GetComponent<PointerHelper>();
-            pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith(entry.Description));
-            pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
+            if (entry.Description != null)
+            {
+                pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith(entry.Description));
+                pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
+            }
 
             // adds clickEvent listener or show that button is disabled
             if (entry.Enabled)

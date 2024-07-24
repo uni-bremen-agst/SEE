@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.Events;
 using UnityEngine.Windows.Speech;
 
 namespace SEE.UI.Menu
@@ -97,6 +97,11 @@ namespace SEE.UI.Menu
             entries.Remove(entry);
             OnEntryRemoved?.Invoke(entry);
         }
+
+        /// <summary>
+        /// Removes all menu entries.
+        /// </summary>
+        public void ClearEntries() => entries.ToList().ForEach(RemoveEntry);
 
         /// <summary>
         /// Selects a menu entry.
