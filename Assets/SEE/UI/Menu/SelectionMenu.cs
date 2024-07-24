@@ -34,7 +34,7 @@ namespace SEE.UI.Menu
                 activeEntry = value;
                 if (oldActiveEntry != null)
                 {
-                    oldActiveEntry.UnselectAction();
+                    oldActiveEntry.UnselectAction?.Invoke();
                     OnEntryUnselected?.Invoke(oldActiveEntry);
                 }
                 OnActiveEntryChanged?.Invoke();

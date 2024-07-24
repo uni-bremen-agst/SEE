@@ -1,8 +1,7 @@
-﻿using NUnit.Framework;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.TestTools;
 
 namespace SEE.UI.Menu
@@ -53,7 +52,7 @@ namespace SEE.UI.Menu
         /// </summary>
         /// <returns><see cref="WaitForEndOfFrame"/></returns>
         [UnityTest]
-        [LoadScene()]
+        [LoadScene]
         public IEnumerator TestMenuOption1()
         {
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
@@ -68,7 +67,7 @@ namespace SEE.UI.Menu
         /// </summary>
         /// <returns><see cref="WaitForEndOfFrame"/></returns>
         [UnityTest]
-        [LoadScene()]
+        [LoadScene]
         public IEnumerator TestMenuNestedOptionOne()
         {
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
@@ -85,7 +84,7 @@ namespace SEE.UI.Menu
         /// </summary>
         /// <returns><see cref="WaitForEndOfFrame"/></returns>
         [UnityTest]
-        [LoadScene()]
+        [LoadScene]
         public IEnumerator TestMenuNestedOptionTwo()
         {
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
@@ -102,7 +101,7 @@ namespace SEE.UI.Menu
         /// </summary>
         /// <returns><see cref="WaitForEndOfFrame"/></returns>
         [UnityTest]
-        [LoadScene()]
+        [LoadScene]
         public IEnumerator TestMenuNoOption()
         {
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
@@ -131,34 +130,27 @@ namespace SEE.UI.Menu
 
             IEnumerable<MenuEntry> menuEntries = new List<MenuEntry>
             {
-                new MenuEntry(selectAction: new UnityAction(() => { selection = OptionOneValue; }),
-                              unselectAction: null,
-                              title: OptionOne,
-                              description: "Select option 1",
-                              entryColor: Color.red,
-                              enabled: true,
-                              icon: GetIcon()),
-                new NestedMenuEntry<MenuEntry>(innerEntries: new List<MenuEntry>()
-                                                      {
-                                                         new MenuEntry(selectAction: new UnityAction(() => { selection = NestedOptionOneValue; }),
-                                                                       unselectAction: null,
-                                                                       title: NestedOptionOne,
-                                                                       description: "Select option 2a",
-                                                                       entryColor: Color.green,
-                                                                       enabled: true,
-                                                                       icon: GetIcon()),
-                                                         new MenuEntry(selectAction: new UnityAction(() => { selection = NestedOptionTwoValue; }),
-                                                                       unselectAction: null,
-                                                                       title: NestedOptionTwo,
-                                                                       description: "Select option 2b",
-                                                                       entryColor: Color.green,
-                                                                       enabled: true,
-                                                                       icon: GetIcon())
+                new(SelectAction: () => { selection = OptionOneValue; },
+                    Title: OptionOne,
+                    Description: "Select option 1",
+                    EntryColor: Color.red,
+                    Icon: GetIcon()),
+                new NestedMenuEntry<MenuEntry>(innerEntries: new List<MenuEntry>
+                                               {
+                                                         new(SelectAction: () => selection = NestedOptionOneValue,
+                                                             Title: NestedOptionOne,
+                                                             Description: "Select option 2a",
+                                                             EntryColor: Color.green,
+                                                             Icon: GetIcon()),
+                                                         new(SelectAction: () => selection = NestedOptionTwoValue,
+                                                             Title: NestedOptionTwo,
+                                                             Description: "Select option 2b",
+                                                             EntryColor: Color.green,
+                                                             Icon: GetIcon())
                                                       },
                                     title: SubMenuTitle,
                                     description: "open subselection 2",
                                     entryColor: Color.red,
-                                    enabled: true,
                                     icon: GetIcon())
             };
 

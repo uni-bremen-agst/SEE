@@ -9,7 +9,7 @@ namespace SEE.UI.Menu
     /// A button which opens another menu when clicking on it.
     /// Must be used inside a <see cref="NestedListMenu"/>.
     /// </summary>
-    public class NestedMenuEntry<T> : MenuEntry where T : MenuEntry
+    public record NestedMenuEntry<T> : MenuEntry where T : MenuEntry
     {
         /// <summary>
         /// The menu entries which shall fill the menu when selecting this entry.
@@ -26,9 +26,8 @@ namespace SEE.UI.Menu
         /// <param name="enabled">Whether this entry should be enabled on creation.</param>
         /// <param name="icon">The icon which shall be displayed alongside this entry.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="title"/> is <c>null</c>.</exception>
-        public NestedMenuEntry(IEnumerable<T> innerEntries, string title, string description = null,
-                               Color entryColor = default, bool enabled = true, Sprite icon = null) :
-            base(() => { }, () => { }, title, description, entryColor, enabled, icon)
+        public NestedMenuEntry(IEnumerable<T> innerEntries, string title, string description = null, Color entryColor = default, bool enabled = true, Sprite icon = null) :
+            base(() => { }, title, () => { }, description, entryColor, enabled, icon)
         {
             InnerEntries = innerEntries?.ToList() ?? throw new ArgumentNullException(nameof(innerEntries));
         }

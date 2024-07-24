@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using InControl;
 using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.Controls.KeyActions;
@@ -86,12 +85,11 @@ namespace SEE.GO.Menu
 
                     if (child is ActionStateType actionStateType)
                     {
-                        MenuEntry menuEntry = new(selectAction: () => GlobalActionHistory.Execute(actionStateType),
-                                                  unselectAction: null,
-                                                  title: actionStateType.Name,
-                                                  description: actionStateType.Description,
-                                                  entryColor: actionStateType.Color,
-                                                  icon: Resources.Load<Sprite>(actionStateType.IconPath));
+                        MenuEntry menuEntry = new(SelectAction: () => GlobalActionHistory.Execute(actionStateType),
+                                                  Title: actionStateType.Name,
+                                                  Description: actionStateType.Description,
+                                                  EntryColor: actionStateType.Color,
+                                                  Icon: Resources.Load<Sprite>(actionStateType.IconPath));
                         entry = menuEntry;
                     }
                     else if (child is ActionStateTypeGroup actionStateTypeGroup)

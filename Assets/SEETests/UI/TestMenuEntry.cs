@@ -38,10 +38,10 @@ namespace SEE.UI.Menu
         /// Creates a new MenuEntry, calling the constructor with the given parameters.
         /// </summary>
         /// <returns>The newly constructed MenuEntry.</returns>
-        protected virtual MenuEntry CreateMenuEntry(UnityAction action, string title, string description = null,
+        protected virtual MenuEntry CreateMenuEntry(Action action, string title, string description = null,
                                                     Color entryColor = default, bool enabled = true, Sprite icon = null)
         {
-            return new MenuEntry(action, null, title, description, entryColor, enabled, icon);
+            return new MenuEntry(action, title, null, description, entryColor, enabled, icon);
         }
 
         [Test]
@@ -54,7 +54,7 @@ namespace SEE.UI.Menu
         [Test]
         public void TestConstructorDefault()
         {
-            List<int> testItems = new List<int>();
+            List<int> testItems = new();
             void Action() => testItems.Add(1);
             MenuEntry entry = CreateMenuEntry(Action, "Test");
             Assert.AreEqual(null, entry.Description);
@@ -72,7 +72,7 @@ namespace SEE.UI.Menu
         }
 
         [Test, TestCaseSource(nameof(ValidConstructorSupplier))]
-        public void TestConstructor(UnityAction action, string title, string description,
+        public void TestConstructor(Action action, string title, string description,
                                     Color entryColor, bool enabled, Sprite icon)
         {
             MenuEntry entry = CreateMenuEntry(action, title, description, entryColor, enabled, icon);
