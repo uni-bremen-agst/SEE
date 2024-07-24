@@ -38,8 +38,8 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
-        /// Calculates the positions for a square. 
-        /// The last point is again the starting point. 
+        /// Calculates the positions for a square.
+        /// The last point is again the starting point.
         /// Thus, the square consists of five points.
         /// </summary>
         /// <param name="point">The middle point of the square. It's the hit point on the drawable.</param>
@@ -55,8 +55,8 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
-        /// Calculates the positions for a rectangle. 
-        /// The last point is again the starting point. 
+        /// Calculates the positions for a rectangle.
+        /// The last point is again the starting point.
         /// Thus, the rectangle consists of five points.
         /// </summary>
         /// <param name="point">The middle point of the rectangle. It's the hit point on the drawable.</param>
@@ -73,8 +73,8 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
-        /// Calculates the positions for a rhombus. 
-        /// The last point is again the starting point. 
+        /// Calculates the positions for a rhombus.
+        /// The last point is again the starting point.
         /// Thus, the rhombus consists of five points.
         /// </summary>
         /// <param name="point">The middle point of the rhombus. It's the hit point on the drawable.</param>
@@ -91,8 +91,8 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
-        /// Calculates the positions for a kite. 
-        /// The last point is again the starting point. 
+        /// Calculates the positions for a kite.
+        /// The last point is again the starting point.
         /// Thus, the kite consists of five points.
         /// </summary>
         /// <param name="point">The middle point of the kite. It's the hit point on the drawable.</param>
@@ -111,7 +111,7 @@ namespace SEE.Game.Drawable.ActionHelpers
 
         /// <summary>
         /// Calculates the positions for an isosceles triangle.
-        /// The last point is again the starting point. 
+        /// The last point is again the starting point.
         /// Thus, the triangle consists of four points.
         /// </summary>
         /// <param name="point">The middle point of the triangle. It's the hit point on the drawable.</param>
@@ -155,15 +155,15 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
-        /// Calculates the positions for a parallelogram. 
-        /// The last point is again the starting point. 
+        /// Calculates the positions for a parallelogram.
+        /// The last point is again the starting point.
         /// Thus, the parallelogram consists of five points.
         /// </summary>
         /// <param name="point">The middle point of the parallelogram. It's the hit point on the drawable.</param>
         /// <param name="a">Specifies the edge length of the a side of the parallelogram</param>
         /// <param name="h">Specifies the height parallelogram</param>
-        /// <param name="offset">Specifies by how much points C and D of the parallelogram should be moved. 
-        /// If the offset is in the negative range, the points will be shifted to the left. 
+        /// <param name="offset">Specifies by how much points C and D of the parallelogram should be moved.
+        /// If the offset is in the negative range, the points will be shifted to the left.
         /// In the positive range, to the right.</param>
         /// <returns>The positions of the parallelogram.</returns>
         public static Vector3[] Parallelogram(Vector3 point, float a, float h, float offset)
@@ -177,7 +177,7 @@ namespace SEE.Game.Drawable.ActionHelpers
 
         /// <summary>
         /// Calculates the positions for a isosceles trapezoid
-        /// The last point is again the starting point. 
+        /// The last point is again the starting point.
         /// Thus, the trapezoid consists of five points.
         /// </summary>
         /// <param name="point">The middle point of the trapezoid. It's the hit point on the drawable.</param>
@@ -237,11 +237,11 @@ namespace SEE.Game.Drawable.ActionHelpers
 
         /// <summary>
         /// Calculates the position for a mind map rectangle.
-        /// It consists of 56 points. 
-        /// The distances between the edges have been reduced so that the node connections 
-        /// between MindMap nodes can be presented more attractively. 
-        /// A branch line chooses the nearest point from the borderline. 
-        /// With the conventional five points, there are not as many options, 
+        /// It consists of 56 points.
+        /// The distances between the edges have been reduced so that the node connections
+        /// between MindMap nodes can be presented more attractively.
+        /// A branch line chooses the nearest point from the borderline.
+        /// With the conventional five points, there are not as many options,
         /// and the connecting lines would always be on the corner edges of the rectangle.
         /// </summary>
         /// <param name="point">The middle point of the rectangle. It's the hit point on the drawable.</param>
@@ -250,8 +250,8 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>The positions for the rectangle</returns>
         public static Vector3[] MindMapRectangle(Vector3 point, float a, float b)
         {
-            float splittedA = a / 12;
-            float splittedB = b / 12;
+            float splitA = a / 12;
+            float splitB = b / 12;
 
             Vector3 A = new Vector3(point.x - a / 2, point.y - b / 2, 0) - ValueHolder.DistanceToDrawable;
 
@@ -260,7 +260,7 @@ namespace SEE.Game.Drawable.ActionHelpers
             AB[0] = A;
             for (int i = 1; i < 13; i++)
             {
-                AB[i] = new Vector3(AB[i - 1].x + splittedA, AB[i - 1].y, 0) - ValueHolder.DistanceToDrawable;
+                AB[i] = new Vector3(AB[i - 1].x + splitA, AB[i - 1].y, 0) - ValueHolder.DistanceToDrawable;
             }
 
             Vector3 B = new Vector3(A.x + a, A.y, 0) - ValueHolder.DistanceToDrawable;
@@ -271,7 +271,7 @@ namespace SEE.Game.Drawable.ActionHelpers
             BC[0] = B;
             for (int i = 1; i < 13; i++)
             {
-                BC[i] = new Vector3(BC[i - 1].x, BC[i - 1].y + splittedB, 0) - ValueHolder.DistanceToDrawable;
+                BC[i] = new Vector3(BC[i - 1].x, BC[i - 1].y + splitB, 0) - ValueHolder.DistanceToDrawable;
             }
 
             Vector3 C = new Vector3(B.x, B.y + b, 0) - ValueHolder.DistanceToDrawable;
@@ -282,7 +282,7 @@ namespace SEE.Game.Drawable.ActionHelpers
             CD[0] = C;
             for (int i = 1; i < 13; i++)
             {
-                CD[i] = new Vector3(CD[i - 1].x - splittedA, CD[i - 1].y, 0) - ValueHolder.DistanceToDrawable;
+                CD[i] = new Vector3(CD[i - 1].x - splitA, CD[i - 1].y, 0) - ValueHolder.DistanceToDrawable;
             }
 
             Vector3 D = new Vector3(A.x, A.y + b, 0) - ValueHolder.DistanceToDrawable;
@@ -293,7 +293,7 @@ namespace SEE.Game.Drawable.ActionHelpers
             DA[0] = D;
             for (int i = 1; i < 13; i++)
             {
-                DA[i] = new Vector3(DA[i - 1].x, DA[i - 1].y - splittedB, 0) - ValueHolder.DistanceToDrawable;
+                DA[i] = new Vector3(DA[i - 1].x, DA[i - 1].y - splitB, 0) - ValueHolder.DistanceToDrawable;
             }
             DA[13] = A;
 
