@@ -14,50 +14,8 @@ namespace SEE.Controls.Actions.Drawable
     /// This action allows the user to delete a line connector between two points.
     /// Is intended for shapes.
     /// </summary>
-    class LineConnectionEraseAction : DrawableAction
+    class LineConnectionEraseAction : LineAction
     {
-        /// <summary>
-        /// True if the action is active.
-        /// </summary>
-        private bool isActive = false;
-        /// <summary>
-        /// Saves all the information needed to revert or repeat this action.
-        /// </summary>
-        private Memento memento;
-
-        /// <summary>
-        /// This struct can store all the information needed to
-        /// revert or repeat a <see cref="LineConnectionEraseAction"/>.
-        /// </summary>
-        private readonly struct Memento
-        {
-            /// <summary>
-            /// Is the configuration of line before it was modified.
-            /// </summary>
-            public readonly LineConf OriginalLine;
-            /// <summary>
-            /// Is the drawable surface on which the lines are displayed.
-            /// </summary>
-            public readonly DrawableConfig Surface;
-            /// <summary>
-            /// The list of lines that resulted from modify the original line.
-            /// </summary>
-            public readonly List<LineConf> Lines;
-
-            /// <summary>
-            /// The constructor.
-            /// </summary>
-            /// <param name="originalLine">Is the configuration of line before it was modified.</param>
-            /// <param name="surface">The drawable surface where the lines are displayed</param>
-            /// <param name="lines">The list of lines that resulted from modify the original line</param>
-            public Memento(GameObject originalLine, GameObject surface, List<LineConf> lines)
-            {
-                OriginalLine = LineConf.GetLine(originalLine);
-                Surface = DrawableConfigManager.GetDrawableConfig(surface);
-                Lines = lines;
-            }
-        }
-
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.LineConnectorErase"/>.
         /// Specifically: Allows the user to delete a line connection between two points.
@@ -174,7 +132,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
         /// </summary>
-        /// <returns>the id of the line that was splitted.</returns>
+        /// <returns>the id of the line that was split.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento.Surface == null)

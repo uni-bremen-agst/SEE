@@ -13,55 +13,12 @@ namespace SEE.Controls.Actions.Drawable
     /// <summary>
     /// This class provides an action to erase only some points of a <see cref="LineConf"/>.
     /// </summary>
-    class LinePointEraseAction : DrawableAction
+    class LinePointEraseAction : LineAction
     {
-        /// <summary>
-        /// True if the action is active.
-        /// </summary>
-        private bool isActive = false;
-
         /// <summary>
         /// Saves all the information needed to revert or repeat this action.
         /// </summary>
         private readonly List<Memento> mementoList = new();
-
-        /// <summary>
-        /// Saves the information for one line point erase.
-        /// </summary>
-        private Memento memento;
-
-        /// <summary>
-        /// This class can store all the information needed to
-        /// revert or repeat a <see cref="LinePointEraseAction"/>.
-        /// </summary>
-        private class Memento
-        {
-            /// <summary>
-            /// Is the configuration of line before a point was removed.
-            /// </summary>
-            public LineConf OriginalLine;
-            /// <summary>
-            /// Is the drawable surface on which the lines are displayed.
-            /// </summary>
-            public readonly DrawableConfig Surface;
-            /// <summary>
-            /// The list of lines that resulted from point remove of the original line.
-            /// </summary>
-            public List<LineConf> Lines;
-
-            /// <summary>
-            /// The constructor.
-            /// </summary>
-            /// <param name="originalLine">Is the configuration of line before a point was removed.</param>
-            /// <param name="surface">The drawable surface where the lines are displayed</param>
-            /// <param name="lines">The list of lines that resulted from remove a point of the original line</param>
-            public Memento(GameObject originalLine, GameObject surface, List<LineConf> lines)
-            {
-                OriginalLine = LineConf.GetLine(originalLine);
-                Surface = DrawableConfigManager.GetDrawableConfig(surface);
-                Lines = lines;
-            }
-        }
 
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.LinePointErase"/>.
@@ -132,6 +89,7 @@ namespace SEE.Controls.Actions.Drawable
                 }
             }
         }
+
         /// <summary>
         /// Repeats this action, i.e., deletes the original line and restores the sublines.
         /// </summary>

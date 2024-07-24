@@ -16,50 +16,8 @@ namespace SEE.Controls.Actions.Drawable
     /// <summary>
     /// This action allows the user to split a <see cref="LineConf"/>.
     /// </summary>
-    public class LineSplitAction : DrawableAction
+    public class LineSplitAction : LineAction
     {
-        /// <summary>
-        /// True if the action is active.
-        /// </summary>
-        private bool isActive = false;
-        /// <summary>
-        /// Saves all the information needed to revert or repeat this action.
-        /// </summary>
-        private Memento memento;
-
-        /// <summary>
-        /// This struct can store all the information needed to
-        /// revert or repeat a <see cref="LineSplitAction"/>.
-        /// </summary>
-        private readonly struct Memento
-        {
-            /// <summary>
-            /// Is the configuration of line before it was splitted.
-            /// </summary>
-            public readonly LineConf OriginalLine;
-            /// <summary>
-            /// Is the drawable surface on which the lines are displayed.
-            /// </summary>
-            public readonly DrawableConfig Surface;
-            /// <summary>
-            /// The list of lines that resulted from splitting the original line.
-            /// </summary>
-            public readonly List<LineConf> Lines;
-
-            /// <summary>
-            /// The constructor, which simply assigns its only parameter to a field in this class.
-            /// </summary>
-            /// <param name="originalLine">Is the configuration of line before it was splitted.</param>
-            /// <param name="surface">The drawable surface where the lines are displayed</param>
-            /// <param name="lines">The list of lines that resulted from splitting the original line</param>
-            public Memento(GameObject originalLine, GameObject surface, List<LineConf> lines)
-            {
-                OriginalLine = LineConf.GetLine(originalLine);
-                Surface = DrawableConfigManager.GetDrawableConfig(surface);
-                Lines = lines;
-            }
-        }
-
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.LineSplit"/>.
         /// Specifically: Allows the user to split a line. One action run allows to split the line one time.
