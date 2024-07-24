@@ -1,5 +1,4 @@
-﻿using LibGit2Sharp;
-using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.GO;
@@ -102,9 +101,8 @@ namespace SEE.Controls.Actions.Drawable
             });
         }
 
-
         /// <summary>
-        /// Stops the action. It disable the shape menu and
+        /// Stops the action. It disables the shape menu and
         /// destroys the line shape if it is not successfully completed.
         /// </summary>
         public override void Stop()
@@ -166,9 +164,9 @@ namespace SEE.Controls.Actions.Drawable
                 /// Block for successfully completing the line.
                 /// It adds a final point to the line.
                 /// It requires a left-click with the left Ctrl key held down.
-                if (Queries.MouseUp(MouseButton.Left) 
+                if (Queries.MouseUp(MouseButton.Left)
                     && Input.GetKey(KeyCode.LeftControl)
-                    && drawing 
+                    && drawing
                     && positions.Length > 0
                     && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
                     && Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit hit))
@@ -180,9 +178,8 @@ namespace SEE.Controls.Actions.Drawable
                     positions = newPositions;
 
                     GameDrawer.Drawing(shape, positions);
-                    new DrawingNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), shape.name, newPosition, newPositions.Length - 1).Execute();
-                    //new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
-                    //    LineConf.GetLine(shape)).Execute();
+                    new DrawingNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
+                                         shape.name, newPosition, newPositions.Length - 1).Execute();
                     FinishDrawing();
                     return true;
                 }
@@ -190,7 +187,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// Block for successfully completing the line without adding a new point.
                 /// It requires a wheel-click.
                 if (Queries.MouseUp(MouseButton.Middle)
-                    && drawing 
+                    && drawing
                     && positions.Length > 1
                     && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line)
                 {
@@ -199,8 +196,7 @@ namespace SEE.Controls.Actions.Drawable
                 }
             }
             /// This block is outside the !Raycasting.IsMouseOverGUI check to allow
-            /// the immediate detection of a click on
-            /// the Finish button of the menu,
+            /// the immediate detection of a click on the Finish button of the menu,
             /// even if the mouse cursor is still over the GUI.
             if (finishDrawingViaButton)
             {
@@ -224,7 +220,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (drawing && SEEInput.Cancel())
             {
-                ShowNotification.Info("Line-Shape drawing canceled.", 
+                ShowNotification.Info("Line-Shape drawing canceled.",
                     "The drawing of the shape art line has been canceled.");
                 new EraseNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), shape.name).Execute();
                 Destroyer.Destroy(shape);
@@ -247,18 +243,17 @@ namespace SEE.Controls.Actions.Drawable
             {
                 if (shape.GetComponent<LineRenderer>().positionCount >= 3)
                 {
-                    ShowNotification.Info("Last point removed.", 
+                    ShowNotification.Info("Last point removed.",
                         "The last placed point of the line has been removed.");
                     LineRenderer renderer = shape.GetComponent<LineRenderer>();
                     renderer.positionCount -= 2;
                     positions = positions.ToList().GetRange(0, positions.Length - 1).ToArray();
-                    //renderer.SetPositions(positions);
                     GameDrawer.Drawing(shape, positions);
                     new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(shape)).Execute();
                 }
                 else
                 {
-                    ShowNotification.Info("Line-Shape drawing canceled.", 
+                    ShowNotification.Info("Line-Shape drawing canceled.",
                         "The drawing of the shape art line has been canceled.");
                     new EraseNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), shape.name).Execute();
                     Destroyer.Destroy(shape);
@@ -314,7 +309,6 @@ namespace SEE.Controls.Actions.Drawable
             switch (ShapeMenu.GetSelectedShape())
             {
                 case ShapePointsCalculator.Shape.Line:
-
                     positions[0] = hitpoint;
                     shape = GameDrawer.StartDrawing(Surface, positions, ValueHolder.CurrentColorKind,
                         ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor,
@@ -421,7 +415,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void ShapePreviewReleasePosition()
         {
-            if (Queries.MouseDown(MouseButton.Middle) 
+            if (Queries.MouseDown(MouseButton.Middle)
                 && shapePreviewFix
                 && Input.GetKey(KeyCode.LeftControl)
                 && ShapeMenu.GetSelectedShape() != ShapePointsCalculator.Shape.Line)
@@ -434,7 +428,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Allows a position to be marked where the preview is held. 
+        /// Allows a position to be marked where the preview is held.
         /// It can then be further configured until the confirming left click.
         /// </summary>
         private void ShapePreviewFixPosition()
@@ -513,7 +507,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void LineShapePreview()
         {
-            if (drawing && !Queries.LeftMouseInteraction() 
+            if (drawing && !Queries.LeftMouseInteraction()
                 && Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit raycastHit)
                 && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
                 && Queries.DrawableSurfaceNullOrSame(Surface, raycastHit.collider.gameObject))
@@ -524,18 +518,18 @@ namespace SEE.Controls.Actions.Drawable
                 newPositions[^1] = newPosition;
                 GameDrawer.Drawing(shape, newPositions);
                 new DrawingNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), shape.name, newPosition, newPositions.Length - 1).Execute();
-                //new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(shape)).Execute();
             }
         }
 
         /// <summary>
         /// Provides the function to add a new point in the Line shape.
         /// However, the new point must be different from the previous one.
-        /// This requires a left mouse click, with neither the left Shift nor the left Ctrl key pressed.
+        /// This requires a left mouse click, with neither the left Shift
+        /// nor the left Ctrl key pressed.
         /// </summary>
         private void AddLineShapePoint()
         {
-            if (Queries.LeftMouseDown() && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift) 
+            if (Queries.LeftMouseDown() && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift)
                 && Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit raycastHit)
                 && drawing && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
                 && Queries.DrawableSurfaceNullOrSame(Surface, raycastHit.collider.gameObject))
@@ -549,8 +543,8 @@ namespace SEE.Controls.Actions.Drawable
                     positions = newPositions;
 
                     GameDrawer.Drawing(shape, positions);
-                    new DrawingNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), shape.name, newPosition, newPositions.Length - 1).Execute();
-                    //new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(shape)).Execute();
+                    new DrawingNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
+                                         shape.name, newPosition, newPositions.Length - 1).Execute();
                 }
             }
         }

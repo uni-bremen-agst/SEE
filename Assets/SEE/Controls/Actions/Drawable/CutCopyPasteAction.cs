@@ -310,7 +310,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void SelectObject()
         {
-            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, Canvas, 
+            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, Canvas,
                 false, true, false, GetActionStateType()))
             {
                 oldSurface = GameFinder.GetDrawableSurface(selectedObj);
@@ -345,9 +345,9 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void CutCopyPaste()
         {
-            if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit) 
+            if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit)
                 && selectedObj != null
-                && selectedObj.GetComponent<BlinkEffect>() != null 
+                && selectedObj.GetComponent<BlinkEffect>() != null
                 && state != CutCopy.None)
             {
                 Destroyer.Destroy(cutCopyPasteMenu);
@@ -567,7 +567,8 @@ namespace SEE.Controls.Actions.Drawable
                     }
                 }
                 SetToInitialState();
-            } else
+            }
+            else
             {
                 /// This block is needed to restore the appearance of the parent branch line.
                 if (oldBranchLineConf != null && !editToOldBranchLine)
@@ -579,7 +580,6 @@ namespace SEE.Controls.Actions.Drawable
                     editToOldBranchLine = true;
                 }
             }
-
         }
 
         /// <summary>
@@ -595,7 +595,7 @@ namespace SEE.Controls.Actions.Drawable
 
                 if (memento.OldValueHolder is MindMapNodeConf)
                 {
-                    foreach(DrawableType type in memento.OldNodesHolder.GetAllDrawableTypes())
+                    foreach (DrawableType type in memento.OldNodesHolder.GetAllDrawableTypes())
                     {
                         DrawableType.Restore(type, oldSurface);
                     }
@@ -611,7 +611,8 @@ namespace SEE.Controls.Actions.Drawable
                                 LineConf.GetLineWithoutRenderPos(branchLineToParent)).Execute();
                         }
                     }
-                } else
+                }
+                else
                 {
                     DrawableType.Restore(memento.OldValueHolder, oldSurface);
                 }
@@ -671,7 +672,8 @@ namespace SEE.Controls.Actions.Drawable
                             LineConf.GetLineWithoutRenderPos(branchLineToParent)).Execute();
                     }
                 }
-            } else
+            }
+            else
             {
                 DrawableType.Restore(memento.NewValueHolder, newSurface);
             }
@@ -702,12 +704,11 @@ namespace SEE.Controls.Actions.Drawable
                 }
                 new EraseNetAction(memento.OldSurface.ID, memento.OldSurface.ParentID, oldObject.name).Execute();
                 Destroyer.Destroy(oldObject);
-
             }
         }
 
         /// <summary>
-        /// A new instance of <see cref="CutCopyPasteAction"/>.
+        /// A new instance of <see cref="CutCopyPasteActyion"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="CutCopyPasteAction"/></returns>

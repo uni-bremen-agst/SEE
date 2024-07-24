@@ -424,9 +424,9 @@ namespace SEE.Net
         /// <summary>
         /// Splitts a string after <paramref name="fragmentSize"/> chars.
         /// </summary>
-        /// <param name="str">The string to be splitted</param>
+        /// <param name="str">The string to be split</param>
         /// <param name="fragmentSize">The size for the sub strings.</param>
-        /// <returns>A list with the splitted strings.</returns>
+        /// <returns>A list with the split strings.</returns>
         private static List<string> SplitString(string str, int fragmentSize)
         {
             List<string> fragments = new ();

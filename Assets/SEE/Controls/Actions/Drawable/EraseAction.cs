@@ -19,13 +19,13 @@ namespace SEE.Controls.Actions.Drawable
     {
         /// <summary>
         /// A list of mementos for this action.
-        /// It will be needed, because a memento saves one deleted drawable object.
+        /// It will be needed because a memento saves one deleted drawable object.
         /// </summary>
         private List<Memento> mementoList = new();
 
         /// <summary>
-        /// This class can store all the information needed to revert or repeat the <see cref="EraseAction"/>
-        /// for one drawable type object.
+        /// This class can store all the information needed to revert or repeat
+        /// the <see cref="EraseAction"/> for one drawable type object.
         /// </summary>
         private class Memento
         {
@@ -39,7 +39,7 @@ namespace SEE.Controls.Actions.Drawable
             public DrawableType DrawableType;
 
             /// <summary>
-            /// The constructor, which simply assigns its only parameter to a field in this class.
+            /// The constructor setting its fields.
             /// </summary>
             /// <param name="surface">The drawable surface on which the drawable type is displayed</param>
             /// <param name="drawableType">The drawable type of the deleted object</param>
@@ -71,12 +71,12 @@ namespace SEE.Controls.Actions.Drawable
                         mementoList.Add(new Memento(GameFinder.GetDrawableSurface(hitObject),
                             DrawableType.Get(hitObject)));
 
-                        if (mementoList.Last().DrawableType is MindMapNodeConf conf)
+                        if (mementoList.Last().DrawableType is MindMapNodeConf)
                         {
                             DeleteChildren(hitObject);
                         }
 
-                        new EraseNetAction(mementoList.Last().Surface.ID, 
+                        new EraseNetAction(mementoList.Last().Surface.ID,
                             mementoList.Last().Surface.ParentID,
                             hitObject.name).Execute();
                         Destroyer.Destroy(hitObject);
@@ -97,7 +97,8 @@ namespace SEE.Controls.Actions.Drawable
         /// It deletes the child nodes and the branch lines associated with them.
         /// </summary>
         /// <param name="node">The parent node to be deleted.</param>
-        /// <param name="delete">Recursive iteration variable, needed to include the child nodes in the memento list.</param>
+        /// <param name="delete">Recursive iteration variable, needed to include the child nodes in
+        /// the memento list.</param>
         private void DeleteChildren(GameObject node, bool delete = false)
         {
             GameObject surface = GameFinder.GetDrawableSurface(node);
@@ -118,7 +119,7 @@ namespace SEE.Controls.Actions.Drawable
             if (valueHolder.GetParent() != null)
             {
                 valueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(node);
-                new MindMapRemoveChildNetAction(mementoList.Last().Surface.ID, 
+                new MindMapRemoveChildNetAction(mementoList.Last().Surface.ID,
                     mementoList.Last().Surface.ParentID,
                     MindMapNodeConf.GetNodeConf(node)).Execute();
             }
@@ -136,7 +137,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 mementoList.Add(new Memento(surface, DrawableType.Get(node)));
 
-                new EraseNetAction(mementoList.Last().Surface.ID, 
+                new EraseNetAction(mementoList.Last().Surface.ID,
                     mementoList.Last().Surface.ParentID, node.name).Execute();
                 Destroyer.Destroy(node);
             }
