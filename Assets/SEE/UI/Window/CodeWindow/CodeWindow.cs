@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using MoreLinq;
 using SEE.Tools.LSP;
 using SEE.Utils;
 using TMPro;
@@ -95,6 +96,11 @@ namespace SEE.UI.Window.CodeWindow
         /// The word that was hovered last frame.
         /// </summary>
         private static TMP_WordInfo? lastHoveredWord;
+
+        /// <summary>
+        /// Whether the code window contains text.
+        /// </summary>
+        public bool ContainsText => text != null;
 
         /// <summary>
         /// Visually highlights the line number at the given <paramref name="lineNumber"/> and scrolls to it.

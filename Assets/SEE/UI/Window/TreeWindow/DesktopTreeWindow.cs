@@ -404,7 +404,7 @@ namespace SEE.UI.Window.TreeWindow
                             }
 
                             // We want all applicable actions for the element, except ones where the element
-                            // element is shown in the TreeWindow, since we are already in the TreeWindow.
+                            // is shown in the TreeWindow, since we are already in the TreeWindow.
                             IEnumerable<PopupMenuAction> actions = ContextMenuAction
                                                                    .GetApplicableOptions(representedGraphElement,
                                                                                          representedGameObject)

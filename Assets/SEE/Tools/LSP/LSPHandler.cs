@@ -110,6 +110,11 @@ namespace SEE.Tools.LSP
         public TimeSpan TimeoutSpan = TimeSpan.FromSeconds(2);
 
         /// <summary>
+        /// The URI of the project.
+        /// </summary>
+        public Uri ProjectUri => new(ProjectPath, UriKind.Absolute);
+
+        /// <summary>
         /// The capabilities of the language server.
         /// </summary>
         public IServerCapabilities ServerCapabilities => Client?.ServerSettings.Capabilities;

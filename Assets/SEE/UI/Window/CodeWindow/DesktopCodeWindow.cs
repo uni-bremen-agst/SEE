@@ -16,6 +16,7 @@ using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using SEE.Controls;
 using SEE.UI.DebugAdapterProtocol;
+using SEE.UI.Menu;
 using SEE.Utils.Markdown;
 using UnityEngine.Assertions;
 
@@ -53,6 +54,13 @@ namespace SEE.UI.Window.CodeWindow
 
             scrollable = PrefabInstantiator.InstantiatePrefab(codeWindowPrefab, Window.transform.Find("Content"), false);
             scrollable.name = "Scrollable";
+
+            // Initialize list and context menu, if necessary.
+            if (lspHandler != null)
+            {
+                contextMenu = gameObject.AddComponent<PopupMenu.PopupMenu>();
+                simpleListMenu = gameObject.AddComponent<SimpleListMenu>();
+            }
 
             // Set text and preferred font size
             GameObject code = scrollable.transform.Find("Code").gameObject;
@@ -162,24 +170,36 @@ namespace SEE.UI.Window.CodeWindow
         {
             if (WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer].ActiveWindow == this)
             {
-                // Show issue info on click (on hover would be too expensive)
+                // Right-click opens menu with LSP actions.
+                if (Input.GetMouseButtonDown(1))
+                {
+                    if (lspHandler != null)
+                    {
+                        // We use the word detection instead of the character detection because the latter
+                        // needs the cursor to be precisely over a character, while the former works more broadly.
+                        if (DetectHoveredWord() is { } word)
+                        {
+                            int character = word.firstCharacterIndex;
+                            (int line, int column) = GetSourcePosition(character);
+                            ShowContextMenu(line-1, column-1, Input.mousePosition, word.GetWord());
+                        }
+                        return;
+                    }
+                }
                 if (issueDictionary.Count != 0)
                 {
-                    // Passing camera as null causes the screen space rather than world space camera to be used
+                    // Show issue info by leveraging links we created earlier.
+                    // Passing camera as null causes the screen space rather than world space camera to be used.
                     int link = TMP_TextUtilities.FindIntersectingLink(textMesh, Input.mousePosition, null);
                     if (link != -1)
                     {
-                        char linkId = textMesh.textInfo.linkInfo[link].GetLinkID()[0];
-                        // Display tooltip containing all issue descriptions
-                        UniTask.WhenAll(issueDictionary[linkId].Select(x => x.ToCodeWindowStringAsync()))
-                               .ContinueWith(x => Tooltip.ActivateWith(string.Join('\n', x), Tooltip.AfterShownBehavior.HideUntilActivated))
-                               .Forget();
+                        TriggerIssueHoverAsync(link).Forget();
+                        return;
                     }
                 }
 
+                TMP_WordInfo? hoveredWord = DetectHoveredWord();
                 // Detect hovering over words
-                int index = TMP_TextUtilities.FindIntersectingWord(textMesh, Input.mousePosition, null);
-                TMP_WordInfo? hoveredWord = index >= 0 && index < textMesh.textInfo.wordCount ? textMesh.textInfo.wordInfo[index] : null;
                 if (!lastHoveredWord.Equals(hoveredWord))
                 {
                     if (lspHandler != null)
@@ -198,6 +218,24 @@ namespace SEE.UI.Window.CodeWindow
                 }
                 lastHoveredWord = hoveredWord;
             }
+            return;
+
+            TMP_WordInfo? DetectHoveredWord()
+            {
+                int index = TMP_TextUtilities.FindIntersectingWord(textMesh, Input.mousePosition, null);
+                return index >= 0 && index < textMesh.textInfo.wordCount ? textMesh.textInfo.wordInfo[index] : null;
+            }
+        }
+
+        /// <summary>
+        /// Triggers the hover event for issues.
+        /// </summary>
+        private async UniTaskVoid TriggerIssueHoverAsync(int link)
+        {
+            char linkId = textMesh.textInfo.linkInfo[link].GetLinkID()[0];
+            // Display tooltip containing all issue descriptions
+            IEnumerable<string> issueTexts = await UniTask.WhenAll(issueDictionary[linkId].Select(x => x.ToCodeWindowStringAsync()));
+            Tooltip.ActivateWith(string.Join('\n', issueTexts), Tooltip.AfterShownBehavior.HideUntilActivated);
         }
 
         /// <summary>
@@ -222,7 +260,7 @@ namespace SEE.UI.Window.CodeWindow
                     Hover hoverInfo = await lspHandler.HoverAsync(FilePath, line - 1, column - 1);
                     if (hoverInfo?.Contents != null && lastHoveredWord != null)
                     {
-                        Tooltip.ActivateWith(hoverInfo.Contents.ToRichText(), Tooltip.AfterShownBehavior.HideUntilActivated);
+                        Tooltip.ActivateWith(hoverInfo.Contents.ToRichText());
                     }
                 }
             }

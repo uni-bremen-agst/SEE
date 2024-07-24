@@ -316,7 +316,6 @@ namespace SEE.DataModel.DG.IO
                     // The Count+1 prevents the progress from reaching 1.0, since the diagnostics may not yet be pulled.
                     changePercentage?.Invoke(1 - edgeProgressFactor + edgeProgressFactor * i++ / (relevantNodes.Count+1));
                 }
-                //Handler.CloseDocument(path);
             }
             Debug.Log($"LSPImporter: Imported {graph.Nodes().Except(originalNodes).Count()} new nodes and {newEdges} new edges.\n");
 
@@ -336,6 +335,8 @@ namespace SEE.DataModel.DG.IO
             MetricAggregator.AggregateSum(graph, new[] { NumericAttributeNames.LOC.Name() }, withSuffix: false, asInt: true);
             // Aggregate diagnostics upwards. We do this with a suffix, since these metrics may be used for erosion icons.
             MetricAggregator.AggregateSum(graph, IncludeDiagnostics.ToDiagnosticSeverity().Select(x => x.Name()), withSuffix: true, asInt: true);
+
+            graph.BasePath = Handler.ProjectPath;
 
             changePercentage?.Invoke(1);
 
