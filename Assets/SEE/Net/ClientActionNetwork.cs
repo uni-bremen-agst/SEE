@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using Cysharp.Threading.Tasks;
@@ -17,11 +18,12 @@ namespace SEE.Net
     {
         /// <summary>
         /// Where multiplayer files are stored locally relative to the streaming assets.
+        /// This is a dedicated directory where only files are stored that are downloaded from the backend.
         /// </summary>
         private const string ServerContentDirectory = "Multiplayer/";
 
         /// <summary>
-        /// The data structure for loggint into the backend.
+        /// The data structure for logging into the backend.
         /// </summary>
         [System.Serializable]
         private struct LoginData
@@ -35,9 +37,67 @@ namespace SEE.Net
                 Password = password;
             }
 
-            public string ToJson()
+            public override string ToString()
             {
                 return JsonUtility.ToJson(this);
+            }
+
+            public static implicit operator string(LoginData loginData)
+            {
+                return loginData.ToString();
+            }
+        }
+
+        /// <summary>
+        /// The data structure for file metadata from the backend.
+        /// </summary>
+        [System.Serializable]
+        private struct FileData
+        {
+            public string id;
+            public string name;
+            public string contentType;
+            public string fileType;
+            public long size;
+            public long creationTime;
+
+            public static FileData FromJson(string json)
+            {
+                return JsonUtility.FromJson<FileData>(json);
+            }
+
+            public override string ToString()
+            {
+                return JsonUtility.ToJson(this);
+            }
+
+            public static implicit operator string(FileData fileData)
+            {
+                return fileData.ToString();
+            }
+
+            public static implicit operator FileData(string json)
+            {
+                return FromJson(json);
+            }
+        }
+
+        /// <summary>
+        /// A list of <c>FileData</c> for deserialization of server responses.
+        /// </summary>
+        [System.Serializable]
+        private class FileDataList
+        {
+            public List<FileData> items;
+
+            public static FileDataList FromJson(string json)
+            {
+                return JsonUtility.FromJson<FileDataList>("{ \"items\": " + json + "}");
+            }
+
+            public override string ToString()
+            {
+                return items.ToString();
             }
         }
 
@@ -94,38 +154,62 @@ namespace SEE.Net
         {
             Network.ServerId = serverId;
             Network.BackendDomain = backendDomain;
-            /*
-             * We do not want to delete the server content directory altogether.
-             * Who knows what other files are in there that we might need.
-            if (Directory.Exists(AbsoluteServerContentDirectory))
+            
+            // This should be safe to clear as files are downloaded from the backend each time SEE starts.
+            string multiplayerDataPath = System.IO.Path.Combine(Application.streamingAssetsPath, ServerContentDirectory);
+            if (Directory.Exists(multiplayerDataPath))
             {
-                Directory.Delete(AbsoluteServerContentDirectory, true);
-                Directory.CreateDirectory(AbsoluteServerContentDirectory);
+                Directory.Delete(multiplayerDataPath, true);
+                Directory.CreateDirectory(multiplayerDataPath);
             }
-            */
 
-            // For the time being, we will not download the data.
-            // This must be re-enabled once the backend is ready.
-            // GetAllData();
+            DownloadAllFilesAsync();
         }
 
 
         /// <summary>
-        /// Retrieves all data files from the server.
+        /// Retrieves all multiplayer files from the backend server.
         /// </summary>
-        private async UniTask GetAllData()
+        private async UniTask DownloadAllFilesAsync()
         {
-            Debug.Log($"Backend API URL is: {Network.ClientRestAPI}.\n");
+            Debug.Log($"Backend API URL is: {Network.ClientRestAPI}");
 
-            if (!await LogIn())
+            if (!await LogInAsync())
             {
-                Debug.Log("Login was NOT successful!");
+                Debug.LogError("Unable to download files!");
                 return;
             }
 
-            // TODO download files to ServerContentDirectory
-
-            // TODO Unzip() ZIP files to ServerContentDirectory
+            List<FileData> files = await GetFilesAsync(Network.ServerId);
+            Debug.Log($"Downloading {files.Count} files to: {System.IO.Path.Combine(Application.streamingAssetsPath, ServerContentDirectory)}");
+            foreach (FileData file in files)
+            {
+                try
+                {
+                    Debug.Log($"Downloading file: {file.name}");
+                    string localFileName = System.IO.Path.Combine(ServerContentDirectory, file.name);
+                    bool success = await DownloadFileAsync(file.id, localFileName);
+                    if (success && file.contentType.ToLower() == "application/zip")
+                    {
+                        Debug.Log($"Extracting ZIP file: {file.name}");
+                        try
+                        {
+                            Unzip(localFileName, ServerContentDirectory);
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogError($"Error unzipping file: {file.name}");
+                            Debug.LogError(e);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"Error downloading file: {file.name}");
+                    Debug.LogError(e);
+                }
+            }
+            Debug.Log("Done downloading!");
 
             Network.ServerNetwork.Value?.SyncClientServerRpc(NetworkManager.Singleton.LocalClientId);
         }
@@ -146,13 +230,12 @@ namespace SEE.Net
                 throw new IOException($"The file does not exist: '{filePath}'");
             }
 
-            ZipFile.ExtractToDirectory(targetPath, dirPath);
+            ZipFile.ExtractToDirectory(filePath, dirPath);
         }
 
         /// <summary>
         /// Asynchronously retrieves a file from the backend using the specified file ID and path.
-        /// Throws an <c>InvalidOperationException</c> if the server ID is not set and an <c>IOException</c>
-        /// if the file already exists in local storage.
+        /// Throws an <c>IOException</c> if the file already exists in local storage.
         /// </summary>
         /// <param name="id">The unique identifier of the file to be retrieved.</param>
         /// <param name="path">The path and filename of the file to be saved locally after retrieval.</param>
@@ -164,12 +247,8 @@ namespace SEE.Net
         /// On successful retrieval, the file is stored with the specified path relative to the
         /// <c>Application.streamingAssetsPath</c>.
         /// </remarks>
-        private async UniTask<bool> GetFile(string id, string path)
+        private async UniTask<bool> DownloadFileAsync(string id, string path)
         {
-            if (string.IsNullOrEmpty(Network.ServerId))
-            {
-                throw new InvalidOperationException("Server ID is not set.");
-            }
             if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(path))
             {
                 Debug.LogWarning("Parameters must not be empty!");
@@ -184,7 +263,6 @@ namespace SEE.Net
             string url = Network.ClientRestAPI + "file/download?id=" + id;
             using (UnityWebRequest getRequest = UnityWebRequest.Get(url))
             {
-
                 getRequest.downloadHandler = new DownloadHandlerFile(targetPath);
                 UnityWebRequestAsyncOperation asyncOp = getRequest.SendWebRequest();
                 await asyncOp.ToUniTask();
@@ -210,10 +288,10 @@ namespace SEE.Net
         /// A <see cref="UniTask{bool}"/> indicating whether the login was successful.
         /// Returns <c>true</c> if the login is successful; otherwise, <c>false</c>.
         /// </returns>
-        private async UniTask<bool> LogIn()
+        private async UniTask<bool> LogInAsync()
         {
             string url = Network.ClientRestAPI + "user/signin";
-            string postBody = new LoginData(Network.ServerId, Network.Instance.RoomPassword).ToJson();
+            string postBody = new LoginData(Network.ServerId, Network.Instance.RoomPassword);
             UnityWebRequest.ClearCookieCache(new System.Uri(url));
             using (UnityWebRequest signinRequest = UnityWebRequest.Post(url, postBody, "application/json"))
             {
@@ -222,6 +300,7 @@ namespace SEE.Net
 
                 if (signinRequest.result != UnityWebRequest.Result.Success)
                 {
+                    Debug.LogError("Login to the backend was NOT successful!");
                     Debug.LogError(signinRequest.error);
                     return false;
                 }
@@ -231,5 +310,32 @@ namespace SEE.Net
                 }
             }
         }
+
+        /// <summary>
+        /// Fetches the metadata for all files associated to the server ID.
+        /// </summary>
+        /// <param name="serverId">the server ID</param>
+        /// <returns>A list of file metadata objects if the request was successful, or <c>null</c> if not.</returns>
+        private async UniTask<List<FileData>> GetFilesAsync(string serverId)
+        {
+            string url = Network.ClientRestAPI + "server/files?id=" + serverId;
+            using (UnityWebRequest fetchRequest = UnityWebRequest.Get(url))
+            {
+                UnityWebRequestAsyncOperation operation = fetchRequest.SendWebRequest();
+                await operation.ToUniTask();
+
+                if (fetchRequest.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogWarning("Fetching files for server failed!");
+                    Debug.Log(fetchRequest.error);
+                    return null;
+                }
+                else
+                {
+                    return FileDataList.FromJson(fetchRequest.downloadHandler.text).items;
+                }
+            }
+        }
+
     }
 }
