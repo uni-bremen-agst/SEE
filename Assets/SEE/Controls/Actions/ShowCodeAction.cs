@@ -14,6 +14,8 @@ using SEE.UI.Window;
 using SEE.Utils.History;
 using SEE.Game.City;
 using SEE.VCS;
+using GraphElementRef = SEE.GO.GraphElementRef;
+using Range = SEE.DataModel.DG.Range;
 
 namespace SEE.Controls.Actions
 {
@@ -214,7 +216,7 @@ namespace SEE.Controls.Actions
             {
                 case Change.Unmodified or Change.Added or Change.TypeChanged or Change.Copied or Change.Unknown:
                     // We can show the plain file in the newer revision.
-                    codeWindow.EnterFromText(vcs.Show(relativePath, city.NewRevision).Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None));
+                    codeWindow.EnterFromText(vcs.Show(relativePath, city.NewRevision).Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None));
                     break;
                 case Change.Modified or Change.Deleted or Change.Renamed:
                     // If a file was renamed, it can still have differences.
@@ -226,22 +228,45 @@ namespace SEE.Controls.Actions
                     throw new Exception($"Unexpected change type {change} for {relativePath}");
             }
 
-            switch (change)
+            codeWindow.Title = change switch
             {
-                case Change.Renamed:
-                    codeWindow.Title = $"<color=\"red\"><s><noparse>{oldRelativePath}</noparse></s></color>"
-                        + $" -> <color=\"green\"><u><noparse>{sourceFilename}</noparse></u></color>";
-                    break;
-                case Change.Deleted:
-                    codeWindow.Title = $"<color=\"red\"><s><noparse>{sourceFilename}</noparse></s></color>";
-                    break;
-                default:
-                    codeWindow.Title = sourceFilename;
-                    break;
-            }
+                Change.Renamed => $"<color=\"red\"><s><noparse>{oldRelativePath}</noparse></s></color>"
+                    + $" -> <color=\"green\"><u><noparse>{sourceFilename}</noparse></u></color>",
+                Change.Deleted => $"<color=\"red\"><s><noparse>{sourceFilename}</noparse></s></color>",
+                _ => sourceFilename
+            };
 
             codeWindow.ScrolledVisibleLine = 1;
             return codeWindow;
+        }
+
+        /// <summary>
+        /// Returns a CodeWindow showing the code range of the graph element most closely matching
+        /// the given <paramref name="path"/> and <paramref name="range"/> in the given <paramref name="graph"/>.
+        /// Will return null and show an error message if no suitable graph element is found.
+        /// </summary>
+        /// <param name="graph">The graph to search in</param>
+        /// <param name="path">The path to search for</param>
+        /// <param name="range">The range to search for</param>
+        /// <param name="ContentTextEntered">Action to be executed after the CodeWindow has been filled
+        /// with its content</param>
+        /// <returns>new CodeWindow showing the code range of the graph element most closely matching
+        /// the given <paramref name="path"/> and <paramref name="range"/></returns>
+        public static CodeWindow ShowCodeForPath(Graph graph, string path, Range range = null, Action<CodeWindow> ContentTextEntered = null)
+        {
+            // If we just have a path as input, we need to find a fitting graph element.
+            GraphElementRef element = graph.FittingElements(path, range).WithGameObject()
+                                           .Select(x => x.GameObject().MustGetComponent<GraphElementRef>())
+                                           .FirstOrDefault();
+
+            if (element == null)
+            {
+                ShowNotification.Error("No graph element found",
+                                       $"No suitable graph element found for path {path}", log: false);
+                return null;
+            }
+
+            return ShowCode(element, ContentTextEntered);
         }
 
         /// <summary>
@@ -251,15 +276,17 @@ namespace SEE.Controls.Actions
         /// attributes.
         /// </summary>
         /// <param name="graphElementRef">The graph element to get the CodeWindow for</param>
+        /// <param name="ContentTextEntered">Action to be executed after the CodeWindow has been filled
+        /// with its content</param>
         /// <returns>new CodeWindow showing the code range of the given graph element</returns>
-        public static CodeWindow ShowCode(GraphElementRef graphElementRef)
+        public static CodeWindow ShowCode(GraphElementRef graphElementRef, Action<CodeWindow> ContentTextEntered = null)
         {
             GraphElement graphElement = graphElementRef.Elem;
             CodeWindow codeWindow = GetOrCreateCodeWindow(graphElementRef, graphElement.Filename);
-            EnterWindowContent().Forget();  // This can happen in the background.
+            EnterWindowContent().ContinueWith(() => ContentTextEntered?.Invoke(codeWindow));
             return codeWindow;
 
-            async UniTaskVoid EnterWindowContent()
+            async UniTask EnterWindowContent()
             {
                 // We have to differentiate between a file-based and a VCS-based code city.
                 if (graphElement.TryGetCommitID(out string commitID))
@@ -271,11 +298,10 @@ namespace SEE.Controls.Actions
                         throw new InvalidOperationException(message);
                     }
                     IVersionControl vcs = VersionControlFactory.GetVersionControl(VCSKind.Git, repositoryPath);
-                    string[] fileContent = vcs.Show(graphElement.ID, commitID).
-                        Split("\\n", StringSplitOptions.RemoveEmptyEntries);
+                    string[] fileContent = vcs.Show(graphElement.ID, commitID).Split("\\n", StringSplitOptions.RemoveEmptyEntries);
                     codeWindow.EnterFromText(fileContent);
                 }
-                else
+                else if (!codeWindow.ContainsText)
                 {
                     await codeWindow.EnterFromFileAsync(GetPath(graphElement).absolutePlatformPath);
                 }
@@ -286,7 +312,6 @@ namespace SEE.Controls.Actions
                     codeWindow.ScrolledVisibleLine = line;
                 }
             }
-
         }
 
         public override bool Update()
