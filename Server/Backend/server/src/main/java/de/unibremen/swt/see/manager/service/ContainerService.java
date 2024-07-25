@@ -285,7 +285,7 @@ public class ContainerService {
             final int port,
             final String serverId,
             final String password) {
-        ExposedPort exposedPort = ExposedPort.tcp(CONTAINER_PORT);
+        ExposedPort exposedPort = ExposedPort.udp(CONTAINER_PORT);
         PortBinding portBinding = new PortBinding(Ports.Binding.bindPort(port), exposedPort);
 
         return dockerClient.createContainerCmd(containerImageName)
@@ -295,9 +295,10 @@ public class ContainerService {
                         .withPortBindings(portBinding)
                 )
                 .withExposedPorts(exposedPort)
-                .withEnv("SEE_BACKEND_DOMAIN=" + backendDomain)
-                .withEnv("SEE_SERVER_ID=" + serverId)
-                .withEnv("SEE_SERVER_PASSWORD=" + password)
+                .withEnv(
+                        "SEE_BACKEND_DOMAIN=" + backendDomain,
+                        "SEE_SERVER_ID=" + serverId,
+                        "SEE_SERVER_PASSWORD=" + password)
                 .exec();
     }
 

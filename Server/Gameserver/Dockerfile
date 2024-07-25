@@ -17,7 +17,7 @@ RUN  \
 
 WORKDIR /app
 
-EXPOSE 7777
+EXPOSE 7777/udp
 
 VOLUME /multiplayer_data
 

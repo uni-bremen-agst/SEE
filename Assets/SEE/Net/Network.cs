@@ -314,50 +314,66 @@ namespace SEE.Net
 
             bool launchAsServer = false;
 
+            // Commented out because it logs the plaintext password!
+            Debug.Log($"Parsing {arguments.Length} command-line parameters"); //:\n{string.Join("; ", arguments)}");
+
             // Check command line arguments
             // The first element in the array contains the file name of the executing program.
             // If the file name is not available, the first element is equal to String.Empty.
             for (int i = 1; i < arguments.Length; i++)
             {
-                if (arguments[i] == portArgument)
+                switch (arguments[i])
                 {
-                    CheckArgumentValue(arguments, i, portArgument);
-                    ServerPort = Int32.Parse(arguments[i + 1]);
-                    i++;
-                }
-                else if (arguments[i] == passwordArgument)
-                {
-                    CheckArgumentValue(arguments, i, passwordArgument);
-                    RoomPassword = arguments[i + 1];
-                    i++;
-                }
-                else if (arguments[i] == domainArgument)
-                {
-                    CheckArgumentValue(arguments, i, domainArgument);
-                    BackendDomain = arguments[i + 1];
-                    i++;
-                }
-                else if (arguments[i] == serverIdArgument)
-                {
-                    CheckArgumentValue(arguments, i, serverIdArgument);
-                    ServerId = arguments[i + 1];
-                    i++;
-                }
-                else if (arguments[i] == launchAsServerArgument)
-                {
-                    // This argument does not have a value. It works as a flag.
-                    launchAsServer = true;
-                    i++;
-                }
-                else
-                {
-                    Debug.LogWarning($"Unknown command-line parameter {arguments[i]} will be ignored.\n");
+                    case portArgument:
+                        Debug.Log($"Found {portArgument} as parameter {i}");
+                        CheckArgumentValue(arguments, i, portArgument);
+                        ServerPort = Int32.Parse(arguments[i + 1]);
+                        i++; // skip one parameter
+                        break;
+                    case passwordArgument:
+                        Debug.Log($"Found {passwordArgument} as parameter {i}");
+                        CheckArgumentValue(arguments, i, passwordArgument);
+                        RoomPassword = arguments[i + 1];
+                        i++; // skip one parameter
+                        break;
+                    case domainArgument:
+                        Debug.Log($"Found {domainArgument} as parameter {i}");
+                        CheckArgumentValue(arguments, i, domainArgument);
+                        BackendDomain = arguments[i + 1];
+                        i++; // skip one parameter
+                        break;
+                    case serverIdArgument:
+                        Debug.Log($"Found {serverIdArgument} as parameter {i}");
+                        CheckArgumentValue(arguments, i, serverIdArgument);
+                        ServerId = arguments[i + 1];
+                        i++; // skip one parameter
+                        break;
+                    case launchAsServerArgument:
+                        Debug.Log($"Found {launchAsServerArgument} as parameter {i}");
+                        // This argument does not have a value. It works as a flag.
+                        launchAsServer = true;
+                        break;
+                    default:
+                        Debug.LogWarning($"Unknown command-line parameter {i} will be ignored: {arguments[i]}");
+                        break;
                 }
             }
 
             if (launchAsServer)
             {
-                StartServer(null);
+                CallBack serverCallback = (success, message) =>
+                {
+                    if (success)
+                    {
+                        Debug.Log($"Server started successfully: {message}");
+                    }
+                    else
+                    {
+                        Debug.LogError($"Starting server failed: {message}");
+                    }
+                };
+                Debug.LogWarning("Starting server...");
+                StartServer(serverCallback);
             }
 
             return;
