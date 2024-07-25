@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <bean id="clinicService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="target">
+            <bean class="org.mockito.Mockito" factory-method="mock">
+                <constructor-arg type="java.lang.Class"  value="org.springframework.samples.petclinic.service.ClinicService" />
+            </bean>
+        </property>
+        <property name="proxyInterfaces" value="org.springframework.samples.petclinic.service.ClinicService"/>
+    </bean>
+
+</beans>

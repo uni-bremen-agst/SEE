@@ -446,7 +446,7 @@ namespace SEE.DataModel.DG
             }
             else
             {
-                throw new Exception($"Node hierarchy does not form a tree. Node with multiple parents: {child.ID}.");
+                throw new Exception($"Node hierarchy does not form a tree. Node with multiple parents: {child.ID}.{System.Environment.NewLine}new parent: {this.ID}{System.Environment.NewLine}old parent: {child.Parent.ID}");
             }
         }
 

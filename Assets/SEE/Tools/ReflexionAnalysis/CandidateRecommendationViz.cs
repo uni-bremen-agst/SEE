@@ -27,6 +27,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using XInputDotNetPure;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis
 {
@@ -258,7 +259,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                         {
                             Node nodeSource = reflexionGraphCalc.GetNode(edgeEvent.Edge.Source.ID);
                             Node nodeTarget = reflexionGraphCalc.GetNode(edgeEvent.Edge.Target.ID);
-                            reflexionGraphCalc.AddToMapping(nodeSource, nodeTarget);
+                            reflexionGraphCalc.AddToMapping(nodeSource, nodeTarget, overrideMapping: true);
                         }
                         else
                         {
@@ -409,7 +410,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 CandidateRecommendation.UpdateConfiguration(reflexionGraphCalc,
                                                             recommendationSettings,
                                                             oracleMapping);
-                TriggerBlinkAnimation().Forget();
             }
         }
 
@@ -1264,6 +1264,28 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             UnityEngine.Debug.Log($"Saved architecture to {architectureGxl}");
         }
 
+        [Button("Generate initial mapping with instructions", ButtonSizes.Small)]
+        [ButtonGroup(debugButtonGroup)]
+        public void GenerateInitialMappingWithInstructions()
+        {
+            string configPath = GetConfigPath();
+
+            string instructions = Path.Combine(configPath, "mappingInstructions.txt");
+
+            if (this.reflexionGraphViz == null)
+            {
+                UnityEngine.Debug.LogWarning("Reflexiongraph is null. Cannot generate an oracle mapping.");
+                return;
+            }
+
+            ReflexionGraph clone = new ReflexionGraph(this.reflexionGraphViz);
+            Graph mapping = GenerateInitialMappingGxl(clone, instructions);
+
+            string mappingGxl = Path.Combine(configPath, "Mapping.gxl");
+            GraphWriter.Save(mappingGxl, mapping, AbstractSEECity.HierarchicalEdgeTypes().First());
+            UnityEngine.Debug.Log($"Saved mapping to {mapping}");
+        }
+
         /// <summary>
         /// Gets the path where the loaded Reflexion.cfg is located.
         /// </summary>
@@ -1411,6 +1433,54 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
         }
 
+        private Graph GenerateInitialMappingGxl(ReflexionGraph graph, string instructions)
+        {
+            graph.ResetMapping();
+            // Open the file for reading using StreamReader
+            using (StreamReader sr = new StreamReader(instructions))
+            {
+                string nodeID;
+                // Read and display lines from the file until the end of the file is reached
+                while ((nodeID = sr.ReadLine()) != null)
+                {
+                    nodeID = nodeID.Replace(" ", "");
+
+                    if (nodeID.IsNullOrWhitespace())
+                    {
+                        break;
+                    }
+
+                    if (graph.TryGetNode(nodeID, out Node node))
+                    {
+                        string expectedClusterID = this.CandidateRecommendation.GetExpectedClusterID(nodeID);
+                        if (expectedClusterID != null)
+                        {
+                            if (graph.TryGetNode(expectedClusterID, out Node cluster))
+                            {
+                                graph.AddToMapping(node, cluster, overrideMapping: true);
+                            } 
+                            else
+                            {
+                                UnityEngine.Debug.Log($"");
+                            }
+                        }
+                        else
+                        {
+                            UnityEngine.Debug.Log($"No expected cluster found in OracleGraph for {nodeID}. The will be ignored and not contained within the mapping.");
+                        }
+                    } 
+                    else
+                    {
+                        UnityEngine.Debug.Log($"Unknown node {nodeID}. The node will be ignored and not contained within the mapping.");
+                    }
+                }
+            }
+
+            (_, _, Graph mapping) = graph.Disassemble();
+
+            return mapping;
+        }
+
         // TODO: Delete later only for debug purposes
         [Button("Print Edge Types", ButtonSizes.Small)]
         [ButtonGroup(debugButtonGroup)]
@@ -1422,6 +1492,19 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             {
                 int count = this.reflexionGraphCalc.Edges().Where(e => e.Type.Equals(edgeType)).Count();
                 UnityEngine.Debug.Log($"There are {count} edges with type {edgeType} within implementation");
+            }
+        }
+
+        // TODO: Delete later only for debug purposes
+        [Button("Candidate Status", ButtonSizes.Small)]
+        [ButtonGroup(debugButtonGroup)]
+        public void PrintCandidateStatus()
+        {
+            IEnumerable<Node> candidates = this.CandidateRecommendation.GetCandidates();
+
+            foreach (Node candidate in candidates)
+            {
+                UnityEngine.Debug.Log($"Candidate {candidate.ID} Maps to {this.reflexionGraphCalc.MapsTo(candidate)?.ID ?? "NOTHING"}. Expected Cluster {this.CandidateRecommendation.GetExpectedClusterID(candidate.ID)}");
             }
         }
 
@@ -1468,10 +1551,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 Node oracleCluster = oracleGraph.MapsTo(node);
                 string oracleClusterID = oracleCluster != null ? oracleCluster.ID : "UNKNOWN";
                 sb.Append(oracleClusterID.PadRight(20));
-                string isArtificial = $"Element.Is_Artificial:{node.ToggleAttributes.Contains("Element.Is_Artificial")}";
-                sb.Append(isArtificial.PadRight(35));
-                string isAnonymous = $"Element.Is_Anonymous:{node.ToggleAttributes.Contains("Element.Is_Anonymous")}";
-                sb.Append(isAnonymous.PadRight(35));
+                string type = $"Type:{node.Type}";
+                sb.Append(type.PadRight(35));
+                //string isArtificial = $"Element.Is_Artificial:{node.ToggleAttributes.Contains("Element.Is_Artificial")}";
+                //sb.Append(isArtificial.PadRight(35));
+                //string isAnonymous = $"Element.Is_Anonymous:{node.ToggleAttributes.Contains("Element.Is_Anonymous")}";
+                //sb.Append(isAnonymous.PadRight(35));
                 sb.Append(Environment.NewLine);
             }
 
@@ -1499,6 +1584,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         {
             // Empty method for debugging
         }
+
+        [Button("Color unmapped Candidates", ButtonSizes.Small)]
+        [ButtonGroup(debugButtonGroup)]
+        public void ColorUnmappedCandidates()
+        {
+            this.ColorUnmappedCandidates(Color.black);
+        }
+
 
         #endregion
     }

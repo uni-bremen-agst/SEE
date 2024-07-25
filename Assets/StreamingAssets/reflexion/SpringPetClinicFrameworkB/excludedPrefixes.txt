@@ -1,0 +1,7 @@
+org.springframework.samples.petclinic.web.PetTypeFormatter
+org.springframework.samples.petclinic.repository.jdbc.JdbcVisitRowMapper
+org.springframework.samples.petclinic.repository.jdbc.JdbcPetRowMapper
+org.springframework.samples.petclinic.web.PetController
+org.springframework.samples.petclinic.util.CallMonitoringAspect
+org.springframework.samples.petclinic.model.Pet
+org.springframework.samples.petclinic.model.Visit

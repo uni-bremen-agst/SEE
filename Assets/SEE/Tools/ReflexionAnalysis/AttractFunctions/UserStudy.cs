@@ -7,8 +7,11 @@ using SEE.Game.City;
 using SEE.UI.PropertyDialog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
+using static SEE.Utils.Paths.DataPath;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
@@ -24,7 +27,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         private UserStudyRun currentRun;
 
-        private string Group = "A";
+        private string BuildGroup = "A";
+
+        private string pathInStreamingAssets = @"/reflexion/SpringPetClinicFramework";
 
         public async UniTask StartStudy(SEEReflexionCity city, CandidateRecommendationViz candidateRecommendation)
         {
@@ -36,7 +41,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             foreach(UserStudyRun run in userStudyRuns)
             {
                 currentRun = run;
-                await ResetCity(run);
+                await NextCity(run);
 
                 this.StartNextIteration();
 
@@ -50,20 +55,34 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 UnityEngine.Debug.Log("Finished Iteration.");
             }
 
-            async UniTask ResetCity(UserStudyRun run)
+            async UniTask NextCity(UserStudyRun run)
             {
-                city.Reset();
-                await city.LoadDataAsync();
-                city.DrawGraph();
-                await city.UpdateRecommendationSettings(run.Settings);
-                MoveAction.UnblockMovement();
-                await candidateRecommendation.CreateInitialMappingAsync(run.Settings.InitialMappingPercentage,
-                                                                        run.Settings.RootSeed, 
-                                                                        syncWithView: true,
-                                                                        delay: 500);
-                BlockUnnecessaryMovement();
-                // candidateRecommendation.ColorUnmappedCandidates(Color.blue);
-                candidateRecommendation.StartRecording();
+                try
+                {
+                    UnityEngine.Debug.Log($"Load City for group {run.group}");
+                    city.Reset();
+                    city.ConfigurationPath.RelativePath = Path.Combine(pathInStreamingAssets + run.group, "Reflexion.cfg");
+                    city.ConfigurationPath.Root = RootKind.StreamingAssets;
+
+                    UnityEngine.Debug.Log($"Configuration path of run {city.ConfigurationPath.ToString()}");
+                    city.LoadConfiguration();
+                    await city.LoadDataAsync();
+                    await city.UpdateRecommendationSettings(run.Settings);
+                    await UniTask.Delay(500);
+                    city.ClearGraphElementIDMap();
+                    await UniTask.Delay(500);
+                    city.DrawGraph();
+                    await UniTask.Delay(500);
+                    city.LoadLayout();
+
+                    MoveAction.UnblockMovement();
+                    BlockUnnecessaryMovement();
+                    candidateRecommendation.ColorUnmappedCandidates(Color.blue);
+                }
+                catch (Exception e)
+                {
+                    UnityEngine.Debug.LogException(e);
+                }
             }
 
             void BlockUnnecessaryMovement()
@@ -100,7 +119,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         public void Update()
         {
-            if (SEEInput.FinishStudyIteration() && (this.candidateRecommendation.GetUnmappedCandidates().Count() <= 0 || currentRun.TestRun))
+            if (SEEInput.FinishStudyIteration())
             {
                 iterationFinished = true;
             }
@@ -140,20 +159,24 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             run1.Settings = SetDefaultSettings();
             run1.Settings.AttractFunctionType = AttractFunction.AttractFunctionType.NBAttract;
             run1.Settings.ExperimentName = "NBAttract";
+            run1.group = "A";
 
             UserStudyRun run2 = new();
             run2.Settings = SetDefaultSettings();
             run2.Settings.AttractFunctionType = AttractFunction.AttractFunctionType.NoAttract;
             run2.Settings.ExperimentName = "NoAttract";
-            run2.Settings.RootSeed = 239637258;
+            run2.group = "B";
+            // run2.Settings.RootSeed = 239637258;
 
-            if(Group.Equals("A"))
-            {
+            if(BuildGroup.Equals("A"))
+            {   
+                //AB
                 userStudyRuns.Add(run1);
                 userStudyRuns.Add(run2);
             } 
             else
-            {
+            {   
+                //BA
                 userStudyRuns.Add(run2);
                 userStudyRuns.Add(run1);
             }
@@ -176,6 +199,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             public bool TestRun {  get; set; }
 
             public RecommendationSettings Settings { get; set; }
+
+            public string group;
         }
 
     }

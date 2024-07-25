@@ -1,0 +1,7 @@
+org.springframework.samples.petclinic.web.PetValidator
+org.springframework.samples.petclinic.repository.jdbc.OneToManyResultSetExtractor
+org.springframework.samples.petclinic.repository.jdbc.JdbcPetVisitExtractor
+org.springframework.samples.petclinic.web.VetController
+org.springframework.samples.petclinic.util.EntityUtils
+org.springframework.samples.petclinic.model.Vets
+org.springframework.samples.petclinic.model.NamedEntity
