@@ -98,6 +98,18 @@ namespace SEE.UI.Menu.Drawable
         /// The HSVPicker ColorPicker component of the line menu.
         /// </summary>
         private static HSVPicker.ColorPicker picker;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private enum Mode
+        {
+            None,
+            Drawing,
+            Edit
+        }
+
+        private static Mode mode;
         #endregion
 
         /// <summary>
@@ -147,7 +159,7 @@ namespace SEE.UI.Menu.Drawable
             secondaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
             tilingSlider = GameFinder.FindChild(instance, "Tiling").GetComponentInChildren<FloatValueSliderController>();
             picker = instance.GetComponentInChildren<HSVPicker.ColorPicker>();
-
+            mode = Mode.None;
             instance.SetActive(false);
         }
 
@@ -248,6 +260,16 @@ namespace SEE.UI.Menu.Drawable
             return instance.activeInHierarchy;
         }
 
+        public static bool IsInDrawingMode()
+        {
+            return instance.activeInHierarchy && mode == Mode.Drawing;
+        }
+
+        public static bool IsInEditMode()
+        {
+            return instance.activeInHierarchy && mode == Mode.Edit;
+        }
+
         /// <summary>
         /// Enables all line menu layers,
         /// sets the parent back to UI Canvas, enables the window dragger 
@@ -260,6 +282,7 @@ namespace SEE.UI.Menu.Drawable
             instance.transform.SetParent(GameObject.Find("UI Canvas").transform);
             GameFinder.FindChild(instance, "Dragger").GetComponent<WindowDragger>().enabled = true;
             DisableReturn();
+            mode = Mode.None;
             instance.SetActive(false);
         }
 
@@ -277,7 +300,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 RemoveListeners();
             }
-
+            mode = Mode.None;
             /// Disables the given <see cref="MenuLayer"/>.
             if (withoutMenuLayer != null)
             {
@@ -327,6 +350,7 @@ namespace SEE.UI.Menu.Drawable
         {
             EnableLineMenu(withoutMenuLayer: new MenuLayer[] { MenuLayer.Layer, MenuLayer.Loop });
             InitDrawing();
+            mode = Mode.Drawing;
             /// Calculates the height of the menu.
             MenuHelper.CalculateHeight(instance, true);
         }
@@ -564,6 +588,8 @@ namespace SEE.UI.Menu.Drawable
 
                 /// Set up the <see cref="HSVPicker.ColorPicker"/>.
                 SetUpColorPickerForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
+
+                mode = Mode.Edit;
 
                 /// Re-calculates the menu height.
                 MenuHelper.CalculateHeight(instance, true);

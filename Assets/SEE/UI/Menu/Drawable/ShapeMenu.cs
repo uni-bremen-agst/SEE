@@ -1,10 +1,12 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
 using SEE.UI.Drawable;
 using SEE.UI.Notification;
 using SEE.Utils;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -614,6 +616,14 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
+        /// Opens the <see cref="LineMenu"/> in the correct mode.
+        /// </summary>
+        public static void OpenLineMenuInCorrectMode()
+        {
+            ConfigOnClick();
+        }
+
+        /// <summary>
         /// Enables the config menu (line menu) and it ensures that the menus (shape and config) are mutually exclusive.
         /// </summary>
         private static void ConfigOnClick()
@@ -622,7 +632,15 @@ namespace SEE.UI.Menu.Drawable
             configBMB.enabled = false;
             shapeBMB.enabled = true;
             shapeBtn.interactable = true;
-            LineMenu.EnableForDrawing();
+            if (DrawShapesAction.currentShape == null)
+            {
+                LineMenu.EnableForDrawing();
+            } 
+            else
+            {
+                LineMenu.EnableForEditing(DrawShapesAction.currentShape, 
+                    LineConf.Get(DrawShapesAction.currentShape));
+            }
             MenuHelper.CalculateHeight(LineMenu.instance);
             /// Binds the config menu to the switch menu.
             BindLineMenu();
