@@ -37,7 +37,7 @@ namespace SEE.Game.Drawable
         /// <param name="state">Query for increase or decrease.</param>
         /// <param name="showInformation">Show a notification when the limit is reached.</param>
         /// <param name="useWorldPos">Use world position for moving, only needed for sticky note.</param>
-        public static void ChangeOrderInLayer(GameObject obj, int order, LayerChangerStates state, 
+        public static void ChangeOrderInLayer(GameObject obj, int order, LayerChangerStates state,
             bool showInformation = true, bool useWorldPos = false)
         {
             if (obj.GetComponent<OrderInLayerValueHolder>() != null
@@ -56,7 +56,8 @@ namespace SEE.Game.Drawable
                         ShowNotification.Warn("Maximum layer order", obj.name +
                             " has reached the maximum layer order: " + holder.OrderInLayer);
                     }
-                } else if (holder.OrderInLayer == 0 && state == LayerChangerStates.Decrease)
+                }
+                else if (holder.OrderInLayer == 0 && state == LayerChangerStates.Decrease)
                 {
                     if (showInformation)
                     {
@@ -75,7 +76,8 @@ namespace SEE.Game.Drawable
                         {
                             ShowNotification.Info("Increases the order",
                                 "The order in layer of the chosen object increases to " + holder.OrderInLayer + ".", 0.8f);
-                        } else
+                        }
+                        else
                         {
                             ShowNotification.Info("Decreases the order",
                                 "The order in layer of the chosen object decreases to " + holder.OrderInLayer + ".", 0.8f);

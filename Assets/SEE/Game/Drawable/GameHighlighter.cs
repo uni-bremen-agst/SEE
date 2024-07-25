@@ -26,7 +26,6 @@ namespace SEE.Game.Drawable
             effect.glowQuality = HighlightPlus.QualityLevel.Highest;
             effect.glow = 1.0f;
             effect.glowHQColor = Color.yellow;
-
             return effect;
         }
 

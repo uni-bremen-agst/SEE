@@ -76,9 +76,9 @@ namespace SEE.Game.Drawable
             canvas.sortingOrder = order;
 
             /// Adds the image to the object.
-            Image i = image.AddComponent<Image>();
+            Image theImage = image.AddComponent<Image>();
             /// Sets the size initial to 1, 1. (Otherwise the image were to big for the game)
-            i.rectTransform.sizeDelta = new Vector2(1, 1);
+            theImage.rectTransform.sizeDelta = new Vector2(1, 1);
 
             /// Block for the case that the path is not empty and the file exists. Then load the image from the file.
             if (imageFilePath != "" && File.Exists(imageFilePath))
@@ -94,7 +94,7 @@ namespace SEE.Game.Drawable
                     anisoLevel = 5
                 };
                 texture.LoadImage(fileData);
-                i.sprite = TextureToSprite(texture);
+                theImage.sprite = TextureToSprite(texture);
             }
             else if (data != null)
             {
@@ -105,7 +105,7 @@ namespace SEE.Game.Drawable
                     anisoLevel = 5
                 };
                 texture.LoadImage(data);
-                i.sprite = TextureToSprite(texture);
+                theImage.sprite = TextureToSprite(texture);
             }
             /// Add the box collider to the image object.
             BoxCollider collider = image.AddComponent<BoxCollider>();
@@ -253,7 +253,8 @@ namespace SEE.Game.Drawable
                     {
                         imageObj.GetComponent<ImageValueHolder>().Path = path;
                     }
-                } else
+                }
+                else
                 {
                     /// For the case if the file in the path does not exists and the file data is empty.
                     ShowNotification.Warn("Cannot be restored.", "The image cannot be restored.");

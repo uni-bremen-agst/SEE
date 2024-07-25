@@ -1,5 +1,4 @@
-﻿using Assets.SEE.UI.Window.DrawableManagerWindow;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
@@ -23,8 +22,8 @@ namespace SEE.DataModel.Drawable
         }
 
         /// <summary>
-        /// Instantiates the surface asynchronously. 
-        /// This is necessary because for objects added during runtime, some properties, 
+        /// Instantiates the surface asynchronously.
+        /// This is necessary because for objects added during runtime, some properties,
         /// such as the name, are adjusted later.
         /// </summary>
         /// <param name="surface">The depending surface for the instantiation.</param>
@@ -46,7 +45,7 @@ namespace SEE.DataModel.Drawable
         }
 
         /// <summary>
-        /// Indicator of whether the instantiation is complete. 
+        /// Indicator of whether the instantiation is complete.
         /// </summary>
         private bool initFinishIndicator;
 

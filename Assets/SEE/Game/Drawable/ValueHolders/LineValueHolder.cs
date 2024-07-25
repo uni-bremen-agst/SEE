@@ -8,31 +8,13 @@ namespace SEE.Game.Drawable.ValueHolders
     public class LineValueHolder : MonoBehaviour
     {
         /// <summary>
-        /// The held line kind of the line.
-        /// </summary>
-        private GameDrawer.LineKind lineKind;
-
-        /// <summary>
         /// The line kind property.
         /// </summary>
-        public GameDrawer.LineKind LineKind 
-        { 
-            get { return lineKind; }
-            set { lineKind = value; }
-        }
-
-        /// <summary>
-        /// The held color kind of the line.
-        /// </summary>
-        private GameDrawer.ColorKind colorKind;
+        public GameDrawer.LineKind LineKind { get; set; }
 
         /// <summary>
         /// The color kind property.
         /// </summary>
-        public GameDrawer.ColorKind ColorKind 
-        { 
-            get { return colorKind; } 
-            set {  colorKind = value; } 
-        }
+        public GameDrawer.ColorKind ColorKind { get; set; }
     }
 }

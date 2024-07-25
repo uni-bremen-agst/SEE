@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SEE.Game.Drawable.ActionHelpers
 {
     /// <summary>
-    /// This class provides methods to enable the collision detection and disable them.  
+    /// This class provides methods to enable and disable the collision detection.
     /// </summary>
     public static class CollisionDetectionManager
     {

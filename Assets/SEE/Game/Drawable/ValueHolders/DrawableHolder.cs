@@ -42,45 +42,18 @@ namespace SEE.Game.Drawable.ValueHolders
         }
 
         /// <summary>
-        /// The description for this drawable surface.
-        /// </summary>
-        private string description = "";
-
-        /// <summary>
         /// The description property.
         /// </summary>
-        public string Description
-        {
-            get { return description; }
-            set { description = value; }
-        }
-
-        /// <summary>
-        /// The current selected page.
-        /// </summary>
-        private int currentPage = 0;
+        public string Description { get; set; }
 
         /// <summary>
         /// The current page property.
         /// </summary>
-        public int CurrentPage
-        {
-            get { return currentPage; }
-            set { currentPage = value; }
-        }
-
-        /// <summary>
-        /// The maximum page size.
-        /// </summary>
-        private int maxPageSize = 1;
+        public int CurrentPage { get; set; }
 
         /// <summary>
         /// The maximum page size property.
         /// </summary>
-        public int MaxPageSize
-        {
-            get { return maxPageSize; }
-            set { maxPageSize = value; }
-        }
+        public int MaxPageSize { get; set; }
     }
 }

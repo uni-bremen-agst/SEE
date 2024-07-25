@@ -9,18 +9,9 @@ namespace SEE.Game.Drawable.ValueHolders
     public class MMNodeValueHolder : MonoBehaviour
     {
         /// <summary>
-        /// The kind of the mind map node. (Theme/Subtheme/Leaf)
-        /// </summary>
-        private GameMindMap.NodeKind nodeKind;
-
-        /// <summary>
         /// Property for the node kind of the mind map node.
         /// </summary>
-        public GameMindMap.NodeKind NodeKind
-        {
-            get { return nodeKind; }
-            set { nodeKind = value; }
-        }
+        public GameMindMap.NodeKind NodeKind { get; set; }
 
         /// <summary>
         /// The layer of the mind map node.
@@ -34,9 +25,9 @@ namespace SEE.Game.Drawable.ValueHolders
         public int Layer
         {
             get { return layer; }
-            set 
+            set
             {
-                if (nodeKind == GameMindMap.NodeKind.Theme)
+                if (NodeKind == GameMindMap.NodeKind.Theme)
                 {
                     layer = 0;
                 }
@@ -73,15 +64,15 @@ namespace SEE.Game.Drawable.ValueHolders
             children = new Dictionary<GameObject, GameObject>();
             if (gameObject.name.StartsWith(ValueHolder.MindMapThemePrefix))
             {
-                nodeKind = GameMindMap.NodeKind.Theme;
+                NodeKind = GameMindMap.NodeKind.Theme;
             }
             else if (gameObject.name.StartsWith(ValueHolder.MindMapSubthemePrefix))
             {
-                nodeKind = GameMindMap.NodeKind.Subtheme;
+                NodeKind = GameMindMap.NodeKind.Subtheme;
             }
             else
             {
-                nodeKind = GameMindMap.NodeKind.Leaf;
+                NodeKind = GameMindMap.NodeKind.Leaf;
             }
             layer = 0;
         }
@@ -93,7 +84,7 @@ namespace SEE.Game.Drawable.ValueHolders
         /// <param name="parent">The parent node</param>
         public void SetParent(GameObject parent, GameObject branchLine)
         {
-            if (nodeKind == GameMindMap.NodeKind.Theme)
+            if (NodeKind == GameMindMap.NodeKind.Theme)
             {
                 if (this.parent != null)
                 {

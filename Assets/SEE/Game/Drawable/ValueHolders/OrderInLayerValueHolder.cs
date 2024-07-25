@@ -9,32 +9,14 @@ namespace SEE.Game.Drawable.ValueHolders
     public class OrderInLayerValueHolder : MonoBehaviour
     {
         /// <summary>
-        /// The holded order in layer.
-        /// </summary>
-        private int orderInLayer;
-
-        /// <summary>
         /// The order in layer property.
         /// </summary>
-        public int OrderInLayer
-        {
-            get { return orderInLayer; }
-            set { orderInLayer = value; }
-        }
-
-        /// <summary>
-        /// The original position.
-        /// Only used for sticky note.
-        /// </summary>
-        private Vector3 originPos;
+        public int OrderInLayer { get; set; }
 
         /// <summary>
         /// The origin position property.
+        /// Only used for sticky note.
         /// </summary>
-        public Vector3 OriginPosition
-        {
-            get { return originPos; }
-            set { originPos = value; }
-        }
+        public Vector3 OriginPosition { get; set; }
     }
 }
