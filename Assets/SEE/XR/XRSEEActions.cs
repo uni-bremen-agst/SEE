@@ -45,9 +45,17 @@ public class XRSEEActions : MonoBehaviour
     public InputActionReference inputAction;
 
     public InputActionReference openContextMenu;
+
+    public InputActionReference undo;
+    public InputActionReference redo;
+    public InputActionReference radialMenu;
+
     // Start is called before the first frame update
     private void Awake()
     {
+        radialMenu.action.performed += RadialMenu;
+        undo.action.performed += Undo;
+        redo.action.performed += Redo;
         rightHandTurnInput.inputAction.performed += Rotate;
         inputAction.action.Enable();
         inputAction.action.performed += Action;
@@ -117,6 +125,22 @@ public class XRSEEActions : MonoBehaviour
                 Delete = true;
             }
         }
+    }
+
+    public static bool UndoToggle { get; set; }
+    private void Undo(InputAction.CallbackContext context)
+    {
+        UndoToggle = true;
+    }
+    public static bool RedoToggle { get; set; }
+    private void Redo(InputAction.CallbackContext context)
+    {
+        RedoToggle = true;
+    }
+    public static bool RadialMenuTrigger { get; set; }
+    private void RadialMenu(InputAction.CallbackContext context)
+    {
+        RadialMenuTrigger = true;
     }
 
     public static bool ContextMenu { get; set; }
