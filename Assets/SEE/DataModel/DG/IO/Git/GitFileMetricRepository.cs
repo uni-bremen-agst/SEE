@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using LibGit2Sharp;
 using Microsoft.Extensions.FileSystemGlobbing;
@@ -26,7 +23,7 @@ namespace SEE.DataModel.DG.IO.Git
     /// }
     /// // Get the calculated metrics
     /// fileRepo.FileToMetrics;
-    /// 
+    ///
     /// </code>
     /// </example>
     public class GitFileMetricRepository
@@ -51,16 +48,16 @@ namespace SEE.DataModel.DG.IO.Git
         /// <summary>
         /// Used in the calculation of the truck factor.
         ///
-        /// Specifies the minimum ratio of the file churn the core devs should be responsible for 
+        /// Specifies the minimum ratio of the file churn the core devs should be responsible for
         /// </summary>
         private const float TruckFactorCoreDevRatio = 0.8f;
 
 
-        public GitFileMetricRepository(Repository gitRepository, Dictionary<string, bool> PathGlobbing)
+        public GitFileMetricRepository(Repository gitRepository, Dictionary<string, bool> PathGlobbing,
+            IEnumerable<string> repositoryFiles)
         {
             this.gitRepository = gitRepository;
             this.pathGlobbing = PathGlobbing;
-
             this.matcher = new();
 
             foreach (KeyValuePair<string, bool> pattern in pathGlobbing)
@@ -72,6 +69,14 @@ namespace SEE.DataModel.DG.IO.Git
                 else
                 {
                     matcher.AddExclude(pattern.Key);
+                }
+            }
+
+            foreach (var file in repositoryFiles)
+            {
+                if (matcher.Match(file).HasMatches)
+                {
+                    FileToMetrics.Add(file, new GitFileMetricsCollector(0, new HashSet<string>(), 0));
                 }
             }
         }
@@ -98,12 +103,17 @@ namespace SEE.DataModel.DG.IO.Git
         /// <returns>The calculated truck factor</returns>
         private static int CalculateTruckFactor(IReadOnlyDictionary<string, int> developersChurn)
         {
+            if (developersChurn.Count == 0)
+            {
+                return 0;
+            }
+
             int totalChurn = developersChurn.Select(x => x.Value).Sum();
 
             HashSet<string> coreDevs = new();
 
             float cumulativeRatio = 0;
-            // Sorting devs by their number of changed files 
+            // Sorting devs by their number of changed files
             List<string> sortedDevs =
                 developersChurn
                     .OrderByDescending(x => x.Value)

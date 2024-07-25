@@ -72,12 +72,14 @@ namespace SEE.GraphProviders
         /// </summary>
         [OdinSerialize] [ShowInInspector] public bool AutoFetch = false;
 
+        /// <summary>
+        /// The interval in seconds in which git fetch should be called
+        /// </summary>
         [OdinSerialize, ShowInInspector, EnableIf(nameof(AutoFetch)), Range(5, 200)]
         public int PollingInterval = 5;
 
         [OdinSerialize, ShowInInspector, EnableIf(nameof(AutoFetch)), Range(5, 200)]
         public int MarkerTime = 10;
-
 
         private float progressPercantage = 0f;
 
@@ -162,7 +164,7 @@ namespace SEE.GraphProviders
                 cancellationToken: token);
             if (AutoFetch)
             {
-                if (city is not SEECity seeCity)
+                if (city is not BranchCity seeCity)
                 {
                     ShowNotification.Warn("Can't enable auto fetch",
                         "Automatically fetching git repos is only supported in SEECity");

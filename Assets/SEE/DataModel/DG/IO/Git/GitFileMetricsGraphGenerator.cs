@@ -54,7 +54,10 @@ namespace SEE.DataModel.DG.IO.Git
                 n.SetInt(NumberOfCommitsMetricName, file.Value.NumberOfCommits);
                 n.SetInt(NumberOfFileChurnMetricName, file.Value.Churn);
                 n.SetInt(TruckFactorMetricName, file.Value.TruckFactor);
-                n.SetString("Metric.File.Authors", String.Join(',', file.Value.Authors));
+                if (file.Value.Authors.Any())
+                {
+                    n.SetString("Metric.File.Authors", String.Join(',', file.Value.Authors));
+                }
                 foreach (var authorChurn in file.Value.AuthorsChurn)
                 {
                     n.SetInt(NumberOfFileChurnMetricName + ":" + authorChurn.Key, authorChurn.Value);

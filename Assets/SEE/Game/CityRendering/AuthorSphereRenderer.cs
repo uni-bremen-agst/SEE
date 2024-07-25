@@ -97,16 +97,8 @@ namespace SEE.Game.CityRendering
                     };
                     gameEdge.transform.parent = parent.transform;
 
-
-                    // Add a line renderer which serves as a preview in the Unity
-                    // editor. The line renderer will be replaced with a mesh
-                    // renderer at runtime (i.e., when starting the application).
                     LineRenderer line = gameEdge.AddComponent<LineRenderer>();
-                    // Use sharedMaterial if changes to the original material
-                    // should affect all objects using this material;
-                    // renderer.material instead will create a copy of the
-                    // material and will not be affected by changes of the
-                    // original material.
+
                     Color edgeColor = sphere.GetComponent<Renderer>().sharedMaterial.color;
                     Material material = Materials.New(Materials.ShaderType.Opaque, edgeColor);
                     material.shader = Shader.Find("Standard");
@@ -119,16 +111,11 @@ namespace SEE.Game.CityRendering
 
                     LineFactory.SetWidth(line, width);
 
-                    // If enabled, the lines are defined in world space. This
-                    // means the object's position is ignored and the lines are
-                    // rendered around world origin.
                     line.useWorldSpace = false;
 
-                    // Draw spline as concatenation of subsplines (polyline).
                     SEESpline spline = gameEdge.AddComponent<SEESpline>();
                     spline.Spline = bSpline;
                     spline.GradientColors = (edgeColor, edgeColor);
-                    //spline.CreateMesh();
 
                     Vector3[] positions = TinySplineInterop.ListToVectors(bSpline.Sample());
                     line.positionCount = positions.Length; // number of vertices
