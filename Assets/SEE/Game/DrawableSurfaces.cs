@@ -1,19 +1,19 @@
 ﻿using SEE.DataModel;
 using SEE.DataModel.Drawable;
-using Assets.SEE.UI.Window.DrawableManagerWindow;
 using System.Collections.Generic;
 
 namespace SEE.Game
 {
     /// <summary>
-    /// Class used by the <see cref="DrawableManagerWindow"> to detect added or removed drawable surfaces.
+    /// Class used by the <see cref="DrawableManagerWindow"> to detect added or
+    /// removed drawable surfaces.
     /// </summary>
     public class DrawableSurfaces : Observable<ChangeEvent>
     {
         /// <summary>
         /// The observable list of <see cref="DrawableSurface"/>s.
         /// </summary>
-        private List<DrawableSurface> surfaces = new();
+        private readonly List<DrawableSurface> surfaces = new();
 
         /// <summary>
         /// Property for the surface list.

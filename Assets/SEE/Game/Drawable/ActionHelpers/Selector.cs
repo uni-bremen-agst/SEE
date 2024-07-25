@@ -1,6 +1,4 @@
 ﻿using SEE.Controls.Actions;
-using SEE.Game;
-using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.GO;
 using SEE.UI.Drawable;
@@ -10,7 +8,7 @@ using UnityEngine;
 namespace SEE.Game.Drawable.ActionHelpers
 {
     /// <summary>
-    /// This class provides a function for selecting <see cref="DrawableType"/> objects.
+    /// This class provides functions for selecting <see cref="DrawableType"/> objects.
     /// </summary>
     public static class Selector
     {

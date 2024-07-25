@@ -150,7 +150,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>The positions of the ellipse</returns>
         public static Vector3[] Ellipse(Vector3 point, float xScale, float yScale)
         {
-            int vertices = 50;
+            const int vertices = 50;
             return Polygon(point, xScale, yScale, vertices);
         }
 

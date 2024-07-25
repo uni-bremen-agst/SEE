@@ -4,7 +4,6 @@ using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.UI.Drawable;
 using SEE.Utils;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -101,9 +100,11 @@ namespace SEE.Game.Drawable
             {
                 surf.CurrentPage = page;
             }
-            if (GameFinder.GetHighestParent(obj).GetComponentInChildren<SurfacePageController>() != null)
+
+            SurfacePageController surfacePageController = GameFinder.GetHighestParent(obj).GetComponentInChildren<SurfacePageController>();
+            if (surfacePageController != null)
             {
-                GameFinder.GetHighestParent(obj).GetComponentInChildren<SurfacePageController>().UpdatePage();
+                surfacePageController.UpdatePage();
             }
         }
 
@@ -198,7 +199,7 @@ namespace SEE.Game.Drawable
         private static void ChangePageNumbering(GameObject surface, int page)
         {
             GameObject attached = GameFinder.GetAttachedObjectsObject(surface);
-            if (attached != null) 
+            if (attached != null)
             {
                 AssociatedPageHolder[] holders = attached.GetComponentsInChildren<AssociatedPageHolder>(true);
                 foreach (AssociatedPageHolder holder in holders)
@@ -216,8 +217,8 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="obj">An object of the drawable.</param>
         /// <param name="visibility">The visibility.</param>
-        /// <remarks>Must be called last. 
-        /// If this method is called before the <see cref="DrawableType"> objects are restored, 
+        /// <remarks>Must be called last.
+        /// If this method is called before the <see cref="DrawableType"> objects are restored,
         /// the correct object will not be hidden, causing errors.</remarks>
         public static void ChangeVisibility(GameObject obj, bool visibility)
         {

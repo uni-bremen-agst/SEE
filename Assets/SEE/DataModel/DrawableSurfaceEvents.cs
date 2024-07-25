@@ -14,8 +14,8 @@ namespace SEE.DataModel
         /// </summary>
         public readonly DrawableSurface Surface;
 
-        public DrawableSurfaceEvent(Guid versionId, DrawableSurface surface, 
-            ReflexionSubgraphs? affectedGraph = null, ChangeType? change = null) 
+        public DrawableSurfaceEvent(Guid versionId, DrawableSurface surface,
+            ReflexionSubgraphs? affectedGraph = null, ChangeType? change = null)
             : base(versionId, affectedGraph, change)
         {
             Surface = surface;
@@ -30,8 +30,8 @@ namespace SEE.DataModel
     /// </summary>
     public class AddSurfaceEvent : DrawableSurfaceEvent
     {
-        public AddSurfaceEvent(Guid versionId, DrawableSurface surface, 
-            ReflexionSubgraphs? affectedGraph = null, ChangeType? change = null) 
+        public AddSurfaceEvent(Guid versionId, DrawableSurface surface,
+            ReflexionSubgraphs? affectedGraph = null, ChangeType? change = null)
             : base(versionId, surface, affectedGraph, change)
         {
         }
@@ -45,8 +45,8 @@ namespace SEE.DataModel
     /// </summary>
     public class RemoveSurfaceEvent : DrawableSurfaceEvent
     {
-        public RemoveSurfaceEvent(Guid versionId, DrawableSurface surface, 
-            ReflexionSubgraphs? affectedGraph = null, ChangeType? change = null) 
+        public RemoveSurfaceEvent(Guid versionId, DrawableSurface surface,
+            ReflexionSubgraphs? affectedGraph = null, ChangeType? change = null)
             : base(versionId, surface, affectedGraph, change)
         {
         }
@@ -60,8 +60,8 @@ namespace SEE.DataModel
     /// </summary>
     public class ColorChangeEvent : DrawableSurfaceEvent
     {
-        public ColorChangeEvent(Guid versionId, DrawableSurface surface, 
-            ReflexionSubgraphs? affectedGraph = null, ChangeType? change = null) 
+        public ColorChangeEvent(Guid versionId, DrawableSurface surface,
+            ReflexionSubgraphs? affectedGraph = null, ChangeType? change = null)
             : base(versionId, surface, affectedGraph, change)
         {
         }
@@ -75,8 +75,8 @@ namespace SEE.DataModel
     /// </summary>
     public class DescriptionChangeEvent : DrawableSurfaceEvent
     {
-        public DescriptionChangeEvent(Guid versionId, DrawableSurface surface, 
-            ReflexionSubgraphs? affectedGraph = null, ChangeType? change = null) 
+        public DescriptionChangeEvent(Guid versionId, DrawableSurface surface,
+            ReflexionSubgraphs? affectedGraph = null, ChangeType? change = null)
             : base(versionId, surface, affectedGraph, change)
         {
         }
@@ -90,8 +90,8 @@ namespace SEE.DataModel
     /// </summary>
     public class LightingChangeEvent : DrawableSurfaceEvent
     {
-        public LightingChangeEvent(Guid versionId, DrawableSurface surface, 
-            ReflexionSubgraphs? affectedGraph = null, ChangeType? change = null) 
+        public LightingChangeEvent(Guid versionId, DrawableSurface surface,
+            ReflexionSubgraphs? affectedGraph = null, ChangeType? change = null)
             : base(versionId, surface, affectedGraph, change)
         {
         }
@@ -105,8 +105,8 @@ namespace SEE.DataModel
     /// </summary>
     public class VisibilityChangeEvent : DrawableSurfaceEvent
     {
-        public VisibilityChangeEvent(Guid versionId, DrawableSurface surface, 
-            ReflexionSubgraphs? affectedGraph = null, ChangeType? change = null) 
+        public VisibilityChangeEvent(Guid versionId, DrawableSurface surface,
+            ReflexionSubgraphs? affectedGraph = null, ChangeType? change = null)
             : base(versionId, surface, affectedGraph, change)
         {
         }

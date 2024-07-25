@@ -114,7 +114,8 @@ namespace SEE.Game.Drawable
             if (config.GetAllDrawableTypes().Count > 0)
             {
                 ChangeVisibilityAfterLoadDrawablesAsync(stickyNote, config).Forget();
-            } else
+            }
+            else
             {
                 GameDrawableManager.ChangeVisibility(stickyNote, config.Visibility);
             }
@@ -122,8 +123,8 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Visibility restoration can only occur after the drawables have been restored, 
-        /// as the parent object DrawableHolder and its associated AttachedObject object do not exist yet. 
+        /// Visibility restoration can only occur after the drawables have been restored,
+        /// as the parent object DrawableHolder and its associated AttachedObject object do not exist yet.
         /// Failure to wait here would result in altering the visibility of the wrong object.
         /// </summary>
         /// <param name="stickyNote">The sticky note to be restored.</param>
@@ -280,16 +281,15 @@ namespace SEE.Game.Drawable
             /// Checks if the order in layer should increase or decrease.
             if (newLayer - oldLayer > 0)
             {
-                GameLayerChanger.ChangeOrderInLayer(GameFinder.GetHighestParent(stickyNote), newLayer, 
+                GameLayerChanger.ChangeOrderInLayer(GameFinder.GetHighestParent(stickyNote), newLayer,
                     GameLayerChanger.LayerChangerStates.Increase, false, true);
             }
             else
             {
-                GameLayerChanger.ChangeOrderInLayer(GameFinder.GetHighestParent(stickyNote), newLayer, 
+                GameLayerChanger.ChangeOrderInLayer(GameFinder.GetHighestParent(stickyNote), newLayer,
                     GameLayerChanger.LayerChangerStates.Decrease, false, true);
             }
         }
-
 
         /// <summary>
         /// Combines all edit method together.

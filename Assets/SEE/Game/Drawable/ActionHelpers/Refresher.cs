@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SEE.Game.Drawable.ActionHelpers
 {
@@ -10,13 +9,21 @@ namespace SEE.Game.Drawable.ActionHelpers
     public static class Refresher
     {
         /// <summary>
+        /// The UI canvas object. Saved to prevent multiple searches.
+        /// </summary>
+        private static GameObject uiCanvas;
+
+        /// <summary>
         /// Refreshes the UI canvas, necessary to prevent an error with canvas movement.
         /// </summary>
         public static void UICanvas()
         {
-            GameObject UICanvas = GameObject.Find("UI Canvas");
-            UICanvas.SetActive(false);
-            UICanvas.SetActive(true);
+            if (uiCanvas == null)
+            {
+                uiCanvas = GameObject.Find("UI Canvas");
+            }
+            uiCanvas.SetActive(false);
+            uiCanvas.SetActive(true);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SEE.Game.Drawable.ValueHolders
 {
@@ -9,17 +8,8 @@ namespace SEE.Game.Drawable.ValueHolders
     public class AssociatedPageHolder : MonoBehaviour
     {
         /// <summary>
-        /// The associted page.
+        /// Associated page property.
         /// </summary>
-        private int associatedPage;
-
-        /// <summary>
-        /// Associted page property.
-        /// </summary>
-        public int AssociatedPage
-        {
-            get { return associatedPage; }
-            set { associatedPage = value;}
-        }
+        public int AssociatedPage { get; set; }
     }
 }
