@@ -7,6 +7,7 @@ using FuzzySharp;
 using SEE.Controls;
 using SEE.DataModel.DG.GraphSearch;
 using SEE.GO;
+using SEE.UI.Drawable;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Windows.Speech;
@@ -134,8 +135,13 @@ namespace SEE.UI.Menu
             Description = nestedEntry.Description + (breadcrumb.Length > 0 ? $"\n{GetBreadcrumb()}" : "");
             Icon = nestedEntry.Icon;
             nestedEntry.InnerEntries.ForEach(AddEntry);
-            KeywordListener.Unregister(HandleKeyword);
-            KeywordListener.Register(HandleKeyword);
+            /// The null check must be performed due to the <see cref="DrawableActionBar">. 
+            /// When switching to a drawable action via the bar without opening the menu, the KeywordListener is null.
+            if (KeywordListener != null)
+            {
+                KeywordListener.Unregister(HandleKeyword);
+                KeywordListener.Register(HandleKeyword);
+            }
             Tooltip.Deactivate();
         }
 
