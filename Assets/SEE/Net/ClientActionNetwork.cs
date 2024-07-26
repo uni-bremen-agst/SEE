@@ -28,13 +28,13 @@ namespace SEE.Net
         [System.Serializable]
         private struct LoginData
         {
-            public string Username;
-            public string Password;
+            public string username;
+            public string password;
 
             public LoginData(string username, string password)
             {
-                Username = username;
-                Password = password;
+                this.username = username;
+                this.password = password;
             }
 
             public override string ToString()
@@ -109,6 +109,7 @@ namespace SEE.Net
         {
             if (!IsServer && !IsHost)
             {
+                Debug.Log("Starting client action network!");
                 Network.ServerNetwork.Value?.SyncFilesServerRpc();
             }
         }
