@@ -635,7 +635,7 @@ namespace SEE.GO
             surface = null;
             if (gameObject.TryGetComponent(out DrawableSurfaceRef surfaceRef))
             {
-                surface = surfaceRef.Value;
+                surface = surfaceRef.Surface;
             }
             return surface != null;
         }

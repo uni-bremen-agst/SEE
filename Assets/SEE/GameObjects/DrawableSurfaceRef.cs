@@ -1,5 +1,4 @@
 ﻿using SEE.DataModel.Drawable;
-using System.Collections;
 using UnityEngine;
 
 namespace SEE.GO
@@ -12,15 +11,6 @@ namespace SEE.GO
         /// <summary>
         /// The drawable surface it referenced.
         /// </summary>
-        public DrawableSurface surface;
-
-        /// <summary>
-        /// The property for the drawable surface.
-        /// </summary>
-        public DrawableSurface Value
-        {
-            get => surface;
-            set => surface = value;
-        }
+        public DrawableSurface Surface;
     }
 }

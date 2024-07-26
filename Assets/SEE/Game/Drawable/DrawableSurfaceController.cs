@@ -28,11 +28,11 @@ namespace SEE.Game.Drawable
                 ValueHolder.DrawableSurfaces.Add(gameObject);
 
                 DrawableSurfaceRef reference = gameObject.AddComponent<DrawableSurfaceRef>();
-                reference.Value = new DrawableSurface(gameObject);
+                reference.Surface = new DrawableSurface(gameObject);
                 if (LocalPlayer.Instance != null
                     && LocalPlayer.TryGetDrawableSurfaces(out DrawableSurfaces surfaces))
                 {
-                    surfaces.Add(reference.Value);
+                    surfaces.Add(reference.Surface);
                 }
                 else
                 {
@@ -52,7 +52,7 @@ namespace SEE.Game.Drawable
                 && LocalPlayer.TryGetDrawableSurfaces(out DrawableSurfaces surfaces))
             {
                 DrawableSurfaceRef reference = gameObject.GetComponent<DrawableSurfaceRef>();
-                surfaces.Add(reference.Value);
+                surfaces.Add(reference.Surface);
                 mustWaitForPlayerInstantiate = false;
             }
         }
@@ -66,7 +66,7 @@ namespace SEE.Game.Drawable
             if (LocalPlayer.Instance != null
                 && LocalPlayer.TryGetDrawableSurfaces(out DrawableSurfaces surfaces))
             {
-                surfaces.Remove(gameObject.GetComponent<DrawableSurfaceRef>().Value);
+                surfaces.Remove(gameObject.GetComponent<DrawableSurfaceRef>().Surface);
             }
         }
     }
