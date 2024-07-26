@@ -8,14 +8,15 @@ using UnityEngine;
 namespace SEE.UI.Drawable
 {
     /// <summary>
-    /// The border trigger controller ensures that the 
-    /// <see cref="DrawableType"/> objects stay within the drawables 
+    /// The border trigger controller ensures that the
+    /// <see cref="DrawableType"/> objects stay within the drawables
     /// and moves them in the respective direction when necessary.
     /// </summary>
     public class BorderTriggerController : MonoBehaviour
     {
         /// <summary>
-        /// Will be executed when a collision stay.
+        /// Is called once per physics update for every Collider other
+        /// that is touching the trigger.
         /// It moves the collision object back into the drawable area.
         /// </summary>
         /// <param name="other">The object that causes the collision.</param>
@@ -28,7 +29,7 @@ namespace SEE.UI.Drawable
                 GameObject surface = GameFinder.GetDrawableSurface(other.gameObject);
                 string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
-                /// Block for Mind Map Nodes, they could include children, 
+                /// Block for Mind Map Nodes, they could include children,
                 /// which is why they are considered particularly.
                 if (other.gameObject.CompareTag(Tags.MindMapNode))
                 {
@@ -47,7 +48,8 @@ namespace SEE.UI.Drawable
                     }
                 }
                 else
-                { /// For all other <see cref="DrawableType"/> move the object back into the drawable area.
+                {
+                    /// For all other <see cref="DrawableType"/> move the object back into the drawable area.
                     MoveBack(other.gameObject, surface, surfaceParentName);
                 }
             }
