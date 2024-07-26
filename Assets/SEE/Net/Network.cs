@@ -410,7 +410,8 @@ namespace SEE.Net
             if (serializedAction.Length < maxPacketSize)
             {
                 ServerNetwork.Value?.BroadcastActionServerRpc(serializedAction, recipients);
-            } else
+            }
+            else
             {
                 List<string> fragmentData = SplitString(serializedAction, maxPacketSize);
                 string id = Guid.NewGuid().ToString();
@@ -429,7 +430,7 @@ namespace SEE.Net
         /// <returns>A list with the split strings.</returns>
         private static List<string> SplitString(string str, int fragmentSize)
         {
-            List<string> fragments = new ();
+            List<string> fragments = new();
 
             for (int i = 0; i < str.Length; i += fragmentSize)
             {
