@@ -19,27 +19,27 @@ namespace SEE.UI.Drawable
     public class SurfacePageController : MonoBehaviour
     {
         /// <summary>
-        /// Button for increase the current selected page.
+        /// Button for increasing the currently selected page.
         /// </summary>
         private ButtonManagerBasic forward;
 
         /// <summary>
-        /// Button for decrease the current selected page.
+        /// Button for decreasing the currently selected page.
         /// </summary>
         private ButtonManagerBasic backward;
 
         /// <summary>
-        /// Button for open a <see cref="PopupMenu"/> to select a page.
+        /// Button for opening a <see cref="PopupMenu"/> to select a page.
         /// </summary>
         private ButtonManagerBasic display;
 
         /// <summary>
-        /// Text for displaying the current selected page.
+        /// Text for displaying the currentl< selected page.
         /// </summary>
         private TextMeshProUGUI displayMesh;
 
         /// <summary>
-        /// The popup menu for choseing a page.
+        /// The popup menu for chosing a page.
         /// </summary>
         private PopupMenu.PopupMenu popupMenu;
 
@@ -48,7 +48,7 @@ namespace SEE.UI.Drawable
         /// </summary>
         private DrawableHolder holder;
 
-        void Awake()
+        private void Awake()
         {
             forward = transform.Find("ForwardButton").GetComponent<ButtonManagerBasic>();
             backward = transform.Find("BackButton").GetComponent<ButtonManagerBasic>();
@@ -63,10 +63,10 @@ namespace SEE.UI.Drawable
             backward.clickEvent.AddListener(() =>
             {
                 int page;
-                if (holder.CurrentPage > 0) 
+                if (holder.CurrentPage > 0)
                 {
-                    page = holder.CurrentPage - 1; 
-                } else 
+                    page = holder.CurrentPage - 1;
+                } else
                 {
                     page = holder.MaxPageSize - 1;
                 };
@@ -90,7 +90,7 @@ namespace SEE.UI.Drawable
                 GameDrawableManager.ChangeCurrentPage(gameObject, page);
                 new SynchronizeSurface(DrawableConfigManager.GetDrawableConfig(GameFinder.GetDrawableSurface(gameObject))).Execute();
             });
-            
+
             /// Register handler for the middle button (popup menu button)
             display.clickEvent.AddListener(PopupMenu);
         }
@@ -122,7 +122,7 @@ namespace SEE.UI.Drawable
                 pages.Add(i);
             }
             entries.AddRange(pages.Select(CreatePopupEntries));
-            entries.Add(new PopupMenuAction("+", () => 
+            entries.Add(new PopupMenuAction("+", () =>
             {
                 holder.MaxPageSize++;
                 new SynchronizeSurface(DrawableConfigManager.GetDrawableConfig(GameFinder.GetDrawableSurface(gameObject))).Execute();

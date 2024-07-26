@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SEE.UI.Drawable
 {
     /// <summary>
-    /// Locks the shortcuts as long as input is entered in an input field. 
+    /// Locks the shortcuts as long as input is entered in an input field.
     /// Used in the menu's prefabs.
     /// </summary>
     [RequireComponent(typeof(TMP_InputField))]
@@ -29,7 +29,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Deactivates the keyboard shortcuts of SEE.
         /// </summary>
-        /// <param name="hex">Simply a placeholder, not used. 
+        /// <param name="hex">Simply a placeholder, not used.
         /// However, must be specified as AddListener expects a string UnityAction.</param>
         private void DeactivateInput(string hex)
         {
@@ -39,7 +39,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Enables the keyboard shortcuts of SEE.
         /// </summary>
-        /// <param name="hex">Simply a placeholder, not used. 
+        /// <param name="hex">Simply a placeholder, not used.
         /// However, must be specified as AddListener expects a string UnityAction.</param>
         private void ActivateInput(string hex)
         {

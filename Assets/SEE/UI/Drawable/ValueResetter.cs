@@ -6,7 +6,8 @@ using UnityEngine;
 namespace SEE.UI.Drawable
 {
     /// <summary>
-    /// This class ensures that the static attributes of an action will be resetted after a actionstate type change.
+    /// This class ensures that the static attributes of an action will be resetted after
+    /// an actionstate type change.
     /// </summary>
     public class ValueResetter : MonoBehaviour
     {
@@ -26,7 +27,7 @@ namespace SEE.UI.Drawable
 
         /// <summary>
         /// Checks every frame if the action state has changes.
-        /// If it changes and it's not the allowed state this component will be destroyed.
+        /// If it changes and it's not the allowed state, this component will be destroyed.
         /// </summary>
         private void Update()
         {
@@ -37,9 +38,9 @@ namespace SEE.UI.Drawable
         }
 
         /// <summary>
-        /// If this component will be destroyed it calls the reset method for the
+        /// If this component will be destroyed, it calls the reset method for the
         /// appropriate action.
-        /// The static attributes are needed in the actions to select a new 
+        /// The static attributes are needed in the actions to select a new
         /// <see cref="DrawableType"/> object directly after the action.
         /// </summary>
         private void OnDestroy()

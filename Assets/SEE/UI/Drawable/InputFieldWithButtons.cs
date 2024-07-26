@@ -3,12 +3,13 @@ using SEE.UI.Notification;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace SEE.UI.Drawable
 {
     /// <summary>
-    /// This class provides a controller for a combination 
-    /// of an input field with a up and a down button.
+    /// This class provides a controller for a combination
+    /// of an input field with an up and a down button.
     /// </summary>
     public class InputFieldWithButtons : MonoBehaviour
     {
@@ -54,14 +55,16 @@ namespace SEE.UI.Drawable
         /// The action to be executed when the input field is edited.
         /// </summary>
         [Header("Event")]
-        public UnityEvent<float> onValueChanged = new();
+        [FormerlySerializedAs("onValueChanged")]
+        public UnityEvent<float> OnValueChanged = new();
 
         /// <summary>
         /// The action event for another input field.
         /// When the fields are intended to increase proportionally.
         /// </summary>
         [Header("Event")]
-        public UnityEvent<float> onProportionalValueChanged = null;
+        [FormerlySerializedAs("onProportionalValueChanged")]
+        public UnityEvent<float> OnProportionalValueChanged = null;
 
         /// <summary>
         /// Get and sets up the input field and the buttons.
@@ -95,7 +98,7 @@ namespace SEE.UI.Drawable
         /// The initial onEndEditEvent for the input field.
         /// It displayed the value and invoke the specific onValueChanged Event
         /// </summary>
-        /// <param name="newValue">is the new value for the input field. It must be between the minimum and maximum range. 
+        /// <param name="newValue">is the new value for the input field. It must be between the minimum and maximum range.
         /// Otherwise it is set of the respective limit.</param>
         private void ValueChanged(string newValue)
         {
@@ -109,7 +112,7 @@ namespace SEE.UI.Drawable
                 value = 0.5f;
             }
 
-            /// If the value would be less then the <see cref="minValue"/>. 
+            /// If the value would be less then the <see cref="minValue"/>.
             /// Set to <see cref="minValue"/>.
             if (value < minValue)
             {
@@ -126,11 +129,8 @@ namespace SEE.UI.Drawable
             }
 
             /// If an action for proportional increase is provided, execute it.
-            if (onProportionalValueChanged != null)
-            {
-                onProportionalValueChanged.Invoke(value - oldValue);
-            }
-            onValueChanged.Invoke(value);
+            OnProportionalValueChanged?.Invoke(value - oldValue);
+            OnValueChanged.Invoke(value);
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace SEE.UI.Drawable
         /// <param name="assignValue">The value that should assigned.</param>
         public void AssignValue(float assignValue)
         {
-            /// If the value would be less then the <see cref="minValue"/>. 
+            /// If the value would be less then the <see cref="minValue"/>.
             /// Set to <see cref="minValue"/>.
             if (assignValue < minValue)
             {
@@ -162,7 +162,7 @@ namespace SEE.UI.Drawable
         /// </summary>
         private void ClickUp()
         {
-            /// Assigns the new value. 
+            /// Assigns the new value.
             /// Increase by <see cref="upAndDownValue"/>.
             value += upAndDownValue;
             value = (float)decimal.Round((decimal)value, 2);
@@ -174,11 +174,8 @@ namespace SEE.UI.Drawable
             AssignValue(value);
 
             /// If an action for proportional increase is provided, execute it.
-            if (onProportionalValueChanged != null)
-            {
-                onProportionalValueChanged.Invoke(+upAndDownValue);
-            }
-            onValueChanged.Invoke(value);
+            OnProportionalValueChanged?.Invoke(+upAndDownValue);
+            OnValueChanged.Invoke(value);
         }
 
         /// <summary>
@@ -186,7 +183,7 @@ namespace SEE.UI.Drawable
         /// </summary>
         private void ClickDown()
         {
-            /// Assigns the new value. 
+            /// Assigns the new value.
             /// Decrease by <see cref="upAndDownValue"/>.
             value -= upAndDownValue;
             value = (float)decimal.Round((decimal)value, 2);
@@ -198,11 +195,8 @@ namespace SEE.UI.Drawable
             AssignValue(value);
 
             /// If an action for proportional increase is provided, execute it.
-            if (onProportionalValueChanged != null)
-            {
-                onProportionalValueChanged.Invoke(-upAndDownValue);
-            }
-            onValueChanged.Invoke(value);
+            OnProportionalValueChanged?.Invoke(-upAndDownValue);
+            OnValueChanged.Invoke(value);
         }
 
         /// <summary>

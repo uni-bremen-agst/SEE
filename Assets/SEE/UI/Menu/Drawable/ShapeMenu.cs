@@ -332,7 +332,7 @@ namespace SEE.UI.Menu.Drawable
             objVertices = GameFinder.FindChild(shapeMenu, "Vertices");
             sliderVertices = objVertices.GetComponent<IntValueSliderController>();
             vertices = sliderVertices.GetValue();
-            sliderVertices.onValueChanged.AddListener(value => { vertices = value; });
+            sliderVertices.OnValueChanged.AddListener(value => { vertices = value; });
 
             /// Initialize the shape info.
             objInfo = GameFinder.FindChild(shapeMenu, "InfoPlaceHolder");

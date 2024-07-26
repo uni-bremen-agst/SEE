@@ -173,9 +173,9 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="order">The order that should be assigned.</param>
         private static void AssignOrderInLayer(UnityAction<int> orderInLayerAction, int order)
         {
-            orderInLayerSlider.onValueChanged.RemoveAllListeners();
+            orderInLayerSlider.OnValueChanged.RemoveAllListeners();
             orderInLayerSlider.AssignValue(order);
-            orderInLayerSlider.onValueChanged.AddListener(orderInLayerAction);
+            orderInLayerSlider.OnValueChanged.AddListener(orderInLayerAction);
         }
 
         /// <summary>

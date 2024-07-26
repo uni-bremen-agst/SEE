@@ -79,7 +79,7 @@ namespace SEE.UI.Menu.Drawable
         {
             LayerSliderController orderInLayerSlider = instance.GetComponentInChildren<LayerSliderController>();
             orderInLayerSlider.AssignValue(newConfig.Order);
-            orderInLayerSlider.onValueChanged.AddListener(order =>
+            orderInLayerSlider.OnValueChanged.AddListener(order =>
             {
                 newConfig.Order = order;
                 GameStickyNoteManager.ChangeLayer(stickyNote, order);

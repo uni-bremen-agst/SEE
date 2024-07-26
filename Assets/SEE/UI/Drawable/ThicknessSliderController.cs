@@ -2,6 +2,7 @@ using Michsky.UI.ModernUIPack;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace SEE.UI.Drawable
 {
@@ -11,7 +12,7 @@ namespace SEE.UI.Drawable
     public class ThicknessSliderController : MonoBehaviour
     {
         /// <summary>
-        /// The slider manager. 
+        /// The slider manager.
         /// It contains the slider in manager.mainSlider.
         /// When the value of the main slider changes (meaning the player moved the slider), the value
         /// will be set to the value of this slider.
@@ -29,10 +30,11 @@ namespace SEE.UI.Drawable
         /// The unity event which will executed when the slider value changes.
         /// </summary>
         [Header("Event")]
-        public UnityEvent<float> onValueChanged = new UnityEvent<float>();
+        [FormerlySerializedAs("onValueChanged")]
+        public UnityEvent<float> OnValueChanged = new();
 
         /// <summary>
-        /// Initializes the Thickness Slider Controller 
+        /// Initializes the Thickness Slider Controller
         /// and sets the values for the minimum and maximum values.
         /// </summary>
         private void Awake()
@@ -53,8 +55,8 @@ namespace SEE.UI.Drawable
         }
 
         /// <summary>
-        /// Executed when the slider value changes. 
-        /// The new value is added to the text to represent 
+        /// Executed when the slider value changes.
+        /// The new value is added to the text to represent
         /// the slider value, and the associated event is invoked with this value.
         /// </summary>
         /// <param name="newValue">The new slider value.</param>
@@ -62,7 +64,7 @@ namespace SEE.UI.Drawable
         {
             newValue = manager.mainSlider.value;
             tmpText.text = newValue.ToString("F2");
-            onValueChanged.Invoke(newValue);
+            OnValueChanged.Invoke(newValue);
         }
 
         /// <summary>

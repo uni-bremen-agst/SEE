@@ -5,6 +5,7 @@ using System.Globalization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace SEE.UI.Drawable
 {
@@ -14,7 +15,7 @@ namespace SEE.UI.Drawable
     public class RotationSliderController : MonoBehaviour
     {
         /// <summary>
-        /// The slider manager. 
+        /// The slider manager.
         /// It contains the slider in manager.mainSlider.
         /// When the value of the main slider changes (meaning the player moved the slider), the value
         /// will be set to the value of this slider.
@@ -33,7 +34,8 @@ namespace SEE.UI.Drawable
         /// Action that is executed when the value of the slider changes.
         /// </summary>
         [Header("Event")]
-        public UnityEvent<float> onValueChanged = new();
+        [FormerlySerializedAs("onValueChanged")]
+        public UnityEvent<float> OnValueChanged = new();
 
         /// <summary>
         /// Initializes the slider controller.
@@ -76,7 +78,7 @@ namespace SEE.UI.Drawable
             {
                 inputField.text = newValue.ToString("F1");
             }
-            onValueChanged.Invoke(newValue);
+            OnValueChanged.Invoke(newValue);
         }
 
         /// <summary>

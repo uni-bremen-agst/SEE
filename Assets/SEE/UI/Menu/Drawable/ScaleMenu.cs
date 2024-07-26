@@ -95,7 +95,7 @@ namespace SEE.UI.Menu.Drawable
         private static void XScale(GameObject objToScale)
         {
             xScale.AssignValue(objToScale.transform.localScale.x);
-            xScale.onValueChanged.AddListener(xScale =>
+            xScale.OnValueChanged.AddListener(xScale =>
             {
                 Vector3 newScale = new(xScale, yScale.GetValue(), 1);
                 GameScaler.SetScale(objToScale, newScale);
@@ -112,7 +112,7 @@ namespace SEE.UI.Menu.Drawable
         private static void YScale(GameObject objToScale)
         {
             yScale.AssignValue(objToScale.transform.localScale.y);
-            yScale.onValueChanged.AddListener(yScale =>
+            yScale.OnValueChanged.AddListener(yScale =>
             {
                 Vector3 newScale = new(xScale.GetValue(), yScale, 1);
                 GameScaler.SetScale(objToScale, newScale);
@@ -128,13 +128,13 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void EnableProportionalScaling()
         {
-            xScale.onProportionalValueChanged = new UnityEvent<float>();
-            xScale.onProportionalValueChanged.AddListener(diff =>
+            xScale.OnProportionalValueChanged = new UnityEvent<float>();
+            xScale.OnProportionalValueChanged.AddListener(diff =>
             {
                 yScale.AssignValue((float)decimal.Round((decimal)(yScale.GetValue() + diff), 6));
             });
-            yScale.onProportionalValueChanged = new UnityEvent<float>();
-            yScale.onProportionalValueChanged.AddListener(diff =>
+            yScale.OnProportionalValueChanged = new UnityEvent<float>();
+            yScale.OnProportionalValueChanged.AddListener(diff =>
             {
                 xScale.AssignValue((float)decimal.Round((decimal)(xScale.GetValue() + diff), 6));
             });
@@ -155,8 +155,8 @@ namespace SEE.UI.Menu.Drawable
             /// Turns off proportional scaling.
             switchManager.OffEvents.AddListener(() =>
             {
-                xScale.onProportionalValueChanged = null;
-                yScale.onProportionalValueChanged = null;
+                xScale.OnProportionalValueChanged = null;
+                yScale.OnProportionalValueChanged = null;
             });
         }
 

@@ -352,8 +352,8 @@ namespace SEE.UI.Window.DrawableManagerWindow
             pageBtn.buttonText = config.CurrentPage.ToString();
             pageBtnMesh.text = config.CurrentPage.ToString();
             GUIClickController pageClickController = foreground.Find("PageBtn").gameObject.MustGetComponent<GUIClickController>();
-            pageClickController.onLeft.AddListener(() => contextMenu.ShowSelectionAddPageMenu(surface, pageBtn.transform.position));
-            pageClickController.onRight.AddListener(() => contextMenu.ShowRemovePageMenu(surface, pageBtn.transform.position));
+            pageClickController.OnLeft.AddListener(() => contextMenu.ShowSelectionAddPageMenu(surface, pageBtn.transform.position));
+            pageClickController.OnRight.AddListener(() => contextMenu.ShowRemovePageMenu(surface, pageBtn.transform.position));
 
             ButtonManagerBasic lightingBtn = foreground.Find("LightingBtn").gameObject.MustGetComponent<ButtonManagerBasic>();
             Image lightingImage = foreground.Find("LightingBtn").gameObject.GetComponent<Image>();

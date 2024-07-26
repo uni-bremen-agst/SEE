@@ -7,12 +7,12 @@ using UnityEngine.Events;
 namespace SEE.UI.Drawable
 {
     /// <summary>
-    /// A controller for a slider that used a float value.
+    /// A controller for a slider that uses a float value.
     /// </summary>
     public class FloatValueSliderController : MonoBehaviour
     {
         /// <summary>
-        /// The slider manager. 
+        /// The slider manager.
         /// It contains the slider in manager.mainSlider.
         /// When the value of the main slider changes (meaning the player moved the slider), the value
         /// will be set to the value of this slider.
@@ -20,7 +20,7 @@ namespace SEE.UI.Drawable
         private SliderManager manager;
 
         /// <summary>
-        /// The tmp text that show's the value of the slider.
+        /// The tmp text that shows the value of the slider.
         /// </summary>
         private TMP_Text tmpText;
 
@@ -32,13 +32,13 @@ namespace SEE.UI.Drawable
         private int decimalPlaces = 0;
 
         /// <summary>
-        /// Option to normalized the value of the slider.
+        /// Option to normalize the value of the slider.
         /// </summary>
         [SerializeField]
         private bool valueNormalized = true;
 
         /// <summary>
-        /// Option if the slider should aligned left.
+        /// Option if the slider should be aligned left.
         /// Otherwise the handler is in the middle of the slider.
         /// </summary>
         [SerializeField]
@@ -112,7 +112,7 @@ namespace SEE.UI.Drawable
         }
 
         /// <summary>
-        /// Resets the slider to it's minimum based on <see cref="sliderLeftAligned"/>.
+        /// Resets the slider to its minimum based on <see cref="sliderLeftAligned"/>.
         /// </summary>
         public void ResetToMin()
         {
@@ -127,7 +127,7 @@ namespace SEE.UI.Drawable
         }
 
         /// <summary>
-        /// Get's the current value of the slider.
+        /// Gets the current value of the slider.
         /// </summary>
         /// <returns>the slider value.</returns>
         public float GetValue()

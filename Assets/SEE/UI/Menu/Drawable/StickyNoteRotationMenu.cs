@@ -322,7 +322,7 @@ namespace SEE.UI.Menu.Drawable
             Transform transform = stickyNote.transform;
 
             slider.AssignValue(transform.localEulerAngles.y);
-            slider.onValueChanged.AddListener(degree =>
+            slider.OnValueChanged.AddListener(degree =>
             {
                 GameStickyNoteManager.SetRotateY(stickyNote, degree);
                 if (!spawnMode)

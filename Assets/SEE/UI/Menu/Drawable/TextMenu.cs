@@ -385,8 +385,8 @@ namespace SEE.UI.Menu.Drawable
             thicknessSlider.onValueChanged.RemoveAllListeners();
             outlineSwitch.OffEvents.RemoveAllListeners();
             outlineSwitch.OnEvents.RemoveAllListeners();
-            fontSizeInput.onValueChanged.RemoveAllListeners();
-            orderInLayerSlider.onValueChanged.RemoveAllListeners();
+            fontSizeInput.OnValueChanged.RemoveAllListeners();
+            orderInLayerSlider.OnValueChanged.RemoveAllListeners();
         }
 
         /// <summary>
@@ -817,9 +817,9 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="fontSize">The font size that should be assigned.</param>
         public static void AssignFontSize(UnityAction<float> fontSizeAction, float fontSize)
         {
-            fontSizeInput.onValueChanged.RemoveAllListeners();
+            fontSizeInput.OnValueChanged.RemoveAllListeners();
             fontSizeInput.AssignValue(fontSize);
-            fontSizeInput.onValueChanged.AddListener(fontSizeAction);
+            fontSizeInput.OnValueChanged.AddListener(fontSizeAction);
         }
 
         /// <summary>
@@ -829,9 +829,9 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="order">The order that should be assigned.</param>
         public static void AssignOrderInLayer(UnityAction<int> orderInLayerAction, int order)
         {
-            orderInLayerSlider.onValueChanged.RemoveAllListeners();
+            orderInLayerSlider.OnValueChanged.RemoveAllListeners();
             orderInLayerSlider.AssignValue(order);
-            orderInLayerSlider.onValueChanged.AddListener(orderInLayerAction);
+            orderInLayerSlider.OnValueChanged.AddListener(orderInLayerAction);
         }
 
         /// <summary>

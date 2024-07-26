@@ -1,5 +1,4 @@
 ﻿using Michsky.UI.ModernUIPack;
-using SEE.Game.Drawable;
 using SEE.UI.Menu.Drawable;
 using System.Collections;
 using UnityEngine;
@@ -13,9 +12,8 @@ namespace SEE.UI.Drawable
     /// </summary>
     public class LineMenuUpdater : MonoBehaviour
     {
-
         /// The update is only performed during the initial use of the menu.
-        void Start()
+        private void Start()
         {
             StartCoroutine(Updater());
         }
@@ -24,7 +22,7 @@ namespace SEE.UI.Drawable
         /// Performs the update.
         /// </summary>
         /// <returns>waits 1 ms.</returns>
-        public IEnumerator Updater()
+        private IEnumerator Updater()
         {
             yield return new WaitForSeconds(0.1f);
             LineMenu.RefreshHorizontalSelectors();

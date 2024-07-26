@@ -224,7 +224,7 @@ namespace SEE.Game.UI.Menu.Drawable
             string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
             layerSlider.AssignMaxOrder(surface.GetComponent<DrawableHolder>().OrderInLayer);
             /// Adds the handler for changing.
-            layerSlider.onValueChanged.AddListener(layerOrder =>
+            layerSlider.OnValueChanged.AddListener(layerOrder =>
             {
                 GameEdit.ChangeLayer(node, layerOrder);
                 conf.OrderInLayer = layerOrder;

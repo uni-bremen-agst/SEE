@@ -530,7 +530,7 @@ namespace SEE.UI.Menu.Drawable
             /// Assigns the current value to the slider.
             thicknessSlider.AssignValue(ValueHolder.CurrentThickness);
             /// Add the handler.
-            thicknessSlider.onValueChanged.AddListener(thickness =>
+            thicknessSlider.OnValueChanged.AddListener(thickness =>
             {
                 ValueHolder.CurrentThickness = thickness;
             });
@@ -812,7 +812,7 @@ namespace SEE.UI.Menu.Drawable
             /// Assigns the current value to the slider.
             thicknessSlider.AssignValue(renderer.startWidth);
             /// Adds the handler for changing.
-            thicknessSlider.onValueChanged.AddListener(thickness =>
+            thicknessSlider.OnValueChanged.AddListener(thickness =>
             {
                 /// The thickness must be greater then zero.
                 if (thickness > 0.0f)
@@ -842,7 +842,7 @@ namespace SEE.UI.Menu.Drawable
             /// Assigns the current value to the slider.
             layerSlider.AssignValue(lineHolder.OrderInLayer);
             /// Adds the handler for changing.
-            layerSlider.onValueChanged.AddListener(layerOrder =>
+            layerSlider.OnValueChanged.AddListener(layerOrder =>
             {
                 GameEdit.ChangeLayer(selectedLine, layerOrder);
                 lineHolder.OrderInLayer = layerOrder;
@@ -962,8 +962,8 @@ namespace SEE.UI.Menu.Drawable
             }
             primaryColorBMB.clickEvent.RemoveAllListeners();
             secondaryColorBMB.clickEvent.RemoveAllListeners();
-            instance.GetComponentInChildren<ThicknessSliderController>().onValueChanged.RemoveAllListeners();
-            instance.GetComponentInChildren<LayerSliderController>().onValueChanged.RemoveAllListeners();
+            instance.GetComponentInChildren<ThicknessSliderController>().OnValueChanged.RemoveAllListeners();
+            instance.GetComponentInChildren<LayerSliderController>().OnValueChanged.RemoveAllListeners();
             loopManager.OffEvents.RemoveAllListeners();
             loopManager.OnEvents.RemoveAllListeners();
 

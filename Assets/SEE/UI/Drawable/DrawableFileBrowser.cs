@@ -11,7 +11,7 @@ using static SEE.Controls.Actions.Drawable.SaveAction;
 namespace SEE.UI.Drawable
 {
     /// <summary>
-    /// The file browser which will used in different drawable actions.
+    /// The file browser which is used in different drawable actions.
     /// </summary>
     public class DrawableFileBrowser : MonoBehaviour
     {
@@ -31,7 +31,7 @@ namespace SEE.UI.Drawable
         private string initPath;
 
         /// <summary>
-        /// Ensure that the configuration path exists and set the init path to the configuration path.
+        /// Ensures that the configuration path exists and sets the init path to the configuration path.
         /// </summary>
         private void Awake()
         {
@@ -40,7 +40,7 @@ namespace SEE.UI.Drawable
         }
 
         /// <summary>
-        /// Method to load a drawable configuration.
+        /// Loads a drawable configuration.
         /// </summary>
         /// <param name="loadState">The chosen load state (regular/specific)</param>
         public void LoadDrawableConfiguration(LoadState loadState)
@@ -192,9 +192,9 @@ namespace SEE.UI.Drawable
         }
 
         /// <summary>
-        /// Gets the value if the file browser is open.
+        /// Returns true if the file browser is open.
         /// </summary>
-        /// <returns>The is open state.</returns>
+        /// <returns>Whether file browser is open.</returns>
         public bool IsOpen()
         {
             return FileBrowser.IsOpen;

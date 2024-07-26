@@ -2,16 +2,17 @@ using Michsky.UI.ModernUIPack;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace SEE.UI.Drawable
 {
     /// <summary>
-    /// A controller for a slider that used a int value.
+    /// A controller for a slider that uses an int value.
     /// </summary>
     public class IntValueSliderController : MonoBehaviour
     {
         /// <summary>
-        /// The slider manager. 
+        /// The slider manager.
         /// It contains the slider in manager.mainSlider.
         /// When the value of the main slider changes (meaning the player moved the slider), the value
         /// will be set to the value of this slider.
@@ -19,7 +20,7 @@ namespace SEE.UI.Drawable
         private SliderManager manager;
 
         /// <summary>
-        /// The tmp text that show's the value of the slider.
+        /// The tmp text that shows the value of the slider.
         /// </summary>
         private TMP_Text tmpText;
 
@@ -27,7 +28,8 @@ namespace SEE.UI.Drawable
         /// Action that is executed when the value of the slider changes.
         /// </summary>
         [Header("Event")]
-        public UnityEvent<int> onValueChanged = new();
+        [FormerlySerializedAs("onValueChanged")]
+        public UnityEvent<int> OnValueChanged = new();
 
         /// <summary>
         /// Initializes the slider controller.
@@ -57,7 +59,7 @@ namespace SEE.UI.Drawable
         {
             newValue = manager.mainSlider.value;
             tmpText.text = ((int)newValue).ToString();
-            onValueChanged.Invoke((int)newValue);
+            OnValueChanged.Invoke((int)newValue);
         }
 
         /// <summary>
@@ -71,7 +73,7 @@ namespace SEE.UI.Drawable
         }
 
         /// <summary>
-        /// Resets the slider to it's minimum.
+        /// Resets the slider to its minimum.
         /// </summary>
         public void ResetToMin()
         {
@@ -79,7 +81,7 @@ namespace SEE.UI.Drawable
         }
 
         /// <summary>
-        /// Get's the current value of the slider.
+        /// Gets the current value of the slider.
         /// </summary>
         /// <returns>the slider value.</returns>
         public int GetValue()

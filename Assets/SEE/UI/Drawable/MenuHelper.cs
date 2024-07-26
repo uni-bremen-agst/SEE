@@ -32,7 +32,7 @@ namespace SEE.UI.Drawable
             /// Forces the menu canvas to update so that the correct sizes are calculated.
             Canvas.ForceUpdateCanvases();
 
-            /// Updates the Content Size Fitter of the content object. 
+            /// Updates the Content Size Fitter of the content object.
             /// This is needed for it to recalculate its size.
             ContentSizeFitter csf = GameFinder.FindChild(menuInstance, "Content").GetComponent<ContentSizeFitter>();
             csf.verticalFit = ContentSizeFitter.FitMode.Unconstrained;

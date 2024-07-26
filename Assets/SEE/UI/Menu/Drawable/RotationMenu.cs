@@ -156,7 +156,7 @@ namespace SEE.UI.Menu.Drawable
             slider.AssignValue(transform.localEulerAngles.z);
 
             /// Adds the handler to rotate to the slider.
-            slider.onValueChanged.AddListener(degree =>
+            slider.OnValueChanged.AddListener(degree =>
             {
                 float degreeToMove = 0;
                 Vector3 currentDirection = Vector3.forward;
