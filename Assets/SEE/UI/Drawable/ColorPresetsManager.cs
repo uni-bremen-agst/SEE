@@ -7,10 +7,10 @@ namespace SEE.UI.Drawable
 {
     /// <summary>
     /// This class holds the color preset list with a name.
-    /// 
+    ///
     /// The file comes from the HSVPicker package.
     /// https://github.com/judah4/HSV-Color-Picker-Unity/blob/master/Packages/com.judahperez.hsvcolorpicker/UI/ColorPresetManager.cs
-    /// It has been extended to include the functionality of removing and modifying colors, 
+    /// It has been extended to include the functionality of removing and modifying colors,
     /// as well as loading and saving colors from the previous session.
     /// </summary>
     public static class ColorPresetManager
@@ -18,7 +18,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// The dictionary that currently holds the color preset list.
         /// </summary>
-        private static Dictionary<string, ColorPresetList> _presets = new();
+        private static Dictionary<string, ColorPresetList> presets = new();
 
         /// <summary>
         /// Adds the created color preset list to the dictionary and returned the list.
@@ -28,13 +28,11 @@ namespace SEE.UI.Drawable
         /// <returns>The preset list</returns>
         public static ColorPresetList Get(Color[] colors, string listId = "loaded")
         {
-            ColorPresetList preset;
-            if (!_presets.TryGetValue(listId, out preset))
+            if (!presets.TryGetValue(listId, out ColorPresetList preset))
             {
                 preset = new ColorPresetList(listId, colors.ToList());
-                _presets.Add(listId, preset);
+                presets.Add(listId, preset);
             }
-
             return preset;
         }
     }
@@ -82,10 +80,7 @@ namespace SEE.UI.Drawable
         public void AddColor(Color color)
         {
             Colors.Add(color);
-            if (OnColorsUpdated != null)
-            {
-                OnColorsUpdated.Invoke(Colors);
-            }
+            OnColorsUpdated?.Invoke(Colors);
         }
 
         /// <summary>
@@ -95,10 +90,7 @@ namespace SEE.UI.Drawable
         public void RemoveColor(Color color)
         {
             Colors.Remove(color);
-            if (OnColorsUpdated != null)
-            {
-                OnColorsUpdated.Invoke(Colors);
-            }
+            OnColorsUpdated?.Invoke(Colors);
         }
 
         /// <summary>
@@ -109,10 +101,7 @@ namespace SEE.UI.Drawable
         public void ChangeColor(int index, Color newColor)
         {
             Colors[index] = newColor;
-            if (OnColorsUpdated != null)
-            {
-                OnColorsUpdated.Invoke(Colors);
-            }
+            OnColorsUpdated?.Invoke(Colors);
         }
 
         /// <summary>
@@ -124,11 +113,7 @@ namespace SEE.UI.Drawable
             Colors.Clear();
             Colors.AddRange(colors);
 
-            if (OnColorsUpdated != null)
-            {
-                OnColorsUpdated.Invoke(Colors);
-            }
+            OnColorsUpdated?.Invoke(Colors);
         }
     }
 }
-
