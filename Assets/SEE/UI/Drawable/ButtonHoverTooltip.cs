@@ -1,7 +1,7 @@
-﻿using SEE.GO;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 
 namespace SEE.UI.Drawable
 {
@@ -13,7 +13,8 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// The message to be displayed when the button is hovered over.
         /// </summary>
-        public string message;
+        [FormerlySerializedAs("message")]
+        public string Message;
 
         /// <summary>
         /// The time to wait before displaying the message when hovering over the button.
@@ -55,7 +56,7 @@ namespace SEE.UI.Drawable
         /// </summary>
         private void ShowMessage()
         {
-            Tooltip.ActivateWith(message);
+            Tooltip.ActivateWith(Message);
         }
 
         /// <summary>
@@ -75,7 +76,7 @@ namespace SEE.UI.Drawable
         /// <param name="message">The message to be displayed.</param>
         public void SetMessage(string message)
         {
-            this.message = message;
+            Message = message;
         }
 
         /// <summary>
