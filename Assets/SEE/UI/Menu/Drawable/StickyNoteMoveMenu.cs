@@ -74,7 +74,7 @@ namespace SEE.UI.Menu.Drawable
             /// the speed switching would no longer work. 
             /// Therefore, they are grouped together in a region.
             #region Movement buttons
-            GameFinder.FindChild(moveMenu, "Left").AddComponent<ButtonHolded>().SetAction(() =>
+            GameFinder.FindChild(moveMenu, "Left").AddComponent<ButtonHeld>().SetAction(() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Left, speed);
                 if (!spawnMode)
@@ -84,7 +84,7 @@ namespace SEE.UI.Menu.Drawable
                 }
             }, true);
 
-            GameFinder.FindChild(moveMenu, "Right").AddComponent<ButtonHolded>().SetAction(() =>
+            GameFinder.FindChild(moveMenu, "Right").AddComponent<ButtonHeld>().SetAction(() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Right, speed);
                 if (!spawnMode)
@@ -94,7 +94,7 @@ namespace SEE.UI.Menu.Drawable
                 }
             }, true);
 
-            GameFinder.FindChild(moveMenu, "Up").AddComponent<ButtonHolded>().SetAction(() =>
+            GameFinder.FindChild(moveMenu, "Up").AddComponent<ButtonHeld>().SetAction(() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Up, speed);
                 if (!spawnMode)
@@ -104,7 +104,7 @@ namespace SEE.UI.Menu.Drawable
                 }
             }, true);
 
-            GameFinder.FindChild(moveMenu, "Down").AddComponent<ButtonHolded>().SetAction(() =>
+            GameFinder.FindChild(moveMenu, "Down").AddComponent<ButtonHeld>().SetAction(() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Down, speed);
                 if (!spawnMode)
@@ -114,7 +114,7 @@ namespace SEE.UI.Menu.Drawable
                 }
             }, true);
 
-            GameFinder.FindChild(moveMenu, "Forward").AddComponent<ButtonHolded>().SetAction(() =>
+            GameFinder.FindChild(moveMenu, "Forward").AddComponent<ButtonHeld>().SetAction(() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Forward, speed);
                 if (!spawnMode)
@@ -124,7 +124,7 @@ namespace SEE.UI.Menu.Drawable
                 }
             }, true);
 
-            GameFinder.FindChild(moveMenu, "Back").AddComponent<ButtonHolded>().SetAction(() =>
+            GameFinder.FindChild(moveMenu, "Back").AddComponent<ButtonHeld>().SetAction(() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Back, speed);
                 if (!spawnMode)

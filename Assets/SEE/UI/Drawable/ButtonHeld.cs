@@ -7,28 +7,28 @@ namespace SEE.UI.Drawable
 {
     /// <summary>
     /// Component for hold a mouse button pressed.
-    /// It will used for some menu's.
-    /// 
+    /// It will be used for some of the menus.
+    ///
     /// Inspired by Ahsanhabibrafy, Jul. 2020
     /// https://discussions.unity.com/t/how-to-make-the-button-respond-to-touch-and-hold-feature/213417/6
     /// </summary>
-    public class ButtonHolded : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+    public class ButtonHeld : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         /// <summary>
-        /// Status indicating whether the action should be repeatedly executed. 
+        /// Status indicating whether the action should be repeatedly executed.
         /// This is the case as long as the selected mouse button is held down.
         /// </summary>
         private bool isPressed = false;
 
         /// <summary>
-        /// The action that is executed on a holded mouse button.
+        /// The action that is executed on a held mouse button.
         /// </summary>
         private UnityAction action;
 
         /// <summary>
-        /// Bool state for hold left mouse click.
-        /// When this is activated, the left mouse button is considered for 
-        /// holding down instead of the right mouse button.
+        /// Bool state for holding the left mouse click.
+        /// When this is activated, the left mouse button is considered for
+        /// being held down instead of the right mouse button.
         /// </summary>
         private bool leftMouseClick;
 
@@ -50,7 +50,6 @@ namespace SEE.UI.Drawable
         {
             bool pressedRightButton = false;
 
-            /// Block for holding the left mouse button.
             if (leftMouseClick)
             {
                 if (data.button == PointerEventData.InputButton.Left)
@@ -59,7 +58,7 @@ namespace SEE.UI.Drawable
                 }
             }
             else
-            { /// Block for holding the right mouse button.
+            {
                 if (data.button == PointerEventData.InputButton.Right)
                 {
                     pressedRightButton = true;
@@ -73,10 +72,12 @@ namespace SEE.UI.Drawable
                 StartCoroutine(Pressed());
             }
         }
+
         /// <summary>
-        /// Will be called when the button is not pressed
+        /// Will be called when the button is not pressed.
+        /// Sets <see cref="isPressed"/> to false.
         /// </summary>
-        /// <param name="data">The data of the pointer event.</param>
+        /// <param name="data">The data of the pointer event (ignored).</param>
         public void OnPointerUp(PointerEventData data)
         {
             isPressed = false;
@@ -86,7 +87,7 @@ namespace SEE.UI.Drawable
         /// Will be executed as long as the right mouse button is clicked.
         /// </summary>
         /// <returns>the wait value</returns>
-        IEnumerator Pressed()
+        private IEnumerator Pressed()
         {
             while (isPressed)
             {

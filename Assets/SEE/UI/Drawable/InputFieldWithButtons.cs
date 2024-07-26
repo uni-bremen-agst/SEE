@@ -77,11 +77,11 @@ namespace SEE.UI.Drawable
             /// Adds the handler for the normal left click.
             upBtn.clickEvent.AddListener(ClickUp);
             /// Adds the component for the option that the button can be holded (right click).
-            up.AddComponent<ButtonHolded>().SetAction(ClickUp);
+            up.AddComponent<ButtonHeld>().SetAction(ClickUp);
             /// Adds the handler for the normal left click.
             downBtn.clickEvent.AddListener(ClickDown);
             /// Adds the component for the option that the button can be holded (right click).
-            down.AddComponent<ButtonHolded>().SetAction(ClickDown);
+            down.AddComponent<ButtonHeld>().SetAction(ClickDown);
             /// Adds a hover tool tip to the buttons.
             up.AddComponent<ButtonHoverTooltip>().SetMessage("Left mouse button for a single click, " +
                 "right mouse button can be held down (performs multiple steps).");

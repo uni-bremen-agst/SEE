@@ -65,7 +65,7 @@ namespace SEE.UI.Menu.Drawable
 
                 /// Initialize the button for left moving.
                 /// Enables the functionality to hold down the left mouse button.
-                GameFinder.FindChild(instance, "Left").AddComponent<ButtonHolded>().SetAction(() =>
+                GameFinder.FindChild(instance, "Left").AddComponent<ButtonHeld>().SetAction(() =>
                 {
                     moveByMouseManager.isOn = false;
                     moveByMouseManager.UpdateUI();
@@ -77,7 +77,7 @@ namespace SEE.UI.Menu.Drawable
 
                 /// Initialize the button for right moving.
                 /// Enables the functionality to hold down the left mouse button.
-                GameFinder.FindChild(instance, "Right").AddComponent<ButtonHolded>().SetAction(() =>
+                GameFinder.FindChild(instance, "Right").AddComponent<ButtonHeld>().SetAction(() =>
                 {
                     moveByMouseManager.isOn = false;
                     moveByMouseManager.UpdateUI();
@@ -89,7 +89,7 @@ namespace SEE.UI.Menu.Drawable
 
                 /// Initialize the button for up moving.
                 /// Enables the functionality to hold down the left mouse button.
-                GameFinder.FindChild(instance, "Up").AddComponent<ButtonHolded>().SetAction(() =>
+                GameFinder.FindChild(instance, "Up").AddComponent<ButtonHeld>().SetAction(() =>
                 {
                     moveByMouseManager.isOn = false;
                     moveByMouseManager.UpdateUI();
@@ -101,7 +101,7 @@ namespace SEE.UI.Menu.Drawable
 
                 /// Initialize the button for down moving.
                 /// Enables the functionality to hold down the left mouse button.
-                GameFinder.FindChild(instance, "Down").AddComponent<ButtonHolded>().SetAction(() =>
+                GameFinder.FindChild(instance, "Down").AddComponent<ButtonHeld>().SetAction(() =>
                 {
                     moveByMouseManager.isOn = false;
                     moveByMouseManager.UpdateUI();
