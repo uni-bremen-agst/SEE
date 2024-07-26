@@ -18,7 +18,7 @@ using UnityEngine;
 namespace SEE.UI.Window.DrawableManagerWindow
 {
     /// <summary>
-    /// A window that represents a manager for managing drawable surfaces. 
+    /// A window that represents a manager for managing drawable surfaces.
     /// The window contains a scrollable list of expandable items.
     /// </summary>
     public partial class DrawableManagerWindow : BaseWindow, IObserver<ChangeEvent>
@@ -54,7 +54,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
         private DrawableWindowContextMenu contextMenu;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private List<IDisposable> subscriptions = new();
 
@@ -129,7 +129,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
         /// <summary>
         /// Register the observer.
         /// First, an observer ti detect when surfaces are added or removed.
-        /// Then, an observer for each existing surface. 
+        /// Then, an observer for each existing surface.
         /// </summary>
         protected override void Start()
         {
@@ -139,7 +139,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
             }
             foreach(GameObject surface in ValueHolder.DrawableSurfaces)
             {
-                subscriptions.Add(surface.GetComponent<DrawableSurfaceRef>().Value.Subscribe(this));
+                subscriptions.Add(surface.GetComponent<DrawableSurfaceRef>().Surface.Subscribe(this));
             }
             base.Start();
         }
@@ -150,11 +150,11 @@ namespace SEE.UI.Window.DrawableManagerWindow
         /// </summary>
         private void OnDestroy()
         {
-            foreach (IDisposable subscription in subscriptions) 
+            foreach (IDisposable subscription in subscriptions)
             {
                 subscription.Dispose();
-            } 
-           
+            }
+
             if (SurfaceColorMenu.IsOpen())
             {
                 SurfaceColorMenu.Disable();
@@ -273,7 +273,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
         }
 
         /// <summary>
-        /// Waits for the complete instantiation of a <see cref="DrawableSurface"> before adding the surface to the window. 
+        /// Waits for the complete instantiation of a <see cref="DrawableSurface"> before adding the surface to the window.
         /// This prevents incorrect display and other resulting errors.
         /// </summary>
         /// <param name="surface">The surface to be displayed.</param>
