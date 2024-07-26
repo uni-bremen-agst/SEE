@@ -6,14 +6,14 @@ using UnityEngine;
 namespace SEE.UI.Drawable
 {
     /// <summary>
-    /// This class ensures that the color picker menu is hidden when an action state change occurs. 
-    /// (It is required to prevent a display error of the switch. See <see cref="ColorPickerAction.Awake"/>)
+    /// This class ensures that the color picker menu is hidden when an action state change occurs.
+    /// (It is required to prevent a display error of the switch. See <see cref="ColorPickerAction.Awake"/>.)
     /// </summary>
     public class ColorPickerMenuDisabler : MonoBehaviour
     {
         /// <summary>
         /// Checks every frame if the action has changed.
-        /// If yes the component will be destroyed.
+        /// If yes, the component will be destroyed.
         /// </summary>
         private void Update()
         {
