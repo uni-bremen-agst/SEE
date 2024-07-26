@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace SEE.Net
 {
@@ -23,7 +21,7 @@ namespace SEE.Net
         public readonly int PacketSize;
 
         /// <summary>
-        /// The current fragment.
+        /// The number of the current fragment.
         /// </summary>
         public readonly int CurrentFragment;
 
@@ -51,7 +49,8 @@ namespace SEE.Net
         /// Combines the fragments to recover the packet data.
         /// </summary>
         /// <param name="fragments">The fragments</param>
-        /// <returns>The combined string, is empty if a fragment is missing or a wrong fragment is in the list.</returns>
+        /// <returns>The combined string, is empty if a fragment is missing or a wrong fragment
+        /// is in the list.</returns>
         public static string CombineFragments(List<Fragment> fragments)
         {
             string combined = "";
@@ -71,10 +70,10 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Checks if every fragment are there.
+        /// Checks whether all fragments have been received.
         /// </summary>
         /// <param name="fragments">The list of fragments.</param>
-        /// <returns>True if every fragment are in the list, false if some fragment is missing.</returns>
+        /// <returns>True if every fragment is in the list, false if some fragment is missing.</returns>
         private static bool CheckNumbering(List<Fragment> fragments)
         {
             List<int> numbers = fragments.Select(f => f.CurrentFragment).ToList();
