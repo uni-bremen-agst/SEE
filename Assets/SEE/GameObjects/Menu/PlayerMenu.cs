@@ -245,11 +245,12 @@ namespace SEE.GO.Menu
         }
 
         /// <summary>
-        /// Updates the menu depending on the current selected action in <see cref="GlobalActionHistory"/>.
+        /// Updates the menu depending on the currently selected action in <see cref="GlobalActionHistory"/>.
         /// It changes the current selected menu entry in PlayerMenu and
         /// it changes also the depending indicator.
         /// </summary>
-        /// <param name="nestedMenuName">The name of the nested menu of the new active entry. null if the entry is in the root menu.</param>
+        /// <param name="nestedMenuName">The name of the nested menu of the new active entry;
+        /// null if the entry is in the root menu.</param>
         internal void UpdateActiveEntry(string nestedMenuName = null)
         {
             ActionStateType currentAction = GlobalActionHistory.Current();
@@ -260,7 +261,7 @@ namespace SEE.GO.Menu
             }
             SetPlayerMenu(currentAction.Name);
             indicator.ChangeActionState(currentAction);
-            
+
             foreach (MenuEntry entry in modeMenu.Entries)
             {
                 if (entry.Title.Equals(currentAction.Name))
