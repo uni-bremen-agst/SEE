@@ -418,6 +418,12 @@ namespace SEE.Tools.LSP
         /// <param name="showMessageParams">The parameters of the ShowMessage notification.</param>
         private void ShowMessage(ShowMessageParams showMessageParams)
         {
+            if (showMessageParams.Message.Contains("window/workDoneProgress/cancel"))
+            {
+                // Cancellation messages are sometimes sent to the language server even when they don't support them.
+                // We can safely ignore any failing cancellations.
+                return;
+            }
             string languageServerName = Server?.Name ?? "Language Server";
             switch (showMessageParams.Type)
             {
@@ -678,8 +684,20 @@ namespace SEE.Tools.LSP
                 {
                     Item = item
                 };
-                return AsyncUtils.ObserveUntilTimeout(t => Client.RequestCallHierarchyOutgoing(outgoingParams, t), TimeoutSpan).Select(x => x.To);
+                // We can not use the built-in method here and have to make the request manually,
+                // as the specialized method contains a bug (issue #1303 in OmniSharp/csharp-language-server-protocol).
+                // return AsyncUtils.ObserveUntilTimeout(t => Client.RequestCallHierarchyOutgoing(outgoingParams, t), TimeoutSpan).Select(x => x.To);
+                return AsyncUtils.RunWithTimeoutAsync(MakeOutgoingCallRequest(outgoingParams), TimeoutSpan)
+                                 .AsUniTaskAsyncEnumerable()
+                                 .Select(y => y.To);
             });
+
+            Func<CancellationToken, UniTask<IEnumerable<CallHierarchyOutgoingCall>>> MakeOutgoingCallRequest(CallHierarchyOutgoingCallsParams outgoingParams)
+            {
+                return token => Client.SendRequest("callHierarchy/outgoingCalls", outgoingParams)
+                                      .Returning<IEnumerable<CallHierarchyOutgoingCall>>(token)
+                                      .AsUniTask(useCurrentSynchronizationContext: false);
+            }
         }
 
         /// <summary>

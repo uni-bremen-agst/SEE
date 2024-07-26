@@ -21,6 +21,17 @@ namespace SEE.Utils
         public static int MainThreadId = 0;
 
         /// <summary>
+        /// Converts the given <paramref name="task"/> to an asynchronous UniTask enumerable.
+        /// </summary>
+        /// <param name="task">The task of enumerables to convert.</param>
+        /// <typeparam name="T">The type of the elements in the enumerable.</typeparam>
+        /// <returns>An asynchronous UniTask enumerable that emits the elements of the enumerable.</returns>
+        public static IUniTaskAsyncEnumerable<T> AsUniTaskAsyncEnumerable<T>(this UniTask<IEnumerable<T>> task)
+        {
+            return task.ToUniTaskAsyncEnumerable().SelectMany(x => x.ToUniTaskAsyncEnumerable());
+        }
+
+        /// <summary>
         /// Runs the given <paramref name="task"/> with a <paramref name="timeout"/> and returns the result.
         /// Note that a timeout of <see cref="TimeSpan.Zero"/> will cause no timeout to be applied.
         ///

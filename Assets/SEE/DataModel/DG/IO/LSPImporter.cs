@@ -304,8 +304,7 @@ namespace SEE.DataModel.DG.IO
                     }
                     if (IncludeEdgeTypes.HasFlag(EdgeKind.Call) && Handler.ServerCapabilities.CallHierarchyProvider.TrueOrValue())
                     {
-                        // FIXME (external: OmniSharp bug, sends wrong method name)
-                        // await HandleCallHierarchyAsync(node, graph, token);
+                        await HandleCallHierarchyAsync(node, graph, token);
                     }
                     if (IncludeEdgeTypes.HasFlag(EdgeKind.Extend) && Handler.ServerCapabilities.TypeHierarchyProvider.TrueOrValue())
                     {
@@ -388,7 +387,7 @@ namespace SEE.DataModel.DG.IO
         /// <param name="token">A cancellation token that can be used to cancel the operation.</param>
         private async UniTask HandleCallHierarchyAsync(Node node, Graph graph, CancellationToken token)
         {
-            IUniTaskAsyncEnumerable<CallHierarchyItem> results = Handler.OutgoingCalls(SelectItem, node.Path(), node.SourceLine ?? 0, node.SourceColumn ?? 0);
+            IUniTaskAsyncEnumerable<CallHierarchyItem> results = Handler.OutgoingCalls(SelectItem, node.Path(), node.SourceLine - 1 ?? 0, node.SourceColumn - 1 ?? 0);
             await foreach (CallHierarchyItem item in results)
             {
                 if (token.IsCancellationRequested)
@@ -407,7 +406,7 @@ namespace SEE.DataModel.DG.IO
 
             bool SelectItem(CallHierarchyItem item)
             {
-                return item.Uri.Path == node.Path() && node.SourceRange.Contains(Range.FromLspRange(item.Range));
+                return item.Uri.Path == node.Path() && Range.FromLspRange(item.Range) == node.SourceRange;
             }
         }
 
@@ -420,7 +419,7 @@ namespace SEE.DataModel.DG.IO
         /// <param name="token">A cancellation token that can be used to cancel the operation.</param>
         private async UniTask HandleTypeHierarchyAsync(Node node, Graph graph, CancellationToken token)
         {
-            IUniTaskAsyncEnumerable<TypeHierarchyItem> results = Handler.Supertypes(SelectItem, node.Path(), node.SourceLine ?? 0, node.SourceColumn ?? 0);
+            IUniTaskAsyncEnumerable<TypeHierarchyItem> results = Handler.Supertypes(SelectItem, node.Path(), node.SourceLine - 1 ?? 0, node.SourceColumn - 1 ?? 0);
             await foreach (TypeHierarchyItem item in results)
             {
                 if (token.IsCancellationRequested)
