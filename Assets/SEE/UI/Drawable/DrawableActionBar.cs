@@ -14,14 +14,14 @@ namespace SEE.UI.Drawable
     public class DrawableActionBar : MonoBehaviour
     {
         /// <summary>
-        /// The action bar.
+        /// Prefab of the drawable action bar with toggler.
         /// </summary>
-        private const string actionBarPrefab = "Prefabs/UI/Drawable/DrawableActionBar";
+        private const string actionBarWithTogglerPrefab = "Prefabs/UI/Drawable/DrawableActionBarWithToggler";
 
         /// <summary>
-        /// The toggler for the action bar.
+        /// The instance of the action bar with toggle button.
         /// </summary>
-        private const string togglerPrefab = "Prefabs/UI/Drawable/DrawableActionBarToggler";
+        private GameObject actionBar;
 
         /// <summary>
         /// The instance of the action bar.
@@ -39,18 +39,23 @@ namespace SEE.UI.Drawable
         private bool toggles = false;
 
         /// <summary>
+        /// The original position of the toggler.
+        /// </summary>
+        private Vector3 originTogglePos;
+
+        /// <summary>
         /// Instantiates the action bar.
         /// </summary>
         void Start()
         {
-            barInstance = PrefabInstantiator.InstantiatePrefab(actionBarPrefab,
-                    GameObject.Find("UI Canvas").transform, false);
+            actionBar = PrefabInstantiator.InstantiatePrefab(actionBarWithTogglerPrefab,
+                GameObject.Find("UI Canvas").transform, false);
+            barInstance = actionBar.transform.Find("DrawableActionBar").gameObject;
+            togglerInstance = actionBar.transform.Find("DrawableActionBarToggler").gameObject;
             Init();
             barInstance.SetActive(false);
-
-            togglerInstance = PrefabInstantiator.InstantiatePrefab(togglerPrefab,
-                GameObject.Find("UI Canvas").transform, false);
             InitToggler();
+            originTogglePos = togglerInstance.transform.position;
         }
 
         /// <summary>
@@ -96,17 +101,17 @@ namespace SEE.UI.Drawable
                 {
                     toggles = true;
                     toggle.transform.eulerAngles = new Vector3(0, 0, 180);
-                    togglerInstance.transform.position = new Vector3(togglerInstance.transform.position.x,
-                        32.5f,
-                        togglerInstance.transform.position.z);
+                    RectTransform barRect = (RectTransform)barInstance.transform;
+                    RectTransform togglerRect = (RectTransform)togglerInstance.transform;
+                    togglerRect.localPosition = new Vector3(togglerRect.localPosition.x,
+                        togglerRect.localPosition.y + barRect.rect.height,
+                        togglerRect.localPosition.z);
                 }
                 else
                 {
                     toggles = false;
                     toggle.transform.eulerAngles = new Vector3(0, 0, 0);
-                    togglerInstance.transform.position = new Vector3(togglerInstance.transform.position.x,
-                        7.5f,
-                        togglerInstance.transform.position.z);
+                    togglerInstance.transform.position = originTogglePos;
                 }
 
             });
