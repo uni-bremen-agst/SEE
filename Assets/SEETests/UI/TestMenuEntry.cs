@@ -12,26 +12,25 @@ namespace SEE.UI.Menu
     internal class TestMenuEntry
     {
         /// <summary>
-        /// Path to a sprite we can use for testing.
+        /// An icon used for testing.
         /// </summary>
-        private const string TEST_SPRITE = "Materials/Charts/MoveIcon";
+        private const char testIcon = '!';
 
         protected static IEnumerable<TestCaseData> ValidConstructorSupplier()
         {
-            Sprite testSprite = Resources.Load<Sprite>(TEST_SPRITE);
-            yield return new TestCaseData(new UnityAction(() => { }), "Test", "Test description", Color.red,
-                                          true, testSprite);
+            yield return new TestCaseData(new Action(() => { }), "Test", "Test description", Color.red,
+                                          true, testIcon);
             yield return new TestCaseData(null, "Test", "Test description", Color.green,
-                                          true, testSprite);
-            yield return new TestCaseData(new UnityAction(() => { }), "Test", null, Color.blue,
-                                          true, testSprite);
-            yield return new TestCaseData(new UnityAction(() => { }), "Test", "Test description", null,
-                                          true, testSprite);
-            yield return new TestCaseData(new UnityAction(() => { }), "Test", "Test description", Color.white,
-                                          false, testSprite);
-            yield return new TestCaseData(new UnityAction(() => { }), "Test", "Test description", Color.black,
-                                          true, null);
-            yield return new TestCaseData(null, "Test", null, null, true, null);
+                                          true, testIcon);
+            yield return new TestCaseData(new Action(() => { }), "Test", null, Color.blue,
+                                          true, testIcon);
+            yield return new TestCaseData(new Action(() => { }), "Test", "Test description", null,
+                                          true, testIcon);
+            yield return new TestCaseData(new Action(() => { }), "Test", "Test description", Color.white,
+                                          false, testIcon);
+            yield return new TestCaseData(new Action(() => { }), "Test", "Test description", Color.black,
+                                          true, ' ');
+            yield return new TestCaseData(null, "Test", null, null, true, ' ');
         }
 
         /// <summary>
@@ -39,16 +38,9 @@ namespace SEE.UI.Menu
         /// </summary>
         /// <returns>The newly constructed MenuEntry.</returns>
         protected virtual MenuEntry CreateMenuEntry(Action action, string title, string description = null,
-                                                    Color entryColor = default, bool enabled = true, Sprite icon = null)
+                                                    Color entryColor = default, bool enabled = true, char icon = ' ')
         {
             return new MenuEntry(action, title, null, description, entryColor, enabled, icon);
-        }
-
-        [Test]
-        public void TestConstructorTitleNull()
-        {
-            Assert.Throws<ArgumentNullException>(() => _ = CreateMenuEntry(null, null));
-            Assert.Throws<ArgumentNullException>(() => _ = CreateMenuEntry(() => { }, null));
         }
 
         [Test]
@@ -60,7 +52,7 @@ namespace SEE.UI.Menu
             Assert.AreEqual(null, entry.Description);
             Assert.AreEqual("Test", entry.Title);
             Assert.AreEqual(true, entry.Enabled);
-            Assert.AreEqual(null, entry.Icon);
+            Assert.AreEqual(' ', entry.Icon);
             Assert.AreEqual(default(Color), entry.EntryColor);
 #if INCLUDE_STEAM_VR
 
@@ -73,7 +65,7 @@ namespace SEE.UI.Menu
 
         [Test, TestCaseSource(nameof(ValidConstructorSupplier))]
         public void TestConstructor(Action action, string title, string description,
-                                    Color entryColor, bool enabled, Sprite icon)
+                                    Color entryColor, bool enabled, char icon)
         {
             MenuEntry entry = CreateMenuEntry(action, title, description, entryColor, enabled, icon);
             // Given action must either be null or NOP for this test

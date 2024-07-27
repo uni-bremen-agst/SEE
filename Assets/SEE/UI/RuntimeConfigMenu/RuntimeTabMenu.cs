@@ -392,7 +392,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     Title: tabName,
                     Description: $"Settings for {tabName}",
                     EntryColor: GetColorForTab(),
-                    Icon: Resources.Load<Sprite>("Materials/Charts/MoveIcon")
+                    Icon: Icons.Move
                 );
                 AddEntry(entry);
             }

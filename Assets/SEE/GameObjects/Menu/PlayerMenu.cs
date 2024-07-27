@@ -89,7 +89,7 @@ namespace SEE.GO.Menu
                                                   Title: actionStateType.Name,
                                                   Description: actionStateType.Description,
                                                   EntryColor: actionStateType.Color,
-                                                  Icon: Resources.Load<Sprite>(actionStateType.IconPath));
+                                                  Icon: actionStateType.Icon);
                         entry = menuEntry;
                     }
                     else if (child is ActionStateTypeGroup actionStateTypeGroup)
@@ -98,7 +98,7 @@ namespace SEE.GO.Menu
                                                                           title: actionStateTypeGroup.Name,
                                                                           description: actionStateTypeGroup.Description,
                                                                           entryColor: actionStateTypeGroup.Color,
-                                                                          icon: Resources.Load<Sprite>(actionStateTypeGroup.IconPath));
+                                                                          icon: actionStateTypeGroup.Icon);
                         toNestedMenuEntry[actionStateTypeGroup] = nestedMenuEntry;
                         entry = nestedMenuEntry;
                     }

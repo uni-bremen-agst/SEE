@@ -15,7 +15,7 @@ namespace SEE.UI.Menu
     {
         protected override MenuEntry CreateMenuEntry(Action action, string title, string description = null,
                                                      Color entryColor = default, bool enabled = true,
-                                                     Sprite icon = null)
+                                                     char icon = '#')
         {
             return new MenuEntry(action, title, null, description, entryColor, enabled, icon);
         }

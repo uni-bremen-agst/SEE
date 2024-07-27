@@ -57,26 +57,26 @@ namespace SEE.UI
                     Title: "Host",
                     Description: "Starts a server and local client process.",
                     EntryColor: NextColor(),
-                    Icon: Resources.Load<Sprite>("Icons/Host")),
+                    Icon: Icons.Broadcast),
 
                 new(SelectAction: StartClient,
                     Title: "Client",
                     Description: "Starts a local client connection to a server.",
                     EntryColor: NextColor(),
-                    Icon: Resources.Load<Sprite>("Icons/Client")),
+                    Icon: Icons.Link),
 
 #if ENABLE_VR
                 new(SelectAction: ToggleEnvironment,
                     Title: "Toggle Desktop/VR",
                     Description: "Toggles between desktop and VR hardware.",
                     EntryColor: NextColor(),
-                    Icon: Resources.Load<Sprite>("Icons/Client")),
+                    Icon: Icons.VR),
 #endif
                 new(SelectAction: Settings,
                     Title: "Settings",
                     Description: "Allows to set additional network settings.",
                     EntryColor: Color.gray,
-                    Icon: Resources.Load<Sprite>("Icons/Settings")),
+                    Icon: Icons.Gear)
             };
 
             Color NextColor()

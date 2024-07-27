@@ -126,7 +126,7 @@ namespace SEE.UI.Menu
             menu.Title = MenuTitle;
             menu.Description = "Tests the menu";
             menu.HideAfterSelection = true;
-            menu.Icon = GetIcon();
+            menu.Icon = GetIconSprite();
 
             IEnumerable<MenuEntry> menuEntries = new List<MenuEntry>
             {
@@ -134,24 +134,24 @@ namespace SEE.UI.Menu
                     Title: OptionOne,
                     Description: "Select option 1",
                     EntryColor: Color.red,
-                    Icon: GetIcon()),
+                    Icon: ExampleIcon),
                 new NestedMenuEntry<MenuEntry>(innerEntries: new List<MenuEntry>
                                                {
                                                          new(SelectAction: () => selection = NestedOptionOneValue,
                                                              Title: NestedOptionOne,
                                                              Description: "Select option 2a",
                                                              EntryColor: Color.green,
-                                                             Icon: GetIcon()),
+                                                             Icon: ExampleIcon),
                                                          new(SelectAction: () => selection = NestedOptionTwoValue,
                                                              Title: NestedOptionTwo,
                                                              Description: "Select option 2b",
                                                              EntryColor: Color.green,
-                                                             Icon: GetIcon())
+                                                             Icon: ExampleIcon)
                                                       },
                                     title: SubMenuTitle,
                                     description: "open subselection 2",
                                     entryColor: Color.red,
-                                    icon: GetIcon())
+                                    icon: ExampleIcon)
             };
 
             menu.AddEntries(menuEntries);

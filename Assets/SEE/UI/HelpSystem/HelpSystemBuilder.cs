@@ -18,6 +18,7 @@
 using System.Collections.Generic;
 using System.IO;
 using SEE.UI.Menu;
+using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Video;
@@ -107,24 +108,19 @@ namespace SEE.UI.HelpSystem
         }
 
         /// <summary>
-        /// The path to the default-icon for an HelpSystemEntry in the nested menu.
+        /// The path to the default-icon for a <see cref="HelpSystemEntry"/> in the nested menu.
         /// </summary>
-        private const string entryIcon = "Materials/ModernUIPack/Eye";
+        private const char entryIcon = Icons.Eye;
 
         /// <summary>
-        /// The path to the default-icon for an RefEntry in the nested menu.
+        /// The path to the default-icon for a RefEntry in the nested menu.
         /// </summary>
-        private const string refIcon = "Materials/ModernUIPack/Plus";
+        private const char refIcon = '+';
 
         /// <summary>
         /// The LinkedListEntries of the currently selected HelpSystemEntry.
         /// </summary>
         public static LinkedList<HelpEntry> CurrentEntries;
-
-        /// <summary>
-        /// The space where the entry is inside.
-        /// </summary>
-        public static GameObject EntrySpace;
 
         /// <summary>
         /// The headline gameObject of the helpSystemEntry or rather the headline which is inside of the dynamicPanel.
@@ -154,7 +150,7 @@ namespace SEE.UI.HelpSystem
                                  Title: title,
                                  Description: description,
                                  EntryColor: entryColor,
-                                 Icon: Resources.Load<Sprite>(entryIcon));
+                                 Icon: entryIcon);
         }
 
         /// <summary>
@@ -173,7 +169,7 @@ namespace SEE.UI.HelpSystem
                                                   title: title,
                                                   description: description,
                                                   entryColor: entryColor,
-                                                  icon: Resources.Load<Sprite>(refIcon));
+                                                  icon: refIcon);
         }
 
         /// <summary>

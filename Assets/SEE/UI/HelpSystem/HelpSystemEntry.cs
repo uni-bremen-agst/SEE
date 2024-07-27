@@ -245,7 +245,6 @@ namespace SEE.UI.HelpSystem
         {
             helpSystemSpace = PrefabInstantiator.InstantiatePrefab(helpSystemEntrySpacePrefab, Canvas.transform, false);
             helpSystemEntry = PrefabInstantiator.InstantiatePrefab(helpSystemEntryPrefab, helpSystemSpace.transform, false);
-            HelpSystemBuilder.EntrySpace = helpSystemSpace;
             helpSystemSpace.transform.localScale = new Vector3(1.7f, 1.7f);
             RectTransform dynamicPanel = helpSystemSpace.transform.GetChild(2).GetComponent<RectTransform>();
             dynamicPanel.sizeDelta = new Vector2(550, 425);

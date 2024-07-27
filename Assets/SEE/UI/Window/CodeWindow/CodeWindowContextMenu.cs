@@ -232,7 +232,7 @@ namespace SEE.UI.Window.CodeWindow
                         }
                         entries.Add(new(SelectAction: () => OpenSelection(targetUri, targetRange),
                                         Title: title ?? $"{uri}: {targetRange}",
-                                        // TODO: Icon
+                                        Icon: Icons.Crosshairs,
                                         EntryColor: new Color(0.051f, 0.3608f, 0.1333f)));
                     }
                     await UniTask.SwitchToMainThread();

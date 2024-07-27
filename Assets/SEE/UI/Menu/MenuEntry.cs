@@ -15,8 +15,10 @@ namespace SEE.UI.Menu
     /// <param name="description">A description of the entry.</param>
     /// <param name="entryColor">The color with which this entry shall be displayed.</param>
     /// <param name="enabled">Whether this entry should be enabled (i.e., whether it can be selected).</param>
-    /// <param name="icon">The icon which shall be displayed alongside this entry.</param>
-    public record MenuEntry(Action SelectAction, string Title, Action UnselectAction = null, string Description = null, Color EntryColor = default, bool Enabled = true, Sprite Icon = null)
+    /// <param name="icon">The icon which shall be displayed alongside this entry,
+    /// given as a FontAwesome codepoint. See <see cref="Icons"/> for more information.</param>
+    public record MenuEntry(Action SelectAction, string Title, Action UnselectAction = null, string Description = null,
+                            Color EntryColor = default, bool Enabled = true, char Icon = ' ')
     {
         /// <summary>
         /// The color of this entry when disabled.
