@@ -76,6 +76,16 @@ namespace SEE.Net.Dashboard
         [Tooltip("Whether to throw an error if Dashboard models have more fields than the C# models.")]
         public bool StrictMode = false;
 
+        /// <summary>
+        /// The number of seconds after which a request to the dashboard will be considered timed out.
+        /// If this is set to 0, the request will never time out.
+        /// </summary>
+        [EnvironmentVariable("DASHBOARD_TIMEOUT_SECONDS")]
+        [Tooltip("The number of seconds after which a request to the dashboard will be considered timed out. "
+            + "If this is set to 0, the request will never time out.")]
+        [Min(0)]
+        public float TimeoutSeconds = 5;
+
         [Header("Issue Retrieval")]
         /// <summary>
         /// Whether <see cref="ArchitectureViolationIssue"/>s shall be retrieved when calling <see cref="GetConfiguredIssuesAsync"/>.
@@ -159,7 +169,7 @@ namespace SEE.Net.Dashboard
         {
             string requestUrl = apiPath ? BaseUrl.Replace("/projects/", "/api/projects/") : BaseUrl;
             requestUrl += path;
-            if (queryParameters != null && queryParameters.Count > 0)
+            if (queryParameters is { Count: > 0 })
             {
                 requestUrl += "?" + Encoding.UTF8.GetString(UnityWebRequest.SerializeSimpleForm(queryParameters));
             }
@@ -172,10 +182,13 @@ namespace SEE.Net.Dashboard
             }
             request.SetRequestHeader("Accept", accept);
             request.SetRequestHeader("Authorization", $"AxToken {Token}");
-#pragma warning disable CS4014
-            request.SendWebRequest(); // we don't need to await this, because of the next line
-#pragma warning restore CS4014
-            await UniTask.WaitUntil(() => request.isDone);
+            request.SendWebRequest();
+            bool timeout = !await AsyncUtils.RunWithTimeoutAsync(t => UniTask.WaitUntil(() => request.isDone, cancellationToken: t),
+                                                                 TimeSpan.FromSeconds(TimeoutSeconds), throwOnTimeout: false);
+            if (timeout)
+            {
+                return new DashboardResult(new TimeoutException("Request timed out."));
+            }
             DashboardResult result = request.result switch
             {
                 UnityWebRequest.Result.Success => new DashboardResult(true, request.downloadHandler.text),
@@ -264,7 +277,7 @@ namespace SEE.Net.Dashboard
                     ShowNotification.Error("Dashboard Version too old",
                                            $"The version of the dashboard is {version}, but the DashboardRetriever "
                                            + $"has been written for version {DashboardVersion.SupportedVersion}."
-                                           + $" Please update your dashboard.");
+                                           + " Please update your dashboard.");
                     break;
                 case DashboardVersion.Difference.PathOlder:
                     // If patch version is older, there may be some bugfixes / security problems not accounted for.
