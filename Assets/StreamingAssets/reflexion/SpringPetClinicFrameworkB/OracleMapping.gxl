@@ -14,37 +14,37 @@
         <enum />
       </attr>
       <attr name="Source.Name">
-        <string>BaseEntity</string>
+        <string>PetValidator</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.model.BaseEntity</string>
+        <string>org.springframework.samples.petclinic.web.PetValidator</string>
       </attr>
       <attr name="Source.File">
-        <string>BaseEntity.java</string>
+        <string>PetValidator.java</string>
       </attr>
       <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/model/</string>
+        <string>src/main/java/org/springframework/samples/petclinic/web/</string>
       </attr>
       <attr name="Metric.Halstead.Volume">
-        <float>210.8312</float>
+        <float>694.5619</float>
       </attr>
       <attr name="Metric.Halstead.Difficulty">
-        <float>7.125</float>
+        <float>13.39286</float>
       </attr>
       <attr name="Metric.Halstead.Effort">
-        <float>1502.173</float>
+        <float>9302.168</float>
       </attr>
       <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>2.285714</float>
+        <float>2.976744</float>
       </attr>
       <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.043721</float>
+        <float>0.147435</float>
       </attr>
       <attr name="Metric.HIS.VOCF">
-        <float>2.285714</float>
+        <float>2.976744</float>
       </attr>
       <attr name="Source.Line">
-        <int>30</int>
+        <int>32</int>
       </attr>
       <attr name="Source.Column">
         <int>14</int>
@@ -53,22 +53,22 @@
         <int>23</int>
       </attr>
       <attr name="SourceRange_EndLine">
-        <int>48</int>
+        <int>66</int>
       </attr>
       <attr name="Metric.LOC">
-        <int>25</int>
+        <int>43</int>
       </attr>
       <attr name="Metric.Lines.LOC">
-        <int>25</int>
+        <int>43</int>
       </attr>
       <attr name="Metric.Lines.Code">
-        <int>19</int>
+        <int>28</int>
       </attr>
       <attr name="Metric.Lines.Comment">
-        <int>6</int>
+        <int>15</int>
       </attr>
       <attr name="Metric.Lines.Only_Comment">
-        <int>6</int>
+        <int>15</int>
       </attr>
       <attr name="Metric.Lines.Empty">
         <int>0</int>
@@ -86,40 +86,40 @@
         <int>0</int>
       </attr>
       <attr name="Metric.Comment.Preceding">
-        <int>6</int>
+        <int>9</int>
       </attr>
       <attr name="Metric.Comment.Internal">
-        <int>0</int>
+        <int>6</int>
       </attr>
       <attr name="Metric.Lines.Class.Code">
-        <int>19</int>
+        <int>28</int>
       </attr>
       <attr name="Metric.Lines.Class.Comment">
-        <int>6</int>
+        <int>15</int>
       </attr>
       <attr name="Metric.Lines.Class.Empty">
         <int>0</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operands">
-        <int>19</int>
+        <int>50</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operators">
-        <int>29</int>
+        <int>78</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operands">
-        <int>12</int>
+        <int>28</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operators">
-        <int>9</int>
+        <int>15</int>
       </attr>
       <attr name="Metric.Halstead.Length">
-        <int>48</int>
+        <int>128</int>
       </attr>
       <attr name="Metric.Halstead.Vocabulary">
-        <int>21</int>
+        <int>43</int>
       </attr>
       <attr name="Metric.Halstead.Required_Time">
-        <int>83</int>
+        <int>516</int>
       </attr>
       <attr name="Metric.Level">
         <int>2</int>
@@ -128,7 +128,7 @@
         <int>23</int>
       </attr>
       <attr name="Source.Region_Length">
-        <int>25</int>
+        <int>43</int>
       </attr>
     </node>
     <node id="N2">
@@ -143,190 +143,61 @@
         <enum />
       </attr>
       <attr name="Source.Name">
-        <string>ClinicService</string>
+        <string>OwnerController</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.service.ClinicService</string>
+        <string>org.springframework.samples.petclinic.web.OwnerController</string>
       </attr>
       <attr name="Source.File">
-        <string>ClinicService.java</string>
+        <string>OwnerController.java</string>
       </attr>
       <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/service/</string>
+        <string>src/main/java/org/springframework/samples/petclinic/web/</string>
       </attr>
       <attr name="Metric.Halstead.Volume">
-        <float>333.6685</float>
+        <float>2731.163</float>
       </attr>
       <attr name="Metric.Halstead.Difficulty">
-        <float>4.717391</float>
+        <float>15.76027</float>
       </attr>
       <attr name="Metric.Halstead.Effort">
-        <float>1574.045</float>
+        <float>43043.87</float>
       </attr>
       <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>2.266667</float>
+        <float>4.941861</float>
       </attr>
       <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.045105</float>
+        <float>0.409405</float>
       </attr>
       <attr name="Metric.HIS.VOCF">
-        <float>2.266667</float>
+        <float>4.941861</float>
       </attr>
       <attr name="Source.Line">
-        <int>32</int>
-      </attr>
-      <attr name="Source.Column">
-        <int>18</int>
-      </attr>
-      <attr name="SourceRange_StartLine">
-        <int>27</int>
-      </attr>
-      <attr name="SourceRange_EndLine">
-        <int>53</int>
-      </attr>
-      <attr name="Metric.LOC">
-        <int>26</int>
-      </attr>
-      <attr name="Metric.Lines.LOC">
-        <int>26</int>
-      </attr>
-      <attr name="Metric.Lines.Code">
-        <int>21</int>
-      </attr>
-      <attr name="Metric.Lines.Comment">
-        <int>5</int>
-      </attr>
-      <attr name="Metric.Lines.Only_Comment">
-        <int>5</int>
-      </attr>
-      <attr name="Metric.Lines.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Fixme">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Todo">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Hack">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.XXX">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Comment.Preceding">
-        <int>5</int>
-      </attr>
-      <attr name="Metric.Comment.Internal">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Code">
-        <int>21</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Comment">
-        <int>5</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operands">
-        <int>31</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operators">
-        <int>37</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operands">
-        <int>23</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operators">
-        <int>7</int>
-      </attr>
-      <attr name="Metric.Halstead.Length">
-        <int>68</int>
-      </attr>
-      <attr name="Metric.Halstead.Vocabulary">
-        <int>30</int>
-      </attr>
-      <attr name="Metric.Halstead.Required_Time">
-        <int>87</int>
-      </attr>
-      <attr name="Metric.Level">
-        <int>2</int>
-      </attr>
-      <attr name="Source.Region_Start">
-        <int>27</int>
-      </attr>
-      <attr name="Source.Region_Length">
-        <int>26</int>
-      </attr>
-    </node>
-    <node id="N3">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Is_Definition">
-        <enum />
-      </attr>
-      <attr name="Element.Has_Public_Visibility">
-        <enum />
-      </attr>
-      <attr name="Implementation">
-        <enum />
-      </attr>
-      <attr name="Source.Name">
-        <string>ClinicServiceImpl</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.service.ClinicServiceImpl</string>
-      </attr>
-      <attr name="Source.File">
-        <string>ClinicServiceImpl.java</string>
-      </attr>
-      <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/service/</string>
-      </attr>
-      <attr name="Metric.Halstead.Volume">
-        <float>1463.453</float>
-      </attr>
-      <attr name="Metric.Halstead.Difficulty">
-        <float>13.32222</float>
-      </attr>
-      <attr name="Metric.Halstead.Effort">
-        <float>19496.45</float>
-      </attr>
-      <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>4.5</float>
-      </attr>
-      <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.241462</float>
-      </attr>
-      <attr name="Metric.HIS.VOCF">
-        <float>4.5</float>
-      </attr>
-      <attr name="Source.Line">
-        <int>41</int>
+        <int>40</int>
       </attr>
       <attr name="Source.Column">
         <int>14</int>
       </attr>
       <attr name="SourceRange_StartLine">
-        <int>34</int>
+        <int>33</int>
       </attr>
       <attr name="SourceRange_EndLine">
-        <int>114</int>
+        <int>136</int>
       </attr>
       <attr name="Metric.LOC">
-        <int>80</int>
+        <int>103</int>
       </attr>
       <attr name="Metric.Lines.LOC">
-        <int>80</int>
+        <int>103</int>
       </attr>
       <attr name="Metric.Lines.Code">
-        <int>74</int>
+        <int>86</int>
       </attr>
       <attr name="Metric.Lines.Comment">
-        <int>6</int>
+        <int>18</int>
       </attr>
       <attr name="Metric.Lines.Only_Comment">
-        <int>6</int>
+        <int>17</int>
       </attr>
       <attr name="Metric.Lines.Empty">
         <int>0</int>
@@ -347,49 +218,49 @@
         <int>6</int>
       </attr>
       <attr name="Metric.Comment.Internal">
-        <int>0</int>
+        <int>12</int>
       </attr>
       <attr name="Metric.Lines.Class.Code">
-        <int>74</int>
+        <int>86</int>
       </attr>
       <attr name="Metric.Lines.Class.Comment">
-        <int>6</int>
+        <int>18</int>
       </attr>
       <attr name="Metric.Lines.Class.Empty">
         <int>0</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operands">
-        <int>109</int>
+        <int>177</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operators">
-        <int>143</int>
+        <int>248</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operands">
-        <int>45</int>
+        <int>73</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operators">
-        <int>11</int>
+        <int>13</int>
       </attr>
       <attr name="Metric.Halstead.Length">
-        <int>252</int>
+        <int>425</int>
       </attr>
       <attr name="Metric.Halstead.Vocabulary">
-        <int>56</int>
+        <int>86</int>
       </attr>
       <attr name="Metric.Halstead.Required_Time">
-        <int>1083</int>
+        <int>2391</int>
       </attr>
       <attr name="Metric.Level">
         <int>2</int>
       </attr>
       <attr name="Source.Region_Start">
-        <int>34</int>
+        <int>33</int>
       </attr>
       <attr name="Source.Region_Length">
-        <int>80</int>
+        <int>103</int>
       </attr>
     </node>
-    <node id="N4">
+    <node id="N3">
       <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="Linkage.Is_Definition">
         <enum />
@@ -518,7 +389,7 @@
         <int>19</int>
       </attr>
     </node>
-    <node id="N5">
+    <node id="N4">
       <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="Linkage.Is_Definition">
         <enum />
@@ -530,61 +401,61 @@
         <enum />
       </attr>
       <attr name="Source.Name">
-        <string>EntityUtils</string>
+        <string>VetController</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.util.EntityUtils</string>
+        <string>org.springframework.samples.petclinic.web.VetController</string>
       </attr>
       <attr name="Source.File">
-        <string>EntityUtils.java</string>
+        <string>VetController.java</string>
       </attr>
       <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/util/</string>
+        <string>src/main/java/org/springframework/samples/petclinic/web/</string>
       </attr>
       <attr name="Metric.Halstead.Volume">
-        <float>306.4945</float>
+        <float>749.5321</float>
       </attr>
       <attr name="Metric.Halstead.Difficulty">
-        <float>12</float>
+        <float>10.1129</float>
       </attr>
       <attr name="Metric.Halstead.Effort">
-        <float>3677.934</float>
+        <float>7579.946</float>
       </attr>
       <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>2.64</float>
+        <float>3.309524</float>
       </attr>
       <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.079423</float>
+        <float>0.128624</float>
       </attr>
       <attr name="Metric.HIS.VOCF">
-        <float>2.64</float>
+        <float>3.309524</float>
       </attr>
       <attr name="Source.Line">
-        <int>33</int>
+        <int>35</int>
       </attr>
       <attr name="Source.Column">
         <int>14</int>
       </attr>
       <attr name="SourceRange_StartLine">
-        <int>24</int>
+        <int>28</int>
       </attr>
       <attr name="SourceRange_EndLine">
-        <int>58</int>
+        <int>77</int>
       </attr>
       <attr name="Metric.LOC">
-        <int>34</int>
+        <int>49</int>
       </attr>
       <attr name="Metric.Lines.LOC">
-        <int>34</int>
+        <int>49</int>
       </attr>
       <attr name="Metric.Lines.Code">
-        <int>15</int>
+        <int>39</int>
       </attr>
       <attr name="Metric.Lines.Comment">
-        <int>19</int>
+        <int>10</int>
       </attr>
       <attr name="Metric.Lines.Only_Comment">
-        <int>19</int>
+        <int>10</int>
       </attr>
       <attr name="Metric.Lines.Empty">
         <int>0</int>
@@ -602,49 +473,178 @@
         <int>0</int>
       </attr>
       <attr name="Metric.Comment.Preceding">
-        <int>9</int>
+        <int>6</int>
       </attr>
       <attr name="Metric.Comment.Internal">
-        <int>10</int>
+        <int>4</int>
       </attr>
       <attr name="Metric.Lines.Class.Code">
-        <int>15</int>
+        <int>39</int>
       </attr>
       <attr name="Metric.Lines.Class.Comment">
-        <int>19</int>
+        <int>10</int>
       </attr>
       <attr name="Metric.Lines.Class.Empty">
         <int>0</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operands">
-        <int>26</int>
+        <int>57</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operators">
-        <int>40</int>
+        <int>82</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operands">
-        <int>13</int>
+        <int>31</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operators">
-        <int>12</int>
+        <int>11</int>
       </attr>
       <attr name="Metric.Halstead.Length">
-        <int>66</int>
+        <int>139</int>
       </attr>
       <attr name="Metric.Halstead.Vocabulary">
-        <int>25</int>
+        <int>42</int>
       </attr>
       <attr name="Metric.Halstead.Required_Time">
-        <int>204</int>
+        <int>421</int>
       </attr>
       <attr name="Metric.Level">
         <int>2</int>
       </attr>
       <attr name="Source.Region_Start">
-        <int>24</int>
+        <int>28</int>
       </attr>
       <attr name="Source.Region_Length">
-        <int>34</int>
+        <int>49</int>
+      </attr>
+    </node>
+    <node id="N5">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Linkage.Is_Definition">
+        <enum />
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum />
+      </attr>
+      <attr name="Implementation">
+        <enum />
+      </attr>
+      <attr name="Source.Name">
+        <string>VisitController</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.springframework.samples.petclinic.web.VisitController</string>
+      </attr>
+      <attr name="Source.File">
+        <string>VisitController.java</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/main/java/org/springframework/samples/petclinic/web/</string>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>1154.022</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>9.946809</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>11478.84</float>
+      </attr>
+      <attr name="Metric.Halstead.Vocabular_Frequency">
+        <float>3.396552</float>
+      </attr>
+      <attr name="Metric.Halstead.Delivered_Bugs">
+        <float>0.16962</float>
+      </attr>
+      <attr name="Metric.HIS.VOCF">
+        <float>3.396552</float>
+      </attr>
+      <attr name="Source.Line">
+        <int>38</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>14</int>
+      </attr>
+      <attr name="SourceRange_StartLine">
+        <int>31</int>
+      </attr>
+      <attr name="SourceRange_EndLine">
+        <int>95</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>64</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>64</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>46</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>18</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>18</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Comment.Preceding">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>12</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Code">
+        <int>46</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Comment">
+        <int>18</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>85</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>112</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>47</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>11</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>197</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>58</int>
+      </attr>
+      <attr name="Metric.Halstead.Required_Time">
+        <int>637</int>
+      </attr>
+      <attr name="Metric.Level">
+        <int>2</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>31</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>64</int>
       </attr>
     </node>
     <node id="N6">
@@ -659,316 +659,61 @@
         <enum />
       </attr>
       <attr name="Source.Name">
-        <string>JdbcOwnerRepositoryImpl</string>
+        <string>VisitRepository</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.repository.jdbc.JdbcOwnerRepositoryImpl</string>
+        <string>org.springframework.samples.petclinic.repository.VisitRepository</string>
       </attr>
       <attr name="Source.File">
-        <string>JdbcOwnerRepositoryImpl.java</string>
+        <string>VisitRepository.java</string>
       </attr>
       <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/repository/jdbc/</string>
+        <string>src/main/java/org/springframework/samples/petclinic/repository/</string>
       </attr>
       <attr name="Metric.Halstead.Volume">
-        <float>2402.803</float>
+        <float>74.23092</float>
       </attr>
       <attr name="Metric.Halstead.Difficulty">
-        <float>14.33823</float>
+        <float>3.9375</float>
       </attr>
       <attr name="Metric.Halstead.Effort">
-        <float>34451.96</float>
+        <float>292.2842</float>
       </attr>
       <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>4.679012</float>
+        <float>1.266667</float>
       </attr>
       <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.35293</float>
+        <float>0.014681</float>
       </attr>
       <attr name="Metric.HIS.VOCF">
-        <float>4.679012</float>
+        <float>1.266667</float>
       </attr>
       <attr name="Source.Line">
-        <int>49</int>
+        <int>32</int>
       </attr>
       <attr name="Source.Column">
-        <int>14</int>
+        <int>18</int>
       </attr>
       <attr name="SourceRange_StartLine">
-        <int>37</int>
-      </attr>
-      <attr name="SourceRange_EndLine">
-        <int>159</int>
-      </attr>
-      <attr name="Metric.LOC">
-        <int>122</int>
-      </attr>
-      <attr name="Metric.Lines.LOC">
-        <int>122</int>
-      </attr>
-      <attr name="Metric.Lines.Code">
-        <int>96</int>
-      </attr>
-      <attr name="Metric.Lines.Comment">
-        <int>26</int>
-      </attr>
-      <attr name="Metric.Lines.Only_Comment">
-        <int>26</int>
-      </attr>
-      <attr name="Metric.Lines.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Fixme">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Todo">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Hack">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.XXX">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Comment.Preceding">
-        <int>11</int>
-      </attr>
-      <attr name="Metric.Comment.Internal">
-        <int>15</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Code">
-        <int>96</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Comment">
-        <int>26</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operands">
-        <int>150</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operators">
-        <int>229</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operands">
-        <int>68</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operators">
-        <int>13</int>
-      </attr>
-      <attr name="Metric.Halstead.Length">
-        <int>379</int>
-      </attr>
-      <attr name="Metric.Halstead.Vocabulary">
-        <int>81</int>
-      </attr>
-      <attr name="Metric.Halstead.Required_Time">
-        <int>1913</int>
-      </attr>
-      <attr name="Metric.Level">
-        <int>2</int>
-      </attr>
-      <attr name="Source.Region_Start">
-        <int>37</int>
-      </attr>
-      <attr name="Source.Region_Length">
-        <int>122</int>
-      </attr>
-    </node>
-    <node id="N7">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Is_Definition">
-        <enum />
-      </attr>
-      <attr name="Implementation">
-        <enum />
-      </attr>
-      <attr name="Source.Name">
-        <string>JdbcPet</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.repository.jdbc.JdbcPet</string>
-      </attr>
-      <attr name="Source.File">
-        <string>JdbcPet.java</string>
-      </attr>
-      <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/repository/jdbc/</string>
-      </attr>
-      <attr name="Metric.Halstead.Volume">
-        <float>179.717</float>
-      </attr>
-      <attr name="Metric.Halstead.Difficulty">
-        <float>7</float>
-      </attr>
-      <attr name="Metric.Halstead.Effort">
-        <float>1258.019</float>
-      </attr>
-      <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>3.066667</float>
-      </attr>
-      <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.038845</float>
-      </attr>
-      <attr name="Metric.HIS.VOCF">
-        <float>3.066667</float>
-      </attr>
-      <attr name="Source.Line">
-        <int>26</int>
-      </attr>
-      <attr name="Source.Column">
-        <int>7</int>
-      </attr>
-      <attr name="SourceRange_StartLine">
-        <int>20</int>
-      </attr>
-      <attr name="SourceRange_EndLine">
-        <int>49</int>
-      </attr>
-      <attr name="Metric.LOC">
-        <int>29</int>
-      </attr>
-      <attr name="Metric.Lines.LOC">
-        <int>29</int>
-      </attr>
-      <attr name="Metric.Lines.Code">
         <int>23</int>
       </attr>
-      <attr name="Metric.Lines.Comment">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Lines.Only_Comment">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Lines.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Fixme">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Todo">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Hack">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.XXX">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Comment.Preceding">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Comment.Internal">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Code">
-        <int>23</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Comment">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operands">
-        <int>16</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operators">
-        <int>30</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operands">
-        <int>8</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operators">
-        <int>7</int>
-      </attr>
-      <attr name="Metric.Halstead.Length">
-        <int>46</int>
-      </attr>
-      <attr name="Metric.Halstead.Vocabulary">
-        <int>15</int>
-      </attr>
-      <attr name="Metric.Halstead.Required_Time">
-        <int>69</int>
-      </attr>
-      <attr name="Metric.Level">
-        <int>2</int>
-      </attr>
-      <attr name="Source.Region_Start">
-        <int>20</int>
-      </attr>
-      <attr name="Source.Region_Length">
-        <int>29</int>
-      </attr>
-    </node>
-    <node id="N8">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Is_Definition">
-        <enum />
-      </attr>
-      <attr name="Element.Has_Public_Visibility">
-        <enum />
-      </attr>
-      <attr name="Implementation">
-        <enum />
-      </attr>
-      <attr name="Source.Name">
-        <string>JdbcPetRepositoryImpl</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.repository.jdbc.JdbcPetRepositoryImpl</string>
-      </attr>
-      <attr name="Source.File">
-        <string>JdbcPetRepositoryImpl.java</string>
-      </attr>
-      <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/repository/jdbc/</string>
-      </attr>
-      <attr name="Metric.Halstead.Volume">
-        <float>1955.601</float>
-      </attr>
-      <attr name="Metric.Halstead.Difficulty">
-        <float>10.23846</float>
-      </attr>
-      <attr name="Metric.Halstead.Effort">
-        <float>20022.35</float>
-      </attr>
-      <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>4.118421</float>
-      </attr>
-      <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.245785</float>
-      </attr>
-      <attr name="Metric.HIS.VOCF">
-        <float>4.118421</float>
-      </attr>
-      <attr name="Source.Line">
-        <int>46</int>
-      </attr>
-      <attr name="Source.Column">
-        <int>14</int>
-      </attr>
-      <attr name="SourceRange_StartLine">
-        <int>36</int>
-      </attr>
       <attr name="SourceRange_EndLine">
-        <int>120</int>
+        <int>45</int>
       </attr>
       <attr name="Metric.LOC">
-        <int>84</int>
+        <int>22</int>
       </attr>
       <attr name="Metric.Lines.LOC">
-        <int>84</int>
+        <int>22</int>
       </attr>
       <attr name="Metric.Lines.Code">
-        <int>72</int>
+        <int>7</int>
       </attr>
       <attr name="Metric.Lines.Comment">
-        <int>12</int>
+        <int>15</int>
       </attr>
       <attr name="Metric.Lines.Only_Comment">
-        <int>12</int>
+        <int>15</int>
       </attr>
       <attr name="Metric.Lines.Empty">
         <int>0</int>
@@ -989,46 +734,304 @@
         <int>9</int>
       </attr>
       <attr name="Metric.Comment.Internal">
-        <int>3</int>
+        <int>6</int>
       </attr>
       <attr name="Metric.Lines.Class.Code">
-        <int>72</int>
+        <int>7</int>
       </attr>
       <attr name="Metric.Lines.Class.Comment">
-        <int>12</int>
+        <int>15</int>
       </attr>
       <attr name="Metric.Lines.Class.Empty">
         <int>0</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operands">
-        <int>121</int>
+        <int>9</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operators">
-        <int>192</int>
+        <int>10</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operands">
-        <int>65</int>
+        <int>8</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operators">
-        <int>11</int>
+        <int>7</int>
       </attr>
       <attr name="Metric.Halstead.Length">
-        <int>313</int>
+        <int>19</int>
       </attr>
       <attr name="Metric.Halstead.Vocabulary">
-        <int>76</int>
+        <int>15</int>
       </attr>
       <attr name="Metric.Halstead.Required_Time">
-        <int>1112</int>
+        <int>16</int>
       </attr>
       <attr name="Metric.Level">
         <int>2</int>
       </attr>
       <attr name="Source.Region_Start">
-        <int>36</int>
+        <int>23</int>
       </attr>
       <attr name="Source.Region_Length">
-        <int>84</int>
+        <int>22</int>
+      </attr>
+    </node>
+    <node id="N7">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Linkage.Is_Definition">
+        <enum />
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum />
+      </attr>
+      <attr name="Implementation">
+        <enum />
+      </attr>
+      <attr name="Source.Name">
+        <string>SpringDataVetRepository</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.springframework.samples.petclinic.repository.springdatajpa.SpringDataVetRepository</string>
+      </attr>
+      <attr name="Source.File">
+        <string>SpringDataVetRepository.java</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/main/java/org/springframework/samples/petclinic/repository/springdatajpa/</string>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>36.54121</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>2.5</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>91.35302</float>
+      </attr>
+      <attr name="Metric.Halstead.Vocabular_Frequency">
+        <float>1.1</float>
+      </attr>
+      <attr name="Metric.Halstead.Delivered_Bugs">
+        <float>0.006761</float>
+      </attr>
+      <attr name="Metric.HIS.VOCF">
+        <float>1.1</float>
+      </attr>
+      <attr name="Source.Line">
+        <int>28</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>18</int>
+      </attr>
+      <attr name="SourceRange_StartLine">
+        <int>22</int>
+      </attr>
+      <attr name="SourceRange_EndLine">
+        <int>30</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>8</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>8</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Comment.Preceding">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Code">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Comment">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>11</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>10</int>
+      </attr>
+      <attr name="Metric.Halstead.Required_Time">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Level">
+        <int>2</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>22</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>8</int>
+      </attr>
+    </node>
+    <node id="N8">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Linkage.Is_Definition">
+        <enum />
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum />
+      </attr>
+      <attr name="Implementation">
+        <enum />
+      </attr>
+      <attr name="Source.Name">
+        <string>SpringDataVisitRepository</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.springframework.samples.petclinic.repository.springdatajpa.SpringDataVisitRepository</string>
+      </attr>
+      <attr name="Source.File">
+        <string>SpringDataVisitRepository.java</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/main/java/org/springframework/samples/petclinic/repository/springdatajpa/</string>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>36.54121</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>2.5</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>91.35302</float>
+      </attr>
+      <attr name="Metric.Halstead.Vocabular_Frequency">
+        <float>1.1</float>
+      </attr>
+      <attr name="Metric.Halstead.Delivered_Bugs">
+        <float>0.006761</float>
+      </attr>
+      <attr name="Metric.HIS.VOCF">
+        <float>1.1</float>
+      </attr>
+      <attr name="Source.Line">
+        <int>28</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>18</int>
+      </attr>
+      <attr name="SourceRange_StartLine">
+        <int>22</int>
+      </attr>
+      <attr name="SourceRange_EndLine">
+        <int>30</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>8</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>8</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Comment.Preceding">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Code">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Comment">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>11</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>10</int>
+      </attr>
+      <attr name="Metric.Halstead.Required_Time">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Level">
+        <int>2</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>22</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>8</int>
       </attr>
     </node>
     <node id="N9">
@@ -1043,61 +1046,61 @@
         <enum />
       </attr>
       <attr name="Source.Name">
-        <string>JdbcPetVisitExtractor</string>
+        <string>SpringDataPetRepository</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.repository.jdbc.JdbcPetVisitExtractor</string>
+        <string>org.springframework.samples.petclinic.repository.springdatajpa.SpringDataPetRepository</string>
       </attr>
       <attr name="Source.File">
-        <string>JdbcPetVisitExtractor.java</string>
+        <string>SpringDataPetRepository.java</string>
       </attr>
       <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/repository/jdbc/</string>
+        <string>src/main/java/org/springframework/samples/petclinic/repository/springdatajpa/</string>
       </attr>
       <attr name="Metric.Halstead.Volume">
-        <float>475</float>
+        <float>112.3701</float>
       </attr>
       <attr name="Metric.Halstead.Difficulty">
-        <float>9.952381</float>
+        <float>4.5</float>
       </attr>
       <attr name="Metric.Halstead.Effort">
-        <float>4727.381</float>
+        <float>505.6656</float>
       </attr>
       <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>2.96875</float>
+        <float>1.3</float>
       </attr>
       <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.093891</float>
+        <float>0.021157</float>
       </attr>
       <attr name="Metric.HIS.VOCF">
-        <float>2.96875</float>
+        <float>1.3</float>
       </attr>
       <attr name="Source.Line">
-        <int>28</int>
+        <int>32</int>
       </attr>
       <attr name="Source.Column">
-        <int>14</int>
+        <int>18</int>
       </attr>
       <attr name="SourceRange_StartLine">
-        <int>24</int>
-      </attr>
-      <attr name="SourceRange_EndLine">
-        <int>54</int>
-      </attr>
-      <attr name="Metric.LOC">
-        <int>30</int>
-      </attr>
-      <attr name="Metric.Lines.LOC">
-        <int>30</int>
-      </attr>
-      <attr name="Metric.Lines.Code">
         <int>26</int>
       </attr>
+      <attr name="SourceRange_EndLine">
+        <int>38</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>12</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>12</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>6</int>
+      </attr>
       <attr name="Metric.Lines.Comment">
-        <int>4</int>
+        <int>6</int>
       </attr>
       <attr name="Metric.Lines.Only_Comment">
-        <int>4</int>
+        <int>6</int>
       </attr>
       <attr name="Metric.Lines.Empty">
         <int>0</int>
@@ -1115,49 +1118,49 @@
         <int>0</int>
       </attr>
       <attr name="Metric.Comment.Preceding">
-        <int>4</int>
+        <int>6</int>
       </attr>
       <attr name="Metric.Comment.Internal">
         <int>0</int>
       </attr>
       <attr name="Metric.Lines.Class.Code">
-        <int>26</int>
+        <int>6</int>
       </attr>
       <attr name="Metric.Lines.Class.Comment">
-        <int>4</int>
+        <int>6</int>
       </attr>
       <attr name="Metric.Lines.Class.Empty">
         <int>0</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operands">
-        <int>38</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operators">
-        <int>57</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operands">
-        <int>21</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operators">
         <int>11</int>
       </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>15</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>11</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>9</int>
+      </attr>
       <attr name="Metric.Halstead.Length">
-        <int>95</int>
+        <int>26</int>
       </attr>
       <attr name="Metric.Halstead.Vocabulary">
-        <int>32</int>
+        <int>20</int>
       </attr>
       <attr name="Metric.Halstead.Required_Time">
-        <int>262</int>
+        <int>28</int>
       </attr>
       <attr name="Metric.Level">
         <int>2</int>
       </attr>
       <attr name="Source.Region_Start">
-        <int>24</int>
+        <int>26</int>
       </attr>
       <attr name="Source.Region_Length">
-        <int>30</int>
+        <int>12</int>
       </attr>
     </node>
     <node id="N10">
@@ -1172,61 +1175,61 @@
         <enum />
       </attr>
       <attr name="Source.Name">
-        <string>JdbcVetRepositoryImpl</string>
+        <string>SpringDataOwnerRepository</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.repository.jdbc.JdbcVetRepositoryImpl</string>
+        <string>org.springframework.samples.petclinic.repository.springdatajpa.SpringDataOwnerRepository</string>
       </attr>
       <attr name="Source.File">
-        <string>JdbcVetRepositoryImpl.java</string>
+        <string>SpringDataOwnerRepository.java</string>
       </attr>
       <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/repository/jdbc/</string>
+        <string>src/main/java/org/springframework/samples/petclinic/repository/springdatajpa/</string>
       </attr>
       <attr name="Metric.Halstead.Volume">
-        <float>1111.586</float>
+        <float>242.4993</float>
       </attr>
       <attr name="Metric.Halstead.Difficulty">
-        <float>11.55</float>
+        <float>5.75</float>
       </attr>
       <attr name="Metric.Halstead.Effort">
-        <float>12838.82</float>
+        <float>1394.371</float>
       </attr>
       <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>3.75</float>
+        <float>1.888889</float>
       </attr>
       <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.182766</float>
+        <float>0.041604</float>
       </attr>
       <attr name="Metric.HIS.VOCF">
-        <float>3.75</float>
+        <float>1.888889</float>
       </attr>
       <attr name="Source.Line">
-        <int>46</int>
+        <int>32</int>
       </attr>
       <attr name="Source.Column">
-        <int>14</int>
+        <int>18</int>
       </attr>
       <attr name="SourceRange_StartLine">
-        <int>33</int>
+        <int>26</int>
       </attr>
       <attr name="SourceRange_EndLine">
-        <int>92</int>
+        <int>42</int>
       </attr>
       <attr name="Metric.LOC">
-        <int>59</int>
+        <int>16</int>
       </attr>
       <attr name="Metric.Lines.LOC">
-        <int>59</int>
+        <int>16</int>
       </attr>
       <attr name="Metric.Lines.Code">
-        <int>41</int>
+        <int>10</int>
       </attr>
       <attr name="Metric.Lines.Comment">
-        <int>18</int>
+        <int>6</int>
       </attr>
       <attr name="Metric.Lines.Only_Comment">
-        <int>18</int>
+        <int>6</int>
       </attr>
       <attr name="Metric.Lines.Empty">
         <int>0</int>
@@ -1244,49 +1247,49 @@
         <int>0</int>
       </attr>
       <attr name="Metric.Comment.Preceding">
-        <int>12</int>
-      </attr>
-      <attr name="Metric.Comment.Internal">
         <int>6</int>
       </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>0</int>
+      </attr>
       <attr name="Metric.Lines.Class.Code">
-        <int>41</int>
+        <int>10</int>
       </attr>
       <attr name="Metric.Lines.Class.Comment">
-        <int>18</int>
+        <int>6</int>
       </attr>
       <attr name="Metric.Lines.Class.Empty">
         <int>0</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operands">
-        <int>77</int>
+        <int>23</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operators">
-        <int>118</int>
+        <int>28</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operands">
-        <int>40</int>
+        <int>18</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operators">
-        <int>12</int>
+        <int>9</int>
       </attr>
       <attr name="Metric.Halstead.Length">
-        <int>195</int>
+        <int>51</int>
       </attr>
       <attr name="Metric.Halstead.Vocabulary">
-        <int>52</int>
+        <int>27</int>
       </attr>
       <attr name="Metric.Halstead.Required_Time">
-        <int>713</int>
+        <int>77</int>
       </attr>
       <attr name="Metric.Level">
         <int>2</int>
       </attr>
       <attr name="Source.Region_Start">
-        <int>33</int>
+        <int>26</int>
       </attr>
       <attr name="Source.Region_Length">
-        <int>59</int>
+        <int>16</int>
       </attr>
     </node>
     <node id="N11">
@@ -1301,61 +1304,61 @@
         <enum />
       </attr>
       <attr name="Source.Name">
-        <string>JdbcVisitRepositoryImpl</string>
+        <string>JpaPetRepositoryImpl</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.repository.jdbc.JdbcVisitRepositoryImpl</string>
+        <string>org.springframework.samples.petclinic.repository.jpa.JpaPetRepositoryImpl</string>
       </attr>
       <attr name="Source.File">
-        <string>JdbcVisitRepositoryImpl.java</string>
+        <string>JpaPetRepositoryImpl.java</string>
       </attr>
       <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/repository/jdbc/</string>
+        <string>src/main/java/org/springframework/samples/petclinic/repository/jpa/</string>
       </attr>
       <attr name="Metric.Halstead.Volume">
-        <float>1493.547</float>
+        <float>492.4112</float>
       </attr>
       <attr name="Metric.Halstead.Difficulty">
-        <float>11.09434</float>
+        <float>8.25</float>
       </attr>
       <attr name="Metric.Halstead.Effort">
-        <float>16569.92</float>
+        <float>4062.392</float>
       </attr>
       <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>3.815385</float>
+        <float>2.742857</float>
       </attr>
       <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.21665</float>
+        <float>0.084866</float>
       </attr>
       <attr name="Metric.HIS.VOCF">
-        <float>3.815385</float>
+        <float>2.742857</float>
       </attr>
       <attr name="Source.Line">
-        <int>41</int>
+        <int>38</int>
       </attr>
       <attr name="Source.Column">
         <int>14</int>
       </attr>
       <attr name="SourceRange_StartLine">
-        <int>29</int>
+        <int>28</int>
       </attr>
       <attr name="SourceRange_EndLine">
-        <int>102</int>
+        <int>64</int>
       </attr>
       <attr name="Metric.LOC">
-        <int>73</int>
+        <int>36</int>
       </attr>
       <attr name="Metric.Lines.LOC">
-        <int>73</int>
+        <int>36</int>
       </attr>
       <attr name="Metric.Lines.Code">
-        <int>59</int>
+        <int>27</int>
       </attr>
       <attr name="Metric.Lines.Comment">
-        <int>14</int>
+        <int>9</int>
       </attr>
       <attr name="Metric.Lines.Only_Comment">
-        <int>14</int>
+        <int>9</int>
       </attr>
       <attr name="Metric.Lines.Empty">
         <int>0</int>
@@ -1373,49 +1376,49 @@
         <int>0</int>
       </attr>
       <attr name="Metric.Comment.Preceding">
-        <int>11</int>
+        <int>9</int>
       </attr>
       <attr name="Metric.Comment.Internal">
-        <int>3</int>
+        <int>0</int>
       </attr>
       <attr name="Metric.Lines.Class.Code">
-        <int>59</int>
+        <int>27</int>
       </attr>
       <attr name="Metric.Lines.Class.Comment">
-        <int>14</int>
+        <int>9</int>
       </attr>
       <attr name="Metric.Lines.Class.Empty">
         <int>0</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operands">
-        <int>98</int>
+        <int>36</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operators">
-        <int>150</int>
+        <int>60</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operands">
-        <int>53</int>
+        <int>24</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operators">
-        <int>12</int>
+        <int>11</int>
       </attr>
       <attr name="Metric.Halstead.Length">
-        <int>248</int>
+        <int>96</int>
       </attr>
       <attr name="Metric.Halstead.Vocabulary">
-        <int>65</int>
+        <int>35</int>
       </attr>
       <attr name="Metric.Halstead.Required_Time">
-        <int>920</int>
+        <int>225</int>
       </attr>
       <attr name="Metric.Level">
         <int>2</int>
       </attr>
       <attr name="Source.Region_Start">
-        <int>29</int>
+        <int>28</int>
       </attr>
       <attr name="Source.Region_Length">
-        <int>73</int>
+        <int>36</int>
       </attr>
     </node>
     <node id="N12">
@@ -1559,135 +1562,6 @@
         <enum />
       </attr>
       <attr name="Source.Name">
-        <string>JpaPetRepositoryImpl</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.repository.jpa.JpaPetRepositoryImpl</string>
-      </attr>
-      <attr name="Source.File">
-        <string>JpaPetRepositoryImpl.java</string>
-      </attr>
-      <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/repository/jpa/</string>
-      </attr>
-      <attr name="Metric.Halstead.Volume">
-        <float>492.4112</float>
-      </attr>
-      <attr name="Metric.Halstead.Difficulty">
-        <float>8.25</float>
-      </attr>
-      <attr name="Metric.Halstead.Effort">
-        <float>4062.392</float>
-      </attr>
-      <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>2.742857</float>
-      </attr>
-      <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.084866</float>
-      </attr>
-      <attr name="Metric.HIS.VOCF">
-        <float>2.742857</float>
-      </attr>
-      <attr name="Source.Line">
-        <int>38</int>
-      </attr>
-      <attr name="Source.Column">
-        <int>14</int>
-      </attr>
-      <attr name="SourceRange_StartLine">
-        <int>28</int>
-      </attr>
-      <attr name="SourceRange_EndLine">
-        <int>64</int>
-      </attr>
-      <attr name="Metric.LOC">
-        <int>36</int>
-      </attr>
-      <attr name="Metric.Lines.LOC">
-        <int>36</int>
-      </attr>
-      <attr name="Metric.Lines.Code">
-        <int>27</int>
-      </attr>
-      <attr name="Metric.Lines.Comment">
-        <int>9</int>
-      </attr>
-      <attr name="Metric.Lines.Only_Comment">
-        <int>9</int>
-      </attr>
-      <attr name="Metric.Lines.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Fixme">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Todo">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Hack">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.XXX">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Comment.Preceding">
-        <int>9</int>
-      </attr>
-      <attr name="Metric.Comment.Internal">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Code">
-        <int>27</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Comment">
-        <int>9</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operands">
-        <int>36</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operators">
-        <int>60</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operands">
-        <int>24</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operators">
-        <int>11</int>
-      </attr>
-      <attr name="Metric.Halstead.Length">
-        <int>96</int>
-      </attr>
-      <attr name="Metric.Halstead.Vocabulary">
-        <int>35</int>
-      </attr>
-      <attr name="Metric.Halstead.Required_Time">
-        <int>225</int>
-      </attr>
-      <attr name="Metric.Level">
-        <int>2</int>
-      </attr>
-      <attr name="Source.Region_Start">
-        <int>28</int>
-      </attr>
-      <attr name="Source.Region_Length">
-        <int>36</int>
-      </attr>
-    </node>
-    <node id="N14">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Is_Definition">
-        <enum />
-      </attr>
-      <attr name="Element.Has_Public_Visibility">
-        <enum />
-      </attr>
-      <attr name="Implementation">
-        <enum />
-      </attr>
-      <attr name="Source.Name">
         <string>JpaVetRepositoryImpl</string>
       </attr>
       <attr name="Linkage.Name">
@@ -1805,7 +1679,7 @@
         <int>23</int>
       </attr>
     </node>
-    <node id="N15">
+    <node id="N14">
       <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="Linkage.Is_Definition">
         <enum />
@@ -1934,7 +1808,7 @@
         <int>37</int>
       </attr>
     </node>
-    <node id="N16">
+    <node id="N15">
       <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="Linkage.Is_Definition">
         <enum />
@@ -1946,61 +1820,61 @@
         <enum />
       </attr>
       <attr name="Source.Name">
-        <string>NamedEntity</string>
+        <string>JdbcOwnerRepositoryImpl</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.model.NamedEntity</string>
+        <string>org.springframework.samples.petclinic.repository.jdbc.JdbcOwnerRepositoryImpl</string>
       </attr>
       <attr name="Source.File">
-        <string>NamedEntity.java</string>
+        <string>JdbcOwnerRepositoryImpl.java</string>
       </attr>
       <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/model/</string>
+        <string>src/main/java/org/springframework/samples/petclinic/repository/jdbc/</string>
       </attr>
       <attr name="Metric.Halstead.Volume">
-        <float>212.3964</float>
+        <float>2402.803</float>
       </attr>
       <attr name="Metric.Halstead.Difficulty">
-        <float>7.272727</float>
+        <float>14.33823</float>
       </attr>
       <attr name="Metric.Halstead.Effort">
-        <float>1544.701</float>
+        <float>34451.96</float>
       </attr>
       <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>2.631579</float>
+        <float>4.679012</float>
       </attr>
       <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.044543</float>
+        <float>0.35293</float>
       </attr>
       <attr name="Metric.HIS.VOCF">
-        <float>2.631579</float>
+        <float>4.679012</float>
       </attr>
       <attr name="Source.Line">
-        <int>30</int>
+        <int>49</int>
       </attr>
       <attr name="Source.Column">
         <int>14</int>
       </attr>
       <attr name="SourceRange_StartLine">
-        <int>22</int>
+        <int>37</int>
       </attr>
       <attr name="SourceRange_EndLine">
-        <int>49</int>
+        <int>159</int>
       </attr>
       <attr name="Metric.LOC">
-        <int>27</int>
+        <int>122</int>
       </attr>
       <attr name="Metric.Lines.LOC">
-        <int>27</int>
+        <int>122</int>
       </attr>
       <attr name="Metric.Lines.Code">
-        <int>20</int>
+        <int>96</int>
       </attr>
       <attr name="Metric.Lines.Comment">
-        <int>7</int>
+        <int>26</int>
       </attr>
       <attr name="Metric.Lines.Only_Comment">
-        <int>7</int>
+        <int>26</int>
       </attr>
       <attr name="Metric.Lines.Empty">
         <int>0</int>
@@ -2018,49 +1892,178 @@
         <int>0</int>
       </attr>
       <attr name="Metric.Comment.Preceding">
-        <int>7</int>
+        <int>11</int>
       </attr>
       <attr name="Metric.Comment.Internal">
-        <int>0</int>
+        <int>15</int>
       </attr>
       <attr name="Metric.Lines.Class.Code">
-        <int>20</int>
+        <int>96</int>
       </attr>
       <attr name="Metric.Lines.Class.Comment">
-        <int>7</int>
+        <int>26</int>
       </attr>
       <attr name="Metric.Lines.Class.Empty">
         <int>0</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operands">
-        <int>20</int>
+        <int>150</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operators">
-        <int>30</int>
+        <int>229</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operands">
-        <int>11</int>
+        <int>68</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operators">
-        <int>8</int>
+        <int>13</int>
       </attr>
       <attr name="Metric.Halstead.Length">
-        <int>50</int>
+        <int>379</int>
       </attr>
       <attr name="Metric.Halstead.Vocabulary">
-        <int>19</int>
+        <int>81</int>
       </attr>
       <attr name="Metric.Halstead.Required_Time">
-        <int>85</int>
+        <int>1913</int>
       </attr>
       <attr name="Metric.Level">
         <int>2</int>
       </attr>
       <attr name="Source.Region_Start">
-        <int>22</int>
+        <int>37</int>
       </attr>
       <attr name="Source.Region_Length">
-        <int>27</int>
+        <int>122</int>
+      </attr>
+    </node>
+    <node id="N16">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Linkage.Is_Definition">
+        <enum />
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum />
+      </attr>
+      <attr name="Implementation">
+        <enum />
+      </attr>
+      <attr name="Source.Name">
+        <string>JdbcPetRepositoryImpl</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.springframework.samples.petclinic.repository.jdbc.JdbcPetRepositoryImpl</string>
+      </attr>
+      <attr name="Source.File">
+        <string>JdbcPetRepositoryImpl.java</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/main/java/org/springframework/samples/petclinic/repository/jdbc/</string>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>1955.601</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>10.23846</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>20022.35</float>
+      </attr>
+      <attr name="Metric.Halstead.Vocabular_Frequency">
+        <float>4.118421</float>
+      </attr>
+      <attr name="Metric.Halstead.Delivered_Bugs">
+        <float>0.245785</float>
+      </attr>
+      <attr name="Metric.HIS.VOCF">
+        <float>4.118421</float>
+      </attr>
+      <attr name="Source.Line">
+        <int>46</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>14</int>
+      </attr>
+      <attr name="SourceRange_StartLine">
+        <int>36</int>
+      </attr>
+      <attr name="SourceRange_EndLine">
+        <int>120</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>84</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>84</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>72</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>12</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>12</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Comment.Preceding">
+        <int>9</int>
+      </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Code">
+        <int>72</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Comment">
+        <int>12</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>121</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>192</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>65</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>11</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>313</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>76</int>
+      </attr>
+      <attr name="Metric.Halstead.Required_Time">
+        <int>1112</int>
+      </attr>
+      <attr name="Metric.Level">
+        <int>2</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>36</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>84</int>
       </attr>
     </node>
     <node id="N17">
@@ -2207,61 +2210,61 @@
         <enum />
       </attr>
       <attr name="Source.Name">
-        <string>Owner</string>
+        <string>JdbcVisitRepositoryImpl</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.model.Owner</string>
+        <string>org.springframework.samples.petclinic.repository.jdbc.JdbcVisitRepositoryImpl</string>
       </attr>
       <attr name="Source.File">
-        <string>Owner.java</string>
+        <string>JdbcVisitRepositoryImpl.java</string>
       </attr>
       <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/model/</string>
+        <string>src/main/java/org/springframework/samples/petclinic/repository/jdbc/</string>
       </attr>
       <attr name="Metric.Halstead.Volume">
-        <float>2672.716</float>
+        <float>1493.547</float>
       </attr>
       <attr name="Metric.Halstead.Difficulty">
-        <float>16.71428</float>
+        <float>11.09434</float>
       </attr>
       <attr name="Metric.Halstead.Effort">
-        <float>44672.54</float>
+        <float>16569.92</float>
       </attr>
       <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>4.905882</float>
+        <float>3.815385</float>
       </attr>
       <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.419668</float>
+        <float>0.21665</float>
       </attr>
       <attr name="Metric.HIS.VOCF">
-        <float>4.905882</float>
+        <float>3.815385</float>
       </attr>
       <attr name="Source.Line">
-        <int>46</int>
+        <int>41</int>
       </attr>
       <attr name="Source.Column">
         <int>14</int>
       </attr>
       <attr name="SourceRange_StartLine">
-        <int>36</int>
+        <int>29</int>
       </attr>
       <attr name="SourceRange_EndLine">
-        <int>154</int>
+        <int>102</int>
       </attr>
       <attr name="Metric.LOC">
-        <int>118</int>
+        <int>73</int>
       </attr>
       <attr name="Metric.Lines.LOC">
-        <int>118</int>
+        <int>73</int>
       </attr>
       <attr name="Metric.Lines.Code">
-        <int>98</int>
+        <int>59</int>
       </attr>
       <attr name="Metric.Lines.Comment">
-        <int>20</int>
+        <int>14</int>
       </attr>
       <attr name="Metric.Lines.Only_Comment">
-        <int>20</int>
+        <int>14</int>
       </attr>
       <attr name="Metric.Lines.Empty">
         <int>0</int>
@@ -2279,49 +2282,49 @@
         <int>0</int>
       </attr>
       <attr name="Metric.Comment.Preceding">
-        <int>8</int>
+        <int>11</int>
       </attr>
       <attr name="Metric.Comment.Internal">
-        <int>12</int>
+        <int>3</int>
       </attr>
       <attr name="Metric.Lines.Class.Code">
-        <int>98</int>
+        <int>59</int>
       </attr>
       <attr name="Metric.Lines.Class.Comment">
-        <int>20</int>
+        <int>14</int>
       </attr>
       <attr name="Metric.Lines.Class.Empty">
         <int>0</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operands">
-        <int>156</int>
+        <int>98</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operators">
-        <int>261</int>
+        <int>150</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operands">
-        <int>70</int>
+        <int>53</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operators">
-        <int>15</int>
+        <int>12</int>
       </attr>
       <attr name="Metric.Halstead.Length">
-        <int>417</int>
+        <int>248</int>
       </attr>
       <attr name="Metric.Halstead.Vocabulary">
-        <int>85</int>
+        <int>65</int>
       </attr>
       <attr name="Metric.Halstead.Required_Time">
-        <int>2481</int>
+        <int>920</int>
       </attr>
       <attr name="Metric.Level">
         <int>2</int>
       </attr>
       <attr name="Source.Region_Start">
-        <int>36</int>
+        <int>29</int>
       </attr>
       <attr name="Source.Region_Length">
-        <int>118</int>
+        <int>73</int>
       </attr>
     </node>
     <node id="N19">
@@ -2329,68 +2332,65 @@
       <attr name="Linkage.Is_Definition">
         <enum />
       </attr>
-      <attr name="Element.Has_Public_Visibility">
-        <enum />
-      </attr>
       <attr name="Implementation">
         <enum />
       </attr>
       <attr name="Source.Name">
-        <string>OwnerController</string>
+        <string>JdbcPet</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.web.OwnerController</string>
+        <string>org.springframework.samples.petclinic.repository.jdbc.JdbcPet</string>
       </attr>
       <attr name="Source.File">
-        <string>OwnerController.java</string>
+        <string>JdbcPet.java</string>
       </attr>
       <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/web/</string>
+        <string>src/main/java/org/springframework/samples/petclinic/repository/jdbc/</string>
       </attr>
       <attr name="Metric.Halstead.Volume">
-        <float>2731.163</float>
+        <float>179.717</float>
       </attr>
       <attr name="Metric.Halstead.Difficulty">
-        <float>15.76027</float>
+        <float>7</float>
       </attr>
       <attr name="Metric.Halstead.Effort">
-        <float>43043.87</float>
+        <float>1258.019</float>
       </attr>
       <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>4.941861</float>
+        <float>3.066667</float>
       </attr>
       <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.409405</float>
+        <float>0.038845</float>
       </attr>
       <attr name="Metric.HIS.VOCF">
-        <float>4.941861</float>
+        <float>3.066667</float>
       </attr>
       <attr name="Source.Line">
-        <int>40</int>
+        <int>26</int>
       </attr>
       <attr name="Source.Column">
-        <int>14</int>
+        <int>7</int>
       </attr>
       <attr name="SourceRange_StartLine">
-        <int>33</int>
+        <int>20</int>
       </attr>
       <attr name="SourceRange_EndLine">
-        <int>136</int>
+        <int>49</int>
       </attr>
       <attr name="Metric.LOC">
-        <int>103</int>
+        <int>29</int>
       </attr>
       <attr name="Metric.Lines.LOC">
-        <int>103</int>
+        <int>29</int>
       </attr>
       <attr name="Metric.Lines.Code">
-        <int>86</int>
+        <int>23</int>
       </attr>
       <attr name="Metric.Lines.Comment">
-        <int>18</int>
+        <int>6</int>
       </attr>
       <attr name="Metric.Lines.Only_Comment">
-        <int>17</int>
+        <int>6</int>
       </attr>
       <attr name="Metric.Lines.Empty">
         <int>0</int>
@@ -2411,46 +2411,46 @@
         <int>6</int>
       </attr>
       <attr name="Metric.Comment.Internal">
-        <int>12</int>
+        <int>0</int>
       </attr>
       <attr name="Metric.Lines.Class.Code">
-        <int>86</int>
+        <int>23</int>
       </attr>
       <attr name="Metric.Lines.Class.Comment">
-        <int>18</int>
+        <int>6</int>
       </attr>
       <attr name="Metric.Lines.Class.Empty">
         <int>0</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operands">
-        <int>177</int>
+        <int>16</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operators">
-        <int>248</int>
+        <int>30</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operands">
-        <int>73</int>
+        <int>8</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operators">
-        <int>13</int>
+        <int>7</int>
       </attr>
       <attr name="Metric.Halstead.Length">
-        <int>425</int>
+        <int>46</int>
       </attr>
       <attr name="Metric.Halstead.Vocabulary">
-        <int>86</int>
+        <int>15</int>
       </attr>
       <attr name="Metric.Halstead.Required_Time">
-        <int>2391</int>
+        <int>69</int>
       </attr>
       <attr name="Metric.Level">
         <int>2</int>
       </attr>
       <attr name="Source.Region_Start">
-        <int>33</int>
+        <int>20</int>
       </attr>
       <attr name="Source.Region_Length">
-        <int>103</int>
+        <int>29</int>
       </attr>
     </node>
     <node id="N20">
@@ -2465,61 +2465,61 @@
         <enum />
       </attr>
       <attr name="Source.Name">
-        <string>OwnerRepository</string>
+        <string>JdbcPetVisitExtractor</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.repository.OwnerRepository</string>
+        <string>org.springframework.samples.petclinic.repository.jdbc.JdbcPetVisitExtractor</string>
       </attr>
       <attr name="Source.File">
-        <string>OwnerRepository.java</string>
+        <string>JdbcPetVisitExtractor.java</string>
       </attr>
       <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/repository/</string>
+        <string>src/main/java/org/springframework/samples/petclinic/repository/jdbc/</string>
       </attr>
       <attr name="Metric.Halstead.Volume">
-        <float>102.1866</float>
+        <float>475</float>
       </attr>
       <attr name="Metric.Halstead.Difficulty">
-        <float>4.2</float>
+        <float>9.952381</float>
       </attr>
       <attr name="Metric.Halstead.Effort">
-        <float>429.1836</float>
+        <float>4727.381</float>
       </attr>
       <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>1.470588</float>
+        <float>2.96875</float>
       </attr>
       <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.018966</float>
+        <float>0.093891</float>
       </attr>
       <attr name="Metric.HIS.VOCF">
-        <float>1.470588</float>
+        <float>2.96875</float>
       </attr>
       <attr name="Source.Line">
-        <int>32</int>
+        <int>28</int>
       </attr>
       <attr name="Source.Column">
-        <int>18</int>
+        <int>14</int>
       </attr>
       <attr name="SourceRange_StartLine">
-        <int>23</int>
+        <int>24</int>
       </attr>
       <attr name="SourceRange_EndLine">
-        <int>64</int>
+        <int>54</int>
       </attr>
       <attr name="Metric.LOC">
-        <int>41</int>
+        <int>30</int>
       </attr>
       <attr name="Metric.Lines.LOC">
-        <int>41</int>
+        <int>30</int>
       </attr>
       <attr name="Metric.Lines.Code">
-        <int>11</int>
+        <int>26</int>
       </attr>
       <attr name="Metric.Lines.Comment">
-        <int>30</int>
+        <int>4</int>
       </attr>
       <attr name="Metric.Lines.Only_Comment">
-        <int>30</int>
+        <int>4</int>
       </attr>
       <attr name="Metric.Lines.Empty">
         <int>0</int>
@@ -2537,49 +2537,49 @@
         <int>0</int>
       </attr>
       <attr name="Metric.Comment.Preceding">
-        <int>9</int>
+        <int>4</int>
       </attr>
       <attr name="Metric.Comment.Internal">
-        <int>21</int>
+        <int>0</int>
       </attr>
       <attr name="Metric.Lines.Class.Code">
-        <int>11</int>
+        <int>26</int>
       </attr>
       <attr name="Metric.Lines.Class.Comment">
-        <int>30</int>
+        <int>4</int>
       </attr>
       <attr name="Metric.Lines.Class.Empty">
         <int>0</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operands">
-        <int>12</int>
+        <int>38</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operators">
-        <int>13</int>
+        <int>57</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operands">
-        <int>10</int>
+        <int>21</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operators">
-        <int>7</int>
+        <int>11</int>
       </attr>
       <attr name="Metric.Halstead.Length">
-        <int>25</int>
+        <int>95</int>
       </attr>
       <attr name="Metric.Halstead.Vocabulary">
-        <int>17</int>
+        <int>32</int>
       </attr>
       <attr name="Metric.Halstead.Required_Time">
-        <int>23</int>
+        <int>262</int>
       </attr>
       <attr name="Metric.Level">
         <int>2</int>
       </attr>
       <attr name="Source.Region_Start">
-        <int>23</int>
+        <int>24</int>
       </attr>
       <attr name="Source.Region_Length">
-        <int>41</int>
+        <int>30</int>
       </attr>
     </node>
     <node id="N21">
@@ -2594,61 +2594,61 @@
         <enum />
       </attr>
       <attr name="Source.Name">
-        <string>Person</string>
+        <string>JdbcVetRepositoryImpl</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.model.Person</string>
+        <string>org.springframework.samples.petclinic.repository.jdbc.JdbcVetRepositoryImpl</string>
       </attr>
       <attr name="Source.File">
-        <string>Person.java</string>
+        <string>JdbcVetRepositoryImpl.java</string>
       </attr>
       <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/model/</string>
+        <string>src/main/java/org/springframework/samples/petclinic/repository/jdbc/</string>
       </attr>
       <attr name="Metric.Halstead.Volume">
-        <float>325.6965</float>
+        <float>1111.586</float>
       </attr>
       <attr name="Metric.Halstead.Difficulty">
-        <float>8.266666</float>
+        <float>11.55</float>
       </attr>
       <attr name="Metric.Halstead.Effort">
-        <float>2692.424</float>
+        <float>12838.82</float>
       </attr>
       <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>3.130435</float>
+        <float>3.75</float>
       </attr>
       <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.064512</float>
+        <float>0.182766</float>
       </attr>
       <attr name="Metric.HIS.VOCF">
-        <float>3.130435</float>
+        <float>3.75</float>
       </attr>
       <attr name="Source.Line">
-        <int>28</int>
+        <int>46</int>
       </attr>
       <attr name="Source.Column">
         <int>14</int>
       </attr>
       <attr name="SourceRange_StartLine">
-        <int>22</int>
+        <int>33</int>
       </attr>
       <attr name="SourceRange_EndLine">
-        <int>56</int>
+        <int>92</int>
       </attr>
       <attr name="Metric.LOC">
-        <int>34</int>
+        <int>59</int>
       </attr>
       <attr name="Metric.Lines.LOC">
-        <int>34</int>
+        <int>59</int>
       </attr>
       <attr name="Metric.Lines.Code">
-        <int>29</int>
+        <int>41</int>
       </attr>
       <attr name="Metric.Lines.Comment">
-        <int>5</int>
+        <int>18</int>
       </attr>
       <attr name="Metric.Lines.Only_Comment">
-        <int>5</int>
+        <int>18</int>
       </attr>
       <attr name="Metric.Lines.Empty">
         <int>0</int>
@@ -2666,1342 +2666,52 @@
         <int>0</int>
       </attr>
       <attr name="Metric.Comment.Preceding">
-        <int>5</int>
+        <int>12</int>
       </attr>
       <attr name="Metric.Comment.Internal">
-        <int>0</int>
+        <int>6</int>
       </attr>
       <attr name="Metric.Lines.Class.Code">
-        <int>29</int>
+        <int>41</int>
       </attr>
       <attr name="Metric.Lines.Class.Comment">
-        <int>5</int>
+        <int>18</int>
       </attr>
       <attr name="Metric.Lines.Class.Empty">
         <int>0</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operands">
-        <int>31</int>
+        <int>77</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operators">
-        <int>41</int>
+        <int>118</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operands">
-        <int>15</int>
+        <int>40</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operators">
-        <int>8</int>
+        <int>12</int>
       </attr>
       <attr name="Metric.Halstead.Length">
-        <int>72</int>
+        <int>195</int>
       </attr>
       <attr name="Metric.Halstead.Vocabulary">
-        <int>23</int>
+        <int>52</int>
       </attr>
       <attr name="Metric.Halstead.Required_Time">
-        <int>149</int>
+        <int>713</int>
       </attr>
       <attr name="Metric.Level">
         <int>2</int>
       </attr>
       <attr name="Source.Region_Start">
-        <int>22</int>
+        <int>33</int>
       </attr>
       <attr name="Source.Region_Length">
-        <int>34</int>
+        <int>59</int>
       </attr>
     </node>
     <node id="N22">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Is_Definition">
-        <enum />
-      </attr>
-      <attr name="Element.Has_Public_Visibility">
-        <enum />
-      </attr>
-      <attr name="Implementation">
-        <enum />
-      </attr>
-      <attr name="Source.Name">
-        <string>PetRepository</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.repository.PetRepository</string>
-      </attr>
-      <attr name="Source.File">
-        <string>PetRepository.java</string>
-      </attr>
-      <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/repository/</string>
-      </attr>
-      <attr name="Metric.Halstead.Volume">
-        <float>92</float>
-      </attr>
-      <attr name="Metric.Halstead.Difficulty">
-        <float>3.888889</float>
-      </attr>
-      <attr name="Metric.Halstead.Effort">
-        <float>357.7778</float>
-      </attr>
-      <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>1.4375</float>
-      </attr>
-      <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.016799</float>
-      </attr>
-      <attr name="Metric.HIS.VOCF">
-        <float>1.4375</float>
-      </attr>
-      <attr name="Source.Line">
-        <int>33</int>
-      </attr>
-      <attr name="Source.Column">
-        <int>18</int>
-      </attr>
-      <attr name="SourceRange_StartLine">
-        <int>24</int>
-      </attr>
-      <attr name="SourceRange_EndLine">
-        <int>60</int>
-      </attr>
-      <attr name="Metric.LOC">
-        <int>36</int>
-      </attr>
-      <attr name="Metric.Lines.LOC">
-        <int>36</int>
-      </attr>
-      <attr name="Metric.Lines.Code">
-        <int>9</int>
-      </attr>
-      <attr name="Metric.Lines.Comment">
-        <int>27</int>
-      </attr>
-      <attr name="Metric.Lines.Only_Comment">
-        <int>27</int>
-      </attr>
-      <attr name="Metric.Lines.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Fixme">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Todo">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Hack">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.XXX">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Comment.Preceding">
-        <int>9</int>
-      </attr>
-      <attr name="Metric.Comment.Internal">
-        <int>18</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Code">
-        <int>9</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Comment">
-        <int>27</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operands">
-        <int>10</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operators">
-        <int>13</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operands">
-        <int>9</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operators">
-        <int>7</int>
-      </attr>
-      <attr name="Metric.Halstead.Length">
-        <int>23</int>
-      </attr>
-      <attr name="Metric.Halstead.Vocabulary">
-        <int>16</int>
-      </attr>
-      <attr name="Metric.Halstead.Required_Time">
-        <int>19</int>
-      </attr>
-      <attr name="Metric.Level">
-        <int>2</int>
-      </attr>
-      <attr name="Source.Region_Start">
-        <int>24</int>
-      </attr>
-      <attr name="Source.Region_Length">
-        <int>36</int>
-      </attr>
-    </node>
-    <node id="N23">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Is_Definition">
-        <enum />
-      </attr>
-      <attr name="Element.Has_Public_Visibility">
-        <enum />
-      </attr>
-      <attr name="Implementation">
-        <enum />
-      </attr>
-      <attr name="Source.Name">
-        <string>PetValidator</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.web.PetValidator</string>
-      </attr>
-      <attr name="Source.File">
-        <string>PetValidator.java</string>
-      </attr>
-      <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/web/</string>
-      </attr>
-      <attr name="Metric.Halstead.Volume">
-        <float>694.5619</float>
-      </attr>
-      <attr name="Metric.Halstead.Difficulty">
-        <float>13.39286</float>
-      </attr>
-      <attr name="Metric.Halstead.Effort">
-        <float>9302.168</float>
-      </attr>
-      <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>2.976744</float>
-      </attr>
-      <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.147435</float>
-      </attr>
-      <attr name="Metric.HIS.VOCF">
-        <float>2.976744</float>
-      </attr>
-      <attr name="Source.Line">
-        <int>32</int>
-      </attr>
-      <attr name="Source.Column">
-        <int>14</int>
-      </attr>
-      <attr name="SourceRange_StartLine">
-        <int>23</int>
-      </attr>
-      <attr name="SourceRange_EndLine">
-        <int>66</int>
-      </attr>
-      <attr name="Metric.LOC">
-        <int>43</int>
-      </attr>
-      <attr name="Metric.Lines.LOC">
-        <int>43</int>
-      </attr>
-      <attr name="Metric.Lines.Code">
-        <int>28</int>
-      </attr>
-      <attr name="Metric.Lines.Comment">
-        <int>15</int>
-      </attr>
-      <attr name="Metric.Lines.Only_Comment">
-        <int>15</int>
-      </attr>
-      <attr name="Metric.Lines.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Fixme">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Todo">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Hack">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.XXX">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Comment.Preceding">
-        <int>9</int>
-      </attr>
-      <attr name="Metric.Comment.Internal">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Code">
-        <int>28</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Comment">
-        <int>15</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operands">
-        <int>50</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operators">
-        <int>78</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operands">
-        <int>28</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operators">
-        <int>15</int>
-      </attr>
-      <attr name="Metric.Halstead.Length">
-        <int>128</int>
-      </attr>
-      <attr name="Metric.Halstead.Vocabulary">
-        <int>43</int>
-      </attr>
-      <attr name="Metric.Halstead.Required_Time">
-        <int>516</int>
-      </attr>
-      <attr name="Metric.Level">
-        <int>2</int>
-      </attr>
-      <attr name="Source.Region_Start">
-        <int>23</int>
-      </attr>
-      <attr name="Source.Region_Length">
-        <int>43</int>
-      </attr>
-    </node>
-    <node id="N24">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Is_Definition">
-        <enum />
-      </attr>
-      <attr name="Element.Has_Public_Visibility">
-        <enum />
-      </attr>
-      <attr name="Implementation">
-        <enum />
-      </attr>
-      <attr name="Source.Name">
-        <string>PetclinicInitializer</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.PetclinicInitializer</string>
-      </attr>
-      <attr name="Source.File">
-        <string>PetclinicInitializer.java</string>
-      </attr>
-      <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/</string>
-      </attr>
-      <attr name="Metric.Halstead.Volume">
-        <float>588.6682</float>
-      </attr>
-      <attr name="Metric.Halstead.Difficulty">
-        <float>9.307693</float>
-      </attr>
-      <attr name="Metric.Halstead.Effort">
-        <float>5479.143</float>
-      </attr>
-      <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>3.054054</float>
-      </attr>
-      <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.103599</float>
-      </attr>
-      <attr name="Metric.HIS.VOCF">
-        <float>3.054054</float>
-      </attr>
-      <attr name="Source.Line">
-        <int>39</int>
-      </attr>
-      <attr name="Source.Column">
-        <int>14</int>
-      </attr>
-      <attr name="SourceRange_StartLine">
-        <int>28</int>
-      </attr>
-      <attr name="SourceRange_EndLine">
-        <int>82</int>
-      </attr>
-      <attr name="Metric.LOC">
-        <int>54</int>
-      </attr>
-      <attr name="Metric.Lines.LOC">
-        <int>54</int>
-      </attr>
-      <attr name="Metric.Lines.Code">
-        <int>31</int>
-      </attr>
-      <attr name="Metric.Lines.Comment">
-        <int>23</int>
-      </attr>
-      <attr name="Metric.Lines.Only_Comment">
-        <int>23</int>
-      </attr>
-      <attr name="Metric.Lines.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Fixme">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Todo">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Hack">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.XXX">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Comment.Preceding">
-        <int>11</int>
-      </attr>
-      <attr name="Metric.Comment.Internal">
-        <int>12</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Code">
-        <int>31</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Comment">
-        <int>23</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operands">
-        <int>44</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operators">
-        <int>69</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operands">
-        <int>26</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operators">
-        <int>11</int>
-      </attr>
-      <attr name="Metric.Halstead.Length">
-        <int>113</int>
-      </attr>
-      <attr name="Metric.Halstead.Vocabulary">
-        <int>37</int>
-      </attr>
-      <attr name="Metric.Halstead.Required_Time">
-        <int>304</int>
-      </attr>
-      <attr name="Metric.Level">
-        <int>2</int>
-      </attr>
-      <attr name="Source.Region_Start">
-        <int>28</int>
-      </attr>
-      <attr name="Source.Region_Length">
-        <int>54</int>
-      </attr>
-    </node>
-    <node id="N25">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Is_Definition">
-        <enum />
-      </attr>
-      <attr name="Element.Has_Public_Visibility">
-        <enum />
-      </attr>
-      <attr name="Implementation">
-        <enum />
-      </attr>
-      <attr name="Source.Name">
-        <string>Specialty</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.model.Specialty</string>
-      </attr>
-      <attr name="Source.File">
-        <string>Specialty.java</string>
-      </attr>
-      <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/model/</string>
-      </attr>
-      <attr name="Metric.Halstead.Volume">
-        <float>46.60451</float>
-      </attr>
-      <attr name="Metric.Halstead.Difficulty">
-        <float>3</float>
-      </attr>
-      <attr name="Metric.Halstead.Effort">
-        <float>139.8135</float>
-      </attr>
-      <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>1.083333</float>
-      </attr>
-      <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.008979</float>
-      </attr>
-      <attr name="Metric.HIS.VOCF">
-        <float>1.083333</float>
-      </attr>
-      <attr name="Source.Line">
-        <int>28</int>
-      </attr>
-      <attr name="Source.Column">
-        <int>14</int>
-      </attr>
-      <attr name="SourceRange_StartLine">
-        <int>21</int>
-      </attr>
-      <attr name="SourceRange_EndLine">
-        <int>31</int>
-      </attr>
-      <attr name="Metric.LOC">
-        <int>10</int>
-      </attr>
-      <attr name="Metric.Lines.LOC">
-        <int>10</int>
-      </attr>
-      <attr name="Metric.Lines.Code">
-        <int>5</int>
-      </attr>
-      <attr name="Metric.Lines.Comment">
-        <int>5</int>
-      </attr>
-      <attr name="Metric.Lines.Only_Comment">
-        <int>5</int>
-      </attr>
-      <attr name="Metric.Lines.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Fixme">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Todo">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Hack">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.XXX">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Comment.Preceding">
-        <int>5</int>
-      </attr>
-      <attr name="Metric.Comment.Internal">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Code">
-        <int>5</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Comment">
-        <int>5</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operands">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operators">
-        <int>7</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operands">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operators">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Halstead.Length">
-        <int>13</int>
-      </attr>
-      <attr name="Metric.Halstead.Vocabulary">
-        <int>12</int>
-      </attr>
-      <attr name="Metric.Halstead.Required_Time">
-        <int>7</int>
-      </attr>
-      <attr name="Metric.Level">
-        <int>2</int>
-      </attr>
-      <attr name="Source.Region_Start">
-        <int>21</int>
-      </attr>
-      <attr name="Source.Region_Length">
-        <int>10</int>
-      </attr>
-    </node>
-    <node id="N26">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Is_Definition">
-        <enum />
-      </attr>
-      <attr name="Element.Has_Public_Visibility">
-        <enum />
-      </attr>
-      <attr name="Implementation">
-        <enum />
-      </attr>
-      <attr name="Source.Name">
-        <string>SpringDataOwnerRepository</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.repository.springdatajpa.SpringDataOwnerRepository</string>
-      </attr>
-      <attr name="Source.File">
-        <string>SpringDataOwnerRepository.java</string>
-      </attr>
-      <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/repository/springdatajpa/</string>
-      </attr>
-      <attr name="Metric.Halstead.Volume">
-        <float>242.4993</float>
-      </attr>
-      <attr name="Metric.Halstead.Difficulty">
-        <float>5.75</float>
-      </attr>
-      <attr name="Metric.Halstead.Effort">
-        <float>1394.371</float>
-      </attr>
-      <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>1.888889</float>
-      </attr>
-      <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.041604</float>
-      </attr>
-      <attr name="Metric.HIS.VOCF">
-        <float>1.888889</float>
-      </attr>
-      <attr name="Source.Line">
-        <int>32</int>
-      </attr>
-      <attr name="Source.Column">
-        <int>18</int>
-      </attr>
-      <attr name="SourceRange_StartLine">
-        <int>26</int>
-      </attr>
-      <attr name="SourceRange_EndLine">
-        <int>42</int>
-      </attr>
-      <attr name="Metric.LOC">
-        <int>16</int>
-      </attr>
-      <attr name="Metric.Lines.LOC">
-        <int>16</int>
-      </attr>
-      <attr name="Metric.Lines.Code">
-        <int>10</int>
-      </attr>
-      <attr name="Metric.Lines.Comment">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Lines.Only_Comment">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Lines.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Fixme">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Todo">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Hack">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.XXX">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Comment.Preceding">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Comment.Internal">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Code">
-        <int>10</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Comment">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operands">
-        <int>23</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operators">
-        <int>28</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operands">
-        <int>18</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operators">
-        <int>9</int>
-      </attr>
-      <attr name="Metric.Halstead.Length">
-        <int>51</int>
-      </attr>
-      <attr name="Metric.Halstead.Vocabulary">
-        <int>27</int>
-      </attr>
-      <attr name="Metric.Halstead.Required_Time">
-        <int>77</int>
-      </attr>
-      <attr name="Metric.Level">
-        <int>2</int>
-      </attr>
-      <attr name="Source.Region_Start">
-        <int>26</int>
-      </attr>
-      <attr name="Source.Region_Length">
-        <int>16</int>
-      </attr>
-    </node>
-    <node id="N27">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Is_Definition">
-        <enum />
-      </attr>
-      <attr name="Element.Has_Public_Visibility">
-        <enum />
-      </attr>
-      <attr name="Implementation">
-        <enum />
-      </attr>
-      <attr name="Source.Name">
-        <string>SpringDataPetRepository</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.repository.springdatajpa.SpringDataPetRepository</string>
-      </attr>
-      <attr name="Source.File">
-        <string>SpringDataPetRepository.java</string>
-      </attr>
-      <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/repository/springdatajpa/</string>
-      </attr>
-      <attr name="Metric.Halstead.Volume">
-        <float>112.3701</float>
-      </attr>
-      <attr name="Metric.Halstead.Difficulty">
-        <float>4.5</float>
-      </attr>
-      <attr name="Metric.Halstead.Effort">
-        <float>505.6656</float>
-      </attr>
-      <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>1.3</float>
-      </attr>
-      <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.021157</float>
-      </attr>
-      <attr name="Metric.HIS.VOCF">
-        <float>1.3</float>
-      </attr>
-      <attr name="Source.Line">
-        <int>32</int>
-      </attr>
-      <attr name="Source.Column">
-        <int>18</int>
-      </attr>
-      <attr name="SourceRange_StartLine">
-        <int>26</int>
-      </attr>
-      <attr name="SourceRange_EndLine">
-        <int>38</int>
-      </attr>
-      <attr name="Metric.LOC">
-        <int>12</int>
-      </attr>
-      <attr name="Metric.Lines.LOC">
-        <int>12</int>
-      </attr>
-      <attr name="Metric.Lines.Code">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Lines.Comment">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Lines.Only_Comment">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Lines.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Fixme">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Todo">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Hack">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.XXX">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Comment.Preceding">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Comment.Internal">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Code">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Comment">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operands">
-        <int>11</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operators">
-        <int>15</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operands">
-        <int>11</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operators">
-        <int>9</int>
-      </attr>
-      <attr name="Metric.Halstead.Length">
-        <int>26</int>
-      </attr>
-      <attr name="Metric.Halstead.Vocabulary">
-        <int>20</int>
-      </attr>
-      <attr name="Metric.Halstead.Required_Time">
-        <int>28</int>
-      </attr>
-      <attr name="Metric.Level">
-        <int>2</int>
-      </attr>
-      <attr name="Source.Region_Start">
-        <int>26</int>
-      </attr>
-      <attr name="Source.Region_Length">
-        <int>12</int>
-      </attr>
-    </node>
-    <node id="N28">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Is_Definition">
-        <enum />
-      </attr>
-      <attr name="Element.Has_Public_Visibility">
-        <enum />
-      </attr>
-      <attr name="Implementation">
-        <enum />
-      </attr>
-      <attr name="Source.Name">
-        <string>SpringDataVetRepository</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.repository.springdatajpa.SpringDataVetRepository</string>
-      </attr>
-      <attr name="Source.File">
-        <string>SpringDataVetRepository.java</string>
-      </attr>
-      <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/repository/springdatajpa/</string>
-      </attr>
-      <attr name="Metric.Halstead.Volume">
-        <float>36.54121</float>
-      </attr>
-      <attr name="Metric.Halstead.Difficulty">
-        <float>2.5</float>
-      </attr>
-      <attr name="Metric.Halstead.Effort">
-        <float>91.35302</float>
-      </attr>
-      <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>1.1</float>
-      </attr>
-      <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.006761</float>
-      </attr>
-      <attr name="Metric.HIS.VOCF">
-        <float>1.1</float>
-      </attr>
-      <attr name="Source.Line">
-        <int>28</int>
-      </attr>
-      <attr name="Source.Column">
-        <int>18</int>
-      </attr>
-      <attr name="SourceRange_StartLine">
-        <int>22</int>
-      </attr>
-      <attr name="SourceRange_EndLine">
-        <int>30</int>
-      </attr>
-      <attr name="Metric.LOC">
-        <int>8</int>
-      </attr>
-      <attr name="Metric.Lines.LOC">
-        <int>8</int>
-      </attr>
-      <attr name="Metric.Lines.Code">
-        <int>2</int>
-      </attr>
-      <attr name="Metric.Lines.Comment">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Lines.Only_Comment">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Lines.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Fixme">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Todo">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Hack">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.XXX">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Comment.Preceding">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Comment.Internal">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Code">
-        <int>2</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Comment">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operands">
-        <int>5</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operators">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operands">
-        <int>5</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operators">
-        <int>5</int>
-      </attr>
-      <attr name="Metric.Halstead.Length">
-        <int>11</int>
-      </attr>
-      <attr name="Metric.Halstead.Vocabulary">
-        <int>10</int>
-      </attr>
-      <attr name="Metric.Halstead.Required_Time">
-        <int>5</int>
-      </attr>
-      <attr name="Metric.Level">
-        <int>2</int>
-      </attr>
-      <attr name="Source.Region_Start">
-        <int>22</int>
-      </attr>
-      <attr name="Source.Region_Length">
-        <int>8</int>
-      </attr>
-    </node>
-    <node id="N29">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Is_Definition">
-        <enum />
-      </attr>
-      <attr name="Element.Has_Public_Visibility">
-        <enum />
-      </attr>
-      <attr name="Implementation">
-        <enum />
-      </attr>
-      <attr name="Source.Name">
-        <string>SpringDataVisitRepository</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.repository.springdatajpa.SpringDataVisitRepository</string>
-      </attr>
-      <attr name="Source.File">
-        <string>SpringDataVisitRepository.java</string>
-      </attr>
-      <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/repository/springdatajpa/</string>
-      </attr>
-      <attr name="Metric.Halstead.Volume">
-        <float>36.54121</float>
-      </attr>
-      <attr name="Metric.Halstead.Difficulty">
-        <float>2.5</float>
-      </attr>
-      <attr name="Metric.Halstead.Effort">
-        <float>91.35302</float>
-      </attr>
-      <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>1.1</float>
-      </attr>
-      <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.006761</float>
-      </attr>
-      <attr name="Metric.HIS.VOCF">
-        <float>1.1</float>
-      </attr>
-      <attr name="Source.Line">
-        <int>28</int>
-      </attr>
-      <attr name="Source.Column">
-        <int>18</int>
-      </attr>
-      <attr name="SourceRange_StartLine">
-        <int>22</int>
-      </attr>
-      <attr name="SourceRange_EndLine">
-        <int>30</int>
-      </attr>
-      <attr name="Metric.LOC">
-        <int>8</int>
-      </attr>
-      <attr name="Metric.Lines.LOC">
-        <int>8</int>
-      </attr>
-      <attr name="Metric.Lines.Code">
-        <int>2</int>
-      </attr>
-      <attr name="Metric.Lines.Comment">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Lines.Only_Comment">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Lines.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Fixme">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Todo">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Hack">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.XXX">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Comment.Preceding">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Comment.Internal">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Code">
-        <int>2</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Comment">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operands">
-        <int>5</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operators">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operands">
-        <int>5</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operators">
-        <int>5</int>
-      </attr>
-      <attr name="Metric.Halstead.Length">
-        <int>11</int>
-      </attr>
-      <attr name="Metric.Halstead.Vocabulary">
-        <int>10</int>
-      </attr>
-      <attr name="Metric.Halstead.Required_Time">
-        <int>5</int>
-      </attr>
-      <attr name="Metric.Level">
-        <int>2</int>
-      </attr>
-      <attr name="Source.Region_Start">
-        <int>22</int>
-      </attr>
-      <attr name="Source.Region_Length">
-        <int>8</int>
-      </attr>
-    </node>
-    <node id="N30">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Is_Definition">
-        <enum />
-      </attr>
-      <attr name="Element.Has_Public_Visibility">
-        <enum />
-      </attr>
-      <attr name="Implementation">
-        <enum />
-      </attr>
-      <attr name="Source.Name">
-        <string>Vet</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.model.Vet</string>
-      </attr>
-      <attr name="Source.File">
-        <string>Vet.java</string>
-      </attr>
-      <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/model/</string>
-      </attr>
-      <attr name="Metric.Halstead.Volume">
-        <float>987.002</float>
-      </attr>
-      <attr name="Metric.Halstead.Difficulty">
-        <float>9.692307</float>
-      </attr>
-      <attr name="Metric.Halstead.Effort">
-        <float>9566.327</float>
-      </attr>
-      <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>3.411765</float>
-      </attr>
-      <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.150213</float>
-      </attr>
-      <attr name="Metric.HIS.VOCF">
-        <float>3.411765</float>
-      </attr>
-      <attr name="Source.Line">
-        <int>45</int>
-      </attr>
-      <attr name="Source.Column">
-        <int>14</int>
-      </attr>
-      <attr name="SourceRange_StartLine">
-        <int>35</int>
-      </attr>
-      <attr name="SourceRange_EndLine">
-        <int>79</int>
-      </attr>
-      <attr name="Metric.LOC">
-        <int>44</int>
-      </attr>
-      <attr name="Metric.Lines.LOC">
-        <int>44</int>
-      </attr>
-      <attr name="Metric.Lines.Code">
-        <int>36</int>
-      </attr>
-      <attr name="Metric.Lines.Comment">
-        <int>8</int>
-      </attr>
-      <attr name="Metric.Lines.Only_Comment">
-        <int>8</int>
-      </attr>
-      <attr name="Metric.Lines.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Fixme">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Todo">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Hack">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.XXX">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Comment.Preceding">
-        <int>8</int>
-      </attr>
-      <attr name="Metric.Comment.Internal">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Code">
-        <int>36</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Comment">
-        <int>8</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operands">
-        <int>63</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operators">
-        <int>111</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operands">
-        <int>39</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operators">
-        <int>12</int>
-      </attr>
-      <attr name="Metric.Halstead.Length">
-        <int>174</int>
-      </attr>
-      <attr name="Metric.Halstead.Vocabulary">
-        <int>51</int>
-      </attr>
-      <attr name="Metric.Halstead.Required_Time">
-        <int>531</int>
-      </attr>
-      <attr name="Metric.Level">
-        <int>2</int>
-      </attr>
-      <attr name="Source.Region_Start">
-        <int>35</int>
-      </attr>
-      <attr name="Source.Region_Length">
-        <int>44</int>
-      </attr>
-    </node>
-    <node id="N31">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Is_Definition">
-        <enum />
-      </attr>
-      <attr name="Element.Has_Public_Visibility">
-        <enum />
-      </attr>
-      <attr name="Implementation">
-        <enum />
-      </attr>
-      <attr name="Source.Name">
-        <string>VetController</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.web.VetController</string>
-      </attr>
-      <attr name="Source.File">
-        <string>VetController.java</string>
-      </attr>
-      <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/web/</string>
-      </attr>
-      <attr name="Metric.Halstead.Volume">
-        <float>749.5321</float>
-      </attr>
-      <attr name="Metric.Halstead.Difficulty">
-        <float>10.1129</float>
-      </attr>
-      <attr name="Metric.Halstead.Effort">
-        <float>7579.946</float>
-      </attr>
-      <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>3.309524</float>
-      </attr>
-      <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.128624</float>
-      </attr>
-      <attr name="Metric.HIS.VOCF">
-        <float>3.309524</float>
-      </attr>
-      <attr name="Source.Line">
-        <int>35</int>
-      </attr>
-      <attr name="Source.Column">
-        <int>14</int>
-      </attr>
-      <attr name="SourceRange_StartLine">
-        <int>28</int>
-      </attr>
-      <attr name="SourceRange_EndLine">
-        <int>77</int>
-      </attr>
-      <attr name="Metric.LOC">
-        <int>49</int>
-      </attr>
-      <attr name="Metric.Lines.LOC">
-        <int>49</int>
-      </attr>
-      <attr name="Metric.Lines.Code">
-        <int>39</int>
-      </attr>
-      <attr name="Metric.Lines.Comment">
-        <int>10</int>
-      </attr>
-      <attr name="Metric.Lines.Only_Comment">
-        <int>10</int>
-      </attr>
-      <attr name="Metric.Lines.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Fixme">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Todo">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.Hack">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Lines.XXX">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Comment.Preceding">
-        <int>6</int>
-      </attr>
-      <attr name="Metric.Comment.Internal">
-        <int>4</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Code">
-        <int>39</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Comment">
-        <int>10</int>
-      </attr>
-      <attr name="Metric.Lines.Class.Empty">
-        <int>0</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operands">
-        <int>57</int>
-      </attr>
-      <attr name="Metric.Halstead.Total_Operators">
-        <int>82</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operands">
-        <int>31</int>
-      </attr>
-      <attr name="Metric.Halstead.Different_Operators">
-        <int>11</int>
-      </attr>
-      <attr name="Metric.Halstead.Length">
-        <int>139</int>
-      </attr>
-      <attr name="Metric.Halstead.Vocabulary">
-        <int>42</int>
-      </attr>
-      <attr name="Metric.Halstead.Required_Time">
-        <int>421</int>
-      </attr>
-      <attr name="Metric.Level">
-        <int>2</int>
-      </attr>
-      <attr name="Source.Region_Start">
-        <int>28</int>
-      </attr>
-      <attr name="Source.Region_Length">
-        <int>49</int>
-      </attr>
-    </node>
-    <node id="N32">
       <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="Linkage.Is_Definition">
         <enum />
@@ -4130,7 +2840,523 @@
         <int>20</int>
       </attr>
     </node>
-    <node id="N33">
+    <node id="N23">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Linkage.Is_Definition">
+        <enum />
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum />
+      </attr>
+      <attr name="Implementation">
+        <enum />
+      </attr>
+      <attr name="Source.Name">
+        <string>OwnerRepository</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.springframework.samples.petclinic.repository.OwnerRepository</string>
+      </attr>
+      <attr name="Source.File">
+        <string>OwnerRepository.java</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/main/java/org/springframework/samples/petclinic/repository/</string>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>102.1866</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>4.2</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>429.1836</float>
+      </attr>
+      <attr name="Metric.Halstead.Vocabular_Frequency">
+        <float>1.470588</float>
+      </attr>
+      <attr name="Metric.Halstead.Delivered_Bugs">
+        <float>0.018966</float>
+      </attr>
+      <attr name="Metric.HIS.VOCF">
+        <float>1.470588</float>
+      </attr>
+      <attr name="Source.Line">
+        <int>32</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>18</int>
+      </attr>
+      <attr name="SourceRange_StartLine">
+        <int>23</int>
+      </attr>
+      <attr name="SourceRange_EndLine">
+        <int>64</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>41</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>41</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>11</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>30</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>30</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Comment.Preceding">
+        <int>9</int>
+      </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>21</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Code">
+        <int>11</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Comment">
+        <int>30</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>12</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>13</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>10</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>7</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>25</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>17</int>
+      </attr>
+      <attr name="Metric.Halstead.Required_Time">
+        <int>23</int>
+      </attr>
+      <attr name="Metric.Level">
+        <int>2</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>23</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>41</int>
+      </attr>
+    </node>
+    <node id="N24">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Linkage.Is_Definition">
+        <enum />
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum />
+      </attr>
+      <attr name="Implementation">
+        <enum />
+      </attr>
+      <attr name="Source.Name">
+        <string>PetRepository</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.springframework.samples.petclinic.repository.PetRepository</string>
+      </attr>
+      <attr name="Source.File">
+        <string>PetRepository.java</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/main/java/org/springframework/samples/petclinic/repository/</string>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>92</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>3.888889</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>357.7778</float>
+      </attr>
+      <attr name="Metric.Halstead.Vocabular_Frequency">
+        <float>1.4375</float>
+      </attr>
+      <attr name="Metric.Halstead.Delivered_Bugs">
+        <float>0.016799</float>
+      </attr>
+      <attr name="Metric.HIS.VOCF">
+        <float>1.4375</float>
+      </attr>
+      <attr name="Source.Line">
+        <int>33</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>18</int>
+      </attr>
+      <attr name="SourceRange_StartLine">
+        <int>24</int>
+      </attr>
+      <attr name="SourceRange_EndLine">
+        <int>60</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>36</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>36</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>9</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>27</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>27</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Comment.Preceding">
+        <int>9</int>
+      </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>18</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Code">
+        <int>9</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Comment">
+        <int>27</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>10</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>13</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>9</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>7</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>23</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>16</int>
+      </attr>
+      <attr name="Metric.Halstead.Required_Time">
+        <int>19</int>
+      </attr>
+      <attr name="Metric.Level">
+        <int>2</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>24</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>36</int>
+      </attr>
+    </node>
+    <node id="N25">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Linkage.Is_Definition">
+        <enum />
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum />
+      </attr>
+      <attr name="Implementation">
+        <enum />
+      </attr>
+      <attr name="Source.Name">
+        <string>BaseEntity</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.springframework.samples.petclinic.model.BaseEntity</string>
+      </attr>
+      <attr name="Source.File">
+        <string>BaseEntity.java</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/main/java/org/springframework/samples/petclinic/model/</string>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>210.8312</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>7.125</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>1502.173</float>
+      </attr>
+      <attr name="Metric.Halstead.Vocabular_Frequency">
+        <float>2.285714</float>
+      </attr>
+      <attr name="Metric.Halstead.Delivered_Bugs">
+        <float>0.043721</float>
+      </attr>
+      <attr name="Metric.HIS.VOCF">
+        <float>2.285714</float>
+      </attr>
+      <attr name="Source.Line">
+        <int>30</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>14</int>
+      </attr>
+      <attr name="SourceRange_StartLine">
+        <int>23</int>
+      </attr>
+      <attr name="SourceRange_EndLine">
+        <int>48</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>25</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>25</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>19</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Comment.Preceding">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Code">
+        <int>19</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Comment">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>19</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>29</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>12</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>9</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>48</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>21</int>
+      </attr>
+      <attr name="Metric.Halstead.Required_Time">
+        <int>83</int>
+      </attr>
+      <attr name="Metric.Level">
+        <int>2</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>23</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>25</int>
+      </attr>
+    </node>
+    <node id="N26">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Linkage.Is_Definition">
+        <enum />
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum />
+      </attr>
+      <attr name="Implementation">
+        <enum />
+      </attr>
+      <attr name="Source.Name">
+        <string>Owner</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.springframework.samples.petclinic.model.Owner</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Owner.java</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/main/java/org/springframework/samples/petclinic/model/</string>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>2672.716</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>16.71428</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>44672.54</float>
+      </attr>
+      <attr name="Metric.Halstead.Vocabular_Frequency">
+        <float>4.905882</float>
+      </attr>
+      <attr name="Metric.Halstead.Delivered_Bugs">
+        <float>0.419668</float>
+      </attr>
+      <attr name="Metric.HIS.VOCF">
+        <float>4.905882</float>
+      </attr>
+      <attr name="Source.Line">
+        <int>46</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>14</int>
+      </attr>
+      <attr name="SourceRange_StartLine">
+        <int>36</int>
+      </attr>
+      <attr name="SourceRange_EndLine">
+        <int>154</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>118</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>118</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>98</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>20</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>20</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Comment.Preceding">
+        <int>8</int>
+      </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>12</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Code">
+        <int>98</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Comment">
+        <int>20</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>156</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>261</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>70</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>15</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>417</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>85</int>
+      </attr>
+      <attr name="Metric.Halstead.Required_Time">
+        <int>2481</int>
+      </attr>
+      <attr name="Metric.Level">
+        <int>2</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>36</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>118</int>
+      </attr>
+    </node>
+    <node id="N27">
       <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="Linkage.Is_Definition">
         <enum />
@@ -4259,7 +3485,7 @@
         <int>20</int>
       </attr>
     </node>
-    <node id="N34">
+    <node id="N28">
       <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="Linkage.Is_Definition">
         <enum />
@@ -4271,61 +3497,61 @@
         <enum />
       </attr>
       <attr name="Source.Name">
-        <string>VisitController</string>
+        <string>Specialty</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.web.VisitController</string>
+        <string>org.springframework.samples.petclinic.model.Specialty</string>
       </attr>
       <attr name="Source.File">
-        <string>VisitController.java</string>
+        <string>Specialty.java</string>
       </attr>
       <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/web/</string>
+        <string>src/main/java/org/springframework/samples/petclinic/model/</string>
       </attr>
       <attr name="Metric.Halstead.Volume">
-        <float>1154.022</float>
+        <float>46.60451</float>
       </attr>
       <attr name="Metric.Halstead.Difficulty">
-        <float>9.946809</float>
+        <float>3</float>
       </attr>
       <attr name="Metric.Halstead.Effort">
-        <float>11478.84</float>
+        <float>139.8135</float>
       </attr>
       <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>3.396552</float>
+        <float>1.083333</float>
       </attr>
       <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.16962</float>
+        <float>0.008979</float>
       </attr>
       <attr name="Metric.HIS.VOCF">
-        <float>3.396552</float>
+        <float>1.083333</float>
       </attr>
       <attr name="Source.Line">
-        <int>38</int>
+        <int>28</int>
       </attr>
       <attr name="Source.Column">
         <int>14</int>
       </attr>
       <attr name="SourceRange_StartLine">
-        <int>31</int>
+        <int>21</int>
       </attr>
       <attr name="SourceRange_EndLine">
-        <int>95</int>
+        <int>31</int>
       </attr>
       <attr name="Metric.LOC">
-        <int>64</int>
+        <int>10</int>
       </attr>
       <attr name="Metric.Lines.LOC">
-        <int>64</int>
+        <int>10</int>
       </attr>
       <attr name="Metric.Lines.Code">
-        <int>46</int>
+        <int>5</int>
       </attr>
       <attr name="Metric.Lines.Comment">
-        <int>18</int>
+        <int>5</int>
       </attr>
       <attr name="Metric.Lines.Only_Comment">
-        <int>18</int>
+        <int>5</int>
       </attr>
       <attr name="Metric.Lines.Empty">
         <int>0</int>
@@ -4343,49 +3569,823 @@
         <int>0</int>
       </attr>
       <attr name="Metric.Comment.Preceding">
-        <int>6</int>
+        <int>5</int>
       </attr>
       <attr name="Metric.Comment.Internal">
-        <int>12</int>
+        <int>0</int>
       </attr>
       <attr name="Metric.Lines.Class.Code">
-        <int>46</int>
+        <int>5</int>
       </attr>
       <attr name="Metric.Lines.Class.Comment">
-        <int>18</int>
+        <int>5</int>
       </attr>
       <attr name="Metric.Lines.Class.Empty">
         <int>0</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operands">
-        <int>85</int>
+        <int>6</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operators">
-        <int>112</int>
+        <int>7</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operands">
-        <int>47</int>
+        <int>6</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operators">
-        <int>11</int>
+        <int>6</int>
       </attr>
       <attr name="Metric.Halstead.Length">
-        <int>197</int>
+        <int>13</int>
       </attr>
       <attr name="Metric.Halstead.Vocabulary">
-        <int>58</int>
+        <int>12</int>
       </attr>
       <attr name="Metric.Halstead.Required_Time">
-        <int>637</int>
+        <int>7</int>
       </attr>
       <attr name="Metric.Level">
         <int>2</int>
       </attr>
       <attr name="Source.Region_Start">
-        <int>31</int>
+        <int>21</int>
       </attr>
       <attr name="Source.Region_Length">
-        <int>64</int>
+        <int>10</int>
+      </attr>
+    </node>
+    <node id="N29">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Linkage.Is_Definition">
+        <enum />
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum />
+      </attr>
+      <attr name="Implementation">
+        <enum />
+      </attr>
+      <attr name="Source.Name">
+        <string>Vet</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.springframework.samples.petclinic.model.Vet</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Vet.java</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/main/java/org/springframework/samples/petclinic/model/</string>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>987.002</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>9.692307</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>9566.327</float>
+      </attr>
+      <attr name="Metric.Halstead.Vocabular_Frequency">
+        <float>3.411765</float>
+      </attr>
+      <attr name="Metric.Halstead.Delivered_Bugs">
+        <float>0.150213</float>
+      </attr>
+      <attr name="Metric.HIS.VOCF">
+        <float>3.411765</float>
+      </attr>
+      <attr name="Source.Line">
+        <int>45</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>14</int>
+      </attr>
+      <attr name="SourceRange_StartLine">
+        <int>35</int>
+      </attr>
+      <attr name="SourceRange_EndLine">
+        <int>79</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>44</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>44</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>36</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>8</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>8</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Comment.Preceding">
+        <int>8</int>
+      </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Code">
+        <int>36</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Comment">
+        <int>8</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>63</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>111</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>39</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>12</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>174</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>51</int>
+      </attr>
+      <attr name="Metric.Halstead.Required_Time">
+        <int>531</int>
+      </attr>
+      <attr name="Metric.Level">
+        <int>2</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>35</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>44</int>
+      </attr>
+    </node>
+    <node id="N30">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Linkage.Is_Definition">
+        <enum />
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum />
+      </attr>
+      <attr name="Implementation">
+        <enum />
+      </attr>
+      <attr name="Source.Name">
+        <string>NamedEntity</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.springframework.samples.petclinic.model.NamedEntity</string>
+      </attr>
+      <attr name="Source.File">
+        <string>NamedEntity.java</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/main/java/org/springframework/samples/petclinic/model/</string>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>212.3964</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>7.272727</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>1544.701</float>
+      </attr>
+      <attr name="Metric.Halstead.Vocabular_Frequency">
+        <float>2.631579</float>
+      </attr>
+      <attr name="Metric.Halstead.Delivered_Bugs">
+        <float>0.044543</float>
+      </attr>
+      <attr name="Metric.HIS.VOCF">
+        <float>2.631579</float>
+      </attr>
+      <attr name="Source.Line">
+        <int>30</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>14</int>
+      </attr>
+      <attr name="SourceRange_StartLine">
+        <int>22</int>
+      </attr>
+      <attr name="SourceRange_EndLine">
+        <int>49</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>27</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>27</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>20</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>7</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>7</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Comment.Preceding">
+        <int>7</int>
+      </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Code">
+        <int>20</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Comment">
+        <int>7</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>20</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>30</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>11</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>8</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>50</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>19</int>
+      </attr>
+      <attr name="Metric.Halstead.Required_Time">
+        <int>85</int>
+      </attr>
+      <attr name="Metric.Level">
+        <int>2</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>22</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>27</int>
+      </attr>
+    </node>
+    <node id="N31">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Linkage.Is_Definition">
+        <enum />
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum />
+      </attr>
+      <attr name="Implementation">
+        <enum />
+      </attr>
+      <attr name="Source.Name">
+        <string>Person</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.springframework.samples.petclinic.model.Person</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Person.java</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/main/java/org/springframework/samples/petclinic/model/</string>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>325.6965</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>8.266666</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>2692.424</float>
+      </attr>
+      <attr name="Metric.Halstead.Vocabular_Frequency">
+        <float>3.130435</float>
+      </attr>
+      <attr name="Metric.Halstead.Delivered_Bugs">
+        <float>0.064512</float>
+      </attr>
+      <attr name="Metric.HIS.VOCF">
+        <float>3.130435</float>
+      </attr>
+      <attr name="Source.Line">
+        <int>28</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>14</int>
+      </attr>
+      <attr name="SourceRange_StartLine">
+        <int>22</int>
+      </attr>
+      <attr name="SourceRange_EndLine">
+        <int>56</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>34</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>34</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>29</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Comment.Preceding">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Code">
+        <int>29</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Comment">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>31</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>41</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>15</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>8</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>72</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>23</int>
+      </attr>
+      <attr name="Metric.Halstead.Required_Time">
+        <int>149</int>
+      </attr>
+      <attr name="Metric.Level">
+        <int>2</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>22</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>34</int>
+      </attr>
+    </node>
+    <node id="N32">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Linkage.Is_Definition">
+        <enum />
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum />
+      </attr>
+      <attr name="Implementation">
+        <enum />
+      </attr>
+      <attr name="Source.Name">
+        <string>EntityUtils</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.springframework.samples.petclinic.util.EntityUtils</string>
+      </attr>
+      <attr name="Source.File">
+        <string>EntityUtils.java</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/main/java/org/springframework/samples/petclinic/util/</string>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>306.4945</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>12</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>3677.934</float>
+      </attr>
+      <attr name="Metric.Halstead.Vocabular_Frequency">
+        <float>2.64</float>
+      </attr>
+      <attr name="Metric.Halstead.Delivered_Bugs">
+        <float>0.079423</float>
+      </attr>
+      <attr name="Metric.HIS.VOCF">
+        <float>2.64</float>
+      </attr>
+      <attr name="Source.Line">
+        <int>33</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>14</int>
+      </attr>
+      <attr name="SourceRange_StartLine">
+        <int>24</int>
+      </attr>
+      <attr name="SourceRange_EndLine">
+        <int>58</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>34</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>34</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>15</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>19</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>19</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Comment.Preceding">
+        <int>9</int>
+      </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>10</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Code">
+        <int>15</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Comment">
+        <int>19</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>26</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>40</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>13</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>12</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>66</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>25</int>
+      </attr>
+      <attr name="Metric.Halstead.Required_Time">
+        <int>204</int>
+      </attr>
+      <attr name="Metric.Level">
+        <int>2</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>24</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>34</int>
+      </attr>
+    </node>
+    <node id="N33">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Linkage.Is_Definition">
+        <enum />
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum />
+      </attr>
+      <attr name="Implementation">
+        <enum />
+      </attr>
+      <attr name="Source.Name">
+        <string>PetclinicInitializer</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.springframework.samples.petclinic.PetclinicInitializer</string>
+      </attr>
+      <attr name="Source.File">
+        <string>PetclinicInitializer.java</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/main/java/org/springframework/samples/petclinic/</string>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>588.6682</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>9.307693</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>5479.143</float>
+      </attr>
+      <attr name="Metric.Halstead.Vocabular_Frequency">
+        <float>3.054054</float>
+      </attr>
+      <attr name="Metric.Halstead.Delivered_Bugs">
+        <float>0.103599</float>
+      </attr>
+      <attr name="Metric.HIS.VOCF">
+        <float>3.054054</float>
+      </attr>
+      <attr name="Source.Line">
+        <int>39</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>14</int>
+      </attr>
+      <attr name="SourceRange_StartLine">
+        <int>28</int>
+      </attr>
+      <attr name="SourceRange_EndLine">
+        <int>82</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>54</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>54</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>31</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>23</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>23</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Comment.Preceding">
+        <int>11</int>
+      </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>12</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Code">
+        <int>31</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Comment">
+        <int>23</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>44</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>69</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>26</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>11</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>113</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>37</int>
+      </attr>
+      <attr name="Metric.Halstead.Required_Time">
+        <int>304</int>
+      </attr>
+      <attr name="Metric.Level">
+        <int>2</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>28</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>54</int>
+      </attr>
+    </node>
+    <node id="N34">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Linkage.Is_Definition">
+        <enum />
+      </attr>
+      <attr name="Element.Has_Public_Visibility">
+        <enum />
+      </attr>
+      <attr name="Implementation">
+        <enum />
+      </attr>
+      <attr name="Source.Name">
+        <string>ClinicService</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.springframework.samples.petclinic.service.ClinicService</string>
+      </attr>
+      <attr name="Source.File">
+        <string>ClinicService.java</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>src/main/java/org/springframework/samples/petclinic/service/</string>
+      </attr>
+      <attr name="Metric.Halstead.Volume">
+        <float>333.6685</float>
+      </attr>
+      <attr name="Metric.Halstead.Difficulty">
+        <float>4.717391</float>
+      </attr>
+      <attr name="Metric.Halstead.Effort">
+        <float>1574.045</float>
+      </attr>
+      <attr name="Metric.Halstead.Vocabular_Frequency">
+        <float>2.266667</float>
+      </attr>
+      <attr name="Metric.Halstead.Delivered_Bugs">
+        <float>0.045105</float>
+      </attr>
+      <attr name="Metric.HIS.VOCF">
+        <float>2.266667</float>
+      </attr>
+      <attr name="Source.Line">
+        <int>32</int>
+      </attr>
+      <attr name="Source.Column">
+        <int>18</int>
+      </attr>
+      <attr name="SourceRange_StartLine">
+        <int>27</int>
+      </attr>
+      <attr name="SourceRange_EndLine">
+        <int>53</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>26</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>26</int>
+      </attr>
+      <attr name="Metric.Lines.Code">
+        <int>21</int>
+      </attr>
+      <attr name="Metric.Lines.Comment">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Lines.Only_Comment">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Lines.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Fixme">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Todo">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Hack">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.XXX">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Comment.Preceding">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Code">
+        <int>21</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Comment">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Lines.Class.Empty">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operands">
+        <int>31</int>
+      </attr>
+      <attr name="Metric.Halstead.Total_Operators">
+        <int>37</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operands">
+        <int>23</int>
+      </attr>
+      <attr name="Metric.Halstead.Different_Operators">
+        <int>7</int>
+      </attr>
+      <attr name="Metric.Halstead.Length">
+        <int>68</int>
+      </attr>
+      <attr name="Metric.Halstead.Vocabulary">
+        <int>30</int>
+      </attr>
+      <attr name="Metric.Halstead.Required_Time">
+        <int>87</int>
+      </attr>
+      <attr name="Metric.Level">
+        <int>2</int>
+      </attr>
+      <attr name="Source.Region_Start">
+        <int>27</int>
+      </attr>
+      <attr name="Source.Region_Length">
+        <int>26</int>
       </attr>
     </node>
     <node id="N35">
@@ -4400,61 +4400,61 @@
         <enum />
       </attr>
       <attr name="Source.Name">
-        <string>VisitRepository</string>
+        <string>ClinicServiceImpl</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>org.springframework.samples.petclinic.repository.VisitRepository</string>
+        <string>org.springframework.samples.petclinic.service.ClinicServiceImpl</string>
       </attr>
       <attr name="Source.File">
-        <string>VisitRepository.java</string>
+        <string>ClinicServiceImpl.java</string>
       </attr>
       <attr name="Source.Path">
-        <string>src/main/java/org/springframework/samples/petclinic/repository/</string>
+        <string>src/main/java/org/springframework/samples/petclinic/service/</string>
       </attr>
       <attr name="Metric.Halstead.Volume">
-        <float>74.23092</float>
+        <float>1463.453</float>
       </attr>
       <attr name="Metric.Halstead.Difficulty">
-        <float>3.9375</float>
+        <float>13.32222</float>
       </attr>
       <attr name="Metric.Halstead.Effort">
-        <float>292.2842</float>
+        <float>19496.45</float>
       </attr>
       <attr name="Metric.Halstead.Vocabular_Frequency">
-        <float>1.266667</float>
+        <float>4.5</float>
       </attr>
       <attr name="Metric.Halstead.Delivered_Bugs">
-        <float>0.014681</float>
+        <float>0.241462</float>
       </attr>
       <attr name="Metric.HIS.VOCF">
-        <float>1.266667</float>
+        <float>4.5</float>
       </attr>
       <attr name="Source.Line">
-        <int>32</int>
+        <int>41</int>
       </attr>
       <attr name="Source.Column">
-        <int>18</int>
+        <int>14</int>
       </attr>
       <attr name="SourceRange_StartLine">
-        <int>23</int>
+        <int>34</int>
       </attr>
       <attr name="SourceRange_EndLine">
-        <int>45</int>
+        <int>114</int>
       </attr>
       <attr name="Metric.LOC">
-        <int>22</int>
+        <int>80</int>
       </attr>
       <attr name="Metric.Lines.LOC">
-        <int>22</int>
+        <int>80</int>
       </attr>
       <attr name="Metric.Lines.Code">
-        <int>7</int>
+        <int>74</int>
       </attr>
       <attr name="Metric.Lines.Comment">
-        <int>15</int>
+        <int>6</int>
       </attr>
       <attr name="Metric.Lines.Only_Comment">
-        <int>15</int>
+        <int>6</int>
       </attr>
       <attr name="Metric.Lines.Empty">
         <int>0</int>
@@ -4472,49 +4472,49 @@
         <int>0</int>
       </attr>
       <attr name="Metric.Comment.Preceding">
-        <int>9</int>
-      </attr>
-      <attr name="Metric.Comment.Internal">
         <int>6</int>
       </attr>
+      <attr name="Metric.Comment.Internal">
+        <int>0</int>
+      </attr>
       <attr name="Metric.Lines.Class.Code">
-        <int>7</int>
+        <int>74</int>
       </attr>
       <attr name="Metric.Lines.Class.Comment">
-        <int>15</int>
+        <int>6</int>
       </attr>
       <attr name="Metric.Lines.Class.Empty">
         <int>0</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operands">
-        <int>9</int>
+        <int>109</int>
       </attr>
       <attr name="Metric.Halstead.Total_Operators">
-        <int>10</int>
+        <int>143</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operands">
-        <int>8</int>
+        <int>45</int>
       </attr>
       <attr name="Metric.Halstead.Different_Operators">
-        <int>7</int>
+        <int>11</int>
       </attr>
       <attr name="Metric.Halstead.Length">
-        <int>19</int>
+        <int>252</int>
       </attr>
       <attr name="Metric.Halstead.Vocabulary">
-        <int>15</int>
+        <int>56</int>
       </attr>
       <attr name="Metric.Halstead.Required_Time">
-        <int>16</int>
+        <int>1083</int>
       </attr>
       <attr name="Metric.Level">
         <int>2</int>
       </attr>
       <attr name="Source.Region_Start">
-        <int>23</int>
+        <int>34</int>
       </attr>
       <attr name="Source.Region_Length">
-        <int>22</int>
+        <int>80</int>
       </attr>
     </node>
     <node id="N36">
@@ -4577,85 +4577,85 @@
         <int>2</int>
       </attr>
     </node>
-    <edge id="Maps_To#org.springframework.samples.petclinic.model.BaseEntity#model" from="N1" to="N36">
+    <edge id="Maps_To#org.springframework.samples.petclinic.model.BaseEntity#model" from="N25" to="N36">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.model.NamedEntity#model" from="N16" to="N36">
+    <edge id="Maps_To#org.springframework.samples.petclinic.model.NamedEntity#model" from="N30" to="N36">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.model.Owner#model" from="N18" to="N36">
+    <edge id="Maps_To#org.springframework.samples.petclinic.model.Owner#model" from="N26" to="N36">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.model.Person#model" from="N21" to="N36">
+    <edge id="Maps_To#org.springframework.samples.petclinic.model.Person#model" from="N31" to="N36">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.model.Specialty#model" from="N25" to="N36">
+    <edge id="Maps_To#org.springframework.samples.petclinic.model.Specialty#model" from="N28" to="N36">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.model.Vet#model" from="N30" to="N36">
+    <edge id="Maps_To#org.springframework.samples.petclinic.model.Vet#model" from="N29" to="N36">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.model.Vets#model" from="N33" to="N36">
+    <edge id="Maps_To#org.springframework.samples.petclinic.model.Vets#model" from="N27" to="N36">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.PetclinicInitializer#util" from="N24" to="N40">
+    <edge id="Maps_To#org.springframework.samples.petclinic.PetclinicInitializer#util" from="N33" to="N40">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.repository.jdbc.JdbcOwnerRepositoryImpl#repository" from="N6" to="N39">
+    <edge id="Maps_To#org.springframework.samples.petclinic.repository.jdbc.JdbcOwnerRepositoryImpl#repository" from="N15" to="N39">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.repository.jdbc.JdbcPet#repository" from="N7" to="N39">
+    <edge id="Maps_To#org.springframework.samples.petclinic.repository.jdbc.JdbcPet#repository" from="N19" to="N39">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.repository.jdbc.JdbcPetRepositoryImpl#repository" from="N8" to="N39">
+    <edge id="Maps_To#org.springframework.samples.petclinic.repository.jdbc.JdbcPetRepositoryImpl#repository" from="N16" to="N39">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.repository.jdbc.JdbcPetVisitExtractor#repository" from="N9" to="N39">
+    <edge id="Maps_To#org.springframework.samples.petclinic.repository.jdbc.JdbcPetVisitExtractor#repository" from="N20" to="N39">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.repository.jdbc.JdbcVetRepositoryImpl#repository" from="N10" to="N39">
+    <edge id="Maps_To#org.springframework.samples.petclinic.repository.jdbc.JdbcVetRepositoryImpl#repository" from="N21" to="N39">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.repository.jdbc.JdbcVisitRepositoryImpl#repository" from="N11" to="N39">
+    <edge id="Maps_To#org.springframework.samples.petclinic.repository.jdbc.JdbcVisitRepositoryImpl#repository" from="N18" to="N39">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
@@ -4673,115 +4673,115 @@
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.repository.jpa.JpaPetRepositoryImpl#repository" from="N13" to="N39">
+    <edge id="Maps_To#org.springframework.samples.petclinic.repository.jpa.JpaPetRepositoryImpl#repository" from="N11" to="N39">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.repository.jpa.JpaVetRepositoryImpl#repository" from="N14" to="N39">
+    <edge id="Maps_To#org.springframework.samples.petclinic.repository.jpa.JpaVetRepositoryImpl#repository" from="N13" to="N39">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.repository.jpa.JpaVisitRepositoryImpl#repository" from="N15" to="N39">
+    <edge id="Maps_To#org.springframework.samples.petclinic.repository.jpa.JpaVisitRepositoryImpl#repository" from="N14" to="N39">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.repository.OwnerRepository#repository" from="N20" to="N39">
+    <edge id="Maps_To#org.springframework.samples.petclinic.repository.OwnerRepository#repository" from="N23" to="N39">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.repository.PetRepository#repository" from="N22" to="N39">
+    <edge id="Maps_To#org.springframework.samples.petclinic.repository.PetRepository#repository" from="N24" to="N39">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.repository.springdatajpa.SpringDataOwnerRepository#repository" from="N26" to="N39">
+    <edge id="Maps_To#org.springframework.samples.petclinic.repository.springdatajpa.SpringDataOwnerRepository#repository" from="N10" to="N39">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.repository.springdatajpa.SpringDataPetRepository#repository" from="N27" to="N39">
+    <edge id="Maps_To#org.springframework.samples.petclinic.repository.springdatajpa.SpringDataPetRepository#repository" from="N9" to="N39">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.repository.springdatajpa.SpringDataVetRepository#repository" from="N28" to="N39">
+    <edge id="Maps_To#org.springframework.samples.petclinic.repository.springdatajpa.SpringDataVetRepository#repository" from="N7" to="N39">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.repository.springdatajpa.SpringDataVisitRepository#repository" from="N29" to="N39">
+    <edge id="Maps_To#org.springframework.samples.petclinic.repository.springdatajpa.SpringDataVisitRepository#repository" from="N8" to="N39">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.repository.VetRepository#repository" from="N32" to="N39">
+    <edge id="Maps_To#org.springframework.samples.petclinic.repository.VetRepository#repository" from="N22" to="N39">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.repository.VisitRepository#repository" from="N35" to="N39">
+    <edge id="Maps_To#org.springframework.samples.petclinic.repository.VisitRepository#repository" from="N6" to="N39">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.service.ClinicService#service" from="N2" to="N37">
+    <edge id="Maps_To#org.springframework.samples.petclinic.service.ClinicService#service" from="N34" to="N37">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.service.ClinicServiceImpl#service" from="N3" to="N37">
+    <edge id="Maps_To#org.springframework.samples.petclinic.service.ClinicServiceImpl#service" from="N35" to="N37">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.util.EntityUtils#service" from="N5" to="N37">
+    <edge id="Maps_To#org.springframework.samples.petclinic.util.EntityUtils#service" from="N32" to="N37">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.web.CrashController#controller" from="N4" to="N38">
+    <edge id="Maps_To#org.springframework.samples.petclinic.web.CrashController#controller" from="N3" to="N38">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.web.OwnerController#controller" from="N19" to="N38">
+    <edge id="Maps_To#org.springframework.samples.petclinic.web.OwnerController#controller" from="N2" to="N38">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.web.PetValidator#controller" from="N23" to="N38">
+    <edge id="Maps_To#org.springframework.samples.petclinic.web.PetValidator#controller" from="N1" to="N38">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.web.VetController#controller" from="N31" to="N38">
+    <edge id="Maps_To#org.springframework.samples.petclinic.web.VetController#controller" from="N4" to="N38">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />
       </attr>
     </edge>
-    <edge id="Maps_To#org.springframework.samples.petclinic.web.VisitController#controller" from="N34" to="N38">
+    <edge id="Maps_To#org.springframework.samples.petclinic.web.VisitController#controller" from="N5" to="N38">
       <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
       <attr name="IsVirtual">
         <enum />

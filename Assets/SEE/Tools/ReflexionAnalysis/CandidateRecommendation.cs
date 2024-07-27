@@ -246,7 +246,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 Node relatedNodeClone = (Node)relatedNode.Clone();
 
                 relatedNodeClone.ItsGraph = null;
-                relatedNodeClone.ID = $"{relatedNode.ID}";
+                relatedNodeClone.ID = relatedNode.ID;
+                relatedNodeClone.SourceName = relatedNode.ID;
                 Edge edge = new Edge(relatedNodeClone, 
                                     examinedNodeClone, 
                                     $"{recommendationEdgeType} {Math.Round(mappingPair.AttractionValue, 4)}");

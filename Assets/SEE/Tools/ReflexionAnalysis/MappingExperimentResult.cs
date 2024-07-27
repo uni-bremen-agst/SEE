@@ -3,6 +3,7 @@ using SEE.DataModel.DG;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Transactions;
 using System.Xml.Linq;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis
@@ -36,6 +37,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// Number of candidates considered for automated mapping during the run of an experiment. 
         /// </summary>
         private double CandidatesConsidered { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private double CandidatesTotal { get; set; }
         
         /// <summary>
         /// Hit rate refering to correctly mapped candidates per all considered candidates 
@@ -93,7 +99,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Number of initially mapped nodes, which would have been candidates, but where mapped from the start. 
         /// </summary>
-        public double LeftOver { get; private set; }
+        public double CandidatesLeft { get; private set; }
 
         /// <summary>
         /// Number of runs this experiment were iterated
@@ -286,17 +292,18 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 new XElement("RootSeed", MasterSeed),
                 new XElement("CurrentSeed", CurrentSeed),
                 new XElement("Iterations", Iterations),
+                new XElement("CandidatesTotal", CandidatesTotal),
+                new XElement("CandidatesConsidered", CandidatesConsidered),
+                new XElement("InitiallyMapped", InitiallyMapped),
+                new XElement("LeftOver", CandidatesLeft),
                 new XElement("MappingRate", MappingRate),
                 new XElement("MappingRateStd", MappingRateStd),
-                new XElement("HitRateAll", HitRateAll),
-                new XElement("HitRateAllStd", HitRateAllStd),
                 new XElement("HitRateMapped", HitRateMapped),
                 new XElement("HitRateMappedStd", HitRateMappedStd),
-                new XElement("InitiallyMapped", InitiallyMapped),
-                new XElement("CandidatesConsidered", CandidatesConsidered),
+                new XElement("HitRateAll", HitRateAll),
+                new XElement("HitRateAllStd", HitRateAllStd),
                 new XElement("TotalHits", TotalHits),
                 new XElement("TotalFails", TotalFails),
-                new XElement("LeftOver", LeftOver),
                 new XElement("AveragePercentileRankGlobally", AveragePercentileRankGlobally),
                 new XElement("CandidateType", config.AttractFunctionConfig.CandidateType),
                 new XElement("ClusterType", config.AttractFunctionConfig.ClusterType));
@@ -326,15 +333,32 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
 
             resultsOrdered.ForEach(r => r.CalculateResults());
+            CandidatesTotal = resultsOrdered.Count();
             InitiallyMapped = resultsOrdered.Where((r) => r.MappedAtMappingStep == -1).Count();
-            CandidatesConsidered = resultsOrdered.Count() - InitiallyMapped;
+            CandidatesConsidered = CandidatesTotal - InitiallyMapped;
             TotalHits = resultsOrdered.Where(r => r.Hit && r.MappedAtMappingStep >= 0).Count();
-            TotalFails = resultsOrdered.Where(r => !r.Hit && r.MappedAtMappingStep >= 0).Count();
-            LeftOver = resultsOrdered.Where((r) => r.MappedAtMappingStep == -2).Count();
+            TotalFails = resultsOrdered.Where(r => !r.Hit && r.MappedAtMappingStep >= 0 && r.MappedAtMappingStep < int.MaxValue).Count();
+            CandidatesLeft = resultsOrdered.Where((r) => r.MappedAtMappingStep == int.MaxValue).Count();
 
-            MappingRate = (CandidatesConsidered - LeftOver) / CandidatesConsidered;
-            HitRateAll = TotalHits / CandidatesConsidered;
-            HitRateMapped = TotalHits / (CandidatesConsidered - LeftOver);
+            if (CandidatesConsidered > 0)
+            {
+                MappingRate = (CandidatesConsidered - CandidatesLeft) / CandidatesConsidered;
+                HitRateAll = TotalHits / CandidatesConsidered;
+            } 
+            else
+            {
+                MappingRate = 0;
+                HitRateAll = 0;
+            }
+
+            if(CandidatesConsidered - CandidatesLeft > 0)
+            {
+                HitRateMapped = TotalHits / (CandidatesConsidered - CandidatesLeft);
+            } 
+            else
+            {
+                HitRateMapped = 0;
+            }
 
             IEnumerable<double> validPercentileRankValues = resultsOrdered.Where(r => r.AveragePercentileRank >= 0)
                                                                          .Select(r => r.AveragePercentileRank);
@@ -360,8 +384,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             
             // Total values
             averageResult.TotalHits = results.Select(r => r.TotalHits).Sum();
+            averageResult.CandidatesTotal = results.Select(r => r.CandidatesTotal).Sum();
             averageResult.CandidatesConsidered = results.Select(r => r.CandidatesConsidered).Sum();
-            averageResult.LeftOver = results.Select(r => r.LeftOver).Sum();
+            averageResult.CandidatesLeft = results.Select(r => r.CandidatesLeft).Sum();
             averageResult.TotalFails = results.Select(r => r.TotalFails).Sum();
             averageResult.InitiallyMapped = results.Select(r => r.InitiallyMapped).Sum();
 

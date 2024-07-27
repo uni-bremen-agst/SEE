@@ -486,7 +486,20 @@ namespace SEE.Game.City
         [PropertyOrder(DataButtonsGroupOrderLoadLayout)]
         public void LoadLayout()
         {
+            if(graphRenderer == null)
+            {
+                UnityEngine.Debug.LogError("Cannot load layout. graph renderer is null.");
+                return;
+            } 
+
+            if(gameObject?.transform?.position == null)
+            {
+                UnityEngine.Debug.LogError($"Cannot load layout. Cannot retrieve ground level from game object. gameObject={gameObject} gameObject.transform={gameObject?.transform} gameObject.transform.position={gameObject?.transform?.position}");
+                return;
+            }
+
             ICollection<GameObject> gameNodes = AllNodeDescendants(gameObject);
+            gameNodes.ForEach(n => UnityEngine.Debug.Log($"LoadLayout(): gameNode={n.name} count={gameNodes.Count}"));
             graphRenderer.LoadLayout(gameNodes, gameObject.transform.position.y);
         }
 

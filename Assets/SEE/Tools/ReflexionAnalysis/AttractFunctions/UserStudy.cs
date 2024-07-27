@@ -1,10 +1,13 @@
 ﻿using Cysharp.Threading.Tasks;
 using MoreLinq;
+using RTG;
 using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.DataModel.DG;
 using SEE.Game.City;
+using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.PropertyDialog;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -67,6 +70,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                     UnityEngine.Debug.Log($"Configuration path of run {city.ConfigurationPath.ToString()}");
                     city.LoadConfiguration();
                     await city.LoadDataAsync();
+                    
                     await city.UpdateRecommendationSettings(run.Settings);
                     await UniTask.Delay(500);
                     city.ClearGraphElementIDMap();
@@ -75,6 +79,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                     await UniTask.Delay(500);
                     city.LoadLayout();
 
+                    //Delete root labels
+                    (Graph implementation, Graph architecture, _) = city.ReflexionGraph.Disassemble();
+                    Node ArchitectureRoot = architecture.GetRoots().FirstOrDefault();
+                    Node ImplementationRoot = implementation.GetRoots().FirstOrDefault();
+                    DisableLabel(ArchitectureRoot);
+                    DisableLabel(ImplementationRoot);
+
                     MoveAction.UnblockMovement();
                     BlockUnnecessaryMovement();
                     candidateRecommendation.ColorUnmappedCandidates(Color.blue);
@@ -82,6 +93,21 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 catch (Exception e)
                 {
                     UnityEngine.Debug.LogException(e);
+                }
+            }
+
+            void DisableLabel(Node node)
+            {
+                GameObject rootGameObject = node.GameObject();
+                for (int i = 0; i < rootGameObject.transform.childCount; i++)
+                {
+                    Transform child = rootGameObject.transform.GetChild(i);
+
+                    if (child.transform.tag.Equals("Text") && child.name.StartsWith("Text"))
+                    {
+                        UnityEngine.Debug.Log($"Found text tranform {child.name}");
+                        child.gameObject.SetActive(false);
+                    }
                 }
             }
 
@@ -155,18 +181,24 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             userStudyRuns.Clear();
             
             // First Run
+            //UserStudyRun run1 = new();
+            //run1.Settings = SetDefaultSettings();
+            //run1.Settings.AttractFunctionType = AttractFunction.AttractFunctionType.NBAttract;
+            //run1.Settings.ExperimentName = "NBAttract";
+            //run1.group = "A";
+
             UserStudyRun run1 = new();
             run1.Settings = SetDefaultSettings();
-            run1.Settings.AttractFunctionType = AttractFunction.AttractFunctionType.NBAttract;
-            run1.Settings.ExperimentName = "NBAttract";
+            run1.Settings.AttractFunctionType = AttractFunction.AttractFunctionType.ADCAttract;
+            run1.Settings.ExperimentName = "ADCAttract";
             run1.group = "A";
+
 
             UserStudyRun run2 = new();
             run2.Settings = SetDefaultSettings();
             run2.Settings.AttractFunctionType = AttractFunction.AttractFunctionType.NoAttract;
             run2.Settings.ExperimentName = "NoAttract";
             run2.group = "B";
-            // run2.Settings.RootSeed = 239637258;
 
             if(BuildGroup.Equals("A"))
             {   

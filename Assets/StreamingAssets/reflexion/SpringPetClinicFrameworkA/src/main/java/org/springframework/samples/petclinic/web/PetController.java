@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.samples.petclinic.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.model.Owner;
@@ -36,7 +35,6 @@ import java.util.Collection;
  * @author Ken Krebs
  * @author Arjen Poutsma
  */
-@Controller
 @RequestMapping("/owners/{ownerId}")
 public class PetController {
 
