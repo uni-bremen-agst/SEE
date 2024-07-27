@@ -499,7 +499,6 @@ namespace SEE.Game.City
             }
 
             ICollection<GameObject> gameNodes = AllNodeDescendants(gameObject);
-            gameNodes.ForEach(n => UnityEngine.Debug.Log($"LoadLayout(): gameNode={n.name} count={gameNodes.Count}"));
             graphRenderer.LoadLayout(gameNodes, gameObject.transform.position.y);
         }
 
