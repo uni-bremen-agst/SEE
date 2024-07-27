@@ -313,7 +313,6 @@ namespace SEE.UI.Window.CodeWindow
         {
             Assert.IsNotNull(lspHandler);
 
-            // TODO: Handle conflicts between LSP Hover and Debug Hover / Issue Hover
             if (hoveredWord == null)
             {
                 Tooltip.Deactivate();
