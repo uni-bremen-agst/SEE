@@ -544,7 +544,7 @@ namespace SEE.UI.Window.CodeWindow
             }
             catch (DashboardException e)
             {
-                ShowNotification.Error("Couldn't load issues", e.Message);
+                ShowNotification.Error("Couldn't load dashboard issues", e.Message);
                 return new List<Issue>();
             }
 

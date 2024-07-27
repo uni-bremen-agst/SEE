@@ -43,5 +43,6 @@ namespace SEE.Utils
         public const char CircleQuestionMark = '\uF059';
         public const char CircleExclamationMark = '\uF06A';
         public const char Sitemap = '\uF0E8';
+        public const char MagnifyingGlass = '\uF002';
     }
 }

@@ -16,7 +16,6 @@ using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using SEE.Controls;
 using SEE.UI.DebugAdapterProtocol;
-using SEE.UI.Menu;
 using SEE.Utils.Markdown;
 using UnityEngine.Assertions;
 
@@ -55,11 +54,10 @@ namespace SEE.UI.Window.CodeWindow
             scrollable = PrefabInstantiator.InstantiatePrefab(codeWindowPrefab, Window.transform.Find("Content"), false);
             scrollable.name = "Scrollable";
 
-            // Initialize list and context menu, if necessary.
+            // Initialize context menu, if necessary.
             if (lspHandler != null)
             {
-                contextMenu = gameObject.AddComponent<PopupMenu.PopupMenu>();
-                simpleListMenu = gameObject.AddComponent<SimpleListMenu>();
+                contextMenu = ContextMenuHandler.FromCodeWindow(this);
             }
 
             // Set text and preferred font size
@@ -181,7 +179,7 @@ namespace SEE.UI.Window.CodeWindow
                         {
                             int character = word.firstCharacterIndex;
                             (int line, int column) = GetSourcePosition(character);
-                            ShowContextMenu(line-1, column-1, Input.mousePosition, word.GetWord());
+                            contextMenu.Show(line - 1, column - 1, Input.mousePosition, word.GetWord());
                         }
                         return;
                     }
@@ -199,8 +197,8 @@ namespace SEE.UI.Window.CodeWindow
                 }
 
                 TMP_WordInfo? hoveredWord = DetectHoveredWord();
-                // Detect hovering over words
-                if (!lastHoveredWord.Equals(hoveredWord))
+                // Detect hovering over words (only while the code window is not being scrolled).
+                if (scrollingTo == 0 && !lastHoveredWord.Equals(hoveredWord))
                 {
                     if (lspHandler != null)
                     {
@@ -210,20 +208,88 @@ namespace SEE.UI.Window.CodeWindow
                     if (lastHoveredWord != null)
                     {
                         OnWordHoverEnd?.Invoke(this, lastHoveredWord.Value);
+                        RemoveUnderline(lastHoveredWord.Value);
                     }
                     if (hoveredWord != null)
                     {
                         OnWordHoverBegin?.Invoke(this, hoveredWord.Value);
+
+                        // NOTE: We are not using SEEInput because:
+                        //       a) Any reasonable key here would conflict with our existing set of keys.
+                        //          We would need to implement context-dependent key bindings first.
+                        //       b) We need to differentiate between "key is in a pressed state", "key was pressed",
+                        //          and "key was released", which goes beyond the general interface of SEEInput.
+                        if (Input.GetKey(KeyCode.LeftControl))
+                        {
+                            UnderlineHoveredWord(hoveredWord.Value);
+                        }
                     }
+
+                    lastHoveredWord = hoveredWord;
                 }
-                lastHoveredWord = hoveredWord;
+                else if (Input.GetKeyUp(KeyCode.LeftControl) && lastHoveredWord != null)
+                {
+                    RemoveUnderline(lastHoveredWord.Value);
+                }
+                else if (Input.GetKeyDown(KeyCode.LeftControl) && lastHoveredWord != null)
+                {
+                    UnderlineHoveredWord(lastHoveredWord.Value);
+                }
+
+                if (Input.GetMouseButton(0) && Input.GetKey(KeyCode.LeftControl) && lastHoveredWord != null)
+                {
+                    RemoveUnderline(lastHoveredWord.Value);
+                    GoToDefinition(lastHoveredWord.Value);
+                }
             }
+
+            const string startUnderline = "</noparse><u><color=\"orange\"><noparse>";
+            const string endUnderline = "</noparse></color></u><noparse>";
+
             return;
 
             TMP_WordInfo? DetectHoveredWord()
             {
                 int index = TMP_TextUtilities.FindIntersectingWord(textMesh, Input.mousePosition, null);
                 return index >= 0 && index < textMesh.textInfo.wordCount ? textMesh.textInfo.wordInfo[index] : null;
+            }
+
+            void UnderlineHoveredWord(TMP_WordInfo word)
+            {
+                int start = textMesh.textInfo.characterInfo[word.firstCharacterIndex].index;
+                int end = textMesh.textInfo.characterInfo[word.lastCharacterIndex].index + 1;
+                // We need to change the rich text tags to underline the word.
+                textMesh.text = text = text[..start] + startUnderline + text[start..end] + endUnderline + text[end..];
+                textMesh.ForceMeshUpdate();
+            }
+
+            void RemoveUnderline(TMP_WordInfo word)
+            {
+                // Start and end characters do not include the underline tags (if they exist),
+                // so we need to adjust them.
+                if (word.lastCharacterIndex >= textMesh.textInfo.characterCount)
+                {
+                    return;
+                }
+                int start = textMesh.textInfo.characterInfo[word.firstCharacterIndex].index - startUnderline.Length;
+                int end = textMesh.textInfo.characterInfo[word.lastCharacterIndex].index + 1 + endUnderline.Length;
+
+                if (start >= 0 && end <= text.Length)
+                {
+                    string underlinedPart = text[start..end];
+                    if (underlinedPart.StartsWith(startUnderline) && underlinedPart.EndsWith(endUnderline))
+                    {
+                        text = text[..start] + underlinedPart[startUnderline.Length..^endUnderline.Length] + text[end..];
+                        textMesh.text = text;
+                        textMesh.ForceMeshUpdate();
+                    }
+                }
+            }
+
+            void GoToDefinition(TMP_WordInfo word)
+            {
+                (int line, int column) = GetSourcePosition(word.firstCharacterIndex);
+                contextMenu.ShowDefinition(line - 1, column - 1, word.GetWord());
             }
         }
 

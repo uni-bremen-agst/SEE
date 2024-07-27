@@ -63,6 +63,12 @@ namespace SEE.UI.Window.CodeWindow
         private LSPHandler lspHandler;
 
         /// <summary>
+        /// The handler for the context menu of this code window, which provides various navigation options,
+        /// such as "Go to Definition" or "Find References".
+        /// </summary>
+        private ContextMenuHandler contextMenu;
+
+        /// <summary>
         /// Path to the code window content prefab.
         /// </summary>
         private const string codeWindowPrefab = "Prefabs/UI/CodeWindowContent";
@@ -118,13 +124,14 @@ namespace SEE.UI.Window.CodeWindow
                                         .ToArray();
             if (lineNumber < 1)
             {
-                textMesh.text = string.Join("\n", allLines);
+                text = string.Join("\n", allLines);
             }
             else
             {
                 string markLine = $"{markColor}{allLines[lineNumber - 1][markColorLength..]}";
-                textMesh.text = string.Join("\n", allLines.Exclude(lineNumber - 1, 1).Insert(new[] { markLine }, lineNumber - 1));
+                text = string.Join("\n", allLines.Exclude(lineNumber - 1, 1).Insert(new[] { markLine }, lineNumber - 1));
             }
+            textMesh.text = text;
         }
 
         #region Visible Line Calculation
@@ -184,7 +191,6 @@ namespace SEE.UI.Window.CodeWindow
                            .AppendCallback(() => scrollingTo = 0);
 
                     MarkLine(value);
-
                     ScrollEvent.Invoke();
                 }
             }
