@@ -8,7 +8,7 @@ using UnityEngine;
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
-    /// This class provides the color picker menu for the <see cref="ColorPickerAction"/>
+    /// This class provides the color picker menu for the <see cref="ColorPickerAction"/>.
     /// </summary>
     public static class ColorPickerMenu
     {
@@ -18,25 +18,25 @@ namespace SEE.UI.Menu.Drawable
         private const string colorPickerMenuPrefab = "Prefabs/UI/Drawable/ColorPickerMenu";
 
         /// <summary>
-        /// The instance for the colorPickerMenu
+        /// The instance for the colorPickerMenu.
         /// </summary>
-        private static GameObject instance;
+        private static readonly GameObject instance;
 
         /// <summary>
         /// The selection for which color the picker should pick the color.
         /// Primary or secondary color.
         /// </summary>
-        private static SwitchManager switchManager;
+        private static readonly SwitchManager switchManager;
 
         /// <summary>
         /// The HSV color picker to show the selected primary color.
         /// </summary>
-        private static ColorPicker pickerForPrimaryColor;
+        private static readonly ColorPicker pickerForPrimaryColor;
 
         /// <summary>
         /// The HSV color picker to show the selected second color.
         /// </summary>
-        private static ColorPicker pickerForSecondColor;
+        private static readonly ColorPicker pickerForSecondColor;
 
         /// <summary>
         /// The init constructor that create the instance for the color picker menu.
@@ -61,7 +61,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Method to enable the color picker menu.
+        /// Enables the color picker menu.
         /// </summary>
         public static void Enable()
         {
@@ -77,7 +77,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Assigns a color to the primary hsv color picker.
+        /// Assigns a color to the primary HSV color picker.
         /// </summary>
         /// <param name="color">The color that should be assigned.</param>
         public static void AssignPrimaryColor(Color color)
@@ -86,7 +86,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Assigns a color to the secondary hsv color picker.
+        /// Assigns a color to the secondary HSV color picker.
         /// </summary>
         /// <param name="color">The color that should be assigned.</param>
         public static void AssignSecondaryColor(Color color)
@@ -95,9 +95,9 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Get the state of the switch.
+        /// Returns the state of the switch.
         /// </summary>
-        /// <returns>The bool of the switch status.</returns>
+        /// <returns>The switch status.</returns>
         public static bool GetSwitchStatus()
         {
             return switchManager.isOn;
