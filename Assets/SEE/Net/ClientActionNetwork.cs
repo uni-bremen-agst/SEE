@@ -5,6 +5,8 @@ using System.IO;
 using System.IO.Compression;
 using Cysharp.Threading.Tasks;
 using SEE.Net.Actions;
+using SEE.Game.City;
+using SEE.Utils.Paths;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -112,6 +114,9 @@ namespace SEE.Net
                 Debug.Log("Starting client action network!");
                 Network.ServerNetwork.Value?.SyncFilesServerRpc();
             }
+            else {
+                LoadCityAsync().Forget();
+            }
         }
 
         /// <summary>
@@ -164,7 +169,7 @@ namespace SEE.Net
                 Directory.CreateDirectory(multiplayerDataPath);
             }
 
-            DownloadAllFilesAsync();
+            DownloadAllFilesAsync().Forget();
         }
 
 
@@ -213,6 +218,47 @@ namespace SEE.Net
             Debug.Log("Done downloading!");
 
             Network.ServerNetwork.Value?.SyncClientServerRpc(NetworkManager.Singleton.LocalClientId);
+            await LoadCityAsync();
+        }
+
+        /// <summary>
+        /// Loads the <c>SEECity</c> in the scene.
+        /// </summary>
+        private async UniTask LoadCityAsync()
+        {
+            var codeCity = GameObject.Find("ImplementationTable/CodeCity");
+            var seeCity = codeCity.GetComponent<SEECity>() as SEECity;
+            seeCity.Reset();
+
+            string configPath = GetCfg(ServerContentDirectory);
+            if (string.IsNullOrWhiteSpace(configPath))
+            {
+                Debug.Log("No SEECity configuration found in multiplayer data.");
+                return;
+            }
+
+            Debug.Log($"Loading SEECity configuration from multiplayer data: {configPath}");
+            seeCity.ConfigurationPath = new DataPath(configPath);
+            seeCity.LoadConfiguration();
+            await seeCity.LoadDataAsync();
+            seeCity.DrawGraph();
+        }
+
+        /// <summary>
+        /// Scans the directory with the given path in the streaming assets for a <c>.cfg</c> file.
+        /// </summary>
+        /// <returns>
+        /// The path of the first <c>.cfg</c> file that is found, or <c>null</c> if none was found.
+        /// </returns>
+        private string GetCfg(string dir)
+        {
+            string dirPath = System.IO.Path.Combine(Application.streamingAssetsPath, dir);
+            var filePaths = Directory.EnumerateFiles(dirPath, "*.cfg", SearchOption.TopDirectoryOnly);
+            foreach (string filePath in filePaths)
+            {
+                return filePath;
+            }
+            return null;
         }
 
         /// <summary>
