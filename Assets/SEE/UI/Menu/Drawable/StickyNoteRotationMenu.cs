@@ -62,7 +62,7 @@ namespace SEE.UI.Menu.Drawable
             UnityAction returnCall = null)
         {
             xRotationMenu = PrefabInstantiator.InstantiatePrefab(xRotationMenuPrefab,
-                GameObject.Find("UI Canvas").transform, false);
+                                                                 UICanvas.Canvas.transform, false);
             GameObject surface = GameFinder.GetDrawableSurface(stickyNoteHolder);
             string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
@@ -156,7 +156,7 @@ namespace SEE.UI.Menu.Drawable
         private static void EnableYRotation(GameObject stickyNoteHolder, bool spawnMode = true, UnityAction returnCall = null)
         {
             yRotationMenu = PrefabInstantiator.InstantiatePrefab(yRotationMenuPrefab,
-                GameObject.Find("UI Canvas").transform, false);
+                                                                 UICanvas.Canvas.transform, false);
             RotationSliderController slider = yRotationMenu.GetComponentInChildren<RotationSliderController>();
             SliderListener(slider, stickyNoteHolder, spawnMode);
             GameObject surface = GameFinder.GetDrawableSurface(stickyNoteHolder);

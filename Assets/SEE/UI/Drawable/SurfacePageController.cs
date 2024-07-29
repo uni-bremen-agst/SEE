@@ -131,8 +131,8 @@ namespace SEE.UI.Drawable
 
             popupMenu.ClearEntries();
             popupMenu.AddEntries(entries);
-            popupMenu.ShowWith(position: GameObject.Find("UI Canvas").transform.position);
-            Refresher.UICanvas();
+            popupMenu.ShowWith(position: UICanvas.Canvas.transform.position);
+            UICanvas.Refresh();
         }
 
         /// <summary>

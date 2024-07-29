@@ -100,7 +100,7 @@ namespace SEE.UI.Menu.Drawable
         private static HSVPicker.ColorPicker picker;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private enum Mode
         {
@@ -125,7 +125,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// The constructor. It creates the instance for the line menu and 
+        /// The constructor. It creates the instance for the line menu and
         /// adds the menu layer to the corresponding game object's.
         /// By default, the menu is hidden.
         /// </summary>
@@ -133,12 +133,12 @@ namespace SEE.UI.Menu.Drawable
         {
             /// Instantiates the menu.
             instance = PrefabInstantiator.InstantiatePrefab(lineMenuPrefab,
-                GameObject.Find("UI Canvas").transform, false);
+                                                            UICanvas.Canvas.transform, false);
 
             /// Initialize the content area
             content = instance.transform.Find("Content");
 
-            /// Disables the ability to return to the previous menu. 
+            /// Disables the ability to return to the previous menu.
             /// Intended only for editing MindMap nodes.
             DisableReturn();
 
@@ -191,8 +191,8 @@ namespace SEE.UI.Menu.Drawable
                     DisableTilingFromLineMenu();
                 }
 
-                /// If you want to switch to <see cref="LineKind.Solid"/> but 
-                /// previously a Dashed LineKind with <see cref="ColorKind.TwoDashed"/> was active, 
+                /// If you want to switch to <see cref="LineKind.Solid"/> but
+                /// previously a Dashed LineKind with <see cref="ColorKind.TwoDashed"/> was active,
                 /// you need also to switch the <see cref="ColorKind"/> to <see cref="ColorKind.Monochrome"/>.
                 if (GetLineKinds()[index] == LineKind.Solid &&
                     selectedColorKind == ColorKind.TwoDashed)
@@ -272,14 +272,14 @@ namespace SEE.UI.Menu.Drawable
 
         /// <summary>
         /// Enables all line menu layers,
-        /// sets the parent back to UI Canvas, enables the window dragger 
+        /// sets the parent back to UI Canvas, enables the window dragger
         /// and then hides the line menu.
         /// The parent of the line menu can be switched through the <see cref="DrawShapesAction"/>
         /// </summary>
         public static void DisableLineMenu()
         {
             EnableLineMenuLayers();
-            instance.transform.SetParent(GameObject.Find("UI Canvas").transform);
+            instance.transform.SetParent(UICanvas.Canvas.transform);
             GameFinder.FindChild(instance, "Dragger").GetComponent<WindowDragger>().enabled = true;
             DisableReturn();
             mode = Mode.None;
@@ -360,7 +360,7 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void InitDrawing()
         {
-            /// Initialize the tiling slider and 
+            /// Initialize the tiling slider and
             /// save the changes in the global value for the tiling <see cref="ValueHolder.CurrentTiling"/>.
             tilingSlider.onValueChanged.AddListener(tilingAction = tiling =>
             {
@@ -373,10 +373,10 @@ namespace SEE.UI.Menu.Drawable
             /// Sets up the color kind selector.
             SetUpColorKindSelectorForDrawing();
 
-            /// Sets up the primary color button. 
+            /// Sets up the primary color button.
             SetUpPrimaryColorButtonForDrawing();
 
-            /// Sets up the secondary color button. 
+            /// Sets up the secondary color button.
             SetUpSecondaryColorButtonForDrawing();
 
             /// Sets up the thickness slider.
@@ -416,8 +416,8 @@ namespace SEE.UI.Menu.Drawable
             {
                 ValueHolder.CurrentLineKind = GetLineKinds()[index];
 
-                /// If you want to switch to <see cref="LineKind.Solid"/> but 
-                /// previously a Dashed LineKind with <see cref="ColorKind.TwoDashed"/> was active, 
+                /// If you want to switch to <see cref="LineKind.Solid"/> but
+                /// previously a Dashed LineKind with <see cref="ColorKind.TwoDashed"/> was active,
                 /// you need also to switch the <see cref="ColorKind"/> to <see cref="ColorKind.Monochrome"/>.
                 if (ValueHolder.CurrentLineKind == LineKind.Solid &&
                     ValueHolder.CurrentColorKind == ColorKind.TwoDashed)
@@ -502,9 +502,9 @@ namespace SEE.UI.Menu.Drawable
             /// Adds the new handler for saving in global value.
             secondaryColorBMB.clickEvent.AddListener(() =>
             {
-                /// If the <see cref="LineKind"/> was <see cref="LineKind.Solid"/> before, 
-                /// the secondary color is clear. 
-                /// Therefore, a random color is added first, 
+                /// If the <see cref="LineKind"/> was <see cref="LineKind.Solid"/> before,
+                /// the secondary color is clear.
+                /// Therefore, a random color is added first,
                 /// and if the color's alpha is 0, it is set to 255 to ensure the color is not transparent.
                 if (ValueHolder.CurrentSecondaryColor == Color.clear)
                 {
@@ -571,10 +571,10 @@ namespace SEE.UI.Menu.Drawable
                             LineKind.Dashed, tiling).Execute();
                 });
 
-                /// Sets up the primary color button. 
+                /// Sets up the primary color button.
                 SetUpPrimaryColorButtonForEditing(selectedLine, lineHolder, surface, surfaceParentName);
 
-                /// Sets up the secondary color button. 
+                /// Sets up the secondary color button.
                 SetUpSecondaryColorButtonForEditing(selectedLine, lineHolder, surface, surfaceParentName);
 
                 /// Set up the outline thickness slider.
@@ -598,9 +598,9 @@ namespace SEE.UI.Menu.Drawable
 
         /// <summary>
         /// Set up the return button.
-        /// If the return call action is not null, 
-        /// activate the return button and add the action to it. 
-        /// This only occurs when editing mind map nodes. 
+        /// If the return call action is not null,
+        /// activate the return button and add the action to it.
+        /// This only occurs when editing mind map nodes.
         /// In this case, the layer slider is set to inactive, as the order of a mind map node must be changed directly on the node.
         /// </summary>
         /// <param name="returnCall">The return call back to the parent menu.</param>
@@ -645,14 +645,14 @@ namespace SEE.UI.Menu.Drawable
             /// Creates a new line kind selector action
             lineKindAction = index =>
             {
-                /// The action should be executed when the new <see cref="LineKind"/> is not <see cref="LineKind.Dashed"/>. 
+                /// The action should be executed when the new <see cref="LineKind"/> is not <see cref="LineKind.Dashed"/>.
                 /// This is because it does not work without an additionally set tiling.
                 if (GetLineKinds()[index] != LineKind.Dashed)
                 {
                     lineHolder.LineKind = GetLineKinds()[index];
 
-                    /// If you want to switch to <see cref="LineKind.Solid"/> but 
-                    /// previously a Dashed LineKind with <see cref="ColorKind.TwoDashed"/> was active, 
+                    /// If you want to switch to <see cref="LineKind.Solid"/> but
+                    /// previously a Dashed LineKind with <see cref="ColorKind.TwoDashed"/> was active,
                     /// you need also to switch the <see cref="ColorKind"/> to <see cref="ColorKind.Monochrome"/>.
                     if (lineHolder.LineKind == LineKind.Solid &&
                         lineHolder.ColorKind == ColorKind.TwoDashed)
@@ -770,9 +770,9 @@ namespace SEE.UI.Menu.Drawable
             /// Add new handler for <see cref="HSVPicker.ColorPicker"/>
             secondaryColorBMB.clickEvent.AddListener(() =>
             {
-                /// If the <see cref="LineKind"/> was <see cref="LineKind.Solid"/> before, 
-                /// the secondary color is clear. 
-                /// Therefore, a random color is added first, 
+                /// If the <see cref="LineKind"/> was <see cref="LineKind.Solid"/> before,
+                /// the secondary color is clear.
+                /// Therefore, a random color is added first,
                 /// and if the color's alpha is 0, it is set to 255 to ensure the color is not transparent.
                 if (lineHolder.SecondaryColor == Color.clear)
                 {
@@ -796,7 +796,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Set up the outline thickness slider for editing mode 
+        /// Set up the outline thickness slider for editing mode
         /// with the current thickness of the selected line.
         /// Furthermore, the action that should be executed on a thickness change is added.
         /// </summary>
@@ -902,7 +902,7 @@ namespace SEE.UI.Menu.Drawable
         private static void SetUpColorPickerForEditing(GameObject selectedLine, LineRenderer renderer,
             LineConf lineHolder, GameObject surface, string surfaceParentName)
         {
-            /// Assign the color to the <see cref="HSVPicker.ColorPicker"/> depending on 
+            /// Assign the color to the <see cref="HSVPicker.ColorPicker"/> depending on
             /// the current <see cref="ColorKind"/> of the selected line.
             switch (lineHolder.ColorKind)
             {
@@ -931,7 +931,7 @@ namespace SEE.UI.Menu.Drawable
 
         /// <summary>
         /// This method removes the handler of the
-        /// line kind selector, the color kind selector, 
+        /// line kind selector, the color kind selector,
         /// the primary and secondary color buttons,
         /// the tiling slider controller,
         /// the thickness slider controller, order in layer slider controller,
@@ -1077,7 +1077,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public static void RefreshHorizontalSelectors()
         {

@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
-    /// This class provides a menu, with which the player can select 
+    /// This class provides a menu, with which the player can select
     /// from which source an image should be load.
     /// </summary>
     public static class ImageSourceMenu
@@ -49,7 +49,7 @@ namespace SEE.UI.Menu.Drawable
             if (instance == null)
             {
                 instance = PrefabInstantiator.InstantiatePrefab(imageSourceMenuPrefab,
-                    GameObject.Find("UI Canvas").transform, false);
+                                                                UICanvas.Canvas.transform, false);
 
                 /// Initialize the button for load the image from local disk.
                 ButtonManagerBasic local = GameFinder.FindChild(instance, "Local")

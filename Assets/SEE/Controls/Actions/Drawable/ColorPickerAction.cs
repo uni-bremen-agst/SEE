@@ -3,6 +3,7 @@ using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.GO;
+using SEE.UI;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.Utils;
@@ -81,8 +82,8 @@ namespace SEE.Controls.Actions.Drawable
                 /// either into <see cref="ValueHolder.CurrentPrimaryColor"/> or
                 /// <see cref="ValueHolder.CurrentSecondaryColor"/>.
                 /// Subsequently, a memento is created, and the action process is completed.
-                if (((Queries.MouseUp(MouseButton.Left) || Queries.MouseUp(MouseButton.Right)) 
-                        && isInAction && !waitForHelperMenu) 
+                if (((Queries.MouseUp(MouseButton.Left) || Queries.MouseUp(MouseButton.Right))
+                        && isInAction && !waitForHelperMenu)
                     || finishChosingMMColor)
                 {
                     if (!ColorPickerMenu.GetSwitchStatus())
@@ -121,7 +122,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void PickingPrimaryColor()
         {
-            if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit) 
+            if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit)
                 && !isInAction)
             {
                 isInAction = true;
@@ -209,7 +210,7 @@ namespace SEE.Controls.Actions.Drawable
 
             oldChosenPrimaryColor = ValueHolder.CurrentPrimaryColor;
             oldChosenSecondColor = ValueHolder.CurrentSecondaryColor;
-            Canvas.AddOrGetComponent<ColorPickerMenuDisabler>();
+            UICanvas.Canvas.AddOrGetComponent<ColorPickerMenuDisabler>();
             ColorPickerMenu.Enable();
         }
 

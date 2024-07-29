@@ -10,6 +10,7 @@ using UnityEngine;
 using SEE.Utils.History;
 using SEE.GO;
 using SEE.Game.Drawable.ActionHelpers;
+using SEE.UI;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -105,7 +106,7 @@ namespace SEE.Controls.Actions.Drawable
                 showInfo = true;
                 ShowNotification.Info("Usage note", "Use the left mouse button to increase the layer." +
                     "\nUse the right mouse button to decrease the layer.");
-                Canvas.AddOrGetComponent<ValueResetter>().SetAllowedState(GetActionStateType());
+                UICanvas.Canvas.AddOrGetComponent<ValueResetter>().SetAllowedState(GetActionStateType());
             }
         }
 

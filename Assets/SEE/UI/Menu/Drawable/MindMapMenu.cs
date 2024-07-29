@@ -49,7 +49,7 @@ namespace SEE.UI.Menu.Drawable
         {
             /// Instantiates the menu.
             instance = PrefabInstantiator.InstantiatePrefab(mindMapMenuPrefab,
-                GameObject.Find("UI Canvas").transform, false);
+                                                            UICanvas.Canvas.transform, false);
 
             /// Initialize the button for spawn a theme.
             ButtonManagerBasic theme = GameFinder.FindChild(instance, "Theme").GetComponent<ButtonManagerBasic>();

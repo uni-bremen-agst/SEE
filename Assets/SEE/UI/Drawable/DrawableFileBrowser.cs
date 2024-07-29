@@ -89,7 +89,7 @@ namespace SEE.UI.Drawable
             }
 
             /// Refreshes the UI canvas to prevent display issues.
-            Refresher.UICanvas();
+            UICanvas.Refresh();
         }
 
         /// <summary>
@@ -150,7 +150,7 @@ namespace SEE.UI.Drawable
             }
 
             /// Refreshes the UI canvas to prevent display issues.
-            Refresher.UICanvas();
+            UICanvas.Refresh();
         }
 
         /// <summary>
@@ -188,7 +188,7 @@ namespace SEE.UI.Drawable
             }
 
             /// Refreshes the UI canvas to prevent display issues.
-            Refresher.UICanvas();
+            UICanvas.Refresh();
         }
 
         /// <summary>

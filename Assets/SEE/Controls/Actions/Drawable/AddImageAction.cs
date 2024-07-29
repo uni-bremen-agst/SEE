@@ -14,6 +14,7 @@ using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.GO;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.UI;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -143,7 +144,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit)
                 && !ImageSourceMenu.IsOpen()
-                && (browser == null || (browser != null && !browser.IsOpen())) 
+                && (browser == null || (browser != null && !browser.IsOpen()))
                 && (webImageDialog == null || (webImageDialog != null && !isDialogOpen)))
             {
                 Surface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
@@ -164,7 +165,7 @@ namespace SEE.Controls.Actions.Drawable
                 switch (source)
                 {
                     case ImageSourceMenu.Source.Local:
-                        browser = Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                        browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
                         browser.LoadImage();
                         break;
                     case ImageSourceMenu.Source.Web:

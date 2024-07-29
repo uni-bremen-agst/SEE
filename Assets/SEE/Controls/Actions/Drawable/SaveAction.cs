@@ -12,6 +12,7 @@ using SEE.UI.Menu.Drawable;
 using SEE.Utils.Paths;
 using SEE.Utils.History;
 using SEE.Game.Drawable.ActionHelpers;
+using SEE.UI;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -109,7 +110,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     if (selectedSurfaces.Count > 0)
                     {
-                        browser = Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                        browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
                         if (selectedSurfaces.Count == 1)
                         {
                             browser.SaveDrawableConfiguration(SaveState.One);
@@ -140,7 +141,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 if (browser == null || (browser != null && !browser.IsOpen()))
                 {
-                    browser = Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                    browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
                     browser.SaveDrawableConfiguration(SaveState.All);
                     List<GameObject> drawables = ValueHolder.DrawableSurfaces;//new(GameObject.FindGameObjectsWithTag(Tags.Drawable));
                     DrawableConfig[] configs = new DrawableConfig[drawables.Count];

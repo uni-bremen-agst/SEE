@@ -47,7 +47,7 @@ namespace SEE.UI.Menu.Drawable
         public static void Enable(GameObject stickyNoteHolder, bool spawnMode = false)
         {
             moveMenu = PrefabInstantiator.InstantiatePrefab(moveMenuPrefab,
-                GameObject.Find("UI Canvas").transform, false);
+                                                            UICanvas.Canvas.transform, false);
             GameObject surface = GameFinder.GetDrawableSurface(stickyNoteHolder);
             string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
@@ -70,8 +70,8 @@ namespace SEE.UI.Menu.Drawable
 
             /// In this region the movement buttons will be register.
             /// It executes also the network action.
-            /// They cannot be outsourced, as otherwise, 
-            /// the speed switching would no longer work. 
+            /// They cannot be outsourced, as otherwise,
+            /// the speed switching would no longer work.
             /// Therefore, they are grouped together in a region.
             #region Movement buttons
             GameFinder.FindChild(moveMenu, "Left").AddComponent<ButtonHeld>().SetAction(() =>

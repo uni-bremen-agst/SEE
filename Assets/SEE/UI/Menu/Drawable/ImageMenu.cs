@@ -86,7 +86,7 @@ namespace SEE.UI.Menu.Drawable
 
                 orderInLayerSlider.AssignMaxOrder(surface.GetComponent<DrawableHolder>().OrderInLayer);
 
-                /// Assigns an action to the slider that should be executed 
+                /// Assigns an action to the slider that should be executed
                 /// along with the current order in layer value
                 AssignOrderInLayer(order =>
                 {
@@ -97,7 +97,7 @@ namespace SEE.UI.Menu.Drawable
                     new EditImageNetAction(surface.name, surfaceParentName, conf).Execute();
                 }, imageConf.OrderInLayer);
 
-                /// Assigns an action to the color picker that should be executed 
+                /// Assigns an action to the color picker that should be executed
                 /// along with the current color.
                 AssignColorArea(color =>
                 {
@@ -123,7 +123,7 @@ namespace SEE.UI.Menu.Drawable
         private static void Instantiate()
         {
             instance = PrefabInstantiator.InstantiatePrefab(imageMenuPrefab,
-                GameObject.Find("UI Canvas").transform, false);
+                                                            UICanvas.Canvas.transform, false);
             orderInLayerSlider = instance.GetComponentInChildren<LayerSliderController>();
             picker = instance.GetComponentInChildren<HSVPicker.ColorPicker>();
             mirrorSwitch = instance.GetComponentInChildren<SwitchManager>();
@@ -133,7 +133,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Initialize the mirror switch.
         /// It mirrors an image.
-        /// Off is normal and on is mirrored. 
+        /// Off is normal and on is mirrored.
         /// </summary>
         /// <param name="imageObj">The image object</param>
         /// <param name="imageConf">The configuration which holds the new values.</param>

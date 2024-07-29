@@ -59,7 +59,7 @@ namespace SEE.UI.Menu.Drawable
         {
             /// Instantiate the menu.
             instance = PrefabInstantiator.InstantiatePrefab(drawableScalePrefab,
-                        GameObject.Find("UI Canvas").transform, false);
+                                                            UICanvas.Canvas.transform, false);
 
             /// Initialize the GUI elements of the menu.
             xScale = GameFinder.FindChild(instance, "XScale").GetComponent<InputFieldWithButtons>();

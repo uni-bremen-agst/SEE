@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using SEE.Game.HolisticMetrics;
+using SEE.UI;
+using SEE.UI.Drawable;
 using SEE.UI.HolisticMetrics;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.HolisticMetrics;
@@ -90,7 +92,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         public override void Start()
         {
             buttonController = PrefabInstantiator
-                .InstantiatePrefab(buttonPath, GameObject.Find("UI Canvas").transform, false)
+                .InstantiatePrefab(buttonPath, UICanvas.Canvas.transform, false)
                 .GetComponent<LoadBoardButtonController>();
         }
 

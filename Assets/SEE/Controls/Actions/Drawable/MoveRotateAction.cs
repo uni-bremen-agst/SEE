@@ -4,6 +4,7 @@ using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Net.Actions.Drawable;
+using SEE.UI;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.Notification;
@@ -286,7 +287,7 @@ namespace SEE.Controls.Actions.Drawable
         private void InitSwitchMenu()
         {
             switchMenu = PrefabInstantiator.InstantiatePrefab(switchMenuPrefab,
-                                                     Canvas.transform, false);
+                                                              UICanvas.Canvas.transform, false);
             /// Adds the functionality to the move button
             GameFinder.FindChild(switchMenu, "Move").GetComponent<ButtonManagerBasic>().clickEvent
                 .AddListener(() =>
@@ -315,7 +316,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void Selection()
         {
-            if (Selector.SelectObject(ref selectedObject, ref oldSelectedObj, ref mouseWasReleased, Canvas,
+            if (Selector.SelectObject(ref selectedObject, ref oldSelectedObj, ref mouseWasReleased, UICanvas.Canvas,
                 true, false, true))
             {
                 oldObjectPosition = selectedObject.transform.localPosition;

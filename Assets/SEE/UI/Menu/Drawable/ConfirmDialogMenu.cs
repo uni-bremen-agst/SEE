@@ -40,7 +40,7 @@ namespace SEE.UI.Menu.Drawable
             if (instance == null)
             {
                 instance = PrefabInstantiator.InstantiatePrefab(confirmMenuPrefab,
-                    GameObject.Find("UI Canvas").transform, false);
+                                                                UICanvas.Canvas.transform, false);
 
                 /// Initialize the buttons.
                 ButtonManagerBasic x = GameFinder.FindChild(instance, "CancelDragger")

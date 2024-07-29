@@ -43,7 +43,7 @@ namespace SEE.UI.Menu.Drawable
         {
             /// Instantiate the menu.
             instance = PrefabInstantiator.InstantiatePrefab(editMenuPrefab,
-                GameObject.Find("UI Canvas").transform, false);
+                                                            UICanvas.Canvas.transform, false);
 
             /// Initialize the oder in layer slider.
             LayerSlider(stickyNote, newConfig);
@@ -69,8 +69,8 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the order in layer slider and adds the required handler. 
-        /// The handler executes the <see cref="GameStickyNoteManager.ChangeLayer"/> 
+        /// Initializes the order in layer slider and adds the required handler.
+        /// The handler executes the <see cref="GameStickyNoteManager.ChangeLayer"/>
         /// and saves the new order in the layer in the configuration.
         /// </summary>
         /// <param name="stickyNote">The sticky note which order in layer should be changed.</param>
@@ -117,8 +117,8 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the color picker and adds the required handler. 
-        /// The handler executes the <see cref="GameStickyNoteManager.ChangeColor"/> 
+        /// Initializes the color picker and adds the required handler.
+        /// The handler executes the <see cref="GameStickyNoteManager.ChangeColor"/>
         /// and saves the new color in the configuration.
         /// </summary>
         /// <param name="stickyNote">The sticky note which color should be changed.</param>
@@ -136,7 +136,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the rotation button and adds the required handler. 
+        /// Initializes the rotation button and adds the required handler.
         /// The handler opens the <see cref="StickyNoteRotationMenu"/>.
         /// </summary>
         /// <param name="stickyNote">The sticky note which rotation should be changed.</param>
@@ -152,7 +152,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the scale button and adds the required handler. 
+        /// Initializes the scale button and adds the required handler.
         /// The handler opens the <see cref="ScaleMenu"/>.
         /// </summary>
         /// <param name="stickyNote">The sticky note which scale should be changed.</param>

@@ -11,6 +11,7 @@ using UnityEngine;
 using SEE.Utils.History;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Game.Drawable.ActionHelpers;
+using SEE.UI;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -104,7 +105,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Awake();
             if (firstStart)
             {
-                Canvas.AddComponent<ValueResetter>().SetAllowedState(GetActionStateType());
+                UICanvas.Canvas.AddComponent<ValueResetter>().SetAllowedState(GetActionStateType());
                 TextMenu.EnableForWriting();
                 firstStart = false;
             }

@@ -250,7 +250,7 @@ namespace SEE.UI.Menu.Drawable
         static TextMenu()
         {
             instance = PrefabInstantiator.InstantiatePrefab(textMenuPrefab,
-                GameObject.Find("UI Canvas").transform, false);
+                                                            UICanvas.Canvas.transform, false);
             InitBtn();
             instance.SetActive(false);
         }
@@ -510,11 +510,11 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Adds the handler for the outline color button.
         /// It saves the changes in the global value for the secondary color <see cref="ValueHolder.CurrentSecondaryColor"/>.
-        /// 
+        ///
         /// Checks the current secondary color before assigning it.
-        /// If it is clear (completely transparent), a new random color is chosen. 
-        /// Subsequently, the alpha value is checked, which also indicates transparency. 
-        /// If it is set to 0, the color would also be fully transparent. 
+        /// If it is clear (completely transparent), a new random color is chosen.
+        /// Subsequently, the alpha value is checked, which also indicates transparency.
+        /// If it is set to 0, the color would also be fully transparent.
         /// In this case, the alpha would be set to full visibility.
         /// </summary>
         private static void AssignOutlineThicknessForWriting()
@@ -522,9 +522,9 @@ namespace SEE.UI.Menu.Drawable
 
             outlineColorBMB.clickEvent.AddListener(() =>
             {
-                /// If the <see cref="GameDrawer.LineKind"/> was <see cref="GameDrawer.LineKind.Solid"/> before, 
-                /// the secondary color is clear. 
-                /// Therefore, a random color is added first, 
+                /// If the <see cref="GameDrawer.LineKind"/> was <see cref="GameDrawer.LineKind.Solid"/> before,
+                /// the secondary color is clear.
+                /// Therefore, a random color is added first,
                 /// and if the color's alpha is 0, it is set to 255 to ensure the color is not transparent.
                 if (ValueHolder.CurrentSecondaryColor == Color.clear)
                 {
@@ -647,7 +647,7 @@ namespace SEE.UI.Menu.Drawable
 
         /// <summary>
         /// Adds the return call to the return button.
-        /// It deactivates the slider for the order in layer because this 
+        /// It deactivates the slider for the order in layer because this
         /// variation is only used by the edit mind map node,
         /// and the layer for the mind map text must not be altered.
         /// </summary>
@@ -667,7 +667,7 @@ namespace SEE.UI.Menu.Drawable
 
         /// <summary>
         /// Adds the handler for the font color button.
-        /// After the button is pressed, the <see cref="HSVPicker.ColorPicker"/> changes the font color of the text. 
+        /// After the button is pressed, the <see cref="HSVPicker.ColorPicker"/> changes the font color of the text.
         /// Changes are saved in the configuration.
         /// </summary>
         /// <param name="selectedText">The text to be edit.</param>
@@ -691,7 +691,7 @@ namespace SEE.UI.Menu.Drawable
 
         /// <summary>
         /// Adds the handler for the outline color button.
-        /// After the button is pressed, the <see cref="HSVPicker.ColorPicker"/> changes the outline color of the text. 
+        /// After the button is pressed, the <see cref="HSVPicker.ColorPicker"/> changes the outline color of the text.
         /// Changes are saved in the configuration.
         /// </summary>
         /// <param name="selectedText">The text to be edit.</param>
@@ -703,9 +703,9 @@ namespace SEE.UI.Menu.Drawable
         {
             outlineColorBMB.clickEvent.AddListener(() =>
             {
-                /// If the <see cref="GameDrawer.LineKind"/> was <see cref="GameDrawer.LineKind.Solid"/> before, 
-                /// the secondary color is clear. 
-                /// Therefore, a random color is added first, 
+                /// If the <see cref="GameDrawer.LineKind"/> was <see cref="GameDrawer.LineKind.Solid"/> before,
+                /// the secondary color is clear.
+                /// Therefore, a random color is added first,
                 /// and if the color's alpha is 0, it is set to 255 to ensure the color is not transparent.
                 if (textHolder.OutlineColor == Color.clear)
                 {
@@ -973,8 +973,8 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Assigns the respective font styles their value and 
-        /// changes their button color when they are selected. 
+        /// Assigns the respective font styles their value and
+        /// changes their button color when they are selected.
         /// </summary>
         /// <param name="style"></param>
         private static void AssignStyles(FontStyles style)

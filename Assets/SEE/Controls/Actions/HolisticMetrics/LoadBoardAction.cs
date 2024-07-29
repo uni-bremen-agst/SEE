@@ -8,6 +8,8 @@ using SEE.Net.Actions.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
 using SEE.Utils.History;
+using SEE.UI.Drawable;
+using SEE.UI;
 
 namespace SEE.Controls.Actions.HolisticMetrics
 {
@@ -83,7 +85,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Start()
         {
-            button = PrefabInstantiator.InstantiatePrefab(buttonPath, GameObject.Find("UI Canvas").transform,
+            button = PrefabInstantiator.InstantiatePrefab(buttonPath, UICanvas.Canvas.transform,
                 false);
             buttonController = button.GetComponent<LoadBoardButtonController>();
         }

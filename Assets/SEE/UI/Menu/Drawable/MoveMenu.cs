@@ -50,7 +50,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 /// Instantiate the menu.
                 instance = PrefabInstantiator.InstantiatePrefab(moveMenuPrefab,
-                                GameObject.Find("UI Canvas").transform, false);
+                                                                UICanvas.Canvas.transform, false);
 
                 /// Initialize the switches for speed and move by mouse.
                 speedUpManager = GameFinder.FindChild(instance, "SpeedSwitch").GetComponent<SwitchManager>();
@@ -117,9 +117,9 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Manages the level of children, 
-        /// whether they should be move with or without children. 
-        /// If a change in the property occurs while movement is already in progress, 
+        /// Manages the level of children,
+        /// whether they should be move with or without children.
+        /// If a change in the property occurs while movement is already in progress,
         /// an attempt is made to reset it accordingly.
         /// </summary>
         /// <param name="selectedObject">The selected object for the rotation.</param>
@@ -136,7 +136,7 @@ namespace SEE.UI.Menu.Drawable
 
                 MMNodeValueHolder valueHolder = selectedObject.GetComponent<MMNodeValueHolder>();
 
-                /// Save the original positions of the children, 
+                /// Save the original positions of the children,
                 /// needed in case the inclusion of children is turned off midway.
                 Dictionary<GameObject, Vector3> oldPositions = new();
                 foreach (KeyValuePair<GameObject, GameObject> pair in valueHolder.GetAllChildren())
@@ -153,9 +153,9 @@ namespace SEE.UI.Menu.Drawable
                 {
                     includeChildren = true;
 
-                    /// Moves the children to the current position of the parent node. 
-                    /// The parent node is first returned to its original position before 
-                    /// being moved with the children to the new point. 
+                    /// Moves the children to the current position of the parent node.
+                    /// The parent node is first returned to its original position before
+                    /// being moved with the children to the new point.
                     /// This preserves the node arrangement.
                     if (valueHolder.GetChildren().Count > 0)
                     {

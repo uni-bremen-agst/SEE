@@ -3,6 +3,7 @@ using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Net.Actions.Drawable;
+using SEE.UI;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.Utils;
@@ -43,7 +44,7 @@ namespace SEE.Game.UI.Menu.Drawable
         /// </summary>
         /// <param name="node">The node that should be edit.</param>
         /// <param name="newValueHolder">The configuration which holds the changes.</param>
-        /// <param name="returned">Specifies whether the return was from the parent selection menu 
+        /// <param name="returned">Specifies whether the return was from the parent selection menu
         /// or the child menu of the change node.</param>
         public static void Enable(GameObject node, DrawableType newValueHolder, bool returned = false)
         {
@@ -62,10 +63,10 @@ namespace SEE.Game.UI.Menu.Drawable
                     conf.BorderConf = confOfReturn.BorderConf;
                     conf.OrderInLayer = confOfReturn.OrderInLayer;
                 }
-                
+
                 /// Instantiates the menu.
                 instance = PrefabInstantiator.InstantiatePrefab(mmEditPrefab,
-                    GameObject.Find("UI Canvas").transform, false);
+                                                                UICanvas.Canvas.transform, false);
 
                 GameObject surface = GameFinder.GetDrawableSurface(node);
                 GameObject attached = GameFinder.GetAttachedObjectsObject(surface);
@@ -101,14 +102,14 @@ namespace SEE.Game.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the button for changing the parent. 
+        /// Initializes the button for changing the parent.
         /// It calls the <see cref="MindMapParentSelectionMenu"/>.
         /// </summary>
         /// <param name="attached">The attached object - object where the <see cref="DrawableType"/> are placed.</param>
         /// <param name="node">The selected node to change.</param>
         /// <param name="conf">The configuration which holds the changes</param>
         /// <param name="callback">The call back to return to the parent menu.</param>
-        private static void InitializeChangeParent(GameObject attached, GameObject node, 
+        private static void InitializeChangeParent(GameObject attached, GameObject node,
             MindMapNodeConf conf, UnityAction callback)
         {
             ButtonManagerBasic changeParent = GameFinder.FindChild(instance, "Parent")
@@ -122,14 +123,14 @@ namespace SEE.Game.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the button for changing the node kind. 
+        /// Initializes the button for changing the node kind.
         /// It calls the <see cref="MindMapChangeNodeKindMenu"/>.
         /// </summary>
         /// <param name="attached">The attached object - object where the <see cref="DrawableType"/> are placed.</param>
         /// <param name="node">The selected node to change.</param>
         /// <param name="conf">The configuration which holds the changes</param>
         /// <param name="callback">The call back to return to the parent menu.</param>
-        private static void InitializeChangeNodeKind(GameObject attached, GameObject node, 
+        private static void InitializeChangeNodeKind(GameObject attached, GameObject node,
             MindMapNodeConf conf, UnityAction callback)
         {
             ButtonManagerBasic changeNodeKind = GameFinder.FindChild(instance, "NodeKind")
@@ -142,7 +143,7 @@ namespace SEE.Game.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the button for changing the border. 
+        /// Initializes the button for changing the border.
         /// It calls the <see cref="LineMenu"/>.
         /// </summary>
         /// <param name="attached">The attached object - object where the <see cref="DrawableType"/> are placed.</param>
@@ -161,7 +162,7 @@ namespace SEE.Game.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the button for changing the text. 
+        /// Initializes the button for changing the text.
         /// It calls the <see cref="TextMenu"/>.
         /// </summary>
         /// <param name="attached">The attached object - object where the <see cref="DrawableType"/> are placed.</param>
@@ -180,7 +181,7 @@ namespace SEE.Game.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the button for changing the branch line. 
+        /// Initializes the button for changing the branch line.
         /// It calls the <see cref="LineMenu"/>, if a branch line exist.
         /// Otherwise the branch line button will be inactive.
         /// </summary>
@@ -217,7 +218,7 @@ namespace SEE.Game.UI.Menu.Drawable
         private static void InitializeChangeOrderInLayer(GameObject node, MindMapNodeConf conf)
         {
             LayerSliderController layerSlider = instance.GetComponentInChildren<LayerSliderController>();
-            
+
             /// Assigns the current value to the slider.
             layerSlider.AssignValue(conf.OrderInLayer);
             GameObject surface = GameFinder.GetDrawableSurface(node);

@@ -9,7 +9,7 @@ using UnityEngine.Events;
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
-    /// This class provides a menu, with which the player can select 
+    /// This class provides a menu, with which the player can select
     /// from which source an image should be load.
     /// </summary>
     public static class SurfaceColorMenu
@@ -34,16 +34,16 @@ namespace SEE.UI.Menu.Drawable
             if (instance == null)
             {
                 instance = PrefabInstantiator.InstantiatePrefab(surfaceColorMenuPrefab,
-                    GameObject.Find("UI Canvas").transform, false);
+                                                                UICanvas.Canvas.transform, false);
 
-                string name = !string.IsNullOrEmpty(GameFinder.GetDrawableSurfaceParentName(surface)) ? 
+                string name = !string.IsNullOrEmpty(GameFinder.GetDrawableSurfaceParentName(surface)) ?
                     GameFinder.GetDrawableSurfaceParentName(surface) : surface.name;
                 GameFinder.FindChild(instance, "Text").GetComponent<TextMeshProUGUI>().text = "Change Color:\n" + name;
 
                 HSVPicker.ColorPicker picker = instance.GetComponentInChildren<HSVPicker.ColorPicker>();
                 picker.AssignColor(DrawableConfigManager.GetDrawableConfig(surface).Color);
-                picker.onValueChanged.AddListener(color => 
-                { 
+                picker.onValueChanged.AddListener(color =>
+                {
                     GameDrawableManager.ChangeColor(surface, color);
                     new DrawableChangeColorNetAction(DrawableConfigManager.GetDrawableConfig(surface)).Execute();
                     colorAction.Invoke(color);

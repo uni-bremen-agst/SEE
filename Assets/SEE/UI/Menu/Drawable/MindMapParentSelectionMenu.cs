@@ -48,7 +48,7 @@ namespace SEE.UI.Menu.Drawable
         {
             /// Instantiate the menu.
             instance = PrefabInstantiator.InstantiatePrefab(parentSelectionMenuPrefab,
-                GameObject.Find("UI Canvas").transform, false);
+                                                            UICanvas.Canvas.transform, false);
 
             /// Disable the return button.
             GameFinder.FindChild(instance, "ReturnBtn").SetActive(false);
@@ -121,7 +121,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 /// Instantiate the menu.
                 instance = PrefabInstantiator.InstantiatePrefab(parentSelectionMenuPrefab,
-                    GameObject.Find("UI Canvas").transform, false);
+                                                                UICanvas.Canvas.transform, false);
 
                 if (returnCall != null)
                 {

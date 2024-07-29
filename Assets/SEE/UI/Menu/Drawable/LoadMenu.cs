@@ -41,7 +41,7 @@ namespace SEE.UI.Menu.Drawable
         {
             /// Instantiate the menu.
             instance = PrefabInstantiator.InstantiatePrefab(loadMenuPrefab,
-                 GameObject.Find("UI Canvas").transform, false);
+                                                            UICanvas.Canvas.transform, false);
             loadButton = GameFinder.FindChild(instance, "Load").GetComponent<ButtonManagerBasic>();
             loadSpecificButton = GameFinder.FindChild(instance, "LoadSpecific").GetComponent<ButtonManagerBasic>();
 

@@ -45,7 +45,7 @@ namespace SEE.UI.Menu.Drawable
         static ColorPickerMenu()
         {
             instance = PrefabInstantiator.InstantiatePrefab(colorPickerMenuPrefab,
-                    GameObject.Find("UI Canvas").transform, false);
+                                                            UICanvas.Canvas.transform, false);
             switchManager = GameFinder.FindChild(instance, "Switch").GetComponent<SwitchManager>();
 
             /// Gets and assign the color picker for the primary color.

@@ -40,7 +40,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 /// Instantiate the menu.
                 instance = PrefabInstantiator.InstantiatePrefab(rotationMenuPrefab,
-                                        GameObject.Find("UI Canvas").transform, false);
+                                                                UICanvas.Canvas.transform, false);
                 RotationSliderController slider = instance.GetComponentInChildren<RotationSliderController>();
                 /// Adds the necessary handler to the slider.
                 SliderListener(slider, selectedObject);
@@ -56,9 +56,9 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Manages the level of children, 
-        /// whether they should be rotated with or without children. 
-        /// If a change in the property occurs while rotation is already in progress, 
+        /// Manages the level of children,
+        /// whether they should be rotated with or without children.
+        /// If a change in the property occurs while rotation is already in progress,
         /// an attempt is made to reset it accordingly.
         /// </summary>
         /// <param name="selectedObject">The selected object for the rotation.</param>
@@ -75,7 +75,7 @@ namespace SEE.UI.Menu.Drawable
 
                 MMNodeValueHolder valueHolder = selectedObject.GetComponent<MMNodeValueHolder>();
 
-                /// Save the original positions and rotation of the children, 
+                /// Save the original positions and rotation of the children,
                 /// needed in case the inclusion of children is turned off midway.
                 Dictionary<GameObject, (Vector3, Vector3)> oldRotations = new();
                 foreach (KeyValuePair<GameObject, GameObject> pair in valueHolder.GetAllChildren())
@@ -91,9 +91,9 @@ namespace SEE.UI.Menu.Drawable
                 childrenSwitch.OnEvents.RemoveAllListeners();
                 childrenSwitch.OnEvents.AddListener(() =>
                 {
-                    /// Rotates the children to the current roation of the parent node. 
-                    /// The parent node is first returned to its original rotation before 
-                    /// being roate with the children to the new degree. 
+                    /// Rotates the children to the current roation of the parent node.
+                    /// The parent node is first returned to its original rotation before
+                    /// being roate with the children to the new degree.
                     /// This preserves the node arrangement.
                     includeChildren = true;
                     Vector3 newRotation = selectedObject.transform.localEulerAngles;

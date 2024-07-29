@@ -37,7 +37,7 @@ namespace SEE.UI.Menu.Drawable
         public ClearMenu()
         {
             instance = PrefabInstantiator.InstantiatePrefab(clearMenuPrefab,
-                GameObject.Find("UI Canvas").transform, false);
+                                                            UICanvas.Canvas.transform, false);
             TextMeshProUGUI text = GameFinder.FindChild(instance, "DeleteText")
                 .GetComponent<TextMeshProUGUI>();
 

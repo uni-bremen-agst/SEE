@@ -8,7 +8,7 @@ using static SEE.Controls.Actions.Drawable.StickyNoteAction;
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
-    /// This class provides a menu, with which the player can select 
+    /// This class provides a menu, with which the player can select
     /// an operation for the sticky notes.
     /// </summary>
     public static class StickyNoteMenu
@@ -40,7 +40,7 @@ namespace SEE.UI.Menu.Drawable
         {
             /// Instantiate the menu.
             instance = PrefabInstantiator.InstantiatePrefab(stickyNoteMenuPrefab,
-                GameObject.Find("UI Canvas").transform, false);
+                                                            UICanvas.Canvas.transform, false);
 
             /// Initialize the button for the spawn option.
             ButtonManagerBasic spawn = GameFinder.FindChild(instance, "Spawn")

@@ -40,7 +40,7 @@ namespace SEE.UI.Menu.Drawable
         {
             /// Instantiate the menu.
             instance = PrefabInstantiator.InstantiatePrefab(saveMenuPrefab,
-                 GameObject.Find("UI Canvas").transform, false);
+                                                            UICanvas.Canvas.transform, false);
             saveButton = GameFinder.FindChild(instance, "Save").GetComponent<ButtonManagerBasic>();
             saveAllButton = GameFinder.FindChild(instance, "SaveAll").GetComponent<ButtonManagerBasic>();
 

@@ -5,6 +5,7 @@ using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.GO;
+using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.Window;
 using SEE.UI.Window.DrawableManagerWindow;
@@ -289,7 +290,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
                 subscriptions.Add(surface.Subscribe(this));
             }
             Rebuild();
-            Refresher.UICanvas();
+            UICanvas.Refresh();
         }
 
         #endregion

@@ -43,7 +43,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 /// Instantiates the menu.
                 instance = PrefabInstantiator.InstantiatePrefab(nodeKindSelectionMenuPrefab,
-                    GameObject.Find("UI Canvas").transform, false);
+                                                                UICanvas.Canvas.transform, false);
 
                 /// Adds the return call to the return button, to return to the parent menu.
                 GameFinder.FindChild(instance, "ReturnBtn").GetComponent<ButtonManagerBasic>()
@@ -103,7 +103,7 @@ namespace SEE.UI.Menu.Drawable
                         newConf.BranchLineToParent = "";
                     }
 
-                    /// If the new one is not a <see cref="GameMindMap.NodeKind.Theme"/> 
+                    /// If the new one is not a <see cref="GameMindMap.NodeKind.Theme"/>
                     /// and the node has no parent, initiate the parent selection.
                     if (newNodeKind != GameMindMap.NodeKind.Theme
                         && addedNode.GetComponent<MMNodeValueHolder>().GetParent() == null)

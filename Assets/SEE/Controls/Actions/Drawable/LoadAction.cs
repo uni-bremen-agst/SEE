@@ -15,6 +15,7 @@ using SEE.Utils.History;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Game.Drawable.ActionHelpers;
 using System.Linq;
+using SEE.UI;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -109,7 +110,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 if (browser == null || (browser != null && !browser.IsOpen()))
                 {
-                    browser = Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                    browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
                     browser.LoadDrawableConfiguration(LoadState.Regular);
                     memento = new(LoadState.Regular);
                 }
@@ -121,7 +122,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     if (selectedSurface != null)
                     {
-                        browser = Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                        browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
                         browser.LoadDrawableConfiguration(LoadState.Specific);
                         memento = new(LoadState.Specific);
                     }
