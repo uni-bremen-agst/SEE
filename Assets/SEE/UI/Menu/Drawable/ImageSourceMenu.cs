@@ -7,12 +7,12 @@ namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
     /// This class provides a menu, with which the player can select
-    /// from which source an image should be load.
+    /// from which source an image should be loaded.
     /// </summary>
     public static class ImageSourceMenu
     {
         /// <summary>
-        /// The location where the menu prefeb is placed.
+        /// The location where the menu prefab is placed.
         /// </summary>
         private const string imageSourceMenuPrefab = "Prefabs/UI/Drawable/ImageSource";
 
@@ -22,7 +22,7 @@ namespace SEE.UI.Menu.Drawable
         private static GameObject instance;
 
         /// <summary>
-        /// Whether this class has a source in store that wasn't yet fetched.
+        /// Whether this class has a source in store that hasn't been fetched yet.
         /// </summary>
         private static bool gotSource;
 
@@ -42,7 +42,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Enables the image source menu and register the needed Handler to the button's.
+        /// Enables the image source menu and registers the needed handler to the buttons.
         /// </summary>
         public static void Enable()
         {
@@ -51,7 +51,7 @@ namespace SEE.UI.Menu.Drawable
                 instance = PrefabInstantiator.InstantiatePrefab(imageSourceMenuPrefab,
                                                                 UICanvas.Canvas.transform, false);
 
-                /// Initialize the button for load the image from local disk.
+                /// Initialize the button for loading the image from local disk.
                 ButtonManagerBasic local = GameFinder.FindChild(instance, "Local")
                     .GetComponent<ButtonManagerBasic>();
                 local.clickEvent.AddListener(() =>
@@ -61,7 +61,7 @@ namespace SEE.UI.Menu.Drawable
                     Disable();
                 });
 
-                /// Initialize the button for load the image from web.
+                /// Initialize the button for loading the image from the web.
                 ButtonManagerBasic web = GameFinder.FindChild(instance, "Web")
                     .GetComponent<ButtonManagerBasic>();
                 web.clickEvent.AddListener(() =>
@@ -82,7 +82,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Destroy's the menu.
+        /// Destroys the menu.
         /// </summary>
         public static void Disable()
         {
