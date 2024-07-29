@@ -14,7 +14,7 @@ namespace SEE.UI.Menu.Drawable
     /// <summary>
     /// This class provides a menu for editing an image.
     /// </summary>
-    public static class ImageMenu
+    public class ImageMenu : Menu
     {
         /// <summary>
         /// The location where the image menu prefeb is placed.
@@ -22,9 +22,19 @@ namespace SEE.UI.Menu.Drawable
         private const string imageMenuPrefab = "Prefabs/UI/Drawable/ImageMenu";
 
         /// <summary>
-        /// The instance of the image menu.
+        /// The only instance of this singleton class.
         /// </summary>
-        public static GameObject instance;
+        private readonly static ImageMenu instance;
+
+        /// <summary>
+        /// We do not want to create an instance of this singleton class outside of this class.
+        /// </summary>
+        private ImageMenu() { }
+
+        static ImageMenu()
+        {
+            instance = new ImageMenu();
+        }
 
         /// <summary>
         /// The action for the HSV Color Picker that should also be carried out.
@@ -42,33 +52,30 @@ namespace SEE.UI.Menu.Drawable
         private static HSVPicker.ColorPicker picker;
 
         /// <summary>
-        /// The mirror switch. It will needed to mirror the image on the y axis at 180°.
+        /// The mirror switch. It will be needed to mirror the image on the y axis at 180°.
         /// </summary>
         private static SwitchManager mirrorSwitch;
 
         /// <summary>
-        /// The thubnail image of the chosen image.
+        /// The thumbnail image of the chosen image.
         /// </summary>
         private static Image thumbnail;
 
         /// <summary>
-        /// To destroy the image menu.
+        /// Destroys the image menu.
         /// </summary>
-        public static void Disable()
+        public static void DestroyMenu()
         {
-            if (instance != null)
-            {
-                Destroyer.Destroy(instance);
-            }
+            instance.Destroy();
         }
 
         /// <summary>
-        /// Gets the state if the menu is already opened.
+        /// Returns true if the menu is already opened.
         /// </summary>
         /// <returns>true, if the menu is alreay opened. Otherwise false.</returns>
-        public static bool IsOpen()
+        public static bool IsMenuOpen()
         {
-            return instance != null;
+            return instance.IsOpen();
         }
 
         /// <summary>
@@ -117,21 +124,20 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Create the instance for the image menu and initialize
+        /// Creates the instance for the image menu and initializes
         /// the GUI elements.
         /// </summary>
         private static void Instantiate()
         {
-            instance = PrefabInstantiator.InstantiatePrefab(imageMenuPrefab,
-                                                            UICanvas.Canvas.transform, false);
-            orderInLayerSlider = instance.GetComponentInChildren<LayerSliderController>();
-            picker = instance.GetComponentInChildren<HSVPicker.ColorPicker>();
-            mirrorSwitch = instance.GetComponentInChildren<SwitchManager>();
-            thumbnail = GameFinder.FindChild(instance, "Image").GetComponent<Image>();
+            instance.Instantiate(imageMenuPrefab);
+            orderInLayerSlider = instance.menu.GetComponentInChildren<LayerSliderController>();
+            picker = instance.menu.GetComponentInChildren<HSVPicker.ColorPicker>();
+            mirrorSwitch = instance.menu.GetComponentInChildren<SwitchManager>();
+            thumbnail = GameFinder.FindChild(instance.menu, "Image").GetComponent<Image>();
         }
 
         /// <summary>
-        /// Initialize the mirror switch.
+        /// Initializes the mirror switch.
         /// It mirrors an image.
         /// Off is normal and on is mirrored.
         /// </summary>
@@ -167,9 +173,9 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Assigns an action and a order to the order in layer slider.
+        /// Assigns an action and an order within the layer-slider order.
         /// </summary>
-        /// <param name="orderInLayerAction">The int action that should be assigned</param>
+        /// <param name="orderInLayerAction">The action that should be assigned</param>
         /// <param name="order">The order that should be assigned.</param>
         private static void AssignOrderInLayer(UnityAction<int> orderInLayerAction, int order)
         {
