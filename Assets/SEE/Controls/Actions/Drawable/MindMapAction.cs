@@ -273,6 +273,11 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (writeTextDialog.GetUserInput(out string textOut))
             {
+                if (string.IsNullOrEmpty(textOut))
+                {
+                    ShowNotification.Error("No text entered", "You need to enter a description for the node.");
+                    return;
+                }
                 writtenText = textOut;
                 progress = ProgressState.Add;
             }
