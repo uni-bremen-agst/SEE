@@ -79,7 +79,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Stop()
         {
             base.Stop();
-            menu.Disable();
+            menu.Destroy();
         }
 
         /// <summary>

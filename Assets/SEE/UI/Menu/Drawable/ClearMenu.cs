@@ -1,8 +1,6 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
-using SEE.Utils;
 using TMPro;
-using UnityEngine;
 
 namespace SEE.UI.Menu.Drawable
 {
@@ -10,17 +8,12 @@ namespace SEE.UI.Menu.Drawable
     /// This class provides a menu, with which the player can
     /// configure the clear action.
     /// </summary>
-    public class ClearMenu
+    public class ClearMenu : Menu
     {
         /// <summary>
         /// The location where the menu prefeb is placed.
         /// </summary>
         private const string clearMenuPrefab = "Prefabs/UI/Drawable/ClearMenu";
-
-        /// <summary>
-        /// The instance for the menu.
-        /// </summary>
-        private readonly GameObject instance;
 
         /// <summary>
         /// The types of clearing.
@@ -36,12 +29,11 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         public ClearMenu()
         {
-            instance = PrefabInstantiator.InstantiatePrefab(clearMenuPrefab,
-                                                            UICanvas.Canvas.transform, false);
-            TextMeshProUGUI text = GameFinder.FindChild(instance, "DeleteText")
+            Instantiate(clearMenuPrefab);
+            TextMeshProUGUI text = GameFinder.FindChild(menu, "DeleteText")
                 .GetComponent<TextMeshProUGUI>();
 
-            SwitchManager typeManager = GameFinder.FindChild(instance, "TypeSwitch")
+            SwitchManager typeManager = GameFinder.FindChild(menu, "TypeSwitch")
                 .GetComponent<SwitchManager>();
 
             typeManager.OnEvents.AddListener(() =>
@@ -56,21 +48,10 @@ namespace SEE.UI.Menu.Drawable
                 text.text = "Delete Page";
             });
 
-            SwitchManager deleteManager = GameFinder.FindChild(instance, "DeleteSwitch")
+            SwitchManager deleteManager = GameFinder.FindChild(menu, "DeleteSwitch")
                 .GetComponent<SwitchManager>();
             deleteManager.OnEvents.AddListener(() => ShouldDeletePage = true);
             deleteManager.OffEvents.AddListener(() => ShouldDeletePage = false);
-        }
-
-        /// <summary>
-        /// Destroys the menu.
-        /// </summary>
-        public void Disable()
-        {
-            if (instance != null)
-            {
-                Destroyer.Destroy(instance);
-            }
         }
 
         /// <summary>
