@@ -470,7 +470,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
                 {
                     await UniTask.Yield();
                 }
-                if (confirm.WasConfirmed() && !confirm.WasCanceled())
+                if (confirm.WasConfirmed && !confirm.WasCanceled)
                 {
                     GameDrawableManager.RemovePage(surface, page);
                     new SurfaceRemovePageNetAction(DrawableConfigManager.GetDrawableConfig(surface), page).Execute();
