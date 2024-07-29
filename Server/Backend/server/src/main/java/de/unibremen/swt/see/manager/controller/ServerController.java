@@ -106,20 +106,20 @@ public class ServerController {
      * Adds a file to an existing server.
      *
      * @param serverId the ID of the server
-     * @param fileType {@code String} representation of a {@code FileType} value
+     * @param projectType {@code String} representation of a {@code ProjectType}
+     * value
      * @param file file content
      * @return {@code 200 OK} with the file metadata object as payload, or
      * {@code 500 Internal Server Error} if the file could not be persisted, or
      * {@code 401 Unauthorized} if access cannot be granted.
-     * @see de.unibremen.swt.see.manager.model.FileType
      */
     @PostMapping("/addFile")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> addFile(
             @RequestParam("id") UUID serverId,
-            @RequestParam("fileType") String fileType,
+            @RequestParam("projectType") String projectType,
             @RequestParam("file") MultipartFile file) {
-        File responseFile = serverService.addFile(serverId, fileType, file);
+        File responseFile = serverService.addFile(serverId, projectType, file);
         if (responseFile == null) {
             return ResponseEntity.internalServerError().build();
         }

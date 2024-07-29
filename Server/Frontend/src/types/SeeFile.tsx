@@ -1,10 +1,10 @@
-import FileType from "../types/FileType";
+import ProjectType from "../types/ProjectType";
 
 type SeeFile = {
   id: string;
   name: string;
   contentType: string;
-  fileType: FileType;
+  projectType: ProjectType;
   size: number;
   creationTime: number;
   _localfile: File;

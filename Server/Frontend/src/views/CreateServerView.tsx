@@ -8,7 +8,7 @@ import { faArrowLeft, faRemove, faRepeat, faX } from "@fortawesome/free-solid-sv
 import { useContext, useState } from "react";
 import { MuiFileInput } from 'mui-file-input';
 import { AuthContext } from "../contexts/AuthContext";
-import { FileTypeUtils } from "../types/FileType";
+import ProjectType, { ProjectTypeUtils } from "../types/ProjectType";
 import SeeFile from "../types/SeeFile";
 import AppUtils from "../utils/AppUtils";
 
@@ -57,6 +57,20 @@ function CreateServerView() {
 
   const [errors, setErrors] = useState(new Map<string, string>());
 
+  const [availableProjectTypes, setAvailableProjectTypes] = useState(ProjectTypeUtils.getAll().map(projectType => [projectType, true]));
+
+
+  function addFile(projectType: ProjectType) {
+    setAvailableProjectTypes(availableProjectTypes => availableProjectTypes.map(([mappedType, active]) => projectType === mappedType ? [mappedType, false] : [mappedType, active]));
+    setFiles((files) => [...files, { projectType: projectType } as SeeFile]);
+  }
+
+  function removeFile(idx: number) {
+    const projectType = files[idx].projectType;
+    setFiles((files) => files.filter((_, itemIdx) => itemIdx !== idx));
+    setAvailableProjectTypes(availableProjectTypes => availableProjectTypes.map(([mappedType, active]) => projectType === mappedType ? [mappedType, true] : [mappedType, active]));
+  }
+
   async function createServer() {
     const createServerResponse = await axiosInstance.post("/server/create", { name: name, avatarSeed: avatarSeed, avatarColor: avatarColor }).catch((error) => {
       AppUtils.notifyAxiosError(error, "Error Creating Server");
@@ -69,7 +83,7 @@ function CreateServerView() {
       const projectFile: SeeFile = files[i];
       const form = new FormData();
       form.append("id", createServerResponse.data.id);
-      form.append("fileType", projectFile.fileType);
+      form.append("projectType", projectFile.projectType);
       form.append("file", projectFile._localfile);
       await axiosInstance.post("/server/addFile", form).catch((error) => {
         success = false;
@@ -91,12 +105,12 @@ function CreateServerView() {
         aria-describedby="remove-user-modal-description">
         <Box sx={modalStyle}>
           <Typography id="modal-title" variant="h6" sx={{ marginBottom: "6pt" }}>
-            Select File Type
+            Select Project Type
           </Typography>
           <Stack direction="column" spacing={1}>
-            {FileTypeUtils.getAll().map((fileType) =>
-              <Button key={fileType} variant="contained" color="primary" sx={{ borderRadius: "25px", width: "100%" }} onClick={() => { setFileTypeModalOpen(false); setFiles((files) => [...files, { fileType: fileType } as SeeFile]); }}>
-                {FileTypeUtils.getLabel(fileType)}
+            {availableProjectTypes.filter(([, active]) => active === true).map(([projectType]) =>
+              <Button key={projectType} variant="contained" color="primary" sx={{ borderRadius: "25px", width: "100%" }} onClick={() => { setFileTypeModalOpen(false); addFile(projectType); }}>
+                {ProjectTypeUtils.getLabel(projectType)}
               </Button>
             )}
           </Stack>
@@ -125,23 +139,23 @@ function CreateServerView() {
                   <TextField error={!!errors.get("name")} helperText={errors.get("name")} value={name} onChange={(e) => setName(e.target.value)} label="Server Name" variant="standard" autoFocus />
                 </Stack>
 
-                <Typography variant="h6">Files</Typography>
+                <Typography variant="h6">Visualizations</Typography>
                 <Card sx={{ borderRadius: "0px", flexGrow: 1, overflow: "auto", minHeight: "100px" }} elevation={0}>
                   <Stack direction="column" spacing={1}>
                     {files.map((projectFile, idx) =>
                       <Stack key={idx} direction="row">
                         <MuiFileInput
-                          label={FileTypeUtils.getLabel(projectFile.fileType)}
+                          label={ProjectTypeUtils.getLabel(projectFile.projectType)}
                           placeholder="Click to choose file…"
                           variant="standard"
                           fullWidth
                           value={projectFile._localfile}
                           onChange={(value) => { setFiles((files) => files.map((item, itemIdx) => itemIdx === idx ? { ...item, _localfile: value } as SeeFile : item)) }}
                           clearIconButtonProps={{ title: "Remove", children: <FontAwesomeIcon icon={faX} /> }}
-                          inputProps={{ accept: FileTypeUtils.getFileExtension(projectFile.fileType) }} />
+                          inputProps={{ accept: ProjectTypeUtils.getFileExtension(projectFile.projectType) }} />
                         <IconButton
                           size="small"
-                          onClick={() => { setFiles((files) => files.filter((_, itemIdx) => itemIdx !== idx)) }}>
+                          onClick={() => removeFile(idx)}>
                           <FontAwesomeIcon icon={faRemove} />
                         </IconButton>
                       </Stack>
@@ -149,7 +163,7 @@ function CreateServerView() {
                     }
                   </Stack>
                   <Button variant="contained" color="primary" sx={{ borderRadius: "25px", marginTop: "6pt" }} onClick={() => setFileTypeModalOpen(true)}>
-                    Add File
+                    Add Project
                   </Button>
                 </Card>
               </Stack>

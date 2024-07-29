@@ -1,7 +1,7 @@
 package de.unibremen.swt.see.manager.service;
 
 import de.unibremen.swt.see.manager.model.File;
-import de.unibremen.swt.see.manager.model.FileType;
+import de.unibremen.swt.see.manager.model.ProjectType;
 import de.unibremen.swt.see.manager.model.Server;
 import de.unibremen.swt.see.manager.repository.FileRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -61,13 +61,13 @@ public class FileService {
      * is stored in the metadata.
      *
      * @param server the server instance this file belongs to
-     * @param type the type of the file
+     * @param projectType the type of the project
      * @param multipartFile the file content from the API request
      * @return the created file, or {@code null} if the file content is empty.
      * @throws java.io.IOException if there was an I/O error while storing the
      * file
      */
-    public File create(Server server, FileType type, MultipartFile multipartFile) throws IOException {
+    public File create(Server server, ProjectType projectType, MultipartFile multipartFile) throws IOException {
         if (multipartFile.isEmpty()) {
             return null;
         }
@@ -76,7 +76,7 @@ public class FileService {
         file.setName(multipartFile.getOriginalFilename());
         file.setContentType(multipartFile.getContentType());
         file.setServer(server);
-        file.setFileType(type);
+        file.setProjectType(projectType);
 
         Path path;
         try {
@@ -106,19 +106,19 @@ public class FileService {
     }
 
     /**
-     * Retrieves a file by its associated server and file type.
+     * Retrieves a file by its associated server and project type.
      *
      * @param serverId the ID of the server the file belongs to
-     * @param type the type of the file
+     * @param projectType the project type of the file
      * @return file if found, or {@code null} if not found
      * @throws EntityNotFoundException if server or file could not be found
      */
-    public File getByServerAndFileType(UUID serverId, FileType type) {
-        log.info("Fetching file for server {} and type {}", serverId, type);
+    public File getByServerAndProjectType(UUID serverId, ProjectType projectType) {
+        log.info("Fetching file for server and project type: {}; {}", serverId, projectType);
 
-        Optional<File> optFile = fileRepo.findByServerIdAndFileType(serverId, type);
+        Optional<File> optFile = fileRepo.findByServerIdAndProjectType(serverId, projectType);
         if (optFile.isEmpty()) {
-            throw new EntityNotFoundException("File not found by type " + type);
+            throw new EntityNotFoundException("File not found by project type " + projectType);
         }
         return optFile.get();
     }
@@ -195,7 +195,7 @@ public class FileService {
             delete(file);
         }
 
-        Files.delete(getUploadPath(server));
+        Files.delete(getServerUploadPath(server));
     }
 
 
@@ -233,7 +233,7 @@ public class FileService {
      * @throws IOException if there is a problem accessing or creating the
      * directory, or if the path is not a directory
      */
-    public Path getUploadPath(Server server) throws IOException {
+    public Path getServerUploadPath(Server server) throws IOException {
         Path basePath = Paths.get(fileStorageRoot).toAbsolutePath();
         Path uploadPath = basePath.resolve(server.getId().toString());
         if (!Files.exists(uploadPath)) {
@@ -257,15 +257,16 @@ public class FileService {
      *
      * @param file the file to which the path should be assembled
      * @return file system path for the given file
-     * @throws IOException if one is thrown by {@link #getUploadPath(Server)}
-     * @see #getUploadPath(Server)
+     * @throws IOException if one is thrown by
+     * {@link #getServerUploadPath(Server)}
+     * @see #getServerUploadPath(Server)
      */
     public Path getPath(File file) throws IOException {
         String fileName = file.getName();
         if (fileName == null || fileName.isEmpty()) {
             throw new RuntimeException("File name must not be empty!");
         }
-        return getUploadPath(file.getServer()).resolve(fileName);
+        return getServerUploadPath(file.getServer()).resolve(fileName);
     }
 
     /**

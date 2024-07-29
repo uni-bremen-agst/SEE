@@ -5,7 +5,7 @@ import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.exception.NotModifiedException;
 import de.unibremen.swt.see.manager.model.Config;
 import de.unibremen.swt.see.manager.model.File;
-import de.unibremen.swt.see.manager.model.FileType;
+import de.unibremen.swt.see.manager.model.ProjectType;
 import de.unibremen.swt.see.manager.model.RoleType;
 import de.unibremen.swt.see.manager.model.Server;
 import de.unibremen.swt.see.manager.model.ServerStatusType;
@@ -186,12 +186,12 @@ public class ServerService {
      * The file will be crated and associated to the given server.
      *
      * @param serverId the ID identifying the server instance
-     * @param fileTypeStr the type of the file
+     * @param projectTypeStr the project type of the file
      * @param multipartFile the file content
      * @return the created file, or {@code null} if the server was not found or
      * an error occurred while storing the file
      */
-    public File addFile(UUID serverId, String fileTypeStr, MultipartFile multipartFile) {
+    public File addFile(UUID serverId, String projectTypeStr, MultipartFile multipartFile) {
         Optional<Server> optServer = serverRepo.findById(serverId);
         if (optServer.isEmpty()) {
             log.error("Server not found with ID: {}", serverId);
@@ -199,11 +199,11 @@ public class ServerService {
         }
         Server server = optServer.get();
 
-        FileType fileType = FileType.valueOf(fileTypeStr);
+        ProjectType projectType = ProjectType.valueOf(projectTypeStr);
         log.info("Adding file {} to server {}", multipartFile.getOriginalFilename(), server.getName());
 
         try {
-            return fileService.create(server, fileType, multipartFile);
+            return fileService.create(server, projectType, multipartFile);
         } catch (IOException e) {
             log.error("Unable to add file to server {}: ", serverId, e);
         }

@@ -10,9 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 /**
- * Represents the data model of files that are exchanged via REST API.
- * <p>
- * Possible types are defined in related {@code enum} {@link FileType}.
+ * Represents the data model of a file that can be exchanged via REST API.
  */
 @Getter
 @Entity
@@ -65,7 +63,7 @@ public class File {
      */
     @Setter
     @Enumerated(EnumType.STRING)
-    private FileType fileType;
+    private ProjectType projectType;
 
     /**
      * The server this file is associated with.

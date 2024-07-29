@@ -59,7 +59,7 @@ namespace SEE.Net
             public string id;
             public string name;
             public string contentType;
-            public string fileType;
+            public string projectType;
             public long size;
             public long creationTime;
 

@@ -1,7 +1,7 @@
 package de.unibremen.swt.see.manager.repository;
 
 import de.unibremen.swt.see.manager.model.File;
-import de.unibremen.swt.see.manager.model.FileType;
+import de.unibremen.swt.see.manager.model.ProjectType;
 import de.unibremen.swt.see.manager.model.Server;
 import java.util.List;
 import java.util.Optional;
@@ -34,18 +34,18 @@ public interface FileRepository extends JpaRepository<File, UUID> {
     List<File> findByServer(Server server);
 
     /**
-     * Retrieves a file by its type and server association.
+     * Retrieves a file by its project type and server association.
      * <p>
-     * This method retrieves the file with the provided type that is linked to
-     * the provided server. If no such file is found, an empty {@code Optional}
-     * is returned.
+     * This method retrieves the file with the provided project type that is
+     * linked to the provided server. If no such file is found, an empty
+     * {@code Optional} is returned.
      *
      * @param serverId the ID of the server that files should be retrieved for
-     * @param fileType the type of the file to be retrieved
+     * @param projectType the type of the project to be retrieved
      * @return an {@link Optional} containing the file if existent, or an empty
      * {@code Optional} if no such file exists
      */
-    Optional<File> findByServerIdAndFileType(UUID serverId, FileType fileType);
+    Optional<File> findByServerIdAndProjectType(UUID serverId, ProjectType projectType);
 
     /**
      * Deletes all file entities from the database that are associated with the

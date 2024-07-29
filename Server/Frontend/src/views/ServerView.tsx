@@ -9,7 +9,7 @@ import { useLocation, useNavigate } from "react-router";
 import Server from "../types/Server";
 import { AuthContext } from "../contexts/AuthContext";
 import SeeFile from "../types/SeeFile";
-import { FileTypeUtils } from "../types/FileType";
+import { ProjectTypeUtils } from "../types/ProjectType";
 import { enqueueSnackbar } from "notistack";
 import { AxiosError } from "axios";
 import AppUtils from "../utils/AppUtils";
@@ -254,7 +254,7 @@ function ServerView() {
                                 </Grid>
                                 <Grid item xs={4}>
                                   <ListItemText>
-                                    <Typography sx={{ fontStyle: "italic" }}>{FileTypeUtils.getLabel(projectFile.fileType)}</Typography>
+                                    <Typography sx={{ fontStyle: "italic" }}>{ProjectTypeUtils.getLabel(projectFile.projectType)}</Typography>
                                   </ListItemText>
                                 </Grid>
                                 <Grid item xs={2} sx={{ textAlign: "right" }}>

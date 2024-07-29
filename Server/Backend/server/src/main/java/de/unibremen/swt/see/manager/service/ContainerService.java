@@ -335,7 +335,7 @@ public class ContainerService {
      */
     private CreateVolumeResponse createVolume(Server server, final String volumeName) throws IOException {
         log.debug("Creating new volume: {}", volumeName);
-        Path uploadDir = fileService.getUploadPath(server);
+        Path uploadDir = fileService.getServerUploadPath(server);
         return dockerClient.createVolumeCmd()
                 .withName(volumeName)
                 .withDriver("local")
