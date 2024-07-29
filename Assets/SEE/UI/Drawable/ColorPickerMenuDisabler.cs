@@ -28,7 +28,7 @@ namespace SEE.UI.Drawable
         /// </summary>
         private void OnDestroy()
         {
-            ColorPickerMenu.Disable();
+            ColorPickerMenu.DisableMenu();
         }
     }
 }

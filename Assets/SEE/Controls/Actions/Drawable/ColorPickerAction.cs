@@ -159,8 +159,8 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void PickingSecondaryColor()
         {
-            if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit, false)
-                && !isInAction)
+            if (!isInAction
+                && Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit, false))
             {
                 isInAction = true;
                 GameObject hitObject = raycastHit.collider.gameObject;
@@ -211,16 +211,32 @@ namespace SEE.Controls.Actions.Drawable
             oldChosenPrimaryColor = ValueHolder.CurrentPrimaryColor;
             oldChosenSecondColor = ValueHolder.CurrentSecondaryColor;
             UICanvas.Canvas.AddOrGetComponent<ColorPickerMenuDisabler>();
-            ColorPickerMenu.Enable();
         }
 
         /// <summary>
-        /// Destroys the mind map color picker menu on action stop.
+        /// Enables the color picker menu on action start.
+        /// </summary>
+        public override void Start()
+        {
+            base.Start();
+            ColorPickerMenu.EnableMenu();
+        }
+
+        /// <summary>
+        /// Disables the color picker menu on action stop.
         /// </summary>
         public override void Stop()
         {
             base.Stop();
-            ColorPickerMindMapMenu.Disable();
+            ColorPickerMenu.DisableMenu();
+            // CHECK: Should the menu be destroyed here or rather only be disabled
+            // and then destroyed in the destructor?
+            ColorPickerMindMapMenu.DestroyMenu();
+        }
+
+        ~ColorPickerAction()
+        {
+            ColorPickerMenu.DestroyMenu();
         }
 
         /// <summary>
