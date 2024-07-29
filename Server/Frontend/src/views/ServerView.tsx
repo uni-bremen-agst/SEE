@@ -82,7 +82,7 @@ function ServerView() {
       () => navigate("/", { replace: true })
     ).catch(
       (error) => AppUtils.notifyAxiosError(error as AxiosError, "Error Deleting Server")
-    );
+    ).finally(() => setIsBusy(false));
   }
 
   async function refreshData() {

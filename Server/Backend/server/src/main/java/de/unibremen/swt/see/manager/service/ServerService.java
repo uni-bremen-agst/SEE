@@ -314,6 +314,10 @@ public class ServerService {
                 containerService.startContainer(server);
             } catch (NotModifiedException e) {
                 throw new IllegalStateException("The container is already running!", e);
+            } catch (NotFoundException e) {
+                // This should not happen except due to external influence or
+                // concurrent requests, as the container is created above if missing.
+                throw new IllegalStateException("The container vanished!", e);
             } catch (InternalServerErrorException e) {
                 throw new IllegalStateException("Internal server error!", e);
             }

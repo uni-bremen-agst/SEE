@@ -144,8 +144,10 @@ public class ContainerService {
      * be accessed
      * @throws NotModifiedException if the container is already running
      * @throws InternalServerErrorException e.g., if the port is already bound
+     * @throws NotFoundException if the container gets deleted in the time
+     * between existence check and start execution
      */
-    public void startContainer(Server server) throws IOException, NotModifiedException, InternalServerErrorException {
+    public void startContainer(Server server) throws IOException, NotModifiedException, NotFoundException, InternalServerErrorException {
         final String containerName = "see-" + server.getId();
         final String volumeName = "see-data-" + server.getId();
         String containerId = server.getContainerId();
@@ -163,10 +165,6 @@ public class ContainerService {
         try {
             dockerClient.startContainerCmd(containerId).exec();
             log.info("Started existing container: {}", containerName);
-        } catch (NotFoundException e) {
-            // This should not happen except due to external influence or 
-            // concurrent requests, as the container is created above if missing.
-            log.error("Container does not exist: {}", containerName);
         } catch (NotModifiedException e) {
             server.setStatus(ServerStatusType.ONLINE);
             throw e;
