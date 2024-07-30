@@ -1,5 +1,6 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Controls.Actions;
+using SEE.Controls.Actions.Drawable;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.GO.Menu;
@@ -91,6 +92,9 @@ namespace SEE.UI.Drawable
             Destroyer.Destroy(barInstance);
         }
 
+        /// <summary>
+        /// Configurates the toggler for the action bar.
+        /// </summary>
         private void InitToggler()
         {
             GameObject toggle = GameFinder.FindChild(togglerInstance, "Toggle");
@@ -282,6 +286,14 @@ namespace SEE.UI.Drawable
                 GlobalActionHistory.Execute(ActionStateTypes.StickyNote);
                 menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
             });
+
+            GameObject manager = GameFinder.FindChild(barInstance, "Manager");
+            manager.AddComponent<ButtonHoverTooltip>().SetMessage("Drawable Surface Manager");
+            manager.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+            {
+                LocalPlayer.Instance.GetComponentInChildren<ShowDrawableManager>().Toggle();
+            }
+            );
         }
     }
 }

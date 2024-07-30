@@ -7,7 +7,7 @@ using UnityEngine;
 namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
-    /// Allows the user to show or hide the drawable manager view.
+    /// Allows the user to show or hide the drawable manager window.
     /// </summary>
     /// <remarks>This component is meant to be attached to a player.</remarks>
     public class ShowDrawableManager : MonoBehaviour
@@ -18,7 +18,7 @@ namespace SEE.Controls.Actions.Drawable
         private WindowSpace space;
 
         /// <summary>
-        /// Status indicating the state of the view (open/closed).
+        /// Status indicating the state of the window (open/closed).
         /// </summary>
         private bool isOpen = false;
 
@@ -28,9 +28,9 @@ namespace SEE.Controls.Actions.Drawable
         private DrawableManagerWindow window;
 
         /// <summary>
-        /// Displays the drawable manager view.
+        /// Displays the drawable manager window.
         /// </summary>
-        internal void ShowDrawableManagerView()
+        internal void ShowDrawableManagerWindow()
         {
             isOpen = true;
             window = GameObject.Find("UI Canvas").AddOrGetComponent<DrawableManagerWindow>();
@@ -47,33 +47,41 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Close the drawable manager view.
+        /// Close the drawable manager window.
         /// </summary>
-        internal void HideDrawableManagerView()
+        internal void HideDrawableManagerWindow()
         {
             isOpen = false;
             bool wasClosed = space.CloseWindow(window);
             if (!wasClosed)
             {
-                ShowDrawableManagerView();
+                ShowDrawableManagerWindow();
             }
         }
 
         /// <summary>
-        /// Based on the input, it shows or hides the drawable manager view.
+        /// Based on the input, it shows or hides the drawable manager window.
         /// </summary>
         private void Update()
         {
             if (SEEInput.ToggleDrawableManagerView())
             {
-                if (!isOpen)
-                {
-                    ShowDrawableManagerView();
-                }
-                else
-                {
-                    HideDrawableManagerView();
-                }
+                Toggle();
+            }
+        }
+
+        /// <summary>
+        /// Toggles the current state of the drawable manager window.
+        /// </summary>
+        public void Toggle()
+        {
+            if (!isOpen)
+            {
+                ShowDrawableManagerWindow();
+            }
+            else
+            {
+                HideDrawableManagerWindow();
             }
         }
     }
