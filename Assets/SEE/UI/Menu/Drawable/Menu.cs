@@ -45,7 +45,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Enables the menu.
         /// </summary>
-        protected void Enable()
+        public void Enable()
         {
             menu.SetActive(true);
         }
@@ -53,7 +53,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Disables the menu.
         /// </summary>
-        protected void Disable()
+        public void Disable()
         {
             menu.SetActive(false);
         }
