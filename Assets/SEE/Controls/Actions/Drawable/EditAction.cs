@@ -190,7 +190,7 @@ namespace SEE.Controls.Actions.Drawable
             }
             TextMenu.Disable();
             LineMenu.DisableLineMenu();
-            ImageMenu.DestroyMenu();
+            ImageMenu.Instance.Destroy();
             MindMapEditMenu.Disable();
         }
 
@@ -244,7 +244,7 @@ namespace SEE.Controls.Actions.Drawable
                 progressState = ProgressState.SelectObject;
                 TextMenu.Disable();
                 LineMenu.DisableLineMenu();
-                ImageMenu.DestroyMenu();
+                ImageMenu.Instance.Destroy();
                 MindMapEditMenu.Disable();
             }
         }
@@ -296,7 +296,7 @@ namespace SEE.Controls.Actions.Drawable
                     }
                     break;
                 case Tags.Image:
-                    if (!ImageMenu.IsMenuOpen())
+                    if (!ImageMenu.Instance.IsOpen())
                     {
                         ImageMenu.Enable(selectedObj, newValueHolder);
                     }
@@ -355,7 +355,7 @@ namespace SEE.Controls.Actions.Drawable
                 progressState = ProgressState.SelectObject;
                 LineMenu.DisableLineMenu();
                 TextMenu.Disable();
-                ImageMenu.DestroyMenu();
+                ImageMenu.Instance.Destroy();
                 MindMapEditMenu.Disable();
                 return false;
             }

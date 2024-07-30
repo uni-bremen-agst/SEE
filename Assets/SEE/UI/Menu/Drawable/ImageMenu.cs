@@ -4,7 +4,6 @@ using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
-using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -14,7 +13,7 @@ namespace SEE.UI.Menu.Drawable
     /// <summary>
     /// This class provides a menu for editing an image.
     /// </summary>
-    public class ImageMenu : Menu
+    public class ImageMenu : SingletonMenu
     {
         /// <summary>
         /// The location where the image menu prefeb is placed.
@@ -22,18 +21,18 @@ namespace SEE.UI.Menu.Drawable
         private const string imageMenuPrefab = "Prefabs/UI/Drawable/ImageMenu";
 
         /// <summary>
-        /// The only instance of this singleton class.
-        /// </summary>
-        private readonly static ImageMenu instance;
-
-        /// <summary>
         /// We do not want to create an instance of this singleton class outside of this class.
         /// </summary>
         private ImageMenu() { }
 
+        /// <summary>
+        /// The only instance of this singleton class.
+        /// </summary>
+        public static ImageMenu Instance { get; set; }
+
         static ImageMenu()
         {
-            instance = new ImageMenu();
+            Instance = new ImageMenu();
         }
 
         /// <summary>
@@ -60,23 +59,6 @@ namespace SEE.UI.Menu.Drawable
         /// The thumbnail image of the chosen image.
         /// </summary>
         private static Image thumbnail;
-
-        /// <summary>
-        /// Destroys the image menu.
-        /// </summary>
-        public static void DestroyMenu()
-        {
-            instance.Destroy();
-        }
-
-        /// <summary>
-        /// Returns true if the menu is already opened.
-        /// </summary>
-        /// <returns>true, if the menu is alreay opened. Otherwise false.</returns>
-        public static bool IsMenuOpen()
-        {
-            return instance.IsOpen();
-        }
 
         /// <summary>
         /// Enables the image menu and register the necessary Handler to the components.
@@ -124,16 +106,15 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Creates the instance for the image menu and initializes
-        /// the GUI elements.
+        /// Creates the instance for the image menu and initializes the GUI elements.
         /// </summary>
         private static void Instantiate()
         {
-            instance.Instantiate(imageMenuPrefab);
-            orderInLayerSlider = instance.menu.GetComponentInChildren<LayerSliderController>();
-            picker = instance.menu.GetComponentInChildren<HSVPicker.ColorPicker>();
-            mirrorSwitch = instance.menu.GetComponentInChildren<SwitchManager>();
-            thumbnail = GameFinder.FindChild(instance.menu, "Image").GetComponent<Image>();
+            Instance.Instantiate(imageMenuPrefab);
+            orderInLayerSlider = Instance.menu.GetComponentInChildren<LayerSliderController>();
+            picker = Instance.menu.GetComponentInChildren<HSVPicker.ColorPicker>();
+            mirrorSwitch = Instance.menu.GetComponentInChildren<SwitchManager>();
+            thumbnail = GameFinder.FindChild(Instance.menu, "Image").GetComponent<Image>();
         }
 
         /// <summary>

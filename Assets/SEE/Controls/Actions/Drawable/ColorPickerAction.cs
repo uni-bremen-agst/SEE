@@ -231,7 +231,7 @@ namespace SEE.Controls.Actions.Drawable
             ColorPickerMenu.DisableMenu();
             // CHECK: Should the menu be destroyed here or rather only be disabled
             // and then destroyed in the destructor?
-            ColorPickerMindMapMenu.DestroyMenu();
+            ColorPickerMindMapMenu.Instance.Destroy();
         }
 
         ~ColorPickerAction()

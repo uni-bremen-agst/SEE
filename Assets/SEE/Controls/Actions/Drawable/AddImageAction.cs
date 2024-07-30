@@ -107,7 +107,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Stop()
         {
             base.Stop();
-            ImageSourceMenu.Disable();
+            ImageSourceMenu.DisableMenu();
         }
 
         /// <summary>
@@ -143,13 +143,13 @@ namespace SEE.Controls.Actions.Drawable
         private void SelectPosition()
         {
             if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit)
-                && !ImageSourceMenu.IsOpen()
+                && !ImageSourceMenu.IsMenuOpen()
                 && (browser == null || (browser != null && !browser.IsOpen()))
                 && (webImageDialog == null || (webImageDialog != null && !isDialogOpen)))
             {
                 Surface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
                 position = raycastHit.point;
-                ImageSourceMenu.Enable();
+                ImageSourceMenu.EnableMenu();
             }
         }
 
