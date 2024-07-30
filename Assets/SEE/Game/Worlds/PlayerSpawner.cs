@@ -153,10 +153,6 @@ namespace SEE.Game.Worlds
                 }
 #endif
 #endif
-                if (numberOfSpawnedPlayers > 1)
-                {
-                    DrawableSynchronizer.Synchronize();
-                }
             }
             else
             {

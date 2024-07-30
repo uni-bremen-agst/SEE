@@ -1,5 +1,7 @@
-﻿using Dissonance;
+﻿using Cysharp.Threading.Tasks;
+using Dissonance;
 using SEE.Game.City;
+using SEE.Game.Drawable;
 using SEE.GO;
 using SEE.UI.Notification;
 using SEE.Utils;
@@ -406,7 +408,7 @@ namespace SEE.Net
         /// <param name="recipients">List of recipients to broadcast to, will broadcast to all if this is null.</param>
         public static void BroadcastAction(String serializedAction, ulong[] recipients)
         {
-            int maxPacketSize = 32000; /// TODO: Replace with the exact value.
+            int maxPacketSize = 32000; /// TODO: Replace with the exact value
             if (serializedAction.Length < maxPacketSize)
             {
                 ServerNetwork.Value?.BroadcastActionServerRpc(serializedAction, recipients);
@@ -679,6 +681,24 @@ namespace SEE.Net
         private void OnClientConnectedCallbackForServer(ulong client)
         {
             ShowNotification.Info("Connection", $"Client {client} has connected.");
+            SynchronizerAsync(client).Forget();
+        }
+
+        /// <summary>
+        /// When a client has connected to the server the drawables must be synchronized.
+        /// </summary>
+        /// <param name="client">the ID of the client</param>
+        private async UniTask SynchronizerAsync(ulong client)
+        {
+            NetworkClient cl = NetworkManager.Singleton.ConnectedClientsList.First(c => c.ClientId == client);
+            while (cl.PlayerObject == null || cl.PlayerObject.GetComponent<ClientActionNetwork>() == null
+                /// Is necessary to ensure that the client player is sufficiently initialized before synchronization can begin. 
+                /// If the local camera on the client is not yet initialized, errors may occur when synchronizing <see cref="DrawableType"> objects.
+                || cl.PlayerObject.GetComponentInChildren<SkinnedMeshRenderer>() == null) 
+            {
+                await UniTask.Yield();
+            }
+            DrawableSynchronizer.Synchronize(client);
         }
 
         /// <summary>

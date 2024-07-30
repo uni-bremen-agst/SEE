@@ -1,4 +1,5 @@
 ﻿using SEE.Net.Actions;
+using SEE.UI.Notification;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,7 +63,7 @@ namespace SEE.Net
                 if (recipients == null || recipients.Contains(client.ClientId))
                 {
                     ClientActionNetwork clientNetwork = client.PlayerObject.GetComponent<ClientActionNetwork>();
-                    clientNetwork.ExecuteActionClientRpc(serializedAction);
+                    clientNetwork.ExecuteActionClientRpc(serializedAction, recipients);
                 }
             }
         }
@@ -122,12 +123,12 @@ namespace SEE.Net
                         ClientActionNetwork clientNetwork = client.PlayerObject.GetComponent<ClientActionNetwork>();
                         foreach(Fragment fragment in fragments)
                         {
-                            clientNetwork.BroadcastActionClientRpc(fragment.PacketID, fragment.PacketSize, 
-                                fragment.CurrentFragment, fragment.Data);
+                            clientNetwork.ReceiveActionClientRpc(fragment.PacketID, fragment.PacketSize, 
+                                fragment.CurrentFragment, fragment.Data, recipients);
                         }
                     }
                 }
-                fragmentsGatherer.Remove(key); /// TODO: test if to remove is okay.
+                fragmentsGatherer.Remove(key);
             }
         }
 

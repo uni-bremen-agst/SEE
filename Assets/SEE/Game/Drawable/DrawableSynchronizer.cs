@@ -21,16 +21,17 @@ namespace SEE.Game.Drawable
         /// and synchronization is performed for all players.
         /// This can lead to delays, especially when there are many images in the game world.
         /// </summary>
-        public static void Synchronize()
+        public static void Synchronize(ulong client)
         {
-            new SynchronizeCurrentOrderInLayer(ValueHolder.MaxOrderInLayer).Execute();
+            ulong[] clients = { client };
+            new SynchronizeCurrentOrderInLayer(ValueHolder.MaxOrderInLayer).Execute(clients);
 
             ArrayList drawables = new(GameObject.FindGameObjectsWithTag(Tags.Drawable));
             foreach (GameObject drawable in drawables)
             {
                 if (GameFinder.GetDrawableSurfaceParentName(drawable).Contains(ValueHolder.StickyNotePrefix))
                 {
-                    new StickyNoteSpawnNetAction(DrawableConfigManager.GetDrawableConfig(drawable)).Execute();
+                    new StickyNoteSpawnNetAction(DrawableConfigManager.GetDrawableConfig(drawable)).Execute(clients);
                 }
 
                 if (GameFinder.GetAttachedObjectsObject(drawable) != null)
@@ -47,19 +48,19 @@ namespace SEE.Game.Drawable
                         {
                             case Tags.Line:
                                 new DrawNetAction(drawable.name, drawableParent,
-                                    LineConf.GetLine(child)).Execute();
+                                    LineConf.GetLine(child)).Execute(clients);
                                 break;
                             case Tags.DText:
                                 new WriteTextNetAction(drawable.name, drawableParent,
-                                    TextConf.GetText(child)).Execute();
+                                    TextConf.GetText(child)).Execute(clients);
                                 break;
                             case Tags.Image:
                                 new AddImageNetAction(drawable.name, drawableParent,
-                                    ImageConf.GetImageConf(child)).Execute();
+                                    ImageConf.GetImageConf(child)).Execute(clients);
                                 break;
                             case Tags.MindMapNode:
                                 new MindMapCreateNodeNetAction(drawable.name, drawableParent,
-                                    MindMapNodeConf.GetNodeConf(child)).Execute();
+                                    MindMapNodeConf.GetNodeConf(child)).Execute(clients);
                                 break;
                         }
                     }

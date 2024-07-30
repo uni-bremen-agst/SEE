@@ -1,9 +1,11 @@
 ﻿using SEE.Net.Actions;
+using SEE.UI.Notification;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -88,14 +90,19 @@ namespace SEE.Net
         /// Executes an action on the client.
         /// </summary>
         [ClientRpc]
-        public void ExecuteActionClientRpc(string serializedAction)
+        public void ExecuteActionClientRpc(string serializedAction, ulong[] recipients)
         {
             if (IsHost  || IsServer)
             {
                 return;
             }
             AbstractNetAction action = ActionSerializer.Deserialize(serializedAction);
-            if (action.Requester != NetworkManager.Singleton.LocalClientId)
+            if (action.Requester != NetworkManager.Singleton.LocalClientId
+                /// The recipients were passed in because there is currently a bug causing all clients to execute the code, 
+                /// even if they are not in the recipients list of the server action network. 
+                /// Therefore, another comparison is made here to ensure that the code is really being executed by the intended client. 
+                /// Once the bug is found and fixed, the recipients can be removed again.
+                && (recipients == null || recipients.Contains(NetworkManager.Singleton.LocalClientId)))
             {
                 action.ExecuteOnClient();
             }
@@ -109,7 +116,7 @@ namespace SEE.Net
         /// <param name="currentFragment">The current fragment.</param>
         /// <param name="data">The data of the fragment</param>
         [ClientRpc]
-        public void BroadcastActionClientRpc(string id, int packetSize, int currentFragment, string data)
+        public void ReceiveActionClientRpc(string id, int packetSize, int currentFragment, string data, ulong[] recipients)
         {
             Fragment fragment = new(id, packetSize, currentFragment, data);
             if (fragmentsGatherer.TryGetValue(fragment.PacketID, out List<Fragment> fragments))
@@ -124,7 +131,7 @@ namespace SEE.Net
             if (fragmentsGatherer.TryGetValue(fragment.PacketID, out List<Fragment> f)
                 && Fragment.CombineFragments(f) != "")
             {
-                BroadcastActClientRpc(fragment.PacketID);
+                ExecuteActClientRpc(fragment.PacketID, recipients);
             }
         }
 
@@ -134,7 +141,7 @@ namespace SEE.Net
         /// <param name="key">The packet id.</param>
         /// <param name="recipients">The recipients of the call.</param>
         [ClientRpc]
-        private void BroadcastActClientRpc(string key)
+        private void ExecuteActClientRpc(string key, ulong[] recipients)
         {
             if (IsHost || IsServer)
             {
@@ -144,7 +151,12 @@ namespace SEE.Net
             {
                 string serializedAction = Fragment.CombineFragments(fragments);
                 AbstractNetAction action = ActionSerializer.Deserialize(serializedAction);
-                if (action.Requester != NetworkManager.Singleton.LocalClientId)
+                if (action.Requester != NetworkManager.Singleton.LocalClientId
+                    /// The recipients were passed in because there is currently a bug causing all clients to execute the code, 
+                    /// even if they are not in the recipients list of the server action network. 
+                    /// Therefore, another comparison is made here to ensure that the code is really being executed by the intended client. 
+                    /// Once the bug is found and fixed, the recipients can be removed again.
+                    && (recipients == null || recipients.Contains(NetworkManager.Singleton.LocalClientId)))
                 {
                     action.ExecuteOnClient();
                 }
