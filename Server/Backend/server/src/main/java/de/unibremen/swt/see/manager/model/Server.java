@@ -73,14 +73,6 @@ public class Server {
     private String containerId;
 
     /**
-     * The Docker Volume name that contains the server-specific files.
-     */
-    @Setter
-    @JsonIgnore
-    @Column(name = "container_volume")
-    private String containerVolume;
-
-    /**
      * The external address of the container host to access the game server.
      */
     @Setter

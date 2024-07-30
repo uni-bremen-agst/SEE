@@ -19,6 +19,4 @@ WORKDIR /app
 
 EXPOSE 7777/udp
 
-VOLUME /multiplayer_data
-
 CMD /run.sh

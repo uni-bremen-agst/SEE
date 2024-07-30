@@ -64,10 +64,11 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Sends the server id to the client, this is not the internal id but the id given to the server by the backend.
+        /// Registers a client at the server.
+        /// This RPC is called by the client to initiate the synchronization process.
         /// </summary>
         [ServerRpc(RequireOwnership = false)]
-        public void SyncFilesServerRpc(ServerRpcParams serverRpcParams = default)
+        public void RegisterClientServerRpc(ServerRpcParams serverRpcParams = default)
         {
             if (!IsServer && !IsHost)
             {
