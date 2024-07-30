@@ -107,7 +107,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Stop()
         {
             base.Stop();
-            ImageSourceMenu.DisableMenu();
+            ImageSourceMenu.Instance.Disable();
         }
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace SEE.Controls.Actions.Drawable
         private void SelectPosition()
         {
             if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit)
-                && !ImageSourceMenu.IsMenuOpen()
+                && !ImageSourceMenu.Instance.IsOpen()
                 && (browser == null || (browser != null && !browser.IsOpen()))
                 && (webImageDialog == null || (webImageDialog != null && !isDialogOpen)))
             {

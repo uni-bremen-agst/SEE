@@ -7,7 +7,7 @@ namespace SEE.UI.Menu.Drawable
     /// This class provides a menu, with which the player can select
     /// from which source an image should be loaded.
     /// </summary>
-    public class ImageSourceMenu : Menu
+    public class ImageSourceMenu : SingletonMenu
     {
         /// <summary>
         /// The location where the menu prefab is placed.
@@ -15,18 +15,18 @@ namespace SEE.UI.Menu.Drawable
         private const string imageSourceMenuPrefab = "Prefabs/UI/Drawable/ImageSource";
 
         /// <summary>
-        /// The only instance of this singleton class.
-        /// </summary>
-        private readonly static ImageSourceMenu instance;
-
-        /// <summary>
         /// We do not want to create an instance of this singleton class outside of this class.
         /// </summary>
         private ImageSourceMenu() { }
 
+        /// <summary>
+        /// The only instance of this singleton class.
+        /// </summary>
+        public static ImageSourceMenu Instance { get; private set; }
+
         static ImageSourceMenu()
         {
-            instance = new ImageSourceMenu();
+            Instance = new ImageSourceMenu();
         }
 
         /// <summary>
@@ -54,55 +54,38 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         public static void EnableMenu()
         {
-            if (instance.menu == null)
+            if (Instance.menu == null)
             {
-                instance.Instantiate(imageSourceMenuPrefab);
+                Instance.Instantiate(imageSourceMenuPrefab);
 
                 /// Initialize the button for loading the image from local disk.
-                ButtonManagerBasic local = GameFinder.FindChild(instance.menu, "Local")
+                ButtonManagerBasic local = GameFinder.FindChild(Instance.menu, "Local")
                     .GetComponent<ButtonManagerBasic>();
                 local.clickEvent.AddListener(() =>
                 {
                     gotSource = true;
                     chosenSource = Source.Local;
-                    DisableMenu();
+                    Instance.Disable();
                 });
 
                 /// Initialize the button for loading the image from the web.
-                ButtonManagerBasic web = GameFinder.FindChild(instance.menu, "Web")
+                ButtonManagerBasic web = GameFinder.FindChild(Instance.menu, "Web")
                     .GetComponent<ButtonManagerBasic>();
                 web.clickEvent.AddListener(() =>
                 {
                     gotSource = true;
                     chosenSource = Source.Web;
-                    DisableMenu();
+                    Instance.Disable();
                 });
 
                 /// Initialize the button for canceling the menu.
-                ButtonManagerBasic cancelBtn = GameFinder.FindChild(instance.menu, "Cancel")
+                ButtonManagerBasic cancelBtn = GameFinder.FindChild(Instance.menu, "Cancel")
                     .GetComponent<ButtonManagerBasic>();
                 cancelBtn.clickEvent.AddListener(() =>
                 {
-                    DisableMenu();
+                    Instance.Disable();
                 });
             }
-        }
-
-        /// <summary>
-        /// Destroys the menu.
-        /// </summary>
-        public static void DisableMenu()
-        {
-            instance.Destroy();
-        }
-
-        /// <summary>
-        /// Gets the state, if the menu is opened.
-        /// </summary>
-        /// <returns>The respective status of whether the menu is open.</returns>
-        public static bool IsMenuOpen()
-        {
-            return instance.IsOpen();
         }
 
         /// <summary>
@@ -117,7 +100,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 source = chosenSource;
                 gotSource = false;
-                DisableMenu();
+                Instance.Disable();
                 return true;
             }
 
