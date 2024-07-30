@@ -292,7 +292,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
         {
             DrawableConfig config = DrawableConfigManager.GetDrawableConfig(surface);
             GameObject item;
-            if (string.IsNullOrEmpty(config.Description.Trim()))
+            if (string.IsNullOrEmpty(config.Description) || string.IsNullOrWhiteSpace(config.Description))
             {
                 item = PrefabInstantiator.InstantiatePrefab(dmwdItemPrefab, items, false);
             }
