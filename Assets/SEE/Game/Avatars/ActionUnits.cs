@@ -640,7 +640,17 @@ namespace SEE.Game.Avatars
         /// </summary>
         void Start()
         {
-            SkinnedMeshRenderer = gameObject.GetComponent<SkinnedMeshRenderer>();
+            SkinnedMeshRenderer skinnedMeshRenderer = gameObject.transform.Find("CC_Base_Body").gameObject.GetComponent<SkinnedMeshRenderer>();
+
+            if (skinnedMeshRenderer != null)
+            {
+                SkinnedMeshRenderer = skinnedMeshRenderer;
+            }
+            else
+            {
+                gameObject.GetComponent<ActionUnits>().enabled = false;
+                Debug.LogError("SkinnedMeshRenderer is null.");
+            }
         }
 
         /// <summary>

@@ -348,6 +348,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 2583431579975501224}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b93f96cf429b12342ac1893df03cdecb,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5907350534295900748}
   m_SourcePrefab: {fileID: 100100000, guid: b93f96cf429b12342ac1893df03cdecb, type: 3}
 --- !u!4 &1242937920193830085 stripped
 Transform:
@@ -669,7 +673,7 @@ MonoBehaviour:
   randomHoldDurationMax: 0.5
   configReady: 0
   warnOnNullRefs: 1
-  inspSalsaLinked: 0
+  inspSalsaLinked: 1
   inspStateFoldoutProcessing: 1
   inspStateFoldoutSettings: 1
   inspStateFoldoutEmotes: 1
@@ -1423,6 +1427,155 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f3d5458c95163a43a7386ad84032fc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5907350534295900748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1906181387538679423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d42a300b2e9df042b94802cda9b85cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ActionUnitList: 0
+  AU_01: 0
+  AU_02: 0
+  AU_03: 0
+  AU_04: 0
+  AU_05: 0
+  AU_06: 0
+  AU_07: 0
+  AU_08: 0
+  AU_09: 0
+  AU_10: 0
+  AU_11: 0
+  AU_12: 0
+  AU_13: 0
+  AU_14: 0
+  AU_15: 0
+  AU_16: 0
+  AU_17: 0
+  AU_18: 0
+  AU_19: 0
+  AU_20: 0
+  AU_21: 0
+  AU_22: 0
+  AU_23: 0
+  AU_24: 0
+  AU_25: 0
+  AU_26: 0
+  AU_27: 0
+  AU_28: 0
+  AU_29: 0
+  AU_30: 0
+  AU_31: 0
+  AU_32: 0
+  AU_33: 0
+  AU_34: 0
+  AU_35: 0
+  AU_36: 0
+  AU_37: 0
+  AU_38: 0
+  AU_39: 0
+  AU_43: 0
+  AU_45: 0
+  AU_46: 0
+  Brow_Raise_Inner_L_Value: 0
+  Brow_Raise_Inner_R_Value: 0
+  Brow_Raise_Outer_R_Value: 0
+  Brow_Raise_Outer_L_Value: 0
+  Brow_Drop_L_Value: 0
+  Brow_Drop_R_Value: 0
+  Brow_Compress_L_Value: 0
+  Brow_Compress_R_Value: 0
+  Cheek_Raise_L_Value: 0
+  Cheek_Raise_R_Value: 0
+  Cheek_Puff_L_Value: 0
+  Cheek_Puff_R_Value: 0
+  Cheek_Suck_L_Value: 0
+  Cheek_Suck_R_Value: 0
+  Mouth_Up_Value: 0
+  Mouth_Smile_L_Value: 0
+  Mouth_Smile_R_Value: 0
+  Mouth_Chin_Up_Value: 0
+  Mouth_Stretch_L_Value: 0
+  Mouth_Stretch_R_Value: 0
+  Mouth_Press_L_Value: 0
+  Mouth_Press_R_Value: 0
+  Mouth_Close_Value: 0
+  Mouth_Contract_Value: 0
+  Mouth_Up_Upper_L_Value: 0
+  Mouth_Up_Upper_R_Value: 0
+  Mouth_Smile_Sharp_L_Value: 0
+  Mouth_Smile_Sharp_R_Value: 0
+  Mouth_Dimple_L_Value: 0
+  Mouth_Dimple_R_Value: 0
+  Mouth_Frown_L_Value: 0
+  Mouth_Frown_R_Value: 0
+  Mouth_Down_Lower_L_Value: 0
+  Mouth_Down_Lower_R_Value: 0
+  Mouth_Pucker_Up_L_Value: 0
+  Mouth_Pucker_Up_R_Value: 0
+  Mouth_Pucker_Down_L_Value: 0
+  Mouth_Pucker_Down_R_Value: 0
+  Mouth_Funnel_Up_L_Value: 0
+  Mouth_Funnel_Up_R_Value: 0
+  Mouth_Funnel_Down_L_Value: 0
+  Mouth_Funnel_Down_R_Value: 0
+  Mouth_Tighten_L_Value: 0
+  Mouth_Tighten_R_Value: 0
+  Mouth_Shrug_Upper_Value: 0
+  Mouth_Shrug_Lower_Value: 0
+  Mouth_Roll_In_Upper_L_Value: 0
+  Mouth_Roll_In_Upper_R_Value: 0
+  Mouth_Roll_In_Lower_L_Value: 0
+  Mouth_Roll_In_Lower_R_Value: 0
+  Mouth_Blow_L_Value: 0
+  Mouth_Blow_R_Value: 0
+  Mouth_Up_Lower_R_Value: 0
+  Mouth_Roll_Out_Upper_L_Value: 0
+  Mouth_Roll_Out_Upper_R_Value: 0
+  Mouth_Roll_Out_Lower_L_Value: 0
+  Mouth_Roll_Out_Lower_R_Value: 0
+  Mouth_Push_Upper_L_Value: 0
+  Mouth_Push_Upper_R_Value: 0
+  Mouth_Push_Lower_L_Value: 0
+  Mouth_Push_Lower_R_Value: 0
+  Mouth_Lower_L_Value: 0
+  Mouth_Lower_R_Value: 0
+  Nose_Sneer_L_Value: 0
+  Nose_Sneer_R_Value: 0
+  Nose_Crease_L_Value: 0
+  Nose_Crease_R_Value: 0
+  Nose_Nostril_Dilate_L_Value: 0
+  Nose_Nostril_Dilate_R_Value: 0
+  Nose_Nostril_In_L_Value: 0
+  Nose_Nostril_In_R_Value: 0
+  Nose_Raise_L_Value: 0
+  Nose_Raise_R_Value: 0
+  Nose_Tip_Up_Value: 0
+  Eye_Wide_L_Value: 0
+  Eye_Wide_R_Value: 0
+  Eye_Squint_L_Value: 0
+  Eye_Squint_R_Value: 0
+  Eye_Blink_L_Value: 0
+  Eye_Blink_R_Value: 0
+  Jaw_Open_Value: 0
+  Jaw_Down_Value: 0
+  Jaw_Forward_Value: 0
+  Jaw_L_Value: 0
+  Jaw_Up_Value: 0
+  Tongue_Out_Value: 0
+  Tongue_Up_Value: 0
+  Tongue_Tip_Down_Value: 0
+  Tongue_Narrow_Value: 0
+  Tongue_Wide_Value: 0
+  Tongue_R_Value: 0
+  Tongue_Bulge_L_Value: 0
+  Neck_Tighten_L_Value: 0
+  Neck_Tighten_R_Value: 0
 --- !u!95 &5179106205997057727 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: b93f96cf429b12342ac1893df03cdecb,
