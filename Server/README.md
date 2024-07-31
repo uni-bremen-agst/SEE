@@ -137,3 +137,34 @@ podman-compose down
 You can edit the compose file to configure many options.
 
 Read the backend README for security considerations and change `JWT_SECRET` to a unique random secret.
+
+
+--------------------------------------------------------------------------------
+## Usage
+
+Using the Frontend, you can create and manage servers on the Backend.
+
+When creating a new server, you can attach several Code City archives that are uploaded to the backend.
+Each Code City type has a dedicated table in the virtual world.
+Clients will automatically download the archives from the backend when connecting to the server instance and try to instantiate them on the appropriate table.
+
+
+### Prepare Code Cities
+
+The Code Cities are stored in the `Assets/StreamingAssets/Multiplayer/` directory.
+
+Prepare your Code Cities depending on their type in the respective subdirectories:
+
+- `SEECity`
+- `DiffCity`
+- `SEECityEvolution`
+- `SEEJlgCity`
+- `SEEReflexionCity`
+
+This is necessary so that all relative paths are correctly referenced.
+
+Each of the Code Cities should contain a valid configuration file (`.cfg`),
+which is automatically loaded by the SEE clients after connecting to the server and downloading the files from the backend.
+
+Each of the above Code City directories should be individually zipped.
+You can either zip the directories' contents or the folder itself.
