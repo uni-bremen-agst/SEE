@@ -115,7 +115,7 @@ namespace SEE.UI.Menu.Drawable
         private static SwitchManager fillOutManager;
 
         /// <summary>
-        /// 
+        /// The modes in which the menu can be opened.
         /// </summary>
         private enum Mode
         {
@@ -124,6 +124,9 @@ namespace SEE.UI.Menu.Drawable
             Edit
         }
 
+        /// <summary>
+        /// The current mode.
+        /// </summary>
         private static Mode mode;
         #endregion
 
