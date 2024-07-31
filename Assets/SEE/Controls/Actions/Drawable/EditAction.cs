@@ -191,7 +191,7 @@ namespace SEE.Controls.Actions.Drawable
             TextMenu.Disable();
             LineMenu.Instance.Disable();
             ImageMenu.Instance.Destroy();
-            MindMapEditMenu.Disable();
+            MindMapEditMenu.Instance.Destroy();
         }
 
         /// <summary>
@@ -245,7 +245,7 @@ namespace SEE.Controls.Actions.Drawable
                 TextMenu.Disable();
                 LineMenu.Instance.Disable();
                 ImageMenu.Instance.Destroy();
-                MindMapEditMenu.Disable();
+                MindMapEditMenu.Instance.Destroy();
             }
         }
 
@@ -302,7 +302,7 @@ namespace SEE.Controls.Actions.Drawable
                     }
                     break;
                 case Tags.MindMapNode:
-                    if (!MindMapEditMenu.IsOpen())
+                    if (!MindMapEditMenu.Instance.IsOpen())
                     {
                         MindMapEditMenu.Enable(selectedObj, newValueHolder);
                     }
@@ -356,7 +356,7 @@ namespace SEE.Controls.Actions.Drawable
                 LineMenu.Instance.Disable();
                 TextMenu.Disable();
                 ImageMenu.Instance.Destroy();
-                MindMapEditMenu.Disable();
+                MindMapEditMenu.Instance.Destroy();
                 return false;
             }
         }

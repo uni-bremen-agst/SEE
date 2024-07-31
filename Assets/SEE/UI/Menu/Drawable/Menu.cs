@@ -62,7 +62,7 @@ namespace SEE.UI.Menu.Drawable
         /// Destroys the menu. Unlike <see cref="Disable"/>, the menu cannot
         /// be re-enabled afterward.
         /// </summary>
-        public void Destroy()
+        public virtual void Destroy()
         {
             if (menu != null)
             {
