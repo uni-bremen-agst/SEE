@@ -11,7 +11,7 @@ namespace SEE.UI.Menu.Drawable
     /// <summary>
     /// Provides the move menus for the sticky notes.
     /// </summary>
-    public class StickyNoteMoveMenu
+    public class StickyNoteMoveMenu : SingletonMenu
     {
         /// <summary>
         /// The prefab of the sticky note move menu.
@@ -19,25 +19,24 @@ namespace SEE.UI.Menu.Drawable
         private const string moveMenuPrefab = "Prefabs/UI/Drawable/StickyNoteMove";
 
         /// <summary>
-        /// The instance for the sticky note move menu.
+        /// We do not want to create an instance of this singleton class outside of this class.
         /// </summary>
-        private static GameObject moveMenu;
+        private StickyNoteMoveMenu() { }
+
+        /// <summary>
+        /// The only instance of this singleton class.
+        /// </summary>
+        public static StickyNoteMoveMenu Instance { get; private set; }
+
+        static StickyNoteMoveMenu()
+        {
+            Instance = new StickyNoteMoveMenu();
+        }
 
         /// <summary>
         /// Whether this class has a finished rotation in store that wasn't yet fetched.
         /// </summary>
         private static bool isFinish;
-
-        /// <summary>
-        /// Method to disable the move menu
-        /// </summary>
-        public static void Disable()
-        {
-            if (moveMenu != null)
-            {
-                Destroyer.Destroy(moveMenu);
-            }
-        }
 
         /// <summary>
         /// Create and enables the sticky note move menu.
@@ -46,13 +45,12 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="stickyNoteHolder">The sticky note holder that should be moved.</param>
         public static void Enable(GameObject stickyNoteHolder, bool spawnMode = false)
         {
-            moveMenu = PrefabInstantiator.InstantiatePrefab(moveMenuPrefab,
-                                                            UICanvas.Canvas.transform, false);
+            Instance.Instantiate(moveMenuPrefab);
             GameObject surface = GameFinder.GetDrawableSurface(stickyNoteHolder);
             string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
             /// Register the switch for speed up option.
-            SwitchManager speedUpManager = GameFinder.FindChild(moveMenu, "SpeedSwitch")
+            SwitchManager speedUpManager = GameFinder.FindChild(Instance.menu, "SpeedSwitch")
                 .GetComponent<SwitchManager>();
             float speed = ValueHolder.Move;
             /// Turn on increase the speed to <see cref="ValueHolder.MoveFast"/>.
@@ -61,10 +59,10 @@ namespace SEE.UI.Menu.Drawable
             speedUpManager.OffEvents.AddListener(() => speed = ValueHolder.Move);
 
             /// Register the finish button. It destroys the move menu and set the finish attribut.
-            GameFinder.FindChild(moveMenu, "Finish").GetComponent<ButtonManagerBasic>()
+            GameFinder.FindChild(Instance.menu, "Finish").GetComponent<ButtonManagerBasic>()
                 .clickEvent.AddListener(() =>
             {
-                Destroyer.Destroy(moveMenu);
+                Destroyer.Destroy(Instance.menu);
                 isFinish = true;
             });
 
@@ -74,7 +72,7 @@ namespace SEE.UI.Menu.Drawable
             /// the speed switching would no longer work.
             /// Therefore, they are grouped together in a region.
             #region Movement buttons
-            GameFinder.FindChild(moveMenu, "Left").AddComponent<ButtonHeld>().SetAction(() =>
+            GameFinder.FindChild(Instance.menu, "Left").AddComponent<ButtonHeld>().SetAction(() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Left, speed);
                 if (!spawnMode)
@@ -84,7 +82,7 @@ namespace SEE.UI.Menu.Drawable
                 }
             }, true);
 
-            GameFinder.FindChild(moveMenu, "Right").AddComponent<ButtonHeld>().SetAction(() =>
+            GameFinder.FindChild(Instance.menu, "Right").AddComponent<ButtonHeld>().SetAction(() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Right, speed);
                 if (!spawnMode)
@@ -94,7 +92,7 @@ namespace SEE.UI.Menu.Drawable
                 }
             }, true);
 
-            GameFinder.FindChild(moveMenu, "Up").AddComponent<ButtonHeld>().SetAction(() =>
+            GameFinder.FindChild(Instance.menu, "Up").AddComponent<ButtonHeld>().SetAction(() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Up, speed);
                 if (!spawnMode)
@@ -104,7 +102,7 @@ namespace SEE.UI.Menu.Drawable
                 }
             }, true);
 
-            GameFinder.FindChild(moveMenu, "Down").AddComponent<ButtonHeld>().SetAction(() =>
+            GameFinder.FindChild(Instance.menu, "Down").AddComponent<ButtonHeld>().SetAction(() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Down, speed);
                 if (!spawnMode)
@@ -114,7 +112,7 @@ namespace SEE.UI.Menu.Drawable
                 }
             }, true);
 
-            GameFinder.FindChild(moveMenu, "Forward").AddComponent<ButtonHeld>().SetAction(() =>
+            GameFinder.FindChild(Instance.menu, "Forward").AddComponent<ButtonHeld>().SetAction(() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Forward, speed);
                 if (!spawnMode)
@@ -124,7 +122,7 @@ namespace SEE.UI.Menu.Drawable
                 }
             }, true);
 
-            GameFinder.FindChild(moveMenu, "Back").AddComponent<ButtonHeld>().SetAction(() =>
+            GameFinder.FindChild(Instance.menu, "Back").AddComponent<ButtonHeld>().SetAction(() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Back, speed);
                 if (!spawnMode)
@@ -136,7 +134,7 @@ namespace SEE.UI.Menu.Drawable
             #endregion
 
             /// Register an information button for explaining the individual movement buttons.
-            GameFinder.FindChild(moveMenu, "Info").GetComponent<ButtonManagerBasic>()
+            GameFinder.FindChild(Instance.menu, "Info").GetComponent<ButtonManagerBasic>()
                 .clickEvent.AddListener(() =>
             {
                 ShowNotification.Info("Movement Buttons",
@@ -173,17 +171,8 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>The selected move speed</returns>
         public static float GetSpeed()
         {
-            return GameFinder.FindChild(moveMenu, "SpeedSwitch")
+            return GameFinder.FindChild(Instance.menu, "SpeedSwitch")
                 .GetComponent<SwitchManager>().isOn ? ValueHolder.MoveFast : ValueHolder.Move;
-        }
-
-        /// <summary>
-        /// Gets the is active state of the menu.
-        /// </summary>
-        /// <returns>true, if the menu is not null.</returns>
-        public static bool IsActive()
-        {
-            return moveMenu != null;
         }
     }
 }

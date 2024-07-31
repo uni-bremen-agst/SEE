@@ -127,7 +127,7 @@ namespace SEE.Controls.Actions.Drawable
             StickyNoteMenu.Instance.Destroy();
             StickyNoteRotationMenu.Disable();
             StickyNoteEditMenu.Instance.Destroy();
-            StickyNoteMoveMenu.Disable();
+            StickyNoteMoveMenu.Instance.Destroy();
             ScaleMenu.Instance.Destroy();
             stickyNote?.Destroy<HighlightEffect>();
 
@@ -217,7 +217,7 @@ namespace SEE.Controls.Actions.Drawable
                 ShowNotification.Info("Canceled", "The action was canceled by the user.");
                 StickyNoteRotationMenu.Disable();
                 StickyNoteEditMenu.Instance.Destroy();
-                StickyNoteMoveMenu.Disable();
+                StickyNoteMoveMenu.Instance.Destroy();
                 ScaleMenu.Instance.Destroy();
                 stickyNote?.Destroy<HighlightEffect>();
 
@@ -339,7 +339,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 finish = isFinished;
             }
-            else if (stickyNote != null && StickyNoteMoveMenu.IsActive())
+            else if (stickyNote != null && StickyNoteMoveMenu.Instance.IsOpen())
             {
                 MoveByKey(stickyNote, spawnMode);
             }
@@ -387,7 +387,7 @@ namespace SEE.Controls.Actions.Drawable
             /// And save the position and rotation in memento, because they could be changed with the menu's.
             if (finish)
             {
-                StickyNoteMoveMenu.Disable();
+                StickyNoteMoveMenu.Instance.Destroy();
                 StickyNoteRotationMenu.Disable();
                 memento.ChangedConfig.Position = stickyNoteHolder.transform.position;
                 memento.ChangedConfig.Rotation = stickyNoteHolder.transform.eulerAngles;
