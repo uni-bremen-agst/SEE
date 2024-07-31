@@ -141,7 +141,8 @@ namespace SEE.Game.Drawable
         {
             GameObject obj = gameObject;
 
-            if (renderer == null && obj.GetComponent<Renderer>() != null)
+            if (renderer == null && obj.GetComponent<Renderer>() != null
+                && obj.GetComponentsInChildren<Renderer>().Length == 1)
             {
                 /// Sets the renderer if available.
                 renderer = obj.GetComponent<Renderer>();
@@ -149,8 +150,6 @@ namespace SEE.Game.Drawable
             else if (obj.GetComponentsInChildren<Renderer>().Length > 0)
             {
                 /// Sets the renderers if available.
-                /// Only for mind map nodes, it takes the border (line render)
-                /// and the text (mesh renderer)
                 renderers = obj.GetComponentsInChildren<Renderer>();
             }
             else if (obj.GetComponent<Canvas>() != null)

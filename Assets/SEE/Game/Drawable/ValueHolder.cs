@@ -55,7 +55,7 @@ namespace SEE.Game.Drawable
         public static int MaxOrderInLayer { get; set; }
         #endregion
 
-        #region prefixes
+        #region prefixes and names
         /// <summary>
         /// The prefix of a line object name.
         /// </summary>
@@ -105,6 +105,11 @@ namespace SEE.Game.Drawable
         /// The name of the attached objects object.
         /// </summary>
         public const string AttachedObject = "AttachedObjects";
+
+        /// <summary>
+        /// The name of the fill out game object for the lines.
+        /// </summary>
+        public const string FillOut = "FillOut";
         #endregion
 
         /// <summary>

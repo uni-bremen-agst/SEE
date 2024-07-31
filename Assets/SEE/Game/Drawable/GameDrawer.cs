@@ -814,5 +814,62 @@ namespace SEE.Game.Drawable
             Destroyer.Destroy(line);
             return convertedPosition;
         }
+
+        /// <summary>
+        /// Fills out a line object.
+        /// Be careful, this is intended for shapes and lines with an activated loop function.
+        /// It also works for freehand drawing, but the result may differ from what is expected.
+        /// </summary>
+        /// <param name="objToFill">The object that is to be filled out.</param>
+        /// <param name="color">The fill out color.</param>
+        public static void FillOut(GameObject objToFill, Color? color = null)
+        {
+            if (objToFill.CompareTag(Tags.Line))
+            {
+                GameObject fillout = new(ValueHolder.FillOut);
+                GameObject holder = GameFinder.HasParent(objToFill)
+                    && Tags.DrawableTypes.Contains(objToFill.transform.parent.tag) ?
+                        objToFill.transform.parent.gameObject : objToFill;
+
+                fillout.transform.SetParent(holder.transform);
+                fillout.transform.rotation = objToFill.transform.rotation;
+                Vector3 pos = objToFill.transform.position;
+                /// To avoid an overlapping issue, position the fill slightly behind the line.
+                fillout.transform.position = new Vector3(pos.x, pos.y, pos.z + 0.00001f);
+                MeshFilter meshFilter = fillout.AddComponent<MeshFilter>();
+                MeshRenderer meshRenderer = fillout.AddComponent<MeshRenderer>();
+                MeshCollider collider = fillout.AddComponent<MeshCollider>();
+                Color fillColor = color ?? objToFill.GetColor();
+                /// Set a default material if none is assigned
+                if (meshRenderer.sharedMaterial == null)
+                {
+                    meshRenderer.sharedMaterial = GetMaterial(fillColor, LineKind.Solid);
+                }
+                Vector3[] worldPos = new Vector3[objToFill.GetComponent<LineRenderer>().positionCount];
+                objToFill.GetComponent<LineRenderer>().GetPositions(worldPos);
+                /// Creates the mesh for the fill out area.
+                int numPos = objToFill.GetComponent<LineRenderer>().positionCount;
+                Vector3[] vertices = new Vector3[numPos];
+                int[] triangles = new int[(numPos - 2) * 3];
+                for (int i = 0; i < numPos; i++)
+                {
+                    vertices[i] = worldPos[i];
+                }
+                int t = 0;
+                for (int i = 1; i < numPos - 1; i++)
+                {
+                    triangles[t] = 0;
+                    triangles[t + 1] = i;
+                    triangles[t + 2] = i + 1;
+                    t += 3;
+                }
+                Mesh mesh = new() { vertices = vertices, triangles = triangles };
+
+                mesh.RecalculateNormals();
+                mesh.RecalculateBounds();
+                meshFilter.mesh = mesh;
+                collider.sharedMesh = mesh;
+            }
+        }
     }
 }

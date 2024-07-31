@@ -100,6 +100,21 @@ namespace SEE.UI.Menu.Drawable
         private static HSVPicker.ColorPicker picker;
 
         /// <summary>
+        /// Button manager for chose color kind area.
+        /// </summary>
+        private static ButtonManagerBasic colorKindBMB;
+
+        /// <summary>
+        /// Button manager for chose fill out area.
+        /// </summary>
+        private static ButtonManagerBasic fillOutBMB;
+
+        /// <summary>
+        /// The switch manager for the fill out status.
+        /// </summary>
+        private static SwitchManager fillOutManager;
+
+        /// <summary>
         /// 
         /// </summary>
         private enum Mode
@@ -1077,7 +1092,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// 
+        /// Refreshes the horizontal selectors of this.
         /// </summary>
         public static void RefreshHorizontalSelectors()
         {
