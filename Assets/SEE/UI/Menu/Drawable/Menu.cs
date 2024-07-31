@@ -37,7 +37,7 @@ namespace SEE.UI.Menu.Drawable
         /// Returns true if the menu is open.
         /// </summary>
         /// <returns>Whether the menu is open.</returns>
-        public bool IsOpen()
+        public virtual bool IsOpen()
         {
             return menu != null;
         }
@@ -45,7 +45,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Enables the menu.
         /// </summary>
-        public void Enable()
+        public virtual void Enable()
         {
             menu.SetActive(true);
         }
@@ -53,7 +53,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Disables the menu.
         /// </summary>
-        public void Disable()
+        public virtual void Disable()
         {
             menu.SetActive(false);
         }
