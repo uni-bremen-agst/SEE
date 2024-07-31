@@ -38,10 +38,10 @@ namespace SEE.Controls.Actions.Drawable
                 if (Selector.SelectQueryHasDrawableSurface(out RaycastHit raycastHit))
                 {
                     GameObject hitObject = raycastHit.collider.gameObject;
-                    isActive = true;
 
                     if (hitObject.CompareTag(Tags.Line))
                     {
+                        isActive = true;
                         LineConf originLine = LineConf.GetLine(hitObject);
                         List<LineConf> lines = new();
                         NearestPoints.GetNearestPoints(hitObject, raycastHit.point,
