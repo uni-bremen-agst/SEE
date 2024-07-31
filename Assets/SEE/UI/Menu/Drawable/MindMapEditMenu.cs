@@ -71,7 +71,7 @@ namespace SEE.Game.UI.Menu.Drawable
                     Instance.menu.SetActive(true);
                     LineMenu.Instance.Disable();
                     TextMenu.Disable();
-                    MindMapParentSelectionMenu.Disable();
+                    MindMapParentSelectionMenu.Instance.Destroy();
                     MindMapChangeNodeKindMenu.Instance.Destroy();
                 };
 
@@ -81,7 +81,7 @@ namespace SEE.Game.UI.Menu.Drawable
                     Enable(node, conf, true);
                     LineMenu.Instance.Disable();
                     TextMenu.Disable();
-                    MindMapParentSelectionMenu.Disable();
+                    MindMapParentSelectionMenu.Instance.Destroy();
                     MindMapChangeNodeKindMenu.Instance.Destroy();
                 };
 
@@ -239,7 +239,7 @@ namespace SEE.Game.UI.Menu.Drawable
         public override void Destroy()
         {
             base.Destroy();
-            MindMapParentSelectionMenu.Disable();
+            MindMapParentSelectionMenu.Instance.Destroy();
             MindMapChangeNodeKindMenu.Instance.Destroy();
         }
     }

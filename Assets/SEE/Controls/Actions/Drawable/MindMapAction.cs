@@ -126,7 +126,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             base.Stop();
             MindMapMenu.Instance.Destroy();
-            MindMapParentSelectionMenu.Disable();
+            MindMapParentSelectionMenu.Instance.Destroy();
 
             if (progress != ProgressState.Finish && node != null)
             {
@@ -196,6 +196,7 @@ namespace SEE.Controls.Actions.Drawable
 
                 if (MindMapParentSelectionMenu.TryGetParent(out GameObject parent))
                 {
+                    MindMapParentSelectionMenu.Instance.Destroy();
                     Destroyer.Destroy(branchLine);
                     branchLine = GameMindMap.CreateBranchLine(node, parent);
                     progress = ProgressState.Finish;
@@ -373,7 +374,7 @@ namespace SEE.Controls.Actions.Drawable
             if (SEEInput.Cancel())
             {
                 ShowNotification.Info("Canceled", "The action was canceled by the user.");
-                MindMapParentSelectionMenu.Disable();
+                MindMapParentSelectionMenu.Instance.Destroy();
 
                 if (progress != ProgressState.Finish && node != null)
                 {

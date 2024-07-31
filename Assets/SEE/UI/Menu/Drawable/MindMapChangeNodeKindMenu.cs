@@ -111,7 +111,7 @@ namespace SEE.UI.Menu.Drawable
                     if (newNodeKind != GameMindMap.NodeKind.Theme
                         && addedNode.GetComponent<MMNodeValueHolder>().GetParent() == null)
                     {
-                        MindMapParentSelectionMenu.Disable();
+                        MindMapParentSelectionMenu.Instance.Destroy();
                         GameObject pMenu = MindMapParentSelectionMenu.EnableForEditing(
                             GameFinder.GetAttachedObjectsObject(surface), addedNode, newConf, null);
                         GameFinder.FindChild(pMenu, "Dragger").GetComponent<WindowDragger>().enabled = false;
@@ -129,13 +129,13 @@ namespace SEE.UI.Menu.Drawable
                     }
                     else
                     {
-                        MindMapParentSelectionMenu.Disable();
+                        MindMapParentSelectionMenu.Instance.Destroy();
 
                     }
                 }
                 else
                 {
-                    ShowNotification.Warn("Can't transform", "The new chosen node kind can't apply to this node.");
+                    ShowNotification.Warn("Cannot transform", "The newly chosen node kind cannot be applied to this node.");
                 }
 
             });

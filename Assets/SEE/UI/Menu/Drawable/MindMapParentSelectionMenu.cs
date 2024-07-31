@@ -5,7 +5,6 @@ using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
-using SEE.Utils;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -16,7 +15,7 @@ namespace SEE.UI.Menu.Drawable
     /// <summary>
     /// This class provides the parent selection menu for the mind map.
     /// </summary>
-    public static class MindMapParentSelectionMenu
+    public class MindMapParentSelectionMenu : SingletonMenu
     {
         /// <summary>
         /// The location where the menu prefeb is placed.
@@ -24,12 +23,22 @@ namespace SEE.UI.Menu.Drawable
         private const string parentSelectionMenuPrefab = "Prefabs/UI/Drawable/MMSelectParent";
 
         /// <summary>
-        /// The instance for the menu.
+        /// We do not want to create an instance of this singleton class outside of this class.
         /// </summary>
-        private static GameObject instance;
+        private MindMapParentSelectionMenu() { }
 
         /// <summary>
-        /// Whether this class has an operation in store that wasn't yet fetched.
+        /// The only instance of this singleton class.
+        /// </summary>
+        public static MindMapParentSelectionMenu Instance { get; private set; }
+
+        static MindMapParentSelectionMenu()
+        {
+            Instance = new MindMapParentSelectionMenu();
+        }
+
+        /// <summary>
+        /// Whether this class has an operation in store that hasn't been fetched yet.
         /// </summary>
         private static bool gotSelection;
 
@@ -46,15 +55,13 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="addedNode">The node for that a parent should be chosen.</param>
         public static void Enable(GameObject attachedObjects, GameObject addedNode)
         {
-            /// Instantiate the menu.
-            instance = PrefabInstantiator.InstantiatePrefab(parentSelectionMenuPrefab,
-                                                            UICanvas.Canvas.transform, false);
+            Instance.Instantiate(parentSelectionMenuPrefab);
 
             /// Disable the return button.
-            GameFinder.FindChild(instance, "ReturnBtn").SetActive(false);
+            GameFinder.FindChild(Instance.menu, "ReturnBtn").SetActive(false);
 
             /// Initialize the parent selector.
-            HorizontalSelector parentSelector = GameFinder.FindChild(instance, "ParentSelection")
+            HorizontalSelector parentSelector = GameFinder.FindChild(Instance.menu, "ParentSelection")
                 .GetComponent<HorizontalSelector>();
 
             /// Gets all Mind Map Nodes of the given attached object - object.
@@ -91,7 +98,7 @@ namespace SEE.UI.Menu.Drawable
             parentSelector.defaultIndex = 0;
 
             /// The parent selection can be completed through the Finish button.
-            ButtonManagerBasic finish = GameFinder.FindChild(instance, "Finish").GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic finish = GameFinder.FindChild(Instance.menu, "Finish").GetComponent<ButtonManagerBasic>();
             finish.clickEvent.AddListener(() =>
             {
                 gotSelection = true;
@@ -119,24 +126,22 @@ namespace SEE.UI.Menu.Drawable
         {
             if (valueHolder is MindMapNodeConf newConf)
             {
-                /// Instantiate the menu.
-                instance = PrefabInstantiator.InstantiatePrefab(parentSelectionMenuPrefab,
-                                                                UICanvas.Canvas.transform, false);
+                Instance.Instantiate(parentSelectionMenuPrefab);
 
                 if (returnCall != null)
                 {
                     /// Adds the return call back to the return button.
-                    GameFinder.FindChild(instance, "ReturnBtn").GetComponent<ButtonManagerBasic>()
+                    GameFinder.FindChild(Instance.menu, "ReturnBtn").GetComponent<ButtonManagerBasic>()
                         .clickEvent.AddListener(returnCall);
                 }
                 else
                 {
                     /// Disables the return button.
-                    GameFinder.FindChild(instance, "ReturnBtn").SetActive(false);
+                    GameFinder.FindChild(Instance.menu, "ReturnBtn").SetActive(false);
                 }
 
                 /// Initalize the parent selector.
-                HorizontalSelector parentSelector = GameFinder.FindChild(instance, "ParentSelection")
+                HorizontalSelector parentSelector = GameFinder.FindChild(Instance.menu, "ParentSelection")
                     .GetComponent<HorizontalSelector>();
 
                 /// Gets all Mind Map Nodes of the given attached object - object.
@@ -163,15 +168,15 @@ namespace SEE.UI.Menu.Drawable
                 {
                     ShowNotification.Warn("Unauthorized action", "A theme can't have a parent.");
                     returnCall.Invoke();
-                    Disable();
+                    Instance.Destroy();
                     return null;
                 }
 
                 /// If no suitable parents are found, close the menu with an appropriate warning.
                 if (nodes.Count == 0)
                 {
-                    ShowNotification.Warn("Add a Theme", "You need a theme for the mind map, first add one");
-                    Disable();
+                    ShowNotification.Warn("Add a Theme", "You need a theme for the mind map. First add one");
+                    Instance.Destroy();
                     return null;
                 }
 
@@ -209,23 +214,23 @@ namespace SEE.UI.Menu.Drawable
                 /// Disable it for all others.
                 if (!cutCopyMode)
                 {
-                    GameObject finish = GameFinder.FindChild(instance, "Finish");
+                    GameObject finish = GameFinder.FindChild(Instance.menu, "Finish");
                     finish.SetActive(false);
                 }
                 else
                 {
-                    ButtonManagerBasic finish = GameFinder.FindChild(instance, "Finish").GetComponent<ButtonManagerBasic>();
+                    ButtonManagerBasic finish = GameFinder.FindChild(Instance.menu, "Finish").GetComponent<ButtonManagerBasic>();
                     finish.clickEvent.AddListener(() =>
                     {
                         gotSelection = true;
                     });
                 }
             }
-            return instance;
+            return Instance.menu;
         }
 
         /// <summary>
-        /// Method that provides the change parent call.
+        /// Returns the change parent call.
         /// </summary>
         /// <param name="addedNode">The selected node.</param>
         /// <param name="newConf">The configuration that holds the changes.</param>
@@ -236,17 +241,6 @@ namespace SEE.UI.Menu.Drawable
             newConf.ParentNode = chosenObject.name;
             new MindMapChangeParentNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
                 newConf).Execute();
-        }
-
-        /// <summary>
-        /// Destroy's the menu.
-        /// </summary>
-        public static void Disable()
-        {
-            if (instance != null)
-            {
-                Destroyer.Destroy(instance);
-            }
         }
 
         /// <summary>
@@ -270,21 +264,11 @@ namespace SEE.UI.Menu.Drawable
             {
                 parent = chosenObject;
                 gotSelection = false;
-                Disable();
                 return true;
             }
 
             parent = null;
             return false;
-        }
-
-        /// <summary>
-        /// Check if the instance is still active.
-        /// </summary>
-        /// <returns>true, if the instance is still active.</returns>
-        public static bool IsActive()
-        {
-            return instance != null;
         }
     }
 }
