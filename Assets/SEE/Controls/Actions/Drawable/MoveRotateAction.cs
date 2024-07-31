@@ -194,7 +194,7 @@ namespace SEE.Controls.Actions.Drawable
                 }
             }
             RotationMenu.Disable();
-            MoveMenu.Disable();
+            MoveMenu.Instance.Destroy();
             if (switchMenu != null)
             {
                 Destroyer.Destroy(switchMenu);
@@ -270,7 +270,7 @@ namespace SEE.Controls.Actions.Drawable
                     }
                 }
                 RotationMenu.Disable();
-                MoveMenu.Disable();
+                MoveMenu.Instance.Destroy();
                 if (switchMenu != null)
                 {
                     Destroyer.Destroy(switchMenu);
@@ -654,7 +654,7 @@ namespace SEE.Controls.Actions.Drawable
                     new RbAndCCDestroyerNetAction(memento.Surface.ID, memento.Surface.ParentID,
                         memento.SelectedObject.name).Execute();
                     RotationMenu.Disable();
-                    MoveMenu.Disable();
+                    MoveMenu.Instance.Destroy();
                     CurrentState = IReversibleAction.Progress.Completed;
                     return true;
                 } else
@@ -678,7 +678,7 @@ namespace SEE.Controls.Actions.Drawable
                     selectedObject.name).Execute();
                 selectedObject = null;
                 RotationMenu.Disable();
-                MoveMenu.Disable();
+                MoveMenu.Instance.Destroy();
                 progressState = ProgressState.SelectObject;
             }
             return false;

@@ -1,9 +1,7 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.Game.Drawable.Configurations;
 using SEE.Net.Actions.Drawable;
-using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.UI.Drawable;
@@ -14,16 +12,27 @@ namespace SEE.UI.Menu.Drawable
     /// <summary>
     /// This class provides the move menu for drawable type objects.
     /// </summary>
-    public static class MoveMenu
+    public class MoveMenu : SingletonMenu
     {
         /// <summary>
         /// The prefab of the rotation menu.
         /// </summary>
         private const string moveMenuPrefab = "Prefabs/UI/Drawable/Move";
+
         /// <summary>
-        /// The instance of the move menu.
+        /// We do not want to create an instance of this singleton class outside of this class.
         /// </summary>
-        private static GameObject instance;
+        private MoveMenu() { }
+
+        /// <summary>
+        /// The only instance of this singleton class.
+        /// </summary>
+        public static MoveMenu Instance { get; private set; }
+
+        static MoveMenu()
+        {
+            Instance = new MoveMenu();
+        }
 
         /// <summary>
         /// The instance for the switch manager of the speed up option.
@@ -46,15 +55,14 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="selectedObject">the chosen drawable type object to move</param>
         public static void Enable(GameObject selectedObject)
         {
-            if (instance == null)
+            if (Instance.menu == null)
             {
                 /// Instantiate the menu.
-                instance = PrefabInstantiator.InstantiatePrefab(moveMenuPrefab,
-                                                                UICanvas.Canvas.transform, false);
+                Instance.Instantiate(moveMenuPrefab);
 
                 /// Initialize the switches for speed and move by mouse.
-                speedUpManager = GameFinder.FindChild(instance, "SpeedSwitch").GetComponent<SwitchManager>();
-                moveByMouseManager = GameFinder.FindChild(instance, "MoveSwitch").GetComponent<SwitchManager>();
+                speedUpManager = GameFinder.FindChild(Instance.menu, "SpeedSwitch").GetComponent<SwitchManager>();
+                moveByMouseManager = GameFinder.FindChild(Instance.menu, "MoveSwitch").GetComponent<SwitchManager>();
 
                 /// The new position for the object.
                 Vector3 newObjectPosition;
@@ -65,7 +73,7 @@ namespace SEE.UI.Menu.Drawable
 
                 /// Initialize the button for left moving.
                 /// Enables the functionality to hold down the left mouse button.
-                GameFinder.FindChild(instance, "Left").AddComponent<ButtonHeld>().SetAction(() =>
+                GameFinder.FindChild(Instance.menu, "Left").AddComponent<ButtonHeld>().SetAction(() =>
                 {
                     moveByMouseManager.isOn = false;
                     moveByMouseManager.UpdateUI();
@@ -77,7 +85,7 @@ namespace SEE.UI.Menu.Drawable
 
                 /// Initialize the button for right moving.
                 /// Enables the functionality to hold down the left mouse button.
-                GameFinder.FindChild(instance, "Right").AddComponent<ButtonHeld>().SetAction(() =>
+                GameFinder.FindChild(Instance.menu, "Right").AddComponent<ButtonHeld>().SetAction(() =>
                 {
                     moveByMouseManager.isOn = false;
                     moveByMouseManager.UpdateUI();
@@ -89,7 +97,7 @@ namespace SEE.UI.Menu.Drawable
 
                 /// Initialize the button for up moving.
                 /// Enables the functionality to hold down the left mouse button.
-                GameFinder.FindChild(instance, "Up").AddComponent<ButtonHeld>().SetAction(() =>
+                GameFinder.FindChild(Instance.menu, "Up").AddComponent<ButtonHeld>().SetAction(() =>
                 {
                     moveByMouseManager.isOn = false;
                     moveByMouseManager.UpdateUI();
@@ -101,7 +109,7 @@ namespace SEE.UI.Menu.Drawable
 
                 /// Initialize the button for down moving.
                 /// Enables the functionality to hold down the left mouse button.
-                GameFinder.FindChild(instance, "Down").AddComponent<ButtonHeld>().SetAction(() =>
+                GameFinder.FindChild(Instance.menu, "Down").AddComponent<ButtonHeld>().SetAction(() =>
                 {
                     moveByMouseManager.isOn = false;
                     moveByMouseManager.UpdateUI();
@@ -145,8 +153,8 @@ namespace SEE.UI.Menu.Drawable
                 }
 
                 /// Initializes the switch to turn child inclusion on and off.
-                GameFinder.FindChild(instance, "Content").transform.Find("Children").gameObject.SetActive(true);
-                SwitchManager childrenSwitch = GameFinder.FindChild(instance, "ChildrenSwitch").GetComponent<SwitchManager>();
+                GameFinder.FindChild(Instance.menu, "Content").transform.Find("Children").gameObject.SetActive(true);
+                SwitchManager childrenSwitch = GameFinder.FindChild(Instance.menu, "ChildrenSwitch").GetComponent<SwitchManager>();
                 bool changeSwitch = false;
                 childrenSwitch.OnEvents.RemoveAllListeners();
                 childrenSwitch.OnEvents.AddListener(() =>
@@ -186,17 +194,9 @@ namespace SEE.UI.Menu.Drawable
             else
             {
                 /// Disables the include children button, if the selected object is not a <see cref="MindMapNodeConf"/>
-                GameFinder.FindChild(instance, "Content").transform.Find("Children").gameObject.SetActive(false);
+                GameFinder.FindChild(Instance.menu, "Content").transform.Find("Children").gameObject.SetActive(false);
                 includeChildren = false;
             }
-        }
-
-        /// <summary>
-        /// Destroy's the menu.
-        /// </summary>
-        public static void Disable()
-        {
-            Destroyer.Destroy(instance);
         }
 
         /// <summary>
