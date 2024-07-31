@@ -126,7 +126,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Stop();
             StickyNoteMenu.Disable();
             StickyNoteRotationMenu.Disable();
-            StickyNoteEditMenu.Disable();
+            StickyNoteEditMenu.Instance.Destroy();
             StickyNoteMoveMenu.Disable();
             ScaleMenu.Instance.Destroy();
             stickyNote?.Destroy<HighlightEffect>();
@@ -216,7 +216,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 ShowNotification.Info("Canceled", "The action was canceled by the user.");
                 StickyNoteRotationMenu.Disable();
-                StickyNoteEditMenu.Disable();
+                StickyNoteEditMenu.Instance.Destroy();
                 StickyNoteMoveMenu.Disable();
                 ScaleMenu.Instance.Destroy();
                 stickyNote?.Destroy<HighlightEffect>();
@@ -653,7 +653,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (stickyNote != null)
             {
-                StickyNoteEditMenu.Disable();
+                StickyNoteEditMenu.Instance.Destroy();
                 StickyNoteRotationMenu.Disable();
                 ScaleMenu.Instance.Destroy();
                 stickyNote.Destroy<HighlightEffect>();
