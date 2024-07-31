@@ -144,7 +144,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Stop()
         {
             base.Stop();
-            LoadMenu.Disable();
+            LoadMenu.Instance.Destroy();
             selectedSurface?.Destroy<HighlightEffect>();
         }
 

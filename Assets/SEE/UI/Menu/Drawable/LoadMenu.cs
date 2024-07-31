@@ -1,16 +1,14 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.Utils;
-using UnityEngine;
 using UnityEngine.Events;
 
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
-    /// The load menu for <see cref="DrawableType"/> objects
+    /// The load menu for <see cref="DrawableType"/> objects.
     /// </summary>
-    public static class LoadMenu
+    public class LoadMenu : SingletonMenu
     {
         /// <summary>
         /// The location where the load menu prefeb is placed.
@@ -18,9 +16,14 @@ namespace SEE.UI.Menu.Drawable
         private const string loadMenuPrefab = "Prefabs/UI/Drawable/LoadMenu";
 
         /// <summary>
-        /// The instance for the load menu.
+        /// We do not want to create an instance of this singleton class outside of this class.
         /// </summary>
-        private static GameObject instance;
+        private LoadMenu() { }
+
+        /// <summary>
+        /// The only instance of this singleton class.
+        /// </summary>
+        public static LoadMenu Instance { get; private set; }
 
         /// <summary>
         /// The instance for the regular load drawable button.
@@ -40,24 +43,16 @@ namespace SEE.UI.Menu.Drawable
         public static void Enable(UnityAction loadButtonCall, UnityAction loadSpecificButtonCall)
         {
             /// Instantiate the menu.
-            instance = PrefabInstantiator.InstantiatePrefab(loadMenuPrefab,
-                                                            UICanvas.Canvas.transform, false);
-            loadButton = GameFinder.FindChild(instance, "Load").GetComponent<ButtonManagerBasic>();
-            loadSpecificButton = GameFinder.FindChild(instance, "LoadSpecific").GetComponent<ButtonManagerBasic>();
+            Instance = new LoadMenu();
+            Instance.Instantiate(loadMenuPrefab);
+            loadButton = GameFinder.FindChild(Instance.menu, "Load").GetComponent<ButtonManagerBasic>();
+            loadSpecificButton = GameFinder.FindChild(Instance.menu, "LoadSpecific").GetComponent<ButtonManagerBasic>();
 
             /// Adds a handler for the <paramref name="loadButtonCall"/>.
             loadButton.clickEvent.AddListener(loadButtonCall);
 
             /// Adds a handler for the <param name="loadSpecificButtonCall"/>.
             loadSpecificButton.clickEvent.AddListener(loadSpecificButtonCall);
-        }
-
-        /// <summary>
-        /// Destroys the menu.
-        /// </summary>
-        public static void Disable()
-        {
-            Destroyer.Destroy(instance);
         }
     }
 }
