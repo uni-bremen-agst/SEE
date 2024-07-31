@@ -101,7 +101,7 @@ namespace SEE.Game.Drawable.Configurations
 
             if (Colors.Length == 0)
             {
-                Colors = LineMenu.instance.GetComponent<HSVPicker.ColorPicker>()
+                Colors = LineMenu.Instance.GameObject.GetComponent<HSVPicker.ColorPicker>()
                     .Setup.DefaultPresetColors;
             }
         }

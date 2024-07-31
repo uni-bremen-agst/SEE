@@ -75,7 +75,7 @@ namespace SEE.Game.UI.Menu.Drawable
                 UnityAction callback = () =>
                 {
                     instance.SetActive(true);
-                    LineMenu.DisableLineMenu();
+                    LineMenu.Instance.Disable();
                     TextMenu.Disable();
                     MindMapParentSelectionMenu.Disable();
                     MindMapChangeNodeKindMenu.Disable();
@@ -85,7 +85,7 @@ namespace SEE.Game.UI.Menu.Drawable
                 UnityAction callBackWithDestroy = () =>
                 {
                     Enable(node, conf, true);
-                    LineMenu.DisableLineMenu();
+                    LineMenu.Instance.Disable();
                     TextMenu.Disable();
                     MindMapParentSelectionMenu.Disable();
                     MindMapChangeNodeKindMenu.Disable();
@@ -157,7 +157,7 @@ namespace SEE.Game.UI.Menu.Drawable
             changeBorder.clickEvent.AddListener(() =>
             {
                 instance.SetActive(false);
-                LineMenu.EnableForEditing(GameFinder.FindChildWithTag(node, Tags.Line), conf.BorderConf, callback);
+                LineMenu.Instance.EnableForEditing(GameFinder.FindChildWithTag(node, Tags.Line), conf.BorderConf, callback);
             });
         }
 
@@ -199,7 +199,7 @@ namespace SEE.Game.UI.Menu.Drawable
                 {
                     instance.SetActive(false);
                     GameObject bLine = GameFinder.FindChild(attached, conf.BranchLineToParent);
-                    LineMenu.EnableForEditing(bLine, conf.BranchLineConf, callback);
+                    LineMenu.Instance.EnableForEditing(bLine, conf.BranchLineConf, callback);
                 });
             }
             else

@@ -249,7 +249,7 @@ namespace SEE.UI.Menu.Drawable
             else
             {
                 shapeMenu.SetActive(false);
-                LineMenu.EnableForDrawing();
+                LineMenu.Instance.EnableForDrawing();
                 BindLineMenu();
             }
         }
@@ -261,7 +261,7 @@ namespace SEE.UI.Menu.Drawable
         {
             DisablePartUndo();
             shapeMenu.SetActive(false);
-            LineMenu.DisableLineMenu();
+            LineMenu.Instance.Disable();
             drawableSwitch.SetActive(false);
         }
 
@@ -467,8 +467,9 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void InitConfigMenu()
         {
-            LineMenu.EnableForDrawing();
-            LineMenu.instance.SetActive(false);
+            LineMenu.Instance.EnableForDrawing();
+            // CHECK: Can we use LineMenu.Instance.Disable() instead?
+            LineMenu.Instance.GameObject.SetActive(false);
         }
 
         /// <summary>
@@ -634,14 +635,14 @@ namespace SEE.UI.Menu.Drawable
             shapeBtn.interactable = true;
             if (DrawShapesAction.currentShape == null)
             {
-                LineMenu.EnableForDrawing();
+                LineMenu.Instance.EnableForDrawing();
             }
             else
             {
-                LineMenu.EnableForEditing(DrawShapesAction.currentShape,
+                LineMenu.Instance.EnableForEditing(DrawShapesAction.currentShape,
                     LineConf.Get(DrawShapesAction.currentShape));
             }
-            MenuHelper.CalculateHeight(LineMenu.instance);
+            MenuHelper.CalculateHeight(LineMenu.Instance.GameObject);
             /// Binds the config menu to the switch menu.
             BindLineMenu();
             shapeMenu.SetActive(false);
@@ -652,8 +653,8 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void BindLineMenu()
         {
-            LineMenu.instance.transform.SetParent(drawableSwitch.transform.Find("Content"));
-            GameFinder.FindChild(LineMenu.instance, "Dragger").GetComponent<WindowDragger>().enabled = false;
+            LineMenu.Instance.GameObject.transform.SetParent(drawableSwitch.transform.Find("Content"));
+            GameFinder.FindChild(LineMenu.Instance.GameObject, "Dragger").GetComponent<WindowDragger>().enabled = false;
         }
 
         /// <summary>
@@ -674,7 +675,7 @@ namespace SEE.UI.Menu.Drawable
             shapeBMB.enabled = false;
             configBtn.interactable = true;
             configBMB.enabled = true;
-            LineMenu.DisableLineMenu();
+            LineMenu.Instance.Disable();
             BindShapeMenu();
             shapeMenu.SetActive(true);
         }

@@ -32,11 +32,11 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Property of the shape.
         /// </summary>
-        private GameObject Shape { 
-            get { return shape; } 
+        private GameObject Shape {
+            get { return shape; }
             set { shape = value;
                 currentShape = value;
-            }  
+            }
         }
 
         /// <summary>
@@ -153,7 +153,7 @@ namespace SEE.Controls.Actions.Drawable
             /// Disables the preview if the user selects <see cref="ShapePointsCalculator.Shape.Line"/>
             DisableShapePreview();
 
-            if (Shape != null && LineMenu.IsInDrawingMode() && !editMode)
+            if (Shape != null && LineMenu.Instance.IsInDrawingMode() && !editMode)
             {
                 editMode = true;
                 ShapeMenu.OpenLineMenuInCorrectMode();
@@ -257,9 +257,9 @@ namespace SEE.Controls.Actions.Drawable
                 drawing = false;
                 Shape = null;
                 editMode = false;
-                if (LineMenu.IsInEditMode())
+                if (LineMenu.Instance.IsInEditMode())
                 {
-                    LineMenu.DisableLineMenu();
+                    LineMenu.Instance.Disable();
                     ShapeMenu.OpenLineMenuInCorrectMode();
                 }
             }

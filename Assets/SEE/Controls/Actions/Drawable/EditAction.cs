@@ -189,7 +189,7 @@ namespace SEE.Controls.Actions.Drawable
                 DrawableType.Edit(selectedObj, oldValueHolder, surface);
             }
             TextMenu.Disable();
-            LineMenu.DisableLineMenu();
+            LineMenu.Instance.Disable();
             ImageMenu.Instance.Destroy();
             MindMapEditMenu.Disable();
         }
@@ -243,7 +243,7 @@ namespace SEE.Controls.Actions.Drawable
                 selectedObj = null;
                 progressState = ProgressState.SelectObject;
                 TextMenu.Disable();
-                LineMenu.DisableLineMenu();
+                LineMenu.Instance.Disable();
                 ImageMenu.Instance.Destroy();
                 MindMapEditMenu.Disable();
             }
@@ -284,9 +284,9 @@ namespace SEE.Controls.Actions.Drawable
             switch (selectedObj.tag)
             {
                 case Tags.Line:
-                    if (!LineMenu.IsOpen())
+                    if (!LineMenu.Instance.IsOpen())
                     {
-                        LineMenu.EnableForEditing(selectedObj, newValueHolder);
+                        LineMenu.Instance.EnableForEditing(selectedObj, newValueHolder);
                     }
                     break;
                 case Tags.DText:
@@ -353,7 +353,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 selectedObj = null;
                 progressState = ProgressState.SelectObject;
-                LineMenu.DisableLineMenu();
+                LineMenu.Instance.Disable();
                 TextMenu.Disable();
                 ImageMenu.Instance.Destroy();
                 MindMapEditMenu.Disable();

@@ -104,7 +104,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Awake()
         {
             base.Awake();
-            LineMenu.EnableForDrawing();
+            LineMenu.Instance.EnableForDrawing();
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Stop()
         {
             base.Stop();
-            LineMenu.DisableLineMenu();
+            LineMenu.Instance.Disable();
             if (progressState != ProgressState.FinishDrawing)
             {
                 Destroyer.Destroy(line);
@@ -134,7 +134,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// This block draws the line when the left mouse button is held down.
                 /// Drawing is only possible when targeting a drawable or an object placed on a drawable,
                 /// and the drawable remains unchanged during drawing.
-                if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit) 
+                if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit)
                     && !finishDrawing
                     && Queries.DrawableSurfaceNullOrSame(Surface, raycastHit.collider.gameObject))
                 {
@@ -151,7 +151,7 @@ namespace SEE.Controls.Actions.Drawable
                 }
 
                 /// This block is executed when the drawing should be completed.
-                if ((Queries.MouseUp(MouseButton.Left) || !Queries.MouseHold(MouseButton.Left)) 
+                if ((Queries.MouseUp(MouseButton.Left) || !Queries.MouseHold(MouseButton.Left))
                     && drawing)
                 {
                     return FinishDrawing();

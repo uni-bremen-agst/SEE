@@ -28,7 +28,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// The only instance of this singleton class.
         /// </summary>
-        public static ImageMenu Instance { get; set; }
+        public static ImageMenu Instance { get; private set; }
 
         static ImageMenu()
         {
