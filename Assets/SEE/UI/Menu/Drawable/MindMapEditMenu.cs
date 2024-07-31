@@ -78,7 +78,7 @@ namespace SEE.Game.UI.Menu.Drawable
                     LineMenu.Instance.Disable();
                     TextMenu.Disable();
                     MindMapParentSelectionMenu.Disable();
-                    MindMapChangeNodeKindMenu.Disable();
+                    MindMapChangeNodeKindMenu.Instance.Destroy();
                 };
 
                 /// The return call back with destroying. Will be needed to get the changes of parent and node kind change.
@@ -88,7 +88,7 @@ namespace SEE.Game.UI.Menu.Drawable
                     LineMenu.Instance.Disable();
                     TextMenu.Disable();
                     MindMapParentSelectionMenu.Disable();
-                    MindMapChangeNodeKindMenu.Disable();
+                    MindMapChangeNodeKindMenu.Instance.Destroy();
                 };
 
                 /// Initialize the buttons for the modification options.
@@ -248,7 +248,7 @@ namespace SEE.Game.UI.Menu.Drawable
                 Destroyer.Destroy(instance);
             }
             MindMapParentSelectionMenu.Disable();
-            MindMapChangeNodeKindMenu.Disable();
+            MindMapChangeNodeKindMenu.Instance.Destroy();
         }
     }
 }
