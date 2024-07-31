@@ -115,7 +115,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Awake()
         {
             base.Awake();
-            StickyNoteMenu.Enable();
+            StickyNoteMenu.Instance.Enable();
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Stop()
         {
             base.Stop();
-            StickyNoteMenu.Disable();
+            StickyNoteMenu.Instance.Destroy();
             StickyNoteRotationMenu.Disable();
             StickyNoteEditMenu.Instance.Destroy();
             StickyNoteMoveMenu.Disable();
@@ -259,7 +259,7 @@ namespace SEE.Controls.Actions.Drawable
                             break;
                     }
                 }
-                StickyNoteMenu.Enable();
+                StickyNoteMenu.Instance.Enable();
                 stickyNote = null;
                 stickyNoteHolder = null;
                 inProgress = false;
@@ -321,7 +321,7 @@ namespace SEE.Controls.Actions.Drawable
                 else
                 {
                     /// Block for selecting the rotation and the right position.
-                    StickyNoteMenu.Disable();
+                    StickyNoteMenu.Instance.Destroy();
                     StickyNoteRotationMenu.Enable(stickyNote, raycastHit.collider.gameObject);
                     StickyNoteMoveMenu.Enable(GameFinder.GetHighestParent(stickyNote), true);
                 }
@@ -429,7 +429,7 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         ChangedConfig = DrawableConfigManager.GetDrawableConfig(surface)
                     };
-                    StickyNoteMenu.Disable();
+                    StickyNoteMenu.Instance.Destroy();
                     surface.GetComponent<Collider>().enabled = false;
                     stickyNote = surface.transform.parent.gameObject;
                     stickyNote.transform.Find("Back").GetComponent<Collider>().enabled = false;
@@ -704,7 +704,7 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         ChangedConfig = DrawableConfigManager.GetDrawableConfig(surface)
                     };
-                    StickyNoteMenu.Disable();
+                    StickyNoteMenu.Instance.Destroy();
                     StickyNoteEditMenu.Enable(surface.transform.parent.gameObject, memento.ChangedConfig);
                 }
                 else
@@ -718,7 +718,7 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         stickyNote = null;
                         selectedAction = Operation.None;
-                        StickyNoteMenu.Enable();
+                        StickyNoteMenu.Instance.Enable();
                     }
                 }
             }
@@ -736,7 +736,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     stickyNote = null;
                     selectedAction = Operation.None;
-                    StickyNoteMenu.Enable();
+                    StickyNoteMenu.Instance.Enable();
                 }
             }
             return EditReturnState.None;

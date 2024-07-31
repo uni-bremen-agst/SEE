@@ -1,8 +1,6 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.UI.Notification;
-using SEE.Utils;
-using UnityEngine;
 using static SEE.Controls.Actions.Drawable.StickyNoteAction;
 
 namespace SEE.UI.Menu.Drawable
@@ -11,7 +9,7 @@ namespace SEE.UI.Menu.Drawable
     /// This class provides a menu, with which the player can select
     /// an operation for the sticky notes.
     /// </summary>
-    public static class StickyNoteMenu
+    public class StickyNoteMenu : SingletonMenu
     {
         /// <summary>
         /// The location where the menu prefeb is placed.
@@ -19,9 +17,19 @@ namespace SEE.UI.Menu.Drawable
         private const string stickyNoteMenuPrefab = "Prefabs/UI/Drawable/StickyNoteMenu";
 
         /// <summary>
-        /// The instance for the sticky note menu.
+        /// We do not want to create an instance of this singleton class outside of this class.
         /// </summary>
-        private static GameObject instance;
+        private StickyNoteMenu() { }
+
+        /// <summary>
+        /// The only instance of this singleton class.
+        /// </summary>
+        public static StickyNoteMenu Instance { get; private set; }
+
+        static StickyNoteMenu()
+        {
+            Instance = new StickyNoteMenu();
+        }
 
         /// <summary>
         /// Whether this class has an operation in store that wasn't yet fetched.
@@ -36,14 +44,14 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Enables the image source menu and register the needed Handler to the button's.
         /// </summary>
-        public static void Enable()
+        public override void Enable()
         {
             /// Instantiate the menu.
-            instance = PrefabInstantiator.InstantiatePrefab(stickyNoteMenuPrefab,
-                                                            UICanvas.Canvas.transform, false);
+            Instance.Instantiate(stickyNoteMenuPrefab);
+            base.Enable();
 
             /// Initialize the button for the spawn option.
-            ButtonManagerBasic spawn = GameFinder.FindChild(instance, "Spawn")
+            ButtonManagerBasic spawn = GameFinder.FindChild(Instance.menu, "Spawn")
                 .GetComponent<ButtonManagerBasic>();
             spawn.clickEvent.AddListener(() =>
             {
@@ -53,7 +61,7 @@ namespace SEE.UI.Menu.Drawable
             });
 
             /// Initialize the button for the move option.
-            ButtonManagerBasic move = GameFinder.FindChild(instance, "Move")
+            ButtonManagerBasic move = GameFinder.FindChild(Instance.menu, "Move")
                 .GetComponent<ButtonManagerBasic>();
             move.clickEvent.AddListener(() =>
             {
@@ -63,7 +71,7 @@ namespace SEE.UI.Menu.Drawable
             });
 
             /// Initialize the button for the edit option.
-            ButtonManagerBasic edit = GameFinder.FindChild(instance, "Edit")
+            ButtonManagerBasic edit = GameFinder.FindChild(Instance.menu, "Edit")
                 .GetComponent<ButtonManagerBasic>();
             edit.clickEvent.AddListener(() =>
             {
@@ -73,7 +81,7 @@ namespace SEE.UI.Menu.Drawable
             });
 
             /// Initialize the button for the delete option.
-            ButtonManagerBasic delete = GameFinder.FindChild(instance, "Delete")
+            ButtonManagerBasic delete = GameFinder.FindChild(Instance.menu, "Delete")
                 .GetComponent<ButtonManagerBasic>();
             delete.clickEvent.AddListener(() =>
             {
@@ -82,22 +90,6 @@ namespace SEE.UI.Menu.Drawable
                 ShowNotification.Info("Select for deleting", "Choose the sticky note that you want to delete.", 2);
             });
 
-        }
-
-        /// <summary>
-        /// Destroy's the menu.
-        /// </summary>
-        public static void Disable()
-        {
-            if (instance != null)
-            {
-                Destroyer.Destroy(instance);
-            }
-        }
-
-        public static bool IsOpen()
-        {
-            return instance != null;
         }
 
         /// <summary>
