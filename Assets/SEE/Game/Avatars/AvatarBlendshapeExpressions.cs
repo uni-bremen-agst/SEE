@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using SEE.GO;
 using UnityEngine;
 using UMA.PoseTools;
 
@@ -13,7 +15,7 @@ namespace SEE.Game.Avatars
     internal class AvatarBlendshapeExpressions : MonoBehaviour
     {
         /// <summary>
-        /// The SkinnedMeshRenderer of the UMARenderer.
+        /// The SkinnedMeshRenderer of CC_Base_Body.
         /// </summary>
         private SkinnedMeshRenderer targetSkinnedRenderer;
 
@@ -22,313 +24,467 @@ namespace SEE.Game.Avatars
         /// </summary>
         private Mesh bakedMesh;
 
-        /// <summary>
-        /// This UMA ExpressionPlayer is controlled by the fake Blendshapes.
-        /// </summary>
-        private UMAExpressionPlayer expressionPlayer;
-
-        /// <summary>
-        /// UMA Renderer.
-        /// </summary>
-        private Transform umaRenderer;
+        private Transform ccBaseBody;
 
         /// <summary>
         /// Constant string literals for the fake Blendshapes.
         /// </summary>
         // Jaw
         private const string jawLeft = "Jaw_Left";
+        private const string ccJawLeft = "Jaw_L";
+
         private const string jawRight = "Jaw_Right";
-        private const string jawForward = "Jaw_Forward";
-        private const string jawOpen = "Jaw_Open";
+        private const string ccJawRight = "Jaw_R";
+
+        private const string jawForward = "Jaw_Forward"; // Same for CC Avatar
+
+        private const string jawOpen = "Jaw_Open"; // Same for CC Avatar
+        private const string ccJawOpen = "Merged_Open_Mouth";
 
         // Mouth
         private const string mouthApeShape = "Mouth_Ape_Shape";
+
         private const string mouthUpperLeft = "Mouth_Upper_Left";
+        private const string ccMouthUpperLeft = "Mouth_Upper_L";
+
         private const string mouthUpperRight = "Mouth_Upper_Right";
+        private const string ccMouthUpperRight = "Mouth_Upper_R";
+
         private const string mouthLowerLeft = "Mouth_Lower_Left";
+        private const string ccLowerLeft = "Mouth_Lower_L";
+
         private const string mouthLowerRight = "Mouth_Lower_Right";
+        private const string ccLowerRight = "Mouth_Lower_R";
+
         private const string mouthUpperOverturn = "Mouth_Upper_Overturn";
         private const string mouthLowerOverturn = "Mouth_Lower_Overturn";
+
         private const string mouthPout = "Mouth_Pout";
+        private const string ccMouthPuckerUpL = "Mouth_Pucker_Up_L";
+        private const string ccMouthPuckerUpR = "Mouth_Pucker_Up_R";
+        private const string ccMouthPuckerDownL = "Mouth_Pucker_Down_L";
+        private const string ccMouthPuckerDownR = "Mouth_Pucker_Down_R";
+
         private const string mouthSmileLeft = "Mouth_Smile_Left";
+        private const string ccMouthSmileLeft = "Mouth_Smile_L";
+
         private const string mouthSmileRight = "Mouth_Smile_Right";
+        private const string ccMouthSmileRight = "Mouth_Smile_R";
+
         private const string mouthSadLeft = "Mouth_Sad_Left";
+        private const string ccMouthFrownLeft = "Mouth_Frown_L";
+
         private const string mouthSadRight = "Mouth_Sad_Right";
+        private const string ccMouthFrownRight = "Mouth_Frown_R";
+
         private const string mouthUpperUpLeft = "Mouth_Upper_UpLeft";
+        private const string ccMouthUpperUpLeft = "Mouth_Up_Upper_L";
+
         private const string mouthUpperUpRight = "Mouth_Upper_UpRight";
+        private const string ccMouthUpperUpRight = "Mouth_Up_Upper_R";
+
         private const string mouthLowerDownLeft = "Mouth_Lower_DownLeft";
+        private const string ccMouthLowerDownLeft = "Mouth_Down_Lower_L";
+
         private const string mouthLowerDownRight = "Mouth_Lower_DownRight";
+        private const string ccMouthLowerDownRight = "Mouth_Down_Lower_R";
+
         private const string mouthUpperInside = "Mouth_Upper_Inside";
+        private const string ccMouthUpperInsideLeft = "Mouth_Roll_In_Upper_L";
+        private const string ccMouthUpperInsideRight = "Mouth_Roll_In_Upper_R";
+
         private const string mouthLowerInside = "Mouth_Lower_Inside";
+        private const string ccMouthLowerInsideLeft = "Mouth_Roll_In_Lower_L";
+        private const string ccMouthLowerInsideRight = "Mouth_Roll_In_Lower_R";
+
         private const string mouthLowerOverlay = "Mouth_Lower_Overlay";
 
         // Tongue
         private const string tongueLongStep1 = "Tongue_LongStep1";
+        private const string ccTongueLongStep1 = "Tongue_Up";
+
         private const string tongueLongStep2 = "Tongue_LongStep2";
+        private const string ccTongueLongStep2 = "Tongue_Out";
+
         private const string tongueLeft = "Tongue_Left";
+        private const string ccTongueLeft = "Tongue_L";
+
         private const string tongueRight = "Tongue_Right";
-        private const string tongueUp = "Tongue_Up";
-        private const string tongueDown = "Tongue_Down";
-        private const string tongueRoll = "Tongue_Roll";
+        private const string ccTongueRight = "Tongue_R";
+
+        private const string tongueUp = "Tongue_Up"; // Same for CC Avatar
+        private const string ccTongueUp = "Tongue_Tip_Up";
+
+        private const string tongueDown = "Tongue_Down"; // Same for CC Avatar
+        private const string ccTongueDown = "Tongue_Tip_Down";
+
+        private const string tongueRoll = "Tongue_Roll"; // Same for CC Avatar
+
         private const string tongueUpLeftMorph = "Tongue_UpLeft_Morph";
+        private const string ccTongueBulgeLeft = "Tongue_Bulge_L"; // + Tongue UP
+
         private const string tongueUpRightMorph = "Tongue_UpRight_Morph";
-        private const string tongueDownLeftMorph = "Tongue_DownLeft_Morph";
-        private const string tongueDownRightMorph = "Tongue_DownRight_Morph";
+        private const string ccTongueBulgeRight = "Tongue_Bulge_R"; // + Tongue UP
+
+        private const string tongueDownLeftMorph = "Tongue_DownLeft_Morph"; // + BulgeLeft && Tongue Down
+        private const string tongueDownRightMorph = "Tongue_DownRight_Morph"; // + BulgeRight && Tongue Down
 
         // Cheeks
         private const string cheekPuffLeft = "Cheek_Puff_Left";
+        private const string ccCheekPuffLeft = "Cheek_Puff_L";
+
         private const string cheekPuffRight = "Cheek_Puff_Right";
+        private const string ccCheekPuffRight = "Cheek_Puff_R";
+
         private const string cheekSuck = "Cheek_Suck";
+        private const string ccCheekSuckLeft = "Cheek_Suck_L";
+        private const string ccCheekSuckRight = "Cheek_Suck_R";
+
+        // Eyes
+        private const string eyeLeftBlink = "Eye_Left_Blink";
+        private const string ccEyeLeftBlink = "Eye_Blink_L";
+
+        private const string eyeLeftWide = "Eye_Left_Wide";
+        private const string ccEyeLeftWide = "Eye_Wide_L";
+
+        private const string eyeLeftRight = "Eye_Left_Right";
+        private const string ccEyeLeftRight = "Eye_L_Look_R";
+
+        private const string eyeLeftLeft = "Eye_Left_Left";
+        private const string ccEyeLeftLeft = "Eye_L_Look_L";
+
+        private const string eyeLeftUp = "Eye_Left_Up";
+        private const string ccEyeLeftUp = "Eye_L_Look_Up";
+
+        private const string eyeLeftDown = "Eye_Left_Down";
+        private const string ccEyeLeftDown = "Eye_L_Look_Down";
+
+        private const string eyeRightBlink = "Eye_Right_Blink";
+        private const string ccEyeRightBlink = "Eye_Blink_R";
+
+        private const string eyeRightWide = "Eye_Right_Wide";
+        private const string ccEyeRightWide = "Eye_Wide_R";
+
+        private const string eyeRightRight = "Eye_Right_Right";
+        private const string ccEyeRightRight = "Eye_R_Look_R";
+
+        private const string eyeRightLeft = "Eye_Right_Left";
+        private const string ccEyeRightLeft = "Eye_R_Look_L";
+
+        private const string eyeRightUp = "Eye_Right_Up";
+        private const string ccEyeRightUp = "Eye_R_Look_Up";
+
+        private const string eyeRightDown = "Eye_Right_Down";
+        private const string ccEyeRightDown = "Eye_R_Look_Down";
+
+        private const string eyeFrown = "Eye_Frown";
+        private const string eyeLeftSqueeze = "Eye_Left_squeeze";
+        private const string eyeRightSqueeze = "Eye_Right_squeeze";
+
+        private bool waitForInit = true;
+
+
+        private ArrayList GetArrayListWithBlendShapeStrings()
+        {
+            ArrayList list = new ArrayList();
+            list.Add(jawLeft);
+            list.Add(jawRight);
+            list.Add(jawOpen);
+            list.Add(mouthApeShape);
+            list.Add(mouthUpperLeft);
+            list.Add(mouthUpperRight);
+            list.Add(mouthLowerLeft);
+            list.Add(mouthLowerRight);
+            list.Add(mouthUpperOverturn);
+            list.Add(mouthLowerOverturn);
+            list.Add(mouthPout);
+            list.Add(mouthSmileLeft);
+            list.Add(mouthSmileRight);
+            list.Add(mouthSadLeft);
+            list.Add(mouthSadRight);
+            list.Add(mouthUpperUpRight);
+            list.Add(mouthUpperUpLeft);
+            list.Add(mouthLowerDownLeft);
+            list.Add(mouthLowerDownRight);
+            list.Add(mouthUpperInside);
+            list.Add(mouthLowerInside);
+            list.Add(mouthLowerOverlay);
+            list.Add(tongueLongStep1);
+            list.Add(tongueLongStep2);
+            list.Add(tongueLeft);
+            list.Add(tongueRight);
+            list.Add(tongueUp);
+            list.Add(tongueDown);
+            list.Add(tongueRoll);
+            list.Add(tongueUpLeftMorph);
+            list.Add(tongueUpRightMorph);
+            list.Add(tongueDownLeftMorph);
+            list.Add(tongueDownRightMorph);
+            list.Add(cheekPuffLeft);
+            list.Add(cheekPuffRight);
+            list.Add(cheekSuck);
+            list.Add(eyeLeftBlink);
+            list.Add(eyeLeftWide);
+            list.Add(eyeLeftRight);
+            list.Add(eyeLeftLeft);
+            list.Add(eyeLeftUp);
+            list.Add(eyeLeftDown);
+            list.Add(eyeRightBlink);
+            list.Add(eyeRightWide);
+            list.Add(eyeRightRight);
+            list.Add(eyeRightLeft);
+            list.Add(eyeRightUp);
+            list.Add(eyeRightDown);
+            list.Add(eyeFrown);
+            list.Add(eyeLeftSqueeze);
+            list.Add(eyeRightSqueeze);
+            return list;
+        }
+
 
         /// <summary>
         /// Starts a coroutine that waits for components to be generated at runtime.
         /// </summary>
         private void Start()
         {
-            StartCoroutine(WaitForComponents());
+            ccBaseBody = gameObject.transform.Find("CC_Base_Body");
+            SkinnedMeshRenderer skinnedMeshRenderer = ccBaseBody.GetComponent<SkinnedMeshRenderer>();
+            ccBaseBody.gameObject.AddComponent<AvatarSRanipalLipV2>();
+            InitializeBlendshapes(skinnedMeshRenderer);
+            //StartCoroutine(WaitForComponents());
         }
 
-        /// <summary>
-        /// Waits for UMARenderer and UMAExpressionPlayer to be created. Once the UMARenderer and
-        /// ExpressionPlayer are found, a script (<see cref="AvatarSRanipalLipV2"/>) for the HTC Facial Tracker
-        /// is added to the UMARenderer.
-        /// After that, the fake blendshapes will be initialised.
-        /// </summary>
         private IEnumerator WaitForComponents()
         {
-            yield return new WaitUntil(() => gameObject.transform.Find("UMARenderer") != null &&
-                                             gameObject.GetComponent<UMAExpressionPlayer>() != null);
-            umaRenderer = gameObject.transform.Find("UMARenderer");
-            umaRenderer.gameObject.AddComponent<AvatarSRanipalLipV2>();
-
-            InitializeBlendshapes();
+            yield return new WaitUntil(() => gameObject.transform.Find("CC_Base_Body").GetComponent<SkinnedMeshRenderer>() != null);
+            ccBaseBody = gameObject.transform.Find("CC_Base_Body");
+            SkinnedMeshRenderer skinnedMeshRenderer = ccBaseBody.GetComponent<SkinnedMeshRenderer>();
+            ccBaseBody.gameObject.AddComponent<AvatarSRanipalLipV2>();
+            InitializeBlendshapes(skinnedMeshRenderer);
         }
 
         /// <summary>
         /// This function creates the fake Blendshapes necessary for the HTC Facial Tracker.
         /// </summary>
-        private void InitializeBlendshapes()
+        private void InitializeBlendshapes(SkinnedMeshRenderer skinnedMeshRenderer)
         {
-            expressionPlayer = gameObject.GetComponent<UMAExpressionPlayer>();
-
-            // Assure that Jaw can be used by UMAExpressionPlayer
-            expressionPlayer.overrideMecanimJaw = true;
-            targetSkinnedRenderer = umaRenderer.GetComponent<SkinnedMeshRenderer>();
+            targetSkinnedRenderer = skinnedMeshRenderer;
             bakedMesh = new Mesh();
             targetSkinnedRenderer.BakeMesh(bakedMesh);
 
             Vector3[] junkData = new Vector3[bakedMesh.vertices.Length];
 
+            foreach (String blendShapeName in GetArrayListWithBlendShapeStrings())
+            {
+                if (BlendShapeByString(blendShapeName) == -1)
+                {
+                    targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(blendShapeName, 100, junkData, junkData, junkData);
+                }
+            }
+
+            /*
             // Setup fake Blendshapes
             // Jaw Blendshapes
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(jawLeft, 100, junkData, junkData, junkData); // Jaw_Left_Right - range (-1 - 0)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(jawRight, 100, junkData, junkData, junkData); // Jaw_Left_Right - range (0 - 1)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(jawForward, 100, junkData, junkData, junkData); //  Jaw_Forward_Back - range (0 - 1)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(jawOpen, 100, junkData, junkData, junkData); // Jaw_Open_Close - range (0 - 1)
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(jawLeft, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(jawRight, 100, junkData, junkData, junkData);
+            //targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(jawForward, 100, junkData, junkData, junkData); //  Jaw_Forward_Back - range (0 - 1)
+            //targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(jawOpen, 100, junkData, junkData, junkData);
 
             // Mouth Blendshapes
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthApeShape, 100, junkData, junkData, junkData); // Drag whole mouth down FIXME
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthUpperLeft, 100, junkData, junkData, junkData); // Mouth Left_Right - range (0 - 1)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthUpperRight, 100, junkData, junkData, junkData); // Mouth Left_Right - range (-1 - 0)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthLowerLeft, 100, junkData, junkData, junkData); // Mouth Left_Right - range (0 - 1)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthLowerRight, 100, junkData, junkData, junkData); // Mouth Left_Right - range (-1 - 0)
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthUpperLeft, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthUpperRight, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthLowerLeft, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthLowerRight, 100, junkData, junkData, junkData);
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthUpperOverturn, 100, junkData, junkData, junkData); // FIXME
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthLowerOverturn, 100, junkData, junkData, junkData); // FIXME
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthPout, 100, junkData, junkData, junkData); // Mouth Narrow_Pucker (but only (0-1)) FIXME
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthSmileLeft, 100, junkData, junkData, junkData); // Left Mouth Smile_Frown (0 - 1)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthSmileRight, 100, junkData, junkData, junkData); // Right Mouth Smile_Frown (0 - 1)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthSadLeft, 100, junkData, junkData, junkData); // Left Mouth Smile_Frown (-1 - 0)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthSadRight, 100, junkData, junkData, junkData); // Left Mouth Smile_Frown (-1 - 0)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthUpperUpLeft, 100, junkData, junkData, junkData); // Left Upper Lip Up_Down - range (0 - 1)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthUpperUpRight, 100, junkData, junkData, junkData); // Right Upper Lip Up_Down - range (0 - 1)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthLowerDownLeft, 100, junkData, junkData, junkData); // Left Lower Lip Up_Down - range (-1 - 0)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthLowerDownRight, 100, junkData, junkData, junkData); // Right Lower Lip Up_Down - range (-1 - 0)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthUpperInside, 100, junkData, junkData, junkData); // Left Upper Lip Up_Down && Right Upper Lip Up_Down (-1 - 1)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthLowerInside, 100, junkData, junkData, junkData); // Left Lower Lip Up_Down && Right Lower Lip Up_Down (0 - 1)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthLowerOverlay, 100, junkData, junkData, junkData); // Maybe Jaw Close with range (-1 - 0) FIXME
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthPout, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthSmileLeft, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthSmileRight, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthSadLeft, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthSadRight, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthUpperUpLeft, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthUpperUpRight, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthLowerDownLeft, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthLowerDownRight, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthUpperInside, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthLowerInside, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(mouthLowerOverlay, 100, junkData, junkData, junkData); // FIXME
+
+            // Eye Blendshapes
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(eyeLeftBlink, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(eyeLeftWide, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(eyeLeftRight, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(eyeLeftLeft, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(eyeLeftUp, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(eyeLeftDown, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(eyeRightBlink, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(eyeRightWide, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(eyeRightRight, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(eyeRightLeft, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(eyeRightUp, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(eyeRightDown, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(eyeFrown, 100, junkData, junkData, junkData); // FIXME
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(eyeLeftSqueeze, 100, junkData, junkData, junkData); //FIXME
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(eyeRightSqueeze, 100, junkData, junkData, junkData); //FIXME
 
             // Tongue Blendshapes
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(tongueLongStep1, 100, junkData, junkData, junkData); // Lift tongue slightly FIXME
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(tongueLongStep2, 100, junkData, junkData, junkData); // Tongue Out - range (0 - 1)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(tongueLeft, 100, junkData, junkData, junkData); // Tongue Left_Right - range (0 - 1)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(tongueRight, 100, junkData, junkData, junkData); // Tongue Left_Right - range (-1 - 0)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(tongueUp, 100, junkData, junkData, junkData); // Tongue Up_Down - range (-1 - 0)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(tongueDown, 100, junkData, junkData, junkData); // Tongue Up_Down - range (1 - 0)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(tongueRoll, 100, junkData, junkData, junkData); // Tongue Curl - range (0-1)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(tongueUpLeftMorph, 100, junkData, junkData, junkData); // FIXME
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(tongueUpRightMorph, 100, junkData, junkData, junkData); // FIXME
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(tongueDownLeftMorph, 100, junkData, junkData, junkData); // FIXME
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(tongueDownRightMorph, 100, junkData, junkData, junkData); // FIXME
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(tongueLongStep1, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(tongueLongStep2, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(tongueLeft, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(tongueRight, 100, junkData, junkData, junkData);
+            //targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(tongueUp, 100, junkData, junkData, junkData);
+            //targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(tongueDown, 100, junkData, junkData, junkData);
+            //targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(tongueRoll, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(tongueUpLeftMorph, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(tongueUpRightMorph, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(tongueDownLeftMorph, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(tongueDownRightMorph, 100, junkData, junkData, junkData);
 
             // Cheek Blendshapes
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(cheekPuffLeft, 100, junkData, junkData, junkData); // Left Cheek Puff_Squint - range (0 - 1)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(cheekPuffRight, 100, junkData, junkData, junkData); // Right Cheek Puff_Squint - range (0 - 1)
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(cheekSuck, 100, junkData, junkData, junkData); // Maybe "Left Cheek Puff_Squint && Right Cheek Puff_Squint" - range (-1 - 0) FIXME
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(cheekPuffLeft, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(cheekPuffRight, 100, junkData, junkData, junkData);
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame(cheekSuck, 100, junkData, junkData, junkData);
+
+            */
+            waitForInit = false;
         }
 
-        /// <summary>
-        /// This method transfers the converted values of the fake Blendshapes to the UMAExpressionPlayer.
-        /// </summary>
+
         private void Update()
         {
-            if (expressionPlayer != null)
+            if (!waitForInit)
             {
-                // JAW
-                float jawOpenClose = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(jawOpen));
-                expressionPlayer.jawOpen_Close = ValueConverter(jawOpenClose, true);
-
-                float jawLeft = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.jawLeft));
-                float jawRight = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.jawRight));
-                if (jawLeft >= jawRight)
-                {
-                    expressionPlayer.jawLeft_Right = ValueConverter(jawLeft - jawRight, true);
-                }
-                else
-                {
-                    expressionPlayer.jawLeft_Right = ValueConverter(jawRight - jawLeft, false);
-                }
-
-                // JAW & MOUTH
-                float jawForward = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.jawForward));
-                float mouthOverlay = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(mouthLowerOverlay));
-                if (jawForward >= mouthOverlay)
-                {
-                    expressionPlayer.jawForward_Back = ValueConverter(jawForward, true);
-                }
-                else
-                {
-                    expressionPlayer.jawForward_Back = ValueConverter(mouthOverlay, false); //FIXME: maybe not representable with UMA.
-                }
+                // Jaw
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(jawLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccJawLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(jawRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccJawRight)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(jawOpen),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccJawOpen)));
 
                 // Mouth
-                float mouthApeShape = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.mouthApeShape));
-                expressionPlayer.mouthUp_Down = ValueConverter(mouthApeShape, false);
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthUpperLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthUpperLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthUpperRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthUpperRight)));
 
-                float mouthUpperLeft = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.mouthUpperLeft));
-                float mouthLowerLeft = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.mouthLowerLeft));
-                float mouthUpperRight = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.mouthUpperRight));
-                float mouthLowerRight = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.mouthLowerRight));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthLowerLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccLowerLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthLowerRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccLowerRight)));
 
-                const int divideByTwo = 2;
-                if (mouthUpperLeft >= mouthLowerLeft && mouthUpperLeft >= mouthUpperRight && mouthUpperLeft >= mouthLowerRight)
-                {
-                    expressionPlayer.mouthLeft_Right = ValueConverter(mouthUpperLeft - (mouthUpperRight + mouthLowerRight) / divideByTwo, true);
-                }
-                else if (mouthLowerLeft >= mouthUpperLeft && mouthLowerLeft >= mouthUpperRight && mouthLowerLeft >= mouthLowerRight)
-                {
-                    expressionPlayer.mouthLeft_Right = ValueConverter(mouthLowerLeft - (mouthUpperRight + mouthLowerRight) / divideByTwo, true);
-                }
-                else if (mouthUpperRight >= mouthUpperLeft && mouthUpperRight >= mouthLowerLeft && mouthUpperRight >= mouthLowerRight)
-                {
-                    expressionPlayer.mouthLeft_Right = ValueConverter(mouthUpperRight - (mouthUpperLeft + mouthLowerLeft) / divideByTwo, false);
-                }
-                else
-                {
-                    expressionPlayer.mouthLeft_Right = ValueConverter(mouthLowerRight - (mouthUpperLeft + mouthLowerLeft) / divideByTwo, false);
-                }
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthPout),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthPuckerUpL)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthPout),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthPuckerUpR)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthPout),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthPuckerDownL)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthPout),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthPuckerDownR)));
 
-                // FIXME: maybe not representable with UMA.
-                //float mouthUpperOverturn = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(MouthUpperOverturn));
-                //float mouthLowerOverturn = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(MouthLowerOverturn));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthSmileLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthSmileLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthSmileRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthSmileRight)));
 
-                float mouthPout = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.mouthPout));
-                expressionPlayer.mouthNarrow_Pucker = ValueConverter(mouthPout, true);
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthSadLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthFrownLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthSadRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthFrownRight)));
 
-                float mouthSmileLeft = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.mouthSmileLeft));
-                float mouthSadLeft = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.mouthSadLeft));
-                if (mouthSmileLeft >= mouthSadLeft)
-                {
-                    expressionPlayer.leftMouthSmile_Frown = ValueConverter(mouthSmileLeft - mouthSadLeft, true);
-                }
-                else
-                {
-                    expressionPlayer.leftMouthSmile_Frown = ValueConverter(mouthSadLeft - mouthSmileLeft, false);
-                }
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthUpperUpLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthUpperUpLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthUpperUpRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthUpperUpRight)));
 
-                float mouthSmileRight = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.mouthSmileRight));
-                float mouthSadRight = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.mouthSadRight));
-                if (mouthSmileRight >= mouthSadRight)
-                {
-                    expressionPlayer.rightMouthSmile_Frown = ValueConverter(mouthSmileRight - mouthSadRight, true);
-                }
-                else
-                {
-                    expressionPlayer.rightMouthSmile_Frown = ValueConverter(mouthSadRight - mouthSmileRight, false);
-                }
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthLowerDownLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthLowerDownLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthLowerDownRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthLowerDownRight)));
 
-                float mouthUpperUpLeft = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.mouthUpperUpLeft));
-                expressionPlayer.leftUpperLipUp_Down = ValueConverter(mouthUpperUpLeft, true);
-
-                float mouthUpperUpRight = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.mouthUpperUpRight));
-                expressionPlayer.rightUpperLipUp_Down = ValueConverter(mouthUpperUpRight, true);
-
-                float mouthLowerDownLeft = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.mouthLowerDownLeft));
-                expressionPlayer.leftLowerLipUp_Down = ValueConverter(mouthLowerDownLeft, false);
-
-                float mouthLowerDownRight = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.mouthLowerDownRight));
-                expressionPlayer.rightLowerLipUp_Down = ValueConverter(mouthLowerDownRight, false);
-
-                // FIXME: maybe not representable with UMA.
-                //float mouthUpperInside = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(MouthUpperInside));
-                //float mouthLowerInside = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(MouthLowerInside));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthUpperInside),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthUpperInsideLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthUpperInside),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthUpperInsideRight)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthLowerInside),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthLowerInsideLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthLowerInside),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthLowerInsideRight)));
 
                 // Tongue
-                float tongueLongStep1 = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.tongueLongStep1));
-                float tongueLongStep2 = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.tongueLongStep2));
-                if (tongueLongStep1 >= tongueLongStep2)
-                {
-                    expressionPlayer.tongueOut = ValueConverter(tongueLongStep1, false); //Is not representable in UMA
-                }
-                else
-                {
-                    expressionPlayer.tongueOut = ValueConverter(tongueLongStep2, true);
-                }
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueLongStep1),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueLongStep1)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueLongStep2),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueLongStep2)));
 
-                float tongueLeft = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.tongueLeft));
-                float tongueRight = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.tongueRight));
-                if (tongueLeft >= tongueRight)
-                {
-                    expressionPlayer.tongueLeft_Right = ValueConverter(tongueLeft - tongueRight, true);
-                }
-                else
-                {
-                    expressionPlayer.tongueLeft_Right = ValueConverter(tongueRight - tongueLeft, false);
-                }
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueRight)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueUp),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueUp)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueDown),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueDown)));
 
-                float tongueUp = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.tongueUp));
-                float tongueDown = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.tongueDown));
-                if (tongueUp >= tongueDown)
-                {
-                    expressionPlayer.tongueUp_Down = ValueConverter(tongueUp - tongueDown, true);
-                }
-                else
-                {
-                    expressionPlayer.tongueUp_Down = ValueConverter(tongueDown - tongueUp, false);
-                }
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueUpLeftMorph),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueBulgeLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueUpLeftMorph),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueUp)));
 
-                float tongueRoll = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.tongueRoll));
-                expressionPlayer.tongueCurl = ValueConverter(tongueRoll, true);
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueUpRightMorph),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueBulgeRight)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueUpRightMorph),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueUp)));
 
-                // FIXME: maybe not representable with UMA.
-                //float tongueUpLeftMorph = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(TongueUpLeftMorph));
-                //float tongueUpRightMorph = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(TongueUpRightMorph));
-                //float tongueDownLeftMorph = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(TongueDownLeftMorph));
-                //float tongueDownRightMorph = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(TongueDownRightMorph));
+
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueDownLeftMorph),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueBulgeLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueDownLeftMorph),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueDown)));
+
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueDownRightMorph),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueBulgeRight)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueDownRightMorph),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueDown)));
 
                 // Cheeks
-                float cheekPuffLeft = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.cheekPuffLeft));
-                float cheekPuffRight = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(AvatarBlendshapeExpressions.cheekPuffRight));
-                float cheeckSuck = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(cheekSuck));
-                if (cheekPuffLeft >= cheeckSuck && cheekPuffRight >= cheeckSuck)
-                {
-                    expressionPlayer.leftCheekPuff_Squint = ValueConverter(cheekPuffLeft, true);
-                    expressionPlayer.rightCheekPuff_Squint = ValueConverter(cheekPuffRight, true);
-                }
-                else
-                {
-                    expressionPlayer.leftCheekPuff_Squint = ValueConverter(cheeckSuck, false);
-                    expressionPlayer.rightCheekPuff_Squint = ValueConverter(cheeckSuck, false);
-                }
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(cheekPuffLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccCheekPuffLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(cheekPuffRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccCheekPuffRight)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(cheekSuck),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccCheekSuckLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(cheekSuck),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccCheekSuckRight)));
+
+                // Eyes
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeLeftBlink),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeLeftBlink)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeLeftWide),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeLeftWide)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeLeftRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeLeftRight)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeLeftLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeLeftLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeLeftUp),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeLeftUp)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeLeftDown),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeLeftDown)));
+
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeRightBlink),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeRightBlink)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeRightWide),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeRightWide)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeRightRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeRightRight)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeRightLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeRightLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeRightUp),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeRightUp)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeRightDown),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeRightDown)));
+
             }
         }
 
