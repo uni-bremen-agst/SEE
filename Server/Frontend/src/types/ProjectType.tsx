@@ -25,10 +25,10 @@ export class ProjectTypeUtils {
   static getLabel(ft: ProjectType): string {
     switch (ft) {
       case ProjectType.DiffCity: return "Diff City";
-      case ProjectType.SEECity: return "SEE City";
-      case ProjectType.SEECityEvolution: return "SEE City Evolution";
-      case ProjectType.SEEJlgCity: return "SEE JLG City";
-      case ProjectType.SEEReflexionCity: return "SEE Reflexion City";
+      case ProjectType.SEECity: return "Code City";
+      case ProjectType.SEECityEvolution: return "City Evolution";
+      case ProjectType.SEEJlgCity: return "JLG City";
+      case ProjectType.SEEReflexionCity: return "Reflexion City";
       default: return "Unspecified";
     }
   }

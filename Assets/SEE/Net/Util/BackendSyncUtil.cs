@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.Game.City;
 using SEE.Utils.Paths;
@@ -171,14 +172,14 @@ namespace SEE.Net.Util
                 try
                 {
                     Debug.Log($"Downloading file: {file.name}");
-                    string localFileName = System.IO.Path.Combine(ServerContentDirectory, file.projectType, file.name);
+                    string localFileName = System.IO.Path.Combine(ServerContentDirectory, file.name);
                     bool success = await DownloadFileAsync(file.id, localFileName);
                     if (success && file.contentType.ToLower() == "application/zip")
                     {
                         Debug.Log($"Extracting ZIP file: {file.name}");
                         try
                         {
-                            Unzip(localFileName, System.IO.Path.Combine(ServerContentDirectory, file.projectType));
+                            Unzip(localFileName, System.IO.Path.Combine(ServerContentDirectory, file.projectType), true);
                         }
                         catch (Exception e)
                         {
@@ -201,18 +202,33 @@ namespace SEE.Net.Util
         /// Throws an <c>IOException</c> if the file does not exist in local storage.
         /// Additionally, the exceptions raised by <c>ZipFile.ExtractToDirectory()</c> are not caught.
         /// </summary>
-        /// <param name="zipPath">The path of the ZIP file to be extracted.</param>
-        /// <param name="targetPath">The path of the target directory in which the file should be extracted.</param>
-        public static void Unzip(string zipPath, string targetPath)
+        /// <param name="relativeZipPath">The path of the ZIP file to be extracted relative to the streaming assets.</param>
+        /// <param name="relativeTtargetPath">The path of the target directory in which the file should be extracted relative to the streaming assets.</param>
+        /// <param name="stripSingleRootDir">Determines if a single root directory is stripped during extraction (if present).</param>
+        public static void Unzip(string relativeZipPath, string relativeTtargetPath, bool stripSingleRootDir = false)
         {
-            var filePath = System.IO.Path.Combine(Application.streamingAssetsPath, zipPath);
-            var dirPath = System.IO.Path.Combine(Application.streamingAssetsPath, targetPath);
-            if (!File.Exists(filePath))
+            var zipPath = System.IO.Path.Combine(Application.streamingAssetsPath, relativeZipPath);
+            var targetPath = System.IO.Path.Combine(Application.streamingAssetsPath, relativeTtargetPath);
+            if (!File.Exists(zipPath))
             {
-                throw new IOException($"The file does not exist: '{filePath}'");
+                throw new IOException($"The file does not exist: '{zipPath}'");
             }
 
-            ZipFile.ExtractToDirectory(filePath, dirPath);
+            string now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+            string tempTargetPath = System.IO.Path.Combine(Application.streamingAssetsPath, ServerContentDirectory, "tmp_" + now);
+            ZipFile.ExtractToDirectory(zipPath, tempTargetPath);
+
+            var dirs = Directory.GetDirectories(tempTargetPath);
+            bool doStripSingleRootDir = stripSingleRootDir && Directory.GetFiles(tempTargetPath).Length == 0 && dirs.Length == 1;
+            if (doStripSingleRootDir)
+            {
+                Directory.Move(dirs[0], targetPath);
+                Directory.Delete(tempTargetPath, true);
+            }
+            else
+            {
+                Directory.Move(tempTargetPath, targetPath);
+            }
         }
 
         /// <summary>
@@ -339,8 +355,6 @@ namespace SEE.Net.Util
         /// </summary>
         public static async UniTask LoadCityAsync(string dirPath, string gameObjectPath)
         {
-            // TODO Use params
-
             var codeCity = GameObject.Find(gameObjectPath);
             var seeCity = codeCity.GetComponent<SEECity>() as SEECity;
             seeCity.Reset();
