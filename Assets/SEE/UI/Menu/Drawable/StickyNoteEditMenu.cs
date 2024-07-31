@@ -55,7 +55,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 instance.SetActive(true);
                 StickyNoteRotationMenu.Disable();
-                ScaleMenu.Disable();
+                ScaleMenu.Instance.Destroy();
             };
 
             /// Initialize the edit rotation button.

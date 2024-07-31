@@ -128,7 +128,7 @@ namespace SEE.Controls.Actions.Drawable
             StickyNoteRotationMenu.Disable();
             StickyNoteEditMenu.Disable();
             StickyNoteMoveMenu.Disable();
-            ScaleMenu.Disable();
+            ScaleMenu.Instance.Destroy();
             stickyNote?.Destroy<HighlightEffect>();
 
             if (selectedAction == Operation.Move && stickyNote != null)
@@ -218,7 +218,7 @@ namespace SEE.Controls.Actions.Drawable
                 StickyNoteRotationMenu.Disable();
                 StickyNoteEditMenu.Disable();
                 StickyNoteMoveMenu.Disable();
-                ScaleMenu.Disable();
+                ScaleMenu.Instance.Destroy();
                 stickyNote?.Destroy<HighlightEffect>();
 
                 if (selectedAction == Operation.Move
@@ -655,7 +655,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 StickyNoteEditMenu.Disable();
                 StickyNoteRotationMenu.Disable();
-                ScaleMenu.Disable();
+                ScaleMenu.Instance.Destroy();
                 stickyNote.Destroy<HighlightEffect>();
                 memento.ChangedConfig.Scale = stickyNote.transform.localScale;
                 memento.ChangedConfig.Rotation = GameFinder.GetHighestParent(stickyNote).transform.eulerAngles;
@@ -764,7 +764,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 finish = isScaleFinished;
             }
-            else if (ScaleMenu.IsActive())
+            else if (ScaleMenu.Instance.IsOpen())
             {
                 ScaleByWheel();
             }

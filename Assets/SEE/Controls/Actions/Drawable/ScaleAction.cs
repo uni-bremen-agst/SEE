@@ -141,7 +141,7 @@ namespace SEE.Controls.Actions.Drawable
                 GameScaler.SetScale(selectedObj, oldScale);
                 new ScaleNetAction(surface.name, surfaceParentName, selectedObj.name, oldScale).Execute();
             }
-            ScaleMenu.Disable();
+            ScaleMenu.Instance.Destroy();
         }
 
         /// <summary>
@@ -208,7 +208,7 @@ namespace SEE.Controls.Actions.Drawable
                     GameScaler.SetScale(selectedObj, oldScale);
                     new ScaleNetAction(surface.name, surfaceParentName, selectedObj.name, oldScale).Execute();
                 }
-                ScaleMenu.Disable();
+                ScaleMenu.Instance.Destroy();
 
                 selectedObj = null;
                 progressState = ProgressState.SelectObject;
@@ -323,7 +323,7 @@ namespace SEE.Controls.Actions.Drawable
         private bool Finish()
         {
             mouseWasReleased = false;
-            ScaleMenu.Disable();
+            ScaleMenu.Instance.Destroy();
             newScale = selectedObj.transform.localScale;
             if (oldScale != newScale)
             {
