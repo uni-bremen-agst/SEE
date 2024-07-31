@@ -193,7 +193,7 @@ namespace SEE.Controls.Actions.Drawable
                         oldObjectLocalEulerAngles.z, RotationMenu.includeChildren).Execute();
                 }
             }
-            RotationMenu.Disable();
+            RotationMenu.Instance.Destroy();
             MoveMenu.Instance.Destroy();
             if (switchMenu != null)
             {
@@ -269,7 +269,7 @@ namespace SEE.Controls.Actions.Drawable
                             oldObjectLocalEulerAngles.z, RotationMenu.includeChildren).Execute();
                     }
                 }
-                RotationMenu.Disable();
+                RotationMenu.Instance.Destroy();
                 MoveMenu.Instance.Destroy();
                 if (switchMenu != null)
                 {
@@ -653,7 +653,7 @@ namespace SEE.Controls.Actions.Drawable
                     GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(selectedObject);
                     new RbAndCCDestroyerNetAction(memento.Surface.ID, memento.Surface.ParentID,
                         memento.SelectedObject.name).Execute();
-                    RotationMenu.Disable();
+                    RotationMenu.Instance.Destroy();
                     MoveMenu.Instance.Destroy();
                     CurrentState = IReversibleAction.Progress.Completed;
                     return true;
@@ -677,7 +677,7 @@ namespace SEE.Controls.Actions.Drawable
                 new RbAndCCDestroyerNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
                     selectedObject.name).Execute();
                 selectedObject = null;
-                RotationMenu.Disable();
+                RotationMenu.Instance.Destroy();
                 MoveMenu.Instance.Destroy();
                 progressState = ProgressState.SelectObject;
             }

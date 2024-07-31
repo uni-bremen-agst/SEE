@@ -1,11 +1,9 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game;
 using SEE.Game.Drawable;
-using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
-using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,16 +12,27 @@ namespace SEE.UI.Menu.Drawable
     /// <summary>
     /// This class provides the rotation menu for drawable type objects.
     /// </summary>
-    public static class RotationMenu
+    public class RotationMenu : SingletonMenu
     {
         /// <summary>
         /// The prefab of the rotation menu.
         /// </summary>
         private const string rotationMenuPrefab = "Prefabs/UI/Drawable/Rotate";
+
         /// <summary>
-        /// The instance of the rotation menu
+        /// We do not want to create an instance of this singleton class outside of this class.
         /// </summary>
-        private static GameObject instance;
+        private RotationMenu() { }
+
+        /// <summary>
+        /// The only instance of this singleton class.
+        /// </summary>
+        public static RotationMenu Instance { get; private set; }
+
+        static RotationMenu()
+        {
+            Instance = new RotationMenu();
+        }
 
         /// <summary>
         /// The status if the children should included in the rotation.
@@ -36,12 +45,10 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="selectedObject">The chosen drawable type object to rotate.</param>
         public static void Enable(GameObject selectedObject)
         {
-            if (instance == null)
+            if (Instance.menu == null)
             {
-                /// Instantiate the menu.
-                instance = PrefabInstantiator.InstantiatePrefab(rotationMenuPrefab,
-                                                                UICanvas.Canvas.transform, false);
-                RotationSliderController slider = instance.GetComponentInChildren<RotationSliderController>();
+                Instance.Instantiate(rotationMenuPrefab);
+                RotationSliderController slider = Instance.menu.GetComponentInChildren<RotationSliderController>();
                 /// Adds the necessary handler to the slider.
                 SliderListener(slider, selectedObject);
                 /// For Mind Map Nodes: Provides functionality to also rotate the children.
@@ -50,7 +57,7 @@ namespace SEE.UI.Menu.Drawable
             else
             {
                 /// Updates the slider value.
-                RotationSliderController slider = instance.GetComponentInChildren<RotationSliderController>();
+                RotationSliderController slider = Instance.menu.GetComponentInChildren<RotationSliderController>();
                 slider.AssignValue(selectedObject.transform.localEulerAngles.z);
             }
         }
@@ -84,8 +91,8 @@ namespace SEE.UI.Menu.Drawable
                 }
 
                 /// Initializes the switch to turn child inclusion on and off.
-                GameFinder.FindChild(instance, "Content").transform.Find("Children").gameObject.SetActive(true);
-                SwitchManager childrenSwitch = GameFinder.FindChild(instance, "ChildrenSwitch")
+                GameFinder.FindChild(Instance.menu, "Content").transform.Find("Children").gameObject.SetActive(true);
+                SwitchManager childrenSwitch = GameFinder.FindChild(Instance.menu, "ChildrenSwitch")
                     .GetComponent<SwitchManager>();
                 bool changeSwitch = false;
                 childrenSwitch.OnEvents.RemoveAllListeners();
@@ -128,17 +135,9 @@ namespace SEE.UI.Menu.Drawable
             else
             {
                 /// Disables the include children button, if the selected object is not a <see cref="MindMapNodeConf"/>
-                GameFinder.FindChild(instance, "Content").transform.Find("Children").gameObject.SetActive(false);
+                GameFinder.FindChild(Instance.menu, "Content").transform.Find("Children").gameObject.SetActive(false);
                 includeChildren = false;
             }
-        }
-
-        /// <summary>
-        /// Destroys the menu.
-        /// </summary>
-        public static void Disable()
-        {
-            Destroyer.Destroy(instance);
         }
 
         /// <summary>
