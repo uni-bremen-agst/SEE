@@ -57,7 +57,8 @@ function CreateServerView() {
 
   const [errors, setErrors] = useState(new Map<string, string>());
 
-  const [availableProjectTypes, setAvailableProjectTypes] = useState(ProjectTypeUtils.getAll().map(projectType => [projectType, true]));
+  type ConditionalProjectType = [ProjectType, boolean];
+  const [availableProjectTypes, setAvailableProjectTypes] = useState<ConditionalProjectType[]>(ProjectTypeUtils.getAll().map(projectType => [projectType, true]));
 
 
   function addFile(projectType: ProjectType) {
