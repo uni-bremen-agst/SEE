@@ -94,7 +94,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 surface.Destroy<HighlightEffect>();
             }
-            SaveMenu.Disable();
+            SaveMenu.Instance.Destroy();
         }
 
         /// <summary>
