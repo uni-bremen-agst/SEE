@@ -4,7 +4,6 @@ using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
-using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 
