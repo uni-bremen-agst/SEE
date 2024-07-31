@@ -1,15 +1,13 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.UI.Notification;
-using SEE.Utils;
-using UnityEngine;
 
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
-    /// This class provides the mind map menu.
+    /// This class provides the mind-map menu.
     /// </summary>
-    public static class MindMapMenu
+    public class MindMapMenu : SingletonMenu
     {
         /// <summary>
         /// The location where the menu prefeb is placed.
@@ -17,12 +15,22 @@ namespace SEE.UI.Menu.Drawable
         private const string mindMapMenuPrefab = "Prefabs/UI/Drawable/MindMapMenu";
 
         /// <summary>
-        /// The instance for the mind map menu.
+        /// We do not want to create an instance of this singleton class outside of this class.
         /// </summary>
-        private static GameObject instance;
+        private MindMapMenu() { }
 
         /// <summary>
-        /// Whether this class has an operation in store that wasn't yet fetched.
+        /// The only instance of this singleton class.
+        /// </summary>
+        public static MindMapMenu Instance { get; private set; }
+
+        static MindMapMenu()
+        {
+            Instance = new MindMapMenu();
+        }
+
+        /// <summary>
+        /// Whether this class has an operation in store that hasn't been fetched yet.
         /// </summary>
         private static bool gotOperation;
 
@@ -32,7 +40,7 @@ namespace SEE.UI.Menu.Drawable
         private static Operation chosenOperation;
 
         /// <summary>
-        /// Contains keywords for the different buttons of the mind map menu.
+        /// Contains keywords for the different buttons of the mind-map menu.
         /// </summary>
         public enum Operation
         {
@@ -45,14 +53,13 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Creates and adds the necessary handler to the buttons.
         /// </summary>
-        public static void Enable()
+        public override void Enable()
         {
-            /// Instantiates the menu.
-            instance = PrefabInstantiator.InstantiatePrefab(mindMapMenuPrefab,
-                                                            UICanvas.Canvas.transform, false);
+            Instance.Instantiate(mindMapMenuPrefab);
+            base.Enable();
 
             /// Initialize the button for spawn a theme.
-            ButtonManagerBasic theme = GameFinder.FindChild(instance, "Theme").GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic theme = GameFinder.FindChild(Instance.menu, "Theme").GetComponent<ButtonManagerBasic>();
             theme.clickEvent.AddListener(() =>
             {
                 gotOperation = true;
@@ -61,7 +68,7 @@ namespace SEE.UI.Menu.Drawable
             });
 
             /// Initialize the button for spawn a subtheme.
-            ButtonManagerBasic subtheme = GameFinder.FindChild(instance, "Subtheme").GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic subtheme = GameFinder.FindChild(Instance.menu, "Subtheme").GetComponent<ButtonManagerBasic>();
             subtheme.clickEvent.AddListener(() =>
             {
                 gotOperation = true;
@@ -70,24 +77,13 @@ namespace SEE.UI.Menu.Drawable
             });
 
             /// Initialize the button for spawn a leaf.
-            ButtonManagerBasic leaf = GameFinder.FindChild(instance, "Leaf").GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic leaf = GameFinder.FindChild(Instance.menu, "Leaf").GetComponent<ButtonManagerBasic>();
             leaf.clickEvent.AddListener(() =>
             {
                 gotOperation = true;
                 chosenOperation = Operation.Leaf;
                 ShowNotification.Info("Select position", "Choose a suitable position for the new leaf.", 3);
             });
-        }
-
-        /// <summary>
-        /// Destroy's the menu.
-        /// </summary>
-        public static void Disable()
-        {
-            if (instance != null)
-            {
-                Destroyer.Destroy(instance);
-            }
         }
 
         /// <summary>

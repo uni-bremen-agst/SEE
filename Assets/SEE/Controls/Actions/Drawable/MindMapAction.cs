@@ -116,7 +116,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Awake()
         {
             base.Awake();
-            MindMapMenu.Enable();
+            MindMapMenu.Instance.Enable();
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Stop()
         {
             base.Stop();
-            MindMapMenu.Disable();
+            MindMapMenu.Instance.Destroy();
             MindMapParentSelectionMenu.Disable();
 
             if (progress != ProgressState.Finish && node != null)
@@ -245,7 +245,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit))
             {
-                MindMapMenu.Disable();
+                MindMapMenu.Instance.Destroy();
                 Surface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
                 if (CheckValid(GameFinder.GetAttachedObjectsObject(Surface)))
                 {
@@ -259,7 +259,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     Surface = null;
                     chosenOperation = Operation.None;
-                    MindMapMenu.Enable();
+                    MindMapMenu.Instance.Enable();
                     return false;
                 }
             }
@@ -284,7 +284,7 @@ namespace SEE.Controls.Actions.Drawable
             if (writeTextDialog.WasCanceled())
             {
                 chosenOperation = Operation.None;
-                MindMapMenu.Enable();
+                MindMapMenu.Instance.Enable();
                 progress = ProgressState.SelectPosition;
             }
         }
@@ -388,7 +388,7 @@ namespace SEE.Controls.Actions.Drawable
                 chosenOperation = Operation.None;
                 node = null;
                 branchLine = null;
-                MindMapMenu.Enable();
+                MindMapMenu.Instance.Enable();
             }
         }
 
