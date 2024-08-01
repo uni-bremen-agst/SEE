@@ -9,10 +9,10 @@ using UnityEngine.Events;
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
-    /// This class provides a menu, with which the player can select
-    /// from which source an image should be load.
+    /// This class provides a menu with which the player can select
+    /// from which source an image should be loaded.
     /// </summary>
-    public static class SurfaceColorMenu
+    public class SurfaceColorMenu : SingletonMenu
     {
         /// <summary>
         /// The location where the menu prefeb is placed.
@@ -20,27 +20,36 @@ namespace SEE.UI.Menu.Drawable
         private const string surfaceColorMenuPrefab = "Prefabs/UI/Drawable/SurfaceColorMenu";
 
         /// <summary>
-        /// The instance for the surface color menu.
+        /// We do not want to create an instance of this singleton class outside of this class.
         /// </summary>
-        private static GameObject instance;
+        private SurfaceColorMenu() { }
 
         /// <summary>
-        /// Enables the surface color menu and register the needed Handler to the button's.
+        /// The only instance of this singleton class.
         /// </summary>
-        /// <param name="surface">The surface which color should be changed.</param>
-        /// <param name="colorAction">An action which changes the color palette icon.</param>
-        public static void Enable(GameObject surface, UnityAction<Color> colorAction)
+        public static SurfaceColorMenu Instance { get; private set; }
+
+        static SurfaceColorMenu()
         {
-            if (instance == null)
+            Instance = new SurfaceColorMenu();
+        }
+
+        /// <summary>
+        /// Enables the surface color menu and registers the needed handlers to the buttons.
+        /// </summary>
+        /// <param name="surface">The surface whose color should be changed.</param>
+        /// <param name="colorAction">An action which changes the color palette icon.</param>
+        public void Enable(GameObject surface, UnityAction<Color> colorAction)
+        {
+            if (Instance.menu == null)
             {
-                instance = PrefabInstantiator.InstantiatePrefab(surfaceColorMenuPrefab,
-                                                                UICanvas.Canvas.transform, false);
+                Instantiate(surfaceColorMenuPrefab);
 
                 string name = !string.IsNullOrEmpty(GameFinder.GetDrawableSurfaceParentName(surface)) ?
                     GameFinder.GetDrawableSurfaceParentName(surface) : surface.name;
-                GameFinder.FindChild(instance, "Text").GetComponent<TextMeshProUGUI>().text = "Change Color:\n" + name;
+                GameFinder.FindChild(Instance.menu, "Text").GetComponent<TextMeshProUGUI>().text = "Change Color:\n" + name;
 
-                HSVPicker.ColorPicker picker = instance.GetComponentInChildren<HSVPicker.ColorPicker>();
+                HSVPicker.ColorPicker picker = Instance.menu.GetComponentInChildren<HSVPicker.ColorPicker>();
                 picker.AssignColor(DrawableConfigManager.GetDrawableConfig(surface).Color);
                 picker.onValueChanged.AddListener(color =>
                 {
@@ -50,33 +59,13 @@ namespace SEE.UI.Menu.Drawable
                 });
 
                 /// Initialize the button for canceling the menu.
-                ButtonManagerBasic cancelBtn = GameFinder.FindChild(instance, "Cancel")
+                ButtonManagerBasic cancelBtn = GameFinder.FindChild(Instance.menu, "Cancel")
                             .GetComponent<ButtonManagerBasic>();
                 cancelBtn.clickEvent.AddListener(() =>
                 {
                     Disable();
                 });
             }
-        }
-
-        /// <summary>
-        /// Destroy's the menu.
-        /// </summary>
-        public static void Disable()
-        {
-            if (instance != null)
-            {
-                Destroyer.Destroy(instance);
-            }
-        }
-
-        /// <summary>
-        /// Gets the state, if the menu is opened.
-        /// </summary>
-        /// <returns>The respective status of whether the menu is open.</returns>
-        public static bool IsOpen()
-        {
-            return instance != null;
         }
     }
 }

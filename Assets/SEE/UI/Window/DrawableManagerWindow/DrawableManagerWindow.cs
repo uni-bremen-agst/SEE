@@ -156,9 +156,9 @@ namespace SEE.UI.Window.DrawableManagerWindow
                 subscription.Dispose();
             }
 
-            if (SurfaceColorMenu.IsOpen())
+            if (SurfaceColorMenu.Instance.IsOpen())
             {
-                SurfaceColorMenu.Disable();
+                SurfaceColorMenu.Instance.Destroy();
             }
         }
 

@@ -337,13 +337,13 @@ namespace SEE.UI.Window.DrawableManagerWindow
             colorMesh.color = config.Color;
             colorBtn.clickEvent.AddListener(() =>
             {
-                if (!SurfaceColorMenu.IsOpen())
+                if (!SurfaceColorMenu.Instance.IsOpen())
                 {
                     UnityAction<Color> colorAction = colorOut =>
                     {
                         colorMesh.color = colorOut;
                     };
-                    SurfaceColorMenu.Enable(surface, colorAction);
+                    SurfaceColorMenu.Instance.Enable(surface, colorAction);
                 }
             });
 
