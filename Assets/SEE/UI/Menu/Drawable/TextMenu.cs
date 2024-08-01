@@ -6,7 +6,6 @@ using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
 using SEE.UI.PropertyDialog.Drawable;
-using SEE.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -21,18 +20,13 @@ namespace SEE.UI.Menu.Drawable
     /// <summary>
     /// This class holds the instance for the text menu.
     /// </summary>
-    public static class TextMenu
+    public class TextMenu : SingletonMenu
     {
         #region Variables
         /// <summary>
         /// The location where the text menu prefeb is placed.
         /// </summary>
         private const string textMenuPrefab = "Prefabs/UI/Drawable/TextMenu";
-
-        /// <summary>
-        /// The instance of the text menu.
-        /// </summary>
-        public static GameObject instance;
 
         /// <summary>
         /// The action for the Font Style Buttons that should also be carried out.
@@ -46,37 +40,37 @@ namespace SEE.UI.Menu.Drawable
 
         #region Label for font styles
         /// <summary>
-        /// The Label for the bold font style state
+        /// The label for the bold font style state
         /// </summary>
         private const string Bold = "Bold";
 
         /// <summary>
-        /// The Label for the italic font style state
+        /// The label for the italic font style state
         /// </summary>
         private const string Italic = "Italic";
 
         /// <summary>
-        /// The Label for the underline font style state
+        /// The label for the underline font style state
         /// </summary>
         private const string Underline = "Underline";
 
         /// <summary>
-        /// The Label for the strikethrough font style state
+        /// The label for the strikethrough font style state
         /// </summary>
         private const string Strikethrough = "Strikethrough";
 
         /// <summary>
-        /// The Label for the lower case font style state
+        /// The label for the lower case font style state
         /// </summary>
         private const string LowerCase = "LowerCase";
 
         /// <summary>
-        /// The Label for the upper case font style state
+        /// The label for the upper case font style state
         /// </summary>
         private const string UpperCase = "UpperCase";
 
         /// <summary>
-        /// The Label for the small caps font style state
+        /// The label for the small caps font style state
         /// </summary>
         private const string SmallCaps = "SmallCaps";
         #endregion
@@ -93,7 +87,7 @@ namespace SEE.UI.Menu.Drawable
             {SmallCaps, false} };
 
         /// <summary>
-        /// The button for the bold font style
+        /// The button for the bold font style.
         /// </summary>
         private static Button boldBtn;
 
@@ -103,7 +97,7 @@ namespace SEE.UI.Menu.Drawable
         private static ButtonManagerBasic boldBMB;
 
         /// <summary>
-        /// The button for the italic font style
+        /// The button for the italic font style.
         /// </summary>
         private static Button italicBtn;
 
@@ -113,7 +107,7 @@ namespace SEE.UI.Menu.Drawable
         private static ButtonManagerBasic italicBMB;
 
         /// <summary>
-        /// The button for the underline font style
+        /// The button for the underline font style.
         /// </summary>
         private static Button underlineBtn;
 
@@ -123,7 +117,7 @@ namespace SEE.UI.Menu.Drawable
         private static ButtonManagerBasic underlineBMB;
 
         /// <summary>
-        /// The button for the strikethrough font style
+        /// The button for the strikethrough font style.
         /// </summary>
         private static Button strikethroughBtn;
 
@@ -133,7 +127,7 @@ namespace SEE.UI.Menu.Drawable
         private static ButtonManagerBasic strikethroughBMB;
 
         /// <summary>
-        /// The button for the lower case font style
+        /// The button for the lower case font style.
         /// </summary>
         private static Button lowerCaseBtn;
 
@@ -143,7 +137,7 @@ namespace SEE.UI.Menu.Drawable
         private static ButtonManagerBasic lowerCaseBMB;
 
         /// <summary>
-        /// The button for the upper case font style
+        /// The button for the upper case font style.
         /// </summary>
         private static Button upperCaseBtn;
 
@@ -153,7 +147,7 @@ namespace SEE.UI.Menu.Drawable
         private static ButtonManagerBasic upperCaseBMB;
 
         /// <summary>
-        /// The button for the small caps font style
+        /// The button for the small caps font style.
         /// </summary>
         private static Button smallCapsBtn;
 
@@ -218,7 +212,7 @@ namespace SEE.UI.Menu.Drawable
         private static GameObject thicknessLayer;
 
         /// <summary>
-        /// The switch for enable or disable the outline.
+        /// The switch to enable or disable the outline.
         /// </summary>
         private static SwitchManager outlineSwitch;
 
@@ -244,64 +238,74 @@ namespace SEE.UI.Menu.Drawable
         #endregion
 
         /// <summary>
+        /// We do not want to create an instance of this singleton class outside of this class.
+        /// </summary>
+        private TextMenu() { }
+
+        /// <summary>
+        /// The only instance of this singleton class.
+        /// </summary>
+        public static TextMenu Instance { get; private set; }
+
+        /// <summary>
         /// The init constructor that create the instance for the text menu.
         /// It hides the text menu by default.
         /// </summary>
         static TextMenu()
         {
-            instance = PrefabInstantiator.InstantiatePrefab(textMenuPrefab,
-                                                            UICanvas.Canvas.transform, false);
+            Instance = new TextMenu();
+            Instance.Instantiate(textMenuPrefab);
             InitBtn();
-            instance.SetActive(false);
+            Enable();
         }
 
         /// <summary>
-        /// Gets the state if the menu is already opened.
+        /// Returns true if the menu is already opened.
         /// </summary>
-        /// <returns>true, if the menu is alreay opened. Otherwise false.</returns>
-        public static bool IsOpen()
+        /// <returns>True if the menu is alreay opened. Otherwise false.</returns>
+        public override bool IsOpen()
         {
-            return instance.activeInHierarchy;
+            return Instance.menu.activeInHierarchy;
         }
 
         /// <summary>
-        /// This method assigns the corresponding objects of the TextMenu instance to the buttons, sliders and other GameObjects.
-        /// It also adds their initial Handler to the components.
+        /// Assigns the corresponding objects of the TextMenu instance to the buttons, sliders and other GameObjects.
+        /// It also adds the initial handlers to the components.
         /// </summary>
         private static void InitBtn()
         {
             /// Initialize the objects for the font style buttons
-            GameObject bold = GameFinder.FindChild(instance, "Bold");
+            GameObject bold = GameFinder.FindChild(Instance.menu, "Bold");
             boldBtn = bold.GetComponent<Button>();
             boldBMB = bold.GetComponent<ButtonManagerBasic>();
             bold.AddComponent<ButtonHoverTooltip>().SetMessage("Bold");
 
-            GameObject italic = GameFinder.FindChild(instance, "Italic");
+            GameObject italic = GameFinder.FindChild(Instance.menu, "Italic");
             italicBtn = italic.GetComponent<Button>();
             italicBMB = italic.GetComponent<ButtonManagerBasic>();
             italic.AddComponent<ButtonHoverTooltip>().SetMessage("Italic");
 
-            GameObject underline = GameFinder.FindChild(instance, "Underline");
+            GameObject underline = GameFinder.FindChild(Instance.menu, "Underline");
             underlineBtn = underline.GetComponent<Button>();
             underlineBMB = underline.GetComponent<ButtonManagerBasic>();
             underline.AddComponent<ButtonHoverTooltip>().SetMessage("Underline");
 
-            GameObject strikethrough = GameFinder.FindChild(instance, "Strikethrough");
+            GameObject strikethrough = GameFinder.FindChild(Instance.menu, "Strikethrough");
             strikethroughBtn = strikethrough.GetComponent<Button>();
             strikethroughBMB = strikethrough.GetComponent<ButtonManagerBasic>();
             strikethrough.AddComponent<ButtonHoverTooltip>().SetMessage("Strikethrough");
 
-            GameObject lowerCase = GameFinder.FindChild(instance, "LowerCase");
+            GameObject lowerCase = GameFinder.FindChild(Instance.menu, "LowerCase");
             lowerCaseBtn = lowerCase.GetComponent<Button>();
             lowerCaseBMB = lowerCase.GetComponent<ButtonManagerBasic>();
             lowerCase.AddComponent<ButtonHoverTooltip>().SetMessage("Lower Case");
 
-            GameObject upperCase = GameFinder.FindChild(instance, "UpperCase");
+            GameObject upperCase = GameFinder.FindChild(Instance.menu, "UpperCase");
             upperCaseBtn = upperCase.GetComponent<Button>();
             upperCaseBMB = upperCase.GetComponent<ButtonManagerBasic>();
             upperCase.AddComponent<ButtonHoverTooltip>().SetMessage("Upper Case");
 
-            GameObject smallCaps = GameFinder.FindChild(instance, "SmallCaps");
+            GameObject smallCaps = GameFinder.FindChild(Instance.menu, "SmallCaps");
             smallCapsBtn = smallCaps.GetComponent<Button>();
             smallCapsBMB = smallCaps.GetComponent<ButtonManagerBasic>();
             smallCaps.AddComponent<ButtonHoverTooltip>().SetMessage("Small Caps");
@@ -316,37 +320,37 @@ namespace SEE.UI.Menu.Drawable
                 selectedBlock.highlightedColor = selectedBlock.pressedColor = Color.gray;
 
             /// Initialize the font color button and adds an exclusion mechanism with the outline color button.
-            fontColorBtn = GameFinder.FindChild(instance, "FontColorBtn").GetComponent<Button>();
-            fontColorBMB = GameFinder.FindChild(instance, "FontColorBtn").GetComponent<ButtonManagerBasic>();
+            fontColorBtn = GameFinder.FindChild(Instance.menu, "FontColorBtn").GetComponent<Button>();
+            fontColorBMB = GameFinder.FindChild(Instance.menu, "FontColorBtn").GetComponent<ButtonManagerBasic>();
             fontColorBtn.interactable = false;
             fontColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
 
             /// Initialize the outline color button and adds an exclusion mechanism with the font color button.
-            outlineColorBtn = GameFinder.FindChild(instance, "OutlineColorBtn").GetComponent<Button>();
-            outlineColorBMB = GameFinder.FindChild(instance, "OutlineColorBtn").GetComponent<ButtonManagerBasic>();
+            outlineColorBtn = GameFinder.FindChild(Instance.menu, "OutlineColorBtn").GetComponent<Button>();
+            outlineColorBMB = GameFinder.FindChild(Instance.menu, "OutlineColorBtn").GetComponent<ButtonManagerBasic>();
             outlineColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
 
             /// Initialize the outline switch and their layer.
-            outlineSwitchLayer = GameFinder.FindChild(instance, "Outline");
+            outlineSwitchLayer = GameFinder.FindChild(Instance.menu, "Outline");
             outlineSwitch = outlineSwitchLayer.GetComponentInChildren<SwitchManager>();
             outlineSwitchLayer.SetActive(false);
 
             /// Initialize the font outline thickness slider.
-            thicknessLayer = GameFinder.FindChild(instance, "Thickness").gameObject;
+            thicknessLayer = GameFinder.FindChild(Instance.menu, "Thickness");
             thicknessSlider = thicknessLayer.GetComponentInChildren<FloatValueSliderController>();
             thicknessLayer.SetActive(false);
 
             /// Initialize the remaining GUI elements.
-            picker = instance.GetComponentInChildren<HSVPicker.ColorPicker>();
-            fontSizeInput = GameFinder.FindChild(instance, "FontSize").GetComponentInChildren<InputFieldWithButtons>();
-            editText = GameFinder.FindChild(instance, "EditText").gameObject;
+            picker = Instance.menu.GetComponentInChildren<HSVPicker.ColorPicker>();
+            fontSizeInput = GameFinder.FindChild(Instance.menu, "FontSize").GetComponentInChildren<InputFieldWithButtons>();
+            editText = GameFinder.FindChild(Instance.menu, "EditText");
             editTextBMB = editText.GetComponentInChildren<ButtonManagerBasic>();
-            orderInLayer = GameFinder.FindChild(instance, "Layer").gameObject;
+            orderInLayer = GameFinder.FindChild(Instance.menu, "Layer");
             orderInLayerSlider = orderInLayer.GetComponentInChildren<LayerSliderController>();
         }
 
         /// <summary>
-        /// This method adds the inital Handler to the font style buttons.
+        /// Adds the inital handlers to the font style buttons.
         /// </summary>
         private static void InitFontStyleButtons()
         {
@@ -361,12 +365,12 @@ namespace SEE.UI.Menu.Drawable
 
         /// <summary>
         /// To hide the text menu.
-        /// It's enable the keyboard shortcuts.
+        /// It enables the keyboard shortcuts.
         /// </summary>
-        public static void Disable()
+        public override void Disable()
         {
-            instance.transform.Find("ReturnBtn").gameObject.SetActive(false);
-            instance.SetActive(false);
+            base.Disable();
+            Instance.menu.transform.Find("ReturnBtn").gameObject.SetActive(false);
             SEEInput.KeyboardShortcutsEnabled = true;
         }
 
@@ -390,10 +394,11 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Reveal the text menu
+        /// Reveals the text menu.
         /// </summary>
         /// <param name="reset">Specifies whether the menu should be reset to its initial state</param>
-        /// <param name="showEditMode">Specifies whether the menu should be opened for edit mode. Otherwise it will be opened for the WriteTextAction</param>
+        /// <param name="showEditMode">Specifies whether the menu should be opened for edit mode.
+        /// Otherwise it will be opened for the WriteTextAction</param>
         public static void Enable(bool reset = true, bool showEditMode = false)
         {
             /// Resets the handlers, if desired (depending on <paramref name="reset").
@@ -407,7 +412,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 /// If yes, the order in layer and the edit text is available.
                 orderInLayer.SetActive(true);
-                GameFinder.FindChild(instance, "Layer").GetComponentInChildren<Slider>().interactable = true;
+                GameFinder.FindChild(Instance.menu, "Layer").GetComponentInChildren<Slider>().interactable = true;
                 editText.SetActive(true);
             }
             else
@@ -417,19 +422,20 @@ namespace SEE.UI.Menu.Drawable
                 editText.SetActive(false);
             }
             /// Re-calculate the text menu height.
-            MenuHelper.CalculateHeight(instance);
+            MenuHelper.CalculateHeight(Instance.menu);
 
             /// Makes the menu active.
-            instance.SetActive(true);
+            Instance.menu.SetActive(true);
         }
 
         /// <summary>
-        /// Reveal the text menu
+        /// Reveals the text menu
         /// </summary>
-        /// <param name="colorAction">The inital action for the hsv color picker.</param>
-        /// <param name="color">The inital color for the hsv color picker.</param>
+        /// <param name="colorAction">The inital action for the HSV color picker.</param>
+        /// <param name="color">The inital color for the HSV color picker.</param>
         /// <param name="reset">Specifies whether the menu should be reset to its initial state.</param>
-        /// <param name="showEditMode">Specifies whether the menu should be opened for edit mode. Otherwise it will be opened for the WriteTextAction</param>
+        /// <param name="showEditMode">Specifies whether the menu should be opened for edit mode.
+        /// Otherwise it will be opened for the WriteTextAction</param>
         private static void EnableTextMenu(UnityAction<Color> colorAction, Color color, bool reset = true,
             bool showEditMode = false)
         {
@@ -444,7 +450,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 /// If yes, the order in layer and the edit text is available.
                 orderInLayer.SetActive(true);
-                GameFinder.FindChild(instance, "Layer").GetComponentInChildren<Slider>().interactable = true;
+                GameFinder.FindChild(Instance.menu, "Layer").GetComponentInChildren<Slider>().interactable = true;
                 editText.SetActive(true);
             }
             else
@@ -454,7 +460,7 @@ namespace SEE.UI.Menu.Drawable
                 editText.SetActive(false);
             }
             /// Makes the menu active.
-            instance.SetActive(true);
+            Instance.menu.SetActive(true);
 
             /// Toggles the interactable of the mutually buttons.
             if (fontColorBtn.interactable)
@@ -466,11 +472,11 @@ namespace SEE.UI.Menu.Drawable
             AssignColorArea(colorAction, color);
 
             /// Re-calculate the menu height.
-            MenuHelper.CalculateHeight(instance);
+            MenuHelper.CalculateHeight(Instance.menu);
         }
 
         /// <summary>
-        /// Provides the text menu for writing action. It's adding the needed Handler to the respective components.
+        /// Provides the text menu for writing action. It adds the needed handlers to the respective components.
         /// </summary>
         public static void EnableForWriting()
         {
@@ -478,14 +484,14 @@ namespace SEE.UI.Menu.Drawable
             EnableTextMenu(color => ValueHolder.CurrentPrimaryColor = color, ValueHolder.CurrentPrimaryColor, true);
 
             /// Disables the return button.
-            instance.transform.Find("ReturnBtn").gameObject.SetActive(false);
+            Instance.menu.transform.Find("ReturnBtn").gameObject.SetActive(false);
 
             /// Adds the handler for the font color button.
             /// It saves the changes in the global value for the primary color <see cref="ValueHolder.CurrentPrimaryColor"/>.
             fontColorBMB.clickEvent.AddListener(() =>
             {
                 AssignColorArea(color => ValueHolder.CurrentPrimaryColor = color, ValueHolder.CurrentPrimaryColor);
-                MenuHelper.CalculateHeight(instance);
+                MenuHelper.CalculateHeight(Instance.menu);
             });
 
             /// Adds the handler for the outline color button.
@@ -504,12 +510,13 @@ namespace SEE.UI.Menu.Drawable
             AssignFontSize(size => ValueHolder.CurrentFontSize = size, ValueHolder.CurrentFontSize);
 
             /// Re-calculate the menu height.
-            MenuHelper.CalculateHeight(instance);
+            MenuHelper.CalculateHeight(Instance.menu);
         }
 
         /// <summary>
         /// Adds the handler for the outline color button.
-        /// It saves the changes in the global value for the secondary color <see cref="ValueHolder.CurrentSecondaryColor"/>.
+        /// It saves the changes in the global value for the secondary color
+        /// <see cref="ValueHolder.CurrentSecondaryColor"/>.
         ///
         /// Checks the current secondary color before assigning it.
         /// If it is clear (completely transparent), a new random color is chosen.
@@ -519,7 +526,6 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void AssignOutlineThicknessForWriting()
         {
-
             outlineColorBMB.clickEvent.AddListener(() =>
             {
                 /// If the <see cref="GameDrawer.LineKind"/> was <see cref="GameDrawer.LineKind.Solid"/> before,
@@ -537,15 +543,19 @@ namespace SEE.UI.Menu.Drawable
                         ValueHolder.CurrentSecondaryColor.g, ValueHolder.CurrentSecondaryColor.b, 255);
                 }
                 AssignColorArea(color => ValueHolder.CurrentSecondaryColor = color, ValueHolder.CurrentSecondaryColor);
-                MenuHelper.CalculateHeight(instance);
+                MenuHelper.CalculateHeight(Instance.menu);
             });
         }
 
         /// <summary>
-        /// This method provides the text menu for editing, adding the necessary Handler to the respective components.
+        /// Provides the text menu for editing, adding the necessary handlers to the respective components.
         /// </summary>
         /// <param name="selectedText">The selected text object for editing.</param>
-        public static void EnableForEditing(GameObject selectedText, DrawableType newValueHolder, UnityAction returnCall = null)
+        /// <param name="newValueHolder">The <see cref="TextConf"/> value holder. If differnt
+        /// from this type, nothing happens.</param>
+        /// <param name="returnCall">The return call action to return to the parent menu.</param>
+        public static void EnableForEditing(GameObject selectedText, DrawableType newValueHolder,
+            UnityAction returnCall = null)
         {
             if (newValueHolder is TextConf textHolder)
             {
@@ -641,7 +651,7 @@ namespace SEE.UI.Menu.Drawable
                 }, textHolder.OrderInLayer);
 
                 /// Re-calculate the menus height.
-                MenuHelper.CalculateHeight(instance);
+                MenuHelper.CalculateHeight(Instance.menu);
             }
         }
 
@@ -656,12 +666,12 @@ namespace SEE.UI.Menu.Drawable
         {
             if (returnCall != null)
             {
-                GameObject obj = instance.transform.Find("ReturnBtn").gameObject;
-                obj.SetActive(true);
-                ButtonManagerBasic returnBtn = obj.GetComponent<ButtonManagerBasic>();
+                GameObject returnButton = Instance.menu.transform.Find("ReturnBtn").gameObject;
+                returnButton.SetActive(true);
+                ButtonManagerBasic returnBtn = returnButton.GetComponent<ButtonManagerBasic>();
                 returnBtn.clickEvent.RemoveAllListeners();
                 returnBtn.clickEvent.AddListener(returnCall);
-                GameFinder.FindChild(instance, "Layer").GetComponentInChildren<Slider>().interactable = false;
+                GameFinder.FindChild(Instance.menu, "Layer").GetComponentInChildren<Slider>().interactable = false;
             }
         }
 
@@ -670,7 +680,7 @@ namespace SEE.UI.Menu.Drawable
         /// After the button is pressed, the <see cref="HSVPicker.ColorPicker"/> changes the font color of the text.
         /// Changes are saved in the configuration.
         /// </summary>
-        /// <param name="selectedText">The text to be edit.</param>
+        /// <param name="selectedText">The text to be edited.</param>
         /// <param name="textHolder">The configuration which holds the changes.</param>
         /// <param name="surface">The drawable surface on which the text is displayed</param>
         /// <param name="surfaceParentName">The id of the drawable surface parent</param>
@@ -685,7 +695,7 @@ namespace SEE.UI.Menu.Drawable
                     textHolder.FontColor = color;
                     new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
                 }, textHolder.FontColor);
-                MenuHelper.CalculateHeight(instance);
+                MenuHelper.CalculateHeight(Instance.menu);
             });
         }
 
@@ -694,7 +704,7 @@ namespace SEE.UI.Menu.Drawable
         /// After the button is pressed, the <see cref="HSVPicker.ColorPicker"/> changes the outline color of the text.
         /// Changes are saved in the configuration.
         /// </summary>
-        /// <param name="selectedText">The text to be edit.</param>
+        /// <param name="selectedText">The text to be edited.</param>
         /// <param name="textHolder">The configuration which holds the changes.</param>
         /// <param name="surface">The drawable surface on which the text is displayed</param>
         /// <param name="surfaceParentName">The id of the drawable surface parent</param>
@@ -724,12 +734,12 @@ namespace SEE.UI.Menu.Drawable
                     textHolder.OutlineColor = color;
                     new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
                 }, textHolder.OutlineColor);
-                MenuHelper.CalculateHeight(instance);
+                MenuHelper.CalculateHeight(Instance.menu);
             });
         }
 
         /// <summary>
-        /// This method will be used as an action for the Handler of the color buttons (font/outline).
+        /// This method will be used as an action for the handler of the color buttons (font/outline).
         /// This allows only one color to be active at a time.
         /// </summary>
         private static void MutuallyExclusiveColorButtons()
@@ -747,7 +757,7 @@ namespace SEE.UI.Menu.Drawable
                 outlineSwitchLayer.SetActive(false);
             }
             /// Re-calculate the text menu height.
-            MenuHelper.CalculateHeight(instance, true);
+            MenuHelper.CalculateHeight(Instance.menu, true);
         }
 
         /// <summary>
@@ -823,9 +833,9 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Assigns an action and a order to the order in layer slider.
+        /// Assigns an action and an order to the order in layer slider.
         /// </summary>
-        /// <param name="orderInLayerAction">The int action that should be assigned</param>
+        /// <param name="orderInLayerAction">The action that should be assigned</param>
         /// <param name="order">The order that should be assigned.</param>
         public static void AssignOrderInLayer(UnityAction<int> orderInLayerAction, int order)
         {
@@ -856,8 +866,9 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// This method will be used as inital Handler action for the font style buttons.
-        /// It enters the status of the selected font style into the dictionary and ensures that mutually exclusive font styles remain exclusive.
+        /// This method will be used as inital handler action for the font style buttons.
+        /// It enters the status of the selected font style into the dictionary and
+        /// ensures that mutually exclusive font styles remain exclusive.
         /// </summary>
         /// <param name="pressedStyle"></param>
         public static void Press(string pressedStyle)
@@ -869,24 +880,17 @@ namespace SEE.UI.Menu.Drawable
                 {
                     GetPressedButton(pressedStyle).colors = selectedBlock;
                     MutuallyExclusiveStyles(pressedStyle);
-                    if (fontStyleAction != null)
-                    {
-                        fontStyleAction.Invoke(GetFontStyle());
-                    }
                 }
                 else
                 {
                     GetPressedButton(pressedStyle).colors = notSelectedBlock;
-                    if (fontStyleAction != null)
-                    {
-                        fontStyleAction.Invoke(GetFontStyle());
-                    }
                 }
+                fontStyleAction?.Invoke(GetFontStyle());
             }
         }
 
         /// <summary>
-        /// This method ensures that the three mutually exclusive font styles do not overlap.
+        /// Ensures that the three mutually exclusive font styles do not overlap.
         /// </summary>
         /// <param name="selectedStyle">The chosen font style.</param>
         private static void MutuallyExclusiveStyles(string selectedStyle)
@@ -950,7 +954,8 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Set's the font style stats in dicitonary to false and changes the color block to not selected.
+        /// Sets the font style stats in dictionary <see cref="styles"/> to false
+        /// and changes the color block to not selected.
         /// </summary>
         private static void ResetStyles()
         {
@@ -976,7 +981,7 @@ namespace SEE.UI.Menu.Drawable
         /// Assigns the respective font styles their value and
         /// changes their button color when they are selected.
         /// </summary>
-        /// <param name="style"></param>
+        /// <param name="style">style to be assigned</param>
         private static void AssignStyles(FontStyles style)
         {
             styles[Bold] = (style & FontStyles.Bold) != 0;
@@ -1033,7 +1038,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Creates a font style with contains all the selected font styles.
+        /// Creates a font style which contains all the selected font styles.
         /// </summary>
         /// <returns>A font style with the chosen font styles</returns>
         public static FontStyles GetFontStyle()
@@ -1050,11 +1055,10 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Gets the status of the outline color.
-        /// True = enabled, false = disabled.
+        /// True if the outline is enabled, otherwise false.
         /// </summary>
         /// <returns>the status of outline.</returns>
-        public static bool GetOutlineStatus()
+        public static bool IsOutlineEnabled()
         {
             return outlineSwitch.isOn;
         }

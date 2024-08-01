@@ -176,7 +176,7 @@ namespace SEE.Controls.Actions.Drawable
                     DrawableHolder holder = Surface.GetComponent<DrawableHolder>();
                     textObj = GameTexter.WriteText(Surface, textOut, position,
                         ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor,
-                        TextMenu.GetOutlineStatus(),
+                        TextMenu.IsOutlineEnabled(),
                         ValueHolder.CurrentOutlineThickness, ValueHolder.CurrentFontSize,
                         holder.OrderInLayer, TextMenu.GetFontStyle());
                     new WriteTextNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
