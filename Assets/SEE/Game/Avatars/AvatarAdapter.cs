@@ -304,7 +304,7 @@ namespace SEE.Game.Avatars
             Debug.Log("aaaaaaaaaaaaaaaaaaa" + gameObject.name);
             Debug.Log("aaaaaaaaaaaaaaaaaaa" + gameObject.name);
             Debug.Log("aaaaaaaaaaaaaaaaaaa" + gameObject.name);
-            GameObject indicator = rig.transform.Find("Camera Offset/Left Controller/ModePanel/Canvas").transform.gameObject;
+            GameObject indicator = rig.transform.Find("Camera Offset/Left Controller/ModePanel/XRCanvas").transform.gameObject;
             Debug.Log(indicator.name + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
             ActionStateType firstType = ActionStateTypes.NewEdge;
             GlobalActionHistory.Execute(ActionStateTypes.Delete);

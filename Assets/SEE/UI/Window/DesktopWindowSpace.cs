@@ -43,6 +43,7 @@ namespace SEE.UI.Window
             Canvas.transform.SetParent(GameObject.Find("XRTabletCanvas").transform, false);
             Canvas.AddComponent<TrackedDeviceGraphicRaycaster>();
             Canvas.GetComponent<RectTransform>().localScale = new Vector3(0.001f, 0.001f, 0.001f);
+            Canvas.GetComponent<RectTransform>().sizeDelta = new Vector2(950, 950);
             Canvas.GetComponent<RectTransform>().localRotation = Quaternion.Euler(0, -90, 0);
             Canvas.GetComponent<RectTransform>().localPosition = new Vector3(0.9f, 0, 0);
             StartDesktop();

@@ -80,12 +80,16 @@ namespace SEE.UI.PopupMenu
         protected override void StartDesktop()
         {
             // Instantiate the menu.
-            menu = (RectTransform)PrefabInstantiator.InstantiatePrefab(menuPrefabPath, Canvas.transform, false).transform;
+            menu = (RectTransform)GameObject.Find("XRRig(Clone)/Camera Offset/Right Controller/ModePanel/XRCanvas/PopupMenu").transform;
             contentSizeFitter = menu.gameObject.MustGetComponent<ContentSizeFitter>();
             menuCanvasGroup = menu.gameObject.MustGetComponent<CanvasGroup>();
             scrollView = (RectTransform)menu.Find("Scroll View");
+            RectTransform background = (RectTransform)menu.Find("Background");
+            RectTransform shadow = (RectTransform)menu.Find("Shadow");
+            shadow.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+            background.localScale = new Vector3(0.1f, 0.1f, 0.1f);
             actionList = (RectTransform)scrollView.Find("Viewport/Action List");
-
+            scrollView.localScale = new Vector3(0.1f, 0.1f, 0.1f);
             // The menu should be hidden when the user moves the mouse away from it.
             PointerHelper pointerHelper = menu.gameObject.MustGetComponent<PointerHelper>();
             pointerHelper.ExitEvent.AddListener(x =>
@@ -111,6 +115,16 @@ namespace SEE.UI.PopupMenu
         protected override void StartVR()
         {
             StartDesktop();
+        }
+
+        protected override void UpdateVR()
+        {
+            if (XRSEEActions.TooltipToggle && XRSEEActions.OnSelectToggle)
+            {
+                XRSEEActions.TooltipToggle = false;
+                XRSEEActions.OnSelectToggle = false;
+                HideMenuAsync().Forget();
+            }
         }
 
         /// <summary>

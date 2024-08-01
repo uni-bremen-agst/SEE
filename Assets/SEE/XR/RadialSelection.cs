@@ -9,6 +9,7 @@ using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit;
+using SEE.Utils;
 
 public class RadialSelection : MonoBehaviour
 {
@@ -25,6 +26,9 @@ public class RadialSelection : MonoBehaviour
     List<(string, List<string>)> subMenus = new List<(string, List<string>)>();
     List<string> menuEntrys = new();
     Dictionary<string, List<string>> menus;
+    GameObject actionObject;
+    Vector3? subMenuPosition;
+    Quaternion? subMenuRotation;
     public static HideModeSelector HideMode { get; set; }
     // Start is called before the first frame update
     private void Awake()
@@ -180,14 +184,64 @@ public class RadialSelection : MonoBehaviour
                 numberOfRadialPart = actions.Count();
                 RadialMenuTrigger = true;
                 menuEntrys.Clear();
+                subMenuPosition = radialPartCanvas.position;
+                subMenuRotation = radialPartCanvas.rotation;
             }
             if (actions[i] == "HideAll")
             {
+                Debug.Log("letsgo");
                 HideMode = HideModeSelector.HideAll;
+                GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == "Hide"));
+                return;
+            }
+            if (actions[i] == "HideSelected")
+            {
+                HideMode = HideModeSelector.HideSelected;
+                GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == "Hide"));
+            }
+            if (actions[i] == "HideUnselected")
+            {
+                HideMode = HideModeSelector.HideUnselected;
+                GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == "Hide"));
+            }
+            if (actions[i] == "HideOutgoing")
+            {
+                HideMode = HideModeSelector.HideOutgoing;
+                GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == "Hide"));
+            }
+            if (actions[i] == "HideIncoming")
+            {
+                HideMode = HideModeSelector.HideIncoming;
+                GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == "Hide"));
+            }
+            if (actions[i] == "HideAllEdgesOfSelected")
+            {
+                HideMode = HideModeSelector.HideAllEdgesOfSelected;
+                GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == "Hide"));
+            }
+            if (actions[i] == "HideForwardTransitiveClosure")
+            {
+                HideMode = HideModeSelector.HideForwardTransitiveClosure;
+                GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == "Hide"));
+            }
+            if (actions[i] == "HideBackwardTransitiveClosure")
+            {
+                HideMode = HideModeSelector.HideBackwardTransitiveClosure;
+                GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == "Hide"));
+            }
+            if (actions[i] == "HideAllTransitiveClosure")
+            {
+                HideMode = HideModeSelector.HideAllTransitiveClosure;
+                GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == "Hide"));
+            }
+            if (actions[i] == "HighlightEdges")
+            {
+                HideMode = HideModeSelector.HighlightEdges;
                 GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == "Hide"));
             }
             else
             {
+                Debug.Log("komisch" + actions[0] + numberOfRadialPart);
                 GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == actions[i]));
             }
         }
@@ -212,6 +266,43 @@ public class RadialSelection : MonoBehaviour
                     actions.Add("HighlightEdges");
                     actions.Add("Back");
                     RadialMenuTrigger = true;
+                    subMenuPosition = radialPartCanvas.position;
+                    subMenuRotation = radialPartCanvas.rotation;
+                }
+                if (actions[i] == ActionStateTypes.Rotate.Name)
+                {
+                    if (actionObject != null)
+                    {
+                        Destroy(actionObject);
+                    }
+                    Debug.Log("jjjjjjjjjjjj");
+                    actionObject = PrefabInstantiator.InstantiatePrefab("Prefabs/Dial").transform.gameObject;
+                    Debug.Log("spawned" + actionObject.name);
+                    Debug.Log("location" + actionObject.transform.position);
+                    Debug.Log("handlocation" + handTransform.position);
+                    actionObject.transform.position = handTransform.position;
+                    actionObject.SetActive(true);
+                }
+                else if (actions[i] == ActionStateTypes.Draw.Name)
+                {
+                    if (actionObject != null)
+                    {
+                        Destroy(actionObject);
+                    }
+                    Debug.Log("jjjjjjjjjjjj");
+                    actionObject = PrefabInstantiator.InstantiatePrefab("Prefabs/Pen").transform.gameObject;
+                    Debug.Log("spawned" + actionObject.name);
+                    Debug.Log("location" + actionObject.transform.position);
+                    Debug.Log("handlocation" + handTransform.position);
+                    actionObject.transform.position = handTransform.position;
+                    actionObject.SetActive(true);
+                }
+                else
+                {
+                    if (actionObject != null)
+                    {
+                        actionObject.SetActive(false);
+                    }
                 }
                 GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == subMenus[i].Item1));
             }
@@ -223,6 +314,8 @@ public class RadialSelection : MonoBehaviour
                 actions.AddRange(subMenus[i].Item2);
                 actions.Add("Back");
                 RadialMenuTrigger = true;
+                subMenuPosition = radialPartCanvas.position;
+                subMenuRotation = radialPartCanvas.rotation;
             }
         }
     }
@@ -231,8 +324,18 @@ public class RadialSelection : MonoBehaviour
     {
         Debug.Log("SoViele:" + numberOfRadialPart);
         radialPartCanvas.gameObject.SetActive(true);
-        radialPartCanvas.position = handTransform.position;
-        radialPartCanvas.rotation = handTransform.rotation;
+        if (subMenuPosition != null && subMenuRotation != null)
+        {
+            radialPartCanvas.position = (Vector3)subMenuPosition;
+            radialPartCanvas.rotation = (Quaternion)subMenuRotation;
+            subMenuPosition = null;
+            subMenuRotation = null;
+        }
+        else
+        {
+            radialPartCanvas.position = handTransform.position + new Vector3(0, 0, 0.2f);
+            radialPartCanvas.rotation = handTransform.rotation;
+        }
 
 
         foreach (GameObject item in spawnedParts)
@@ -252,6 +355,10 @@ public class RadialSelection : MonoBehaviour
             spawnRadialPart.transform.localEulerAngles = radialPartEulerAngle;
 
             spawnRadialPart.GetComponent<Image>().fillAmount = (1 / (float)numberOfRadialPart) - (angleBetweenPart / 360);
+            if (i > (numberOfRadialPart / 2))
+            {
+                spawnRadialPart.gameObject.transform.Find("TextField").gameObject.MustGetComponent<RectTransform>().eulerAngles = new Vector3(0, 0, 180);
+            }
             spawnRadialPart.gameObject.transform.Find("TextField").gameObject.MustGetComponent<TextMeshProUGUI>().text = actions[i];
             Debug.Log("Action:" + actions[i]);
             spawnedParts.Add(spawnRadialPart);
