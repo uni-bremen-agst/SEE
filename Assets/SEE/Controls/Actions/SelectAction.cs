@@ -3,6 +3,7 @@ using SEE.IDE;
 using SEE.Utils;
 using UnityEngine;
 using SEE.Audio;
+using SEE.GO;
 
 namespace SEE.Controls.Actions
 {
@@ -34,23 +35,25 @@ namespace SEE.Controls.Actions
                 InteractableObject.UnselectAll(true);
                 AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
             }
-            else if (SEEInput.Select())
+            else if (SEEInput.Select() || (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.Delete))
             {
                 InteractableObject obj = null;
                 if (Raycasting.RaycastInteractableObject(out _, out InteractableObject o) != HitGraphElement.None)
                 {
                     obj = o;
                 }
-                if (Input.GetKey(KeyCode.LeftControl))
+                if (Input.GetKey(KeyCode.LeftControl) || (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.Delete))
                 {
                     if (obj != null)
                     {
                         obj.SetSelect(!obj.IsSelected, true);
+                        XRSEEActions.Delete = false;
                     }
                 }
                 else
                 {
                     InteractableObject.ReplaceSelection(obj, true);
+                    XRSEEActions.Delete = false;
                 }
             }
             else if (IDEIntegration.Instance != null && IDEIntegration.Instance.PendingSelectionsAction())

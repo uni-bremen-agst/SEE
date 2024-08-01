@@ -49,18 +49,27 @@ public class XRSEEActions : MonoBehaviour
     public InputActionReference undo;
     public InputActionReference redo;
     public InputActionReference radialMenu;
+    public InputActionReference scale;
+    public InputActionReference tooltip;
+    private ShowLabel showLabel;
+    private Vector3 originalScale;
+    private Vector3 originalPoint;
+    private Vector3 updatedScale;
+    public bool allowTurn { get; set; }
 
     // Start is called before the first frame update
     private void Awake()
     {
-        radialMenu.action.performed += RadialMenu;
+        //radialMenu.action.performed += RadialMenu;
+        tooltip.action.performed += Tooltip;
         undo.action.performed += Undo;
         redo.action.performed += Redo;
-        rightHandTurnInput.inputAction.performed += Rotate;
+        //rightHandTurnInput.inputAction.performed += Rotate;
         inputAction.action.Enable();
         inputAction.action.performed += Action;
-        openContextMenu.action.Enable();
-        openContextMenu.action.performed += OpenContexMenu;
+        //scale.action.performed += Scale;
+        //openContextMenu.action.Enable();
+        //openContextMenu.action.performed += OpenContexMenu;
         RayInteractor = m_RayInteractor;
     }
 
@@ -71,8 +80,11 @@ public class XRSEEActions : MonoBehaviour
         hoveredGameObject = args.interactableObject.transform.gameObject;
         oldParent = args.interactableObject.transform.parent;
         Debug.Log(oldParent.name + "cool");
+        hoveredGameObject.transform.TryGetComponent(out showLabel);
+        showLabel?.On();
         if (hoveredGameObject.transform.TryGetComponent(out InteractableObject io))
         {
+            allowTurn = false;
             io.SetHoverFlag(HoverFlag.World, true, true);
         }
     }
@@ -83,8 +95,11 @@ public class XRSEEActions : MonoBehaviour
         hovering = false;
         hoveredGameObject = args.interactableObject.transform.gameObject;
         oldParent = null;
+        hoveredGameObject.transform.TryGetComponent(out showLabel);
+        showLabel?.Off();
         if (hoveredGameObject.transform.TryGetComponent(out InteractableObject io))
         {
+            allowTurn = true;
             io.SetHoverFlag(HoverFlag.World, false, true);
         }
     }
@@ -115,15 +130,39 @@ public class XRSEEActions : MonoBehaviour
     }
     public static bool Selected { get; set; }
     public static bool Delete { get; set; }
+    public static GameObject RotateObject { get; set; }
     private void Action(InputAction.CallbackContext context)
     {
         if (hovering)
         {
-            if(GlobalActionHistory.Current() == ActionStateTypes.NewEdge || GlobalActionHistory.Current() == ActionStateTypes.Delete ||
-                GlobalActionHistory.Current() == ActionStateTypes.NewNode)
+            Delete = true;
+            if (GlobalActionHistory.Current() == ActionStateTypes.NewEdge || GlobalActionHistory.Current() == ActionStateTypes.Delete ||
+                GlobalActionHistory.Current() == ActionStateTypes.NewNode || GlobalActionHistory.Current() == ActionStateTypes.AcceptDivergence)
             {
                 Delete = true;
             }
+            if (GlobalActionHistory.Current() == ActionStateTypes.Rotate)
+            {
+                RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit);
+                RotateObject = hit.collider.transform.gameObject;
+                Delete = true;
+            }
+        }
+    }
+
+    public static bool TooltipToggle { get; set; }
+
+    public static bool OnSelectToggle { get; set; }
+
+    private void Tooltip(InputAction.CallbackContext context)
+    {
+        if (hovering)
+        {
+            TooltipToggle = true;
+        }
+        else if (OnSelectToggle)
+        {
+            TooltipToggle = true;
         }
     }
 

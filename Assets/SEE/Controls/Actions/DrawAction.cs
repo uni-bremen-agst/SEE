@@ -119,7 +119,7 @@ namespace SEE.Controls.Actions
                     Vector3 newPosition;
                     if (SceneSettings.InputType == PlayerInputType.VRPlayer)
                     {
-                        if (XRSEEActions.hoveredGameObject.name == "pen")
+                        if (XRSEEActions.hoveredGameObject.name == "Pen(Clone)")
                         {
                             newPosition = XRSEEActions.hoveredGameObject.transform.Find("Front").position;
                         }

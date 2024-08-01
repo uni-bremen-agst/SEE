@@ -32,9 +32,11 @@ namespace SEE.Controls.Actions
             popupMenu = gameObject.AddComponent<PopupMenu>();
         }
 
+        bool onSelect;
+
         private void Update()
         {
-            if (SEEInput.OpenContextMenu())
+            if (SEEInput.OpenContextMenu() || XRSEEActions.TooltipToggle)
             {
                 // TODO (#664): Detect if multiple elements are selected and adjust options accordingly.
                 HitGraphElement hit = Raycasting.RaycastInteractableObject(out _, out InteractableObject o);
@@ -44,7 +46,17 @@ namespace SEE.Controls.Actions
                 }
 
                 IEnumerable<PopupMenuAction> actions = GetApplicableOptions(o.GraphElemRef.Elem, o.gameObject);
-                popupMenu.ShowWith(actions, Input.mousePosition);
+                if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+                {
+                    XRSEEActions.TooltipToggle = false;
+                    XRSEEActions.OnSelectToggle = true;
+                    XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit ray);
+                    popupMenu.ShowWith(actions, ray.point);
+                }
+                else
+                {
+                    popupMenu.ShowWith(actions, Input.mousePosition);
+                }
             }
         }
 
