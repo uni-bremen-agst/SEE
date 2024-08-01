@@ -539,14 +539,14 @@ namespace SEE.Controls.Actions
                             distanceToUser = Vector3.Distance(origin, grabbedObject.Position);
                             CurrentState = IReversibleAction.Progress.InProgress;
                         }
-                        else
-                        {
-                            Vector3 origin;
-                            XRSEEActions.RayInteractor.GetLineOriginAndDirection(out origin, out Vector3 direction);
-                            grabbedObject.MoveTo(origin + distanceToUser * direction);
-                        }
-                        UpdateHierarchy();
                     }
+                    else
+                    {
+                        Vector3 origin;
+                        XRSEEActions.RayInteractor.GetLineOriginAndDirection(out origin, out Vector3 direction);
+                        grabbedObject.MoveTo(origin + distanceToUser * direction);
+                    }
+                    UpdateHierarchy();
                 }
                 else if (grabbedObject.IsGrabbed) // dragging has ended
                 {
