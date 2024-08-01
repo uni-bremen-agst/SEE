@@ -191,7 +191,7 @@ namespace SEE.Controls.Actions.Drawable
                 isDialogOpen = false;
             }
 
-            if (webImageDialog != null && webImageDialog.GetUserInput(out string url, out string fileNameOut))
+            if (webImageDialog != null && webImageDialog.TryGetUserInput(out string url, out string fileNameOut))
             {
                 isDialogOpen = false;
                 download = Surface.AddComponent<DownloadImage>();
