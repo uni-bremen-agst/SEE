@@ -169,7 +169,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>Whatever the success of creating is.</returns>
         private bool GettingText()
         {
-            if (writeTextDialog.GetUserInput(out string textOut))
+            if (writeTextDialog.TryGetUserInput(out string textOut))
             {
                 if (textOut != null && textOut != "")
                 {

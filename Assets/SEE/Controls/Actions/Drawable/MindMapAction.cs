@@ -272,7 +272,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void WaitForText()
         {
-            if (writeTextDialog.GetUserInput(out string textOut))
+            if (writeTextDialog.TryGetUserInput(out string textOut))
             {
                 if (string.IsNullOrEmpty(textOut))
                 {
