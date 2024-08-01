@@ -151,9 +151,9 @@ namespace SEE.UI.Window.DrawableManagerWindow
         /// <param name="item">The item to be removed.</param>
         private void RemoveItem(GameObject item)
         {
-            Destroyer.Destroy(item);
             string key = surfaceItems.FirstOrDefault(x=>x.Value == item).Key;
             surfaceItems.Remove(key);
+            Destroyer.Destroy(item);
         }
 
         /// <summary>
