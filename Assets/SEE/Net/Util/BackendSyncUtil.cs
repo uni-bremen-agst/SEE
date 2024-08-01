@@ -119,23 +119,22 @@ namespace SEE.Net.Util
         /// </summary>
         public static async UniTask InitializeClientAsync()
         {
-            ClearMultiplayerData();
-            await DownloadAllFilesAsync();
+            await InitializeCitiesAsync();
             Network.ServerNetwork.Value?.SyncClientServerRpc(NetworkManager.Singleton.LocalClientId);
-            // await LoadCityAsync();
         }
 
         /// <summary>
-        /// Initializes the host by downloading files, and instantiating Code Cities.
+        /// Downloads the Multiplayer files and instantes Code Cities.
         /// </summary>
-        public static async UniTask InitializeHostAsync()
+        public static async UniTask InitializeCitiesAsync()
         {
             if (!string.IsNullOrWhiteSpace(Network.ServerId) && !string.IsNullOrWhiteSpace(Network.BackendDomain))
             {
                 ClearMultiplayerData();
                 await DownloadAllFilesAsync();
             }
-            // await LoadCityAsync();
+            Debug.Log("Initializing Multiplayer Cities...");
+            await LoadCitiesAsync();
         }
 
         /// <summary>
@@ -148,8 +147,8 @@ namespace SEE.Net.Util
             if (Directory.Exists(multiplayerDataPath))
             {
                 Directory.Delete(multiplayerDataPath, true);
-                Directory.CreateDirectory(multiplayerDataPath);
             }
+            Directory.CreateDirectory(multiplayerDataPath);
         }
 
         /// <summary>
@@ -345,6 +344,7 @@ namespace SEE.Net.Util
                 string path = System.IO.Path.Combine(Application.streamingAssetsPath, ServerContentDirectory, city);
                 if (Directory.Exists(path))
                 {
+                    Debug.Log($"Found {city}...");
                     await LoadCityAsync(path, cities[city]);
                 }
             }
@@ -362,11 +362,11 @@ namespace SEE.Net.Util
             string configPath = GetCfg(dirPath);
             if (string.IsNullOrWhiteSpace(configPath))
             {
-                Debug.Log("No SEECity configuration found in multiplayer data.");
+                Debug.Log($"No SEECity configuration found in: {dirPath}");
                 return;
             }
 
-            Debug.Log($"Loading SEECity configuration from multiplayer data: {configPath}");
+            Debug.Log($"Loading SEECity configuration from: {configPath}");
             seeCity.ConfigurationPath = new DataPath(configPath);
             seeCity.LoadConfiguration();
             await seeCity.LoadDataAsync();
