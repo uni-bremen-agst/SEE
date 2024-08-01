@@ -125,7 +125,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             base.Stop();
             StickyNoteMenu.Instance.Destroy();
-            StickyNoteRotationMenu.Disable();
+            StickyNoteRotationMenu.Destroy();
             StickyNoteEditMenu.Instance.Destroy();
             StickyNoteMoveMenu.Instance.Destroy();
             ScaleMenu.Instance.Destroy();
@@ -215,7 +215,7 @@ namespace SEE.Controls.Actions.Drawable
                 && SEEInput.Cancel())
             {
                 ShowNotification.Info("Canceled", "The action was canceled by the user.");
-                StickyNoteRotationMenu.Disable();
+                StickyNoteRotationMenu.Destroy();
                 StickyNoteEditMenu.Instance.Destroy();
                 StickyNoteMoveMenu.Instance.Destroy();
                 ScaleMenu.Instance.Destroy();
@@ -388,7 +388,7 @@ namespace SEE.Controls.Actions.Drawable
             if (finish)
             {
                 StickyNoteMoveMenu.Instance.Destroy();
-                StickyNoteRotationMenu.Disable();
+                StickyNoteRotationMenu.Destroy();
                 memento.ChangedConfig.Position = stickyNoteHolder.transform.position;
                 memento.ChangedConfig.Rotation = stickyNoteHolder.transform.eulerAngles;
                 stickyNote.transform.Find("Back").GetComponent<Collider>().enabled = true;
@@ -654,7 +654,7 @@ namespace SEE.Controls.Actions.Drawable
             if (stickyNote != null)
             {
                 StickyNoteEditMenu.Instance.Destroy();
-                StickyNoteRotationMenu.Disable();
+                StickyNoteRotationMenu.Destroy();
                 ScaleMenu.Instance.Destroy();
                 stickyNote.Destroy<HighlightEffect>();
                 memento.ChangedConfig.Scale = stickyNote.transform.localScale;

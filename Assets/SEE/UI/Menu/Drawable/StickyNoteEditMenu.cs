@@ -51,7 +51,7 @@ namespace SEE.UI.Menu.Drawable
             UnityAction callback = () =>
             {
                 Instance.Enable();
-                StickyNoteRotationMenu.Disable();
+                StickyNoteRotationMenu.Destroy();
                 ScaleMenu.Instance.Destroy();
             };
 
