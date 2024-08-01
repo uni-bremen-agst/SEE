@@ -188,7 +188,7 @@ namespace SEE.Controls.Actions.Drawable
                 GameObject surface = GameFinder.GetDrawableSurface(selectedObj);
                 DrawableType.Edit(selectedObj, oldValueHolder, surface);
             }
-            TextMenu.Disable();
+            TextMenu.Instance.Disable();
             LineMenu.Instance.Disable();
             ImageMenu.Instance.Destroy();
             MindMapEditMenu.Instance.Destroy();
@@ -242,7 +242,7 @@ namespace SEE.Controls.Actions.Drawable
                 }
                 selectedObj = null;
                 progressState = ProgressState.SelectObject;
-                TextMenu.Disable();
+                TextMenu.Instance.Disable();
                 LineMenu.Instance.Disable();
                 ImageMenu.Instance.Destroy();
                 MindMapEditMenu.Instance.Destroy();
@@ -290,7 +290,7 @@ namespace SEE.Controls.Actions.Drawable
                     }
                     break;
                 case Tags.DText:
-                    if (!TextMenu.IsOpen())
+                    if (!TextMenu.Instance.IsOpen())
                     {
                         TextMenu.EnableForEditing(selectedObj, newValueHolder);
                     }
@@ -354,7 +354,7 @@ namespace SEE.Controls.Actions.Drawable
                 selectedObj = null;
                 progressState = ProgressState.SelectObject;
                 LineMenu.Instance.Disable();
-                TextMenu.Disable();
+                TextMenu.Instance.Disable();
                 ImageMenu.Instance.Destroy();
                 MindMapEditMenu.Instance.Destroy();
                 return false;

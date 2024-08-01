@@ -208,7 +208,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Stop()
         {
-            TextMenu.Disable();
+            TextMenu.Instance.Disable();
         }
 
         /// <summary>

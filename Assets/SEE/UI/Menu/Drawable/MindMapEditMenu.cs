@@ -70,7 +70,7 @@ namespace SEE.Game.UI.Menu.Drawable
                 {
                     Instance.menu.SetActive(true);
                     LineMenu.Instance.Disable();
-                    TextMenu.Disable();
+                    TextMenu.Instance.Disable();
                     MindMapParentSelectionMenu.Instance.Destroy();
                     MindMapChangeNodeKindMenu.Instance.Destroy();
                 };
@@ -80,7 +80,7 @@ namespace SEE.Game.UI.Menu.Drawable
                 {
                     Enable(node, conf, true);
                     LineMenu.Instance.Disable();
-                    TextMenu.Disable();
+                    TextMenu.Instance.Disable();
                     MindMapParentSelectionMenu.Instance.Destroy();
                     MindMapChangeNodeKindMenu.Instance.Destroy();
                 };
