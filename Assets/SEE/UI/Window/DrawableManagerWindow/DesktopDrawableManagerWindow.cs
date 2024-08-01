@@ -325,7 +325,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
                 {
                     GameDrawableManager.ChangeDescription(surface, textOut);
                     new DrawableChangeDescriptionNetAction(DrawableConfigManager.GetDrawableConfig(surface)).Execute();
-                    Rebuild(contextMenu.filter.GetFilteredSurfaces());
+                    Rebuild(contextMenu.Filter.GetFilteredSurfaces());
                 };
 
                 writeTextDialog.Open(stringAction);
@@ -366,8 +366,8 @@ namespace SEE.UI.Window.DrawableManagerWindow
                 new DrawableChangeLightingNetAction(DrawableConfigManager.GetDrawableConfig(surface)).Execute();
                 lightMesh.color = GetLightColor(light);
 
-                if (light && !contextMenu.filter.IncludeHaveLighting
-                || !light && !contextMenu.filter.IncludeHaveNoLighting)
+                if (light && !contextMenu.Filter.IncludeHaveLighting
+                || !light && !contextMenu.Filter.IncludeHaveNoLighting)
                 {
                     RemoveItem(item);
                 }
@@ -386,8 +386,8 @@ namespace SEE.UI.Window.DrawableManagerWindow
                 visibilityMesh.text = GetVisibilityText(visibility);
                 visibilityMesh.color = GetVisibilityColor(visibility);
 
-                if (visibility && !contextMenu.filter.IncludeIsVisible
-                || !visibility && !contextMenu.filter.IncludeIsInvisibile)
+                if (visibility && !contextMenu.Filter.IncludeIsVisible
+                || !visibility && !contextMenu.Filter.IncludeIsInvisibile)
                 {
                     RemoveItem(item);
                 }

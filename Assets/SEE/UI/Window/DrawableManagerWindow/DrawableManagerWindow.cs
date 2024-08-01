@@ -62,18 +62,18 @@ namespace SEE.UI.Window.DrawableManagerWindow
         private void AddDrawableSurfaces(List<GameObject> surfaces = null)
         {
             /// Case group is active.
-            if (contextMenu.grouper.IsActive)
+            if (contextMenu.Grouper.IsActive)
             {
                 AddGroup("Whiteboards", Icons.Whiteboard,
-                    OrderList(contextMenu.grouper.GetWhiteboards(contextMenu.filter)),
+                    OrderList(contextMenu.Grouper.GetWhiteboards(contextMenu.Filter)),
                     WhiteboardColor);
                 AddGroup("Sticky Notes", Icons.StickyNote,
-                    OrderList(contextMenu.grouper.GetStickyNotes(contextMenu.filter)),
+                    OrderList(contextMenu.Grouper.GetStickyNotes(contextMenu.Filter)),
                     StickyNoteColor);
             }
             else /// Group is not active.
             {
-                surfaces ??= contextMenu.filter.GetFilteredSurfaces();
+                surfaces ??= contextMenu.Filter.GetFilteredSurfaces();
                 foreach (GameObject surface in Sort(surfaces))
                 {
                     if (surface.CompareTag(Tags.Drawable))
@@ -91,7 +91,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
         /// <returns>The sorted surfaces</returns>
         private List<GameObject> Sort(List<GameObject> surfaces)
         {
-            return contextMenu.sorter.IsActive() ? contextMenu.sorter.ApplySort(surfaces) : OrderList(surfaces);
+            return contextMenu.Sorter.IsActive() ? contextMenu.Sorter.ApplySort(surfaces) : OrderList(surfaces);
         }
 
         /// <summary>
@@ -197,7 +197,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
             switch(value)
             {
                 case DescriptionChangeEvent:
-                    Rebuild(contextMenu.filter.GetFilteredSurfaces());
+                    Rebuild(contextMenu.Filter.GetFilteredSurfaces());
                     break;
                 case ColorChangeEvent e:
                     if (surfaceItems.TryGetValue(GameFinder.GetUniqueID(e.Surface.CurrentObject), out GameObject item))
@@ -214,8 +214,8 @@ namespace SEE.UI.Window.DrawableManagerWindow
                         TextMeshProUGUI lightMesh = foreground.Find("LightingBtn").gameObject.GetComponentInChildren<TextMeshProUGUI>();
                         lightMesh.color = GetLightColor(e.Surface.Lighting);
 
-                        if (e.Surface.Lighting && !contextMenu.filter.IncludeHaveLighting
-                        || !e.Surface.Lighting && !contextMenu.filter.IncludeHaveNoLighting)
+                        if (e.Surface.Lighting && !contextMenu.Filter.IncludeHaveLighting
+                        || !e.Surface.Lighting && !contextMenu.Filter.IncludeHaveNoLighting)
                         {
                             RemoveItem(itemObj);
                         }
@@ -229,8 +229,8 @@ namespace SEE.UI.Window.DrawableManagerWindow
                         visibilityMesh.text = GetVisibilityText(e.Surface.Visibility);
                         visibilityMesh.color = GetVisibilityColor(e.Surface.Visibility);
 
-                        if (e.Surface.Visibility && !contextMenu.filter.IncludeIsVisible
-                        || !e.Surface.Visibility && !contextMenu.filter.IncludeIsInvisibile)
+                        if (e.Surface.Visibility && !contextMenu.Filter.IncludeIsVisible
+                        || !e.Surface.Visibility && !contextMenu.Filter.IncludeIsInvisibile)
                         {
                             RemoveItem(itemV);
                         }

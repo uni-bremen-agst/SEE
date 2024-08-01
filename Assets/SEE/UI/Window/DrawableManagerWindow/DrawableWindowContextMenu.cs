@@ -47,17 +47,17 @@ namespace SEE.UI.Window.DrawableManagerWindow
         /// <summary>
         /// The drawable surface filter.
         /// </summary>
-        public readonly DrawableSurfaceFilter filter;
+        public readonly DrawableSurfaceFilter Filter;
 
         /// <summary>
         /// The drawable surface grouper.
         /// </summary>
-        public readonly DrawableWindowGrouper grouper;
+        public readonly DrawableWindowGrouper Grouper;
 
         /// <summary>
         /// The drawable surface sorter.
         /// </summary>
-        public readonly DrawableSurfaceSorter sorter;
+        public readonly DrawableSurfaceSorter Sorter;
 
         /// <summary>
         /// Constructor.
@@ -76,9 +76,9 @@ namespace SEE.UI.Window.DrawableManagerWindow
             this.filterButton = filterButton;
             this.sortButton = sortButton;
             this.groupButton = groupButton;
-            filter = new DrawableSurfaceFilter();
-            grouper = new DrawableWindowGrouper();
-            sorter = new DrawableSurfaceSorter();
+            Filter = new DrawableSurfaceFilter();
+            Grouper = new DrawableWindowGrouper();
+            Sorter = new DrawableSurfaceSorter();
 
             ResetFilter();
             ResetSort();
@@ -108,56 +108,56 @@ namespace SEE.UI.Window.DrawableManagerWindow
                 {
                     ResetFilter();
                     UpdateFilterMenuEntries();
-                    rebuild.Invoke(filter.GetFilteredSurfaces());
+                    rebuild.Invoke(Filter.GetFilteredSurfaces());
                 }, Icons.ArrowRotateLeft, CloseAfterClick: false),
                 new PopupMenuAction("Whiteboards", () =>
                 {
-                    filter.IncludeWhiteboards = !filter.IncludeWhiteboards;
+                    Filter.IncludeWhiteboards = !Filter.IncludeWhiteboards;
                     UpdateFilterMenuEntries();
-                    rebuild.Invoke(filter.GetFilteredSurfaces());
-                }, Checkbox(filter.IncludeWhiteboards), CloseAfterClick: false),
+                    rebuild.Invoke(Filter.GetFilteredSurfaces());
+                }, Checkbox(Filter.IncludeWhiteboards), CloseAfterClick: false),
                 new PopupMenuAction("Sticky Notes", () =>
                 {
-                    filter.IncludeStickyNotes = !filter.IncludeStickyNotes;
+                    Filter.IncludeStickyNotes = !Filter.IncludeStickyNotes;
                     UpdateFilterMenuEntries();
-                    rebuild.Invoke(filter.GetFilteredSurfaces());
-                }, Checkbox(filter.IncludeStickyNotes), CloseAfterClick: false),
+                    rebuild.Invoke(Filter.GetFilteredSurfaces());
+                }, Checkbox(Filter.IncludeStickyNotes), CloseAfterClick: false),
                 new PopupMenuAction("Have Description", () =>
                 {
-                    filter.IncludeHaveDescription = !filter.IncludeHaveDescription;
+                    Filter.IncludeHaveDescription = !Filter.IncludeHaveDescription;
                     UpdateFilterMenuEntries();
-                    rebuild.Invoke(filter.GetFilteredSurfaces());
-                }, Checkbox(filter.IncludeHaveDescription), CloseAfterClick: false),
+                    rebuild.Invoke(Filter.GetFilteredSurfaces());
+                }, Checkbox(Filter.IncludeHaveDescription), CloseAfterClick: false),
                 new PopupMenuAction("Have no Description", () =>
                 {
-                    filter.IncludeHaveNoDescription = !filter.IncludeHaveNoDescription;
+                    Filter.IncludeHaveNoDescription = !Filter.IncludeHaveNoDescription;
                     UpdateFilterMenuEntries();
-                    rebuild.Invoke(filter.GetFilteredSurfaces());
-                }, Checkbox(filter.IncludeHaveNoDescription), CloseAfterClick: false),
+                    rebuild.Invoke(Filter.GetFilteredSurfaces());
+                }, Checkbox(Filter.IncludeHaveNoDescription), CloseAfterClick: false),
                 new PopupMenuAction("Have Lighting", () =>
                 {
-                    filter.IncludeHaveLighting = !filter.IncludeHaveLighting;
+                    Filter.IncludeHaveLighting = !Filter.IncludeHaveLighting;
                     UpdateFilterMenuEntries();
-                    rebuild.Invoke(filter.GetFilteredSurfaces());
-                }, Checkbox(filter.IncludeHaveLighting), CloseAfterClick: false),
+                    rebuild.Invoke(Filter.GetFilteredSurfaces());
+                }, Checkbox(Filter.IncludeHaveLighting), CloseAfterClick: false),
                 new PopupMenuAction("Have no Lighting", () =>
                 {
-                    filter.IncludeHaveNoLighting = !filter.IncludeHaveNoLighting;
+                    Filter.IncludeHaveNoLighting = !Filter.IncludeHaveNoLighting;
                     UpdateFilterMenuEntries();
-                    rebuild.Invoke(filter.GetFilteredSurfaces());
-                }, Checkbox(filter.IncludeHaveNoLighting), CloseAfterClick: false),
+                    rebuild.Invoke(Filter.GetFilteredSurfaces());
+                }, Checkbox(Filter.IncludeHaveNoLighting), CloseAfterClick: false),
                 new PopupMenuAction("Is Visible", () =>
                 {
-                    filter.IncludeIsVisible = !filter.IncludeIsVisible;
+                    Filter.IncludeIsVisible = !Filter.IncludeIsVisible;
                     UpdateFilterMenuEntries();
-                    rebuild.Invoke(filter.GetFilteredSurfaces());
-                }, Checkbox(filter.IncludeIsVisible), CloseAfterClick: false),
+                    rebuild.Invoke(Filter.GetFilteredSurfaces());
+                }, Checkbox(Filter.IncludeIsVisible), CloseAfterClick: false),
                 new PopupMenuAction("Is Invisible", () =>
                 {
-                    filter.IncludeIsInvisibile = !filter.IncludeIsInvisibile;
+                    Filter.IncludeIsInvisibile = !Filter.IncludeIsInvisibile;
                     UpdateFilterMenuEntries();
-                    rebuild.Invoke(filter.GetFilteredSurfaces());
-                }, Checkbox(filter.IncludeIsInvisibile), CloseAfterClick: false),
+                    rebuild.Invoke(Filter.GetFilteredSurfaces());
+                }, Checkbox(Filter.IncludeIsInvisibile), CloseAfterClick: false),
             };
 
             contextMenu.ClearEntries();
@@ -176,7 +176,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
         /// </summary>
         private void ResetFilter()
         {
-            filter.Reset();
+            Filter.Reset();
         }
         #endregion
 
@@ -201,18 +201,17 @@ namespace SEE.UI.Window.DrawableManagerWindow
                 {
                     ResetGrouping();
                     UpdateGroupMenuEntries();
-                    rebuild.Invoke(filter.GetFilteredSurfaces());
-                }, Radio(!grouper.IsActive), CloseAfterClick: false),
+                    rebuild.Invoke(Filter.GetFilteredSurfaces());
+                }, Radio(!Grouper.IsActive), CloseAfterClick: false),
                 new PopupMenuAction("Surface Type", () =>
                 {
-                    grouper.IsActive = true;
+                    Grouper.IsActive = true;
                     UpdateGroupMenuEntries();
-                    rebuild.Invoke(filter.GetFilteredSurfaces());
-                }, Radio(grouper.IsActive), CloseAfterClick: false)
+                    rebuild.Invoke(Filter.GetFilteredSurfaces());
+                }, Radio(Grouper.IsActive), CloseAfterClick: false)
             };
             contextMenu.ClearEntries();
             contextMenu.AddEntries(entries);
-            return;
         }
 
         /// <summary>
@@ -222,9 +221,12 @@ namespace SEE.UI.Window.DrawableManagerWindow
         /// <returns>A radio button icon for the given <paramref name="value"/>.</returns>
         private static char Radio(bool value) => value ? Icons.CheckedRadio : Icons.EmptyRadio;
 
+        /// <summary>
+        /// Resets <see cref="Grouper"/>.
+        /// </summary>
         private void ResetGrouping()
         {
-            grouper.Reset();
+            Grouper.Reset();
         }
         #endregion
 
@@ -249,10 +251,10 @@ namespace SEE.UI.Window.DrawableManagerWindow
                 {
                     ResetSort();
                     UpdateSortMenuEntries();
-                    rebuild.Invoke(filter.GetFilteredSurfaces());
+                    rebuild.Invoke(Filter.GetFilteredSurfaces());
                 }, Icons.ArrowRotateLeft, CloseAfterClick: false)
             };
-            if (grouper.IsActive)
+            if (Grouper.IsActive)
             {
                 entries.Add(new PopupMenuHeading("Grouping is active!"));
                 entries.Add(new PopupMenuHeading("Items ordered by group count."));
@@ -262,27 +264,27 @@ namespace SEE.UI.Window.DrawableManagerWindow
                 entries.Add(new PopupMenuAction("Surface Type", () =>
                 {
                     ToggleSortAction("Type", x => GameFinder.IsStickyNote(x) ? 0 : GameFinder.IsWhiteboard(x) ? 1 : 2);
-                }, SortIcon(false, sorter.IsAttributeDescending("Type")), CloseAfterClick: false));
+                }, SortIcon(false, Sorter.IsAttributeDescending("Type")), CloseAfterClick: false));
 
                 entries.Add(new PopupMenuAction("Name", () =>
                 {
                     ToggleSortAction("Name", x => GameFinder.GetUniqueID(x));
-                }, SortIcon(false, sorter.IsAttributeDescending("Name")), CloseAfterClick: false));
+                }, SortIcon(false, Sorter.IsAttributeDescending("Name")), CloseAfterClick: false));
 
                 entries.Add(new PopupMenuAction("Description", () =>
                 {
                     ToggleSortAction("Description", x => GameDrawableManager.GetDescription(x));
-                }, SortIcon(false, sorter.IsAttributeDescending("Description")), CloseAfterClick: false));
+                }, SortIcon(false, Sorter.IsAttributeDescending("Description")), CloseAfterClick: false));
 
                 entries.Add(new PopupMenuAction("Lighting", () =>
                 {
                     ToggleSortAction("Lighting", x => GameDrawableManager.IsLighting(x));
-                }, SortIcon(false, sorter.IsAttributeDescending("Lighting")), CloseAfterClick: false));
+                }, SortIcon(false, Sorter.IsAttributeDescending("Lighting")), CloseAfterClick: false));
 
                 entries.Add(new PopupMenuAction("Visibility", () =>
                 {
                     ToggleSortAction("Visibility", x => GameDrawableManager.IsVisible(x));
-                }, SortIcon(false, sorter.IsAttributeDescending("Visibility")), CloseAfterClick: false));
+                }, SortIcon(false, Sorter.IsAttributeDescending("Visibility")), CloseAfterClick: false));
             }
 
             contextMenu.ClearEntries();
@@ -292,23 +294,22 @@ namespace SEE.UI.Window.DrawableManagerWindow
             /// Switch from ascending->descending->none->ascending.
             void ToggleSortAction(string name, Func<GameObject, object> key)
             {
-                switch (sorter.IsAttributeDescending(name))
+                switch (Sorter.IsAttributeDescending(name))
                 {
                     case null:
-                        sorter.AddSortAttribute(name, key, false);
+                        Sorter.AddSortAttribute(name, key, false);
                         break;
                     case false:
-                        sorter.RemoveSortAttribute(name);
-                        sorter.AddSortAttribute(name, key, true);
+                        Sorter.RemoveSortAttribute(name);
+                        Sorter.AddSortAttribute(name, key, true);
                         break;
                     default:
-                        sorter.RemoveSortAttribute(name);
+                        Sorter.RemoveSortAttribute(name);
                         break;
                 }
                 UpdateSortMenuEntries();
-                rebuild.Invoke(filter.GetFilteredSurfaces());
+                rebuild.Invoke(Filter.GetFilteredSurfaces());
             }
-
         }
 
         /// <summary>
@@ -332,17 +333,17 @@ namespace SEE.UI.Window.DrawableManagerWindow
         }
 
         /// <summary>
-        /// Resets the sort to its default state.
+        /// Resets the <see cref="Sorter"/> to its default state.
         /// </summary>
         private void ResetSort()
         {
-            sorter.Reset();
+            Sorter.Reset();
         }
         #endregion
 
         #region Page
         /// <summary>
-        /// Displays the selection and add page menu.
+        /// Displays the selection and add-page menu.
         /// </summary>
         /// <param name="surface">The surface whose pages are to be managed.</param>
         /// <param name="position">The position where the popup menu should be displayed.</param>
@@ -352,9 +353,8 @@ namespace SEE.UI.Window.DrawableManagerWindow
             contextMenu.ShowWith(position: position);
         }
 
-
         /// <summary>
-        /// Displays the remove page menu.
+        /// Displays the remove-page menu.
         /// </summary>
         /// <param name="surface">The surface whose pages are to be managed.</param>
         /// <param name="position">The position where the popup menu should be displayed.</param>
@@ -365,7 +365,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
         }
 
         /// <summary>
-        /// Updates the selection and add menu entries.
+        /// Updates the selection and add-menu entries.
         /// </summary>
         /// <param name="surface">The surface whose pages are to be managed.</param>
         /// <param name="removeIndicator">Wheter the remove option should be displayed.</param>
@@ -427,7 +427,8 @@ namespace SEE.UI.Window.DrawableManagerWindow
             /// <returns>The corresponding icon.</returns>
             char GetIcon(int i)
             {
-                return removeIndicator ? Icons.Trash : i == holder.CurrentPage ? Icons.CheckedRadio : Icons.EmptyRadio;
+                return removeIndicator ? Icons.Trash
+                    : i == holder.CurrentPage ? Icons.CheckedRadio : Icons.EmptyRadio;
             }
 
             /// Sets the page.
