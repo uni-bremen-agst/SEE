@@ -24,10 +24,11 @@ namespace SEE.UI.Menu.Drawable
 
         /// <summary>
         /// Returns an instance of the prefab at the given <paramref name="prefabPath"/>.
+        /// It will be a child of the <see cref="UICanvas.Canvas"/> in local space.
         /// </summary>
         /// <param name="prefabPath">path to the prefab to instantiate</param>
         /// <returns>instantiated prefab</returns>
-        protected static GameObject InstantiatePrefab(string prefabPath)
+        public static GameObject InstantiatePrefab(string prefabPath)
         {
             return PrefabInstantiator.InstantiatePrefab(prefabPath,
                                                         UICanvas.Canvas.transform, false);
