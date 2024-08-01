@@ -3,12 +3,8 @@ using SEE.DataModel;
 using SEE.DataModel.Drawable;
 using SEE.Game;
 using SEE.Game.Drawable;
-using SEE.Game.Drawable.ActionHelpers;
 using SEE.GO;
-using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
-using SEE.UI.Window;
-using SEE.UI.Window.DrawableManagerWindow;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -55,14 +51,14 @@ namespace SEE.UI.Window.DrawableManagerWindow
         private DrawableWindowContextMenu contextMenu;
 
         /// <summary>
-        ///
+        /// All disposables that need to be disposed when the window is destroyed (see <see cref="OnDestroy"/>).
         /// </summary>
-        private List<IDisposable> subscriptions = new();
+        private readonly List<IDisposable> subscriptions = new();
 
         /// <summary>
         /// Adds the drawable surfaces of the visualization to the drawable manager view.
         /// </summary>
-        /// <param name="surfaces">The surfaces to be added, if it is not set all surfaces of the scene will be added.</param>
+        /// <param name="surfaces">The surfaces to be added; if it is not set, all surfaces of the scene will be added.</param>
         private void AddDrawableSurfaces(List<GameObject> surfaces = null)
         {
             /// Case group is active.
@@ -128,9 +124,8 @@ namespace SEE.UI.Window.DrawableManagerWindow
         }
 
         /// <summary>
-        /// Register the observer.
-        /// First, an observer ti detect when surfaces are added or removed.
-        /// Then, an observer for each existing surface.
+        /// Adds all <see cref="DrawableSurface"/>s attached to the <see cref="LocalPlayer"/>
+        /// or contained in <see cref="ValueHolder.DrawableSurfaces"/> to <see cref="subscriptions"/>.
         /// </summary>
         protected override void Start()
         {
@@ -146,7 +141,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
         }
 
         /// <summary>
-        /// If the menu is destroyed, dispose the observers and close any open <see cref="SurfaceColorMenu"/>
+        /// If the menu is destroyed, disposes the observers and closes any open <see cref="SurfaceColorMenu"/>
         /// if necessary.
         /// </summary>
         private void OnDestroy()
