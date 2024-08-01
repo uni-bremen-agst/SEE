@@ -355,136 +355,138 @@ namespace SEE.Game.Avatars
         {
             if (!waitForInit)
             {
+
+                float jawOpenValue = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(jawOpen));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(jawOpen), 0f);
+
+
                 // Jaw
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(jawLeft),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccJawLeft)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(jawRight),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccJawRight)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(jawOpen),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccJawOpen)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccJawLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(jawLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccJawRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(jawRight)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccJawOpen), jawOpenValue);
 
                 // Mouth
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthUpperLeft),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthUpperLeft)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthUpperRight),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthUpperRight)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccMouthUpperLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(mouthUpperLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccMouthUpperRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(mouthUpperRight)));
 
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthLowerLeft),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccLowerLeft)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthLowerRight),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccLowerRight)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccLowerLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(mouthLowerLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccLowerRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(mouthLowerRight)));
 
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthPout),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthPuckerUpL)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthPout),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthPuckerUpR)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthPout),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthPuckerDownL)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthPout),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthPuckerDownR)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccMouthPuckerUpL),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(mouthPout)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccMouthPuckerUpR),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(mouthPout)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccMouthPuckerDownL),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(mouthPout)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccMouthPuckerDownR),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(mouthPout)));
 
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthSmileLeft),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthSmileLeft)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthSmileRight),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthSmileRight)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccMouthSmileLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(mouthSmileLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccMouthSmileRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(mouthSmileRight)));
 
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthSadLeft),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthFrownLeft)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthSadRight),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthFrownRight)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccMouthFrownLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(mouthSadLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccMouthFrownRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(mouthSadRight)));
 
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthUpperUpLeft),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthUpperUpLeft)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthUpperUpRight),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthUpperUpRight)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccMouthUpperUpLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(mouthUpperUpLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccMouthUpperUpRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(mouthUpperUpRight)));
 
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthLowerDownLeft),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthLowerDownLeft)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthLowerDownRight),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthLowerDownRight)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccMouthLowerDownLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(mouthLowerDownLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccMouthLowerDownRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(mouthLowerDownRight)));
 
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthUpperInside),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthUpperInsideLeft)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthUpperInside),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthUpperInsideRight)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthLowerInside),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthLowerInsideLeft)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(mouthLowerInside),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccMouthLowerInsideRight)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccMouthUpperInsideLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(mouthUpperInside)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccMouthUpperInsideRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(mouthUpperInside)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccMouthLowerInsideLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(mouthLowerInside)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccMouthLowerInsideRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(mouthLowerInside)));
 
                 // Tongue
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueLongStep1),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueLongStep1)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueLongStep2),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueLongStep2)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccTongueLongStep1),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(tongueLongStep1)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccTongueLongStep2),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(tongueLongStep2)));
 
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueLeft),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueLeft)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueRight),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueRight)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueUp),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueUp)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueDown),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueDown)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccTongueLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(tongueLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccTongueRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(tongueRight)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccTongueUp),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(tongueUp)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccTongueDown),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(tongueDown)));
 
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueUpLeftMorph),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueBulgeLeft)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueUpLeftMorph),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueUp)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccTongueBulgeLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(tongueUpLeftMorph)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccTongueUp),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(tongueUpLeftMorph)));
 
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueUpRightMorph),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueBulgeRight)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueUpRightMorph),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueUp)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccTongueBulgeRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(tongueUpRightMorph)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccTongueUp),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(tongueUpRightMorph)));
 
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccTongueBulgeLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(tongueDownLeftMorph)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccTongueDown),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(tongueDownLeftMorph)));
 
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueDownLeftMorph),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueBulgeLeft)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueDownLeftMorph),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueDown)));
-
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueDownRightMorph),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueBulgeRight)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(tongueDownRightMorph),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccTongueDown)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccTongueBulgeRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(tongueDownRightMorph)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccTongueDown),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(tongueDownRightMorph)));
 
                 // Cheeks
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(cheekPuffLeft),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccCheekPuffLeft)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(cheekPuffRight),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccCheekPuffRight)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(cheekSuck),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccCheekSuckLeft)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(cheekSuck),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccCheekSuckRight)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccCheekPuffLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(cheekPuffLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccCheekPuffRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(cheekPuffRight)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccCheekSuckLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(cheekSuck)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccCheekSuckRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(cheekSuck)));
 
                 // Eyes
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeLeftBlink),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeLeftBlink)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeLeftWide),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeLeftWide)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeLeftRight),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeLeftRight)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeLeftLeft),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeLeftLeft)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeLeftUp),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeLeftUp)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeLeftDown),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeLeftDown)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccEyeLeftBlink),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(eyeLeftBlink)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccEyeLeftWide),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(eyeLeftWide)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccEyeLeftRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(eyeLeftRight)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccEyeLeftLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(eyeLeftLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccEyeLeftUp),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(eyeLeftUp)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccEyeLeftDown),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(eyeLeftDown)));
 
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeRightBlink),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeRightBlink)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeRightWide),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeRightWide)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeRightRight),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeRightRight)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeRightLeft),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeRightLeft)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeRightUp),
-                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeRightUp)));
-                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(eyeRightDown),
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccEyeRightBlink),
                     targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeRightDown)));
-
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccEyeRightWide),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(eyeRightWide)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccEyeRightRight),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(eyeRightRight)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccEyeRightLeft),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(ccEyeRightLeft)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccEyeRightUp),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(eyeRightUp)));
+                targetSkinnedRenderer.SetBlendShapeWeight(BlendShapeByString(ccEyeRightDown),
+                    targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString(eyeRightDown)));
             }
         }
 
