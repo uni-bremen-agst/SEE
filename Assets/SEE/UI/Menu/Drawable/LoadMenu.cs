@@ -45,8 +45,8 @@ namespace SEE.UI.Menu.Drawable
             /// Instantiate the menu.
             Instance = new LoadMenu();
             Instance.Instantiate(loadMenuPrefab);
-            loadButton = GameFinder.FindChild(Instance.menu, "Load").GetComponent<ButtonManagerBasic>();
-            loadSpecificButton = GameFinder.FindChild(Instance.menu, "LoadSpecific").GetComponent<ButtonManagerBasic>();
+            loadButton = GameFinder.FindChild(Instance.gameObject, "Load").GetComponent<ButtonManagerBasic>();
+            loadSpecificButton = GameFinder.FindChild(Instance.gameObject, "LoadSpecific").GetComponent<ButtonManagerBasic>();
 
             /// Adds a handler for the <paramref name="loadButtonCall"/>.
             loadButton.clickEvent.AddListener(loadButtonCall);

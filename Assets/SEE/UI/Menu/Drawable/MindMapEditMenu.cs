@@ -68,7 +68,7 @@ namespace SEE.Game.UI.Menu.Drawable
                 /// The return call back, to return to the (this) parent menu.
                 UnityAction callback = () =>
                 {
-                    Instance.menu.SetActive(true);
+                    Instance.gameObject.SetActive(true);
                     LineMenu.Instance.Disable();
                     TextMenu.Instance.Disable();
                     MindMapParentSelectionMenu.Instance.Destroy();
@@ -106,13 +106,13 @@ namespace SEE.Game.UI.Menu.Drawable
         private static void InitializeChangeParent(GameObject attached, GameObject node,
             MindMapNodeConf conf, UnityAction callback)
         {
-            ButtonManagerBasic changeParent = GameFinder.FindChild(Instance.menu, "Parent")
+            ButtonManagerBasic changeParent = GameFinder.FindChild(Instance.gameObject, "Parent")
                     .GetComponent<ButtonManagerBasic>();
             changeParent.clickEvent.AddListener(() =>
             {
                 /// At this point, immediately is required because Destroyer.Destroy() does not
                 /// delete quickly enough in case a theme node has been selected.
-                GameObject.DestroyImmediate(Instance.menu);
+                GameObject.DestroyImmediate(Instance.gameObject);
                 MindMapParentSelectionMenu.EnableForEditing(attached, node, conf, callback);
             });
         }
@@ -128,11 +128,11 @@ namespace SEE.Game.UI.Menu.Drawable
         private static void InitializeChangeNodeKind(GameObject attached, GameObject node,
             MindMapNodeConf conf, UnityAction callback)
         {
-            ButtonManagerBasic changeNodeKind = GameFinder.FindChild(Instance.menu, "NodeKind")
+            ButtonManagerBasic changeNodeKind = GameFinder.FindChild(Instance.gameObject, "NodeKind")
                     .GetComponent<ButtonManagerBasic>();
             changeNodeKind.clickEvent.AddListener(() =>
             {
-                Destroyer.Destroy(Instance.menu);
+                Destroyer.Destroy(Instance.gameObject);
                 MindMapChangeNodeKindMenu.Enable(node, conf, callback);
             });
         }
@@ -147,11 +147,11 @@ namespace SEE.Game.UI.Menu.Drawable
         /// <param name="callback">The call back to return to the parent menu.</param>
         private static void InitializeChangeBorder(GameObject node, MindMapNodeConf conf, UnityAction callback)
         {
-            ButtonManagerBasic changeBorder = GameFinder.FindChild(Instance.menu, "Border")
+            ButtonManagerBasic changeBorder = GameFinder.FindChild(Instance.gameObject, "Border")
                     .GetComponent<ButtonManagerBasic>();
             changeBorder.clickEvent.AddListener(() =>
             {
-                Instance.menu.SetActive(false);
+                Instance.gameObject.SetActive(false);
                 LineMenu.Instance.EnableForEditing(GameFinder.FindChildWithTag(node, Tags.Line), conf.BorderConf, callback);
             });
         }
@@ -166,11 +166,11 @@ namespace SEE.Game.UI.Menu.Drawable
         /// <param name="callback">The call back to return to the parent menu.</param>
         private static void InitializeChangeText(GameObject node, MindMapNodeConf conf, UnityAction callback)
         {
-            ButtonManagerBasic changeText = GameFinder.FindChild(Instance.menu, "NodeText")
+            ButtonManagerBasic changeText = GameFinder.FindChild(Instance.gameObject, "NodeText")
                     .GetComponent<ButtonManagerBasic>();
             changeText.clickEvent.AddListener(() =>
             {
-                Instance.menu.SetActive(false);
+                Instance.gameObject.SetActive(false);
                 TextMenu.EnableForEditing(GameFinder.FindChildWithTag(node, Tags.DText), conf.TextConf, callback);
             });
         }
@@ -186,13 +186,13 @@ namespace SEE.Game.UI.Menu.Drawable
         /// <param name="callback">The call back to return to the parent menu.</param>
         private static void InitializeChangeBranchLine(GameObject attached, MindMapNodeConf conf, UnityAction callback)
         {
-            GameObject branchLineButtonArea = GameFinder.FindChild(Instance.menu, "BranchLine");
+            GameObject branchLineButtonArea = GameFinder.FindChild(Instance.gameObject, "BranchLine");
             if (conf.BranchLineToParent != "")
             {
                 ButtonManagerBasic branchButton = branchLineButtonArea.GetComponent<ButtonManagerBasic>();
                 branchButton.clickEvent.AddListener(() =>
                 {
-                    Instance.menu.SetActive(false);
+                    Instance.gameObject.SetActive(false);
                     GameObject bLine = GameFinder.FindChild(attached, conf.BranchLineToParent);
                     LineMenu.Instance.EnableForEditing(bLine, conf.BranchLineConf, callback);
                 });
@@ -212,7 +212,7 @@ namespace SEE.Game.UI.Menu.Drawable
         /// <param name="conf">The configuration which holds the changes.</param>
         private static void InitializeChangeOrderInLayer(GameObject node, MindMapNodeConf conf)
         {
-            LayerSliderController layerSlider = Instance.menu.GetComponentInChildren<LayerSliderController>();
+            LayerSliderController layerSlider = Instance.gameObject.GetComponentInChildren<LayerSliderController>();
 
             /// Assigns the current value to the slider.
             layerSlider.AssignValue(conf.OrderInLayer);

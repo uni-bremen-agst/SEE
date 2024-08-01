@@ -55,14 +55,14 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="selectedObject">the chosen drawable type object to move</param>
         public static void Enable(GameObject selectedObject)
         {
-            if (Instance.menu == null)
+            if (Instance.gameObject == null)
             {
                 /// Instantiate the menu.
                 Instance.Instantiate(moveMenuPrefab);
 
                 /// Initialize the switches for speed and move by mouse.
-                speedUpManager = GameFinder.FindChild(Instance.menu, "SpeedSwitch").GetComponent<SwitchManager>();
-                moveByMouseManager = GameFinder.FindChild(Instance.menu, "MoveSwitch").GetComponent<SwitchManager>();
+                speedUpManager = GameFinder.FindChild(Instance.gameObject, "SpeedSwitch").GetComponent<SwitchManager>();
+                moveByMouseManager = GameFinder.FindChild(Instance.gameObject, "MoveSwitch").GetComponent<SwitchManager>();
 
                 /// The new position for the object.
                 Vector3 newObjectPosition;
@@ -73,7 +73,7 @@ namespace SEE.UI.Menu.Drawable
 
                 /// Initialize the button for left moving.
                 /// Enables the functionality to hold down the left mouse button.
-                GameFinder.FindChild(Instance.menu, "Left").AddComponent<ButtonHeld>().SetAction(() =>
+                GameFinder.FindChild(Instance.gameObject, "Left").AddComponent<ButtonHeld>().SetAction(() =>
                 {
                     moveByMouseManager.isOn = false;
                     moveByMouseManager.UpdateUI();
@@ -85,7 +85,7 @@ namespace SEE.UI.Menu.Drawable
 
                 /// Initialize the button for right moving.
                 /// Enables the functionality to hold down the left mouse button.
-                GameFinder.FindChild(Instance.menu, "Right").AddComponent<ButtonHeld>().SetAction(() =>
+                GameFinder.FindChild(Instance.gameObject, "Right").AddComponent<ButtonHeld>().SetAction(() =>
                 {
                     moveByMouseManager.isOn = false;
                     moveByMouseManager.UpdateUI();
@@ -97,7 +97,7 @@ namespace SEE.UI.Menu.Drawable
 
                 /// Initialize the button for up moving.
                 /// Enables the functionality to hold down the left mouse button.
-                GameFinder.FindChild(Instance.menu, "Up").AddComponent<ButtonHeld>().SetAction(() =>
+                GameFinder.FindChild(Instance.gameObject, "Up").AddComponent<ButtonHeld>().SetAction(() =>
                 {
                     moveByMouseManager.isOn = false;
                     moveByMouseManager.UpdateUI();
@@ -109,7 +109,7 @@ namespace SEE.UI.Menu.Drawable
 
                 /// Initialize the button for down moving.
                 /// Enables the functionality to hold down the left mouse button.
-                GameFinder.FindChild(Instance.menu, "Down").AddComponent<ButtonHeld>().SetAction(() =>
+                GameFinder.FindChild(Instance.gameObject, "Down").AddComponent<ButtonHeld>().SetAction(() =>
                 {
                     moveByMouseManager.isOn = false;
                     moveByMouseManager.UpdateUI();
@@ -153,8 +153,8 @@ namespace SEE.UI.Menu.Drawable
                 }
 
                 /// Initializes the switch to turn child inclusion on and off.
-                GameFinder.FindChild(Instance.menu, "Content").transform.Find("Children").gameObject.SetActive(true);
-                SwitchManager childrenSwitch = GameFinder.FindChild(Instance.menu, "ChildrenSwitch").GetComponent<SwitchManager>();
+                GameFinder.FindChild(Instance.gameObject, "Content").transform.Find("Children").gameObject.SetActive(true);
+                SwitchManager childrenSwitch = GameFinder.FindChild(Instance.gameObject, "ChildrenSwitch").GetComponent<SwitchManager>();
                 bool changeSwitch = false;
                 childrenSwitch.OnEvents.RemoveAllListeners();
                 childrenSwitch.OnEvents.AddListener(() =>
@@ -194,7 +194,7 @@ namespace SEE.UI.Menu.Drawable
             else
             {
                 /// Disables the include children button, if the selected object is not a <see cref="MindMapNodeConf"/>
-                GameFinder.FindChild(Instance.menu, "Content").transform.Find("Children").gameObject.SetActive(false);
+                GameFinder.FindChild(Instance.gameObject, "Content").transform.Find("Children").gameObject.SetActive(false);
                 includeChildren = false;
             }
         }

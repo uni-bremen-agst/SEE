@@ -11,7 +11,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// The instance of the menu.
         /// </summary>
-        protected GameObject menu;
+        protected GameObject gameObject;
 
         /// <summary>
         /// Instantiates the menu by loading the prefab from the given <paramref name="prefabPath"/>
@@ -19,7 +19,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="prefabPath">path to the prefab to instantiate</param>
         protected void Instantiate(string prefabPath)
         {
-            menu = InstantiatePrefab(prefabPath);
+            gameObject = InstantiatePrefab(prefabPath);
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>Whether the menu is open.</returns>
         public virtual bool IsOpen()
         {
-            return menu != null;
+            return gameObject != null;
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         public virtual void Enable()
         {
-            menu.SetActive(true);
+            gameObject.SetActive(true);
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         public virtual void Disable()
         {
-            menu.SetActive(false);
+            gameObject.SetActive(false);
         }
 
         /// <summary>
@@ -65,9 +65,9 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         public virtual void Destroy()
         {
-            if (menu != null)
+            if (gameObject != null)
             {
-                Destroyer.Destroy(menu);
+                Destroyer.Destroy(gameObject);
             }
         }
     }

@@ -36,7 +36,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Returns the associated game object of the line menu.
         /// </summary>
-        public GameObject GameObject => Instance.menu;
+        public GameObject GameObject => Instance.gameObject;
 
         /// <summary>
         /// The color action to be executed additionally during the onChangeValue of the HSV Color Picker.
@@ -149,7 +149,7 @@ namespace SEE.UI.Menu.Drawable
             Instance.Instantiate(lineMenuPrefab);
 
             /// Initialize the content area
-            content = Instance.menu.transform.Find("Content");
+            content = Instance.gameObject.transform.Find("Content");
 
             /// Disables the ability to return to the previous menu.
             /// Intended only for editing MindMap nodes.
@@ -162,16 +162,16 @@ namespace SEE.UI.Menu.Drawable
             Instance.InitColorKindSelectorConstructor();
 
             /// Initialize the remaining GUI elements.
-            loopManager = GameFinder.FindChild(Instance.menu, "Loop").GetComponentInChildren<SwitchManager>();
-            primaryColorBMB = GameFinder.FindChild(Instance.menu, "PrimaryColorBtn").GetComponent<ButtonManagerBasic>();
-            primaryColorBMB.buttonVar = GameFinder.FindChild(Instance.menu, "PrimaryColorBtn").GetComponent<Button>();
+            loopManager = GameFinder.FindChild(Instance.gameObject, "Loop").GetComponentInChildren<SwitchManager>();
+            primaryColorBMB = GameFinder.FindChild(Instance.gameObject, "PrimaryColorBtn").GetComponent<ButtonManagerBasic>();
+            primaryColorBMB.buttonVar = GameFinder.FindChild(Instance.gameObject, "PrimaryColorBtn").GetComponent<Button>();
             primaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
             primaryColorBMB.buttonVar.interactable = false;
-            secondaryColorBMB = GameFinder.FindChild(Instance.menu, "SecondaryColorBtn").GetComponent<ButtonManagerBasic>();
-            secondaryColorBMB.buttonVar = GameFinder.FindChild(Instance.menu, "SecondaryColorBtn").GetComponent<Button>();
+            secondaryColorBMB = GameFinder.FindChild(Instance.gameObject, "SecondaryColorBtn").GetComponent<ButtonManagerBasic>();
+            secondaryColorBMB.buttonVar = GameFinder.FindChild(Instance.gameObject, "SecondaryColorBtn").GetComponent<Button>();
             secondaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
-            tilingSlider = GameFinder.FindChild(Instance.menu, "Tiling").GetComponentInChildren<FloatValueSliderController>();
-            picker = Instance.menu.GetComponentInChildren<HSVPicker.ColorPicker>();
+            tilingSlider = GameFinder.FindChild(Instance.gameObject, "Tiling").GetComponentInChildren<FloatValueSliderController>();
+            picker = Instance.gameObject.GetComponentInChildren<HSVPicker.ColorPicker>();
             mode = Mode.None;
             Instance.Disable();
         }
@@ -181,7 +181,7 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private void InitLineKindSelectorConstructor()
         {
-            lineKindSelector = GameFinder.FindChild(Instance.menu, "LineKindSelection")
+            lineKindSelector = GameFinder.FindChild(Instance.gameObject, "LineKindSelection")
                 .GetComponent<HorizontalSelector>();
 
             /// Creates the items for the line kind selector.
@@ -225,7 +225,7 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private void InitColorKindSelectorConstructor()
         {
-            colorKindSelector = GameFinder.FindChild(Instance.menu, "ColorKindSelection")
+            colorKindSelector = GameFinder.FindChild(Instance.gameObject, "ColorKindSelection")
                 .GetComponent<HorizontalSelector>();
             bool isDashed = selectedLineKind != LineKind.Solid;
 
@@ -270,7 +270,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>True, if the menu is already open. Otherwise false.</returns>
         public override bool IsOpen()
         {
-            return menu.activeInHierarchy;
+            return gameObject.activeInHierarchy;
         }
 
         /// <summary>
@@ -279,7 +279,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>true if in drawing mode</returns>
         public bool IsInDrawingMode()
         {
-            return menu.activeInHierarchy && mode == Mode.Drawing;
+            return gameObject.activeInHierarchy && mode == Mode.Drawing;
         }
 
         /// <summary>
@@ -288,7 +288,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>true if in edit mode</returns>
         public bool IsInEditMode()
         {
-            return menu.activeInHierarchy && mode == Mode.Edit;
+            return gameObject.activeInHierarchy && mode == Mode.Edit;
         }
 
         /// <summary>
@@ -301,8 +301,8 @@ namespace SEE.UI.Menu.Drawable
         {
             base.Disable();
             EnableLineMenuLayers();
-            menu.transform.SetParent(UICanvas.Canvas.transform);
-            GameFinder.FindChild(menu, "Dragger").GetComponent<WindowDragger>().enabled = true;
+            gameObject.transform.SetParent(UICanvas.Canvas.transform);
+            GameFinder.FindChild(gameObject, "Dragger").GetComponent<WindowDragger>().enabled = true;
             DisableReturn();
             mode = Mode.None;
         }
@@ -358,7 +358,7 @@ namespace SEE.UI.Menu.Drawable
 
             Enable();
 
-            MenuHelper.CalculateHeight(menu, true);
+            MenuHelper.CalculateHeight(gameObject, true);
         }
 
         /// <summary>
@@ -369,7 +369,7 @@ namespace SEE.UI.Menu.Drawable
             EnableLineMenu(withoutMenuLayer: new MenuLayer[] { MenuLayer.Layer, MenuLayer.Loop });
             InitDrawing();
             mode = Mode.Drawing;
-            MenuHelper.CalculateHeight(menu, true);
+            MenuHelper.CalculateHeight(gameObject, true);
         }
 
         /// <summary>
@@ -395,7 +395,7 @@ namespace SEE.UI.Menu.Drawable
             picker.onValueChanged.AddListener(colorAction = color => ValueHolder.CurrentPrimaryColor = color);
 
             /// At last re-calculate the menu height.
-            MenuHelper.CalculateHeight(menu, true);
+            MenuHelper.CalculateHeight(gameObject, true);
         }
 
         /// <summary>
@@ -534,7 +534,7 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private void SetUpOutlineThicknessSliderForDrawing()
         {
-            ThicknessSliderController thicknessSlider = menu.GetComponentInChildren<ThicknessSliderController>();
+            ThicknessSliderController thicknessSlider = gameObject.GetComponentInChildren<ThicknessSliderController>();
             /// Assigns the current value to the slider.
             thicknessSlider.AssignValue(ValueHolder.CurrentThickness);
             /// Add the handler.
@@ -586,7 +586,7 @@ namespace SEE.UI.Menu.Drawable
                 mode = Mode.Edit;
 
                 /// Re-calculates the menu height.
-                MenuHelper.CalculateHeight(menu, true);
+                MenuHelper.CalculateHeight(gameObject, true);
             }
         }
 
@@ -603,10 +603,10 @@ namespace SEE.UI.Menu.Drawable
             if (returnCall != null)
             {
                 EnableReturn();
-                ButtonManagerBasic returnBtn = GameFinder.FindChild(menu, "ReturnBtn").GetComponent<ButtonManagerBasic>();
+                ButtonManagerBasic returnBtn = GameFinder.FindChild(gameObject, "ReturnBtn").GetComponent<ButtonManagerBasic>();
                 returnBtn.clickEvent.RemoveAllListeners();
                 returnBtn.clickEvent.AddListener(returnCall);
-                GameFinder.FindChild(menu, "Layer").GetComponentInChildren<Slider>().interactable = false;
+                GameFinder.FindChild(gameObject, "Layer").GetComponentInChildren<Slider>().interactable = false;
             }
         }
 
@@ -802,7 +802,7 @@ namespace SEE.UI.Menu.Drawable
         private void SetUpOutlineThicknessSliderForEditing(GameObject selectedLine, LineRenderer renderer,
             LineConf lineHolder, GameObject surface, string surfaceParentName)
         {
-            ThicknessSliderController thicknessSlider = menu.GetComponentInChildren<ThicknessSliderController>();
+            ThicknessSliderController thicknessSlider = gameObject.GetComponentInChildren<ThicknessSliderController>();
             /// Assigns the current value to the slider.
             thicknessSlider.AssignValue(renderer.startWidth);
             /// Adds the handler for changing.
@@ -831,7 +831,7 @@ namespace SEE.UI.Menu.Drawable
         private void SetUpOrderInLayerSliderForEditing(GameObject selectedLine, LineConf lineHolder,
             GameObject surface, string surfaceParentName)
         {
-            LayerSliderController layerSlider = menu.GetComponentInChildren<LayerSliderController>();
+            LayerSliderController layerSlider = gameObject.GetComponentInChildren<LayerSliderController>();
             layerSlider.AssignMaxOrder(surface.GetComponent<DrawableHolder>().OrderInLayer);
             /// Assigns the current value to the slider.
             layerSlider.AssignValue(lineHolder.OrderInLayer);
@@ -950,18 +950,18 @@ namespace SEE.UI.Menu.Drawable
                 {
                     tilingSlider.ResetToMin();
                 }
-                menu.GetComponentInChildren<FloatValueSliderController>().onValueChanged.RemoveListener(tilingAction);
+                gameObject.GetComponentInChildren<FloatValueSliderController>().onValueChanged.RemoveListener(tilingAction);
             }
             primaryColorBMB.clickEvent.RemoveAllListeners();
             secondaryColorBMB.clickEvent.RemoveAllListeners();
-            menu.GetComponentInChildren<ThicknessSliderController>().OnValueChanged.RemoveAllListeners();
-            menu.GetComponentInChildren<LayerSliderController>().OnValueChanged.RemoveAllListeners();
+            gameObject.GetComponentInChildren<ThicknessSliderController>().OnValueChanged.RemoveAllListeners();
+            gameObject.GetComponentInChildren<LayerSliderController>().OnValueChanged.RemoveAllListeners();
             loopManager.OffEvents.RemoveAllListeners();
             loopManager.OnEvents.RemoveAllListeners();
 
             if (colorAction != null)
             {
-                menu.GetComponentInChildren<HSVPicker.ColorPicker>().onValueChanged.RemoveListener(colorAction);
+                gameObject.GetComponentInChildren<HSVPicker.ColorPicker>().onValueChanged.RemoveListener(colorAction);
             }
         }
 
@@ -999,7 +999,7 @@ namespace SEE.UI.Menu.Drawable
         public void AssignLineKind(LineKind kind)
         {
             selectedLineKind = kind;
-            MenuHelper.CalculateHeight(menu, true);
+            MenuHelper.CalculateHeight(gameObject, true);
         }
 
         /// <summary>
@@ -1022,7 +1022,7 @@ namespace SEE.UI.Menu.Drawable
             { /// In all other cases the tiling layer will disabled.
                 DisableTilingFromLineMenu();
             }
-            MenuHelper.CalculateHeight(menu, true);
+            MenuHelper.CalculateHeight(gameObject, true);
         }
         #endregion
 
@@ -1055,7 +1055,7 @@ namespace SEE.UI.Menu.Drawable
                 /// For all other <see cref="ColorKind"/> enable the color area.
                 EnableColorAreaFromLineMenu();
             }
-            MenuHelper.CalculateHeight(menu, true);
+            MenuHelper.CalculateHeight(gameObject, true);
         }
         #endregion
 
@@ -1210,7 +1210,7 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private void DisableReturn()
         {
-            menu.transform.Find("ReturnBtn").gameObject.SetActive(false);
+            gameObject.transform.Find("ReturnBtn").gameObject.SetActive(false);
         }
 
         /// <summary>
@@ -1218,7 +1218,7 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private void EnableReturn()
         {
-            menu.transform.Find("ReturnBtn").gameObject.SetActive(true);
+            gameObject.transform.Find("ReturnBtn").gameObject.SetActive(true);
         }
         #endregion
     }

@@ -41,15 +41,15 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="colorAction">An action which changes the color palette icon.</param>
         public void Enable(GameObject surface, UnityAction<Color> colorAction)
         {
-            if (Instance.menu == null)
+            if (Instance.gameObject == null)
             {
                 Instantiate(surfaceColorMenuPrefab);
 
                 string name = !string.IsNullOrEmpty(GameFinder.GetDrawableSurfaceParentName(surface)) ?
                     GameFinder.GetDrawableSurfaceParentName(surface) : surface.name;
-                GameFinder.FindChild(Instance.menu, "Text").GetComponent<TextMeshProUGUI>().text = "Change Color:\n" + name;
+                GameFinder.FindChild(Instance.gameObject, "Text").GetComponent<TextMeshProUGUI>().text = "Change Color:\n" + name;
 
-                HSVPicker.ColorPicker picker = Instance.menu.GetComponentInChildren<HSVPicker.ColorPicker>();
+                HSVPicker.ColorPicker picker = Instance.gameObject.GetComponentInChildren<HSVPicker.ColorPicker>();
                 picker.AssignColor(DrawableConfigManager.GetDrawableConfig(surface).Color);
                 picker.onValueChanged.AddListener(color =>
                 {
@@ -59,7 +59,7 @@ namespace SEE.UI.Menu.Drawable
                 });
 
                 /// Initialize the button for canceling the menu.
-                ButtonManagerBasic cancelBtn = GameFinder.FindChild(Instance.menu, "Cancel")
+                ButtonManagerBasic cancelBtn = GameFinder.FindChild(Instance.gameObject, "Cancel")
                             .GetComponent<ButtonManagerBasic>();
                 cancelBtn.clickEvent.AddListener(() =>
                 {

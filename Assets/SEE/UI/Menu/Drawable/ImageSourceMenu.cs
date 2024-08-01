@@ -54,12 +54,12 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         public static void EnableMenu()
         {
-            if (Instance.menu == null)
+            if (Instance.gameObject == null)
             {
                 Instance.Instantiate(imageSourceMenuPrefab);
 
                 /// Initialize the button for loading the image from local disk.
-                ButtonManagerBasic local = GameFinder.FindChild(Instance.menu, "Local")
+                ButtonManagerBasic local = GameFinder.FindChild(Instance.gameObject, "Local")
                     .GetComponent<ButtonManagerBasic>();
                 local.clickEvent.AddListener(() =>
                 {
@@ -69,7 +69,7 @@ namespace SEE.UI.Menu.Drawable
                 });
 
                 /// Initialize the button for loading the image from the web.
-                ButtonManagerBasic web = GameFinder.FindChild(Instance.menu, "Web")
+                ButtonManagerBasic web = GameFinder.FindChild(Instance.gameObject, "Web")
                     .GetComponent<ButtonManagerBasic>();
                 web.clickEvent.AddListener(() =>
                 {
@@ -79,7 +79,7 @@ namespace SEE.UI.Menu.Drawable
                 });
 
                 /// Initialize the button for canceling the menu.
-                ButtonManagerBasic cancelBtn = GameFinder.FindChild(Instance.menu, "Cancel")
+                ButtonManagerBasic cancelBtn = GameFinder.FindChild(Instance.gameObject, "Cancel")
                     .GetComponent<ButtonManagerBasic>();
                 cancelBtn.clickEvent.AddListener(() =>
                 {

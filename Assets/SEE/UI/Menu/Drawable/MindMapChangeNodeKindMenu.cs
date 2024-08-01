@@ -49,11 +49,11 @@ namespace SEE.UI.Menu.Drawable
                 Instance.Instantiate(nodeKindSelectionMenuPrefab);
 
                 /// Adds the return call to the return button, to return to the parent menu.
-                GameFinder.FindChild(Instance.menu, "ReturnBtn").GetComponent<ButtonManagerBasic>()
+                GameFinder.FindChild(Instance.gameObject, "ReturnBtn").GetComponent<ButtonManagerBasic>()
                     .clickEvent.AddListener(returnCall);
 
                 /// Initialize the node kind selector.
-                nodeKindSelector = GameFinder.FindChild(Instance.menu, "Selection").GetComponent<HorizontalSelector>();
+                nodeKindSelector = GameFinder.FindChild(Instance.gameObject, "Selection").GetComponent<HorizontalSelector>();
 
                 /// Creates the items for them.
                 foreach (GameMindMap.NodeKind kind in GameMindMap.GetNodeKinds())
@@ -115,7 +115,7 @@ namespace SEE.UI.Menu.Drawable
                         GameObject pMenu = MindMapParentSelectionMenu.EnableForEditing(
                             GameFinder.GetAttachedObjectsObject(surface), addedNode, newConf, null);
                         GameFinder.FindChild(pMenu, "Dragger").GetComponent<WindowDragger>().enabled = false;
-                        pMenu.transform.SetParent(GameFinder.FindChild(Instance.menu, "Content").transform);
+                        pMenu.transform.SetParent(GameFinder.FindChild(Instance.gameObject, "Content").transform);
 
                         /// Restore the appearance of the previous branch line, if there was one.
                         if (addedNode.GetComponent<MMNodeValueHolder>().GetParentBranchLine() != null

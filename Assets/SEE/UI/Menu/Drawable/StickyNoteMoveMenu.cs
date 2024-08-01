@@ -50,7 +50,7 @@ namespace SEE.UI.Menu.Drawable
             string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
             /// Register the switch for speed up option.
-            SwitchManager speedUpManager = GameFinder.FindChild(Instance.menu, "SpeedSwitch")
+            SwitchManager speedUpManager = GameFinder.FindChild(Instance.gameObject, "SpeedSwitch")
                 .GetComponent<SwitchManager>();
             float speed = ValueHolder.Move;
             /// Turn on increase the speed to <see cref="ValueHolder.MoveFast"/>.
@@ -59,10 +59,10 @@ namespace SEE.UI.Menu.Drawable
             speedUpManager.OffEvents.AddListener(() => speed = ValueHolder.Move);
 
             /// Register the finish button. It destroys the move menu and set the finish attribut.
-            GameFinder.FindChild(Instance.menu, "Finish").GetComponent<ButtonManagerBasic>()
+            GameFinder.FindChild(Instance.gameObject, "Finish").GetComponent<ButtonManagerBasic>()
                 .clickEvent.AddListener(() =>
             {
-                Destroyer.Destroy(Instance.menu);
+                Destroyer.Destroy(Instance.gameObject);
                 isFinish = true;
             });
 
@@ -72,7 +72,7 @@ namespace SEE.UI.Menu.Drawable
             /// the speed switching would no longer work.
             /// Therefore, they are grouped together in a region.
             #region Movement buttons
-            GameFinder.FindChild(Instance.menu, "Left").AddComponent<ButtonHeld>().SetAction(() =>
+            GameFinder.FindChild(Instance.gameObject, "Left").AddComponent<ButtonHeld>().SetAction(() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Left, speed);
                 if (!spawnMode)
@@ -82,7 +82,7 @@ namespace SEE.UI.Menu.Drawable
                 }
             }, true);
 
-            GameFinder.FindChild(Instance.menu, "Right").AddComponent<ButtonHeld>().SetAction(() =>
+            GameFinder.FindChild(Instance.gameObject, "Right").AddComponent<ButtonHeld>().SetAction(() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Right, speed);
                 if (!spawnMode)
@@ -92,7 +92,7 @@ namespace SEE.UI.Menu.Drawable
                 }
             }, true);
 
-            GameFinder.FindChild(Instance.menu, "Up").AddComponent<ButtonHeld>().SetAction(() =>
+            GameFinder.FindChild(Instance.gameObject, "Up").AddComponent<ButtonHeld>().SetAction(() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Up, speed);
                 if (!spawnMode)
@@ -102,7 +102,7 @@ namespace SEE.UI.Menu.Drawable
                 }
             }, true);
 
-            GameFinder.FindChild(Instance.menu, "Down").AddComponent<ButtonHeld>().SetAction(() =>
+            GameFinder.FindChild(Instance.gameObject, "Down").AddComponent<ButtonHeld>().SetAction(() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Down, speed);
                 if (!spawnMode)
@@ -112,7 +112,7 @@ namespace SEE.UI.Menu.Drawable
                 }
             }, true);
 
-            GameFinder.FindChild(Instance.menu, "Forward").AddComponent<ButtonHeld>().SetAction(() =>
+            GameFinder.FindChild(Instance.gameObject, "Forward").AddComponent<ButtonHeld>().SetAction(() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Forward, speed);
                 if (!spawnMode)
@@ -122,7 +122,7 @@ namespace SEE.UI.Menu.Drawable
                 }
             }, true);
 
-            GameFinder.FindChild(Instance.menu, "Back").AddComponent<ButtonHeld>().SetAction(() =>
+            GameFinder.FindChild(Instance.gameObject, "Back").AddComponent<ButtonHeld>().SetAction(() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Back, speed);
                 if (!spawnMode)
@@ -134,7 +134,7 @@ namespace SEE.UI.Menu.Drawable
             #endregion
 
             /// Register an information button for explaining the individual movement buttons.
-            GameFinder.FindChild(Instance.menu, "Info").GetComponent<ButtonManagerBasic>()
+            GameFinder.FindChild(Instance.gameObject, "Info").GetComponent<ButtonManagerBasic>()
                 .clickEvent.AddListener(() =>
             {
                 ShowNotification.Info("Movement Buttons",
@@ -171,7 +171,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>The selected move speed</returns>
         public static float GetSpeed()
         {
-            return GameFinder.FindChild(Instance.menu, "SpeedSwitch")
+            return GameFinder.FindChild(Instance.gameObject, "SpeedSwitch")
                 .GetComponent<SwitchManager>().isOn ? ValueHolder.MoveFast : ValueHolder.Move;
         }
     }

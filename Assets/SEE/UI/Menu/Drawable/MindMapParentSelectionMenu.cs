@@ -58,10 +58,10 @@ namespace SEE.UI.Menu.Drawable
             Instance.Instantiate(parentSelectionMenuPrefab);
 
             /// Disable the return button.
-            GameFinder.FindChild(Instance.menu, "ReturnBtn").SetActive(false);
+            GameFinder.FindChild(Instance.gameObject, "ReturnBtn").SetActive(false);
 
             /// Initialize the parent selector.
-            HorizontalSelector parentSelector = GameFinder.FindChild(Instance.menu, "ParentSelection")
+            HorizontalSelector parentSelector = GameFinder.FindChild(Instance.gameObject, "ParentSelection")
                 .GetComponent<HorizontalSelector>();
 
             /// Gets all Mind Map Nodes of the given attached object - object.
@@ -98,7 +98,7 @@ namespace SEE.UI.Menu.Drawable
             parentSelector.defaultIndex = 0;
 
             /// The parent selection can be completed through the Finish button.
-            ButtonManagerBasic finish = GameFinder.FindChild(Instance.menu, "Finish").GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic finish = GameFinder.FindChild(Instance.gameObject, "Finish").GetComponent<ButtonManagerBasic>();
             finish.clickEvent.AddListener(() =>
             {
                 gotSelection = true;
@@ -131,17 +131,17 @@ namespace SEE.UI.Menu.Drawable
                 if (returnCall != null)
                 {
                     /// Adds the return call back to the return button.
-                    GameFinder.FindChild(Instance.menu, "ReturnBtn").GetComponent<ButtonManagerBasic>()
+                    GameFinder.FindChild(Instance.gameObject, "ReturnBtn").GetComponent<ButtonManagerBasic>()
                         .clickEvent.AddListener(returnCall);
                 }
                 else
                 {
                     /// Disables the return button.
-                    GameFinder.FindChild(Instance.menu, "ReturnBtn").SetActive(false);
+                    GameFinder.FindChild(Instance.gameObject, "ReturnBtn").SetActive(false);
                 }
 
                 /// Initalize the parent selector.
-                HorizontalSelector parentSelector = GameFinder.FindChild(Instance.menu, "ParentSelection")
+                HorizontalSelector parentSelector = GameFinder.FindChild(Instance.gameObject, "ParentSelection")
                     .GetComponent<HorizontalSelector>();
 
                 /// Gets all Mind Map Nodes of the given attached object - object.
@@ -214,19 +214,19 @@ namespace SEE.UI.Menu.Drawable
                 /// Disable it for all others.
                 if (!cutCopyMode)
                 {
-                    GameObject finish = GameFinder.FindChild(Instance.menu, "Finish");
+                    GameObject finish = GameFinder.FindChild(Instance.gameObject, "Finish");
                     finish.SetActive(false);
                 }
                 else
                 {
-                    ButtonManagerBasic finish = GameFinder.FindChild(Instance.menu, "Finish").GetComponent<ButtonManagerBasic>();
+                    ButtonManagerBasic finish = GameFinder.FindChild(Instance.gameObject, "Finish").GetComponent<ButtonManagerBasic>();
                     finish.clickEvent.AddListener(() =>
                     {
                         gotSelection = true;
                     });
                 }
             }
-            return Instance.menu;
+            return Instance.gameObject;
         }
 
         /// <summary>

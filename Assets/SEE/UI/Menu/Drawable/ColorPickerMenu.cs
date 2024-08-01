@@ -52,14 +52,14 @@ namespace SEE.UI.Menu.Drawable
 
             Instance.Instantiate(colorPickerMenuPrefab);
 
-            switchManager = GameFinder.FindChild(Instance.menu, "Switch").GetComponent<SwitchManager>();
+            switchManager = GameFinder.FindChild(Instance.gameObject, "Switch").GetComponent<SwitchManager>();
 
             /// Gets and assign the color picker for the primary color.
-            pickerForPrimaryColor = GameFinder.FindChild(Instance.menu, "Primary").GetComponent<ColorPicker>();
+            pickerForPrimaryColor = GameFinder.FindChild(Instance.gameObject, "Primary").GetComponent<ColorPicker>();
             pickerForPrimaryColor.AssignColor(ValueHolder.CurrentPrimaryColor);
 
             /// Gets and assign the color picker for the secondary color.
-            pickerForSecondColor = GameFinder.FindChild(Instance.menu, "Second").GetComponent<ColorPicker>();
+            pickerForSecondColor = GameFinder.FindChild(Instance.gameObject, "Second").GetComponent<ColorPicker>();
             pickerForSecondColor.AssignColor(ValueHolder.CurrentSecondaryColor);
 
             /// Hides the menu.

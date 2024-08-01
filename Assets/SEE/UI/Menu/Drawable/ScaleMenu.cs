@@ -69,10 +69,10 @@ namespace SEE.UI.Menu.Drawable
             Instance.Instantiate(drawableScalePrefab);
 
             /// Initialize the GUI elements of the menu.
-            xScale = GameFinder.FindChild(Instance.menu, "XScale").GetComponent<InputFieldWithButtons>();
-            yScale = GameFinder.FindChild(Instance.menu, "YScale").GetComponent<InputFieldWithButtons>();
-            switchManager = GameFinder.FindChild(Instance.menu, "Switch").GetComponent<SwitchManager>();
-            doneObject = GameFinder.FindChild(Instance.menu, "Done");
+            xScale = GameFinder.FindChild(Instance.gameObject, "XScale").GetComponent<InputFieldWithButtons>();
+            yScale = GameFinder.FindChild(Instance.gameObject, "YScale").GetComponent<InputFieldWithButtons>();
+            switchManager = GameFinder.FindChild(Instance.gameObject, "Switch").GetComponent<SwitchManager>();
+            doneObject = GameFinder.FindChild(Instance.gameObject, "Done");
 
             /// Sets up the x scale component.
             XScale(objToScale);
@@ -199,13 +199,13 @@ namespace SEE.UI.Menu.Drawable
         {
             if (returnCall != null)
             {
-                Instance.menu.transform.Find("ReturnBtn").gameObject.SetActive(true);
-                GameFinder.FindChild(Instance.menu, "ReturnBtn").GetComponent<ButtonManagerBasic>()
+                Instance.gameObject.transform.Find("ReturnBtn").gameObject.SetActive(true);
+                GameFinder.FindChild(Instance.gameObject, "ReturnBtn").GetComponent<ButtonManagerBasic>()
                     .clickEvent.AddListener(returnCall);
             }
             else
             {
-                Instance.menu.transform.Find("ReturnBtn").gameObject.SetActive(false);
+                Instance.gameObject.transform.Find("ReturnBtn").gameObject.SetActive(false);
             }
         }
 

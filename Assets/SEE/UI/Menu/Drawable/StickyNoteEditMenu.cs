@@ -74,7 +74,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="newConfig">The configuration which holds the new values.</param>
         private static void LayerSlider(GameObject stickyNote, DrawableConfig newConfig)
         {
-            LayerSliderController orderInLayerSlider = Instance.menu.GetComponentInChildren<LayerSliderController>();
+            LayerSliderController orderInLayerSlider = Instance.gameObject.GetComponentInChildren<LayerSliderController>();
             orderInLayerSlider.AssignValue(newConfig.Order);
             orderInLayerSlider.OnValueChanged.AddListener(order =>
             {
@@ -94,7 +94,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="newConfig">The configuration which holds the new values.</param>
         private static void Lighting(GameObject stickyNote, DrawableConfig newConfig)
         {
-            SwitchManager lightingManager = Instance.menu.GetComponentInChildren<SwitchManager>();
+            SwitchManager lightingManager = Instance.gameObject.GetComponentInChildren<SwitchManager>();
             lightingManager.OffEvents.AddListener(() =>
             {
                 newConfig.Lighting = false;
@@ -122,7 +122,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="newConfig">The configuration which holds the new values.</param>
         private static void ColorPicker(GameObject stickyNote, DrawableConfig newConfig)
         {
-            HSVPicker.ColorPicker picker = Instance.menu.GetComponentInChildren<HSVPicker.ColorPicker>();
+            HSVPicker.ColorPicker picker = Instance.gameObject.GetComponentInChildren<HSVPicker.ColorPicker>();
             picker.AssignColor(newConfig.Color);
             picker.onValueChanged.AddListener(color =>
             {
@@ -140,7 +140,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="callback">The call back to return to the parent menu.</param>
         private static void Rotation(GameObject stickyNote, UnityAction callback)
         {
-            ButtonManagerBasic rotation = GameFinder.FindChild(Instance.menu, "Rotation").GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic rotation = GameFinder.FindChild(Instance.gameObject, "Rotation").GetComponent<ButtonManagerBasic>();
             rotation.clickEvent.AddListener(() =>
             {
                 Instance.Disable();
@@ -156,7 +156,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="callback">The call back to return to the parent menu.</param>
         private static void Scale(GameObject stickyNote, UnityAction callback)
         {
-            ButtonManagerBasic scale = GameFinder.FindChild(Instance.menu, "Scale").GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic scale = GameFinder.FindChild(Instance.gameObject, "Scale").GetComponent<ButtonManagerBasic>();
             scale.clickEvent.AddListener(() =>
             {
                 Instance.Disable();

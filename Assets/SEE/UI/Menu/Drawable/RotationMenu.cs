@@ -45,10 +45,10 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="selectedObject">The chosen drawable type object to rotate.</param>
         public static void Enable(GameObject selectedObject)
         {
-            if (Instance.menu == null)
+            if (Instance.gameObject == null)
             {
                 Instance.Instantiate(rotationMenuPrefab);
-                RotationSliderController slider = Instance.menu.GetComponentInChildren<RotationSliderController>();
+                RotationSliderController slider = Instance.gameObject.GetComponentInChildren<RotationSliderController>();
                 /// Adds the necessary handler to the slider.
                 SliderListener(slider, selectedObject);
                 /// For Mind Map Nodes: Provides functionality to also rotate the children.
@@ -57,7 +57,7 @@ namespace SEE.UI.Menu.Drawable
             else
             {
                 /// Updates the slider value.
-                RotationSliderController slider = Instance.menu.GetComponentInChildren<RotationSliderController>();
+                RotationSliderController slider = Instance.gameObject.GetComponentInChildren<RotationSliderController>();
                 slider.AssignValue(selectedObject.transform.localEulerAngles.z);
             }
         }
@@ -91,8 +91,8 @@ namespace SEE.UI.Menu.Drawable
                 }
 
                 /// Initializes the switch to turn child inclusion on and off.
-                GameFinder.FindChild(Instance.menu, "Content").transform.Find("Children").gameObject.SetActive(true);
-                SwitchManager childrenSwitch = GameFinder.FindChild(Instance.menu, "ChildrenSwitch")
+                GameFinder.FindChild(Instance.gameObject, "Content").transform.Find("Children").gameObject.SetActive(true);
+                SwitchManager childrenSwitch = GameFinder.FindChild(Instance.gameObject, "ChildrenSwitch")
                     .GetComponent<SwitchManager>();
                 bool changeSwitch = false;
                 childrenSwitch.OnEvents.RemoveAllListeners();
@@ -135,7 +135,7 @@ namespace SEE.UI.Menu.Drawable
             else
             {
                 /// Disables the include children button, if the selected object is not a <see cref="MindMapNodeConf"/>
-                GameFinder.FindChild(Instance.menu, "Content").transform.Find("Children").gameObject.SetActive(false);
+                GameFinder.FindChild(Instance.gameObject, "Content").transform.Find("Children").gameObject.SetActive(false);
                 includeChildren = false;
             }
         }

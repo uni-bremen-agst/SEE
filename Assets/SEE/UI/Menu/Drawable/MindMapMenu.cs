@@ -59,7 +59,7 @@ namespace SEE.UI.Menu.Drawable
             base.Enable();
 
             /// Initialize the button for spawn a theme.
-            ButtonManagerBasic theme = GameFinder.FindChild(Instance.menu, "Theme").GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic theme = GameFinder.FindChild(Instance.gameObject, "Theme").GetComponent<ButtonManagerBasic>();
             theme.clickEvent.AddListener(() =>
             {
                 gotOperation = true;
@@ -68,7 +68,7 @@ namespace SEE.UI.Menu.Drawable
             });
 
             /// Initialize the button for spawn a subtheme.
-            ButtonManagerBasic subtheme = GameFinder.FindChild(Instance.menu, "Subtheme").GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic subtheme = GameFinder.FindChild(Instance.gameObject, "Subtheme").GetComponent<ButtonManagerBasic>();
             subtheme.clickEvent.AddListener(() =>
             {
                 gotOperation = true;
@@ -77,7 +77,7 @@ namespace SEE.UI.Menu.Drawable
             });
 
             /// Initialize the button for spawn a leaf.
-            ButtonManagerBasic leaf = GameFinder.FindChild(Instance.menu, "Leaf").GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic leaf = GameFinder.FindChild(Instance.gameObject, "Leaf").GetComponent<ButtonManagerBasic>();
             leaf.clickEvent.AddListener(() =>
             {
                 gotOperation = true;

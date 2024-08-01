@@ -265,7 +265,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>True if the menu is alreay opened. Otherwise false.</returns>
         public override bool IsOpen()
         {
-            return Instance.menu.activeInHierarchy;
+            return Instance.gameObject.activeInHierarchy;
         }
 
         /// <summary>
@@ -275,37 +275,37 @@ namespace SEE.UI.Menu.Drawable
         private static void InitBtn()
         {
             /// Initialize the objects for the font style buttons
-            GameObject bold = GameFinder.FindChild(Instance.menu, "Bold");
+            GameObject bold = GameFinder.FindChild(Instance.gameObject, "Bold");
             boldBtn = bold.GetComponent<Button>();
             boldBMB = bold.GetComponent<ButtonManagerBasic>();
             bold.AddComponent<ButtonHoverTooltip>().SetMessage("Bold");
 
-            GameObject italic = GameFinder.FindChild(Instance.menu, "Italic");
+            GameObject italic = GameFinder.FindChild(Instance.gameObject, "Italic");
             italicBtn = italic.GetComponent<Button>();
             italicBMB = italic.GetComponent<ButtonManagerBasic>();
             italic.AddComponent<ButtonHoverTooltip>().SetMessage("Italic");
 
-            GameObject underline = GameFinder.FindChild(Instance.menu, "Underline");
+            GameObject underline = GameFinder.FindChild(Instance.gameObject, "Underline");
             underlineBtn = underline.GetComponent<Button>();
             underlineBMB = underline.GetComponent<ButtonManagerBasic>();
             underline.AddComponent<ButtonHoverTooltip>().SetMessage("Underline");
 
-            GameObject strikethrough = GameFinder.FindChild(Instance.menu, "Strikethrough");
+            GameObject strikethrough = GameFinder.FindChild(Instance.gameObject, "Strikethrough");
             strikethroughBtn = strikethrough.GetComponent<Button>();
             strikethroughBMB = strikethrough.GetComponent<ButtonManagerBasic>();
             strikethrough.AddComponent<ButtonHoverTooltip>().SetMessage("Strikethrough");
 
-            GameObject lowerCase = GameFinder.FindChild(Instance.menu, "LowerCase");
+            GameObject lowerCase = GameFinder.FindChild(Instance.gameObject, "LowerCase");
             lowerCaseBtn = lowerCase.GetComponent<Button>();
             lowerCaseBMB = lowerCase.GetComponent<ButtonManagerBasic>();
             lowerCase.AddComponent<ButtonHoverTooltip>().SetMessage("Lower Case");
 
-            GameObject upperCase = GameFinder.FindChild(Instance.menu, "UpperCase");
+            GameObject upperCase = GameFinder.FindChild(Instance.gameObject, "UpperCase");
             upperCaseBtn = upperCase.GetComponent<Button>();
             upperCaseBMB = upperCase.GetComponent<ButtonManagerBasic>();
             upperCase.AddComponent<ButtonHoverTooltip>().SetMessage("Upper Case");
 
-            GameObject smallCaps = GameFinder.FindChild(Instance.menu, "SmallCaps");
+            GameObject smallCaps = GameFinder.FindChild(Instance.gameObject, "SmallCaps");
             smallCapsBtn = smallCaps.GetComponent<Button>();
             smallCapsBMB = smallCaps.GetComponent<ButtonManagerBasic>();
             smallCaps.AddComponent<ButtonHoverTooltip>().SetMessage("Small Caps");
@@ -320,32 +320,32 @@ namespace SEE.UI.Menu.Drawable
                 selectedBlock.highlightedColor = selectedBlock.pressedColor = Color.gray;
 
             /// Initialize the font color button and adds an exclusion mechanism with the outline color button.
-            fontColorBtn = GameFinder.FindChild(Instance.menu, "FontColorBtn").GetComponent<Button>();
-            fontColorBMB = GameFinder.FindChild(Instance.menu, "FontColorBtn").GetComponent<ButtonManagerBasic>();
+            fontColorBtn = GameFinder.FindChild(Instance.gameObject, "FontColorBtn").GetComponent<Button>();
+            fontColorBMB = GameFinder.FindChild(Instance.gameObject, "FontColorBtn").GetComponent<ButtonManagerBasic>();
             fontColorBtn.interactable = false;
             fontColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
 
             /// Initialize the outline color button and adds an exclusion mechanism with the font color button.
-            outlineColorBtn = GameFinder.FindChild(Instance.menu, "OutlineColorBtn").GetComponent<Button>();
-            outlineColorBMB = GameFinder.FindChild(Instance.menu, "OutlineColorBtn").GetComponent<ButtonManagerBasic>();
+            outlineColorBtn = GameFinder.FindChild(Instance.gameObject, "OutlineColorBtn").GetComponent<Button>();
+            outlineColorBMB = GameFinder.FindChild(Instance.gameObject, "OutlineColorBtn").GetComponent<ButtonManagerBasic>();
             outlineColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
 
             /// Initialize the outline switch and their layer.
-            outlineSwitchLayer = GameFinder.FindChild(Instance.menu, "Outline");
+            outlineSwitchLayer = GameFinder.FindChild(Instance.gameObject, "Outline");
             outlineSwitch = outlineSwitchLayer.GetComponentInChildren<SwitchManager>();
             outlineSwitchLayer.SetActive(false);
 
             /// Initialize the font outline thickness slider.
-            thicknessLayer = GameFinder.FindChild(Instance.menu, "Thickness");
+            thicknessLayer = GameFinder.FindChild(Instance.gameObject, "Thickness");
             thicknessSlider = thicknessLayer.GetComponentInChildren<FloatValueSliderController>();
             thicknessLayer.SetActive(false);
 
             /// Initialize the remaining GUI elements.
-            picker = Instance.menu.GetComponentInChildren<HSVPicker.ColorPicker>();
-            fontSizeInput = GameFinder.FindChild(Instance.menu, "FontSize").GetComponentInChildren<InputFieldWithButtons>();
-            editText = GameFinder.FindChild(Instance.menu, "EditText");
+            picker = Instance.gameObject.GetComponentInChildren<HSVPicker.ColorPicker>();
+            fontSizeInput = GameFinder.FindChild(Instance.gameObject, "FontSize").GetComponentInChildren<InputFieldWithButtons>();
+            editText = GameFinder.FindChild(Instance.gameObject, "EditText");
             editTextBMB = editText.GetComponentInChildren<ButtonManagerBasic>();
-            orderInLayer = GameFinder.FindChild(Instance.menu, "Layer");
+            orderInLayer = GameFinder.FindChild(Instance.gameObject, "Layer");
             orderInLayerSlider = orderInLayer.GetComponentInChildren<LayerSliderController>();
         }
 
@@ -370,7 +370,7 @@ namespace SEE.UI.Menu.Drawable
         public override void Disable()
         {
             base.Disable();
-            Instance.menu.transform.Find("ReturnBtn").gameObject.SetActive(false);
+            Instance.gameObject.transform.Find("ReturnBtn").gameObject.SetActive(false);
             SEEInput.KeyboardShortcutsEnabled = true;
         }
 
@@ -412,7 +412,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 /// If yes, the order in layer and the edit text is available.
                 orderInLayer.SetActive(true);
-                GameFinder.FindChild(Instance.menu, "Layer").GetComponentInChildren<Slider>().interactable = true;
+                GameFinder.FindChild(Instance.gameObject, "Layer").GetComponentInChildren<Slider>().interactable = true;
                 editText.SetActive(true);
             }
             else
@@ -422,10 +422,10 @@ namespace SEE.UI.Menu.Drawable
                 editText.SetActive(false);
             }
             /// Re-calculate the text menu height.
-            MenuHelper.CalculateHeight(Instance.menu);
+            MenuHelper.CalculateHeight(Instance.gameObject);
 
             /// Makes the menu active.
-            Instance.menu.SetActive(true);
+            Instance.gameObject.SetActive(true);
         }
 
         /// <summary>
@@ -450,7 +450,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 /// If yes, the order in layer and the edit text is available.
                 orderInLayer.SetActive(true);
-                GameFinder.FindChild(Instance.menu, "Layer").GetComponentInChildren<Slider>().interactable = true;
+                GameFinder.FindChild(Instance.gameObject, "Layer").GetComponentInChildren<Slider>().interactable = true;
                 editText.SetActive(true);
             }
             else
@@ -460,7 +460,7 @@ namespace SEE.UI.Menu.Drawable
                 editText.SetActive(false);
             }
             /// Makes the menu active.
-            Instance.menu.SetActive(true);
+            Instance.gameObject.SetActive(true);
 
             /// Toggles the interactable of the mutually buttons.
             if (fontColorBtn.interactable)
@@ -472,7 +472,7 @@ namespace SEE.UI.Menu.Drawable
             AssignColorArea(colorAction, color);
 
             /// Re-calculate the menu height.
-            MenuHelper.CalculateHeight(Instance.menu);
+            MenuHelper.CalculateHeight(Instance.gameObject);
         }
 
         /// <summary>
@@ -484,14 +484,14 @@ namespace SEE.UI.Menu.Drawable
             EnableTextMenu(color => ValueHolder.CurrentPrimaryColor = color, ValueHolder.CurrentPrimaryColor, true);
 
             /// Disables the return button.
-            Instance.menu.transform.Find("ReturnBtn").gameObject.SetActive(false);
+            Instance.gameObject.transform.Find("ReturnBtn").gameObject.SetActive(false);
 
             /// Adds the handler for the font color button.
             /// It saves the changes in the global value for the primary color <see cref="ValueHolder.CurrentPrimaryColor"/>.
             fontColorBMB.clickEvent.AddListener(() =>
             {
                 AssignColorArea(color => ValueHolder.CurrentPrimaryColor = color, ValueHolder.CurrentPrimaryColor);
-                MenuHelper.CalculateHeight(Instance.menu);
+                MenuHelper.CalculateHeight(Instance.gameObject);
             });
 
             /// Adds the handler for the outline color button.
@@ -510,7 +510,7 @@ namespace SEE.UI.Menu.Drawable
             AssignFontSize(size => ValueHolder.CurrentFontSize = size, ValueHolder.CurrentFontSize);
 
             /// Re-calculate the menu height.
-            MenuHelper.CalculateHeight(Instance.menu);
+            MenuHelper.CalculateHeight(Instance.gameObject);
         }
 
         /// <summary>
@@ -543,7 +543,7 @@ namespace SEE.UI.Menu.Drawable
                         ValueHolder.CurrentSecondaryColor.g, ValueHolder.CurrentSecondaryColor.b, 255);
                 }
                 AssignColorArea(color => ValueHolder.CurrentSecondaryColor = color, ValueHolder.CurrentSecondaryColor);
-                MenuHelper.CalculateHeight(Instance.menu);
+                MenuHelper.CalculateHeight(Instance.gameObject);
             });
         }
 
@@ -651,7 +651,7 @@ namespace SEE.UI.Menu.Drawable
                 }, textHolder.OrderInLayer);
 
                 /// Re-calculate the menus height.
-                MenuHelper.CalculateHeight(Instance.menu);
+                MenuHelper.CalculateHeight(Instance.gameObject);
             }
         }
 
@@ -666,12 +666,12 @@ namespace SEE.UI.Menu.Drawable
         {
             if (returnCall != null)
             {
-                GameObject returnButton = Instance.menu.transform.Find("ReturnBtn").gameObject;
+                GameObject returnButton = Instance.gameObject.transform.Find("ReturnBtn").gameObject;
                 returnButton.SetActive(true);
                 ButtonManagerBasic returnBtn = returnButton.GetComponent<ButtonManagerBasic>();
                 returnBtn.clickEvent.RemoveAllListeners();
                 returnBtn.clickEvent.AddListener(returnCall);
-                GameFinder.FindChild(Instance.menu, "Layer").GetComponentInChildren<Slider>().interactable = false;
+                GameFinder.FindChild(Instance.gameObject, "Layer").GetComponentInChildren<Slider>().interactable = false;
             }
         }
 
@@ -695,7 +695,7 @@ namespace SEE.UI.Menu.Drawable
                     textHolder.FontColor = color;
                     new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
                 }, textHolder.FontColor);
-                MenuHelper.CalculateHeight(Instance.menu);
+                MenuHelper.CalculateHeight(Instance.gameObject);
             });
         }
 
@@ -734,7 +734,7 @@ namespace SEE.UI.Menu.Drawable
                     textHolder.OutlineColor = color;
                     new EditTextNetAction(surface.name, surfaceParentName, TextConf.GetText(selectedText)).Execute();
                 }, textHolder.OutlineColor);
-                MenuHelper.CalculateHeight(Instance.menu);
+                MenuHelper.CalculateHeight(Instance.gameObject);
             });
         }
 
@@ -757,7 +757,7 @@ namespace SEE.UI.Menu.Drawable
                 outlineSwitchLayer.SetActive(false);
             }
             /// Re-calculate the text menu height.
-            MenuHelper.CalculateHeight(Instance.menu, true);
+            MenuHelper.CalculateHeight(Instance.gameObject, true);
         }
 
         /// <summary>

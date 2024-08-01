@@ -20,33 +20,33 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="text">The text that should be displayed.</param>
         public void Enable(string text)
         {
-            if (menu == null)
+            if (gameObject == null)
             {
                 Instantiate(confirmMenuPrefab);
 
                 /// Initialize the buttons.
-                ButtonManagerBasic cancelDragger = GameFinder.FindChild(menu, "CancelDragger")
+                ButtonManagerBasic cancelDragger = GameFinder.FindChild(gameObject, "CancelDragger")
                     .GetComponent<ButtonManagerBasic>();
                 cancelDragger.clickEvent.AddListener(() =>
                  {
                      WasCanceled = true;
                      Destroy();
                  });
-                ButtonManagerBasic confirm = GameFinder.FindChild(menu, "Confirm")
+                ButtonManagerBasic confirm = GameFinder.FindChild(gameObject, "Confirm")
                     .GetComponent<ButtonManagerBasic>();
                 confirm.clickEvent.AddListener(() =>
                 {
                     WasConfirmed = true;
                     Destroy();
                 });
-                ButtonManagerBasic cancel = GameFinder.FindChild(menu, "Cancel")
+                ButtonManagerBasic cancel = GameFinder.FindChild(gameObject, "Cancel")
                     .GetComponent<ButtonManagerBasic>();
                 cancel.clickEvent.AddListener(() =>
                 {
                     WasCanceled = true;
                     Destroy();
                 });
-                TextMeshProUGUI description = GameFinder.FindChild(menu, "Description")
+                TextMeshProUGUI description = GameFinder.FindChild(gameObject, "Description")
                     .GetComponent<TextMeshProUGUI>();
                 description.text = text;
             }

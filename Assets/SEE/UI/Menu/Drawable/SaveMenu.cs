@@ -50,8 +50,8 @@ namespace SEE.UI.Menu.Drawable
         {
             /// Instantiate the menu.
             Instance.Instantiate(saveMenuPrefab);
-            saveButton = GameFinder.FindChild(Instance.menu, "Save").GetComponent<ButtonManagerBasic>();
-            saveAllButton = GameFinder.FindChild(Instance.menu, "SaveAll").GetComponent<ButtonManagerBasic>();
+            saveButton = GameFinder.FindChild(Instance.gameObject, "Save").GetComponent<ButtonManagerBasic>();
+            saveAllButton = GameFinder.FindChild(Instance.gameObject, "SaveAll").GetComponent<ButtonManagerBasic>();
 
             /// Adds a handler for the <paramref name="saveButtonCall"/>.
             saveButton.clickEvent.AddListener(saveButtonCall);

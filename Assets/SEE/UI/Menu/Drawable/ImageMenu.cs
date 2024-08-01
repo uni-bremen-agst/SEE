@@ -111,10 +111,10 @@ namespace SEE.UI.Menu.Drawable
         private static void Instantiate()
         {
             Instance.Instantiate(imageMenuPrefab);
-            orderInLayerSlider = Instance.menu.GetComponentInChildren<LayerSliderController>();
-            picker = Instance.menu.GetComponentInChildren<HSVPicker.ColorPicker>();
-            mirrorSwitch = Instance.menu.GetComponentInChildren<SwitchManager>();
-            thumbnail = GameFinder.FindChild(Instance.menu, "Image").GetComponent<Image>();
+            orderInLayerSlider = Instance.gameObject.GetComponentInChildren<LayerSliderController>();
+            picker = Instance.gameObject.GetComponentInChildren<HSVPicker.ColorPicker>();
+            mirrorSwitch = Instance.gameObject.GetComponentInChildren<SwitchManager>();
+            thumbnail = GameFinder.FindChild(Instance.gameObject, "Image").GetComponent<Image>();
         }
 
         /// <summary>
