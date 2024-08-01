@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Assets.SEE.UI.Window.DrawableManagerWindow
+namespace SEE.UI.Window.DrawableManagerWindow
 {
     /// <summary>
     /// A configurable filter for drawable surfaces.
@@ -16,7 +16,7 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
         public bool IncludeWhiteboards = true;
 
         /// <summary>
-        /// Whether to include sticky notes. 
+        /// Whether to include sticky notes.
         /// </summary>
         public bool IncludeStickyNotes = true;
 
@@ -71,9 +71,9 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
         /// <returns>True if all filter includes are active.</returns>
         public bool AllActive()
         {
-            return IncludeWhiteboards 
-                && IncludeStickyNotes 
-                && IncludeHaveDescription 
+            return IncludeWhiteboards
+                && IncludeStickyNotes
+                && IncludeHaveDescription
                 && IncludeHaveNoDescription
                 && IncludeHaveLighting
                 && IncludeHaveNoLighting
@@ -88,10 +88,11 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
         public List<GameObject> GetFilteredSurfaces()
         {
             List<GameObject> surfaces;
-            if (AllActive()) 
+            if (AllActive())
             {
                 surfaces = ValueHolder.DrawableSurfaces;
-            } else
+            }
+            else
             {
                 HashSet<GameObject> setSurface = new(ValueHolder.DrawableSurfaces);
                 if (!IncludeWhiteboards)
@@ -102,7 +103,7 @@ namespace Assets.SEE.UI.Window.DrawableManagerWindow
                 {
                     setSurface.ExceptWith(ValueHolder.DrawableSurfaces.FindAll(GameFinder.IsStickyNote));
                 }
-                if (!IncludeHaveDescription) 
+                if (!IncludeHaveDescription)
                 {
                     setSurface.ExceptWith(ValueHolder.DrawableSurfaces.FindAll(GameDrawableManager.HasDescription));
                 }

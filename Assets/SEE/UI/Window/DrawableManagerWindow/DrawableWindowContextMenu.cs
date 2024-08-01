@@ -6,18 +6,9 @@ using UnityEngine;
 using SEE.Utils;
 using UnityEngine.Events;
 using SEE.Game.Drawable;
-using Assets.SEE.UI.Window.DrawableManagerWindow;
 using SEE.Game.Drawable.ValueHolders;
-using RTG;
-using SEE.Game.Drawable.ActionHelpers;
 using SEE.Net.Actions.Drawable;
-using SEE.UI.Notification;
 using System.Linq;
-using SEE.Game;
-using SEE.GO.Menu;
-using SEE.Controls.Actions;
-using SEE.Controls.Actions.Drawable;
-using SEE.UI.PropertyDialog.Drawable;
 using Cysharp.Threading.Tasks;
 using SEE.UI.Menu.Drawable;
 

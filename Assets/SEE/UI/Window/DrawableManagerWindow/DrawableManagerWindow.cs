@@ -94,7 +94,6 @@ namespace SEE.UI.Window.DrawableManagerWindow
             return contextMenu.sorter.IsActive() ? contextMenu.sorter.ApplySort(surfaces) : OrderList(surfaces);
         }
 
-
         /// <summary>
         /// Orders a list by type of surface and then by the unqiue id.
         /// </summary>
