@@ -357,7 +357,9 @@ public class RadialSelection : MonoBehaviour
             spawnRadialPart.GetComponent<Image>().fillAmount = (1 / (float)numberOfRadialPart) - (angleBetweenPart / 360);
             if (i > (numberOfRadialPart / 2))
             {
-                spawnRadialPart.gameObject.transform.Find("TextField").gameObject.MustGetComponent<RectTransform>().eulerAngles = new Vector3(0, 0, 180);
+                spawnRadialPart.gameObject.transform.Find("TextField").gameObject.MustGetComponent<RectTransform>().rotation =
+                spawnRadialPart.gameObject.transform.Find("TextField").gameObject.MustGetComponent<RectTransform>().rotation * Quaternion.Euler(0,0,180);
+                spawnRadialPart.gameObject.transform.Find("TextField").gameObject.MustGetComponent<TextMeshProUGUI>().alignment = TextAlignmentOptions.Right;
             }
             spawnRadialPart.gameObject.transform.Find("TextField").gameObject.MustGetComponent<TextMeshProUGUI>().text = actions[i];
             Debug.Log("Action:" + actions[i]);
