@@ -62,6 +62,9 @@ namespace SEE.Controls.Actions
         /// </summary>
         static ActionStateTypes()
         {
+            // IMPORTANT NOTE: The order of the following field assignments must be exaclty
+            // the same as the order of their declarations below.
+
             Move =
               new("Move", "Move a node within a graph",
                   Color.red.Darker(), "Materials/Charts/MoveIcon",
@@ -106,12 +109,10 @@ namespace SEE.Controls.Actions
               new("Show Code", "Display the source code of a node.",
                   Color.black, "Materials/ModernUIPack/Document",
                   ShowCodeAction.CreateReversibleAction);
-            /*
             Draw =
-              new("Draw", "Draw a line",
+              new("Draw", "Draw freely in world space",
                   Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                   DrawAction.CreateReversibleAction);
-            */
             AcceptDivergence =
               new("Accept Divergence", "Accept a diverging edge into the architecture",
                   Color.grey.Darker(), "Materials/ModernUIPack/Arrow Bold",
@@ -205,6 +206,12 @@ namespace SEE.Controls.Actions
                     MindMapAction.CreateReversibleAction,
                     parent: Drawable);
 
+            StickyNote =
+                new("Sticky Note", "Manages sticky notes (spawn/move/edit/delete).",
+                    Color.blue.Darker(), "Materials/Drawable/StickyNote",
+                    StickyNoteAction.CreateReversibleAction,
+                    parent: Drawable);
+
             ColorPicker =
                 new("Color Picker", "Picks a color.",
                     Color.yellow.Darker(), "Materials/Drawable/Eyedropper",
@@ -223,10 +230,10 @@ namespace SEE.Controls.Actions
                     MoveRotateAction.CreateReversibleAction,
                     parent: Drawable);
 
-            Scale =
-                new("Scale", "Scales a drawable. Mouse wheel up to scale up, mouse wheel down to scale down.",
-                    Color.green.Darker(), "Materials/Drawable/Scale",
-                    ScaleAction.CreateReversibleAction,
+            MovePoint =
+                new("Move a Point", "Moves a point of a line.",
+                    Color.green.Darker().Darker(), "Materials/Charts/MoveIcon",
+                    MovePointAction.CreateReversibleAction,
                     parent: Drawable);
 
             LayerChanger =
@@ -235,33 +242,22 @@ namespace SEE.Controls.Actions
                     LayerChangeAction.CreateReversibleAction,
                     parent: Drawable);
 
-            CutCopyPaste = new("Cut, Copy, Paste", "Cuts or copies a drawable and pastes it on the selected position.",
+            CutCopyPaste =
+                new("Cut, Copy, Paste", "Cuts or copies a drawable and pastes it on the selected position.",
                     Color.green.Darker(), "Materials/Drawable/CutCopyPaste",
                     CutCopyPasteAction.CreateReversibleAction,
                     parent: Drawable);
 
-            MovePoint =
-                new("Move a Point", "Moves a point of a line.",
-                    Color.green.Darker().Darker(), "Materials/Charts/MoveIcon",
-                    MovePointAction.CreateReversibleAction,
+            Scale =
+                new("Scale", "Scales a drawable. Mouse wheel up to scale up, mouse wheel down to scale down.",
+                    Color.green.Darker(), "Materials/Drawable/Scale",
+                    ScaleAction.CreateReversibleAction,
                     parent: Drawable);
 
             LineSplit =
                 new("Line Split", "Splits a line on a given point.",
                     Color.green.Darker().Darker(), "Materials/Drawable/LineSplit",
                     LineSplitAction.CreateReversibleAction,
-                    parent: Drawable);
-
-            Save =
-                new("Save", "Saves one or more drawables.",
-                    Color.yellow, "Materials/Drawable/Save",
-                    SaveAction.CreateReversibleAction,
-                    parent: Drawable);
-
-            Load =
-                new("Load", "Loads one or more drawables.",
-                    Color.yellow.Darker(), "Materials/ModernUIPack/Document",
-                    LoadAction.CreateReversibleAction,
                     parent: Drawable);
 
             LinePointErase =
@@ -288,12 +284,21 @@ namespace SEE.Controls.Actions
                     ClearAction.CreateReversibleAction,
                     parent: Drawable);
 
-            StickyNote =
-                new("Sticky Note", "Manages sticky notes (spawn/move/edit/delete).",
-                 Color.blue.Darker(), "Materials/Drawable/StickyNote",
-                    StickyNoteAction.CreateReversibleAction,
+            Save =
+                new("Save", "Saves one or more drawables.",
+                    Color.yellow, "Materials/Drawable/Save",
+                    SaveAction.CreateReversibleAction,
+                    parent: Drawable);
+
+            Load =
+                new("Load", "Loads one or more drawables.",
+                    Color.yellow.Darker(), "Materials/ModernUIPack/Document",
+                    LoadAction.CreateReversibleAction,
                     parent: Drawable);
         }
+
+        // IMPORTANT NOTE: The order of the following field declarations must be exaclty the same
+        // as the order of their assignments in the static constructor above.
 
         public static readonly ActionStateType Move;
         public static readonly ActionStateType Rotate;
@@ -323,6 +328,7 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType WriteText;
         public readonly static ActionStateType AddImage;
         public readonly static ActionStateType MindMap;
+        public readonly static ActionStateType StickyNote;
         public readonly static ActionStateType ColorPicker;
         public readonly static ActionStateType Edit;
         public readonly static ActionStateType MoveRotator;
@@ -331,13 +337,12 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType CutCopyPaste;
         public readonly static ActionStateType Scale;
         public readonly static ActionStateType LineSplit;
-        public readonly static ActionStateType Load;
-        public readonly static ActionStateType Save;
-        public readonly static ActionStateType Erase;
         public readonly static ActionStateType LinePointErase;
         public readonly static ActionStateType LineConnectionErase;
+        public readonly static ActionStateType Erase;
         public readonly static ActionStateType Clear;
-        public readonly static ActionStateType StickyNote;
+        public readonly static ActionStateType Save;
+        public readonly static ActionStateType Load;
 
         #endregion
 
