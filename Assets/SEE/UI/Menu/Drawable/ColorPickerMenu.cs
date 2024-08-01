@@ -9,7 +9,7 @@ namespace SEE.UI.Menu.Drawable
     /// <summary>
     /// This singleton class provides the color picker menu for the <see cref="ColorPickerAction"/>.
     /// </summary>
-    public class ColorPickerMenu : Menu
+    public class ColorPickerMenu : SingletonMenu
     {
         /// <summary>
         /// The location where the color picker menu prefeb is placed.
@@ -17,14 +17,14 @@ namespace SEE.UI.Menu.Drawable
         private const string colorPickerMenuPrefab = "Prefabs/UI/Drawable/ColorPickerMenu";
 
         /// <summary>
-        /// The only instance of this singleton class.
-        /// </summary>
-        private readonly static ColorPickerMenu instance;
-
-        /// <summary>
         /// We do not want to create an instance of this singleton class outside of this class.
         /// </summary>
         private ColorPickerMenu() { }
+
+        /// <summary>
+        /// The only instance of this singleton class.
+        /// </summary>
+        public static ColorPickerMenu Instance { get; private set; }
 
         /// <summary>
         /// The selection for which color the picker should pick the color.
@@ -48,46 +48,22 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         static ColorPickerMenu()
         {
-            instance = new ColorPickerMenu();
+            Instance = new ColorPickerMenu();
 
-            instance.Instantiate(colorPickerMenuPrefab);
+            Instance.Instantiate(colorPickerMenuPrefab);
 
-            switchManager = GameFinder.FindChild(instance.menu, "Switch").GetComponent<SwitchManager>();
+            switchManager = GameFinder.FindChild(Instance.menu, "Switch").GetComponent<SwitchManager>();
 
             /// Gets and assign the color picker for the primary color.
-            pickerForPrimaryColor = GameFinder.FindChild(instance.menu, "Primary").GetComponent<ColorPicker>();
+            pickerForPrimaryColor = GameFinder.FindChild(Instance.menu, "Primary").GetComponent<ColorPicker>();
             pickerForPrimaryColor.AssignColor(ValueHolder.CurrentPrimaryColor);
 
             /// Gets and assign the color picker for the secondary color.
-            pickerForSecondColor = GameFinder.FindChild(instance.menu, "Second").GetComponent<ColorPicker>();
+            pickerForSecondColor = GameFinder.FindChild(Instance.menu, "Second").GetComponent<ColorPicker>();
             pickerForSecondColor.AssignColor(ValueHolder.CurrentSecondaryColor);
 
             /// Hides the menu.
-            instance.menu.SetActive(false);
-        }
-
-        /// <summary>
-        /// Enables the color picker menu.
-        /// </summary>
-        public static void EnableMenu()
-        {
-            instance.menu.SetActive(true);
-        }
-
-        /// <summary>
-        /// Hides the color picker menu.
-        /// </summary>
-        public static void DisableMenu()
-        {
-            instance.menu.SetActive(false);
-        }
-
-        /// <summary>
-        /// Destroys the color picker menu. It cannot be re-enabled afterward.
-        /// </summary>
-        public static void DestroyMenu()
-        {
-            instance.Destroy();
+            Instance.Enable();
         }
 
         /// <summary>

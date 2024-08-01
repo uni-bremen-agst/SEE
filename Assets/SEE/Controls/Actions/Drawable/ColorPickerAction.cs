@@ -219,7 +219,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Start()
         {
             base.Start();
-            ColorPickerMenu.EnableMenu();
+            ColorPickerMenu.Instance.Enable();
         }
 
         /// <summary>
@@ -228,15 +228,13 @@ namespace SEE.Controls.Actions.Drawable
         public override void Stop()
         {
             base.Stop();
-            ColorPickerMenu.DisableMenu();
-            // CHECK: Should the menu be destroyed here or rather only be disabled
-            // and then destroyed in the destructor?
+            ColorPickerMenu.Instance.Disable();
             ColorPickerMindMapMenu.Instance.Destroy();
         }
 
         ~ColorPickerAction()
         {
-            ColorPickerMenu.DestroyMenu();
+            ColorPickerMenu.Instance.Destroy();
         }
 
         /// <summary>
