@@ -233,60 +233,117 @@ namespace SEE.Net.Actions
                 if (networkSpawnManager.SpawnedObjects.TryGetValue(NetworkObjectID,
                         out NetworkObject networkObject))
                 {
-                    if (networkObject.gameObject.TryGetComponent(out SkinnedMeshRenderer skinnedMeshRenderer))
+                    Transform ccBaseBody = networkObject.gameObject.transform.Find("CC_Base_Body");
+                    if (networkObject.gameObject != null)
                     {
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(JawLeftName, skinnedMeshRenderer), JawLeft);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(JawRightName, skinnedMeshRenderer), JawRight);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(JawForwardName, skinnedMeshRenderer), JawForward);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(JawOpenName, skinnedMeshRenderer), JawOpen);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthApeShapeName, skinnedMeshRenderer), MouthApeShape);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthUpperLeftName, skinnedMeshRenderer), MouthUpperLeft);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthUpperRightName, skinnedMeshRenderer), MouthUpperRight);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthLowerLeftName, skinnedMeshRenderer), MouthLowerLeft);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthLowerRightName, skinnedMeshRenderer), MouthLowerRight);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthUpperOverturnName, skinnedMeshRenderer), MouthUpperOverturn);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthLowerOverturnName, skinnedMeshRenderer), MouthLowerOverturn);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthPoutName, skinnedMeshRenderer), MouthPout);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthSmileLeftName, skinnedMeshRenderer), MouthSmileLeft);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthSmileRightName, skinnedMeshRenderer), MouthSmileRight);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthSadLeftName, skinnedMeshRenderer), MouthSadLeft);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthSadRightName, skinnedMeshRenderer), MouthSadRight);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(CheekPuffLeftName, skinnedMeshRenderer), CheekPuffLeft);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(CheekPuffRightName, skinnedMeshRenderer), CheekPuffRight);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(CheekSuckName, skinnedMeshRenderer), CheekSuck);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthUpperUpLeftName, skinnedMeshRenderer), MouthUpperUpLeft);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthUpperUpRightName, skinnedMeshRenderer), MouthUpperUpRight);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthLowerDownLeftName, skinnedMeshRenderer), MouthLowerDownLeft);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthLowerDownRightName, skinnedMeshRenderer), MouthLowerDownRight);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthUpperInsideName, skinnedMeshRenderer), MouthUpperInside);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthLowerInsideName, skinnedMeshRenderer), MouthLowerInside);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthLowerOverlayName, skinnedMeshRenderer), MouthLowerOverlay);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(EyeLeftBlinkName, skinnedMeshRenderer), EyeLeftBlink);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(EyeLeftWideName, skinnedMeshRenderer), EyeLeftWide);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(EyeLeftRightName, skinnedMeshRenderer), EyeLeftRight);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(EyeLeftLeftName, skinnedMeshRenderer), EyeLeftLeft);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(EyeLeftUpName, skinnedMeshRenderer), EyeLeftUp);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(EyeLeftDownName, skinnedMeshRenderer), EyeLeftDown);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(EyeRightBlinkName, skinnedMeshRenderer), EyeRightBlink);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(EyeRightWideName, skinnedMeshRenderer), EyeRightWide);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(EyeRightRightName, skinnedMeshRenderer), EyeRightRight);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(EyeRightLeftName, skinnedMeshRenderer), EyeRightLeft);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(EyeRightUpName, skinnedMeshRenderer), EyeRightUp);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(EyeRightDownName, skinnedMeshRenderer), EyeRightDown);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(EyeFrownName, skinnedMeshRenderer), EyeFrown);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(EyeLeftSqueezeName, skinnedMeshRenderer), EyeLeftSqueeze);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(EyeRightSqueezeName, skinnedMeshRenderer), EyeRightSqueeze);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(TongueLongStep1Name, skinnedMeshRenderer), TongueLongStep1);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(TongueLongStep2Name, skinnedMeshRenderer), TongueLongStep2);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(TongueLeftName, skinnedMeshRenderer), TongueLeft);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(TongueRightName, skinnedMeshRenderer), TongueRight);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(TongueUpName, skinnedMeshRenderer), TongueUp);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(TongueDownName, skinnedMeshRenderer), TongueDown);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(TongueRollName, skinnedMeshRenderer), TongueRoll);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(TongueUpLeftMorphName, skinnedMeshRenderer), TongueUpLeftMorph);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(TongueUpRightMorphName, skinnedMeshRenderer), TongueUpRightMorph);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(TongueDownLeftMorphName, skinnedMeshRenderer), TongueDownLeftMorph);
-                        skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(TongueDownRightMorphName, skinnedMeshRenderer), TongueDownRightMorph);
+                        if (ccBaseBody.gameObject.TryGetComponent(out SkinnedMeshRenderer skinnedMeshRenderer))
+                        {
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(JawLeftName, skinnedMeshRenderer), JawLeft);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(JawRightName, skinnedMeshRenderer), JawRight);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(JawForwardName, skinnedMeshRenderer), JawForward);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(JawOpenName, skinnedMeshRenderer), JawOpen);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(MouthApeShapeName, skinnedMeshRenderer), MouthApeShape);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(MouthUpperLeftName, skinnedMeshRenderer), MouthUpperLeft);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(MouthUpperRightName, skinnedMeshRenderer), MouthUpperRight);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(MouthLowerLeftName, skinnedMeshRenderer), MouthLowerLeft);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(MouthLowerRightName, skinnedMeshRenderer), MouthLowerRight);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(MouthUpperOverturnName, skinnedMeshRenderer), MouthUpperOverturn);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(MouthLowerOverturnName, skinnedMeshRenderer), MouthLowerOverturn);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(MouthPoutName, skinnedMeshRenderer), MouthPout);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(MouthSmileLeftName, skinnedMeshRenderer), MouthSmileLeft);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(MouthSmileRightName, skinnedMeshRenderer), MouthSmileRight);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(MouthSadLeftName, skinnedMeshRenderer), MouthSadLeft);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(MouthSadRightName, skinnedMeshRenderer), MouthSadRight);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(CheekPuffLeftName, skinnedMeshRenderer), CheekPuffLeft);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(CheekPuffRightName, skinnedMeshRenderer), CheekPuffRight);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(CheekSuckName, skinnedMeshRenderer), CheekSuck);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(MouthUpperUpLeftName, skinnedMeshRenderer), MouthUpperUpLeft);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(MouthUpperUpRightName, skinnedMeshRenderer), MouthUpperUpRight);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(MouthLowerDownLeftName, skinnedMeshRenderer), MouthLowerDownLeft);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(MouthLowerDownRightName, skinnedMeshRenderer), MouthLowerDownRight);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(MouthUpperInsideName, skinnedMeshRenderer), MouthUpperInside);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(MouthLowerInsideName, skinnedMeshRenderer), MouthLowerInside);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(MouthLowerOverlayName, skinnedMeshRenderer), MouthLowerOverlay);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(EyeLeftBlinkName, skinnedMeshRenderer), EyeLeftBlink);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(EyeLeftWideName, skinnedMeshRenderer), EyeLeftWide);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(EyeLeftRightName, skinnedMeshRenderer), EyeLeftRight);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(EyeLeftLeftName, skinnedMeshRenderer), EyeLeftLeft);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(EyeLeftUpName, skinnedMeshRenderer), EyeLeftUp);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(EyeLeftDownName, skinnedMeshRenderer), EyeLeftDown);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(EyeRightBlinkName, skinnedMeshRenderer), EyeRightBlink);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(EyeRightWideName, skinnedMeshRenderer), EyeRightWide);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(EyeRightRightName, skinnedMeshRenderer), EyeRightRight);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(EyeRightLeftName, skinnedMeshRenderer), EyeRightLeft);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(EyeRightUpName, skinnedMeshRenderer), EyeRightUp);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(EyeRightDownName, skinnedMeshRenderer), EyeRightDown);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(EyeFrownName, skinnedMeshRenderer), EyeFrown);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(EyeLeftSqueezeName, skinnedMeshRenderer), EyeLeftSqueeze);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(EyeRightSqueezeName, skinnedMeshRenderer), EyeRightSqueeze);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(TongueLongStep1Name, skinnedMeshRenderer), TongueLongStep1);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(TongueLongStep2Name, skinnedMeshRenderer), TongueLongStep2);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(TongueLeftName, skinnedMeshRenderer), TongueLeft);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(TongueRightName, skinnedMeshRenderer), TongueRight);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(TongueUpName, skinnedMeshRenderer), TongueUp);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(TongueDownName, skinnedMeshRenderer), TongueDown);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(TongueRollName, skinnedMeshRenderer), TongueRoll);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(TongueUpLeftMorphName, skinnedMeshRenderer), TongueUpLeftMorph);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(TongueUpRightMorphName, skinnedMeshRenderer), TongueUpRightMorph);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(TongueDownLeftMorphName, skinnedMeshRenderer), TongueDownLeftMorph);
+                            skinnedMeshRenderer.SetBlendShapeWeight(
+                                BlendShapeByString(TongueDownRightMorphName, skinnedMeshRenderer),
+                                TongueDownRightMorph);
+                        }
                     }
                 }
                 else
