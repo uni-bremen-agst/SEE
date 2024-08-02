@@ -263,7 +263,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 (memberInfo.GetCustomAttributes().OfType<RuntimeButtonAttribute>().FirstOrDefault()
                  ?? new RuntimeButtonAttribute(null, null)).Name;
 
-            // ordered depending if a setting is primitive or has nested settings
+            // ordered depending on whether a setting is primitive or has nested settings
             bool SortIsNotNested(MemberInfo memberInfo)
             {
                 object value;
@@ -388,12 +388,11 @@ namespace SEE.UI.RuntimeConfigMenu
             if (entry == null)
             {
                 entry = new MenuEntry(
-                    () => { },
-                    () => { },
-                    tabName,
-                    $"Settings for {tabName}",
-                    GetColorForTab(),
-                    Resources.Load<Sprite>("Materials/Charts/MoveIcon")
+                    SelectAction: () => { },
+                    Title: tabName,
+                    Description: $"Settings for {tabName}",
+                    EntryColor: GetColorForTab(),
+                    Icon: Icons.Move
                 );
                 AddEntry(entry);
             }

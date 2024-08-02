@@ -13,7 +13,7 @@ namespace SEE.Utils
     {
         public new V this[K key]
         {
-            get => this.GetOrAdd(key, new V());
+            get => this.GetOrAdd(key, () => new V());
             set => base[key] = value;
         }
     }
