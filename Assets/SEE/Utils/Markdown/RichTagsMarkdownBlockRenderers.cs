@@ -3,6 +3,9 @@ using Markdig.Syntax;
 
 namespace SEE.Utils.Markdown
 {
+    /// <summary>
+    /// Partial class that contains renderers for block Markdown elements.
+    /// </summary>
     public partial class RichTagsMarkdownRenderer
     {
         /// <summary>

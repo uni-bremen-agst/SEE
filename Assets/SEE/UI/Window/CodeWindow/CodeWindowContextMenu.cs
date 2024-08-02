@@ -17,6 +17,10 @@ using Range = SEE.DataModel.DG.Range;
 
 namespace SEE.UI.Window.CodeWindow
 {
+    /// <summary>
+    /// Partial class containing methods related to context menus and LSP navigation in code windows.
+    /// In addition, this part contains a record representing a context menu handler for a code window.
+    /// </summary>
     public partial class CodeWindow
     {
         /// <summary>
