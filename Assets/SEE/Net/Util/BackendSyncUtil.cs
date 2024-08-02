@@ -120,7 +120,7 @@ namespace SEE.Net.Util
         public static async UniTask InitializeClientAsync()
         {
             await InitializeCitiesAsync();
-            Network.ServerNetwork.Value?.SyncClientServerRpc(NetworkManager.Singleton.LocalClientId);
+            Network.ActionNetworkInst.Value?.SyncClientServerRpc(NetworkManager.Singleton.LocalClientId);
         }
 
         /// <summary>

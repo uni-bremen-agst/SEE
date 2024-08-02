@@ -12,8 +12,13 @@ namespace SEE.Net
     /// <summary>
     /// Gateway to the server.
     /// </summary>
-    public class ServerActionNetwork : NetworkBehaviour
+    public class ActionNetwork : NetworkBehaviour
     {
+        /// <summary>
+        /// The server id to verify sender for client RPCs.
+        /// </summary>
+        public static ulong ServerClientId = NetworkManager.ServerClientId;
+
         /// <summary>
         /// Fetches the multiplayer city files from the backend on the server or host.
         /// </summary>
@@ -32,7 +37,7 @@ namespace SEE.Net
         /// <summary>
         /// Syncs the current state of the server with the connecting client.
         /// </summary>
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server)]
         public void SyncClientServerRpc(ulong clientId)
         {
             foreach (string serializedAction in Network.NetworkActionList.ToList())
@@ -42,10 +47,10 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Sends an action to all clients in the recipients list, or to all connected clients if <c>recipients</c> is <c>null</c>.
+        /// Sends an action to all clients in the recipients list, or to all connected clients (except the sender) if <c>recipients</c> is <c>null</c>.
         /// </summary>
-        [ServerRpc(RequireOwnership = false)]
-        public void BroadcastActionServerRpc(string serializedAction, ulong[] recipientIds)
+        [Rpc(SendTo.Server)]
+        public void BroadcastActionServerRpc(string serializedAction, ulong[] recipientIds = null, RpcParams rpcParams = default)
         {
             if (!IsServer && !IsHost)
             {
@@ -55,8 +60,6 @@ namespace SEE.Net
             {
                 return;
             }
-            // TODO check if empty list was ever used for targeting all clients
-            // TODO should this be sent to the caller as well or should we filter them out?
 
             AbstractNetAction deserializedAction = ActionSerializer.Deserialize(serializedAction);
             if (deserializedAction.ShouldBeSentToNewClient)
@@ -65,9 +68,9 @@ namespace SEE.Net
             }
             deserializedAction.ExecuteOnServer();
 
-
             if (recipientIds == null) {
-                ExecuteActionClientRpc(serializedAction);
+                ulong senderId = rpcParams.Receive.SenderClientId;
+                ExecuteActionClientRpc(serializedAction, RpcTarget.Not(senderId, RpcTargetUse.Temp));
             }
             else {
                 using (var targetClientIds = new NativeArray<ulong>(recipientIds, Allocator.Temp))
@@ -81,16 +84,16 @@ namespace SEE.Net
         /// Request client synchronization.
         /// This RPC is called by the client to initiate the synchronization process.
         /// </summary>
-        [ServerRpc(RequireOwnership = false)]
-        public void RequestSynchronizationServerRpc(ServerRpcParams serverRpcParams = default)
+        [Rpc(SendTo.Server)]
+        public void RequestSynchronizationServerRpc(RpcParams rpcParams = default)
         {
             if (!IsServer && !IsHost)
             {
                 return;
             }
 
-            ulong clientId = serverRpcParams.Receive.SenderClientId;
-            SyncFilesClientRpc(Network.ServerId, Network.BackendDomain, RpcTarget.Single(clientId, RpcTargetUse.Temp));
+            ulong senderId = rpcParams.Receive.SenderClientId;
+            SyncFilesClientRpc(Network.ServerId, Network.BackendDomain, RpcTarget.Single(senderId, RpcTargetUse.Temp));
         }
 
         /// <summary>
@@ -104,6 +107,13 @@ namespace SEE.Net
             {
                 return;
             }
+
+            if (rpcParams.Receive.SenderClientId != ServerClientId)
+            {
+                Debug.LogWarning($"Received a ExecuteActionUnsafeClientRpc from client ID {rpcParams.Receive.SenderClientId}!");
+                return;
+            }
+
             AbstractNetAction action = ActionSerializer.Deserialize(serializedAction);
             action.ExecuteOnClient();
         }
@@ -118,6 +128,13 @@ namespace SEE.Net
             {
                 return;
             }
+
+            if (rpcParams.Receive.SenderClientId != ServerClientId)
+            {
+                Debug.LogWarning($"Received a ExecuteActionClientRpc from client ID {rpcParams.Receive.SenderClientId}!");
+                return;
+            }
+
             AbstractNetAction action = ActionSerializer.Deserialize(serializedAction);
             if (action.Requester != NetworkManager.Singleton.LocalClientId)
             {
@@ -130,13 +147,20 @@ namespace SEE.Net
         /// This RPC is called by the game server after the client has registered itself.
         /// </summary>
         [Rpc(SendTo.SpecifiedInParams)]
-        public void SyncFilesClientRpc(string serverId, string backendDomain, RpcParams rpcParams = default)
+        public void SyncFilesClientRpc(string backendServerId, string backendDomain, RpcParams rpcParams = default)
         {
             if (IsHost || IsServer)
             {
                 return;
             }
-            Network.ServerId = serverId;
+
+            if (rpcParams.Receive.SenderClientId != ServerClientId)
+            {
+                Debug.LogWarning($"Received a SyncFilesClientRpc from client ID {rpcParams.Receive.SenderClientId}!");
+                return;
+            }
+
+            Network.ServerId = backendServerId;
             Network.BackendDomain = backendDomain;
 
             BackendSyncUtil.InitializeClientAsync().Forget();

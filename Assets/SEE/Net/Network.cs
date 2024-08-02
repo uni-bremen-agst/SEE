@@ -37,6 +37,11 @@ namespace SEE.Net
         public static Network Instance { get; private set; }
 
         /// <summary>
+        /// The <see cref="ActionNetwork"/> instance for communication between the clients and the server.
+        /// </summary>
+        public static readonly Lazy<ActionNetwork> ActionNetworkInst = new(InitActionNetworkInst);
+
+        /// <summary>
         /// The maximal port number.
         /// </summary>
         private const int maxServerPort = 65535;
@@ -392,25 +397,20 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// The gateway to the server.
+        /// Yields the <see cref="ActionNetwork"/> component attached to the Server game object.
         /// </summary>
-        public static readonly Lazy<ServerActionNetwork> ServerNetwork = new(InitServerNetwork);
-
-        /// <summary>
-        /// Yields the <see cref="ServerActionNetwork"/> component attached to the Server game object.
-        /// </summary>
-        private static ServerActionNetwork InitServerNetwork()
+        private static ActionNetwork InitActionNetworkInst()
         {
             const string serverName = "Server";
             GameObject server = GameObject.Find(serverName);
             if (server != null)
             {
-                server.TryGetComponentOrLog(out ServerActionNetwork serverNetwork);
+                server.TryGetComponentOrLog(out ActionNetwork serverNetwork);
                 return serverNetwork;
             }
             else
             {
-                Debug.LogError($"There is no game object named {serverName} in the scene.\n");
+                Debug.LogError($"There is no game object named {serverName} in the scene.");
                 return null;
             }
         }
@@ -419,10 +419,10 @@ namespace SEE.Net
         /// Broadcasts a serialized action.
         /// </summary>
         /// <param name="serializedAction">Serialized action to be broadcast</param>
-        /// <param name="recipients">List of recipients to broadcast to, will broadcast to all if this is null.</param>
-        public static void BroadcastAction(String serializedAction, ulong[] recipients)
+        /// <param name="recipients">List of recipients to broadcast to. Will broadcast to all clients if this is <c>null</c> or omitted.</param>
+        public static void BroadcastAction(String serializedAction, ulong[] recipients = null)
         {
-            ServerNetwork.Value?.BroadcastActionServerRpc(serializedAction, recipients);
+            ActionNetworkInst.Value?.BroadcastActionServerRpc(serializedAction, recipients);
         }
 
         /// <summary>
