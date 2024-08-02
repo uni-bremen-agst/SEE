@@ -234,6 +234,9 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// </summary>
         public IEnumerable<(string Path, Range Range)> Occurrences => Entities.Select(e => (e.Path, new Range(e.Line, (e.EndLine ?? e.Line) + 1)));
 
+        /// <summary>
+        /// Implements <see cref="IDisplayableIssue.GetCharacterRangeForLine"/>.
+        /// </summary>
         public (int startCharacter, int endCharacter)? GetCharacterRangeForLine(string path, int lineNumber, string line)
         {
             // Axivion Dashboard doesn't provide character ranges for issues, so we have to calculate them ourselves.
