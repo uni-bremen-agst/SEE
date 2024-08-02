@@ -1,6 +1,9 @@
 ﻿using HighlightPlus;
 using SEE.Utils;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace SEE.Game.Drawable
@@ -24,7 +27,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// The renderers of the attached game object (for mind map nodes)
         /// </summary>
-        private Renderer[] renderers;
+        private List<Renderer> renderers;
 
         /// <summary>
         /// The canvas of the attached game object.
@@ -150,7 +153,7 @@ namespace SEE.Game.Drawable
             else if (obj.GetComponentsInChildren<Renderer>().Length > 0)
             {
                 /// Sets the renderers if available.
-                renderers = obj.GetComponentsInChildren<Renderer>();
+                renderers = obj.GetComponentsInChildren<Renderer>().ToList();
             }
             else if (obj.GetComponent<Canvas>() != null)
             {
@@ -170,6 +173,48 @@ namespace SEE.Game.Drawable
             }
             loopOn = true;
             StartCoroutine(Blink());
+        }
+
+        /// <summary>
+        /// Removes the renderer of the fill out.
+        /// </summary>
+        /// <param name="obj">The object which has a fill out.</param>
+        public static void RemoveFillOutFromEffect(GameObject obj)
+        {
+            if (obj != null && obj.GetComponent<BlinkEffect>() != null)
+            {
+                GameObject fillOut = GameFinder.FindChild(obj, ValueHolder.FillOut);
+                BlinkEffect effect = obj.GetComponent<BlinkEffect>();
+                if (fillOut != null)
+                {
+                    effect.renderers.Remove(fillOut.GetComponent<Renderer>());
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds the renderer of the fill out.
+        /// </summary>
+        /// <param name="obj">The object which has a fill out.</param>
+        public static void AddFillOutToEffect(GameObject obj)
+        {
+            if (obj != null && obj.GetComponent<BlinkEffect>() != null)
+            {
+                GameObject fillOut = GameFinder.FindChild(obj, ValueHolder.FillOut);
+                BlinkEffect effect = obj.GetComponent<BlinkEffect>();
+                if (fillOut != null && fillOut.GetComponent<Renderer>() != null)
+                {
+                    if (effect.renderers != null)
+                    {
+                        effect.renderers.Add(fillOut.GetComponent<Renderer>());
+                    } 
+                    else if (effect.renderer != null)
+                    {
+                        effect.Deactivate();
+                        obj.AddComponent<BlinkEffect>();
+                    }
+                }
+            }
         }
     }
 }

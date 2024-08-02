@@ -1,5 +1,7 @@
 ﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.GO;
+using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -97,6 +99,39 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
+        /// Changes the fill out object.
+        /// </summary>
+        /// <param name="obj">The line object.</param>
+        /// <param name="status">Whether the fill out is activ.</param>
+        /// <param name="color">The color of the fill out</param>
+        private static void ChangeFillOut(GameObject obj, bool status, Color color)
+        {
+            if (obj.CompareTag(Tags.Line))
+            {
+                if (!status)
+                {
+                    GameObject.DestroyImmediate(GameFinder.FindChild(obj, ValueHolder.FillOut));
+                } else
+                {
+                    GameDrawer.FillOut(obj, color);
+                }
+            }
+        }
+
+        /// <summary>
+        /// This method changes the fill out color of a drawbale type.
+        /// </summary>
+        /// <param name="obj">The drawable type whose color should be changed.</param>
+        /// <param name="color">The new color.</param>
+        public static void ChangeFillOutColor(GameObject obj, Color color)
+        {
+            if (obj.CompareTag(Tags.Line) && GameFinder.FindChild(obj, ValueHolder.FillOut) != null)
+            {
+                GameFinder.FindChild(obj, ValueHolder.FillOut).SetColor(color);
+            }
+        }
+
+        /// <summary>
         /// This method changes all editable values of a line at once.
         /// </summary>
         /// <param name="lineObj">The line whose values should be changed.</param>
@@ -110,6 +145,8 @@ namespace SEE.Game.Drawable
                 GameDrawer.ChangeColorKind(lineObj, line.ColorKind, line);
                 ChangePrimaryColor(lineObj, line.PrimaryColor);
                 ChangeSecondaryColor(lineObj, line.SecondaryColor);
+                ChangeFillOut(lineObj, line.FillOutStatus, line.FillOutColor);
+                ChangeFillOutColor(lineObj, line.FillOutColor);
                 ChangeLoop(lineObj, line.Loop);
                 GameDrawer.ChangeLineKind(lineObj, line.LineKind, line.Tiling);
             }

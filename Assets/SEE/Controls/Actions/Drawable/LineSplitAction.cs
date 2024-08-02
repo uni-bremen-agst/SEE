@@ -106,7 +106,7 @@ namespace SEE.Controls.Actions.Drawable
             GameObject point = GameDrawer.DrawLine(surface, RandomStrings.GetRandomString(10), positions,
                 GameDrawer.ColorKind.Monochrome,
                 negativColor, negativColor, 0.01f,
-                false, GameDrawer.LineKind.Solid, 1f, false);
+                false, GameDrawer.LineKind.Solid, 1f, increaseCurrentOrder: false);
             /// Sets the pivot point of the marker.
             GameDrawer.SetPivotShape(point, position);
             /// Adds the point on all clients.

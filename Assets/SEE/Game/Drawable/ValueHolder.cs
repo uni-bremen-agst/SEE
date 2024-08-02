@@ -20,6 +20,11 @@ namespace SEE.Game.Drawable
         public static Color CurrentSecondaryColor { get; set; }
 
         /// <summary>
+        /// The current chosen tertiary color.
+        /// </summary>
+        public static Color CurrentTertiaryColor { get; set; }
+
+        /// <summary>
         /// The current chosen thickness for drawing.
         /// </summary>
         public static float CurrentThickness { get; set; }
@@ -53,6 +58,11 @@ namespace SEE.Game.Drawable
         /// The current order in layer value.
         /// </summary>
         public static int MaxOrderInLayer { get; set; }
+
+        /// <summary>
+        /// The current fill out status.
+        /// </summary>
+        public static bool CurrentFillOutStatus { get; set; }
         #endregion
 
         #region prefixes and names
@@ -256,6 +266,7 @@ namespace SEE.Game.Drawable
         {
             CurrentPrimaryColor = UnityEngine.Random.ColorHSV();
             CurrentSecondaryColor = Color.clear;
+            CurrentTertiaryColor = Color.clear;
             CurrentOutlineThickness = 0.4f;
             CurrentFontSize = 0.5f;
             CurrentThickness = 0.01f;
@@ -263,6 +274,7 @@ namespace SEE.Game.Drawable
             CurrentColorKind = GameDrawer.ColorKind.Monochrome;
             CurrentTiling = 1f;
             MaxOrderInLayer = 1;
+            CurrentFillOutStatus = false;
         }
     }
 }

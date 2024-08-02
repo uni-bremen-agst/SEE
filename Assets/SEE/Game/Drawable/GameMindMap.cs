@@ -200,7 +200,7 @@ namespace SEE.Game.Drawable
             /// Draws the border.
             shape = DrawLine(surface, "", positions, ColorKind.Monochrome,
                         lineColor, ValueHolder.CurrentSecondaryColor, ValueHolder.StandardLineThickness, true,
-                        lineKind, ValueHolder.StandardLineTiling, false);
+                        lineKind, ValueHolder.StandardLineTiling, increaseCurrentOrder: false);
             /// Sets the pivot to the middle.
             shape = SetPivotShape(shape, convertedHitPoint);
             return shape;
@@ -385,7 +385,7 @@ namespace SEE.Game.Drawable
             /// Creates the branch line.
             GameObject branchLine = DrawLine(surface, name, positions, ColorKind.Monochrome,
                         Color.black, ValueHolder.CurrentSecondaryColor, ValueHolder.StandardLineThickness, true,
-                        LineKind.Solid, ValueHolder.StandardLineTiling, false);
+                        LineKind.Solid, ValueHolder.StandardLineTiling, increaseCurrentOrder: false);
 
             /// Calculates the order.
             /// An order lower than the lower order (parent or node).

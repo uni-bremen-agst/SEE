@@ -5,25 +5,19 @@ using UnityEngine;
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is responsible for drawing (<see cref="DrawFreehandAction"/>
-    /// or <see cref="DrawShapesAction"/>) a line on the given drawable on all clients.
+    /// This class is responsible for filling out a line on the given drawable on all clients.
     /// </summary>
-    public class DrawingFinishNetAction : DrawableNetAction
+    public class DrawingFillOutNetAction : DrawableNetAction
     {
         /// <summary>
-        /// The line that should be drawn as <see cref="Line"/> object.
+        /// The line that should be filled out.
         /// </summary>
         public string LineID;
 
         /// <summary>
-        /// Whether the loop option should be activated.
-        /// </summary>
-        public bool Loop;
-
-        /// <summary>
         /// The filled out color, if the line should be filled out.
         /// </summary>
-        public Color? FillOutColor;
+        public Color FillOutColor;
 
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
@@ -31,13 +25,11 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="drawableID">The id of the drawable on which the line should be drawn.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="lineID">The name of the line.</param>
-        /// <param name="loop">Whether the line should activate the loop functionality.</param>
         /// <param name="fillOutColor">The fill out color of the line; null if the line should not filled out.</param>
-        public DrawingFinishNetAction(string drawableID, string parentDrawableID, string lineID, bool loop, Color? fillOutColor)
+        public DrawingFillOutNetAction(string drawableID, string parentDrawableID, string lineID, Color fillOutColor)
             : base(drawableID, parentDrawableID)
         {
             LineID = lineID;
-            Loop = loop;
             FillOutColor = fillOutColor;
         }
 
@@ -50,11 +42,11 @@ namespace SEE.Net.Actions.Drawable
             base.ExecuteOnClient();
             if (LineID != null && LineID != "")
             {
-                GameDrawer.FinishDrawing(FindChild(LineID), Loop, FillOutColor);
+                GameDrawer.FillOut(FindChild(LineID), FillOutColor);
             }
             else
             {
-                throw new System.Exception($"There is no line to draw.");
+                throw new System.Exception($"There is no line to fill out.");
             }
         }
     }

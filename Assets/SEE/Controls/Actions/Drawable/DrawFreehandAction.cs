@@ -232,10 +232,11 @@ namespace SEE.Controls.Actions.Drawable
                 if (GameDrawer.DifferentMeshVerticesCounter(line) >= 3)
                 {
                     finishDrawing = true;
-                    line = GameDrawer.SetPivot(line);
+                    line = GameDrawer.SetPivot(line, LineMenu.GetFillOutColorForDrawing());
                     LineConf currentLine = LineConf.GetLine(line);
                     memento = new Memento(Surface, currentLine);
-                    new DrawingFinishNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), line.name, currentLine.Loop).Execute();
+                    new DrawingFinishNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), line.name, 
+                        currentLine.Loop, LineMenu.GetFillOutColorForDrawing()).Execute();
                     CurrentState = IReversibleAction.Progress.Completed;
                     return true;
                 }
