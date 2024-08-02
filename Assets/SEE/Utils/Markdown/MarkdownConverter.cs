@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace SEE.Utils.Markdown
 {
+    /// <summary>
+    /// Utility class for converting markdown text to TextMeshPro-compatible rich text.
+    /// </summary>
     public static class MarkdownConverter
     {
         /// <summary>
