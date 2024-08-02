@@ -15,6 +15,9 @@ namespace SEE.Tools.LSP
     /// <param name="Diagnostic">The diagnostic that represents the issue.</param>
     public record LSPIssue(string Path, Diagnostic Diagnostic) : IDisplayableIssue
     {
+        /// <summary>
+        /// Implements <see cref="IDisplayableIssue.ToDisplayStringAsync"/>.
+        /// </summary>
         public UniTask<string> ToDisplayStringAsync()
         {
             string message = "";
@@ -26,8 +29,14 @@ namespace SEE.Tools.LSP
             return UniTask.FromResult(message);
         }
 
+        /// <summary>
+        /// Implements <see cref="IDisplayableIssue.Source"/>.
+        /// </summary>
         public string Source => Diagnostic.Source ?? "LSP";
 
+        /// <summary>
+        /// Implements <see cref="IDisplayableIssue.RichTags"/>.
+        /// </summary>
         public IList<string> RichTags
         {
             get
@@ -76,6 +85,9 @@ namespace SEE.Tools.LSP
                 _ => throw new ArgumentOutOfRangeException(nameof(severity), severity, "Unknown diagnostic severity")
             };
 
+        /// <summary>
+        /// Implements <see cref="IDisplayableIssue.Occurrences"/>.
+        /// </summary>
         public IEnumerable<(string Path, Range Range)> Occurrences
         {
             get

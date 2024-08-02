@@ -224,8 +224,14 @@ namespace SEE.Net.Dashboard.Model.Issues
             $"<mark=#{ColorUtility.ToHtmlStringRGB(Color)}33>"
         };
 
+        /// <summary>
+        /// Implements <see cref="IDisplayableIssue.Source"/>.
+        /// </summary>
         public string Source => "Axivion Dashboard";
 
+        /// <summary>
+        /// Implements <see cref="IDisplayableIssue.Occurrences"/>.
+        /// </summary>
         public IEnumerable<(string Path, Range Range)> Occurrences => Entities.Select(e => (e.Path, new Range(e.Line, (e.EndLine ?? e.Line) + 1)));
 
         public (int startCharacter, int endCharacter)? GetCharacterRangeForLine(string path, int lineNumber, string line)
