@@ -6745,6 +6745,51 @@ PrefabInstance:
       propertyPath: visemes.Array.data[6].expData.components.Array.data[7].inspFoldout
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 650674032146329087, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: eyelidExpRend
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 650674032146329087, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: configReadyBlink
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 650674032146329087, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: inspStateFoldoutEyelids
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 650674032146329087, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: blinklids.Array.data[0].expData.inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 650674032146329087, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: blinklids.Array.data[1].expData.inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 650674032146329087, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: blinklids.Array.data[0].expData.controllerVars.Array.data[0].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 650674032146329087, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: blinklids.Array.data[0].expData.controllerVars.Array.data[1].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 650674032146329087, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: blinklids.Array.data[1].expData.controllerVars.Array.data[0].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 650674032146329087, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: blinklids.Array.data[1].expData.controllerVars.Array.data[1].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
     - target: {fileID: 1242937920193830085, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6863,16 +6908,3176 @@ PrefabInstance:
     - target: {fileID: 5673393830814623364, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 2840276190
+      value: 23245841
       objectReference: {fileID: 0}
     - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: configReady
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: inspSalsaLinked
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.size
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: inspStateFoldoutSettings
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: inspStateFoldoutProcessing
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: numRandomEmphasizersPerCycle
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.name
+      value: exasper
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.name
+      value: soften
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.name
+      value: browsUp
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.name
+      value: browUp
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.name
+      value: squint
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.name
+      value: focus
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.name
+      value: flare
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.name
+      value: scrunch
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].isRepeaterEmote
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.inspFoldout
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.inspFoldout
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.inspFoldout
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.inspFoldout
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.inspFoldout
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.inspFoldout
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.inspFoldout
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.inspFoldout
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].isLipsyncEmphasisEmote
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].isLipsyncEmphasisEmote
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].isLipsyncEmphasisEmote
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].isLipsyncEmphasisEmote
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].isLipsyncEmphasisEmote
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].isLipsyncEmphasisEmote
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].isLipsyncEmphasisEmote
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].isLipsyncEmphasisEmote
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.previewDisplayMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.previewDisplayMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.previewDisplayMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.previewDisplayMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.previewDisplayMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.previewDisplayMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.previewDisplayMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.previewDisplayMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.size
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.controllerVars.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.controllerVars.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.size
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[0].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[0].name
+      value: component 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[1].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[1].name
+      value: component 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[2].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[2].name
+      value: component 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[3].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[3].name
+      value: component 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[0].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[0].name
+      value: component 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[1].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[1].name
+      value: component 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[2].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[2].name
+      value: component 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[3].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[3].name
+      value: component 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[0].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[0].name
+      value: component 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[1].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[1].name
+      value: component 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[2].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[2].name
+      value: component 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[3].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[3].name
+      value: component 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[0].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[0].name
+      value: component 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[1].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[1].name
+      value: component 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[2].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[2].name
+      value: component 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[3].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[3].name
+      value: component 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[0].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[0].name
+      value: component 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[1].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[1].name
+      value: component 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[0].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[0].name
+      value: component 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[1].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[1].name
+      value: component 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[0].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[0].name
+      value: component 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[1].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[1].name
+      value: component 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[2].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[2].name
+      value: component 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[3].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[3].name
+      value: component 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[0].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[0].name
+      value: component 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[1].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[1].name
+      value: component 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[2].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[2].name
+      value: component 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[3].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[3].name
+      value: component 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[4].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[4].name
+      value: component 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[5].frac
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[5].name
+      value: component 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[0].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[1].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[2].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[3].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[0].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[1].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[2].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[3].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[0].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[1].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[2].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[3].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[0].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[1].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[2].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[3].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[0].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[1].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[0].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[1].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[0].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[1].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[2].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[3].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[0].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[1].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[2].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[3].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[4].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[5].easing
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[0].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[1].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[2].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[3].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[0].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[1].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[2].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[3].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[0].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[1].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[2].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[3].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[0].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[1].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[2].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[3].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[0].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[1].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[2].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[3].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[0].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[1].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[2].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[3].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[0].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[1].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[2].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[3].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[0].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[1].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[2].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[3].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[0].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[1].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.controllerVars.Array.data[0].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.controllerVars.Array.data[1].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[0].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[1].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.controllerVars.Array.data[0].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.controllerVars.Array.data[1].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[0].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[1].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[2].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[3].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[0].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[1].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[2].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[3].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[0].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[1].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[2].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[3].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[4].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[5].enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[0].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[1].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[2].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[3].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[4].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[5].smr
+      value: 
+      objectReference: {fileID: 5216004669473979318}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[0].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[1].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[2].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[3].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[0].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[1].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[2].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[3].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[0].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[1].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[2].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[3].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[0].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[1].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[2].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[3].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[0].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[1].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[0].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[1].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[0].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[1].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[2].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[3].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[0].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[1].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[2].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[3].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[4].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[5].durationOn
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[0].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[0].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[1].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[1].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[2].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[2].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[3].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[3].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[0].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[0].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[0].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[0].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[1].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[1].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[1].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[1].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[2].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[2].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[2].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[2].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[3].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[3].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[3].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[3].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[0].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[0].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[1].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[1].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[2].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[2].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[3].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[3].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[0].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[0].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[0].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[0].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[1].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[1].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[1].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[1].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[2].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[2].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[2].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[2].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[3].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[3].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[3].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[3].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[0].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[0].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[1].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[1].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[2].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[2].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[3].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[3].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[0].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[0].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[0].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[0].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[1].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[1].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[1].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[1].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[2].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[2].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[2].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[2].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[3].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[3].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[3].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[3].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[0].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[0].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[1].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[1].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[2].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[2].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[3].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[3].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[0].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[0].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[0].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[0].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[1].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[1].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[1].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[1].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[2].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[2].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[2].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[2].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[3].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[3].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[3].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[3].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[0].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[0].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[1].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[1].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.controllerVars.Array.data[0].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.controllerVars.Array.data[0].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.controllerVars.Array.data[0].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.controllerVars.Array.data[0].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.controllerVars.Array.data[1].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.controllerVars.Array.data[1].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.controllerVars.Array.data[1].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.controllerVars.Array.data[1].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[0].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[0].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[1].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[1].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.controllerVars.Array.data[0].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.controllerVars.Array.data[0].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.controllerVars.Array.data[0].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.controllerVars.Array.data[0].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.controllerVars.Array.data[1].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.controllerVars.Array.data[1].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.controllerVars.Array.data[1].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.controllerVars.Array.data[1].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[0].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[0].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[1].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[1].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[2].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[2].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[3].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[3].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[0].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[0].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[0].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[0].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[1].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[1].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[1].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[1].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[2].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[2].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[2].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[2].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[3].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[3].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[3].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[3].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[0].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[0].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[1].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[1].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[2].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[2].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[3].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[3].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[4].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[4].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[5].durationOff
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[5].inspFoldout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[0].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[0].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[0].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[0].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[1].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[1].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[1].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[1].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[2].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[2].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[2].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[2].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[3].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[3].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[3].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[3].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[4].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[4].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[4].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[4].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[5].fracPos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[5].fracRot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[5].fracScl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[5].onState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[0].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[1].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[2].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[3].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[0].maxShape
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[1].maxShape
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[2].maxShape
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[3].maxShape
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[0].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[1].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[2].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[3].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[0].maxShape
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[1].maxShape
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[2].maxShape
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[3].maxShape
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[0].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[1].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[2].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[3].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[0].maxShape
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[1].maxShape
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[2].maxShape
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[3].maxShape
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[0].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[1].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[2].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[3].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[0].maxShape
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[1].maxShape
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[2].maxShape
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[3].maxShape
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[0].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[1].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.controllerVars.Array.data[0].maxShape
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.controllerVars.Array.data[1].maxShape
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[0].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[1].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.controllerVars.Array.data[0].maxShape
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.controllerVars.Array.data[1].maxShape
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[0].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[1].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[2].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[3].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[0].maxShape
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[1].maxShape
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[2].maxShape
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[3].maxShape
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[0].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[1].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[2].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[3].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[4].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[5].durationHold
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[0].maxShape
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[0].minShape
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[1].maxShape
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[2].maxShape
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[3].maxShape
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[4].maxShape
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[5].maxShape
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[0].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[1].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[2].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[3].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[0].blendIndex
+      value: 102
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[1].blendIndex
+      value: 103
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[2].blendIndex
+      value: 46
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.controllerVars.Array.data[3].blendIndex
+      value: 47
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[0].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[1].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[2].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[3].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[0].blendIndex
+      value: 104
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[1].blendIndex
+      value: 105
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[2].blendIndex
+      value: 48
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.controllerVars.Array.data[3].blendIndex
+      value: 49
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[0].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[1].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[2].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[3].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[0].blendIndex
+      value: 49
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[1].blendIndex
+      value: 48
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[2].blendIndex
+      value: 46
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.controllerVars.Array.data[3].blendIndex
+      value: 47
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[0].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[1].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[2].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[3].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[0].blendIndex
+      value: 47
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[1].blendIndex
+      value: 46
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[2].blendIndex
+      value: 48
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.controllerVars.Array.data[3].blendIndex
+      value: 49
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[0].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[1].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.controllerVars.Array.data[0].blendIndex
+      value: 56
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.controllerVars.Array.data[1].blendIndex
+      value: 57
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[0].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[1].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.controllerVars.Array.data[0].blendIndex
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.controllerVars.Array.data[1].blendIndex
+      value: 101
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[0].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[1].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[2].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[3].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[0].blendIndex
+      value: 82
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[1].blendIndex
+      value: 83
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[2].blendIndex
+      value: 46
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.controllerVars.Array.data[3].blendIndex
+      value: 47
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[0].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[1].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[2].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[3].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[4].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[5].expressionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[0].blendIndex
+      value: 51
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[1].blendIndex
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[2].blendIndex
+      value: 82
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[3].blendIndex
+      value: 83
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[4].blendIndex
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[5].blendIndex
+      value: 101
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[0].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[0].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[1].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[1].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[2].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[2].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[3].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[3].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[0].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[0].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[1].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[1].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[2].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[2].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[3].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[3].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[0].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[0].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[1].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[1].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[2].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[2].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[3].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[3].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[0].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[0].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[1].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[1].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[2].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[2].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[3].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[3].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[0].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[0].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[1].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[1].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[0].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[0].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[1].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[1].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[0].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[0].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[1].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[1].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[2].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[2].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[3].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[3].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[0].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[0].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[1].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[1].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[2].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[2].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[3].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[3].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[4].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[4].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[5].eyesControlType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[5].useOffsetFollow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[0].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[1].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[2].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[0].expData.components.Array.data[3].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[0].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[1].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[2].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[1].expData.components.Array.data[3].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[0].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[1].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[2].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[2].expData.components.Array.data[3].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[0].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[1].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[2].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[3].expData.components.Array.data[3].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[0].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[4].expData.components.Array.data[1].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[0].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[5].expData.components.Array.data[1].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[0].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[1].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[2].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[6].expData.components.Array.data[3].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[0].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[1].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[2].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[3].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[4].expressionHandler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: emotes.Array.data[7].expData.components.Array.data[5].expressionHandler
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8584076162079612798, guid: 628493a4652d54b47aaee2226a0c0890,
