@@ -263,7 +263,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 (memberInfo.GetCustomAttributes().OfType<RuntimeButtonAttribute>().FirstOrDefault()
                  ?? new RuntimeButtonAttribute(null, null)).Name;
 
-            // ordered depending on if a setting is primitive or has nested settings
+            // ordered depending on whether a setting is primitive or has nested settings
             bool SortIsNotNested(MemberInfo memberInfo)
             {
                 object value;
