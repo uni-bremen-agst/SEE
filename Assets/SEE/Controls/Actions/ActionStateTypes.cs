@@ -63,109 +63,109 @@ namespace SEE.Controls.Actions
         {
             Move =
               new("Move", "Move a node within a graph",
-                  Color.red.Darker(), "Materials/Charts/MoveIcon",
+                  Color.red.Darker(), Icons.Move,
                   MoveAction.CreateReversibleAction);
 
             Rotate =
               new("Rotate", "Rotate the selected node and its children within a graph",
-                  Color.blue.Darker(), "Materials/ModernUIPack/Refresh",
+                  Color.blue.Darker(), Icons.Rotate,
                   RotateAction.CreateReversibleAction);
 
             Hide =
               new("Hide", "Hides nodes or edges",
-                  Color.yellow.Darker(), "Materials/ModernUIPack/Eye",
+                  Color.yellow.Darker(), Icons.EyeSlash,
                   HideAction.CreateReversibleAction);
 
             NewEdge =
               new("New Edge", "Draw a new edge between two nodes",
-                  Color.green.Darker(), "Materials/ModernUIPack/Minus",
+                  Color.green.Darker(), Icons.Edge,
                   AddEdgeAction.CreateReversibleAction);
 
             NewNode =
               new("New Node", "Create a new node",
-                  Color.green.Darker(), "Materials/ModernUIPack/Plus",
+                  Color.green.Darker(), '+',
                   AddNodeAction.CreateReversibleAction);
 
             EditNode =
               new("Edit Node", "Edit a node",
-                  Color.green.Darker(), "Materials/ModernUIPack/Settings",
+                  Color.green.Darker(), Icons.PenToSquare,
                   EditNodeAction.CreateReversibleAction);
 
             ScaleNode =
               new("Scale Node", "Scale a node",
-                  Color.green.Darker(), "Materials/ModernUIPack/Crop",
+                  Color.green.Darker(), Icons.Scale,
                   ScaleNodeAction.CreateReversibleAction);
 
             Delete =
               new("Delete", "Delete a node or an edge",
-                  Color.yellow.Darker(), "Materials/ModernUIPack/Trash",
+                  Color.yellow.Darker(), Icons.Trash,
                   DeleteAction.CreateReversibleAction);
 
             ShowCode =
               new("Show Code", "Display the source code of a node.",
-                  Color.black, "Materials/ModernUIPack/Document",
+                  Color.black, Icons.Code,
                   ShowCodeAction.CreateReversibleAction);
 
             Draw =
               new("Draw", "Draw a line",
-                  Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
+                  Color.magenta.Darker(), Icons.Pencil,
                   DrawAction.CreateReversibleAction);
 
             AcceptDivergence =
               new("Accept Divergence", "Accept a diverging edge into the architecture",
-                  Color.grey.Darker(), "Materials/ModernUIPack/Arrow Bold",
+                  Color.grey.Darker(), Icons.CheckedCheckbox,
                   AcceptDivergenceAction.CreateReversibleAction);
 
             // Metric Board actions
             MetricBoard =
-              new("Metric Board", "Manipulate a metric board",
-                  Color.white.Darker(), "Materials/ModernUIPack/Pencil");
+                new("Metric Board", "Manipulate a metric board",
+                    Color.white.Darker(), Icons.Chalkboard);
 
             AddBoard =
               new("Add Board", "Add a board",
-                  Color.green.Darker(), "Materials/ModernUIPack/Plus",
+                  Color.green.Darker(), '+',
                   AddBoardAction.CreateReversibleAction,
                   parent: MetricBoard);
 
             AddWidget =
               new("Add Widget", "Add a widget",
-                  Color.green.Darker(), "Materials/ModernUIPack/Plus",
+                  Color.green.Darker(), '+',
                   AddWidgetAction.CreateReversibleAction,
                   parent: MetricBoard);
 
             MoveBoard =
               new("Move Board", "Move a board",
-                  Color.yellow.Darker(), "Materials/Charts/MoveIcon",
+                  Color.yellow.Darker(), Icons.Move,
                   MoveBoardAction.CreateReversibleAction,
                   parent: MetricBoard);
 
             MoveWidget =
               new("Move Widget", "Move a widget",
-                  Color.yellow.Darker(), "Materials/Charts/MoveIcon",
+                  Color.yellow.Darker(), Icons.Move,
                   MoveWidgetAction.CreateReversibleAction,
                   parent: MetricBoard);
 
             DeleteBoard =
               new("Delete Board", "Delete a board",
-                  Color.red.Darker(), "Materials/ModernUIPack/Trash",
+                  Color.red.Darker(), Icons.Trash,
                   DeleteBoardAction.CreateReversibleAction,
                   parent: MetricBoard);
 
             DeleteWidget =
               new("Delete Widget", "Delete a widget",
-                  Color.red.Darker(), "Materials/ModernUIPack/Trash",
+                  Color.red.Darker(), Icons.Trash,
                   DeleteWidgetAction.CreateReversibleAction,
                   parent: MetricBoard);
 
             LoadBoard =
               new("Load Board", "Load a board",
-                  Color.blue.Darker(), "Materials/ModernUIPack/Document",
+                  Color.blue.Darker(), Icons.Import,
                   LoadBoardAction.CreateReversibleAction,
                   parent: MetricBoard);
 
             SaveBoard =
               new("Save Board", "Save a board",
-                  Color.blue.Darker(), "Materials/ModernUIPack/Document",
+                  Color.blue.Darker(), Icons.Export,
                   SaveBoardAction.CreateReversibleAction,
                   parent: MetricBoard);
         }
@@ -196,7 +196,7 @@ namespace SEE.Controls.Actions
         #endregion
 
         /// <summary>
-        /// Dumps all elements in <see cref="AllRootTypes"/>-
+        /// Dumps all elements in <see cref="AllRootTypes"/>.
         /// Can be used for debugging.
         /// </summary>
         public static void Dump()

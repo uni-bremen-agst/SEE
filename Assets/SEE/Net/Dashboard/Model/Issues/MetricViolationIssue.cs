@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Newtonsoft.Json;
 using SEE.DataModel.DG;
 using SEE.Utils;
-using Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
 {
@@ -101,18 +101,18 @@ namespace SEE.Net.Dashboard.Model.Issues
                                     string linkName, string metric, string errorNumber, string description,
                                     float? max, float? min, float value)
         {
-            this.Severity = severity;
-            this.Entity = entity;
-            this.EntityType = entityType;
-            this.Path = path;
-            this.Line = line;
-            this.LinkName = linkName;
-            this.Metric = metric;
-            this.ErrorNumber = errorNumber;
-            this.Description = description;
-            this.Max = max;
-            this.Min = min;
-            this.Value = value;
+            Severity = severity;
+            Entity = entity;
+            EntityType = entityType;
+            Path = path;
+            Line = line;
+            LinkName = linkName;
+            Metric = metric;
+            ErrorNumber = errorNumber;
+            Description = description;
+            Max = max;
+            Min = min;
+            Value = value;
         }
 
         public override async UniTask<string> ToDisplayStringAsync()

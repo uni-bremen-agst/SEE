@@ -12,7 +12,7 @@ namespace SEE.Controls.KeyActions
     {
         // IMPORTANT NOTES:
         // (1) Keep in mind that KeyCodes in Unity map directly to a
-        //     physical key on an keyboard with an English layout.
+        //     physical key on a keyboard with an English layout.
         // (2) Ctrl-Z and Ctrl-Y are reserved for Undo and Redo.
         // (3) The digits 0-9 are reserved for shortcuts for the player menu.
 
@@ -30,6 +30,7 @@ namespace SEE.Controls.KeyActions
 
         /// <summary>
         /// Returns true if the user has pressed down a key requesting the given <paramref name="keyAction"/>
+        /// in the last frame.
         /// </summary>
         /// <param name="keyAction">the <see cref="KeyAction"/> to check</param>
         /// <returns>true if the user has pressed a key requesting the given <paramref name="keyAction"/></returns>
