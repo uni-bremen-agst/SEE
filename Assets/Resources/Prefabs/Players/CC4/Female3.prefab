@@ -6314,6 +6314,11 @@ PrefabInstance:
       propertyPath: solver.head.defaultLocalRotation.x
       value: -0.14104699
       objectReference: {fileID: 0}
+    - target: {fileID: 5179106205997057727, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: m_Avatar
+      value: 
+      objectReference: {fileID: 9000000, guid: 4c2a714f3cebd7d4c87af602f4eb2cba, type: 3}
     - target: {fileID: 5673393830814623364, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: GlobalObjectIdHash
