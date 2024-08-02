@@ -466,7 +466,7 @@ namespace SEE.Game.Avatars
                 gameObject.AddComponent<AvatarBlendshapeExpressions>();
 
                 // Multiplayer functionality for UMAExpressionplayer and Facialtracker.
-                gameObject.AddComponent<ExpressionPlayerSynchronizer>();
+                gameObject.AddComponent<BlendshapeExpressionsSynchronizer>();
                 Debug.Log("[HTC Facial Tracker] Initialisation complete.\n");
             }
         }
