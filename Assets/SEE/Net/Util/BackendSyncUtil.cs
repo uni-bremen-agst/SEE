@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.Game.City;
 using SEE.Utils.Paths;
@@ -20,7 +19,7 @@ namespace SEE.Net.Util
         /// <summary>
         /// Associates the Code City types with the paths to find the matching game objects.
         /// </summary>
-        private static Dictionary<string, string> cities = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> cities = new()
         {
             {"SEECity",          "ImplementationTable/CodeCity"},
             {"DiffCity",         "DiffTable/DiffCity"},
@@ -33,7 +32,7 @@ namespace SEE.Net.Util
         /// Where multiplayer files are stored locally relative to the streaming assets.
         /// This is a dedicated directory where only files are stored that are downloaded from the backend.
         /// </summary>
-        private const string ServerContentDirectory = "Multiplayer/";
+        private const string serverContentDirectory = "Multiplayer/";
 
         /// <summary>
         /// The data structure for logging into the backend.
@@ -41,16 +40,22 @@ namespace SEE.Net.Util
         [System.Serializable]
         private struct LoginData
         {
-            public string username;
-            public string password;
+            /// <summary>
+            /// Name of the user.
+            /// </summary>
+            public string Username;
+            /// <summary>
+            /// Password of the user
+            /// </summary>
+            public string Password;
 
             public LoginData(string username, string password)
             {
-                this.username = username;
-                this.password = password;
+                Username = username;
+                Password = password;
             }
 
-            public override string ToString()
+            public readonly override string ToString()
             {
                 return JsonUtility.ToJson(this);
             }
@@ -67,19 +72,19 @@ namespace SEE.Net.Util
         [System.Serializable]
         private struct FileData
         {
-            public string id;
-            public string name;
-            public string contentType;
-            public string projectType;
-            public long size;
-            public long creationTime;
+            public string Id;
+            public string Name;
+            public string ContentType;
+            public string ProjectType;
+            public long Size;
+            public long CreationTime;
 
             public static FileData FromJson(string json)
             {
                 return JsonUtility.FromJson<FileData>(json);
             }
 
-            public override string ToString()
+            public readonly override string ToString()
             {
                 return JsonUtility.ToJson(this);
             }
@@ -101,7 +106,7 @@ namespace SEE.Net.Util
         [System.Serializable]
         private class FileDataList
         {
-            public List<FileData> items;
+            public List<FileData> Items;
 
             public static FileDataList FromJson(string json)
             {
@@ -110,7 +115,7 @@ namespace SEE.Net.Util
 
             public override string ToString()
             {
-                return items.ToString();
+                return Items.ToString();
             }
         }
 
@@ -124,7 +129,7 @@ namespace SEE.Net.Util
         }
 
         /// <summary>
-        /// Downloads the Multiplayer files and instantes Code Cities.
+        /// Downloads the multiplayer files and instantiates Code Cities.
         /// </summary>
         internal static async UniTask InitializeCitiesAsync()
         {
@@ -133,17 +138,17 @@ namespace SEE.Net.Util
                 ClearMultiplayerData();
                 await DownloadAllFilesAsync();
             }
-            Debug.Log("Initializing Multiplayer Cities...");
+            Debug.Log("Initializing Multiplayer Cities...\n");
             await LoadCitiesAsync();
         }
 
         /// <summary>
-        /// Deletes the multiplayer data and recreates the directory to prepare for downlaod.
+        /// Deletes the multiplayer files and recreates the directory to prepare for downlaod.
         /// </summary>
         private static void ClearMultiplayerData()
         {
             // This should be safe to clear as files are downloaded from the backend each time SEE starts.
-            string multiplayerDataPath = System.IO.Path.Combine(Application.streamingAssetsPath, ServerContentDirectory);
+            string multiplayerDataPath = System.IO.Path.Combine(Application.streamingAssetsPath, serverContentDirectory);
             if (Directory.Exists(multiplayerDataPath))
             {
                 Directory.Delete(multiplayerDataPath, true);
@@ -156,40 +161,40 @@ namespace SEE.Net.Util
         /// </summary>
         private static async UniTask DownloadAllFilesAsync()
         {
-            Debug.Log($"Backend API URL is: {Network.ClientRestAPI}");
+            Debug.Log($"Backend API URL is: {Network.ClientRestAPI}.\n");
 
             if (!await LogInAsync())
             {
-                Debug.LogError("Unable to download files!");
+                Debug.LogError("Unable to download files!\n");
                 return;
             }
 
             List<FileData> files = await GetFilesAsync(Network.ServerId);
-            Debug.Log($"Downloading {files.Count} files to: {System.IO.Path.Combine(Application.streamingAssetsPath, ServerContentDirectory)}");
+            Debug.Log($"Downloading {files.Count} files to: {System.IO.Path.Combine(Application.streamingAssetsPath, serverContentDirectory)}.\n");
             foreach (FileData file in files)
             {
                 try
                 {
-                    Debug.Log($"Downloading file: {file.name}");
-                    string localFileName = System.IO.Path.Combine(ServerContentDirectory, file.name);
-                    bool success = await DownloadFileAsync(file.id, localFileName);
-                    if (success && file.contentType.ToLower() == "application/zip")
+                    Debug.Log($"Downloading file: {file.Name}");
+                    string localFileName = System.IO.Path.Combine(serverContentDirectory, file.Name);
+                    bool success = await DownloadFileAsync(file.Id, localFileName);
+                    if (success && file.ContentType.ToLower() == "application/zip")
                     {
-                        Debug.Log($"Extracting ZIP file: {file.name}");
+                        Debug.Log($"Extracting ZIP file: {file.Name}.\n");
                         try
                         {
-                            Unzip(localFileName, System.IO.Path.Combine(ServerContentDirectory, file.projectType), true);
+                            Unzip(localFileName, System.IO.Path.Combine(serverContentDirectory, file.ProjectType), true);
                         }
                         catch (Exception e)
                         {
-                            Debug.LogError($"Error unzipping file: {file.name}");
+                            Debug.LogError($"Error unzipping file: {file.Name}");
                             Debug.LogError(e);
                         }
                     }
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"Error downloading file: {file.name}");
+                    Debug.LogError($"Error downloading file: {file.Name}");
                     Debug.LogError(e);
                 }
             }
@@ -214,7 +219,7 @@ namespace SEE.Net.Util
             }
 
             string now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
-            string tempTargetPath = System.IO.Path.Combine(Application.streamingAssetsPath, ServerContentDirectory, "tmp_" + now);
+            string tempTargetPath = System.IO.Path.Combine(Application.streamingAssetsPath, serverContentDirectory, "tmp_" + now);
             ZipFile.ExtractToDirectory(zipPath, tempTargetPath);
 
             var dirs = Directory.GetDirectories(tempTargetPath);
@@ -329,7 +334,7 @@ namespace SEE.Net.Util
                 }
                 else
                 {
-                    return FileDataList.FromJson(fetchRequest.downloadHandler.text).items;
+                    return FileDataList.FromJson(fetchRequest.downloadHandler.text).Items;
                 }
             }
         }
@@ -341,7 +346,7 @@ namespace SEE.Net.Util
         {
             foreach (var city in cities.Keys)
             {
-                string path = System.IO.Path.Combine(Application.streamingAssetsPath, ServerContentDirectory, city);
+                string path = System.IO.Path.Combine(Application.streamingAssetsPath, serverContentDirectory, city);
                 if (Directory.Exists(path))
                 {
                     Debug.Log($"Found {city}...");
