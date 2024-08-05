@@ -22,3 +22,8 @@ To build the game server image, execute the following command from this working 
 ```
 docker build -t see-gameserver .
 ```
+
+## Backend Access
+
+Please note that if the backend is configured as `localhost`, the game server will not be able to access the backend from within the container.
+This is because `localhost` will refer to the game server's container and not the backend container or container host.
