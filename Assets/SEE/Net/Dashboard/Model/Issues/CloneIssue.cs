@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Newtonsoft.Json;
 using SEE.DataModel.DG;
 using SEE.Utils;
-using Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
 {
@@ -89,17 +89,17 @@ namespace SEE.Net.Dashboard.Model.Issues
                           int leftWeight, string rightPath, int rightLine, int rightEndLine, int rightLength,
                           int rightWeight)
         {
-            this.CloneType = cloneType;
-            this.LeftPath = leftPath;
-            this.LeftLine = leftLine;
-            this.LeftEndLine = leftEndLine;
-            this.LeftLength = leftLength;
-            this.LeftWeight = leftWeight;
-            this.RightPath = rightPath;
-            this.RightLine = rightLine;
-            this.RightEndLine = rightEndLine;
-            this.RightLength = rightLength;
-            this.RightWeight = rightWeight;
+            CloneType = cloneType;
+            LeftPath = leftPath;
+            LeftLine = leftLine;
+            LeftEndLine = leftEndLine;
+            LeftLength = leftLength;
+            LeftWeight = leftWeight;
+            RightPath = rightPath;
+            RightLine = rightLine;
+            RightEndLine = rightEndLine;
+            RightLength = rightLength;
+            RightWeight = rightWeight;
         }
 
         public override async UniTask<string> ToDisplayStringAsync()

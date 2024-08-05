@@ -15,6 +15,7 @@ using UnityEngine;
 using SEE.Scanner;
 using System.Threading;
 using Microsoft.Extensions.FileSystemGlobbing;
+using SEE.Scanner.Antlr;
 
 namespace SEE.GraphProviders
 {
@@ -264,7 +265,7 @@ namespace SEE.GraphProviders
                 }
 
                 // Directory does not exist.
-                if (currentSegmentNode == null && pathSegments.Length > 1 && parent == null)
+                if (pathSegments.Length > 1 && parent == null)
                 {
                     rootNode.AddChild(NewNode(graph, pathSegments[0], directoryNodeType, pathSegments[0]));
                     return BuildGraphFromPath(nodePath, graph.GetNode(pathSegments[0]),
@@ -286,8 +287,7 @@ namespace SEE.GraphProviders
                 }
 
                 // The node for the current pathSegment does not exist, and the node is a directory.
-                if (currentPathSegmentNode == null &&
-                    pathSegments.Length > 1)
+                if (pathSegments.Length > 1)
                 {
                     parent.AddChild(NewNode(graph, currentPathSegment, directoryNodeType, pathSegments[0]));
                     return BuildGraphFromPath(nodePath, graph.GetNode(currentPathSegment),
@@ -295,8 +295,7 @@ namespace SEE.GraphProviders
                 }
 
                 // The node for the current pathSegment does not exist, and the node is a file.
-                if (currentPathSegmentNode == null &&
-                    pathSegments.Length == 1)
+                if (pathSegments.Length == 1)
                 {
                     Node addedFileNode = NewNode(graph, currentPathSegment, fileNodeType, pathSegments[0]);
                     parent.AddChild(addedFileNode);
@@ -342,21 +341,21 @@ namespace SEE.GraphProviders
         /// <param name="commitID">The commitID where the files exist.</param>
         /// <param name="language">The language the given text is written in.</param>
         /// <returns>The token stream for the specified file and commit.</returns>
-        public static IEnumerable<SEEToken> RetrieveTokens(string repositoryFilePath, Repository repository,
-                                                           string commitID, TokenLanguage language)
+        public static ICollection<AntlrToken> RetrieveTokens(string repositoryFilePath, Repository repository,
+                                                           string commitID, AntlrLanguage language)
         {
             Blob blob = repository.Lookup<Blob>($"{commitID}:{repositoryFilePath}");
 
             if (blob != null)
             {
                 string fileContent = blob.GetContentText();
-                return SEEToken.FromString(fileContent, language);
+                return AntlrToken.FromString(fileContent, language);
             }
             else
             {
                 // Blob does not exist.
                 Debug.LogWarning($"File {repositoryFilePath} does not exist.\n");
-                return Enumerable.Empty<SEEToken>();
+                return new List<AntlrToken>();
             }
         }
 
@@ -375,10 +374,10 @@ namespace SEE.GraphProviders
                 if (node.Type == fileNodeType)
                 {
                     string repositoryFilePath = node.ID;
-                    TokenLanguage language = TokenLanguage.FromFileExtension(Path.GetExtension(repositoryFilePath).TrimStart('.'));
-                    if (language != TokenLanguage.Plain)
+                    AntlrLanguage language = AntlrLanguage.FromFileExtension(Path.GetExtension(repositoryFilePath).TrimStart('.'));
+                    if (language != AntlrLanguage.Plain)
                     {
-                        IEnumerable<SEEToken> tokens = RetrieveTokens(repositoryFilePath, repository, commitID, language);
+                        ICollection<AntlrToken> tokens = RetrieveTokens(repositoryFilePath, repository, commitID, language);
                         node.SetInt(Metrics.Prefix + "LOC", TokenMetrics.CalculateLinesOfCode(tokens));
                         node.SetInt(Metrics.Prefix + "McCabe_Complexity", TokenMetrics.CalculateMcCabeComplexity(tokens));
                         TokenMetrics.HalsteadMetrics halsteadMetrics = TokenMetrics.CalculateHalsteadMetrics(tokens);

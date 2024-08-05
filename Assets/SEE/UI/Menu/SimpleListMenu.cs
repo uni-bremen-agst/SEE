@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.Events;
 using UnityEngine.Windows.Speech;
 
 namespace SEE.UI.Menu
@@ -99,6 +99,11 @@ namespace SEE.UI.Menu
         }
 
         /// <summary>
+        /// Removes all menu entries.
+        /// </summary>
+        public void ClearEntries() => entries.ToList().ForEach(RemoveEntry);
+
+        /// <summary>
         /// Selects a menu entry.
         /// It is assumed that the menu contains the entry.
         /// </summary>
@@ -145,26 +150,26 @@ namespace SEE.UI.Menu
         /// <summary>
         /// Triggers when <see cref="AllowNoSelection"/> was changed.
         /// </summary>
-        public event UnityAction OnAllowNoSelectionChanged;
+        public event Action OnAllowNoSelectionChanged;
 
         /// <summary>
         /// Triggers when <see cref="HideAfterSelection"/> was changed.
         /// </summary>
-        public event UnityAction OnHideAfterSelectionChanged;
+        public event Action OnHideAfterSelectionChanged;
 
         /// <summary>
         /// Triggers when an entry was added. (<see cref="AddEntry"/>)
         /// </summary>
-        public event UnityAction<T> OnEntryAdded;
+        public event Action<T> OnEntryAdded;
 
         /// <summary>
         /// Triggers when an entry was removed. (<see cref="RemoveEntry"/>)
         /// </summary>
-        public event UnityAction<T> OnEntryRemoved;
+        public event Action<T> OnEntryRemoved;
 
         /// <summary>
         /// Triggers when an entry was selected. (<see cref="SelectEntry"/>)
         /// </summary>
-        public event UnityAction<T> OnEntrySelected;
+        public event Action<T> OnEntrySelected;
     }
 }

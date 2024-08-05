@@ -188,8 +188,9 @@ namespace SEE.UI.Window
             }
             panel = PanelUtils.CreatePanelFor((RectTransform)windows[0].Window.transform, panelsCanvas);
             // When the active tab *on this panel* is changed, we invoke the corresponding event
-            PanelNotificationCenter.OnActiveTabChanged += ChangeActiveTab;
             PanelNotificationCenter.OnPanelClosed += ClosePanel;
+            PanelNotificationCenter.OnActiveTabChanged += ChangeActiveTab;
+            return;
 
             void ChangeActiveTab(PanelTab tab)
             {

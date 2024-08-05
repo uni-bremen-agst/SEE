@@ -67,7 +67,8 @@
         "Markdig.dll",
         "System.Collections.Immutable.dll",
         "MoreLinq.dll",
-        "Microsoft.Extensions.FileSystemGlobbing.dll"
+        "Microsoft.Extensions.FileSystemGlobbing.dll",
+        "MediatR.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

@@ -25,16 +25,16 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             actions.Enqueue(() =>
             {
-                adapterHost.SendRequest(new SetBreakpointsRequest()
+                adapterHost.SendRequest(new SetBreakpointsRequest
                 {
-                    Source = new Source() { Path = path, Name = path },
+                    Source = new Source { Path = path, Name = path },
                     Breakpoints = DebugBreakpointManager.Breakpoints[path].Values.ToList(),
                 }, _ => { });
             });
         }
 
         /// <summary>
-        /// Handles the begining of hovering a word.
+        /// Handles the beginning of hovering a word.
         /// </summary>
         /// <param name="codeWindow">The code window containing the hovered word.</param>
         /// <param name="wordInfo">The info of the hovered word.</param>
@@ -66,11 +66,11 @@ namespace SEE.UI.DebugAdapterProtocol
                 return;
             }
 
-            string expression = ((TMP_WordInfo)hoveredWord).GetWord();
+            string expression = hoveredWord.Value.GetWord();
 
             try
             {
-                EvaluateResponse result = adapterHost.SendRequestSync(new EvaluateRequest()
+                EvaluateResponse result = adapterHost.SendRequestSync(new EvaluateRequest
                 {
                     Expression = expression,
                     Context = capabilities.SupportsEvaluateForHovers == true ? EvaluateArguments.ContextValue.Hover : null,
@@ -133,14 +133,14 @@ namespace SEE.UI.DebugAdapterProtocol
                 adapterHost.SendRequest(Adapter.GetLaunchRequest(), _ => IsRunning = true);
                 foreach ((string path, Dictionary<int, SourceBreakpoint> breakpoints) in DebugBreakpointManager.Breakpoints)
                 {
-                    adapterHost.SendRequest(new SetBreakpointsRequest()
+                    adapterHost.SendRequest(new SetBreakpointsRequest
                     {
-                        Source = new Source() { Path = path, Name = path },
+                        Source = new Source { Path = path, Name = path },
                         Breakpoints = breakpoints.Values.ToList(),
                     }, _ => { });
                 }
-                adapterHost.SendRequest(new SetFunctionBreakpointsRequest() { Breakpoints = new() }, _ => { });
-                adapterHost.SendRequest(new SetExceptionBreakpointsRequest() { Filters = new() }, _ => { });
+                adapterHost.SendRequest(new SetFunctionBreakpointsRequest { Breakpoints = new() }, _ => { });
+                adapterHost.SendRequest(new SetExceptionBreakpointsRequest { Filters = new() }, _ => { });
                 if (capabilities.SupportsConfigurationDoneRequest == true)
                 {
                     adapterHost.SendRequest(new ConfigurationDoneRequest(), _ => { });
@@ -227,7 +227,7 @@ namespace SEE.UI.DebugAdapterProtocol
                         return;
                     }
 
-                    ExceptionInfoResponse exceptionInfo = adapterHost.SendRequestSync(new ExceptionInfoRequest()
+                    ExceptionInfoResponse exceptionInfo = adapterHost.SendRequestSync(new ExceptionInfoRequest
                     {
                         ThreadId = MainThread.Id,
                     });
@@ -358,7 +358,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Queues a continue request.
         /// </summary>
-        void OnContinue()
+        private void OnContinue()
         {
             actions.Enqueue(() =>
             {
@@ -373,7 +373,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Queues a pause request.
         /// </summary>
-        void OnPause()
+        private void OnPause()
         {
             actions.Enqueue(() =>
             {
@@ -388,7 +388,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Queues a reverse continue request.
         /// </summary>
-        void OnReverseContinue()
+        private void OnReverseContinue()
         {
             actions.Enqueue(() =>
             {
@@ -403,7 +403,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Queues a next request.
         /// </summary>
-        void OnNext()
+        private void OnNext()
         {
             actions.Enqueue(() =>
             {
@@ -418,7 +418,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Queues a step back request.
         /// </summary>
-        void OnStepBack()
+        private void OnStepBack()
         {
             actions.Enqueue(() =>
             {
@@ -433,7 +433,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Queues a step in request.
         /// </summary>
-        void OnStepIn()
+        private void OnStepIn()
         {
             actions.Enqueue(() =>
             {
@@ -448,7 +448,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Queues a step out request.
         /// </summary>
-        void OnStepOut()
+        private void OnStepOut()
         {
             actions.Enqueue(() =>
             {
@@ -463,7 +463,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Queues a restart request.
         /// </summary>
-        void OnRestart()
+        private void OnRestart()
         {
             actions.Enqueue(() =>
             {
@@ -474,7 +474,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Queues a terminate request.
         /// </summary>
-        void OnStop()
+        private void OnStop()
         {
             actions.Enqueue(() =>
             {
@@ -487,6 +487,7 @@ namespace SEE.UI.DebugAdapterProtocol
                     Disconnect();
                 }
             });
+            return;
 
             // Tries to stop the debuggee gracefully.
             void Terminate()

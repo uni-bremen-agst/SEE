@@ -132,7 +132,7 @@ namespace SEE.UI.Menu
             // as the title is technically the last element in the breadcrumb)
             string breadcrumb = withBreadcrumb ? GetBreadcrumb() : string.Empty;
             Description = nestedEntry.Description + (breadcrumb.Length > 0 ? $"\n{GetBreadcrumb()}" : "");
-            Icon = nestedEntry.Icon;
+            Icon = nestedEntry.MenuIconSprite;
             nestedEntry.InnerEntries.ForEach(AddEntry);
             KeywordListener.Unregister(HandleKeyword);
             KeywordListener.Register(HandleKeyword);
@@ -311,8 +311,7 @@ namespace SEE.UI.Menu
                                                 .Select(x => allEntries[x.Value])
                                                 .ToList();
 
-                NestedMenuEntry<T> resultEntry = new(results, Title, Description,
-                                                     default, default, Icon);
+                NestedMenuEntry<T> resultEntry = new(results, Title, Description, menuIconSprite: Icon);
                 DescendLevel(resultEntry, withBreadcrumb: false);
             }
             finally
