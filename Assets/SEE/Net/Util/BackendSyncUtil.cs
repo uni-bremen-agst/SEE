@@ -263,7 +263,7 @@ namespace SEE.Net.Util
                 getRequest.downloadHandler = new DownloadHandlerFile(targetPath);
                 UnityWebRequestAsyncOperation asyncOp = getRequest.SendWebRequest();
                 await asyncOp.ToUniTask();
-                
+
                 if (getRequest.result != UnityWebRequest.Result.Success)
                 {
                     Debug.LogError(getRequest.error);

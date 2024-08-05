@@ -1,4 +1,4 @@
-# SEE Managed Games Server Container
+# Game Server Container
 
 This directory contains the game server container configuration for the SEE management server.
 
@@ -25,5 +25,5 @@ docker build -t see-gameserver .
 
 ## Backend Access
 
-Please note that if the backend is configured as `localhost`, the game server will not be able to access the backend from within the container.
-This is because `localhost` will refer to the game server's container and not the backend container or container host.
+Please note that if the Backend domain is configured as `localhost`, the game server will not be able to access the Backend from within the container.
+This is because `localhost` will refer to the game server's container and not the Backend container or the container host.

@@ -153,6 +153,8 @@ Clients will automatically download the archives from the backend when connectin
 
 The Code Cities are stored in the `Assets/StreamingAssets/Multiplayer/` directory.
 
+**Heads up:** The `Multiplayer` directory will get cleared if you connect to a server. Keep that in mind while you prepare your Code Cities for upload!
+
 Prepare your Code Cities depending on their type in the respective subdirectories:
 
 - `SEECity`
@@ -161,7 +163,7 @@ Prepare your Code Cities depending on their type in the respective subdirectorie
 - `SEEJlgCity`
 - `SEEReflexionCity`
 
-This is necessary so that all relative paths are correctly referenced.
+This is necessary so that all relative paths are correctly referenced, e.g., in the `.cfg` files.
 
 Each of the Code Cities should contain a valid configuration file (`.cfg`),
 which is automatically loaded by the SEE clients after connecting to the server and downloading the files from the backend.
