@@ -59,10 +59,10 @@ namespace SEE.UI.Menu.Drawable
 
         /// <summary>
         /// Initialize the button to obtain the color of the border.
-        /// Selects the color based on the <paramref name="primaryColor"/>. 
-        /// If it is true, the primary color is chosen. 
-        /// Otherwise, the secondary color is chosen. 
-        ///     (For monochromatic lines, the primary color is also chosen.) 
+        /// Selects the color based on the <paramref name="primaryColor"/>.
+        /// If it is true, the primary color is chosen.
+        /// Otherwise, the secondary color is chosen.
+        ///     (For monochromatic lines, the primary color is also chosen.)
         /// </summary>
         /// <param name="conf">The configuration of the selected node.</param>
         /// <param name="primaryColor">Option whether the primary color is being sought.</param>
@@ -78,7 +78,7 @@ namespace SEE.UI.Menu.Drawable
                 else
                 {
                     chosenColor = conf.BorderConf.SecondaryColor;
-                    /// For monochromatic lines, the secondary color is clear; 
+                    /// For monochromatic lines, the secondary color is clear;
                     /// therefore, the primary color is taken instead.
                     if (conf.BorderConf.ColorKind == GameDrawer.ColorKind.Monochrome)
                     {
@@ -91,9 +91,9 @@ namespace SEE.UI.Menu.Drawable
 
         /// <summary>
         /// Initialize the button to obtain the color of the text.
-        /// Selects the color based on the <paramref name="primaryColor"/>. 
-        /// If it is true, the primary color is chosen. 
-        /// Otherwise, the secondary (outline) color is chosen. 
+        /// Selects the color based on the <paramref name="primaryColor"/>.
+        /// If it is true, the primary color is chosen.
+        /// Otherwise, the secondary (outline) color is chosen.
         /// </summary>
         /// <param name="conf">The configuration of the selected node.</param>
         /// <param name="primaryColor">Option whether the primary color is being sought.</param>
@@ -116,10 +116,10 @@ namespace SEE.UI.Menu.Drawable
 
         /// <summary>
         /// Initialize the button to obtain the color of the branch line.
-        /// Selects the color based on the <paramref name="primaryColor"/>. 
-        /// If it is true, the primary color is chosen. 
-        /// Otherwise, the secondary color is chosen. 
-        ///     (For monochromatic lines, the primary color is also chosen.) 
+        /// Selects the color based on the <paramref name="primaryColor"/>.
+        /// If it is true, the primary color is chosen.
+        /// Otherwise, the secondary color is chosen.
+        ///     (For monochromatic lines, the primary color is also chosen.)
         /// </summary>
         /// <param name="conf">The configuration of the selected node.</param>
         /// <param name="primaryColor">Option whether the primary color is being sought.</param>
@@ -139,7 +139,7 @@ namespace SEE.UI.Menu.Drawable
                     else
                     {
                         chosenColor = conf.BranchLineConf.SecondaryColor;
-                        /// For monochromatic lines, the secondary color is clear; 
+                        /// For monochromatic lines, the secondary color is clear;
                         /// therefore, the primary color is taken instead.
                         if (conf.BranchLineConf.ColorKind == GameDrawer.ColorKind.Monochrome)
                         {
@@ -185,7 +185,7 @@ namespace SEE.UI.Menu.Drawable
                 return true;
             }
 
-            color = Color.black;
+            color = Color.clear;
             return false;
         }
     }

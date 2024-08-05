@@ -62,12 +62,27 @@ namespace SEE.Game.Drawable
                     /// Makes the renderers blink.
                     foreach (Renderer renderer in renderers)
                     {
-                        renderer.enabled = false;
+                        if (renderer != null)
+                        {
+                            renderer.enabled = false;
+                        }
+                        else
+                        {
+                            renderers.Remove(renderer);
+                            break;
+                        }
                     }
                     yield return new WaitForSeconds(0.2f);
                     foreach (Renderer renderer in renderers)
                     {
-                        renderer.enabled = true;
+                        if (renderer != null)
+                        {
+                            renderer.enabled = true;
+                        } else
+                        {
+                            renderers.Remove(renderer);
+                            break;
+                        }
                     }
                     yield return new WaitForSeconds(0.5f);
                 }
@@ -108,7 +123,10 @@ namespace SEE.Game.Drawable
             {
                 foreach (Renderer renderer in renderers)
                 {
-                    renderer.enabled = true;
+                    if (renderer != null)
+                    {
+                        renderer.enabled = true;
+                    }
                 }
             }
             else if (canvas != null)
@@ -198,22 +216,49 @@ namespace SEE.Game.Drawable
         /// <param name="obj">The object which has a fill out.</param>
         public static void AddFillOutToEffect(GameObject obj)
         {
-            if (obj != null && obj.GetComponent<BlinkEffect>() != null)
+            if (obj != null && (obj.GetComponent<BlinkEffect>() != null
+                    || obj.GetComponentInParent<BlinkEffect>() != null))
             {
                 GameObject fillOut = GameFinder.FindChild(obj, ValueHolder.FillOut);
-                BlinkEffect effect = obj.GetComponent<BlinkEffect>();
+                BlinkEffect effect = obj.GetComponent<BlinkEffect>() ?? obj.GetComponentInParent<BlinkEffect>();
                 if (fillOut != null && fillOut.GetComponent<Renderer>() != null)
                 {
                     if (effect.renderers != null)
                     {
                         effect.renderers.Add(fillOut.GetComponent<Renderer>());
-                    } 
+                    }
                     else if (effect.renderer != null)
                     {
                         effect.Deactivate();
                         obj.AddComponent<BlinkEffect>();
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Checks if the effect contains the fill out renderer.
+        /// </summary>
+        /// <param name="obj">The object which has a fill out.</param>
+        /// <returns>True if the blink effect is active for the fill out, otherwise false.</returns>
+        public static bool CanFillOutBeAdded(GameObject obj)
+        {
+            BlinkEffect effect = obj.GetComponent<BlinkEffect>() ?? obj.GetComponentInParent<BlinkEffect>();
+            if (obj != null && effect != null
+                && effect.renderers != null
+                && GameFinder.FindChild(obj, ValueHolder.FillOut) != null)
+            {
+                return !effect.renderers.Contains(GameFinder.FindChild(obj,
+                    ValueHolder.FillOut).GetComponent<Renderer>());
+            }
+            else if (obj != null && effect != null
+                && effect.renderer != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }

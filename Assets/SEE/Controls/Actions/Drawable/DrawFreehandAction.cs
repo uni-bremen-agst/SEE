@@ -134,7 +134,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// This block draws the line when the left mouse button is held down.
                 /// Drawing is only possible when targeting a drawable or an object placed on a drawable,
                 /// and the drawable remains unchanged during drawing.
-                if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit) 
+                if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit)
                     && !finishDrawing
                     && Queries.DrawableSurfaceNullOrSame(Surface, raycastHit.collider.gameObject))
                 {
@@ -151,7 +151,7 @@ namespace SEE.Controls.Actions.Drawable
                 }
 
                 /// This block is executed when the drawing should be completed.
-                if ((Queries.MouseUp(MouseButton.Left) || !Queries.MouseHold(MouseButton.Left)) 
+                if ((Queries.MouseUp(MouseButton.Left) || !Queries.MouseHold(MouseButton.Left))
                     && drawing)
                 {
                     return FinishDrawing();
@@ -235,7 +235,7 @@ namespace SEE.Controls.Actions.Drawable
                     line = GameDrawer.SetPivot(line, LineMenu.GetFillOutColorForDrawing());
                     LineConf currentLine = LineConf.GetLine(line);
                     memento = new Memento(Surface, currentLine);
-                    new DrawingFinishNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), line.name, 
+                    new DrawingFinishNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), line.name,
                         currentLine.Loop, LineMenu.GetFillOutColorForDrawing()).Execute();
                     CurrentState = IReversibleAction.Progress.Completed;
                     return true;

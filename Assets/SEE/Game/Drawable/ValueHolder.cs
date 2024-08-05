@@ -198,9 +198,9 @@ namespace SEE.Game.Drawable
         public const float LineSplitTimer = 3.0f;
 
         /// <summary>
-        /// The default marker color for colors that do not have a complementary color.
+        /// The default color for colors that do not have a complementary color.
         /// </summary>
-        public static readonly Color LineSplitDefaultMarkerColor = Color.magenta;
+        public static readonly Color DefaultComplementary = Color.magenta;
 
         /// <summary>
         /// The initial scale for sticky notes.

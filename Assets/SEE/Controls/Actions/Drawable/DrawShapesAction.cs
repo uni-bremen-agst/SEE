@@ -32,11 +32,11 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Property of the shape.
         /// </summary>
-        private GameObject Shape { 
-            get { return shape; } 
+        private GameObject Shape {
+            get { return shape; }
             set { shape = value;
                 currentShape = value;
-            }  
+            }
         }
 
         /// <summary>
@@ -106,9 +106,9 @@ namespace SEE.Controls.Actions.Drawable
         private bool editMode = false;
 
         /// <summary>
-        /// Status and color if a line shape has activates the fill out option.
+        /// Status and color if a shape has activates the fill out option.
         /// </summary>
-        private Color? lineShapeFillOut = null;
+        private Color? shapeFillOut = null;
 
         /// <summary>
         /// Enables the shape menu.
@@ -267,7 +267,7 @@ namespace SEE.Controls.Actions.Drawable
                 drawing = false;
                 Shape = null;
                 editMode = false;
-                lineShapeFillOut = null;
+                shapeFillOut = null;
                 if (LineMenu.IsInEditMode())
                 {
                     LineMenu.DisableLineMenu();
@@ -330,7 +330,7 @@ namespace SEE.Controls.Actions.Drawable
                     LineConf conf = LineConf.GetLine(Shape);
                     conf.RendererPositions = positions;
                     new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), conf).Execute();
-                    lineShapeFillOut = LineMenu.GetFillOutColorForDrawing();
+                    shapeFillOut = LineMenu.GetFillOutColorForDrawing();
                     break;
                 case ShapePointsCalculator.Shape.Square:
                     positions = ShapePointsCalculator.Square(convertedHitPoint, ShapeMenu.GetValue1());
@@ -404,6 +404,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 positions = new Vector3[1];
                 drawing = false;
+                new EraseNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name).Execute();
                 Destroyer.Destroy(Shape);
                 Shape = null;
                 editMode = false;
@@ -480,14 +481,25 @@ namespace SEE.Controls.Actions.Drawable
                 Shape = GameDrawer.DrawLine(Surface, "", positions, ValueHolder.CurrentColorKind,
                     ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor, ValueHolder.CurrentThickness, false,
                     ValueHolder.CurrentLineKind, ValueHolder.CurrentTiling, fillOutColor: LineMenu.GetFillOutColorForDrawing());
+                shapeFillOut = LineMenu.GetFillOutColorForDrawing();
                 Shape.GetComponent<LineRenderer>().loop = false;
                 Shape.AddOrGetComponent<BlinkEffect>();
                 new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(Shape)).Execute();
             }
             else
             {
-                LineConf conf = LineConf.GetLine(Shape);
-                GameDrawer.Drawing(Shape, positions, fillOutColor: LineConf.GetFillOutColor(conf));
+                shapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(Shape));
+                LineMenu.AssignFillOutForEditing(shapeFillOut, color =>
+                {
+                    shapeFillOut = color;
+                    GameEdit.ChangeFillOutColor(shape, color);
+                    new EditLineFillOutColorNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), shape.name, color).Execute();
+                }, () => shapeFillOut = null);
+                if (shapeFillOut != null && BlinkEffect.CanFillOutBeAdded(shape))
+                {
+                    BlinkEffect.AddFillOutToEffect(shape);
+                }
+                GameDrawer.Drawing(Shape, positions, fillOutColor: shapeFillOut);
                 new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(Shape)).Execute();
             }
         }
@@ -540,18 +552,18 @@ namespace SEE.Controls.Actions.Drawable
                     LineRenderer renderer = Shape.GetComponent<LineRenderer>();
                     renderer.positionCount -= 2;
                     positions = positions.ToList().GetRange(0, positions.Length - 1).ToArray();
-                    lineShapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(shape));
+                    shapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(shape));
                     if (positions.Length > 2)
                     {
-                        GameDrawer.Drawing(Shape, positions, lineShapeFillOut);
+                        GameDrawer.Drawing(Shape, positions, shapeFillOut);
                     }
                     else
                     {
-                        if (lineShapeFillOut != null)
+                        if (shapeFillOut != null)
                         {
                             GameObject.DestroyImmediate(GameFinder.FindChild(Shape, ValueHolder.FillOut));
                             new DeleteFillOutNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name).Execute();
-                            LineMenu.AssignFillOutForEditing(null);
+                            LineMenu.AssignFillOutForEditing(null, null, null);
                         }
                         GameDrawer.Drawing(Shape, positions);
                     }
@@ -568,7 +580,7 @@ namespace SEE.Controls.Actions.Drawable
                     drawing = false;
                     Shape = null;
                     editMode = false;
-                    lineShapeFillOut = null;
+                    shapeFillOut = null;
                 }
             }
         }
@@ -591,13 +603,17 @@ namespace SEE.Controls.Actions.Drawable
                 newPositions[^1] = newPosition;
                 if (GameDrawer.DifferentPositionCounter(newPositions) > 2)
                 {
-                    lineShapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(shape));
-                    GameDrawer.Drawing(Shape, newPositions, lineShapeFillOut);
+                    shapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(shape));
+                    GameDrawer.Drawing(Shape, newPositions, shapeFillOut);
                     new DrawingNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name, newPosition, newPositions.Length - 1).Execute();
-                    if (lineShapeFillOut != null)
+                    if (shapeFillOut != null)
                     {
-                        LineMenu.AssignFillOutForEditing(lineShapeFillOut);
-                        new DrawingFillOutNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name, lineShapeFillOut.Value).Execute();
+                        LineMenu.AssignFillOutForEditing(shapeFillOut, color => {
+                            shapeFillOut = color;
+                            GameEdit.ChangeFillOutColor(shape, color);
+                            new EditLineFillOutColorNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), shape.name, color).Execute();
+                        }, () => shapeFillOut = null);
+                        new DrawingFillOutNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name, shapeFillOut.Value).Execute();
                     }
                 }
                 else
@@ -631,14 +647,17 @@ namespace SEE.Controls.Actions.Drawable
 
                     if (positions.Length > 2)
                     {
-                        lineShapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(shape));
-                        GameDrawer.Drawing(Shape, positions, lineShapeFillOut);
+                        shapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(shape));
+                        GameDrawer.Drawing(Shape, positions, shapeFillOut);
                         new DrawingNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                                          Shape.name, newPosition, newPositions.Length - 1).Execute();
-                        if (lineShapeFillOut != null)
+                        if (shapeFillOut != null)
                         {
-                            LineMenu.AssignFillOutForEditing(lineShapeFillOut);
-                            new DrawingFillOutNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name, lineShapeFillOut.Value).Execute();
+                            LineMenu.AssignFillOutForEditing(shapeFillOut, color => {
+                                shapeFillOut = color; GameEdit.ChangeFillOutColor(shape, color);
+                                new EditLineFillOutColorNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), shape.name, color).Execute();
+                            }, () => shapeFillOut = null);
+                            new DrawingFillOutNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name, shapeFillOut.Value).Execute();
                         }
                     }
                     else
@@ -647,7 +666,7 @@ namespace SEE.Controls.Actions.Drawable
                         new DrawingNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
                                          Shape.name, newPosition, newPositions.Length - 1).Execute();
                     }
-                    
+
                 }
             }
         }
@@ -660,7 +679,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             GameDrawer.Drawing(Shape, positions);
             Shape.GetComponent<LineRenderer>().loop = ShapeMenu.GetLoopManager().isOn;
-            Shape = GameDrawer.SetPivot(Shape, lineShapeFillOut);
+            Shape = GameDrawer.SetPivot(Shape, shapeFillOut);
             LineConf currentShape = LineConf.GetLine(Shape);
             //Test(ref currentShape);
             memento = new Memento(Surface, currentShape);
@@ -701,7 +720,7 @@ namespace SEE.Controls.Actions.Drawable
                 GameMoveRotator.SetPosition(arrow, pos, false);
 
                 /// X Value von middle pos verschieben um Aggregation / Komposition zu erzeugen
-                /// Wenn Pfeillinie durchtrennt ist, kann x von pMiddle in positiven bereich verschoben werden um andere Pfeilspitze zu erzeugen. 
+                /// Wenn Pfeillinie durchtrennt ist, kann x von pMiddle in positiven bereich verschoben werden um andere Pfeilspitze zu erzeugen.
                 Vector3[] arrowPositions = new Vector3[arrowPos.Length];
                 arrow.GetComponent<LineRenderer>().GetPositions(arrowPositions);
 

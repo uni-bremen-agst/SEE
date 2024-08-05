@@ -44,15 +44,15 @@ namespace SEE.Controls.Actions.Drawable
         private bool isInAction = false;
 
         /// <summary>
-        /// True if the action waits for user input of the
-        /// mind map color picker menu.
+        /// True if the action waits for user input of a
+        /// sub color picker menu.
         /// </summary>
         private bool waitForHelperMenu = false;
 
         /// <summary>
-        /// True if the color picking from a mind map node is finished.
+        /// True if the color picking from a sub menu is finished.
         /// </summary>
-        private bool finishChosingMMColor = false;
+        private bool finishChosingColor = false;
 
         /// <summary>
         /// True if the picker picks a color for the second color.
@@ -81,9 +81,9 @@ namespace SEE.Controls.Actions.Drawable
                 /// either into <see cref="ValueHolder.CurrentPrimaryColor"/> or
                 /// <see cref="ValueHolder.CurrentSecondaryColor"/>.
                 /// Subsequently, a memento is created, and the action process is completed.
-                if (((Queries.MouseUp(MouseButton.Left) || Queries.MouseUp(MouseButton.Right)) 
-                        && isInAction && !waitForHelperMenu) 
-                    || finishChosingMMColor)
+                if (((Queries.MouseUp(MouseButton.Left) || Queries.MouseUp(MouseButton.Right))
+                        && isInAction && !waitForHelperMenu)
+                    || finishChosingColor)
                 {
                     if (!ColorPickerMenu.GetSwitchStatus())
                     {
@@ -110,7 +110,18 @@ namespace SEE.Controls.Actions.Drawable
             {
                 pickedColor = color;
                 waitForHelperMenu = false;
-                finishChosingMMColor = true;
+                finishChosingColor = true;
+            }
+
+            /// This block is waiting for user input to select a line element
+            /// of <see cref="ColorPickerLineMenu"/>.
+            /// It is placed outside the <see cref="Raycasting.IsMouseOverGUI"/> block so
+            /// that the input can be immediately detected.
+            if (waitForHelperMenu && ColorPickerLineMenu.TryGetColor(out Color color1))
+            {
+                pickedColor = color1;
+                waitForHelperMenu = false;
+                finishChosingColor = true;
             }
             return false;
         }
@@ -121,17 +132,30 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void PickingPrimaryColor()
         {
-            if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit) 
+            if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit)
                 && !isInAction)
             {
                 isInAction = true;
                 GameObject hitObject = raycastHit.collider.gameObject;
+
+                /// Check for the case that a child object of a drawable type object was clicked.
+                if (!Tags.DrawableTypes.Contains(hitObject.tag)
+                    && !hitObject.CompareTag(Tags.Drawable)
+                    && hitObject.transform.parent != null)
+                {
+                    hitObject = hitObject.transform.parent.gameObject;
+                }
 
                 switch (hitObject.tag)
                 {
                     case Tags.Line:
                         LineConf line = LineConf.GetLine(hitObject);
                         pickedColor = line.PrimaryColor;
+                        if (line.ColorKind != GameDrawer.ColorKind.Monochrome && line.FillOutStatus)
+                        {
+                            ColorPickerLineMenu.Enable(hitObject);
+                            waitForHelperMenu = true;
+                        }
                         break;
                     case Tags.DText:
                         pickedColor = hitObject.GetComponent<TextMeshPro>().color;
@@ -164,6 +188,14 @@ namespace SEE.Controls.Actions.Drawable
                 isInAction = true;
                 GameObject hitObject = raycastHit.collider.gameObject;
 
+                /// Check for the case that a child object of a drawable type object was clicked.
+                if (!Tags.DrawableTypes.Contains(hitObject.tag)
+                    && !hitObject.CompareTag(Tags.Drawable)
+                    && hitObject.transform.parent != null)
+                {
+                    hitObject = hitObject.transform.parent.gameObject;
+                }
+
                 switch (hitObject.tag)
                 {
                     case Tags.Line:
@@ -172,6 +204,11 @@ namespace SEE.Controls.Actions.Drawable
                         if (line.ColorKind == GameDrawer.ColorKind.Monochrome)
                         {
                             pickedColor = line.PrimaryColor;
+                        }
+                        if (line.ColorKind != GameDrawer.ColorKind.Monochrome && line.FillOutStatus)
+                        {
+                            ColorPickerLineMenu.Enable(hitObject);
+                            waitForHelperMenu = true;
                         }
                         break;
                     case Tags.DText:

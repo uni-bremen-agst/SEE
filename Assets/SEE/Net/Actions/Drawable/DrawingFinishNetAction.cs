@@ -23,7 +23,12 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The filled out color, if the line should be filled out.
         /// </summary>
-        public Color? FillOutColor;
+        public Color FillOutColor;
+
+        /// <summary>
+        /// Whether the fill out should be set or not.
+        /// </summary>
+        public bool FillOutStatus;
 
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
@@ -38,7 +43,15 @@ namespace SEE.Net.Actions.Drawable
         {
             LineID = lineID;
             Loop = loop;
-            FillOutColor = fillOutColor;
+            if (fillOutColor != null)
+            {
+                FillOutStatus = true;
+                FillOutColor = fillOutColor.Value;
+            } else
+            {
+                FillOutStatus = false;
+                FillOutColor = Color.clear;
+            }
         }
 
         /// <summary>
@@ -50,7 +63,13 @@ namespace SEE.Net.Actions.Drawable
             base.ExecuteOnClient();
             if (LineID != null && LineID != "")
             {
-                GameDrawer.FinishDrawing(FindChild(LineID), Loop, FillOutColor);
+                if (FillOutStatus)
+                {
+                    GameDrawer.FinishDrawing(FindChild(LineID), Loop, FillOutColor);
+                } else
+                {
+                    GameDrawer.FinishDrawing(FindChild(LineID), Loop, null);
+                }
             }
             else
             {

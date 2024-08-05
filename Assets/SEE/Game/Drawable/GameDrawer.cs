@@ -243,7 +243,7 @@ namespace SEE.Game.Drawable
             /// Ensure that all points of the line have a z-axis value of 0.
             UpdateZPositions(ref positions);
             renderer.SetPositions(positions);
-            
+
             if (fillOutColor != null && FillOut(line, fillOutColor))
             {
                 GameFinder.FindChild(line, ValueHolder.FillOut).GetComponent<MeshCollider>().enabled = false;
@@ -280,7 +280,8 @@ namespace SEE.Game.Drawable
         /// <param name="line">The line for which drawing is to be finished.</param>
         /// <param name="loop">Option to connect the line endpoint with the starting point.</param>
         /// <param name="fillOutColor">The color for fill out the line; null if the line should not filled out.</param>
-        public static void FinishDrawing(GameObject line, bool loop, Color? fillOutColor = null)
+        /// <param name="showInfo">Whether the information of the fill out should be shown.</param>
+        public static void FinishDrawing(GameObject line, bool loop, Color? fillOutColor = null, bool showInfo = true)
         {
             LineRenderer renderer = GetRenderer(line);
             MeshCollider meshCollider = GetMeshCollider(line);
@@ -291,7 +292,7 @@ namespace SEE.Game.Drawable
             {
                 meshCollider.sharedMesh = mesh;
             }
-            if (fillOutColor != null && FillOut(line, fillOutColor.Value, true))
+            if (fillOutColor != null && FillOut(line, fillOutColor.Value, showInfo))
             {
                 GameFinder.FindChild(line, ValueHolder.FillOut).GetComponent<MeshCollider>().enabled = true;
             }
@@ -415,7 +416,7 @@ namespace SEE.Game.Drawable
                 line.GetComponent<OrderInLayerValueHolder>().OrderInLayer = orderInLayer;
                 line.GetComponent<AssociatedPageHolder>().AssociatedPage = associatedPage;
                 Drawing(line, positions);
-                FinishDrawing(line, loop, fillOutColor);
+                FinishDrawing(line, loop, fillOutColor, false);
 
                 return line;
             }
@@ -430,7 +431,7 @@ namespace SEE.Game.Drawable
                 line.transform.localPosition = position;
 
                 renderer.SetPositions(positions);
-                FinishDrawing(line, loop, fillOutColor);
+                FinishDrawing(line, loop, fillOutColor, false);
 
                 return line;
             }
@@ -861,7 +862,7 @@ namespace SEE.Game.Drawable
         /// <returns>True if the fill out was successfully, false if not.</returns>
         public static bool FillOut(GameObject line, Color? color = null, bool showInfo = false)
         {
-            if (line.CompareTag(Tags.Line) 
+            if (line.CompareTag(Tags.Line)
                 && DifferentPositionCounter(line) > 2)
             {
                 GameObject fillOut;
@@ -870,11 +871,7 @@ namespace SEE.Game.Drawable
                 if (!GameFinder.FindChild(line, ValueHolder.FillOut))
                 {
                     fillOut = new(ValueHolder.FillOut);
-                    GameObject holder = GameFinder.HasParent(line)
-                        && Tags.DrawableTypes.Contains(line.transform.parent.tag) ?
-                            line.transform.parent.gameObject : line;
-
-                    fillOut.transform.SetParent(holder.transform);
+                    fillOut.transform.SetParent(line.transform);
                     fillOut.transform.rotation = line.transform.rotation;
                     Vector3 pos = line.transform.position;
                     /// To avoid an overlapping issue, position the fill slightly behind the line.
@@ -893,6 +890,7 @@ namespace SEE.Game.Drawable
                     fillOut = GameFinder.FindChild(line, ValueHolder.FillOut);
                     meshFilter = fillOut.GetComponent<MeshFilter>();
                     collider = fillOut.GetComponent <MeshCollider>();
+                    GameEdit.ChangeFillOutColor(line, color ?? line.GetColor());
                 }
                 Vector3[] worldPos = new Vector3[line.GetComponent<LineRenderer>().positionCount];
                 line.GetComponent<LineRenderer>().GetPositions(worldPos);
@@ -933,6 +931,10 @@ namespace SEE.Game.Drawable
                 {
                     ShowNotification.Info("Fill out cannot be applied.",
                         "The fill out cannot be applied because the selected object either is no line or has too few points.");
+                }
+                if (GameFinder.FindChild(line, ValueHolder.FillOut))
+                {
+                    Destroyer.Destroy(GameFinder.FindChild(line, ValueHolder.FillOut));
                 }
                 return false;
             }
