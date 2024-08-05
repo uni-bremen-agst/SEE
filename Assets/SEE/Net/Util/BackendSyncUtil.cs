@@ -188,7 +188,7 @@ namespace SEE.Net.Util
                         catch (Exception e)
                         {
                             Debug.LogError($"Error unzipping file: {file.Name}");
-                            Debug.LogError(e);
+                            Debug.LogError(e + "\n");
                         }
                     }
                 }
@@ -198,7 +198,7 @@ namespace SEE.Net.Util
                     Debug.LogError(e);
                 }
             }
-            Debug.Log("Done downloading!");
+            Debug.Log("Done downloading!\n");
         }
 
         /// <summary>
@@ -211,8 +211,8 @@ namespace SEE.Net.Util
         /// <param name="stripSingleRootDir">Determines if a single root directory is stripped during extraction (if present).</param>
         private static void Unzip(string relativeZipPath, string relativeTtargetPath, bool stripSingleRootDir = false)
         {
-            var zipPath = System.IO.Path.Combine(Application.streamingAssetsPath, relativeZipPath);
-            var targetPath = System.IO.Path.Combine(Application.streamingAssetsPath, relativeTtargetPath);
+            var zipPath = Path.Combine(Application.streamingAssetsPath, relativeZipPath);
+            var targetPath = Path.Combine(Application.streamingAssetsPath, relativeTtargetPath);
             if (!File.Exists(zipPath))
             {
                 throw new IOException($"The file does not exist: '{zipPath}'");
@@ -253,7 +253,7 @@ namespace SEE.Net.Util
         {
             if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(path))
             {
-                Debug.LogWarning("Parameters must not be empty!");
+                Debug.LogWarning("Parameters must not be empty!\n");
                 return false;
             }
             var targetPath = System.IO.Path.Combine(Application.streamingAssetsPath, path);
@@ -302,7 +302,7 @@ namespace SEE.Net.Util
 
                 if (signinRequest.result != UnityWebRequest.Result.Success)
                 {
-                    Debug.LogError("Login to the backend was NOT successful!");
+                    Debug.LogError("Login to the backend was NOT successful!\n");
                     Debug.LogError(signinRequest.error);
                     return false;
                 }
@@ -328,7 +328,7 @@ namespace SEE.Net.Util
 
                 if (fetchRequest.result != UnityWebRequest.Result.Success)
                 {
-                    Debug.LogWarning("Fetching files for server failed!");
+                    Debug.LogWarning("Fetching files for server failed!\n");
                     Debug.Log(fetchRequest.error);
                     return null;
                 }
@@ -349,7 +349,7 @@ namespace SEE.Net.Util
                 string path = System.IO.Path.Combine(Application.streamingAssetsPath, serverContentDirectory, city);
                 if (Directory.Exists(path))
                 {
-                    Debug.Log($"Found {city}...");
+                    Debug.Log($"Found {city}...\n");
                     await LoadCityAsync(path, cities[city]);
                 }
             }
@@ -367,11 +367,11 @@ namespace SEE.Net.Util
             string configPath = GetCfg(dirPath);
             if (string.IsNullOrWhiteSpace(configPath))
             {
-                Debug.Log($"No SEECity configuration found in: {dirPath}");
+                Debug.Log($"No SEECity configuration found in: {dirPath}\n");
                 return;
             }
 
-            Debug.Log($"Loading SEECity configuration from: {configPath}");
+            Debug.Log($"Loading SEECity configuration from: {configPath}\n");
             seeCity.ConfigurationPath = new DataPath(configPath);
             seeCity.LoadConfiguration();
             await seeCity.LoadDataAsync();
