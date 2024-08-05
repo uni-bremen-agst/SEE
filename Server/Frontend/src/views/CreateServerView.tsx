@@ -106,7 +106,7 @@ function CreateServerView() {
         aria-describedby="remove-user-modal-description">
         <Box sx={modalStyle}>
           <Typography id="modal-title" variant="h6" sx={{ marginBottom: "6pt" }}>
-            Select Project Type
+            Select Code City Type
           </Typography>
           <Stack direction="column" spacing={1}>
             {availableProjectTypes.filter(([, active]) => active === true).map(([projectType]) =>
@@ -164,7 +164,7 @@ function CreateServerView() {
                     }
                   </Stack>
                   <Button variant="contained" color="primary" sx={{ borderRadius: "25px", marginTop: "6pt" }} onClick={() => setFileTypeModalOpen(true)}>
-                    Add Project
+                    Add Code City
                   </Button>
                 </Card>
               </Stack>
