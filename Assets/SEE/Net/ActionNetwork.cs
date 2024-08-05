@@ -1,7 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using SEE.Net.Actions;
 using SEE.Net.Util;
-using System;
 using System.Linq;
 using Unity.Collections;
 using Unity.Netcode;
@@ -22,7 +21,7 @@ namespace SEE.Net
         /// <summary>
         /// Fetches the multiplayer city files from the backend on the server or host.
         /// </summary>
-        public void Start()
+        private void Start()
         {
             if (!IsServer && !IsHost)
             {
@@ -60,16 +59,15 @@ namespace SEE.Net
                 ulong senderId = rpcParams.Receive.SenderClientId;
                 ExecuteActionClientRpc(serializedAction, RpcTarget.Not(senderId, RpcTargetUse.Temp));
             }
-            else {
-                using (var targetClientIds = new NativeArray<ulong>(recipientIds, Allocator.Temp))
-                {
-                    ExecuteActionClientRpc(serializedAction, RpcTarget.Group(targetClientIds, RpcTargetUse.Temp));
-                }
+            else
+            {
+                using NativeArray<ulong> targetClientIds = new NativeArray<ulong>(recipientIds, Allocator.Temp);
+                ExecuteActionClientRpc(serializedAction, RpcTarget.Group(targetClientIds, RpcTargetUse.Temp));
             }
         }
 
         /// <summary>
-        /// Request client synchronization.
+        /// Requests client synchronization.
         /// This RPC is called by the client to initiate the synchronization process.
         /// </summary>
         [Rpc(SendTo.Server)]
@@ -97,7 +95,7 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Executes an Action, even if the sender and this client are the same, this is used
+        /// Executes an action, even if the sender and this client are the same. This is used
         /// for synchronizing server state.
         /// </summary>
         [Rpc(SendTo.NotServer, AllowTargetOverride = true)]
