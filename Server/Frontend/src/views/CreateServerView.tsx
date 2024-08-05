@@ -81,6 +81,9 @@ function CreateServerView() {
 
     let success = true;
     for (let i = 0; i < files.length; i++) {
+      if (!files[i]._localfile) {
+        continue;
+      }
       const projectFile: SeeFile = files[i];
       const form = new FormData();
       form.append("id", createServerResponse.data.id);
