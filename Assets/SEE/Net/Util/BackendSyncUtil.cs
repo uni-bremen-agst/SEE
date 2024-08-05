@@ -148,7 +148,7 @@ namespace SEE.Net.Util
         private static void ClearMultiplayerData()
         {
             // This should be safe to clear as files are downloaded from the backend each time SEE starts.
-            string multiplayerDataPath = System.IO.Path.Combine(Application.streamingAssetsPath, serverContentDirectory);
+            string multiplayerDataPath = Path.Combine(Application.streamingAssetsPath, serverContentDirectory);
             if (Directory.Exists(multiplayerDataPath))
             {
                 Directory.Delete(multiplayerDataPath, true);
@@ -170,20 +170,20 @@ namespace SEE.Net.Util
             }
 
             List<FileData> files = await GetFilesAsync(Network.ServerId);
-            Debug.Log($"Downloading {files.Count} files to: {System.IO.Path.Combine(Application.streamingAssetsPath, serverContentDirectory)}.\n");
+            Debug.Log($"Downloading {files.Count} files to: {Path.Combine(Application.streamingAssetsPath, serverContentDirectory)}.\n");
             foreach (FileData file in files)
             {
                 try
                 {
                     Debug.Log($"Downloading file: {file.Name}");
-                    string localFileName = System.IO.Path.Combine(serverContentDirectory, file.Name);
+                    string localFileName = Path.Combine(serverContentDirectory, file.Name);
                     bool success = await DownloadFileAsync(file.Id, localFileName);
                     if (success && file.ContentType.ToLower() == "application/zip")
                     {
                         Debug.Log($"Extracting ZIP file: {file.Name}.\n");
                         try
                         {
-                            Unzip(localFileName, System.IO.Path.Combine(serverContentDirectory, file.ProjectType), true);
+                            Unzip(localFileName, Path.Combine(serverContentDirectory, file.ProjectType), true);
                         }
                         catch (Exception e)
                         {
@@ -194,8 +194,8 @@ namespace SEE.Net.Util
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"Error downloading file: {file.Name}");
-                    Debug.LogError(e);
+                    Debug.LogError($"Error downloading file: {file.Name}.\n");
+                    Debug.LogError(e + "\n");
                 }
             }
             Debug.Log("Done downloading!\n");
@@ -211,18 +211,18 @@ namespace SEE.Net.Util
         /// <param name="stripSingleRootDir">Determines if a single root directory is stripped during extraction (if present).</param>
         private static void Unzip(string relativeZipPath, string relativeTtargetPath, bool stripSingleRootDir = false)
         {
-            var zipPath = Path.Combine(Application.streamingAssetsPath, relativeZipPath);
-            var targetPath = Path.Combine(Application.streamingAssetsPath, relativeTtargetPath);
+            string zipPath = Path.Combine(Application.streamingAssetsPath, relativeZipPath);
+            string targetPath = Path.Combine(Application.streamingAssetsPath, relativeTtargetPath);
             if (!File.Exists(zipPath))
             {
                 throw new IOException($"The file does not exist: '{zipPath}'");
             }
 
             string now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
-            string tempTargetPath = System.IO.Path.Combine(Application.streamingAssetsPath, serverContentDirectory, "tmp_" + now);
+            string tempTargetPath = Path.Combine(Application.streamingAssetsPath, serverContentDirectory, "tmp_" + now);
             ZipFile.ExtractToDirectory(zipPath, tempTargetPath);
 
-            var dirs = Directory.GetDirectories(tempTargetPath);
+            string[] dirs = Directory.GetDirectories(tempTargetPath);
             bool doStripSingleRootDir = stripSingleRootDir && Directory.GetFiles(tempTargetPath).Length == 0 && dirs.Length == 1;
             if (doStripSingleRootDir)
             {
@@ -256,33 +256,31 @@ namespace SEE.Net.Util
                 Debug.LogWarning("Parameters must not be empty!\n");
                 return false;
             }
-            var targetPath = System.IO.Path.Combine(Application.streamingAssetsPath, path);
+            string targetPath = Path.Combine(Application.streamingAssetsPath, path);
             if (File.Exists(targetPath))
             {
                 throw new IOException($"The file already exists: '{targetPath}'");
             }
 
             string url = Network.ClientRestAPI + "file/download?id=" + id;
-            using (UnityWebRequest getRequest = UnityWebRequest.Get(url))
-            {
-                getRequest.downloadHandler = new DownloadHandlerFile(targetPath);
-                UnityWebRequestAsyncOperation asyncOp = getRequest.SendWebRequest();
-                await asyncOp.ToUniTask();
+            using UnityWebRequest getRequest = UnityWebRequest.Get(url);
+            getRequest.downloadHandler = new DownloadHandlerFile(targetPath);
+            UnityWebRequestAsyncOperation asyncOp = getRequest.SendWebRequest();
+            await asyncOp.ToUniTask();
 
-                if (getRequest.result != UnityWebRequest.Result.Success)
-                {
-                    Debug.LogError(getRequest.error);
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError(getRequest.error);
+                return false;
+            }
+            else
+            {
+                return true;
             }
         }
 
         /// <summary>
-        /// Asynchronously logs in to the backend by sending a POST request to the user/signin endpoint.
+        /// Asynchronously logs into the backend by sending a POST request to the user/signin endpoint.
         /// If the login is successful, the server responds with a cookie containing a JWT (JSON Web Token)
         /// that is stored in Unity's cookie cache and used for subsequent API calls.
         /// </summary>
@@ -294,22 +292,20 @@ namespace SEE.Net.Util
         {
             string url = Network.ClientRestAPI + "user/signin";
             string postBody = new LoginData(Network.ServerId, Network.Instance.RoomPassword);
-            UnityWebRequest.ClearCookieCache(new System.Uri(url));
-            using (UnityWebRequest signinRequest = UnityWebRequest.Post(url, postBody, "application/json"))
-            {
-                UnityWebRequestAsyncOperation asyncOp = signinRequest.SendWebRequest();
-                await asyncOp.ToUniTask();
+            UnityWebRequest.ClearCookieCache(new Uri(url));
+            using UnityWebRequest signinRequest = UnityWebRequest.Post(url, postBody, "application/json");
+            UnityWebRequestAsyncOperation asyncOp = signinRequest.SendWebRequest();
+            await asyncOp.ToUniTask();
 
-                if (signinRequest.result != UnityWebRequest.Result.Success)
-                {
-                    Debug.LogError("Login to the backend was NOT successful!\n");
-                    Debug.LogError(signinRequest.error);
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
+            if (signinRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Login to the backend was NOT successful!\n");
+                Debug.LogError(signinRequest.error);
+                return false;
+            }
+            else
+            {
+                return true;
             }
         }
 
@@ -321,21 +317,19 @@ namespace SEE.Net.Util
         private static async UniTask<List<FileData>> GetFilesAsync(string serverId)
         {
             string url = Network.ClientRestAPI + "server/files?id=" + serverId;
-            using (UnityWebRequest fetchRequest = UnityWebRequest.Get(url))
-            {
-                UnityWebRequestAsyncOperation operation = fetchRequest.SendWebRequest();
-                await operation.ToUniTask();
+            using UnityWebRequest fetchRequest = UnityWebRequest.Get(url);
+            UnityWebRequestAsyncOperation operation = fetchRequest.SendWebRequest();
+            await operation.ToUniTask();
 
-                if (fetchRequest.result != UnityWebRequest.Result.Success)
-                {
-                    Debug.LogWarning("Fetching files for server failed!\n");
-                    Debug.Log(fetchRequest.error);
-                    return null;
-                }
-                else
-                {
-                    return FileDataList.FromJson(fetchRequest.downloadHandler.text).Items;
-                }
+            if (fetchRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogWarning("Fetching files for server failed!\n");
+                Debug.Log(fetchRequest.error);
+                return null;
+            }
+            else
+            {
+                return FileDataList.FromJson(fetchRequest.downloadHandler.text).Items;
             }
         }
 
@@ -344,9 +338,9 @@ namespace SEE.Net.Util
         /// </summary>
         private static async UniTask LoadCitiesAsync()
         {
-            foreach (var city in cities.Keys)
+            foreach (string city in cities.Keys)
             {
-                string path = System.IO.Path.Combine(Application.streamingAssetsPath, serverContentDirectory, city);
+                string path = Path.Combine(Application.streamingAssetsPath, serverContentDirectory, city);
                 if (Directory.Exists(path))
                 {
                     Debug.Log($"Found {city}...\n");
@@ -360,8 +354,8 @@ namespace SEE.Net.Util
         /// </summary>
         private static async UniTask LoadCityAsync(string dirPath, string gameObjectPath)
         {
-            var codeCity = GameObject.Find(gameObjectPath);
-            var seeCity = codeCity.GetComponent<SEECity>() as SEECity;
+            GameObject codeCity = GameObject.Find(gameObjectPath);
+            SEECity seeCity = codeCity.GetComponent<SEECity>() as SEECity;
             seeCity.Reset();
 
             string configPath = GetCfg(dirPath);
@@ -386,14 +380,12 @@ namespace SEE.Net.Util
         /// </returns>
         private static string GetCfg(string dir)
         {
-            string dirPath = System.IO.Path.Combine(Application.streamingAssetsPath, dir);
-            var filePaths = Directory.EnumerateFiles(dirPath, "*.cfg", SearchOption.TopDirectoryOnly);
-            foreach (string filePath in filePaths)
+            string dirPath = Path.Combine(Application.streamingAssetsPath, dir);
+            foreach (string filePath in Directory.EnumerateFiles(dirPath, "*.cfg", SearchOption.TopDirectoryOnly))
             {
                 return filePath;
             }
             return null;
         }
-
     }
 }
