@@ -133,7 +133,7 @@ namespace SEE.Net.Util
                 ClearMultiplayerData();
                 await DownloadAllFilesAsync();
             }
-            Debug.Log("Initializing Multiplayer Cities...");
+            Debug.Log("Initializing Multiplayer Cities...\n");
             await LoadCitiesAsync();
         }
 
@@ -156,44 +156,44 @@ namespace SEE.Net.Util
         /// </summary>
         private static async UniTask DownloadAllFilesAsync()
         {
-            Debug.Log($"Backend API URL is: {Network.ClientRestAPI}");
+            Debug.Log($"Backend API URL is: {Network.ClientRestAPI}\n");
 
             if (!await LogInAsync())
             {
-                Debug.LogError("Unable to download files!");
+                Debug.LogError("Unable to download files!\n");
                 return;
             }
 
             List<FileData> files = await GetFilesAsync(Network.ServerId);
-            Debug.Log($"Downloading {files.Count} files to: {System.IO.Path.Combine(Application.streamingAssetsPath, ServerContentDirectory)}");
+            Debug.Log($"Downloading {files.Count} files to: {System.IO.Path.Combine(Application.streamingAssetsPath, ServerContentDirectory)}\n");
             foreach (FileData file in files)
             {
                 try
                 {
-                    Debug.Log($"Downloading file: {file.name}");
+                    Debug.Log($"Downloading file: {file.name}\n");
                     string localFileName = System.IO.Path.Combine(ServerContentDirectory, file.name);
                     bool success = await DownloadFileAsync(file.id, localFileName);
                     if (success && file.contentType.ToLower() == "application/zip")
                     {
-                        Debug.Log($"Extracting ZIP file: {file.name}");
+                        Debug.Log($"Extracting ZIP file: {file.name}\n");
                         try
                         {
                             Unzip(localFileName, System.IO.Path.Combine(ServerContentDirectory, file.projectType), true);
                         }
                         catch (Exception e)
                         {
-                            Debug.LogError($"Error unzipping file: {file.name}");
+                            Debug.LogError($"Error unzipping file: {file.name}\n");
                             Debug.LogError(e);
                         }
                     }
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"Error downloading file: {file.name}");
+                    Debug.LogError($"Error downloading file: {file.name}\n");
                     Debug.LogError(e);
                 }
             }
-            Debug.Log("Done downloading!");
+            Debug.Log("Done downloading!\n");
         }
 
         /// <summary>
@@ -248,7 +248,7 @@ namespace SEE.Net.Util
         {
             if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(path))
             {
-                Debug.LogWarning("Parameters must not be empty!");
+                Debug.LogWarning("Parameters must not be empty!\n");
                 return false;
             }
             var targetPath = System.IO.Path.Combine(Application.streamingAssetsPath, path);
@@ -297,7 +297,7 @@ namespace SEE.Net.Util
 
                 if (signinRequest.result != UnityWebRequest.Result.Success)
                 {
-                    Debug.LogError("Login to the backend was NOT successful!");
+                    Debug.LogError("Login to the backend was NOT successful!\n");
                     Debug.LogError(signinRequest.error);
                     return false;
                 }
@@ -323,7 +323,7 @@ namespace SEE.Net.Util
 
                 if (fetchRequest.result != UnityWebRequest.Result.Success)
                 {
-                    Debug.LogWarning("Fetching files for server failed!");
+                    Debug.LogWarning("Fetching files for server failed!\n");
                     Debug.Log(fetchRequest.error);
                     return null;
                 }
@@ -344,7 +344,7 @@ namespace SEE.Net.Util
                 string path = System.IO.Path.Combine(Application.streamingAssetsPath, ServerContentDirectory, city);
                 if (Directory.Exists(path))
                 {
-                    Debug.Log($"Found {city}...");
+                    Debug.Log($"Found {city}...\n");
                     await LoadCityAsync(path, cities[city]);
                 }
             }
@@ -362,11 +362,11 @@ namespace SEE.Net.Util
             string configPath = GetCfg(dirPath);
             if (string.IsNullOrWhiteSpace(configPath))
             {
-                Debug.Log($"No SEECity configuration found in: {dirPath}");
+                Debug.Log($"No SEECity configuration found in: {dirPath}\n");
                 return;
             }
 
-            Debug.Log($"Loading SEECity configuration from: {configPath}");
+            Debug.Log($"Loading SEECity configuration from: {configPath}\n");
             seeCity.ConfigurationPath = new DataPath(configPath);
             seeCity.LoadConfiguration();
             await seeCity.LoadDataAsync();

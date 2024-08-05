@@ -25,11 +25,11 @@ namespace SEE.Net
         {
             if (!IsServer && !IsHost)
             {
-                Debug.Log("Starting client action network!");
+                Debug.Log("Starting client action network!\n");
                 RequestSynchronizationServerRpc();
                 return;
             }
-            Debug.Log("Starting server action network!");
+            Debug.Log("Starting server action network!\n");
             BackendSyncUtil.InitializeCitiesAsync().Forget();
         }
 
@@ -108,7 +108,7 @@ namespace SEE.Net
 
             if (rpcParams.Receive.SenderClientId != ServerClientId)
             {
-                Debug.LogWarning($"Received a ExecuteActionUnsafeClientRpc from client ID {rpcParams.Receive.SenderClientId}!");
+                Debug.LogWarning($"Received a ExecuteActionUnsafeClientRpc from client ID {rpcParams.Receive.SenderClientId}!\n");
                 return;
             }
 
@@ -129,7 +129,7 @@ namespace SEE.Net
 
             if (rpcParams.Receive.SenderClientId != ServerClientId)
             {
-                Debug.LogWarning($"Received a ExecuteActionClientRpc from client ID {rpcParams.Receive.SenderClientId}!");
+                Debug.LogWarning($"Received a ExecuteActionClientRpc from client ID {rpcParams.Receive.SenderClientId}!\n");
                 return;
             }
 
@@ -154,7 +154,7 @@ namespace SEE.Net
 
             if (rpcParams.Receive.SenderClientId != ServerClientId)
             {
-                Debug.LogWarning($"Received a SyncFilesClientRpc from client ID {rpcParams.Receive.SenderClientId}!");
+                Debug.LogWarning($"Received a SyncFilesClientRpc from client ID {rpcParams.Receive.SenderClientId}!\n");
                 return;
             }
 
