@@ -114,7 +114,7 @@ namespace SEE.Net
             NetworkConfig networkConfig = networkManager.NetworkConfig;
             if (networkConfig == null)
             {
-                Debug.LogError("NetworkManager.Singleton has no valid NetworkConfig.\n");
+                Debug.LogError($"NetworkManager.Singleton has no valid {nameof(NetworkConfig)}.\n");
                 return null;
             }
             return networkConfig.NetworkTransport as UnityTransport;
@@ -303,7 +303,7 @@ namespace SEE.Net
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
             NetworkManager.Singleton.NetworkConfig.ConnectionApproval = true;
 #if UNITY_EDITOR
-            Debug.Log("Skipping parsing command-line parameters in Editor mode.");
+            Debug.Log("Skipping parsing command-line parameters in Editor mode.\n");
 #else
             ProcessCommandLineArguments();
 #endif
@@ -324,7 +324,7 @@ namespace SEE.Net
             bool launchAsServer = false;
 
             // Commented out because it logs the plaintext password!
-            Debug.Log($"Parsing {arguments.Length} command-line parameters"); //:\n{string.Join("; ", arguments)}");
+            Debug.Log($"Parsing {arguments.Length} command-line parameters.\n"); //:\n{string.Join("; ", arguments)}");
 
             // Check command line arguments
             // The first element in the array contains the file name of the executing program.
@@ -334,36 +334,36 @@ namespace SEE.Net
                 switch (arguments[i])
                 {
                     case portArgument:
-                        Debug.Log($"Found {portArgument} as parameter {i}");
+                        Debug.Log($"Found {portArgument} as parameter {i}.\n");
                         CheckArgumentValue(arguments, i, portArgument);
                         ServerPort = Int32.Parse(arguments[i + 1]);
                         i++; // skip one parameter
                         break;
                     case passwordArgument:
-                        Debug.Log($"Found {passwordArgument} as parameter {i}");
+                        Debug.Log($"Found {passwordArgument} as parameter {i}.\n");
                         CheckArgumentValue(arguments, i, passwordArgument);
                         RoomPassword = arguments[i + 1];
                         i++; // skip one parameter
                         break;
                     case domainArgument:
-                        Debug.Log($"Found {domainArgument} as parameter {i}");
+                        Debug.Log($"Found {domainArgument} as parameter {i}.\n");
                         CheckArgumentValue(arguments, i, domainArgument);
                         BackendDomain = arguments[i + 1];
                         i++; // skip one parameter
                         break;
                     case serverIdArgument:
-                        Debug.Log($"Found {serverIdArgument} as parameter {i}");
+                        Debug.Log($"Found {serverIdArgument} as parameter {i}.\n");
                         CheckArgumentValue(arguments, i, serverIdArgument);
                         ServerId = arguments[i + 1];
                         i++; // skip one parameter
                         break;
                     case launchAsServerArgument:
-                        Debug.Log($"Found {launchAsServerArgument} as parameter {i}");
+                        Debug.Log($"Found {launchAsServerArgument} as parameter {i}.\n");
                         // This argument does not have a value. It works as a flag.
                         launchAsServer = true;
                         break;
                     default:
-                        Debug.LogWarning($"Unknown command-line parameter {i} will be ignored: {arguments[i]}");
+                        Debug.LogWarning($"Unknown command-line parameter {i} will be ignored: {arguments[i]}.\n");
                         break;
                 }
             }
@@ -374,14 +374,14 @@ namespace SEE.Net
                 {
                     if (success)
                     {
-                        Debug.Log($"Server started successfully: {message}");
+                        Debug.Log($"Server started successfully: {message}.\n");
                     }
                     else
                     {
-                        Debug.LogError($"Starting server failed: {message}");
+                        Debug.LogError($"Starting server failed: {message}.\n");
                     }
                 };
-                Debug.LogWarning("Starting server...");
+                Debug.LogWarning("Starting server...\n");
                 StartServer(serverCallback);
             }
 
@@ -414,7 +414,7 @@ namespace SEE.Net
             }
             else
             {
-                Debug.LogError($"There is no game object named {serverName} in the scene.");
+                Debug.LogError($"There is no game object named {serverName} in the scene.\n");
                 return null;
             }
         }
@@ -730,7 +730,7 @@ namespace SEE.Net
         {
             if (RoomPassword == Encoding.ASCII.GetString(request.Payload))
             {
-                Debug.Log($"Client {request.ClientNetworkId} has sent correct room password.");
+                Debug.Log($"Client {request.ClientNetworkId} has sent correct room password.\n");
                 response.Approved = true;
 
             }
@@ -738,7 +738,7 @@ namespace SEE.Net
             {
                 response.Approved = false;
                 response.Reason = "Invalid password";
-                Debug.LogWarning($"Client {request.ClientNetworkId} has sent incorrect room password.");
+                Debug.LogWarning($"Client {request.ClientNetworkId} has sent incorrect room password.\n");
             }
         }
 
