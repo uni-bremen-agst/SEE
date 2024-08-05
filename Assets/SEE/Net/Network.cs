@@ -302,7 +302,11 @@ namespace SEE.Net
 
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
             NetworkManager.Singleton.NetworkConfig.ConnectionApproval = true;
+#if UNITY_EDITOR
+            Debug.Log("Skipping parsing command-line parameters in Editor mode.");
+#else
             ProcessCommandLineArguments();
+#endif
         }
 
         /// <summary>
