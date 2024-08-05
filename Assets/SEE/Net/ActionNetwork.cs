@@ -35,18 +35,6 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Syncs the current state of the server with the connecting client.
-        /// </summary>
-        [Rpc(SendTo.Server)]
-        public void SyncClientServerRpc(ulong clientId)
-        {
-            foreach (string serializedAction in Network.NetworkActionList.ToList())
-            {
-                ExecuteActionUnsafeClientRpc(serializedAction, RpcTarget.Single(clientId, RpcTargetUse.Temp));
-            }
-        }
-
-        /// <summary>
         /// Sends an action to all clients in the recipients list, or to all connected clients (except the sender) if <c>recipients</c> is <c>null</c>.
         /// </summary>
         [Rpc(SendTo.Server)]
@@ -97,11 +85,23 @@ namespace SEE.Net
         }
 
         /// <summary>
+        /// Syncs the current state of the server with the connecting client.
+        /// </summary>
+        [Rpc(SendTo.Server)]
+        internal void SyncClientServerRpc(ulong clientId)
+        {
+            foreach (string serializedAction in Network.NetworkActionList.ToList())
+            {
+                ExecuteActionUnsafeClientRpc(serializedAction, RpcTarget.Single(clientId, RpcTargetUse.Temp));
+            }
+        }
+
+        /// <summary>
         /// Executes an Action, even if the sender and this client are the same, this is used
         /// for synchronizing server state.
         /// </summary>
         [Rpc(SendTo.NotServer, AllowTargetOverride = true)]
-        public void ExecuteActionUnsafeClientRpc(string serializedAction, RpcParams rpcParams = default)
+        private void ExecuteActionUnsafeClientRpc(string serializedAction, RpcParams rpcParams = default)
         {
             if (IsHost || IsServer)
             {
@@ -122,7 +122,7 @@ namespace SEE.Net
         /// Executes an action on the client.
         /// </summary>
         [Rpc(SendTo.NotServer, AllowTargetOverride = true)]
-        public void ExecuteActionClientRpc(string serializedAction, RpcParams rpcParams = default)
+        private void ExecuteActionClientRpc(string serializedAction, RpcParams rpcParams = default)
         {
             if (IsHost || IsServer)
             {
@@ -147,7 +147,7 @@ namespace SEE.Net
         /// This RPC is called by the game server after the client has registered itself.
         /// </summary>
         [Rpc(SendTo.SpecifiedInParams)]
-        public void SyncFilesClientRpc(string backendServerId, string backendDomain, RpcParams rpcParams = default)
+        private void SyncFilesClientRpc(string backendServerId, string backendDomain, RpcParams rpcParams = default)
         {
             if (IsHost || IsServer)
             {

@@ -15,7 +15,7 @@ namespace SEE.Net.Util
     /// <summary>
     /// Utility to synchronize files from the SEE backend.
     /// </summary>
-    public class BackendSyncUtil
+    internal class BackendSyncUtil
     {
         /// <summary>
         /// Associates the Code City types with the paths to find the matching game objects.
@@ -117,7 +117,7 @@ namespace SEE.Net.Util
         /// <summary>
         /// Initializes the client by downloading files, synchronizing with the server and instantiating Code Cities.
         /// </summary>
-        public static async UniTask InitializeClientAsync()
+        internal static async UniTask InitializeClientAsync()
         {
             await InitializeCitiesAsync();
             Network.ActionNetworkInst.Value?.SyncClientServerRpc(NetworkManager.Singleton.LocalClientId);
@@ -126,7 +126,7 @@ namespace SEE.Net.Util
         /// <summary>
         /// Downloads the Multiplayer files and instantes Code Cities.
         /// </summary>
-        public static async UniTask InitializeCitiesAsync()
+        internal static async UniTask InitializeCitiesAsync()
         {
             if (!string.IsNullOrWhiteSpace(Network.ServerId) && !string.IsNullOrWhiteSpace(Network.BackendDomain))
             {
@@ -140,7 +140,7 @@ namespace SEE.Net.Util
         /// <summary>
         /// Deletes the multiplayer data and recreates the directory to prepare for downlaod.
         /// </summary>
-        public static void ClearMultiplayerData()
+        private static void ClearMultiplayerData()
         {
             // This should be safe to clear as files are downloaded from the backend each time SEE starts.
             string multiplayerDataPath = System.IO.Path.Combine(Application.streamingAssetsPath, ServerContentDirectory);
@@ -154,7 +154,7 @@ namespace SEE.Net.Util
         /// <summary>
         /// Retrieves all multiplayer files from the backend server.
         /// </summary>
-        public static async UniTask DownloadAllFilesAsync()
+        private static async UniTask DownloadAllFilesAsync()
         {
             Debug.Log($"Backend API URL is: {Network.ClientRestAPI}");
 
@@ -204,7 +204,7 @@ namespace SEE.Net.Util
         /// <param name="relativeZipPath">The path of the ZIP file to be extracted relative to the streaming assets.</param>
         /// <param name="relativeTtargetPath">The path of the target directory in which the file should be extracted relative to the streaming assets.</param>
         /// <param name="stripSingleRootDir">Determines if a single root directory is stripped during extraction (if present).</param>
-        public static void Unzip(string relativeZipPath, string relativeTtargetPath, bool stripSingleRootDir = false)
+        private static void Unzip(string relativeZipPath, string relativeTtargetPath, bool stripSingleRootDir = false)
         {
             var zipPath = System.IO.Path.Combine(Application.streamingAssetsPath, relativeZipPath);
             var targetPath = System.IO.Path.Combine(Application.streamingAssetsPath, relativeTtargetPath);
@@ -244,7 +244,7 @@ namespace SEE.Net.Util
         /// On successful retrieval, the file is stored with the specified path relative to the
         /// <c>Application.streamingAssetsPath</c>.
         /// </remarks>
-        public static async UniTask<bool> DownloadFileAsync(string id, string path)
+        private static async UniTask<bool> DownloadFileAsync(string id, string path)
         {
             if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(path))
             {
@@ -285,7 +285,7 @@ namespace SEE.Net.Util
         /// A <see cref="UniTask{bool}"/> indicating whether the login was successful.
         /// Returns <c>true</c> if the login is successful; otherwise, <c>false</c>.
         /// </returns>
-        public static async UniTask<bool> LogInAsync()
+        private static async UniTask<bool> LogInAsync()
         {
             string url = Network.ClientRestAPI + "user/signin";
             string postBody = new LoginData(Network.ServerId, Network.Instance.RoomPassword);
@@ -337,7 +337,7 @@ namespace SEE.Net.Util
         /// <summary>
         /// Loads all available Code Cities in the scene.
         /// </summary>
-        public static async UniTask LoadCitiesAsync()
+        private static async UniTask LoadCitiesAsync()
         {
             foreach (var city in cities.Keys)
             {
@@ -353,7 +353,7 @@ namespace SEE.Net.Util
         /// <summary>
         /// Loads a Code City in the scene.
         /// </summary>
-        public static async UniTask LoadCityAsync(string dirPath, string gameObjectPath)
+        private static async UniTask LoadCityAsync(string dirPath, string gameObjectPath)
         {
             var codeCity = GameObject.Find(gameObjectPath);
             var seeCity = codeCity.GetComponent<SEECity>() as SEECity;
@@ -379,7 +379,7 @@ namespace SEE.Net.Util
         /// <returns>
         /// The path of the first <c>.cfg</c> file that is found, or <c>null</c> if none was found.
         /// </returns>
-        public static string GetCfg(string dir)
+        private static string GetCfg(string dir)
         {
             string dirPath = System.IO.Path.Combine(Application.streamingAssetsPath, dir);
             var filePaths = Directory.EnumerateFiles(dirPath, "*.cfg", SearchOption.TopDirectoryOnly);
