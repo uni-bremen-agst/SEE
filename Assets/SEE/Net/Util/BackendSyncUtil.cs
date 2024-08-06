@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using Cysharp.Threading.Tasks;
+using Newtonsoft.Json;
 using SEE.Game.City;
 using SEE.Utils.Paths;
 using Unity.Netcode;
@@ -43,10 +44,12 @@ namespace SEE.Net.Util
             /// <summary>
             /// Name of the user.
             /// </summary>
+            [JsonProperty(PropertyName = "username", Required = Required.Always)]
             public string Username;
             /// <summary>
             /// Password of the user
             /// </summary>
+            [JsonProperty(PropertyName = "password", Required = Required.Always)]
             public string Password;
 
             public LoginData(string username, string password)
@@ -57,7 +60,7 @@ namespace SEE.Net.Util
 
             public readonly override string ToString()
             {
-                return JsonUtility.ToJson(this);
+                return JsonConvert.SerializeObject(this);
             }
 
             public static implicit operator string(LoginData loginData)
@@ -72,21 +75,27 @@ namespace SEE.Net.Util
         [System.Serializable]
         private struct FileData
         {
+            [JsonProperty(PropertyName = "id", Required = Required.Always)]
             public string Id;
+            [JsonProperty(PropertyName = "name", Required = Required.Always)]
             public string Name;
+            [JsonProperty(PropertyName = "contentType", Required = Required.Always)]
             public string ContentType;
+            [JsonProperty(PropertyName = "projectType", Required = Required.Always)]
             public string ProjectType;
+            [JsonProperty(PropertyName = "size")]
             public long Size;
+            [JsonProperty(PropertyName = "creationTime")]
             public long CreationTime;
 
             public static FileData FromJson(string json)
             {
-                return JsonUtility.FromJson<FileData>(json);
+                return JsonConvert.DeserializeObject<FileData>(json);
             }
 
             public readonly override string ToString()
             {
-                return JsonUtility.ToJson(this);
+                return JsonConvert.SerializeObject(this);
             }
 
             public static implicit operator string(FileData fileData)
@@ -97,25 +106,6 @@ namespace SEE.Net.Util
             public static implicit operator FileData(string json)
             {
                 return FromJson(json);
-            }
-        }
-
-        /// <summary>
-        /// A list of <c>FileData</c> for deserialization of server responses.
-        /// </summary>
-        [System.Serializable]
-        private class FileDataList
-        {
-            public List<FileData> Items;
-
-            public static FileDataList FromJson(string json)
-            {
-                return JsonUtility.FromJson<FileDataList>("{ \"items\": " + json + "}");
-            }
-
-            public override string ToString()
-            {
-                return Items.ToString();
             }
         }
 
@@ -329,7 +319,7 @@ namespace SEE.Net.Util
             }
             else
             {
-                return FileDataList.FromJson(fetchRequest.downloadHandler.text).Items;
+                return JsonConvert.DeserializeObject<List<FileData>>(fetchRequest.downloadHandler.text);
             }
         }
 
