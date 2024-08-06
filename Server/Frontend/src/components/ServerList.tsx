@@ -1,46 +1,47 @@
-import {Card, CardContent, Stack } from "@mui/material";
+import { Card, CardContent, Grid } from "@mui/material";
 import ServerListItem from "./ServerListItem";
 import { useContext, useEffect, useState } from "react";
 import Server from "../types/Server";
 import { AuthContext } from "../contexts/AuthContext";
+import AppUtils from "../utils/AppUtils";
 
 function ServerList() {
-  const {axiosInstance} = useContext(AuthContext);
+  const { axiosInstance } = useContext(AuthContext);
 
   const [servers, setServers] = useState<Server[]>([]);
 
-  useEffect(() => {
-    let isApiSubscribed = true;
-    const fetchServers = setInterval(() => {
-      axiosInstance.get("/server/all").then(
-        (response) => setServers(response.data)
-      )
-    }, 30000);
+  async function refreshData() {
+    await axiosInstance.get("/server/all").then(
+      (response) => {
+        setServers(response.data)
+        AppUtils.notifyOnline();
+      }
+    ).catch(
+      () => AppUtils.notifyOffline()
+    );
+  }
 
-    if(isApiSubscribed){
-      axiosInstance.get("/server/all").then(
-        (response) => setServers(response.data)
-      )
-    }
+  useEffect(() => {
+    refreshData();
+    const refreshInterval = setInterval(() => refreshData(), 10000);
     return () => {
-      isApiSubscribed = false;
-      clearInterval(fetchServers);
+      clearInterval(refreshInterval);
     }
   }, [])
-  
+
   return (
-    <Card elevation={0} sx={{margin: "2em 0 1em 0", maxHeight: "calc(100% - 150px)", overflow: "auto"}}>
-    <CardContent>
-      <Stack direction="column" spacing={2}>
+    <Card elevation={0} sx={{ margin: "2em 0 1em 0", maxHeight: "calc(100% - 150px)", overflow: "auto" }}>
+      <CardContent>
+        <Grid container spacing={2}>
           {
-            servers && servers.length > 0 ?
-              servers.map(
-                (server) => <ServerListItem server={server} key={server.id}/>
-              ) :
-              <></>
+            servers && servers.length ? servers.map((server) =>
+              <Grid key={server.id} item xs={12} sm={12} md={6} lg={6}>
+                <ServerListItem server={server} key={server.id} />
+              </Grid>
+            ) : <></>
           }
-      </Stack>
-    </CardContent>
+        </Grid>
+      </CardContent>
     </Card>
   )
 }
