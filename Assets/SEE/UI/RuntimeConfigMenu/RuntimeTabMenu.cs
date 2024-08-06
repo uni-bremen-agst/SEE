@@ -74,7 +74,7 @@ namespace SEE.UI.RuntimeConfigMenu
         private const string buttonPrefab = RuntimeConfigPrefabFolder + "RuntimeConfigButton";
 
         /// <summary>
-        /// Prefab for a add button.
+        /// Prefab for an add button.
         /// </summary>
         private const string addElementButtonPrefab = RuntimeConfigPrefabFolder + "RuntimeAddButton";
 
