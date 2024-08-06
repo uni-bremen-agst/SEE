@@ -88,7 +88,7 @@ namespace SEE.Net
                 List<Fragment> frags = new() { fragment };
                 fragmentsGatherer.Add(fragment.PacketID, frags);
             }
-            if (fragmentsGatherer.TryGetValue(fragment.PacketID, out List<Fragment> f) 
+            if (fragmentsGatherer.TryGetValue(fragment.PacketID, out List<Fragment> f)
                 && Fragment.CombineFragments(f) != "")
             {
                 BroadcastActServerRpc(fragment.PacketID, recipients);
@@ -106,7 +106,7 @@ namespace SEE.Net
             if (!IsServer && !IsHost)
             {
                 return;
-            } 
+            }
             if (fragmentsGatherer.TryGetValue(key, out List<Fragment> fragments))
             {
                 string serializedAction = Fragment.CombineFragments(fragments);
@@ -123,7 +123,7 @@ namespace SEE.Net
                         ClientActionNetwork clientNetwork = client.PlayerObject.GetComponent<ClientActionNetwork>();
                         foreach(Fragment fragment in fragments)
                         {
-                            clientNetwork.ReceiveActionClientRpc(fragment.PacketID, fragment.PacketSize, 
+                            clientNetwork.ReceiveActionClientRpc(fragment.PacketID, fragment.PacketSize,
                                 fragment.CurrentFragment, fragment.Data, recipients);
                         }
                     }

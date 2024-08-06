@@ -101,6 +101,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Add a new color to the list.
         /// Will be used from the create preset button in the line configuration menu.
+        /// Warning: This method is used by a prefab (Picker 2.0) and therefore has 0 references!
         /// </summary>
         public void CreatePresetButton()
         {
@@ -110,6 +111,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Assigns the chosen color to the color picker.
         /// Will be used from the preset boxes in the line configuration menu.
+        /// Warning: This method is used by a prefab (Picker 2.0) and therefore has 0 references!
         /// </summary>
         public void PresetSelect(Image sender)
         {
@@ -127,6 +129,7 @@ namespace SEE.UI.Drawable
 
         /// <summary>
         /// Removes the chosen color from the list.
+        /// Warning: This method is used by a prefab (Picker 2.0) and therefore has 0 references!
         /// </summary>
         public void RemoveColor(Image sender)
         {
@@ -135,6 +138,7 @@ namespace SEE.UI.Drawable
 
         /// <summary>
         /// Changes the chosen color from the list to the current color of the color picker.
+        /// Warning: This method is used by a prefab (Picker 2.0) and therefore has 0 references!
         /// </summary>
         public void ChangeColor(int index)
         {

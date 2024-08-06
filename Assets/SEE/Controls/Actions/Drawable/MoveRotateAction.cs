@@ -664,7 +664,7 @@ namespace SEE.Controls.Actions.Drawable
                         /// This code is needed because occasionally a trigger exit is not registered during rotation.
                         /// This block attempts to set the isInCollision value of the Collision Controller to false.
                         /// However, if the object is still in a collision, it will be set back to true by its OnStayCollision method.
-                        selectedObject.GetComponent<CollisionController>().TrySetCollisionToFalse();
+                        selectedObject.GetComponent<CollisionController>().SetCollisionToFalse();
                     }
                 }
             }

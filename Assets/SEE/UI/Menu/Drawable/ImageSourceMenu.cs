@@ -65,7 +65,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     gotSource = true;
                     chosenSource = Source.Local;
-                    Instance.Disable();
+                    Instance.Destroy();
                 });
 
                 /// Initialize the button for loading the image from the web.
@@ -75,7 +75,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     gotSource = true;
                     chosenSource = Source.Web;
-                    Instance.Disable();
+                    Instance.Destroy();
                 });
 
                 /// Initialize the button for canceling the menu.
@@ -83,7 +83,7 @@ namespace SEE.UI.Menu.Drawable
                     .GetComponent<ButtonManagerBasic>();
                 cancelBtn.clickEvent.AddListener(() =>
                 {
-                    Instance.Disable();
+                    Instance.Destroy();
                 });
             }
         }
@@ -100,7 +100,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 source = chosenSource;
                 gotSource = false;
-                Instance.Disable();
+                Instance.Destroy();
                 return true;
             }
 

@@ -203,7 +203,7 @@ namespace SEE.UI.Drawable
             layerChanger.AddComponent<ButtonHoverTooltip>().SetMessage("Change The Sorting Layer.");
             layerChanger.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
-                GlobalActionHistory.Execute(ActionStateTypes.MindMap);
+                GlobalActionHistory.Execute(ActionStateTypes.LayerChanger);
                 menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
             });
 

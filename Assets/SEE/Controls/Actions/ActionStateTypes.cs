@@ -230,12 +230,6 @@ namespace SEE.Controls.Actions
                     MoveRotateAction.CreateReversibleAction,
                     parent: Drawable);
 
-            MovePoint =
-                new("Move a Point", "Moves a point of a line.",
-                    Color.green.Darker().Darker(), "Materials/Charts/MoveIcon",
-                    MovePointAction.CreateReversibleAction,
-                    parent: Drawable);
-
             LayerChanger =
                 new("Change The Sorting Layer", "Left mouse click to increase, right mouse click to decrease the layer.",
                     Color.green.Darker(), "Materials/Drawable/Layer",
@@ -252,6 +246,12 @@ namespace SEE.Controls.Actions
                 new("Scale", "Scales a drawable. Mouse wheel up to scale up, mouse wheel down to scale down.",
                     Color.green.Darker(), "Materials/Drawable/Scale",
                     ScaleAction.CreateReversibleAction,
+                    parent: Drawable);
+
+            MovePoint =
+                new("Move a Point", "Moves a point of a line.",
+                    Color.green.Darker().Darker(), "Materials/Charts/MoveIcon",
+                    MovePointAction.CreateReversibleAction,
                     parent: Drawable);
 
             LineSplit =
@@ -332,10 +332,10 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType ColorPicker;
         public readonly static ActionStateType Edit;
         public readonly static ActionStateType MoveRotator;
-        public readonly static ActionStateType MovePoint;
         public readonly static ActionStateType LayerChanger;
         public readonly static ActionStateType CutCopyPaste;
         public readonly static ActionStateType Scale;
+        public readonly static ActionStateType MovePoint;
         public readonly static ActionStateType LineSplit;
         public readonly static ActionStateType LinePointErase;
         public readonly static ActionStateType LineConnectionErase;

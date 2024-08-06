@@ -32,6 +32,11 @@ namespace SEE.Game.UI.Menu.Drawable
         /// </summary>
         public static MindMapEditMenu Instance { get; private set; }
 
+        static MindMapEditMenu()
+        {
+            Instance = new MindMapEditMenu();
+        }
+
         /// <summary>
         /// Creates the edit menu for the given mind map node.
         /// It adds the necessary handler to the different buttons.
@@ -43,7 +48,7 @@ namespace SEE.Game.UI.Menu.Drawable
         /// or the child menu of the change node.</param>
         public static void Enable(GameObject node, DrawableType newValueHolder, bool returned = false)
         {
-            if (newValueHolder is MindMapNodeConf conf && Instance == null)
+            if (newValueHolder is MindMapNodeConf conf)
             {
                 /// Apply the changes from ChangeParent and ChangeNodeKind if returned.
                 if (returned)

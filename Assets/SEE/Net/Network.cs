@@ -408,7 +408,8 @@ namespace SEE.Net
         /// <param name="recipients">List of recipients to broadcast to, will broadcast to all if this is null.</param>
         public static void BroadcastAction(String serializedAction, ulong[] recipients)
         {
-            int maxPacketSize = 32000; /// TODO: Replace with the exact value
+            /// TODO(#754): Replace with the exact value.
+            int maxPacketSize = 32000;
             if (serializedAction.Length < maxPacketSize)
             {
                 ServerNetwork.Value?.BroadcastActionServerRpc(serializedAction, recipients);
@@ -692,9 +693,9 @@ namespace SEE.Net
         {
             NetworkClient cl = NetworkManager.Singleton.ConnectedClientsList.First(c => c.ClientId == client);
             while (cl.PlayerObject == null || cl.PlayerObject.GetComponent<ClientActionNetwork>() == null
-                /// Is necessary to ensure that the client player is sufficiently initialized before synchronization can begin. 
+                /// Is necessary to ensure that the client player is sufficiently initialized before synchronization can begin.
                 /// If the local camera on the client is not yet initialized, errors may occur when synchronizing <see cref="DrawableType"> objects.
-                || cl.PlayerObject.GetComponentInChildren<SkinnedMeshRenderer>() == null) 
+                || cl.PlayerObject.GetComponentInChildren<SkinnedMeshRenderer>() == null)
             {
                 await UniTask.Yield();
             }

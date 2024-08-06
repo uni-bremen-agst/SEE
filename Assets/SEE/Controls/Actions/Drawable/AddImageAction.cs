@@ -107,7 +107,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Stop()
         {
             base.Stop();
-            ImageSourceMenu.Instance.Disable();
+            ImageSourceMenu.Instance.Destroy();
         }
 
         /// <summary>

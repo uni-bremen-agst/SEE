@@ -29,6 +29,11 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         public static MindMapChangeNodeKindMenu Instance { get; private set; }
 
+        static MindMapChangeNodeKindMenu()
+        {
+            Instance = new MindMapChangeNodeKindMenu();
+        }
+
         /// <summary>
         /// The instance for the node kind selector.
         /// </summary>

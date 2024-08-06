@@ -31,29 +31,45 @@ namespace SEE.Game.Drawable.ValueHolders
         }
 
         /// <summary>
-        /// Decreases the order in layer by one.
+        /// The current description for this drawable surface.
         /// </summary>
-        public void Dec()
-        {
-            if (orderInLayer > 0)
-            {
-                orderInLayer--;
-            }
-        }
+        private string description = "";
 
         /// <summary>
         /// The description property.
         /// </summary>
-        public string Description { get; set; }
+        public string Description
+        {
+            get { return description; }
+            set { description = value; }
+        }
+
+        /// <summary>
+        /// The current selected page of this drawable surface.
+        /// </summary>
+        private int currentPage = 0;
 
         /// <summary>
         /// The current page property.
         /// </summary>
-        public int CurrentPage { get; set; }
+        public int CurrentPage
+        {
+            get { return currentPage; }
+            set { currentPage = value; }
+        }
+
+        /// <summary>
+        /// The current max page size for this drawable surface.
+        /// </summary>
+        private int maxPageSize = 1;
 
         /// <summary>
         /// The maximum page size property.
         /// </summary>
-        public int MaxPageSize { get; set; }
+        public int MaxPageSize
+        {
+            get { return maxPageSize; }
+            set { maxPageSize = value; }
+        }
     }
 }

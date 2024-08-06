@@ -7,6 +7,12 @@ namespace SEE.Game.Drawable.ValueHolders
     /// </summary>
     public class ImageValueHolder : MonoBehaviour
     {
+        ImageValueHolder()
+        {
+            Path = "";
+            URL = "";
+        }
+
         /// <summary>
         /// The byte file data property.
         /// </summary>

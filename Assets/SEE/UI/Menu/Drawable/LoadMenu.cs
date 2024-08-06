@@ -25,6 +25,11 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         public static LoadMenu Instance { get; private set; }
 
+        static LoadMenu()
+        {
+            Instance = new LoadMenu();
+        }
+
         /// <summary>
         /// The instance for the regular load drawable button.
         /// </summary>

@@ -236,8 +236,6 @@ namespace SEE.UI.Menu
                     {
                         searchInput.text = string.Empty;
                     }
-                    // FIXME: Can the following line be removed?
-                    //ResetToBase();
                 }
             };
         }

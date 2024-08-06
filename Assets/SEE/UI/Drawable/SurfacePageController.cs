@@ -1,6 +1,5 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
-using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Notification;
@@ -48,6 +47,9 @@ namespace SEE.UI.Drawable
         /// </summary>
         private DrawableHolder holder;
 
+        /// <summary>
+        /// Initializes the Surface Page Controller.
+        /// </summary>
         private void Awake()
         {
             forward = transform.Find("ForwardButton").GetComponent<ButtonManagerBasic>();
