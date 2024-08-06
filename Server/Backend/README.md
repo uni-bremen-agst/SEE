@@ -18,12 +18,12 @@ Please read the JavaDoc documentation for additional details.
 
 ### User Service
 
-Manages users and their passwords along with other metadata like role assignment.
+Manages users and their passwords along with other metadata like role assignment.<br>
 Data is stored in the relational database.
 
 ### Server Service
 
-Manages metadata on SEE game server instances and controls them using `ContainerService`.
+Manages metadata on SEE game server instances and controls them using `ContainerService`.<br>
 Data is stored in the relational database.
 
 ### Container Service
@@ -32,7 +32,7 @@ Manages SEE game server instances that are launched via Docker/Podman containers
 
 ### File Service
 
-The file service allows for storing and retrieving files that are required to render Code Cities in SEE clients.
+The file service allows for storing and retrieving files that are required to render Code Cities in SEE clients.<br>
 Metadata to identify and retrieve files are stored in the relational database, while the actual files are stored in the backend-local file system.
 
 
@@ -42,7 +42,7 @@ Metadata to identify and retrieve files are stored in the relational database, w
 This backend requires a container runtime to manage SEE game server instances.
 Refer to the README in the parent directory for additional considerations.
 
-The backend container image is configured in the `Dockerfile`.
+The backend container image is configured in the `Dockerfile`.<br>
 The complete stack, including back- and frontend, is configured vie `compose.yaml` in the parent directory.
 
 
