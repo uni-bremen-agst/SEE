@@ -1,6 +1,9 @@
 using System;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using MoreLinq;
+using SEE.Tools.LSP;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
@@ -53,6 +56,19 @@ namespace SEE.UI.Window.CodeWindow
         private int lines;
 
         /// <summary>
+        /// The LSP handler for this code window.
+        ///
+        /// Will only be set if the LSP feature is enabled and active for this code window.
+        /// </summary>
+        private LSPHandler lspHandler;
+
+        /// <summary>
+        /// The handler for the context menu of this code window, which provides various navigation options,
+        /// such as "Go to Definition" or "Find References".
+        /// </summary>
+        private ContextMenuHandler contextMenu;
+
+        /// <summary>
         /// Path to the code window content prefab.
         /// </summary>
         private const string codeWindowPrefab = "Prefabs/UI/CodeWindowContent";
@@ -88,26 +104,34 @@ namespace SEE.UI.Window.CodeWindow
         private static TMP_WordInfo? lastHoveredWord;
 
         /// <summary>
-        /// Visually marks the line at the given <paramref name="lineNumber"/> and scrolls to it.
-        /// Will also unmark any other line. Sets <see cref="markedLine"/> to
-        /// <paramref name="lineNumber"/>.
+        /// Whether the code window contains text.
+        /// </summary>
+        public bool ContainsText => text != null;
+
+        /// <summary>
+        /// Visually highlights the line number at the given <paramref name="lineNumber"/> and scrolls to it.
+        /// Will also unhighlight any other line. Sets <see cref="markedLine"/> to <paramref name="lineNumber"/>.
         /// Clears the markers for line numbers smaller than 1.
         /// </summary>
-        /// <param name="line">The line number of the line to mark and scroll to (1-indexed)</param>
+        /// <param name="line">The line number of the line to highlight and scroll to (1-indexed)</param>
         public void MarkLine(int lineNumber)
         {
+            const string markColor = "<color=#FF0000>";
+            int markColorLength = markColor.Length;
             markedLine = lineNumber;
-            string[] allLines = textMesh.text.Split('\n').Select(x => x.EndsWith("</mark>") ? x.Substring(16, x.Length - 16 - 7) : x).ToArray();
+            string[] allLines = textMesh.text.Split('\n')
+                                        .Select(x => x.StartsWith(markColor) ? $"<color=#CCCCCC>{x[markColorLength..]}" : x)
+                                        .ToArray();
             if (lineNumber < 1)
             {
-                textMesh.text = string.Join("\n", allLines);
+                text = string.Join("\n", allLines);
             }
             else
             {
-                string markLine = $"<mark=#ff000044>{allLines[lineNumber - 1]}</mark>";
-                textMesh.text = string.Join("\n", allLines.Take(lineNumber - 1).Append(markLine).Concat(allLines.Skip(lineNumber).Take(lines - lineNumber + 1)));
+                string markLine = $"{markColor}{allLines[lineNumber - 1][markColorLength..]}";
+                text = string.Join("\n", allLines.Exclude(lineNumber - 1, 1).Insert(new[] { markLine }, lineNumber - 1));
             }
-
+            textMesh.text = text;
         }
 
         #region Visible Line Calculation
@@ -166,13 +190,7 @@ namespace SEE.UI.Window.CodeWindow
                     DOTween.Sequence().Append(DOTween.To(() => ImmediateVisibleLine, f => ImmediateVisibleLine = f, value - 1, 1f))
                            .AppendCallback(() => scrollingTo = 0);
 
-                    // FIXME (#250): TMP bug: Large files cause issues with highlighting text. This is just a workaround.
-                    // See https://github.com/uni-bremen-agst/SEE/issues/250#issuecomment-819653373
-                    if (text.Length < 16382)
-                    {
-                        MarkLine(value);
-                    }
-
+                    MarkLine(value);
                     ScrollEvent.Invoke();
                 }
             }
@@ -201,7 +219,8 @@ namespace SEE.UI.Window.CodeWindow
                 }
                 else
                 {
-                    scrollRect.verticalNormalizedPosition = 1 - value / (lines - 1 - excessLines);
+                    scrollRect.verticalNormalizedPosition = 1 - (value-1) / (lines - 1 - excessLines);
+                    scrollRect.horizontalNormalizedPosition = 0;
                 }
             }
         }
@@ -225,17 +244,17 @@ namespace SEE.UI.Window.CodeWindow
 
             if (codeValues.Path != null)
             {
-                EnterFromFile(codeValues.Path);
+                EnterFromFileAsync(codeValues.Path).ContinueWith(() => ScrolledVisibleLine = codeValues.VisibleLine).Forget();
             }
             else if (codeValues.Text != null)
             {
                 EnterFromText(codeValues.Text.Split('\n'));
+                ScrolledVisibleLine = codeValues.VisibleLine;
             }
             else
             {
                 throw new ArgumentException("Invalid value object. Either FilePath or Text must not be null.");
             }
-            ScrolledVisibleLine = codeValues.VisibleLine;
         }
 
         public override void UpdateFromNetworkValueObject(WindowValues valueObject)

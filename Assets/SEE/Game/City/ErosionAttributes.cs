@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SEE.DataModel.DG;
 using SEE.Utils.Config;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SEE.Game.City
 {
@@ -34,9 +35,10 @@ namespace SEE.Game.City
         public float ErosionScalingFactor = 1.5f;
 
         /// <summary>
-        /// Whether code issues should be downloaded and shown in code viewers.
+        /// Whether code issues from the Axivion Dashboard should be downloaded and shown in code viewers.
         /// </summary>
-        public bool ShowIssuesInCodeWindow = false;
+        [FormerlySerializedAs("ShowIssuesInCodeWindow")]
+        public bool ShowDashboardIssuesInCodeWindow = false;
 
         /// <summary>
         /// The attribute name of the metric representing architecture violations.
@@ -129,7 +131,7 @@ namespace SEE.Game.City
             writer.BeginGroup(label);
             writer.Save(ShowInnerErosions, showInnerErosionsLabel);
             writer.Save(ShowLeafErosions, showLeafErosionsLabel);
-            writer.Save(ShowIssuesInCodeWindow, showIssuesInCodeWindowLabel);
+            writer.Save(ShowDashboardIssuesInCodeWindow, showIssuesInCodeWindowLabel);
             writer.Save(ErosionScalingFactor, erosionScalingFactorLabel);
 
             writer.Save(StyleIssue, styleIssueLabel);
@@ -162,7 +164,7 @@ namespace SEE.Game.City
 
                 ConfigIO.Restore(values, showInnerErosionsLabel, ref ShowInnerErosions);
                 ConfigIO.Restore(values, showLeafErosionsLabel, ref ShowLeafErosions);
-                ConfigIO.Restore(values, showIssuesInCodeWindowLabel, ref ShowIssuesInCodeWindow);
+                ConfigIO.Restore(values, showIssuesInCodeWindowLabel, ref ShowDashboardIssuesInCodeWindow);
                 ConfigIO.Restore(values, erosionScalingFactorLabel, ref ErosionScalingFactor);
 
                 ConfigIO.Restore(values, styleIssueLabel, ref StyleIssue);
@@ -190,7 +192,7 @@ namespace SEE.Game.City
         private const string showLeafErosionsLabel = "ShowLeafErosions";
         private const string showInnerErosionsLabel = "ShowInnerErosions";
         private const string erosionScalingFactorLabel = "ErosionScalingFactor";
-        private const string showIssuesInCodeWindowLabel = "ShowIssuesInCodeWindow";
+        private const string showIssuesInCodeWindowLabel = "ShowDashboardIssuesInCodeWindow";
 
         private const string styleIssueLabel = "StyleIssue";
         private const string universalIssueLabel = "UniversalIssue";

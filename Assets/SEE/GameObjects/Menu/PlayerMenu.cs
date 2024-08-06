@@ -85,12 +85,11 @@ namespace SEE.GO.Menu
 
                     if (child is ActionStateType actionStateType)
                     {
-                        MenuEntry menuEntry = new(selectAction: () => GlobalActionHistory.Execute(actionStateType),
-                                                  unselectAction: null,
-                                                  title: actionStateType.Name,
-                                                  description: actionStateType.Description,
-                                                  entryColor: actionStateType.Color,
-                                                  icon: Resources.Load<Sprite>(actionStateType.IconPath));
+                        MenuEntry menuEntry = new(SelectAction: () => GlobalActionHistory.Execute(actionStateType),
+                                                  Title: actionStateType.Name,
+                                                  Description: actionStateType.Description,
+                                                  EntryColor: actionStateType.Color,
+                                                  Icon: actionStateType.Icon);
                         entry = menuEntry;
                     }
                     else if (child is ActionStateTypeGroup actionStateTypeGroup)
@@ -99,7 +98,7 @@ namespace SEE.GO.Menu
                                                                           title: actionStateTypeGroup.Name,
                                                                           description: actionStateTypeGroup.Description,
                                                                           entryColor: actionStateTypeGroup.Color,
-                                                                          icon: Resources.Load<Sprite>(actionStateTypeGroup.IconPath));
+                                                                          icon: actionStateTypeGroup.Icon);
                         toNestedMenuEntry[actionStateTypeGroup] = nestedMenuEntry;
                         entry = nestedMenuEntry;
                     }

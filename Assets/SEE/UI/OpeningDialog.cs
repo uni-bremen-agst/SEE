@@ -53,34 +53,30 @@ namespace SEE.UI
 
             return new List<MenuEntry>
             {
-                new(selectAction: StartHost,
-                    unselectAction: null,
-                    title: "Host",
-                    description: "Starts a server and local client process.",
-                    entryColor: NextColor(),
-                    icon: Resources.Load<Sprite>("Icons/Host")),
+                new(SelectAction: StartHost,
+                    Title: "Host",
+                    Description: "Starts a server and local client process.",
+                    EntryColor: NextColor(),
+                    Icon: Icons.Broadcast),
 
-                new(selectAction: StartClient,
-                    unselectAction: null,
-                    title: "Client",
-                    description: "Starts a local client connection to a server.",
-                    entryColor: NextColor(),
-                    icon: Resources.Load<Sprite>("Icons/Client")),
+                new(SelectAction: StartClient,
+                    Title: "Client",
+                    Description: "Starts a local client connection to a server.",
+                    EntryColor: NextColor(),
+                    Icon: Icons.Link),
 
 #if ENABLE_VR
-                new(selectAction: ToggleEnvironment,
-                    unselectAction: null,
-                    title: "Toggle Desktop/VR",
-                    description: "Toggles between desktop and VR hardware.",
-                    entryColor: NextColor(),
-                    icon: Resources.Load<Sprite>("Icons/Client")),
+                new(SelectAction: ToggleEnvironment,
+                    Title: "Toggle Desktop/VR",
+                    Description: "Toggles between desktop and VR hardware.",
+                    EntryColor: NextColor(),
+                    Icon: Icons.VR),
 #endif
-                new(selectAction: Settings,
-                    unselectAction: null,
-                    title: "Settings",
-                    description: "Allows to set additional network settings.",
-                    entryColor: Color.gray,
-                    icon: Resources.Load<Sprite>("Icons/Settings")),
+                new(SelectAction: Settings,
+                    Title: "Settings",
+                    Description: "Allows to set additional network settings.",
+                    EntryColor: Color.gray,
+                    Icon: Icons.Gear)
             };
 
             Color NextColor()

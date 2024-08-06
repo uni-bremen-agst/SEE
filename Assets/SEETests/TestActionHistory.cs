@@ -8,7 +8,7 @@ namespace SEE.Utils.History
     /// <summary>
     /// Test cases for <see cref="SEE.Utils.ActionHistory"/>.
     /// </summary>
-    class TestActionHistory
+    internal class TestActionHistory
     {
         /// <summary>
         /// Shortcut to a constructor of <see cref="ActionStateType"/> that requires
@@ -23,7 +23,7 @@ namespace SEE.Utils.History
             /// <param name="createReversible">value for <see cref="CreateReversible"/></param>
             protected TestActionStateType(string name, CreateReversibleAction createReversible)
                 : base(name: name, description: "", color: UnityEngine.Color.white,
-                       iconPath: "", createReversible: createReversible, register: false)
+                       icon: ' ', createReversible: createReversible, register: false)
             {
             }
         }

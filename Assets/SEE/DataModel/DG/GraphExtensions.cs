@@ -29,17 +29,17 @@ namespace SEE.DataModel.DG
         /// <param name="equal">the elements in both graphs that have no differences according
         /// to <paramref name="diff"/>; it belongs to <paramref name="newGraph"/></param>
         public static void Diff<T>
-           (this Graph newGraph,
-            Graph oldGraph,
-            Func<Graph, IEnumerable<T>> getElements,
-            Func<Graph, string, T> getElement,
-            IGraphElementDiff diff,
-            GraphElementEqualityComparer<T> comparer,
-            out ISet<T> added,
-            out ISet<T> removed,
-            out ISet<T> changed,
-            out ISet<T> equal)
-           where T : GraphElement
+        (this Graph newGraph,
+         Graph oldGraph,
+         Func<Graph, IEnumerable<T>> getElements,
+         Func<Graph, string, T> getElement,
+         IGraphElementDiff diff,
+         GraphElementEqualityComparer<T> comparer,
+         out ISet<T> added,
+         out ISet<T> removed,
+         out ISet<T> changed,
+         out ISet<T> equal)
+            where T : GraphElement
         {
             IEnumerable<T> oldElements = oldGraph != null ? getElements(oldGraph).ToList() : null;
             IEnumerable<T> newElements = newGraph != null ? getElements(newGraph).ToList() : null;
@@ -141,6 +141,53 @@ namespace SEE.DataModel.DG
             where T : GraphElement
         {
             return modifiers.Aggregate(elements, (current, modifier) => modifier.Apply(current));
+        }
+
+        /// <summary>
+        /// Returns the graph elements that most closely match the given
+        /// <paramref name="path"/> and <paramref name="range"/>, ordered by descending specificity.
+        ///
+        /// If the <paramref name="range"/> is not given, we prefer file nodes
+        /// (as they most closely represent the file at the given path),
+        ///
+        /// If the <paramref name="range"/> is given, we prefer elements that have a source range
+        /// which contains the given range. If multiple elements have a source range that contains
+        /// the given range, we prefer the one with the fewest lines.
+        /// </summary>
+        /// <param name="graph">The graph to search in</param>
+        /// <param name="path">The path to search for</param>
+        /// <param name="range">The range to search for</param>
+        /// <returns>The graph elements that most closely match the given path and range</returns>
+        public static IOrderedEnumerable<GraphElement> FittingElements(this Graph graph, string path, Range range = null)
+        {
+            return graph.Elements().Where(e => e.Path() == path).OrderBy(OrderKey);
+
+            int OrderKey(GraphElement graphElement)
+            {
+                if (range != null && graphElement.SourceRange != null && graphElement.SourceRange.Contains(range))
+                {
+                    // The fewer lines there are (i.e., the more specific the element is), the higher this is ordered.
+                    // The 1_000_000 is just an arbitrary large number to make sure that the range is always preferred.
+                    return graphElement.SourceRange.Lines - 1_000_000;
+                }
+                else
+                {
+                    // We prefer file nodes (as they most closely represent the file at the given path),
+                    // but fall back to using more specific node kinds, as long as they have the same path.
+                    if (graphElement.Type == "File")
+                    {
+                        return 1;
+                    }
+                    else if (graphElement.SourceLine == null)
+                    {
+                        return 2;
+                    }
+                    else
+                    {
+                        return 3;
+                    }
+                }
+            }
         }
     }
 }

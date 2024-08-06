@@ -13,6 +13,11 @@ namespace SEE.Net.Actions.Drawable
     public class SurfaceNetAction : AbstractNetAction
     {
         /// <summary>
+        /// Should not be sent to newly connecting clients
+        /// </summary>
+        public override bool ShouldBeSentToNewClient { get => false; }
+
+        /// <summary>
         /// The configuration without drawable type objects
         /// </summary>
         public DrawableConfig DrawableConf;

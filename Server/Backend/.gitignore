@@ -27,9 +27,8 @@ replay_pid*
 
 .DS_Store
 
-/target/
-/.apt_generated/
-/.apt_generated_tests/
+target
+/server/target
 
 *.db
 filestorage
